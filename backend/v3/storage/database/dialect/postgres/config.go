@@ -34,7 +34,7 @@ type Config struct {
 	// // The value will be taken as is. Multiple options are space separated.
 	// Options string
 
-	configuredFields []string
+	// configuredFields []string
 }
 
 // Connect implements [database.Connector].

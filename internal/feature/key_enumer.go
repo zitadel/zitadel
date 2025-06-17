@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _KeyName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performanceweb_keydebug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
+const _KeyName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactions_deprecatedimproved_performanceweb_keydebug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
 
-var _KeyIndex = [...]uint16{0, 11, 28, 61, 81, 92, 106, 113, 133, 140, 163, 197, 221, 247, 255, 274, 297}
+var _KeyIndex = [...]uint16{0, 11, 28, 61, 81, 92, 106, 124, 144, 151, 174, 208, 232, 258, 266, 285, 308}
 
-const _KeyLowerName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performanceweb_keydebug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
+const _KeyLowerName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactions_deprecatedimproved_performanceweb_keydebug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
 
 func (i Key) String() string {
 	if i < 0 || i >= Key(len(_KeyIndex)-1) {
@@ -57,26 +57,26 @@ var _KeyNameToValueMap = map[string]Key{
 	_KeyLowerName[81:92]:   KeyUserSchema,
 	_KeyName[92:106]:       KeyTokenExchange,
 	_KeyLowerName[92:106]:  KeyTokenExchange,
-	_KeyName[106:113]:      KeyActionsDeprecated,
-	_KeyLowerName[106:113]: KeyActionsDeprecated,
-	_KeyName[113:133]:      KeyImprovedPerformance,
-	_KeyLowerName[113:133]: KeyImprovedPerformance,
-	_KeyName[133:140]:      KeyWebKey,
-	_KeyLowerName[133:140]: KeyWebKey,
-	_KeyName[140:163]:      KeyDebugOIDCParentError,
-	_KeyLowerName[140:163]: KeyDebugOIDCParentError,
-	_KeyName[163:197]:      KeyOIDCSingleV1SessionTermination,
-	_KeyLowerName[163:197]: KeyOIDCSingleV1SessionTermination,
-	_KeyName[197:221]:      KeyDisableUserTokenEvent,
-	_KeyLowerName[197:221]: KeyDisableUserTokenEvent,
-	_KeyName[221:247]:      KeyEnableBackChannelLogout,
-	_KeyLowerName[221:247]: KeyEnableBackChannelLogout,
-	_KeyName[247:255]:      KeyLoginV2,
-	_KeyLowerName[247:255]: KeyLoginV2,
-	_KeyName[255:274]:      KeyPermissionCheckV2,
-	_KeyLowerName[255:274]: KeyPermissionCheckV2,
-	_KeyName[274:297]:      KeyConsoleUseV2UserApi,
-	_KeyLowerName[274:297]: KeyConsoleUseV2UserApi,
+	_KeyName[106:124]:      KeyActionsDeprecated,
+	_KeyLowerName[106:124]: KeyActionsDeprecated,
+	_KeyName[124:144]:      KeyImprovedPerformance,
+	_KeyLowerName[124:144]: KeyImprovedPerformance,
+	_KeyName[144:151]:      KeyWebKey,
+	_KeyLowerName[144:151]: KeyWebKey,
+	_KeyName[151:174]:      KeyDebugOIDCParentError,
+	_KeyLowerName[151:174]: KeyDebugOIDCParentError,
+	_KeyName[174:208]:      KeyOIDCSingleV1SessionTermination,
+	_KeyLowerName[174:208]: KeyOIDCSingleV1SessionTermination,
+	_KeyName[208:232]:      KeyDisableUserTokenEvent,
+	_KeyLowerName[208:232]: KeyDisableUserTokenEvent,
+	_KeyName[232:258]:      KeyEnableBackChannelLogout,
+	_KeyLowerName[232:258]: KeyEnableBackChannelLogout,
+	_KeyName[258:266]:      KeyLoginV2,
+	_KeyLowerName[258:266]: KeyLoginV2,
+	_KeyName[266:285]:      KeyPermissionCheckV2,
+	_KeyLowerName[266:285]: KeyPermissionCheckV2,
+	_KeyName[285:308]:      KeyConsoleUseV2UserApi,
+	_KeyLowerName[285:308]: KeyConsoleUseV2UserApi,
 }
 
 var _KeyNames = []string{
@@ -86,16 +86,16 @@ var _KeyNames = []string{
 	_KeyName[61:81],
 	_KeyName[81:92],
 	_KeyName[92:106],
-	_KeyName[106:113],
-	_KeyName[113:133],
-	_KeyName[133:140],
-	_KeyName[140:163],
-	_KeyName[163:197],
-	_KeyName[197:221],
-	_KeyName[221:247],
-	_KeyName[247:255],
-	_KeyName[255:274],
-	_KeyName[274:297],
+	_KeyName[106:124],
+	_KeyName[124:144],
+	_KeyName[144:151],
+	_KeyName[151:174],
+	_KeyName[174:208],
+	_KeyName[208:232],
+	_KeyName[232:258],
+	_KeyName[258:266],
+	_KeyName[266:285],
+	_KeyName[285:308],
 }
 
 // KeyString retrieves an enum value from the enum constants string name.

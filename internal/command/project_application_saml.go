@@ -16,7 +16,7 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-35Fn0", "Errors.Project.App.Invalid")
 	}
 
-	if err := c.checkProjectExists(ctx, application.AggregateID, resourceOwner); err != nil {
+	if _, err := c.checkProjectExists(ctx, application.AggregateID, resourceOwner); err != nil {
 		return nil, err
 	}
 	addedApplication := NewSAMLApplicationWriteModel(application.AggregateID, resourceOwner)

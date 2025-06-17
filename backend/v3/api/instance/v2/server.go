@@ -1,19 +1,21 @@
 package v2
 
-import (
-	"github.com/zitadel/zitadel/backend/v3/telemetry/logging"
-	"github.com/zitadel/zitadel/backend/v3/telemetry/tracing"
-)
+// this file has been commented out to pass the linter
 
-var (
-	logger logging.Logger
-	tracer tracing.Tracer
-)
+// import (
+// 	"github.com/zitadel/zitadel/backend/v3/telemetry/logging"
+// 	"github.com/zitadel/zitadel/backend/v3/telemetry/tracing"
+// )
 
-func SetLogger(l logging.Logger) {
-	logger = l
-}
+// var (
+// 	logger logging.Logger
+// 	tracer tracing.Tracer
+// )
 
-func SetTracer(t tracing.Tracer) {
-	tracer = t
-}
+// func SetLogger(l logging.Logger) {
+// 	logger = l
+// }
+
+// func SetTracer(t tracing.Tracer) {
+// 	tracer = t
+// }

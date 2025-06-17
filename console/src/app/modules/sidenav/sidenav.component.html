@@ -28,6 +28,7 @@
           [attr.data-e2e]="'sidenav-element-' + setting.id"
         >
           <span>{{ setting.i18nKey | translate }}</span>
+          <span class="state" *ngIf="setting?.beta">{{ 'SETTINGS.BETA' | translate }}</span>
           <mat-icon *ngIf="setting.showWarn" class="warn-icon" svgIcon="mdi_shield_alert"></mat-icon>
         </button>
       </ng-container>

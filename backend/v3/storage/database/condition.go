@@ -20,7 +20,7 @@ func (a *and) Write(builder *StatementBuilder) {
 		if i > 0 {
 			builder.WriteString(" AND ")
 		}
-		condition.(Condition).Write(builder)
+		condition.Write(builder)
 	}
 }
 
@@ -45,7 +45,7 @@ func (o *or) Write(builder *StatementBuilder) {
 		if i > 0 {
 			builder.WriteString(" OR ")
 		}
-		condition.(Condition).Write(builder)
+		condition.Write(builder)
 	}
 }
 
@@ -85,7 +85,7 @@ func (i *isNotNull) Write(builder *StatementBuilder) {
 
 // IsNotNull creates a condition that checks if a column is NOT NULL.
 func IsNotNull(column Column) *isNotNull {
-	return &isNotNull{column: column.(Column)}
+	return &isNotNull{column: column}
 }
 
 var _ Condition = (*isNotNull)(nil)

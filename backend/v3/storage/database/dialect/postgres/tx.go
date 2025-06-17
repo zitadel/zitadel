@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v5"
 
@@ -25,7 +26,10 @@ func (tx *pgxTx) Rollback(ctx context.Context) error {
 // End implements [database.Transaction].
 func (tx *pgxTx) End(ctx context.Context, err error) error {
 	if err != nil {
-		tx.Rollback(ctx)
+		rollbackErr := tx.Rollback(ctx)
+		if rollbackErr != nil {
+			err = errors.Join(err, rollbackErr)
+		}
 		return err
 	}
 	return tx.Commit(ctx)

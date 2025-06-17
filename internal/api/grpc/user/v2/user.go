@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -117,7 +118,7 @@ func genderToDomain(gender user.Gender) domain.Gender {
 }
 
 func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserRequest) (_ *user.UpdateHumanUserResponse, err error) {
-	human, err := UpdateUserRequestToChangeHuman(req)
+	human, err := updateHumanUserRequestToChangeHuman(req)
 	if err != nil {
 		return nil, err
 	}
@@ -179,86 +180,6 @@ func ifNotNilPtr[v, p any](value *v, conv func(v) p) *p {
 	}
 	pVal := conv(*value)
 	return &pVal
-}
-
-func UpdateUserRequestToChangeHuman(req *user.UpdateHumanUserRequest) (*command.ChangeHuman, error) {
-	email, err := SetHumanEmailToEmail(req.Email, req.GetUserId())
-	if err != nil {
-		return nil, err
-	}
-	return &command.ChangeHuman{
-		ID:       req.GetUserId(),
-		Username: req.Username,
-		Profile:  SetHumanProfileToProfile(req.Profile),
-		Email:    email,
-		Phone:    SetHumanPhoneToPhone(req.Phone),
-		Password: SetHumanPasswordToPassword(req.Password),
-	}, nil
-}
-
-func SetHumanProfileToProfile(profile *user.SetHumanProfile) *command.Profile {
-	if profile == nil {
-		return nil
-	}
-	var firstName *string
-	if profile.GivenName != "" {
-		firstName = &profile.GivenName
-	}
-	var lastName *string
-	if profile.FamilyName != "" {
-		lastName = &profile.FamilyName
-	}
-	return &command.Profile{
-		FirstName:         firstName,
-		LastName:          lastName,
-		NickName:          profile.NickName,
-		DisplayName:       profile.DisplayName,
-		PreferredLanguage: ifNotNilPtr(profile.PreferredLanguage, language.Make),
-		Gender:            ifNotNilPtr(profile.Gender, genderToDomain),
-	}
-}
-
-func SetHumanEmailToEmail(email *user.SetHumanEmail, userID string) (*command.Email, error) {
-	if email == nil {
-		return nil, nil
-	}
-	var urlTemplate string
-	if email.GetSendCode() != nil && email.GetSendCode().UrlTemplate != nil {
-		urlTemplate = *email.GetSendCode().UrlTemplate
-		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, userID, "code", "orgID"); err != nil {
-			return nil, err
-		}
-	}
-	return &command.Email{
-		Address:     domain.EmailAddress(email.Email),
-		Verified:    email.GetIsVerified(),
-		ReturnCode:  email.GetReturnCode() != nil,
-		URLTemplate: urlTemplate,
-	}, nil
-}
-
-func SetHumanPhoneToPhone(phone *user.SetHumanPhone) *command.Phone {
-	if phone == nil {
-		return nil
-	}
-	return &command.Phone{
-		Number:     domain.PhoneNumber(phone.GetPhone()),
-		Verified:   phone.GetIsVerified(),
-		ReturnCode: phone.GetReturnCode() != nil,
-	}
-}
-
-func SetHumanPasswordToPassword(password *user.SetPassword) *command.Password {
-	if password == nil {
-		return nil
-	}
-	return &command.Password{
-		PasswordCode:        password.GetVerificationCode(),
-		OldPassword:         password.GetCurrentPassword(),
-		Password:            password.GetPassword().GetPassword(),
-		EncodedPasswordHash: password.GetHashedPassword().GetHash(),
-		ChangeRequired:      password.GetPassword().GetChangeRequired() || password.GetHashedPassword().GetChangeRequired(),
-	}
 }
 
 func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_ *user.DeleteUserResponse, err error) {
@@ -481,4 +402,26 @@ func (s *Server) HumanMFAInitSkipped(ctx context.Context, req *user.HumanMFAInit
 	return &user.HumanMFAInitSkippedResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
+}
+
+func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*user.CreateUserResponse, error) {
+	switch userType := req.GetUserType().(type) {
+	case *user.CreateUserRequest_Human_:
+		return s.createUserTypeHuman(ctx, userType.Human, req.OrganizationId, req.Username, req.UserId)
+	case *user.CreateUserRequest_Machine_:
+		return s.createUserTypeMachine(ctx, userType.Machine, req.OrganizationId, req.GetUsername(), req.GetUserId())
+	default:
+		return nil, zerrors.ThrowInternal(nil, "", "user type is not implemented")
+	}
+}
+
+func (s *Server) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (*user.UpdateUserResponse, error) {
+	switch userType := req.GetUserType().(type) {
+	case *user.UpdateUserRequest_Human_:
+		return s.updateUserTypeHuman(ctx, userType.Human, req.UserId, req.Username)
+	case *user.UpdateUserRequest_Machine_:
+		return s.updateUserTypeMachine(ctx, userType.Machine, req.UserId, req.Username)
+	default:
+		return nil, zerrors.ThrowUnimplemented(nil, "", "user type is not implemented")
+	}
 }

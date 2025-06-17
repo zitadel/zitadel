@@ -2,8 +2,12 @@ package notification
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -39,6 +43,9 @@ func Register(
 		queue.ShouldStart()
 	}
 
+	// make sure the slice does not contain old values
+	projections = nil
+
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	c := newChannels(q)
 	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl, notificationWorkerConfig, queue))
@@ -67,12 +74,34 @@ func Start(ctx context.Context) {
 	}
 }
 
+func SetCurrentState(ctx context.Context, es *eventstore.Eventstore) error {
+	if len(projections) == 0 {
+		return nil
+	}
+	position, err := es.LatestPosition(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxPosition).InstanceID(authz.GetInstance(ctx).InstanceID()).OrderDesc().Limit(1))
+	if err != nil {
+		return err
+	}
+
+	for i, projection := range projections {
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("set current state of notification projection")
+		_, err = projection.Trigger(ctx, handler.WithMinPosition(position))
+		if err != nil {
+			return err
+		}
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("current state of notification projection set")
+	}
+	return nil
+}
+
 func ProjectInstance(ctx context.Context) error {
-	for _, projection := range projections {
+	for i, projection := range projections {
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("starting notification projection")
 		_, err := projection.Trigger(ctx)
 		if err != nil {
 			return err
 		}
+		logging.WithFields("name", projection.ProjectionName(), "instance", authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("notification projection done")
 	}
 	return nil
 }

@@ -16,6 +16,7 @@ type Pool interface {
 
 type PoolTest interface {
 	Pool
+	// MigrateTest is the same as [Migrator] but executes the migrations multiple times instead of only once.
 	MigrateTest(ctx context.Context) error
 }
 
@@ -35,6 +36,7 @@ type Querier interface {
 }
 
 // Executor is a database client that can execute statements.
+// It returns the number of rows affected or an error
 type Executor interface {
 	Exec(ctx context.Context, stmt string, args ...any) (int64, error)
 }

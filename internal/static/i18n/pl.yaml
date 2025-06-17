@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Numer telefonu już zweryfikowany
       Empty: Numer telefonu jest pusty
       NotChanged: Numer telefonu nie zmieniony
+      VerifyingRemovalIsNotSupported: Usunięcie weryfikacji nie jest obsługiwane
     Address:
       NotFound: Adres nie znaleziony
       NotChanged: Adres nie zmieniony
@@ -536,6 +537,7 @@ Errors:
     StateMissing: Brak parametru stanu w żądaniu
     NotStarted: Intencja nie została rozpoczęta lub już się zakończyła
     NotSucceeded: intencja nie powiodła się
+    Expired: Intencja wygasła
     TokenCreationFailed: Tworzenie tokena nie powiodło się
     InvalidToken: Token intencji jest nieprawidłowy
     OtherUser: Intencja przeznaczona dla innego użytkownika
