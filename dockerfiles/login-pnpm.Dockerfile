@@ -6,8 +6,7 @@ RUN corepack enable && corepack prepare pnpm@9.1.2 --activate && \
     rm -rf /var/lib/apt/lists/*
 WORKDIR /build
 
-COPY \
-  turbo.json \
+COPY turbo.json \
   .npmrc \
   package.json \
   pnpm-lock.yaml \
