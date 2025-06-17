@@ -8,6 +8,10 @@ variable "BUILD_CACHE_KEY" {
   default = "local"
 }
 
+target "default" {
+  platforms = ["linux/amd64"]
+}
+
 target "login-pnpm" {
   cache-from = [
     { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:${BUILD_CACHE_KEY}" }

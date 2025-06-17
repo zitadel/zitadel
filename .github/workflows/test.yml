@@ -40,7 +40,6 @@ jobs:
         with:
           source: .
           targets: login-lint
-          provenance: false
           push: false
           files: |
             docker-bake.hcl
