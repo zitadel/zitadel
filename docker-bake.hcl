@@ -6,6 +6,7 @@ group "default" {
 
 target "login-pnpm" {
   dockerfile = "dockerfiles/login-pnpm.Dockerfile"
+  output = ["type=docker"]
 }
 
 target "login-dev-base" {
@@ -13,6 +14,7 @@ target "login-dev-base" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
+  output = ["type=docker"]
 }
 
 variable "LOGIN_LINT_TAG" {
@@ -25,6 +27,7 @@ target "login-lint" {
     login-dev-base = "target:login-dev-base"
   }
   tags = ["${LOGIN_LINT_TAG}"]
+  output = ["type=docker"]
 }
 
 variable "LOGIN_TEST_UNIT_TAG" {
