@@ -104,7 +104,7 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 	}
 }
 
-func TestServer_SetPassword(t *testing.T) {
+func TestServer_Deprecated_SetPassword(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		req *user.SetPasswordRequest

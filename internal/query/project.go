@@ -126,6 +126,10 @@ var (
 		name:  "project_grant_resource_owner",
 		table: grantedProjectsAlias,
 	}
+	grantedProjectColumnGrantID = Column{
+		name:  projection.ProjectGrantColumnGrantID,
+		table: grantedProjectsAlias,
+	}
 	grantedProjectColumnGrantedOrganization = Column{
 		name:  projection.ProjectGrantColumnGrantedOrgID,
 		table: grantedProjectsAlias,
@@ -155,20 +159,6 @@ func projectsCheckPermission(ctx context.Context, projects *Projects, permission
 
 func projectCheckPermission(ctx context.Context, resourceOwner string, projectID string, permissionCheck domain.PermissionCheck) error {
 	return permissionCheck(ctx, domain.PermissionProjectRead, resourceOwner, projectID)
-}
-
-func projectPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *ProjectAndGrantedProjectSearchQueries) sq.SelectBuilder {
-	if !enabled {
-		return query
-	}
-	join, args := PermissionClause(
-		ctx,
-		grantedProjectColumnResourceOwner,
-		domain.PermissionProjectRead,
-		SingleOrgPermissionOption(queries.Queries),
-		OwnedRowsPermissionOption(GrantedProjectColumnID),
-	)
-	return query.JoinClause(join, args...)
 }
 
 type Project struct {
@@ -221,7 +211,7 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -277,6 +267,20 @@ func (q *ProjectAndGrantedProjectSearchQueries) toQuery(query sq.SelectBuilder) 
 	return query
 }
 
+func projectPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *ProjectAndGrantedProjectSearchQueries) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		grantedProjectColumnResourceOwner,
+		domain.PermissionProjectRead,
+		SingleOrgPermissionOption(queries.Queries),
+		WithProjectsPermissionOption(GrantedProjectColumnID),
+	)
+	return query.JoinClause(join, args...)
+}
+
 func (q *Queries) SearchGrantedProjects(ctx context.Context, queries *ProjectAndGrantedProjectSearchQueries, permissionCheck domain.PermissionCheck) (*GrantedProjects, error) {
 	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
 	projects, err := q.searchGrantedProjects(ctx, queries, permissionCheckV2)
@@ -328,11 +332,11 @@ func NewGrantedProjectIDSearchQuery(ids []string) (SearchQuery, error) {
 }
 
 func NewGrantedProjectOrganizationIDSearchQuery(value string) (SearchQuery, error) {
-	project, err := NewTextQuery(grantedProjectColumnResourceOwner, value, TextEquals)
+	project, err := NewGrantedProjectResourceOwnerSearchQuery(value)
 	if err != nil {
 		return nil, err
 	}
-	grant, err := NewTextQuery(grantedProjectColumnGrantedOrganization, value, TextEquals)
+	grant, err := NewGrantedProjectGrantedOrganizationIDSearchQuery(value)
 	if err != nil {
 		return nil, err
 	}
@@ -494,6 +498,9 @@ type GrantedProjects struct {
 func grantedProjectsCheckPermission(ctx context.Context, grantedProjects *GrantedProjects, permissionCheck domain.PermissionCheck) {
 	grantedProjects.GrantedProjects = slices.DeleteFunc(grantedProjects.GrantedProjects,
 		func(grantedProject *GrantedProject) bool {
+			if grantedProject.GrantedOrgID != "" {
+				return projectGrantCheckPermission(ctx, grantedProject.ResourceOwner, grantedProject.ProjectID, grantedProject.GrantID, grantedProject.GrantedOrgID, permissionCheck) != nil
+			}
 			return projectCheckPermission(ctx, grantedProject.ResourceOwner, grantedProject.ProjectID, permissionCheck) != nil
 		},
 	)
@@ -513,6 +520,7 @@ type GrantedProject struct {
 	HasProjectCheck        bool
 	PrivateLabelingSetting domain.PrivateLabelingSetting
 
+	GrantID           string
 	GrantedOrgID      string
 	OrgName           string
 	ProjectGrantState domain.ProjectGrantState
@@ -531,6 +539,7 @@ func prepareGrantedProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*GrantedP
 			grantedProjectColumnProjectRoleCheck.identifier(),
 			grantedProjectColumnHasProjectCheck.identifier(),
 			grantedProjectColumnPrivateLabelingSetting.identifier(),
+			grantedProjectColumnGrantID.identifier(),
 			grantedProjectColumnGrantedOrganization.identifier(),
 			grantedProjectColumnGrantedOrganizationName.identifier(),
 			grantedProjectColumnGrantState.identifier(),
@@ -541,6 +550,7 @@ func prepareGrantedProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*GrantedP
 			projects := make([]*GrantedProject, 0)
 			var (
 				count             uint64
+				grantID           = sql.NullString{}
 				orgID             = sql.NullString{}
 				orgName           = sql.NullString{}
 				projectGrantState = sql.NullInt16{}
@@ -559,6 +569,7 @@ func prepareGrantedProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*GrantedP
 					&grantedProject.ProjectRoleCheck,
 					&grantedProject.HasProjectCheck,
 					&grantedProject.PrivateLabelingSetting,
+					&grantID,
 					&orgID,
 					&orgName,
 					&projectGrantState,
@@ -566,6 +577,9 @@ func prepareGrantedProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*GrantedP
 				)
 				if err != nil {
 					return nil, err
+				}
+				if grantID.Valid {
+					grantedProject.GrantID = grantID.String
 				}
 				if orgID.Valid {
 					grantedProject.GrantedOrgID = orgID.String
@@ -614,6 +628,7 @@ func prepareProjects() string {
 		ProjectColumnHasProjectCheck.identifier()+" AS "+grantedProjectColumnHasProjectCheck.name,
 		ProjectColumnPrivateLabelingSetting.identifier()+" AS "+grantedProjectColumnPrivateLabelingSetting.name,
 		"NULL::TEXT AS "+grantedProjectColumnGrantResourceOwner.name,
+		"NULL::TEXT AS "+grantedProjectColumnGrantID.name,
 		"NULL::TEXT AS "+grantedProjectColumnGrantedOrganization.name,
 		"NULL::TEXT AS "+grantedProjectColumnGrantedOrganizationName.name,
 		"NULL::SMALLINT AS "+grantedProjectColumnGrantState.name,
@@ -641,6 +656,7 @@ func prepareGrantedProjects() string {
 		ProjectColumnHasProjectCheck.identifier()+" AS "+grantedProjectColumnHasProjectCheck.name,
 		ProjectColumnPrivateLabelingSetting.identifier()+" AS "+grantedProjectColumnPrivateLabelingSetting.name,
 		ProjectGrantColumnResourceOwner.identifier()+" AS "+grantedProjectColumnGrantResourceOwner.name,
+		ProjectGrantColumnGrantID.identifier()+" AS "+grantedProjectColumnGrantID.name,
 		ProjectGrantColumnGrantedOrgID.identifier()+" AS "+grantedProjectColumnGrantedOrganization.name,
 		ProjectGrantColumnGrantedOrgName.identifier()+" AS "+grantedProjectColumnGrantedOrganizationName.name,
 		ProjectGrantColumnState.identifier()+" AS "+grantedProjectColumnGrantState.name,

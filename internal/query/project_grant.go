@@ -108,15 +108,23 @@ type ProjectGrantSearchQueries struct {
 func projectGrantsCheckPermission(ctx context.Context, projectGrants *ProjectGrants, permissionCheck domain.PermissionCheck) {
 	projectGrants.ProjectGrants = slices.DeleteFunc(projectGrants.ProjectGrants,
 		func(projectGrant *ProjectGrant) bool {
-			return projectGrantCheckPermission(ctx, projectGrant.ResourceOwner, projectGrant.GrantID, permissionCheck) != nil
+			return projectGrantCheckPermission(ctx, projectGrant.ResourceOwner, projectGrant.ProjectID, projectGrant.GrantID, projectGrant.GrantedOrgID, permissionCheck) != nil
 		},
 	)
 }
 
-func projectGrantCheckPermission(ctx context.Context, resourceOwner string, grantID string, permissionCheck domain.PermissionCheck) error {
-	return permissionCheck(ctx, domain.PermissionProjectGrantRead, resourceOwner, grantID)
+func projectGrantCheckPermission(ctx context.Context, resourceOwner, projectID, grantID, grantedOrgID string, permissionCheck domain.PermissionCheck) error {
+	if err := permissionCheck(ctx, domain.PermissionProjectGrantRead, resourceOwner, grantID); err != nil {
+		if err := permissionCheck(ctx, domain.PermissionProjectGrantRead, grantedOrgID, grantID); err != nil {
+			if err := permissionCheck(ctx, domain.PermissionProjectGrantRead, resourceOwner, projectID); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
+// TODO: add permission check on project grant level
 func projectGrantPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *ProjectGrantSearchQueries) sq.SelectBuilder {
 	if !enabled {
 		return query
@@ -126,7 +134,6 @@ func projectGrantPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, 
 		ProjectGrantColumnResourceOwner,
 		domain.PermissionProjectGrantRead,
 		SingleOrgPermissionOption(queries.Queries),
-		OwnedRowsPermissionOption(ProjectGrantColumnGrantID),
 	)
 	return query.JoinClause(join, args...)
 }
@@ -160,7 +167,7 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Nf93d", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Nf93d", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -182,7 +189,7 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-MO9fs", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-MO9fs", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {

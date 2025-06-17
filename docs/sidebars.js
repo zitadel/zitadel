@@ -807,18 +807,6 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Organization (Beta)",
-              link: {
-                type: "generated-index",
-                title: "Organization Service beta API",
-                slug: "/apis/resources/org_service/v2beta",
-                description:
-                  "This API is intended to manage organizations for ZITADEL. \n",
-              },
-              items: sidebar_api_org_service_v2beta,
-            },
-            {
-              type: "category",
               label: "Identity Provider",
               link: {
                 type: "generated-index",
@@ -867,35 +855,6 @@ module.exports = {
                     "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running Zitadel V3.",
               },
               items: sidebar_api_actions_v2,
-            },
-            {
-              type: "category",
-              label: "Project (Beta)",
-              link: {
-                type: "generated-index",
-                title: "Project Service API (Beta)",
-                slug: "/apis/resources/project_service_v2",
-                description:
-                  "This API is intended to manage projects and subresources for ZITADEL. \n"+
-                  "\n" +
-                  "This service is in beta state. It can AND will continue breaking until a stable version is released.",
-              },
-              items: sidebar_api_project_service_v2,
-              label: "Instance (Beta)",
-              link: {
-                type: "generated-index",
-                title: "Instance Service API (Beta)",
-                slug: "/apis/resources/instance_service_v2",
-                description:
-                    "This API is intended to manage instances, custom domains and trusted domains in ZITADEL.\n" +
-                    "\n" +
-                    "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
-                    "\n" +
-                    "This v2 of the API provides the same functionalities as the v1, but organised on a per resource basis.\n" +
-                    "The whole functionality related to domains (custom and trusted) has been moved under this instance API."
-                    ,
-              },
-              items: sidebar_api_instance_service_v2,
             },
           ],
         },

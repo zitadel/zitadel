@@ -118,6 +118,14 @@ func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, ph
 	return newUserV2WriteModel(userID, resourceOwner, opts...)
 }
 
+func NewUserMachineWriteModel(userID, resourceOwner string, metadataListWM bool) *UserV2WriteModel {
+	opts := []UserV2WMOption{WithMachine(), WithState()}
+	if metadataListWM {
+		opts = append(opts, WithMetadata())
+	}
+	return newUserV2WriteModel(userID, resourceOwner, opts...)
+}
+
 func newUserV2WriteModel(userID, resourceOwner string, opts ...UserV2WMOption) *UserV2WriteModel {
 	wm := &UserV2WriteModel{
 		WriteModel: eventstore.WriteModel{

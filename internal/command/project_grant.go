@@ -58,11 +58,11 @@ func (c *Commands) AddProjectGrant(ctx context.Context, grant *AddProjectGrant) 
 	if grant.ResourceOwner == "" {
 		grant.ResourceOwner = projectResourceOwner
 	}
-	if err := c.checkPermissionWriteProjectGrant(ctx, grant.ResourceOwner, grant.GrantID); err != nil {
+	if err := c.checkPermissionUpdateProjectGrant(ctx, grant.ResourceOwner, grant.AggregateID, grant.GrantID); err != nil {
 		return nil, err
 	}
 
-	wm := NewProjectGrantWriteModel(grant.GrantID, grant.AggregateID, grant.ResourceOwner)
+	wm := NewProjectGrantWriteModel(grant.GrantID, grant.GrantedOrgID, grant.AggregateID, grant.ResourceOwner)
 	// error if provided resourceowner is not equal to the resourceowner of the project or the project grant is for the same organization
 	if projectResourceOwner != wm.ResourceOwner || wm.ResourceOwner == grant.GrantedOrgID {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-ckUpbvboAH", "Errors.Project.Grant.Invalid")
@@ -83,19 +83,24 @@ func (c *Commands) AddProjectGrant(ctx context.Context, grant *AddProjectGrant) 
 type ChangeProjectGrant struct {
 	es_models.ObjectRoot
 
-	GrantID  string
-	RoleKeys []string
+	GrantID      string
+	GrantedOrgID string
+	RoleKeys     []string
 }
 
 func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *ChangeProjectGrant, cascadeUserGrantIDs ...string) (_ *domain.ObjectDetails, err error) {
-	if grant.GrantID == "" {
+	if grant.GrantID == "" && grant.GrantedOrgID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-1j83s", "Errors.IDMissing")
 	}
-	existingGrant, err := c.projectGrantWriteModelByID(ctx, grant.GrantID, grant.AggregateID, grant.ResourceOwner)
+	existingGrant, err := c.projectGrantWriteModelByID(ctx, grant.GrantID, grant.GrantedOrgID, grant.AggregateID, grant.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionWriteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.GrantID); err != nil {
+	if !existingGrant.State.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.Project.Grant.NotFound")
+	}
+
+	if err := c.checkPermissionUpdateProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.AggregateID, existingGrant.GrantID); err != nil {
 		return nil, err
 	}
 	projectResourceOwner, err := c.checkProjectGrantPreCondition(ctx, existingGrant.AggregateID, existingGrant.GrantedOrgID, existingGrant.ResourceOwner, grant.RoleKeys)
@@ -152,12 +157,12 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *ChangeProjectG
 }
 
 func (c *Commands) removeRoleFromProjectGrant(ctx context.Context, projectAgg *eventstore.Aggregate, projectID, projectGrantID, roleKey string, cascade bool) (_ eventstore.Command, _ *ProjectGrantWriteModel, err error) {
-	existingProjectGrant, err := c.projectGrantWriteModelByID(ctx, projectGrantID, projectID, "")
+	existingProjectGrant, err := c.projectGrantWriteModelByID(ctx, projectGrantID, "", projectID, "")
 	if err != nil {
 		return nil, nil, err
 	}
-	if existingProjectGrant.State == domain.ProjectGrantStateUnspecified || existingProjectGrant.State == domain.ProjectGrantStateRemoved {
-		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.Grant.NotFound")
+	if !existingProjectGrant.State.Exists() {
+		return nil, nil, zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.Project.Grant.NotFound")
 	}
 	keyExists := false
 	for i, key := range existingProjectGrant.RoleKeys {
@@ -172,7 +177,7 @@ func (c *Commands) removeRoleFromProjectGrant(ctx context.Context, projectAgg *e
 	if !keyExists {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5m8g9", "Errors.Project.Grant.RoleKeyNotFound")
 	}
-	changedProjectGrant := NewProjectGrantWriteModel(projectGrantID, projectID, existingProjectGrant.ResourceOwner)
+	changedProjectGrant := NewProjectGrantWriteModel(projectGrantID, projectID, "", existingProjectGrant.ResourceOwner)
 
 	if cascade {
 		return project.NewGrantCascadeChangedEvent(ctx, projectAgg, projectGrantID, existingProjectGrant.RoleKeys), changedProjectGrant, nil
@@ -181,8 +186,8 @@ func (c *Commands) removeRoleFromProjectGrant(ctx context.Context, projectAgg *e
 	return project.NewGrantChangedEvent(ctx, projectAgg, projectGrantID, existingProjectGrant.RoleKeys), changedProjectGrant, nil
 }
 
-func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantID, resourceOwner string) (details *domain.ObjectDetails, err error) {
-	if grantID == "" || projectID == "" {
+func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantID, grantedOrgID, resourceOwner string) (details *domain.ObjectDetails, err error) {
+	if (grantID == "" && grantedOrgID == "") || projectID == "" {
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-p0s4V", "Errors.IDMissing")
 	}
 
@@ -191,9 +196,12 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 		return nil, err
 	}
 
-	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, projectID, resourceOwner)
+	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, grantedOrgID, projectID, resourceOwner)
 	if err != nil {
 		return details, err
+	}
+	if !existingGrant.State.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.Project.Grant.NotFound")
 	}
 	// error if provided resourceowner is not equal to the resourceowner of the project
 	if projectResourceOwner != existingGrant.ResourceOwner {
@@ -207,13 +215,13 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	if existingGrant.State != domain.ProjectGrantStateActive {
 		return details, zerrors.ThrowPreconditionFailed(nil, "PROJECT-47fu8", "Errors.Project.Grant.NotActive")
 	}
-	if err := c.checkPermissionWriteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.GrantID); err != nil {
+	if err := c.checkPermissionUpdateProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.AggregateID, existingGrant.GrantID); err != nil {
 		return nil, err
 	}
 	pushedEvents, err := c.eventstore.Push(ctx,
 		project.NewGrantDeactivateEvent(ctx,
 			ProjectAggregateFromWriteModelWithCTX(ctx, &existingGrant.WriteModel),
-			grantID,
+			existingGrant.GrantID,
 		),
 	)
 	if err != nil {
@@ -226,8 +234,8 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	return writeModelToObjectDetails(&existingGrant.WriteModel), nil
 }
 
-func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantID, resourceOwner string) (details *domain.ObjectDetails, err error) {
-	if grantID == "" || projectID == "" {
+func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantID, grantedOrgID, resourceOwner string) (details *domain.ObjectDetails, err error) {
+	if (grantID == "" && grantedOrgID == "") || projectID == "" {
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-p0s4V", "Errors.IDMissing")
 	}
 
@@ -236,9 +244,12 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 		return nil, err
 	}
 
-	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, projectID, resourceOwner)
+	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, grantedOrgID, projectID, resourceOwner)
 	if err != nil {
 		return details, err
+	}
+	if !existingGrant.State.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.Project.Grant.NotFound")
 	}
 	// error if provided resourceowner is not equal to the resourceowner of the project
 	if projectResourceOwner != existingGrant.ResourceOwner {
@@ -252,13 +263,13 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 	if existingGrant.State != domain.ProjectGrantStateInactive {
 		return details, zerrors.ThrowPreconditionFailed(nil, "PROJECT-47fu8", "Errors.Project.Grant.NotInactive")
 	}
-	if err := c.checkPermissionWriteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.GrantID); err != nil {
+	if err := c.checkPermissionUpdateProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.AggregateID, existingGrant.GrantID); err != nil {
 		return nil, err
 	}
 	pushedEvents, err := c.eventstore.Push(ctx,
 		project.NewGrantReactivatedEvent(ctx,
 			ProjectAggregateFromWriteModelWithCTX(ctx, &existingGrant.WriteModel),
-			grantID,
+			existingGrant.GrantID,
 		),
 	)
 	if err != nil {
@@ -271,25 +282,25 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 	return writeModelToObjectDetails(&existingGrant.WriteModel), nil
 }
 
+// Deprecated: use commands.DeleteProjectGrant
 func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, resourceOwner string, cascadeUserGrantIDs ...string) (details *domain.ObjectDetails, err error) {
 	if grantID == "" || projectID == "" {
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-1m9fJ", "Errors.IDMissing")
 	}
-	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, projectID, resourceOwner)
+	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, "", projectID, resourceOwner)
 	if err != nil {
 		return details, err
 	}
-	// return if project grant does not exist, or was removed already
 	if !existingGrant.State.Exists() {
-		return writeModelToObjectDetails(&existingGrant.WriteModel), nil
+		return nil, zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.Project.Grant.NotFound")
 	}
-	if err := c.checkPermissionDeleteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.GrantID); err != nil {
+	if err := c.checkPermissionDeleteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.AggregateID, existingGrant.GrantID); err != nil {
 		return nil, err
 	}
 	events := make([]eventstore.Command, 0)
 	events = append(events, project.NewGrantRemovedEvent(ctx,
 		ProjectAggregateFromWriteModelWithCTX(ctx, &existingGrant.WriteModel),
-		grantID,
+		existingGrant.GrantID,
 		existingGrant.GrantedOrgID,
 	),
 	)
@@ -297,7 +308,7 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 	for _, userGrantID := range cascadeUserGrantIDs {
 		event, _, err := c.removeUserGrant(ctx, userGrantID, "", true)
 		if err != nil {
-			logging.LogWithFields("COMMAND-3m8sG", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
+			logging.WithFields("id", "COMMAND-3m8sG", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
 		events = append(events, event)
@@ -313,24 +324,57 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 	return writeModelToObjectDetails(&existingGrant.WriteModel), nil
 }
 
-func (c *Commands) checkPermissionDeleteProjectGrant(ctx context.Context, resourceOwner, projectGrantID string) error {
-	return c.checkPermission(ctx, domain.PermissionProjectGrantDelete, resourceOwner, projectGrantID)
+func (c *Commands) DeleteProjectGrant(ctx context.Context, projectID, grantID, grantedOrgID, resourceOwner string, cascadeUserGrantIDs ...string) (details *domain.ObjectDetails, err error) {
+	if (grantID == "" && grantedOrgID == "") || projectID == "" {
+		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-1m9fJ", "Errors.IDMissing")
+	}
+	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, grantedOrgID, projectID, resourceOwner)
+	if err != nil {
+		return details, err
+	}
+	// return if project grant does not exist, or was removed already
+	if !existingGrant.State.Exists() {
+		return writeModelToObjectDetails(&existingGrant.WriteModel), nil
+	}
+	if err := c.checkPermissionDeleteProjectGrant(ctx, existingGrant.ResourceOwner, existingGrant.AggregateID, existingGrant.GrantID); err != nil {
+		return nil, err
+	}
+	events := make([]eventstore.Command, 0)
+	events = append(events, project.NewGrantRemovedEvent(ctx,
+		ProjectAggregateFromWriteModelWithCTX(ctx, &existingGrant.WriteModel),
+		existingGrant.GrantID,
+		existingGrant.GrantedOrgID,
+	),
+	)
+
+	for _, userGrantID := range cascadeUserGrantIDs {
+		event, _, err := c.removeUserGrant(ctx, userGrantID, "", true)
+		if err != nil {
+			logging.WithFields("id", "COMMAND-3m8sG", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
+			continue
+		}
+		events = append(events, event)
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingGrant, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingGrant.WriteModel), nil
 }
 
-func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, projectID, resourceOwner string) (member *ProjectGrantWriteModel, err error) {
+func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, grantedOrgID, projectID, resourceOwner string) (member *ProjectGrantWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewProjectGrantWriteModel(grantID, projectID, resourceOwner)
+	writeModel := NewProjectGrantWriteModel(grantID, grantedOrgID, projectID, resourceOwner)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
-
-	if writeModel.State == domain.ProjectGrantStateUnspecified || writeModel.State == domain.ProjectGrantStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.Project.Grant.NotFound")
-	}
-
 	return writeModel, nil
 }
 

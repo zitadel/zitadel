@@ -54,7 +54,11 @@ type orgSetupCommands struct {
 
 type CreatedOrg struct {
 	ObjectDetails *domain.ObjectDetails
-	CreatedAdmins []*CreatedOrgAdmin
+	OrgAdmins     []OrgAdmin
+}
+
+type OrgAdmin interface {
+	GetID() string
 }
 
 type CreatedOrgAdmin struct {
@@ -63,6 +67,18 @@ type CreatedOrgAdmin struct {
 	PhoneCode  *string
 	PAT        *PersonalAccessToken
 	MachineKey *MachineKey
+}
+
+func (a *CreatedOrgAdmin) GetID() string {
+	return a.ID
+}
+
+type AssignedOrgAdmin struct {
+	ID string
+}
+
+func (a *AssignedOrgAdmin) GetID() string {
+	return a.ID
 }
 
 func (o *OrgSetup) Validate() (err error) {
@@ -188,14 +204,15 @@ func (c *orgSetupCommands) push(ctx context.Context) (_ *CreatedOrg, err error) 
 			EventDate:     events[len(events)-1].CreatedAt(),
 			ResourceOwner: c.aggregate.ID,
 		},
-		CreatedAdmins: c.createdAdmins(),
+		OrgAdmins: c.createdAdmins(),
 	}, nil
 }
 
-func (c *orgSetupCommands) createdAdmins() []*CreatedOrgAdmin {
-	users := make([]*CreatedOrgAdmin, 0, len(c.admins))
+func (c *orgSetupCommands) createdAdmins() []OrgAdmin {
+	users := make([]OrgAdmin, 0, len(c.admins))
 	for _, admin := range c.admins {
 		if admin.ID != "" && admin.Human == nil {
+			users = append(users, &AssignedOrgAdmin{ID: admin.ID})
 			continue
 		}
 		if admin.Human != nil {
@@ -300,7 +317,7 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 	return nil
 }
 
-func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner, orgID string, claimedUserIDs []string) (_ *domain.Org, err error) {
+func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner, orgID string, setOrgInactive bool, claimedUserIDs []string) (_ *domain.Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -312,7 +329,7 @@ func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner
 		return nil, zerrors.ThrowNotFound(nil, "ORG-lapo2m", "Errors.Org.AlreadyExisting")
 	}
 
-	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, claimedUserIDs)
+	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, setOrgInactive, claimedUserIDs)
 }
 
 func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner string, claimedUserIDs []string) (*domain.Org, error) {
@@ -325,10 +342,10 @@ func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner strin
 		return nil, zerrors.ThrowInternal(err, "COMMA-OwciI", "Errors.Internal")
 	}
 
-	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, claimedUserIDs)
+	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, false, claimedUserIDs)
 }
 
-func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, resourceOwner, orgID string, claimedUserIDs []string) (_ *domain.Org, err error) {
+func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, resourceOwner, orgID string, setOrgInactive bool, claimedUserIDs []string) (_ *domain.Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -346,10 +363,15 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 		return nil, err
 	}
 	events = append(events, orgMemberEvent)
+	if setOrgInactive {
+		deactivateOrgEvent := org.NewOrgDeactivatedEvent(ctx, orgAgg)
+		events = append(events, deactivateOrgEvent)
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
+
 	err = AppendAndReduce(addedOrg, pushedEvents...)
 	if err != nil {
 		return nil, err

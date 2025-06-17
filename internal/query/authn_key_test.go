@@ -20,6 +20,7 @@ import (
 
 var (
 	prepareAuthNKeysStmt = `SELECT projections.authn_keys2.id,` +
+		` projections.authn_keys2.aggregate_id,` +
 		` projections.authn_keys2.creation_date,` +
 		` projections.authn_keys2.change_date,` +
 		` projections.authn_keys2.resource_owner,` +
@@ -30,6 +31,7 @@ var (
 		` FROM projections.authn_keys2`
 	prepareAuthNKeysCols = []string{
 		"id",
+		"aggregate_id",
 		"creation_date",
 		"change_date",
 		"resource_owner",
@@ -121,6 +123,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"id",
+							"aggId",
 							testNow,
 							testNow,
 							"ro",
@@ -138,6 +141,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 				AuthNKeys: []*AuthNKey{
 					{
 						ID:            "id",
+						AggregateID:   "aggId",
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						ResourceOwner: "ro",
@@ -158,6 +162,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"id-1",
+							"aggId-1",
 							testNow,
 							testNow,
 							"ro",
@@ -167,6 +172,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 						},
 						{
 							"id-2",
+							"aggId-2",
 							testNow,
 							testNow,
 							"ro",
@@ -184,6 +190,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 				AuthNKeys: []*AuthNKey{
 					{
 						ID:            "id-1",
+						AggregateID:   "aggId-1",
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						ResourceOwner: "ro",
@@ -193,6 +200,7 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 					},
 					{
 						ID:            "id-2",
+						AggregateID:   "aggId-2",
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						ResourceOwner: "ro",
