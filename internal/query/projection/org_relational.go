@@ -4,7 +4,6 @@ import (
 	"context"
 
 	repoDomain "github.com/zitadel/zitadel/backend/v3/domain"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -137,7 +136,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalReactivated(event eventstor
 	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(State, domain.OrgStateActive),
+			handler.NewCol(State, repoDomain.Active),
 			handler.NewCol(UpdatedAt, e.CreationDate()),
 		},
 		[]handler.Condition{

@@ -329,6 +329,7 @@ func (i *Instance) CreateOrganization(ctx context.Context, name, adminEmail stri
 }
 
 func (i *Instance) DeactivateOrganization(ctx context.Context, orgID string) *mgmt.DeactivateOrgResponse {
+	//nolint
 	resp, err := i.Client.Mgmt.DeactivateOrg(
 		SetOrgID(ctx, orgID),
 		&mgmt.DeactivateOrgRequest{},
@@ -338,6 +339,7 @@ func (i *Instance) DeactivateOrganization(ctx context.Context, orgID string) *mg
 }
 
 func (i *Instance) ReactivateOrganization(ctx context.Context, orgID string) *mgmt.ReactivateOrgResponse {
+	//nolint
 	resp, err := i.Client.Mgmt.ReactivateOrg(
 		SetOrgID(ctx, orgID),
 		&mgmt.ReactivateOrgRequest{},
@@ -347,11 +349,12 @@ func (i *Instance) ReactivateOrganization(ctx context.Context, orgID string) *mg
 }
 
 func (i *Instance) RemoveOrganization(ctx context.Context, orgID string) *mgmt.RemoveOrgResponse {
+	//nolint
 	resp, err := i.Client.Mgmt.RemoveOrg(
 		SetOrgID(ctx, orgID),
 		&mgmt.RemoveOrgRequest{},
 	)
-	logging.OnError(err).Fatal("reactivate org")
+	logging.OnError(err).Fatal("remove org")
 	return resp
 }
 

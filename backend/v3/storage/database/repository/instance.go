@@ -255,4 +255,3 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 
 	return instances, nil
 }
-

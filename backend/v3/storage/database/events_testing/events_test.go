@@ -10,6 +10,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/internal/integration"
@@ -17,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
+
 const ConnString = "host=localhost port=5432 user=zitadel dbname=zitadel sslmode=disable"
 
 var (

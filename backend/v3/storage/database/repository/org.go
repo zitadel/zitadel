@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
@@ -37,7 +38,7 @@ func (o *org) Get(ctx context.Context, opts ...database.Condition) (*domain.Orga
 
 	builder.WriteString(queryOrganizationStmt)
 
-	// return only non deleted isntances
+	// return only non deleted instanes
 	opts = append(opts, database.IsNull(o.DeletedAtColumn()))
 	andCondition := database.And(opts...)
 	o.writeCondition(&builder, andCondition)
@@ -51,7 +52,7 @@ func (o *org) List(ctx context.Context, opts ...database.Condition) ([]*domain.O
 
 	builder.WriteString(queryOrganizationStmt)
 
-	// return only non deleted isntances
+	// return only non deleted instanes
 	opts = append(opts, database.IsNull(o.DeletedAtColumn()))
 	andCondition := database.And(opts...)
 	o.writeCondition(&builder, andCondition)
