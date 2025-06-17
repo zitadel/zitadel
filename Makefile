@@ -2,7 +2,6 @@ XDG_CACHE_HOME ?= $(HOME)/.cache
 export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 
 export LOGIN_TAG ?= login:local
-export LOGIN_LINT_TAG := login-lint:local
 export LOGIN_TEST_UNIT_TAG := login-test-unit:local
 export LOGIN_TEST_INTEGRATION_TAG ?= login-test-integration:local
 export LOGIN_TEST_ACCEPTANCE_TAG := login-test-acceptance:local

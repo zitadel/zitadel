@@ -17,7 +17,6 @@ jobs:
           install: true
           driver: docker-container
           use: true
-      - run: ls -la turbo.json   .npmrc   package.json   pnpm-lock.yaml   pnpm-workspace.yaml
       - name: Build
         uses: docker/bake-action@v6
         with:
@@ -25,7 +24,4 @@ jobs:
           push: false
           builder: ${{ steps.buildx.outputs.name }}
           load: true
-          set: |
-            *.cache-from=type=gha
-            *.cache-to=type=gha,mode=max
           targets: login-lint

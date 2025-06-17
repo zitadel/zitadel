@@ -4,18 +4,17 @@ group "default" {
   ]
 }
 
-variable "LOGIN_PNPM_TAG" {
-  default = "login-pnpm:local"
+variable "REGISTRY" {
+  default = "ghcr.io/zitadel"
+}
+
+variable "GITHUB_REF_NAME" {
+  default = "local"
 }
 
 target "login-pnpm" {
   context = "."
   dockerfile = "dockerfiles/login-pnpm.Dockerfile"
-  tags = ["${LOGIN_PNPM_TAG}"]
-}
-
-variable "LOGIN_DEV_BASE_TAG" {
-  default = "login-dev-base:local"
 }
 
 target "login-dev-base" {
@@ -24,11 +23,6 @@ target "login-dev-base" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-  tags = ["${LOGIN_DEV_BASE_TAG}"]
-}
-
-variable "LOGIN_LINT_TAG" {
-  default = "login-lint:local"
 }
 
 target "login-lint" {
@@ -37,7 +31,11 @@ target "login-lint" {
   contexts = {
     login-dev-base = "target:login-dev-base"
   }
-  tags = ["${LOGIN_LINT_TAG}"]
+  cache-from = [
+    "type=registry,ref=${REGISTRY}/login-lint-buildcache:${GITHUB_REF_NAME}",
+    "type=registry,ref=${REGISTRY}/login-lint-buildcache:main"
+  ]
+  cache-to = ["type=registry,ref=${REGISTRY}/login-lint-buildcache:${GITHUB_REF_NAME},mode=max"]
 }
 
 variable "LOGIN_TEST_UNIT_TAG" {
