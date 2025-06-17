@@ -50,7 +50,7 @@ func (s *Server) CreateAdministrator(ctx context.Context, req *internal_permissi
 			creationDate = timestamppb.New(member.EventDate)
 		}
 	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-TODO", "Errors.Invalid.Argument")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-IbPp47HDP5", "Errors.Invalid.Argument")
 	}
 
 	return &internal_permission.CreateAdministratorResponse{
@@ -130,7 +130,7 @@ func (s *Server) UpdateAdministrator(ctx context.Context, req *internal_permissi
 			changeDate = timestamppb.New(member.EventDate)
 		}
 	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-TODO", "Errors.Invalid.Argument")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-i0V2IbdloZ", "Errors.Invalid.Argument")
 	}
 
 	return &internal_permission.UpdateAdministratorResponse{
@@ -210,7 +210,7 @@ func (s *Server) DeleteAdministrator(ctx context.Context, req *internal_permissi
 			deletionDate = timestamppb.New(member.EventDate)
 		}
 	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-TODO", "Errors.Invalid.Argument")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-3UOjLtuohh", "Errors.Invalid.Argument")
 	}
 
 	return &internal_permission.DeleteAdministratorResponse{

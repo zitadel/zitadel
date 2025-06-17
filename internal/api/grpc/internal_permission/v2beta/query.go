@@ -41,17 +41,14 @@ func (s *Server) listAdministratorsRequestToModel(req *internal_permission.ListA
 			Offset:        offset,
 			Limit:         limit,
 			Asc:           asc,
-			SortingColumn: administratorFieldNameToSortingColumn(req.SortingColumn),
+			SortingColumn: administratorFieldNameToSortingColumn(req.GetSortingColumn()),
 		},
 		Queries: queries,
 	}, nil
 }
 
-func administratorFieldNameToSortingColumn(field *internal_permission.AdministratorFieldName) query.Column {
-	if field == nil {
-		return query.MembershipCreationDate
-	}
-	switch *field {
+func administratorFieldNameToSortingColumn(field internal_permission.AdministratorFieldName) query.Column {
+	switch field {
 	case internal_permission.AdministratorFieldName_ADMINISTRATOR_FIELD_NAME_CREATION_DATE:
 		return query.MembershipCreationDate
 	case internal_permission.AdministratorFieldName_ADMINISTRATOR_FIELD_NAME_USER_ID:

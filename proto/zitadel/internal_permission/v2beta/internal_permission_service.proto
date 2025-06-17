@@ -19,9 +19,9 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2b
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "Project Service";
+    title: "Internal Permission Service";
     version: "2.0-beta";
-    description: "This API is intended to manage Projects in a ZITADEL Organization. This service is in beta state. It can AND will continue breaking until a stable version is released.";
+    description: "This API is intended to manage internal permissions in ZITADEL. This service is in beta state. It can AND will continue breaking until a stable version is released.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -119,7 +119,6 @@ service InternalPermissionService {
   //   - "org.member.read" for organization administrators
   //   - "project.member.read" for project administrators
   //   - "project.grant.member.read" for project grant administrators
-  //   - "user.membership.read" TODO: only this required?
   //   - no permissions required for listing own administrator roles
   rpc ListAdministrators(ListAdministratorsRequest) returns (ListAdministratorsResponse) {
     option (google.api.http) = {
@@ -156,7 +155,6 @@ service InternalPermissionService {
   //   - "org.member.read" for organization administrators
   //   - "project.member.read" for project administrators
   //   - "project.grant.member.read" for project grant administrators
-  //   - "user.membership.read" TODO: only this required?
   //   - no permissions required for getting own administrator roles
   rpc GetAdministrator(GetAdministratorRequest) returns (GetAdministratorResponse) {
     option (google.api.http) = {

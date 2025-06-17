@@ -19,9 +19,9 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/project/v2beta;project"
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "Internal Permission Service";
+    title: "Project Service";
     version: "2.0-beta";
-    description: "This API is intended to manage internal permissions in ZITADEL. This service is in beta state. It can AND will continue breaking until a stable version is released.";
+    description: "This API is intended to manage Projects in a ZITADEL Organization. This service is in beta state. It can AND will continue breaking until a stable version is released.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
