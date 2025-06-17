@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS projections.hosted_login_translations (
     creation_date TIMESTAMPTZ NOT NULL,
     change_date TIMESTAMPTZ,
     sequence BIGINT NOT NULL,
-    locale TEXT NOT NULL CHECK (LENGTH(TRIM(locale)) = 2),
+    locale TEXT NOT NULL CHECK (LENGTH(TRIM(locale)) >= 2),
     file JSONB NOT NULL DEFAULT '{}',
 
     PRIMARY KEY (instance_id, aggregate_id, aggregate_type, locale)

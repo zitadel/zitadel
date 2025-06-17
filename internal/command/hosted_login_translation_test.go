@@ -31,7 +31,7 @@ func TestSetTranslationEvents(t *testing.T) {
 		testName string
 
 		inputAggregate    eventstore.Aggregate
-		inputLanguage     language.Base
+		inputLanguage     language.Tag
 		inputTranslations map[string]any
 
 		expectedCommands   []eventstore.Command
@@ -41,10 +41,10 @@ func TestSetTranslationEvents(t *testing.T) {
 		{
 			testName:          "when aggregate type is instance should return matching write model and instance.hosted_login_translation_set event",
 			inputAggregate:    eventstore.Aggregate{ID: "123", Type: instance.AggregateType},
-			inputLanguage:     language.MustParseBase("en"),
+			inputLanguage:     language.MustParse("en-US"),
 			inputTranslations: map[string]any{"test": "translation"},
 			expectedCommands: []eventstore.Command{
-				instance.NewHostedLoginTranslationSetEvent(testCtx, &eventstore.Aggregate{ID: "123", Type: instance.AggregateType}, map[string]any{"test": "translation"}, "en"),
+				instance.NewHostedLoginTranslationSetEvent(testCtx, &eventstore.Aggregate{ID: "123", Type: instance.AggregateType}, map[string]any{"test": "translation"}, "en-US"),
 			},
 			expectedWriteModel: &HostedLoginTranslationWriteModel{
 				WriteModel: eventstore.WriteModel{AggregateID: "123", ResourceOwner: "123"},
@@ -53,10 +53,10 @@ func TestSetTranslationEvents(t *testing.T) {
 		{
 			testName:          "when aggregate type is org should return matching write model and org.hosted_login_translation_set event",
 			inputAggregate:    eventstore.Aggregate{ID: "123", Type: org.AggregateType},
-			inputLanguage:     language.MustParseBase("en"),
+			inputLanguage:     language.MustParse("en-GB"),
 			inputTranslations: map[string]any{"test": "translation"},
 			expectedCommands: []eventstore.Command{
-				org.NewHostedLoginTranslationSetEvent(testCtx, &eventstore.Aggregate{ID: "123", Type: org.AggregateType}, map[string]any{"test": "translation"}, "en"),
+				org.NewHostedLoginTranslationSetEvent(testCtx, &eventstore.Aggregate{ID: "123", Type: org.AggregateType}, map[string]any{"test": "translation"}, "en-GB"),
 			},
 			expectedWriteModel: &HostedLoginTranslationWriteModel{
 				WriteModel: eventstore.WriteModel{AggregateID: "123", ResourceOwner: "123"},
@@ -65,7 +65,7 @@ func TestSetTranslationEvents(t *testing.T) {
 		{
 			testName:          "when aggregate type is neither org nor instance should return invalid argument error",
 			inputAggregate:    eventstore.Aggregate{ID: "123"},
-			inputLanguage:     language.MustParseBase("en"),
+			inputLanguage:     language.MustParse("en-US"),
 			inputTranslations: map[string]any{"test": "translation"},
 			expectedError:     zerrors.ThrowInvalidArgument(nil, "COMMA-0aw7In", "Errors.Arguments.LevelType.Invalid"),
 		},
@@ -149,7 +149,7 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 						Version:       instance.AggregateVersion,
 					},
 					testTranslation,
-					"it",
+					"it-CH",
 				),
 			)),
 
@@ -174,7 +174,7 @@ func TestSetHostedLoginTranslation(t *testing.T) {
 						Version:       org.AggregateVersion,
 					},
 					testTranslation,
-					"it",
+					"it-CH",
 				),
 			)),
 

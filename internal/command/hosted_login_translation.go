@@ -31,13 +31,12 @@ func (c *Commands) SetHostedLoginTranslation(ctx context.Context, req *settings.
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-YB6Sri", "Errors.Arguments.Level.Invalid")
 	}
 
-	lang, err := language.BCP47.Parse(req.GetLocale())
+	lang, err := language.Parse(req.GetLocale())
 	if err != nil || lang.IsRoot() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-xmjATA", "Errors.Arguments.Locale.Invalid")
 	}
-	baseLang, _ := lang.Base()
 
-	commands, wm, err := c.setTranslationEvents(ctx, agg, baseLang, req.GetTranslations().AsMap())
+	commands, wm, err := c.setTranslationEvents(ctx, agg, lang, req.GetTranslations().AsMap())
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +62,7 @@ func (c *Commands) SetHostedLoginTranslation(ctx context.Context, req *settings.
 	}, nil
 }
 
-func (c *Commands) setTranslationEvents(ctx context.Context, agg eventstore.Aggregate, lang language.Base, translations map[string]any) ([]eventstore.Command, *HostedLoginTranslationWriteModel, error) {
+func (c *Commands) setTranslationEvents(ctx context.Context, agg eventstore.Aggregate, lang language.Tag, translations map[string]any) ([]eventstore.Command, *HostedLoginTranslationWriteModel, error) {
 	wm := NewHostedLoginTranslationWriteModel(agg.ID)
 	events := []eventstore.Command{}
 	switch agg.Type {
