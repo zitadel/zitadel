@@ -1,6 +1,5 @@
 <cnsl-refresh-table [hideRefresh]="true" [loading]="listOrganizationsQuery.isPending()">
-  <cnsl-filter-org actions (filterChanged)="applySearchQuery($any($event), paginator)">
-  </cnsl-filter-org>
+  <cnsl-filter-org actions (filterChanged)="applySearchQuery($any($event), paginator)"> </cnsl-filter-org>
 
   <ng-template actions cnslHasRole [hasRole]="['org.create', 'iam.write']">
     <a [routerLink]="['/orgs', 'create']" color="primary" mat-raised-button>
