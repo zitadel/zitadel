@@ -9,11 +9,16 @@ import (
 )
 
 type Instance struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
-	DeletedAt time.Time `json:"-"`
+	ID              string     `json:"id,omitempty" db:"id"`
+	Name            string     `json:"name,omitempty" db:"name"`
+	DefaultOrgID    string     `json:"defaultOrgId,omitempty" db:"default_org_id"`
+	IAMProjectID    string     `json:"iamProjectId,omitempty" db:"iam_project_id"`
+	ConsoleClientID string     `json:"consoleClientId,omitempty" db:"console_client_id"`
+	ConsoleAppID    string     `json:"consoleAppId,omitempty" db:"console_app_id"`
+	DefaultLanguage string     `json:"defaultLanguage,omitempty" db:"default_language"`
+	CreatedAt       time.Time  `json:"createdAt" db:"created_at"`
+	UpdatedAt       time.Time  `json:"updatedAt" db:"updated_at"`
+	DeletedAt       *time.Time `json:"deletedAt" db:"deleted_at"`
 }
 
 type instanceCacheIndex uint8
@@ -39,6 +44,16 @@ type instanceColumns interface {
 	IDColumn() database.Column
 	// NameColumn returns the column for the name field.
 	NameColumn() database.Column
+	// DefaultOrgIDColumn returns the column for the default org id field
+	DefaultOrgIDColumn() database.Column
+	// IAMProjectIDColumn returns the column for the default IAM org id field
+	IAMProjectIDColumn() database.Column
+	// ConsoleClientIDColumn returns the column for the default IAM org id field
+	ConsoleClientIDColumn() database.Column
+	// ConsoleAppIDColumn returns the column for the console client id field
+	ConsoleAppIDColumn() database.Column
+	// DefaultLanguageColumn returns the column for the default language field
+	DefaultLanguageColumn() database.Column
 	// CreatedAtColumn returns the column for the created at field.
 	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
@@ -67,13 +82,15 @@ type InstanceRepository interface {
 	instanceConditions
 	instanceChanges
 
+	// TODO
 	// Member returns the member repository which is a sub repository of the instance repository.
-	Member() MemberRepository
+	// Member() MemberRepository
 
-	Get(ctx context.Context, opts ...database.QueryOption) (*Instance, error)
+	Get(ctx context.Context, opts ...database.Condition) (*Instance, error)
+	List(ctx context.Context, opts ...database.Condition) ([]*Instance, error)
 
 	Create(ctx context.Context, instance *Instance) error
-	Update(ctx context.Context, condition database.Condition, changes ...database.Change) error
+	Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, condition database.Condition) error
 }
 

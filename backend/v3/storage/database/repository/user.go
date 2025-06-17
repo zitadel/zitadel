@@ -47,13 +47,14 @@ func (u *user) List(ctx context.Context, opts ...database.QueryOption) (users []
 		opt(options)
 	}
 
-	u.builder.WriteString(queryUserStmt)
-	options.WriteCondition(&u.builder)
-	options.WriteOrderBy(&u.builder)
-	options.WriteLimit(&u.builder)
-	options.WriteOffset(&u.builder)
+	builder := database.StatementBuilder{}
+	builder.WriteString(queryUserStmt)
+	options.WriteCondition(&builder)
+	options.WriteOrderBy(&builder)
+	options.WriteLimit(&builder)
+	options.WriteOffset(&builder)
 
-	rows, err := u.client.Query(ctx, u.builder.String(), u.builder.Args()...)
+	rows, err := u.client.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
@@ -84,13 +85,14 @@ func (u *user) Get(ctx context.Context, opts ...database.QueryOption) (*domain.U
 		opt(options)
 	}
 
-	u.builder.WriteString(queryUserStmt)
-	options.WriteCondition(&u.builder)
-	options.WriteOrderBy(&u.builder)
-	options.WriteLimit(&u.builder)
-	options.WriteOffset(&u.builder)
+	builder := database.StatementBuilder{}
+	builder.WriteString(queryUserStmt)
+	options.WriteCondition(&builder)
+	options.WriteOrderBy(&builder)
+	options.WriteLimit(&builder)
+	options.WriteOffset(&builder)
 
-	return scanUser(u.client.QueryRow(ctx, u.builder.String(), u.builder.Args()...))
+	return scanUser(u.client.QueryRow(ctx, builder.String(), builder.Args()...))
 }
 
 const (
@@ -104,23 +106,26 @@ const (
 
 // Create implements [domain.UserRepository].
 func (u *user) Create(ctx context.Context, user *domain.User) error {
-	u.builder.AppendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.Traits.Type())
+	builder := database.StatementBuilder{}
+	builder.AppendArgs(user.InstanceID, user.OrgID, user.ID, user.Username, user.Traits.Type())
 	switch trait := user.Traits.(type) {
 	case *domain.Human:
-		u.builder.WriteString(createHumanStmt)
-		u.builder.AppendArgs(trait.FirstName, trait.LastName, trait.Email.Address, trait.Email.VerifiedAt, trait.Phone.Number, trait.Phone.VerifiedAt)
+		builder.WriteString(createHumanStmt)
+		builder.AppendArgs(trait.FirstName, trait.LastName, trait.Email.Address, trait.Email.VerifiedAt, trait.Phone.Number, trait.Phone.VerifiedAt)
 	case *domain.Machine:
-		u.builder.WriteString(createMachineStmt)
-		u.builder.AppendArgs(trait.Description)
+		builder.WriteString(createMachineStmt)
+		builder.AppendArgs(trait.Description)
 	}
-	return u.client.QueryRow(ctx, u.builder.String(), u.builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
+	return u.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&user.CreatedAt, &user.UpdatedAt)
 }
 
 // Delete implements [domain.UserRepository].
 func (u *user) Delete(ctx context.Context, condition database.Condition) error {
-	u.builder.WriteString("DELETE FROM users")
-	u.writeCondition(condition)
-	return u.client.Exec(ctx, u.builder.String(), u.builder.Args()...)
+	builder := database.StatementBuilder{}
+	builder.WriteString("DELETE FROM users")
+	u.writeCondition(builder, condition)
+	_, err := u.client.Exec(ctx, builder.String(), builder.Args()...)
+	return err
 }
 
 // -------------------------------------------------------------
@@ -218,12 +223,15 @@ func (user) DeletedAtColumn() database.Column {
 	return database.NewColumn("deleted_at")
 }
 
-func (u *user) writeCondition(condition database.Condition) {
+func (u *user) writeCondition(
+	builder database.StatementBuilder,
+	condition database.Condition,
+) {
 	if condition == nil {
 		return
 	}
-	u.builder.WriteString(" WHERE ")
-	condition.Write(&u.builder)
+	builder.WriteString(" WHERE ")
+	condition.Write(&builder)
 }
 
 func (u user) columns() database.Columns {

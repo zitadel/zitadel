@@ -13,9 +13,13 @@ type pgxPool struct {
 	*pgxpool.Pool
 }
 
-var (
-	_ database.Pool = (*pgxPool)(nil)
-)
+var _ database.Pool = (*pgxPool)(nil)
+
+func PGxPool(pool *pgxpool.Pool) *pgxPool {
+	return &pgxPool{
+		Pool: pool,
+	}
+}
 
 // Acquire implements [database.Pool].
 func (c *pgxPool) Acquire(ctx context.Context) (database.Client, error) {
@@ -41,9 +45,9 @@ func (c *pgxPool) QueryRow(ctx context.Context, sql string, args ...any) databas
 
 // Exec implements [database.Pool].
 // Subtle: this method shadows the method (Pool).Exec of pgxPool.Pool.
-func (c *pgxPool) Exec(ctx context.Context, sql string, args ...any) error {
-	_, err := c.Pool.Exec(ctx, sql, args...)
-	return err
+func (c *pgxPool) Exec(ctx context.Context, sql string, args ...any) (int64, error) {
+	res, err := c.Pool.Exec(ctx, sql, args...)
+	return res.RowsAffected(), err
 }
 
 // Begin implements [database.Pool].
@@ -67,6 +71,18 @@ func (c *pgxPool) Migrate(ctx context.Context) error {
 		return nil
 	}
 
+	client, err := c.Pool.Acquire(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = migration.Migrate(ctx, client.Conn())
+	isMigrated = err == nil
+	return err
+}
+
+// Migrate implements [database.PoolTest].
+func (c *pgxPool) MigrateTest(ctx context.Context) error {
 	client, err := c.Pool.Acquire(ctx)
 	if err != nil {
 		return err

@@ -1,7 +1,8 @@
-package repository
+package repository_test
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -14,28 +15,37 @@ func TestMain(m *testing.M) {
 	os.Exit(runTests(m))
 }
 
-var pool database.Pool
+var pool database.PoolTest
 
 func runTests(m *testing.M) int {
-	connector, stop, err := embedded.StartEmbedded()
+	var stop func()
+	var err error
+	ctx := context.Background()
+	pool, stop, err = newEmbeddedDB(ctx)
 	if err != nil {
-		log.Fatalf("unable to start embedded postgres: %v", err)
+		log.Printf("error with embedded postgres database: %v", err)
+		return 1
 	}
 	defer stop()
 
-	ctx := context.Background()
-
-	pool, err = connector.Connect(ctx)
-	if err != nil {
-		log.Printf("unable to connect to embedded postgres: %v", err)
-		return 1
-	}
-
-	err = pool.Migrate(ctx)
-	if err != nil {
-		log.Printf("unable to migrate database: %v", err)
-		return 1
-	}
-
 	return m.Run()
+}
+
+func newEmbeddedDB(ctx context.Context) (pool database.PoolTest, stop func(), err error) {
+	connector, stop, err := embedded.StartEmbedded()
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to start embedded postgres: %w", err)
+	}
+
+	pool_, err := connector.Connect(ctx)
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to connect to embedded postgres: %w", err)
+	}
+	pool = pool_.(database.PoolTest)
+
+	err = pool.MigrateTest(ctx)
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to migrate database: %w", err)
+	}
+	return pool, stop, err
 }
