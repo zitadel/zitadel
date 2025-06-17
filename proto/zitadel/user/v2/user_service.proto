@@ -701,7 +701,7 @@ service UserService {
 
   // Unlock user
   //
-  // The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)..
+  // The state of the user will be changed to 'active'. The user will be able to log in again. The endpoint returns an error if the user is not in the state 'locked'.
   rpc UnlockUser(UnlockUserRequest) returns (UnlockUserResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/unlock"
