@@ -45,5 +45,8 @@ jobs:
           provenance: false
           load: true
           pull: true
+          files: |
+            docker-bake.hcl
+            docker-bake-ci.hcl
       - run: ls -la
         if: always()

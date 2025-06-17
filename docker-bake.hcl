@@ -9,45 +9,36 @@ variable "BUILD_CACHE_KEY" {
 }
 
 target "login-pnpm" {
-  context = "."
-  dockerfile = "dockerfiles/login-pnpm.Dockerfile"
   cache-from = [
     { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:latest" },
     { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:${BUILD_CACHE_KEY}" }
   ]
-  cache-to = [
-    { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:${BUILD_CACHE_KEY}", "mode": "max" }
-  ]
+  dockerfile = "dockerfiles/login-pnpm.Dockerfile"
+  context = "."
 }
 
 target "login-dev-base" {
-  context = "."
-  dockerfile = "dockerfiles/login-dev-base.Dockerfile"
-  contexts = {
-    login-pnpm = "target:login-pnpm"
-  }
   cache-from = [
     {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-dev-base-buildcache:latest"},
     {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-dev-base-buildcache:${BUILD_CACHE_KEY}"}
   ]
-  cache-to = [
-    { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-dev-base-buildcache:${BUILD_CACHE_KEY}", "mode": "max" }
-  ]
+  dockerfile = "dockerfiles/login-dev-base.Dockerfile"
+  context = "."
+  contexts = {
+    login-pnpm = "target:login-pnpm"
+  }
 }
 
 target "login-lint" {
-  context = "."
-  dockerfile = "dockerfiles/login-lint.Dockerfile"
-  contexts = {
-    login-dev-base = "target:login-dev-base"
-  }
   cache-from = [
     {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-lint-buildcache:latest"},
     {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY}"}
   ]
-  cache-to = [
-    { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY}", "mode": "max" }
-  ]
+  dockerfile = "dockerfiles/login-lint.Dockerfile"
+  context = "."
+  contexts = {
+    login-dev-base = "target:login-dev-base"
+  }
 }
 
 variable "LOGIN_TEST_UNIT_TAG" {
