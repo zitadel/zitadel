@@ -32,7 +32,7 @@ jobs:
       - uses: depot/setup-action@v1
       - uses: depot/bake-action@v1
         with:
-          project: w47wkxzdtw
+          project: jp837jn3fm
           push: false
           targets: login-lint
           files: |
