@@ -16,7 +16,6 @@ target "login-pnpm" {
     { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:${BUILD_CACHE_KEY}" }
   ]
   cache-to = [
-    { "type": "inline" },
     { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:${BUILD_CACHE_KEY}", "mode": "max" }
   ]
 }
@@ -32,7 +31,6 @@ target "login-dev-base" {
     {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-dev-base-buildcache:${BUILD_CACHE_KEY}"}
   ]
   cache-to = [
-    { "type": "inline" },
     { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-dev-base-buildcache:${BUILD_CACHE_KEY}", "mode": "max" }
   ]
 }
@@ -48,7 +46,6 @@ target "login-lint" {
     {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY}"}
   ]
   cache-to = [
-    { "type": "inline"},
     { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY}", "mode": "max" }
   ]
 }

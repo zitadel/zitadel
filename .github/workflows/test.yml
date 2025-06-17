@@ -44,5 +44,6 @@ jobs:
           targets: login-pnpm,login-dev-base,login-lint
           provenance: false
           load: true
+          pull: true
       - run: ls -la
         if: always()
