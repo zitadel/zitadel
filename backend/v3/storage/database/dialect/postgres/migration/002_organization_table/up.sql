@@ -12,3 +12,9 @@ CREATE TABLE zitadel.organizations(
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   deleted_at TIMESTAMPTZ DEFAULT NULL
 );
+
+CREATE TRIGGER trigger_set_updated_at
+BEFORE UPDATE ON zitadel.organizations
+FOR EACH ROW
+WHEN (OLD.updated_at IS NOT DISTINCT FROM NEW.updated_at)
+EXECUTE FUNCTION zitadel.set_updated_at();

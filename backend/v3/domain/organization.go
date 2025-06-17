@@ -17,11 +17,11 @@ const (
 type Organization struct {
 	ID         string     `json:"id,omitempty" db:"id"`
 	Name       string     `json:"name,omitempty" db:"name"`
-	InstanceID string     `json:"instance_id,omitempty" db:"instance_id"`
+	InstanceID string     `json:"instanceId,omitempty" db:"instance_id"`
 	State      State      `json:"state,omitempty" db:"state"`
-	CreatedAt  time.Time  `json:"created_at,omitempty" db:"created_at"`
-	UpdatedAt  time.Time  `json:"updated_at,omitempty" db:"updated_at"`
-	DeletedAt  *time.Time `json:"deleted_at,omitempty" db:"deleted_at"`
+	CreatedAt  time.Time  `json:"createdAt,omitempty" db:"created_at"`
+	UpdatedAt  time.Time  `json:"updatedAt,omitempty" db:"updated_at"`
+	DeletedAt  *time.Time `json:"deletedAt,omitempty" db:"deleted_at"`
 }
 
 // organizationColumns define all the columns of the instance table.
@@ -48,12 +48,15 @@ type organizationConditions interface {
 	IDCondition(instanceID string) database.Condition
 	// NameCondition returns a filter on the name field.
 	NameCondition(op database.TextOperation, name string) database.Condition
+	// StateCondition returns a filter on the name field.
+	StateCondition(state State) database.Condition
 }
 
 // organizationChanges define all the changes for the instance table.
 type organizationChanges interface {
 	// SetName sets the name column.
 	SetName(name string) database.Change
+	// SetState sets the name column.
 	SetState(state State) database.Change
 }
 

@@ -28,7 +28,7 @@ func TestServer_TestOrganizationAddReduces(t *testing.T) {
 	require.NoError(t, err)
 	afterCreate := time.Now()
 
-	orgRepo := repository.OrgRepository(pool)
+	orgRepo := repository.OrganizationRepository(pool)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -66,7 +66,7 @@ func TestServer_TestOrganizationChangeReduces(t *testing.T) {
 	require.NoError(t, err)
 	afterCreate := time.Now()
 
-	orgRepo := repository.OrgRepository(pool)
+	orgRepo := repository.OrganizationRepository(pool)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -96,7 +96,7 @@ func TestServer_TestOrganizationDeactivateReduces(t *testing.T) {
 	require.NoError(t, err)
 	afterCreate := time.Now()
 
-	orgRepo := repository.OrgRepository(pool)
+	orgRepo := repository.OrganizationRepository(pool)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -131,7 +131,7 @@ func TestServer_TestOrganizationActivateReduces(t *testing.T) {
 	require.NoError(t, err)
 	afterCreate := time.Now()
 
-	orgRepo := repository.OrgRepository(pool)
+	orgRepo := repository.OrganizationRepository(pool)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -157,7 +157,7 @@ func TestServer_TestOrganizationRemoveReduces(t *testing.T) {
 	require.NoError(t, err)
 
 	// 2. check org retrivable
-	orgRepo := repository.OrgRepository(pool)
+	orgRepo := repository.OrganizationRepository(pool)
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
 		organization, err := orgRepo.Get(CTX,

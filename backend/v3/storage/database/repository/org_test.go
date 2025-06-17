@@ -8,6 +8,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -17,7 +18,7 @@ import (
 func TestCreateOrganization(t *testing.T) {
 	tests := []struct {
 		name         string
-		testFunc     func() *domain.Organization
+		testFunc     func(ctx context.Context, t *testing.T) *domain.Organization
 		organization domain.Organization
 		err          error
 	}{
@@ -54,13 +55,12 @@ func TestCreateOrganization(t *testing.T) {
 		},
 		{
 			name: "adding same organization twice",
-			testFunc: func() *domain.Organization {
-				organizationRepo := repository.OrgRepository(pool)
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
+				organizationRepo := repository.OrganizationRepository(pool)
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
 				instanceId := gofakeit.Name()
 
-				ctx := context.Background()
 				inst := domain.Organization{
 					ID:         organizationId,
 					Name:       organizationName,
@@ -112,11 +112,11 @@ func TestCreateOrganization(t *testing.T) {
 
 			var organization *domain.Organization
 			if tt.testFunc != nil {
-				organization = tt.testFunc()
+				organization = tt.testFunc(ctx, t)
 			} else {
 				organization = &tt.organization
 			}
-			organizationRepo := repository.OrgRepository(pool)
+			organizationRepo := repository.OrganizationRepository(pool)
 
 			// create organization
 			beforeCreate := time.Now()
@@ -145,21 +145,20 @@ func TestCreateOrganization(t *testing.T) {
 }
 
 func TestUpdateOrganization(t *testing.T) {
-	organizationRepo := repository.OrgRepository(pool)
+	organizationRepo := repository.OrganizationRepository(pool)
 	tests := []struct {
 		name         string
-		testFunc     func() *domain.Organization
+		testFunc     func(ctx context.Context, t *testing.T) *domain.Organization
 		update       []database.Change
 		rowsAffected int64
 	}{
 		{
 			name: "happy path update name",
-			testFunc: func() *domain.Organization {
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
 				instanceId := gofakeit.Name()
 
-				ctx := context.Background()
 				org := domain.Organization{
 					ID:         organizationId,
 					Name:       organizationName,
@@ -179,13 +178,40 @@ func TestUpdateOrganization(t *testing.T) {
 			rowsAffected: 1,
 		},
 		{
-			name: "happy path change state",
-			testFunc: func() *domain.Organization {
+			name: "update deleted organization",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
 				instanceId := gofakeit.Name()
 
-				ctx := context.Background()
+				org := domain.Organization{
+					ID:         organizationId,
+					Name:       organizationName,
+					InstanceID: instanceId,
+					State:      domain.Active,
+				}
+
+				// create organization
+				err := organizationRepo.Create(ctx, &org)
+				assert.NoError(t, err)
+
+				// delete instance
+				err = organizationRepo.Delete(ctx,
+					organizationRepo.IDCondition(org.ID),
+				)
+				require.NoError(t, err)
+
+				return &org
+			},
+			rowsAffected: 0,
+		},
+		{
+			name: "happy path change state",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
+				organizationId := gofakeit.Name()
+				organizationName := gofakeit.Name()
+				instanceId := gofakeit.Name()
+
 				org := domain.Organization{
 					ID:         organizationId,
 					Name:       organizationName,
@@ -204,27 +230,28 @@ func TestUpdateOrganization(t *testing.T) {
 			update:       []database.Change{organizationRepo.SetState(domain.Inactive)},
 			rowsAffected: 1,
 		},
-		// {
-		// 	name: "update non existent organization",
-		// 	testFunc: func() *domain.Organization {
-		// 		organizationId := gofakeit.Name()
+		{
+			name: "update non existent organization",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
+				organizationId := gofakeit.Name()
 
-		// 		org := domain.Organization{
-		// 			ID: organizationId,
-		// 		}
-		// 		return &org
-		// 	},
-		// 	rowsAffected: 0,
-		// },
+				org := domain.Organization{
+					ID: organizationId,
+				}
+				return &org
+			},
+			update:       []database.Change{organizationRepo.SetName("new_name")},
+			rowsAffected: 0,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			beforeUpdate := time.Now()
 
 			ctx := context.Background()
-			organizationRepo := repository.OrgRepository(pool)
+			organizationRepo := repository.OrganizationRepository(pool)
 
-			createdOrg := tt.testFunc()
+			createdOrg := tt.testFunc(ctx, t)
 
 			// update org
 			rowsAffected, err := organizationRepo.Update(ctx,
@@ -255,489 +282,438 @@ func TestUpdateOrganization(t *testing.T) {
 	}
 }
 
-// func TestGetOrganization(t *testing.T) {
-// 	organizationRepo := repository.OrgRepository(pool)
-// 	type test struct {
-// 		name                   string
-// 		testFunc               func() *domain.Organization
-// 		conditionClauses       []database.Condition
-// 		noOrganizationReturned bool
-// 	}
+func TestGetOrganization(t *testing.T) {
+	orgRepo := repository.OrganizationRepository(pool)
+	type test struct {
+		name             string
+		testFunc         func(ctx context.Context, t *testing.T) *domain.Organization
+		conditionClauses []database.Condition
+	}
 
-// 	tests := []test{
-// 		func() test {
-// 			organizationId := gofakeit.Name()
-// 			return test{
-// 				name: "happy path get using id",
-// 				testFunc: func() *domain.Organization {
-// 					organizationName := gofakeit.Name()
+	tests := []test{
+		func() test {
+			organizationId := gofakeit.Name()
+			return test{
+				name: "happy path get using id",
+				testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
+					organizationName := gofakeit.Name()
+					instanceId := gofakeit.Name()
 
-// 					ctx := context.Background()
-// 					inst := domain.Organization{
-// 						ID:              organizationId,
-// 						Name:            organizationName,
-// 						DefaultOrgID:    "defaultOrgId",
-// 						IAMProjectID:    "iamProject",
-// 						ConsoleClientID: "consoleCLient",
-// 						ConsoleAppID:    "consoleApp",
-// 						DefaultLanguage: "defaultLanguage",
-// 					}
+					org := domain.Organization{
+						ID:         organizationId,
+						Name:       organizationName,
+						InstanceID: instanceId,
+						State:      domain.Active,
+					}
 
-// 					// create organization
-// 					err := organizationRepo.Create(ctx, &inst)
-// 					assert.NoError(t, err)
-// 					return &inst
-// 				},
-// 				conditionClauses: []database.Condition{organizationRepo.IDCondition(organizationId)},
-// 			}
-// 		}(),
-// 		func() test {
-// 			organizationName := gofakeit.Name()
-// 			return test{
-// 				name: "happy path get using name",
-// 				testFunc: func() *domain.Organization {
-// 					organizationId := gofakeit.Name()
+					// create organization
+					err := orgRepo.Create(ctx, &org)
+					assert.NoError(t, err)
 
-// 					ctx := context.Background()
-// 					inst := domain.Organization{
-// 						ID:              organizationId,
-// 						Name:            organizationName,
-// 						DefaultOrgID:    "defaultOrgId",
-// 						IAMProjectID:    "iamProject",
-// 						ConsoleClientID: "consoleCLient",
-// 						ConsoleAppID:    "consoleApp",
-// 						DefaultLanguage: "defaultLanguage",
-// 					}
+					return &org
+				},
+				conditionClauses: []database.Condition{orgRepo.IDCondition(organizationId)},
+			}
+		}(),
+		func() test {
+			organizationName := gofakeit.Name()
+			return test{
+				name: "happy path get using name",
+				testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
+					organizationId := gofakeit.Name()
+					instanceId := gofakeit.Name()
 
-// 					// create organization
-// 					err := organizationRepo.Create(ctx, &inst)
-// 					assert.NoError(t, err)
-// 					return &inst
-// 				},
-// 				conditionClauses: []database.Condition{organizationRepo.NameCondition(database.TextOperationEqual, organizationName)},
-// 			}
-// 		}(),
-// 		{
-// 			name: "get non existent organization",
-// 			testFunc: func() *domain.Organization {
-// 				organizationId := gofakeit.Name()
+					org := domain.Organization{
+						ID:         organizationId,
+						Name:       organizationName,
+						InstanceID: instanceId,
+						State:      domain.Active,
+					}
 
-// 				inst := domain.Organization{
-// 					ID: organizationId,
-// 				}
-// 				return &inst
-// 			},
-// 			conditionClauses:       []database.Condition{organizationRepo.NameCondition(database.TextOperationEqual, "non-existent-organization-name")},
-// 			noOrganizationReturned: true,
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			ctx := context.Background()
-// 			organizationRepo := repository.OrgRepository(pool)
+					// create organization
+					err := orgRepo.Create(ctx, &org)
+					assert.NoError(t, err)
 
-// 			var organization *domain.Organization
-// 			if tt.testFunc != nil {
-// 				organization = tt.testFunc()
-// 			}
+					return &org
+				},
+				conditionClauses: []database.Condition{orgRepo.NameCondition(database.TextOperationEqual, organizationName)},
+			}
+		}(),
+		{
+			name: "get non existent organization",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
+				instanceId := gofakeit.Name()
 
-// 			// check organization values
-// 			returnedOrganization, err := organizationRepo.Get(ctx,
-// 				tt.conditionClauses...,
-// 			)
-// 			assert.NoError(t, err)
-// 			if tt.noOrganizationReturned {
-// 				assert.Nil(t, returnedOrganization)
-// 				return
-// 			}
+				_ = domain.Instance{
+					ID: instanceId,
+				}
+				return nil
+			},
+			conditionClauses: []database.Condition{orgRepo.NameCondition(database.TextOperationEqual, "non-existent-instance-name")},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			orgRepo := repository.OrganizationRepository(pool)
 
-// 			assert.Equal(t, returnedOrganization.ID, organization.ID)
-// 			assert.Equal(t, returnedOrganization.Name, organization.Name)
-// 			assert.Equal(t, returnedOrganization.DefaultOrgID, organization.DefaultOrgID)
-// 			assert.Equal(t, returnedOrganization.IAMProjectID, organization.IAMProjectID)
-// 			assert.Equal(t, returnedOrganization.ConsoleClientID, organization.ConsoleClientID)
-// 			assert.Equal(t, returnedOrganization.ConsoleAppID, organization.ConsoleAppID)
-// 			assert.Equal(t, returnedOrganization.DefaultLanguage, organization.DefaultLanguage)
-// 			assert.NoError(t, err)
-// 		})
-// 	}
-// }
+			var org *domain.Organization
+			if tt.testFunc != nil {
+				org = tt.testFunc(ctx, t)
+			}
 
-// func TestListOrganization(t *testing.T) {
-// 	type test struct {
-// 		name                   string
-// 		testFunc               func() ([]*domain.Organization, database.PoolTest, func())
-// 		conditionClauses       []database.Condition
-// 		noOrganizationReturned bool
-// 	}
-// 	tests := []test{
-// 		{
-// 			name: "happy path single organization no filter",
-// 			testFunc: func() ([]*domain.Organization, database.PoolTest, func()) {
-// 				ctx := context.Background()
-// 				// create new db to make sure no organizations exist
-// 				pool, stop, err := newEmbeededDB()
-// 				assert.NoError(t, err)
+			// get org values
+			returnedOrg, err := orgRepo.Get(ctx,
+				tt.conditionClauses...,
+			)
+			require.NoError(t, err)
+			if org == nil {
+				require.Nil(t, org, returnedOrg)
+				return
+			}
 
-// 				organizationRepo := repository.OrgRepository(pool)
-// 				noOfOrganizations := 1
-// 				organizations := make([]*domain.Organization, noOfOrganizations)
-// 				for i := range noOfOrganizations {
+			require.Equal(t, returnedOrg.ID, org.ID)
+			require.Equal(t, returnedOrg.Name, org.Name)
+			require.Equal(t, returnedOrg.InstanceID, org.InstanceID)
+			require.Equal(t, returnedOrg.State, org.State)
+		})
+	}
+}
 
-// 					organizationId := gofakeit.Name()
-// 					organizationName := gofakeit.Name()
+func TestListOrganization(t *testing.T) {
+	ctx := context.Background()
+	pool, stop, err := newEmbeddedDB(ctx)
+	require.NoError(t, err)
+	defer stop()
+	organizationRepo := repository.OrganizationRepository(pool)
 
-// 					inst := domain.Organization{
-// 						ID:              organizationId,
-// 						Name:            organizationName,
-// 						DefaultOrgID:    "defaultOrgId",
-// 						IAMProjectID:    "iamProject",
-// 						ConsoleClientID: "consoleCLient",
-// 						ConsoleAppID:    "consoleApp",
-// 						DefaultLanguage: "defaultLanguage",
-// 					}
+	type test struct {
+		name                   string
+		testFunc               func(ctx context.Context, t *testing.T) []*domain.Organization
+		conditionClauses       []database.Condition
+		noOrganizationReturned bool
+	}
+	tests := []test{
+		{
+			name: "happy path single organization no filter",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
+				noOfOrganizations := 1
+				organizations := make([]*domain.Organization, noOfOrganizations)
+				instanceId := gofakeit.Name()
+				for i := range noOfOrganizations {
 
-// 					// create organization
-// 					err := organizationRepo.Create(ctx, &inst)
-// 					assert.NoError(t, err)
+					inst := domain.Organization{
+						ID:         gofakeit.Name(),
+						Name:       gofakeit.Name(),
+						InstanceID: instanceId,
+						State:      domain.Active,
+					}
 
-// 					organizations[i] = &inst
-// 				}
+					// create organization
+					err := organizationRepo.Create(ctx, &inst)
+					require.NoError(t, err)
 
-// 				return organizations, pool, stop
-// 			},
-// 		},
-// 		{
-// 			name: "happy path multiple organization no filter",
-// 			testFunc: func() ([]*domain.Organization, database.PoolTest, func()) {
-// 				ctx := context.Background()
-// 				// create new db to make sure no organizations exist
-// 				pool, stop, err := newEmbeededDB()
-// 				assert.NoError(t, err)
+					organizations[i] = &inst
+				}
 
-// 				organizationRepo := repository.OrgRepository(pool)
-// 				noOfOrganizations := 5
-// 				organizations := make([]*domain.Organization, noOfOrganizations)
-// 				for i := range noOfOrganizations {
+				return organizations
+			},
+		},
+		{
+			name: "happy path multiple organization no filter",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
+				noOfOrganizations := 5
+				organizations := make([]*domain.Organization, noOfOrganizations)
+				instanceId := gofakeit.Name()
+				for i := range noOfOrganizations {
 
-// 					organizationId := gofakeit.Name()
-// 					organizationName := gofakeit.Name()
+					inst := domain.Organization{
+						ID:         gofakeit.Name(),
+						Name:       gofakeit.Name(),
+						InstanceID: instanceId,
+						State:      domain.Active,
+					}
 
-// 					inst := domain.Organization{
-// 						ID:              organizationId,
-// 						Name:            organizationName,
-// 						DefaultOrgID:    "defaultOrgId",
-// 						IAMProjectID:    "iamProject",
-// 						ConsoleClientID: "consoleCLient",
-// 						ConsoleAppID:    "consoleApp",
-// 						DefaultLanguage: "defaultLanguage",
-// 					}
+					// create organization
+					err := organizationRepo.Create(ctx, &inst)
+					require.NoError(t, err)
 
-// 					// create organization
-// 					err := organizationRepo.Create(ctx, &inst)
-// 					assert.NoError(t, err)
+					organizations[i] = &inst
+				}
 
-// 					organizations[i] = &inst
-// 				}
+				return organizations
+			},
+		},
+		func() test {
+			organizationId := gofakeit.Name()
+			return test{
+				name: "organization filter on id",
+				testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
+					noOfOrganizations := 1
+					organizations := make([]*domain.Organization, noOfOrganizations)
+					instanceId := gofakeit.Name()
+					for i := range noOfOrganizations {
 
-// 				return organizations, pool, stop
-// 			},
-// 		},
-// 		func() test {
-// 			organizationRepo := repository.OrgRepository(pool)
-// 			organizationId := gofakeit.Name()
-// 			return test{
-// 				name: "organization filter on id",
-// 				testFunc: func() ([]*domain.Organization, database.PoolTest, func()) {
-// 					ctx := context.Background()
+						inst := domain.Organization{
+							ID:         organizationId,
+							Name:       gofakeit.Name(),
+							InstanceID: instanceId,
+							State:      domain.Active,
+						}
 
-// 					noOfOrganizations := 1
-// 					organizations := make([]*domain.Organization, noOfOrganizations)
-// 					for i := range noOfOrganizations {
+						// create organization
+						err := organizationRepo.Create(ctx, &inst)
+						require.NoError(t, err)
 
-// 						organizationName := gofakeit.Name()
+						organizations[i] = &inst
+					}
 
-// 						inst := domain.Organization{
-// 							ID:              organizationId,
-// 							Name:            organizationName,
-// 							DefaultOrgID:    "defaultOrgId",
-// 							IAMProjectID:    "iamProject",
-// 							ConsoleClientID: "consoleCLient",
-// 							ConsoleAppID:    "consoleApp",
-// 							DefaultLanguage: "defaultLanguage",
-// 						}
+					return organizations
+				},
+				conditionClauses: []database.Condition{organizationRepo.IDCondition(organizationId)},
+			}
+		}(),
+		{
+			name: "multiple organization filter on state",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
+				noOfOrganizations := 5
+				organizations := make([]*domain.Organization, noOfOrganizations)
+				instanceId := gofakeit.Name()
+				for i := range noOfOrganizations {
 
-// 						// create organization
-// 						err := organizationRepo.Create(ctx, &inst)
-// 						assert.NoError(t, err)
+					inst := domain.Organization{
+						ID:         gofakeit.Name(),
+						Name:       gofakeit.Name(),
+						InstanceID: instanceId,
+						State:      domain.Inactive,
+					}
 
-// 						organizations[i] = &inst
-// 					}
+					// create organization
+					err := organizationRepo.Create(ctx, &inst)
+					require.NoError(t, err)
 
-// 					return organizations, nil, nil
-// 				},
-// 				conditionClauses: []database.Condition{organizationRepo.IDCondition(organizationId)},
-// 			}
-// 		}(),
-// 		func() test {
-// 			organizationRepo := repository.OrgRepository(pool)
-// 			organizationName := gofakeit.Name()
-// 			return test{
-// 				name: "multiple organization filter on name",
-// 				testFunc: func() ([]*domain.Organization, database.PoolTest, func()) {
-// 					ctx := context.Background()
+					organizations[i] = &inst
+				}
 
-// 					noOfOrganizations := 5
-// 					organizations := make([]*domain.Organization, noOfOrganizations)
-// 					for i := range noOfOrganizations {
+				return organizations
+			},
+			conditionClauses: []database.Condition{organizationRepo.StateCondition(domain.Inactive)},
+		},
+		func() test {
+			organizationName := gofakeit.Name()
+			return test{
+				name: "multiple organization filter on name",
+				testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
+					noOfOrganizations := 5
+					organizations := make([]*domain.Organization, noOfOrganizations)
+					instanceId := gofakeit.Name()
+					for i := range noOfOrganizations {
 
-// 						organizationId := gofakeit.Name()
+						inst := domain.Organization{
+							ID:         gofakeit.Name(),
+							Name:       organizationName,
+							InstanceID: instanceId,
+							State:      domain.Active,
+						}
 
-// 						inst := domain.Organization{
-// 							ID:              organizationId,
-// 							Name:            organizationName,
-// 							DefaultOrgID:    "defaultOrgId",
-// 							IAMProjectID:    "iamProject",
-// 							ConsoleClientID: "consoleCLient",
-// 							ConsoleAppID:    "consoleApp",
-// 							DefaultLanguage: "defaultLanguage",
-// 						}
+						// create organization
+						err := organizationRepo.Create(ctx, &inst)
+						require.NoError(t, err)
 
-// 						// create organization
-// 						err := organizationRepo.Create(ctx, &inst)
-// 						assert.NoError(t, err)
+						organizations[i] = &inst
+					}
 
-// 						organizations[i] = &inst
-// 					}
+					return organizations
+				},
+				conditionClauses: []database.Condition{organizationRepo.NameCondition(database.TextOperationEqual, organizationName)},
+			}
+		}(),
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Cleanup(func() {
+				_, err := pool.Exec(ctx, "DELETE FROM zitadel.organizations")
+				require.NoError(t, err)
+			})
 
-// 					return organizations, nil, nil
-// 				},
-// 				conditionClauses: []database.Condition{organizationRepo.NameCondition(database.TextOperationEqual, organizationName)},
-// 			}
-// 		}(),
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			ctx := context.Background()
+			organizations := tt.testFunc(ctx, t)
 
-// 			var organizations []*domain.Organization
+			// check organization values
+			returnedOrgs, err := organizationRepo.List(ctx,
+				tt.conditionClauses...,
+			)
+			require.NoError(t, err)
+			if tt.noOrganizationReturned {
+				require.Nil(t, returnedOrgs)
+				return
+			}
 
-// 			pool := pool
-// 			if tt.testFunc != nil {
-// 				var stop func()
-// 				var pool_ database.PoolTest
-// 				organizations, pool_, stop = tt.testFunc()
-// 				if pool_ != nil {
-// 					pool = pool_
-// 					defer stop()
-// 				}
-// 			}
-// 			organizationRepo := repository.OrgRepository(pool)
+			require.Equal(t, len(organizations), len(returnedOrgs))
+			for i, org := range organizations {
+				require.Equal(t, returnedOrgs[i].ID, org.ID)
+				require.Equal(t, returnedOrgs[i].Name, org.Name)
+				require.Equal(t, returnedOrgs[i].InstanceID, org.InstanceID)
+				require.Equal(t, returnedOrgs[i].State, org.State)
+			}
+		})
+	}
+}
 
-// 			// check organization values
-// 			returnedOrganizations, err := organizationRepo.List(ctx,
-// 				tt.conditionClauses...,
-// 			)
-// 			assert.NoError(t, err)
-// 			if tt.noOrganizationReturned {
-// 				assert.Nil(t, returnedOrganizations)
-// 				return
-// 			}
+func TestDeleteOrganization(t *testing.T) {
+	type test struct {
+		name             string
+		testFunc         func(ctx context.Context, t *testing.T)
+		conditionClauses database.Condition
+	}
+	tests := []test{
+		func() test {
+			organizationRepo := repository.OrganizationRepository(pool)
+			organizationId := gofakeit.Name()
+			instanceId := gofakeit.Name()
+			return test{
+				name: "happy path delete single organization filter id",
+				testFunc: func(ctx context.Context, t *testing.T) {
+					noOfOrganizations := 1
+					organizations := make([]*domain.Organization, noOfOrganizations)
+					for i := range noOfOrganizations {
 
-// 			assert.Equal(t, len(organizations), len(returnedOrganizations))
-// 			for i, organization := range organizations {
-// 				assert.Equal(t, returnedOrganizations[i].ID, organization.ID)
-// 				assert.Equal(t, returnedOrganizations[i].Name, organization.Name)
-// 				assert.Equal(t, returnedOrganizations[i].DefaultOrgID, organization.DefaultOrgID)
-// 				assert.Equal(t, returnedOrganizations[i].IAMProjectID, organization.IAMProjectID)
-// 				assert.Equal(t, returnedOrganizations[i].ConsoleClientID, organization.ConsoleClientID)
-// 				assert.Equal(t, returnedOrganizations[i].ConsoleAppID, organization.ConsoleAppID)
-// 				assert.Equal(t, returnedOrganizations[i].DefaultLanguage, organization.DefaultLanguage)
-// 				assert.NoError(t, err)
-// 			}
-// 		})
-// 	}
-// }
+						inst := domain.Organization{
+							ID:         organizationId,
+							Name:       gofakeit.Name(),
+							InstanceID: instanceId,
+							State:      domain.Active,
+						}
 
-// func TestDeleteOrganization(t *testing.T) {
-// 	type test struct {
-// 		name             string
-// 		testFunc         func()
-// 		conditionClauses database.Condition
-// 	}
-// 	tests := []test{
-// 		func() test {
-// 			organizationRepo := repository.OrgRepository(pool)
-// 			organizationId := gofakeit.Name()
-// 			return test{
-// 				name: "happy path delete single organization filter id",
-// 				testFunc: func() {
-// 					ctx := context.Background()
+						// create organization
+						err := organizationRepo.Create(ctx, &inst)
+						require.NoError(t, err)
 
-// 					noOfOrganizations := 1
-// 					organizations := make([]*domain.Organization, noOfOrganizations)
-// 					for i := range noOfOrganizations {
+						organizations[i] = &inst
+					}
+				},
+				conditionClauses: organizationRepo.IDCondition(organizationId),
+			}
+		}(),
+		func() test {
+			organizationRepo := repository.OrganizationRepository(pool)
+			organizationName := gofakeit.Name()
+			instanceId := gofakeit.Name()
+			return test{
+				name: "happy path delete single organization filter name",
+				testFunc: func(ctx context.Context, t *testing.T) {
+					noOfOrganizations := 1
+					organizations := make([]*domain.Organization, noOfOrganizations)
+					for i := range noOfOrganizations {
 
-// 						organizationName := gofakeit.Name()
+						inst := domain.Organization{
+							ID:         gofakeit.Name(),
+							Name:       organizationName,
+							InstanceID: instanceId,
+							State:      domain.Active,
+						}
 
-// 						inst := domain.Organization{
-// 							ID:              organizationId,
-// 							Name:            organizationName,
-// 							DefaultOrgID:    "defaultOrgId",
-// 							IAMProjectID:    "iamProject",
-// 							ConsoleClientID: "consoleCLient",
-// 							ConsoleAppID:    "consoleApp",
-// 							DefaultLanguage: "defaultLanguage",
-// 						}
+						// create organization
+						err := organizationRepo.Create(ctx, &inst)
+						require.NoError(t, err)
 
-// 						// create organization
-// 						err := organizationRepo.Create(ctx, &inst)
-// 						assert.NoError(t, err)
+						organizations[i] = &inst
+					}
+				},
+				conditionClauses: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
+			}
+		}(),
+		func() test {
+			organizationRepo := repository.OrganizationRepository(pool)
+			non_existent_organization_name := gofakeit.Name()
+			return test{
+				name:             "delete non existent organization",
+				conditionClauses: organizationRepo.NameCondition(database.TextOperationEqual, non_existent_organization_name),
+			}
+		}(),
+		func() test {
+			organizationRepo := repository.OrganizationRepository(pool)
+			organizationName := gofakeit.Name()
+			instanceId := gofakeit.Name()
+			return test{
+				name: "multiple organization filter on name",
+				testFunc: func(ctx context.Context, t *testing.T) {
+					noOfOrganizations := 5
+					organizations := make([]*domain.Organization, noOfOrganizations)
+					for i := range noOfOrganizations {
 
-// 						organizations[i] = &inst
-// 					}
-// 				},
-// 				conditionClauses: organizationRepo.IDCondition(organizationId),
-// 			}
-// 		}(),
-// 		func() test {
-// 			organizationRepo := repository.OrgRepository(pool)
-// 			organizationName := gofakeit.Name()
-// 			return test{
-// 				name: "happy path delete single organization filter name",
-// 				testFunc: func() {
-// 					ctx := context.Background()
+						inst := domain.Organization{
+							ID:         gofakeit.Name(),
+							Name:       organizationName,
+							InstanceID: instanceId,
+							State:      domain.Active,
+						}
 
-// 					noOfOrganizations := 1
-// 					organizations := make([]*domain.Organization, noOfOrganizations)
-// 					for i := range noOfOrganizations {
+						// create organization
+						err := organizationRepo.Create(ctx, &inst)
+						require.NoError(t, err)
 
-// 						organizationId := gofakeit.Name()
+						organizations[i] = &inst
+					}
+				},
+				conditionClauses: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
+			}
+		}(),
+		func() test {
+			organizationRepo := repository.OrganizationRepository(pool)
+			organizationName := gofakeit.Name()
+			instanceId := gofakeit.Name()
+			return test{
+				name: "deleted already deleted organization",
+				testFunc: func(ctx context.Context, t *testing.T) {
+					noOfOrganizations := 1
+					organizations := make([]*domain.Organization, noOfOrganizations)
+					for i := range noOfOrganizations {
 
-// 						inst := domain.Organization{
-// 							ID:              organizationId,
-// 							Name:            organizationName,
-// 							DefaultOrgID:    "defaultOrgId",
-// 							IAMProjectID:    "iamProject",
-// 							ConsoleClientID: "consoleCLient",
-// 							ConsoleAppID:    "consoleApp",
-// 							DefaultLanguage: "defaultLanguage",
-// 						}
+						inst := domain.Organization{
+							ID:         gofakeit.Name(),
+							Name:       organizationName,
+							InstanceID: instanceId,
+							State:      domain.Active,
+						}
 
-// 						// create organization
-// 						err := organizationRepo.Create(ctx, &inst)
-// 						assert.NoError(t, err)
+						// create organization
+						err := organizationRepo.Create(ctx, &inst)
+						require.NoError(t, err)
 
-// 						organizations[i] = &inst
-// 					}
-// 				},
-// 				conditionClauses: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
-// 			}
-// 		}(),
-// 		func() test {
-// 			organizationRepo := repository.OrgRepository(pool)
-// 			non_existent_organization_name := gofakeit.Name()
-// 			return test{
-// 				name:             "delete non existent organization",
-// 				conditionClauses: organizationRepo.NameCondition(database.TextOperationEqual, non_existent_organization_name),
-// 			}
-// 		}(),
-// 		func() test {
-// 			organizationRepo := repository.OrgRepository(pool)
-// 			organizationName := gofakeit.Name()
-// 			return test{
-// 				name: "multiple organization filter on name",
-// 				testFunc: func() {
-// 					ctx := context.Background()
+						organizations[i] = &inst
+					}
 
-// 					noOfOrganizations := 5
-// 					organizations := make([]*domain.Organization, noOfOrganizations)
-// 					for i := range noOfOrganizations {
+					// delete organization
+					err := organizationRepo.Delete(ctx,
+						organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
+					)
+					require.NoError(t, err)
+				},
+				conditionClauses: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
+			}
+		}(),
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			organizationRepo := repository.OrganizationRepository(pool)
 
-// 						organizationId := gofakeit.Name()
+			if tt.testFunc != nil {
+				tt.testFunc(ctx, t)
+			}
 
-// 						inst := domain.Organization{
-// 							ID:              organizationId,
-// 							Name:            organizationName,
-// 							DefaultOrgID:    "defaultOrgId",
-// 							IAMProjectID:    "iamProject",
-// 							ConsoleClientID: "consoleCLient",
-// 							ConsoleAppID:    "consoleApp",
-// 							DefaultLanguage: "defaultLanguage",
-// 						}
+			// delete organization
+			err := organizationRepo.Delete(ctx,
+				tt.conditionClauses,
+			)
+			require.NoError(t, err)
 
-// 						// create organization
-// 						err := organizationRepo.Create(ctx, &inst)
-// 						assert.NoError(t, err)
-
-// 						organizations[i] = &inst
-// 					}
-// 				},
-// 				conditionClauses: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
-// 			}
-// 		}(),
-// 		func() test {
-// 			organizationRepo := repository.OrgRepository(pool)
-// 			organizationName := gofakeit.Name()
-// 			return test{
-// 				name: "deleted already deleted organization",
-// 				testFunc: func() {
-// 					ctx := context.Background()
-
-// 					noOfOrganizations := 1
-// 					organizations := make([]*domain.Organization, noOfOrganizations)
-// 					for i := range noOfOrganizations {
-
-// 						organizationId := gofakeit.Name()
-
-// 						inst := domain.Organization{
-// 							ID:              organizationId,
-// 							Name:            organizationName,
-// 							DefaultOrgID:    "defaultOrgId",
-// 							IAMProjectID:    "iamProject",
-// 							ConsoleClientID: "consoleCLient",
-// 							ConsoleAppID:    "consoleApp",
-// 							DefaultLanguage: "defaultLanguage",
-// 						}
-
-// 						// create organization
-// 						err := organizationRepo.Create(ctx, &inst)
-// 						assert.NoError(t, err)
-
-// 						organizations[i] = &inst
-// 					}
-
-// 					// delete organization
-// 					err := organizationRepo.Delete(ctx,
-// 						organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
-// 					)
-// 					assert.NoError(t, err)
-// 				},
-// 				conditionClauses: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
-// 			}
-// 		}(),
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			ctx := context.Background()
-// 			organizationRepo := repository.OrgRepository(pool)
-
-// 			if tt.testFunc != nil {
-// 				tt.testFunc()
-// 			}
-
-// 			// delete organization
-// 			err := organizationRepo.Delete(ctx,
-// 				tt.conditionClauses,
-// 			)
-// 			assert.NoError(t, err)
-
-// 			// check organization was deleted
-// 			organization, err := organizationRepo.Get(ctx,
-// 				tt.conditionClauses,
-// 			)
-// 			assert.NoError(t, err)
-// 			assert.Nil(t, organization)
-// 		})
-// 	}
-// }
+			// check organization was deleted
+			organization, err := organizationRepo.Get(ctx,
+				tt.conditionClauses,
+			)
+			require.NoError(t, err)
+			require.Nil(t, organization)
+		})
+	}
+}

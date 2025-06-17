@@ -20,7 +20,7 @@ type org struct {
 	repository
 }
 
-func OrgRepository(client database.QueryExecutor) domain.OrganizationRepository {
+func OrganizationRepository(client database.QueryExecutor) domain.OrganizationRepository {
 	return &org{
 		repository: repository{
 			client: client,
@@ -110,10 +110,16 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 
 // Update implements [domain.OrganizationRepository].
 func (o org) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
+	if changes == nil {
+		return 0, nil
+	}
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.organizations SET `)
+
+	// don't update deleted instances
+	conditions := []database.Condition{condition, database.IsNull(o.DeletedAtColumn())}
 	database.Changes(changes).Write(&builder)
-	o.writeCondition(&builder, condition)
+	o.writeCondition(&builder, database.And(conditions...))
 
 	stmt := builder.String()
 
@@ -161,6 +167,11 @@ func (o org) IDCondition(id string) database.Condition {
 // NameCondition implements [domain.organizationConditions].
 func (o org) NameCondition(op database.TextOperation, name string) database.Condition {
 	return database.NewTextCondition(o.NameColumn(), op, name)
+}
+
+// StateCondition implements [domain.organizationConditions].
+func (o org) StateCondition(state domain.State) database.Condition {
+	return database.NewTextCondition(o.StateColumn(), database.TextOperationEqual, state)
 }
 
 // -------------------------------------------------------------

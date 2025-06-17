@@ -6,7 +6,6 @@ import (
 	repoDomain "github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -25,25 +24,6 @@ func (*orgRelationalProjection) Name() string {
 
 func newOrgRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
 	return handler.NewHandler(ctx, &config, new(orgRelationalProjection))
-}
-
-// Init implements [handler.initializer]
-func (p *orgRelationalProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(OrgColumnID, handler.ColumnTypeText),
-			handler.NewColumn(OrgColumnName, handler.ColumnTypeText),
-			handler.NewColumn(OrgColumnInstanceID, handler.ColumnTypeText),
-			handler.NewColumn(State, handler.ColumnTypeEnum),
-			handler.NewColumn(CreatedAt, handler.ColumnTypeTimestamp),
-			handler.NewColumn(UpdatedAt, handler.ColumnTypeTimestamp),
-			handler.NewColumn(DeletedAt, handler.ColumnTypeTimestamp),
-		},
-			handler.NewPrimaryKey(OrgColumnInstanceID, OrgColumnID),
-			// handler.WithIndex(handler.NewIndex("domain", []string{OrgColumnDomain})),
-			handler.WithIndex(handler.NewIndex("name", []string{OrgColumnName})),
-		),
-	)
 }
 
 func (p *orgRelationalProjection) Reducers() []handler.AggregateReducer {

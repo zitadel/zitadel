@@ -96,6 +96,9 @@ func (i *instance) Create(ctx context.Context, instance *domain.Instance) error 
 
 // Update implements [domain.InstanceRepository].
 func (i instance) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
+	if changes == nil {
+		return 0, nil
+	}
 	var builder database.StatementBuilder
 
 	builder.WriteString(`UPDATE zitadel.instances SET `)

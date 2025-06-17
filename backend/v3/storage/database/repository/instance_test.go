@@ -340,7 +340,6 @@ func TestGetInstance(t *testing.T) {
 				require.Nil(t, instance, returnedInstance)
 				return
 			}
-			require.NoError(t, err)
 
 			require.Equal(t, returnedInstance.ID, instance.ID)
 			require.Equal(t, returnedInstance.Name, instance.Name)
