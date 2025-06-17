@@ -26,3 +26,4 @@ Makefile
 docker-bake.hcl
 *.md
 .gitignore
+_temp

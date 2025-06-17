@@ -32,6 +32,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - run: ls -la
       - name: Build
         uses: docker/bake-action@v6
         env:
@@ -46,3 +47,5 @@ jobs:
             login-lint
           provenance: false
           load: true
+      - run: ls -la
+        if: always()
