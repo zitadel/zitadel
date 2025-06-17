@@ -87,22 +87,6 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
 					return err
 				}
 			}
-
-			// Checken & Egg problem:
-			// conn.Exec(ctx, "CREATE SCHEMA IF NOT EXISTS zitadel")
-			// conn.Exec(ctx, `
-			// 		CREATE TYPE zitadel.organization_state AS ENUM (
-			// 			'ACTIVE',
-			// 			'INACTIVE'
-			// 		)`,
-			// )
-
-			// orgState, err := conn.LoadType(ctx, "zitadel.organization_state")
-			// if err != nil {
-			// 	return err
-			// }
-			// conn.TypeMap().RegisterType(orgState)
-
 			return nil
 		}
 	}

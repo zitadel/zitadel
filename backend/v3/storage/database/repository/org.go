@@ -42,12 +42,6 @@ func (o *org) Get(ctx context.Context, opts ...database.Condition) (*domain.Orga
 	andCondition := database.And(opts...)
 	o.writeCondition(&builder, andCondition)
 
-	// rows, err := o.client.Query(ctx, builder.String(), builder.Args()...)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// defer rows.Close()
-
 	return scanOrganization(ctx, o.client, &builder)
 }
 
@@ -61,12 +55,6 @@ func (o *org) List(ctx context.Context, opts ...database.Condition) ([]*domain.O
 	opts = append(opts, database.IsNull(o.DeletedAtColumn()))
 	andCondition := database.And(opts...)
 	o.writeCondition(&builder, andCondition)
-
-	// rows, err := o.client.Query(ctx, builder.String(), builder.Args()...)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// defer rows.Close()
 
 	return scanOrganizations(ctx, o.client, &builder)
 }

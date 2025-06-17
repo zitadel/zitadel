@@ -222,9 +222,6 @@ func scanInstance(ctx context.Context, querier database.Querier, builder *databa
 	if err != nil {
 		return nil, err
 	}
-	if err != nil {
-		return nil, nil
-	}
 
 	instance := new(domain.Instance)
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(instance); err != nil {
@@ -258,3 +255,4 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 
 	return instances, nil
 }
+

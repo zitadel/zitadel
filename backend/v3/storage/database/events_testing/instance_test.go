@@ -132,3 +132,4 @@ func TestServer_TestInstanceDeleteReduces(t *testing.T) {
 		require.NoError(t, err)
 	}, retryDuration, tick)
 }
+

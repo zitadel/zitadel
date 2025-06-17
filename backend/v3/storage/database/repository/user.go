@@ -58,8 +58,13 @@ func (u *user) List(ctx context.Context, opts ...database.QueryOption) (users []
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
+	defer func() {
+		closeErr := rows.Close()
+		if err != nil {
+			return
+		}
+		err = closeErr
+	}()
 	for rows.Next() {
 		user, err := scanUser(rows)
 		if err != nil {
