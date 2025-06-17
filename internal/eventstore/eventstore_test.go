@@ -10,7 +10,6 @@ import (
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/shopspring/decimal"
-	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
@@ -33,8 +32,8 @@ func newTestEvent(id, description string, data func() interface{}, checkPrevious
 		data:                data,
 		shouldCheckPrevious: checkPrevious,
 		BaseEvent: *NewBaseEventForPush(
-			service.WithService(authz.NewMockContext("instanceID", "resourceOwner", "editorUser", authz.WithMockDefaultLanguage(language.English)), "editorService"),
-			NewAggregate(authz.NewMockContext("zitadel", "caos", "adlerhurst", authz.WithMockDefaultLanguage(language.English)), id, "test.aggregate", "v1"),
+			service.WithService(authz.NewMockContext("instanceID", "resourceOwner", "editorUser"), "editorService"),
+			NewAggregate(authz.NewMockContext("zitadel", "caos", "adlerhurst"), id, "test.aggregate", "v1"),
 			"test.event",
 		),
 	}

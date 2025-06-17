@@ -9,7 +9,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
-	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
@@ -3198,7 +3197,7 @@ func TestAuthRequestRepo_VerifyPassword_IgnoreUnknownUsernames(t *testing.T) {
 				UserEventProvider: &mockEventUser{},
 			},
 			args: args{
-				ctx:           authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx:           authz.NewMockContext("instance1", "", ""),
 				authReqID:     "authRequestID",
 				userID:        unknownUserID,
 				resourceOwner: "org1",
@@ -3227,7 +3226,7 @@ func TestAuthRequestRepo_VerifyPassword_IgnoreUnknownUsernames(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:           authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx:           authz.NewMockContext("instance1", "", ""),
 				authReqID:     "authRequestID",
 				userID:        "user1",
 				resourceOwner: "org1",

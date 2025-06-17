@@ -144,7 +144,7 @@ func TestCommands_RegisterUserU2F(t *testing.T) {
 }
 
 func TestCommands_pushUserU2F(t *testing.T) {
-	ctx := http_util.WithRequestedHost(authz.NewMockContext("instance1", "org1", "user1", authz.WithMockDefaultLanguage(language.English)), "example.com")
+	ctx := http_util.WithRequestedHost(authz.NewMockContext("instance1", "org1", "user1"), "example.com")
 	webauthnConfig := &webauthn_helper.Config{
 		DisplayName:    "test",
 		ExternalSecure: true,

@@ -54,7 +54,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:    authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:    authz.NewMockContext("instanceID", "org1", "user1"),
 				orgID:  "org1",
 				userID: "",
 			},
@@ -70,7 +70,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:    authz.NewMockContext("instanceID", "org1", "user1"),
 				orgID:  "org1",
 				userID: "user1",
 			},
@@ -100,7 +100,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				permissionCheck: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				ctx:    authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:    authz.NewMockContext("instanceID", "org1", "user1"),
 				orgID:  "org1",
 				userID: "user2",
 			},
@@ -130,7 +130,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:    authz.NewMockContext("instanceID", "org1", "user1"),
 				orgID:  "org1",
 				userID: "user1",
 			},
@@ -167,7 +167,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:    authz.NewMockContext("instanceID", "org1", "user1"),
 				orgID:  "org1",
 				userID: "user1",
 			},
@@ -225,7 +225,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:    authz.NewMockContext("instanceID", "org1", "user1"),
 				orgID:  "org1",
 				userID: "user1",
 			},
@@ -279,7 +279,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:           authz.NewMockContext("instanceID", "org1", "user1"),
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
@@ -309,7 +309,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				ctx:           authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:           authz.NewMockContext("instanceID", "org1", "user1"),
 				resourceOwner: "org1",
 				userID:        "user2",
 			},
@@ -339,7 +339,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:           authz.NewMockContext("instanceID", "org1", "user1"),
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
@@ -378,7 +378,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:           authz.NewMockContext("instanceID", "org1", "user1"),
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
@@ -441,7 +441,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:           authz.NewMockContext("instanceID", "org1", "user1"),
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
@@ -489,7 +489,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:           authz.NewMockContext("instanceID", "org1", "user1"),
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
@@ -537,7 +537,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           http_util.WithRequestedHost(authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)), "zitadel.com"),
+				ctx:           http_util.WithRequestedHost(authz.NewMockContext("instanceID", "org1", "user1"), "zitadel.com"),
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
@@ -586,7 +586,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:           http_util.WithRequestedHost(authz.NewMockContext("instanceID", "org1", "user1", authz.WithMockDefaultLanguage(language.English)), "zitadel.com"),
+				ctx:           http_util.WithRequestedHost(authz.NewMockContext("instanceID", "org1", "user1"), "zitadel.com"),
 				resourceOwner: "org1",
 				userID:        "user2",
 			},
@@ -620,7 +620,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 }
 
 func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
-	ctx := authz.NewMockContext("", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	key, err := domain.NewTOTPKey("example.com", "user1")
@@ -971,7 +971,7 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 }
 
 func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
 		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
@@ -1187,7 +1187,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 }
 
 func TestCommandSide_AddHumanOTPSMSWithCheckSucceeded(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
@@ -1314,7 +1314,7 @@ func TestCommandSide_AddHumanOTPSMSWithCheckSucceeded(t *testing.T) {
 }
 
 func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
 		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
@@ -1429,7 +1429,7 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 }
 
 func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	defaultGenerators := &SecretGenerators{
 		OTPSMS: &crypto.GeneratorConfig{
 			Length:              8,
@@ -1802,7 +1802,7 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 }
 
 func TestCommandSide_HumanOTPSMSCodeSent(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
@@ -1935,7 +1935,7 @@ func TestCommandSide_HumanOTPSMSCodeSent(t *testing.T) {
 }
 
 func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
 		eventstore        func(*testing.T) *eventstore.Eventstore
 		userEncryption    crypto.EncryptionAlgorithm
@@ -2417,7 +2417,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 }
 
 func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
 		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
@@ -2600,7 +2600,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 }
 
 func TestCommandSide_AddHumanOTPEmailWithCheckSucceeded(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
@@ -2727,7 +2727,7 @@ func TestCommandSide_AddHumanOTPEmailWithCheckSucceeded(t *testing.T) {
 }
 
 func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
 		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
@@ -2842,7 +2842,7 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 }
 
 func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	defaultGenerators := &SecretGenerators{
 		OTPEmail: &crypto.GeneratorConfig{
 			Length:              8,
@@ -3018,7 +3018,7 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 }
 
 func TestCommandSide_HumanOTPEmailCodeSent(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
@@ -3111,7 +3111,7 @@ func TestCommandSide_HumanOTPEmailCodeSent(t *testing.T) {
 }
 
 func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
 		eventstore     func(*testing.T) *eventstore.Eventstore
 		userEncryption crypto.EncryptionAlgorithm

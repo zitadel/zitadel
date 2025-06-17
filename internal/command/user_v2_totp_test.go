@@ -21,7 +21,7 @@ import (
 )
 
 func TestCommands_AddUserTOTP(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	userAgg2 := &user.NewAggregate("user2", "org1").Aggregate
 
@@ -259,7 +259,7 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 }
 
 func TestCommands_CheckUserTOTP(t *testing.T) {
-	ctx := authz.NewMockContext("", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	key, err := domain.NewTOTPKey("example.com", "user1")

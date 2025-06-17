@@ -205,7 +205,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				},
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				userAgent: &domain.UserAgent{
 					FingerprintID: gu.Ptr("fp1"),
 					IP:            net.ParseIP("1.2.3.4"),
@@ -232,7 +232,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				},
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				userAgent: &domain.UserAgent{
 					FingerprintID: gu.Ptr("fp1"),
 					IP:            net.ParseIP("1.2.3.4"),
@@ -447,7 +447,7 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands:   []SessionCommand{},
@@ -467,7 +467,7 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands:   []SessionCommand{},
@@ -501,7 +501,7 @@ func TestCommands_updateSession(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands:   []SessionCommand{},
@@ -550,7 +550,7 @@ func TestCommands_updateSession(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
@@ -608,7 +608,7 @@ func TestCommands_updateSession(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
@@ -652,7 +652,7 @@ func TestCommands_updateSession(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
@@ -702,7 +702,7 @@ func TestCommands_updateSession(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
@@ -733,7 +733,7 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
@@ -788,7 +788,7 @@ func TestCommands_updateSession(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
@@ -838,7 +838,7 @@ func TestCommands_updateSession(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
@@ -899,7 +899,7 @@ func TestCommands_updateSession(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
@@ -982,7 +982,7 @@ func TestCommands_updateSession(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instance1", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
@@ -1025,7 +1025,7 @@ func TestCommands_updateSession(t *testing.T) {
 }
 
 func TestCheckTOTP(t *testing.T) {
-	ctx := authz.NewMockContext("instance1", "org1", "user1", authz.WithMockDefaultLanguage(language.English))
+	ctx := authz.NewMockContext("instance1", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	key, err := domain.NewTOTPKey("example.com", "user1")
@@ -1462,12 +1462,12 @@ func TestCommands_TerminateSession(t *testing.T) {
 						),
 					),
 					expectPush(
-						session.NewTerminateEvent(authz.NewMockContext("instance1", "org1", "user1", authz.WithMockDefaultLanguage(language.English)), &session.NewAggregate("sessionID", "instance1").Aggregate),
+						session.NewTerminateEvent(authz.NewMockContext("instance1", "org1", "user1"), &session.NewAggregate("sessionID", "instance1").Aggregate),
 					),
 				),
 			},
 			args{
-				ctx:          authz.NewMockContext("instance1", "org1", "user1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:          authz.NewMockContext("instance1", "org1", "user1"),
 				sessionID:    "sessionID",
 				sessionToken: "",
 			},
@@ -1503,13 +1503,13 @@ func TestCommands_TerminateSession(t *testing.T) {
 						),
 					),
 					expectPush(
-						session.NewTerminateEvent(authz.NewMockContext("instance1", "org1", "admin1", authz.WithMockDefaultLanguage(language.English)), &session.NewAggregate("sessionID", "instance1").Aggregate),
+						session.NewTerminateEvent(authz.NewMockContext("instance1", "org1", "admin1"), &session.NewAggregate("sessionID", "instance1").Aggregate),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:          authz.NewMockContext("instance1", "org1", "admin1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:          authz.NewMockContext("instance1", "org1", "admin1"),
 				sessionID:    "sessionID",
 				sessionToken: "",
 			},
@@ -1549,13 +1549,13 @@ func TestCommands_TerminateSession(t *testing.T) {
 							"username", "firstname", "lastname", "nickname", "displayname", language.English, domain.GenderUnspecified, "email", false),
 					),
 					expectPush(
-						session.NewTerminateEvent(authz.NewMockContext("instance1", "org1", "admin1", authz.WithMockDefaultLanguage(language.English)), &session.NewAggregate("sessionID", "instance1").Aggregate),
+						session.NewTerminateEvent(authz.NewMockContext("instance1", "org1", "admin1"), &session.NewAggregate("sessionID", "instance1").Aggregate),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:          authz.NewMockContext("instance1", "org1", "admin1", authz.WithMockDefaultLanguage(language.English)),
+				ctx:          authz.NewMockContext("instance1", "org1", "admin1"),
 				sessionID:    "sessionID",
 				sessionToken: "",
 			},

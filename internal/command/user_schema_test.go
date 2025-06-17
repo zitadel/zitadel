@@ -7,7 +7,6 @@ import (
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -43,7 +42,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx:        authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx:        authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{},
 			},
 			res{
@@ -56,7 +55,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
 					Type: "type",
 				},
@@ -71,7 +70,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
 					Type:   "type",
 					Schema: json.RawMessage(`{}`),
@@ -90,7 +89,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
 					Type:   "type",
 					Schema: json.RawMessage(`{}`),
@@ -121,7 +120,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				idGenerator: mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
 					ResourceOwner: "instanceID",
 					Type:          "type",
@@ -164,7 +163,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				idGenerator: mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
 					ResourceOwner: "instanceID",
 					Type:          "type",
@@ -195,7 +194,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
 					ResourceOwner: "instanceID",
 					Type:          "type",
@@ -247,7 +246,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				idGenerator: mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
 					ResourceOwner: "instanceID",
 					Type:          "type",
@@ -313,7 +312,7 @@ func TestCommands_ChangeUserSchema(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx:        authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx:        authz.NewMockContext("instanceID", "", ""),
 				userSchema: &ChangeUserSchema{},
 			},
 			res{
@@ -326,7 +325,7 @@ func TestCommands_ChangeUserSchema(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &ChangeUserSchema{
 					ID:   "id1",
 					Type: gu.Ptr(""),
@@ -342,7 +341,7 @@ func TestCommands_ChangeUserSchema(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &ChangeUserSchema{
 					ID: "id1",
 				},
@@ -357,7 +356,7 @@ func TestCommands_ChangeUserSchema(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &ChangeUserSchema{
 					ID: "id1",
 					Schema: json.RawMessage(`{
@@ -380,7 +379,7 @@ func TestCommands_ChangeUserSchema(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Schema: json.RawMessage(`{}`),
@@ -401,7 +400,7 @@ func TestCommands_ChangeUserSchema(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Type:   gu.Ptr("type"),
@@ -433,7 +432,7 @@ func TestCommands_ChangeUserSchema(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Type:   gu.Ptr("type"),
@@ -474,7 +473,7 @@ func TestCommands_ChangeUserSchema(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Schema: json.RawMessage(`{}`),
@@ -542,7 +541,7 @@ func TestCommands_ChangeUserSchema(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &ChangeUserSchema{
 					ID: "id1",
 					Schema: json.RawMessage(`{
@@ -600,7 +599,7 @@ func TestCommands_ChangeUserSchema(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Schema: json.RawMessage(`{}`),
@@ -654,7 +653,7 @@ func TestCommands_DeactivateUserSchema(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				id:  "",
 			},
 			res{
@@ -669,7 +668,7 @@ func TestCommands_DeactivateUserSchema(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				id:  "id1",
 			},
 			res{
@@ -700,7 +699,7 @@ func TestCommands_DeactivateUserSchema(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				id:  "id1",
 			},
 			res{
@@ -747,7 +746,7 @@ func TestCommands_ReactivateUserSchema(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				id:  "",
 			},
 			res{
@@ -762,7 +761,7 @@ func TestCommands_ReactivateUserSchema(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				id:  "id1",
 			},
 			res{
@@ -799,7 +798,7 @@ func TestCommands_ReactivateUserSchema(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				id:  "id1",
 			},
 			res{
@@ -846,7 +845,7 @@ func TestCommands_DeleteUserSchema(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				id:  "",
 			},
 			res{
@@ -861,7 +860,7 @@ func TestCommands_DeleteUserSchema(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				id:  "id1",
 			},
 			res{
@@ -893,7 +892,7 @@ func TestCommands_DeleteUserSchema(t *testing.T) {
 				),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", "", authz.WithMockDefaultLanguage(language.English)),
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				id:  "id1",
 			},
 			res{
