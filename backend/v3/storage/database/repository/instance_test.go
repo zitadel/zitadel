@@ -192,10 +192,11 @@ func TestUpdateInstance(t *testing.T) {
 				require.NoError(t, err)
 
 				// delete instance
-				err = instanceRepo.Delete(ctx,
+				affectedRows, err := instanceRepo.Delete(ctx,
 					instanceRepo.IDCondition(inst.ID),
 				)
 				require.NoError(t, err)
+				assert.Equal(t, int64(1), affectedRows)
 
 				return &inst
 			},
@@ -527,15 +528,16 @@ func TestDeleteInstance(t *testing.T) {
 		name             string
 		testFunc         func(ctx context.Context, t *testing.T)
 		conditionClauses database.Condition
+		noOfDeletedRows  int64
 	}
 	tests := []test{
 		func() test {
 			instanceRepo := repository.InstanceRepository(pool)
 			instanceId := gofakeit.Name()
+			var noOfInstances int64 = 1
 			return test{
 				name: "happy path delete single instance filter id",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					noOfInstances := 1
 					instances := make([]*domain.Instance, noOfInstances)
 					for i := range noOfInstances {
 
@@ -557,15 +559,16 @@ func TestDeleteInstance(t *testing.T) {
 					}
 				},
 				conditionClauses: instanceRepo.IDCondition(instanceId),
+				noOfDeletedRows:  noOfInstances,
 			}
 		}(),
 		func() test {
 			instanceRepo := repository.InstanceRepository(pool)
 			instanceName := gofakeit.Name()
+			var noOfInstances int64 = 1
 			return test{
 				name: "happy path delete single instance filter name",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					noOfInstances := 1
 					instances := make([]*domain.Instance, noOfInstances)
 					for i := range noOfInstances {
 
@@ -587,6 +590,7 @@ func TestDeleteInstance(t *testing.T) {
 					}
 				},
 				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+				noOfDeletedRows:  noOfInstances,
 			}
 		}(),
 		func() test {
@@ -600,10 +604,10 @@ func TestDeleteInstance(t *testing.T) {
 		func() test {
 			instanceRepo := repository.InstanceRepository(pool)
 			instanceName := gofakeit.Name()
+			var noOfInstances int64 = 5
 			return test{
 				name: "multiple instance filter on name",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					noOfInstances := 5
 					instances := make([]*domain.Instance, noOfInstances)
 					for i := range noOfInstances {
 
@@ -625,6 +629,7 @@ func TestDeleteInstance(t *testing.T) {
 					}
 				},
 				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+				noOfDeletedRows:  noOfInstances,
 			}
 		}(),
 		func() test {
@@ -655,12 +660,15 @@ func TestDeleteInstance(t *testing.T) {
 					}
 
 					// delete instance
-					err := instanceRepo.Delete(ctx,
+					affectedRows, err := instanceRepo.Delete(ctx,
 						instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
 					)
 					require.NoError(t, err)
+					assert.Equal(t, int64(1), affectedRows)
 				},
 				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+				// this test should return 0 affected rows as the instance was already deleted
+				noOfDeletedRows: 0,
 			}
 		}(),
 	}
@@ -674,10 +682,11 @@ func TestDeleteInstance(t *testing.T) {
 			}
 
 			// delete instance
-			err := instanceRepo.Delete(ctx,
+			noOfDeletedRows, err := instanceRepo.Delete(ctx,
 				tt.conditionClauses,
 			)
 			require.NoError(t, err)
+			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
 
 			// check instance was deleted
 			instance, err := instanceRepo.Get(ctx,

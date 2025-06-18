@@ -91,7 +91,7 @@ type InstanceRepository interface {
 
 	Create(ctx context.Context, instance *Instance) error
 	Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error)
-	Delete(ctx context.Context, condition database.Condition) error
+	Delete(ctx context.Context, condition database.Condition) (int64, error)
 }
 
 type CreateInstance struct {

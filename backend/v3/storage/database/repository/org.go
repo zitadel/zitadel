@@ -124,17 +124,20 @@ func (o org) Update(ctx context.Context, condition database.Condition, changes .
 }
 
 // Delete implements [domain.OrganizationRepository].
-func (o org) Delete(ctx context.Context, condition database.Condition) error {
+func (o org) Delete(ctx context.Context, condition database.Condition) (int64, error) {
 	if condition == nil {
-		return errors.New("Delete must contain a condition") // (otherwise ALL organizations will be deleted)
+		return 0, errors.New("Delete must contain a condition") // (otherwise ALL organizations will be deleted)
 	}
 	builder := database.StatementBuilder{}
+
 	builder.WriteString(`UPDATE zitadel.organizations SET deleted_at = $1`)
 	builder.AppendArgs(time.Now())
 
-	o.writeCondition(&builder, condition)
-	_, err := o.client.Exec(ctx, builder.String(), builder.Args()...)
-	return err
+	// don't delete already deleted organization
+	conditions := []database.Condition{condition, database.IsNull(o.DeletedAtColumn())}
+	o.writeCondition(&builder, database.And(conditions...))
+
+	return o.client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 // -------------------------------------------------------------

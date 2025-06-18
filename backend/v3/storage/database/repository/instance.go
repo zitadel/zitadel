@@ -115,18 +115,20 @@ func (i instance) Update(ctx context.Context, condition database.Condition, chan
 }
 
 // Delete implements [domain.InstanceRepository].
-func (i instance) Delete(ctx context.Context, condition database.Condition) error {
+func (i instance) Delete(ctx context.Context, condition database.Condition) (int64, error) {
 	if condition == nil {
-		return errors.New("Delete must contain a condition") // (otherwise ALL instances will be deleted)
+		return 0, errors.New("Delete must contain a condition") // (otherwise ALL instances will be deleted)
 	}
 	var builder database.StatementBuilder
 
+	// don't delete already deleted instance
 	builder.WriteString(`UPDATE zitadel.instances SET deleted_at = $1`)
 	builder.AppendArgs(time.Now())
 
-	i.writeCondition(&builder, condition)
-	_, err := i.client.Exec(ctx, builder.String(), builder.Args()...)
-	return err
+	conditions := []database.Condition{condition, database.IsNull(i.DeletedAtColumn())}
+	i.writeCondition(&builder, database.And(conditions...))
+
+	return i.client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 // -------------------------------------------------------------

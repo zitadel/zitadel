@@ -233,7 +233,7 @@ func TestUpdateOrganization(t *testing.T) {
 				require.NoError(t, err)
 
 				// delete instance
-				err = organizationRepo.Delete(ctx,
+				_, err = organizationRepo.Delete(ctx,
 					organizationRepo.IDCondition(org.ID),
 				)
 				require.NoError(t, err)
@@ -685,15 +685,16 @@ func TestDeleteOrganization(t *testing.T) {
 		name             string
 		testFunc         func(ctx context.Context, t *testing.T)
 		conditionClauses database.Condition
+		noOfDeletedRows  int64
 	}
 	tests := []test{
 		func() test {
 			organizationRepo := repository.OrganizationRepository(pool)
 			organizationId := gofakeit.Name()
+			var noOfOrganizations int64 = 1
 			return test{
 				name: "happy path delete single organization filter id",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					noOfOrganizations := 1
 					organizations := make([]*domain.Organization, noOfOrganizations)
 					for i := range noOfOrganizations {
 
@@ -712,15 +713,16 @@ func TestDeleteOrganization(t *testing.T) {
 					}
 				},
 				conditionClauses: organizationRepo.IDCondition(organizationId),
+				noOfDeletedRows:  noOfOrganizations,
 			}
 		}(),
 		func() test {
 			organizationRepo := repository.OrganizationRepository(pool)
 			organizationName := gofakeit.Name()
+			var noOfOrganizations int64 = 1
 			return test{
 				name: "happy path delete single organization filter name",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					noOfOrganizations := 1
 					organizations := make([]*domain.Organization, noOfOrganizations)
 					for i := range noOfOrganizations {
 
@@ -739,6 +741,7 @@ func TestDeleteOrganization(t *testing.T) {
 					}
 				},
 				conditionClauses: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
+				noOfDeletedRows:  noOfOrganizations,
 			}
 		}(),
 		func() test {
@@ -752,10 +755,10 @@ func TestDeleteOrganization(t *testing.T) {
 		func() test {
 			organizationRepo := repository.OrganizationRepository(pool)
 			organizationName := gofakeit.Name()
+			var noOfOrganizations int64 = 5
 			return test{
 				name: "multiple organization filter on name",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					noOfOrganizations := 5
 					organizations := make([]*domain.Organization, noOfOrganizations)
 					for i := range noOfOrganizations {
 
@@ -774,6 +777,7 @@ func TestDeleteOrganization(t *testing.T) {
 					}
 				},
 				conditionClauses: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
+				noOfDeletedRows:  noOfOrganizations,
 			}
 		}(),
 		func() test {
@@ -801,12 +805,15 @@ func TestDeleteOrganization(t *testing.T) {
 					}
 
 					// delete organization
-					err := organizationRepo.Delete(ctx,
+					affectedRows, err := organizationRepo.Delete(ctx,
 						organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
 					)
+					assert.Equal(t, int64(1), affectedRows)
 					require.NoError(t, err)
 				},
 				conditionClauses: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
+				// this test should return 0 affected rows as the org was already deleted
+				noOfDeletedRows: 0,
 			}
 		}(),
 	}
@@ -820,10 +827,11 @@ func TestDeleteOrganization(t *testing.T) {
 			}
 
 			// delete organization
-			err := organizationRepo.Delete(ctx,
+			noOfDeletedRows, err := organizationRepo.Delete(ctx,
 				tt.conditionClauses,
 			)
 			require.NoError(t, err)
+			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
 
 			// check organization was deleted
 			organization, err := organizationRepo.Get(ctx,
