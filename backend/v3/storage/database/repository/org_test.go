@@ -9,7 +9,6 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
@@ -52,7 +51,7 @@ func TestCreateOrganization(t *testing.T) {
 			}(),
 		},
 		{
-			name: "create organization wihtout name",
+			name: "create organization without name",
 			organization: func() domain.Organization {
 				organizationId := gofakeit.Name()
 				// organizationName := gofakeit.Name()
@@ -114,6 +113,21 @@ func TestCreateOrganization(t *testing.T) {
 				return organization
 			}(),
 			err: errors.New("instance id not provided"),
+		},
+		{
+			name: "adding organization with non existent instance id",
+			organization: func() domain.Organization {
+				organizationId := gofakeit.Name()
+				organizationName := gofakeit.Name()
+				organization := domain.Organization{
+					ID:         organizationId,
+					Name:       organizationName,
+					InstanceID: gofakeit.Name(),
+					State:      domain.OrgStateActive.String(),
+				}
+				return organization
+			}(),
+			err: errors.New("invalid instance id"),
 		},
 	}
 	for _, tt := range tests {
@@ -226,6 +240,7 @@ func TestUpdateOrganization(t *testing.T) {
 
 				return &org
 			},
+			update:       []database.Change{organizationRepo.SetName("new_name")},
 			rowsAffected: 0,
 		},
 		{
@@ -268,14 +283,13 @@ func TestUpdateOrganization(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			beforeUpdate := time.Now()
-
 			ctx := context.Background()
 			organizationRepo := repository.OrganizationRepository(pool)
 
 			createdOrg := tt.testFunc(ctx, t)
 
 			// update org
+			beforeUpdate := time.Now()
 			rowsAffected, err := organizationRepo.Update(ctx,
 				organizationRepo.IDCondition(createdOrg.ID),
 				tt.update...,

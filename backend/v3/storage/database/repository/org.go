@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
@@ -38,7 +39,7 @@ func (o *org) Get(ctx context.Context, opts ...database.Condition) (*domain.Orga
 
 	builder.WriteString(queryOrganizationStmt)
 
-	// return only non deleted instanes
+	// return only non deleted organizations
 	opts = append(opts, database.IsNull(o.DeletedAtColumn()))
 	andCondition := database.And(opts...)
 	o.writeCondition(&builder, andCondition)
@@ -52,7 +53,7 @@ func (o *org) List(ctx context.Context, opts ...database.Condition) ([]*domain.O
 
 	builder.WriteString(queryOrganizationStmt)
 
-	// return only non deleted instanes
+	// return only non deleted organizations
 	opts = append(opts, database.IsNull(o.DeletedAtColumn()))
 	andCondition := database.And(opts...)
 	o.writeCondition(&builder, andCondition)
@@ -73,7 +74,7 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 	err := o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
 	if err != nil {
 		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
+			fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> pgErr = %+v\n", pgErr)
 			// constraint violation
 			if pgErr.Code == "23514" {
 				if pgErr.ConstraintName == "organizations_name_check" {
@@ -92,6 +93,12 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 					return errors.New("organization id already exists")
 				}
 			}
+			// invalid instance id
+			if pgErr.Code == "23503" {
+				if pgErr.ConstraintName == "organizations_instance_id_fkey" {
+					return errors.New("invalid instance id")
+				}
+			}
 		}
 	}
 	return err
@@ -100,12 +107,12 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 // Update implements [domain.OrganizationRepository].
 func (o org) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
 	if changes == nil {
-		return 0, nil
+		return 0, errors.New("Update must contain a condition") // (otherwise ALL organizations will be updated)
 	}
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.organizations SET `)
 
-	// don't update deleted instances
+	// don't update deleted organizations
 	conditions := []database.Condition{condition, database.IsNull(o.DeletedAtColumn())}
 	database.Changes(changes).Write(&builder)
 	o.writeCondition(&builder, database.And(conditions...))
@@ -215,9 +222,6 @@ func (o *org) writeCondition(
 
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
 	if err != nil {
 		return nil, err
 	}

@@ -97,7 +97,7 @@ func (i *instance) Create(ctx context.Context, instance *domain.Instance) error 
 // Update implements [domain.InstanceRepository].
 func (i instance) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
 	if changes == nil {
-		return 0, nil
+		return 0, errors.New("Update must contain a condition") // (otherwise ALL instances will be updated)
 	}
 	var builder database.StatementBuilder
 
@@ -206,17 +206,6 @@ func (instance) DeletedAtColumn() database.Column {
 	return database.NewColumn("deleted_at")
 }
 
-func (i *instance) writeCondition(
-	builder *database.StatementBuilder,
-	condition database.Condition,
-) {
-	if condition == nil {
-		return
-	}
-	builder.WriteString(" WHERE ")
-	condition.Write(builder)
-}
-
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
@@ -226,8 +215,8 @@ func scanInstance(ctx context.Context, querier database.Querier, builder *databa
 	instance := new(domain.Instance)
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(instance); err != nil {
 		// if no results returned, this is not a error
-		// it just means the organization was not found
-		// the caller should check if the returned organization is nil
+		// it just means the instance was not found
+		// the caller should check if the returned instance is nil
 		if err.Error() == "no rows in result set" {
 			return nil, nil
 		}
@@ -245,8 +234,8 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 
 	if err := rows.(database.CollectableRows).Collect(&instances); err != nil {
 		// if no results returned, this is not a error
-		// it just means the organization was not found
-		// the caller should check if the returned organization is nil
+		// it just means the instance was not found
+		// the caller should check if the returned instance is nil
 		if err.Error() == "no rows in result set" {
 			return nil, nil
 		}
