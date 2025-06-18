@@ -12,8 +12,6 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -215,13 +213,13 @@ func TestServer_CreateOrganization(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.CreateOrganization(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 
 			if tt.id != "" {
-				require.Equal(t, tt.id, got.Id)
+				assert.Equal(t, tt.id, got.Id)
 			}
 
 			// check details
@@ -230,7 +228,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 			// check the admins
-			require.Equal(t, len(tt.want.GetOrganizationAdmins()), len(got.GetOrganizationAdmins()))
+			assert.Equal(t, len(tt.want.GetOrganizationAdmins()), len(got.GetOrganizationAdmins()))
 			for i, admin := range tt.want.GetOrganizationAdmins() {
 				gotAdmin := got.GetOrganizationAdmins()[i].OrganizationAdmin
 				switch admin := admin.OrganizationAdmin.(type) {
@@ -299,10 +297,10 @@ func TestServer_UpdateOrganization(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.UpdateOrganization(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 
 			// check details
 			gotCD := got.GetChangeDate().AsTime()
@@ -321,7 +319,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 	noOfOrgs := 3
 	orgs, orgsName, err := createOrgs(listOrgIAmOwnerCtx, listOrgClient, noOfOrgs)
 	if err != nil {
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		return
 	}
 
@@ -329,7 +327,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 	_, err = listOrgClient.DeactivateOrganization(listOrgIAmOwnerCtx, &v2beta_org.DeactivateOrganizationRequest{
 		Id: orgs[1].Id,
 	})
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	tests := []struct {
 		name  string
@@ -339,7 +337,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 		err   error
 	}{
 		{
-			name: "list organizations, without required permissions",
+			name: "list organizations, without assertd permissions",
 			ctx:  ListOrgIinstance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			err:  errors.New("membership not found"),
 		},
@@ -526,7 +524,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 										},
 									},
 								})
-								require.NoError(t, err)
+								assert.NoError(t, err)
 								domain := listOrgRes.Organizations[0].PrimaryDomain
 								return domain
 							}(),
@@ -592,17 +590,17 @@ func TestServer_ListOrganizations(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+			assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := listOrgClient.ListOrganizations(tt.ctx, &v2beta_org.ListOrganizationsRequest{
 					Filter: tt.query,
 				})
 				if tt.err != nil {
-					require.ErrorContains(t, err, tt.err.Error())
+					assert.ErrorContains(t, err, tt.err.Error())
 					return
 				}
-				require.NoError(ttt, err)
+				assert.NoError(ttt, err)
 
-				require.Equal(ttt, uint64(len(tt.want)), got.Pagination.GetTotalResult())
+				assert.Equal(ttt, uint64(len(tt.want)), got.Pagination.GetTotalResult())
 
 				foundOrgs := 0
 				for _, got := range got.Organizations {
@@ -627,7 +625,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						}
 					}
 				}
-				require.Equal(ttt, len(tt.want), foundOrgs)
+				assert.Equal(ttt, len(tt.want), foundOrgs)
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 		})
 	}
@@ -681,7 +679,7 @@ func TestServer_DeleteOrganization(t *testing.T) {
 				}
 				// delete org
 				_, err = Client.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{Id: orgs[0].Id})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 
 				return orgs[0].Id
 			},
@@ -705,10 +703,10 @@ func TestServer_DeleteOrganization(t *testing.T) {
 
 			got, err := Client.DeleteOrganization(tt.ctx, tt.req)
 			if tt.err != nil {
-				require.Contains(t, err.Error(), tt.err.Error())
+				assert.Contains(t, err.Error(), tt.err.Error())
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 
 			// check details
 			gotCD := got.GetDeletionDate().AsTime()
@@ -727,13 +725,13 @@ func TestServer_DeactivateReactivateNonExistentOrganization(t *testing.T) {
 	_, err := Client.DeactivateOrganization(ctx, &v2beta_org.DeactivateOrganizationRequest{
 		Id: "non existent organization",
 	})
-	require.Contains(t, err.Error(), "Organisation not found")
+	assert.Contains(t, err.Error(), "Organisation not found")
 
 	// reactivate non existent organization
 	_, err = Client.ActivateOrganization(ctx, &v2beta_org.ActivateOrganizationRequest{
 		Id: "non existent organization",
 	})
-	require.Contains(t, err.Error(), "Organisation not found")
+	assert.Contains(t, err.Error(), "Organisation not found")
 }
 
 func TestServer_ActivateOrganization(t *testing.T) {
@@ -759,14 +757,14 @@ func TestServer_ActivateOrganization(t *testing.T) {
 				deactivate_res, err := Client.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
 					Id: orgId,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				gotCD := deactivate_res.GetChangeDate().AsTime()
 				now := time.Now()
 				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 				// 3. check organization state is deactivated
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 					listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
 						Filter: []*v2beta_org.OrganizationSearchFilter{
 							{
@@ -778,8 +776,8 @@ func TestServer_ActivateOrganization(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(ttt, err)
-					require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+					assert.NoError(ttt, err)
+					assert.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				return orgId
@@ -834,9 +832,9 @@ func TestServer_ActivateOrganization(t *testing.T) {
 				Id: orgId,
 			})
 			if tt.err != nil {
-				require.Contains(t, err.Error(), tt.err.Error())
+				assert.Contains(t, err.Error(), tt.err.Error())
 			} else {
-				require.NoError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -903,14 +901,14 @@ func TestServer_DeactivateOrganization(t *testing.T) {
 				deactivate_res, err := Client.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
 					Id: orgId,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				gotCD := deactivate_res.GetChangeDate().AsTime()
 				now := time.Now()
 				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 				// 3. check organization state is deactivated
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 					listOrgRes, err := Client.ListOrganizations(CTX, &v2beta_org.ListOrganizationsRequest{
 						Filter: []*v2beta_org.OrganizationSearchFilter{
 							{
@@ -922,8 +920,8 @@ func TestServer_DeactivateOrganization(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(ttt, err)
-					require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+					assert.NoError(ttt, err)
+					assert.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				return orgId
@@ -940,9 +938,9 @@ func TestServer_DeactivateOrganization(t *testing.T) {
 				Id: orgId,
 			})
 			if tt.err != nil {
-				require.Contains(t, err.Error(), tt.err.Error())
+				assert.Contains(t, err.Error(), tt.err.Error())
 			} else {
-				require.NoError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -987,7 +985,7 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 					OrganizationId: orgId,
 					Domain:         domain,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				// check details
 				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
 				now := time.Now()
@@ -995,18 +993,18 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 
 				// check domain added
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
 						OrganizationId: orgId,
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					found := false
 					for _, res := range queryRes.Domains {
 						if res.DomainName == domain {
 							found = true
 						}
 					}
-					require.True(t, found, "unable to find added domain")
+					assert.True(t, found, "unable to find added domain")
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				return orgId
@@ -1033,9 +1031,9 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 			Domain:         tt.domain,
 		})
 		if tt.err != nil {
-			require.Contains(t, err.Error(), tt.err.Error())
+			assert.Contains(t, err.Error(), tt.err.Error())
 		} else {
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			// check details
 			gotCD := addOrgDomainRes.GetCreationDate().AsTime()
 			now := time.Now()
@@ -1069,7 +1067,7 @@ func TestServer_ListOrganizationDomains(t *testing.T) {
 					OrganizationId: orgId,
 					Domain:         domain,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				// check details
 				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
 				now := time.Now()
@@ -1090,18 +1088,18 @@ func TestServer_ListOrganizationDomains(t *testing.T) {
 		var queryRes *v2beta_org.ListOrganizationDomainsResponse
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-		require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
 				OrganizationId: orgId,
 			})
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			found := false
 			for _, res := range queryRes.Domains {
 				if res.DomainName == tt.domain {
 					found = true
 				}
 			}
-			require.True(t, found, "unable to find added domain")
+			assert.True(t, found, "unable to find added domain")
 		}, retryDuration, tick, "timeout waiting for adding domain")
 
 	}
@@ -1133,7 +1131,7 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 					OrganizationId: orgId,
 					Domain:         domain,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				// check details
 				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
 				now := time.Now()
@@ -1141,18 +1139,18 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 
 				// check domain added
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
 						OrganizationId: orgId,
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					found := false
 					for _, res := range queryRes.Domains {
 						if res.DomainName == domain {
 							found = true
 						}
 					}
-					require.True(t, found, "unable to find added domain")
+					assert.True(t, found, "unable to find added domain")
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				return orgId
@@ -1176,7 +1174,7 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 					OrganizationId: orgId,
 					Domain:         domain,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				// check details
 				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
 				now := time.Now()
@@ -1184,25 +1182,25 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 
 				// check domain added
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
 						OrganizationId: orgId,
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					found := false
 					for _, res := range queryRes.Domains {
 						if res.DomainName == domain {
 							found = true
 						}
 					}
-					require.True(t, found, "unable to find added domain")
+					assert.True(t, found, "unable to find added domain")
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				_, err = Client.DeleteOrganizationDomain(CTX, &v2beta_org.DeleteOrganizationDomainRequest{
 					OrganizationId: orgId,
 					Domain:         domain,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 
 				return orgId
 			},
@@ -1231,9 +1229,9 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 		})
 
 		if tt.err != nil {
-			require.Contains(t, err.Error(), tt.err.Error())
+			assert.Contains(t, err.Error(), tt.err.Error())
 		} else {
-			require.NoError(t, err)
+			assert.NoError(t, err)
 		}
 	}
 }
@@ -1261,7 +1259,7 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 					OrganizationId: orgId,
 					Domain:         domain,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				// check details
 				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
 				now := time.Now()
@@ -1273,8 +1271,8 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 					Domain:         domain,
 				})
 				// TODO remove error for adding already existing domain
-				// require.NoError(t, err)
-				require.Contains(t, err.Error(), "Errors.Already.Exists")
+				// assert.NoError(t, err)
+				assert.Contains(t, err.Error(), "Errors.Already.Exists")
 				// check details
 				// gotCD = addOrgDomainRes.GetDetails().GetChangeDate().AsTime()
 				// now = time.Now()
@@ -1284,14 +1282,14 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
 					OrganizationId: orgId,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				found := false
 				for _, res := range queryRes.Domains {
 					if res.DomainName == domain {
 						found = true
 					}
 				}
-				require.True(t, found, "unable to find added domain")
+				assert.True(t, found, "unable to find added domain")
 			},
 		},
 		{
@@ -1311,7 +1309,7 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 					OrganizationId: orgId,
 					Domain:         domain,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				// check details
 				gotCD := addOrgDomainRes.GetCreationDate().AsTime()
 				now := time.Now()
@@ -1322,26 +1320,26 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 					OrganizationId: orgId,
 					Domain:         domain,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				// check details
 				gotCD = deleteOrgDomainRes.GetDeletionDate().AsTime()
 				now = time.Now()
 				assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-				require.EventuallyWithT(t, func(t *assert.CollectT) {
+				assert.EventuallyWithT(t, func(t *assert.CollectT) {
 					// 3. check organization domain deleted
 					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
 						OrganizationId: orgId,
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					found := false
 					for _, res := range queryRes.Domains {
 						if res.DomainName == domain {
 							found = true
 						}
 					}
-					require.False(t, found, "deleted domain found")
+					assert.False(t, found, "deleted domain found")
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				// 4. redelete organisation domain
@@ -1350,8 +1348,8 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 					Domain:         domain,
 				})
 				// TODO remove error for deleting org domain already deleted
-				// require.NoError(t, err)
-				require.Contains(t, err.Error(), "Domain doesn't exist on organization")
+				// assert.NoError(t, err)
+				assert.Contains(t, err.Error(), "Domain doesn't exist on organization")
 				// check details
 				// gotCD = deleteOrgDomainRes.GetDetails().GetChangeDate().AsTime()
 				// now = time.Now()
@@ -1361,14 +1359,14 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
 					OrganizationId: orgId,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				found := false
 				for _, res := range queryRes.Domains {
 					if res.DomainName == domain {
 						found = true
 					}
 				}
-				require.False(t, found, "deleted domain found")
+				assert.False(t, found, "deleted domain found")
 			},
 		},
 	}
@@ -1392,7 +1390,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 		ValidateOrgDomains: true,
 	})
 	if err != nil && !strings.Contains(err.Error(), "Organisation is already deactivated") {
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	}
 
 	domain := gofakeit.URL()
@@ -1400,7 +1398,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 		OrganizationId: orgId,
 		Domain:         domain,
 	})
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	tests := []struct {
 		name string
@@ -1463,13 +1461,13 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.GenerateOrganizationDomainValidation(tt.ctx, tt.req)
 			if tt.err != nil {
-				require.Contains(t, err.Error(), tt.err.Error())
+				assert.Contains(t, err.Error(), tt.err.Error())
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 
-			require.NotEmpty(t, got.Token)
-			require.Contains(t, got.Url, domain)
+			assert.NotEmpty(t, got.Token)
+			assert.Contains(t, got.Url, domain)
 		})
 	}
 }
@@ -1519,7 +1517,7 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 						},
 					},
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 			},
 			orgId: orgId,
 			key:   "key4",
@@ -1538,7 +1536,7 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 						},
 					},
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 			},
 			orgId: orgId,
 			key:   "key5",
@@ -1560,10 +1558,10 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 				},
 			})
 			if tt.err != nil {
-				require.Contains(t, err.Error(), tt.err.Error())
+				assert.Contains(t, err.Error(), tt.err.Error())
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 
 			// check details
 			gotCD := got.GetSetDate().AsTime()
@@ -1571,12 +1569,12 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+			assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// check metadata
 				listMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
 					OrganizationId: orgId,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				foundMetadata := false
 				foundMetadataKeyCount := 0
 				for _, res := range listMetadataRes.Metadata {
@@ -1588,8 +1586,8 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 						foundMetadata = true
 					}
 				}
-				require.True(ttt, foundMetadata, "unable to find added metadata")
-				require.Equal(ttt, 1, foundMetadataKeyCount, "same metadata key found multiple times")
+				assert.True(ttt, foundMetadata, "unable to find added metadata")
+				assert.Equal(ttt, 1, foundMetadataKeyCount, "same metadata key found multiple times")
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 		})
 	}
@@ -1626,7 +1624,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 						},
 					},
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 			},
 			orgId: orgId,
 			keyValuPars: []struct{ key, value string }{
@@ -1657,7 +1655,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 						},
 					},
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 			},
 			orgId: orgId,
 			keyValuPars: []struct{ key, value string }{
@@ -1689,11 +1687,11 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 			}
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+			assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
 					OrganizationId: tt.orgId,
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 
 				foundMetadataCount := 0
 				for _, kv := range tt.keyValuPars {
@@ -1704,7 +1702,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 						}
 					}
 				}
-				require.Equal(t, len(tt.keyValuPars), foundMetadataCount)
+				assert.Equal(t, len(tt.keyValuPars), foundMetadataCount)
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 		})
 	}
@@ -1746,7 +1744,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 						},
 					},
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 			},
 			orgId: orgId,
 			metadataToDelete: []struct{ key, value string }{
@@ -1773,7 +1771,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 						},
 					},
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 			},
 			orgId: orgId,
 			metadataToDelete: []struct{ key, value string }{
@@ -1809,7 +1807,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 						},
 					},
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 			},
 			orgId: orgId,
 			metadataToDelete: []struct{ key, value string }{
@@ -1846,7 +1844,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 						},
 					},
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 			},
 			orgId: orgId,
 			// TODO: this error message needs to be either removed or changed
@@ -1869,7 +1867,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 						},
 					},
 				})
-				require.NoError(t, err)
+				assert.NoError(t, err)
 			},
 			orgId: "non existant org id",
 			// TODO: this error message needs to be either removed or changed
@@ -1884,11 +1882,11 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 
 			// check metadata exists
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+			assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				listOrgMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
 					OrganizationId: tt.orgId,
 				})
-				require.NoError(ttt, err)
+				assert.NoError(ttt, err)
 				foundMetadataCount := 0
 				for _, kv := range tt.metadataToDelete {
 					for _, res := range listOrgMetadataRes.Metadata {
@@ -1898,7 +1896,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 						}
 					}
 				}
-				require.Equal(ttt, len(tt.metadataToDelete), foundMetadataCount)
+				assert.Equal(ttt, len(tt.metadataToDelete), foundMetadataCount)
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 			keys := make([]string, len(tt.metadataToDelete))
@@ -1912,18 +1910,18 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 				Keys:           keys,
 			})
 			if tt.err != nil {
-				require.Contains(t, err.Error(), tt.err.Error())
+				assert.Contains(t, err.Error(), tt.err.Error())
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 
 			retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, 10*time.Minute)
-			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+			assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// check metadata was definitely deleted
 				listOrgMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
 					OrganizationId: tt.orgId,
 				})
-				require.NoError(ttt, err)
+				assert.NoError(ttt, err)
 				foundMetadataCount := 0
 				for _, kv := range tt.metadataToDelete {
 					for _, res := range listOrgMetadataRes.Metadata {
@@ -1933,14 +1931,14 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 						}
 					}
 				}
-				require.Equal(ttt, foundMetadataCount, 0)
+				assert.Equal(ttt, foundMetadataCount, 0)
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 			// check metadata that should not be delted was not deleted
 			listOrgMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
 				OrganizationId: tt.orgId,
 			})
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			foundMetadataCount := 0
 			for _, kv := range tt.metadataToRemain {
 				for _, res := range listOrgMetadataRes.Metadata {
@@ -1950,7 +1948,7 @@ func TestServer_DeleteOrganizationMetadata(t *testing.T) {
 					}
 				}
 			}
-			require.Equal(t, len(tt.metadataToRemain), foundMetadataCount)
+			assert.Equal(t, len(tt.metadataToRemain), foundMetadataCount)
 		})
 	}
 }
