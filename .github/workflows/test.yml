@@ -42,4 +42,4 @@ jobs:
         env:
           # latest if branch is main, otherwise image version which is the pull request number
           BUILD_CACHE_KEY: ${{ github.ref == 'refs/heads/main' && 'latest' || fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
-      - run: make quality
+      - run: make login-quality
