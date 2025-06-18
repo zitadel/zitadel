@@ -5,8 +5,8 @@ export BAKE_CLI ?= docker buildx bake --file ./docker-bake.hcl --file ./apps/log
 export REF_TAG ?= local
 export LOGIN_TAG := login:${REF_TAG}
 export LOGIN_TEST_UNIT_TAG := login-test-unit:${REF_TAG}
-export LOGIN_TEST_INTEGRATION_TAG ?= login-test-integration:${REF_TAG}
-export LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT ?= apps/login-test-acceptance
+export LOGIN_TEST_INTEGRATION_TAG := login-test-integration:${REF_TAG}
+export LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT := apps/login-test-acceptance
 export LOGIN_TEST_ACCEPTANCE_TAG := login-test-acceptance:${REF_TAG}
 export LOGIN_TEST_ACCEPTANCE_SETUP_TAG := login-test-acceptance-setup:${REF_TAG}
 export LOGIN_TEST_ACCEPTANCE_SINK_TAG := login-test-acceptance-sink:${REF_TAG}
@@ -16,7 +16,6 @@ export LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG := login-test-acceptance-samlsp:${REF_TA
 export LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG := login-test-acceptance-samlidp:${REF_TAG}
 export POSTGRES_TAG := postgres:17.0-alpine3.19
 export GOLANG_TAG := golang:1.24-alpine
-# TODO: use ghcr.io/zitadel/zitadel:latest
 export ZITADEL_TAG ?= ghcr.io/zitadel/zitadel:02617cf17fdde849378c1a6b5254bbfb2745b164
 export CORE_MOCK_TAG := core-mock:${REF_TAG}
 
@@ -31,8 +30,8 @@ login-help:
 	@echo "  login-test-unit         - Run unit tests. Tests without any dependencies. FORCE=true prevents skipping."
 	@echo "  login-test-integration  - Run integration tests. Tests a login production build against a mocked Zitadel core API. FORCE=true prevents skipping."
 	@echo "  login-test-acceptance   - Run acceptance tests. Tests a login production build with a local Zitadel instance behind a reverse proxy. FORCE=true prevents skipping."
-	@echo "  show-cache-keys         - Show all cache keys with image ids and exit codes."
-	@echo "  clean-cache-keys        - Remove all cache keys."
+	@echo "  show-run-caches         - Show all run caches with image ids and exit codes."
+	@echo "  clean-run-caches        - Remove all run caches."
 
 login-lint:
 	$(BAKE_CLI) login-lint
@@ -87,14 +86,14 @@ login-quality: login-lint login-test-integration login-test-acceptance
 login-standalone-build:
 	$(BAKE_CLI) login-standalone
 
-.PHONY: clean-cache-keys
-clean-cache-keys:
+.PHONY: clean-run-caches
+clean-run-caches:
 	@echo "Removing cache directory: $(CACHE_DIR)"
 	rm -rf "$(CACHE_DIR)"
 
-.PHONY: show-cache-keys
-show-cache-keys:
-	@echo "Showing cache keys with docker image ids and exit codes in $(CACHE_DIR):"
+.PHONY: show-run-caches
+show-run-caches:
+	@echo "Showing run caches with docker image ids and exit codes in $(CACHE_DIR):"
 	@find "$(CACHE_DIR)" -type f 2>/dev/null | while read file; do \
 		echo "$$file: $$(cat $$file)"; \
 	done

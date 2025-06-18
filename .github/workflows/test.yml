@@ -1,6 +1,16 @@
 name: Quality
 on:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      ref-tag:
+        description: 'The tag to use for the build cache'
+        required: false
+        default: 'latest'
+      clean-run-caches:
+        description: 'Whether to clean the run caches'
+        required: false
+        default: 'true'
 jobs:
   quality:
     name: Ensure Quality
@@ -10,6 +20,8 @@ jobs:
       contents: read
       id-token: write
       packages: write
+    env:
+      CACHE_DIR: ${{ runner.temp }}/login-run-caches
     steps:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -37,19 +49,23 @@ jobs:
         uses: actions/cache/restore@v4
         id: run-caches-restore
         with:
-          path: ${{ runner.temp }}/login-make-cache
-          key: login-make-cache-${{ github.ref == 'refs/heads/main' && 'latest' || fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
-          restore-keys: login-make-cache-latest
+          path: ${{ github.env.CACHE_DIR }}
+          key: login-run-caches-${{ github.ref == 'refs/heads/main' && 'latest' || fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+          restore-keys: login-run-caches-latest
+      - name: Clean up Run Caches
+#        if: ${{ github.event.inputs.clean-run-caches == 'true' }}
+        run: make clean-run-caches
+      - name: Show Run Caches
+        run: make show-run-caches
       - run: make login-quality
         env:
           # latest if branch is main, otherwise image version which is the pull request number
           BAKE_CLI: depot bake --file docker-bake.hcl --file docker-bake-ci.hcl --file ./apps/login-test-acceptance/docker-compose.yaml --file ./apps/login-test-acceptance/docker-compose-ci.yaml
           DEPOT_PROJECT_ID: jp837jn3fm
           REF_TAG: ${{ github.ref == 'refs/heads/main' && 'latest' || fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
-          CACHE_DIR: ${{ runner.temp }}/login-make-cache
       - name: Save Run Caches
         uses: actions/cache/save@v4
         with:
-          path: ${{ runner.temp }}/login-make-cache
+          path: ${{ github.env.CACHE_DIR }}
           key: ${{ steps.run-caches-restore.outputs.cache-primary-key }}
         if: always()
