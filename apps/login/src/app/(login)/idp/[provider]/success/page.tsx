@@ -81,7 +81,7 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const branding = await getBrandingSettings({
+  let branding = await getBrandingSettings({
     serviceUrl,
     organization,
   });
@@ -293,6 +293,13 @@ export default async function Page(props: {
       addHumanUser,
       serviceUrl,
     });
+
+    if (orgToRegisterOn) {
+      branding = await getBrandingSettings({
+        serviceUrl,
+        organization: orgToRegisterOn,
+      });
+    }
 
     if (!orgToRegisterOn) {
       return loginFailed(branding, "No organization found for registration");
