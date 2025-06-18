@@ -1,6 +1,6 @@
 CREATE TYPE zitadel.organization_state AS ENUM (
-	'ACTIVE',
-	'INACTIVE'
+	'active',
+	'inactive'
 );
 
 CREATE TABLE zitadel.organizations(

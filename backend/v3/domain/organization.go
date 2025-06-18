@@ -7,18 +7,19 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-type State string
+//go:generate enumer -type OrgState -transform lower -trimprefix OrgState
+type OrgState int
 
 const (
-	Active   State = "ACTIVE"
-	Inactive State = "INACTIVE"
+	OrgStateActive OrgState = iota
+	OrgStateInactive
 )
 
 type Organization struct {
 	ID         string     `json:"id,omitempty" db:"id"`
 	Name       string     `json:"name,omitempty" db:"name"`
 	InstanceID string     `json:"instanceId,omitempty" db:"instance_id"`
-	State      State      `json:"state,omitempty" db:"state"`
+	State      string     `json:"state,omitempty" db:"state"`
 	CreatedAt  time.Time  `json:"createdAt,omitempty" db:"created_at"`
 	UpdatedAt  time.Time  `json:"updatedAt,omitempty" db:"updated_at"`
 	DeletedAt  *time.Time `json:"deletedAt,omitempty" db:"deleted_at"`
@@ -49,7 +50,7 @@ type organizationConditions interface {
 	// NameCondition returns a filter on the name field.
 	NameCondition(op database.TextOperation, name string) database.Condition
 	// StateCondition returns a filter on the name field.
-	StateCondition(state State) database.Condition
+	StateCondition(state OrgState) database.Condition
 }
 
 // organizationChanges define all the changes for the instance table.
@@ -57,7 +58,7 @@ type organizationChanges interface {
 	// SetName sets the name column.
 	SetName(name string) database.Change
 	// SetState sets the name column.
-	SetState(state State) database.Change
+	SetState(state OrgState) database.Change
 }
 
 // OrganizationRepository is the interface for the instance repository.

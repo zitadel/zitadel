@@ -46,7 +46,7 @@ func TestCreateOrganization(t *testing.T) {
 					ID:         organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.Active,
+					State:      domain.OrgStateActive.String(),
 				}
 				return organization
 			}(),
@@ -60,7 +60,7 @@ func TestCreateOrganization(t *testing.T) {
 					ID:         organizationId,
 					Name:       "",
 					InstanceID: instanceId,
-					State:      domain.Active,
+					State:      domain.OrgStateActive.String(),
 				}
 				return organization
 			}(),
@@ -77,7 +77,7 @@ func TestCreateOrganization(t *testing.T) {
 					ID:         organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.Active,
+					State:      domain.OrgStateActive.String(),
 				}
 
 				err := organizationRepo.Create(ctx, &inst)
@@ -95,7 +95,7 @@ func TestCreateOrganization(t *testing.T) {
 					// ID:              organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.Active,
+					State:      domain.OrgStateActive.String(),
 				}
 				return organization
 			}(),
@@ -109,7 +109,7 @@ func TestCreateOrganization(t *testing.T) {
 				organization := domain.Organization{
 					ID:    organizationId,
 					Name:  organizationName,
-					State: domain.Active,
+					State: domain.OrgStateActive.String(),
 				}
 				return organization
 			}(),
@@ -187,7 +187,7 @@ func TestUpdateOrganization(t *testing.T) {
 					ID:         organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.Active,
+					State:      domain.OrgStateActive.String(),
 				}
 
 				// create organization
@@ -211,7 +211,7 @@ func TestUpdateOrganization(t *testing.T) {
 					ID:         organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.Active,
+					State:      domain.OrgStateActive.String(),
 				}
 
 				// create organization
@@ -238,7 +238,7 @@ func TestUpdateOrganization(t *testing.T) {
 					ID:         organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.Active,
+					State:      domain.OrgStateActive.String(),
 				}
 
 				// create organization
@@ -246,10 +246,10 @@ func TestUpdateOrganization(t *testing.T) {
 				assert.NoError(t, err)
 
 				// update with updated value
-				org.State = domain.Inactive
+				org.State = domain.OrgStateInactive.String()
 				return &org
 			},
-			update:       []database.Change{organizationRepo.SetState(domain.Inactive)},
+			update:       []database.Change{organizationRepo.SetState(domain.OrgStateInactive)},
 			rowsAffected: 1,
 		},
 		{
@@ -329,7 +329,7 @@ func TestGetOrganization(t *testing.T) {
 		ID:         gofakeit.Name(),
 		Name:       gofakeit.Name(),
 		InstanceID: instanceId,
-		State:      domain.Active,
+		State:      domain.OrgStateActive.String(),
 	}
 	err = orgRepo.Create(t.Context(), &org)
 	assert.NoError(t, err)
@@ -352,7 +352,7 @@ func TestGetOrganization(t *testing.T) {
 						ID:         organizationId,
 						Name:       organizationName,
 						InstanceID: instanceId,
-						State:      domain.Active,
+						State:      domain.OrgStateActive.String(),
 					}
 
 					// create organization
@@ -375,7 +375,7 @@ func TestGetOrganization(t *testing.T) {
 						ID:         organizationId,
 						Name:       organizationName,
 						InstanceID: instanceId,
-						State:      domain.Active,
+						State:      domain.OrgStateActive.String(),
 					}
 
 					// create organization
@@ -466,7 +466,7 @@ func TestListOrganization(t *testing.T) {
 						ID:         gofakeit.Name(),
 						Name:       gofakeit.Name(),
 						InstanceID: instanceId,
-						State:      domain.Active,
+						State:      domain.OrgStateActive.String(),
 					}
 
 					// create organization
@@ -490,7 +490,7 @@ func TestListOrganization(t *testing.T) {
 						ID:         gofakeit.Name(),
 						Name:       gofakeit.Name(),
 						InstanceID: instanceId,
-						State:      domain.Active,
+						State:      domain.OrgStateActive.String(),
 					}
 
 					// create organization
@@ -515,7 +515,7 @@ func TestListOrganization(t *testing.T) {
 						ID:         gofakeit.Name(),
 						Name:       gofakeit.Name(),
 						InstanceID: instanceId,
-						State:      domain.Active,
+						State:      domain.OrgStateActive.String(),
 					}
 					err = organizationRepo.Create(ctx, &org)
 					assert.NoError(t, err)
@@ -528,7 +528,7 @@ func TestListOrganization(t *testing.T) {
 							ID:         organizationId,
 							Name:       gofakeit.Name(),
 							InstanceID: instanceId,
-							State:      domain.Active,
+							State:      domain.OrgStateActive.String(),
 						}
 
 						// create organization
@@ -553,7 +553,7 @@ func TestListOrganization(t *testing.T) {
 					ID:         gofakeit.Name(),
 					Name:       gofakeit.Name(),
 					InstanceID: instanceId,
-					State:      domain.Active,
+					State:      domain.OrgStateActive.String(),
 				}
 				err = organizationRepo.Create(ctx, &org)
 				assert.NoError(t, err)
@@ -566,7 +566,7 @@ func TestListOrganization(t *testing.T) {
 						ID:         gofakeit.Name(),
 						Name:       gofakeit.Name(),
 						InstanceID: instanceId,
-						State:      domain.Inactive,
+						State:      domain.OrgStateInactive.String(),
 					}
 
 					// create organization
@@ -578,7 +578,7 @@ func TestListOrganization(t *testing.T) {
 
 				return organizations
 			},
-			conditionClauses: []database.Condition{organizationRepo.StateCondition(domain.Inactive)},
+			conditionClauses: []database.Condition{organizationRepo.StateCondition(domain.OrgStateInactive)},
 		},
 		func() test {
 			organizationName := gofakeit.Name()
@@ -592,7 +592,7 @@ func TestListOrganization(t *testing.T) {
 						ID:         gofakeit.Name(),
 						Name:       gofakeit.Name(),
 						InstanceID: instanceId,
-						State:      domain.Active,
+						State:      domain.OrgStateActive.String(),
 					}
 					err = organizationRepo.Create(ctx, &org)
 					assert.NoError(t, err)
@@ -605,7 +605,7 @@ func TestListOrganization(t *testing.T) {
 							ID:         gofakeit.Name(),
 							Name:       organizationName,
 							InstanceID: instanceId,
-							State:      domain.Active,
+							State:      domain.OrgStateActive.String(),
 						}
 
 						// create organization
@@ -687,7 +687,7 @@ func TestDeleteOrganization(t *testing.T) {
 							ID:         organizationId,
 							Name:       gofakeit.Name(),
 							InstanceID: instanceId,
-							State:      domain.Active,
+							State:      domain.OrgStateActive.String(),
 						}
 
 						// create organization
@@ -714,7 +714,7 @@ func TestDeleteOrganization(t *testing.T) {
 							ID:         gofakeit.Name(),
 							Name:       organizationName,
 							InstanceID: instanceId,
-							State:      domain.Active,
+							State:      domain.OrgStateActive.String(),
 						}
 
 						// create organization
@@ -749,7 +749,7 @@ func TestDeleteOrganization(t *testing.T) {
 							ID:         gofakeit.Name(),
 							Name:       organizationName,
 							InstanceID: instanceId,
-							State:      domain.Active,
+							State:      domain.OrgStateActive.String(),
 						}
 
 						// create organization
@@ -776,7 +776,7 @@ func TestDeleteOrganization(t *testing.T) {
 							ID:         gofakeit.Name(),
 							Name:       organizationName,
 							InstanceID: instanceId,
-							State:      domain.Active,
+							State:      domain.OrgStateActive.String(),
 						}
 
 						// create organization

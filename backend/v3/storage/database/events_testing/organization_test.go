@@ -30,17 +30,17 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		orgRepo := repository.OrganizationRepository(pool)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+		assert.EventuallyWithT(t, func(tt *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
 				orgRepo.NameCondition(database.TextOperationEqual, orgName),
 			)
-			assert.NoError(t, err)
+			assert.NoError(tt, err)
 
 			// event org.added
 			assert.NotNil(t, organization.ID)
 			assert.Equal(t, orgName, organization.Name)
 			assert.NotNil(t, organization.InstanceID)
-			assert.Equal(t, domain.Active, organization.State)
+			assert.Equal(t, domain.OrgStateActive.String(), organization.State)
 			assert.WithinRange(t, organization.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, organization.UpdatedAt, beforeCreate, afterCreate)
 			assert.Nil(t, organization.DeletedAt)
@@ -110,7 +110,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 
 			// event org.deactivate
 			assert.Equal(t, orgName, organization.Name)
-			assert.Equal(t, domain.Inactive, organization.State)
+			assert.Equal(t, domain.OrgStateInactive.String(), organization.State)
 			assert.WithinRange(t, organization.UpdatedAt, beforeDeactivate, afterDeactivate)
 		}, retryDuration, tick)
 	})
@@ -140,7 +140,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 			assert.NoError(t, err)
 
 			assert.Equal(t, orgName, organization.Name)
-			assert.Equal(t, domain.Inactive, organization.State)
+			assert.Equal(t, domain.OrgStateInactive.String(), organization.State)
 		}, retryDuration, tick)
 
 		// 4. activate org name
@@ -160,7 +160,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 
 			// event org.reactivate
 			assert.Equal(t, orgName, organization.Name)
-			assert.Equal(t, domain.Active, organization.State)
+			assert.Equal(t, domain.OrgStateActive.String(), organization.State)
 			assert.WithinRange(t, organization.UpdatedAt, beforeActivate, afterActivate)
 		}, retryDuration, tick)
 	})

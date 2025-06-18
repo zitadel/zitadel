@@ -140,7 +140,7 @@ func (o org) SetName(name string) database.Change {
 }
 
 // SetState implements [domain.organizationChanges].
-func (i org) SetState(state domain.State) database.Change {
+func (i org) SetState(state domain.OrgState) database.Change {
 	return database.NewChange(i.StateColumn(), state)
 }
 
@@ -159,8 +159,8 @@ func (o org) NameCondition(op database.TextOperation, name string) database.Cond
 }
 
 // StateCondition implements [domain.organizationConditions].
-func (o org) StateCondition(state domain.State) database.Condition {
-	return database.NewTextCondition(o.StateColumn(), database.TextOperationEqual, state)
+func (o org) StateCondition(state domain.OrgState) database.Condition {
+	return database.NewTextCondition(o.StateColumn(), database.TextOperationEqual, state.String())
 }
 
 // -------------------------------------------------------------

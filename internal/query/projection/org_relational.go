@@ -81,7 +81,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalAdded(event eventstore.Even
 			handler.NewCol(OrgColumnID, e.Aggregate().ID),
 			handler.NewCol(OrgColumnName, e.Name),
 			handler.NewCol(OrgColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(State, repoDomain.Active),
+			handler.NewCol(State, repoDomain.OrgStateActive.String()),
 			handler.NewCol(CreatedAt, e.CreationDate()),
 			handler.NewCol(UpdatedAt, e.CreationDate()),
 		},
@@ -118,7 +118,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalDeactivated(event eventstor
 	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(State, repoDomain.Inactive),
+			handler.NewCol(State, repoDomain.OrgStateInactive.String()),
 			handler.NewCol(UpdatedAt, e.CreationDate()),
 		},
 		[]handler.Condition{
@@ -136,7 +136,7 @@ func (p *orgRelationalProjection) reduceOrgRelationalReactivated(event eventstor
 	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(State, repoDomain.Active),
+			handler.NewCol(State, repoDomain.OrgStateActive.String()),
 			handler.NewCol(UpdatedAt, e.CreationDate()),
 		},
 		[]handler.Condition{

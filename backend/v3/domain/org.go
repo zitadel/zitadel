@@ -8,13 +8,6 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-type OrgState uint8
-
-const (
-	OrgStateActive OrgState = iota + 1
-	OrgStateInactive
-)
-
 // Org is used by all other packages to represent an organization.
 type Org struct {
 	ID   string `json:"id"`
