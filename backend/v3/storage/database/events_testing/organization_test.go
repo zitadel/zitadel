@@ -8,6 +8,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -24,7 +25,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		_, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
 			Name: orgName,
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		afterCreate := time.Now()
 
 		orgRepo := repository.OrganizationRepository(pool)
@@ -34,7 +35,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 			organization, err := orgRepo.Get(CTX,
 				orgRepo.NameCondition(database.TextOperationEqual, orgName),
 			)
-			assert.NoError(tt, err)
+			require.NoError(tt, err)
 
 			// event org.added
 			assert.NotNil(t, organization.ID)
@@ -54,7 +55,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
 			Name: orgName,
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// 2. update org name
 		beforeUpdate := time.Now()
@@ -63,7 +64,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 			Id:   organization.Id,
 			Name: orgName,
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		afterUpdate := time.Now()
 
 		orgRepo := repository.OrganizationRepository(pool)
@@ -73,7 +74,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 			organization, err := orgRepo.Get(CTX,
 				orgRepo.NameCondition(database.TextOperationEqual, orgName),
 			)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			// event org.changed
 			assert.Equal(t, orgName, organization.Name)
@@ -88,7 +89,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
 			Name: orgName,
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// 2. deactivate org name
 		beforeDeactivate := time.Now()
@@ -96,7 +97,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 			Id: organization.Id,
 		})
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		afterDeactivate := time.Now()
 
 		orgRepo := repository.OrganizationRepository(pool)
@@ -106,7 +107,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 			organization, err := orgRepo.Get(CTX,
 				orgRepo.NameCondition(database.TextOperationEqual, orgName),
 			)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			// event org.deactivate
 			assert.Equal(t, orgName, organization.Name)
@@ -122,13 +123,13 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
 			Name: orgName,
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// 2. deactivate org name
 		_, err = OrgClient.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
 			Id: organization.Id,
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		orgRepo := repository.OrganizationRepository(pool)
 		// 3. check org deactivated
@@ -137,7 +138,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 			organization, err := orgRepo.Get(CTX,
 				orgRepo.NameCondition(database.TextOperationEqual, orgName),
 			)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			assert.Equal(t, orgName, organization.Name)
 			assert.Equal(t, domain.OrgStateInactive.String(), organization.State)
@@ -148,7 +149,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		_, err = OrgClient.ActivateOrganization(CTX, &v2beta_org.ActivateOrganizationRequest{
 			Id: organization.Id,
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		afterActivate := time.Now()
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
@@ -156,7 +157,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 			organization, err := orgRepo.Get(CTX,
 				orgRepo.NameCondition(database.TextOperationEqual, orgName),
 			)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			// event org.reactivate
 			assert.Equal(t, orgName, organization.Name)
@@ -172,7 +173,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
 			Name: orgName,
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		// 2. check org retrivable
 		orgRepo := repository.OrganizationRepository(pool)
@@ -181,7 +182,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 			organization, err := orgRepo.Get(CTX,
 				orgRepo.NameCondition(database.TextOperationEqual, orgName),
 			)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			if organization == nil {
 				assert.Fail(t, "this error is here because of a race condition")
@@ -193,14 +194,14 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		_, err = OrgClient.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{
 			Id: organization.Id,
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
 				orgRepo.NameCondition(database.TextOperationEqual, orgName),
 			)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			// event org.remove
 			assert.Nil(t, organization)

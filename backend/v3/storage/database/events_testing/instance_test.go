@@ -42,20 +42,20 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			)
 			require.NoError(ttt, err)
 			// event instance.added
-			require.Equal(ttt, instanceName, instance.Name)
+			assert.Equal(ttt, instanceName, instance.Name)
 			// event instance.default.org.set
-			require.NotNil(t, instance.DefaultOrgID)
+			assert.NotNil(t, instance.DefaultOrgID)
 			// event instance.iam.project.set
-			require.NotNil(t, instance.IAMProjectID)
+			assert.NotNil(t, instance.IAMProjectID)
 			// event instance.iam.console.set
-			require.NotNil(t, instance.ConsoleAppID)
+			assert.NotNil(t, instance.ConsoleAppID)
 			// event instance.default.language.set
-			require.NotNil(t, instance.DefaultLanguage)
+			assert.NotNil(t, instance.DefaultLanguage)
 			// event instance.added
 			assert.WithinRange(t, instance.CreatedAt, beforeCreate, afterCreate)
 			// event instance.added
 			assert.WithinRange(t, instance.UpdatedAt, beforeCreate, afterCreate)
-			require.Nil(t, instance.DeletedAt)
+			assert.Nil(t, instance.DeletedAt)
 		}, retryDuration, tick)
 	})
 
@@ -90,7 +90,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			)
 			require.NoError(ttt, err)
 			// event instance.changed
-			require.Equal(ttt, instanceName, instance.Name)
+			assert.Equal(ttt, instanceName, instance.Name)
 			assert.WithinRange(t, instance.UpdatedAt, beforeUpdate, afterUpdate)
 		}, retryDuration, tick)
 	})
@@ -118,7 +118,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 				instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
 			)
 			require.NoError(ttt, err)
-			require.Equal(ttt, instanceName, instance.Name)
+			assert.Equal(ttt, instanceName, instance.Name)
 		}, retryDuration, tick)
 
 		_, err = SystemClient.RemoveInstance(CTX, &system.RemoveInstanceRequest{
@@ -132,7 +132,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 				instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
 			)
 			// event instance.removed
-			require.Nil(t, instance)
+			assert.Nil(t, instance)
 			require.NoError(t, err)
 		}, retryDuration, tick)
 	})
