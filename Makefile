@@ -1,7 +1,7 @@
 XDG_CACHE_HOME ?= $(HOME)/.cache
 export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 
-export BUILDX_CLI ?= docker buildx
+export BAKE_CLI ?= docker buildx
 export REF_TAG ?= local
 export LOGIN_TAG := login:${REF_TAG}
 export LOGIN_TEST_UNIT_TAG := login-test-unit:${REF_TAG}
@@ -56,8 +56,7 @@ login-test-integration: login-standalone-build login-test-integration-build
 	$(LOGIN_TEST_INTEGRATION_TAG)"
 
 login-test-acceptance-build:
-	COMPOSE_BAKE=true docker compose --file ./apps/login-test-acceptance/docker-compose.yaml build
-	$(BUILDX_CLI) bake login-standalone login-test-acceptance
+	$(BUILDX_CLI) --file ./apps/login-test-acceptance/docker-compose.yaml bake setup sink oidcop samlsp samlidp login-standalone login-test-acceptance
 
 login-test-acceptance-run: login-acceptance-cleanup
 	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml run --rm --service-ports acceptance
