@@ -67,6 +67,7 @@ target "typescript-proto-client" {
     # We directly generate and download the client server-side with buf, so we don't need the proto files
     login-pnpm = "target:login-pnpm"
   }
+    output = ["type=docker"]
 }
 
 # proto-files is only used to build core-mock against which the integration tests run.

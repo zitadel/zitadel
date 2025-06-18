@@ -71,11 +71,16 @@ services:
         condition: "service_completed_successfully"
 
   setup:
-    container_name: acceptance-setup
     image: ${LOGIN_TEST_ACCEPTANCE_SETUP_TAG:-login-test-acceptance-setup:local}
+    container_name: acceptance-setup
     build:
       context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/setup"
       dockerfile: ../go-command.Dockerfile
+      x-bake:
+        output: "type=docker"
+        cache-from:
+        - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-setup-buildcache:${REF_TAG}
+        - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-setup-buildcache:latest
     entrypoint: "./setup.sh"
     environment:
       PAT_FILE: /pat/zitadel-admin-sa.pat
@@ -120,6 +125,11 @@ services:
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+      x-bake:
+        output: "type=docker"
+        cache-from:
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-sink-buildcache:${REF_TAG}
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-sink-buildcache:latest
     environment:
       PORT: '3333'
     command:
@@ -145,6 +155,11 @@ services:
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+      x-bake:
+        output: "type=docker"
+        cache-from:
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-oidcrp-buildcache:${REF_TAG}
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-oidcrp-buildcache:latest
     environment:
       API_URL: 'http://traefik'
       API_DOMAIN: 'traefik'
@@ -172,6 +187,11 @@ services:
       dockerfile: ../../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+      x-bake:
+        output: "type=docker"
+        cache-from:
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-oidcop-buildcache:${REF_TAG}
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-oidcop-buildcache:latest
     environment:
       API_URL: 'http://traefik'
       API_DOMAIN: 'traefik'
@@ -197,6 +217,11 @@ services:
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+      x-bake:
+        output: "type=docker"
+        cache-from:
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-samlsp-buildcache:${REF_TAG}
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-samlsp-buildcache:latest
     environment:
       API_URL: 'http://traefik'
       API_DOMAIN: 'traefik'
@@ -221,6 +246,11 @@ services:
       dockerfile: ../../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+      x-bake:
+        output: "type=docker"
+        cache-from:
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-samlidp-buildcache:${REF_TAG}
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-samlidp-buildcache:latest
     environment:
       API_URL: 'http://traefik:8080'
       API_DOMAIN: 'traefik'

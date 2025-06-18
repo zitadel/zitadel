@@ -1,0 +1,36 @@
+services:
+  setup:
+    build:
+      x-bake:
+        cache-to:
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-setup-buildcache:${REF_TAG},mode=max,oci-mediatypes=true
+
+  sink:
+    build:
+      x-bake:
+        cache-to:
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-sink-buildcache:${REF_TAG},mode=max,oci-mediatypes=true
+
+  oidcrp:
+    build:
+      x-bake:
+        cache-to:
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-oidcrp-buildcache:${REF_TAG},mode=max,oci-mediatypes=true
+
+  oidcop:
+    build:
+      x-bake:
+        cache-to:
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-oidcop-buildcache:${REF_TAG},mode=max,oci-mediatypes=true
+
+  samlsp:
+    build:
+      x-bake:
+        cache-to:
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-samlsp-buildcache:${REF_TAG},mode=max,oci-mediatypes=true
+
+  samlidp:
+    build:
+      x-bake:
+        cache-to:
+          - type=registry,ref=ghcr.io/zitadel/login-test-acceptance-samlidp-buildcache:${REF_TAG},mode=max,oci-mediatypes=true
