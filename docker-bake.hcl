@@ -15,8 +15,8 @@ target "_platforms" {
 target "login-pnpm" {
   inherits = ["_platforms"]
   cache-from = [
-    { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:${BUILD_CACHE_KEY}" }
-#    { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:latest" },
+    { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:${BUILD_CACHE_KEY}" },
+    { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:latest" },
   ]
   dockerfile = "dockerfiles/login-pnpm.Dockerfile"
  }
@@ -24,8 +24,8 @@ target "login-pnpm" {
 target "login-dev-base" {
   inherits = ["_platforms"]
   cache-from = [
-    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-dev-base-buildcache:${BUILD_CACHE_KEY}"}
-#    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-dev-base-buildcache:latest"},
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-dev-base-buildcache:${BUILD_CACHE_KEY}"},
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-dev-base-buildcache:latest"},
   ]
   dockerfile = "dockerfiles/login-dev-base.Dockerfile"
   contexts = {
@@ -36,8 +36,8 @@ target "login-dev-base" {
 target "login-lint" {
   inherits = ["_platforms"]
   cache-from = [
-    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY}"}
-#    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-lint-buildcache:latest"},
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY}"},
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-lint-buildcache:latest"},
   ]
   dockerfile = "dockerfiles/login-lint.Dockerfile"
   contexts = {
