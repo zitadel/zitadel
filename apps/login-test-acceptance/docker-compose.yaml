@@ -74,7 +74,7 @@ services:
     container_name: acceptance-setup
     image: ${LOGIN_TEST_ACCEPTANCE_SETUP_TAG:-login-test-acceptance-setup:local}
     build:
-      context: ${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/setup
+      context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/setup"
       dockerfile: ../go-command.Dockerfile
     entrypoint: "./setup.sh"
     environment:
@@ -116,7 +116,7 @@ services:
     image: ${LOGIN_TEST_ACCEPTANCE_SINK_TAG:-login-test-acceptance-sink:local}
     container_name: acceptance-sink
     build:
-      context: ${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/sink
+      context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/sink"
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
@@ -141,7 +141,7 @@ services:
     image: ${LOGIN_TEST_ACCEPTANCE_OIDCRP_TAG:-login-test-acceptance-oidcrp:local}
     container_name: acceptance-oidcrp
     build:
-      context: ${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/oidcrp
+      context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/oidcrp"
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
@@ -168,7 +168,7 @@ services:
     image: ${LOGIN_TEST_ACCEPTANCE_OIDCOP_TAG:-login-test-acceptance-oidcop:local}
     container_name: acceptance-oidcop
     build:
-      context: ${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/idp/oidc
+      context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/idp/oidc"
       dockerfile: ../../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
@@ -190,10 +190,10 @@ services:
         condition: "service_healthy"
 
   samlsp:
-    image: ${LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG:-login-test-acceptance-samlsp:local}
+    image: "${LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG:-login-test-acceptance-samlsp:local}"
     container_name: acceptance-samlsp
     build:
-      context: ${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/samlsp
+      context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/samlsp"
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
@@ -214,10 +214,10 @@ services:
         condition: "service_healthy"
 
   samlidp:
-    image: ${LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG:-login-test-acceptance-samlidp:local}
+    image: "${LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG:-login-test-acceptance-samlidp:local}"
     container_name: acceptance-samlidp
     build:
-      context: ${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/idp/saml
+      context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/idp/saml"
       dockerfile: ../../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}

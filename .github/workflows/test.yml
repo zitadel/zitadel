@@ -47,7 +47,7 @@ jobs:
           DEPOT_PROJECT_ID: jp837jn3fm
           REF_TAG: ${{ github.ref == 'refs/heads/main' && 'latest' || fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
           CACHE_DIR: ${{ runner.temp }}/zitadel-make-cache
-          LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT: "."
+          LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT: "./"
       - name: Save Run Caches
         id: cache-primes-save
         uses: actions/cache/save@v4
