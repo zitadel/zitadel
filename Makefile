@@ -35,13 +35,13 @@ login-help:
 	@echo "  clean-cache-keys        - Remove all cache keys."
 
 login-lint:
-	$(BAKE_CLI) login-lint
+	$(BAKE_CLI) login-lint --print && $(BAKE_CLI) login-lint
 
 login-test-unit:
-	$(BAKE_CLI) login-test-unit
+	$(BAKE_CLI) login-test-unit --print && $(BAKE_CLI) login-test-unit
 
 login-test-integration-build:
-	$(BAKE_CLI) core-mock login-test-integration
+	$(BAKE_CLI) core-mock login-test-integration --print && $(BAKE_CLI) core-mock login-test-integration
 
 login-test-integration-run: login-test-integration-cleanup
 	docker compose --file ./apps/login-test-integration/docker-compose.yaml run --rm integration
