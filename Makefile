@@ -1,7 +1,7 @@
 XDG_CACHE_HOME ?= $(HOME)/.cache
 export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 
-export BAKE_CLI ?= docker buildx
+export BAKE_CLI ?= docker buildx bake
 export REF_TAG ?= local
 export LOGIN_TAG := login:${REF_TAG}
 export LOGIN_TEST_UNIT_TAG := login-test-unit:${REF_TAG}
