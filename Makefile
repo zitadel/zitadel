@@ -2,11 +2,14 @@ XDG_CACHE_HOME ?= $(HOME)/.cache
 export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 
 export BAKE_CLI ?= docker buildx bake --file ./docker-bake.hcl --file ./apps/login-test-acceptance/docker-compose.yaml
+export COMPOSE_BAKE=true
+
+export LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT := apps/login-test-acceptance
+
 export REF_TAG ?= local
 export LOGIN_TAG := login:${REF_TAG}
 export LOGIN_TEST_UNIT_TAG := login-test-unit:${REF_TAG}
 export LOGIN_TEST_INTEGRATION_TAG := login-test-integration:${REF_TAG}
-export LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT := apps/login-test-acceptance
 export LOGIN_TEST_ACCEPTANCE_TAG := login-test-acceptance:${REF_TAG}
 export LOGIN_TEST_ACCEPTANCE_SETUP_TAG := login-test-acceptance-setup:${REF_TAG}
 export LOGIN_TEST_ACCEPTANCE_SINK_TAG := login-test-acceptance-sink:${REF_TAG}
