@@ -2351,6 +2351,8 @@
     "REMOVE_WARN_DESCRIPTION": "You are about to remove an identity provider. This will remove the selection of the available IdP for your users and already registered users won't be able to login again. Are you sure to continue?",
     "DELETE_SELECTION_TITLE": "Delete IdP",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+    "FEDERATEDLOGOUTENABLED": "Federated Logout Enabled",
+    "FEDERATEDLOGOUTENABLED_DESC": "If enabled, the user will be logged out from the IdP as well if the user terminates the session in ZITADEL.",
     "EMPTY": "No IdP available",
     "OIDC": {
       "GENERAL": "General Information",

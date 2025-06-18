@@ -204,7 +204,6 @@ func (h *UsersHandler) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-
 	_, err = h.command.RemoveUserV2(ctx, id, authz.GetCtxData(ctx).OrgID, memberships, grants...)
 	return err
 }
