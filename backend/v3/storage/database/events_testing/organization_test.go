@@ -14,8 +14,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
-	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
 func TestServer_TestOrganizationReduces(t *testing.T) {
@@ -23,7 +22,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		beforeCreate := time.Now()
 		orgName := gofakeit.Name()
 
-		_, err := OrgClient.AddOrganization(CTX, &org.AddOrganizationRequest{
+		_, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
 			Name: orgName,
 		})
 		require.NoError(t, err)
@@ -53,7 +52,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		orgName := gofakeit.Name()
 
 		// 1. create org
-		_, err := OrgClient.AddOrganization(CTX, &org.AddOrganizationRequest{
+		organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
 			Name: orgName,
 		})
 		require.NoError(t, err)
@@ -61,7 +60,8 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		// 2. update org name
 		beforeUpdate := time.Now()
 		orgName = orgName + "_new"
-		_, err = MgmtClient.UpdateOrg(CTX, &management.UpdateOrgRequest{
+		_, err = OrgClient.UpdateOrganization(CTX, &v2beta_org.UpdateOrganizationRequest{
+			Id:   organization.Id,
 			Name: orgName,
 		})
 		require.NoError(t, err)
@@ -86,14 +86,17 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		orgName := gofakeit.Name()
 
 		// 1. create org
-		organization, err := OrgClient.AddOrganization(CTX, &org.AddOrganizationRequest{
+		organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
 			Name: orgName,
 		})
 		require.NoError(t, err)
 
 		// 2. deactivate org name
 		beforeDeactivate := time.Now()
-		_ = Instance.DeactivateOrganization(CTX, organization.OrganizationId)
+		_, err = OrgClient.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
+			Id: organization.Id,
+		})
+
 		require.NoError(t, err)
 		afterDeactivate := time.Now()
 
@@ -117,13 +120,15 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		orgName := gofakeit.Name()
 
 		// 1. create org
-		organization, err := OrgClient.AddOrganization(CTX, &org.AddOrganizationRequest{
+		organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
 			Name: orgName,
 		})
 		require.NoError(t, err)
 
 		// 2. deactivate org name
-		_ = Instance.DeactivateOrganization(CTX, organization.OrganizationId)
+		_, err = OrgClient.DeactivateOrganization(CTX, &v2beta_org.DeactivateOrganizationRequest{
+			Id: organization.Id,
+		})
 		require.NoError(t, err)
 
 		orgRepo := repository.OrganizationRepository(pool)
@@ -141,7 +146,9 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 
 		// 4. activate org name
 		beforeActivate := time.Now()
-		_ = Instance.ReactivateOrganization(CTX, organization.OrganizationId)
+		_, err = OrgClient.ActivateOrganization(CTX, &v2beta_org.ActivateOrganizationRequest{
+			Id: organization.Id,
+		})
 		require.NoError(t, err)
 		afterActivate := time.Now()
 
@@ -163,7 +170,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		orgName := gofakeit.Name()
 
 		// 1. create org
-		organization, err := OrgClient.AddOrganization(CTX, &org.AddOrganizationRequest{
+		organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
 			Name: orgName,
 		})
 		require.NoError(t, err)
@@ -184,7 +191,9 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// 3. delete org
-		_ = Instance.RemoveOrganization(CTX, organization.OrganizationId)
+		_, err = OrgClient.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{
+			Id: organization.Id,
+		})
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)

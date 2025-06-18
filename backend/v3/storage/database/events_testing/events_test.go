@@ -15,7 +15,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/internal/integration"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
@@ -26,7 +26,7 @@ var (
 	CTX          context.Context
 	Instance     *integration.Instance
 	SystemClient system.SystemServiceClient
-	OrgClient    org.OrganizationServiceClient
+	OrgClient    v2beta_org.OrganizationServiceClient
 	MgmtClient   mgmt.ManagementServiceClient
 )
 
@@ -41,7 +41,7 @@ func TestMain(m *testing.M) {
 
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		SystemClient = integration.SystemClient()
-		OrgClient = Instance.Client.OrgV2
+		OrgClient = Instance.Client.OrgV2beta
 		MgmtClient = Instance.Client.Mgmt
 
 		var err error
