@@ -36,8 +36,8 @@ jobs:
       - name: Save Run Caches
         uses: actions/cache@v4
         with:
-          path: |
-            ${{ runner.temp }}/zitadel-make-cache
+          path: ${{ runner.temp }}/zitadel-make-cache
+          key: zitadel-make-cache
       - run: make login-quality
         env:
           # latest if branch is main, otherwise image version which is the pull request number
