@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
@@ -74,7 +73,7 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 	err := o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
 	if err != nil {
 		var pgErr *pgconn.PgError
-			fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> pgErr = %+v\n", pgErr)
+		if errors.As(err, &pgErr) {
 			// constraint violation
 			if pgErr.Code == "23514" {
 				if pgErr.ConstraintName == "organizations_name_check" {
@@ -100,8 +99,9 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 				}
 			}
 		}
+		return err
 	}
-	return err
+	return nil
 }
 
 // Update implements [domain.OrganizationRepository].

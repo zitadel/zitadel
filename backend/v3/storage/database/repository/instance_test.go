@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -113,7 +114,7 @@ func TestCreateInstance(t *testing.T) {
 			// create instance
 			beforeCreate := time.Now()
 			err := instanceRepo.Create(ctx, instance)
-			require.Equal(t, tt.err, err)
+			assert.Equal(t, tt.err, err)
 			if err != nil {
 				return
 			}
@@ -125,16 +126,16 @@ func TestCreateInstance(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			require.Equal(t, tt.instance.ID, instance.ID)
-			require.Equal(t, tt.instance.Name, instance.Name)
-			require.Equal(t, tt.instance.DefaultOrgID, instance.DefaultOrgID)
-			require.Equal(t, tt.instance.IAMProjectID, instance.IAMProjectID)
-			require.Equal(t, tt.instance.ConsoleClientID, instance.ConsoleClientID)
-			require.Equal(t, tt.instance.ConsoleAppID, instance.ConsoleAppID)
-			require.Equal(t, tt.instance.DefaultLanguage, instance.DefaultLanguage)
-			require.WithinRange(t, instance.CreatedAt, beforeCreate, afterCreate)
-			require.WithinRange(t, instance.UpdatedAt, beforeCreate, afterCreate)
-			require.Nil(t, instance.DeletedAt)
+			assert.Equal(t, tt.instance.ID, instance.ID)
+			assert.Equal(t, tt.instance.Name, instance.Name)
+			assert.Equal(t, tt.instance.DefaultOrgID, instance.DefaultOrgID)
+			assert.Equal(t, tt.instance.IAMProjectID, instance.IAMProjectID)
+			assert.Equal(t, tt.instance.ConsoleClientID, instance.ConsoleClientID)
+			assert.Equal(t, tt.instance.ConsoleAppID, instance.ConsoleAppID)
+			assert.Equal(t, tt.instance.DefaultLanguage, instance.DefaultLanguage)
+			assert.WithinRange(t, instance.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, instance.UpdatedAt, beforeCreate, afterCreate)
+			assert.Nil(t, instance.DeletedAt)
 		})
 	}
 }
@@ -230,7 +231,7 @@ func TestUpdateInstance(t *testing.T) {
 			afterUpdate := time.Now()
 			require.NoError(t, err)
 
-			require.Equal(t, tt.rowsAffected, rowsAffected)
+			assert.Equal(t, tt.rowsAffected, rowsAffected)
 
 			if rowsAffected == 0 {
 				return
@@ -242,9 +243,9 @@ func TestUpdateInstance(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			require.Equal(t, newName, instance.Name)
-			require.WithinRange(t, instance.UpdatedAt, beforeUpdate, afterUpdate)
-			require.Nil(t, instance.DeletedAt)
+			assert.Equal(t, newName, instance.Name)
+			assert.WithinRange(t, instance.UpdatedAt, beforeUpdate, afterUpdate)
+			assert.Nil(t, instance.DeletedAt)
 		})
 	}
 }
@@ -337,17 +338,17 @@ func TestGetInstance(t *testing.T) {
 			)
 			require.NoError(t, err)
 			if instance == nil {
-				require.Nil(t, instance, returnedInstance)
+				assert.Nil(t, instance, returnedInstance)
 				return
 			}
 
-			require.Equal(t, returnedInstance.ID, instance.ID)
-			require.Equal(t, returnedInstance.Name, instance.Name)
-			require.Equal(t, returnedInstance.DefaultOrgID, instance.DefaultOrgID)
-			require.Equal(t, returnedInstance.IAMProjectID, instance.IAMProjectID)
-			require.Equal(t, returnedInstance.ConsoleClientID, instance.ConsoleClientID)
-			require.Equal(t, returnedInstance.ConsoleAppID, instance.ConsoleAppID)
-			require.Equal(t, returnedInstance.DefaultLanguage, instance.DefaultLanguage)
+			assert.Equal(t, returnedInstance.ID, instance.ID)
+			assert.Equal(t, returnedInstance.Name, instance.Name)
+			assert.Equal(t, returnedInstance.DefaultOrgID, instance.DefaultOrgID)
+			assert.Equal(t, returnedInstance.IAMProjectID, instance.IAMProjectID)
+			assert.Equal(t, returnedInstance.ConsoleClientID, instance.ConsoleClientID)
+			assert.Equal(t, returnedInstance.ConsoleAppID, instance.ConsoleAppID)
+			assert.Equal(t, returnedInstance.DefaultLanguage, instance.DefaultLanguage)
 		})
 	}
 }
@@ -503,19 +504,19 @@ func TestListInstance(t *testing.T) {
 			)
 			require.NoError(t, err)
 			if tt.noInstanceReturned {
-				require.Nil(t, returnedInstances)
+				assert.Nil(t, returnedInstances)
 				return
 			}
 
-			require.Equal(t, len(instances), len(returnedInstances))
+			assert.Equal(t, len(instances), len(returnedInstances))
 			for i, instance := range instances {
-				require.Equal(t, returnedInstances[i].ID, instance.ID)
-				require.Equal(t, returnedInstances[i].Name, instance.Name)
-				require.Equal(t, returnedInstances[i].DefaultOrgID, instance.DefaultOrgID)
-				require.Equal(t, returnedInstances[i].IAMProjectID, instance.IAMProjectID)
-				require.Equal(t, returnedInstances[i].ConsoleClientID, instance.ConsoleClientID)
-				require.Equal(t, returnedInstances[i].ConsoleAppID, instance.ConsoleAppID)
-				require.Equal(t, returnedInstances[i].DefaultLanguage, instance.DefaultLanguage)
+				assert.Equal(t, returnedInstances[i].ID, instance.ID)
+				assert.Equal(t, returnedInstances[i].Name, instance.Name)
+				assert.Equal(t, returnedInstances[i].DefaultOrgID, instance.DefaultOrgID)
+				assert.Equal(t, returnedInstances[i].IAMProjectID, instance.IAMProjectID)
+				assert.Equal(t, returnedInstances[i].ConsoleClientID, instance.ConsoleClientID)
+				assert.Equal(t, returnedInstances[i].ConsoleAppID, instance.ConsoleAppID)
+				assert.Equal(t, returnedInstances[i].DefaultLanguage, instance.DefaultLanguage)
 			}
 		})
 	}
@@ -683,7 +684,7 @@ func TestDeleteInstance(t *testing.T) {
 				tt.conditionClauses,
 			)
 			require.NoError(t, err)
-			require.Nil(t, instance)
+			assert.Nil(t, instance)
 		})
 	}
 }

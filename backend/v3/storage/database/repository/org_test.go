@@ -80,7 +80,7 @@ func TestCreateOrganization(t *testing.T) {
 				}
 
 				err := organizationRepo.Create(ctx, &inst)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				return &inst
 			},
 			err: errors.New("organization id already exists"),
@@ -155,7 +155,7 @@ func TestCreateOrganization(t *testing.T) {
 			organization, err = organizationRepo.Get(ctx,
 				organizationRepo.NameCondition(database.TextOperationEqual, organization.Name),
 			)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			assert.Equal(t, tt.organization.ID, organization.ID)
 			assert.Equal(t, tt.organization.Name, organization.Name)
@@ -206,7 +206,7 @@ func TestUpdateOrganization(t *testing.T) {
 
 				// create organization
 				err := organizationRepo.Create(ctx, &org)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 
 				// update with updated value
 				org.Name = "new_name"
@@ -230,7 +230,7 @@ func TestUpdateOrganization(t *testing.T) {
 
 				// create organization
 				err := organizationRepo.Create(ctx, &org)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 
 				// delete instance
 				err = organizationRepo.Delete(ctx,
@@ -258,7 +258,7 @@ func TestUpdateOrganization(t *testing.T) {
 
 				// create organization
 				err := organizationRepo.Create(ctx, &org)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 
 				// update with updated value
 				org.State = domain.OrgStateInactive.String()
@@ -295,7 +295,7 @@ func TestUpdateOrganization(t *testing.T) {
 				tt.update...,
 			)
 			afterUpdate := time.Now()
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			assert.Equal(t, tt.rowsAffected, rowsAffected)
 
@@ -307,7 +307,7 @@ func TestUpdateOrganization(t *testing.T) {
 			organization, err := organizationRepo.Get(ctx,
 				organizationRepo.IDCondition(createdOrg.ID),
 			)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			assert.Equal(t, createdOrg.ID, organization.ID)
 			assert.Equal(t, createdOrg.Name, organization.Name)
@@ -346,7 +346,7 @@ func TestGetOrganization(t *testing.T) {
 		State:      domain.OrgStateActive.String(),
 	}
 	err = orgRepo.Create(t.Context(), &org)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	type test struct {
 		name             string
@@ -371,7 +371,7 @@ func TestGetOrganization(t *testing.T) {
 
 					// create organization
 					err := orgRepo.Create(ctx, &org)
-					assert.NoError(t, err)
+					require.NoError(t, err)
 
 					return &org
 				},
@@ -394,7 +394,7 @@ func TestGetOrganization(t *testing.T) {
 
 					// create organization
 					err := orgRepo.Create(ctx, &org)
-					assert.NoError(t, err)
+					require.NoError(t, err)
 
 					return &org
 				},
@@ -428,14 +428,14 @@ func TestGetOrganization(t *testing.T) {
 			)
 			require.NoError(t, err)
 			if org == nil {
-				require.Nil(t, org, returnedOrg)
+				assert.Nil(t, org, returnedOrg)
 				return
 			}
 
-			require.Equal(t, returnedOrg.ID, org.ID)
-			require.Equal(t, returnedOrg.Name, org.Name)
-			require.Equal(t, returnedOrg.InstanceID, org.InstanceID)
-			require.Equal(t, returnedOrg.State, org.State)
+			assert.Equal(t, returnedOrg.ID, org.ID)
+			assert.Equal(t, returnedOrg.Name, org.Name)
+			assert.Equal(t, returnedOrg.InstanceID, org.InstanceID)
+			assert.Equal(t, returnedOrg.State, org.State)
 		})
 	}
 }
@@ -532,7 +532,7 @@ func TestListOrganization(t *testing.T) {
 						State:      domain.OrgStateActive.String(),
 					}
 					err = organizationRepo.Create(ctx, &org)
-					assert.NoError(t, err)
+					require.NoError(t, err)
 
 					noOfOrganizations := 1
 					organizations := make([]*domain.Organization, noOfOrganizations)
@@ -570,7 +570,7 @@ func TestListOrganization(t *testing.T) {
 					State:      domain.OrgStateActive.String(),
 				}
 				err = organizationRepo.Create(ctx, &org)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 
 				noOfOrganizations := 5
 				organizations := make([]*domain.Organization, noOfOrganizations)
@@ -609,7 +609,7 @@ func TestListOrganization(t *testing.T) {
 						State:      domain.OrgStateActive.String(),
 					}
 					err = organizationRepo.Create(ctx, &org)
-					assert.NoError(t, err)
+					require.NoError(t, err)
 
 					noOfOrganizations := 5
 					organizations := make([]*domain.Organization, noOfOrganizations)
@@ -650,16 +650,16 @@ func TestListOrganization(t *testing.T) {
 			)
 			require.NoError(t, err)
 			if tt.noOrganizationReturned {
-				require.Nil(t, returnedOrgs)
+				assert.Nil(t, returnedOrgs)
 				return
 			}
 
-			require.Equal(t, len(organizations), len(returnedOrgs))
+			assert.Equal(t, len(organizations), len(returnedOrgs))
 			for i, org := range organizations {
-				require.Equal(t, returnedOrgs[i].ID, org.ID)
-				require.Equal(t, returnedOrgs[i].Name, org.Name)
-				require.Equal(t, returnedOrgs[i].InstanceID, org.InstanceID)
-				require.Equal(t, returnedOrgs[i].State, org.State)
+				assert.Equal(t, returnedOrgs[i].ID, org.ID)
+				assert.Equal(t, returnedOrgs[i].Name, org.Name)
+				assert.Equal(t, returnedOrgs[i].InstanceID, org.InstanceID)
+				assert.Equal(t, returnedOrgs[i].State, org.State)
 			}
 		})
 	}
@@ -830,7 +830,7 @@ func TestDeleteOrganization(t *testing.T) {
 				tt.conditionClauses,
 			)
 			require.NoError(t, err)
-			require.Nil(t, organization)
+			assert.Nil(t, organization)
 		})
 	}
 }
