@@ -374,6 +374,9 @@ service SettingsService {
   // a merging process fallbacks onto the higher levels ensuring all keys in the file have a translation,
   // which could be in the default language if the one of the locale is missing on all levels.
   //
+  // The etag returned in the response represents the hash of the translations as they are stored on DB
+  // and its reliable only if ignore_inheritance = true.
+  //
   // Required permissions:
   //   - `iam.policy.read`
   rpc GetHostedLoginTranslation(GetHostedLoginTranslationRequest) returns (GetHostedLoginTranslationResponse) {
@@ -605,7 +608,7 @@ message SetHostedLoginTranslationRequest {
 }
 
 message SetHostedLoginTranslationResponse {
-  // hash of the saved translation
+  // hash of the saved translation. Valid only when ignore_inheritance = true
   string etag = 1 [
     (validate.rules).string = {min_len: 32, max_len: 32},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

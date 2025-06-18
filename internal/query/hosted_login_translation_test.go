@@ -34,8 +34,8 @@ func TestGetSystemTranslation(t *testing.T) {
 	tt := []struct {
 		testName string
 
-		inputLanguage          string
-		inputInstanceLanguage  string
+		inputLanguage          language.Tag
+		inputInstanceLanguage  language.Tag
 		systemTranslationToSet []byte
 
 		expectedLanguage map[string]any
@@ -45,16 +45,16 @@ func TestGetSystemTranslation(t *testing.T) {
 		{
 			testName:               "when neither input language nor system default language have translation should return not found error",
 			systemTranslationToSet: okTranslation,
-			inputLanguage:          "ro",
-			inputInstanceLanguage:  "fr",
+			inputLanguage:          language.MustParse("ro"),
+			inputInstanceLanguage:  language.MustParse("fr"),
 
 			expectedError: zerrors.ThrowNotFoundf(nil, "QUERY-6gb5QR", "Errors.Query.HostedLoginTranslationNotFound-%s", "ro"),
 		},
 		{
 			testName:               "when input language has no translation should fallback onto instance default",
 			systemTranslationToSet: okTranslation,
-			inputLanguage:          "ro",
-			inputInstanceLanguage:  "de",
+			inputLanguage:          language.MustParse("ro"),
+			inputInstanceLanguage:  language.MustParse("de"),
 
 			expectedLanguage: parsedOKTranslation["de"],
 			expectedEtag:     hex.EncodeToString(hashOK[:]),
@@ -62,8 +62,8 @@ func TestGetSystemTranslation(t *testing.T) {
 		{
 			testName:               "when input language has translation should return it",
 			systemTranslationToSet: okTranslation,
-			inputLanguage:          "de",
-			inputInstanceLanguage:  "en",
+			inputLanguage:          language.MustParse("de"),
+			inputInstanceLanguage:  language.MustParse("en"),
 
 			expectedLanguage: parsedOKTranslation["de"],
 			expectedEtag:     hex.EncodeToString(hashOK[:]),

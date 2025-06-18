@@ -29,7 +29,7 @@ var (
 	//go:embed v2-default.json
 	defaultLoginTranslations []byte
 
-	defaultSystemTranslations map[string]any
+	defaultSystemTranslations map[language.Tag]map[string]any
 
 	hostedLoginTranslationTable = table{
 		name:          projection.HostedLoginTranslationTable,
@@ -98,9 +98,12 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 	if err != nil || lang.IsRoot() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "QUERY-rZLAGi", "Errors.Arguments.Locale.Invalid")
 	}
-	baseLang, _ := lang.Base()
+	parentLang := lang.Parent()
+	if parentLang.IsRoot() {
+		parentLang = lang
+	}
 
-	sysTranslation, systemEtag, err := getSystemTranslation(baseLang.String(), defaultInstLang.String())
+	sysTranslation, systemEtag, err := getSystemTranslation(parentLang, defaultInstLang)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +126,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 
 	langORBaseLang := sq.Or{
 		sq.Eq{hostedLoginTranslationColLocale.identifier(): lang.String()},
-		sq.Eq{hostedLoginTranslationColLocale.identifier(): baseLang.String()},
+		sq.Eq{hostedLoginTranslationColLocale.identifier(): parentLang.String()},
 	}
 	eq := sq.Eq{
 		hostedLoginTranslationColInstanceID.identifier():        inst.InstanceID(),
@@ -189,7 +192,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 	return getTranslationOutputMessage(requestedTranslation.File, requestedTranslation.Etag)
 }
 
-func getSystemTranslation(lang, instanceDefaultLang string) (map[string]any, string, error) {
+func getSystemTranslation(lang, instanceDefaultLang language.Tag) (map[string]any, string, error) {
 	translation, ok := defaultSystemTranslations[lang]
 	if !ok {
 		translation, ok = defaultSystemTranslations[instanceDefaultLang]
@@ -198,14 +201,9 @@ func getSystemTranslation(lang, instanceDefaultLang string) (map[string]any, str
 		}
 	}
 
-	castedTranslation, ok := translation.(map[string]any)
-	if !ok {
-		return nil, "", zerrors.ThrowInternal(nil, "QUERY-WrRn5e", "Errors.Query.HostedLoginCastError")
-	}
+	hash := md5.Sum(fmt.Append(nil, translation))
 
-	hash := md5.Sum(fmt.Append(nil, castedTranslation))
-
-	return castedTranslation, hex.EncodeToString(hash[:]), nil
+	return translation, hex.EncodeToString(hash[:]), nil
 }
 
 func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*HostedLoginTranslation, error)) {
