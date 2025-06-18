@@ -41,6 +41,7 @@ import {
   SendEmailCodeRequestSchema,
   SetPasswordRequest,
   SetPasswordRequestSchema,
+  UpdateHumanUserRequest,
   UserService,
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
@@ -453,6 +454,21 @@ export async function addHuman({
   );
 
   return userService.addHumanUser(request);
+}
+
+export async function updateHuman({
+  serviceUrl,
+  request,
+}: {
+  serviceUrl: string;
+  request: UpdateHumanUserRequest;
+}) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl,
+  );
+
+  return userService.updateHumanUser(request);
 }
 
 export async function verifyTOTPRegistration({
