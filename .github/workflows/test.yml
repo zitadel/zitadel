@@ -53,7 +53,7 @@ jobs:
           key: login-run-caches-${{ github.ref == 'refs/heads/main' && 'latest' || fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
           restore-keys: login-run-caches-latest
       - name: Clean up Run Caches
-        if: ${{ github.event.inputs.clean-run-caches == 'true' }}
+#        if: ${{ github.event.inputs.clean-run-caches == 'true' }}
         run: make clean-run-caches
       - name: Show Run Caches
         run: make show-run-caches
