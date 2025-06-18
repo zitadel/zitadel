@@ -58,10 +58,10 @@ login-test-integration: login-standalone-build login-test-integration-build
 login-test-acceptance-build: login-standalone-build
 	$(BAKE_CLI) setup sink oidcrp samlsp login-test-acceptance
 
-login-test-acceptance-run: login-acceptance-cleanup
+login-test-acceptance-run: login-test-acceptance-cleanup
 	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml run --rm --service-ports acceptance
 
-login-acceptance-cleanup:
+login-test-acceptance-cleanup:
 	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml down --volumes
 
 login-test-acceptance: login-test-acceptance-build
