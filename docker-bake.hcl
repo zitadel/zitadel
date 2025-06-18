@@ -8,12 +8,7 @@ variable "BUILD_CACHE_KEY" {
   default = "local"
 }
 
-target "_platforms" {
-  platforms = ["linux/amd64"]
-}
-
 target "login-pnpm" {
-  inherits = ["_platforms"]
   cache-from = [
     { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:${BUILD_CACHE_KEY}" },
     { "type": "registry", "ref": "${IMAGE_REGISTRY}/login-pnpm-buildcache:latest" },
@@ -22,7 +17,6 @@ target "login-pnpm" {
  }
 
 target "login-dev-base" {
-  inherits = ["_platforms"]
   cache-from = [
     {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-dev-base-buildcache:${BUILD_CACHE_KEY}"},
     {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-dev-base-buildcache:latest"},
@@ -34,7 +28,6 @@ target "login-dev-base" {
 }
 
 target "login-lint" {
-  inherits = ["_platforms"]
   cache-from = [
     {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY}"},
     {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-lint-buildcache:latest"},
@@ -45,11 +38,11 @@ target "login-lint" {
   }
 }
 
-variable "LOGIN_TEST_UNIT_TAG" {
-  default = "login-test-unit:local"
-}
-
 target "login-test-unit" {
+  cache-from = [
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-test-unit-buildcache:${BUILD_CACHE_KEY}"},
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-test-unit-buildcache:latest"},
+  ]
   dockerfile = "dockerfiles/login-test-unit.Dockerfile"
   contexts = {
     login-client   = "target:login-client"
@@ -59,6 +52,10 @@ target "login-test-unit" {
 }
 
 target "login-client" {
+  cache-from = [
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-client-buildcache:${BUILD_CACHE_KEY}"},
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-client-buildcache:latest"},
+  ]
   dockerfile = "dockerfiles/login-client.Dockerfile"
   contexts = {
     login-pnpm              = "target:login-pnpm"
@@ -100,6 +97,10 @@ variable "LOGIN_TEST_INTEGRATION_TAG" {
 }
 
 target "login-test-integration" {
+  cache-from = [
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-test-integration-buildcache:${BUILD_CACHE_KEY}"},
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-test-integration-buildcache:latest"},
+  ]
   dockerfile = "dockerfiles/login-test-integration.Dockerfile"
   contexts = {
     login-pnpm = "target:login-pnpm"
@@ -112,6 +113,10 @@ variable "LOGIN_TEST_ACCEPTANCE_TAG" {
 }
 
 target "login-test-acceptance" {
+  cache-from = [
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-test-acceptance-buildcache:${BUILD_CACHE_KEY}"},
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-test-acceptance-buildcache:latest"},
+  ]
   dockerfile = "dockerfiles/login-test-acceptance.Dockerfile"
   contexts = {
     login-pnpm = "target:login-pnpm"
@@ -125,6 +130,10 @@ variable "LOGIN_TAG" {
 
 # We run integration and acceptance tests against the next standalone server for docker.
 target "login-standalone" {
+  cache-from = [
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-buildcache:${BUILD_CACHE_KEY}"},
+    {"type": "registry", "ref": "${IMAGE_REGISTRY}/login-buildcache:latest"},
+  ]
   dockerfile = "dockerfiles/login-standalone.Dockerfile"
   contexts = {
     login-client = "target:login-client"
