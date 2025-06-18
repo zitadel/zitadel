@@ -34,13 +34,13 @@ login-help:
 	@echo "  clean-cache-keys        - Remove all cache keys."
 
 login-lint:
-	$(BUILDX_CLI) bake login-lint
+	$(BAKE_CLI) login-lint
 
 login-test-unit:
-	$(BUILDX_CLI) bake login-test-unit
+	$(BAKE_CLI) login-test-unit
 
 login-test-integration-build:
-	$(BUILDX_CLI) bake core-mock login-test-integration
+	$(BAKE_CLI) core-mock login-test-integration
 
 login-test-integration-run: login-test-integration-cleanup
 	docker compose --file ./apps/login-test-integration/docker-compose.yaml run --rm integration
@@ -56,7 +56,7 @@ login-test-integration: login-standalone-build login-test-integration-build
 	$(LOGIN_TEST_INTEGRATION_TAG)"
 
 login-test-acceptance-build:
-	$(BUILDX_CLI) --file ./apps/login-test-acceptance/docker-compose.yaml bake setup sink oidcop samlsp samlidp login-standalone login-test-acceptance
+	$(BAKE_CLI) --file ./apps/login-test-acceptance/docker-compose.yaml setup sink oidcop samlsp samlidp login-standalone login-test-acceptance
 
 login-test-acceptance-run: login-acceptance-cleanup
 	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml run --rm --service-ports acceptance
@@ -84,7 +84,7 @@ login-quality: login-lint login-test-unit login-test-integration login-test-acce
 
 .PHONY: login-standalone-build
 login-standalone-build:
-	$(BUILDX_CLI) bake login-standalone
+	$(BAKE_CLI) bake login-standalone
 
 .PHONY: clean-cache-keys
 clean-cache-keys:
