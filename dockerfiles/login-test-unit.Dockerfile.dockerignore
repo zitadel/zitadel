@@ -1,0 +1,6 @@
+*
+!/apps/login/src
+!/apps/login/public
+!/apps/login/locales
+!/apps/login/constants
+!/apps/login/*.json

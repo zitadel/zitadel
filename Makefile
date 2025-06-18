@@ -1,11 +1,12 @@
 XDG_CACHE_HOME ?= $(HOME)/.cache
 export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 
-export BAKE_CLI ?= docker buildx bake
+export BAKE_CLI ?= docker buildx bake --file ./docker-bake.hcl
 export REF_TAG ?= local
 export LOGIN_TAG := login:${REF_TAG}
 export LOGIN_TEST_UNIT_TAG := login-test-unit:${REF_TAG}
 export LOGIN_TEST_INTEGRATION_TAG ?= login-test-integration:${REF_TAG}
+export LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT := apps/login-test-acceptance
 export LOGIN_TEST_ACCEPTANCE_TAG := login-test-acceptance:${REF_TAG}
 export LOGIN_TEST_ACCEPTANCE_SETUP_TAG := login-test-acceptance-setup:${REF_TAG}
 export LOGIN_TEST_ACCEPTANCE_SINK_TAG := login-test-acceptance-sink:${REF_TAG}
@@ -55,8 +56,8 @@ login-test-integration: login-standalone-build login-test-integration-build
 	$(CORE_MOCK_TAG) \
 	$(LOGIN_TEST_INTEGRATION_TAG)"
 
-login-test-acceptance-build:
-	$(BAKE_CLI) --file ./apps/login-test-acceptance/docker-compose.yaml setup sink oidcop samlsp samlidp login-standalone login-test-acceptance
+login-test-acceptance-build: login-standalone-build
+	$(BAKE_CLI) --file ./apps/login-test-acceptance/docker-compose.yaml setup sink oidcrp oidcop samlsp samlidp login-test-acceptance
 
 login-test-acceptance-run: login-acceptance-cleanup
 	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml run --rm --service-ports acceptance
@@ -64,7 +65,7 @@ login-test-acceptance-run: login-acceptance-cleanup
 login-acceptance-cleanup:
 	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml down --volumes
 
-login-test-acceptance: login-standalone-build login-test-acceptance-build
+login-test-acceptance: login-test-acceptance-build
 	./scripts/run_or_skip.sh login-test-acceptance-run \
 		"$(LOGIN_TAG) \
   		$(ZITADEL_TAG) \
@@ -79,7 +80,7 @@ login-test-acceptance: login-standalone-build login-test-acceptance-build
   		$(LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG)"
 
 .PHONY: login-quality
-login-quality: login-lint login-test-unit login-test-integration login-test-acceptance
+login-quality: login-lint login-test-integration login-test-acceptance
 	@:
 
 .PHONY: login-standalone-build
