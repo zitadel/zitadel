@@ -11,7 +11,7 @@ target "login-pnpm" {
 
 target "login-dev-base" {
   cache-to = [
-    { type: "registry", ref: "${IMAGE_REGISTRY}/login-dev-base-buildcache:${BUILD_CACHE_KEY}", mode: "max" }
+    { type: "registry", ref: "${IMAGE_REGISTRY}/login-dev-base-buildcache:${BUILD_CACHE_KEY}", mode: "max", oci-mediatypes=true }
   ]
   output = [
     { type : "image", name: "${IMAGE_REGISTRY}/login-dev-base:${BUILD_CACHE_KEY}", push: true },
@@ -20,7 +20,7 @@ target "login-dev-base" {
 
 target "login-lint" {
   cache-to = [
-    { type: "registry", ref: "${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY}", mode: "max" }
+    { type: "registry", ref: "${IMAGE_REGISTRY}/login-lint-buildcache:${BUILD_CACHE_KEY}", mode: "max", oci-mediatypes=true }
   ]
   output = [
     { type : "image", name: "${IMAGE_REGISTRY}/login-lint:${BUILD_CACHE_KEY}", push: true },
