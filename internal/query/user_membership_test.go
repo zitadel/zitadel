@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -461,7 +462,7 @@ func Test_MembershipPrepares(t *testing.T) {
 
 func prepareMembershipWrapper() func() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
 	return func() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
-		builder, _, fun := prepareMembershipsQuery(&MembershipSearchQuery{})
+		builder, _, fun := prepareMembershipsQuery(context.Background(), &MembershipSearchQuery{}, false)
 		return builder, fun
 	}
 }

@@ -64,7 +64,7 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 					ExpirationDate: expirationDate,
 				},
 				func(request *user.AddPersonalAccessTokenRequest) error {
-					resp := Instance.CreateUserTypeHuman(IamCTX)
+					resp := Instance.CreateUserTypeHuman(IamCTX, gofakeit.Email())
 					request.UserId = resp.Id
 					return nil
 				},

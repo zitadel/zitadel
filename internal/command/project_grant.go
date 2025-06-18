@@ -234,6 +234,17 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	return writeModelToObjectDetails(&existingGrant.WriteModel), nil
 }
 
+func (c *Commands) checkProjectGrantExists(ctx context.Context, grantID, grantedOrgID, projectID, resourceOwner string) (string, error) {
+	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, grantedOrgID, projectID, resourceOwner)
+	if err != nil {
+		return "", err
+	}
+	if !existingGrant.State.Exists() {
+		return "", zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.Project.Grant.NotFound")
+	}
+	return existingGrant.ResourceOwner, nil
+}
+
 func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantID, grantedOrgID, resourceOwner string) (details *domain.ObjectDetails, err error) {
 	if (grantID == "" && grantedOrgID == "") || projectID == "" {
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-p0s4V", "Errors.IDMissing")
