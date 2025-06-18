@@ -49,7 +49,7 @@ jobs:
         uses: actions/cache/restore@v4
         id: run-caches-restore
         with:
-          path: ${{ github.env.CACHE_DIR }}
+          path: ${{ env.CACHE_DIR }}
           key: login-run-caches-${{ github.ref == 'refs/heads/main' && 'latest' || fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
           restore-keys: login-run-caches-latest
       - name: Clean up Run Caches
@@ -66,6 +66,6 @@ jobs:
       - name: Save Run Caches
         uses: actions/cache/save@v4
         with:
-          path: ${{ github.env.CACHE_DIR }}
+          path: ${{ env.CACHE_DIR }}
           key: ${{ steps.run-caches-restore.outputs.cache-primary-key }}
         if: always()
