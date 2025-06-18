@@ -84,7 +84,7 @@ login-quality: login-lint login-test-unit login-test-integration login-test-acce
 
 .PHONY: login-standalone-build
 login-standalone-build:
-	$(BAKE_CLI) bake login-standalone
+	$(BAKE_CLI) login-standalone
 
 .PHONY: clean-cache-keys
 clean-cache-keys:
