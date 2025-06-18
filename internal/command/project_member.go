@@ -2,7 +2,7 @@ package command
 
 import (
 	"context"
-	"reflect"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -114,10 +114,10 @@ func (c *Commands) ChangeProjectMember(ctx context.Context, member *ChangeProjec
 	if err := c.checkPermissionUpdateProjectMember(ctx, existingMember.ResourceOwner, existingMember.AggregateID); err != nil {
 		return nil, err
 	}
-	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
-		return writeModelToObjectDetails(&existingMember.MemberWriteModel.WriteModel), nil
+	if slices.Compare(existingMember.Roles, member.Roles) == 0 {
+		return writeModelToObjectDetails(&existingMember.WriteModel), nil
 	}
-	projectAgg := ProjectAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
+	projectAgg := ProjectAggregateFromWriteModel(&existingMember.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectMemberChangedEvent(ctx, projectAgg, member.UserID, member.Roles...))
 	if err != nil {
 		return nil, err
@@ -146,7 +146,7 @@ func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, r
 		return nil, err
 	}
 
-	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingMember.MemberWriteModel.WriteModel)
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingMember.WriteModel)
 	removeEvent := c.removeProjectMember(ctx, projectAgg, userID, false)
 	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
 	if err != nil {

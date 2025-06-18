@@ -2,7 +2,7 @@ package command
 
 import (
 	"context"
-	"reflect"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -117,7 +117,7 @@ func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *ChangeP
 	if err := c.checkPermissionUpdateProjectGrantMember(ctx, existingMember.ResourceOwner, existingMember.AggregateID, existingMember.GrantID); err != nil {
 		return nil, err
 	}
-	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
+	if slices.Compare(existingMember.Roles, member.Roles) == 0 {
 		return writeModelToObjectDetails(&existingMember.WriteModel), nil
 	}
 

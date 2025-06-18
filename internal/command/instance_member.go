@@ -2,7 +2,7 @@ package command
 
 import (
 	"context"
-	"reflect"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -90,14 +90,11 @@ func (c *Commands) AddInstanceMember(ctx context.Context, member *AddInstanceMem
 		return nil, err
 	}
 	addedMember := NewInstanceMemberWriteModel(member.InstanceID, member.UserID)
-	if err != nil {
-		return nil, err
-	}
 	err = AppendAndReduce(addedMember, events...)
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(&addedMember.MemberWriteModel.WriteModel), nil
+	return writeModelToObjectDetails(&addedMember.WriteModel), nil
 }
 
 type ChangeInstanceMember struct {
@@ -132,12 +129,12 @@ func (c *Commands) ChangeInstanceMember(ctx context.Context, member *ChangeInsta
 	if err := c.checkPermissionUpdateInstanceMember(ctx, existingMember.AggregateID); err != nil {
 		return nil, err
 	}
-	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
-		return writeModelToObjectDetails(&existingMember.MemberWriteModel.WriteModel), nil
+	if slices.Compare(existingMember.Roles, member.Roles) == 0 {
+		return writeModelToObjectDetails(&existingMember.WriteModel), nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx,
 		instance.NewMemberChangedEvent(ctx,
-			InstanceAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel),
+			InstanceAggregateFromWriteModel(&existingMember.WriteModel),
 			member.UserID,
 			member.Roles...,
 		),
@@ -150,7 +147,7 @@ func (c *Commands) ChangeInstanceMember(ctx context.Context, member *ChangeInsta
 		return nil, err
 	}
 
-	return writeModelToObjectDetails(&existingMember.MemberWriteModel.WriteModel), nil
+	return writeModelToObjectDetails(&existingMember.WriteModel), nil
 }
 
 func (c *Commands) RemoveInstanceMember(ctx context.Context, instanceID, userID string) (*domain.ObjectDetails, error) {
@@ -165,12 +162,12 @@ func (c *Commands) RemoveInstanceMember(ctx context.Context, instanceID, userID 
 		return nil, err
 	}
 	if !existingMember.State.Exists() {
-		return writeModelToObjectDetails(&existingMember.MemberWriteModel.WriteModel), nil
+		return writeModelToObjectDetails(&existingMember.WriteModel), nil
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx,
 		c.removeInstanceMember(ctx,
-			InstanceAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel),
+			InstanceAggregateFromWriteModel(&existingMember.WriteModel),
 			userID,
 			false,
 		),
@@ -183,7 +180,7 @@ func (c *Commands) RemoveInstanceMember(ctx context.Context, instanceID, userID 
 		return nil, err
 	}
 
-	return writeModelToObjectDetails(&existingMember.MemberWriteModel.WriteModel), nil
+	return writeModelToObjectDetails(&existingMember.WriteModel), nil
 }
 
 func (c *Commands) removeInstanceMember(ctx context.Context, instanceAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.Command {

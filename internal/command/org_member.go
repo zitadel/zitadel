@@ -2,7 +2,7 @@ package command
 
 import (
 	"context"
-	"reflect"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -109,7 +109,7 @@ func (c *Commands) AddOrgMember(ctx context.Context, member *AddOrgMember) (_ *d
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(&addedMember.MemberWriteModel.WriteModel), nil
+	return writeModelToObjectDetails(&addedMember.WriteModel), nil
 }
 
 type ChangeOrgMember struct {
@@ -146,13 +146,13 @@ func (c *Commands) ChangeOrgMember(ctx context.Context, member *ChangeOrgMember)
 		return nil, err
 	}
 
-	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
-		return writeModelToObjectDetails(&existingMember.MemberWriteModel.WriteModel), nil
+	if slices.Compare(existingMember.Roles, member.Roles) == 0 {
+		return writeModelToObjectDetails(&existingMember.WriteModel), nil
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx,
 		org.NewMemberChangedEvent(ctx,
-			OrgAggregateFromWriteModelWithCTX(ctx, &existingMember.MemberWriteModel.WriteModel),
+			OrgAggregateFromWriteModelWithCTX(ctx, &existingMember.WriteModel),
 			member.UserID,
 			member.Roles...,
 		),
@@ -165,7 +165,7 @@ func (c *Commands) ChangeOrgMember(ctx context.Context, member *ChangeOrgMember)
 		return nil, err
 	}
 
-	return writeModelToObjectDetails(&existingMember.MemberWriteModel.WriteModel), nil
+	return writeModelToObjectDetails(&existingMember.WriteModel), nil
 }
 
 func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*domain.ObjectDetails, error) {
@@ -177,7 +177,7 @@ func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*
 		return nil, err
 	}
 	if !existingMember.State.Exists() {
-		return writeModelToObjectDetails(&existingMember.MemberWriteModel.WriteModel), nil
+		return writeModelToObjectDetails(&existingMember.WriteModel), nil
 	}
 	if err := c.checkPermissionDeleteOrgMember(ctx, existingMember.ResourceOwner, existingMember.AggregateID); err != nil {
 		return nil, err
@@ -185,7 +185,7 @@ func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*
 
 	pushedEvents, err := c.eventstore.Push(ctx,
 		c.removeOrgMember(ctx,
-			OrgAggregateFromWriteModelWithCTX(ctx, &existingMember.MemberWriteModel.WriteModel),
+			OrgAggregateFromWriteModelWithCTX(ctx, &existingMember.WriteModel),
 			userID,
 			false,
 		),
