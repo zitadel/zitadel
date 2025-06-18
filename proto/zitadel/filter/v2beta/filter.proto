@@ -86,7 +86,18 @@ message TimestampFilter {
 message InIDsFilter {
   // Defines the ids to query for.
   repeated string ids = 1 [
+    (validate.rules).repeated = {
+      unique: true
+      items: {
+        string: {
+          min_len: 1
+          max_len: 200
+        }
+      }
+    },
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
       example: "[\"69629023906488334\",\"69622366012355662\"]";
     }
   ];
