@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS zitadel.instances(
 );
 
 CREATE INDEX instance_name_not_deleted_idx ON zitadel.instances (name)
-    WHERE deleted_at IS NOT NULL;
+    WHERE deleted_at IS NULL;
 
 CREATE OR REPLACE FUNCTION zitadel.set_updated_at()
 RETURNS TRIGGER AS $$

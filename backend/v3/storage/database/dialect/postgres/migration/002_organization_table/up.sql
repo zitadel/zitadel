@@ -15,10 +15,10 @@ CREATE TABLE zitadel.organizations(
 
 -- users are able to set the id for organizations
 CREATE INDEX org_id_not_deleted_idx ON zitadel.organizations (id)
-    WHERE deleted_at IS NOT NULL;
+    WHERE deleted_at IS NULL;
 
 CREATE INDEX org_name_not_deleted_idx ON zitadel.organizations (name)
-    WHERE deleted_at IS NOT NULL;
+    WHERE deleted_at IS NULL;
 
 CREATE TRIGGER trigger_set_updated_at
 BEFORE UPDATE ON zitadel.organizations
