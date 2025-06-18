@@ -13,7 +13,7 @@ import (
 	filter_pb "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 )
 
-func (s *Server) ListProjects(ctx context.Context, req *authorization.ListAuthorizationsRequest) (*authorization.ListAuthorizationsResponse, error) {
+func (s *Server) ListAuthorizations(ctx context.Context, req *authorization.ListAuthorizationsRequest) (*authorization.ListAuthorizationsResponse, error) {
 	queries, err := s.listAuthorizationsRequestToModel(req)
 	if err != nil {
 		return nil, err
@@ -158,13 +158,39 @@ func userGrantsToPb(userGrants []*query.UserGrant) []*authorization.Authorizatio
 func userGrantToPb(userGrant *query.UserGrant) *authorization.Authorization {
 	return &authorization.Authorization{
 		Id:             userGrant.ID,
-		Grant:          nil,
+		Grant:          userGrantToGrantType(userGrant),
 		OrganizationId: userGrant.ResourceOwner,
 		CreationDate:   timestamppb.New(userGrant.CreationDate),
 		ChangeDate:     timestamppb.New(userGrant.ChangeDate),
 		State:          userGrantStateToPb(userGrant.State),
-		User:           nil,
-		Roles:          nil,
+		User: &authorization.User{
+			Id:                 userGrant.UserID,
+			PreferredLoginName: userGrant.PreferredLoginName,
+			DisplayName:        userGrant.DisplayName,
+			AvatarUrl:          userGrant.AvatarURL,
+			OrganizationId:     userGrant.UserResourceOwner,
+		},
+		Roles: userGrant.Roles,
+	}
+}
+
+func userGrantToGrantType(userGrant *query.UserGrant) authorization.GrantType {
+	if userGrant.GrantID != "" {
+		return &authorization.Authorization_ProjectGrant{
+			ProjectGrant: &authorization.ProjectGrant{
+				Id:             userGrant.GrantID,
+				ProjectId:      userGrant.ProjectID,
+				ProjectName:    userGrant.ProjectName,
+				OrganizationId: userGrant.GrantedOrgID,
+			},
+		}
+	}
+	return &authorization.Authorization_Project{
+		Project: &authorization.Project{
+			Id:             userGrant.ProjectID,
+			Name:           userGrant.ProjectName,
+			OrganizationId: userGrant.ProjectResourceOwner,
+		},
 	}
 }
 

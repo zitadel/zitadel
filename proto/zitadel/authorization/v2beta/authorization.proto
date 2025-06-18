@@ -47,7 +47,7 @@ message Authorization {
   State state = 7;
   User user = 8;
   // Roles contains the roles the user was granted for the project.
-  repeated Role roles = 9;
+  repeated string roles = 9;
 }
 
 message Project {
@@ -92,13 +92,6 @@ message User {
   // The organization the user belong to.
   // This does not have to correspond with the authorizations organization.
   string organization_id = 5;
-}
-
-message Role {
-  // Key is the unique identifier of the role.
-  string key = 1;
-  // DisplayName is the human readable name of the role.
-  string display_name = 2;
 }
 
 message AuthorizationsSearchFilter {

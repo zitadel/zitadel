@@ -44,8 +44,9 @@ type UserGrant struct {
 	OrgName          string `json:"org_name,omitempty"`
 	OrgPrimaryDomain string `json:"org_primary_domain,omitempty"`
 
-	ProjectID   string `json:"project_id,omitempty"`
-	ProjectName string `json:"project_name,omitempty"`
+	ProjectResourceOwner string `json:"project_resource_owner,omitempty"`
+	ProjectID            string `json:"project_id,omitempty"`
+	ProjectName          string `json:"project_name,omitempty"`
 
 	GrantedOrgID     string `json:"granted_org_id,omitempty"`
 	GrantedOrgName   string `json:"granted_org_name,omitempty"`
@@ -336,6 +337,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 
 			UserGrantProjectID.identifier(),
 			ProjectColumnName.identifier(),
+			ProjectColumnResourceOwner.identifier(),
 
 			GrantedOrgColumnId.identifier(),
 			GrantedOrgColumnName.identifier(),
@@ -368,7 +370,8 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 				orgName   sql.NullString
 				orgDomain sql.NullString
 
-				projectName sql.NullString
+				projectName          sql.NullString
+				projectResourceOwner sql.NullString
 
 				grantedOrgID     sql.NullString
 				grantedOrgName   sql.NullString
@@ -401,6 +404,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 
 				&g.ProjectID,
 				&projectName,
+				&projectResourceOwner,
 
 				&grantedOrgID,
 				&grantedOrgName,
