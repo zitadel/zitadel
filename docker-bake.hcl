@@ -47,8 +47,6 @@ target "login-test-unit" {
   contexts = {
     login-client   = "target:login-client"
   }
-  output = ["type=docker"]
-  tags = ["${LOGIN_TEST_UNIT_TAG}"]
 }
 
 target "login-client" {
@@ -90,6 +88,7 @@ target "core-mock" {
     protos = "target:proto-files"
   }
   tags = ["${CORE_MOCK_TAG}"]
+  output = ["type=docker"]
 }
 
 variable "LOGIN_TEST_INTEGRATION_TAG" {
@@ -106,6 +105,7 @@ target "login-test-integration" {
     login-pnpm = "target:login-pnpm"
   }
   tags = ["${LOGIN_TEST_INTEGRATION_TAG}"]
+  output = ["type=docker"]
 }
 
 variable "LOGIN_TEST_ACCEPTANCE_TAG" {
@@ -122,6 +122,7 @@ target "login-test-acceptance" {
     login-pnpm = "target:login-pnpm"
   }
   tags = ["${LOGIN_TEST_ACCEPTANCE_TAG}"]
+  output = ["type=docker"]
 }
 
 variable "LOGIN_TAG" {
@@ -139,4 +140,5 @@ target "login-standalone" {
     login-client = "target:login-client"
   }
   tags = ["${LOGIN_TAG}"]
+  output = ["type=docker"]
 }
