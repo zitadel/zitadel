@@ -8,12 +8,16 @@ import {
   SetUpOrgResponse,
 } from '@zitadel/proto/zitadel/admin_pb';
 import { injectQuery } from '@tanstack/angular-query-experimental';
+import { NewAuthService } from './new-auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NewAdminService {
-  constructor(private readonly grpcService: GrpcService) {}
+  constructor(
+    private readonly grpcService: GrpcService,
+    private readonly authService: NewAuthService,
+  ) {}
 
   public setupOrg(req: MessageInitShape<typeof SetUpOrgRequestSchema>): Promise<SetUpOrgResponse> {
     return this.grpcService.adminNew.setupOrg(req);
@@ -28,9 +32,11 @@ export class NewAdminService {
   }
 
   public getMyInstanceQuery() {
+    const listMyZitadelPermissionsQuery = this.authService.listMyZitadelPermissionsQuery();
     return injectQuery(() => ({
       queryKey: ['admin', 'getMyInstance'],
-      queryFn: ({ signal }) => this.getMyInstance(signal),
+      queryFn: async () => this.getMyInstance(),
+      enabled: (listMyZitadelPermissionsQuery.data() ?? []).includes('iam.write'),
     }));
   }
 }

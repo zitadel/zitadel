@@ -12,13 +12,7 @@ import {
   Signal,
   untracked,
 } from '@angular/core';
-import {
-  CdkConnectedOverlay,
-  CdkOverlayOrigin,
-  FlexibleConnectedPositionStrategy,
-  Overlay,
-  ScrollStrategy,
-} from '@angular/cdk/overlay';
+import { CdkConnectedOverlay, CdkOverlayOrigin, FlexibleConnectedPositionStrategy, Overlay } from '@angular/cdk/overlay';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { map } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -48,7 +42,7 @@ export class HeaderDropdownComponent implements OnInit {
   protected readonly isOpen$ = new ReplaySubject<boolean>(1);
   protected readonly isHandset: Signal<boolean>;
   protected readonly positionStrategy: Signal<FlexibleConnectedPositionStrategy>;
-  protected readonly scrollStrategy: Signal<ScrollStrategy>;
+  protected readonly scrollStrategy = this.overlay.scrollStrategies.block();
 
   constructor(
     private readonly overlay: Overlay,
@@ -57,7 +51,6 @@ export class HeaderDropdownComponent implements OnInit {
   ) {
     this.isHandset = this.getIsHandset();
     this.positionStrategy = this.getPositionStrategy(this.isHandset);
-    this.scrollStrategy = this.getScrollStrategy(this.isHandset);
   }
 
   ngOnInit(): void {
@@ -100,9 +93,5 @@ export class HeaderDropdownComponent implements OnInit {
             ])
         : undefined!,
     );
-  }
-
-  private getScrollStrategy(isHandset: Signal<boolean>): Signal<ScrollStrategy> {
-    return computed(() => (isHandset() ? this.overlay.scrollStrategies.block() : undefined!));
   }
 }

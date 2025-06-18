@@ -16,6 +16,7 @@ import { map } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { NewAdminService } from '../../services/new-admin.service';
+import { NewAuthService } from '../../services/new-auth.service';
 
 @Component({
   selector: 'cnsl-new-header',
@@ -39,8 +40,12 @@ import { NewAdminService } from '../../services/new-admin.service';
   ],
 })
 export class NewHeaderComponent {
+  protected readonly listMyZitadelPermissionsQuery = this.newAuthService.listMyZitadelPermissionsQuery();
   protected readonly myInstanceQuery = this.adminService.getMyInstanceQuery();
-  protected readonly organizationsQuery = injectQuery(() => this.newOrganizationService.listOrganizationsQueryOptions());
+  protected readonly organizationsQuery = injectQuery(() => ({
+    ...this.newOrganizationService.listOrganizationsQueryOptions(),
+    enabled: (this.listMyZitadelPermissionsQuery.data() ?? []).includes('org.read'),
+  }));
   protected readonly isInstanceDropdownOpen = signal(false);
   protected readonly isOrgDropdownOpen = signal(false);
   protected readonly instanceSelectorSecondStep = signal(false);
@@ -52,8 +57,16 @@ export class NewHeaderComponent {
     private readonly toastService: ToastService,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly adminService: NewAdminService,
+    private readonly newAuthService: NewAuthService,
   ) {
     this.isHandset = this.getIsHandset();
+
+    effect(() => {
+      if (this.listMyZitadelPermissionsQuery.isError()) {
+        this.toastService.showError(this.listMyZitadelPermissionsQuery.error());
+      }
+    });
+
     effect(() => {
       if (this.organizationsQuery.isError()) {
         this.toastService.showError(this.organizationsQuery.error());
