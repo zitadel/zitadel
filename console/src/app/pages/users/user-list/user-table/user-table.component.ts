@@ -41,10 +41,8 @@ import { Type, UserFieldName } from '@zitadel/proto/zitadel/user/v2/query_pb';
 import { UserState, User } from '@zitadel/proto/zitadel/user/v2/user_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { ListUsersRequestSchema, ListUsersResponse } from '@zitadel/proto/zitadel/user/v2/user_service_pb';
-import { AuthenticationService } from 'src/app/services/authentication.service';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { UserState as UserStateV1 } from 'src/app/proto/generated/zitadel/user_pb';
-import { NewOrganizationService } from '../../../../services/new-organization.service';
+import { NewOrganizationService } from 'src/app/services/new-organization.service';
 
 type Query = Exclude<
   Exclude<MessageInitShape<typeof ListUsersRequestSchema>['queries'], undefined>[number]['query'],
@@ -124,8 +122,6 @@ export class UserTableComponent implements OnInit {
     private readonly dialog: MatDialog,
     private readonly route: ActivatedRoute,
     private readonly destroyRef: DestroyRef,
-    private readonly authenticationService: AuthenticationService,
-    private readonly authService: GrpcAuthService,
     private readonly newOrganizationService: NewOrganizationService,
   ) {
     this.type$ = this.getType$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
@@ -232,9 +228,10 @@ export class UserTableComponent implements OnInit {
   }
 
   private getQueries(type$: Observable<Type>): Observable<Query[]> {
+    const orgId$ = toObservable(this.newOrganizationService.orgId).pipe(filter(Boolean));
     return this.searchQueries$.pipe(
       startWith([]),
-      combineLatestWith(type$, toObservable(this.newOrganizationService.getOrgId())),
+      combineLatestWith(type$, orgId$),
       map(([queries, type, organizationId]) => {
         const mappedQueries = queries.map((q) => this.searchQueryToV2(q.toObject()));
 

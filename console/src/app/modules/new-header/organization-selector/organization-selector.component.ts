@@ -91,6 +91,15 @@ export class OrganizationSelectorComponent {
         toast.showError(this.activeOrg.error());
       }
     });
+
+    effect(() => {
+      const orgId = newOrganizationService.orgId();
+      const orgs = this.organizationsQuery.data()?.pages[0]?.result;
+      if (orgId || !orgs || orgs.length === 0) {
+        return;
+      }
+      const _ = newOrganizationService.setOrgId(orgs[0].id);
+    });
   }
 
   private buildForm() {
@@ -123,7 +132,7 @@ export class OrganizationSelectorComponent {
     return injectInfiniteQuery(() => {
       const query = nameQuery();
       return {
-        queryKey: ['listOrganizationsInfinite', query],
+        queryKey: ['organization', 'listOrganizationsInfinite', query],
         queryFn: ({ pageParam, signal }) => this.newOrganizationService.listOrganizations(pageParam, signal),
         initialPageParam: {
           query: {

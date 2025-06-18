@@ -44,6 +44,8 @@ export class NewOrganizationService {
   }
 
   public async setOrgId(orgId?: string) {
+    console.log('beboop', orgId);
+    console.trace(orgId);
     const organization = await this.queryClient.fetchQuery(this.organizationByIdQueryOptions(orgId ?? this.getOrgId()()));
     if (organization) {
       this.storage.setItem(StorageKey.organizationId, orgId, StorageLocation.session);
@@ -73,7 +75,7 @@ export class NewOrganizationService {
     };
 
     return queryOptions({
-      queryKey: ['listOrganizations', req],
+      queryKey: ['organization', 'listOrganizations', req],
       queryFn: organizationId
         ? () => this.listOrganizations(req).then((resp) => resp.result.find(Boolean) ?? null)
         : skipToken,
@@ -93,7 +95,7 @@ export class NewOrganizationService {
 
   public listOrganizationsQueryKey(req?: MessageInitShape<typeof ListOrganizationsRequestSchema>) {
     if (!req) {
-      return ['listOrganizations'];
+      return ['organization', 'listOrganizations'];
     }
 
     // needed because angular query isn't able to serialize a bigint key
@@ -103,7 +105,7 @@ export class NewOrganizationService {
       ...(query ? { query } : {}),
     };
 
-    return ['listOrganizations', queryKey];
+    return ['organization', 'listOrganizations', queryKey];
   }
 
   public listOrganizations(

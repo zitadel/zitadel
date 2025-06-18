@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, effect, OnInit, signal } from '@angular/c
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { BehaviorSubject, from, lastValueFrom, Observable, of } from 'rxjs';
-import { catchError, distinctUntilChanged, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
@@ -159,6 +159,7 @@ export class OrgDetailComponent implements OnInit {
 
     try {
       await this.deleteOrgMutation.mutateAsync();
+      this.toast.showInfo('ORG.TOAST.DELETED', true);
       await this.router.navigate(['/orgs']);
     } catch (error) {
       this.toast.showError(error);

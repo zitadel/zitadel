@@ -39,7 +39,6 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private injector: Injector,
     private adminService: AdminService,
-    private storageService: StorageService,
     private readonly newOrganizationService: NewOrganizationService,
   ) {}
 
