@@ -16,6 +16,21 @@ import (
 )
 
 func TestCreateOrganization(t *testing.T) {
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err := instanceRepo.Create(t.Context(), &instance)
+	assert.Nil(t, err)
+
 	tests := []struct {
 		name         string
 		testFunc     func(ctx context.Context, t *testing.T) *domain.Organization
@@ -27,7 +42,6 @@ func TestCreateOrganization(t *testing.T) {
 			organization: func() domain.Organization {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
-				instanceId := gofakeit.Name()
 				organization := domain.Organization{
 					ID:         organizationId,
 					Name:       organizationName,
@@ -42,7 +56,6 @@ func TestCreateOrganization(t *testing.T) {
 			organization: func() domain.Organization {
 				organizationId := gofakeit.Name()
 				// organizationName := gofakeit.Name()
-				instanceId := gofakeit.Name()
 				organization := domain.Organization{
 					ID:         organizationId,
 					Name:       "",
@@ -59,7 +72,6 @@ func TestCreateOrganization(t *testing.T) {
 				organizationRepo := repository.OrganizationRepository(pool)
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
-				instanceId := gofakeit.Name()
 
 				inst := domain.Organization{
 					ID:         organizationId,
@@ -79,7 +91,6 @@ func TestCreateOrganization(t *testing.T) {
 			organization: func() domain.Organization {
 				// organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
-				instanceId := gofakeit.Name()
 				organization := domain.Organization{
 					// ID:              organizationId,
 					Name:       organizationName,
@@ -96,9 +107,8 @@ func TestCreateOrganization(t *testing.T) {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
 				organization := domain.Organization{
-					ID:   organizationId,
-					Name: organizationName,
-					// InstanceID: instanceId,
+					ID:    organizationId,
+					Name:  organizationName,
 					State: domain.Active,
 				}
 				return organization
@@ -120,7 +130,7 @@ func TestCreateOrganization(t *testing.T) {
 
 			// create organization
 			beforeCreate := time.Now()
-			err := organizationRepo.Create(ctx, organization)
+			err = organizationRepo.Create(ctx, organization)
 			assert.Equal(t, tt.err, err)
 			if err != nil {
 				return
@@ -145,7 +155,22 @@ func TestCreateOrganization(t *testing.T) {
 }
 
 func TestUpdateOrganization(t *testing.T) {
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err := instanceRepo.Create(t.Context(), &instance)
+	assert.Nil(t, err)
 	organizationRepo := repository.OrganizationRepository(pool)
+
 	tests := []struct {
 		name         string
 		testFunc     func(ctx context.Context, t *testing.T) *domain.Organization
@@ -157,7 +182,6 @@ func TestUpdateOrganization(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
-				instanceId := gofakeit.Name()
 
 				org := domain.Organization{
 					ID:         organizationId,
@@ -182,7 +206,6 @@ func TestUpdateOrganization(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
-				instanceId := gofakeit.Name()
 
 				org := domain.Organization{
 					ID:         organizationId,
@@ -210,7 +233,6 @@ func TestUpdateOrganization(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
-				instanceId := gofakeit.Name()
 
 				org := domain.Organization{
 					ID:         organizationId,
@@ -283,7 +305,35 @@ func TestUpdateOrganization(t *testing.T) {
 }
 
 func TestGetOrganization(t *testing.T) {
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err := instanceRepo.Create(t.Context(), &instance)
+	assert.Nil(t, err)
+
 	orgRepo := repository.OrganizationRepository(pool)
+
+	// create organization
+	// this org is created as an additional org which should NOT
+	// be returned in the results of the tests
+	org := domain.Organization{
+		ID:         gofakeit.Name(),
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.Active,
+	}
+	err = orgRepo.Create(t.Context(), &org)
+	assert.NoError(t, err)
+
 	type test struct {
 		name             string
 		testFunc         func(ctx context.Context, t *testing.T) *domain.Organization
@@ -297,7 +347,6 @@ func TestGetOrganization(t *testing.T) {
 				name: "happy path get using id",
 				testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
 					organizationName := gofakeit.Name()
-					instanceId := gofakeit.Name()
 
 					org := domain.Organization{
 						ID:         organizationId,
@@ -321,7 +370,6 @@ func TestGetOrganization(t *testing.T) {
 				name: "happy path get using name",
 				testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
 					organizationId := gofakeit.Name()
-					instanceId := gofakeit.Name()
 
 					org := domain.Organization{
 						ID:         organizationId,
@@ -342,8 +390,6 @@ func TestGetOrganization(t *testing.T) {
 		{
 			name: "get non existent organization",
 			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
-				instanceId := gofakeit.Name()
-
 				_ = domain.Instance{
 					ID: instanceId,
 				}
@@ -381,11 +427,26 @@ func TestGetOrganization(t *testing.T) {
 }
 
 func TestListOrganization(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	pool, stop, err := newEmbeddedDB(ctx)
 	require.NoError(t, err)
 	defer stop()
 	organizationRepo := repository.OrganizationRepository(pool)
+
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err = instanceRepo.Create(ctx, &instance)
+	assert.Nil(t, err)
 
 	type test struct {
 		name                   string
@@ -399,7 +460,6 @@ func TestListOrganization(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
 				noOfOrganizations := 1
 				organizations := make([]*domain.Organization, noOfOrganizations)
-				instanceId := gofakeit.Name()
 				for i := range noOfOrganizations {
 
 					inst := domain.Organization{
@@ -424,7 +484,6 @@ func TestListOrganization(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
 				noOfOrganizations := 5
 				organizations := make([]*domain.Organization, noOfOrganizations)
-				instanceId := gofakeit.Name()
 				for i := range noOfOrganizations {
 
 					inst := domain.Organization{
@@ -449,9 +508,20 @@ func TestListOrganization(t *testing.T) {
 			return test{
 				name: "organization filter on id",
 				testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
+					// create organization
+					// this org is created as an additional org which should NOT
+					// be returned in the results of this test case
+					org := domain.Organization{
+						ID:         gofakeit.Name(),
+						Name:       gofakeit.Name(),
+						InstanceID: instanceId,
+						State:      domain.Active,
+					}
+					err = organizationRepo.Create(ctx, &org)
+					assert.NoError(t, err)
+
 					noOfOrganizations := 1
 					organizations := make([]*domain.Organization, noOfOrganizations)
-					instanceId := gofakeit.Name()
 					for i := range noOfOrganizations {
 
 						inst := domain.Organization{
@@ -476,9 +546,20 @@ func TestListOrganization(t *testing.T) {
 		{
 			name: "multiple organization filter on state",
 			testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
+				// create organization
+				// this org is created as an additional org which should NOT
+				// be returned in the results of this test case
+				org := domain.Organization{
+					ID:         gofakeit.Name(),
+					Name:       gofakeit.Name(),
+					InstanceID: instanceId,
+					State:      domain.Active,
+				}
+				err = organizationRepo.Create(ctx, &org)
+				assert.NoError(t, err)
+
 				noOfOrganizations := 5
 				organizations := make([]*domain.Organization, noOfOrganizations)
-				instanceId := gofakeit.Name()
 				for i := range noOfOrganizations {
 
 					inst := domain.Organization{
@@ -504,9 +585,20 @@ func TestListOrganization(t *testing.T) {
 			return test{
 				name: "multiple organization filter on name",
 				testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
+					// create organization
+					// this org is created as an additional org which should NOT
+					// be returned in the results of this test case
+					org := domain.Organization{
+						ID:         gofakeit.Name(),
+						Name:       gofakeit.Name(),
+						InstanceID: instanceId,
+						State:      domain.Active,
+					}
+					err = organizationRepo.Create(ctx, &org)
+					assert.NoError(t, err)
+
 					noOfOrganizations := 5
 					organizations := make([]*domain.Organization, noOfOrganizations)
-					instanceId := gofakeit.Name()
 					for i := range noOfOrganizations {
 
 						inst := domain.Organization{
@@ -560,6 +652,21 @@ func TestListOrganization(t *testing.T) {
 }
 
 func TestDeleteOrganization(t *testing.T) {
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err := instanceRepo.Create(t.Context(), &instance)
+	assert.Nil(t, err)
+
 	type test struct {
 		name             string
 		testFunc         func(ctx context.Context, t *testing.T)
@@ -569,7 +676,6 @@ func TestDeleteOrganization(t *testing.T) {
 		func() test {
 			organizationRepo := repository.OrganizationRepository(pool)
 			organizationId := gofakeit.Name()
-			instanceId := gofakeit.Name()
 			return test{
 				name: "happy path delete single organization filter id",
 				testFunc: func(ctx context.Context, t *testing.T) {
@@ -597,7 +703,6 @@ func TestDeleteOrganization(t *testing.T) {
 		func() test {
 			organizationRepo := repository.OrganizationRepository(pool)
 			organizationName := gofakeit.Name()
-			instanceId := gofakeit.Name()
 			return test{
 				name: "happy path delete single organization filter name",
 				testFunc: func(ctx context.Context, t *testing.T) {
@@ -633,7 +738,6 @@ func TestDeleteOrganization(t *testing.T) {
 		func() test {
 			organizationRepo := repository.OrganizationRepository(pool)
 			organizationName := gofakeit.Name()
-			instanceId := gofakeit.Name()
 			return test{
 				name: "multiple organization filter on name",
 				testFunc: func(ctx context.Context, t *testing.T) {
@@ -661,7 +765,6 @@ func TestDeleteOrganization(t *testing.T) {
 		func() test {
 			organizationRepo := repository.OrganizationRepository(pool)
 			organizationName := gofakeit.Name()
-			instanceId := gofakeit.Name()
 			return test{
 				name: "deleted already deleted organization",
 				testFunc: func(ctx context.Context, t *testing.T) {

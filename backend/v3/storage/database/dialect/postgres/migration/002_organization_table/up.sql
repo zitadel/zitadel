@@ -8,8 +8,8 @@ CREATE TABLE zitadel.organizations(
   name TEXT NOT NULL CHECK (name <> ''),
   instance_id TEXT NOT NULL CHECK (instance_id <> '') REFERENCES zitadel.instances (id),
   state zitadel.organization_state NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   deleted_at TIMESTAMPTZ DEFAULT NULL
 );
 
