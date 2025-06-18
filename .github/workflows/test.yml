@@ -33,8 +33,8 @@ jobs:
       - uses: depot/setup-action@v1
         with:
           oidc: true
-      - name: Save Run Caches
-        uses: actions/cache@v4
+      - name: Restore Run Caches
+        uses: actions/cache/restore@v4
         with:
           path: ${{ runner.temp }}/zitadel-make-cache
           key: zitadel-make-cache-${{ github.ref == 'refs/heads/main' && 'latest' || fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
@@ -47,3 +47,10 @@ jobs:
           REF_TAG: ${{ github.ref == 'refs/heads/main' && 'latest' || fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
           CACHE_DIR: ${{ runner.temp }}/zitadel-make-cache
           LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT: .
+      - name: Save Run Caches
+        id: cache-primes-save
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/zitadel-make-cache
+          key: ${{ steps.cache-primes-restore.outputs.cache-primary-key }}
+        if: always()
