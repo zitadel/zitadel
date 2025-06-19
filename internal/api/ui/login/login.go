@@ -231,8 +231,7 @@ func startCaches(background context.Context, connectors connector.Connectors, fe
 type idpFormCallbackIndex int
 
 const (
-	idpFormCallbackIndexUnspecified idpFormCallbackIndex = iota
-	idpFormCallbackIndexRequestID
+	idpFormCallbackIndexRequestID idpFormCallbackIndex = iota
 )
 
 type idpFormCallback struct {

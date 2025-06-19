@@ -1,0 +1,2 @@
+internal/v2/.*
+.*ThrowPermissionDenied.*

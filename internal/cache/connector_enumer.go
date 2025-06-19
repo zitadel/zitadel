@@ -22,14 +22,6 @@ func (i Connector) String() string {
 
 // An "invalid array index" compiler error signifies that the constant values have changed.
 // Re-run the stringer command to generate them again.
-func _ConnectorNoOp() {
-	var x [1]struct{}
-	_ = x[ConnectorUnspecified-(0)]
-	_ = x[ConnectorMemory-(1)]
-	_ = x[ConnectorPostgres-(2)]
-	_ = x[ConnectorRedis-(3)]
-}
-
 var _ConnectorValues = []Connector{ConnectorUnspecified, ConnectorMemory, ConnectorPostgres, ConnectorRedis}
 
 var _ConnectorNameToValueMap = map[string]Connector{
