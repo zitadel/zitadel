@@ -18,7 +18,7 @@ DIGEST_FILE="$CACHE_DIR/$MAKE_TARGET.digests"
 mkdir -p "$CACHE_DIR"
 
 get_image_ids() {
-  local depot_pull_out=$(depot pull 2>&1 || true)
+  local depot_pull_out=$(depot pull 2>&1)
 	local ids=""
 	for img in $(echo "$IMAGES"); do
 		local id=$(docker image inspect "$img" --format='{{.Id}}' 2>/dev/null || true)
