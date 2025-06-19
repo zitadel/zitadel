@@ -1,5 +1,7 @@
 import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME } from "@/lib/i18n";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getHostedLoginTranslation } from "@/lib/zitadel";
+import { JsonObject } from "@zitadel/client";
 import deepmerge from "deepmerge";
 import { getRequestConfig } from "next-intl/server";
 import { cookies, headers } from "next/headers";
@@ -14,14 +16,22 @@ export default getRequestConfig(async () => {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const i18nOrganization = _headers.get("x-zitadel-i18n-organization") || ""; // You may need to set this header in middleware
+  console.log("i18nOrganization:", i18nOrganization);
+  let translations: JsonObject | {} = {};
+  try {
+    const i18nJSON = await getHostedLoginTranslation({
+      serviceUrl,
+      locale,
+      organization: i18nOrganization,
+    });
 
-  // const translations = await getHostedLoginTranslation({
-  //   serviceUrl,
-  //   locale,
-  //   organization: i18nOrganization,
-  // });
-
-  // console.log("Translations:", translations);
+    if (i18nJSON) {
+      translations = i18nJSON;
+    }
+    console.log("Translations:", translations);
+  } catch (error) {
+    console.warn("Error fetching custom translations:", error);
+  }
 
   const languageHeader = await (await headers()).get(LANGUAGE_HEADER_NAME);
   if (languageHeader) {

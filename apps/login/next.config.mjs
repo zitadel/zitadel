@@ -26,8 +26,6 @@ const secureHeaders = [
     key: "X-XSS-Protection",
     value: "1; mode=block",
   },
-  // img-src vercel.com needed for deploy button,
-  // script-src va.vercel-scripts.com for analytics/vercel scripts
   {
     key: "Content-Security-Policy",
     value: `${DEFAULT_CSP} frame-ancestors 'none'`,

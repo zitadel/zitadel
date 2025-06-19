@@ -10,8 +10,7 @@ export const config = {
     "/oidc/:path*",
     "/idps/callback/:path*",
     "/saml/:path*",
-    // Add "/*" to match all routes for translation header injection
-    "/*",
+    "/:path*",
   ],
 };
 
