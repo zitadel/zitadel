@@ -18,8 +18,7 @@ DIGEST_FILE="$CACHE_DIR/$MAKE_TARGET.digests"
 mkdir -p "$CACHE_DIR"
 
 get_image_ids() {
-  local depot_pull_out=$(depot pull 2>&1)
-	local ids=""
+  local ids=""
 	for img in $(echo "$IMAGES"); do
 		local id=$(docker image inspect "$img" --format='{{.Id}}' 2>/dev/null || true)
 		if [[ -z $id ]]; then
@@ -41,6 +40,8 @@ OLD_DIGEST=$(cat "$DIGEST_FILE" 2>/dev/null || echo "")
 OLD_STATUS=$(echo "$OLD_DIGEST" | cut -d ';' -f1)
 OLD_IDS=$(echo "$OLD_DIGEST" | cut -d ';' -f2-99)
 CURRENT_IMAGE_IDS=$(get_image_ids)
+docker images
+echo $CURRENT_IMAGE_IDS
 if [[ "$OLD_IDS" == "$CURRENT_IMAGE_IDS" ]]; then
     if [[ "$FORCE" == "true" ]]; then
         echo "\$FORCE=$FORCE - Running $MAKE_TARGET despite unchanged images."
