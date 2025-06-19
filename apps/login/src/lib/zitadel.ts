@@ -21,7 +21,6 @@ import {
   SessionService,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { TranslationLevelType } from "@zitadel/proto/zitadel/settings/v2/settings_pb";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
@@ -75,13 +74,23 @@ export async function getHostedLoginTranslation({
   const callback = settingsService
     .getHostedLoginTranslation(
       {
-        level: TranslationLevelType.INSTANCE,
-        levelId: organization,
+        level: organization
+          ? {
+              case: "organizationId",
+              value: organization,
+            }
+          : {
+              case: "instance",
+              value: true,
+            },
         locale: locale,
       },
       {},
     )
-    .then((resp) => (resp.translations ? resp.translations : undefined));
+    .then((resp) => {
+      console.log(resp);
+      return resp.translations ? resp.translations : undefined;
+    });
 
   return useCache ? cacheWrapper(callback) : callback;
 }
