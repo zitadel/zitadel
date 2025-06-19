@@ -2,7 +2,6 @@
 
 import { Alert } from "@/components/alert";
 import { getDeviceAuthorizationRequest } from "@/lib/server/oidc";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,14 +9,13 @@ import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 type Inputs = {
   userCode: string;
 };
 
 export function DeviceCodeForm({ userCode }: { userCode?: string }) {
-  const t = useTranslations("verify");
-
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
@@ -87,8 +85,8 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
             onClick={handleSubmit(submitCodeAndContinue)}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="h-5 w-5 mr-2" />}
-            {t("verify.submit")}
+            {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+            <Translated i18nKey="verify.submit" namespace="verify" />
           </Button>
         </div>
       </form>

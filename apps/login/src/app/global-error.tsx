@@ -3,7 +3,7 @@
 import { Boundary } from "@/components/boundary";
 import { Button } from "@/components/button";
 import { ThemeWrapper } from "@/components/theme-wrapper";
-import { useTranslations } from "next-intl";
+import { Translated } from "@/components/translated";
 
 export default function GlobalError({
   error,
@@ -12,8 +12,6 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const t = useTranslations("error");
-
   return (
     // global-error must include html and body tags
     <html>
@@ -26,7 +24,7 @@ export default function GlobalError({
               </div>
               <div>
                 <Button data-i18n-key="error.tryagain" onClick={() => reset()}>
-                  {t("tryagain")}
+                  <Translated i18nKey="tryagain" namespace="error" />
                 </Button>
               </div>
             </div>

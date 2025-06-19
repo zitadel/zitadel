@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar } from "./avatar";
 import { isSessionValid } from "./session-item";
+import { Translated } from "./translated";
 
 export function SessionClearItem({
   session,
@@ -89,7 +90,7 @@ export function SessionClearItem({
       <span className="flex-grow"></span>
       <div className="relative flex flex-row items-center">
         <div className="mr-6 px-2 py-[2px] text-xs hidden group-hover:block transition-all text-warn-light-500 dark:text-warn-dark-500 bg-[#ff0000]/10 dark:bg-[#ff0000]/10 rounded-full flex items-center justify-center">
-          {t("clear")}
+          <Translated i18nKey="clear" namespace="logout" />
         </div>
 
         {valid ? (

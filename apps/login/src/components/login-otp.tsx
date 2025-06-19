@@ -6,7 +6,6 @@ import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -15,6 +14,7 @@ import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -42,8 +42,6 @@ export function LoginOTP({
   code,
   loginSettings,
 }: Props) {
-  const t = useTranslations("otp");
-
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -223,7 +221,7 @@ export function LoginOTP({
         <Alert type={AlertType.INFO}>
           <div className="flex flex-row">
             <span className="flex-1 mr-auto text-left">
-              {t("verify.noCodeReceived")}
+              <Translated i18nKey="verify.noCodeReceived" namespace="otp" />
             </span>
             <button
               aria-label="Resend OTP Code"
@@ -243,7 +241,7 @@ export function LoginOTP({
               }}
               data-testid="resend-button"
             >
-              {t("verify.resendCode")}
+              <Translated i18nKey="verify.resendCode" namespace="otp" />
             </button>
           </div>
         </Alert>
@@ -277,8 +275,8 @@ export function LoginOTP({
           })}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("verify.submit")}
+          {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+          <Translated i18nKey="verify.submit" namespace="otp" />
         </Button>
       </div>
     </form>

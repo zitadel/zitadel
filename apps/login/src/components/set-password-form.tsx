@@ -24,6 +24,7 @@ import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { PasswordComplexity } from "./password-complexity";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 type Inputs =
   | {
@@ -207,7 +208,7 @@ export function SetPasswordForm({
                 }}
                 data-testid="resend-button"
               >
-                {t("set.resend")}
+                <Translated i18nKey="set.resend" namespace="password" />
               </button>
             </div>
           </Alert>
@@ -279,8 +280,8 @@ export function SetPasswordForm({
           onClick={handleSubmit(submitPassword)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("set.submit")}
+          {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+          <Translated i18nKey="set.submit" namespace="password" />
         </Button>
       </div>
     </form>

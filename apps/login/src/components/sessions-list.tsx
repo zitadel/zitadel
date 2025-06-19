@@ -2,10 +2,10 @@
 
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Alert } from "./alert";
 import { SessionItem } from "./session-item";
+import { Translated } from "./translated";
 
 type Props = {
   sessions: Session[];
@@ -13,7 +13,6 @@ type Props = {
 };
 
 export function SessionsList({ sessions, requestId }: Props) {
-  const t = useTranslations("accounts");
   const [list, setList] = useState<Session[]>(sessions);
   return sessions ? (
     <div className="flex flex-col space-y-2">
@@ -44,6 +43,8 @@ export function SessionsList({ sessions, requestId }: Props) {
         })}
     </div>
   ) : (
-    <Alert>{t("noResults")}</Alert>
+    <Alert>
+      <Translated i18nKey="noResults" namespace="accounts" />
+    </Alert>
   );
 }
