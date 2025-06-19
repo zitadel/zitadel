@@ -14,47 +14,59 @@ MAKE_TARGET=$1
 IMAGES=$2
 FORCE=${FORCE:-false}
 
-DIGEST_FILE="$CACHE_DIR/$MAKE_TARGET.digests"
+CACHE_FILE="$CACHE_DIR/$MAKE_TARGET.digests"
 mkdir -p "$CACHE_DIR"
 
-get_image_ids() {
-  local ids=""
-	for img in $(echo "$IMAGES"); do
-		local id=$(docker image inspect "$img" --format='{{index .RepoDigests 0}}' 2>/dev/null || true)
-		if [[ -z $id ]]; then
-		  docker pull "$img" >/dev/null 2>&1 || true
-		  id=$(docker image inspect "$img" --format='{{index .RepoDigests 0}}' 2>/dev/null || true)
-    fi
-    if [[ -z $id ]]; then
-		  id=$(docker image inspect "$img" --format='{{index .RepoDigests 0}}' 2>/dev/null || true)
-    fi
-		id=${id:-new-and-not-pullable-or-failed-to-build}
-		id="${img}@${id}"
-		ids="${ids}${id};"
-	done
-	ids=${ids%;}  # Remove trailing semicolon
-	echo "$ids"
+inspect_image() {
+  local image=$1
+  local format=$2
+  docker image inspect "$image" --format="$format" 2>/dev/null || true
 }
 
-PREVIOUS_DIGEST=$(cat "$DIGEST_FILE" 2>/dev/null || echo "")
-PREVIOUS_STATUS=$(echo "$PREVIOUS_DIGEST" | cut -d ';' -f1)
-PREVIOUS_IMAGE_IDS=$(echo "$PREVIOUS_DIGEST" | cut -d ';' -f2-99)
-CURRENT_IMAGE_IDS="$(get_image_ids)"
-  if [[ "$PREVIOUS_IMAGE_IDS" == "$CURRENT_IMAGE_IDS" ]]; then
+get_digest() {
+  local image=$1
+  echo "id=$(inspect_image $image '{{ .Id }}'),digest=$(inspect_image $image '{{ index RepoDigests 0 }}')"
+}
+
+get_image_digests() {
+  local digests=""
+	for img in $(echo "$IMAGES"); do
+		local digest=$(get_digest $img)
+		if [[ -z $digest ]]; then
+		  docker pull "$img" >/dev/null 2>&1 || true
+		  digest=$(get_digest $img)
+    fi
+    if [[ -z $digest ]]; then
+		  digest=$(get_digest $img)
+    fi
+		digest="${img}@${digest}"
+		digests="${digests}${digest};"
+	done
+	digests=${digests%;}  # Remove trailing semicolon
+	echo "$digests"
+}
+
+CACHE_CONTENT=$(cat "$CACHE_FILE" 2>/dev/null || echo "")
+CACHED_STATUS=$(echo "$CACHE_CONTENT" | cut -d ';' -f1)
+CACHED_DIGESTS=$(echo "$CACHE_CONTENT" | cut -d ';' -f2-99)
+CURRENT_DIGESTS="$(get_image_digests)"
+
+echo "CACHED_DIGESTS does not match CURRENT_DIGESTS"
+echo
+echo "$CACHED_DIGESTS"
+echo
+echo "$CURRENT_DIGESTS"
+
+if [[ "$CACHED_DIGESTS" == "$CURRENT_DIGESTS" ]]; then
     if [[ "$FORCE" == "true" ]]; then
         echo "\$FORCE=$FORCE - Running $MAKE_TARGET despite unchanged images."
     else
-        echo "Skipping $MAKE_TARGET – all images unchanged, returning cached status $PREVIOUS_STATUS"
-        exit $PREVIOUS_STATUS
+        echo "Skipping $MAKE_TARGET – all images unchanged, returning cached status $CACHED_STATUS"
+        exit $CACHED_STATUS
     fi
 fi
+
 echo "Images have changed"
-echo
-echo "PREVIOUS_IMAGE_IDS does not match CURRENT_IMAGE_IDS"
-echo
-echo "$PREVIOUS_IMAGE_IDS"
-echo
-echo "$CURRENT_IMAGE_IDS"
 echo
 docker images
 echo
@@ -63,5 +75,5 @@ set +e
 make -j $MAKE_TARGET
 STATUS=$?
 set -e
-echo "${STATUS};$(get_image_ids)" > $DIGEST_FILE
+echo "${STATUS};$(get_image_digests)" > $CACHE_FILE
 exit $STATUS
