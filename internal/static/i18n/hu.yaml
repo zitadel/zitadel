@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefon már ellenőrizve
       Empty: A telefon mező üres
       NotChanged: Telefon nem lett megváltoztatva
+      VerifyingRemovalIsNotSupported: A telefon eltávolításának ellenőrzése nem támogatott
     Address:
       NotFound: Cím nem található
       NotChanged: Cím nem lett megváltoztatva
@@ -536,6 +537,7 @@ Errors:
     StateMissing: A kérésből hiányzik a State paraméter
     NotStarted: Az intent nem indult el, vagy már befejeződött
     NotSucceeded: Az intent nem sikerült
+    Expired: A kérésből lejárt
     TokenCreationFailed: A token létrehozása nem sikerült
     InvalidToken: Az Intent Token érvénytelen
     OtherUser: Az intent egy másik felhasználónak szól

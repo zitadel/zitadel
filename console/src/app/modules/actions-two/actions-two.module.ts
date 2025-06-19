@@ -20,6 +20,7 @@ import { ProjectRoleChipModule } from '../project-role-chip/project-role-chip.mo
 import { ActionConditionPipeModule } from 'src/app/pipes/action-condition-pipe/action-condition-pipe.module';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
+import { InfoSectionModule } from '../info-section/info-section.module';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { MatIconModule } from '@angular/material/icon';
     TypeSafeCellDefModule,
     ProjectRoleChipModule,
     ActionConditionPipeModule,
+    InfoSectionModule,
   ],
   exports: [ActionsTwoActionsComponent, ActionsTwoTargetsComponent, ActionsTwoTargetsTableComponent],
 })

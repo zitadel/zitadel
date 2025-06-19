@@ -69,7 +69,8 @@
       "FLOWS": {
         "TITLE": "Mengalir",
         "DESCRIPTION": "Pilih alur autentikasi dan picu tindakan Anda pada peristiwa tertentu dalam alur ini."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, versi baru dan lebih baik dari Actions, sekarang tersedia. Versi saat ini masih dapat diakses, tetapi pengembangan di masa depan akan difokuskan pada versi baru ini yang pada akhirnya akan menggantikan versi saat ini."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -497,13 +498,14 @@
     "APPLY": "Menerapkan"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Anda saat ini menggunakan Actions V2 baru, yang masih dalam versi beta. Versi sebelumnya, Versi 1, masih tersedia tetapi akan dihentikan di masa depan. Silakan laporkan masalah atau berikan masukan.",
     "EXECUTION": {
       "TITLE": "Tindakan",
       "DESCRIPTION": "Tindakan memungkinkan Anda menjalankan kode khusus sebagai respons terhadap permintaan API, peristiwa, atau fungsi tertentu. Gunakan ini untuk memperluas Zitadel, mengotomatiskan alur kerja, dan berintegrasi dengan sistem lain.",
       "TYPES": {
         "request": "Permintaan",
         "response": "Respons",
-        "events": "Peristiwa",
+        "event": "Peristiwa",
         "function": "Fungsi"
       },
       "DIALOG": {
@@ -534,6 +536,7 @@
             "TITLE": "Semua",
             "DESCRIPTION": "Pilih ini jika Anda ingin menjalankan tindakan Anda pada setiap permintaan"
           },
+          "ALL_EVENTS": "Pilih ini jika Anda ingin menjalankan aksi Anda pada setiap peristiwa",
           "SELECT_SERVICE": {
             "TITLE": "Pilih Layanan",
             "DESCRIPTION": "Pilih Layanan Zitadel untuk tindakan Anda."
@@ -587,6 +590,7 @@
           "restCall": "Panggilan REST",
           "restAsync": "REST Asinkron"
         },
+        "TYPES_DESCRIPTION": "Webhook, panggilan menangani kode status tetapi respons tidak relevan\nCall, panggilan menangani kode status dan respons\nAsync, panggilan tidak menangani kode status maupun respons, tetapi dapat dipanggil secara paralel dengan Target lain",
         "ENDPOINT": "Titik Akhir",
         "ENDPOINT_DESCRIPTION": "Masukkan titik akhir tempat kode Anda dihosting. Pastikan dapat diakses oleh kami!",
         "TIMEOUT": "Batas Waktu",
@@ -649,6 +653,7 @@
     "EMAIL": "E-mail",
     "USERNAME": "Nama belakang",
     "ORGNAME": "Nama Organisasi",
+    "ORGID": "ID Organisasi",
     "PRIMARYDOMAIN": "Domain Utama",
     "PROJECTNAME": "Nama Proyek",
     "RESOURCEOWNER": "Pemilik Sumber Daya",
@@ -1387,7 +1392,8 @@
       "APPEARANCE": "Penampilan",
       "OTHER": "Lainnya",
       "STORAGE": "Penyimpanan"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -1976,6 +1982,7 @@
       "ACTIVATE": "Aktifkan Proyek",
       "DELETE": "Hapus Proyek",
       "ORGNAME": "Nama Organisasi",
+      "ORGID": "ID Organisasi",
       "ORGDOMAIN": "Domain Organisasi",
       "STATE": "Status",
       "TYPE": "Jenis",
@@ -2122,6 +2129,8 @@
     "REMOVE_WARN_DESCRIPTION": "Anda akan menghapus penyedia identitas. Ini akan menghapus pilihan IDP yang tersedia untuk pengguna Anda dan pengguna yang sudah terdaftar tidak akan bisa masuk lagi. Apakah Anda yakin untuk melanjutkan?",
     "DELETE_SELECTION_TITLE": "Hapus IDP",
     "DELETE_SELECTION_DESCRIPTION": "Anda akan menghapus penyedia identitas. Perubahan yang dihasilkan tidak dapat dibatalkan. Apakah Anda benar-benar ingin melakukan ini?",
+    "FEDERATEDLOGOUTENABLED": "Logout Federasi Diaktifkan",
+    "FEDERATEDLOGOUTENABLED_DESC": "Jika diaktifkan, pengguna juga akan keluar dari IdP jika pengguna mengakhiri sesi di ZITADEL.",
     "EMPTY": "Tidak ada pengungsi yang tersedia",
     "OIDC": {
       "GENERAL": "Informasi Umum",

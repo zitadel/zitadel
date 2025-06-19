@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Fluxuri",
         "DESCRIPTION": "Alegeți un flux de autentificare și declanșați acțiunea dvs. la un anumit eveniment din cadrul acestui flux."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, o nouă versiune îmbunătățită a Actions, este acum disponibilă. Versiunea actuală este încă accesibilă, dar dezvoltarea viitoare se va concentra pe cea nouă, care în cele din urmă va înlocui versiunea actuală."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -530,13 +531,14 @@
     "APPLY": "Aplicați"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "În prezent utilizați noua versiune Actions V2, care este în faza beta. Versiunea anterioară 1 este încă disponibilă, dar va fi întreruptă în viitor. Vă rugăm să raportați orice problemă sau feedback.",
     "EXECUTION": {
       "TITLE": "Acțiuni",
       "DESCRIPTION": "Acțiunile vă permit să rulați cod personalizat ca răspuns la cereri API, evenimente sau funcții specifice. Folosiți-le pentru a extinde Zitadel, a automatiza fluxurile de lucru și a vă integra cu alte sisteme.",
       "TYPES": {
         "request": "Cerere",
         "response": "Răspuns",
-        "events": "Evenimente",
+        "event": "Evenimente",
         "function": "Funcție"
       },
       "DIALOG": {
@@ -567,6 +569,7 @@
             "TITLE": "Toate",
             "DESCRIPTION": "Selectați aceasta dacă doriți să rulați acțiunea la fiecare cerere"
           },
+          "ALL_EVENTS": "Selectează aceasta dacă vrei să rulezi acțiunea ta la fiecare eveniment",
           "SELECT_SERVICE": {
             "TITLE": "Selectați Serviciul",
             "DESCRIPTION": "Alegeți un Serviciu Zitadel pentru acțiunea dvs."
@@ -620,6 +623,7 @@
           "restCall": "Apel REST",
           "restAsync": "REST Asincron"
         },
+        "TYPES_DESCRIPTION": "Webhook, apelul gestionează codul de stare, dar răspunsul este irelevant\nCall, apelul gestionează codul de stare și răspunsul\nAsync, apelul nu gestionează nici codul de stare, nici răspunsul, dar poate fi apelat în paralel cu alte Ținte",
         "ENDPOINT": "Punct Final",
         "ENDPOINT_DESCRIPTION": "Introduceți punctul final unde este găzduit codul dvs. Asigurați-vă că este accesibil pentru noi!",
         "TIMEOUT": "Timeout",
@@ -688,6 +692,7 @@
     "EMAIL": "E-mail",
     "USERNAME": "Numele utilizatorului",
     "ORGNAME": "Numele organizației",
+    "ORGID": "ID-ul organizației",
     "PRIMARYDOMAIN": "Domeniu principal",
     "PROJECTNAME": "Numele proiectului",
     "RESOURCEOWNER": "Proprietarul resursei",
@@ -1507,7 +1512,8 @@
       "APPEARANCE": "Aspect",
       "OTHER": "Altele",
       "STORAGE": "Stocare"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -2144,6 +2150,7 @@
       "ACTIVATE": "Activați proiectul",
       "DELETE": "Ștergeți proiectul",
       "ORGNAME": "Nume organizație",
+      "ORGID": "ID organizație",
       "ORGDOMAIN": "Domeniu organizație",
       "STATE": "Stare",
       "TYPE": "Tip",
@@ -2340,6 +2347,8 @@
     "REMOVE_WARN_DESCRIPTION": "Sunteți pe cale să eliminați un furnizor de identitate. Aceasta va elimina selecția IdP-ului disponibil pentru utilizatorii dvs. și utilizatorii deja înregistrați nu se vor mai putea conecta. Sigur doriți să continuați?",
     "DELETE_SELECTION_TITLE": "Ștergeți IdP",
     "DELETE_SELECTION_DESCRIPTION": "Sunteți pe cale să ștergeți un furnizor de identitate. Modificările rezultate sunt irevocabile. Doriți cu adevărat să faceți acest lucru?",
+    "FEDERATEDLOGOUTENABLED": "Deconectare federată activată",
+    "FEDERATEDLOGOUTENABLED_DESC": "Dacă este activat, utilizatorul va fi deconectat și de la IdP dacă încheie sesiunea în ZITADEL.",
     "EMPTY": "Niciun IdP disponibil",
     "OIDC": {
       "GENERAL": "Informații generale",

@@ -23,10 +23,6 @@ const (
 )
 
 func (s *Server) GetTarget(ctx context.Context, req *action.GetTargetRequest) (*action.GetTargetResponse, error) {
-	if err := checkActionsEnabled(ctx); err != nil {
-		return nil, err
-	}
-
 	resp, err := s.query.GetTargetByID(ctx, req.GetId())
 	if err != nil {
 		return nil, err
@@ -46,9 +42,6 @@ type Context interface {
 }
 
 func (s *Server) ListTargets(ctx context.Context, req *action.ListTargetsRequest) (*action.ListTargetsResponse, error) {
-	if err := checkActionsEnabled(ctx); err != nil {
-		return nil, err
-	}
 	queries, err := s.ListTargetsRequestToModel(req)
 	if err != nil {
 		return nil, err
@@ -64,9 +57,6 @@ func (s *Server) ListTargets(ctx context.Context, req *action.ListTargetsRequest
 }
 
 func (s *Server) ListExecutions(ctx context.Context, req *action.ListExecutionsRequest) (*action.ListExecutionsResponse, error) {
-	if err := checkActionsEnabled(ctx); err != nil {
-		return nil, err
-	}
 	queries, err := s.ListExecutionsRequestToModel(req)
 	if err != nil {
 		return nil, err
@@ -174,7 +164,7 @@ func targetFieldNameToSortingColumn(field *action.TargetFieldName) query.Column 
 	}
 	switch *field {
 	case action.TargetFieldName_TARGET_FIELD_NAME_UNSPECIFIED:
-		return query.TargetColumnID
+		return query.TargetColumnCreationDate
 	case action.TargetFieldName_TARGET_FIELD_NAME_ID:
 		return query.TargetColumnID
 	case action.TargetFieldName_TARGET_FIELD_NAME_CREATED_DATE:
@@ -203,7 +193,7 @@ func executionFieldNameToSortingColumn(field *action.ExecutionFieldName) query.C
 	}
 	switch *field {
 	case action.ExecutionFieldName_EXECUTION_FIELD_NAME_UNSPECIFIED:
-		return query.ExecutionColumnID
+		return query.ExecutionColumnCreationDate
 	case action.ExecutionFieldName_EXECUTION_FIELD_NAME_ID:
 		return query.ExecutionColumnID
 	case action.ExecutionFieldName_EXECUTION_FIELD_NAME_CREATED_DATE:
@@ -252,12 +242,6 @@ func executionQueryToQuery(searchQuery *action.ExecutionSearchFilter) (query.Sea
 		return inConditionsQueryToQuery(q.InConditionsFilter)
 	case *action.ExecutionSearchFilter_ExecutionTypeFilter:
 		return executionTypeToQuery(q.ExecutionTypeFilter)
-	case *action.ExecutionSearchFilter_IncludeFilter:
-		include, err := conditionToInclude(q.IncludeFilter.GetInclude())
-		if err != nil {
-			return nil, err
-		}
-		return query.NewIncludeSearchQuery(include)
 	case *action.ExecutionSearchFilter_TargetFilter:
 		return query.NewTargetSearchQuery(q.TargetFilter.GetTargetId())
 	default:
@@ -333,14 +317,12 @@ func executionsToPb(executions []*query.Execution) []*action.Execution {
 }
 
 func executionToPb(e *query.Execution) *action.Execution {
-	targets := make([]*action.ExecutionTargetType, len(e.Targets))
+	targets := make([]string, len(e.Targets))
 	for i := range e.Targets {
 		switch e.Targets[i].Type {
-		case domain.ExecutionTargetTypeInclude:
-			targets[i] = &action.ExecutionTargetType{Type: &action.ExecutionTargetType_Include{Include: executionIDToCondition(e.Targets[i].Target)}}
 		case domain.ExecutionTargetTypeTarget:
-			targets[i] = &action.ExecutionTargetType{Type: &action.ExecutionTargetType_Target{Target: e.Targets[i].Target}}
-		case domain.ExecutionTargetTypeUnspecified:
+			targets[i] = e.Targets[i].Target
+		case domain.ExecutionTargetTypeInclude, domain.ExecutionTargetTypeUnspecified:
 			continue
 		default:
 			continue

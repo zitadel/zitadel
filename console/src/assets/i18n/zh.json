@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "流程",
         "DESCRIPTION": "选择一个认证流程，并在该流程中的特定事件上触发您的操作。"
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2，一个全新改进版的Actions，现在已上线。目前版本仍可使用，但未来开发将专注于新版本，最终将取代当前版本。"
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -530,13 +531,14 @@
     "APPLY": "申请"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "您目前正在使用新的 Actions V2（测试版）。之前的版本1仍可使用，但未来将停止支持。请报告任何问题或反馈意见。",
     "EXECUTION": {
       "TITLE": "操作",
       "DESCRIPTION": "操作允许您运行自定义代码以响应 API 请求、事件或特定函数。使用它们来扩展 Zitadel、自动化工作流程并与其他系统集成。",
       "TYPES": {
         "request": "请求",
         "response": "响应",
-        "events": "事件",
+        "event": "事件",
         "function": "函数"
       },
       "DIALOG": {
@@ -567,6 +569,7 @@
             "TITLE": "全部",
             "DESCRIPTION": "如果您希望在每个请求上运行您的操作，请选择此项"
           },
+          "ALL_EVENTS": "如果您想在每个事件上运行操作，请选择此项",
           "SELECT_SERVICE": {
             "TITLE": "选择服务",
             "DESCRIPTION": "为您的操作选择一个 Zitadel 服务。"
@@ -620,6 +623,7 @@
           "restCall": "REST 调用",
           "restAsync": "REST 异步"
         },
+        "TYPES_DESCRIPTION": "Webhook，调用处理状态码但响应无关紧要\nCall，调用处理状态码和响应\nAsync，调用既不处理状态码也不处理响应，但可以与其他目标并行调用",
         "ENDPOINT": "端点",
         "ENDPOINT_DESCRIPTION": "输入您的代码托管的端点。确保我们可以访问它！",
         "TIMEOUT": "超时",
@@ -690,6 +694,7 @@
     "EMAIL": "邮箱",
     "USERNAME": "用户名",
     "ORGNAME": "组织名称",
+    "ORGID": "组织ID",
     "PRIMARYDOMAIN": "主域",
     "PROJECTNAME": "项目名称",
     "RESOURCEOWNER": "资源所有者",
@@ -1509,7 +1514,8 @@
       "APPEARANCE": "外观",
       "OTHER": "其他",
       "STORAGE": "贮存"
-    }
+    },
+    "BETA": "测试版"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -2145,6 +2151,7 @@
       "ACTIVATE": "启用项目",
       "DELETE": "删除项目",
       "ORGNAME": "组织名称",
+      "ORGID": "组织ID",
       "ORGDOMAIN": "组织域名",
       "STATE": "状态",
       "TYPE": "类型",
@@ -2338,6 +2345,8 @@
     "REMOVE_WARN_DESCRIPTION": "您即将删除身份提供者。这将为您的用户删除可用 IDP 的选择，并且已经注册的用户将无法再次登录。您确定要继续吗？",
     "DELETE_SELECTION_TITLE": "删除 IDP",
     "DELETE_SELECTION_DESCRIPTION": "您即将删除身份提供者。由此产生的变化是不可撤销的。你真的想这样做吗？",
+    "FEDERATEDLOGOUTENABLED": "已启用联合注销",
+    "FEDERATEDLOGOUTENABLED_DESC": "如果启用，用户在 ZITADEL 中终止会话时，也会从 IdP 注销。",
     "EMPTY": "没有可用的 IDP",
     "OIDC": {
       "GENERAL": "通用信息",

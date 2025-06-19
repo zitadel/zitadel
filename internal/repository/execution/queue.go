@@ -41,16 +41,16 @@ func ContextInfoFromRequest(e *Request) *ContextInfoEvent {
 }
 
 type ContextInfoEvent struct {
-	AggregateID   string `json:"aggregateID,omitempty"`
-	AggregateType string `json:"aggregateType,omitempty"`
-	ResourceOwner string `json:"resourceOwner,omitempty"`
-	InstanceID    string `json:"instanceID,omitempty"`
-	Version       string `json:"version,omitempty"`
-	Sequence      uint64 `json:"sequence,omitempty"`
-	EventType     string `json:"event_type,omitempty"`
-	CreatedAt     string `json:"created_at,omitempty"`
-	UserID        string `json:"userID,omitempty"`
-	EventPayload  []byte `json:"event_payload,omitempty"`
+	AggregateID   string          `json:"aggregateID,omitempty"`
+	AggregateType string          `json:"aggregateType,omitempty"`
+	ResourceOwner string          `json:"resourceOwner,omitempty"`
+	InstanceID    string          `json:"instanceID,omitempty"`
+	Version       string          `json:"version,omitempty"`
+	Sequence      uint64          `json:"sequence,omitempty"`
+	EventType     string          `json:"event_type,omitempty"`
+	CreatedAt     string          `json:"created_at,omitempty"`
+	UserID        string          `json:"userID,omitempty"`
+	EventPayload  json.RawMessage `json:"event_payload,omitempty"`
 }
 
 func (c *ContextInfoEvent) GetHTTPRequestBody() []byte {

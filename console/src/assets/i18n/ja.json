@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "フロー",
         "DESCRIPTION": "認証フローを選択し、そのフロー内の特定のイベントでアクションをトリガーします。"
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2（アクションズV2）、改善された新しいバージョンが利用可能になりました。現在のバージョンも引き続き利用可能ですが、今後の開発は新バージョンに集中し、最終的には現在のバージョンを置き換える予定です。"
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -530,13 +531,14 @@
     "APPLY": "アプライ"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "現在、新しいActions V2（ベータ版）を使用しています。以前のバージョン1はまだ利用可能ですが、今後廃止される予定です。問題やフィードバックがあればお知らせください。",
     "EXECUTION": {
       "TITLE": "アクション",
       "DESCRIPTION": "アクションを使用すると、APIリクエスト、イベント、または特定の関数に応答してカスタムコードを実行できます。これらを使用して、Zitadelを拡張し、ワークフローを自動化し、他のシステムと統合します。",
       "TYPES": {
         "request": "リクエスト",
         "response": "レスポンス",
-        "events": "イベント",
+        "event": "イベント",
         "function": "関数"
       },
       "DIALOG": {
@@ -567,6 +569,7 @@
             "TITLE": "すべて",
             "DESCRIPTION": "すべてのリクエストでアクションを実行する場合は、これを選択します"
           },
+          "ALL_EVENTS": "すべてのイベントでアクションを実行する場合はこれを選択してください",
           "SELECT_SERVICE": {
             "TITLE": "サービスを選択",
             "DESCRIPTION": "アクションのZitadelサービスを選択します。"
@@ -620,6 +623,7 @@
           "restCall": "REST 呼び出し",
           "restAsync": "REST 非同期"
         },
+        "TYPES_DESCRIPTION": "Webhook、呼び出しはステータスコードを処理しますが、応答は無関係です\nCall、呼び出しはステータスコードと応答を処理します\nAsync、呼び出しはステータスコードも応答も処理しませんが、他のターゲットと並行して呼び出すことができます",
         "ENDPOINT": "エンドポイント",
         "ENDPOINT_DESCRIPTION": "コードがホストされているエンドポイントを入力します。アクセス可能であることを確認してください。",
         "TIMEOUT": "タイムアウト",
@@ -690,6 +694,7 @@
     "EMAIL": "Eメール",
     "USERNAME": "ユーザー名",
     "ORGNAME": "組織名",
+    "ORGID": "組織ID",
     "PRIMARYDOMAIN": "プライマリドメイン",
     "PROJECTNAME": "プロジェクト名",
     "RESOURCEOWNER": "リソース所有者",
@@ -1509,7 +1514,8 @@
       "APPEARANCE": "設定",
       "OTHER": "その他",
       "STORAGE": "ストレージ"
-    }
+    },
+    "BETA": "ベータ"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -2146,6 +2152,7 @@
       "ACTIVATE": "プロジェクトのアクティブ化",
       "DELETE": "プロジェクトの削除",
       "ORGNAME": "組織名",
+      "ORGID": "組織ID",
       "ORGDOMAIN": "組織ドメイン",
       "STATE": "ステータス",
       "TYPE": "タイプ",
@@ -2342,6 +2349,8 @@
     "REMOVE_WARN_DESCRIPTION": "ID プロバイダーを削除しようとしています。これにより、ユーザーが使用できる IDP の選択が削除され、すでに登録されているユーザーは再度ログインできなくなります。続けてもよろしいですか?",
     "DELETE_SELECTION_TITLE": "IDPの削除",
     "DELETE_SELECTION_DESCRIPTION": "IDプロバイダーを削除しようとしています。変更は取消できません。本当によろしいですか？",
+    "FEDERATEDLOGOUTENABLED": "フェデレーションログアウト有効",
+    "FEDERATEDLOGOUTENABLED_DESC": "有効にすると、ユーザーがZITADELでセッションを終了した場合、IdPからもログアウトされます。",
     "EMPTY": "IDPは利用できません",
     "OIDC": {
       "GENERAL": "一般",

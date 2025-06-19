@@ -10,13 +10,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
-
+ 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func TestServer_SetEmail(t *testing.T) {
+func TestServer_Deprecated_SetEmail(t *testing.T) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 
 	tests := []struct {

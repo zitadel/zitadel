@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flöden",
         "DESCRIPTION": "Välj ett autentiseringsflöde och trigga din åtgärd vid en specifik händelse inom detta flöde."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, en ny och förbättrad version av Actions, är nu tillgänglig. Den nuvarande versionen är fortfarande tillgänglig, men framtida utveckling kommer att fokusera på den nya, som så småningom kommer att ersätta den nuvarande."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -530,13 +531,14 @@
     "APPLY": "Tillämpa"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Du använder för närvarande nya Actions V2, som är i betaversion. Den tidigare versionen 1 är fortfarande tillgänglig men kommer att avvecklas i framtiden. Vänligen rapportera eventuella problem eller ge feedback.",
     "EXECUTION": {
       "TITLE": "Åtgärder",
       "DESCRIPTION": "Åtgärder låter dig köra anpassad kod som svar på API-förfrågningar, händelser eller specifika funktioner. Använd dem för att utöka Zitadel, automatisera arbetsflöden och integrera med andra system.",
       "TYPES": {
         "request": "Förfrågan",
         "response": "Svar",
-        "events": "Händelser",
+        "event": "Händelser",
         "function": "Funktion"
       },
       "DIALOG": {
@@ -567,6 +569,7 @@
             "TITLE": "Alla",
             "DESCRIPTION": "Välj detta om du vill köra din åtgärd på varje förfrågan"
           },
+          "ALL_EVENTS": "Välj detta om du vill köra din åtgärd vid varje händelse",
           "SELECT_SERVICE": {
             "TITLE": "Välj tjänst",
             "DESCRIPTION": "Välj en Zitadel-tjänst för din åtgärd."
@@ -620,6 +623,7 @@
           "restCall": "REST Anrop",
           "restAsync": "REST Asynkron"
         },
+        "TYPES_DESCRIPTION": "Webhook, anropet hanterar statuskoden men svaret är irrelevant\nCall, anropet hanterar statuskoden och svaret\nAsync, anropet hanterar varken statuskod eller svar men kan anropas parallellt med andra mål",
         "ENDPOINT": "Slutpunkt",
         "ENDPOINT_DESCRIPTION": "Ange slutpunkten där din kod finns. Se till att den är tillgänglig för oss!",
         "TIMEOUT": "Tidsgräns",
@@ -690,6 +694,7 @@
     "EMAIL": "E-post",
     "USERNAME": "Användarnamn",
     "ORGNAME": "Organisationsnamn",
+    "ORGID": "Organisations ID",
     "PRIMARYDOMAIN": "Primär domän",
     "PROJECTNAME": "Projektnamn",
     "RESOURCEOWNER": "Resursägare",
@@ -1513,7 +1518,8 @@
       "APPEARANCE": "Utseende",
       "OTHER": "Övrigt",
       "STORAGE": "Lagring"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -2150,6 +2156,7 @@
       "ACTIVATE": "Aktivera projekt",
       "DELETE": "Ta bort projekt",
       "ORGNAME": "Organisationsnamn",
+      "ORGID": "Organisations ID",
       "ORGDOMAIN": "Organisationsdomän",
       "STATE": "Status",
       "TYPE": "Typ",
@@ -2346,6 +2353,8 @@
     "REMOVE_WARN_DESCRIPTION": "Du håller på att ta bort en identitetsleverantör. Detta kommer att ta bort valet av den tillgängliga IDP för dina användare och redan registrerade användare kommer inte att kunna logga in igen. Är du säker på att fortsätta?",
     "DELETE_SELECTION_TITLE": "Radera IDP",
     "DELETE_SELECTION_DESCRIPTION": "Du håller på att radera en identitetsleverantör. De resulterande ändringarna är oåterkalleliga. Vill du verkligen göra detta?",
+    "FEDERATEDLOGOUTENABLED": "Federerad utloggning aktiverad",
+    "FEDERATEDLOGOUTENABLED_DESC": "Om aktiverat kommer användaren också att loggas ut från IdP om användaren avslutar sessionen i ZITADEL.",
     "EMPTY": "Ingen IDP tillgänglig",
     "OIDC": {
       "GENERAL": "Allmän information",

@@ -48,7 +48,6 @@ var (
 
 func TestServer_ExecutionTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	fullMethod := action.ActionService_GetTarget_FullMethodName
 
@@ -77,14 +76,14 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, domain.TargetTypeCall, false)
 
 				// request received by target
-				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
+				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: middleware.Message{Message: request}}
 				changedRequest := &action.GetTargetRequest{Id: targetCreated.GetId()}
 				// replace original request with different targetID
-				urlRequest, closeRequest, calledRequest, _ := integration.TestServerCall(wantRequest, 0, http.StatusOK, changedRequest)
+				urlRequest, closeRequest, calledRequest, _ := integration.TestServerCallProto(wantRequest, 0, http.StatusOK, changedRequest)
 
 				targetRequest := waitForTarget(ctx, t, instance, urlRequest, domain.TargetTypeCall, false)
 
-				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), []string{targetRequest.GetId()})
 
 				// expected response from the GetTarget
 				expectedResponse := &action.GetTargetResponse{
@@ -103,9 +102,26 @@ func TestServer_ExecutionTarget(t *testing.T) {
 						SigningKey: targetCreated.GetSigningKey(),
 					},
 				}
-				// has to be set separately because of the pointers
+
+				changedResponse := &action.GetTargetResponse{
+					Target: &action.Target{
+						Id:           "changed",
+						CreationDate: targetCreated.GetCreationDate(),
+						ChangeDate:   targetCreated.GetCreationDate(),
+						Name:         targetCreatedName,
+						TargetType: &action.Target_RestCall{
+							RestCall: &action.RESTCall{
+								InterruptOnError: false,
+							},
+						},
+						Timeout:    durationpb.New(5 * time.Second),
+						Endpoint:   targetCreatedURL,
+						SigningKey: targetCreated.GetSigningKey(),
+					},
+				}
+				// content for update
 				response.Target = &action.Target{
-					Id:           targetCreated.GetId(),
+					Id:           "changed",
 					CreationDate: targetCreated.GetCreationDate(),
 					ChangeDate:   targetCreated.GetCreationDate(),
 					Name:         targetCreatedName,
@@ -119,18 +135,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					SigningKey: targetCreated.GetSigningKey(),
 				}
 
-				// content for partial update
-				changedResponse := &action.GetTargetResponse{
-					Target: &action.Target{
-						Id: targetCreated.GetId(),
-						TargetType: &action.Target_RestCall{
-							RestCall: &action.RESTCall{
-								InterruptOnError: false,
-							},
-						},
-					},
-				}
-
 				// response received by target
 				wantResponse := &middleware.ContextInfoResponse{
 					FullMethod: fullMethod,
@@ -138,14 +142,14 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					OrgID:      orgID,
 					ProjectID:  projectID,
 					UserID:     userID,
-					Request:    changedRequest,
-					Response:   expectedResponse,
+					Request:    middleware.Message{Message: changedRequest},
+					Response:   middleware.Message{Message: expectedResponse},
 				}
 				// after request with different targetID, return changed response
-				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCall(wantResponse, 0, http.StatusOK, changedResponse)
+				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCallProto(wantResponse, 0, http.StatusOK, changedResponse)
 
 				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, domain.TargetTypeCall, false)
-				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), []string{targetResponse.GetId()})
 				return func() {
 						closeRequest()
 						closeResponse()
@@ -167,9 +171,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				Id: "something",
 			},
 			want: &action.GetTargetResponse{
-				Target: &action.Target{
-					Id: "changed",
-				},
+				// defined in the dependency function
 			},
 		},
 		{
@@ -181,11 +183,11 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				userID := instance.Users.Get(integration.UserTypeIAMOwner).ID
 
 				// request received by target
-				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
-				urlRequest, closeRequest, calledRequest, _ := integration.TestServerCall(wantRequest, 0, http.StatusInternalServerError, &action.GetTargetRequest{Id: "notchanged"})
+				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: middleware.Message{Message: request}}
+				urlRequest, closeRequest, calledRequest, _ := integration.TestServerCallProto(wantRequest, 0, http.StatusInternalServerError, nil)
 
 				targetRequest := waitForTarget(ctx, t, instance, urlRequest, domain.TargetTypeCall, true)
-				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), []string{targetRequest.GetId()})
 				// GetTarget with used target
 				request.Id = targetRequest.GetId()
 				return func() {
@@ -234,17 +236,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 						SigningKey: targetCreated.GetSigningKey(),
 					},
 				}
-				// content for partial update
-				changedResponse := &action.GetTargetResponse{
-					Target: &action.Target{
-						Id: "changed",
-						TargetType: &action.Target_RestCall{
-							RestCall: &action.RESTCall{
-								InterruptOnError: false,
-							},
-						},
-					},
-				}
 
 				// response received by target
 				wantResponse := &middleware.ContextInfoResponse{
@@ -253,14 +244,14 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					OrgID:      orgID,
 					ProjectID:  projectID,
 					UserID:     userID,
-					Request:    request,
-					Response:   expectedResponse,
+					Request:    middleware.Message{Message: request},
+					Response:   middleware.Message{Message: expectedResponse},
 				}
 				// after request with different targetID, return changed response
-				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCall(wantResponse, 0, http.StatusInternalServerError, changedResponse)
+				targetResponseURL, closeResponse, calledResponse, _ := integration.TestServerCallProto(wantResponse, 0, http.StatusInternalServerError, nil)
 
 				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, domain.TargetTypeCall, true)
-				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetId()))
+				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), []string{targetResponse.GetId()})
 				return func() {
 						closeResponse()
 					}, func() bool {
@@ -301,7 +292,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 
 func TestServer_ExecutionTarget_Event(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	event := "session.added"
@@ -309,7 +299,7 @@ func TestServer_ExecutionTarget_Event(t *testing.T) {
 	defer closeF()
 
 	targetResponse := waitForTarget(isolatedIAMOwnerCTX, t, instance, urlRequest, domain.TargetTypeWebhook, true)
-	waitForExecutionOnCondition(isolatedIAMOwnerCTX, t, instance, conditionEvent(event), executionTargetsSingleTarget(targetResponse.GetId()))
+	waitForExecutionOnCondition(isolatedIAMOwnerCTX, t, instance, conditionEvent(event), []string{targetResponse.GetId()})
 
 	tests := []struct {
 		name          string
@@ -359,7 +349,6 @@ func TestServer_ExecutionTarget_Event(t *testing.T) {
 
 func TestServer_ExecutionTarget_Event_LongerThanTargetTimeout(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	event := "session.added"
@@ -368,7 +357,7 @@ func TestServer_ExecutionTarget_Event_LongerThanTargetTimeout(t *testing.T) {
 	defer closeF()
 
 	targetResponse := waitForTarget(isolatedIAMOwnerCTX, t, instance, urlRequest, domain.TargetTypeWebhook, true)
-	waitForExecutionOnCondition(isolatedIAMOwnerCTX, t, instance, conditionEvent(event), executionTargetsSingleTarget(targetResponse.GetId()))
+	waitForExecutionOnCondition(isolatedIAMOwnerCTX, t, instance, conditionEvent(event), []string{targetResponse.GetId()})
 
 	tests := []struct {
 		name          string
@@ -412,7 +401,6 @@ func TestServer_ExecutionTarget_Event_LongerThanTargetTimeout(t *testing.T) {
 
 func TestServer_ExecutionTarget_Event_LongerThanTransactionTimeout(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	event := "session.added"
@@ -420,7 +408,7 @@ func TestServer_ExecutionTarget_Event_LongerThanTransactionTimeout(t *testing.T)
 	defer closeF()
 
 	targetResponse := waitForTarget(isolatedIAMOwnerCTX, t, instance, urlRequest, domain.TargetTypeWebhook, true)
-	waitForExecutionOnCondition(isolatedIAMOwnerCTX, t, instance, conditionEvent(event), executionTargetsSingleTarget(targetResponse.GetId()))
+	waitForExecutionOnCondition(isolatedIAMOwnerCTX, t, instance, conditionEvent(event), []string{targetResponse.GetId()})
 
 	tests := []struct {
 		name          string
@@ -474,7 +462,7 @@ func TestServer_ExecutionTarget_Event_LongerThanTransactionTimeout(t *testing.T)
 	}
 }
 
-func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *integration.Instance, condition *action.Condition, targets []*action.ExecutionTargetType) {
+func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *integration.Instance, condition *action.Condition, targets []string) {
 	instance.SetExecution(ctx, t, condition, targets)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
@@ -496,7 +484,7 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 		// always first check length, otherwise its failed anyway
 		if assert.Len(ttt, gotTargets, len(targets)) {
 			for i := range targets {
-				assert.EqualExportedValues(ttt, targets[i].GetType(), gotTargets[i].GetType())
+				assert.EqualExportedValues(ttt, targets[i], gotTargets[i])
 			}
 		}
 	}, retryDuration, tick, "timeout waiting for expected execution result")
@@ -589,11 +577,10 @@ func conditionFunction(function string) *action.Condition {
 
 func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	ctxLoginClient := instance.WithAuthorization(CTX, integration.UserTypeLogin)
 
-	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, redirectURIImplicit, loginV2)
+	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, t, redirectURIImplicit, loginV2)
 	require.NoError(t, err)
 
 	type want struct {
@@ -785,7 +772,7 @@ func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *int
 	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
 	targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
-	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preuserinfo"), executionTargetsSingleTarget(targetResp.GetId()))
+	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preuserinfo"), []string{targetResp.GetId()})
 	return userResp.GetUserId(), closeF
 }
 
@@ -903,11 +890,10 @@ func contextInfoForUserOIDC(instance *integration.Instance, function string, use
 
 func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	ctxLoginClient := instance.WithAuthorization(CTX, integration.UserTypeLogin)
 
-	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, redirectURIImplicit, loginV2)
+	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, t, redirectURIImplicit, loginV2)
 	require.NoError(t, err)
 
 	type want struct {
@@ -1091,13 +1077,12 @@ func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *
 	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
 	targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
-	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preaccesstoken"), executionTargetsSingleTarget(targetResp.GetId()))
+	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("preaccesstoken"), []string{targetResp.GetId()})
 	return userResp.GetUserId(), closeF
 }
 
 func TestServer_ExecutionTargetPreSAMLResponse(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	ctxLoginClient := instance.WithAuthorization(CTX, integration.UserTypeLogin)
 
@@ -1257,7 +1242,7 @@ func expectPreSAMLResponseExecution(ctx context.Context, t *testing.T, instance 
 	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
 	targetResp := waitForTarget(ctx, t, instance, targetURL, domain.TargetTypeCall, true)
-	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("presamlresponse"), executionTargetsSingleTarget(targetResp.GetId()))
+	waitForExecutionOnCondition(ctx, t, instance, conditionFunction("presamlresponse"), []string{targetResp.GetId()})
 
 	return userResp.GetUserId(), closeF
 }
@@ -1270,10 +1255,9 @@ func createSAMLSP(t *testing.T, idpMetadata *saml.EntityDescriptor, binding stri
 }
 
 func createSAMLApplication(ctx context.Context, t *testing.T, instance *integration.Instance, idpMetadata *saml.EntityDescriptor, binding string, projectRoleCheck, hasProjectCheck bool) (string, string, *samlsp.Middleware) {
-	project, err := instance.CreateProjectWithPermissionCheck(ctx, projectRoleCheck, hasProjectCheck)
-	require.NoError(t, err)
+	project := instance.CreateProject(ctx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), projectRoleCheck, hasProjectCheck)
 	rootURL, sp := createSAMLSP(t, idpMetadata, binding)
-	_, err = instance.CreateSAMLClient(ctx, project.GetId(), sp)
+	_, err := instance.CreateSAMLClient(ctx, project.GetId(), sp)
 	require.NoError(t, err)
 	return project.GetId(), rootURL, sp
 }

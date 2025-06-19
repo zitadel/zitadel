@@ -15,7 +15,6 @@ import { AuthInterceptor, AuthInterceptorProvider, NewConnectWebAuthInterceptor 
 import { ExhaustedGrpcInterceptor } from './interceptors/exhausted.grpc.interceptor';
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
 import { NewConnectWebOrgInterceptor, OrgInterceptor, OrgInterceptorProvider } from './interceptors/org.interceptor';
-import { StorageService } from './storage.service';
 import { UserServiceClient } from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
 //@ts-ignore
 import { createFeatureServiceClient, createUserServiceClient, createSessionServiceClient } from '@zitadel/client/v2';
@@ -24,13 +23,9 @@ import { createAuthServiceClient, createManagementServiceClient } from '@zitadel
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
 // @ts-ignore
 import { createClientFor } from '@zitadel/client';
-import { Client, Transport } from '@connectrpc/connect';
 
 import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
 import { ActionService } from '@zitadel/proto/zitadel/action/v2beta/action_service_pb';
-
-// @ts-ignore
-import { createClientFor } from '@zitadel/client';
 
 const createWebKeyServiceClient = createClientFor(WebKeyService);
 const createActionServiceClient = createClientFor(ActionService);

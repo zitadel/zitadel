@@ -117,6 +117,7 @@ Errors:
       AlreadyVerified: Телефонът вече е потвърден
       Empty: Телефонът е празен
       NotChanged: Телефонът не е сменен
+      VerifyingRemovalIsNotSupported: Премахването на проверката не се поддържа
     Address:
       NotFound: Адресът не е намерен
       NotChanged: Адресът не е променен
@@ -554,6 +555,7 @@ Errors:
     StateMissing: В заявката липсва параметър състояние
     NotStarted: Намерението не е стартирано или вече е прекратено
     NotSucceeded: Намерението не е успешно
+    Expired: Намерението е изтекло
     TokenCreationFailed: Неуспешно създаване на токен
     InvalidToken: Знакът за намерение е невалиден
     OtherUser: Намерение, предназначено за друг потребител

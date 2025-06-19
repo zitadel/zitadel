@@ -19,7 +19,6 @@ import (
 
 func TestServer_CreateTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	type want struct {
 		id           bool
@@ -244,7 +243,6 @@ func assertCreateTargetResponse(t *testing.T, creationDate, changeDate time.Time
 
 func TestServer_UpdateTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	type args struct {
 		ctx context.Context
@@ -463,7 +461,6 @@ func assertUpdateTargetResponse(t *testing.T, creationDate, changeDate time.Time
 
 func TestServer_DeleteTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	ensureFeatureEnabled(t, instance)
 	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	tests := []struct {
 		name             string

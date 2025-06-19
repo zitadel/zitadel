@@ -8,6 +8,9 @@ import (
 	"reflect"
 	"sync"
 	"time"
+
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 )
 
 type server struct {
@@ -81,6 +84,64 @@ func TestServerCall(
 		if respBody != nil {
 			w.Header().Set("Content-Type", "application/json")
 			resp, err := json.Marshal(respBody)
+			if err != nil {
+				http.Error(w, "error", http.StatusInternalServerError)
+				return
+			}
+			if _, err := io.Writer.Write(w, resp); err != nil {
+				http.Error(w, "error", http.StatusInternalServerError)
+				return
+			}
+		} else {
+			if _, err := io.WriteString(w, "finished successfully"); err != nil {
+				http.Error(w, "error", http.StatusInternalServerError)
+				return
+			}
+		}
+	}
+
+	server.server = httptest.NewServer(http.HandlerFunc(handler))
+	return server.URL(), server.Close, server.Called, server.ResetCalled
+}
+
+func TestServerCallProto(
+	reqBody interface{},
+	sleep time.Duration,
+	statusCode int,
+	respBody proto.Message,
+) (url string, closeF func(), calledF func() int, resetCalledF func()) {
+	server := &server{
+		called: 0,
+	}
+
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		server.Increase()
+		if reqBody != nil {
+			data, err := json.Marshal(reqBody)
+			if err != nil {
+				http.Error(w, "error, marshall: "+err.Error(), http.StatusInternalServerError)
+				return
+			}
+			sentBody, err := io.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, "error, read body: "+err.Error(), http.StatusInternalServerError)
+				return
+			}
+			if !reflect.DeepEqual(data, sentBody) {
+				http.Error(w, "error, equal:\n"+string(data)+"\nsent:\n"+string(sentBody), http.StatusInternalServerError)
+				return
+			}
+		}
+		if statusCode != http.StatusOK {
+			http.Error(w, "error, statusCode", statusCode)
+			return
+		}
+
+		time.Sleep(sleep)
+
+		if respBody != nil {
+			w.Header().Set("Content-Type", "application/json")
+			resp, err := protojson.Marshal(respBody)
 			if err != nil {
 				http.Error(w, "error", http.StatusInternalServerError)
 				return

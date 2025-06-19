@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flows",
         "DESCRIPTION": "Choose an authentication flow and trigger your action on a specific event within this flow."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2 a new, improved version of Actions is now available. The current version is still accessible, but our future development will focus on the new one, which will eventually replace the current version."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -530,13 +531,14 @@
     "APPLY": "Apply"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "You are currently using the new Actions V2, which is in beta. The previous Version 1 is still available but will be discontinued in the future. Please report any issues or feedback.",
     "EXECUTION": {
       "TITLE": "Actions",
       "DESCRIPTION": "Actions let you run custom code in response to API requests, events or specific functions. Use them to extend Zitadel, automate workflows, and itegrate with other systems.",
       "TYPES": {
         "request": "Request",
         "response": "Response",
-        "events": "Events",
+        "event": "Events",
         "function": "Function"
       },
       "DIALOG": {
@@ -567,6 +569,7 @@
             "TITLE": "All",
             "DESCRIPTION": "Select this if you want to run your action on every request"
           },
+          "ALL_EVENTS": "Select this if you want to run your action on every event",
           "SELECT_SERVICE": {
             "TITLE": "Select Service",
             "DESCRIPTION": "Choose a Zitadel Service for you action."
@@ -620,6 +623,7 @@
           "restCall": "REST Call",
           "restAsync": "REST Async"
         },
+        "TYPES_DESCRIPTION": "Webhook, the call handles the status code but response is irrelevant\nCall, the call handles the status code and response\nAsync, the call handles neither status code nor response, but can be called in parallel with other Targets",
         "ENDPOINT": "Endpoint",
         "ENDPOINT_DESCRIPTION": "Enter the endpoint where your code is hosted. Make sure it is accessible to us!",
         "TIMEOUT": "Timeout",
@@ -685,12 +689,13 @@
   },
   "FILTER": {
     "TITLE": "Filter",
-    "STATE": "Status",
+    "ORGNAME": "Organization Name",
+    "ORGID": "Organization ID",
+    "STATE": "State",
+    "PRIMARYDOMAIN": "Primary Domain",
     "DISPLAYNAME": "User Display Name",
     "EMAIL": "Email",
     "USERNAME": "User Name",
-    "ORGNAME": "Organization Name",
-    "PRIMARYDOMAIN": "Primary Domain",
     "PROJECTNAME": "Project Name",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
@@ -1512,7 +1517,8 @@
       "OTHER": "Other",
       "STORAGE": "Storage",
       "ACTIONS": "Actions"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -2149,6 +2155,7 @@
       "ACTIVATE": "Activate Project",
       "DELETE": "Delete Project",
       "ORGNAME": "Organization Name",
+      "ORGID": "Organization ID",
       "ORGDOMAIN": "Organization Domain",
       "STATE": "Status",
       "TYPE": "Type",
@@ -2345,6 +2352,8 @@
     "REMOVE_WARN_DESCRIPTION": "You are about to remove an identity provider. This will remove the selection of the available IdP for your users and already registered users won't be able to login again. Are you sure to continue?",
     "DELETE_SELECTION_TITLE": "Delete IdP",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+    "FEDERATEDLOGOUTENABLED": "Federated Logout Enabled",
+    "FEDERATEDLOGOUTENABLED_DESC": "If enabled, the user will be logged out from the IdP as well if the user terminates the session in ZITADEL.",
     "EMPTY": "No IdP available",
     "OIDC": {
       "GENERAL": "General Information",

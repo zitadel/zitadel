@@ -36,7 +36,10 @@ type errCheckerMigration interface {
 
 type RepeatableMigration interface {
 	Migration
-	Check(lastRun map[string]interface{}) bool
+
+	// Check if the migration should be executed again.
+	// True will repeat the migration, false will not.
+	Check(lastRun map[string]any) bool
 }
 
 func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration) (err error) {

@@ -75,7 +75,8 @@
       "FLOWS": {
         "TITLE": "Flows",
         "DESCRIPTION": "Vyberte proces autentizace a spusťte vaši akci na konkrétní události v rámci tohoto procesu."
-      }
+      },
+      "ACTIONSTWO_NOTE": "Actions V2, nová a vylepšená verze Actions, je nyní k dispozici. Aktuální verze je stále přístupná, ale budoucí vývoj se zaměří na novou verzi, která nakonec nahradí tu současnou."
     },
     "SETTINGS": {
       "INSTANCE": {
@@ -530,13 +531,14 @@
     "APPLY": "Platit"
   },
   "ACTIONSTWO": {
+    "BETA_NOTE": "Aktuálně používáte novou verzi Actions V2, která je v beta verzi. Předchozí verze 1 je stále k dispozici, ale v budoucnu bude ukončena. Prosím, hlaste jakékoliv problémy nebo zpětnou vazbu.",
     "EXECUTION": {
       "TITLE": "Akce",
       "DESCRIPTION": "Akce vám umožňují spouštět vlastní kód v reakci na požadavky API, události nebo specifické funkce. Použijte je k rozšíření Zitadel, automatizaci pracovních postupů a integraci s dalšími systémy.",
       "TYPES": {
         "request": "Požadavek",
         "response": "Odpověď",
-        "events": "Události",
+        "event": "Události",
         "function": "Funkce"
       },
       "DIALOG": {
@@ -567,6 +569,7 @@
             "TITLE": "Všechny",
             "DESCRIPTION": "Vyberte tuto možnost, pokud chcete spustit akci pro každý požadavek"
           },
+          "ALL_EVENTS": "Vyberte toto, pokud chcete spustit akci při každé události",
           "SELECT_SERVICE": {
             "TITLE": "Vybrat službu",
             "DESCRIPTION": "Vyberte službu Zitadel pro svou akci."
@@ -620,6 +623,7 @@
           "restCall": "REST Volání",
           "restAsync": "REST Asynchronní"
         },
+        "TYPES_DESCRIPTION": "Webhook, volání zpracovává stavový kód, ale odpověď je irelevantní\nCall, volání zpracovává stavový kód a odpověď\nAsync, volání nezpracovává ani stavový kód, ani odpověď, ale může být spuštěno paralelně s jinými cíli",
         "ENDPOINT": "Koncový bod",
         "ENDPOINT_DESCRIPTION": "Zadejte koncový bod, kde je hostován váš kód. Ujistěte se, že je pro nás přístupný!",
         "TIMEOUT": "Časový limit",
@@ -690,6 +694,7 @@
     "EMAIL": "Email",
     "USERNAME": "Uživatelské jméno",
     "ORGNAME": "Název organizace",
+    "ORGID": "ID organizace",
     "PRIMARYDOMAIN": "Primární doména",
     "PROJECTNAME": "Název projektu",
     "RESOURCEOWNER": "Vlastník zdroje",
@@ -1509,7 +1514,8 @@
       "APPEARANCE": "Vzhled",
       "OTHER": "Ostatní",
       "STORAGE": "Data"
-    }
+    },
+    "BETA": "BETA"
   },
   "SETTING": {
     "LANGUAGES": {
@@ -2147,6 +2153,7 @@
       "ACTIVATE": "Aktivovat projekt",
       "DELETE": "Smazat projekt",
       "ORGNAME": "Název organizace",
+      "ORGID": "ID organizace",
       "ORGDOMAIN": "Doména organizace",
       "STATE": "Stav",
       "TYPE": "Typ",
@@ -2339,6 +2346,8 @@
     "REMOVE_WARN_DESCRIPTION": "Chystáte se odebrat poskytovatele identity. To odstraní výběr dostupného IDP pro vaše uživatele a již registrovaní uživatelé se nebudou moci znovu přihlásit. Jste si jisti, že chcete pokračovat?",
     "DELETE_SELECTION_TITLE": "Odstranit IDP",
     "DELETE_SELECTION_DESCRIPTION": "Chystáte se odstranit poskytovatele identity. Výsledné změny jsou nevratné. Opravdu to chcete udělat?",
+    "FEDERATEDLOGOUTENABLED": "Federované odhlášení povoleno",
+    "FEDERATEDLOGOUTENABLED_DESC": "Je-li povoleno, uživatel bude odhlášen i z IdP, pokud ukončí relaci v ZITADEL.",
     "EMPTY": "Žádný IDP není dostupný",
     "OIDC": {
       "GENERAL": "Obecné informace",

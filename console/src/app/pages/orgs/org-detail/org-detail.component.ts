@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { Buffer } from 'buffer';
 import { BehaviorSubject, from, Observable, of, Subject, takeUntil } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
@@ -266,10 +265,11 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
       .listOrgMetadata()
       .then((resp) => {
         this.loadingMetadata = false;
-        this.metadata = resp.resultList.map((md) => {
+        const decoder = new TextDecoder();
+        this.metadata = resp.resultList.map(({ key, value }) => {
           return {
-            key: md.key,
-            value: Buffer.from(md.value as string, 'base64').toString('utf-8'),
+            key,
+            value: atob(typeof value === 'string' ? value : decoder.decode(value)),
           };
         });
       })

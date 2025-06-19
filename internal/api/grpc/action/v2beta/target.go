@@ -14,9 +14,6 @@ import (
 )
 
 func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetRequest) (*action.CreateTargetResponse, error) {
-	if err := checkActionsEnabled(ctx); err != nil {
-		return nil, err
-	}
 	add := createTargetToCommand(req)
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	createdAt, err := s.command.AddTarget(ctx, add, instanceID)
@@ -35,9 +32,6 @@ func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetReque
 }
 
 func (s *Server) UpdateTarget(ctx context.Context, req *action.UpdateTargetRequest) (*action.UpdateTargetResponse, error) {
-	if err := checkActionsEnabled(ctx); err != nil {
-		return nil, err
-	}
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	update := updateTargetToCommand(req)
 	changedAt, err := s.command.ChangeTarget(ctx, update, instanceID)
@@ -55,9 +49,6 @@ func (s *Server) UpdateTarget(ctx context.Context, req *action.UpdateTargetReque
 }
 
 func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetRequest) (*action.DeleteTargetResponse, error) {
-	if err := checkActionsEnabled(ctx); err != nil {
-		return nil, err
-	}
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	deletedAt, err := s.command.DeleteTarget(ctx, req.GetId(), instanceID)
 	if err != nil {
