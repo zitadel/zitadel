@@ -1531,8 +1531,8 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						ResourceOwner: "orgID",
 					},
-					CreatedAdmins: []*CreatedOrgAdmin{
-						{
+					OrgAdmins: []OrgAdmin{
+						&CreatedOrgAdmin{
 							ID: "userID",
 						},
 					},
@@ -1574,7 +1574,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						ResourceOwner: "custom-org-ID",
 					},
-					CreatedAdmins: []*CreatedOrgAdmin{},
+					OrgAdmins: []OrgAdmin{},
 				},
 			},
 		},
@@ -1641,7 +1641,11 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						ResourceOwner: "orgID",
 					},
-					CreatedAdmins: []*CreatedOrgAdmin{},
+					OrgAdmins: []OrgAdmin{
+						&AssignedOrgAdmin{
+							ID: "userID",
+						},
+					},
 				},
 			},
 		},
@@ -1751,8 +1755,8 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					ObjectDetails: &domain.ObjectDetails{
 						ResourceOwner: "orgID",
 					},
-					CreatedAdmins: []*CreatedOrgAdmin{
-						{
+					OrgAdmins: []OrgAdmin{
+						&CreatedOrgAdmin{
 							ID: "userID",
 							PAT: &PersonalAccessToken{
 								ObjectRoot: models.ObjectRoot{

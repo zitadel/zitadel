@@ -185,10 +185,10 @@ message ProjectSearchFilter {
     option (validate.required) = true;
 
     ProjectNameFilter project_name_filter = 1;
-    InProjectIDsFilter in_project_ids_filter = 2;
-    ProjectResourceOwnerFilter project_resource_owner_filter = 3;
-    ProjectGrantResourceOwnerFilter project_grant_resource_owner_filter = 4;
-    ProjectOrganizationIDFilter project_organization_id_filter = 5;
+    zitadel.filter.v2beta.InIDsFilter in_project_ids_filter = 2;
+    zitadel.filter.v2beta.IDFilter project_resource_owner_filter = 3;
+    zitadel.filter.v2beta.IDFilter project_grant_resource_owner_filter = 4;
+    zitadel.filter.v2beta.IDFilter project_organization_id_filter = 5;
   }
 }
 
@@ -210,66 +210,16 @@ message ProjectNameFilter {
   ];
 }
 
-message InProjectIDsFilter {
-  // Defines the ids to query for.
-  repeated string project_ids = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the ids of the projects to include"
-      example: "[\"69629023906488334\",\"69622366012355662\"]";
-    }
-  ];
-}
-
-message ProjectResourceOwnerFilter {
-  // Defines the ID of organization the project belongs to query for.
-  string project_resource_owner = 1 [
-    (validate.rules).string = {max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"69629023906488334\""
-    }
-  ];
-}
-
-message ProjectGrantResourceOwnerFilter {
-  // Defines the ID of organization the project grant belongs to query for.
-  string project_grant_resource_owner = 1 [
-    (validate.rules).string = {max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"69629023906488334\""
-    }
-  ];
-}
-
-message ProjectOrganizationIDFilter {
-  // Defines the ID of organization the project and granted project belong to query for.
-  string project_organization_id = 1 [
-    (validate.rules).string = {max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"69629023906488334\""
-    }
-  ];
-}
-
 message ProjectGrantSearchFilter {
   oneof filter {
     option (validate.required) = true;
 
     ProjectNameFilter project_name_filter = 1;
     ProjectRoleKeyFilter role_key_filter = 2;
-    InProjectIDsFilter in_project_ids_filter = 3;
-    ProjectResourceOwnerFilter project_resource_owner_filter = 4;
-    ProjectGrantResourceOwnerFilter project_grant_resource_owner_filter = 5;
+    zitadel.filter.v2beta.InIDsFilter in_project_ids_filter = 3;
+    zitadel.filter.v2beta.IDFilter project_resource_owner_filter = 4;
+    zitadel.filter.v2beta.IDFilter project_grant_resource_owner_filter = 5;
   }
-}
-
-message GrantedOrganizationIDFilter {
-  // Defines the ID of organization the project is granted to query for.
-  string granted_organization_id = 1 [
-    (validate.rules).string = {max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"69629023906488334\""
-    }
-  ];
 }
 
 message ProjectRole {

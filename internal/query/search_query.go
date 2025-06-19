@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -334,23 +335,23 @@ func (q *textQuery) comp() sq.Sqlizer {
 	case TextNotEquals:
 		return sq.NotEq{q.Column.identifier(): q.Text}
 	case TextEqualsIgnoreCase:
-		return sq.ILike{q.Column.identifier(): q.Text}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text)}
 	case TextNotEqualsIgnoreCase:
-		return sq.NotILike{q.Column.identifier(): q.Text}
+		return sq.NotLike{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text)}
 	case TextStartsWith:
 		return sq.Like{q.Column.identifier(): q.Text + "%"}
 	case TextStartsWithIgnoreCase:
-		return sq.ILike{q.Column.identifier(): q.Text + "%"}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text) + "%"}
 	case TextEndsWith:
 		return sq.Like{q.Column.identifier(): "%" + q.Text}
 	case TextEndsWithIgnoreCase:
-		return sq.ILike{q.Column.identifier(): "%" + q.Text}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text)}
 	case TextContains:
 		return sq.Like{q.Column.identifier(): "%" + q.Text + "%"}
 	case TextContainsIgnoreCase:
-		return sq.ILike{q.Column.identifier(): "%" + q.Text + "%"}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text) + "%"}
 	case TextListContains:
-		return &listContains{col: q.Column, args: []interface{}{q.Text}}
+		return &listContains{col: q.Column, args: []any{q.Text}}
 	case textCompareMax:
 		return nil
 	}
