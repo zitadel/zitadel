@@ -26,7 +26,7 @@ func (u *userHuman) GetEmail(ctx context.Context, condition database.Condition) 
 
 	builder := database.StatementBuilder{}
 	builder.WriteString(userEmailQuery)
-	u.writeCondition(builder, condition)
+	u.writeCondition(&builder, condition)
 
 	err := u.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(
 		&email.Address,
@@ -43,7 +43,7 @@ func (h userHuman) Update(ctx context.Context, condition database.Condition, cha
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE human_users SET `)
 	database.Changes(changes).Write(&builder)
-	h.writeCondition(builder, condition)
+	h.writeCondition(&builder, condition)
 
 	stmt := builder.String()
 

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -74,10 +75,37 @@ func TestCreateInstance(t *testing.T) {
 				}
 
 				err := instanceRepo.Create(ctx, &inst)
+				// change the name to make sure same only the id clashes
+				inst.Name = gofakeit.Name()
 				require.NoError(t, err)
 				return &inst
 			},
 			err: errors.New("instance id already exists"),
+		},
+		{
+			name: "adding instance with same name twice",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
+				instanceRepo := repository.InstanceRepository(pool)
+				instanceId := gofakeit.Name()
+				instanceName := gofakeit.Name()
+
+				inst := domain.Instance{
+					ID:              instanceId,
+					Name:            instanceName,
+					DefaultOrgID:    "defaultOrgId",
+					IAMProjectID:    "iamProject",
+					ConsoleClientID: "consoleCLient",
+					ConsoleAppID:    "consoleApp",
+					DefaultLanguage: "defaultLanguage",
+				}
+
+				err := instanceRepo.Create(ctx, &inst)
+				// change the id to make sure same name+instance causes an error
+				inst.ID = gofakeit.Name()
+				require.NoError(t, err)
+				return &inst
+			},
+			err: errors.New("organization name already exists for instance"),
 		},
 		{
 			name: "adding instance with no id",
@@ -113,7 +141,7 @@ func TestCreateInstance(t *testing.T) {
 			// create instance
 			beforeCreate := time.Now()
 			err := instanceRepo.Create(ctx, instance)
-			require.Equal(t, tt.err, err)
+			assert.Equal(t, tt.err, err)
 			if err != nil {
 				return
 			}
@@ -125,16 +153,16 @@ func TestCreateInstance(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			require.Equal(t, tt.instance.ID, instance.ID)
-			require.Equal(t, tt.instance.Name, instance.Name)
-			require.Equal(t, tt.instance.DefaultOrgID, instance.DefaultOrgID)
-			require.Equal(t, tt.instance.IAMProjectID, instance.IAMProjectID)
-			require.Equal(t, tt.instance.ConsoleClientID, instance.ConsoleClientID)
-			require.Equal(t, tt.instance.ConsoleAppID, instance.ConsoleAppID)
-			require.Equal(t, tt.instance.DefaultLanguage, instance.DefaultLanguage)
-			require.WithinRange(t, instance.CreatedAt, beforeCreate, afterCreate)
-			require.WithinRange(t, instance.UpdatedAt, beforeCreate, afterCreate)
-			require.Nil(t, instance.DeletedAt)
+			assert.Equal(t, tt.instance.ID, instance.ID)
+			assert.Equal(t, tt.instance.Name, instance.Name)
+			assert.Equal(t, tt.instance.DefaultOrgID, instance.DefaultOrgID)
+			assert.Equal(t, tt.instance.IAMProjectID, instance.IAMProjectID)
+			assert.Equal(t, tt.instance.ConsoleClientID, instance.ConsoleClientID)
+			assert.Equal(t, tt.instance.ConsoleAppID, instance.ConsoleAppID)
+			assert.Equal(t, tt.instance.DefaultLanguage, instance.DefaultLanguage)
+			assert.WithinRange(t, instance.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, instance.UpdatedAt, beforeCreate, afterCreate)
+			assert.Nil(t, instance.DeletedAt)
 		})
 	}
 }
@@ -191,10 +219,11 @@ func TestUpdateInstance(t *testing.T) {
 				require.NoError(t, err)
 
 				// delete instance
-				err = instanceRepo.Delete(ctx,
+				affectedRows, err := instanceRepo.Delete(ctx,
 					instanceRepo.IDCondition(inst.ID),
 				)
 				require.NoError(t, err)
+				assert.Equal(t, int64(1), affectedRows)
 
 				return &inst
 			},
@@ -230,7 +259,7 @@ func TestUpdateInstance(t *testing.T) {
 			afterUpdate := time.Now()
 			require.NoError(t, err)
 
-			require.Equal(t, tt.rowsAffected, rowsAffected)
+			assert.Equal(t, tt.rowsAffected, rowsAffected)
 
 			if rowsAffected == 0 {
 				return
@@ -242,9 +271,9 @@ func TestUpdateInstance(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			require.Equal(t, newName, instance.Name)
-			require.WithinRange(t, instance.UpdatedAt, beforeUpdate, afterUpdate)
-			require.Nil(t, instance.DeletedAt)
+			assert.Equal(t, newName, instance.Name)
+			assert.WithinRange(t, instance.UpdatedAt, beforeUpdate, afterUpdate)
+			assert.Nil(t, instance.DeletedAt)
 		})
 	}
 }
@@ -337,18 +366,17 @@ func TestGetInstance(t *testing.T) {
 			)
 			require.NoError(t, err)
 			if instance == nil {
-				require.Nil(t, instance, returnedInstance)
+				assert.Nil(t, instance, returnedInstance)
 				return
 			}
-			require.NoError(t, err)
 
-			require.Equal(t, returnedInstance.ID, instance.ID)
-			require.Equal(t, returnedInstance.Name, instance.Name)
-			require.Equal(t, returnedInstance.DefaultOrgID, instance.DefaultOrgID)
-			require.Equal(t, returnedInstance.IAMProjectID, instance.IAMProjectID)
-			require.Equal(t, returnedInstance.ConsoleClientID, instance.ConsoleClientID)
-			require.Equal(t, returnedInstance.ConsoleAppID, instance.ConsoleAppID)
-			require.Equal(t, returnedInstance.DefaultLanguage, instance.DefaultLanguage)
+			assert.Equal(t, returnedInstance.ID, instance.ID)
+			assert.Equal(t, returnedInstance.Name, instance.Name)
+			assert.Equal(t, returnedInstance.DefaultOrgID, instance.DefaultOrgID)
+			assert.Equal(t, returnedInstance.IAMProjectID, instance.IAMProjectID)
+			assert.Equal(t, returnedInstance.ConsoleClientID, instance.ConsoleClientID)
+			assert.Equal(t, returnedInstance.ConsoleAppID, instance.ConsoleAppID)
+			assert.Equal(t, returnedInstance.DefaultLanguage, instance.DefaultLanguage)
 		})
 	}
 }
@@ -504,19 +532,19 @@ func TestListInstance(t *testing.T) {
 			)
 			require.NoError(t, err)
 			if tt.noInstanceReturned {
-				require.Nil(t, returnedInstances)
+				assert.Nil(t, returnedInstances)
 				return
 			}
 
-			require.Equal(t, len(instances), len(returnedInstances))
+			assert.Equal(t, len(instances), len(returnedInstances))
 			for i, instance := range instances {
-				require.Equal(t, returnedInstances[i].ID, instance.ID)
-				require.Equal(t, returnedInstances[i].Name, instance.Name)
-				require.Equal(t, returnedInstances[i].DefaultOrgID, instance.DefaultOrgID)
-				require.Equal(t, returnedInstances[i].IAMProjectID, instance.IAMProjectID)
-				require.Equal(t, returnedInstances[i].ConsoleClientID, instance.ConsoleClientID)
-				require.Equal(t, returnedInstances[i].ConsoleAppID, instance.ConsoleAppID)
-				require.Equal(t, returnedInstances[i].DefaultLanguage, instance.DefaultLanguage)
+				assert.Equal(t, returnedInstances[i].ID, instance.ID)
+				assert.Equal(t, returnedInstances[i].Name, instance.Name)
+				assert.Equal(t, returnedInstances[i].DefaultOrgID, instance.DefaultOrgID)
+				assert.Equal(t, returnedInstances[i].IAMProjectID, instance.IAMProjectID)
+				assert.Equal(t, returnedInstances[i].ConsoleClientID, instance.ConsoleClientID)
+				assert.Equal(t, returnedInstances[i].ConsoleAppID, instance.ConsoleAppID)
+				assert.Equal(t, returnedInstances[i].DefaultLanguage, instance.DefaultLanguage)
 			}
 		})
 	}
@@ -527,15 +555,16 @@ func TestDeleteInstance(t *testing.T) {
 		name             string
 		testFunc         func(ctx context.Context, t *testing.T)
 		conditionClauses database.Condition
+		noOfDeletedRows  int64
 	}
 	tests := []test{
 		func() test {
 			instanceRepo := repository.InstanceRepository(pool)
 			instanceId := gofakeit.Name()
+			var noOfInstances int64 = 1
 			return test{
 				name: "happy path delete single instance filter id",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					noOfInstances := 1
 					instances := make([]*domain.Instance, noOfInstances)
 					for i := range noOfInstances {
 
@@ -557,15 +586,16 @@ func TestDeleteInstance(t *testing.T) {
 					}
 				},
 				conditionClauses: instanceRepo.IDCondition(instanceId),
+				noOfDeletedRows:  noOfInstances,
 			}
 		}(),
 		func() test {
 			instanceRepo := repository.InstanceRepository(pool)
 			instanceName := gofakeit.Name()
+			var noOfInstances int64 = 1
 			return test{
 				name: "happy path delete single instance filter name",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					noOfInstances := 1
 					instances := make([]*domain.Instance, noOfInstances)
 					for i := range noOfInstances {
 
@@ -587,6 +617,7 @@ func TestDeleteInstance(t *testing.T) {
 					}
 				},
 				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+				noOfDeletedRows:  noOfInstances,
 			}
 		}(),
 		func() test {
@@ -600,10 +631,10 @@ func TestDeleteInstance(t *testing.T) {
 		func() test {
 			instanceRepo := repository.InstanceRepository(pool)
 			instanceName := gofakeit.Name()
+			var noOfInstances int64 = 5
 			return test{
 				name: "multiple instance filter on name",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					noOfInstances := 5
 					instances := make([]*domain.Instance, noOfInstances)
 					for i := range noOfInstances {
 
@@ -625,6 +656,7 @@ func TestDeleteInstance(t *testing.T) {
 					}
 				},
 				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+				noOfDeletedRows:  noOfInstances,
 			}
 		}(),
 		func() test {
@@ -655,12 +687,15 @@ func TestDeleteInstance(t *testing.T) {
 					}
 
 					// delete instance
-					err := instanceRepo.Delete(ctx,
+					affectedRows, err := instanceRepo.Delete(ctx,
 						instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
 					)
 					require.NoError(t, err)
+					assert.Equal(t, int64(1), affectedRows)
 				},
 				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+				// this test should return 0 affected rows as the instance was already deleted
+				noOfDeletedRows: 0,
 			}
 		}(),
 	}
@@ -674,17 +709,18 @@ func TestDeleteInstance(t *testing.T) {
 			}
 
 			// delete instance
-			err := instanceRepo.Delete(ctx,
+			noOfDeletedRows, err := instanceRepo.Delete(ctx,
 				tt.conditionClauses,
 			)
 			require.NoError(t, err)
+			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
 
 			// check instance was deleted
 			instance, err := instanceRepo.Get(ctx,
 				tt.conditionClauses,
 			)
 			require.NoError(t, err)
-			require.Nil(t, instance)
+			assert.Nil(t, instance)
 		})
 	}
 }

@@ -6,10 +6,13 @@ CREATE TABLE IF NOT EXISTS zitadel.instances(
   console_client_id TEXT, -- NOT NULL,
   console_app_id TEXT, -- NOT NULL,
   default_language TEXT, -- NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   deleted_at TIMESTAMPTZ DEFAULT NULL
 );
+
+CREATE UNIQUE INDEX instance_name_not_deleted_idx ON zitadel.instances (name)
+    WHERE deleted_at IS NULL;
 
 CREATE OR REPLACE FUNCTION zitadel.set_updated_at()
 RETURNS TRIGGER AS $$
