@@ -31,13 +31,13 @@ get_digest() {
 get_image_digests() {
   local digests=""
 	for img in $(echo "$IMAGES"); do
-		local digest=$(get_digest $img)
+		local digest="$(get_digest $img)"
 		if [[ -z $digest ]]; then
 		  docker pull "$img" >/dev/null 2>&1 || true
-		  digest=$(get_digest $img)
+		  digest="$(get_digest $img)"
     fi
     if [[ -z $digest ]]; then
-		  digest=$(get_digest $img)
+		  digest="$(get_digest $img)"
     fi
 		digest="${img}@${digest}"
 		digests="${digests}${digest} "
@@ -77,11 +77,11 @@ if [[ "$IMAGE_CHANGED" == "false" ]]; then
     for cached_digest in $CACHED_DIGESTS; do
       cached_digest_image_id=$(echo "$current_digest" | cut -d ',' -f1)
       cached_digest_repo_digest=$(echo "$current_digest" | cut -d ',' -f2)
-      if [[ "$current<_digest_image_id" != "$cached_digest_image_id" && "$current_digest_repo_digest" != "$cached_digest_repo_digest" ]]; then
+      if [[ "$current_digest_image_id" != "$cached_digest_image_id" && "$current_digest_repo_digest" != "$cached_digest_repo_digest" ]]; then
         echo "Image digest mismatch:"
         echo "Current: $current_digest"
         echo "Cached:  $cached_digest"
-        IMAGE_CHANGED=true
+        IMAGE_CHANGED="true"
         break 2
       fi
     done
