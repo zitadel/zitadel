@@ -52,9 +52,10 @@ jobs:
         id: run-caches-restore
         with:
           path: ${{ env.CACHE_DIR }}
-          key: ${{ runner.os }}-login-run-caches-${{ github.sha }}
+          key: ${{ runner.os }}-login-run-caches-${{ github.sha }}-${{github.run_number}}
           restore-keys: |
-              ${{ runner.os }}-login-run-caches-
+            ${{ runner.os }}-login-run-caches-${{ github.sha }}-
+            ${{ runner.os }}-login-run-caches-
       - name: Show Run Caches
         run: make show-run-caches
       - run: make login-quality
