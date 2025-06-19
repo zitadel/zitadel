@@ -40,7 +40,7 @@ func CreateOIDCAppRequestToDomain(name, projectID string, req *app.CreateOIDCApp
 	}, nil
 }
 
-func PatchOIDCAppConfigRequestToDomain(appID, projectID string, app *app.PatchOIDCApplicationConfigurationRequest) (*domain.OIDCApp, error) {
+func PatchOIDCAppConfigRequestToDomain(appID, projectID string, app *app.UpdateOIDCApplicationConfigurationRequest) (*domain.OIDCApp, error) {
 	loginVersion, loginBaseURI, err := loginVersionToDomain(app.GetLoginVersion())
 	if err != nil {
 		return nil, err

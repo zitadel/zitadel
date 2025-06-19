@@ -124,7 +124,7 @@ func TestPatchSAMLAppConfigRequestToDomain(t *testing.T) {
 		testName  string
 		appID     string
 		projectID string
-		req       *app.PatchSAMLApplicationConfigurationRequest
+		req       *app.UpdateSAMLApplicationConfigurationRequest
 
 		expectedResponse *domain.SAMLApp
 		expectedError    error
@@ -133,8 +133,8 @@ func TestPatchSAMLAppConfigRequestToDomain(t *testing.T) {
 			testName:  "login version error",
 			appID:     "app-1",
 			projectID: "proj-1",
-			req: &app.PatchSAMLApplicationConfigurationRequest{
-				Metadata: &app.PatchSAMLApplicationConfigurationRequest_MetadataXml{
+			req: &app.UpdateSAMLApplicationConfigurationRequest{
+				Metadata: &app.UpdateSAMLApplicationConfigurationRequest_MetadataXml{
 					MetadataXml: samlMetadataGen(gofakeit.URL()),
 				},
 				LoginVersion: &app.LoginVersion{
@@ -153,8 +153,8 @@ func TestPatchSAMLAppConfigRequestToDomain(t *testing.T) {
 			testName:  "valid request",
 			appID:     "app-1",
 			projectID: "proj-1",
-			req: &app.PatchSAMLApplicationConfigurationRequest{
-				Metadata: &app.PatchSAMLApplicationConfigurationRequest_MetadataXml{
+			req: &app.UpdateSAMLApplicationConfigurationRequest{
+				Metadata: &app.UpdateSAMLApplicationConfigurationRequest_MetadataXml{
 					MetadataXml: genMetaForValidRequest,
 				},
 				LoginVersion: nil,

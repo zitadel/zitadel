@@ -143,9 +143,15 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCA
 	if oidcApp == nil || oidcApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-34Fm0", "Errors.Project.App.Invalid")
 	}
-	if _, err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner); err != nil {
+
+	projectResOwner, err := c.checkProjectExists(ctx, oidcApp.AggregateID, resourceOwner)
+	if err != nil {
 		return nil, err
 	}
+	if resourceOwner == "" {
+		resourceOwner = projectResOwner
+	}
+
 	if oidcApp.AppName == "" || !oidcApp.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-1n8df", "Errors.Project.App.Invalid")
 	}

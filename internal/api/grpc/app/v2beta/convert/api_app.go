@@ -17,7 +17,7 @@ func CreateAPIApplicationRequestToDomain(name, projectID string, app *app.Create
 	}
 }
 
-func PatchAPIApplicationConfigurationRequestToDomain(appID, projectID string, app *app.PatchAPIApplicationConfigurationRequest) *domain.APIApp {
+func PatchAPIApplicationConfigurationRequestToDomain(appID, projectID string, app *app.UpdateAPIApplicationConfigurationRequest) *domain.APIApp {
 	return &domain.APIApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectID,

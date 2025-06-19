@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -16,7 +17,8 @@ import (
 func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicationRequest) (*app.CreateApplicationResponse, error) {
 	switch t := req.GetCreationRequestType().(type) {
 	case *app.CreateApplicationRequest_ApiRequest:
-		apiApp, err := s.command.AddAPIApplication(ctx, convert.CreateAPIApplicationRequestToDomain(req.GetName(), req.GetProjectId(), t.ApiRequest), authz.GetCtxData(ctx).OrgID)
+		// should also pass the Id in case we don't want to regen it
+		apiApp, err := s.command.AddAPIApplication(ctx, convert.CreateAPIApplicationRequestToDomain(req.GetName(), req.GetProjectId(), t.ApiRequest), "")
 		if err != nil {
 			return nil, err
 		}
@@ -62,7 +64,7 @@ func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicati
 			return nil, err
 		}
 
-		samlApp, err := s.command.AddSAMLApplication(ctx, samlAppRequest, authz.GetCtxData(ctx).OrgID)
+		samlApp, err := s.command.AddSAMLApplication(ctx, samlAppRequest, "")
 		if err != nil {
 			return nil, err
 		}
@@ -79,71 +81,69 @@ func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicati
 	}
 }
 
-func (s *Server) PatchApplication(ctx context.Context, req *app.PatchApplicationRequest) (*app.PatchApplicationResponse, error) {
+func (s *Server) UpdateApplication(ctx context.Context, req *app.UpdateApplicationRequest) (*app.UpdateApplicationResponse, error) {
 	var changedTime time.Time
 
-	switch t := req.GetPatchRequestType().(type) {
-	case *app.PatchApplicationRequest_ApplicationNameRequest:
+	if name := strings.TrimSpace(req.GetName()); name != "" {
 		updatedDetails, err := s.command.PatchApplication(
 			ctx,
 			req.GetProjectId(),
 			&domain.ChangeApp{
-				AppID:   req.GetApplicationId(),
-				AppName: t.ApplicationNameRequest.GetName(),
+				AppID:   req.GetId(),
+				AppName: name,
 			},
-			authz.GetCtxData(ctx).OrgID,
+			"",
 		)
 		if err != nil {
 			return nil, err
 		}
 
 		changedTime = updatedDetails.EventDate
+	}
 
-	case *app.PatchApplicationRequest_ApiConfigurationRequest:
-		updatedAPIApp, err := s.command.PatchAPIApplication(ctx, convert.PatchAPIApplicationConfigurationRequestToDomain(req.GetApplicationId(), req.GetProjectId(), t.ApiConfigurationRequest), authz.GetCtxData(ctx).OrgID)
+	switch t := req.GetUpdateRequestType().(type) {
+	case *app.UpdateApplicationRequest_ApiConfigurationRequest:
+		updatedAPIApp, err := s.command.PatchAPIApplication(ctx, convert.PatchAPIApplicationConfigurationRequestToDomain(req.GetId(), req.GetProjectId(), t.ApiConfigurationRequest), "")
 		if err != nil {
 			return nil, err
 		}
 
 		changedTime = updatedAPIApp.ChangeDate
 
-	case *app.PatchApplicationRequest_OidcConfigurationRequest:
-		oidcApp, err := convert.PatchOIDCAppConfigRequestToDomain(req.GetApplicationId(), req.GetProjectId(), t.OidcConfigurationRequest)
+	case *app.UpdateApplicationRequest_OidcConfigurationRequest:
+		oidcApp, err := convert.PatchOIDCAppConfigRequestToDomain(req.GetId(), req.GetProjectId(), t.OidcConfigurationRequest)
 		if err != nil {
 			return nil, err
 		}
 
-		updatedOIDCApp, err := s.command.PatchOIDCApplication(ctx, oidcApp, authz.GetCtxData(ctx).OrgID)
+		updatedOIDCApp, err := s.command.PatchOIDCApplication(ctx, oidcApp, "")
 		if err != nil {
 			return nil, err
 		}
 
 		changedTime = updatedOIDCApp.ChangeDate
 
-	case *app.PatchApplicationRequest_SamlConfigurationRequest:
-		samlApp, err := convert.PatchSAMLAppConfigRequestToDomain(req.GetApplicationId(), req.GetProjectId(), t.SamlConfigurationRequest)
+	case *app.UpdateApplicationRequest_SamlConfigurationRequest:
+		samlApp, err := convert.PatchSAMLAppConfigRequestToDomain(req.GetId(), req.GetProjectId(), t.SamlConfigurationRequest)
 		if err != nil {
 			return nil, err
 		}
 
-		updatedSAMLApp, err := s.command.PatchSAMLApplication(ctx, samlApp, authz.GetCtxData(ctx).OrgID)
+		updatedSAMLApp, err := s.command.PatchSAMLApplication(ctx, samlApp, "")
 		if err != nil {
 			return nil, err
 		}
 
 		changedTime = updatedSAMLApp.ChangeDate
-
-	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, "APP-0iiN46", "unknown app type")
 	}
 
-	return &app.PatchApplicationResponse{
+	return &app.UpdateApplicationResponse{
 		ChangeDate: timestamppb.New(changedTime),
 	}, nil
 }
 
 func (s *Server) DeleteApplication(ctx context.Context, req *app.DeleteApplicationRequest) (*app.DeleteApplicationResponse, error) {
-	details, err := s.command.RemoveApplication(ctx, req.GetProjectId(), req.GetApplicationId(), authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.RemoveApplication(ctx, req.GetProjectId(), req.GetId(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func (s *Server) DeleteApplication(ctx context.Context, req *app.DeleteApplicati
 }
 
 func (s *Server) DeactivateApplication(ctx context.Context, req *app.DeactivateApplicationRequest) (*app.DeactivateApplicationResponse, error) {
-	details, err := s.command.DeactivateApplication(ctx, req.GetProjectId(), req.GetApplicationId(), authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.DeactivateApplication(ctx, req.GetProjectId(), req.GetId(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +166,7 @@ func (s *Server) DeactivateApplication(ctx context.Context, req *app.DeactivateA
 }
 
 func (s *Server) ReactivateApplication(ctx context.Context, req *app.ReactivateApplicationRequest) (*app.ReactivateApplicationResponse, error) {
-	details, err := s.command.ReactivateApplication(ctx, req.GetProjectId(), req.GetApplicationId(), authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.ReactivateApplication(ctx, req.GetProjectId(), req.GetId(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

@@ -44,7 +44,7 @@ func ListApplicationsRequestToModel(sysDefaults systemdefaults.SystemDefaults, r
 		return nil, err
 	}
 
-	queries, err := appQueriesToModel(req.GetQueries())
+	queries, err := appQueriesToModel(req.GetFilters())
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func ListApplicationsRequestToModel(sysDefaults systemdefaults.SystemDefaults, r
 			Offset:        offset,
 			Limit:         limit,
 			Asc:           asc,
-			SortingColumn: appSortingToColumn(req.GetSortBy()),
+			SortingColumn: appSortingToColumn(req.GetSortingColumn()),
 		},
 
 		Queries: queries,
@@ -135,7 +135,7 @@ func loginVersionToPb(version domain.LoginVersion, baseURI *string) *app.LoginVe
 	}
 }
 
-func appQueriesToModel(queries []*app.ApplicationQuery) (toReturn []query.SearchQuery, err error) {
+func appQueriesToModel(queries []*app.ApplicationSearchFilter) (toReturn []query.SearchQuery, err error) {
 	toReturn = make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
 		toReturn[i], err = appQueryToModel(query)
@@ -146,17 +146,17 @@ func appQueriesToModel(queries []*app.ApplicationQuery) (toReturn []query.Search
 	return toReturn, nil
 }
 
-func appQueryToModel(appQuery *app.ApplicationQuery) (query.SearchQuery, error) {
-	switch q := appQuery.GetQuery().(type) {
-	case *app.ApplicationQuery_NameQuery:
-		return query.NewAppNameSearchQuery(filter.TextMethodPbToQuery(q.NameQuery.GetMethod()), q.NameQuery.Name)
-	case *app.ApplicationQuery_StateQuery:
-		return query.NewAppStateSearchQuery(domain.AppState(q.StateQuery))
-	case *app.ApplicationQuery_ApiAppOnly:
+func appQueryToModel(appQuery *app.ApplicationSearchFilter) (query.SearchQuery, error) {
+	switch q := appQuery.GetApplicationFilter().(type) {
+	case *app.ApplicationSearchFilter_NameFilter:
+		return query.NewAppNameSearchQuery(filter.TextMethodPbToQuery(q.NameFilter.GetMethod()), q.NameFilter.Name)
+	case *app.ApplicationSearchFilter_StateFilter:
+		return query.NewAppStateSearchQuery(domain.AppState(q.StateFilter))
+	case *app.ApplicationSearchFilter_ApiAppOnly:
 		return query.NewNotNullQuery(query.AppAPIConfigColumnAppID)
-	case *app.ApplicationQuery_OidcAppOnly:
+	case *app.ApplicationSearchFilter_OidcAppOnly:
 		return query.NewNotNullQuery(query.AppOIDCConfigColumnAppID)
-	case *app.ApplicationQuery_SamlAppOnly:
+	case *app.ApplicationSearchFilter_SamlAppOnly:
 		return query.NewNotNullQuery(query.AppSAMLConfigColumnAppID)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "CONV-z2mAGy", "List.Query.Invalid")

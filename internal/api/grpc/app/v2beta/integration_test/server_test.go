@@ -9,24 +9,28 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
+
 	"github.com/zitadel/zitadel/internal/integration"
+	project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 )
 
 var (
-	CTX                  context.Context
-	AdminCTX             context.Context
+	IAMOwnerCtx          context.Context
 	instance             *integration.Instance
 	instancePermissionV2 *integration.Instance
 	baseURI              = "http://example.com"
+	Project              *project.CreateProjectResponse
 )
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 		defer cancel()
-		CTX = ctx
+
 		instance = integration.NewInstance(ctx)
-		AdminCTX = instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
+		IAMOwnerCtx = instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		Project = instance.CreateProject(IAMOwnerCtx, &testing.T{}, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
 
 		return m.Run()
 	}())

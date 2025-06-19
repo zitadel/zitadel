@@ -66,11 +66,11 @@ enum AppSorting {
     APP_SORT_BY_CHANGE_DATE = 4;
 }
 
-message ApplicationQuery {
-    oneof query {
+message ApplicationSearchFilter {
+    oneof application_filter {
         option (validate.required) = true;
-        ApplicationNameQuery name_query = 1;
-        AppState state_query = 2;
+        ApplicationNameQuery name_filter = 1;
+        AppState state_filter = 2;
         bool api_app_only = 3;
         bool oidc_app_only = 4;
         bool saml_app_only = 5;

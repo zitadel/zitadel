@@ -16,9 +16,14 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-35Fn0", "Errors.Project.App.Invalid")
 	}
 
-	if _, err := c.checkProjectExists(ctx, application.AggregateID, resourceOwner); err != nil {
+	projectResOwner, err := c.checkProjectExists(ctx, application.AggregateID, resourceOwner)
+	if err != nil {
 		return nil, err
 	}
+	if resourceOwner == "" {
+		resourceOwner = projectResOwner
+	}
+
 	addedApplication := NewSAMLApplicationWriteModel(application.AggregateID, resourceOwner)
 	if err := c.eventstore.FilterToQueryReducer(ctx, addedApplication); err != nil {
 		return nil, err

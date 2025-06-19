@@ -103,7 +103,7 @@ func TestCreateOIDCAppRequestToDomain(t *testing.T) {
 	}
 }
 
-func TestPatchOIDCAppConfigRequestToDomain(t *testing.T) {
+func TestUpdateOIDCAppConfigRequestToDomain(t *testing.T) {
 	t.Parallel()
 
 	tt := []struct {
@@ -111,7 +111,7 @@ func TestPatchOIDCAppConfigRequestToDomain(t *testing.T) {
 
 		appID     string
 		projectID string
-		req       *app.PatchOIDCApplicationConfigurationRequest
+		req       *app.UpdateOIDCApplicationConfigurationRequest
 
 		expectedModel *domain.OIDCApp
 		expectedError error
@@ -120,7 +120,7 @@ func TestPatchOIDCAppConfigRequestToDomain(t *testing.T) {
 			testName:  "unparsable login version 2 URL",
 			appID:     "app1",
 			projectID: "pid",
-			req: &app.PatchOIDCApplicationConfigurationRequest{
+			req: &app.UpdateOIDCApplicationConfigurationRequest{
 				LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV2{
 					LoginV2: &app.LoginV2{BaseUri: gu.Ptr("%+o")},
 				}},
@@ -133,10 +133,10 @@ func TestPatchOIDCAppConfigRequestToDomain(t *testing.T) {
 			},
 		},
 		{
-			testName:  "successful patch",
+			testName:  "successful Update",
 			appID:     "app1",
 			projectID: "proj1",
-			req: &app.PatchOIDCApplicationConfigurationRequest{
+			req: &app.UpdateOIDCApplicationConfigurationRequest{
 				RedirectUris:             []string{"https://redirect"},
 				ResponseTypes:            []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
 				GrantTypes:               []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},

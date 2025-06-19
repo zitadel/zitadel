@@ -90,9 +90,14 @@ func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp,
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Project.App.Invalid")
 	}
 
-	if _, err := c.checkProjectExists(ctx, apiApp.AggregateID, resourceOwner); err != nil {
+	projectResOwner, err := c.checkProjectExists(ctx, apiApp.AggregateID, resourceOwner)
+	if err != nil {
 		return nil, err
 	}
+	if resourceOwner == "" {
+		resourceOwner = projectResOwner
+	}
+
 	if !apiApp.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Project.App.Invalid")
 	}

@@ -121,13 +121,13 @@ func TestListApplicationsRequestToModel(t *testing.T) {
 			testName: "valid request",
 			req: &app.ListApplicationsRequest{
 				ProjectId: "project1",
-				Queries: []*app.ApplicationQuery{
+				Filters: []*app.ApplicationSearchFilter{
 					{
-						Query: &app.ApplicationQuery_NameQuery{NameQuery: &app.ApplicationNameQuery{Name: "test"}},
+						ApplicationFilter: &app.ApplicationSearchFilter_NameFilter{NameFilter: &app.ApplicationNameQuery{Name: "test"}},
 					},
 				},
-				SortBy:     app.AppSorting_APP_SORT_BY_NAME,
-				Pagination: &filter_pb_v2.PaginationRequest{Asc: true},
+				SortingColumn: app.AppSorting_APP_SORT_BY_NAME,
+				Pagination:    &filter_pb_v2.PaginationRequest{Asc: true},
 			},
 
 			expectedResponse: &query.AppSearchQueries{
@@ -444,16 +444,16 @@ func TestAppQueryToModel(t *testing.T) {
 
 	tt := []struct {
 		name  string
-		query *app.ApplicationQuery
+		query *app.ApplicationSearchFilter
 
 		expectedQuery query.SearchQuery
 		expectedError error
 	}{
 		{
 			name: "name query",
-			query: &app.ApplicationQuery{
-				Query: &app.ApplicationQuery_NameQuery{
-					NameQuery: &app.ApplicationNameQuery{
+			query: &app.ApplicationSearchFilter{
+				ApplicationFilter: &app.ApplicationSearchFilter_NameFilter{
+					NameFilter: &app.ApplicationNameQuery{
 						Name:   "test",
 						Method: filter_pb_v2.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS,
 					},
@@ -463,17 +463,17 @@ func TestAppQueryToModel(t *testing.T) {
 		},
 		{
 			name: "state query",
-			query: &app.ApplicationQuery{
-				Query: &app.ApplicationQuery_StateQuery{
-					StateQuery: app.AppState_APP_STATE_ACTIVE,
+			query: &app.ApplicationSearchFilter{
+				ApplicationFilter: &app.ApplicationSearchFilter_StateFilter{
+					StateFilter: app.AppState_APP_STATE_ACTIVE,
 				},
 			},
 			expectedQuery: validAppStateSearchQuery,
 		},
 		{
 			name: "api app only query",
-			query: &app.ApplicationQuery{
-				Query: &app.ApplicationQuery_ApiAppOnly{},
+			query: &app.ApplicationSearchFilter{
+				ApplicationFilter: &app.ApplicationSearchFilter_ApiAppOnly{},
 			},
 			expectedQuery: &query.NotNullQuery{
 				Column: query.AppAPIConfigColumnAppID,
@@ -481,8 +481,8 @@ func TestAppQueryToModel(t *testing.T) {
 		},
 		{
 			name: "oidc app only query",
-			query: &app.ApplicationQuery{
-				Query: &app.ApplicationQuery_OidcAppOnly{},
+			query: &app.ApplicationSearchFilter{
+				ApplicationFilter: &app.ApplicationSearchFilter_OidcAppOnly{},
 			},
 			expectedQuery: &query.NotNullQuery{
 				Column: query.AppOIDCConfigColumnAppID,
@@ -490,8 +490,8 @@ func TestAppQueryToModel(t *testing.T) {
 		},
 		{
 			name: "saml app only query",
-			query: &app.ApplicationQuery{
-				Query: &app.ApplicationQuery_SamlAppOnly{},
+			query: &app.ApplicationSearchFilter{
+				ApplicationFilter: &app.ApplicationSearchFilter_SamlAppOnly{},
 			},
 			expectedQuery: &query.NotNullQuery{
 				Column: query.AppSAMLConfigColumnAppID,
@@ -499,7 +499,7 @@ func TestAppQueryToModel(t *testing.T) {
 		},
 		{
 			name:          "invalid query type",
-			query:         &app.ApplicationQuery{},
+			query:         &app.ApplicationSearchFilter{},
 			expectedQuery: nil,
 			expectedError: zerrors.ThrowInvalidArgument(nil, "CONV-z2mAGy", "List.Query.Invalid"),
 		},

@@ -23,16 +23,9 @@ import (
 func TestGetApplication(t *testing.T) {
 	t.Parallel()
 
-	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	p := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.Id, gofakeit.AppName(), false, false)
-
-	t.Cleanup(func() {
-		instance.DeleteProject(iamOwnerCtx, t, p.GetId())
-	})
-
 	apiAppName := gofakeit.AppName()
-	createdApiApp, errAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId: p.GetId(),
+	createdApiApp, errAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId: Project.GetId(),
 		Name:      apiAppName,
 		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
 			ApiRequest: &app.CreateAPIApplicationRequest{
@@ -43,8 +36,8 @@ func TestGetApplication(t *testing.T) {
 	require.Nil(t, errAPIAppCreation)
 
 	samlAppName := gofakeit.AppName()
-	createdSAMLApp, errSAMLAppCreation := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId: p.GetId(),
+	createdSAMLApp, errSAMLAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId: Project.GetId(),
 		Name:      samlAppName,
 		CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 			SamlRequest: &app.CreateSAMLApplicationRequest{
@@ -56,8 +49,8 @@ func TestGetApplication(t *testing.T) {
 	require.Nil(t, errSAMLAppCreation)
 
 	oidcAppName := gofakeit.AppName()
-	createdOIDCApp, errOIDCAppCreation := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId: p.GetId(),
+	createdOIDCApp, errOIDCAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId: Project.GetId(),
 		Name:      oidcAppName,
 		CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
 			OidcRequest: &app.CreateOIDCApplicationRequest{
@@ -88,7 +81,7 @@ func TestGetApplication(t *testing.T) {
 		{
 			testName: "when unknown app ID should return not found error",
 			inputRequest: &app.GetApplicationRequest{
-				ApplicationId: gofakeit.Sentence(2),
+				Id: gofakeit.Sentence(2),
 			},
 
 			expectedErrorType: codes.NotFound,
@@ -96,7 +89,7 @@ func TestGetApplication(t *testing.T) {
 		{
 			testName: "when providing API app ID should return valid API app result",
 			inputRequest: &app.GetApplicationRequest{
-				ApplicationId: createdApiApp.GetAppId(),
+				Id: createdApiApp.GetAppId(),
 			},
 
 			expectedAppName:         apiAppName,
@@ -106,7 +99,7 @@ func TestGetApplication(t *testing.T) {
 		{
 			testName: "when providing SAML app ID should return valid SAML app result",
 			inputRequest: &app.GetApplicationRequest{
-				ApplicationId: createdSAMLApp.GetAppId(),
+				Id: createdSAMLApp.GetAppId(),
 			},
 
 			expectedAppName:         samlAppName,
@@ -116,7 +109,7 @@ func TestGetApplication(t *testing.T) {
 		{
 			testName: "when providing OIDC app ID should return valid OIDC app result",
 			inputRequest: &app.GetApplicationRequest{
-				ApplicationId: createdOIDCApp.GetAppId(),
+				Id: createdOIDCApp.GetAppId(),
 			},
 
 			expectedAppName:         oidcAppName,
@@ -129,10 +122,10 @@ func TestGetApplication(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, 30*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMOwnerCtx, 30*time.Second)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
-				res, err := instance.Client.AppV2Beta.GetApplication(iamOwnerCtx, tc.inputRequest)
+				res, err := instance.Client.AppV2Beta.GetApplication(IAMOwnerCtx, tc.inputRequest)
 
 				// Then
 				require.Equal(t, tc.expectedErrorType, status.Code(err))
@@ -152,17 +145,12 @@ func TestGetApplication(t *testing.T) {
 }
 
 func TestListApplications(t *testing.T) {
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
+
 	t.Parallel()
 
-	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	p := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.Id, gofakeit.AppName(), false, false)
-
-	t.Cleanup(func() {
-		instance.DeleteProject(iamOwnerCtx, t, p.GetId())
-	})
-
 	apiAppName := gofakeit.AppName()
-	createdApiApp, errAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+	createdApiApp, errAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: p.GetId(),
 		Name:      apiAppName,
 		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
@@ -174,7 +162,7 @@ func TestListApplications(t *testing.T) {
 	require.Nil(t, errAPIAppCreation)
 
 	deactivatedApiAppName := gofakeit.AppName()
-	createdDeactivatedApiApp, errDeactivatedAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+	createdDeactivatedApiApp, errDeactivatedAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: p.GetId(),
 		Name:      deactivatedApiAppName,
 		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
@@ -184,14 +172,14 @@ func TestListApplications(t *testing.T) {
 		},
 	})
 	require.Nil(t, errDeactivatedAPIAppCreation)
-	_, deactivateErr := instance.Client.AppV2Beta.DeactivateApplication(iamOwnerCtx, &app.DeactivateApplicationRequest{
-		ProjectId:     p.GetId(),
-		ApplicationId: createdDeactivatedApiApp.GetAppId(),
+	_, deactivateErr := instance.Client.AppV2Beta.DeactivateApplication(IAMOwnerCtx, &app.DeactivateApplicationRequest{
+		ProjectId: p.GetId(),
+		Id:        createdDeactivatedApiApp.GetAppId(),
 	})
 	require.Nil(t, deactivateErr)
 
 	samlAppName := gofakeit.AppName()
-	createdSAMLApp, errSAMLAppCreation := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+	createdSAMLApp, errSAMLAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: p.GetId(),
 		Name:      samlAppName,
 		CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
@@ -204,7 +192,7 @@ func TestListApplications(t *testing.T) {
 	require.Nil(t, errSAMLAppCreation)
 
 	oidcAppName := gofakeit.AppName()
-	createdOIDCApp, errOIDCAppCreation := instance.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+	createdOIDCApp, errOIDCAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: p.GetId(),
 		Name:      oidcAppName,
 		CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
@@ -270,9 +258,9 @@ func TestListApplications(t *testing.T) {
 		{
 			testName: "when sorting by name should return apps sorted by name in descending order",
 			inputRequest: &app.ListApplicationsRequest{
-				ProjectId:  p.GetId(),
-				SortBy:     app.AppSorting_APP_SORT_BY_NAME,
-				Pagination: &filter.PaginationRequest{Asc: true},
+				ProjectId:     p.GetId(),
+				SortingColumn: app.AppSorting_APP_SORT_BY_NAME,
+				Pagination:    &filter.PaginationRequest{Asc: true},
 			},
 
 			expectedOrderedList: appsSortedByName,
@@ -296,9 +284,9 @@ func TestListApplications(t *testing.T) {
 		{
 			testName: "when sorting by id should return apps sorted by id in descending order",
 			inputRequest: &app.ListApplicationsRequest{
-				ProjectId:  p.GetId(),
-				SortBy:     app.AppSorting_APP_SORT_BY_ID,
-				Pagination: &filter.PaginationRequest{Asc: true},
+				ProjectId:     p.GetId(),
+				SortingColumn: app.AppSorting_APP_SORT_BY_ID,
+				Pagination:    &filter.PaginationRequest{Asc: true},
 			},
 			expectedOrderedList: appsSortedByID,
 			expectedOrderedKeys: func(apps []appWithName) any {
@@ -321,9 +309,9 @@ func TestListApplications(t *testing.T) {
 		{
 			testName: "when sorting by creation date should return apps sorted by creation date in descending order",
 			inputRequest: &app.ListApplicationsRequest{
-				ProjectId:  p.GetId(),
-				SortBy:     app.AppSorting_APP_SORT_BY_CREATION_DATE,
-				Pagination: &filter.PaginationRequest{Asc: true},
+				ProjectId:     p.GetId(),
+				SortingColumn: app.AppSorting_APP_SORT_BY_CREATION_DATE,
+				Pagination:    &filter.PaginationRequest{Asc: true},
 			},
 			expectedOrderedList: appsSortedByCreationDate,
 			expectedOrderedKeys: func(apps []appWithName) any {
@@ -348,8 +336,8 @@ func TestListApplications(t *testing.T) {
 			inputRequest: &app.ListApplicationsRequest{
 				ProjectId:  p.GetId(),
 				Pagination: &filter.PaginationRequest{Asc: true},
-				Queries: []*app.ApplicationQuery{
-					{Query: &app.ApplicationQuery_StateQuery{StateQuery: app.AppState_APP_STATE_ACTIVE}},
+				Filters: []*app.ApplicationSearchFilter{
+					{ApplicationFilter: &app.ApplicationSearchFilter_StateFilter{StateFilter: app.AppState_APP_STATE_ACTIVE}},
 				},
 			},
 			expectedOrderedList: slices.DeleteFunc(
@@ -378,8 +366,8 @@ func TestListApplications(t *testing.T) {
 			inputRequest: &app.ListApplicationsRequest{
 				ProjectId:  p.GetId(),
 				Pagination: &filter.PaginationRequest{Asc: true},
-				Queries: []*app.ApplicationQuery{
-					{Query: &app.ApplicationQuery_OidcAppOnly{}},
+				Filters: []*app.ApplicationSearchFilter{
+					{ApplicationFilter: &app.ApplicationSearchFilter_OidcAppOnly{}},
 				},
 			},
 			expectedOrderedList: slices.DeleteFunc(
@@ -408,17 +396,17 @@ func TestListApplications(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamOwnerCtx, 30*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMOwnerCtx, 30*time.Second)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
-				res, err := instance.Client.AppV2Beta.ListApplications(iamOwnerCtx, tc.inputRequest)
+				res, err := instance.Client.AppV2Beta.ListApplications(IAMOwnerCtx, tc.inputRequest)
 
 				// Then
 				require.Equal(ttt, codes.OK, status.Code(err))
 
 				if err == nil {
-					assert.Len(ttt, res.GetApp(), len(tc.expectedOrderedList))
-					actualOrderedKeys := tc.actualOrderedKeys(res.GetApp())
+					assert.Len(ttt, res.GetApplications(), len(tc.expectedOrderedList))
+					actualOrderedKeys := tc.actualOrderedKeys(res.GetApplications())
 					expectedOrderedKeys := tc.expectedOrderedKeys(tc.expectedOrderedList)
 					assert.ElementsMatch(ttt, expectedOrderedKeys, actualOrderedKeys)
 				}

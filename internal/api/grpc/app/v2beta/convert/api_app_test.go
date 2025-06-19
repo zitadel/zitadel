@@ -60,20 +60,20 @@ func TestCreateAPIApplicationRequestToDomain(t *testing.T) {
 	}
 }
 
-func TestPatchAPIApplicationConfigurationRequestToDomain(t *testing.T) {
+func TestUpdateAPIApplicationConfigurationRequestToDomain(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name      string
 		appID     string
 		projectID string
-		req       *app.PatchAPIApplicationConfigurationRequest
+		req       *app.UpdateAPIApplicationConfigurationRequest
 		want      *domain.APIApp
 	}{
 		{
 			name:      "basic auth method",
 			appID:     "app-1",
 			projectID: "proj-1",
-			req: &app.PatchAPIApplicationConfigurationRequest{
+			req: &app.UpdateAPIApplicationConfigurationRequest{
 				AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
 			},
 			want: &domain.APIApp{
@@ -86,7 +86,7 @@ func TestPatchAPIApplicationConfigurationRequestToDomain(t *testing.T) {
 			name:      "private key jwt",
 			appID:     "app-2",
 			projectID: "proj-2",
-			req: &app.PatchAPIApplicationConfigurationRequest{
+			req: &app.UpdateAPIApplicationConfigurationRequest{
 				AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
 			},
 			want: &domain.APIApp{

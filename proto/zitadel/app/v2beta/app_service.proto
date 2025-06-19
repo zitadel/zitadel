@@ -20,7 +20,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/app/v2beta;app";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "App Service";
+    title: "Application Service";
     version: "2.0-beta";
     description: "This API is intended to manage apps (SAML, OIDC, etc..) in a ZITADEL instance. This service is in beta state. It can AND will continue breaking until a stable version is released.";
     contact:{
@@ -114,7 +114,7 @@ service AppService {
     //
     // Create an application. The application can be OIDC, API or SAML type, based on the input.
     //
-    // The user needs to be owner of the project and have project.app.write permission
+    // The user needs to have project.app.write permission
     //
     // Required permissions:
     //   - `project.app.write`
@@ -123,13 +123,13 @@ service AppService {
             responses: {
                 key: "200";
                 value: {
-                    description: "The created app.";
+                    description: "The created application";
                 }
             };
         };
 
         option (google.api.http) = {
-            post: "/v2beta/{project_id}/apps"
+            post: "/v2beta/applications"
             body: "*"
         };
 
@@ -140,27 +140,27 @@ service AppService {
         };
     }
 
-    // Patch Application
+    // Update Application
     //
     // Changes the configuration of an OIDC, API or SAML type application, as well as
     // the application name, based on the input provided.
     //
-    // The user needs to be owner of the project and have project.app.write permission
+    // The user needs to have project.app.write permission
     //
     // Required permissions:
     //   - `project.app.write`
-    rpc PatchApplication(PatchApplicationRequest) returns (PatchApplicationResponse) {
+    rpc UpdateApplication(UpdateApplicationRequest) returns (UpdateApplicationResponse) {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             responses: {
                 key: "200";
                 value: {
-                    description: "The patched app.";
+                    description: "The updated app.";
                 }
             };
         };
 
         option (google.api.http) = {
-            patch: "/v2beta/{project_id}/apps/{application_id}"
+            patch: "/v2beta/applications/{id}"
             body: "*"
         };
 
@@ -175,7 +175,7 @@ service AppService {
     //
     // Retrieves the application matching the provided ID.
     //
-    // The user needs to be owner of the project and have project.app.read permission
+    // The user needs to have project.app.read permission
     //
     // Required permissions:
     //   - `project.app.read`
@@ -190,7 +190,7 @@ service AppService {
         };
 
         option (google.api.http) = {
-            get: "/v2beta/apps/{application_id}"
+            get: "/v2beta/applications/{id}"
         };
 
         option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -205,13 +205,13 @@ service AppService {
     // Deletes the application belonging to the input project and matching the provided
     // application ID
     //
-    // The user needs to be owner of the project and have project.app.delete permission
+    // The user needs to have project.app.delete permission
     //
     // Required permissions:
     //   - `project.app.delete`
     rpc DeleteApplication(DeleteApplicationRequest) returns (DeleteApplicationResponse) {
         option (google.api.http) = {
-            delete: "/projects/{project_id}/apps/{application_id}"
+            delete: "/v2beta/applications/{id}"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -235,13 +235,13 @@ service AppService {
     // Deactivates the application belonging to the input project and matching the provided
     // application ID
     //
-    // The user needs to be owner of the project and have project.app.write permission
+    // The user needs to have project.app.write permission
     //
     // Required permissions:
     //   - `project.app.write`
     rpc DeactivateApplication(DeactivateApplicationRequest) returns (DeactivateApplicationResponse) {
         option (google.api.http) = {
-            post: "/projects/{project_id}/apps/{application_id}/deactivate"
+            post: "/v2beta/applications/{id}/deactivate"
             body: "*"
         };
 
@@ -266,13 +266,13 @@ service AppService {
     // Reactivates the application belonging to the input project and matching the provided
     // application ID
     //
-    // The user needs to be owner of the project and have project.app.write permission
+    // The user needs to have project.app.write permission
     //
     // Required permissions:
     //   - `project.app.write`
     rpc ReactivateApplication(ReactivateApplicationRequest) returns (ReactivateApplicationResponse) {
         option (google.api.http) = {
-            post: "/projects/{project_id}/apps/{application_id}/reactivate"
+            post: "/v2beta/applications/{id}/reactivate"
             body: "*"
         };
 
@@ -297,13 +297,13 @@ service AppService {
     //
     // Regenerates the client secret of an API or OIDC application that belongs to the input project.
     // 
-    // The user needs to be owner of the project and have project.app.write permission
+    // The user needs to have project.app.write permission
     //
     // Required permissions:
     //   - `project.app.write`
     rpc RegenerateClientSecret(RegenerateClientSecretRequest) returns (RegenerateClientSecretResponse) {
         option (google.api.http) = {
-            post: "/projects/{project_id}/apps/{application_id}/config/generate_client_secret"
+            post: "/v2beta/applications/{application_id}/generate_client_secret"
             body: "*"
         };
 
@@ -331,13 +331,13 @@ service AppService {
     // The result can be sorted by app id, name, creation date, change date or state. It can also
     // be filtered by app state, app type and app name.
     //
-    // The user needs to be owner of the project and have project.app.read permission
+    // The user needs to have project.app.read permission
     //
     // Required permissions:
     //   - `project.app.read`
     rpc ListApplications(ListApplicationsRequest) returns (ListApplicationsResponse) {
         option (google.api.http) = {
-            post: "/projects/{project_id}/apps/search"
+            post: "/v2beta/applications/search"
             body: "*"
         };
 
@@ -360,7 +360,8 @@ service AppService {
 
 message CreateApplicationRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 2 [
+    string id = 2 [(validate.rules).string = {max_len: 200}];
+    string name = 3 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -371,9 +372,9 @@ message CreateApplicationRequest {
     ];
     oneof creation_request_type {
         option (validate.required) = true;
-        CreateOIDCApplicationRequest oidc_request = 3;
-        CreateSAMLApplicationRequest saml_request = 4;
-        CreateAPIApplicationRequest api_request = 5;
+        CreateOIDCApplicationRequest oidc_request = 4;
+        CreateSAMLApplicationRequest saml_request = 5;
+        CreateAPIApplicationRequest api_request = 6;
     }
 }
 
@@ -394,6 +395,7 @@ message CreateApplicationResponse {
 }
 
 message CreateOIDCApplicationRequest {
+    // Callback URI of the authorization request where the code or tokens will be sent to
     repeated string redirect_uris = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"http://localhost:4200/auth/callback\"]";
@@ -422,6 +424,8 @@ message CreateOIDCApplicationRequest {
             description: "Defines how the application passes login credentials";
         }
     ];
+
+    // ZITADEL will redirect to this link after a successful logout
     repeated string post_logout_redirect_uris = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"http://localhost:4200/signedout\"]";
@@ -537,9 +541,9 @@ message CreateAPIApplicationResponse {
     ];
 }
 
-message PatchApplicationRequest {
+message UpdateApplicationRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string application_id = 2 [
+    string id = 2 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -548,17 +552,23 @@ message PatchApplicationRequest {
             example: "\"45984352431\"";
         }
     ];
+    string name = 3 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"MyApplicationName\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
 
-    oneof patch_request_type {
-        option (validate.required) = true;
-        PatchApplicationNameRequest application_name_request = 3;
-        PatchSAMLApplicationConfigurationRequest saml_configuration_request = 4;
-        PatchOIDCApplicationConfigurationRequest oidc_configuration_request = 5;
-        PatchAPIApplicationConfigurationRequest api_configuration_request = 6;
+    oneof update_request_type {
+        UpdateSAMLApplicationConfigurationRequest saml_configuration_request = 4;
+        UpdateOIDCApplicationConfigurationRequest oidc_configuration_request = 5;
+        UpdateAPIApplicationConfigurationRequest api_configuration_request = 6;
     }
 }
 
-message PatchApplicationResponse {
+message UpdateApplicationResponse {
     // The timestamp of the app update.
     google.protobuf.Timestamp change_date = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -567,19 +577,7 @@ message PatchApplicationResponse {
     ];
 }
 
-message PatchApplicationNameRequest {
-    string name = 1 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
-        (google.api.field_behavior) = REQUIRED,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"MyApplicationName\"";
-            min_length: 1;
-            max_length: 200;
-        }
-    ];
-}
-
-message PatchSAMLApplicationConfigurationRequest {
+message UpdateSAMLApplicationConfigurationRequest {
     oneof metadata {
         option (validate.required) = true;
         bytes metadata_xml = 1 [(validate.rules).bytes.max_len = 500000];
@@ -592,7 +590,7 @@ message PatchSAMLApplicationConfigurationRequest {
     ];    
 }
 
-message PatchOIDCApplicationConfigurationRequest {
+message UpdateOIDCApplicationConfigurationRequest {
     repeated string redirect_uris = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"http://localhost:4200/auth/callback\"]";
@@ -685,12 +683,12 @@ message PatchOIDCApplicationConfigurationRequest {
     ];
 }
 
-message PatchAPIApplicationConfigurationRequest {
+message UpdateAPIApplicationConfigurationRequest {
     APIAuthMethodType auth_method_type = 1 [(validate.rules).enum = {defined_only: true}];
 }
 
 message GetApplicationRequest {
-    string application_id = 1 [
+    string id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -707,7 +705,7 @@ message GetApplicationResponse {
 
 message DeleteApplicationRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string application_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message DeleteApplicationResponse {
@@ -720,7 +718,7 @@ message DeleteApplicationResponse {
 
 message DeactivateApplicationRequest{
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string application_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message DeactivateApplicationResponse{
@@ -733,7 +731,7 @@ message DeactivateApplicationResponse{
 
 message ReactivateApplicationRequest{
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string application_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ReactivateApplicationResponse{
@@ -777,13 +775,13 @@ message ListApplicationsRequest {
     zitadel.filter.v2.PaginationRequest pagination = 2;
 
     //criteria the client is looking for
-    repeated ApplicationQuery queries = 3;
+    repeated ApplicationSearchFilter filters = 3;
 
-    AppSorting sort_by = 4;
+    AppSorting sorting_column = 4;
 }
 
 message ListApplicationsResponse {
-    repeated Application app = 1;
+    repeated Application applications = 1;
 
     // Contains the total number of apps matching the query and the applied limit.
     zitadel.filter.v2.PaginationResponse pagination = 2;
