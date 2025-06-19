@@ -7,7 +7,6 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/app/v2beta/convert"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -143,7 +142,7 @@ func (s *Server) UpdateApplication(ctx context.Context, req *app.UpdateApplicati
 }
 
 func (s *Server) DeleteApplication(ctx context.Context, req *app.DeleteApplicationRequest) (*app.DeleteApplicationResponse, error) {
-	details, err := s.command.RemoveApplication(ctx, req.GetProjectId(), req.GetId(), authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.RemoveApplication(ctx, req.GetProjectId(), req.GetId(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +153,7 @@ func (s *Server) DeleteApplication(ctx context.Context, req *app.DeleteApplicati
 }
 
 func (s *Server) DeactivateApplication(ctx context.Context, req *app.DeactivateApplicationRequest) (*app.DeactivateApplicationResponse, error) {
-	details, err := s.command.DeactivateApplication(ctx, req.GetProjectId(), req.GetId(), authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.DeactivateApplication(ctx, req.GetProjectId(), req.GetId(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +165,7 @@ func (s *Server) DeactivateApplication(ctx context.Context, req *app.DeactivateA
 }
 
 func (s *Server) ReactivateApplication(ctx context.Context, req *app.ReactivateApplicationRequest) (*app.ReactivateApplicationResponse, error) {
-	details, err := s.command.ReactivateApplication(ctx, req.GetProjectId(), req.GetId(), authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.ReactivateApplication(ctx, req.GetProjectId(), req.GetId(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +182,7 @@ func (s *Server) RegenerateClientSecret(ctx context.Context, req *app.Regenerate
 
 	switch req.GetAppType().(type) {
 	case *app.RegenerateClientSecretRequest_IsApi:
-		config, err := s.command.ChangeAPIApplicationSecret(ctx, req.GetProjectId(), req.GetApplicationId(), authz.GetCtxData(ctx).OrgID)
+		config, err := s.command.ChangeAPIApplicationSecret(ctx, req.GetProjectId(), req.GetApplicationId(), "")
 		if err != nil {
 			return nil, err
 		}
@@ -191,7 +190,7 @@ func (s *Server) RegenerateClientSecret(ctx context.Context, req *app.Regenerate
 		changeDate = config.ChangeDate
 
 	case *app.RegenerateClientSecretRequest_IsOidc:
-		config, err := s.command.ChangeOIDCApplicationSecret(ctx, req.GetProjectId(), req.GetApplicationId(), authz.GetCtxData(ctx).OrgID)
+		config, err := s.command.ChangeOIDCApplicationSecret(ctx, req.GetProjectId(), req.GetApplicationId(), "")
 		if err != nil {
 			return nil, err
 		}
