@@ -85,9 +85,7 @@ login-test-acceptance: login-test-acceptance-build
   		$(LOGIN_TEST_ACCEPTANCE_SETUP_TAG) \
   		$(LOGIN_TEST_ACCEPTANCE_SINK_TAG) \
   		$(LOGIN_TEST_ACCEPTANCE_OIDCRP_TAG) \
-  		$(LOGIN_TEST_ACCEPTANCE_OIDCOP_TAG) \
-  		$(LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG) \
-  		$(LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG)"
+  		$(LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG)"
 
 .PHONY: login-quality
 login-quality: login-lint login-test-integration login-test-acceptance
