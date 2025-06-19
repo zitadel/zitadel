@@ -16,6 +16,7 @@ import {
   getOrgsByDomain,
   listUsers,
   retrieveIDPIntent,
+  updateHuman,
 } from "@/lib/zitadel";
 import { ConnectError, create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
@@ -24,6 +25,7 @@ import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import {
   AddHumanUserRequest,
   AddHumanUserRequestSchema,
+  UpdateHumanUserRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -79,7 +81,7 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const branding = await getBrandingSettings({
+  let branding = await getBrandingSettings({
     serviceUrl,
     organization,
   });
@@ -106,18 +108,6 @@ export default async function Page(props: {
   const { idpInformation, userId } = intent;
   let { addHumanUser } = intent;
 
-  // sign in user. If user should be linked continue
-  if (userId && !link) {
-    // TODO: update user if idp.options.isAutoUpdate is true
-
-    return loginSuccess(
-      userId,
-      { idpIntentId: id, idpIntentToken: token },
-      requestId,
-      branding,
-    );
-  }
-
   if (!idpInformation) {
     return loginFailed(branding, "IDP information missing");
   }
@@ -126,10 +116,39 @@ export default async function Page(props: {
     serviceUrl,
     id: idpInformation.idpId,
   });
+
   const options = idp?.config?.options;
 
   if (!idp) {
     throw new Error("IDP not found");
+  }
+
+  // sign in user. If user should be linked continue
+  if (userId && !link) {
+    // if auto update is enabled, we will update the user with the new information
+    if (options?.isAutoUpdate && addHumanUser) {
+      try {
+        await updateHuman({
+          serviceUrl,
+          request: create(UpdateHumanUserRequestSchema, {
+            userId: userId,
+            profile: addHumanUser.profile,
+            email: addHumanUser.email,
+            phone: addHumanUser.phone,
+          }),
+        });
+      } catch (error: unknown) {
+        // Log the error and continue with the login process
+        console.warn("An error occurred while updating the user:", error);
+      }
+    }
+
+    return loginSuccess(
+      userId,
+      { idpIntentId: id, idpIntentToken: token },
+      requestId,
+      branding,
+    );
   }
 
   if (link) {
@@ -274,6 +293,13 @@ export default async function Page(props: {
       addHumanUser,
       serviceUrl,
     });
+
+    if (orgToRegisterOn) {
+      branding = await getBrandingSettings({
+        serviceUrl,
+        organization: orgToRegisterOn,
+      });
+    }
 
     if (!orgToRegisterOn) {
       return loginFailed(branding, "No organization found for registration");
