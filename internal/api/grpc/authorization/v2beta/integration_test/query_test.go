@@ -8,17 +8,31 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
+	project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func TestServer_ListAuthorizations(t *testing.T) {
 	iamOwnerCtx := Instance.WithAuthorizationToken(EmptyCTX, integration.UserTypeIAMOwner)
+
+	projectOwnerResp := Instance.CreateMachineUser(iamOwnerCtx)
+	projectOwnerPatResp := Instance.CreatePersonalAccessToken(iamOwnerCtx, projectOwnerResp.GetUserId())
+	projectResp := createProject(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), false, false)
+	Instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), projectOwnerResp.GetUserId())
+	projectOwnerCtx := integration.WithAuthorizationToken(EmptyCTX, projectOwnerPatResp.Token)
+
+	projectGrantOwnerResp := Instance.CreateMachineUser(iamOwnerCtx)
+	projectGrantOwnerPatResp := Instance.CreatePersonalAccessToken(iamOwnerCtx, projectGrantOwnerResp.GetUserId())
+	grantedProjectResp := createGrantedProject(iamOwnerCtx, Instance, t, projectResp)
+	Instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), grantedProjectResp.GetGrantedOrganizationId(), projectGrantOwnerResp.GetUserId())
+	projectGrantOwnerCtx := integration.WithAuthorizationToken(EmptyCTX, projectGrantOwnerPatResp.Token)
 
 	type args struct {
 		ctx context.Context
@@ -55,26 +69,6 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			name: "list by id, no permission",
 			args: args{
 				ctx: Instance.WithAuthorizationToken(EmptyCTX, integration.UserTypeNoPermission),
-				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
-
-					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
-						UserId: &filter.IDFilter{
-							Id: userResp.GetId(),
-						},
-					}
-					createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
-				},
-				req: &authorization.ListAuthorizationsRequest{
-					Filters: []*authorization.AuthorizationsSearchFilter{{}},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "list by id, missing permission",
-			args: args{
-				ctx: Instance.WithAuthorizationToken(EmptyCTX, integration.UserTypeOrgOwner),
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
 					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
 
@@ -175,6 +169,39 @@ func TestServer_ListAuthorizations(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "list single id, project and project grant, multiple",
+			args: args{
+				ctx: iamOwnerCtx,
+				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
+
+					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
+						UserId: &filter.IDFilter{
+							Id: userResp.GetId(),
+						},
+					}
+					response.Authorizations[5] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
+					response.Authorizations[4] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
+					response.Authorizations[3] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
+					response.Authorizations[2] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), true)
+					response.Authorizations[1] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), true)
+					response.Authorizations[0] = createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), true)
+				},
+				req: &authorization.ListAuthorizationsRequest{
+					Filters: []*authorization.AuthorizationsSearchFilter{{}},
+				},
+			},
+			want: &authorization.ListAuthorizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  6,
+					AppliedLimit: 100,
+				},
+				Authorizations: []*authorization.Authorization{
+					{}, {}, {}, {}, {}, {},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -230,7 +257,7 @@ func createAuthorization(ctx context.Context, instance *integration.Instance, t 
 					OrganizationId: orgID,
 				},
 			},
-			OrganizationId: grantedOrg.GetOrganizationId(),
+			OrganizationId: orgID,
 			CreationDate:   userGrantResp.Details.GetCreationDate(),
 			ChangeDate:     userGrantResp.Details.GetCreationDate(),
 			State:          1,
@@ -241,7 +268,6 @@ func createAuthorization(ctx context.Context, instance *integration.Instance, t 
 				AvatarUrl:          userResp.User.GetHuman().GetProfile().GetAvatarUrl(),
 				OrganizationId:     userResp.GetUser().GetDetails().GetResourceOwner(),
 			},
-			Roles: []string{},
 		}
 	}
 	userGrantResp := instance.CreateProjectUserGrant(t, ctx, projectResp.GetId(), userID)
@@ -265,5 +291,44 @@ func createAuthorization(ctx context.Context, instance *integration.Instance, t 
 			AvatarUrl:          userResp.User.GetHuman().GetProfile().GetAvatarUrl(),
 			OrganizationId:     userResp.GetUser().GetDetails().GetResourceOwner(),
 		},
+	}
+}
+
+func createProject(ctx context.Context, instance *integration.Instance, t *testing.T, orgID string, projectRoleCheck, hasProjectCheck bool) *project.Project {
+	name := gofakeit.AppName()
+	resp := instance.CreateProject(ctx, t, orgID, name, projectRoleCheck, hasProjectCheck)
+	return &project.Project{
+		Id:                     resp.GetId(),
+		Name:                   name,
+		OrganizationId:         orgID,
+		CreationDate:           resp.GetCreationDate(),
+		ChangeDate:             resp.GetCreationDate(),
+		State:                  1,
+		ProjectRoleAssertion:   false,
+		ProjectAccessRequired:  hasProjectCheck,
+		AuthorizationRequired:  projectRoleCheck,
+		PrivateLabelingSetting: project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
+	}
+}
+
+func createGrantedProject(ctx context.Context, instance *integration.Instance, t *testing.T, projectToGrant *project.Project) *project.Project {
+	grantedOrgName := gofakeit.AppName()
+	grantedOrg := instance.CreateOrganization(ctx, grantedOrgName, gofakeit.Email())
+	projectGrantResp := instance.CreateProjectGrant(ctx, t, projectToGrant.GetId(), grantedOrg.GetOrganizationId())
+
+	return &project.Project{
+		Id:                      projectToGrant.GetId(),
+		Name:                    projectToGrant.GetName(),
+		OrganizationId:          projectToGrant.GetOrganizationId(),
+		CreationDate:            projectGrantResp.GetCreationDate(),
+		ChangeDate:              projectGrantResp.GetCreationDate(),
+		State:                   1,
+		ProjectRoleAssertion:    false,
+		ProjectAccessRequired:   projectToGrant.GetProjectAccessRequired(),
+		AuthorizationRequired:   projectToGrant.GetAuthorizationRequired(),
+		PrivateLabelingSetting:  project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
+		GrantedOrganizationId:   gu.Ptr(grantedOrg.GetOrganizationId()),
+		GrantedOrganizationName: gu.Ptr(grantedOrgName),
+		GrantedState:            1,
 	}
 }

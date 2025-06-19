@@ -35,7 +35,7 @@ func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantR
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.UserGrants(ctx, queries, false)
+	res, err := s.query.UserGrants(ctx, queries, false, nil)
 	if err != nil {
 		return nil, err
 	}

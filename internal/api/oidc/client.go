@@ -820,7 +820,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 			userIDQuery,
 			activeQuery,
 		},
-	}, true)
+	}, true, nil)
 	if err != nil {
 		return nil, nil, err
 	}

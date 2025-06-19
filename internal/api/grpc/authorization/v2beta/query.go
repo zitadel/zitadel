@@ -18,7 +18,7 @@ func (s *Server) ListAuthorizations(ctx context.Context, req *authorization.List
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.query.UserGrants(ctx, queries, false)
+	resp, err := s.query.UserGrants(ctx, queries, false, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}

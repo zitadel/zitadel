@@ -108,7 +108,7 @@ func (s *Server) userGrantsFromProjectAndRole(ctx context.Context, projectID, ro
 	}
 	userGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{projectQuery, rolesQuery},
-	}, false)
+	}, false, nil)
 	if err != nil {
 		return nil, err
 	}

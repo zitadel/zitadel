@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -58,6 +59,37 @@ type UserGrants struct {
 	UserGrants []*UserGrant
 }
 
+func userGrantsCheckPermission(ctx context.Context, grants *UserGrants, permissionCheck domain.PermissionCheck) {
+	grants.UserGrants = slices.DeleteFunc(grants.UserGrants,
+		func(grant *UserGrant) bool {
+			return userGrantCheckPermission(ctx, grant.ResourceOwner, grant.ProjectID, grant.GrantID, grant.GrantedOrgID, grant.UserID, permissionCheck) != nil
+		},
+	)
+}
+
+func userGrantCheckPermission(ctx context.Context, resourceOwner string, projectID, grantedOrgID, grantID, userID string, permissionCheck domain.PermissionCheck) error {
+	ctxData := authz.GetCtxData(ctx)
+	// you should always be able to read your own permissions
+	if ctxData.UserID != userID {
+		// check permission on the underlying project
+		if err := permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, projectID); err != nil {
+			// only check for project grant permissions if user grant is for a project grant
+			if grantedOrgID != "" && grantID != "" {
+				// permissions can be available on the project grant
+				if err := permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, grantID); err != nil {
+					// or the organization the project is granted to
+					if err := permissionCheck(ctx, domain.PermissionUserGrantRead, grantedOrgID, grantID); err != nil {
+						return err
+					}
+				}
+			} else { // if the user grant is for a project then return with the error
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 type UserGrantsQueries struct {
 	SearchRequest
 	Queries []SearchQuery
@@ -69,6 +101,21 @@ func (q *UserGrantsQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		query = q.toQuery(query)
 	}
 	return query
+}
+
+func userGrantPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *UserGrantsQueries) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		UserGrantResourceOwner,
+		domain.PermissionUserGrantRead,
+		SingleOrgPermissionOption(queries.Queries),
+		WithProjectsPermissionOption(UserGrantProjectID),
+		OwnedRowsPermissionOption(UserGrantUserID),
+	)
+	return query.JoinClause(join, args...)
 }
 
 func NewUserGrantUserIDSearchQuery(id string) (SearchQuery, error) {
@@ -275,7 +322,19 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, queries
 	return grant, err
 }
 
-func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, shouldTriggerBulk bool) (grants *UserGrants, err error) {
+func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, shouldTriggerBulk bool, permissionCheck domain.PermissionCheck) (*UserGrants, error) {
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	grants, err := q.userGrants(ctx, queries, shouldTriggerBulk, permissionCheckV2)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+		userGrantsCheckPermission(ctx, grants, permissionCheck)
+	}
+	return grants, nil
+}
+
+func (q *Queries) userGrants(ctx context.Context, queries *UserGrantsQueries, shouldTriggerBulk bool, permissionCheckV2 bool) (grants *UserGrants, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -287,6 +346,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 	}
 
 	query, scan := prepareUserGrantsQuery()
+	query = userGrantPermissionCheckV2(ctx, query, permissionCheckV2, queries)
 	eq := sq.Eq{UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -429,6 +489,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			g.OrgName = orgName.String
 			g.OrgPrimaryDomain = orgDomain.String
 			g.ProjectName = projectName.String
+			g.ProjectResourceOwner = projectResourceOwner.String
 			g.GrantedOrgID = grantedOrgID.String
 			g.GrantedOrgName = grantedOrgName.String
 			g.GrantedOrgDomain = grantedOrgDomain.String
@@ -463,6 +524,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 
 			UserGrantProjectID.identifier(),
 			ProjectColumnName.identifier(),
+			ProjectColumnResourceOwner.identifier(),
 
 			GrantedOrgColumnId.identifier(),
 			GrantedOrgColumnName.identifier(),
@@ -504,7 +566,8 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 					grantedOrgName   sql.NullString
 					grantedOrgDomain sql.NullString
 
-					projectName sql.NullString
+					projectName          sql.NullString
+					projectResourceOwner sql.NullString
 				)
 
 				err := rows.Scan(
@@ -533,6 +596,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 
 					&g.ProjectID,
 					&projectName,
+					&projectResourceOwner,
 
 					&grantedOrgID,
 					&grantedOrgName,
@@ -556,6 +620,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 				g.OrgName = orgName.String
 				g.OrgPrimaryDomain = orgDomain.String
 				g.ProjectName = projectName.String
+				g.ProjectResourceOwner = projectResourceOwner.String
 				g.GrantedOrgID = grantedOrgID.String
 				g.GrantedOrgName = grantedOrgName.String
 				g.GrantedOrgDomain = grantedOrgDomain.String
