@@ -52,8 +52,7 @@ jobs:
         id: run-caches-restore
         with:
           path: ${{ env.CACHE_DIR }}
-          key: login-run-caches-${{ env.DOCKER_METADATA_OUTPUT_VERSION }}
-          restore-keys: login-run-caches-latest
+          key: login-run-caches
       - name: Show Run Caches
         run: make show-run-caches
       - run: make login-quality
@@ -67,4 +66,4 @@ jobs:
         with:
           path: ${{ env.CACHE_DIR }}
           key: ${{ steps.run-caches-restore.outputs.cache-primary-key }}
-#        if: always()
+        if: always()
