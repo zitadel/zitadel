@@ -90,6 +90,7 @@ type ScimIms struct {
 type ScimEmail struct {
 	Value   string `json:"value" scim:"required"`
 	Primary bool   `json:"primary"`
+	Type    string `json:"type,omitempty"`
 }
 
 type ScimPhoneNumber struct {
