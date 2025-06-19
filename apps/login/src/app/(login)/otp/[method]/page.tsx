@@ -11,7 +11,7 @@ import {
   getLoginSettings,
   getSession,
 } from "@/lib/zitadel";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: {
@@ -21,7 +21,6 @@ export default async function Page(props: {
   const params = await props.params;
   const searchParams = await props.searchParams;
   const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "otp" });
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -81,15 +80,23 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("verify.title")}</h1>
+        <h1>
+          <Translated i18nKey="verify.title" namespace="otp" />
+        </h1>
         {method === "time-based" && (
-          <p className="ztdl-p">{t("verify.totpDescription")}</p>
+          <p className="ztdl-p">
+            <Translated i18nKey="verify.totpDescription" namespace="otp" />
+          </p>
         )}
         {method === "sms" && (
-          <p className="ztdl-p">{t("verify.smsDescription")}</p>
+          <p className="ztdl-p">
+            <Translated i18nKey="verify.smsDescription" namespace="otp" />
+          </p>
         )}
         {method === "email" && (
-          <p className="ztdl-p">{t("verify.emailDescription")}</p>
+          <p className="ztdl-p">
+            <Translated i18nKey="verify.emailDescription" namespace="otp" />
+          </p>
         )}
 
         {!session && (
