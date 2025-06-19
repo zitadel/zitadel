@@ -20,13 +20,13 @@ mkdir -p "$CACHE_DIR"
 get_image_ids() {
   local ids=""
 	for img in $(echo "$IMAGES"); do
-		local id=$(docker image inspect "$img" --format='{{.Id}}' 2>/dev/null || true)
+		local id=$(docker image inspect "$img" --format='{{index .RepoDigests 0}}' 2>/dev/null || true)
 		if [[ -z $id ]]; then
 		  docker pull "$img" >/dev/null 2>&1 || true
-		  id=$(docker image inspect "$img" --format='{{.Id}}' 2>/dev/null || true)
+		  id=$(docker image inspect "$img" --format='{{index .RepoDigests 0}}' 2>/dev/null || true)
     fi
     if [[ -z $id ]]; then
-		  id=$(docker image inspect "$img" --format='{{.Id}}' 2>/dev/null || true)
+		  id=$(docker image inspect "$img" --format='{{index .RepoDigests 0}}' 2>/dev/null || true)
     fi
 		id=${id:-new-and-not-pullable-or-failed-to-build}
 		id="${img}@${id}"
