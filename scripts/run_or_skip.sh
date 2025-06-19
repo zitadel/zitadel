@@ -25,7 +25,7 @@ inspect_image() {
 
 get_digest() {
   local image=$1
-  echo "id=$(inspect_image $image '{{ .Id }}'),digest=$(inspect_image $image '{{ index RepoDigests 0 }}'),json=$(inspect_image $image '{{ json . }}' | base64 --wrap 0)"
+  echo "id=$(inspect_image $image '{{ .Id }}'),digest=$(inspect_image $image '{{ index RepoDigests 0 }}')"
 }
 
 get_image_digests() {
@@ -40,24 +40,41 @@ get_image_digests() {
 		  digest=$(get_digest $img)
     fi
 		digest="${img}@${digest}"
-		digests="${digests}${digest};"
+		digests="${digests}${digest} "
 	done
-	digests=${digests%;}  # Remove trailing semicolon
+	digests=${digests% }  # Remove trailing space
 	echo "$digests"
 }
 
 CACHE_CONTENT=$(cat "$CACHE_FILE" 2>/dev/null || echo "")
 CACHED_STATUS=$(echo "$CACHE_CONTENT" | cut -d ';' -f1)
-CACHED_DIGESTS=$(echo "$CACHE_CONTENT" | cut -d ';' -f2-99)
+CACHED_DIGESTS=$(echo "$CACHE_CONTENT" | cut -d ';' -f2)
 CURRENT_DIGESTS="$(get_image_digests)"
 
-echo "CACHED_DIGESTS does not match CURRENT_DIGESTS"
+echo "Comparing cached vs current image digests..."
 echo
 echo "$CACHED_DIGESTS"
 echo
 echo "$CURRENT_DIGESTS"
 
-if [[ "$CACHED_DIGESTS" == "$CURRENT_DIGESTS" ]]; then
+IMAGE_CHANGED=false
+for current_digest in $CURRENT_DIGESTS; do
+  current_digest_image_id=$(echo "$current_digest" | cut -d ',' -f1)
+  current_digest_repo_digest=$(echo "$current_digest" | cut -d ',' -f2)
+  for cached_digest in $CACHED_DIGESTS; do
+    cached_digest_image_id=$(echo "$current_digest" | cut -d ',' -f1)
+    cached_digest_repo_digest=$(echo "$current_digest" | cut -d ',' -f2)
+    if [[ "$current_digest_image_id" != "$cached_digest_image_id" && "$current_digest_repo_digest" != "$cached_digest_repo_digest" ]]; then
+      echo "Image digest mismatch:"
+      echo "Current: $current_digest"
+      echo "Cached:  $cached_digest"
+      IMAGE_CHANGED=true
+      break 2
+    fi
+  done
+done
+
+if [[ "$IMAGE_CHANGED" == "false" ]]; then
     if [[ "$FORCE" == "true" ]]; then
         echo "\$FORCE=$FORCE - Running $MAKE_TARGET despite unchanged images."
     else
