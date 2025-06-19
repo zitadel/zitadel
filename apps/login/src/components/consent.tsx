@@ -74,7 +74,11 @@ export function ConsentScreen({
       </ul>
 
       <p className="ztdl-p text-xs text-left">
-        {t("device.request.disclaimer", { appName: appName })}
+        <Translated
+          i18nKey="request.disclaimer"
+          namespace="device"
+          data={{ appName: appName }}
+        />
       </p>
 
       {error && (
