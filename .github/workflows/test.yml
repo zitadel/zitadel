@@ -38,6 +38,7 @@ jobs:
           images: |
             ghcr.io/zitadel/login
           tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
@@ -51,7 +52,7 @@ jobs:
         id: run-caches-restore
         with:
           path: ${{ env.CACHE_DIR }}
-          key: login-run-caches-${{ github.ref == 'refs/heads/main' && 'latest' || fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+          key: login-run-caches-${{ env.DOCKER_METADATA_OUTPUT_VERSION }}
           restore-keys: login-run-caches-latest
       - name: Show Run Caches
         run: make show-run-caches
@@ -60,7 +61,6 @@ jobs:
           # latest if branch is main, otherwise image version which is the pull request number
           BAKE_CLI: depot bake
           DEPOT_PROJECT_ID: jp837jn3fm
-          DOCKER_METADATA_OUTPUT_VERSION: ${{ github.ref == 'refs/heads/main' && 'latest' || fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
           FORCE: ${{ github.event.inputs.clean-run-caches == 'true' }}
       - name: Save Run Caches
         uses: actions/cache/save@v4
