@@ -11,9 +11,10 @@ export function Translated({
   namespace?: string;
 } & React.HTMLAttributes<HTMLSpanElement>) {
   const t = useTranslations(namespace);
+  const helperKey = `${namespace ? `${namespace}.` : ""}${i18nKey}`;
 
   return (
-    <span data-i18n-key={i18nKey} {...props}>
+    <span data-i18n-key={helperKey} {...props}>
       {t(i18nKey)}
     </span>
   );
