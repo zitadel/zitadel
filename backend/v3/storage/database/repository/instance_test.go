@@ -75,10 +75,37 @@ func TestCreateInstance(t *testing.T) {
 				}
 
 				err := instanceRepo.Create(ctx, &inst)
+				// change the name to make sure same only the id clashes
+				inst.Name = gofakeit.Name()
 				require.NoError(t, err)
 				return &inst
 			},
 			err: errors.New("instance id already exists"),
+		},
+		{
+			name: "adding instance with same name twice",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
+				instanceRepo := repository.InstanceRepository(pool)
+				instanceId := gofakeit.Name()
+				instanceName := gofakeit.Name()
+
+				inst := domain.Instance{
+					ID:              instanceId,
+					Name:            instanceName,
+					DefaultOrgID:    "defaultOrgId",
+					IAMProjectID:    "iamProject",
+					ConsoleClientID: "consoleCLient",
+					ConsoleAppID:    "consoleApp",
+					DefaultLanguage: "defaultLanguage",
+				}
+
+				err := instanceRepo.Create(ctx, &inst)
+				// change the id to make sure same name+instance causes an error
+				inst.ID = gofakeit.Name()
+				require.NoError(t, err)
+				return &inst
+			},
+			err: errors.New("organization name already exists for instance"),
 		},
 		{
 			name: "adding instance with no id",

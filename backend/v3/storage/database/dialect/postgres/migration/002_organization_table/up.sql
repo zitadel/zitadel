@@ -4,13 +4,16 @@ CREATE TYPE zitadel.organization_state AS ENUM (
 );
 
 CREATE TABLE zitadel.organizations(
-  id TEXT NOT NULL CHECK (id <> '') PRIMARY KEY,
+  id TEXT NOT NULL CHECK (id <> ''),
   name TEXT NOT NULL CHECK (name <> ''),
   instance_id TEXT NOT NULL CHECK (instance_id <> '') REFERENCES zitadel.instances (id),
   state zitadel.organization_state NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-  deleted_at TIMESTAMPTZ DEFAULT NULL
+  deleted_at TIMESTAMPTZ DEFAULT NULL,
+
+  PRIMARY KEY (id, instance_id),
+  UNIQUE (name, instance_id)
 );
 
 -- users are able to set the id for organizations
