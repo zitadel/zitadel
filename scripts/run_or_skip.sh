@@ -58,21 +58,35 @@ echo
 echo "$CURRENT_DIGESTS"
 
 IMAGE_CHANGED=false
-for current_digest in $CURRENT_DIGESTS; do
-  current_digest_image_id=$(echo "$current_digest" | cut -d ',' -f1)
-  current_digest_repo_digest=$(echo "$current_digest" | cut -d ',' -f2)
-  for cached_digest in $CACHED_DIGESTS; do
-    cached_digest_image_id=$(echo "$current_digest" | cut -d ',' -f1)
-    cached_digest_repo_digest=$(echo "$current_digest" | cut -d ',' -f2)
-    if [[ "$current_digest_image_id" != "$cached_digest_image_id" && "$current_digest_repo_digest" != "$cached_digest_repo_digest" ]]; then
-      echo "Image digest mismatch:"
-      echo "Current: $current_digest"
-      echo "Cached:  $cached_digest"
-      IMAGE_CHANGED=true
-      break 2
-    fi
+
+# Check if the numbeer of cached digests is equal or greater than the current digests
+if [[ -z "$CACHED_DIGESTS" ]]; then
+  echo "No cached digests found, running $MAKE_TARGET."
+  IMAGE_CHANGED=true
+elif [[ $(echo "$CACHED_DIGESTS" | wc -w) -lt $(echo "$CURRENT_DIGESTS" | wc -w) ]]; then
+  echo "Cached digests are fewer than current digests, running $MAKE_TARGET."
+  IMAGE_CHANGED=true
+fi
+
+
+if [[ "$IMAGE_CHANGED" == "false" ]]; then
+  # Compare against cached digests
+  for current_digest in $CURRENT_DIGESTS; do
+    current_digest_image_id=$(echo "$current_digest" | cut -d ',' -f1)
+    current_digest_repo_digest=$(echo "$current_digest" | cut -d ',' -f2)
+    for cached_digest in $CACHED_DIGESTS; do
+      cached_digest_image_id=$(echo "$current_digest" | cut -d ',' -f1)
+      cached_digest_repo_digest=$(echo "$current_digest" | cut -d ',' -f2)
+      if [[ "$current<_digest_image_id" != "$cached_digest_image_id" && "$current_digest_repo_digest" != "$cached_digest_repo_digest" ]]; then
+        echo "Image digest mismatch:"
+        echo "Current: $current_digest"
+        echo "Cached:  $cached_digest"
+        IMAGE_CHANGED=true
+        break 2
+      fi
+    done
   done
-done
+fi
 
 if [[ "$IMAGE_CHANGED" == "false" ]]; then
     if [[ "$FORCE" == "true" ]]; then
