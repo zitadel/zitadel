@@ -1,5 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsClearList } from "@/components/sessions-clear-list";
+import { Translated } from "@/components/translated";
 import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
@@ -8,7 +9,6 @@ import {
   listSessions,
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
@@ -30,8 +30,6 @@ export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
   const searchParams = await props.searchParams;
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "logout" });
 
   const organization = searchParams?.organization;
   const postLogoutRedirectUri = searchParams?.post_logout_redirect_uri;
@@ -67,8 +65,12 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("title")}</h1>
-        <p className="ztdl-p mb-6 block">{t("description")}</p>
+        <h1>
+          <Translated i18nKey="title" namespace="logout" />
+        </h1>
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="description" namespace="logout" />
+        </p>
 
         <div className="flex flex-col w-full space-y-2">
           <SessionsClearList
