@@ -60,8 +60,14 @@ login-test-integration: login-standalone-build login-test-integration-build
 	$(CORE_MOCK_TAG) \
 	$(LOGIN_TEST_INTEGRATION_TAG)"
 
-login-test-acceptance-build: login-standalone-build
-	$(BAKE_CLI_WITH_COMMON_ARGS) --load setup sink oidcrp samlsp login-test-acceptance
+login-test-acceptance-compose-build:
+	$(BAKE_CLI_WITH_COMMON_ARGS) --load setup sink oidcrp samlsp
+
+login-test-acceptance-bake-build:
+	$(BAKE_CLI_WITH_COMMON_ARGS) login-test-acceptance
+
+login-test-acceptance-build: login-test-acceptance-compose-build login-test-acceptance-bake-build login-standalone-build
+	@:
 
 login-test-acceptance-run: login-test-acceptance-cleanup
 	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml run --rm --service-ports acceptance
