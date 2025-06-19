@@ -24,7 +24,7 @@ func CreateSAMLAppRequestToDomain(name, projectID string, req *app.CreateSAMLApp
 	}, nil
 }
 
-func PatchSAMLAppConfigRequestToDomain(appID, projectID string, app *app.UpdateSAMLApplicationConfigurationRequest) (*domain.SAMLApp, error) {
+func UpdateSAMLAppConfigRequestToDomain(appID, projectID string, app *app.UpdateSAMLApplicationConfigurationRequest) (*domain.SAMLApp, error) {
 	loginVersion, loginBaseURI, err := loginVersionToDomain(app.GetLoginVersion())
 	if err != nil {
 		return nil, err

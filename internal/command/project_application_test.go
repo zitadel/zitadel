@@ -184,7 +184,7 @@ func TestCommandSide_ChangeApplication(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: newMockPermissionCheckAllowed(),
 			}
-			got, err := r.PatchApplication(tt.args.ctx, tt.args.projectID, tt.args.app, tt.args.resourceOwner)
+			got, err := r.UpdateApplicationName(tt.args.ctx, tt.args.projectID, tt.args.app, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

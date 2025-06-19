@@ -865,7 +865,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 				httpClient:      tt.fields.httpClient,
 				checkPermission: newMockPermissionCheckAllowed(),
 			}
-			got, err := r.PatchSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
+			got, err := r.UpdateSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

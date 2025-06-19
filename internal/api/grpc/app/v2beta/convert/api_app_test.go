@@ -101,7 +101,7 @@ func TestUpdateAPIApplicationConfigurationRequestToDomain(t *testing.T) {
 			t.Parallel()
 
 			// When
-			got := PatchAPIApplicationConfigurationRequestToDomain(tt.appID, tt.projectID, tt.req)
+			got := UpdateAPIApplicationConfigurationRequestToDomain(tt.appID, tt.projectID, tt.req)
 
 			// Then
 			assert.Equal(t, tt.want, got)

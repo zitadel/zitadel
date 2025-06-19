@@ -185,7 +185,7 @@ func TestUpdateOIDCAppConfigRequestToDomain(t *testing.T) {
 			t.Parallel()
 
 			// When
-			got, err := PatchOIDCAppConfigRequestToDomain(tc.appID, tc.projectID, tc.req)
+			got, err := UpdateOIDCAppConfigRequestToDomain(tc.appID, tc.projectID, tc.req)
 
 			// Then
 			assert.Equal(t, tc.expectedError, err)

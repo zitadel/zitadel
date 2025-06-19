@@ -15,7 +15,7 @@ type AddApp struct {
 	Name      string
 }
 
-func (c *Commands) PatchApplication(ctx context.Context, projectID string, appChange domain.Application, resourceOwner string) (*domain.ObjectDetails, error) {
+func (c *Commands) UpdateApplicationName(ctx context.Context, projectID string, appChange domain.Application, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || appChange.GetAppID() == "" || appChange.GetApplicationName() == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.App.Invalid")
 	}

@@ -1110,7 +1110,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: newMockPermissionCheckAllowed(),
 			}
-			got, err := r.PatchOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
+			got, err := r.UpdateOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

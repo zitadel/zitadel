@@ -125,7 +125,7 @@ func (s *Server) AddAPIApp(ctx context.Context, req *mgmt_pb.AddAPIAppRequest) (
 }
 
 func (s *Server) UpdateApp(ctx context.Context, req *mgmt_pb.UpdateAppRequest) (*mgmt_pb.UpdateAppResponse, error) {
-	details, err := s.command.PatchApplication(ctx, req.ProjectId, UpdateAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.UpdateApplicationName(ctx, req.ProjectId, UpdateAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +139,7 @@ func (s *Server) UpdateOIDCAppConfig(ctx context.Context, req *mgmt_pb.UpdateOID
 	if err != nil {
 		return nil, err
 	}
-	config, err := s.command.PatchOIDCApplication(ctx, oidcApp, authz.GetCtxData(ctx).OrgID)
+	config, err := s.command.UpdateOIDCApplication(ctx, oidcApp, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (s *Server) UpdateSAMLAppConfig(ctx context.Context, req *mgmt_pb.UpdateSAM
 	if err != nil {
 		return nil, err
 	}
-	config, err := s.command.PatchSAMLApplication(ctx, samlApp, authz.GetCtxData(ctx).OrgID)
+	config, err := s.command.UpdateSAMLApplication(ctx, samlApp, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (s *Server) UpdateSAMLAppConfig(ctx context.Context, req *mgmt_pb.UpdateSAM
 }
 
 func (s *Server) UpdateAPIAppConfig(ctx context.Context, req *mgmt_pb.UpdateAPIAppConfigRequest) (*mgmt_pb.UpdateAPIAppConfigResponse, error) {
-	config, err := s.command.PatchAPIApplication(ctx, UpdateAPIAppConfigRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	config, err := s.command.UpdateAPIApplication(ctx, UpdateAPIAppConfigRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

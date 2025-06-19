@@ -93,7 +93,7 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 	}, nil
 }
 
-func (c *Commands) PatchSAMLApplication(ctx context.Context, samlApp *domain.SAMLApp, resourceOwner string) (*domain.SAMLApp, error) {
+func (c *Commands) UpdateSAMLApplication(ctx context.Context, samlApp *domain.SAMLApp, resourceOwner string) (*domain.SAMLApp, error) {
 	if !samlApp.IsValid() || samlApp.AppID == "" || samlApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-5n9fs", "Errors.Project.App.SAMLConfigInvalid")
 	}

@@ -85,7 +85,7 @@ func (s *Server) UpdateApplication(ctx context.Context, req *app.UpdateApplicati
 	var changedTime time.Time
 
 	if name := strings.TrimSpace(req.GetName()); name != "" {
-		updatedDetails, err := s.command.PatchApplication(
+		updatedDetails, err := s.command.UpdateApplicationName(
 			ctx,
 			req.GetProjectId(),
 			&domain.ChangeApp{
@@ -103,7 +103,7 @@ func (s *Server) UpdateApplication(ctx context.Context, req *app.UpdateApplicati
 
 	switch t := req.GetUpdateRequestType().(type) {
 	case *app.UpdateApplicationRequest_ApiConfigurationRequest:
-		updatedAPIApp, err := s.command.PatchAPIApplication(ctx, convert.PatchAPIApplicationConfigurationRequestToDomain(req.GetId(), req.GetProjectId(), t.ApiConfigurationRequest), "")
+		updatedAPIApp, err := s.command.UpdateAPIApplication(ctx, convert.UpdateAPIApplicationConfigurationRequestToDomain(req.GetId(), req.GetProjectId(), t.ApiConfigurationRequest), "")
 		if err != nil {
 			return nil, err
 		}
@@ -111,12 +111,12 @@ func (s *Server) UpdateApplication(ctx context.Context, req *app.UpdateApplicati
 		changedTime = updatedAPIApp.ChangeDate
 
 	case *app.UpdateApplicationRequest_OidcConfigurationRequest:
-		oidcApp, err := convert.PatchOIDCAppConfigRequestToDomain(req.GetId(), req.GetProjectId(), t.OidcConfigurationRequest)
+		oidcApp, err := convert.UpdateOIDCAppConfigRequestToDomain(req.GetId(), req.GetProjectId(), t.OidcConfigurationRequest)
 		if err != nil {
 			return nil, err
 		}
 
-		updatedOIDCApp, err := s.command.PatchOIDCApplication(ctx, oidcApp, "")
+		updatedOIDCApp, err := s.command.UpdateOIDCApplication(ctx, oidcApp, "")
 		if err != nil {
 			return nil, err
 		}
@@ -124,12 +124,12 @@ func (s *Server) UpdateApplication(ctx context.Context, req *app.UpdateApplicati
 		changedTime = updatedOIDCApp.ChangeDate
 
 	case *app.UpdateApplicationRequest_SamlConfigurationRequest:
-		samlApp, err := convert.PatchSAMLAppConfigRequestToDomain(req.GetId(), req.GetProjectId(), t.SamlConfigurationRequest)
+		samlApp, err := convert.UpdateSAMLAppConfigRequestToDomain(req.GetId(), req.GetProjectId(), t.SamlConfigurationRequest)
 		if err != nil {
 			return nil, err
 		}
 
-		updatedSAMLApp, err := s.command.PatchSAMLApplication(ctx, samlApp, "")
+		updatedSAMLApp, err := s.command.UpdateSAMLApplication(ctx, samlApp, "")
 		if err != nil {
 			return nil, err
 		}

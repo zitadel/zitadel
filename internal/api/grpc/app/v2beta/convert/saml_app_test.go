@@ -115,7 +115,7 @@ func TestCreateSAMLAppRequestToDomain(t *testing.T) {
 		})
 	}
 }
-func TestPatchSAMLAppConfigRequestToDomain(t *testing.T) {
+func TestUpdateSAMLAppConfigRequestToDomain(t *testing.T) {
 	t.Parallel()
 
 	genMetaForValidRequest := samlMetadataGen(gofakeit.URL())
@@ -184,7 +184,7 @@ func TestPatchSAMLAppConfigRequestToDomain(t *testing.T) {
 			t.Parallel()
 
 			// When
-			res, err := PatchSAMLAppConfigRequestToDomain(tc.appID, tc.projectID, tc.req)
+			res, err := UpdateSAMLAppConfigRequestToDomain(tc.appID, tc.projectID, tc.req)
 
 			// Then
 			assert.Equal(t, tc.expectedError, err)

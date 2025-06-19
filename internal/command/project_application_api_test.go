@@ -619,7 +619,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 				},
 				checkPermission: newMockPermissionCheckAllowed(),
 			}
-			got, err := r.PatchAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
+			got, err := r.UpdateAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

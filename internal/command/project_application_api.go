@@ -162,7 +162,7 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	return result, nil
 }
 
-func (c *Commands) PatchAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string) (*domain.APIApp, error) {
+func (c *Commands) UpdateAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string) (*domain.APIApp, error) {
 	if apiApp.AppID == "" || apiApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-1m900", "Errors.Project.App.APIConfigInvalid")
 	}
