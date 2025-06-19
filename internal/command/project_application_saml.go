@@ -28,7 +28,7 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 	if err := c.eventstore.FilterToQueryReducer(ctx, addedApplication); err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionCreateApp(ctx, addedApplication.ResourceOwner, addedApplication.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateApplication(ctx, addedApplication.ResourceOwner, addedApplication.AggregateID); err != nil {
 		return nil, err
 	}
 
@@ -108,10 +108,8 @@ func (c *Commands) UpdateSAMLApplication(ctx context.Context, samlApp *domain.SA
 	if !existingSAML.IsSAML() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-GBr35", "Errors.Project.App.IsNotSAML")
 	}
-	if err := c.eventstore.FilterToQueryReducer(ctx, existingSAML); err != nil {
-		return nil, err
-	}
-	if err := c.checkPermissionPatchApp(ctx, existingSAML.ResourceOwner, existingSAML.AggregateID); err != nil {
+
+	if err := c.checkPermissionUpdateApplication(ctx, existingSAML.ResourceOwner, existingSAML.AggregateID); err != nil {
 		return nil, err
 	}
 

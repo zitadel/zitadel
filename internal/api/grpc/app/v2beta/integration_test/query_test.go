@@ -5,7 +5,6 @@ package instance_test
 import (
 	"fmt"
 	"slices"
-	"sort"
 	"testing"
 	"time"
 
@@ -21,8 +20,6 @@ import (
 )
 
 func TestGetApplication(t *testing.T) {
-	t.Parallel()
-
 	apiAppName := gofakeit.AppName()
 	createdApiApp, errAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: Project.GetId(),
@@ -68,6 +65,8 @@ func TestGetApplication(t *testing.T) {
 		},
 	})
 	require.Nil(t, errOIDCAppCreation)
+
+	t.Parallel()
 
 	tt := []struct {
 		testName     string
@@ -212,30 +211,65 @@ func TestListApplications(t *testing.T) {
 	})
 	require.Nil(t, errOIDCAppCreation)
 
+	type appWithName struct {
+		app  *app.CreateApplicationResponse
+		name string
+	}
+
 	// Sorting
-	appsSortedByName := appSortedByName{
+	appsSortedByName := []appWithName{
 		{name: apiAppName, app: createdApiApp},
 		{name: deactivatedApiAppName, app: createdDeactivatedApiApp},
 		{name: samlAppName, app: createdSAMLApp},
 		{name: oidcAppName, app: createdOIDCApp},
 	}
-	sort.Sort(appsSortedByName)
+	slices.SortFunc(appsSortedByName, func(a, b appWithName) int {
+		if a.name < b.name {
+			return -1
+		}
+		if a.name > b.name {
+			return 1
+		}
 
-	appsSortedByID := appSortedByID{
-		{name: apiAppName, app: createdApiApp},
-		{name: deactivatedApiAppName, app: createdDeactivatedApiApp},
-		{name: samlAppName, app: createdSAMLApp},
-		{name: oidcAppName, app: createdOIDCApp},
-	}
-	sort.Sort(appsSortedByID)
+		return 0
+	})
 
-	appsSortedByCreationDate := appSortedByCreateTime{
+	appsSortedByID := []appWithName{
 		{name: apiAppName, app: createdApiApp},
 		{name: deactivatedApiAppName, app: createdDeactivatedApiApp},
 		{name: samlAppName, app: createdSAMLApp},
 		{name: oidcAppName, app: createdOIDCApp},
 	}
-	sort.Sort(appsSortedByCreationDate)
+	slices.SortFunc(appsSortedByID, func(a, b appWithName) int {
+		if a.app.GetAppId() < b.app.GetAppId() {
+			return -1
+		}
+		if a.app.GetAppId() > b.app.GetAppId() {
+			return 1
+		}
+
+		return 0
+	})
+
+	appsSortedByCreationDate :=  []appWithName{
+		{name: apiAppName, app: createdApiApp},
+		{name: deactivatedApiAppName, app: createdDeactivatedApiApp},
+		{name: samlAppName, app: createdSAMLApp},
+		{name: oidcAppName, app: createdOIDCApp},
+	}
+	slices.SortFunc(appsSortedByCreationDate, func(a, b appWithName) int {
+		aCreationDate := a.app.GetCreationDate().AsTime()
+		bCreationDate := b.app.GetCreationDate().AsTime()
+		
+		if aCreationDate.Before(bCreationDate) {
+			return -1
+		}
+		if bCreationDate.Before(aCreationDate) {
+			return 1
+		}
+
+		return 0
+	})
 
 	tt := []struct {
 		testName     string
@@ -413,54 +447,4 @@ func TestListApplications(t *testing.T) {
 			}, retryDuration, tick)
 		})
 	}
-}
-
-type appWithName struct {
-	app  *app.CreateApplicationResponse
-	name string
-}
-
-type appSortedByName []appWithName
-
-func (al appSortedByName) Len() int {
-	return len(al)
-}
-
-func (al appSortedByName) Less(i, j int) bool {
-	return al[i].name <= al[j].name
-}
-
-func (al appSortedByName) Swap(i, j int) {
-	al[i], al[j] = al[j], al[i]
-}
-
-type appSortedByID []appWithName
-
-func (al appSortedByID) Len() int {
-	return len(al)
-}
-
-func (al appSortedByID) Less(i, j int) bool {
-	return al[i].app.GetAppId() <= al[j].app.GetAppId()
-}
-
-func (al appSortedByID) Swap(i, j int) {
-	al[i], al[j] = al[j], al[i]
-}
-
-type appSortedByCreateTime []appWithName
-
-func (al appSortedByCreateTime) Len() int {
-	return len(al)
-}
-
-func (al appSortedByCreateTime) Less(i, j int) bool {
-	ti := al[i].app.GetCreationDate().AsTime()
-	tj := al[j].app.GetCreationDate().AsTime()
-
-	return ti.Before(tj)
-}
-
-func (al appSortedByCreateTime) Swap(i, j int) {
-	al[i], al[j] = al[j], al[i]
 }

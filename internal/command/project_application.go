@@ -33,7 +33,7 @@ func (c *Commands) UpdateApplicationName(ctx context.Context, projectID string, 
 	if err := c.eventstore.FilterToQueryReducer(ctx, existingApp); err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionPatchApp(ctx, existingApp.ResourceOwner, existingApp.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateApplication(ctx, existingApp.ResourceOwner, existingApp.AggregateID); err != nil {
 		return nil, err
 	}
 
@@ -69,7 +69,7 @@ func (c *Commands) DeactivateApplication(ctx context.Context, projectID, appID, 
 	if err := c.eventstore.FilterToQueryReducer(ctx, existingApp); err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionDeactivateApp(ctx, existingApp.ResourceOwner, existingApp.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateApplication(ctx, existingApp.ResourceOwner, existingApp.AggregateID); err != nil {
 		return nil, err
 	}
 
@@ -100,10 +100,8 @@ func (c *Commands) ReactivateApplication(ctx context.Context, projectID, appID, 
 	if existingApp.State != domain.AppStateInactive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-1n8cM", "Errors.Project.App.NotInactive")
 	}
-	if err := c.eventstore.FilterToQueryReducer(ctx, existingApp); err != nil {
-		return nil, err
-	}
-	if err := c.checkPermissionReactivateApp(ctx, existingApp.ResourceOwner, existingApp.AggregateID); err != nil {
+
+	if err := c.checkPermissionUpdateApplication(ctx, existingApp.ResourceOwner, existingApp.AggregateID); err != nil {
 		return nil, err
 	}
 

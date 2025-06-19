@@ -120,7 +120,7 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	if err := c.eventstore.FilterToQueryReducer(ctx, addedApplication); err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionCreateApp(ctx, addedApplication.ResourceOwner, addedApplication.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateApplication(ctx, addedApplication.ResourceOwner, addedApplication.AggregateID); err != nil {
 		return nil, err
 	}
 
@@ -180,7 +180,7 @@ func (c *Commands) UpdateAPIApplication(ctx context.Context, apiApp *domain.APIA
 	if err := c.eventstore.FilterToQueryReducer(ctx, existingAPI); err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionPatchApp(ctx, existingAPI.ResourceOwner, existingAPI.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateApplication(ctx, existingAPI.ResourceOwner, existingAPI.AggregateID); err != nil {
 		return nil, err
 	}
 
@@ -224,10 +224,8 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 	if !existingAPI.IsAPI() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-aeH4", "Errors.Project.App.IsNotAPI")
 	}
-	if err := c.eventstore.FilterToQueryReducer(ctx, existingAPI); err != nil {
-		return nil, err
-	}
-	if err := c.checkPermissionRegenClientSecret(ctx, existingAPI.ResourceOwner, existingAPI.AggregateID); err != nil {
+
+	if err := c.checkPermissionUpdateApplication(ctx, existingAPI.ResourceOwner, existingAPI.AggregateID); err != nil {
 		return nil, err
 	}
 

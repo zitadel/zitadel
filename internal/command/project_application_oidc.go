@@ -172,7 +172,7 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	if err := c.eventstore.FilterToQueryReducer(ctx, addedApplication); err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionCreateApp(ctx, addedApplication.ResourceOwner, addedApplication.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateApplication(ctx, addedApplication.ResourceOwner, addedApplication.AggregateID); err != nil {
 		return nil, err
 	}
 
@@ -258,7 +258,7 @@ func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 	if err := c.eventstore.FilterToQueryReducer(ctx, existingOIDC); err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionPatchApp(ctx, existingOIDC.ResourceOwner, existingOIDC.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateApplication(ctx, existingOIDC.ResourceOwner, existingOIDC.AggregateID); err != nil {
 		return nil, err
 	}
 
@@ -322,10 +322,8 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	if !existingOIDC.IsOIDC() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Ghrh3", "Errors.Project.App.IsNotOIDC")
 	}
-	if err := c.eventstore.FilterToQueryReducer(ctx, existingOIDC); err != nil {
-		return nil, err
-	}
-	if err := c.checkPermissionRegenClientSecret(ctx, existingOIDC.ResourceOwner, existingOIDC.AggregateID); err != nil {
+
+	if err := c.checkPermissionUpdateApplication(ctx, existingOIDC.ResourceOwner, existingOIDC.AggregateID); err != nil {
 		return nil, err
 	}
 

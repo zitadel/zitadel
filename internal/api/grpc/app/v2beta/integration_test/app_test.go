@@ -174,8 +174,6 @@ func TestCreateApplication(t *testing.T) {
 }
 
 func TestPatchApplication(t *testing.T) {
-	t.Parallel()
-
 	orgNotInCtx := instance.CreateOrganization(IAMOwnerCtx, gofakeit.Name(), gofakeit.Email())
 	pNotInCtx := instance.CreateProject(IAMOwnerCtx, t, orgNotInCtx.GetOrganizationId(), gofakeit.AppName(), false, false)
 
@@ -256,6 +254,8 @@ func TestPatchApplication(t *testing.T) {
 		CreationRequestType: reqForSAMLAppCreation,
 	})
 	require.Nil(t, appSAMLConfigChangeErr)
+
+	t.Parallel()
 
 	tt := []struct {
 		testName     string
@@ -381,19 +381,19 @@ func TestPatchApplication(t *testing.T) {
 }
 
 func TestDeleteApplication(t *testing.T) {
-	t.Parallel()
-
+	
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
-
+	
 	appToDelete, appNameChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           Project.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
 	require.Nil(t, appNameChangeErr)
-
+	
+	t.Parallel()
 	tt := []struct {
 		testName      string
 		deleteRequest *app.DeleteApplicationRequest
@@ -434,18 +434,19 @@ func TestDeleteApplication(t *testing.T) {
 }
 
 func TestDeactivateApplication(t *testing.T) {
-	t.Parallel()
-
+	
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
-
+	
 	appToDeactivate, appCreateErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           Project.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
 	require.NoError(t, appCreateErr)
+	
+	t.Parallel()
 
 	tt := []struct {
 		testName      string
@@ -487,8 +488,6 @@ func TestDeactivateApplication(t *testing.T) {
 }
 
 func TestReactivateApplication(t *testing.T) {
-	t.Parallel()
-
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
@@ -505,6 +504,8 @@ func TestReactivateApplication(t *testing.T) {
 		Id:        appToReactivate.GetAppId(),
 	})
 	require.Nil(t, appDeactivateErr)
+
+	t.Parallel()
 
 	tt := []struct {
 		testName          string
@@ -546,12 +547,10 @@ func TestReactivateApplication(t *testing.T) {
 }
 
 func TestRegenerateClientSecret(t *testing.T) {
-	t.Parallel()
-
 	reqForApiAppCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
-
+	
 	apiAppToRegen, apiAppCreateErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           Project.GetId(),
 		Name:                gofakeit.AppName(),
@@ -586,6 +585,8 @@ func TestRegenerateClientSecret(t *testing.T) {
 		CreationRequestType: reqForOIDCAppCreation,
 	})
 	require.Nil(t, oidcAppCreateErr)
+
+	t.Parallel()
 
 	tt := []struct {
 		testName     string
