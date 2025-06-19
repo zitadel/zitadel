@@ -31,6 +31,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@ngx-translate/core": "^15.0.0",
+    "@tanstack/angular-query-experimental": "^5.75.4",
     "@zitadel/client": "1.2.0",
     "@zitadel/proto": "1.2.0",
     "angular-oauth2-oidc": "^15.0.1",

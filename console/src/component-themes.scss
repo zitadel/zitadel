@@ -78,6 +78,9 @@
 @import './styles/codemirror.scss';
 @import 'src/app/components/copy-row/copy-row.component.scss';
 @import 'src/app/modules/providers/provider-next/provider-next.component.scss';
+@import 'src/app/modules/new-header/organization-selector/organization-selector.component.scss';
+@import 'src/app/modules/new-header/instance-selector/instance-selector.component.scss';
+@import 'src/app/modules/new-header/header-dropdown/header-dropdown.component.scss';
 
 @mixin component-themes($theme) {
   @include cnsl-color-theme($theme);
@@ -159,4 +162,7 @@
   @include copy-row-theme($theme);
   @include provider-next-theme($theme);
   @include smtp-settings-theme($theme);
+  @include organization-selector-theme($theme);
+  @include instance-selector-theme($theme);
+  @include header-dropdown-theme($theme);
 }
