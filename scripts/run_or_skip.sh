@@ -3,7 +3,7 @@
 # Usage: ./run_or_skip.sh <Make target> <images>
 # Example: ./run_or_skip.sh lint-force "img1;img2"
 
-set -euo pipefail
+set -euox pipefail
 
 if [ -z "$CACHE_DIR" ]; then
     echo "CACHE_DIR is not set. Please set it to a valid directory."
