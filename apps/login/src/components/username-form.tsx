@@ -151,7 +151,7 @@ export function UsernameForm({
           onClick={handleSubmit((e) => submitLoginName(e, organization))}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          continue
+          <Translated i18nKey="submit" namespace="loginname" />
         </Button>
       </div>
     </form>
