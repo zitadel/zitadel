@@ -1,7 +1,9 @@
 XDG_CACHE_HOME ?= $(HOME)/.cache
 export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 
-export BAKE_CLI ?= docker buildx bake --file ./docker-bake.hcl --file ./apps/login-test-acceptance/docker-compose.yaml
+export BAKE_CLI ?= docker buildx bake
+BAKE_CLI_WITH_COMMON_ARGS := $(BAKE_CLI) --file ./docker-bake.hcl --file ./apps/login-test-acceptance/docker-compose.yaml
+
 export COMPOSE_BAKE=true
 
 export LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT := apps/login-test-acceptance
@@ -37,13 +39,13 @@ login-help:
 	@echo "  clean-run-caches        - Remove all run caches."
 
 login-lint:
-	$(BAKE_CLI) login-lint
+	$(BAKE_CLI_WITH_COMMON_ARGS) login-lint
 
 login-test-unit:
-	$(BAKE_CLI) login-test-unit
+	$(BAKE_CLI_WITH_COMMON_ARGS) login-test-unit
 
 login-test-integration-build:
-	$(BAKE_CLI) core-mock login-test-integration
+	$(BAKE_CLI_WITH_COMMON_ARGS) core-mock login-test-integration
 
 login-test-integration-run: login-test-integration-cleanup
 	docker compose --file ./apps/login-test-integration/docker-compose.yaml run --rm integration
@@ -59,7 +61,7 @@ login-test-integration: login-standalone-build login-test-integration-build
 	$(LOGIN_TEST_INTEGRATION_TAG)"
 
 login-test-acceptance-build: login-standalone-build
-	$(BAKE_CLI) setup sink oidcrp samlsp login-test-acceptance
+	$(BAKE_CLI_WITH_COMMON_ARGS) --load setup sink oidcrp samlsp login-test-acceptance
 
 login-test-acceptance-run: login-test-acceptance-cleanup
 	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml run --rm --service-ports acceptance
@@ -87,7 +89,7 @@ login-quality: login-lint login-test-integration login-test-acceptance
 
 .PHONY: login-standalone-build
 login-standalone-build:
-	$(BAKE_CLI) login-standalone
+	$(BAKE_CLI_WITH_COMMON_ARGS) login-standalone
 
 .PHONY: clean-run-caches
 clean-run-caches:
