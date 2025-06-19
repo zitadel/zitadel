@@ -59,7 +59,7 @@ jobs:
             ${{ runner.os }}-login-run-caches-
       - name: Show Run Caches
         run: make show-run-caches
-      - run: make login-quality
+      - run: make login-test-acceptance
         env:
           # latest if branch is main, otherwise image version which is the pull request number
           BAKE_CLI: depot bake

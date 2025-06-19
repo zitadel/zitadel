@@ -25,7 +25,7 @@ inspect_image() {
 
 get_digest() {
   local image=$1
-  echo "id=$(inspect_image $image '{{ .Id }}'),digest=$(inspect_image $image '{{ index RepoDigests 0 }}')"
+  echo "id=$(inspect_image $image '{{ .Id }}'),digest=$(inspect_image $image '{{ index RepoDigests 0 }}'),json=$(inspect_image $image '{{ json . }}' | base64 --wrap 0)"
 }
 
 get_image_digests() {
