@@ -8,21 +8,21 @@ export COMPOSE_BAKE=true
 
 export LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT := apps/login-test-acceptance
 
-export REF_TAG ?= local
-export LOGIN_TAG := login:${REF_TAG}
-export LOGIN_TEST_UNIT_TAG := login-test-unit:${REF_TAG}
-export LOGIN_TEST_INTEGRATION_TAG := login-test-integration:${REF_TAG}
-export LOGIN_TEST_ACCEPTANCE_TAG := login-test-acceptance:${REF_TAG}
-export LOGIN_TEST_ACCEPTANCE_SETUP_TAG := login-test-acceptance-setup:${REF_TAG}
-export LOGIN_TEST_ACCEPTANCE_SINK_TAG := login-test-acceptance-sink:${REF_TAG}
-export LOGIN_TEST_ACCEPTANCE_OIDCRP_TAG := login-test-acceptance-oidcrp:${REF_TAG}
-export LOGIN_TEST_ACCEPTANCE_OIDCOP_TAG := login-test-acceptance-oidcop:${REF_TAG}
-export LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG := login-test-acceptance-samlsp:${REF_TAG}
-export LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG := login-test-acceptance-samlidp:${REF_TAG}
+export DOCKER_METADATA_OUTPUT_VERSION ?= local
+export LOGIN_TAG := login:${DOCKER_METADATA_OUTPUT_VERSION}
+export LOGIN_TEST_UNIT_TAG := login-test-unit:${DOCKER_METADATA_OUTPUT_VERSION}
+export LOGIN_TEST_INTEGRATION_TAG := login-test-integration:${DOCKER_METADATA_OUTPUT_VERSION}
+export LOGIN_TEST_ACCEPTANCE_TAG := login-test-acceptance:${DOCKER_METADATA_OUTPUT_VERSION}
+export LOGIN_TEST_ACCEPTANCE_SETUP_TAG := login-test-acceptance-setup:${DOCKER_METADATA_OUTPUT_VERSION}
+export LOGIN_TEST_ACCEPTANCE_SINK_TAG := login-test-acceptance-sink:${DOCKER_METADATA_OUTPUT_VERSION}
+export LOGIN_TEST_ACCEPTANCE_OIDCRP_TAG := login-test-acceptance-oidcrp:${DOCKER_METADATA_OUTPUT_VERSION}
+export LOGIN_TEST_ACCEPTANCE_OIDCOP_TAG := login-test-acceptance-oidcop:${DOCKER_METADATA_OUTPUT_VERSION}
+export LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG := login-test-acceptance-samlsp:${DOCKER_METADATA_OUTPUT_VERSION}
+export LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG := login-test-acceptance-samlidp:${DOCKER_METADATA_OUTPUT_VERSION}
 export POSTGRES_TAG := postgres:17.0-alpine3.19
 export GOLANG_TAG := golang:1.24-alpine
 export ZITADEL_TAG ?= ghcr.io/zitadel/zitadel:02617cf17fdde849378c1a6b5254bbfb2745b164
-export CORE_MOCK_TAG := core-mock:${REF_TAG}
+export CORE_MOCK_TAG := core-mock:${DOCKER_METADATA_OUTPUT_VERSION}
 
 .PHONY: login-help
 login-help:

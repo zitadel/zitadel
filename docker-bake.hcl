@@ -1,13 +1,3 @@
-target "docker-metadata-action" {}
-
-variable "IMAGE_REGISTRY" {
-  default = "ghcr.io/zitadel"
-}
-
-variable "REF_TAG" {
-  default = "local"
-}
-
 target "login-pnpm" {
   dockerfile = "dockerfiles/login-pnpm.Dockerfile"
  }
@@ -102,8 +92,11 @@ variable "LOGIN_TAG" {
   default = "zitadel-login:local"
 }
 
+target "docker-metadata-action" {}
+
 # We run integration and acceptance tests against the next standalone server for docker.
 target "login-standalone" {
+  inherits = ["docker-metadata-action"]
   dockerfile = "dockerfiles/login-standalone.Dockerfile"
   contexts = {
     login-client = "target:login-client"
