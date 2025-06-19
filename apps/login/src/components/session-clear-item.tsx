@@ -4,7 +4,7 @@ import { clearSession } from "@/lib/server/session";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
-import { useLocale, useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar } from "./avatar";
@@ -18,8 +18,6 @@ export function SessionClearItem({
   session: Session;
   reload: () => void;
 }) {
-  const t = useTranslations("logout");
-
   const currentLocale = useLocale();
   moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
 
