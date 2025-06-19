@@ -8,7 +8,6 @@ import {
 } from "@/helpers/validators";
 import { registerUser } from "@/lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
@@ -44,8 +43,6 @@ export function SetRegisterPasswordForm({
   organization,
   requestId,
 }: Props) {
-  const t = useTranslations("register");
-
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {

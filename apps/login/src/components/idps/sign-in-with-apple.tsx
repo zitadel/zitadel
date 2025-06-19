@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { forwardRef } from "react";
+import { Translated } from "../translated";
 import { BaseButton, SignInWithIdentityProviderProps } from "./base-button";
 
 export const SignInWithApple = forwardRef<
@@ -9,7 +9,6 @@ export const SignInWithApple = forwardRef<
   SignInWithIdentityProviderProps
 >(function SignInWithApple(props, ref) {
   const { children, name, ...restProps } = props;
-  const t = useTranslations("idp");
 
   return (
     <BaseButton {...restProps} ref={ref}>
@@ -24,7 +23,13 @@ export const SignInWithApple = forwardRef<
       {children ? (
         children
       ) : (
-        <span className="ml-4">{name ? name : t("signInWithApple")}</span>
+        <span className="ml-4">
+          {name ? (
+            name
+          ) : (
+            <Translated i18nKey="signInWithApple" namespace="idp" />
+          )}
+        </span>
       )}
     </BaseButton>
   );
