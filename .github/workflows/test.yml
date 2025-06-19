@@ -52,7 +52,7 @@ jobs:
         id: run-caches-restore
         with:
           path: ${{ env.CACHE_DIR }}
-          key: login-run-caches
+          key: ${{ runner.os }}-login-run-caches
       - name: Show Run Caches
         run: make show-run-caches
       - run: make login-quality
