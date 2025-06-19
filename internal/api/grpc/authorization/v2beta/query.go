@@ -102,6 +102,8 @@ func AuthorizationSearchFilterToQuery(query *authorization.AuthorizationsSearchF
 		return AuthorizationProjectNameQueryToModel(q.ProjectName)
 	case *authorization.AuthorizationsSearchFilter_RoleKey:
 		return AuthorizationRoleKeyQueryToModel(q.RoleKey)
+	case *authorization.AuthorizationsSearchFilter_ProjectGrantId:
+		return AuthorizationProjectGrantIDQueryToModel(q.ProjectGrantId)
 	default:
 		return nil, errors.New("invalid query")
 	}
@@ -125,6 +127,10 @@ func AuthorizationProjectIDQueryToModel(q *filter_pb.IDFilter) (query.SearchQuer
 
 func AuthorizationProjectNameQueryToModel(q *authorization.ProjectNameQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantProjectNameQuery(q.Name, filter.TextMethodPbToQuery(q.Method))
+}
+
+func AuthorizationProjectGrantIDQueryToModel(q *filter_pb.IDFilter) (query.SearchQuery, error) {
+	return query.NewUserGrantGrantIDSearchQuery(q.Id)
 }
 
 func AuthorizationRoleKeyQueryToModel(q *authorization.RoleKeyQuery) (query.SearchQuery, error) {
