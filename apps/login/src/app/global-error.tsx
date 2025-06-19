@@ -25,7 +25,9 @@ export default function GlobalError({
                 <span className="font-bold">Error:</span> {error?.message}
               </div>
               <div>
-                <Button onClick={() => reset()}>{t("tryagain")}</Button>
+                <Button data-i18n-key="error.tryagain" onClick={() => reset()}>
+                  {t("tryagain")}
+                </Button>
               </div>
             </div>
           </Boundary>

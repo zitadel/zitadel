@@ -1,6 +1,7 @@
 import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginOTP } from "@/components/login-otp";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
@@ -21,7 +22,6 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "otp" });
-  const tError = await getTranslations({ locale, namespace: "error" });
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -94,7 +94,9 @@ export default async function Page(props: {
 
         {!session && (
           <div className="py-4">
-            <Alert>{tError("unknownContext")}</Alert>
+            <Alert>
+              <Translated i18nKey="unknownContext" namespace="error" />
+            </Alert>
           </div>
         )}
 

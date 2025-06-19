@@ -3,6 +3,7 @@ import { BackButton } from "@/components/back-button";
 import { ChooseAuthenticatorToSetup } from "@/components/choose-authenticator-to-setup";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
@@ -27,7 +28,6 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "authenticator" });
-  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { loginName, requestId, organization, sessionId } = searchParams;
 
@@ -99,7 +99,11 @@ export default async function Page(props: {
     !sessionWithData.factors ||
     !sessionWithData.factors.user
   ) {
-    return <Alert>{tError("unknownContext")}</Alert>;
+    return (
+      <Alert>
+        <Translated i18nKey="unknownContext" namespace="error" />
+      </Alert>
+    );
   }
 
   const branding = await getBrandingSettings({

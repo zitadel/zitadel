@@ -2,6 +2,7 @@ import { Alert } from "@/components/alert";
 import { BackButton } from "@/components/back-button";
 import { ChooseSecondFactor } from "@/components/choose-second-factor";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
@@ -20,7 +21,6 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "mfa" });
-  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { loginName, requestId, organization, sessionId } = searchParams;
 
@@ -103,7 +103,11 @@ export default async function Page(props: {
           ></UserAvatar>
         )}
 
-        {!(loginName || sessionId) && <Alert>{tError("unknownContext")}</Alert>}
+        {!(loginName || sessionId) && (
+          <Alert>
+            <Translated i18nKey="unknownContext" namespace="error" />
+          </Alert>
+        )}
 
         {sessionFactors ? (
           <ChooseSecondFactor

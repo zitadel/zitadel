@@ -1,6 +1,7 @@
 import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginPasskey } from "@/components/login-passkey";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
@@ -15,7 +16,6 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "passkey" });
-  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { loginName, altPassword, requestId, organization, sessionId } =
     searchParams;
@@ -67,7 +67,11 @@ export default async function Page(props: {
         )}
         <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
 
-        {!(loginName || sessionId) && <Alert>{tError("unknownContext")}</Alert>}
+        {!(loginName || sessionId) && (
+          <Alert>
+            <Translated i18nKey="unknownContext" namespace="error" />
+          </Alert>
+        )}
 
         {(loginName || sessionId) && (
           <LoginPasskey

@@ -1,6 +1,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SetPasswordForm } from "@/components/set-password-form";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
@@ -21,7 +22,6 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "password" });
-  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { userId, loginName, organization, requestId, code, initial } =
     searchParams;
@@ -79,7 +79,9 @@ export default async function Page(props: {
         {/* show error only if usernames should be shown to be unknown */}
         {loginName && !session && !loginSettings?.ignoreUnknownUsernames && (
           <div className="py-4">
-            <Alert>{tError("unknownContext")}</Alert>
+            <Alert>
+              <Translated i18nKey="unknownContext" namespace="error" />
+            </Alert>
           </div>
         )}
 
@@ -115,7 +117,9 @@ export default async function Page(props: {
           />
         ) : (
           <div className="py-4">
-            <Alert>{tError("failedLoading")}</Alert>
+            <Alert>
+              <Translated i18nKey="failedLoading" namespace="error" />
+            </Alert>
           </div>
         )}
       </div>

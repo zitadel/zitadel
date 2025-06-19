@@ -1,6 +1,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterPasskey } from "@/components/register-passkey";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
@@ -14,7 +15,6 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "passkey" });
-  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { loginName, prompt, organization, requestId, userId } = searchParams;
 
@@ -64,7 +64,9 @@ export default async function Page(props: {
 
         {!session && (
           <div className="py-4">
-            <Alert>{tError("unknownContext")}</Alert>
+            <Alert>
+              <Translated i18nKey="unknownContext" namespace="error" />
+            </Alert>
           </div>
         )}
 

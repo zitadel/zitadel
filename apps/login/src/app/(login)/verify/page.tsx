@@ -1,5 +1,6 @@
 import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { sendEmailCode, sendInviteEmailCode } from "@/lib/server/verify";
@@ -14,7 +15,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "verify" });
-  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { userId, loginName, code, organization, requestId, invite, send } =
     searchParams;
@@ -130,7 +130,9 @@ export default async function Page(props: { searchParams: Promise<any> }) {
             <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
 
             <div className="py-4">
-              <Alert>{tError("unknownContext")}</Alert>
+              <Alert>
+                <Translated i18nKey="unknownContext" namespace="error" />
+              </Alert>
             </div>
           </>
         )}

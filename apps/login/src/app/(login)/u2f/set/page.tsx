@@ -1,6 +1,7 @@
 import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterU2f } from "@/components/register-u2f";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
@@ -14,7 +15,6 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "u2f" });
-  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { loginName, organization, requestId, checkAfter } = searchParams;
 
@@ -51,7 +51,9 @@ export default async function Page(props: {
 
         {!sessionFactors && (
           <div className="py-4">
-            <Alert>{tError("unknownContext")}</Alert>
+            <Alert>
+              <Translated i18nKey="unknownContext" namespace="error" />
+            </Alert>
           </div>
         )}
 
