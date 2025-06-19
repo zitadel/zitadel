@@ -14,6 +14,10 @@ import (
 )
 
 func AppToPb(query_app *query.App) *app.Application {
+	if query_app == nil {
+		return &app.Application{}
+	}
+
 	return &app.Application{
 		Id:           query_app.ID,
 		CreationDate: timestamppb.New(query_app.CreationDate),

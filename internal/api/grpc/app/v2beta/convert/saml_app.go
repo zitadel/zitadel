@@ -42,6 +42,15 @@ func PatchSAMLAppConfigRequestToDomain(appID, projectID string, app *app.PatchSA
 }
 
 func appSAMLConfigToPb(samlApp *query.SAMLApp) app.ApplicationConfig {
+	if samlApp == nil {
+		return &app.Application_SamlConfig{
+			SamlConfig: &app.SAMLConfig{
+				Metadata:     &app.SAMLConfig_MetadataXml{},
+				LoginVersion: &app.LoginVersion{},
+			},
+		}
+	}
+
 	return &app.Application_SamlConfig{
 		SamlConfig: &app.SAMLConfig{
 			Metadata:     &app.SAMLConfig_MetadataXml{MetadataXml: samlApp.Metadata},
