@@ -1624,8 +1624,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Organisation par défaut de connexion",
       "LOGINDEFAULTORG_DESCRIPTION": "L'interface de connexion utilisera les paramètres de l'organisation par défaut (et non de l'instance) si aucun contexte d'organisation n'est défini.",
-      "OIDCLEGACYINTROSPECTION": "Introspection héritée OIDC",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Nous avons récemment refondu le point d'introspection pour des raisons de performances. Cette fonctionnalité peut être utilisée pour revenir à l'implémentation héritée en cas de bogues inattendus.",
       "OIDCTOKENEXCHANGE": "Échange de jetons OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Activez le type d'octroi expérimental urn:ietf:params:oauth:grant-type:token-exchange pour le point de terminaison de jeton OIDC. L'échange de jetons peut être utilisé pour demander des jetons avec une portée moindre ou pour usurper d'autres utilisateurs. Consultez la politique de sécurité pour autoriser l'usurpation sur une instance.",
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Déclencheurs de projections d'introspection OIDC",

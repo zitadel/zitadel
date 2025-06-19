@@ -61,10 +61,6 @@ func (*systemFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceSystemSetFeature[bool],
 			},
 			{
-				Event:  feature_v2.SystemLegacyIntrospectionEventType,
-				Reduce: reduceSystemSetFeature[bool],
-			},
-			{
 				Event:  feature_v2.SystemUserSchemaEventType,
 				Reduce: reduceSystemSetFeature[bool],
 			},

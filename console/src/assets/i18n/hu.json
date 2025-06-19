@@ -1622,8 +1622,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Alapértelmezett Org bejelentkezés",
       "LOGINDEFAULTORG_DESCRIPTION": "A bejelentkezési felület az alapértelmezett org beállításait fogja használni (és nem az instance-tól), ha nincs megadva szervezeti kontextus",
-      "OIDCLEGACYINTROSPECTION": "OIDC régi introspekció",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Nemrég refaktoráltuk az introspekciós végpontot a teljesítmény javítása érdekében. Ezt a funkciót használhatod a régi implementációra való visszaállításhoz, ha váratlan hibák lépnének fel.",
       "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Engedélyezd a kísérleti urn:ietf:params:oauth:grant-type:token-exchange támogatását az OIDC token végpont számára. A token csere használható kisebb hatókörű tokenek kérésére vagy más felhasználók megszemélyesítésére. Tekintsd meg a biztonsági irányelvet az impersonáció engedélyezéséhez egy példányon.",
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Introspekciós Projekciók Indítása",

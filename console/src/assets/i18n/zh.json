@@ -1624,8 +1624,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "登录默认组织",
       "LOGINDEFAULTORG_DESCRIPTION": "如果没有设置组织上下文，登录界面将使用默认组织的设置（而不是实例的设置）",
-      "OIDCLEGACYINTROSPECTION": "OIDC 传统内省",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "我们最近出于性能原因重构了内省端点。如果出现意外错误，可以使用此功能回滚到传统实现。",
       "OIDCTOKENEXCHANGE": "OIDC 令牌交换",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "启用 OIDC 令牌端点的实验性 urn:ietf:params:oauth:grant-type:token-exchange 授权类型。令牌交换可用于请求具有较少范围的令牌或模拟其他用户。请参阅安全策略以允许在实例上模拟。",
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC 触发内省投影",
