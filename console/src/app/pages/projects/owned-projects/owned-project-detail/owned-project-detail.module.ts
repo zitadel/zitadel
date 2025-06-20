@@ -23,10 +23,12 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { ProjectRolesTableModule } from 'src/app/modules/project-roles-table/project-roles-table.module';
+import { NavToggleModule } from 'src/app/modules/nav-toggle/nav-toggle.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SidenavModule } from 'src/app/modules/sidenav/sidenav.module';
 import { TopViewModule } from 'src/app/modules/top-view/top-view.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
+import { GroupGrantsModule } from 'src/app/modules/group-grants/group-grants.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
@@ -57,6 +59,7 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
     ProjectRolesTableModule,
     HasRolePipeModule,
     UserGrantsModule,
+    GroupGrantsModule,
     TimestampToDatePipeModule,
     SidenavModule,
     MatTableModule,
@@ -65,6 +68,7 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
     PaginatorModule,
     ProjectGrantsModule,
     ProjectRolesModule,
+    NavToggleModule,
     MatRippleModule,
     TopViewModule,
     MatCheckboxModule,

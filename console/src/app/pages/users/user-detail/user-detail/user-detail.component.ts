@@ -63,6 +63,7 @@ const SECURITY: SidenavSetting = { id: 'security', i18nKey: 'USER.SETTINGS.SECUR
 const PERSONALACCESSTOKEN: SidenavSetting = { id: 'pat', i18nKey: 'USER.SETTINGS.PAT' };
 const KEYS: SidenavSetting = { id: 'keys', i18nKey: 'USER.SETTINGS.KEYS' };
 const MEMBERSHIPS: SidenavSetting = { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS' };
+const GROUPS: SidenavSetting = { id: 'groups', i18nKey: 'USER.SETTINGS.GROUPS' };
 
 type UserQuery =
   | { state: 'success'; value: UserV2 }
@@ -164,13 +165,13 @@ export class UserDetailComponent implements OnInit {
         }
 
         if (user.value.type.case === 'human') {
-          return of([GENERAL, SECURITY, IDP, GRANTS, MEMBERSHIPS, METADATA]);
+          return of([GENERAL, SECURITY, IDP, GRANTS, MEMBERSHIPS, METADATA, GROUPS]);
         } else if (user.value.type.case === 'machine') {
-          return of([GENERAL, GRANTS, MEMBERSHIPS, PERSONALACCESSTOKEN, KEYS, METADATA]);
+          return of([GENERAL, GRANTS, MEMBERSHIPS, PERSONALACCESSTOKEN, KEYS, METADATA, GROUPS]);
         }
         return EMPTY;
       }),
-      startWith([GENERAL, GRANTS, MEMBERSHIPS, METADATA]),
+      startWith([GENERAL, GRANTS, MEMBERSHIPS, METADATA, GROUPS]),
     );
   }
 

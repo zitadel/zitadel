@@ -25,6 +25,10 @@ func (i *Member) IsValid() bool {
 	return i.AggregateID != "" && i.UserID != "" && len(i.Roles) != 0
 }
 
+func (i *Member) IsGroupMemberValid() bool {
+	return i.AggregateID != "" && i.UserID != ""
+}
+
 func (i *Member) IsIAMValid() bool {
 	return i.UserID != "" && len(i.Roles) != 0
 }
