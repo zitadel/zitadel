@@ -9,10 +9,16 @@ import (
 
 	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/cache/connector"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/authncache"
+    "github.com/zitadel/zitadel/internal/cachekey"
+
+
 )
 
 type Caches struct {
+	authnKeys cache.Cache[cachekey.AuthnKeyIndex, string, *authncache.CachedPublicKey]	
 	instance cache.Cache[instanceIndex, string, *authzInstance]
 	org      cache.Cache[orgIndex, string, *Org]
 
@@ -30,6 +36,26 @@ func startCaches(background context.Context, connectors connector.Connectors, in
 	if err != nil {
 		return nil, err
 	}
+
+	caches.authnKeys, err = connector.StartCache[
+	cachekey.AuthnKeyIndex,
+	string,
+	*authncache.CachedPublicKey](
+	background,
+	[]cachekey.AuthnKeyIndex{
+		cachekey.InstanceID,
+		cachekey.UserType,
+		cachekey.KeyID,
+	},
+	cache.PurposeAuthNKeys,
+	connectors.Config.Instance, // можешь временно оставить Instance
+	connectors,
+)
+if err != nil {
+	return nil, err
+}
+
+
 	caches.org, err = connector.StartCache[orgIndex, string, *Org](background, orgIndexValues(), cache.PurposeOrganization, connectors.Config.Organization, connectors)
 	if err != nil {
 		return nil, err
@@ -39,6 +65,7 @@ func startCaches(background context.Context, connectors connector.Connectors, in
 
 	caches.registerInstanceInvalidation()
 	caches.registerOrgInvalidation()
+	caches.registerAuthNKeyInvalidation()
 	return caches, nil
 }
 
@@ -63,4 +90,12 @@ func getAggregateID(aggregate *eventstore.Aggregate) string {
 
 func getResourceOwner(aggregate *eventstore.Aggregate) string {
 	return aggregate.ResourceOwner
+}
+func (c *Caches) registerAuthNKeyInvalidation() {
+	invalidate := cacheInvalidationFunc(
+		c.authnKeys,
+		cachekey.KeyID, 
+		getAggregateID, 
+	)
+	projection.AuthNKeyProjection.RegisterCacheInvalidation(invalidate)
 }
