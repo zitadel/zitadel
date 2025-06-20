@@ -89,6 +89,15 @@ func TestGetApplication(t *testing.T) {
 			expectedErrorType: codes.NotFound,
 		},
 		{
+			testName: "when user has no permission should return membership not found error",
+			inputCtx: NoPermissionCtx,
+			inputRequest: &app.GetApplicationRequest{
+				Id: createdApiApp.GetAppId(),
+			},
+
+			expectedErrorType: codes.NotFound,
+		},
+		{
 			testName: "when providing API app ID should return valid API app result",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.GetApplicationRequest{
@@ -125,7 +134,7 @@ func TestGetApplication(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
-			t.Parallel()
+			// t.Parallel()
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {

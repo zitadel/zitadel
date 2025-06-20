@@ -181,7 +181,242 @@ func TestCreateApplication(t *testing.T) {
 	}
 }
 
-func TestPatchApplication(t *testing.T) {
+func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		testName        string
+		creationRequest *app.CreateApplicationRequest
+		inputCtx        context.Context
+
+		expectedResponseType string
+		expectedErrorType    codes.Code
+	}{
+		// Login User with no project.app.write
+		{
+			testName: "when user has no project.app.write permission for API request should return permission error",
+			inputCtx: LoginUserCtx,
+			creationRequest: &app.CreateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Name:      gofakeit.Name(),
+				CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
+					ApiRequest: &app.CreateAPIApplicationRequest{
+						AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
+					},
+				},
+			},
+			expectedErrorType: codes.PermissionDenied,
+		},
+		{
+			testName: "when user has no project.app.write permission for OIDC request should return permission error",
+			inputCtx: LoginUserCtx,
+			creationRequest: &app.CreateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Name:      gofakeit.AppName(),
+				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
+					OidcRequest: &app.CreateOIDCApplicationRequest{
+						RedirectUris:           []string{"http://example.com"},
+						ResponseTypes:          []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
+						GrantTypes:             []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
+						AppType:                app.OIDCAppType_OIDC_APP_TYPE_WEB,
+						AuthMethodType:         app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC,
+						PostLogoutRedirectUris: []string{"http://example.com/home"},
+						Version:                app.OIDCVersion_OIDC_VERSION_1_0,
+						AccessTokenType:        app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
+						BackChannelLogoutUri:   "http://example.com/logout",
+						LoginVersion: &app.LoginVersion{
+							Version: &app.LoginVersion_LoginV2{
+								LoginV2: &app.LoginV2{
+									BaseUri: &baseURI,
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expectedErrorType: codes.PermissionDenied,
+		},
+		{
+			testName: "when user has no project.app.write permission for SAML request should return permission error",
+			inputCtx: LoginUserCtx,
+			creationRequest: &app.CreateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Name:      gofakeit.AppName(),
+				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
+					SamlRequest: &app.CreateSAMLApplicationRequest{
+						Metadata: &app.CreateSAMLApplicationRequest_MetadataXml{
+							MetadataXml: samlMetadataGen(gofakeit.URL()),
+						},
+						LoginVersion: &app.LoginVersion{
+							Version: &app.LoginVersion_LoginV2{
+								LoginV2: &app.LoginV2{
+									BaseUri: &baseURI,
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedErrorType: codes.PermissionDenied,
+		},
+
+		// OrgOwner with project.app.write permission
+		{
+			testName: "when user is OrgOwner API request should succeed",
+			inputCtx: OrgOwnerCtx,
+			creationRequest: &app.CreateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Name:      gofakeit.Name(),
+				CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
+					ApiRequest: &app.CreateAPIApplicationRequest{
+						AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
+					},
+				},
+			},
+			expectedResponseType: fmt.Sprintf("%T", &app.CreateApplicationResponse_ApiResponse{}),
+		},
+		{
+			testName: "when user is OrgOwner OIDC request should succeed",
+			inputCtx: OrgOwnerCtx,
+			creationRequest: &app.CreateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Name:      gofakeit.AppName(),
+				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
+					OidcRequest: &app.CreateOIDCApplicationRequest{
+						RedirectUris:           []string{"http://example.com"},
+						ResponseTypes:          []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
+						GrantTypes:             []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
+						AppType:                app.OIDCAppType_OIDC_APP_TYPE_WEB,
+						AuthMethodType:         app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC,
+						PostLogoutRedirectUris: []string{"http://example.com/home"},
+						Version:                app.OIDCVersion_OIDC_VERSION_1_0,
+						AccessTokenType:        app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
+						BackChannelLogoutUri:   "http://example.com/logout",
+						LoginVersion: &app.LoginVersion{
+							Version: &app.LoginVersion_LoginV2{
+								LoginV2: &app.LoginV2{
+									BaseUri: &baseURI,
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expectedResponseType: fmt.Sprintf("%T", &app.CreateApplicationResponse_OidcResponse{}),
+		},
+		{
+			testName: "when user is OrgOwner SAML request should succeed",
+			inputCtx: OrgOwnerCtx,
+			creationRequest: &app.CreateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Name:      gofakeit.AppName(),
+				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
+					SamlRequest: &app.CreateSAMLApplicationRequest{
+						Metadata: &app.CreateSAMLApplicationRequest_MetadataXml{
+							MetadataXml: samlMetadataGen(gofakeit.URL()),
+						},
+						LoginVersion: &app.LoginVersion{
+							Version: &app.LoginVersion_LoginV2{
+								LoginV2: &app.LoginV2{
+									BaseUri: &baseURI,
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedResponseType: fmt.Sprintf("%T", &app.CreateApplicationResponse_SamlResponse{}),
+		},
+
+		// Project owner with project.app.write permission
+		{
+			testName: "when user is ProjectOwner API request should succeed",
+			inputCtx: ProjectOwnerCtx,
+			creationRequest: &app.CreateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Name:      gofakeit.Name(),
+				CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
+					ApiRequest: &app.CreateAPIApplicationRequest{
+						AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
+					},
+				},
+			},
+			expectedResponseType: fmt.Sprintf("%T", &app.CreateApplicationResponse_ApiResponse{}),
+		},
+		{
+			testName: "when user is ProjectOwner OIDC request should succeed",
+			inputCtx: ProjectOwnerCtx,
+			creationRequest: &app.CreateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Name:      gofakeit.AppName(),
+				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
+					OidcRequest: &app.CreateOIDCApplicationRequest{
+						RedirectUris:           []string{"http://example.com"},
+						ResponseTypes:          []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
+						GrantTypes:             []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
+						AppType:                app.OIDCAppType_OIDC_APP_TYPE_WEB,
+						AuthMethodType:         app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC,
+						PostLogoutRedirectUris: []string{"http://example.com/home"},
+						Version:                app.OIDCVersion_OIDC_VERSION_1_0,
+						AccessTokenType:        app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
+						BackChannelLogoutUri:   "http://example.com/logout",
+						LoginVersion: &app.LoginVersion{
+							Version: &app.LoginVersion_LoginV2{
+								LoginV2: &app.LoginV2{
+									BaseUri: &baseURI,
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expectedResponseType: fmt.Sprintf("%T", &app.CreateApplicationResponse_OidcResponse{}),
+		},
+		{
+			testName: "when user is ProjectOwner SAML request should succeed",
+			inputCtx: ProjectOwnerCtx,
+			creationRequest: &app.CreateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Name:      gofakeit.AppName(),
+				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
+					SamlRequest: &app.CreateSAMLApplicationRequest{
+						Metadata: &app.CreateSAMLApplicationRequest_MetadataXml{
+							MetadataXml: samlMetadataGen(gofakeit.URL()),
+						},
+						LoginVersion: &app.LoginVersion{
+							Version: &app.LoginVersion_LoginV2{
+								LoginV2: &app.LoginV2{
+									BaseUri: &baseURI,
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedResponseType: fmt.Sprintf("%T", &app.CreateApplicationResponse_SamlResponse{}),
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+			res, err := instance.Client.AppV2Beta.CreateApplication(tc.inputCtx, tc.creationRequest)
+
+			require.Equal(t, tc.expectedErrorType, status.Code(err))
+			if tc.expectedErrorType == codes.OK {
+				resType := fmt.Sprintf("%T", res.GetCreationResponseType())
+				assert.Equal(t, tc.expectedResponseType, resType)
+				assert.NotZero(t, res.GetAppId())
+				assert.NotZero(t, res.GetCreationDate())
+			}
+		})
+	}
+}
+
+func TestUpdateApplication(t *testing.T) {
 	orgNotInCtx := instance.CreateOrganization(IAMOwnerCtx, gofakeit.Name(), gofakeit.Email())
 	pNotInCtx := instance.CreateProject(IAMOwnerCtx, t, orgNotInCtx.GetOrganizationId(), gofakeit.AppName(), false, false)
 
@@ -396,8 +631,222 @@ func TestPatchApplication(t *testing.T) {
 	}
 }
 
-func TestDeleteApplication(t *testing.T) {
+func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
+	baseURI := "http://example.com"
 
+	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
+		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
+	}
+
+	appForNameChange, appNameChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId:           Project.GetId(),
+		Name:                gofakeit.AppName(),
+		CreationRequestType: reqForAppNameCreation,
+	})
+	require.Nil(t, appNameChangeErr)
+
+	appForAPIConfigChangeForProjectOwner := createAPIApp(t)
+	appForAPIConfigChangeForOrgOwner := createAPIApp(t)
+	appForAPIConfigChangeForLoginUser := createAPIApp(t)
+
+	appForOIDCConfigChangeForProjectOwner := createOIDCApp(t, baseURI)
+	appForOIDCConfigChangeForOrgOwner := createOIDCApp(t, baseURI)
+	appForOIDCConfigChangeForLoginUser := createOIDCApp(t, baseURI)
+
+	samlMetasForProjectOwner, appForSAMLConfigChangeForProjectOwner := createSAMLApp(t, baseURI)
+	samlMetasForOrgOwner, appForSAMLConfigChangeForOrgOwner := createSAMLApp(t, baseURI)
+	samlMetasForLoginUser, appForSAMLConfigChangeForLoginUser := createSAMLApp(t, baseURI)
+
+	t.Parallel()
+
+	tt := []struct {
+		testName      string
+		inputCtx      context.Context
+		updateRequest *app.UpdateApplicationRequest
+
+		expectedErrorType codes.Code
+	}{
+		// ProjectOwner
+		{
+			testName: "when user is ProjectOwner app name request should succeed",
+			inputCtx: ProjectOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appForNameChange.GetAppId(),
+
+				Name: gofakeit.AppName(),
+			},
+		},
+		{
+			testName: "when user is ProjectOwner API app request should succeed",
+			inputCtx: ProjectOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appForAPIConfigChangeForProjectOwner.GetAppId(),
+				UpdateRequestType: &app.UpdateApplicationRequest_ApiConfigurationRequest{
+					ApiConfigurationRequest: &app.UpdateAPIApplicationConfigurationRequest{
+						AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
+					},
+				},
+			},
+		},
+		{
+			testName: "when user is ProjectOwner OIDC app request should succeed",
+			inputCtx: ProjectOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appForOIDCConfigChangeForProjectOwner.GetAppId(),
+				UpdateRequestType: &app.UpdateApplicationRequest_OidcConfigurationRequest{
+					OidcConfigurationRequest: &app.UpdateOIDCApplicationConfigurationRequest{
+						PostLogoutRedirectUris: []string{"http://example.com/home2"},
+					},
+				},
+			},
+		},
+		{
+			testName: "when user is ProjectOwner SAML request should succeed",
+			inputCtx: ProjectOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appForSAMLConfigChangeForProjectOwner.GetAppId(),
+				UpdateRequestType: &app.UpdateApplicationRequest_SamlConfigurationRequest{
+					SamlConfigurationRequest: &app.UpdateSAMLApplicationConfigurationRequest{
+						Metadata: &app.UpdateSAMLApplicationConfigurationRequest_MetadataXml{
+							MetadataXml: samlMetasForProjectOwner,
+						},
+						LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
+					},
+				},
+			},
+		},
+
+		// OrgOwner context
+		{
+			testName: "when user is OrgOwner app name request should succeed",
+			inputCtx: OrgOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appForNameChange.GetAppId(),
+
+				Name: gofakeit.AppName(),
+			},
+		},
+		{
+			testName: "when user is OrgOwner API app request should succeed",
+			inputCtx: OrgOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appForAPIConfigChangeForOrgOwner.GetAppId(),
+				UpdateRequestType: &app.UpdateApplicationRequest_ApiConfigurationRequest{
+					ApiConfigurationRequest: &app.UpdateAPIApplicationConfigurationRequest{
+						AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
+					},
+				},
+			},
+		},
+		{
+			testName: "when user is OrgOwner OIDC app request should succeed",
+			inputCtx: OrgOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appForOIDCConfigChangeForOrgOwner.GetAppId(),
+				UpdateRequestType: &app.UpdateApplicationRequest_OidcConfigurationRequest{
+					OidcConfigurationRequest: &app.UpdateOIDCApplicationConfigurationRequest{
+						PostLogoutRedirectUris: []string{"http://example.com/home2"},
+					},
+				},
+			},
+		},
+		{
+			testName: "when user is OrgOwner SAML request should succeed",
+			inputCtx: OrgOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appForSAMLConfigChangeForOrgOwner.GetAppId(),
+				UpdateRequestType: &app.UpdateApplicationRequest_SamlConfigurationRequest{
+					SamlConfigurationRequest: &app.UpdateSAMLApplicationConfigurationRequest{
+						Metadata: &app.UpdateSAMLApplicationConfigurationRequest_MetadataXml{
+							MetadataXml: samlMetasForOrgOwner,
+						},
+						LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
+					},
+				},
+			},
+		},
+
+		// LoginUser
+		{
+			testName: "when user has no project.app.write permission for app name change request should return permission error",
+			inputCtx: LoginUserCtx,
+			updateRequest: &app.UpdateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appForNameChange.GetAppId(),
+
+				Name: gofakeit.AppName(),
+			},
+			expectedErrorType: codes.PermissionDenied,
+		},
+		{
+			testName: "when user has no project.app.write permission for API request should return permission error",
+			inputCtx: LoginUserCtx,
+			updateRequest: &app.UpdateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appForAPIConfigChangeForLoginUser.GetAppId(),
+				UpdateRequestType: &app.UpdateApplicationRequest_ApiConfigurationRequest{
+					ApiConfigurationRequest: &app.UpdateAPIApplicationConfigurationRequest{
+						AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
+					},
+				},
+			},
+			expectedErrorType: codes.PermissionDenied,
+		},
+		{
+			testName: "when user has no project.app.write permission for OIDC request should return permission error",
+			inputCtx: LoginUserCtx,
+			updateRequest: &app.UpdateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appForOIDCConfigChangeForLoginUser.GetAppId(),
+				UpdateRequestType: &app.UpdateApplicationRequest_OidcConfigurationRequest{
+					OidcConfigurationRequest: &app.UpdateOIDCApplicationConfigurationRequest{
+						PostLogoutRedirectUris: []string{"http://example.com/home2"},
+					},
+				},
+			},
+			expectedErrorType: codes.PermissionDenied,
+		},
+		{
+			testName: "when user has no project.app.write permission for SAML request should return permission error",
+			inputCtx: LoginUserCtx,
+			updateRequest: &app.UpdateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appForSAMLConfigChangeForLoginUser.GetAppId(),
+				UpdateRequestType: &app.UpdateApplicationRequest_SamlConfigurationRequest{
+					SamlConfigurationRequest: &app.UpdateSAMLApplicationConfigurationRequest{
+						Metadata: &app.UpdateSAMLApplicationConfigurationRequest_MetadataXml{
+							MetadataXml: samlMetasForLoginUser,
+						},
+						LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
+					},
+				},
+			},
+			expectedErrorType: codes.PermissionDenied,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+			res, err := instance.Client.AppV2Beta.UpdateApplication(tc.inputCtx, tc.updateRequest)
+
+			require.Equal(t, tc.expectedErrorType, status.Code(err))
+			if tc.expectedErrorType == codes.OK {
+				assert.NotZero(t, res.GetChangeDate())
+			}
+		})
+	}
+}
+
+func TestDeleteApplication(t *testing.T) {
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
@@ -432,6 +881,67 @@ func TestDeleteApplication(t *testing.T) {
 			deleteRequest: &app.DeleteApplicationRequest{
 				ProjectId: Project.GetId(),
 				Id:        appToDelete.GetAppId(),
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			// When
+			res, err := instance.Client.AppV2Beta.DeleteApplication(tc.inputCtx, tc.deleteRequest)
+
+			// Then
+			require.Equal(t, tc.expectedErrorType, status.Code(err))
+			if tc.expectedErrorType == codes.OK {
+				assert.NotZero(t, res.GetDeletionDate())
+			}
+		})
+	}
+}
+
+func TestDeleteApplication_WithDifferentPermissions(t *testing.T) {
+	appToDeleteForLoginUser := createAPIApp(t)
+	appToDeleteForProjectOwner := createAPIApp(t)
+	appToDeleteForOrgOwner := createAPIApp(t)
+
+	t.Parallel()
+	tt := []struct {
+		testName      string
+		deleteRequest *app.DeleteApplicationRequest
+		inputCtx      context.Context
+
+		expectedErrorType codes.Code
+	}{
+		// Login User
+		{
+			testName: "when user has no project.app.delete permission for app delete request should return permission error",
+			inputCtx: LoginUserCtx,
+			deleteRequest: &app.DeleteApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appToDeleteForLoginUser.GetAppId(),
+			},
+			expectedErrorType: codes.PermissionDenied,
+		},
+
+		// Project Owner
+		{
+			testName: "when user is ProjectOwner delete app request should succeed",
+			inputCtx: ProjectOwnerCtx,
+			deleteRequest: &app.DeleteApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appToDeleteForProjectOwner.GetAppId(),
+			},
+		},
+
+		// Org Owner
+		{
+			testName: "when user is OrgOwner delete app request should succeed",
+			inputCtx: ProjectOwnerCtx,
+			deleteRequest: &app.DeleteApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appToDeleteForOrgOwner.GetAppId(),
 			},
 		},
 	}
@@ -509,6 +1019,67 @@ func TestDeactivateApplication(t *testing.T) {
 	}
 }
 
+func TestDeactivateApplication_WithDifferentPermissions(t *testing.T) {
+	appToDeactivateForLoginUser := createAPIApp(t)
+	appToDeactivateForPrjectOwner := createAPIApp(t)
+	appToDeactivateForOrgOwner := createAPIApp(t)
+
+	t.Parallel()
+
+	tt := []struct {
+		testName      string
+		inputCtx      context.Context
+		deleteRequest *app.DeactivateApplicationRequest
+
+		expectedErrorType codes.Code
+	}{
+		// Login User
+		{
+			testName: "when user has no project.app.write permission for app deactivate request should return permission error",
+			inputCtx: IAMOwnerCtx,
+			deleteRequest: &app.DeactivateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appToDeactivateForLoginUser.GetAppId(),
+			},
+		},
+
+		// Project Owner
+		{
+			testName: "when user is ProjectOwner deactivate app request should succeed",
+			inputCtx: ProjectOwnerCtx,
+			deleteRequest: &app.DeactivateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appToDeactivateForPrjectOwner.GetAppId(),
+			},
+		},
+
+		// Org Owner
+		{
+			testName: "when user is OrgOwner deactivate app request should succeed",
+			inputCtx: OrgOwnerCtx,
+			deleteRequest: &app.DeactivateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appToDeactivateForOrgOwner.GetAppId(),
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			// When
+			res, err := instance.Client.AppV2Beta.DeactivateApplication(tc.inputCtx, tc.deleteRequest)
+
+			// Then
+			require.Equal(t, tc.expectedErrorType, status.Code(err))
+			if tc.expectedErrorType == codes.OK {
+				assert.NotZero(t, res.GetDeactivationDate())
+			}
+		})
+	}
+}
+
 func TestReactivateApplication(t *testing.T) {
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
@@ -551,6 +1122,73 @@ func TestReactivateApplication(t *testing.T) {
 			reactivateRequest: &app.ReactivateApplicationRequest{
 				ProjectId: Project.GetId(),
 				Id:        appToReactivate.GetAppId(),
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			// When
+			res, err := instance.Client.AppV2Beta.ReactivateApplication(tc.inputCtx, tc.reactivateRequest)
+
+			// Then
+			require.Equal(t, tc.expectedErrorType, status.Code(err))
+			if tc.expectedErrorType == codes.OK {
+				assert.NotZero(t, res.GetReactivationDate())
+			}
+		})
+	}
+}
+
+func TestReactivateApplication_WithDifferentPermissions(t *testing.T) {
+	appToReactivateForLoginUser := createAPIApp(t)
+	deactivateApp(t, appToReactivateForLoginUser)
+
+	appToReactivateForProjectOwner := createAPIApp(t)
+	deactivateApp(t, appToReactivateForProjectOwner)
+
+	appToReactivateForOrgOwner := createAPIApp(t)
+	deactivateApp(t, appToReactivateForOrgOwner)
+
+	t.Parallel()
+
+	tt := []struct {
+		testName          string
+		inputCtx          context.Context
+		reactivateRequest *app.ReactivateApplicationRequest
+
+		expectedErrorType codes.Code
+	}{
+		// Login User
+		{
+			testName: "when user has no project.app.write permission for app reactivate request should return permission error",
+			inputCtx: LoginUserCtx,
+			reactivateRequest: &app.ReactivateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appToReactivateForLoginUser.GetAppId(),
+			},
+			expectedErrorType: codes.PermissionDenied,
+		},
+
+		// Project Owner
+		{
+			testName: "when user is ProjectOwner reactivate app request should succeed",
+			inputCtx: ProjectOwnerCtx,
+			reactivateRequest: &app.ReactivateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appToReactivateForProjectOwner.GetAppId(),
+			},
+		},
+
+		// Org Owner
+		{
+			testName: "when user is OrgOwner reactivate app request should succeed",
+			inputCtx: OrgOwnerCtx,
+			reactivateRequest: &app.ReactivateApplicationRequest{
+				ProjectId: Project.GetId(),
+				Id:        appToReactivateForOrgOwner.GetAppId(),
 			},
 		},
 	}
@@ -659,6 +1297,110 @@ func TestRegenerateClientSecret(t *testing.T) {
 				AppType:       &app.RegenerateClientSecretRequest_IsOidc{},
 			},
 			oldSecret: oidcAppToRegen.GetOidcResponse().GetClientSecret(),
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			// When
+			res, err := instance.Client.AppV2Beta.RegenerateClientSecret(tc.inputCtx, tc.regenRequest)
+
+			// Then
+			require.Equal(t, tc.expectedErrorType, status.Code(err))
+			if tc.expectedErrorType == codes.OK {
+				assert.NotZero(t, res.GetCreationDate())
+				assert.NotEqual(t, tc.oldSecret, res.GetClientSecret())
+			}
+		})
+	}
+
+}
+
+func TestRegenerateClientSecret_WithDifferentPermissions(t *testing.T) {
+	apiAppToRegenForLoginUser := createAPIApp(t)
+	apiAppToRegenForProjectOwner := createAPIApp(t)
+	apiAppToRegenForOrgOwner := createAPIApp(t)
+
+	oidcAppToRegenForLoginUser := createOIDCApp(t, baseURI)
+	oidcAppToRegenForProjectOwner := createOIDCApp(t, baseURI)
+	oidcAppToRegenForOrgOwner := createOIDCApp(t, baseURI)
+
+	t.Parallel()
+
+	tt := []struct {
+		testName     string
+		inputCtx     context.Context
+		regenRequest *app.RegenerateClientSecretRequest
+
+		expectedErrorType codes.Code
+		oldSecret         string
+	}{
+		// Login user
+		{
+			testName: "when user has no project.app.write permission for API app secret regen request should return permission error",
+			inputCtx: LoginUserCtx,
+			regenRequest: &app.RegenerateClientSecretRequest{
+				ProjectId:     Project.GetId(),
+				ApplicationId: apiAppToRegenForLoginUser.GetAppId(),
+				AppType:       &app.RegenerateClientSecretRequest_IsApi{},
+			},
+			expectedErrorType: codes.PermissionDenied,
+		},
+		{
+			testName: "when user has no project.app.write permission for OIDC app secret regen request should return permission error",
+			inputCtx: LoginUserCtx,
+			regenRequest: &app.RegenerateClientSecretRequest{
+				ProjectId:     Project.GetId(),
+				ApplicationId: oidcAppToRegenForLoginUser.GetAppId(),
+				AppType:       &app.RegenerateClientSecretRequest_IsOidc{},
+			},
+			expectedErrorType: codes.PermissionDenied,
+		},
+
+		// Project Owner
+		{
+			testName: "when user is ProjectOwner regen API app secret request should succeed",
+			inputCtx: ProjectOwnerCtx,
+			regenRequest: &app.RegenerateClientSecretRequest{
+				ProjectId:     Project.GetId(),
+				ApplicationId: apiAppToRegenForProjectOwner.GetAppId(),
+				AppType:       &app.RegenerateClientSecretRequest_IsApi{},
+			},
+			oldSecret: apiAppToRegenForProjectOwner.GetApiResponse().GetClientSecret(),
+		},
+		{
+			testName: "when user is ProjectOwner regen OIDC app secret request should succeed",
+			inputCtx: ProjectOwnerCtx,
+			regenRequest: &app.RegenerateClientSecretRequest{
+				ProjectId:     Project.GetId(),
+				ApplicationId: oidcAppToRegenForProjectOwner.GetAppId(),
+				AppType:       &app.RegenerateClientSecretRequest_IsOidc{},
+			},
+			oldSecret: oidcAppToRegenForProjectOwner.GetOidcResponse().GetClientSecret(),
+		},
+
+		// Org Owner
+		{
+			testName: "when user is OrgOwner regen API app secret request should succeed",
+			inputCtx: OrgOwnerCtx,
+			regenRequest: &app.RegenerateClientSecretRequest{
+				ProjectId:     Project.GetId(),
+				ApplicationId: apiAppToRegenForOrgOwner.GetAppId(),
+				AppType:       &app.RegenerateClientSecretRequest_IsApi{},
+			},
+			oldSecret: apiAppToRegenForOrgOwner.GetApiResponse().GetClientSecret(),
+		},
+		{
+			testName: "when user is OrgOwner regen OIDC app secret request should succeed",
+			inputCtx: OrgOwnerCtx,
+			regenRequest: &app.RegenerateClientSecretRequest{
+				ProjectId:     Project.GetId(),
+				ApplicationId: oidcAppToRegenForOrgOwner.GetAppId(),
+				AppType:       &app.RegenerateClientSecretRequest_IsOidc{},
+			},
+			oldSecret: oidcAppToRegenForOrgOwner.GetOidcResponse().GetClientSecret(),
 		},
 	}
 
