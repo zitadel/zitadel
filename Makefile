@@ -87,10 +87,6 @@ login-test-acceptance: login-test-acceptance-build
   		$(LOGIN_TEST_ACCEPTANCE_OIDCRP_TAG) \
   		$(LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG)"
 
-.PHONY: login-quality
-login-quality: login-lint login-test-integration login-test-acceptance
-	@:
-
 .PHONY: login-standalone-build
 login-standalone-build:
 	$(BAKE_CLI_WITH_COMMON_ARGS) login-standalone

@@ -57,9 +57,25 @@ jobs:
             ${{ runner.os }}-login-run-caches-${{github.ref_name}}-${{ github.sha }}-
             ${{ runner.os }}-login-run-caches-${{github.ref_name}}-
             ${{ runner.os }}-login-run-caches-
-      - name: Show Run Caches
-        run: make show-run-caches
-      - run: make login-quality
+      - run: make login-lint
+        env:
+          # latest if branch is main, otherwise image version which is the pull request number
+          BAKE_CLI: depot bake
+          DEPOT_PROJECT_ID: jp837jn3fm
+          FORCE: ${{ github.event.inputs.clean-run-caches == 'true' }}
+      - run: make login-test-unit
+        env:
+          # latest if branch is main, otherwise image version which is the pull request number
+          BAKE_CLI: depot bake
+          DEPOT_PROJECT_ID: jp837jn3fm
+          FORCE: ${{ github.event.inputs.clean-run-caches == 'true' }}
+      - run: make login-test-integration
+        env:
+          # latest if branch is main, otherwise image version which is the pull request number
+          BAKE_CLI: depot bake
+          DEPOT_PROJECT_ID: jp837jn3fm
+          FORCE: ${{ github.event.inputs.clean-run-caches == 'true' }}
+      - run: make login-test-acceptance
         env:
           # latest if branch is main, otherwise image version which is the pull request number
           BAKE_CLI: depot bake
