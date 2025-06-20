@@ -16,6 +16,7 @@ import (
 )
 
 var (
+	ctx                  context.Context
 	IAMOwnerCtx          context.Context
 	instance             *integration.Instance
 	instancePermissionV2 *integration.Instance

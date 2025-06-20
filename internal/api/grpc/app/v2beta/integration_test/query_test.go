@@ -3,6 +3,7 @@
 package instance_test
 
 import (
+	"context"
 	"fmt"
 	"slices"
 	"testing"
@@ -71,6 +72,7 @@ func TestGetApplication(t *testing.T) {
 	tt := []struct {
 		testName     string
 		inputRequest *app.GetApplicationRequest
+		inputCtx     context.Context
 
 		expectedErrorType       codes.Code
 		expectedAppName         string
@@ -79,6 +81,7 @@ func TestGetApplication(t *testing.T) {
 	}{
 		{
 			testName: "when unknown app ID should return not found error",
+			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.GetApplicationRequest{
 				Id: gofakeit.Sentence(2),
 			},
@@ -87,6 +90,7 @@ func TestGetApplication(t *testing.T) {
 		},
 		{
 			testName: "when providing API app ID should return valid API app result",
+			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.GetApplicationRequest{
 				Id: createdApiApp.GetAppId(),
 			},
@@ -97,6 +101,7 @@ func TestGetApplication(t *testing.T) {
 		},
 		{
 			testName: "when providing SAML app ID should return valid SAML app result",
+			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.GetApplicationRequest{
 				Id: createdSAMLApp.GetAppId(),
 			},
@@ -107,6 +112,7 @@ func TestGetApplication(t *testing.T) {
 		},
 		{
 			testName: "when providing OIDC app ID should return valid OIDC app result",
+			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.GetApplicationRequest{
 				Id: createdOIDCApp.GetAppId(),
 			},
@@ -121,10 +127,10 @@ func TestGetApplication(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMOwnerCtx, 30*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
-				res, err := instance.Client.AppV2Beta.GetApplication(IAMOwnerCtx, tc.inputRequest)
+				res, err := instance.Client.AppV2Beta.GetApplication(tc.inputCtx, tc.inputRequest)
 
 				// Then
 				require.Equal(t, tc.expectedErrorType, status.Code(err))
@@ -251,7 +257,7 @@ func TestListApplications(t *testing.T) {
 		return 0
 	})
 
-	appsSortedByCreationDate :=  []appWithName{
+	appsSortedByCreationDate := []appWithName{
 		{name: apiAppName, app: createdApiApp},
 		{name: deactivatedApiAppName, app: createdDeactivatedApiApp},
 		{name: samlAppName, app: createdSAMLApp},
@@ -260,7 +266,7 @@ func TestListApplications(t *testing.T) {
 	slices.SortFunc(appsSortedByCreationDate, func(a, b appWithName) int {
 		aCreationDate := a.app.GetCreationDate().AsTime()
 		bCreationDate := b.app.GetCreationDate().AsTime()
-		
+
 		if aCreationDate.Before(bCreationDate) {
 			return -1
 		}
@@ -274,6 +280,7 @@ func TestListApplications(t *testing.T) {
 	tt := []struct {
 		testName     string
 		inputRequest *app.ListApplicationsRequest
+		inputCtx     context.Context
 
 		expectedOrderedList []appWithName
 		expectedOrderedKeys func(keys []appWithName) any
@@ -281,6 +288,7 @@ func TestListApplications(t *testing.T) {
 	}{
 		{
 			testName: "when no apps found should return empty list",
+			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.ListApplicationsRequest{
 				ProjectId: "another-id",
 			},
@@ -291,6 +299,7 @@ func TestListApplications(t *testing.T) {
 		},
 		{
 			testName: "when sorting by name should return apps sorted by name in descending order",
+			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.ListApplicationsRequest{
 				ProjectId:     p.GetId(),
 				SortingColumn: app.AppSorting_APP_SORT_BY_NAME,
@@ -317,6 +326,7 @@ func TestListApplications(t *testing.T) {
 		},
 		{
 			testName: "when sorting by id should return apps sorted by id in descending order",
+			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.ListApplicationsRequest{
 				ProjectId:     p.GetId(),
 				SortingColumn: app.AppSorting_APP_SORT_BY_ID,
@@ -342,6 +352,7 @@ func TestListApplications(t *testing.T) {
 		},
 		{
 			testName: "when sorting by creation date should return apps sorted by creation date in descending order",
+			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.ListApplicationsRequest{
 				ProjectId:     p.GetId(),
 				SortingColumn: app.AppSorting_APP_SORT_BY_CREATION_DATE,
@@ -367,6 +378,7 @@ func TestListApplications(t *testing.T) {
 		},
 		{
 			testName: "when filtering by active apps should return active apps only",
+			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.ListApplicationsRequest{
 				ProjectId:  p.GetId(),
 				Pagination: &filter.PaginationRequest{Asc: true},
@@ -397,6 +409,7 @@ func TestListApplications(t *testing.T) {
 		},
 		{
 			testName: "when filtering by app type should return apps of matching type only",
+			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.ListApplicationsRequest{
 				ProjectId:  p.GetId(),
 				Pagination: &filter.PaginationRequest{Asc: true},
@@ -430,10 +443,10 @@ func TestListApplications(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMOwnerCtx, 30*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				// When
-				res, err := instance.Client.AppV2Beta.ListApplications(IAMOwnerCtx, tc.inputRequest)
+				res, err := instance.Client.AppV2Beta.ListApplications(tc.inputCtx, tc.inputRequest)
 
 				// Then
 				require.Equal(ttt, codes.OK, status.Code(err))

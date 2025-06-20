@@ -3,6 +3,7 @@
 package instance_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -24,12 +25,14 @@ func TestCreateApplication(t *testing.T) {
 	tt := []struct {
 		testName        string
 		creationRequest *app.CreateApplicationRequest
+		inputCtx        context.Context
 
 		expectedResponseType string
 		expectedErrorType    codes.Code
 	}{
 		{
 			testName: "when project for API app creation is not found should return failed precondition error",
+			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: notExistingProjectID,
 				Name:      "App Name",
@@ -43,6 +46,7 @@ func TestCreateApplication(t *testing.T) {
 		},
 		{
 			testName: "when CreateAPIApp request is valid should create app and return no error",
+			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: Project.GetId(),
 				Name:      "App Name",
@@ -56,6 +60,7 @@ func TestCreateApplication(t *testing.T) {
 		},
 		{
 			testName: "when project for OIDC app creation is not found should return failed precondition error",
+			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: notExistingProjectID,
 				Name:      "App Name",
@@ -84,6 +89,7 @@ func TestCreateApplication(t *testing.T) {
 		},
 		{
 			testName: "when CreateOIDCApp request is valid should create app and return no error",
+			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: Project.GetId(),
 				Name:      gofakeit.AppName(),
@@ -113,6 +119,7 @@ func TestCreateApplication(t *testing.T) {
 		},
 		{
 			testName: "when project for SAML app creation is not found should return failed precondition error",
+			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: notExistingProjectID,
 				Name:      gofakeit.AppName(),
@@ -135,6 +142,7 @@ func TestCreateApplication(t *testing.T) {
 		},
 		{
 			testName: "when CreateSAMLApp request is valid should create app and return no error",
+			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: Project.GetId(),
 				Name:      gofakeit.AppName(),
@@ -160,7 +168,7 @@ func TestCreateApplication(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
-			res, err := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, tc.creationRequest)
+			res, err := instance.Client.AppV2Beta.CreateApplication(tc.inputCtx, tc.creationRequest)
 
 			require.Equal(t, tc.expectedErrorType, status.Code(err))
 			if tc.expectedErrorType == codes.OK {
@@ -258,14 +266,16 @@ func TestPatchApplication(t *testing.T) {
 	t.Parallel()
 
 	tt := []struct {
-		testName     string
-		patchRequest *app.UpdateApplicationRequest
+		testName      string
+		inputCtx      context.Context
+		updateRequest *app.UpdateApplicationRequest
 
 		expectedErrorType codes.Code
 	}{
 		{
 			testName: "when app for app name change request is not found should return not found error",
-			patchRequest: &app.UpdateApplicationRequest{
+			inputCtx: IAMOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
 				ProjectId: pNotInCtx.GetId(),
 				Id:        appForNameChange.GetAppId(),
 				Name:      "New name",
@@ -274,7 +284,8 @@ func TestPatchApplication(t *testing.T) {
 		},
 		{
 			testName: "when request for app name change is valid should return updated timestamp",
-			patchRequest: &app.UpdateApplicationRequest{
+			inputCtx: IAMOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
 				ProjectId: Project.GetId(),
 				Id:        appForNameChange.GetAppId(),
 
@@ -284,7 +295,8 @@ func TestPatchApplication(t *testing.T) {
 
 		{
 			testName: "when app for API config change request is not found should return not found error",
-			patchRequest: &app.UpdateApplicationRequest{
+			inputCtx: IAMOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
 				ProjectId: pNotInCtx.GetId(),
 				Id:        appForAPIConfigChange.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_ApiConfigurationRequest{
@@ -297,7 +309,8 @@ func TestPatchApplication(t *testing.T) {
 		},
 		{
 			testName: "when request for API config change is valid should return updated timestamp",
-			patchRequest: &app.UpdateApplicationRequest{
+			inputCtx: IAMOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
 				ProjectId: Project.GetId(),
 				Id:        appForAPIConfigChange.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_ApiConfigurationRequest{
@@ -307,10 +320,10 @@ func TestPatchApplication(t *testing.T) {
 				},
 			},
 		},
-
 		{
 			testName: "when app for OIDC config change request is not found should return not found error",
-			patchRequest: &app.UpdateApplicationRequest{
+			inputCtx: IAMOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
 				ProjectId: pNotInCtx.GetId(),
 				Id:        appForOIDCConfigChange.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_OidcConfigurationRequest{
@@ -323,7 +336,8 @@ func TestPatchApplication(t *testing.T) {
 		},
 		{
 			testName: "when request for OIDC config change is valid should return updated timestamp",
-			patchRequest: &app.UpdateApplicationRequest{
+			inputCtx: IAMOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
 				ProjectId: Project.GetId(),
 				Id:        appForOIDCConfigChange.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_OidcConfigurationRequest{
@@ -336,7 +350,8 @@ func TestPatchApplication(t *testing.T) {
 
 		{
 			testName: "when app for SAML config change request is not found should return not found error",
-			patchRequest: &app.UpdateApplicationRequest{
+			inputCtx: IAMOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
 				ProjectId: pNotInCtx.GetId(),
 				Id:        appForSAMLConfigChange.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_SamlConfigurationRequest{
@@ -352,7 +367,8 @@ func TestPatchApplication(t *testing.T) {
 		},
 		{
 			testName: "when request for SAML config change is valid should return updated timestamp",
-			patchRequest: &app.UpdateApplicationRequest{
+			inputCtx: IAMOwnerCtx,
+			updateRequest: &app.UpdateApplicationRequest{
 				ProjectId: Project.GetId(),
 				Id:        appForSAMLConfigChange.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_SamlConfigurationRequest{
@@ -370,7 +386,7 @@ func TestPatchApplication(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			t.Parallel()
-			res, err := instance.Client.AppV2Beta.UpdateApplication(IAMOwnerCtx, tc.patchRequest)
+			res, err := instance.Client.AppV2Beta.UpdateApplication(tc.inputCtx, tc.updateRequest)
 
 			require.Equal(t, tc.expectedErrorType, status.Code(err))
 			if tc.expectedErrorType == codes.OK {
@@ -381,27 +397,29 @@ func TestPatchApplication(t *testing.T) {
 }
 
 func TestDeleteApplication(t *testing.T) {
-	
+
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
-	
+
 	appToDelete, appNameChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           Project.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
 	require.Nil(t, appNameChangeErr)
-	
+
 	t.Parallel()
 	tt := []struct {
 		testName      string
 		deleteRequest *app.DeleteApplicationRequest
+		inputCtx      context.Context
 
 		expectedErrorType codes.Code
 	}{
 		{
 			testName: "when app to delete is not found should return not found error",
+			inputCtx: IAMOwnerCtx,
 			deleteRequest: &app.DeleteApplicationRequest{
 				ProjectId: Project.GetId(),
 				Id:        gofakeit.Sentence(2),
@@ -410,6 +428,7 @@ func TestDeleteApplication(t *testing.T) {
 		},
 		{
 			testName: "when app to delete is found should return deletion time",
+			inputCtx: IAMOwnerCtx,
 			deleteRequest: &app.DeleteApplicationRequest{
 				ProjectId: Project.GetId(),
 				Id:        appToDelete.GetAppId(),
@@ -422,7 +441,7 @@ func TestDeleteApplication(t *testing.T) {
 			t.Parallel()
 
 			// When
-			res, err := instance.Client.AppV2Beta.DeleteApplication(IAMOwnerCtx, tc.deleteRequest)
+			res, err := instance.Client.AppV2Beta.DeleteApplication(tc.inputCtx, tc.deleteRequest)
 
 			// Then
 			require.Equal(t, tc.expectedErrorType, status.Code(err))
@@ -434,28 +453,30 @@ func TestDeleteApplication(t *testing.T) {
 }
 
 func TestDeactivateApplication(t *testing.T) {
-	
+
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
-	
+
 	appToDeactivate, appCreateErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           Project.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
 	require.NoError(t, appCreateErr)
-	
+
 	t.Parallel()
 
 	tt := []struct {
 		testName      string
+		inputCtx      context.Context
 		deleteRequest *app.DeactivateApplicationRequest
 
 		expectedErrorType codes.Code
 	}{
 		{
 			testName: "when app to deactivate is not found should return not found error",
+			inputCtx: IAMOwnerCtx,
 			deleteRequest: &app.DeactivateApplicationRequest{
 				ProjectId: Project.GetId(),
 				Id:        gofakeit.Sentence(2),
@@ -464,6 +485,7 @@ func TestDeactivateApplication(t *testing.T) {
 		},
 		{
 			testName: "when app to deactivate is found should return deactivation time",
+			inputCtx: IAMOwnerCtx,
 			deleteRequest: &app.DeactivateApplicationRequest{
 				ProjectId: Project.GetId(),
 				Id:        appToDeactivate.GetAppId(),
@@ -476,7 +498,7 @@ func TestDeactivateApplication(t *testing.T) {
 			t.Parallel()
 
 			// When
-			res, err := instance.Client.AppV2Beta.DeactivateApplication(IAMOwnerCtx, tc.deleteRequest)
+			res, err := instance.Client.AppV2Beta.DeactivateApplication(tc.inputCtx, tc.deleteRequest)
 
 			// Then
 			require.Equal(t, tc.expectedErrorType, status.Code(err))
@@ -509,12 +531,14 @@ func TestReactivateApplication(t *testing.T) {
 
 	tt := []struct {
 		testName          string
+		inputCtx          context.Context
 		reactivateRequest *app.ReactivateApplicationRequest
 
 		expectedErrorType codes.Code
 	}{
 		{
 			testName: "when app to reactivate is not found should return not found error",
+			inputCtx: IAMOwnerCtx,
 			reactivateRequest: &app.ReactivateApplicationRequest{
 				ProjectId: Project.GetId(),
 				Id:        gofakeit.Sentence(2),
@@ -523,6 +547,7 @@ func TestReactivateApplication(t *testing.T) {
 		},
 		{
 			testName: "when app to reactivate is found should return deactivation time",
+			inputCtx: IAMOwnerCtx,
 			reactivateRequest: &app.ReactivateApplicationRequest{
 				ProjectId: Project.GetId(),
 				Id:        appToReactivate.GetAppId(),
@@ -535,7 +560,7 @@ func TestReactivateApplication(t *testing.T) {
 			t.Parallel()
 
 			// When
-			res, err := instance.Client.AppV2Beta.ReactivateApplication(IAMOwnerCtx, tc.reactivateRequest)
+			res, err := instance.Client.AppV2Beta.ReactivateApplication(tc.inputCtx, tc.reactivateRequest)
 
 			// Then
 			require.Equal(t, tc.expectedErrorType, status.Code(err))
@@ -550,7 +575,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 	reqForApiAppCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
-	
+
 	apiAppToRegen, apiAppCreateErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId:           Project.GetId(),
 		Name:                gofakeit.AppName(),
@@ -590,6 +615,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 
 	tt := []struct {
 		testName     string
+		inputCtx     context.Context
 		regenRequest *app.RegenerateClientSecretRequest
 
 		expectedErrorType codes.Code
@@ -597,6 +623,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 	}{
 		{
 			testName: "when app to regen is not expected type should return invalid argument error",
+			inputCtx: IAMOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
 				ProjectId:     Project.GetId(),
 				ApplicationId: gofakeit.Sentence(2),
@@ -605,6 +632,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 		},
 		{
 			testName: "when app to regen is not found should return not found error",
+			inputCtx: IAMOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
 				ProjectId:     Project.GetId(),
 				ApplicationId: gofakeit.Sentence(2),
@@ -614,6 +642,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 		},
 		{
 			testName: "when API app to regen is found should return different secret",
+			inputCtx: IAMOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
 				ProjectId:     Project.GetId(),
 				ApplicationId: apiAppToRegen.GetAppId(),
@@ -623,6 +652,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 		},
 		{
 			testName: "when OIDC app to regen is found should return different secret",
+			inputCtx: IAMOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
 				ProjectId:     Project.GetId(),
 				ApplicationId: oidcAppToRegen.GetAppId(),
@@ -637,7 +667,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 			t.Parallel()
 
 			// When
-			res, err := instance.Client.AppV2Beta.RegenerateClientSecret(IAMOwnerCtx, tc.regenRequest)
+			res, err := instance.Client.AppV2Beta.RegenerateClientSecret(tc.inputCtx, tc.regenRequest)
 
 			// Then
 			require.Equal(t, tc.expectedErrorType, status.Code(err))
