@@ -7,7 +7,7 @@ import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getSession } from "@/lib/zitadel";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: {
@@ -15,7 +15,6 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
   const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "u2f" });
 
   const { loginName, requestId, sessionId, organization } = searchParams;
 
@@ -59,7 +58,9 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("verify.title")}</h1>
+        <h1>
+          <Translated i18nKey="verify.title" namespace="u2f" />
+        </h1>
 
         {sessionFactors && (
           <UserAvatar
@@ -69,7 +70,9 @@ export default async function Page(props: {
             searchParams={searchParams}
           ></UserAvatar>
         )}
-        <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="verify.description" namespace="u2f" />
+        </p>
 
         {!(loginName || sessionId) && (
           <Alert>

@@ -10,7 +10,6 @@ import {
   getLoginSettings,
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
-import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: {
@@ -20,8 +19,6 @@ export default async function Page(props: {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const searchParams = await props.searchParams;
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "password" });
 
   const { loginName, organization, requestId } = searchParams;
 
@@ -53,9 +50,13 @@ export default async function Page(props: {
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
         <h1>
-          {sessionFactors?.factors?.user?.displayName ?? t("change.title")}
+          {sessionFactors?.factors?.user?.displayName ?? (
+            <Translated i18nKey="change.title" namespace="password" />
+          )}
         </h1>
-        <p className="ztdl-p mb-6 block">{t("change.description")}</p>
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="change.description" namespace="u2f" />
+        </p>
 
         {/* show error only if usernames should be shown to be unknown */}
         {(!sessionFactors || !loginName) &&

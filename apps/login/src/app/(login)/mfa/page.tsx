@@ -12,15 +12,12 @@ import {
   getSession,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
-import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
   const searchParams = await props.searchParams;
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "mfa" });
 
   const { loginName, requestId, organization, sessionId } = searchParams;
 
@@ -90,9 +87,13 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("verify.title")}</h1>
+        <h1>
+          <Translated i18nKey="verify.title" namespace="mfa" />
+        </h1>
 
-        <p className="ztdl-p">{t("verify.description")}</p>
+        <p className="ztdl-p">
+          <Translated i18nKey="verify.description" namespace="mfa" />
+        </p>
 
         {sessionFactors && (
           <UserAvatar
@@ -118,7 +119,9 @@ export default async function Page(props: {
             userMethods={sessionFactors.authMethods ?? []}
           ></ChooseSecondFactor>
         ) : (
-          <Alert>{t("verify.noResults")}</Alert>
+          <Alert>
+            <Translated i18nKey="verify.noResults" namespace="mfa" />
+          </Alert>
         )}
 
         <div className="mt-8 flex w-full flex-row items-center">
