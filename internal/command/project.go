@@ -80,6 +80,7 @@ func (c *Commands) AddProject(ctx context.Context, add *AddProject) (_ *domain.O
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
+		logging.WithError(err).Errorf("failed pushing events: %v", events)
 		return nil, err
 	}
 	postCommit(ctx)

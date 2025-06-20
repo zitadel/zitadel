@@ -147,6 +147,7 @@ func TestAddAPIConfig(t *testing.T) {
 }
 
 func TestCommandSide_AddAPIApplication(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
@@ -243,6 +244,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -297,6 +299,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -351,6 +354,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -395,6 +399,8 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			r := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				idGenerator:     tt.fields.idGenerator,
@@ -402,8 +408,9 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 				defaultSecretGenerators: &SecretGenerators{
 					ClientSecret: emptyConfig,
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
-			got, err := r.AddAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
+			got, err := r.AddAPIApplication(tt.args.ctx, tt.args.apiApp, "", tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -418,6 +425,8 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 }
 
 func TestCommandSide_ChangeAPIApplication(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
@@ -521,6 +530,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 								domain.APIAuthMethodTypePrivateKeyJWT),
 						),
 					),
+					expectFilter(),
 				),
 			},
 			args: args{
@@ -560,6 +570,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 								domain.APIAuthMethodTypeBasic),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						newAPIAppChangedEvent(context.Background(),
 							"app1",
@@ -598,14 +609,17 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			r := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				newHashedSecret: mockHashedSecret("secret"),
 				defaultSecretGenerators: &SecretGenerators{
 					ClientSecret: emptyConfig,
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
-			got, err := r.ChangeAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
+			got, err := r.UpdateAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -620,6 +634,8 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 }
 
 func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
@@ -739,12 +755,15 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			r := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				newHashedSecret: mockHashedSecret("secret"),
 				defaultSecretGenerators: &SecretGenerators{
 					ClientSecret: emptyConfig,
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
 			got, err := r.ChangeAPIApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner)
 			if tt.res.err == nil {
