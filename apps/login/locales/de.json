@@ -22,7 +22,8 @@
   "loginname": {
     "title": "Willkommen zurück!",
     "description": "Geben Sie Ihre Anmeldedaten ein.",
-    "register": "Neuen Benutzer registrieren"
+    "register": "Neuen Benutzer registrieren",
+    "submit": "Weiter"
   },
   "password": {
     "verify": {
