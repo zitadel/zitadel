@@ -85,7 +85,7 @@ func (c *Commands) AddAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, appID)
 }
 
-func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string) (_ *domain.APIApp, err error) {
+func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp, inputAppID, resourceOwner string) (_ *domain.APIApp, err error) {
 	if apiApp == nil || apiApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Project.App.Invalid")
 	}
@@ -102,9 +102,12 @@ func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp,
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Project.App.Invalid")
 	}
 
-	appID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
+	appID := inputAppID
+	if appID == "" {
+		appID, err = c.idGenerator.Next()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, appID)
