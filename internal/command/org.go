@@ -325,7 +325,7 @@ func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
-	if existingOrg.State != domain.OrgStateUnspecified {
+	if existingOrg.State != domain.OrgStateUnspecified && existingOrg.State != domain.OrgStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "ORG-lapo2m", "Errors.Org.AlreadyExisting")
 	}
 
