@@ -17,78 +17,30 @@ FORCE=${FORCE:-false}
 CACHE_FILE="$CACHE_DIR/$MAKE_TARGET.digests"
 mkdir -p "$CACHE_DIR"
 
-inspect_image() {
-  local image=$1
-  local format=$2
-  docker image inspect "$image" --format="$format" 2>/dev/null || true
-}
-
-get_digest() {
-  local image=$1
-  echo "id=$(inspect_image $image '{{ .Id }}'),digest=$(inspect_image $image '{{ index RepoDigests 0 }}'),json=$(inspect_image $image '{{ json . }}' | base64 --wrap 0)"
-}
-
-get_image_digests() {
-  local digests=""
+get_image_creation_dates() {
+  local values=""
 	for img in $(echo "$IMAGES"); do
-		local digest="$(get_digest $img)"
-		if [[ -z $digest ]]; then
+		local value=$(docker image inspect "$img" --format='{{.Created}}' 2>/dev/null || true)
+		if [[ -z $value ]]; then
 		  docker pull "$img" >/dev/null 2>&1 || true
-		  digest="$(get_digest $img)"
+		  value=$(docker image inspect "$img" --format='{{.Created}}' 2>/dev/null || true)
     fi
-    if [[ -z $digest ]]; then
-		  digest="$(get_digest $img)"
+    if [[ -z $value ]]; then
+		  value=$(docker image inspect "$img" --format='{{.Created}}' 2>/dev/null || true)
     fi
-		digest="${img}@${digest}"
-		digests="${digests}${digest} "
+		value=${value:-new-and-not-pullable-or-failed-to-build}
+		value="${img}@${value}"
+		values="${values}${value};"
 	done
-	digests=${digests% }  # Remove trailing space
-	echo "$digests"
+	values=${values%;}  # Remove trailing semicolon
+	echo "$values"
 }
 
-CACHE_CONTENT=$(cat "$CACHE_FILE" 2>/dev/null || echo "")
-CACHED_STATUS=$(echo "$CACHE_CONTENT" | cut -d ';' -f1)
-CACHED_DIGESTS=$(echo "$CACHE_CONTENT" | cut -d ';' -f2)
-CURRENT_DIGESTS="$(get_image_digests)"
-
-echo "Comparing cached vs current image digests..."
-echo
-echo "$CACHED_DIGESTS"
-echo
-echo "$CURRENT_DIGESTS"
-
-IMAGE_CHANGED=false
-
-# Check if the numbeer of cached digests is equal or greater than the current digests
-if [[ -z "$CACHED_DIGESTS" ]]; then
-  echo "No cached digests found, running $MAKE_TARGET."
-  IMAGE_CHANGED=true
-elif [[ $(echo "$CACHED_DIGESTS" | wc -w) -lt $(echo "$CURRENT_DIGESTS" | wc -w) ]]; then
-  echo "Cached digests are fewer than current digests, running $MAKE_TARGET."
-  IMAGE_CHANGED=true
-fi
-
-
-if [[ "$IMAGE_CHANGED" == "false" ]]; then
-  # Compare against cached digests
-  for current_digest in $CURRENT_DIGESTS; do
-    current_digest_image_id=$(echo "$current_digest" | cut -d ',' -f1)
-    current_digest_repo_digest=$(echo "$current_digest" | cut -d ',' -f2)
-    for cached_digest in $CACHED_DIGESTS; do
-      cached_digest_image_id=$(echo "$cached_digest" | cut -d ',' -f1)
-      cached_digest_repo_digest=$(echo "$cached_digest" | cut -d ',' -f2)
-      if [[ "$current_digest_image_id" != "$cached_digest_image_id" && "$current_digest_repo_digest" != "$cached_digest_repo_digest" ]]; then
-        echo "Image digest mismatch:"
-        echo "Current: $current_digest"
-        echo "Cached:  $cached_digest"
-        IMAGE_CHANGED="true"
-        break 2
-      fi
-    done
-  done
-fi
-
-if [[ "$IMAGE_CHANGED" == "false" ]]; then
+CACHE_FILE_CONTENT=$(cat "$CACHE_FILE" 2>/dev/null || echo "")
+CACHED_STATUS=$(echo "$CACHE_FILE_CONTENT" | cut -d ';' -f1)
+CACHED_IMAGE_CREATED_VALUES=$(echo "$CACHE_FILE_CONTENT" | cut -d ';' -f2-99)
+CURRENT_IMAGE_CREATED_VALUES="$(get_image_creation_dates)"
+  if [[ "$CACHED_IMAGE_CREATED_VALUES" == "$CURRENT_IMAGE_CREATED_VALUES" ]]; then
     if [[ "$FORCE" == "true" ]]; then
         echo "\$FORCE=$FORCE - Running $MAKE_TARGET despite unchanged images."
     else
@@ -96,8 +48,13 @@ if [[ "$IMAGE_CHANGED" == "false" ]]; then
         exit $CACHED_STATUS
     fi
 fi
-
 echo "Images have changed"
+echo
+echo "CACHED_IMAGE_CREATED_VALUES does not match CURRENT_IMAGE_CREATED_VALUES"
+echo
+echo "$CACHED_IMAGE_CREATED_VALUES"
+echo
+echo "$CURRENT_IMAGE_CREATED_VALUES"
 echo
 docker images
 echo
@@ -106,5 +63,5 @@ set +e
 make -j $MAKE_TARGET
 STATUS=$?
 set -e
-echo "${STATUS};$(get_image_digests)" > $CACHE_FILE
+echo "${STATUS};$(get_image_creation_dates)" > $CACHE_FILE
 exit $STATUS
