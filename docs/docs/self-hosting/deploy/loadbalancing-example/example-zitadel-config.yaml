@@ -1,7 +1,6 @@
 # All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml
 
 ExternalSecure: true
-ExternalDomain: 127.0.0.1.sslip.io
 ExternalPort: 443
 
 # Traefik terminates TLS. Inside the Docker network, we use plain text.
@@ -27,3 +26,5 @@ LogStore.Access.Stdout.Enabled: true
 
 # Skipping the MFA init step allows us to immediately authenticate at the console
 DefaultInstance.LoginPolicy.MfaInitSkipLifetime: "0s"
+# To use the login container for all applications, we require it for the whole instance
+DefaultInstance.Features.LoginV2.Required: true
