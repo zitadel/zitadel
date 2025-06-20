@@ -25,7 +25,7 @@ inspect_image() {
 
 get_digest() {
   local image=$1
-  echo "id=$(inspect_image $image '{{ .Id }}'),digest=$(inspect_image $image '{{ index RepoDigests 0 }}'),json=$(inspect_image $image '{{ json . }}' | base64 --wrap 0)"
+  echo "id=$(inspect_image $image '{{ .Id }}'),digest=$(inspect_image $image '{{ index RepoDigests 0 }}')"
 }
 
 get_image_digests() {
@@ -75,8 +75,8 @@ if [[ "$IMAGE_CHANGED" == "false" ]]; then
     current_digest_image_id=$(echo "$current_digest" | cut -d ',' -f1)
     current_digest_repo_digest=$(echo "$current_digest" | cut -d ',' -f2)
     for cached_digest in $CACHED_DIGESTS; do
-      cached_digest_image_id=$(echo "$current_digest" | cut -d ',' -f1)
-      cached_digest_repo_digest=$(echo "$current_digest" | cut -d ',' -f2)
+      cached_digest_image_id=$(echo "$cached_digest" | cut -d ',' -f1)
+      cached_digest_repo_digest=$(echo "$cached_digest" | cut -d ',' -f2)
       if [[ "$current_digest_image_id" != "$cached_digest_image_id" && "$current_digest_repo_digest" != "$cached_digest_repo_digest" ]]; then
         echo "Image digest mismatch:"
         echo "Current: $current_digest"
