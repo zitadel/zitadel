@@ -33,7 +33,7 @@
     "@ngx-translate/core": "^15.0.0",
     "@zitadel/client": "1.2.0",
     "@zitadel/proto": "1.2.0",
-    "angular-oauth2-oidc": "^15.0.1",
+    "angular-oauth2-oidc": "^17.0.2",
     "angularx-qrcode": "^16.0.2",
     "buffer": "^6.0.3",
     "codemirror": "^5.65.19",
