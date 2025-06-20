@@ -59,13 +59,12 @@ jobs:
             ${{ runner.os }}-login-run-caches-
       - name: Show Run Caches
         run: make show-run-caches
-      - run: make login-test-acceptance
+      - run: make login-quality
         env:
           # latest if branch is main, otherwise image version which is the pull request number
           BAKE_CLI: depot bake
           DEPOT_PROJECT_ID: jp837jn3fm
-          FORCE: true
-#          FORCE: ${{ github.event.inputs.clean-run-caches == 'true' }}
+          FORCE: ${{ github.event.inputs.clean-run-caches == 'true' }}
       - name: Save Run Caches
         uses: actions/cache/save@v4
         with:
