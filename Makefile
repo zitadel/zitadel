@@ -69,9 +69,6 @@ login-test-acceptance-build-compose:
 login-test-acceptance-build: login-test-acceptance-build-compose login-test-acceptance-build-bake
 	@:
 
-login-test-acceptance-build:
-	$(BAKE_CLI_WITH_COMMON_ARGS) --load setup sink oidcrp samlsp login-test-acceptance login-standalone
-
 login-test-acceptance-run: login-test-acceptance-cleanup
 	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml run --rm --service-ports acceptance
 
