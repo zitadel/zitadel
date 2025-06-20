@@ -60,6 +60,15 @@ login-test-integration: login-test-integration-build
 	$(CORE_MOCK_TAG) \
 	$(LOGIN_TEST_INTEGRATION_TAG)"
 
+login-test-acceptance-build-bake:
+	$(BAKE_CLI_WITH_COMMON_ARGS) login-test-acceptance login-standalone
+
+login-test-acceptance-build-compose:
+	$(BAKE_CLI_WITH_COMMON_ARGS) --load setup sink oidcrp samlsp
+
+login-test-acceptance-build: login-test-acceptance-build-compose login-test-acceptance-build-bake
+	@:
+
 login-test-acceptance-build:
 	$(BAKE_CLI_WITH_COMMON_ARGS) --load setup sink oidcrp samlsp login-test-acceptance login-standalone
 
