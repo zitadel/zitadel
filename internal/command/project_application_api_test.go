@@ -722,7 +722,6 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 								domain.APIAuthMethodTypeBasic),
 						),
 					),
-					expectFilter(),
 					expectPush(
 						project.NewAPIConfigSecretChangedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,

@@ -574,7 +574,6 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 				),
 				httpClient: newTestClient(http.StatusOK, testMetadata),
 			},
@@ -621,7 +620,6 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 				),
 				httpClient: nil,
 			},
@@ -668,7 +666,6 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectPush(
 						newSAMLAppChangedEventMetadataURL(context.Background(),
 							"app1",
@@ -736,7 +733,6 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectPush(
 						newSAMLAppChangedEventMetadata(context.Background(),
 							"app1",
@@ -804,7 +800,6 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectPush(
 						newSAMLAppChangedEventLoginVersion(context.Background(),
 							"app1",

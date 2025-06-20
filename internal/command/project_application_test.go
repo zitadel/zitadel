@@ -460,7 +460,6 @@ func TestCommandSide_ReactivateApplication(t *testing.T) {
 							"app1",
 						)),
 					),
-					expectFilter(),
 					expectPush(
 						project.NewApplicationReactivatedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,

@@ -1231,7 +1231,6 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectPush(
 						project.NewOIDCConfigSecretChangedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
