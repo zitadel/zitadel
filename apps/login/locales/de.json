@@ -72,6 +72,10 @@
     "linkingError": {
       "title": "Konto-Verknüpfung fehlgeschlagen",
       "description": "Beim Verknüpfen Ihres Kontos ist ein Fehler aufgetreten."
+    },
+    "completeRegister": {
+      "title": "Registrierung abschließen",
+      "description": "Bitte vervollständige die Registrierung, um dein Konto zu erstellen."
     }
   },
   "mfa": {
@@ -149,11 +153,13 @@
     },
     "title": "Registrieren",
     "description": "Erstellen Sie Ihr ZITADEL-Konto.",
+    "noMethodAvailableWarning": "Keine Authentifizierungsmethode verfügbar. Bitte wenden Sie sich an den Administrator.",
     "selectMethod": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten",
     "agreeTo": "Um sich zu registrieren, müssen Sie den Nutzungsbedingungen zustimmen",
     "termsOfService": "Nutzungsbedingungen",
     "privacyPolicy": "Datenschutzrichtlinie",
     "submit": "Weiter",
+    "orUseIDP": "oder verwenden Sie einen Identitätsanbieter",
     "password": {
       "title": "Passwort festlegen",
       "description": "Legen Sie das Passwort für Ihr Konto fest",

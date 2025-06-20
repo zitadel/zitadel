@@ -72,6 +72,10 @@
     "linkingError": {
       "title": "Powiązanie konta nie powiodło się",
       "description": "Wystąpił błąd podczas próby powiązania konta."
+    },
+    "completeRegister": {
+      "title": "Ukończ rejestrację",
+      "description": "Ukończ rejestrację swojego konta."
     }
   },
   "mfa": {
@@ -149,11 +153,13 @@
     },
     "title": "Rejestracja",
     "description": "Utwórz konto ZITADEL.",
+    "noMethodAvailableWarning": "Brak dostępnych metod uwierzytelniania. Skontaktuj się z administratorem.",
     "selectMethod": "Wybierz metodę uwierzytelniania, której chcesz użyć",
     "agreeTo": "Aby się zarejestrować, musisz zaakceptować warunki korzystania",
     "termsOfService": "Regulamin",
     "privacyPolicy": "Polityka prywatności",
     "submit": "Kontynuuj",
+    "orUseIDP": "lub użyj dostawcy tożsamości",
     "password": {
       "title": "Ustaw hasło",
       "description": "Ustaw hasło dla swojego konta",

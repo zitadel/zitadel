@@ -33,7 +33,7 @@ export default async function Page(props: {
     }
   }
 
-  const missingData = !firstname || !lastname || !email;
+  const missingData = !firstname || !lastname || !email || !organization;
 
   const legal = await getLegalAndSupportSettings({
     serviceUrl,
@@ -73,7 +73,7 @@ export default async function Page(props: {
             email={email}
             firstname={firstname}
             lastname={lastname}
-            organization={organization}
+            organization={organization as string} // organization is guaranteed to be a string here otherwise we would have returned earlier
             requestId={requestId}
           ></SetRegisterPasswordForm>
         )}

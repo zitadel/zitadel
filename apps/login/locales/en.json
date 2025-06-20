@@ -72,6 +72,10 @@
     "linkingError": {
       "title": "Account linking failed",
       "description": "An error occurred while trying to link your account."
+    },
+    "completeRegister": {
+      "title": "Complete your data",
+      "description": "You need to complete your registration by providing your email address and name."
     }
   },
   "mfa": {
@@ -149,11 +153,13 @@
     },
     "title": "Register",
     "description": "Create your ZITADEL account.",
+    "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
     "selectMethod": "Select the method you would like to authenticate",
     "agreeTo": "To register you must agree to the terms and conditions",
     "termsOfService": "Terms of Service",
     "privacyPolicy": "Privacy Policy",
     "submit": "Continue",
+    "orUseIDP": "or use an Identity Provider",
     "password": {
       "title": "Set Password",
       "description": "Set the password for your account",

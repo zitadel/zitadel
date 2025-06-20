@@ -75,7 +75,7 @@ export default async function Page(props: {
           submit={submit}
           allowRegister={!!loginSettings?.allowRegister}
         >
-          {identityProviders && (
+          {identityProviders && loginSettings?.allowExternalIdp && (
             <SignInWithIdp
               identityProviders={identityProviders}
               requestId={requestId}
