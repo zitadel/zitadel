@@ -25,18 +25,18 @@ export default defineConfig({
   timeout: 300 * 1000, // 5 minutes
   globalTimeout: 30 * 60_000, // 30 minutes
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [["line"], ["html", { open: process.env.CI ? "never" : "on-failure" , host: "0.0.0.0" }]],
+  reporter: [["line"], ["html", { open: process.env.CI ? "never" : "on-failure", host: "0.0.0.0" }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.LOGIN_BASE_URL || "http://127.0.0.1:3000",
     trace: "retain-on-failure",
     headless: true,
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
     ignoreHTTPSErrors: true,
   },
-  outputDir: 'test-results',
+  outputDir: "test-results",
 
   /* Configure projects for major browsers */
   projects: [
@@ -79,7 +79,7 @@ export default defineConfig({
 
   /* Run local dev server before starting the tests */
 
-/*  webServer: {
+  /*  webServer: {
     command: "pnpm start:built",
     url: process.env.LOGIN_BASE_URL || "http://127.0.0.1:3000",
     reuseExistingServer: !!process.env.LOGIN_BASE_URL,

@@ -47,6 +47,9 @@ login-test-unit:
 login-test-integration-build:
 	$(BAKE_CLI_WITH_COMMON_ARGS) core-mock login-test-integration login-standalone
 
+login-test-integration-dev:
+	$(BAKE_CLI_WITH_COMMON_ARGS) core-mock && docker compose --file ./apps/login-test-integration/docker-compose.yaml run --service-ports --rm core-mock
+
 login-test-integration-run: login-test-integration-cleanup
 	docker compose --file ./apps/login-test-integration/docker-compose.yaml run --rm integration
 

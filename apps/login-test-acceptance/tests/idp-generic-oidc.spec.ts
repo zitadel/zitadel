@@ -3,7 +3,7 @@
 import test from "@playwright/test";
 
 test("login with Generic OIDC IDP", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given a Generic OIDC IDP is configured on the organization
   // Given the user has Generic OIDC IDP added as auth method
   // User authenticates with the Generic OIDC IDP
@@ -12,7 +12,7 @@ test("login with Generic OIDC IDP", async ({ page }) => {
 });
 
 test("login with Generic OIDC IDP - error", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given the Generic OIDC IDP is configured on the organization
   // Given the user has Generic OIDC IDP added as auth method
   // User is redirected to the Generic OIDC IDP
@@ -22,7 +22,7 @@ test("login with Generic OIDC IDP - error", async ({ page }) => {
 });
 
 test("login with Generic OIDC IDP, no user existing - auto register", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given idp Generic OIDC is configure on the organization as only authencation method
   // Given idp Generic OIDC is configure with account creation alloweed, and automatic creation enabled
   // Given no user exists yet
@@ -34,7 +34,7 @@ test("login with Generic OIDC IDP, no user existing - auto register", async ({ p
 });
 
 test("login with Generic OIDC IDP, no user existing - auto register not possible", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given idp Generic OIDC is configure on the organization as only authencation method
   // Given idp Generic OIDC is configure with account creation alloweed, and automatic creation enabled
   // Given no user exists yet
@@ -52,7 +52,7 @@ test("login with Generic OIDC IDP, no user existing - auto register not possible
 test("login with Generic OIDC IDP, no user existing - auto register enabled - manual creation disabled, creation not possible", async ({
   page,
 }) => {
-  test.skip()
+  test.skip();
   // Given idp Generic OIDC is configure on the organization as only authencation method
   // Given idp Generic OIDC is configure with account creation not allowed, and automatic creation enabled
   // Given no user exists yet
@@ -64,7 +64,7 @@ test("login with Generic OIDC IDP, no user existing - auto register enabled - ma
 });
 
 test("login with Generic OIDC IDP, no user linked - auto link", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given idp Generic OIDC is configure on the organization as only authencation method
   // Given idp Generic OIDC is configure with account linking allowed, and linking set to existing email
   // Given user with email address user@zitadel.com exists
@@ -76,7 +76,7 @@ test("login with Generic OIDC IDP, no user linked - auto link", async ({ page })
 });
 
 test("login with Generic OIDC IDP, no user linked, linking not possible", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given idp Generic OIDC is configure on the organization as only authencation method
   // Given idp Generic OIDC is configure with manually account linking  not allowed, and linking set to existing email
   // Given user with email address user@zitadel.com doesn't exists
@@ -88,7 +88,7 @@ test("login with Generic OIDC IDP, no user linked, linking not possible", async 
 });
 
 test("login with Generic OIDC IDP, no user linked, linking successful", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given idp Generic OIDC is configure on the organization as only authencation method
   // Given idp Generic OIDC is configure with manually account linking allowed, and linking set to existing email
   // Given user with email address user@zitadel.com doesn't exists

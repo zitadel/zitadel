@@ -24,7 +24,6 @@ public/dist
 
 Makefile
 docker-bake.hcl
-docker-bake-ci.hcl
-*.md
-.gitignore
-_temp
+**/*.md
+**/*.gitignore
+.git

@@ -7,8 +7,8 @@
     "test:integration:watch:open": "pnpm exec concurrently --names 'mock,test' --kill-others 'pnpm:mock' 'env-cmd -f ./.env.integration start-server-and-test dev http://localhost:3000 \"pnpm nodemon -e js,jsx,ts,tsx,css,scss --ignore \\\"__test__/**\\\" --exec \\\"pnpm test:integration:open\\\"\"'",
     "test:integration:run": "pnpm exec cypress run --quiet",
     "test:integration:open": "pnpm exec cypress open",
-    "mock": "pnpm mock:stop && docker run --rm --name zitadel-mock-grpc-server --publish 22220:22220 --publish 22222:22222 ${CORE_MOCK_TAG:-zitadel-core-mock:local}",
-    "mock:stop": "docker rm --force zitadel-mock-grpc-server 2>/dev/null || true"
+    "mock": "make login-test-integration-build-dev",
+    "mock:stop": "docker compose down core-mock"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",

@@ -37,7 +37,7 @@ test("register with passkey", async ({ page }) => {
 });
 
 test("register with username and password - only password enabled", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given on the default organization "username and password is allowed" is enabled
   // Given on the default organization "username registeration allowed" is enabled
   // Given on the default organization no idp is configured and enabled
@@ -51,7 +51,7 @@ test("register with username and password - only password enabled", async ({ pag
 });
 
 test("register with username and password - wrong password not enough characters", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given on the default organization "username and password is allowed" is enabled
   // Given on the default organization "username registeration allowed" is enabled
   // Given on the default organization no idp is configured and enabled
@@ -66,7 +66,7 @@ test("register with username and password - wrong password not enough characters
 });
 
 test("register with username and password - wrong password number missing", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given on the default organization "username and password is allowed" is enabled
   // Given on the default organization "username registeration allowed" is enabled
   // Given on the default organization no idp is configured and enabled
@@ -81,7 +81,7 @@ test("register with username and password - wrong password number missing", asyn
 });
 
 test("register with username and password - wrong password upper case missing", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given on the default organization "username and password is allowed" is enabled
   // Given on the default organization "username registeration allowed" is enabled
   // Given on the default organization no idp is configured and enabled
@@ -96,7 +96,7 @@ test("register with username and password - wrong password upper case missing", 
 });
 
 test("register with username and password - wrong password lower case missing", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given on the default organization "username and password is allowed" is enabled
   // Given on the default organization "username registeration allowed" is enabled
   // Given on the default organization no idp is configured and enabled
@@ -111,7 +111,7 @@ test("register with username and password - wrong password lower case missing", 
 });
 
 test("register with username and password - wrong password symboo missing", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given on the default organization "username and password is allowed" is enabled
   // Given on the default organization "username registeration allowed" is enabled
   // Given on the default organization no idp is configured and enabled
@@ -126,7 +126,7 @@ test("register with username and password - wrong password symboo missing", asyn
 });
 
 test("register with username and password - password and passkey enabled", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given on the default organization "username and password is allowed" is enabled
   // Given on the default organization "username registeration allowed" is enabled
   // Given on the default organization no idp is configured and enabled
@@ -142,7 +142,7 @@ test("register with username and password - password and passkey enabled", async
 });
 
 test("register with username and passkey - password and passkey enabled", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given on the default organization "username and password is allowed" is enabled
   // Given on the default organization "username registeration allowed" is enabled
   // Given on the default organization no idp is configured and enabled
@@ -159,7 +159,7 @@ test("register with username and passkey - password and passkey enabled", async 
 });
 
 test("register with username and password - registration disabled", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given on the default organization "username and password is allowed" is enabled
   // Given on the default organization "username registeration allowed" is enabled
   // Given on the default organization no idp is configured and enabled
@@ -168,7 +168,7 @@ test("register with username and password - registration disabled", async ({ pag
 });
 
 test("register with username and password - multiple registration options", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given on the default organization "username and password is allowed" is enabled
   // Given on the default organization "username registeration allowed" is enabled
   // Given on the default organization one idp is configured and enabled

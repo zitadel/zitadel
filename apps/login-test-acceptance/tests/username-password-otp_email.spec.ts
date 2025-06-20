@@ -44,7 +44,7 @@ test.skip("DOESN'T WORK: username, password and email otp login, enter code manu
 });
 
 test("username, password and email otp login, click link in email", async ({ page }) => {
-  base.skip()
+  base.skip();
   // Given email otp is enabled on the organization of the user
   // Given the user has only email otp configured as second factor
   // User enters username
@@ -85,7 +85,7 @@ test("username, password and email otp login, wrong code", async ({ user, page }
 });
 
 test("username, password and email otp login, multiple mfa options", async ({ page }) => {
-  base.skip()
+  base.skip();
   // Given email otp and sms otp is enabled on the organization of the user
   // Given the user has email and sms otp configured as second factor
   // User enters username

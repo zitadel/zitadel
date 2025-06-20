@@ -31,7 +31,7 @@ test("username and passkey login", async ({ user, page }) => {
 });
 
 test("username and passkey login, multiple auth methods", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given passkey and password is enabled on the organization of the user
   // Given the user has password and passkey registered
   // enter username

@@ -51,7 +51,7 @@ test("username and password login, wrong password", async ({ user, page }) => {
 });
 
 test("username and password login, wrong username, ignore unknown usernames", async ({ user, page }) => {
-  test.skip()
+  test.skip();
   // Given user doesn't exist but ignore unknown usernames setting is set to true
   // Given username password login is enabled on the users organization
   // enter login name
@@ -60,7 +60,7 @@ test("username and password login, wrong username, ignore unknown usernames", as
 });
 
 test("username and password login, initial password change", async ({ user, page }) => {
-  test.skip()
+  test.skip();
   // Given user is created and has changePassword set to true
   // Given username password login is enabled on the users organization
   // enter login name
@@ -69,7 +69,7 @@ test("username and password login, initial password change", async ({ user, page
 });
 
 test("username and password login, reset password hidden", async ({ user, page }) => {
-  test.skip()
+  test.skip();
   // Given the organization has enabled "Password reset hidden" in the login policy
   // Given username password login is enabled on the users organization
   // enter login name
@@ -77,7 +77,7 @@ test("username and password login, reset password hidden", async ({ user, page }
 });
 
 test("username and password login, reset password - enter code manually", async ({ user, page }) => {
-  test.skip()
+  test.skip();
   // Given user has forgotten password and clicks the forgot password button
   // Given username password login is enabled on the users organization
   // enter login name
@@ -87,7 +87,7 @@ test("username and password login, reset password - enter code manually", async 
 });
 
 test("username and password login, reset password - click link", async ({ user, page }) => {
-  test.skip()
+  test.skip();
   // Given user has forgotten password and clicks the forgot password button, and then the link in the email
   // Given username password login is enabled on the users organization
   // enter login name
@@ -98,7 +98,7 @@ test("username and password login, reset password - click link", async ({ user, 
 });
 
 test("username and password login, reset password, resend code", async ({ user, page }) => {
-  test.skip()
+  test.skip();
   // Given user has forgotten password and clicks the forgot password button and then resend code
   // Given username password login is enabled on the users organization
   // enter login name
@@ -109,7 +109,7 @@ test("username and password login, reset password, resend code", async ({ user, 
 });
 
 test("email login enabled", async ({ user, page }) => {
-  test.skip()
+  test.skip();
   // Given user with the username "testuser", email test@zitadel.com and phone number 0711111111 exists
   // Given no other user with the same email address exists
   // enter email address "test@zitadel.com " in login screen
@@ -117,7 +117,7 @@ test("email login enabled", async ({ user, page }) => {
 });
 
 test("email login disabled", async ({ user, page }) => {
-  test.skip()
+  test.skip();
   // Given user with the username "testuser", email test@zitadel.com and phone number 0711111111 exists
   // Given no other user with the same email address exists
   // enter email address "test@zitadel.com" in login screen
@@ -125,7 +125,7 @@ test("email login disabled", async ({ user, page }) => {
 });
 
 test("email login enabled - multiple users", async ({ user, page }) => {
-  test.skip()
+  test.skip();
   // Given user with the username "testuser", email test@zitadel.com and phone number 0711111111 exists
   // Given a second user with the username "testuser2", email test@zitadel.com and phone number 0711111111 exists
   // enter email address "test@zitadel.com" in login screen
@@ -133,7 +133,7 @@ test("email login enabled - multiple users", async ({ user, page }) => {
 });
 
 test("phone login enabled", async ({ user, page }) => {
-  test.skip()
+  test.skip();
   // Given user with the username "testuser", email test@zitadel.com and phone number 0711111111 exists
   // Given no other user with the same phon number exists
   // enter phone number "0711111111" in login screen
@@ -141,7 +141,7 @@ test("phone login enabled", async ({ user, page }) => {
 });
 
 test("phone login disabled", async ({ user, page }) => {
-  test.skip()
+  test.skip();
   // Given user with the username "testuser", email test@zitadel.com and phone number 0711111111 exists
   // Given no other user with the same phone number exists
   // enter phone number "0711111111" in login screen
@@ -149,7 +149,7 @@ test("phone login disabled", async ({ user, page }) => {
 });
 
 test("phone login enabled - multiple users", async ({ user, page }) => {
-  test.skip()
+  test.skip();
   // Given user with the username "testuser", email test@zitadel.com and phone number 0711111111 exists
   // Given a second user with the username "testuser2", email test@zitadel.com and phone number 0711111111 exists
   // enter phone number "0711111111" in login screen

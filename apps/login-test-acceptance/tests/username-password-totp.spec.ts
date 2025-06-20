@@ -57,7 +57,7 @@ test("username, password and totp otp login, wrong code", async ({ user, page })
 });
 
 test("username, password and totp login, multiple mfa options", async ({ page }) => {
-  test.skip()
+  test.skip();
   // Given totp and email otp is enabled on the organization of the user
   // Given the user has totp and email otp configured as second factor
   // User enters username

@@ -1,10 +1,10 @@
 import { expect, Page } from "@playwright/test";
+import dotenv from "dotenv";
+import path from "path";
 import { code, otpFromSink } from "./code";
 import { loginname } from "./loginname";
 import { password } from "./password";
 import { totp } from "./zitadel";
-import dotenv from "dotenv";
-import path from "path";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env-file/.env") });
 
