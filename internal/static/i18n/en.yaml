@@ -1367,8 +1367,6 @@ EventTypes:
         code:
           added: Phone number verification code generated
           sent: Phone number verification code sent
-
-
   web_key:
     added: Web Key added
     activated: Web Key activated
