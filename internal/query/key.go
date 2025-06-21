@@ -15,6 +15,8 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/internal/cachekey"
+
 )
 
 type Key interface {
@@ -398,6 +400,39 @@ func (wm *PublicKeyReadModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 func (q *Queries) GetPublicKeyByID(ctx context.Context, keyID string) (_ PublicKey, err error) {
+	if q.caches != nil && q.caches.authnKeys != nil {
+		if cached, ok := q.caches.authnKeys.Get(ctx, cachekey.KeyID, keyID); ok && cached != nil {
+			if pub, ok := cached.Key.(*rsa.PublicKey); ok {
+				keyUsageMap := map[string]crypto.KeyUsage{
+					"sig":               crypto.KeyUsageSigning,
+					"saml_ca":           crypto.KeyUsageSAMLCA,
+					"saml_response_sig": crypto.KeyUsageSAMLResponseSinging,
+					"saml_metadata_sig": crypto.KeyUsageSAMLMetadataSigning,
+				}
+				ku, ok := keyUsageMap[cached.Use]
+				if !ok {
+					return nil, zerrors.ThrowInvalidArgumentf(nil, "QUERY-1a92k", "invalid key usage: %s", cached.Use)
+
+				}
+	
+				return &rsaPublicKey{
+					key: key{
+						id:        cached.KeyID,
+						algorithm: cached.Algorithm,
+						use:       ku,
+					},
+					expiry:    time.Unix(cached.Expiry, 0),
+					publicKey: pub,
+				}, nil
+			}
+		}
+	}
+	
+	
+	
+
+	
+	
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
