@@ -7,6 +7,5 @@ type authnKeyIndex = cachekey.AuthnKeyIndex
 
 const (
 	InstanceID = cachekey.InstanceID
-	UserType   = cachekey.UserType
 	KeyID      = cachekey.KeyID
 )

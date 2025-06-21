@@ -44,7 +44,6 @@ func startCaches(background context.Context, connectors connector.Connectors, in
 	background,
 	[]cachekey.AuthnKeyIndex{
 		cachekey.InstanceID,
-		cachekey.UserType,
 		cachekey.KeyID,
 	},
 	cache.PurposeAuthNKeys,
