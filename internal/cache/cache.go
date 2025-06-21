@@ -20,7 +20,6 @@ const (
 	PurposeIdPFormCallback
 	PurposeFederatedLogout
 	PurposeAuthNKeys
-
 )
 
 // Cache stores objects with a value of type `V`.

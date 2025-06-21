@@ -6,13 +6,13 @@ import (
 
 
 type CachedPublicKey struct {
-	Algorithm string
-	Use       string
-	KeyID     string
+	Algorithm  string
+	Use        string
+	KeyID      string
 	InstanceID string
 	UserType   string
 	Key        any
-	Expiry     int64 
+	Expiry     int64
 }
 
 
@@ -28,4 +28,3 @@ func (c *CachedPublicKey) Keys(index cachekey.AuthnKeyIndex) []string {
 		return nil
 	}
 }
-
