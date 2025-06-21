@@ -36,7 +36,6 @@ func startCaches(background context.Context, connectors connector.Connectors, in
 	if err != nil {
 		return nil, err
 	}
-
 	caches.authnKeys, err = connector.StartCache[
 	cachekey.AuthnKeyIndex,
 	string,
@@ -47,7 +46,7 @@ func startCaches(background context.Context, connectors connector.Connectors, in
 		cachekey.KeyID,
 	},
 	cache.PurposeAuthNKeys,
-	connectors.Config.Instance, // можешь временно оставить Instance
+	connectors.Config.Instance, 
 	connectors,
 )
 if err != nil {
