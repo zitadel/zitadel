@@ -1,4 +1,4 @@
-ExternalDomain: traefik
+ExternalDomain: zitadel
 ExternalSecure: true
 ExternalPort: 443
 

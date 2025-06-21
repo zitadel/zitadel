@@ -67,7 +67,7 @@ login-test-acceptance-build-bake:
 	$(BAKE_CLI_WITH_COMMON_ARGS) login-test-acceptance login-standalone
 
 login-test-acceptance-build-compose:
-	$(BAKE_CLI_WITH_COMMON_ARGS) --load setup sink oidcrp samlsp
+	$(BAKE_CLI_WITH_COMMON_ARGS) --load setup sink
 
 login-test-acceptance-build: login-test-acceptance-build-compose login-test-acceptance-build-bake
 	@:

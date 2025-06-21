@@ -9,6 +9,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.zitadel.rule=!PathPrefix(`/ui/v2/login`)"
       - "traefik.http.services.zitadel-service.loadbalancer.server.scheme=h2c"
+      - "traefik.http.middlewares.zitadel-headers.headers.customrequestheaders.Host=zitadel"
     ports:
       - "8080:8080"
     volumes:
@@ -256,12 +257,12 @@ services:
         condition: "service_healthy"
       sink:
         condition: service_healthy
-      oidcrp:
-        condition: service_healthy
+#      oidcrp:
+#        condition: service_healthy
 #      oidcop:
 #        condition: service_healthy
-      samlsp:
-        condition: service_healthy
+#      samlsp:
+#        condition: service_healthy
 #      samlidp:
 #        condition: service_healthy
 
