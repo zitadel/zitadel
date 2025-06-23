@@ -1,30 +1,43 @@
+variable "LOGIN_DIR" {
+  default = "./"
+}
+
+variable "DOCKERFILES_DIR" {
+  default = "${LOGIN_DIR}dockerfiles/"
+}
+
 target "login-pnpm" {
-  dockerfile = "./dockerfiles/login-pnpm.Dockerfile"
+  context = "${LOGIN_DIR}"
+  dockerfile = "${DOCKERFILES_DIR}login-pnpm.Dockerfile"
 }
 
 target "login-dev-base" {
-  dockerfile = "./dockerfiles/login-dev-base.Dockerfile"
+  dockerfile = "${DOCKERFILES_DIR}login-dev-base.Dockerfile"
+  context = "${LOGIN_DIR}"
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
 }
 
 target "login-lint" {
-  dockerfile = "./dockerfiles/login-lint.Dockerfile"
+  dockerfile = "${DOCKERFILES_DIR}login-lint.Dockerfile"
+  context = "${LOGIN_DIR}"
   contexts = {
     login-dev-base = "target:login-dev-base"
   }
 }
 
 target "login-test-unit" {
-  dockerfile = "./dockerfiles/login-test-unit.Dockerfile"
+  dockerfile = "${DOCKERFILES_DIR}login-test-unit.Dockerfile"
+  context = "${LOGIN_DIR}"
   contexts = {
     login-client = "target:login-client"
   }
 }
 
 target "login-client" {
-  dockerfile = "./dockerfiles/login-client.Dockerfile"
+  dockerfile = "${DOCKERFILES_DIR}login-client.Dockerfile"
+  context = "${LOGIN_DIR}"
   contexts = {
     login-pnpm              = "target:login-pnpm"
     typescript-proto-client = "target:typescript-proto-client"
@@ -32,7 +45,8 @@ target "login-client" {
 }
 
 target "typescript-proto-client" {
-  dockerfile = "./dockerfiles/typescript-proto-client.Dockerfile"
+  dockerfile = "${DOCKERFILES_DIR}typescript-proto-client.Dockerfile"
+  context = "${LOGIN_DIR}"
   contexts = {
     # We directly generate and download the client server-side with buf, so we don't need the proto files
     login-pnpm = "target:login-pnpm"
@@ -43,7 +57,8 @@ target "typescript-proto-client" {
 # proto-files is only used to build core-mock against which the integration tests run.
 # To build the proto-client, we use buf to generate and download the client code directly.
 target "proto-files" {
-  dockerfile = "./dockerfiles/proto-files.Dockerfile"
+  dockerfile = "${DOCKERFILES_DIR}proto-files.Dockerfile"
+  context = "${LOGIN_DIR}"
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
@@ -54,7 +69,7 @@ variable "CORE_MOCK_TAG" {
 }
 
 target "core-mock" {
-  context = "./apps/login-test-integration/core-mock"
+  context = "${LOGIN_DIR}apps/login-test-integration/core-mock"
   contexts = {
     protos = "target:proto-files"
   }
@@ -67,7 +82,8 @@ variable "LOGIN_TEST_INTEGRATION_TAG" {
 }
 
 target "login-test-integration" {
-  dockerfile = "./dockerfiles/login-test-integration.Dockerfile"
+  dockerfile = "${DOCKERFILES_DIR}login-test-integration.Dockerfile"
+  context = "${LOGIN_DIR}"
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
@@ -80,7 +96,8 @@ variable "LOGIN_TEST_ACCEPTANCE_TAG" {
 }
 
 target "login-test-acceptance" {
-  dockerfile = "./dockerfiles/login-test-acceptance.Dockerfile"
+  dockerfile = "${DOCKERFILES_DIR}login-test-acceptance.Dockerfile"
+  context = "${LOGIN_DIR}"
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
@@ -97,7 +114,8 @@ target "docker-metadata-action" {}
 # We run integration and acceptance tests against the next standalone server for docker.
 target "login-standalone" {
   inherits   = ["docker-metadata-action"]
-  dockerfile = "./dockerfiles/login-standalone.Dockerfile"
+  dockerfile = "${DOCKERFILES_DIR}login-standalone.Dockerfile"
+  context = "${LOGIN_DIR}"
   contexts = {
     login-client = "target:login-client"
   }
