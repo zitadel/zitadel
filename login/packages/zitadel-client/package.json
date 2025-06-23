@@ -43,12 +43,14 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsup",
+    "build": "pnpm exec tsup",
+    "build:client:standalone": "pnpm build",
     "test": "pnpm test:unit",
     "test:watch": "pnpm test:unit:watch",
-    "test:unit": "vitest",
-    "test:unit:watch": "vitest --watch",
-    "dev": "tsup --watch --dts",
+    "test:unit": "pnpm exec vitest",
+    "test:unit:standalone": "pnpm test:unit",
+    "test:unit:watch": "pnpm exec vitest --watch",
+    "dev": "pnpm exec tsup --watch --dts",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
@@ -62,6 +64,7 @@
   },
   "devDependencies": {
     "@bufbuild/protocompile": "^0.0.1",
+    "@bufbuild/buf": "^1.53.0",
     "@zitadel/tsconfig": "workspace:*",
     "@zitadel/eslint-config": "workspace:*"
   }

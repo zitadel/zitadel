@@ -28,39 +28,6 @@ Please consider the following guidelines when creating a pull request.
 - We use ESLint/Prettier for linting/formatting, so please run `pnpm lint:fix` before committing to make resolving conflicts easier (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
 - If you add new functionality, please provide the corresponding documentation as well and make it part of the pull request
 
-## Setting Up The ZITADEL API
-
-If you want to have a one-liner to get you up and running,
-or if you want to develop against a ZITADEL API with the latest features,
-or even add changes to ZITADEL itself at the same time,
-you should develop against your local ZITADEL process.
-However, it might be easier to develop against your ZITADEL Cloud instance
-if you don't have docker installed
-or have limited resources on your local machine.
-
-### Developing Against Your Local ZITADEL Instance
-
-```sh
-# To have your service user key and environment file written with the correct ownership, export your current users ID.
-export ZITADEL_DEV_UID="$(id -u)"
-
-# Pull images
-docker compose --file ./acceptance/docker-compose.yaml pull
-
-# Run ZITADEL with local notification sink and configure ./apps/login/.env.local
-pnpm run-sink
-```
-
-### Developing Against Your ZITADEL Cloud Instance
-
-Configure your shell by exporting the following environment variables:
-
-```sh
-export ZITADEL_API_URL=<your cloud instance URL here>
-export ZITADEL_ORG_ID=<your service accounts organization id here>
-export ZITADEL_SERVICE_USER_TOKEN=<your service account personal access token here>
-```
-
 ### Setting up local environment
 
 ```sh
@@ -76,34 +43,95 @@ pnpm dev
 
 The application is now available at `http://localhost:3000`
 
-### Adding applications and IDPs
+Configure apps/login/.env.local to target the Zitadel instance of your choice.
+The login app live-reloads on changes, so you can start developing right away.
+
+<!-- Console doesn't load
+
+### Developing Against Your Local ZITADEL Instance
+
+The following command uses Docker to run a local ZITADEL instance and the login application in live-reloading dev mode.
+Additionally, it runs a Traefik reverse proxy that exposes the login at https://localhost with a self-signed certificate.
 
 ```sh
-# OPTIONAL Run SAML SP
-pnpm run-samlsp
+pnpm test:acceptance:setup
+```
+-->
 
-# OPTIONAL Run OIDC RP
-pnpm run-oidcrp
+### Quality Assurance
 
-# OPTIONAL Run SAML IDP
-pnpm run-samlidp
+Use `make` commands to test the quality of your code against a production build without installing any dependencies besides Docker.
+Using `make` commands, you can reproduce and debug the CI pipelines locally.
 
-# OPTIONAL Run OIDC OP
-pnpm run-oidcop
+```sh
+# Reproduce the whole CI pipeline in docker
+make login-quality
+# Show other options with make
+make help
 ```
 
-### Testing
+Use `pnpm` commands to run the tests in dev mode with live reloading and debugging capabilities.
 
-You can execute the following commands `pnpm test` for a single test run or `pnpm test:watch` in the following directories:
+#### Linting and formatting
 
-- apps/login
-- packages/zitadel-proto
-- packages/zitadel-client
-- packages/zitadel-node
-- The projects root directory: all tests in the project are executed
+Check the formatting and linting of the code in docker
 
-In apps/login, these commands also spin up the application and a ZITADEL gRPC API mock server to run integration tests using [Cypress](https://www.cypress.io/) against them.
-If you want to run the integration tests standalone against an environment of your choice, navigate to ./apps/login, [configure your shell as you like](# Developing Against Your ZITADEL Cloud Instance) and run `pnpm test:integration:run` or `pnpm test:integration:open`.
-Then you need to lifecycle the mock process using the command `pnpm mock` or the more fine grained commands `pnpm mock:build`, `pnpm mock:build:nocache`, `pnpm mock:run` and `pnpm mock:destroy`.
+```sh
+make login-lint
+```
 
-That's it! 🎉
+Check the linting of the code using pnpm
+
+```sh
+pnpm lint
+pnpm format
+```
+
+Fix the linting of your code
+
+```sh
+pnpm lint:fix
+pnpm format:fix
+```
+
+#### Running Unit Tests
+
+Run the tests in docker
+
+```sh
+make login-test-unit
+```
+
+Run unit tests with live-reloading
+
+```sh
+pnpm test:unit
+```
+
+#### Running Integration Tests
+
+Run the test in docker
+
+```sh
+make login-test-integration
+```
+
+Open the Cypress test suite to run the integration tests in interactive mode.
+First, set up your local test environment.
+This runs a mock server in docker and the login application in dev mode with live-reloading enabled.
+
+```sh
+pnpm test:integration:setup
+```
+
+Now, in another terminal session, open the interactive Cypress integration test suite.
+
+```sh
+pnpm test:integration open
+```
+
+Show more options with Cypress
+
+```sh
+pnpm test:integration help
+```

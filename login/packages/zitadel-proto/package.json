@@ -14,7 +14,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "generate": "buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel",
+    "generate": "pnpm exec buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel",
     "clean": "rm -rf zitadel .turbo node_modules google protoc-gen-openapiv2 validate"
   },
   "dependencies": {

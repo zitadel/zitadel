@@ -1,0 +1,10 @@
+*
+
+!apps/login
+apps/login/.next
+apps/login/screenshots
+
+**/*.md
+**/*.png
+**/node_modules
+**/.turbo
