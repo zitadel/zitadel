@@ -21,7 +21,7 @@ export default defineConfig({
   timeout: 300 * 1000, // 5 minutes
   globalTimeout: 30 * 60_000, // 30 minutes
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [["line"], ["html", { open: process.env.CI ? "never" : "on-failure", host: "0.0.0.0" }]],
+  reporter: [["line"], ["html", { open: process.env.CI ? "never" : "on-failure", host: "0.0.0.0", outputFolder: "./playwright-report/html" }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -32,7 +32,7 @@ export default defineConfig({
     video: "retain-on-failure",
     ignoreHTTPSErrors: true,
   },
-  outputDir: "test-results",
+  outputDir: "test-results/results",
 
   /* Configure projects for major browsers */
   projects: [

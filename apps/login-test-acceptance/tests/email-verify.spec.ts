@@ -45,7 +45,8 @@ test("user email not verified, resend, verify", async ({ user, page }) => {
   await emailVerifyResend(page);
   const c = await getCodeFromSink(user.getUsername());
   // wait for resend of the code
-  await page.waitForTimeout(2000);  await emailVerify(page, c);
+  await page.waitForTimeout(2000);
+  await emailVerify(page, c);
   await loginScreenExpect(page, user.getFullName());
 });
 

@@ -23,7 +23,7 @@ export LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG := login-test-acceptance-samlsp:${DOCKER
 export LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG := login-test-acceptance-samlidp:${DOCKER_METADATA_OUTPUT_VERSION}
 export POSTGRES_TAG := postgres:17.0-alpine3.19
 export GOLANG_TAG := golang:1.24-alpine
-export ZITADEL_TAG ?= ghcr.io/zitadel/zitadel:02617cf17fdde849378c1a6b5254bbfb2745b164
+export ZITADEL_TAG ?= ghcr.io/zitadel/zitadel:v3.3.0
 export CORE_MOCK_TAG := core-mock:${DOCKER_METADATA_OUTPUT_VERSION}
 
 .PHONY: login-help
@@ -94,6 +94,10 @@ login-test-acceptance: login-test-acceptance-build
   		$(LOGIN_TEST_ACCEPTANCE_SINK_TAG) \
   		$(LOGIN_TEST_ACCEPTANCE_OIDCRP_TAG) \
   		$(LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG)"
+
+.PHONY: login-quality
+login-quality: login-lint login-test-unit login-test-integration
+	@:
 
 .PHONY: login-standalone-build
 login-standalone-build:

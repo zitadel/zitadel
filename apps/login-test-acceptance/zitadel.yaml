@@ -46,6 +46,15 @@ DefaultInstance:
     HelpLink: "https://zitadel.com/docs"
     SupportEmail: "support@zitadel.com"
     DocsLink: "https://zitadel.com/docs"
+  Features:
+    LoginV2:
+      Required: true
+
+OIDC:
+  DefaultLoginURLV2: "/ui/v2/login/login?authRequest="
+
+SAML:
+  DefaultLoginURLV2: "/ui/v2/login/login?authRequest="
 
 Database:
   EventPushConnRatio: 0.2 # 4

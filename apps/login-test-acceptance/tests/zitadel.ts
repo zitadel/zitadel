@@ -3,11 +3,11 @@ import { createDigest, createRandomBytes } from "@otplib/plugin-crypto";
 import { keyDecoder, keyEncoder } from "@otplib/plugin-thirty-two"; // use your chosen base32 plugin
 import axios from "axios";
 import dotenv from "dotenv";
+import { request } from "gaxios";
 import path from "path";
 import { OtpType, userProps } from "./user";
-import {request} from "gaxios";
 
-dotenv.config({ path: path.resolve(__dirname, "../env/.env") })
+dotenv.config({ path: path.resolve(__dirname, "../env/.env") });
 
 export async function addUser(props: userProps) {
   const body = {
@@ -173,10 +173,10 @@ export function totp(secret: string) {
 export async function eventualNewUser(id: string) {
   return request({
     url: `${process.env.ZITADEL_API_URL}/v2/users/${id}`,
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${process.env.ZITADEL_ADMIN_TOKEN}`,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     retryConfig: {
       statusCodesToRetry: [[404, 404]],
@@ -184,7 +184,7 @@ export async function eventualNewUser(id: string) {
       totalTimeout: 10000, // 10 seconds
       onRetryAttempt: (error) => {
         console.warn(`Retrying to query new user ${id}: ${error.message}`);
-      }
-    }
-  })
+      },
+    },
+  });
 }

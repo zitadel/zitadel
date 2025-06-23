@@ -2,7 +2,7 @@ services:
 
   zitadel:
     user: "${UID:-1000}:${GID:-1000}"
-    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}"
+    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:v3.3.0}"
     container_name: acceptance-zitadel
     pull_policy: always
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
@@ -12,7 +12,6 @@ services:
       #      - "traefik.http.middlewares.zitadel.headers.customrequestheaders.Host=localhost"
 #      - "traefik.http.routers.zitadel.middlewares=zitadel@docker"
       - "traefik.http.services.zitadel-service.loadbalancer.server.scheme=h2c"
-      - "traefik.http.services.zitadel-service.loadbalancer.passHostHeader=false"
     ports:
       - "8080:8080"
     volumes:

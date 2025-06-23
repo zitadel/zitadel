@@ -54,7 +54,7 @@ variable "CORE_MOCK_TAG" {
 }
 
 target "core-mock" {
-  context = "apps/core-mock"
+  context = "apps/login-test-integration/core-mock"
   contexts = {
     protos = "target:proto-files"
   }
