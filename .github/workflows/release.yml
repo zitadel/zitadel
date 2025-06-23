@@ -15,6 +15,15 @@ on:
       google_image_name:
         required: true
         type: string
+      build_image_name_login:
+        required: true
+        type: string
+      image_name_login:
+        required: true
+        type: string
+      google_image_name_login:
+        required: true
+        type: string
     secrets:
       GCR_JSON_KEY_BASE64:
         description: 'base64 endcrypted key to connect to Google'
@@ -96,6 +105,9 @@ jobs:
         docker buildx imagetools create \
           --tag ${{ inputs.google_image_name }}:${{ needs.version.outputs.version }} \
           ${{ inputs.build_image_name }}
+        docker buildx imagetools create \
+          --tag ${{ inputs.google_image_name_login }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.build_image_name_login }}
     -
       name: Publish latest
       if: ${{ github.ref_name == 'next' }}
@@ -106,6 +118,9 @@ jobs:
         docker buildx imagetools create \
           --tag ${{ inputs.image_name }}:latest-debug \
           ${{ inputs.build_image_name }}-debug
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name_login }}:latest \
+          ${{ inputs.build_image_name_login }}
 
   homebrew-tap:
     runs-on: ubuntu-22.04

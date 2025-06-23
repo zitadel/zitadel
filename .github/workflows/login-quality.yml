@@ -1,0 +1,65 @@
+name: Login Quality
+
+on:
+  workflow_call:
+    inputs:
+      force:
+        description: 'Ignore run caches'
+        type: boolean
+        required: true
+    outputs:
+      login_build_image:
+        description: 'The image name of the built production standalone login image'
+        value: 'ghcr.io/zitadel/login:${{ github.sha }}'
+
+jobs:
+  quality:
+    name: Ensure Quality
+    runs-on: depot-ubuntu-22.04-8
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+      actions: write
+    env:
+      CACHE_DIR: /tmp/login-run-caches
+    steps:
+      - uses: actions/checkout@v4
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/zitadel/login
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+      - uses: depot/setup-action@v1
+        with:
+          oidc: true
+      - name: Restore Run Caches
+        uses: actions/cache/restore@v4
+        id: run-caches-restore
+        with:
+          path: ${{ env.CACHE_DIR }}
+          key: ${{ runner.os }}-login-run-caches-${{github.ref_name}}-${{ github.sha }}-${{github.run_attempt}}
+          restore-keys: |
+            ${{ runner.os }}-login-run-caches-${{github.ref_name}}-${{ github.sha }}-
+            ${{ runner.os }}-login-run-caches-${{github.ref_name}}-
+            ${{ runner.os }}-login-run-caches-
+      - run: make login-quality
+        env:
+          # latest if branch is main, otherwise image version which is the pull request number
+          BAKE_CLI: depot bake
+          DEPOT_PROJECT_ID: w47wkxzdtw
+          FORCE: ${{ github.event.inputs.force }}
+      - name: Save Run Caches
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.CACHE_DIR }}
+          key: ${{ steps.run-caches-restore.outputs.cache-primary-key }}
+        if: always()

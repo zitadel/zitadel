@@ -76,6 +76,11 @@ jobs:
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
 
+  login-quality:
+    uses: ./.github/workflows/login-quality.yml
+    with:
+      force:  ${{ github.event_name == 'workflow_dispatch' }}
+
   container:
     needs: [compile]
     uses: ./.github/workflows/container.yml
@@ -85,6 +90,10 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
       build_image_name: "ghcr.io/zitadel/zitadel-build"
+
+  login-container:
+    uses: ./.github/workflows/login-container.yml
+    if: ${{ github.event_name == 'workflow_dispatch' }}
 
   e2e:
     uses: ./.github/workflows/e2e.yml
@@ -98,7 +107,7 @@ jobs:
       issues: write
       pull-requests: write
     needs:
-      [version, core-unit-test, core-integration-test, lint, container, e2e]
+      [version, core-unit-test, core-integration-test, lint, container, e2e, login-container]
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
@@ -109,3 +118,6 @@ jobs:
       semantic_version: "23.0.7"
       image_name: "ghcr.io/zitadel/zitadel"
       google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
+      build_image_name_login: ${{ needs.login-container.outputs.login_build_image }}
+      image_name_login: "ghcr.io/zitadel/login"
+      google_image_name_login: europe-docker.pkg.dev/zitadel-common/zitadel-repo/login
