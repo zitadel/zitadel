@@ -1,35 +1,30 @@
 name: Quality
 on:
+  push:
   pull_request:
+  pull_request_target:
   workflow_dispatch:
     inputs:
-      ref-tag:
-        description: 'The tag to use for the build cache'
+      force:
+        description: 'Whether to ignore the run caches'
         required: false
-        default: 'latest'
-      clean-run-caches:
-        description: 'Whether to clean the run caches'
-        required: false
-        default: 'true'
+        default: true
 jobs:
   quality:
     name: Ensure Quality
-    runs-on: depot-ubuntu-22.04-8
+    if: github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && github.repository_owner != 'zitadel') ||
+      (github.event_name == 'pull_request' && github.repository_owner != 'zitadel') ||
+      (github.event_name == 'pull_request_target' && github.repository_owner != 'zitadel')
+    runs-on: ubuntu-22.04
     timeout-minutes: 30
     permissions:
-      contents: read
-      id-token: write
-      packages: write
-      actions: write
+      contents: read # We only need read access to the repository contents
+      actions: write # We need write access to the actions cache
     env:
       CACHE_DIR: /tmp/login-run-caches
+    # Only run this job on workflow_dispatch or pushes to forks
     steps:
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@v4
       - name: Docker meta
         id: meta
@@ -44,9 +39,8 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-      - uses: depot/setup-action@v1
-        with:
-          oidc: true
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Restore Run Caches
         uses: actions/cache/restore@v4
         id: run-caches-restore
@@ -59,10 +53,7 @@ jobs:
             ${{ runner.os }}-login-run-caches-
       - run: make login-quality
         env:
-          # latest if branch is main, otherwise image version which is the pull request number
-          BAKE_CLI: depot bake
-          DEPOT_PROJECT_ID: jp837jn3fm
-          FORCE: ${{ github.event.inputs.clean-run-caches == 'true' }}
+          FORCE: ${{ github.event.inputs.force == 'true' }}
       - name: Save Run Caches
         uses: actions/cache/save@v4
         with:
