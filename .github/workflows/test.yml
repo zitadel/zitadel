@@ -9,6 +9,10 @@ on:
         description: 'Whether to ignore the run caches'
         required: false
         default: true
+      ref-tag:
+        description: 'overwrite the DOCKER_METADATA_OUTPUT_VERSION environment variable used by the make file'
+        required: false
+        default: ''
 jobs:
   quality:
     name: Ensure Quality
@@ -54,6 +58,7 @@ jobs:
       - run: make login-quality
         env:
           FORCE: ${{ github.event.inputs.force == 'true' }}
+          DOCKER_METADATA_OUTPUT_VERSION: ${{ github.event.inputs.ref-tag || env.DOCKER_METADATA_OUTPUT_VERSION || steps.meta.outputs.version }}
       - name: Save Run Caches
         uses: actions/cache/save@v4
         with:
