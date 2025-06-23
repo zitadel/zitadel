@@ -6,9 +6,9 @@ import {
   SecondFactorType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { EMAIL, SMS, TOTP, U2F } from "./auth-methods";
+import { Translated } from "./translated";
 
 type Props = {
   userId: string;
@@ -37,7 +37,6 @@ export function ChooseSecondFactorToSetup({
   emailVerified,
   force,
 }: Props) {
-  const t = useTranslations("mfa");
   const router = useRouter();
   const params = new URLSearchParams({});
 
@@ -112,7 +111,7 @@ export function ChooseSecondFactorToSetup({
           type="button"
           data-testid="reset-button"
         >
-          {t("set.skip")}
+          <Translated i18nKey="set.skip" namespace="mfa" />
         </button>
       )}
     </>

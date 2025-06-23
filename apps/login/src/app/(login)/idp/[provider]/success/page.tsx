@@ -5,6 +5,7 @@ import { linkingFailed } from "@/components/idps/pages/linking-failed";
 import { linkingSuccess } from "@/components/idps/pages/linking-success";
 import { loginFailed } from "@/components/idps/pages/login-failed";
 import { loginSuccess } from "@/components/idps/pages/login-success";
+import { Translated } from "@/components/translated";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   addHuman,
@@ -27,7 +28,6 @@ import {
   AddHumanUserRequestSchema,
   UpdateHumanUserRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
@@ -73,8 +73,6 @@ export default async function Page(props: {
 }) {
   const params = await props.params;
   const searchParams = await props.searchParams;
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "idp" });
   let { id, token, requestId, organization, link } = searchParams;
   const { provider } = params;
 
@@ -321,8 +319,12 @@ export default async function Page(props: {
     return (
       <DynamicTheme branding={branding}>
         <div className="flex flex-col items-center space-y-4">
-          <h1>{t("registerSuccess.title")}</h1>
-          <p className="ztdl-p">{t("registerSuccess.description")}</p>
+          <h1>
+            <Translated i18nKey="registerSuccess.title" namespace="idp" />
+          </h1>
+          <p className="ztdl-p">
+            <Translated i18nKey="registerSuccess.description" namespace="idp" />
+          </p>
           <IdpSignin
             userId={newUser.userId}
             idpIntent={{ idpIntentId: id, idpIntentToken: token }}

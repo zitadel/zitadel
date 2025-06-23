@@ -3,6 +3,7 @@ import { BackButton } from "@/components/back-button";
 import { ChooseAuthenticatorToSetup } from "@/components/choose-authenticator-to-setup";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
@@ -17,7 +18,7 @@ import {
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -26,8 +27,6 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
   const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "authenticator" });
-  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { loginName, requestId, organization, sessionId } = searchParams;
 
@@ -99,7 +98,11 @@ export default async function Page(props: {
     !sessionWithData.factors ||
     !sessionWithData.factors.user
   ) {
-    return <Alert>{tError("unknownContext")}</Alert>;
+    return (
+      <Alert>
+        <Translated i18nKey="unknownContext" namespace="error" />
+      </Alert>
+    );
   }
 
   const branding = await getBrandingSettings({
@@ -165,9 +168,13 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("title")}</h1>
+        <h1>
+          <Translated i18nKey="title" namespace="authenticator" />
+        </h1>
 
-        <p className="ztdl-p">{t("description")}</p>
+        <p className="ztdl-p">
+          <Translated i18nKey="description" namespace="authenticator" />
+        </p>
 
         <UserAvatar
           loginName={sessionWithData.factors?.user?.loginName}
@@ -187,7 +194,9 @@ export default async function Page(props: {
         {loginSettings?.allowExternalIdp && !!identityProviders.length && (
           <>
             <div className="py-3 flex flex-col">
-              <p className="ztdl-p text-center">{t("linkWithIDP")}</p>
+              <p className="ztdl-p text-center">
+                <Translated i18nKey="linkWithIDP" namespace="authenticator" />
+              </p>
             </div>
 
             <SignInWithIdp

@@ -2,7 +2,6 @@
 
 import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,6 +9,7 @@ import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 type Inputs = {
   code: string;
@@ -32,8 +32,6 @@ export function VerifyForm({
   code,
   isInvite,
 }: Props) {
-  const t = useTranslations("verify");
-
   const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
@@ -117,7 +115,7 @@ export function VerifyForm({
         <Alert type={AlertType.INFO}>
           <div className="flex flex-row">
             <span className="flex-1 mr-auto text-left">
-              {t("verify.noCodeReceived")}
+              <Translated i18nKey="verify.noCodeReceived" namespace="verify" />
             </span>
             <button
               aria-label="Resend Code"
@@ -129,7 +127,7 @@ export function VerifyForm({
               }}
               data-testid="resend-button"
             >
-              {t("verify.resendCode")}
+              <Translated i18nKey="verify.resendCode" namespace="verify" />
             </button>
           </div>
         </Alert>
@@ -161,7 +159,7 @@ export function VerifyForm({
             data-testid="submit-button"
           >
             {loading && <Spinner className="h-5 w-5 mr-2" />}
-            {t("verify.submit")}
+            <Translated i18nKey="verify.submit" namespace="verify" />
           </Button>
         </div>
       </form>

@@ -1,7 +1,6 @@
 "use client";
 
 import { registerUserAndLinkToIDP } from "@/lib/server/register";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
@@ -10,6 +9,7 @@ import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 type Inputs =
   | {
@@ -45,8 +45,6 @@ export function RegisterFormIDPIncomplete({
   idpId,
   idpUserName,
 }: Props) {
-  const t = useTranslations("register");
-
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
@@ -149,8 +147,8 @@ export function RegisterFormIDPIncomplete({
           onClick={handleSubmit(submitAndRegister)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("submit")}
+          {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+          <Translated i18nKey="submit" namespace="register" />
         </Button>
       </div>
     </form>

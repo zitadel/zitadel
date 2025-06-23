@@ -5,7 +5,6 @@ import {
   registerPasskeyLink,
   verifyPasskeyRegistration,
 } from "@/lib/server/passkeys";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,6 +12,7 @@ import { Alert } from "./alert";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 type Inputs = {};
 
@@ -29,8 +29,6 @@ export function RegisterPasskey({
   organization,
   requestId,
 }: Props) {
-  const t = useTranslations("passkey");
-
   const { handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -198,7 +196,7 @@ export function RegisterPasskey({
               continueAndLogin();
             }}
           >
-            {t("set.skip")}
+            <Translated i18nKey="set.skip" namespace="passkey" />
           </Button>
         ) : (
           <BackButton />
@@ -213,8 +211,8 @@ export function RegisterPasskey({
           onClick={handleSubmit(submitRegisterAndContinue)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("set.submit")}
+          {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+          <Translated i18nKey="set.submit" namespace="passkey" />
         </Button>
       </div>
     </form>
