@@ -28,7 +28,6 @@ export default getRequestConfig(async () => {
     if (i18nJSON) {
       translations = i18nJSON;
     }
-    console.log("Translations:", translations);
   } catch (error) {
     console.warn("Error fetching custom translations:", error);
   }
@@ -48,14 +47,13 @@ export default getRequestConfig(async () => {
     }
   }
 
-  // const customMessages = translations;
-  const customMessages = {};
+  const customMessages = translations;
   const localeMessages = (await import(`../../locales/${locale}.json`)).default;
   const fallbackMessages = (await import(`../../locales/${fallback}.json`))
     .default;
 
   return {
     locale,
-    messages: deepmerge(fallbackMessages, localeMessages, customMessages),
+    messages: deepmerge.all([fallbackMessages, localeMessages, customMessages]),
   };
 });
