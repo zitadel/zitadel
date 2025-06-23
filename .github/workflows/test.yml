@@ -45,6 +45,10 @@ jobs:
             type=semver,pattern={{major}}
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
+      # Only with correctly restored build cache layers, the run caches work as expected.
+      # To restore docker build layer caches, extend the docker-bake.hcl to use the cache-from and cache-to options.
+      # https://docs.docker.com/build/ci/github-actions/cache/
+      # Alternatively, you can use a self-hosted runner or a third-party builder that restores build layer caches out-of-the-box, like https://depot.dev/
       - name: Restore Run Caches
         uses: actions/cache/restore@v4
         id: run-caches-restore

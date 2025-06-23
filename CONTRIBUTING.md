@@ -60,8 +60,9 @@ pnpm test:acceptance:setup
 
 ### Quality Assurance
 
-Use `make` commands to test the quality of your code without installing any dependencies besides Docker.
+Use `make` commands to test the quality of your code against a production build without installing any dependencies besides Docker.
 Using `make` commands, you can reproduce and debug the CI pipelines locally.
+
 ```sh
 # Reproduce the whole CI pipeline in docker
 make login-quality
