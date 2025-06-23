@@ -16,7 +16,7 @@ target "typescript-proto-client" {
   output = ["type=docker"]
 }
 
-# proto-files is only used to build core-mock against which the integration tests run.
+# proto-files is only used to build login-core-mock against which the integration tests run.
 # To build the proto-client, we use buf to generate and download the client code directly.
 # It is not login-prefixed, so it is easily extendable.
 # To extend this bake-file.hcl, set the context of all login-prefixed targets to a different directory.
