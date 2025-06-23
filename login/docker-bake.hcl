@@ -1,19 +1,40 @@
-variable "LOGIN_DIR" {
-  default = "./"
-}
-
 variable "DOCKERFILES_DIR" {
   default = "dockerfiles/"
 }
 
+# typescript-proto-client is used to generate the client code for the login service.
+# It is not login-prefixed, so it is easily extendable.
+# To extend this bake-file.hcl, set the context of all login-prefixed targets to a different directory.
+# For example docker bake --file login/docker-bake.hcl --file docker-bake.hcl --set login-*.context=./login/
+# The zitadel repository uses this to generate the client and the mock server from local proto files.
+target "typescript-proto-client" {
+  dockerfile = "${DOCKERFILES_DIR}typescript-proto-client.Dockerfile"
+  contexts = {
+    # We directly generate and download the client server-side with buf, so we don't need the proto files
+    login-pnpm = "target:login-pnpm"
+  }
+  output = ["type=docker"]
+}
+
+# proto-files is only used to build login-core-mock against which the integration tests run.
+# To build the proto-client, we use buf to generate and download the client code directly.
+# It is not login-prefixed, so it is easily extendable.
+# To extend this bake-file.hcl, set the context of all login-prefixed targets to a different directory.
+# For example docker bake --file login/docker-bake.hcl --file docker-bake.hcl --set login-*.context=./login/
+# The zitadel repository uses this to generate the client and the mock server from local proto files.
+target "proto-files" {
+  dockerfile = "${DOCKERFILES_DIR}proto-files.Dockerfile"
+  contexts = {
+    login-pnpm = "target:login-pnpm"
+  }
+}
+
 target "login-pnpm" {
-  context = "${LOGIN_DIR}"
   dockerfile = "${DOCKERFILES_DIR}login-pnpm.Dockerfile"
 }
 
 target "login-dev-base" {
   dockerfile = "${DOCKERFILES_DIR}login-dev-base.Dockerfile"
-  context = "${LOGIN_DIR}"
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
@@ -21,7 +42,6 @@ target "login-dev-base" {
 
 target "login-lint" {
   dockerfile = "${DOCKERFILES_DIR}login-lint.Dockerfile"
-  context = "${LOGIN_DIR}"
   contexts = {
     login-dev-base = "target:login-dev-base"
   }
@@ -29,7 +49,6 @@ target "login-lint" {
 
 target "login-test-unit" {
   dockerfile = "${DOCKERFILES_DIR}login-test-unit.Dockerfile"
-  context = "${LOGIN_DIR}"
   contexts = {
     login-client = "target:login-client"
   }
@@ -37,7 +56,6 @@ target "login-test-unit" {
 
 target "login-client" {
   dockerfile = "${DOCKERFILES_DIR}login-client.Dockerfile"
-  context = "${LOGIN_DIR}"
   contexts = {
     login-pnpm              = "target:login-pnpm"
     typescript-proto-client = "target:typescript-proto-client"
@@ -46,7 +64,6 @@ target "login-client" {
 
 target "typescript-proto-client" {
   dockerfile = "${DOCKERFILES_DIR}typescript-proto-client.Dockerfile"
-  context = "${LOGIN_DIR}"
   contexts = {
     # We directly generate and download the client server-side with buf, so we don't need the proto files
     login-pnpm = "target:login-pnpm"
@@ -54,26 +71,16 @@ target "typescript-proto-client" {
   output = ["type=docker"]
 }
 
-# proto-files is only used to build core-mock against which the integration tests run.
-# To build the proto-client, we use buf to generate and download the client code directly.
-target "proto-files" {
-  dockerfile = "${DOCKERFILES_DIR}proto-files.Dockerfile"
-  context = "${LOGIN_DIR}"
-  contexts = {
-    login-pnpm = "target:login-pnpm"
-  }
+variable "LOGIN_CORE_MOCK_TAG" {
+  default = "login-core-mock:local"
 }
 
-variable "CORE_MOCK_TAG" {
-  default = "core-mock:local"
-}
-
-target "core-mock" {
-  context = "${LOGIN_DIR}apps/login-test-integration/core-mock"
+target "login-core-mock" {
+  context = "/apps/login-test-integration/core-mock"
   contexts = {
     protos = "target:proto-files"
   }
-  tags   = ["${CORE_MOCK_TAG}"]
+  tags   = ["${LOGIN_CORE_MOCK_TAG}"]
   output = ["type=docker"]
 }
 
@@ -83,7 +90,6 @@ variable "LOGIN_TEST_INTEGRATION_TAG" {
 
 target "login-test-integration" {
   dockerfile = "${DOCKERFILES_DIR}login-test-integration.Dockerfile"
-  context = "${LOGIN_DIR}"
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
@@ -97,7 +103,6 @@ variable "LOGIN_TEST_ACCEPTANCE_TAG" {
 
 target "login-test-acceptance" {
   dockerfile = "${DOCKERFILES_DIR}login-test-acceptance.Dockerfile"
-  context = "${LOGIN_DIR}"
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
@@ -115,7 +120,6 @@ target "docker-metadata-action" {}
 target "login-standalone" {
   inherits   = ["docker-metadata-action"]
   dockerfile = "${DOCKERFILES_DIR}login-standalone.Dockerfile"
-  context = "${LOGIN_DIR}"
   contexts = {
     login-client = "target:login-client"
   }

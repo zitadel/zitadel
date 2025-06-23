@@ -1,10 +1,11 @@
 XDG_CACHE_HOME ?= $(HOME)/.cache
 export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 
-export LOGIN_DIR := $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
-
-export LOGIN_BAKE_CLI ?= docker buildx bake
+LOGIN_DIR ?= ./
+LOGIN_BAKE_CLI ?= docker buildx bake
 LOGIN_BAKE_CLI_WITH_COMMON_ARGS := $(LOGIN_BAKE_CLI) --file $(LOGIN_DIR)docker-bake.hcl --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml
+LOGIN_BAKE_CLI_ADDITIONAL_ARGS ?=
+LOGIN_BAKE_CLI_WITH_COMMON_ARGS += $(LOGIN_BAKE_CLI_ADDITIONAL_ARGS)
 
 export COMPOSE_BAKE=true
 export UID := $(id -u)
@@ -26,7 +27,7 @@ export LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG := login-test-acceptance-samlidp:${DOCK
 export POSTGRES_TAG := postgres:17.0-alpine3.19
 export GOLANG_TAG := golang:1.24-alpine
 export ZITADEL_TAG ?= ghcr.io/zitadel/zitadel:v3.3.0
-export CORE_MOCK_TAG := core-mock:${DOCKER_METADATA_OUTPUT_VERSION}
+export CORE_MOCK_TAG := login-core-mock:${DOCKER_METADATA_OUTPUT_VERSION}
 
 .PHONY: login-help
 login-help:
@@ -49,10 +50,10 @@ login-test-unit:
 	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-test-unit
 
 login-test-integration-build:
-	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) core-mock login-test-integration login-standalone
+	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-core-mock login-test-integration login-standalone
 
 login-test-integration-dev: login-test-integration-cleanup
-	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) core-mock && docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --service-ports --rm core-mock
+	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-core-mock && docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --service-ports --rm login-core-mock
 
 login-test-integration-run: login-test-integration-cleanup
 	docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --rm integration
