@@ -1,14 +1,16 @@
 XDG_CACHE_HOME ?= $(HOME)/.cache
 export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 
+export LOGIN_DIR := $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+
 export BAKE_CLI ?= docker buildx bake
-BAKE_CLI_WITH_COMMON_ARGS := $(BAKE_CLI) --file ./docker-bake.hcl --file ./apps/login-test-acceptance/docker-compose.yaml
+BAKE_CLI_WITH_COMMON_ARGS := $(BAKE_CLI) --file $(LOGIN_DIR)docker-bake.hcl --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml
 
 export COMPOSE_BAKE=true
 export UID := $(id -u)
 export GID := $(id -g)
 
-export LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT := apps/login-test-acceptance
+export LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT := $(LOGIN_DIR)apps/login-test-acceptance
 
 export DOCKER_METADATA_OUTPUT_VERSION ?= local
 export LOGIN_TAG := login:${DOCKER_METADATA_OUTPUT_VERSION}
@@ -50,17 +52,17 @@ login-test-integration-build:
 	$(BAKE_CLI_WITH_COMMON_ARGS) core-mock login-test-integration login-standalone
 
 login-test-integration-dev: login-test-integration-cleanup
-	$(BAKE_CLI_WITH_COMMON_ARGS) core-mock && docker compose --file ./apps/login-test-integration/docker-compose.yaml run --service-ports --rm core-mock
+	$(BAKE_CLI_WITH_COMMON_ARGS) core-mock && docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --service-ports --rm core-mock
 
 login-test-integration-run: login-test-integration-cleanup
-	docker compose --file ./apps/login-test-integration/docker-compose.yaml run --rm integration
+	docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --rm integration
 
 login-test-integration-cleanup:
-	docker compose --file ./apps/login-test-integration/docker-compose.yaml down --volumes
+	docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml down --volumes
 
 .PHONY: login-test-integration
 login-test-integration: login-test-integration-build
-	./scripts/run_or_skip.sh login-test-integration-run \
+	$(LOGIN_DIR)scripts/run_or_skip.sh login-test-integration-run \
 	"$(LOGIN_TAG) \
 	$(CORE_MOCK_TAG) \
 	$(LOGIN_TEST_INTEGRATION_TAG)"
@@ -75,16 +77,16 @@ login-test-acceptance-build: login-test-acceptance-build-compose login-test-acce
 	@:
 
 login-test-acceptance-dev: login-test-acceptance-build-compose login-test-acceptance-cleanup
-	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml up zitadel setup traefik setup sink
+	docker compose --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml up zitadel setup traefik setup sink
 
 login-test-acceptance-run: login-test-acceptance-cleanup
-	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml --file ./apps/login-test-acceptance/docker-compose-ci.yaml run --rm --service-ports acceptance
+	docker compose --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose-ci.yaml run --rm --service-ports acceptance
 
 login-test-acceptance-cleanup:
-	docker compose --file ./apps/login-test-acceptance/docker-compose.yaml --file ./apps/login-test-acceptance/docker-compose-ci.yaml down --volumes
+	docker compose --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose-ci.yaml down --volumes
 
 login-test-acceptance: login-test-acceptance-build
-	./scripts/run_or_skip.sh login-test-acceptance-run \
+	$(LOGIN_DIR)scripts/run_or_skip.sh login-test-acceptance-run \
 		"$(LOGIN_TAG) \
   		$(ZITADEL_TAG) \
   		$(POSTGRES_TAG) \
