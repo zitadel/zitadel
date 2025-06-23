@@ -3,7 +3,7 @@ variable "LOGIN_DIR" {
 }
 
 variable "DOCKERFILES_DIR" {
-  default = "${LOGIN_DIR}dockerfiles/"
+  default = "dockerfiles/"
 }
 
 target "login-pnpm" {
