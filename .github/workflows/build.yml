@@ -78,6 +78,9 @@ jobs:
 
   login-quality:
     uses: ./.github/workflows/login-quality.yml
+    permissions:
+      actions: write
+      id-token: write
     with:
       force:  ${{ github.event_name == 'workflow_dispatch' }}
 
