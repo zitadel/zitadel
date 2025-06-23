@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e
+set -ex pipefail
 
 PAT_FILE=${PAT_FILE:-./pat/zitadel-admin-sa.pat}
 LOGIN_BASE_URL=${LOGIN_BASE_URL:-"http://localhost:3000"}
@@ -68,6 +68,9 @@ SINK_NOTIFICATION_URL=${SINK_NOTIFICATION_URL}
 EMAIL_VERIFICATION=true
 DEBUG=false
 LOGIN_BASE_URL=${LOGIN_BASE_URL}
+NODE_TLS_REJECT_UNAUTHORIZED=0
+ZITADEL_ADMIN_USER=${ZITADEL_ADMIN_USER:-"zitadel-admin@zitadel.localhost"}
+NEXT_PUBLIC_BASE_PATH=/ui/v2/login
 " | tee "${WRITE_ENVIRONMENT_FILE}" "${WRITE_TEST_ENVIRONMENT_FILE}" > /dev/null
 
 echo "Wrote environment file ${WRITE_ENVIRONMENT_FILE}"

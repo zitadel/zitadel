@@ -17,8 +17,6 @@ export async function registerWithPassword(
   await page.getByTestId("submit-button").click();
   await registerPasswordScreen(page, password1, password2);
   await page.getByTestId("submit-button").click();
-  await page.waitForTimeout(10000);
-
   await verifyEmail(page, email);
 }
 
@@ -36,7 +34,6 @@ export async function registerWithPasskey(page: Page, firstname: string, lastnam
 }
 
 async function verifyEmail(page: Page, email: string) {
-  await page.waitForTimeout(10000);
   const c = await getCodeFromSink(email);
   await emailVerify(page, c);
 }

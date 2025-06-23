@@ -1,4 +1,4 @@
-ExternalDomain: zitadel
+ExternalDomain: localhost
 ExternalSecure: true
 ExternalPort: 443
 

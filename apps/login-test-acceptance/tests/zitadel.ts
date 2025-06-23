@@ -5,8 +5,9 @@ import axios from "axios";
 import dotenv from "dotenv";
 import path from "path";
 import { OtpType, userProps } from "./user";
+import {request} from "gaxios";
 
-dotenv.config({ path: path.resolve(__dirname, "../.env-file/.env") });
+dotenv.config({ path: path.resolve(__dirname, "../env/.env") })
 
 export async function addUser(props: userProps) {
   const body = {
@@ -167,4 +168,23 @@ export function totp(secret: string) {
   }
 
   return token;
+}
+
+export async function eventualNewUser(id: string) {
+  return request({
+    url: `${process.env.ZITADEL_API_URL}/v2/users/${id}`,
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${process.env.ZITADEL_ADMIN_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    retryConfig: {
+      statusCodesToRetry: [[404, 404]],
+      retry: Number.MAX_SAFE_INTEGER, // totalTimeout limits the number of retries
+      totalTimeout: 10000, // 10 seconds
+      onRetryAttempt: (error) => {
+        console.warn(`Retrying to query new user ${id}: ${error.message}`);
+      }
+    }
+  })
 }

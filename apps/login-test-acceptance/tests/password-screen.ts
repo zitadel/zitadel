@@ -3,7 +3,6 @@ import { getCodeFromSink } from "./sink";
 
 const codeField = "code-text-input";
 const passwordField = "password-text-input";
-const passwordConfirmField = "password-confirm-text-input";
 const passwordChangeField = "password-change-text-input";
 const passwordChangeConfirmField = "password-change-confirm-text-input";
 const passwordSetField = "password-set-text-input";
@@ -75,8 +74,6 @@ async function checkContent(page: Page, testid: string, match: boolean) {
 }
 
 export async function resetPasswordScreen(page: Page, username: string, password1: string, password2: string) {
-  // wait for send of the code
-  await page.waitForTimeout(10000);
   const c = await getCodeFromSink(username);
   await page.getByTestId(codeField).pressSequentially(c);
   await page.getByTestId(passwordSetField).pressSequentially(password1);

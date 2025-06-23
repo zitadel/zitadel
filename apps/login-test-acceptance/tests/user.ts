@@ -1,6 +1,7 @@
 import { Page } from "@playwright/test";
 import { registerWithPasskey } from "./register";
-import { activateOTP, addTOTP, addUser, getUserByUsername, removeUser } from "./zitadel";
+import {activateOTP, addTOTP, addUser, eventualNewUser, getUserByUsername, removeUser} from "./zitadel";
+import {request} from 'gaxios';
 
 export interface userProps {
   email: string;
@@ -68,8 +69,7 @@ class User {
 export class PasswordUser extends User {
   async ensure(page: Page) {
     await super.ensure(page);
-    // wait for projection of user
-    await page.waitForTimeout(10000);
+    await eventualNewUser(this.getUserId());
   }
 }
 
@@ -111,11 +111,8 @@ export class PasswordUserWithOTP extends User {
 
   async ensure(page: Page) {
     await super.ensure(page);
-
     await activateOTP(this.getUserId(), this.type);
-
-    // wait for projection of user
-    await page.waitForTimeout(10000);
+    await eventualNewUser(this.getUserId())
   }
 }
 
@@ -124,11 +121,8 @@ export class PasswordUserWithTOTP extends User {
 
   async ensure(page: Page) {
     await super.ensure(page);
-
     this.secret = await addTOTP(this.getUserId());
-
-    // wait for projection of user
-    await page.waitForTimeout(10000);
+    await eventualNewUser(this.getUserId())
   }
 
   public getSecret(): string {

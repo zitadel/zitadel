@@ -1,6 +1,8 @@
 *
-!/apps/login-test-integration/*.json
-!/apps/login-test-integration/*.ts
-!/apps/login-test-integration/integration
-!/apps/login-test-integration/fixtures
-!/apps/login-test-integration/support
+
+!/apps/login-test-integration
+
+**/*.md
+**/*.png
+**/node_modules
+**/.turbo

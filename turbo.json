@@ -27,9 +27,8 @@
     "start:built": {},
     "test:unit": {},
     "test:unit:standalone": {},
-    "test:integration": {},
-    "test:integration:run": {},
-    "test:acceptance": {},
+    "test:integration:setup": {},
+    "test:acceptance:setup": {},
     "test:watch": {
       "persistent": true
     },

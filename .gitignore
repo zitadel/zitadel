@@ -7,16 +7,12 @@ dist
 dist-ssr
 *.local
 .env
-.cache
 server/dist
 public/dist
 .vscode
 .idea
 .vercel
 .env*.local
-/test-results/
-/playwright-report/
 /blob-report/
-/playwright/.cache/
 /out
 /docker

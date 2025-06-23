@@ -68,6 +68,6 @@ describe("register", () => {
     cy.get('input[type="checkbox"][value="privacypolicy"]').check();
     cy.get('input[type="checkbox"][value="tos"]').check();
     cy.get('button[type="submit"]').click();
-    cy.location("pathname", { timeout: 10_000 }).should("eq", "/ui/v2/login/passkey/set");
+    cy.url({ timeout: 10_000 }).should("include", Cypress.config().baseUrl +"/passkey/set");
   });
 });

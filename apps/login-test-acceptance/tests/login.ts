@@ -1,12 +1,8 @@
 import { expect, Page } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
 import { code, otpFromSink } from "./code";
 import { loginname } from "./loginname";
 import { password } from "./password";
 import { totp } from "./zitadel";
-
-dotenv.config({ path: path.resolve(__dirname, "../.env-file/.env") });
 
 export async function startLogin(page: Page) {
   await page.goto(`./loginname`);

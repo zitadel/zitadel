@@ -8,7 +8,7 @@ import { loginScreenExpect, loginWithPassword, loginWithPasswordAndEmailOTP } fr
 import { OtpType, PasswordUserWithOTP } from "./user";
 
 // Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../env-file/.env") });
+dotenv.config({ path: path.resolve(__dirname, "../env/.env") });
 
 const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
   user: async ({ page }, use) => {

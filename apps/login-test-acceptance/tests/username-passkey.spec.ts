@@ -6,7 +6,7 @@ import { loginScreenExpect, loginWithPasskey } from "./login";
 import { PasskeyUser } from "./user";
 
 // Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../env-file/.env") });
+dotenv.config({ path: path.resolve(__dirname, "../env/.env") });
 
 const test = base.extend<{ user: PasskeyUser }>({
   user: async ({ page }, use) => {

@@ -94,6 +94,8 @@ pnpm run-oidcop
 
 ### Testing
 
+To test the quality of your code, make sure 
+
 You can execute the following commands `pnpm test` for a single test run or `pnpm test:watch` in the following directories:
 
 - apps/login

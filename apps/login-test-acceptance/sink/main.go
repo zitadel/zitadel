@@ -84,12 +84,17 @@ func main() {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-
-		serializableData, err := json.Marshal(messages[response.Recipient])
+		msg, ok := messages[response.Recipient]
+		if !ok {
+			http.Error(w, "No messages found for recipient: "+response.Recipient, http.StatusNotFound)
+			return
+		}
+		serializableData, err := json.Marshal(msg)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
 		io.WriteString(w, string(serializableData))
 	})
 

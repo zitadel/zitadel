@@ -95,7 +95,7 @@ describe("login", () => {
     });
     it("should redirect a user with password authentication to /password", () => {
       cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
-      cy.location("pathname", { timeout: 10_000 }).should("eq", "/ui/v2/login/password");
+      cy.url({ timeout: 10_000 }).should("include", Cypress.config().baseUrl +"/password");
     });
     describe("with passkey prompt", () => {
       beforeEach(() => {
@@ -166,7 +166,7 @@ describe("login", () => {
 
     it("should redirect a user with passwordless authentication to /passkey", () => {
       cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
-      cy.location("pathname", { timeout: 10_000 }).should("eq", "/ui/v2/login/passkey");
+      cy.url({ timeout: 10_000 }).should("include", Cypress.config().baseUrl +"/passkey");
     });
   });
 });

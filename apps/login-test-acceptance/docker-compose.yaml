@@ -1,6 +1,7 @@
 services:
+
   zitadel:
-    user: "root"
+    user: "${UID:-1000}:${GID:-1000}"
     image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}"
     container_name: acceptance-zitadel
     pull_policy: always
@@ -8,12 +9,14 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.zitadel.rule=!PathPrefix(`/ui/v2/login`)"
+      #      - "traefik.http.middlewares.zitadel.headers.customrequestheaders.Host=localhost"
+#      - "traefik.http.routers.zitadel.middlewares=zitadel@docker"
       - "traefik.http.services.zitadel-service.loadbalancer.server.scheme=h2c"
-      - "traefik.http.middlewares.zitadel-headers.headers.customrequestheaders.Host=zitadel"
+      - "traefik.http.services.zitadel-service.loadbalancer.passHostHeader=false"
     ports:
       - "8080:8080"
     volumes:
-      - pat:/pat
+      - ./pat:/pat
       - ./zitadel.yaml:/zitadel.yaml
     depends_on:
       db:
@@ -48,13 +51,16 @@ services:
   traefik:
     image: "traefik:v3.4"
     container_name: "acceptance-traefik"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.login.rule=PathPrefix(`/ui/v2/login`)"
+      - "traefik.http.services.login-service.loadbalancer.server.url=http://host.docker.internal:3000"
     command:
       - "--log.level=DEBUG"
       - "--ping"
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--entryPoints.web.address=:80"
       - "--entrypoints.websecure.http.tls=true"
       - "--entryPoints.websecure.address=:443"
     healthcheck:
@@ -67,51 +73,39 @@ services:
       - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    depends_on:
-      wait-for-zitadel:
-        condition: "service_completed_successfully"
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   setup:
+    user: "${UID:-1000}:${GID:-1000}"
     image: ${LOGIN_TEST_ACCEPTANCE_SETUP_TAG:-login-test-acceptance-setup:local}
     container_name: acceptance-setup
+    restart: no
     build:
       context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/setup"
       dockerfile: ../go-command.Dockerfile
     entrypoint: "./setup.sh"
     environment:
       PAT_FILE: /pat/zitadel-admin-sa.pat
-      LOGIN_BASE_URL: https://traefik/ui/v2/login/
-      ZITADEL_API_INTERNAL_URL: http://traefik
-      WRITE_ENVIRONMENT_FILE: /login-env/.env
+      ZITADEL_API_INTERNAL_URL: http://zitadel:8080
+      WRITE_ENVIRONMENT_FILE: /login-env/.env.local
       WRITE_TEST_ENVIRONMENT_FILE: /acceptance-env/.env
       SINK_EMAIL_INTERNAL_URL: http://sink:3333/email
       SINK_SMS_INTERNAL_URL: http://sink:3333/sms
-      SINK_NOTIFICATION_URL: http://sink:3333/notification
-      ZITADEL_API_DOMAIN: traefik
-      ZITADEL_API_URL: https://traefik
+      SINK_NOTIFICATION_URL: http://localhost:3333/notification
+      LOGIN_BASE_URL: https://localhost/ui/v2/login/
+      ZITADEL_API_URL: https://localhost
+      ZITADEL_API_DOMAIN: localhost
+      ZITADEL_ADMIN_USER: zitadel-admin@zitadel.localhost
     volumes:
-      - "pat:/pat" # Read the PAT file from zitadels setup
-      - "acceptance-env:/acceptance-env" # Write the environment variables file for the tests
-      - "login-env:/login-env" # Write the environment variables file for the login
+      - ./pat:/pat # Read the PAT file from zitadels setup
+      - ./env:/acceptance-env # Write the environment variables file for the tests
+      - ../login:/login-env # Write the environment variables file for the login
     depends_on:
       traefik:
         condition: "service_healthy"
-
-  login:
-    image: "${LOGIN_TAG:-login:local}"
-    container_name: acceptance-login
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.login.rule=PathPrefix(`/ui/v2/login`)"
-    ports:
-      - "3000:3000"
-    volumes:
-      - "login-env:/.env-file/"
-    environment:
-      - NODE_TLS_REJECT_UNAUTHORIZED=0
-    depends_on:
-      setup:
-        condition: service_completed_successfully
+      wait-for-zitadel:
+        condition: "service_completed_successfully"
 
   sink:
     image: ${LOGIN_TEST_ACCEPTANCE_SINK_TAG:-login-test-acceptance-sink:local}
@@ -139,6 +133,7 @@ services:
         condition: "service_completed_successfully"
 
   oidcrp:
+    user: "${UID:-1000}:${GID:-1000}"
     image: ${LOGIN_TEST_ACCEPTANCE_OIDCRP_TAG:-login-test-acceptance-oidcrp:local}
     container_name: acceptance-oidcrp
     build:
@@ -158,14 +153,15 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - "pat:/pat"
+      - "./pat:/pat"
     depends_on:
       traefik:
         condition: "service_healthy"
-      login:
-        condition: "service_healthy"
+      setup:
+        condition: "service_completed_successfully"
 
   oidcop:
+    user: "${UID:-1000}:${GID:-1000}"
     image: ${LOGIN_TEST_ACCEPTANCE_OIDCOP_TAG:-login-test-acceptance-oidcop:local}
     container_name: acceptance-oidcop
     build:
@@ -183,14 +179,15 @@ services:
     ports:
       - 8004:8004
     volumes:
-      - "pat:/pat"
+      - "./pat:/pat"
     depends_on:
       traefik:
         condition: "service_healthy"
-      login:
-        condition: "service_healthy"
+      setup:
+        condition: "service_completed_successfully"
 
   samlsp:
+    user: "${UID:-1000}:${GID:-1000}"
     image: "${LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG:-login-test-acceptance-samlsp:local}"
     container_name: acceptance-samlsp
     build:
@@ -203,18 +200,21 @@ services:
       API_DOMAIN: 'traefik'
       PAT_FILE: '/pat/zitadel-admin-sa.pat'
       LOGIN_URL: 'https://traefik/ui/v2/login'
-      IDP_URL: 'http://traefik/saml/v2/metadata'
+      IDP_URL: 'http://zitadel:8080/saml/v2/metadata'
       HOST: 'https://traefik'
       PORT: '8001'
     ports:
       - 8001:8001
     volumes:
-      - "pat:/pat"
+      - "./pat:/pat"
     depends_on:
       traefik:
         condition: "service_healthy"
+      setup:
+        condition: "service_completed_successfully"
 
   samlidp:
+    user: "${UID:-1000}:${GID:-1000}"
     image: "${LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG:-login-test-acceptance-samlidp:local}"
     container_name: acceptance-samlidp
     build:
@@ -232,41 +232,9 @@ services:
     ports:
       - 8003:8003
     volumes:
-      - "pat:/pat"
+      - "./pat:/pat"
     depends_on:
       traefik:
         condition: "service_healthy"
-
-  acceptance:
-    image: "${LOGIN_TEST_ACCEPTANCE_TAG:-login-test-acceptance:local}"
-    container_name: acceptance
-    environment:
-      - CI
-      - LOGIN_BASE_URL=https://traefik/ui/v2/login/
-      - NODE_TLS_REJECT_UNAUTHORIZED=0
-    volumes:
-      - "acceptance-env:/build/apps/login-test-acceptance/.env-file/"
-      - "pat:/pat"
-      - "./test-results:/build/apps/login-test-acceptance/test-results"
-    ports:
-      - 9323:9323
-    ipc: "host"
-    init: true
-    depends_on:
-      login:
-        condition: "service_healthy"
-      sink:
-        condition: service_healthy
-#      oidcrp:
-#        condition: service_healthy
-#      oidcop:
-#        condition: service_healthy
-#      samlsp:
-#        condition: service_healthy
-#      samlidp:
-#        condition: service_healthy
-
-volumes:
-  pat:
-  login-env:
-  acceptance-env:
+      setup:
+        condition: "service_completed_successfully"

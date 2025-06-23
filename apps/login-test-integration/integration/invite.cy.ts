@@ -93,7 +93,7 @@ describe("verify invite", () => {
     stub("zitadel.user.v2.UserService", "VerifyInviteCode");
 
     cy.visit("/verify?userId=221394658884845598&code=abc&invite=true");
-    cy.location("pathname", { timeout: 10_000 }).should("eq", "/ui/v2/login/authenticator/set");
+    cy.url({ timeout: 10_000 }).should("include", Cypress.config().baseUrl +"/authenticator/set");
   });
 
   it("shows an error if invite code validation failed", () => {

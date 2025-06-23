@@ -5,7 +5,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 FROM cypress/factory:5.10.0 AS login-test-integration
 WORKDIR /opt/app
 COPY --from=login-test-integration-dependencies /build/apps/login-test-integration .
-COPY ./apps/login-test-integration .
 RUN npm install cypress
 RUN npx cypress install
+COPY ./apps/login-test-integration .
 CMD ["npx", "cypress", "run"]

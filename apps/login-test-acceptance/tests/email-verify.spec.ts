@@ -9,7 +9,7 @@ import { getCodeFromSink } from "./sink";
 import { PasswordUser } from "./user";
 
 // Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../.env-file/.env") });
+dotenv.config({ path: path.resolve(__dirname, "../env/.env") });
 
 const test = base.extend<{ user: PasswordUser }>({
   user: async ({ page }, use) => {
@@ -32,11 +32,10 @@ const test = base.extend<{ user: PasswordUser }>({
 
 test("user email not verified, verify", async ({ user, page }) => {
   await loginWithPassword(page, user.getUsername(), user.getPassword());
-  // auto-redirect on /verify
-  // wait for send of the code
-  await page.waitForTimeout(10000);
   const c = await getCodeFromSink(user.getUsername());
   await emailVerify(page, c);
+  // wait for resend of the code
+  await page.waitForTimeout(2000);
   await loginScreenExpect(page, user.getFullName());
 });
 
@@ -44,22 +43,18 @@ test("user email not verified, resend, verify", async ({ user, page }) => {
   await loginWithPassword(page, user.getUsername(), user.getPassword());
   // auto-redirect on /verify
   await emailVerifyResend(page);
-  // wait for send of the code
-  await page.waitForTimeout(10000);
   const c = await getCodeFromSink(user.getUsername());
-  await emailVerify(page, c);
+  // wait for resend of the code
+  await page.waitForTimeout(2000);  await emailVerify(page, c);
   await loginScreenExpect(page, user.getFullName());
 });
 
 test("user email not verified, resend, old code", async ({ user, page }) => {
   await loginWithPassword(page, user.getUsername(), user.getPassword());
-  // auto-redirect on /verify
-  // wait for send of the code
-  await page.waitForTimeout(10000);
   const c = await getCodeFromSink(user.getUsername());
   await emailVerifyResend(page);
   // wait for resend of the code
-  await page.waitForTimeout(10000);
+  await page.waitForTimeout(2000);
   await emailVerify(page, c);
   await emailVerifyScreenExpect(page, c);
 });

@@ -1,7 +1,7 @@
 {
   "extends": ["//"],
   "tasks": {
-    "test:integration:setup": {
+    "test:acceptance:setup": {
       "interactive": true,
       "cache": false,
       "persistent": true,

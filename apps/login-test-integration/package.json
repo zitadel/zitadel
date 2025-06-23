@@ -2,13 +2,8 @@
   "name": "login-test-integration",
   "private": true,
   "scripts": {
-    "test:integration": "pnpm exec concurrently --names 'mock,test' --success command-test --kill-others 'pnpm:mock' 'env-cmd -f ./.env.integration start-server-and-test start http://localhost:3000 \"test:integration:run\"'",
-    "test:integration:watch:run": "pnpm exec concurrently --names 'mock,test' --kill-others 'pnpm:mock' 'env-cmd -f ./.env.integration start-server-and-test dev http://localhost:3000 \"pnpm nodemon -e js,jsx,ts,tsx,css,scss --ignore \\\"__test__/**\\\" --exec \\\"pnpm test:integration:run\\\"\"'",
-    "test:integration:watch:open": "pnpm exec concurrently --names 'mock,test' --kill-others 'pnpm:mock' 'env-cmd -f ./.env.integration start-server-and-test dev http://localhost:3000 \"pnpm nodemon -e js,jsx,ts,tsx,css,scss --ignore \\\"__test__/**\\\" --exec \\\"pnpm test:integration:open\\\"\"'",
-    "test:integration:run": "pnpm exec cypress run --quiet",
-    "test:integration:open": "pnpm exec cypress open",
-    "mock": "make login-test-integration-build-dev",
-    "mock:stop": "docker compose down core-mock"
+    "test:integration": "pnpm exec cypress",
+    "test:integration:setup": "cd ../.. && make login-test-integration-dev"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",

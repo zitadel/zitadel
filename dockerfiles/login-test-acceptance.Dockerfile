@@ -5,4 +5,4 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     cd apps/login-test-acceptance && \
     pnpm exec playwright install --with-deps chromium
 COPY ./apps/login-test-acceptance ./apps/login-test-acceptance
-CMD ["bash", "-c", "cd apps/login-test-acceptance && pnpm test:acceptance"]
+CMD ["bash", "-c", "cd apps/login-test-acceptance && pnpm test:acceptance test"]

@@ -3,14 +3,15 @@
   "private": true,
   "scripts": {
     "test:acceptance": "pnpm exec playwright",
-    "test:acceptance:setup": "pnpm exec playwright"
+    "test:acceptance:setup": "cd ../.. && make login-test-acceptance-dev"
   },
   "devDependencies": {
-    "@otplib/core": "^12.0.0",
-    "@otplib/plugin-thirty-two": "^12.0.0",
-    "@otplib/plugin-crypto": "^12.0.0",
     "@faker-js/faker": "^9.7.0",
+    "@otplib/core": "^12.0.0",
+    "@otplib/plugin-crypto": "^12.0.0",
+    "@otplib/plugin-thirty-two": "^12.0.0",
     "@playwright/test": "^1.52.0",
+    "gaxios": "^7.1.0",
     "typescript": "^5.8.3"
   }
 }
