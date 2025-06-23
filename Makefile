@@ -4,7 +4,7 @@ export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 export LOGIN_DIR := $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 
 export BAKE_CLI ?= docker buildx bake
-BAKE_CLI_WITH_COMMON_ARGS := $(BAKE_CLI) --file $(LOGIN_DIR)docker-bake.hcl --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml
+BAKE_CLI_WITH_COMMON_ARGS := $(BAKE_CLI) --file ./docker-bake.hcl --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml
 
 export COMPOSE_BAKE=true
 export UID := $(id -u)
