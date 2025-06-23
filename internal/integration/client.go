@@ -233,45 +233,8 @@ func (i *Instance) CreateHumanUserWithTOTP(ctx context.Context, secret string) *
 	return resp
 }
 
-func (i *Instance) CreateUserTypeHuman(ctx context.Context) *user_v2.CreateUserResponse {
-	resp, err := i.Client.UserV2.CreateUser(ctx, &user_v2.CreateUserRequest{
-		OrganizationId: i.DefaultOrg.GetId(),
-		UserType: &user_v2.CreateUserRequest_Human_{
-			Human: &user_v2.CreateUserRequest_Human{
-				Profile: &user_v2.SetHumanProfile{
-					GivenName:  "Mickey",
-					FamilyName: "Mouse",
-				},
-				Email: &user_v2.SetHumanEmail{
-					Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
-					Verification: &user_v2.SetHumanEmail_ReturnCode{
-						ReturnCode: &user_v2.ReturnEmailVerificationCode{},
-					},
-				},
-			},
-		},
-	})
-	logging.OnError(err).Panic("create human user")
-	i.TriggerUserByID(ctx, resp.GetId())
-	return resp
-}
-
-func (i *Instance) CreateUserTypeMachine(ctx context.Context) *user_v2.CreateUserResponse {
-	resp, err := i.Client.UserV2.CreateUser(ctx, &user_v2.CreateUserRequest{
-		OrganizationId: i.DefaultOrg.GetId(),
-		UserType: &user_v2.CreateUserRequest_Machine_{
-			Machine: &user_v2.CreateUserRequest_Machine{
-				Name: "machine",
-			},
-		},
-	})
-	logging.OnError(err).Panic("create machine user")
-	i.TriggerUserByID(ctx, resp.GetId())
-	return resp
-}
-
-func (i *Instance) CreatePersonalAccessToken(ctx context.Context, userID string) *user_v2.AddPersonalAccessTokenResponse {
-	resp, err := i.Client.UserV2.AddPersonalAccessToken(ctx, &user_v2.AddPersonalAccessTokenRequest{
+func (i *Instance) CreatePersonalAccessToken(ctx context.Context, userID string) *mgmt.AddPersonalAccessTokenResponse {
+	resp, err := i.Client.Mgmt.AddPersonalAccessToken(ctx, &mgmt.AddPersonalAccessTokenRequest{
 		UserId:         userID,
 		ExpirationDate: timestamppb.New(time.Now().Add(30 * time.Minute)),
 	})
