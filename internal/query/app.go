@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -313,7 +314,7 @@ func (q *Queries) AppByIDWithPermission(ctx context.Context, appID string, activ
 		return nil, err
 	}
 
-	if err := appCheckPermission(ctx, app.ResourceOwner, app.ID, permissionCheck); err != nil {
+	if err := appCheckPermission(ctx, app.ResourceOwner, app.ProjectID, permissionCheck); err != nil {
 		return nil, err
 	}
 
@@ -540,23 +541,24 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string) (app *App,
 }
 
 func (q *Queries) SearchAppsWithPermission(ctx context.Context, queries *AppSearchQueries, withOwnerRemoved bool, permissionCheck domain.PermissionCheck) (*Apps, error) {
-	apps, err := q.SearchApps(ctx, queries, withOwnerRemoved)
+	apps, err := q.SearchApps(ctx, queries, withOwnerRemoved, PermissionV2(ctx, permissionCheck))
 	if err != nil {
 		return nil, err
 	}
 
-	if err := appsCheckPermission(ctx, apps, permissionCheck); err != nil {
-		return nil, err
+	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+		apps.Apps = appsCheckPermission(ctx, apps.Apps, permissionCheck)
 	}
-
 	return apps, nil
 }
 
-func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, withOwnerRemoved bool) (apps *Apps, err error) {
+func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, withOwnerRemoved, isPermissionV2Enabled bool) (apps *Apps, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareAppsQuery()
+	query = appPermissionCheckV2(ctx, query, isPermissionV2Enabled, queries)
+
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -572,6 +574,21 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 	}
 	apps.State, err = q.latestState(ctx, appsTable)
 	return apps, err
+}
+
+func appPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *AppSearchQueries) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+
+	join, args := PermissionClause(
+		ctx,
+		AppColumnResourceOwner,
+		domain.PermissionProjectAppRead,
+		SingleOrgPermissionOption(queries.Queries),
+		WithProjectsPermissionOption(AppColumnProjectID),
+	)
+	return query.JoinClause(join, args...)
 }
 
 func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries, shouldTriggerBulk bool) (ids []string, err error) {
@@ -650,19 +667,15 @@ func (q *Queries) SAMLAppLoginVersion(ctx context.Context, appID string) (loginV
 	return loginVersion, nil
 }
 
-func appCheckPermission(ctx context.Context, resourceOwner string, appID string, permissionCheck domain.PermissionCheck) error {
-	return permissionCheck(ctx, domain.PermissionProjectAppRead, resourceOwner, appID)
+func appCheckPermission(ctx context.Context, resourceOwner string, projectID string, permissionCheck domain.PermissionCheck) error {
+	return permissionCheck(ctx, domain.PermissionProjectAppRead, resourceOwner, projectID)
 }
 
-func appsCheckPermission(ctx context.Context, apps *Apps, permissionCheck domain.PermissionCheck) error {
-	var errCollector []error
-	for _, a := range apps.Apps {
-		if err := permissionCheck(ctx, domain.PermissionProjectAppRead, a.ResourceOwner, a.ID); err != nil {
-			errCollector = append(errCollector, err)
-		}
-	}
-
-	return errors.Join(errCollector...)
+// appsCheckPermission returns only the apps that the user in context has permission to read
+func appsCheckPermission(ctx context.Context, apps []*App, permissionCheck domain.PermissionCheck) []*App {
+	return slices.DeleteFunc(apps, func(app *App) bool {
+		return permissionCheck(ctx, domain.PermissionProjectAppRead, app.ResourceOwner, app.ProjectID) != nil
+	})
 }
 
 func NewAppNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {

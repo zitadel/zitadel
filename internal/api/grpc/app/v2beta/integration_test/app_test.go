@@ -18,6 +18,8 @@ import (
 )
 
 func TestCreateApplication(t *testing.T) {
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
+
 	t.Parallel()
 
 	notExistingProjectID := gofakeit.UUID()
@@ -48,7 +50,7 @@ func TestCreateApplication(t *testing.T) {
 			testName: "when CreateAPIApp request is valid should create app and return no error",
 			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Name:      "App Name",
 				CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
 					ApiRequest: &app.CreateAPIApplicationRequest{
@@ -91,7 +93,7 @@ func TestCreateApplication(t *testing.T) {
 			testName: "when CreateOIDCApp request is valid should create app and return no error",
 			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Name:      gofakeit.AppName(),
 				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
 					OidcRequest: &app.CreateOIDCApplicationRequest{
@@ -144,7 +146,7 @@ func TestCreateApplication(t *testing.T) {
 			testName: "when CreateSAMLApp request is valid should create app and return no error",
 			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Name:      gofakeit.AppName(),
 				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 					SamlRequest: &app.CreateSAMLApplicationRequest{
@@ -182,6 +184,8 @@ func TestCreateApplication(t *testing.T) {
 }
 
 func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
+
 	t.Parallel()
 
 	tt := []struct {
@@ -197,7 +201,7 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user has no project.app.write permission for API request should return permission error",
 			inputCtx: LoginUserCtx,
 			creationRequest: &app.CreateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Name:      gofakeit.Name(),
 				CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
 					ApiRequest: &app.CreateAPIApplicationRequest{
@@ -211,7 +215,7 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user has no project.app.write permission for OIDC request should return permission error",
 			inputCtx: LoginUserCtx,
 			creationRequest: &app.CreateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Name:      gofakeit.AppName(),
 				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
 					OidcRequest: &app.CreateOIDCApplicationRequest{
@@ -241,7 +245,7 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user has no project.app.write permission for SAML request should return permission error",
 			inputCtx: LoginUserCtx,
 			creationRequest: &app.CreateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Name:      gofakeit.AppName(),
 				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 					SamlRequest: &app.CreateSAMLApplicationRequest{
@@ -266,7 +270,7 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user is OrgOwner API request should succeed",
 			inputCtx: OrgOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Name:      gofakeit.Name(),
 				CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
 					ApiRequest: &app.CreateAPIApplicationRequest{
@@ -280,7 +284,7 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user is OrgOwner OIDC request should succeed",
 			inputCtx: OrgOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Name:      gofakeit.AppName(),
 				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
 					OidcRequest: &app.CreateOIDCApplicationRequest{
@@ -310,7 +314,7 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user is OrgOwner SAML request should succeed",
 			inputCtx: OrgOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Name:      gofakeit.AppName(),
 				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 					SamlRequest: &app.CreateSAMLApplicationRequest{
@@ -333,9 +337,9 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 		// Project owner with project.app.write permission
 		{
 			testName: "when user is ProjectOwner API request should succeed",
-			inputCtx: ProjectOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Name:      gofakeit.Name(),
 				CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
 					ApiRequest: &app.CreateAPIApplicationRequest{
@@ -347,9 +351,9 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 		},
 		{
 			testName: "when user is ProjectOwner OIDC request should succeed",
-			inputCtx: ProjectOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Name:      gofakeit.AppName(),
 				CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
 					OidcRequest: &app.CreateOIDCApplicationRequest{
@@ -377,9 +381,9 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 		},
 		{
 			testName: "when user is ProjectOwner SAML request should succeed",
-			inputCtx: ProjectOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Name:      gofakeit.AppName(),
 				CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 					SamlRequest: &app.CreateSAMLApplicationRequest{
@@ -419,6 +423,8 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 func TestUpdateApplication(t *testing.T) {
 	orgNotInCtx := instance.CreateOrganization(IAMOwnerCtx, gofakeit.Name(), gofakeit.Email())
 	pNotInCtx := instance.CreateProject(IAMOwnerCtx, t, orgNotInCtx.GetOrganizationId(), gofakeit.AppName(), false, false)
+
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
 
 	baseURI := "http://example.com"
 
@@ -471,28 +477,28 @@ func TestUpdateApplication(t *testing.T) {
 	}
 
 	appForNameChange, appNameChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId:           Project.GetId(),
+		ProjectId:           p.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
 	require.Nil(t, appNameChangeErr)
 
 	appForAPIConfigChange, appAPIConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId:           Project.GetId(),
+		ProjectId:           p.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForAPIAppCreation,
 	})
 	require.Nil(t, appAPIConfigChangeErr)
 
 	appForOIDCConfigChange, appOIDCConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId:           Project.GetId(),
+		ProjectId:           p.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForOIDCAppCreation,
 	})
 	require.Nil(t, appOIDCConfigChangeErr)
 
 	appForSAMLConfigChange, appSAMLConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId:           Project.GetId(),
+		ProjectId:           p.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForSAMLAppCreation,
 	})
@@ -521,7 +527,7 @@ func TestUpdateApplication(t *testing.T) {
 			testName: "when request for app name change is valid should return updated timestamp",
 			inputCtx: IAMOwnerCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForNameChange.GetAppId(),
 
 				Name: "New name",
@@ -546,7 +552,7 @@ func TestUpdateApplication(t *testing.T) {
 			testName: "when request for API config change is valid should return updated timestamp",
 			inputCtx: IAMOwnerCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForAPIConfigChange.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_ApiConfigurationRequest{
 					ApiConfigurationRequest: &app.UpdateAPIApplicationConfigurationRequest{
@@ -573,7 +579,7 @@ func TestUpdateApplication(t *testing.T) {
 			testName: "when request for OIDC config change is valid should return updated timestamp",
 			inputCtx: IAMOwnerCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForOIDCConfigChange.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_OidcConfigurationRequest{
 					OidcConfigurationRequest: &app.UpdateOIDCApplicationConfigurationRequest{
@@ -604,7 +610,7 @@ func TestUpdateApplication(t *testing.T) {
 			testName: "when request for SAML config change is valid should return updated timestamp",
 			inputCtx: IAMOwnerCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForSAMLConfigChange.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_SamlConfigurationRequest{
 					SamlConfigurationRequest: &app.UpdateSAMLApplicationConfigurationRequest{
@@ -634,28 +640,30 @@ func TestUpdateApplication(t *testing.T) {
 func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 	baseURI := "http://example.com"
 
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
+
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
 
 	appForNameChange, appNameChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId:           Project.GetId(),
+		ProjectId:           p.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
 	require.Nil(t, appNameChangeErr)
 
-	appForAPIConfigChangeForProjectOwner := createAPIApp(t)
-	appForAPIConfigChangeForOrgOwner := createAPIApp(t)
-	appForAPIConfigChangeForLoginUser := createAPIApp(t)
+	appForAPIConfigChangeForProjectOwner := createAPIApp(t, p.GetId())
+	appForAPIConfigChangeForOrgOwner := createAPIApp(t, p.GetId())
+	appForAPIConfigChangeForLoginUser := createAPIApp(t, p.GetId())
 
-	appForOIDCConfigChangeForProjectOwner := createOIDCApp(t, baseURI)
-	appForOIDCConfigChangeForOrgOwner := createOIDCApp(t, baseURI)
-	appForOIDCConfigChangeForLoginUser := createOIDCApp(t, baseURI)
+	appForOIDCConfigChangeForProjectOwner := createOIDCApp(t, baseURI, p.GetId())
+	appForOIDCConfigChangeForOrgOwner := createOIDCApp(t, baseURI, p.GetId())
+	appForOIDCConfigChangeForLoginUser := createOIDCApp(t, baseURI, p.GetId())
 
-	samlMetasForProjectOwner, appForSAMLConfigChangeForProjectOwner := createSAMLApp(t, baseURI)
-	samlMetasForOrgOwner, appForSAMLConfigChangeForOrgOwner := createSAMLApp(t, baseURI)
-	samlMetasForLoginUser, appForSAMLConfigChangeForLoginUser := createSAMLApp(t, baseURI)
+	samlMetasForProjectOwner, appForSAMLConfigChangeForProjectOwner := createSAMLApp(t, baseURI, p.GetId())
+	samlMetasForOrgOwner, appForSAMLConfigChangeForOrgOwner := createSAMLApp(t, baseURI, p.GetId())
+	samlMetasForLoginUser, appForSAMLConfigChangeForLoginUser := createSAMLApp(t, baseURI, p.GetId())
 
 	t.Parallel()
 
@@ -669,9 +677,9 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 		// ProjectOwner
 		{
 			testName: "when user is ProjectOwner app name request should succeed",
-			inputCtx: ProjectOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForNameChange.GetAppId(),
 
 				Name: gofakeit.AppName(),
@@ -679,9 +687,9 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 		},
 		{
 			testName: "when user is ProjectOwner API app request should succeed",
-			inputCtx: ProjectOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForAPIConfigChangeForProjectOwner.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_ApiConfigurationRequest{
 					ApiConfigurationRequest: &app.UpdateAPIApplicationConfigurationRequest{
@@ -692,9 +700,9 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 		},
 		{
 			testName: "when user is ProjectOwner OIDC app request should succeed",
-			inputCtx: ProjectOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForOIDCConfigChangeForProjectOwner.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_OidcConfigurationRequest{
 					OidcConfigurationRequest: &app.UpdateOIDCApplicationConfigurationRequest{
@@ -705,9 +713,9 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 		},
 		{
 			testName: "when user is ProjectOwner SAML request should succeed",
-			inputCtx: ProjectOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForSAMLConfigChangeForProjectOwner.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_SamlConfigurationRequest{
 					SamlConfigurationRequest: &app.UpdateSAMLApplicationConfigurationRequest{
@@ -725,7 +733,7 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user is OrgOwner app name request should succeed",
 			inputCtx: OrgOwnerCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForNameChange.GetAppId(),
 
 				Name: gofakeit.AppName(),
@@ -735,7 +743,7 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user is OrgOwner API app request should succeed",
 			inputCtx: OrgOwnerCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForAPIConfigChangeForOrgOwner.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_ApiConfigurationRequest{
 					ApiConfigurationRequest: &app.UpdateAPIApplicationConfigurationRequest{
@@ -748,7 +756,7 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user is OrgOwner OIDC app request should succeed",
 			inputCtx: OrgOwnerCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForOIDCConfigChangeForOrgOwner.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_OidcConfigurationRequest{
 					OidcConfigurationRequest: &app.UpdateOIDCApplicationConfigurationRequest{
@@ -761,7 +769,7 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user is OrgOwner SAML request should succeed",
 			inputCtx: OrgOwnerCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForSAMLConfigChangeForOrgOwner.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_SamlConfigurationRequest{
 					SamlConfigurationRequest: &app.UpdateSAMLApplicationConfigurationRequest{
@@ -779,7 +787,7 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user has no project.app.write permission for app name change request should return permission error",
 			inputCtx: LoginUserCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForNameChange.GetAppId(),
 
 				Name: gofakeit.AppName(),
@@ -790,7 +798,7 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user has no project.app.write permission for API request should return permission error",
 			inputCtx: LoginUserCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForAPIConfigChangeForLoginUser.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_ApiConfigurationRequest{
 					ApiConfigurationRequest: &app.UpdateAPIApplicationConfigurationRequest{
@@ -804,7 +812,7 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user has no project.app.write permission for OIDC request should return permission error",
 			inputCtx: LoginUserCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForOIDCConfigChangeForLoginUser.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_OidcConfigurationRequest{
 					OidcConfigurationRequest: &app.UpdateOIDCApplicationConfigurationRequest{
@@ -818,7 +826,7 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user has no project.app.write permission for SAML request should return permission error",
 			inputCtx: LoginUserCtx,
 			updateRequest: &app.UpdateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appForSAMLConfigChangeForLoginUser.GetAppId(),
 				UpdateRequestType: &app.UpdateApplicationRequest_SamlConfigurationRequest{
 					SamlConfigurationRequest: &app.UpdateSAMLApplicationConfigurationRequest{
@@ -847,12 +855,14 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 }
 
 func TestDeleteApplication(t *testing.T) {
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
+
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
 
 	appToDelete, appNameChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId:           Project.GetId(),
+		ProjectId:           p.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
@@ -870,7 +880,7 @@ func TestDeleteApplication(t *testing.T) {
 			testName: "when app to delete is not found should return not found error",
 			inputCtx: IAMOwnerCtx,
 			deleteRequest: &app.DeleteApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        gofakeit.Sentence(2),
 			},
 			expectedErrorType: codes.NotFound,
@@ -879,7 +889,7 @@ func TestDeleteApplication(t *testing.T) {
 			testName: "when app to delete is found should return deletion time",
 			inputCtx: IAMOwnerCtx,
 			deleteRequest: &app.DeleteApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appToDelete.GetAppId(),
 			},
 		},
@@ -902,9 +912,11 @@ func TestDeleteApplication(t *testing.T) {
 }
 
 func TestDeleteApplication_WithDifferentPermissions(t *testing.T) {
-	appToDeleteForLoginUser := createAPIApp(t)
-	appToDeleteForProjectOwner := createAPIApp(t)
-	appToDeleteForOrgOwner := createAPIApp(t)
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
+
+	appToDeleteForLoginUser := createAPIApp(t, p.GetId())
+	appToDeleteForProjectOwner := createAPIApp(t, p.GetId())
+	appToDeleteForOrgOwner := createAPIApp(t, p.GetId())
 
 	t.Parallel()
 	tt := []struct {
@@ -919,7 +931,7 @@ func TestDeleteApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user has no project.app.delete permission for app delete request should return permission error",
 			inputCtx: LoginUserCtx,
 			deleteRequest: &app.DeleteApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appToDeleteForLoginUser.GetAppId(),
 			},
 			expectedErrorType: codes.PermissionDenied,
@@ -928,9 +940,9 @@ func TestDeleteApplication_WithDifferentPermissions(t *testing.T) {
 		// Project Owner
 		{
 			testName: "when user is ProjectOwner delete app request should succeed",
-			inputCtx: ProjectOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			deleteRequest: &app.DeleteApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appToDeleteForProjectOwner.GetAppId(),
 			},
 		},
@@ -938,9 +950,9 @@ func TestDeleteApplication_WithDifferentPermissions(t *testing.T) {
 		// Org Owner
 		{
 			testName: "when user is OrgOwner delete app request should succeed",
-			inputCtx: ProjectOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			deleteRequest: &app.DeleteApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appToDeleteForOrgOwner.GetAppId(),
 			},
 		},
@@ -963,13 +975,14 @@ func TestDeleteApplication_WithDifferentPermissions(t *testing.T) {
 }
 
 func TestDeactivateApplication(t *testing.T) {
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
 
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
 
 	appToDeactivate, appCreateErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId:           Project.GetId(),
+		ProjectId:           p.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
@@ -988,7 +1001,7 @@ func TestDeactivateApplication(t *testing.T) {
 			testName: "when app to deactivate is not found should return not found error",
 			inputCtx: IAMOwnerCtx,
 			deleteRequest: &app.DeactivateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        gofakeit.Sentence(2),
 			},
 			expectedErrorType: codes.NotFound,
@@ -997,7 +1010,7 @@ func TestDeactivateApplication(t *testing.T) {
 			testName: "when app to deactivate is found should return deactivation time",
 			inputCtx: IAMOwnerCtx,
 			deleteRequest: &app.DeactivateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appToDeactivate.GetAppId(),
 			},
 		},
@@ -1020,9 +1033,11 @@ func TestDeactivateApplication(t *testing.T) {
 }
 
 func TestDeactivateApplication_WithDifferentPermissions(t *testing.T) {
-	appToDeactivateForLoginUser := createAPIApp(t)
-	appToDeactivateForPrjectOwner := createAPIApp(t)
-	appToDeactivateForOrgOwner := createAPIApp(t)
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
+
+	appToDeactivateForLoginUser := createAPIApp(t, p.GetId())
+	appToDeactivateForPrjectOwner := createAPIApp(t, p.GetId())
+	appToDeactivateForOrgOwner := createAPIApp(t, p.GetId())
 
 	t.Parallel()
 
@@ -1038,7 +1053,7 @@ func TestDeactivateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user has no project.app.write permission for app deactivate request should return permission error",
 			inputCtx: IAMOwnerCtx,
 			deleteRequest: &app.DeactivateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appToDeactivateForLoginUser.GetAppId(),
 			},
 		},
@@ -1046,9 +1061,9 @@ func TestDeactivateApplication_WithDifferentPermissions(t *testing.T) {
 		// Project Owner
 		{
 			testName: "when user is ProjectOwner deactivate app request should succeed",
-			inputCtx: ProjectOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			deleteRequest: &app.DeactivateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appToDeactivateForPrjectOwner.GetAppId(),
 			},
 		},
@@ -1058,7 +1073,7 @@ func TestDeactivateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user is OrgOwner deactivate app request should succeed",
 			inputCtx: OrgOwnerCtx,
 			deleteRequest: &app.DeactivateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appToDeactivateForOrgOwner.GetAppId(),
 			},
 		},
@@ -1081,19 +1096,21 @@ func TestDeactivateApplication_WithDifferentPermissions(t *testing.T) {
 }
 
 func TestReactivateApplication(t *testing.T) {
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
+
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
 
 	appToReactivate, appCreateErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId:           Project.GetId(),
+		ProjectId:           p.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
 	require.Nil(t, appCreateErr)
 
 	_, appDeactivateErr := instance.Client.AppV2Beta.DeactivateApplication(IAMOwnerCtx, &app.DeactivateApplicationRequest{
-		ProjectId: Project.GetId(),
+		ProjectId: p.GetId(),
 		Id:        appToReactivate.GetAppId(),
 	})
 	require.Nil(t, appDeactivateErr)
@@ -1111,7 +1128,7 @@ func TestReactivateApplication(t *testing.T) {
 			testName: "when app to reactivate is not found should return not found error",
 			inputCtx: IAMOwnerCtx,
 			reactivateRequest: &app.ReactivateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        gofakeit.Sentence(2),
 			},
 			expectedErrorType: codes.NotFound,
@@ -1120,7 +1137,7 @@ func TestReactivateApplication(t *testing.T) {
 			testName: "when app to reactivate is found should return deactivation time",
 			inputCtx: IAMOwnerCtx,
 			reactivateRequest: &app.ReactivateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appToReactivate.GetAppId(),
 			},
 		},
@@ -1143,14 +1160,16 @@ func TestReactivateApplication(t *testing.T) {
 }
 
 func TestReactivateApplication_WithDifferentPermissions(t *testing.T) {
-	appToReactivateForLoginUser := createAPIApp(t)
-	deactivateApp(t, appToReactivateForLoginUser)
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
 
-	appToReactivateForProjectOwner := createAPIApp(t)
-	deactivateApp(t, appToReactivateForProjectOwner)
+	appToReactivateForLoginUser := createAPIApp(t, p.GetId())
+	deactivateApp(t, appToReactivateForLoginUser, p.GetId())
 
-	appToReactivateForOrgOwner := createAPIApp(t)
-	deactivateApp(t, appToReactivateForOrgOwner)
+	appToReactivateForProjectOwner := createAPIApp(t, p.GetId())
+	deactivateApp(t, appToReactivateForProjectOwner, p.GetId())
+
+	appToReactivateForOrgOwner := createAPIApp(t, p.GetId())
+	deactivateApp(t, appToReactivateForOrgOwner, p.GetId())
 
 	t.Parallel()
 
@@ -1166,7 +1185,7 @@ func TestReactivateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user has no project.app.write permission for app reactivate request should return permission error",
 			inputCtx: LoginUserCtx,
 			reactivateRequest: &app.ReactivateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appToReactivateForLoginUser.GetAppId(),
 			},
 			expectedErrorType: codes.PermissionDenied,
@@ -1175,9 +1194,9 @@ func TestReactivateApplication_WithDifferentPermissions(t *testing.T) {
 		// Project Owner
 		{
 			testName: "when user is ProjectOwner reactivate app request should succeed",
-			inputCtx: ProjectOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			reactivateRequest: &app.ReactivateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appToReactivateForProjectOwner.GetAppId(),
 			},
 		},
@@ -1187,7 +1206,7 @@ func TestReactivateApplication_WithDifferentPermissions(t *testing.T) {
 			testName: "when user is OrgOwner reactivate app request should succeed",
 			inputCtx: OrgOwnerCtx,
 			reactivateRequest: &app.ReactivateApplicationRequest{
-				ProjectId: Project.GetId(),
+				ProjectId: p.GetId(),
 				Id:        appToReactivateForOrgOwner.GetAppId(),
 			},
 		},
@@ -1210,12 +1229,14 @@ func TestReactivateApplication_WithDifferentPermissions(t *testing.T) {
 }
 
 func TestRegenerateClientSecret(t *testing.T) {
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
+
 	reqForApiAppCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
 
 	apiAppToRegen, apiAppCreateErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId:           Project.GetId(),
+		ProjectId:           p.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForApiAppCreation,
 	})
@@ -1243,7 +1264,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 	}
 
 	oidcAppToRegen, oidcAppCreateErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId:           Project.GetId(),
+		ProjectId:           p.GetId(),
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForOIDCAppCreation,
 	})
@@ -1263,7 +1284,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 			testName: "when app to regen is not expected type should return invalid argument error",
 			inputCtx: IAMOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
-				ProjectId:     Project.GetId(),
+				ProjectId:     p.GetId(),
 				ApplicationId: gofakeit.Sentence(2),
 			},
 			expectedErrorType: codes.InvalidArgument,
@@ -1272,7 +1293,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 			testName: "when app to regen is not found should return not found error",
 			inputCtx: IAMOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
-				ProjectId:     Project.GetId(),
+				ProjectId:     p.GetId(),
 				ApplicationId: gofakeit.Sentence(2),
 				AppType:       &app.RegenerateClientSecretRequest_IsApi{},
 			},
@@ -1282,7 +1303,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 			testName: "when API app to regen is found should return different secret",
 			inputCtx: IAMOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
-				ProjectId:     Project.GetId(),
+				ProjectId:     p.GetId(),
 				ApplicationId: apiAppToRegen.GetAppId(),
 				AppType:       &app.RegenerateClientSecretRequest_IsApi{},
 			},
@@ -1292,7 +1313,7 @@ func TestRegenerateClientSecret(t *testing.T) {
 			testName: "when OIDC app to regen is found should return different secret",
 			inputCtx: IAMOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
-				ProjectId:     Project.GetId(),
+				ProjectId:     p.GetId(),
 				ApplicationId: oidcAppToRegen.GetAppId(),
 				AppType:       &app.RegenerateClientSecretRequest_IsOidc{},
 			},
@@ -1319,13 +1340,15 @@ func TestRegenerateClientSecret(t *testing.T) {
 }
 
 func TestRegenerateClientSecret_WithDifferentPermissions(t *testing.T) {
-	apiAppToRegenForLoginUser := createAPIApp(t)
-	apiAppToRegenForProjectOwner := createAPIApp(t)
-	apiAppToRegenForOrgOwner := createAPIApp(t)
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
 
-	oidcAppToRegenForLoginUser := createOIDCApp(t, baseURI)
-	oidcAppToRegenForProjectOwner := createOIDCApp(t, baseURI)
-	oidcAppToRegenForOrgOwner := createOIDCApp(t, baseURI)
+	apiAppToRegenForLoginUser := createAPIApp(t, p.GetId())
+	apiAppToRegenForProjectOwner := createAPIApp(t, p.GetId())
+	apiAppToRegenForOrgOwner := createAPIApp(t, p.GetId())
+
+	oidcAppToRegenForLoginUser := createOIDCApp(t, baseURI, p.GetId())
+	oidcAppToRegenForProjectOwner := createOIDCApp(t, baseURI, p.GetId())
+	oidcAppToRegenForOrgOwner := createOIDCApp(t, baseURI, p.GetId())
 
 	t.Parallel()
 
@@ -1342,7 +1365,7 @@ func TestRegenerateClientSecret_WithDifferentPermissions(t *testing.T) {
 			testName: "when user has no project.app.write permission for API app secret regen request should return permission error",
 			inputCtx: LoginUserCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
-				ProjectId:     Project.GetId(),
+				ProjectId:     p.GetId(),
 				ApplicationId: apiAppToRegenForLoginUser.GetAppId(),
 				AppType:       &app.RegenerateClientSecretRequest_IsApi{},
 			},
@@ -1352,7 +1375,7 @@ func TestRegenerateClientSecret_WithDifferentPermissions(t *testing.T) {
 			testName: "when user has no project.app.write permission for OIDC app secret regen request should return permission error",
 			inputCtx: LoginUserCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
-				ProjectId:     Project.GetId(),
+				ProjectId:     p.GetId(),
 				ApplicationId: oidcAppToRegenForLoginUser.GetAppId(),
 				AppType:       &app.RegenerateClientSecretRequest_IsOidc{},
 			},
@@ -1362,9 +1385,9 @@ func TestRegenerateClientSecret_WithDifferentPermissions(t *testing.T) {
 		// Project Owner
 		{
 			testName: "when user is ProjectOwner regen API app secret request should succeed",
-			inputCtx: ProjectOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
-				ProjectId:     Project.GetId(),
+				ProjectId:     p.GetId(),
 				ApplicationId: apiAppToRegenForProjectOwner.GetAppId(),
 				AppType:       &app.RegenerateClientSecretRequest_IsApi{},
 			},
@@ -1372,9 +1395,9 @@ func TestRegenerateClientSecret_WithDifferentPermissions(t *testing.T) {
 		},
 		{
 			testName: "when user is ProjectOwner regen OIDC app secret request should succeed",
-			inputCtx: ProjectOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
-				ProjectId:     Project.GetId(),
+				ProjectId:     p.GetId(),
 				ApplicationId: oidcAppToRegenForProjectOwner.GetAppId(),
 				AppType:       &app.RegenerateClientSecretRequest_IsOidc{},
 			},
@@ -1386,7 +1409,7 @@ func TestRegenerateClientSecret_WithDifferentPermissions(t *testing.T) {
 			testName: "when user is OrgOwner regen API app secret request should succeed",
 			inputCtx: OrgOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
-				ProjectId:     Project.GetId(),
+				ProjectId:     p.GetId(),
 				ApplicationId: apiAppToRegenForOrgOwner.GetAppId(),
 				AppType:       &app.RegenerateClientSecretRequest_IsApi{},
 			},
@@ -1396,7 +1419,7 @@ func TestRegenerateClientSecret_WithDifferentPermissions(t *testing.T) {
 			testName: "when user is OrgOwner regen OIDC app secret request should succeed",
 			inputCtx: OrgOwnerCtx,
 			regenRequest: &app.RegenerateClientSecretRequest{
-				ProjectId:     Project.GetId(),
+				ProjectId:     p.GetId(),
 				ApplicationId: oidcAppToRegenForOrgOwner.GetAppId(),
 				AppType:       &app.RegenerateClientSecretRequest_IsOidc{},
 			},

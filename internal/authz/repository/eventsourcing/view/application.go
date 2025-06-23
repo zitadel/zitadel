@@ -32,7 +32,7 @@ func (v *View) ApplicationByProjecIDAndAppName(ctx context.Context, projectID, a
 		},
 	}
 
-	apps, err := v.Query.SearchApps(ctx, queries, false)
+	apps, err := v.Query.SearchApps(ctx, queries, false, false)
 	if err != nil {
 		return nil, err
 	}

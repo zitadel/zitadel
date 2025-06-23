@@ -21,9 +21,11 @@ import (
 )
 
 func TestGetApplication(t *testing.T) {
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
+
 	apiAppName := gofakeit.AppName()
 	createdApiApp, errAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId: Project.GetId(),
+		ProjectId: p.GetId(),
 		Name:      apiAppName,
 		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
 			ApiRequest: &app.CreateAPIApplicationRequest{
@@ -35,7 +37,7 @@ func TestGetApplication(t *testing.T) {
 
 	samlAppName := gofakeit.AppName()
 	createdSAMLApp, errSAMLAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId: Project.GetId(),
+		ProjectId: p.GetId(),
 		Name:      samlAppName,
 		CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
 			SamlRequest: &app.CreateSAMLApplicationRequest{
@@ -48,7 +50,7 @@ func TestGetApplication(t *testing.T) {
 
 	oidcAppName := gofakeit.AppName()
 	createdOIDCApp, errOIDCAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId: Project.GetId(),
+		ProjectId: p.GetId(),
 		Name:      oidcAppName,
 		CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
 			OidcRequest: &app.CreateOIDCApplicationRequest{
@@ -99,7 +101,7 @@ func TestGetApplication(t *testing.T) {
 		},
 		{
 			testName: "when providing API app ID should return valid API app result",
-			inputCtx: IAMOwnerCtx,
+			inputCtx: projectOwnerCtx,
 			inputRequest: &app.GetApplicationRequest{
 				Id: createdApiApp.GetAppId(),
 			},
@@ -134,7 +136,7 @@ func TestGetApplication(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
-			// t.Parallel()
+			t.Parallel()
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
@@ -159,72 +161,18 @@ func TestGetApplication(t *testing.T) {
 }
 
 func TestListApplications(t *testing.T) {
-	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
 
 	t.Parallel()
 
-	apiAppName := gofakeit.AppName()
-	createdApiApp, errAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId: p.GetId(),
-		Name:      apiAppName,
-		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
-			ApiRequest: &app.CreateAPIApplicationRequest{
-				AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
-			},
-		},
-	})
-	require.Nil(t, errAPIAppCreation)
+	createdApiApp, apiAppName := createAPIAppWithName(t, p.GetId())
 
-	deactivatedApiAppName := gofakeit.AppName()
-	createdDeactivatedApiApp, errDeactivatedAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId: p.GetId(),
-		Name:      deactivatedApiAppName,
-		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
-			ApiRequest: &app.CreateAPIApplicationRequest{
-				AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
-			},
-		},
-	})
-	require.Nil(t, errDeactivatedAPIAppCreation)
-	_, deactivateErr := instance.Client.AppV2Beta.DeactivateApplication(IAMOwnerCtx, &app.DeactivateApplicationRequest{
-		ProjectId: p.GetId(),
-		Id:        createdDeactivatedApiApp.GetAppId(),
-	})
-	require.Nil(t, deactivateErr)
+	createdDeactivatedApiApp, deactivatedApiAppName := createAPIAppWithName(t, p.GetId())
+	deactivateApp(t, createdDeactivatedApiApp, p.GetId())
 
-	samlAppName := gofakeit.AppName()
-	createdSAMLApp, errSAMLAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId: p.GetId(),
-		Name:      samlAppName,
-		CreationRequestType: &app.CreateApplicationRequest_SamlRequest{
-			SamlRequest: &app.CreateSAMLApplicationRequest{
-				LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
-				Metadata:     &app.CreateSAMLApplicationRequest_MetadataXml{MetadataXml: samlMetadataGen(gofakeit.URL())},
-			},
-		},
-	})
-	require.Nil(t, errSAMLAppCreation)
+	_, createdSAMLApp, samlAppName := createSAMLAppWithName(t, gofakeit.URL(), p.GetId())
 
-	oidcAppName := gofakeit.AppName()
-	createdOIDCApp, errOIDCAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
-		ProjectId: p.GetId(),
-		Name:      oidcAppName,
-		CreationRequestType: &app.CreateApplicationRequest_OidcRequest{
-			OidcRequest: &app.CreateOIDCApplicationRequest{
-				RedirectUris:           []string{"http://example.com"},
-				ResponseTypes:          []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
-				GrantTypes:             []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE},
-				AppType:                app.OIDCAppType_OIDC_APP_TYPE_WEB,
-				AuthMethodType:         app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC,
-				PostLogoutRedirectUris: []string{"http://example.com/home"},
-				Version:                app.OIDCVersion_OIDC_VERSION_1_0,
-				AccessTokenType:        app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
-				BackChannelLogoutUri:   "http://example.com/logout",
-				LoginVersion:           &app.LoginVersion{Version: &app.LoginVersion_LoginV2{LoginV2: &app.LoginV2{BaseUri: &baseURI}}},
-			},
-		},
-	})
-	require.Nil(t, errOIDCAppCreation)
+	createdOIDCApp, oidcAppName := createOIDCAppWithName(t, gofakeit.URL(), p.GetId())
 
 	type appWithName struct {
 		app  *app.CreateApplicationResponse
@@ -262,7 +210,6 @@ func TestListApplications(t *testing.T) {
 		if a.app.GetAppId() > b.app.GetAppId() {
 			return 1
 		}
-
 		return 0
 	})
 
@@ -307,6 +254,17 @@ func TestListApplications(t *testing.T) {
 			actualOrderedKeys:   func(keys []*app.Application) any { return keys },
 		},
 		{
+			testName: "when user has no read permission should return empty set",
+			inputCtx: NoPermissionCtx,
+			inputRequest: &app.ListApplicationsRequest{
+				ProjectId: p.GetId(),
+			},
+
+			expectedOrderedList: []appWithName{},
+			expectedOrderedKeys: func(keys []appWithName) any { return keys },
+			actualOrderedKeys:   func(keys []*app.Application) any { return keys },
+		},
+		{
 			testName: "when sorting by name should return apps sorted by name in descending order",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.ListApplicationsRequest{
@@ -333,6 +291,35 @@ func TestListApplications(t *testing.T) {
 				return names
 			},
 		},
+
+		{
+			testName: "when user is project owner should return apps sorted by name in ascending order",
+			inputCtx: projectOwnerCtx,
+			inputRequest: &app.ListApplicationsRequest{
+				ProjectId:     p.GetId(),
+				SortingColumn: app.AppSorting_APP_SORT_BY_NAME,
+				Pagination:    &filter.PaginationRequest{Asc: true},
+			},
+
+			expectedOrderedList: appsSortedByName,
+			expectedOrderedKeys: func(apps []appWithName) any {
+				names := make([]string, len(apps))
+				for i, a := range apps {
+					names[i] = a.name
+				}
+
+				return names
+			},
+			actualOrderedKeys: func(apps []*app.Application) any {
+				names := make([]string, len(apps))
+				for i, a := range apps {
+					names[i] = a.GetName()
+				}
+
+				return names
+			},
+		},
+
 		{
 			testName: "when sorting by id should return apps sorted by id in descending order",
 			inputCtx: IAMOwnerCtx,
@@ -465,6 +452,122 @@ func TestListApplications(t *testing.T) {
 					actualOrderedKeys := tc.actualOrderedKeys(res.GetApplications())
 					expectedOrderedKeys := tc.expectedOrderedKeys(tc.expectedOrderedList)
 					assert.ElementsMatch(ttt, expectedOrderedKeys, actualOrderedKeys)
+				}
+			}, retryDuration, tick)
+		})
+	}
+}
+
+func TestListApplications_WithPermissionV2(t *testing.T) {
+	ensureFeaturePermissionV2Enabled(t, instancePermissionV2)
+	iamOwnerCtx := instancePermissionV2.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instancePermissionV2, iamOwnerCtx)
+	_, otherProjectOwnerCtx := getProjectAndProjectContext(t, instancePermissionV2, iamOwnerCtx)
+
+	appName1, appName2, appName3 := gofakeit.AppName(), gofakeit.AppName(), gofakeit.AppName()
+	reqForAPIAppCreation := &app.CreateApplicationRequest_ApiRequest{
+		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
+	}
+
+	app1, appAPIConfigChangeErr := instancePermissionV2.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId:           p.GetId(),
+		Name:                appName1,
+		CreationRequestType: reqForAPIAppCreation,
+	})
+	require.Nil(t, appAPIConfigChangeErr)
+
+	app2, appAPIConfigChangeErr := instancePermissionV2.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId:           p.GetId(),
+		Name:                appName2,
+		CreationRequestType: reqForAPIAppCreation,
+	})
+	require.Nil(t, appAPIConfigChangeErr)
+
+	app3, appAPIConfigChangeErr := instancePermissionV2.Client.AppV2Beta.CreateApplication(iamOwnerCtx, &app.CreateApplicationRequest{
+		ProjectId:           p.GetId(),
+		Name:                appName3,
+		CreationRequestType: reqForAPIAppCreation,
+	})
+	require.Nil(t, appAPIConfigChangeErr)
+
+	t.Parallel()
+
+	tt := []struct {
+		testName     string
+		inputRequest *app.ListApplicationsRequest
+		inputCtx     context.Context
+
+		expectedCode   codes.Code
+		expectedAppIDs []string
+	}{
+		{
+			testName: "when user has no read permission should return empty set",
+			inputCtx: instancePermissionV2.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
+			inputRequest: &app.ListApplicationsRequest{
+				ProjectId: p.GetId(),
+			},
+
+			expectedAppIDs: []string{},
+		},
+		{
+			testName: "when projectOwner should return full app list",
+			inputCtx: projectOwnerCtx,
+			inputRequest: &app.ListApplicationsRequest{
+				ProjectId: p.GetId(),
+			},
+
+			expectedCode:   codes.OK,
+			expectedAppIDs: []string{app1.GetAppId(), app2.GetAppId(), app3.GetAppId()},
+		},
+		{
+			testName: "when orgOwner should return full app list",
+			inputCtx: instancePermissionV2.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			inputRequest: &app.ListApplicationsRequest{
+				ProjectId: p.GetId(),
+			},
+
+			expectedAppIDs: []string{app1.GetAppId(), app2.GetAppId(), app3.GetAppId()},
+		},
+		{
+			testName: "when iamOwner user should return full app list",
+			inputCtx: iamOwnerCtx,
+			inputRequest: &app.ListApplicationsRequest{
+				ProjectId: p.GetId(),
+			},
+
+			expectedAppIDs: []string{app1.GetAppId(), app2.GetAppId(), app3.GetAppId()},
+		},
+		{
+			testName: "when other projectOwner user should return empty list",
+			inputCtx: otherProjectOwnerCtx,
+			inputRequest: &app.ListApplicationsRequest{
+				ProjectId: p.GetId(),
+			},
+
+			expectedAppIDs: []string{},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 5*time.Second)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				// When
+				res, err := instancePermissionV2.Client.AppV2Beta.ListApplications(tc.inputCtx, tc.inputRequest)
+
+				// Then
+				require.Equal(ttt, tc.expectedCode, status.Code(err))
+
+				if err == nil {
+					require.Len(ttt, res.GetApplications(), len(tc.expectedAppIDs))
+
+					resAppIDs := []string{}
+					for _, a := range res.GetApplications() {
+						resAppIDs = append(resAppIDs, a.GetId())
+					}
+
+					assert.ElementsMatch(ttt, tc.expectedAppIDs, resAppIDs)
 				}
 			}, retryDuration, tick)
 		})
