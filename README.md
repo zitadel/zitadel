@@ -151,14 +151,13 @@ You can find a more detailed documentation of the different pages [here](./apps/
 
 ## Useful Commands
 
-- `pnpm generate` - Build proto stubs for server and client package
-- `pnpm build` - Build all packages and the login app
-- `pnpm test` - Test all packages and the login app
-- `pnpm test:watch` - Rerun tests on file change
-- `pnpm dev` - Develop all packages and the login app
-- `pnpm lint` - Lint all packages
-- `pnpm changeset` - Generate a changeset
-- `pnpm clean` - Clean up all `node_modules` and `dist` folders (runs each package's clean script)
+- `make login-quality`  - Check the quality of your code against a production build without installing any dependencies besides Docker
+- `pnpm generate`       - Build proto stubs for the client package
+- `pnpm dev`            - Develop all packages and the login app
+- `pnpm build`          - Build all packages and the login app
+- `pnpm clean`          - Clean up all `node_modules` and `dist` folders (runs each package's clean script)
+
+Learn more about developing the login UI in the [contribution guide](/CONTRIBUTING.md).
 
 ## Versioning And Publishing Packages
 
