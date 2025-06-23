@@ -53,7 +53,7 @@ jobs:
       - run: make login-quality
         env:
           # latest if branch is main, otherwise image version which is the pull request number
-          BAKE_CLI: depot bake
+          LOGIN_BAKE_CLI: depot bake
           DEPOT_PROJECT_ID: w47wkxzdtw
           FORCE: ${{ github.event.inputs.force }}
       - name: Save Run Caches
