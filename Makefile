@@ -3,8 +3,8 @@ export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 
 export LOGIN_DIR := $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 
-export BAKE_CLI ?= docker buildx bake
-BAKE_CLI_WITH_COMMON_ARGS := $(BAKE_CLI) --file $(LOGIN_DIR)/docker-bake.hcl --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml
+export LOGIN_BAKE_CLI ?= docker buildx bake
+LOGIN_BAKE_CLI_WITH_COMMON_ARGS := $(LOGIN_BAKE_CLI) --file $(LOGIN_DIR)/docker-bake.hcl --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml
 
 export COMPOSE_BAKE=true
 export UID := $(id -u)
@@ -43,16 +43,16 @@ login-help:
 	@echo "  clean-run-caches        - Remove all run caches."
 
 login-lint:
-	$(BAKE_CLI_WITH_COMMON_ARGS) login-lint
+	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-lint
 
 login-test-unit:
-	$(BAKE_CLI_WITH_COMMON_ARGS) login-test-unit
+	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-test-unit
 
 login-test-integration-build:
-	$(BAKE_CLI_WITH_COMMON_ARGS) core-mock login-test-integration login-standalone
+	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) core-mock login-test-integration login-standalone
 
 login-test-integration-dev: login-test-integration-cleanup
-	$(BAKE_CLI_WITH_COMMON_ARGS) core-mock && docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --service-ports --rm core-mock
+	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) core-mock && docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --service-ports --rm core-mock
 
 login-test-integration-run: login-test-integration-cleanup
 	docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --rm integration
@@ -68,10 +68,10 @@ login-test-integration: login-test-integration-build
 	$(LOGIN_TEST_INTEGRATION_TAG)"
 
 login-test-acceptance-build-bake:
-	$(BAKE_CLI_WITH_COMMON_ARGS) login-test-acceptance login-standalone
+	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-test-acceptance login-standalone
 
 login-test-acceptance-build-compose:
-	$(BAKE_CLI_WITH_COMMON_ARGS) --load setup sink
+	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) --load setup sink
 
 login-test-acceptance-build: login-test-acceptance-build-compose login-test-acceptance-build-bake
 	@:
@@ -103,7 +103,7 @@ login-quality: login-lint login-test-unit login-test-integration
 
 .PHONY: login-standalone-build
 login-standalone-build:
-	$(BAKE_CLI_WITH_COMMON_ARGS) login-standalone
+	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-standalone
 
 .PHONY: clean-run-caches
 clean-run-caches:
