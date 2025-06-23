@@ -18,6 +18,8 @@ permissions:
   packages: write
   issues: write
   pull-requests: write
+  actions: write
+  id-token: write
 
 jobs:
   core:
