@@ -189,7 +189,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -286,7 +285,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -409,7 +407,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -443,7 +440,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -590,7 +586,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -1394,7 +1389,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
