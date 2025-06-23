@@ -1,8 +1,7 @@
 XDG_CACHE_HOME ?= $(HOME)/.cache
 export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 
-export LOGIN_DIR := $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
-
+LOGIN_DIR ?= ./
 LOGIN_BAKE_CLI ?= docker buildx bake
 LOGIN_BAKE_CLI_WITH_COMMON_ARGS := $(LOGIN_BAKE_CLI) --file $(LOGIN_DIR)docker-bake.hcl --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml
 LOGIN_BAKE_CLI_ADDITIONAL_ARGS ?=
