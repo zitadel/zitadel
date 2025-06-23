@@ -161,3 +161,42 @@ jobs:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           gh workflow -R zitadel/zitadel-charts run bump.yml
+
+  typescript-packages:
+    runs-on: ubuntu-latest
+    needs: version
+    if: ${{ github.ref_name == 'next' }}
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        working-directory: login
+        run: pnpm install
+
+      - name: Create Release Pull Request
+        uses: changesets/action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          version: echo -n "${{ needs.version.outputs.version }}"
+          cwd: login
+
+  typescript-repo:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref_name == 'next' }}
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Push Subtree
+        run: make login-push
