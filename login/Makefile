@@ -103,7 +103,10 @@ login-quality: login-lint login-test-unit login-test-integration
 
 .PHONY: login-standalone-build
 login-standalone-build:
-	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-standalone
+	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) --load login-standalone
+
+login-standalone-build-tag:
+	@echo -n "$(LOGIN_TAG)"
 
 .PHONY: clean-run-caches
 clean-run-caches:
