@@ -2,7 +2,9 @@ package server
 
 import (
 	"crypto/tls"
+	"net/http"
 
+	"connectrpc.com/connect"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -19,19 +21,33 @@ import (
 )
 
 type Server interface {
-	RegisterServer(*grpc.Server)
-	RegisterGateway() RegisterGatewayFunc
 	AppName() string
 	MethodPrefix() string
 	AuthMethods() authz.MethodMapping
+}
+
+type GrpcServer interface {
+	Server
+	RegisterServer(*grpc.Server)
+}
+
+type WithGateway interface {
+	Server
+	RegisterGateway() RegisterGatewayFunc
 }
 
 // WithGatewayPrefix extends the server interface with a prefix for the grpc gateway
 //
 // it's used for the System, Admin, Mgmt and Auth API
 type WithGatewayPrefix interface {
-	Server
+	GrpcServer
+	WithGateway
 	GatewayPathPrefix() string
+}
+
+type ConnectServer interface {
+	Server
+	RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler)
 }
 
 func CreateServer(

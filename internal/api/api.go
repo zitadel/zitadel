@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"connectrpc.com/grpcreflect"
 	"github.com/gorilla/mux"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/zitadel/logging"
@@ -16,7 +17,9 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
+	"github.com/zitadel/zitadel/internal/api/grpc/server/connect_mw"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -24,10 +27,14 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta/webkeyconnect"
 )
 
 type API struct {
 	port              uint16
+	externalDomain    string
 	grpcServer        *grpc.Server
 	verifier          authz.APITokenVerifier
 	health            healthCheck
@@ -37,14 +44,21 @@ type API struct {
 	healthServer      *health.Server
 	accessInterceptor *http_mw.AccessInterceptor
 	queries           *query.Queries
+	authConfig        authz.Config
+	systemAuthZ       authz.Config
+	connectRoutes     []string
 }
 
 func (a *API) ListGrpcServices() []string {
 	serviceInfo := a.grpcServer.GetServiceInfo()
-	services := make([]string, len(serviceInfo))
+	services := make([]string, len(serviceInfo)+len(a.connectRoutes))
 	i := 0
 	for servicename := range serviceInfo {
 		services[i] = servicename
+		i++
+	}
+	for _, prefix := range a.connectRoutes {
+		services[i] = strings.Trim(prefix, "/")
 		i++
 	}
 	sort.Strings(services)
@@ -82,12 +96,15 @@ func New(
 ) (_ *API, err error) {
 	api := &API{
 		port:              port,
+		externalDomain:    externalDomain,
 		verifier:          verifier,
 		health:            queries,
 		router:            router,
 		queries:           queries,
 		accessInterceptor: accessInterceptor,
 		hostHeaders:       hostHeaders,
+		authConfig:        authZ,
+		systemAuthZ:       systemAuthz,
 	}
 
 	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService())
@@ -98,6 +115,13 @@ func New(
 	api.registerHealthServer()
 
 	api.RegisterHandlerOnPrefix("/debug", api.healthHandler())
+	reflector := grpcreflect.NewStaticReflector(
+		user.UserService_ServiceDesc.ServiceName,
+		webkeyconnect.WebKeyServiceName,
+	)
+	api.router.Handle(grpcreflect.NewHandlerV1(reflector))
+	api.router.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
+
 	api.router.Handle("/", http.RedirectHandler(login.HandlerPrefix, http.StatusFound))
 
 	reflection.Register(api.grpcServer)
@@ -131,14 +155,39 @@ func (a *API) RegisterServer(ctx context.Context, grpcServer server.WithGatewayP
 // and its gateway on the gateway handler
 //
 // used for >= v2 api (e.g. user, session, ...)
-func (a *API) RegisterService(ctx context.Context, grpcServer server.Server) error {
-	grpcServer.RegisterServer(a.grpcServer)
-	err := server.RegisterGateway(ctx, a.grpcGateway, grpcServer)
-	if err != nil {
-		return err
+func (a *API) RegisterService(ctx context.Context, srv server.Server) error {
+	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
+	switch service := srv.(type) {
+	case server.GrpcServer:
+		service.RegisterServer(a.grpcServer)
+	case server.ConnectServer:
+		prefix, handler := service.RegisterConnectServer(
+			connect_mw.CallDurationHandler(),
+			connect_mw.MetricsHandler(metricTypes, grpc_api.Probes...),
+			connect_mw.NoCacheInterceptor(),
+			connect_mw.InstanceInterceptor(a.queries, a.externalDomain, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
+			connect_mw.AccessStorageInterceptor(a.accessInterceptor.AccessService()),
+			connect_mw.ErrorHandler(),
+			connect_mw.LimitsInterceptor(system_pb.SystemService_ServiceDesc.ServiceName),
+			connect_mw.AuthorizationInterceptor(a.verifier, a.systemAuthZ, a.authConfig),
+			connect_mw.TranslationHandler(),
+			connect_mw.QuotaExhaustedInterceptor(a.accessInterceptor.AccessService(), system_pb.SystemService_ServiceDesc.ServiceName),
+			connect_mw.ExecutionHandler(a.queries),
+			connect_mw.ValidationHandler(),
+			connect_mw.ServiceHandler(),
+			connect_mw.ActivityInterceptor(),
+		)
+		a.connectRoutes = append(a.connectRoutes, prefix)
+		a.RegisterHandlerPrefixes(handler, prefix)
 	}
-	a.verifier.RegisterServer(grpcServer.AppName(), grpcServer.MethodPrefix(), grpcServer.AuthMethods())
-	a.healthServer.SetServingStatus(grpcServer.MethodPrefix(), healthpb.HealthCheckResponse_SERVING)
+	if withGateway, ok := srv.(server.WithGateway); ok {
+		err := server.RegisterGateway(ctx, a.grpcGateway, withGateway)
+		if err != nil {
+			return err
+		}
+	}
+	a.verifier.RegisterServer(srv.AppName(), srv.MethodPrefix(), srv.AuthMethods())
+	a.healthServer.SetServingStatus(srv.MethodPrefix(), healthpb.HealthCheckResponse_SERVING)
 	return nil
 }
 
