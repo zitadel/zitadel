@@ -117,7 +117,7 @@ service AppService {
     // The user needs to have project.app.write permission
     //
     // Required permissions:
-    //   - `project.app.write`
+    //   - project.app.write
     rpc CreateApplication(CreateApplicationRequest) returns (CreateApplicationResponse) {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             responses: {
@@ -148,7 +148,7 @@ service AppService {
     // The user needs to have project.app.write permission
     //
     // Required permissions:
-    //   - `project.app.write`
+    //   - project.app.write
     rpc UpdateApplication(UpdateApplicationRequest) returns (UpdateApplicationResponse) {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             responses: {
@@ -178,7 +178,7 @@ service AppService {
     // The user needs to have project.app.read permission
     //
     // Required permissions:
-    //   - `project.app.read`
+    //   - project.app.read
     rpc GetApplication(GetApplicationRequest) returns (GetApplicationResponse) {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             responses: {
@@ -208,7 +208,7 @@ service AppService {
     // The user needs to have project.app.delete permission
     //
     // Required permissions:
-    //   - `project.app.delete`
+    //   - project.app.delete
     rpc DeleteApplication(DeleteApplicationRequest) returns (DeleteApplicationResponse) {
         option (google.api.http) = {
             delete: "/v2beta/applications/{id}"
@@ -238,7 +238,7 @@ service AppService {
     // The user needs to have project.app.write permission
     //
     // Required permissions:
-    //   - `project.app.write`
+    //   - project.app.write
     rpc DeactivateApplication(DeactivateApplicationRequest) returns (DeactivateApplicationResponse) {
         option (google.api.http) = {
             post: "/v2beta/applications/{id}/deactivate"
@@ -269,7 +269,7 @@ service AppService {
     // The user needs to have project.app.write permission
     //
     // Required permissions:
-    //   - `project.app.write`
+    //   - project.app.write
     rpc ReactivateApplication(ReactivateApplicationRequest) returns (ReactivateApplicationResponse) {
         option (google.api.http) = {
             post: "/v2beta/applications/{id}/reactivate"
@@ -300,7 +300,7 @@ service AppService {
     // The user needs to have project.app.write permission
     //
     // Required permissions:
-    //   - `project.app.write`
+    //   - project.app.write
     rpc RegenerateClientSecret(RegenerateClientSecretRequest) returns (RegenerateClientSecretResponse) {
         option (google.api.http) = {
             post: "/v2beta/applications/{application_id}/generate_client_secret"
@@ -334,7 +334,7 @@ service AppService {
     // The user needs to have project.app.read permission
     //
     // Required permissions:
-    //   - `project.app.read`
+    //   - project.app.read
     rpc ListApplications(ListApplicationsRequest) returns (ListApplicationsResponse) {
         option (google.api.http) = {
             post: "/v2beta/applications/search"

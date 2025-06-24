@@ -3465,6 +3465,11 @@ service ManagementService {
         };
     }
 
+    // Create Application (API)
+    //
+    // Create a new API client. The client id will be generated and returned in the response.
+    // Depending on the chosen configuration also a secret will be generated and returned.
+    //
     // Deprecated: Use [CreateApplication](/apis/resources/application_service_v2/application-service-create-application.api.mdx) instead to create an API application
     rpc AddAPIApp(AddAPIAppRequest) returns (AddAPIAppResponse) {
         option (google.api.http) = {
