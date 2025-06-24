@@ -34,6 +34,7 @@ login-help:
 	@echo "Makefile for the login service"
 	@echo "Available targets:"
 	@echo "  login-help              - Show this help message."
+	@echo "  login-generate			 - Generate TypeScript client code from Protobuf definitions."
 	@echo "  login-quality           - Run all quality checks (login-lint, login-test-unit, login-test-integration, login-test-acceptance)."
 	@echo "  login-standalone-build  - Build the docker image for production login containers."
 	@echo "  login-lint              - Run linting and formatting checks. FORCE=true prevents skipping."
@@ -42,6 +43,7 @@ login-help:
 	@echo "  login-test-acceptance   - Run acceptance tests. Tests a login production build with a local Zitadel instance behind a reverse proxy. FORCE=true prevents skipping."
 	@echo "  show-run-caches         - Show all run caches with image ids and exit codes."
 	@echo "  clean-run-caches        - Remove all run caches."
+
 
 login-lint:
 	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-lint
@@ -109,6 +111,9 @@ login-standalone-build:
 login-standalone-build-tag:
 	@echo -n "$(LOGIN_TAG)"
 
+typescript-generate:
+	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) typescript-proto-client-out
+
 .PHONY: clean-run-caches
 clean-run-caches:
 	@echo "Removing cache directory: $(CACHE_DIR)"
@@ -120,3 +125,4 @@ show-run-caches:
 	@find "$(CACHE_DIR)" -type f 2>/dev/null | while read file; do \
 		echo "$$file: $$(cat $$file)"; \
 	done
+

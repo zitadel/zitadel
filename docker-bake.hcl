@@ -9,11 +9,19 @@ variable "DOCKERFILES_DIR" {
 # The zitadel repository uses this to generate the client and the mock server from local proto files.
 target "typescript-proto-client" {
   dockerfile = "${DOCKERFILES_DIR}typescript-proto-client.Dockerfile"
+  target = "typescript-proto-client"
   contexts = {
     # We directly generate and download the client server-side with buf, so we don't need the proto files
     login-pnpm = "target:login-pnpm"
   }
-  output = ["type=docker"]
+}
+
+target "typescript-proto-client-out" {
+  inherits = ["typescript-proto-client"]
+  target = "typescript-proto-client-out"
+  output = [
+    "type=local,dest=packages/zitadel-proto"
+  ]
 }
 
 # proto-files is only used to build login-core-mock against which the integration tests run.
@@ -60,15 +68,6 @@ target "login-client" {
     login-pnpm              = "target:login-pnpm"
     typescript-proto-client = "target:typescript-proto-client"
   }
-}
-
-target "typescript-proto-client" {
-  dockerfile = "${DOCKERFILES_DIR}typescript-proto-client.Dockerfile"
-  contexts = {
-    # We directly generate and download the client server-side with buf, so we don't need the proto files
-    login-pnpm = "target:login-pnpm"
-  }
-  output = ["type=docker"]
 }
 
 variable "LOGIN_CORE_MOCK_TAG" {
