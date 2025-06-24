@@ -1,7 +1,7 @@
 "use client";
 
 import { RadioGroup } from "@headlessui/react";
-import { useTranslations } from "next-intl";
+import { Translated } from "./translated";
 
 export enum AuthenticationMethod {
   Passkey = "passkey",
@@ -20,8 +20,6 @@ export function AuthenticationMethodRadio({
   selected: any;
   selectionChanged: (value: any) => void;
 }) {
-  const t = useTranslations("register");
-
   return (
     <div className="w-full">
       <div className="mx-auto w-full max-w-md">
@@ -80,7 +78,18 @@ export function AuthenticationMethodRadio({
                         as="p"
                         className={`font-medium  ${checked ? "" : ""}`}
                       >
-                        {t(`methods.${method}`)}
+                        {method === AuthenticationMethod.Passkey && (
+                          <Translated
+                            i18nKey="methods.passkey"
+                            namespace="register"
+                          />
+                        )}
+                        {method === AuthenticationMethod.Password && (
+                          <Translated
+                            i18nKey="methods.password"
+                            namespace="register"
+                          />
+                        )}
                       </RadioGroup.Label>
                     </div>
                   </>

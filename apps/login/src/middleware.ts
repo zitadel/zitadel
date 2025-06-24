@@ -10,21 +10,51 @@ export const config = {
     "/oidc/:path*",
     "/idps/callback/:path*",
     "/saml/:path*",
+    "/:path*",
   ],
 };
 
 export async function middleware(request: NextRequest) {
+  // Add the original URL as a header to all requests
+  const requestHeaders = new Headers(request.headers);
+
+  // Extract "organization" search param from the URL and set it as a header if available
+  const organization = request.nextUrl.searchParams.get("organization");
+  if (organization) {
+    requestHeaders.set("x-zitadel-i18n-organization", organization);
+  }
+
+  // Only run the rest of the logic for the original matcher paths
+  const matchedPaths = [
+    "/.well-known/",
+    "/oauth/",
+    "/oidc/",
+    "/idps/callback/",
+    "/saml/",
+  ];
+
+  const isMatched = matchedPaths.some((prefix) =>
+    request.nextUrl.pathname.startsWith(prefix),
+  );
+
+  if (!isMatched) {
+    // For all other routes, just add the header and continue
+    return NextResponse.next({
+      request: { headers: requestHeaders },
+    });
+  }
+
   // escape proxy if the environment is setup for multitenancy
   if (!process.env.ZITADEL_API_URL || !process.env.ZITADEL_SERVICE_USER_TOKEN) {
-    return NextResponse.next();
+    return NextResponse.next({
+      request: { headers: requestHeaders },
+    });
   }
 
   const _headers = await headers();
-
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   // Call the /security route handler
-  // TODO check this on cloud run deployment
   const securityResponse = await fetch(`${request.nextUrl.origin}/security`);
 
   if (!securityResponse.ok) {
@@ -32,7 +62,9 @@ export async function middleware(request: NextRequest) {
       "Failed to fetch security settings:",
       securityResponse.statusText,
     );
-    return NextResponse.next(); // Fallback if the request fails
+    return NextResponse.next({
+      request: { headers: requestHeaders },
+    });
   }
 
   const { settings: securitySettings } = await securityResponse.json();
@@ -41,13 +73,8 @@ export async function middleware(request: NextRequest) {
     .replace("https://", "")
     .replace("http://", "");
 
-  const requestHeaders = new Headers(request.headers);
-
-  // this is a workaround for the next.js server not forwarding the host header
-  // requestHeaders.set("x-zitadel-forwarded", `host="${request.nextUrl.host}"`);
+  // Add additional headers as before
   requestHeaders.set("x-zitadel-public-host", `${request.nextUrl.host}`);
-
-  // this is a workaround for the next.js server not forwarding the host header
   requestHeaders.set("x-zitadel-instance-host", instanceHost);
 
   const responseHeaders = new Headers();
@@ -55,7 +82,6 @@ export async function middleware(request: NextRequest) {
   responseHeaders.set("Access-Control-Allow-Headers", "*");
 
   if (securitySettings?.embeddedIframe?.enabled) {
-    securitySettings.embeddedIframe.allowedOrigins;
     responseHeaders.set(
       "Content-Security-Policy",
       `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,

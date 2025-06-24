@@ -28,7 +28,7 @@ target "typescript-proto-client-out" {
   ]
 }
 
-# proto-files is only used to build login-core-mock against which the integration tests run.
+# proto-files is only used to build core-mock against which the integration tests run.
 # To build the proto-client, we use buf to generate and download the client code directly.
 # It is not login-prefixed, so it is easily extendable.
 # To extend this bake-file.hcl, set the context of all login-prefixed targets to a different directory.
@@ -75,10 +75,11 @@ target "login-client" {
 }
 
 variable "LOGIN_CORE_MOCK_TAG" {
-  default = "login-core-mock:local"
+  default = "core-mock:local"
 }
 
-target "login-core-mock" {
+# the core-mock context must not be overwritten, so we don't prefix it with login-.
+target "core-mock" {
   context = "${LOGIN_DIR}apps/login-test-integration/core-mock"
   contexts = {
     protos = "target:proto-files"

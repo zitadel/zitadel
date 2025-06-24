@@ -1,6 +1,7 @@
-ExternalDomain: localhost
+ExternalDomain: 127.0.0.1.sslip.io
 ExternalSecure: true
 ExternalPort: 443
+TLS.Enabled: false
 
 FirstInstance:
   PatPath: /pat/zitadel-admin-sa.pat

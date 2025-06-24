@@ -26,7 +26,7 @@ export LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG := login-test-acceptance-samlsp:${DOCKER
 export LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG := login-test-acceptance-samlidp:${DOCKER_METADATA_OUTPUT_VERSION}
 export POSTGRES_TAG := postgres:17.0-alpine3.19
 export GOLANG_TAG := golang:1.24-alpine
-export ZITADEL_TAG ?= ghcr.io/zitadel/zitadel:v3.3.0
+export ZITADEL_TAG ?= ghcr.io/zitadel/zitadel:02617cf17fdde849378c1a6b5254bbfb2745b164
 export CORE_MOCK_TAG := login-core-mock:${DOCKER_METADATA_OUTPUT_VERSION}
 
 .PHONY: login-help
@@ -52,10 +52,10 @@ login-test-unit:
 	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-test-unit
 
 login-test-integration-build:
-	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-core-mock login-test-integration login-standalone
+	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) core-mock login-test-integration login-standalone
 
 login-test-integration-dev: login-test-integration-cleanup
-	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-core-mock && docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --service-ports --rm login-core-mock
+	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) core-mock && docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --service-ports --rm core-mock
 
 login-test-integration-run: login-test-integration-cleanup
 	docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --rm integration
@@ -79,8 +79,11 @@ login-test-acceptance-build-compose:
 login-test-acceptance-build: login-test-acceptance-build-compose login-test-acceptance-build-bake
 	@:
 
-login-test-acceptance-dev: login-test-acceptance-build-compose login-test-acceptance-cleanup
-	docker compose --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml up zitadel setup traefik setup sink
+login-test-acceptance-env: login-test-acceptance-build-compose login-test-acceptance-cleanup
+	docker compose --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml run setup
+
+login-test-acceptance-dev:
+	docker compose --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml up zitadel traefik sink
 
 login-test-acceptance-run: login-test-acceptance-cleanup
 	docker compose --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose-ci.yaml run --rm --service-ports acceptance

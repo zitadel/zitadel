@@ -46,17 +46,23 @@ The application is now available at `http://localhost:3000`
 Configure apps/login/.env.local to target the Zitadel instance of your choice.
 The login app live-reloads on changes, so you can start developing right away.
 
-<!-- Console doesn't load
-
 ### Developing Against Your Local ZITADEL Instance
 
 The following command uses Docker to run a local ZITADEL instance and the login application in live-reloading dev mode.
-Additionally, it runs a Traefik reverse proxy that exposes the login at https://localhost with a self-signed certificate.
+Additionally, it runs a Traefik reverse proxy that exposes the login with a self-signed certificate at https://127.0.0.1.sslip.io
+127.0.0.1.sslip.io is a special domain that resolves to your localhost, so it's safe to allow your browser to proceed with loading the page.
 
 ```sh
+# This command runs all dependencies and overwrites the file ./apps/login/.env.test.local.
 pnpm test:acceptance:setup
+
+# As soon as the setup container completed successfully, you are ready to run the login application in live-reloading dev mode
+pnpm dev
 ```
--->
+
+Log in at https://127.0.0.1.sslip.io/ui/v2/login/loginname and use the following credentials:
+**Loginname**: *zitadel-admin@zitadel.127.0.0.1.sslip.io*
+**Password**: *Password1!*.
 
 ### Quality Assurance
 

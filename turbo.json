@@ -28,6 +28,7 @@
     "test:unit": {},
     "test:unit:standalone": {},
     "test:integration:setup": {},
+    "test:acceptance:env": {},
     "test:acceptance:setup": {},
     "test:watch": {
       "persistent": true

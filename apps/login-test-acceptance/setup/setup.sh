@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex pipefail
+set -e pipefail
 
 PAT_FILE=${PAT_FILE:-./pat/zitadel-admin-sa.pat}
 LOGIN_BASE_URL=${LOGIN_BASE_URL:-"http://localhost:3000"}
@@ -12,8 +12,7 @@ ZITADEL_API_INTERNAL_URL="${ZITADEL_API_INTERNAL_URL:-${ZITADEL_API_URL}}"
 SINK_EMAIL_INTERNAL_URL="${SINK_EMAIL_INTERNAL_URL:-"http://sink:3333/email"}"
 SINK_SMS_INTERNAL_URL="${SINK_SMS_INTERNAL_URL:-"http://sink:3333/sms"}"
 SINK_NOTIFICATION_URL="${SINK_NOTIFICATION_URL:-"http://localhost:3333/notification"}"
-WRITE_ENVIRONMENT_FILE=${WRITE_ENVIRONMENT_FILE:-$(dirname "$0")/../apps/login/.env.local}
-WRITE_TEST_ENVIRONMENT_FILE=${WRITE_TEST_ENVIRONMENT_FILE:-$(dirname "$0")/../apps/login-test-acceptance/tests/.env.local}
+WRITE_ENVIRONMENT_FILE=${WRITE_ENVIRONMENT_FILE:-$(dirname "$0")/../apps/login/.env.test.local}
 
 if [ -z "${PAT}" ]; then
   echo "Reading PAT from file ${PAT_FILE}"
@@ -59,7 +58,6 @@ echo "Received ServiceAccount Token: ${SA_PAT}"
 #################################################################
 
 echo "Writing environment file ${WRITE_ENVIRONMENT_FILE}."
-echo "Writing environment file ${WRITE_TEST_ENVIRONMENT_FILE}."
 
 echo "ZITADEL_API_URL=${ZITADEL_API_URL}
 ZITADEL_SERVICE_USER_TOKEN=${SA_PAT}
@@ -71,13 +69,10 @@ LOGIN_BASE_URL=${LOGIN_BASE_URL}
 NODE_TLS_REJECT_UNAUTHORIZED=0
 ZITADEL_ADMIN_USER=${ZITADEL_ADMIN_USER:-"zitadel-admin@zitadel.localhost"}
 NEXT_PUBLIC_BASE_PATH=/ui/v2/login
-" | tee "${WRITE_ENVIRONMENT_FILE}" "${WRITE_TEST_ENVIRONMENT_FILE}" > /dev/null
+" > ${WRITE_ENVIRONMENT_FILE}
 
 echo "Wrote environment file ${WRITE_ENVIRONMENT_FILE}"
 cat ${WRITE_ENVIRONMENT_FILE}
-
-echo "Wrote environment file ${WRITE_TEST_ENVIRONMENT_FILE}"
-cat ${WRITE_TEST_ENVIRONMENT_FILE}
 
 #################################################################
 # SMS provider with HTTP

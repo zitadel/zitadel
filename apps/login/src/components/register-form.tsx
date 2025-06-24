@@ -6,11 +6,10 @@ import {
   LoginSettings,
   PasskeysType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
-import { Alert } from "./alert";
+import { Alert, AlertType } from "./alert";
 import {
   AuthenticationMethod,
   AuthenticationMethodRadio,
@@ -21,6 +20,7 @@ import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { PrivacyPolicyCheckboxes } from "./privacy-policy-checkboxes";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 type Inputs =
   | {
@@ -35,9 +35,10 @@ type Props = {
   firstname?: string;
   lastname?: string;
   email?: string;
-  organization?: string;
+  organization: string;
   requestId?: string;
   loginSettings?: LoginSettings;
+  idpCount: number;
 };
 
 export function RegisterForm({
@@ -48,9 +49,8 @@ export function RegisterForm({
   organization,
   requestId,
   loginSettings,
+  idpCount = 0,
 }: Props) {
-  const t = useTranslations("register");
-
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
@@ -165,16 +165,33 @@ export function RegisterForm({
           onChange={setTosAndPolicyAccepted}
         />
       )}
-      <p className="mt-4 ztdl-p mb-6 block text-left">{t("selectMethod")}</p>
       {/* show chooser if both methods are allowed */}
       {loginSettings &&
         loginSettings.allowUsernamePassword &&
         loginSettings.passkeysType == PasskeysType.ALLOWED && (
-          <div className="pb-4">
-            <AuthenticationMethodRadio
-              selected={selected}
-              selectionChanged={setSelected}
-            />
+          <>
+            <p className="mt-4 ztdl-p mb-6 block text-left">
+              <Translated i18nKey="selectMethod" namespace="register" />
+            </p>
+
+            <div className="pb-4">
+              <AuthenticationMethodRadio
+                selected={selected}
+                selectionChanged={setSelected}
+              />
+            </div>
+          </>
+        )}
+      {!loginSettings?.allowUsernamePassword &&
+        loginSettings?.passkeysType !== PasskeysType.ALLOWED &&
+        (!loginSettings?.allowExternalIdp || !idpCount) && (
+          <div className="py-4">
+            <Alert type={AlertType.INFO}>
+              <Translated
+                i18nKey="noMethodAvailableWarning"
+                namespace="register"
+              />
+            </Alert>
           </div>
         )}
 
@@ -183,6 +200,7 @@ export function RegisterForm({
           <Alert>{error}</Alert>
         </div>
       )}
+
       <div className="mt-8 flex w-full flex-row items-center justify-between">
         <BackButton data-testid="back-button" />
         <Button
@@ -201,7 +219,7 @@ export function RegisterForm({
           data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("submit")}
+          <Translated i18nKey="submit" namespace="register" />
         </Button>
       </div>
     </form>

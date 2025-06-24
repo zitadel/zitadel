@@ -1,6 +1,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SetPasswordForm } from "@/components/set-password-form";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
@@ -12,7 +13,7 @@ import {
 } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: {
@@ -20,8 +21,6 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
   const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "password" });
-  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { userId, loginName, organization, requestId, code, initial } =
     searchParams;
@@ -73,13 +72,21 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{session?.factors?.user?.displayName ?? t("set.title")}</h1>
-        <p className="ztdl-p mb-6 block">{t("set.description")}</p>
+        <h1>
+          {session?.factors?.user?.displayName ?? (
+            <Translated i18nKey="set.title" namespace="password" />
+          )}
+        </h1>
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="set.description" namespace="password" />
+        </p>
 
         {/* show error only if usernames should be shown to be unknown */}
         {loginName && !session && !loginSettings?.ignoreUnknownUsernames && (
           <div className="py-4">
-            <Alert>{tError("unknownContext")}</Alert>
+            <Alert>
+              <Translated i18nKey="unknownContext" namespace="error" />
+            </Alert>
           </div>
         )}
 
@@ -99,7 +106,11 @@ export default async function Page(props: {
           ></UserAvatar>
         ) : null}
 
-        {!initial && <Alert type={AlertType.INFO}>{t("set.codeSent")}</Alert>}
+        {!initial && (
+          <Alert type={AlertType.INFO}>
+            <Translated i18nKey="set.codeSent" namespace="password" />
+          </Alert>
+        )}
 
         {passwordComplexity &&
         (loginName ?? user?.preferredLoginName) &&
@@ -115,7 +126,9 @@ export default async function Page(props: {
           />
         ) : (
           <div className="py-4">
-            <Alert>{tError("failedLoading")}</Alert>
+            <Alert>
+              <Translated i18nKey="failedLoading" namespace="error" />
+            </Alert>
           </div>
         )}
       </div>
