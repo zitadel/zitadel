@@ -12,6 +12,10 @@ ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
 export GOCOVERDIR ZITADEL_MASTERKEY
 
+LOGIN_REMOTE_NAME := login
+LOGIN_REMOTE_URL ?= https://github.com/zitadel/typescript.git
+LOGIN_REMOTE_BRANCH ?= main
+
 .PHONY: compile
 compile: core_build console_build compile_pipeline
 
@@ -165,3 +169,20 @@ core_lint:
 		--config ./.golangci.yaml \
 		--out-format=github-actions \
 		--concurrency=$$(getconf _NPROCESSORS_ONLN)
+
+.PHONY: login-pull
+login-pull: login-ensure-remote
+	git fetch $(LOGIN_REMOTE_NAME)
+	git subtree pull --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+
+.PHONY: login-push
+login-push: login-ensure-remote
+	git subtree push --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+
+login-ensure-remote:
+	@git remote -v | grep $(LOGIN_REMOTE_NAME) || \
+	git remote add $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL)
+
+export LOGIN_DIR := ./login/
+export LOGIN_BAKE_CLI_ADDITIONAL_ARGS :=  --set login-*.context=./login/ --file ./docker-bake.hcl
+include login/Makefile
