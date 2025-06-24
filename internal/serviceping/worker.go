@@ -38,8 +38,6 @@ type Worker struct {
 	config   *Config
 	systemID string
 	version  string
-
-	//now    nowFunc
 }
 
 type Queries interface {
@@ -55,8 +53,7 @@ type Queue interface {
 func (w *Worker) Register(workers *river.Workers, queues map[string]river.QueueConfig) {
 	river.AddWorker[*ServicePingReport](workers, w)
 	queues[QueueName] = river.QueueConfig{
-		//MaxWorkers: int(w.config.Workers),
-		MaxWorkers: 1,
+		MaxWorkers: 1, // for now, we only use a single worker to prevent too much side effects on other queues
 	}
 }
 

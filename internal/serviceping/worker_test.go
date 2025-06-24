@@ -25,8 +25,8 @@ import (
 )
 
 var (
-	testNow     = time.Now()
-	insertError = fmt.Errorf("insert error")
+	testNow   = time.Now()
+	errInsert = fmt.Errorf("insert error")
 )
 
 func TestWorker_reportBaseInformation(t *testing.T) {
@@ -740,7 +740,7 @@ func TestWorker_Work(t *testing.T) {
 						},
 						gomock.AssignableToTypeOf(reflect.TypeOf(queue.WithQueueName(QueueName))),
 						gomock.AssignableToTypeOf(reflect.TypeOf(queue.WithMaxAttempts(5)))). // TODO: better solution
-						Return(insertError)
+						Return(errInsert)
 					return q
 				},
 				config: &Config{
@@ -762,7 +762,7 @@ func TestWorker_Work(t *testing.T) {
 					},
 				},
 			},
-			wantErr: insertError,
+			wantErr: errInsert,
 		},
 		{
 			name: "report base information, success, no error",

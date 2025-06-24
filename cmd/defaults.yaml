@@ -1203,8 +1203,8 @@ ServicePing:
   # By setting Enabled to false, the service ping is disabled completely.
   # TODO: change to enabled by default, but as the corresponding endpoint is not yet available, we keep it disabled for now.
   Enabled: false # ZITADEL_SERVICEPING_ENABLED
-  # The gRPC endpoint to which the reports are sent.
-  Endpoint: "zitadel.cloud:433" # ZITADEL_SERVICEPING_ENDPOINT
+  # The endpoint to which the reports are sent.
+  Endpoint: "https://zitadel.cloud/api/ping" # ZITADEL_SERVICEPING_ENDPOINT
   # Interval at which the service ping is sent to the endpoint.
   # The interval is in the format of a cron expression.
   # By default, it is set to every day at midnight:
