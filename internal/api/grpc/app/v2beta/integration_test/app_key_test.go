@@ -104,3 +104,108 @@ func TestCreateApplicationKey(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteApplicationKey(t *testing.T) {
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
+	createdApp := createAPIApp(t, p.GetId())
+
+	t.Parallel()
+
+	tt := []struct {
+		testName        string
+		deletionRequest func(ttt *testing.T) *app.DeleteApplicationKeyRequest
+		inputCtx        context.Context
+
+		expectedErrorType codes.Code
+	}{
+		{
+			testName: "when app key ID is not found should return not found error",
+			inputCtx: IAMOwnerCtx,
+			deletionRequest: func(ttt *testing.T) *app.DeleteApplicationKeyRequest {
+				return &app.DeleteApplicationKeyRequest{
+					Id:            gofakeit.UUID(),
+					ProjectId:     p.GetId(),
+					ApplicationId: createdApp.GetAppId(),
+				}
+			},
+			expectedErrorType: codes.NotFound,
+		},
+		{
+			testName: "when valid app key ID should delete successfully",
+			inputCtx: IAMOwnerCtx,
+			deletionRequest: func(ttt *testing.T) *app.DeleteApplicationKeyRequest {
+				createdAppKey := createAppKey(ttt, IAMOwnerCtx, p.GetId(), createdApp.GetAppId())
+
+				return &app.DeleteApplicationKeyRequest{
+					Id:            createdAppKey.GetId(),
+					ProjectId:     p.GetId(),
+					ApplicationId: createdApp.GetAppId(),
+				}
+			},
+		},
+
+		// LoginUser
+		{
+			testName: "when user has no project.app.write permission for app key deletion should return permission error",
+			inputCtx: LoginUserCtx,
+			deletionRequest: func(ttt *testing.T) *app.DeleteApplicationKeyRequest {
+				createdAppKey := createAppKey(ttt, IAMOwnerCtx, p.GetId(), createdApp.GetAppId())
+
+				return &app.DeleteApplicationKeyRequest{
+					Id:            createdAppKey.GetId(),
+					ProjectId:     p.GetId(),
+					ApplicationId: createdApp.GetAppId(),
+				}
+			},
+			expectedErrorType: codes.PermissionDenied,
+		},
+
+		// ProjectOwner
+		{
+			testName: "when user is OrgOwner API request should succeed",
+			inputCtx: projectOwnerCtx,
+			deletionRequest: func(ttt *testing.T) *app.DeleteApplicationKeyRequest {
+				createdAppKey := createAppKey(ttt, IAMOwnerCtx, p.GetId(), createdApp.GetAppId())
+
+				return &app.DeleteApplicationKeyRequest{
+					Id:            createdAppKey.GetId(),
+					ProjectId:     p.GetId(),
+					ApplicationId: createdApp.GetAppId(),
+				}
+			},
+		},
+
+		// OrganizationOwner
+		{
+			testName: "when user is OrgOwner app key deletion request should succeed",
+			inputCtx: OrgOwnerCtx,
+			deletionRequest: func(ttt *testing.T) *app.DeleteApplicationKeyRequest {
+				createdAppKey := createAppKey(ttt, IAMOwnerCtx, p.GetId(), createdApp.GetAppId())
+
+				return &app.DeleteApplicationKeyRequest{
+					Id:            createdAppKey.GetId(),
+					ProjectId:     p.GetId(),
+					ApplicationId: createdApp.GetAppId(),
+				}
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			// Given
+			deletionReq := tc.deletionRequest(t)
+
+			// When
+			res, err := instance.Client.AppV2Beta.DeleteApplicationKey(tc.inputCtx, deletionReq)
+
+			// Then
+			require.Equal(t, tc.expectedErrorType, status.Code(err))
+			if tc.expectedErrorType == codes.OK {
+				assert.NotEmpty(t, res.GetDeletionDate())
+			}
+		})
+	}
+}

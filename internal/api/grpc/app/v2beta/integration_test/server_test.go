@@ -13,6 +13,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
@@ -202,4 +203,19 @@ func ensureFeaturePermissionV2Enabled(t *testing.T, instance *integration.Instan
 		require.NoError(tt, err)
 		assert.True(tt, f.PermissionCheckV2.GetEnabled())
 	}, retryDuration, tick, "timed out waiting for ensuring instance feature")
+}
+
+func createAppKey(t *testing.T, ctx context.Context, projectID, appID string) *app.CreateApplicationKeyResponse {
+	res, err := instance.Client.AppV2Beta.CreateApplicationKey(ctx,
+		&app.CreateApplicationKeyRequest{
+			AppId:          appID,
+			Type:           app.ApplicationKeyType_APPLICATION_KEY_TYPE_JSON,
+			ProjectId:      projectID,
+			ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
+		},
+	)
+
+	require.Nil(t, err)
+
+	return res
 }

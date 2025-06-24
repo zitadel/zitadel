@@ -119,6 +119,10 @@ func (c *Commands) RemoveApplicationKey(ctx context.Context, projectID, applicat
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.Project.App.Key.NotFound")
 	}
 
+	if err := c.checkPermissionUpdateApplication(ctx, keyWriteModel.ResourceOwner, keyWriteModel.AggregateID); err != nil {
+		return nil, err
+	}
+
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationKeyRemovedEvent(ctx, ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))
 	if err != nil {
 		return nil, err
