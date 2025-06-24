@@ -1,7 +1,11 @@
+import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterForm } from "@/components/register-form";
+import { SignInWithIdp } from "@/components/sign-in-with-idp";
+import { Translated } from "@/components/translated";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
+  getActiveIdentityProviders,
   getBrandingSettings,
   getDefaultOrg,
   getLegalAndSupportSettings,
@@ -9,7 +13,8 @@ import {
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { getLocale, getTranslations } from "next-intl/server";
+import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: {
@@ -17,7 +22,6 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
   const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "register" });
 
   let { firstname, lastname, email, organization, requestId } = searchParams;
 
@@ -52,12 +56,25 @@ export default async function Page(props: {
     organization,
   });
 
+  const identityProviders = await getActiveIdentityProviders({
+    serviceUrl,
+    orgId: organization,
+  }).then((resp) => {
+    return resp.identityProviders.filter((idp) => {
+      return idp.options?.isAutoCreation || idp.options?.isCreationAllowed; // check if IDP allows to create account automatically or manual creation is allowed
+    });
+  });
+
   if (!loginSettings?.allowRegister) {
     return (
       <DynamicTheme branding={branding}>
         <div className="flex flex-col items-center space-y-4">
-          <h1>{t("disabled.title")}</h1>
-          <p className="ztdl-p">{t("disabled.description")}</p>
+          <h1>
+            <Translated i18nKey="disabled.title" namespace="register" />
+          </h1>
+          <p className="ztdl-p">
+            <Translated i18nKey="disabled.description" namespace="register" />
+          </p>
         </div>
       </DynamicTheme>
     );
@@ -66,19 +83,52 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("title")}</h1>
-        <p className="ztdl-p">{t("description")}</p>
+        <h1>
+          <Translated i18nKey="title" namespace="register" />
+        </h1>
+        <p className="ztdl-p">
+          <Translated i18nKey="description" namespace="register" />
+        </p>
 
-        {legal && passwordComplexitySettings && (
-          <RegisterForm
-            legal={legal}
-            organization={organization}
-            firstname={firstname}
-            lastname={lastname}
-            email={email}
-            requestId={requestId}
-            loginSettings={loginSettings}
-          ></RegisterForm>
+        {!organization && (
+          <Alert>
+            <Translated i18nKey="unknownContext" namespace="error" />
+          </Alert>
+        )}
+
+        {legal &&
+          passwordComplexitySettings &&
+          organization &&
+          (loginSettings.allowUsernamePassword ||
+            loginSettings.passkeysType == PasskeysType.ALLOWED) && (
+            <RegisterForm
+              idpCount={
+                !loginSettings?.allowExternalIdp ? 0 : identityProviders.length
+              }
+              legal={legal}
+              organization={organization}
+              firstname={firstname}
+              lastname={lastname}
+              email={email}
+              requestId={requestId}
+              loginSettings={loginSettings}
+            ></RegisterForm>
+          )}
+
+        {loginSettings?.allowExternalIdp && !!identityProviders.length && (
+          <>
+            <div className="py-3 flex flex-col items-center">
+              <p className="ztdl-p text-center">
+                <Translated i18nKey="orUseIDP" namespace="register" />
+              </p>
+            </div>
+
+            <SignInWithIdp
+              identityProviders={identityProviders}
+              requestId={requestId}
+              organization={organization}
+            ></SignInWithIdp>
+          </>
         )}
       </div>
     </DynamicTheme>

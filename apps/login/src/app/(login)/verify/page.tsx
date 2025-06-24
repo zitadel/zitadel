@@ -1,5 +1,6 @@
 import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { sendEmailCode, sendInviteEmailCode } from "@/lib/server/verify";
@@ -7,14 +8,12 @@ import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
   const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "verify" });
-  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { userId, loginName, code, organization, requestId, invite, send } =
     searchParams;
@@ -121,23 +120,26 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("verify.title")}</h1>
-        <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
+        <h1>
+          <Translated i18nKey="verify.title" namespace="verify" />
+        </h1>
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="verify.description" namespace="verify" />
+        </p>
 
         {!id && (
-          <>
-            <h1>{t("verify.title")}</h1>
-            <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
-
-            <div className="py-4">
-              <Alert>{tError("unknownContext")}</Alert>
-            </div>
-          </>
+          <div className="py-4">
+            <Alert>
+              <Translated i18nKey="unknownContext" namespace="error" />
+            </Alert>
+          </div>
         )}
 
         {id && send && (
           <div className="py-4 w-full">
-            <Alert type={AlertType.INFO}>{t("verify.codeSent")}</Alert>
+            <Alert type={AlertType.INFO}>
+              <Translated i18nKey="verify.codeSent" namespace="verify" />
+            </Alert>
           </div>
         )}
 

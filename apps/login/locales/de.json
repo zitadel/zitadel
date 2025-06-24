@@ -8,10 +8,22 @@
     "addAnother": "Ein weiteres Konto hinzufügen",
     "noResults": "Keine Konten gefunden"
   },
+  "logout": {
+    "title": "Logout",
+    "description": "Wählen Sie den Account aus, das Sie entfernen möchten",
+    "noResults": "Keine Konten gefunden",
+    "clear": "Session beenden",
+    "verifiedAt": "Zuletzt aktiv: {time}",
+    "success": {
+      "title": "Logout erfolgreich",
+      "description": "Sie haben sich erfolgreich abgemeldet."
+    }
+  },
   "loginname": {
     "title": "Willkommen zurück!",
     "description": "Geben Sie Ihre Anmeldedaten ein.",
-    "register": "Neuen Benutzer registrieren"
+    "register": "Neuen Benutzer registrieren",
+    "submit": "Weiter"
   },
   "password": {
     "verify": {
@@ -62,6 +74,10 @@
     "linkingError": {
       "title": "Konto-Verknüpfung fehlgeschlagen",
       "description": "Beim Verknüpfen Ihres Kontos ist ein Fehler aufgetreten."
+    },
+    "completeRegister": {
+      "title": "Registrierung abschließen",
+      "description": "Bitte vervollständige die Registrierung, um dein Konto zu erstellen."
     }
   },
   "mfa": {
@@ -139,11 +155,13 @@
     },
     "title": "Registrieren",
     "description": "Erstellen Sie Ihr ZITADEL-Konto.",
+    "noMethodAvailableWarning": "Keine Authentifizierungsmethode verfügbar. Bitte wenden Sie sich an den Administrator.",
     "selectMethod": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten",
     "agreeTo": "Um sich zu registrieren, müssen Sie den Nutzungsbedingungen zustimmen",
     "termsOfService": "Nutzungsbedingungen",
     "privacyPolicy": "Datenschutzrichtlinie",
     "submit": "Weiter",
+    "orUseIDP": "oder verwenden Sie einen Identitätsanbieter",
     "password": {
       "title": "Passwort festlegen",
       "description": "Legen Sie das Passwort für Ihr Konto fest",

@@ -8,10 +8,22 @@
     "addAnother": "Add another account",
     "noResults": "No accounts found"
   },
+  "logout": {
+    "title": "Logout",
+    "description": "Click an account to end the session",
+    "noResults": "No accounts found",
+    "clear": "End Session",
+    "verifiedAt": "Last active: {time}",
+    "success": {
+      "title": "Logout successful",
+      "description": "You have successfully logged out."
+    }
+  },
   "loginname": {
     "title": "Welcome back!",
     "description": "Enter your login data.",
-    "register": "Register new user"
+    "register": "Register new user",
+    "submit": "Continue"
   },
   "password": {
     "verify": {
@@ -62,6 +74,10 @@
     "linkingError": {
       "title": "Account linking failed",
       "description": "An error occurred while trying to link your account."
+    },
+    "completeRegister": {
+      "title": "Complete your data",
+      "description": "You need to complete your registration by providing your email address and name."
     }
   },
   "ldap": {
@@ -146,11 +162,13 @@
     },
     "title": "Register",
     "description": "Create your ZITADEL account.",
+    "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
     "selectMethod": "Select the method you would like to authenticate",
     "agreeTo": "To register you must agree to the terms and conditions",
     "termsOfService": "Terms of Service",
     "privacyPolicy": "Privacy Policy",
     "submit": "Continue",
+    "orUseIDP": "or use an Identity Provider",
     "password": {
       "title": "Set Password",
       "description": "Set the password for your account",

@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { forwardRef } from "react";
+import { Translated } from "../translated";
 import { BaseButton, SignInWithIdentityProviderProps } from "./base-button";
 
 function GitHubLogo() {
@@ -42,7 +42,6 @@ export const SignInWithGithub = forwardRef<
   SignInWithIdentityProviderProps
 >(function SignInWithGithub(props, ref) {
   const { children, name, ...restProps } = props;
-  const t = useTranslations("idp");
 
   return (
     <BaseButton {...restProps} ref={ref}>
@@ -52,7 +51,13 @@ export const SignInWithGithub = forwardRef<
       {children ? (
         children
       ) : (
-        <span className="ml-4">{name ? name : t("signInWithGithub")}</span>
+        <span className="ml-4">
+          {name ? (
+            name
+          ) : (
+            <Translated i18nKey="signInWithGithub" namespace="idp" />
+          )}
+        </span>
       )}
     </BaseButton>
   );

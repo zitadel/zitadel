@@ -13,7 +13,6 @@ import {
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
@@ -23,6 +22,7 @@ import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { PasswordComplexity } from "./password-complexity";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 type Inputs =
   | {
@@ -46,7 +46,6 @@ export function ChangePasswordForm({
   requestId,
   organization,
 }: Props) {
-  const t = useTranslations("password");
   const router = useRouter();
 
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
@@ -203,8 +202,8 @@ export function ChangePasswordForm({
           onClick={handleSubmit(submitChange)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("change.submit")}
+          {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+          <Translated i18nKey="change.submit" namespace="password" />
         </Button>
       </div>
     </form>

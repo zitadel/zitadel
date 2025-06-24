@@ -1,6 +1,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { ChooseAuthenticatorToLogin } from "@/components/choose-authenticator-to-login";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: {
@@ -19,8 +19,6 @@ export default async function Page(props: {
   params: Promise<{ provider: string }>;
 }) {
   const searchParams = await props.searchParams;
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "idp" });
 
   const { organization, userId } = searchParams;
 
@@ -77,8 +75,12 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("loginError.title")}</h1>
-        <Alert type={AlertType.ALERT}>{t("loginError.description")}</Alert>
+        <h1>
+          <Translated i18nKey="loginError.title" namespace="idp" />
+        </h1>
+        <Alert type={AlertType.ALERT}>
+          <Translated i18nKey="loginError.description" namespace="idp" />
+        </Alert>
 
         {userId && authMethods.length && (
           <>
