@@ -14,7 +14,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
-	"google.golang.org/grpc/reflection"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
@@ -28,8 +27,6 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
-	"github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta/webkeyconnect"
 )
 
 type API struct {
@@ -46,18 +43,18 @@ type API struct {
 	queries           *query.Queries
 	authConfig        authz.Config
 	systemAuthZ       authz.Config
-	connectRoutes     []string
+	connectServices   map[string][]string
 }
 
 func (a *API) ListGrpcServices() []string {
 	serviceInfo := a.grpcServer.GetServiceInfo()
-	services := make([]string, len(serviceInfo)+len(a.connectRoutes))
+	services := make([]string, len(serviceInfo)+len(a.connectServices))
 	i := 0
 	for servicename := range serviceInfo {
 		services[i] = servicename
 		i++
 	}
-	for _, prefix := range a.connectRoutes {
+	for prefix := range a.connectServices {
 		services[i] = strings.Trim(prefix, "/")
 		i++
 	}
@@ -71,6 +68,11 @@ func (a *API) ListGrpcMethods() []string {
 	for servicename, service := range serviceInfo {
 		for _, method := range service.Methods {
 			methods = append(methods, "/"+servicename+"/"+method.Name)
+		}
+	}
+	for service, methodList := range a.connectServices {
+		for _, method := range methodList {
+			methods = append(methods, service+method)
 		}
 	}
 	sort.Strings(methods)
@@ -105,6 +107,7 @@ func New(
 		hostHeaders:       hostHeaders,
 		authConfig:        authZ,
 		systemAuthZ:       systemAuthz,
+		connectServices:   make(map[string][]string),
 	}
 
 	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService())
@@ -115,17 +118,15 @@ func New(
 	api.registerHealthServer()
 
 	api.RegisterHandlerOnPrefix("/debug", api.healthHandler())
-	reflector := grpcreflect.NewStaticReflector(
-		user.UserService_ServiceDesc.ServiceName,
-		webkeyconnect.WebKeyServiceName,
-	)
-	api.router.Handle(grpcreflect.NewHandlerV1(reflector))
-	api.router.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
-
 	api.router.Handle("/", http.RedirectHandler(login.HandlerPrefix, http.StatusFound))
 
-	reflection.Register(api.grpcServer)
 	return api, nil
+}
+
+func (a *API) serverReflection() {
+	reflector := grpcreflect.NewStaticReflector(a.ListGrpcServices()...)
+	a.RegisterHandlerOnPrefix(grpcreflect.NewHandlerV1(reflector))
+	a.RegisterHandlerOnPrefix(grpcreflect.NewHandlerV1Alpha(reflector))
 }
 
 // RegisterServer registers a grpc service on the grpc server,
@@ -177,7 +178,12 @@ func (a *API) RegisterService(ctx context.Context, srv server.Server) error {
 			connect_mw.ServiceHandler(),
 			connect_mw.ActivityInterceptor(),
 		)
-		a.connectRoutes = append(a.connectRoutes, prefix)
+		methods := service.Methods()
+		methodNames := make([]string, methods.Len())
+		for i := 0; i < methods.Len(); i++ {
+			methodNames[i] = string(methods.Get(i).Name())
+		}
+		a.connectServices[prefix] = methodNames
 		a.RegisterHandlerPrefixes(handler, prefix)
 	}
 	if withGateway, ok := srv.(server.WithGateway); ok {
@@ -222,6 +228,9 @@ func (a *API) registerHealthServer() {
 }
 
 func (a *API) RouteGRPC() {
+	// since all services are now registered, we can build the grpc server reflection and register the handler
+	a.serverReflection()
+
 	http2Route := a.router.
 		MatcherFunc(func(r *http.Request, _ *mux.RouteMatch) bool {
 			return r.ProtoMajor == 2

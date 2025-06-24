@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"connectrpc.com/connect"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -54,4 +55,8 @@ func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
 
 func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler) {
 	return webkeyconnect.NewWebKeyServiceHandler(s, connect.WithInterceptors(interceptors...))
+}
+
+func (s *Server) Methods() protoreflect.MethodDescriptors {
+	return webkey.File_zitadel_webkey_v2beta_webkey_service_proto.Services().ByName("WebKeyService").Methods()
 }

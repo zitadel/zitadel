@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
@@ -48,6 +49,7 @@ type WithGatewayPrefix interface {
 type ConnectServer interface {
 	Server
 	RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler)
+	Methods() protoreflect.MethodDescriptors
 }
 
 func CreateServer(
