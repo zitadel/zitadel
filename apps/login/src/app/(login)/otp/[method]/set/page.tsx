@@ -3,6 +3,7 @@ import { BackButton } from "@/components/back-button";
 import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { TotpRegister } from "@/components/totp-register";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
@@ -14,7 +15,6 @@ import {
   registerTOTP,
 } from "@/lib/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -25,9 +25,6 @@ export default async function Page(props: {
 }) {
   const params = await props.params;
   const searchParams = await props.searchParams;
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "otp" });
-  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { loginName, organization, sessionId, requestId, checkAfter } =
     searchParams;
@@ -128,10 +125,14 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("set.title")}</h1>
+        <h1>
+          <Translated i18nKey="set.title" namespace="otp" />
+        </h1>
         {!session && (
           <div className="py-4">
-            <Alert>{tError("unknownContext")}</Alert>
+            <Alert>
+              <Translated i18nKey="unknownContext" namespace="error" />
+            </Alert>
           </div>
         )}
 
@@ -152,7 +153,12 @@ export default async function Page(props: {
 
         {totpResponse && "uri" in totpResponse && "secret" in totpResponse ? (
           <>
-            <p className="ztdl-p">{t("set.totpRegisterDescription")}</p>
+            <p className="ztdl-p">
+              <Translated
+                i18nKey="set.totpRegisterDescription"
+                namespace="otp"
+              />
+            </p>
             <div>
               <TotpRegister
                 uri={totpResponse.uri as string}
@@ -186,7 +192,7 @@ export default async function Page(props: {
                   className="self-end"
                   variant={ButtonVariants.Primary}
                 >
-                  {t("set.submit")}
+                  <Translated i18nKey="set.submit" namespace="otp" />
                 </Button>
               </Link>
             </div>

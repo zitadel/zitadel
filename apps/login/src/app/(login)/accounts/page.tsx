@@ -1,5 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsList } from "@/components/sessions-list";
+import { Translated } from "@/components/translated";
 import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
@@ -9,7 +10,7 @@ import {
 } from "@/lib/zitadel";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
 
@@ -33,7 +34,6 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
   const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "accounts" });
 
   const requestId = searchParams?.requestId;
   const organization = searchParams?.organization;
@@ -71,8 +71,12 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("title")}</h1>
-        <p className="ztdl-p mb-6 block">{t("description")}</p>
+        <h1>
+          <Translated i18nKey="title" namespace="accounts" />
+        </h1>
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="description" namespace="accounts" />
+        </p>
 
         <div className="flex flex-col w-full space-y-2">
           <SessionsList sessions={sessions} requestId={requestId} />
@@ -81,7 +85,9 @@ export default async function Page(props: {
               <div className="w-8 h-8 mr-4 flex flex-row justify-center items-center rounded-full bg-black/5 dark:bg-white/5">
                 <UserPlusIcon className="h-5 w-5" />
               </div>
-              <span className="text-sm">{t("addAnother")}</span>
+              <span className="text-sm">
+                <Translated i18nKey="addAnother" namespace="accounts" />
+              </span>
             </div>
           </Link>
         </div>

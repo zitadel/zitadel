@@ -6,7 +6,6 @@ import {
   LoginSettings,
   PasskeysType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
@@ -21,6 +20,7 @@ import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { PrivacyPolicyCheckboxes } from "./privacy-policy-checkboxes";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 type Inputs =
   | {
@@ -51,8 +51,6 @@ export function RegisterForm({
   loginSettings,
   idpCount = 0,
 }: Props) {
-  const t = useTranslations("register");
-
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
@@ -173,7 +171,7 @@ export function RegisterForm({
         loginSettings.passkeysType == PasskeysType.ALLOWED && (
           <>
             <p className="mt-4 ztdl-p mb-6 block text-left">
-              {t("selectMethod")}
+              <Translated i18nKey="selectMethod" namespace="register" />
             </p>
 
             <div className="pb-4">
@@ -184,12 +182,16 @@ export function RegisterForm({
             </div>
           </>
         )}
-
       {!loginSettings?.allowUsernamePassword &&
-        loginSettings?.passkeysType != PasskeysType.ALLOWED &&
+        loginSettings?.passkeysType !== PasskeysType.ALLOWED &&
         (!loginSettings?.allowExternalIdp || !idpCount) && (
           <div className="py-4">
-            <Alert type={AlertType.INFO}>{t("noMethodAvailableWarning")}</Alert>
+            <Alert type={AlertType.INFO}>
+              <Translated
+                i18nKey="noMethodAvailableWarning"
+                namespace="register"
+              />
+            </Alert>
           </div>
         )}
 
@@ -217,7 +219,7 @@ export function RegisterForm({
           data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("submit")}
+          <Translated i18nKey="submit" namespace="register" />
         </Button>
       </div>
     </form>

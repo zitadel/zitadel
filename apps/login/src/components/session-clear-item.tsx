@@ -4,11 +4,12 @@ import { clearSession } from "@/lib/server/session";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
-import { useLocale, useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar } from "./avatar";
 import { isSessionValid } from "./session-item";
+import { Translated } from "./translated";
 
 export function SessionClearItem({
   session,
@@ -17,8 +18,6 @@ export function SessionClearItem({
   session: Session;
   reload: () => void;
 }) {
-  const t = useTranslations("logout");
-
   const currentLocale = useLocale();
   moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
 
@@ -70,10 +69,13 @@ export function SessionClearItem({
         </span>
         {valid ? (
           <span className="text-xs opacity-80 text-ellipsis">
-            {verifiedAt &&
-              t("verfiedAt", {
-                time: moment(timestampDate(verifiedAt)).fromNow(),
-              })}
+            {verifiedAt && (
+              <Translated
+                i18nKey="verfiedAt"
+                namespace="logout"
+                data={{ time: moment(timestampDate(verifiedAt)).fromNow() }}
+              />
+            )}
           </span>
         ) : (
           verifiedAt && (
@@ -89,7 +91,7 @@ export function SessionClearItem({
       <span className="flex-grow"></span>
       <div className="relative flex flex-row items-center">
         <div className="mr-6 px-2 py-[2px] text-xs hidden group-hover:block transition-all text-warn-light-500 dark:text-warn-dark-500 bg-[#ff0000]/10 dark:bg-[#ff0000]/10 rounded-full flex items-center justify-center">
-          {t("clear")}
+          <Translated i18nKey="clear" namespace="logout" />
         </div>
 
         {valid ? (

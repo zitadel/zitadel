@@ -1,14 +1,12 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { Translated } from "@/components/translated";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { getBrandingSettings, getDefaultOrg } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "logout" });
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -33,8 +31,12 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("success.title")}</h1>
-        <p className="ztdl-p mb-6 block">{t("success.description")}</p>
+        <h1>
+          <Translated i18nKey="success.title" namespace="logout" />
+        </h1>
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="success.description" namespace="logout" />
+        </p>
       </div>
     </DynamicTheme>
   );

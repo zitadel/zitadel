@@ -22,7 +22,8 @@
   "loginname": {
     "title": "欢迎回来！",
     "description": "请输入您的登录信息。",
-    "register": "注册新用户"
+    "register": "注册新用户",
+    "submit": "继续"
   },
   "password": {
     "verify": {

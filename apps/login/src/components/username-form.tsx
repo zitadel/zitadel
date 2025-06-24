@@ -2,7 +2,6 @@
 
 import { sendLoginname } from "@/lib/server/loginname";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -11,6 +10,7 @@ import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 type Inputs = {
   loginName: string;
@@ -37,7 +37,6 @@ export function UsernameForm({
   allowRegister,
   children,
 }: Props) {
-  const t = useTranslations("loginname");
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
@@ -127,7 +126,7 @@ export function UsernameForm({
             disabled={loading}
             data-testid="register-button"
           >
-            {t("register")}
+            <Translated i18nKey="register" namespace="loginname" />
           </button>
         )}
       </div>
@@ -152,7 +151,7 @@ export function UsernameForm({
           onClick={handleSubmit((e) => submitLoginName(e, organization))}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          continue
+          <Translated i18nKey="submit" namespace="loginname" />
         </Button>
       </div>
     </form>

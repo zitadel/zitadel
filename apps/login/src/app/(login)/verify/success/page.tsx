@@ -1,4 +1,5 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
@@ -8,13 +9,10 @@ import {
   getUserByID,
 } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "verify" });
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -65,8 +63,12 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("successTitle")}</h1>
-        <p className="ztdl-p mb-6 block">{t("successDescription")}</p>
+        <h1>
+          <Translated i18nKey="successTitle" namespace="verify" />
+        </h1>
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="successDescription" namespace="verify" />
+        </p>
 
         {sessionFactors ? (
           <UserAvatar

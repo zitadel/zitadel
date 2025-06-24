@@ -22,7 +22,8 @@
   "loginname": {
     "title": "Witamy ponownie!",
     "description": "Wprowadź dane logowania.",
-    "register": "Zarejestruj nowego użytkownika"
+    "register": "Zarejestruj nowego użytkownika",
+    "submit": "Kontynuuj"
   },
   "password": {
     "verify": {

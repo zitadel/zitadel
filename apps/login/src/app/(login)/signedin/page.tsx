@@ -1,6 +1,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import {
   getMostRecentCookieWithLoginname,
@@ -14,7 +15,6 @@ import {
   getLoginSettings,
   getSession,
 } from "@/lib/zitadel";
-import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
 
@@ -37,8 +37,6 @@ async function loadSessionById(
 
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "signedin" });
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -66,8 +64,12 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       return (
         <DynamicTheme branding={branding}>
           <div className="flex flex-col items-center space-y-4">
-            <h1>{t("error.title")}</h1>
-            <p className="ztdl-p mb-6 block">{t("error.description")}</p>
+            <h1>
+              <Translated i18nKey="error.title" namespace="signedin" />
+            </h1>
+            <p className="ztdl-p mb-6 block">
+              <Translated i18nKey="error.description" namespace="signedin" />
+            </p>
             <Alert>{err.message}</Alert>
           </div>
         </DynamicTheme>
@@ -94,9 +96,15 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
         <h1>
-          {t("title", { user: sessionFactors?.factors?.user?.displayName })}
+          <Translated
+            i18nKey="title"
+            namespace="signedin"
+            data={{ user: sessionFactors?.factors?.user?.displayName }}
+          />
         </h1>
-        <p className="ztdl-p mb-6 block">{t("description")}</p>
+        <p className="ztdl-p mb-6 block">
+          <Translated i18nKey="description" namespace="signedin" />
+        </p>
 
         <UserAvatar
           loginName={loginName ?? sessionFactors?.factors?.user?.loginName}
@@ -122,7 +130,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
                 className="self-end"
                 variant={ButtonVariants.Primary}
               >
-                {t("continue")}
+                <Translated i18nKey="continue" namespace="signedin" />
               </Button>
             </Link>
           </div>
