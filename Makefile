@@ -180,13 +180,23 @@ login-push: login-ensure-remote
 	git subtree push --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
 
 login-ensure-remote:
-	@git remote -v | grep $(LOGIN_REMOTE_NAME) || \
-	git remote add $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL)
+	@if ! git remote get-url $(LOGIN_REMOTE_NAME) > /dev/null 2>&1; then \
+		echo "Adding remote $(LOGIN_REMOTE_NAME)"; \
+		git remote add $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
+	else \
+		echo "Remote $(LOGIN_REMOTE_NAME) already exists."; \
+	fi
+	@if [ ! -d login ]; then \
+		echo "Adding subtree for 'login' from branch $(LOGIN_REMOTE_BRANCH)"; \
+		git subtree add --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH); \
+	else \
+		echo "Subtree 'login' already exists."; \
+	fi
 
 export LOGIN_DIR := ./login/
 export LOGIN_BAKE_CLI_ADDITIONAL_ARGS :=  --set login-*.context=./login/ --file ./docker-bake.hcl
 export ZITADEL_TAG := "$(ZITADEL_IMAGE)"
-include login/Makefile
+#include login/Makefile
 
-login-test-acceptance-build: docker_image login-test-acceptance-build-compose login-test-acceptance-build-bake
-	@:
+#login-test-acceptance-build: docker_image login-test-acceptance-build-compose login-test-acceptance-build-bake
+#	@:
