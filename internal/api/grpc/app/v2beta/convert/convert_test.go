@@ -123,7 +123,7 @@ func TestListApplicationsRequestToModel(t *testing.T) {
 				ProjectId: "project1",
 				Filters: []*app.ApplicationSearchFilter{
 					{
-						ApplicationFilter: &app.ApplicationSearchFilter_NameFilter{NameFilter: &app.ApplicationNameQuery{Name: "test"}},
+						Filter: &app.ApplicationSearchFilter_NameFilter{NameFilter: &app.ApplicationNameQuery{Name: "test"}},
 					},
 				},
 				SortingColumn: app.AppSorting_APP_SORT_BY_NAME,
@@ -452,7 +452,7 @@ func TestAppQueryToModel(t *testing.T) {
 		{
 			name: "name query",
 			query: &app.ApplicationSearchFilter{
-				ApplicationFilter: &app.ApplicationSearchFilter_NameFilter{
+				Filter: &app.ApplicationSearchFilter_NameFilter{
 					NameFilter: &app.ApplicationNameQuery{
 						Name:   "test",
 						Method: filter_pb_v2.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS,
@@ -464,7 +464,7 @@ func TestAppQueryToModel(t *testing.T) {
 		{
 			name: "state query",
 			query: &app.ApplicationSearchFilter{
-				ApplicationFilter: &app.ApplicationSearchFilter_StateFilter{
+				Filter: &app.ApplicationSearchFilter_StateFilter{
 					StateFilter: app.AppState_APP_STATE_ACTIVE,
 				},
 			},
@@ -473,7 +473,7 @@ func TestAppQueryToModel(t *testing.T) {
 		{
 			name: "api app only query",
 			query: &app.ApplicationSearchFilter{
-				ApplicationFilter: &app.ApplicationSearchFilter_ApiAppOnly{},
+				Filter: &app.ApplicationSearchFilter_ApiAppOnly{},
 			},
 			expectedQuery: &query.NotNullQuery{
 				Column: query.AppAPIConfigColumnAppID,
@@ -482,7 +482,7 @@ func TestAppQueryToModel(t *testing.T) {
 		{
 			name: "oidc app only query",
 			query: &app.ApplicationSearchFilter{
-				ApplicationFilter: &app.ApplicationSearchFilter_OidcAppOnly{},
+				Filter: &app.ApplicationSearchFilter_OidcAppOnly{},
 			},
 			expectedQuery: &query.NotNullQuery{
 				Column: query.AppOIDCConfigColumnAppID,
@@ -491,7 +491,7 @@ func TestAppQueryToModel(t *testing.T) {
 		{
 			name: "saml app only query",
 			query: &app.ApplicationSearchFilter{
-				ApplicationFilter: &app.ApplicationSearchFilter_SamlAppOnly{},
+				Filter: &app.ApplicationSearchFilter_SamlAppOnly{},
 			},
 			expectedQuery: &query.NotNullQuery{
 				Column: query.AppSAMLConfigColumnAppID,

@@ -379,7 +379,7 @@ func TestListApplications(t *testing.T) {
 				ProjectId:  p.GetId(),
 				Pagination: &filter.PaginationRequest{Asc: true},
 				Filters: []*app.ApplicationSearchFilter{
-					{ApplicationFilter: &app.ApplicationSearchFilter_StateFilter{StateFilter: app.AppState_APP_STATE_ACTIVE}},
+					{Filter: &app.ApplicationSearchFilter_StateFilter{StateFilter: app.AppState_APP_STATE_ACTIVE}},
 				},
 			},
 			expectedOrderedList: slices.DeleteFunc(
@@ -410,7 +410,7 @@ func TestListApplications(t *testing.T) {
 				ProjectId:  p.GetId(),
 				Pagination: &filter.PaginationRequest{Asc: true},
 				Filters: []*app.ApplicationSearchFilter{
-					{ApplicationFilter: &app.ApplicationSearchFilter_OidcAppOnly{}},
+					{Filter: &app.ApplicationSearchFilter_OidcAppOnly{}},
 				},
 			},
 			expectedOrderedList: slices.DeleteFunc(

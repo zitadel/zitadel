@@ -147,7 +147,7 @@ func appQueriesToModel(queries []*app.ApplicationSearchFilter) (toReturn []query
 }
 
 func appQueryToModel(appQuery *app.ApplicationSearchFilter) (query.SearchQuery, error) {
-	switch q := appQuery.GetApplicationFilter().(type) {
+	switch q := appQuery.GetFilter().(type) {
 	case *app.ApplicationSearchFilter_NameFilter:
 		return query.NewAppNameSearchQuery(filter.TextMethodPbToQuery(q.NameFilter.GetMethod()), q.NameFilter.Name)
 	case *app.ApplicationSearchFilter_StateFilter:
