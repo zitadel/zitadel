@@ -5,7 +5,7 @@ services:
     image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:v3.3.0}"
     container_name: acceptance-zitadel
     pull_policy: always
-    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.zitadel.rule=!PathPrefix(`/ui/v2/login`)"
@@ -55,7 +55,7 @@ services:
       - "traefik.http.routers.login.rule=PathPrefix(`/ui/v2/login`)"
       - "traefik.http.services.login-service.loadbalancer.server.url=http://host.docker.internal:3000"
     command:
-      - "--log.level=DEBUG"
+#      - "--log.level=DEBUG"
       - "--ping"
       - "--api.insecure=true"
       - "--providers.docker=true"
@@ -70,6 +70,7 @@ services:
       start_period: "20s"
     ports:
       - "443:443"
+      - "8090:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     extra_hosts:
@@ -87,18 +88,16 @@ services:
     environment:
       PAT_FILE: /pat/zitadel-admin-sa.pat
       ZITADEL_API_INTERNAL_URL: http://zitadel:8080
-      WRITE_ENVIRONMENT_FILE: /login-env/.env.local
-      WRITE_TEST_ENVIRONMENT_FILE: /acceptance-env/.env
+      WRITE_ENVIRONMENT_FILE: /login-env/.env.test.local
       SINK_EMAIL_INTERNAL_URL: http://sink:3333/email
       SINK_SMS_INTERNAL_URL: http://sink:3333/sms
       SINK_NOTIFICATION_URL: http://localhost:3333/notification
-      LOGIN_BASE_URL: https://localhost/ui/v2/login/
-      ZITADEL_API_URL: https://localhost
-      ZITADEL_API_DOMAIN: localhost
-      ZITADEL_ADMIN_USER: zitadel-admin@zitadel.localhost
+      LOGIN_BASE_URL: https://127.0.0.1.sslip.io/ui/v2/login/
+      ZITADEL_API_URL: https://127.0.0.1.sslip.io
+      ZITADEL_API_DOMAIN: 127.0.0.1.sslip.io
+      ZITADEL_ADMIN_USER: zitadel-admin@zitadel.127.0.0.1.sslip.io
     volumes:
       - ./pat:/pat # Read the PAT file from zitadels setup
-      - ./env:/acceptance-env # Write the environment variables file for the tests
       - ../login:/login-env # Write the environment variables file for the login
     depends_on:
       traefik:

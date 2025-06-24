@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "test:acceptance": "pnpm exec playwright",
+    "test:acceptance:env": "cd ../.. && make login-test-acceptance-env",
     "test:acceptance:setup": "cd ../.. && make login-test-acceptance-dev"
   },
   "devDependencies": {

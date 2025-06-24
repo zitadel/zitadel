@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { forwardRef } from "react";
+import { Translated } from "../translated";
 import { BaseButton, SignInWithIdentityProviderProps } from "./base-button";
 
 export const SignInWithGoogle = forwardRef<
@@ -9,7 +9,6 @@ export const SignInWithGoogle = forwardRef<
   SignInWithIdentityProviderProps
 >(function SignInWithGoogle(props, ref) {
   const { children, name, ...restProps } = props;
-  const t = useTranslations("idp");
 
   return (
     <BaseButton {...restProps} ref={ref}>
@@ -54,7 +53,13 @@ export const SignInWithGoogle = forwardRef<
       {children ? (
         children
       ) : (
-        <span className="ml-4">{name ? name : t("signInWithGoogle")}</span>
+        <span className="ml-4">
+          {name ? (
+            name
+          ) : (
+            <Translated i18nKey="signInWithGoogle" namespace="idp" />
+          )}
+        </span>
       )}
     </BaseButton>
   );

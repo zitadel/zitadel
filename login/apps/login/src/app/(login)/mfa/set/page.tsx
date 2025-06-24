@@ -2,6 +2,7 @@ import { Alert } from "@/components/alert";
 import { BackButton } from "@/components/back-button";
 import { ChooseSecondFactorToSetup } from "@/components/choose-second-factor-to-setup";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
@@ -15,7 +16,6 @@ import {
 } from "@/lib/zitadel";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 function isSessionValid(session: Partial<Session>): {
@@ -38,9 +38,6 @@ export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
   const searchParams = await props.searchParams;
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "mfa" });
-  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { loginName, checkAfter, force, requestId, organization, sessionId } =
     searchParams;
@@ -119,9 +116,13 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("set.title")}</h1>
+        <h1>
+          <Translated i18nKey="set.title" namespace="mfa" />
+        </h1>
 
-        <p className="ztdl-p">{t("set.description")}</p>
+        <p className="ztdl-p">
+          <Translated i18nKey="set.description" namespace="mfa" />
+        </p>
 
         {sessionWithData && (
           <UserAvatar
@@ -132,9 +133,17 @@ export default async function Page(props: {
           ></UserAvatar>
         )}
 
-        {!(loginName || sessionId) && <Alert>{tError("unknownContext")}</Alert>}
+        {!(loginName || sessionId) && (
+          <Alert>
+            <Translated i18nKey="unknownContext" namespace="error" />
+          </Alert>
+        )}
 
-        {!valid && <Alert>{tError("sessionExpired")}</Alert>}
+        {!valid && (
+          <Alert>
+            <Translated i18nKey="sessionExpired" namespace="error" />
+          </Alert>
+        )}
 
         {isSessionValid(sessionWithData).valid &&
           loginSettings &&

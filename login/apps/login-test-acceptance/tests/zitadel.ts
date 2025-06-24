@@ -7,7 +7,7 @@ import { request } from "gaxios";
 import path from "path";
 import { OtpType, userProps } from "./user";
 
-dotenv.config({ path: path.resolve(__dirname, "../env/.env") });
+dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
 
 export async function addUser(props: userProps) {
   const body = {

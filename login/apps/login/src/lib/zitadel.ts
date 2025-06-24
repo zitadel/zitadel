@@ -59,6 +59,42 @@ async function cacheWrapper<T>(callback: Promise<T>) {
   return callback;
 }
 
+export async function getHostedLoginTranslation({
+  serviceUrl,
+  organization,
+  locale,
+}: {
+  serviceUrl: string;
+  organization?: string;
+  locale?: string;
+}) {
+  const settingsService: Client<typeof SettingsService> =
+    await createServiceForHost(SettingsService, serviceUrl);
+
+  const callback = settingsService
+    .getHostedLoginTranslation(
+      {
+        level: organization
+          ? {
+              case: "organizationId",
+              value: organization,
+            }
+          : {
+              case: "instance",
+              value: true,
+            },
+        locale: locale,
+      },
+      {},
+    )
+    .then((resp) => {
+      console.log(resp);
+      return resp.translations ? resp.translations : undefined;
+    });
+
+  return useCache ? cacheWrapper(callback) : callback;
+}
+
 export async function getBrandingSettings({
   serviceUrl,
   organization,

@@ -3,7 +3,6 @@
 import { getNextUrl } from "@/lib/client";
 import { verifyTOTP } from "@/lib/server/verify";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
@@ -14,6 +13,7 @@ import { Button, ButtonVariants } from "./button";
 import { CopyToClipboard } from "./copy-to-clipboard";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 type Inputs = {
   code: string;
@@ -39,8 +39,6 @@ export function TotpRegister({
   checkAfter,
   loginSettings,
 }: Props) {
-  const t = useTranslations("otp");
-
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -148,7 +146,7 @@ export function TotpRegister({
                 data-testid="submit-button"
               >
                 {loading && <Spinner className="h-5 w-5 mr-2" />}
-                {t("set.submit")}
+                <Translated i18nKey="set.submit" namespace="otp" />
               </Button>
             </div>
           </form>

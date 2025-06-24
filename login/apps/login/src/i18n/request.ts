@@ -1,4 +1,7 @@
 import { LANGS, LANGUAGE_COOKIE_NAME, LANGUAGE_HEADER_NAME } from "@/lib/i18n";
+import { getServiceUrlFromHeaders } from "@/lib/service-url";
+import { getHostedLoginTranslation } from "@/lib/zitadel";
+import { JsonObject } from "@zitadel/client";
 import deepmerge from "deepmerge";
 import { getRequestConfig } from "next-intl/server";
 import { cookies, headers } from "next/headers";
@@ -8,6 +11,26 @@ export default getRequestConfig(async () => {
   const cookiesList = await cookies();
 
   let locale: string = fallback;
+
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const i18nOrganization = _headers.get("x-zitadel-i18n-organization") || ""; // You may need to set this header in middleware
+  console.log("i18nOrganization:", i18nOrganization);
+  let translations: JsonObject | {} = {};
+  try {
+    const i18nJSON = await getHostedLoginTranslation({
+      serviceUrl,
+      locale,
+      organization: i18nOrganization,
+    });
+
+    if (i18nJSON) {
+      translations = i18nJSON;
+    }
+  } catch (error) {
+    console.warn("Error fetching custom translations:", error);
+  }
 
   const languageHeader = await (await headers()).get(LANGUAGE_HEADER_NAME);
   if (languageHeader) {
@@ -24,12 +47,13 @@ export default getRequestConfig(async () => {
     }
   }
 
-  const userMessages = (await import(`../../locales/${locale}.json`)).default;
+  const customMessages = translations;
+  const localeMessages = (await import(`../../locales/${locale}.json`)).default;
   const fallbackMessages = (await import(`../../locales/${fallback}.json`))
     .default;
 
   return {
     locale,
-    messages: deepmerge(fallbackMessages, userMessages),
+    messages: deepmerge.all([fallbackMessages, localeMessages, customMessages]),
   };
 });

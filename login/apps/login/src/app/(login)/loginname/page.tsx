@@ -1,5 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
+import { Translated } from "@/components/translated";
 import { UsernameForm } from "@/components/username-form";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
@@ -9,15 +10,12 @@ import {
   getLoginSettings,
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
   const searchParams = await props.searchParams;
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "loginname" });
 
   const loginName = searchParams?.loginName;
   const requestId = searchParams?.requestId;
@@ -63,8 +61,12 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("title")}</h1>
-        <p className="ztdl-p">{t("description")}</p>
+        <h1 data-i18n-key="error.tryagain">
+          <Translated i18nKey="title" namespace="loginname" />
+        </h1>
+        <p className="ztdl-p">
+          <Translated i18nKey="description" namespace="loginname" />
+        </p>
 
         <UsernameForm
           loginName={loginName}

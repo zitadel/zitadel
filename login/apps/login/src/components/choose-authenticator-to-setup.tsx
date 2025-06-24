@@ -3,9 +3,9 @@ import {
   PasskeysType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { useTranslations } from "next-intl";
 import { Alert, AlertType } from "./alert";
 import { PASSKEYS, PASSWORD } from "./auth-methods";
+import { Translated } from "./translated";
 
 type Props = {
   authMethods: AuthenticationMethodType[];
@@ -18,16 +18,23 @@ export function ChooseAuthenticatorToSetup({
   params,
   loginSettings,
 }: Props) {
-  const t = useTranslations("authenticator");
-
   if (authMethods.length !== 0) {
-    return <Alert type={AlertType.ALERT}>{t("allSetup")}</Alert>;
+    return (
+      <Alert type={AlertType.ALERT}>
+        <Translated i18nKey="allSetup" namespace="authenticator" />
+      </Alert>
+    );
   } else {
     return (
       <>
         {loginSettings.passkeysType == PasskeysType.NOT_ALLOWED &&
           !loginSettings.allowUsernamePassword && (
-            <Alert type={AlertType.ALERT}>{t("noMethodsAvailable")}</Alert>
+            <Alert type={AlertType.ALERT}>
+              <Translated
+                i18nKey="noMethodsAvailable"
+                namespace="authenticator"
+              />
+            </Alert>
           )}
 
         <div className="grid grid-cols-1 gap-5 w-full pt-4">

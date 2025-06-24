@@ -9,13 +9,13 @@ import {
   UserVerificationRequirement,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Alert } from "./alert";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -35,8 +35,6 @@ export function LoginPasskey({
   organization,
   login = true,
 }: Props) {
-  const t = useTranslations("passkey");
-
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -234,7 +232,7 @@ export function LoginPasskey({
             }}
             data-testid="password-button"
           >
-            {t("verify.usePassword")}
+            <Translated i18nKey="verify.usePassword" namespace="passkey" />
           </Button>
         ) : (
           <BackButton />
@@ -273,8 +271,8 @@ export function LoginPasskey({
           }}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("verify.submit")}
+          {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+          <Translated i18nKey="verify.submit" namespace="passkey" />
         </Button>
       </div>
     </div>

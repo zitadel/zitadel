@@ -1,3 +1,2 @@
 custom-config.js
-.env.local
-.env.acceptance
+.env*.local

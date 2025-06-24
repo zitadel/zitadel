@@ -9,7 +9,6 @@ services:
 
   setup:
     environment:
-      WRITE_ENVIRONMENT_FILE: /login-env/.env
       ZITADEL_API_DOMAIN: traefik
       ZITADEL_API_URL: https://traefik
       LOGIN_BASE_URL: https://traefik/ui/v2/login/
@@ -38,6 +37,8 @@ services:
       - CI
       - LOGIN_BASE_URL=https://traefik/ui/v2/login/
       - NODE_TLS_REJECT_UNAUTHORIZED=0
+    volumes:
+      - ../login/.env.test.local:/builder/apps/login/.env.test.local
     ports:
       - 9323:9323
     ipc: "host"

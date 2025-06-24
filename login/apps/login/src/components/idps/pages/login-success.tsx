@@ -1,7 +1,7 @@
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
-import { getLocale, getTranslations } from "next-intl/server";
 import { DynamicTheme } from "../../dynamic-theme";
 import { IdpSignin } from "../../idp-signin";
+import { Translated } from "../../translated";
 
 export async function loginSuccess(
   userId: string,
@@ -9,14 +9,15 @@ export async function loginSuccess(
   requestId?: string,
   branding?: BrandingSettings,
 ) {
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "idp" });
-
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("loginSuccess.title")}</h1>
-        <p className="ztdl-p">{t("loginSuccess.description")}</p>
+        <h1>
+          <Translated i18nKey="loginSuccess.title" namespace="idp" />
+        </h1>
+        <p className="ztdl-p">
+          <Translated i18nKey="loginSuccess.description" namespace="idp" />
+        </p>
 
         <IdpSignin
           userId={userId}

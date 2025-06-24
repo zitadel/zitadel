@@ -7,7 +7,7 @@ import { registerWithPasskey, registerWithPassword } from "./register";
 import { removeUserByUsername } from "./zitadel";
 
 // Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../env/.env") });
+dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
 
 test("register with password", async ({ page }) => {
   const username = faker.internet.email();

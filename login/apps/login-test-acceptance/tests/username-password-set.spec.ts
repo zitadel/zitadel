@@ -9,7 +9,7 @@ import { resetPasswordScreen, resetPasswordScreenExpect } from "./password-scree
 import { PasswordUser } from "./user";
 
 // Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../env/.env") });
+dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
 
 const test = base.extend<{ user: PasswordUser }>({
   user: async ({ page }, use) => {

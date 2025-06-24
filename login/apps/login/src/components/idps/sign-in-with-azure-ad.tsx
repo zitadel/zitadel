@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { forwardRef } from "react";
+import { Translated } from "../translated";
 import { BaseButton, SignInWithIdentityProviderProps } from "./base-button";
 
 export const SignInWithAzureAd = forwardRef<
@@ -9,7 +9,6 @@ export const SignInWithAzureAd = forwardRef<
   SignInWithIdentityProviderProps
 >(function SignInWithAzureAd(props, ref) {
   const { children, name, ...restProps } = props;
-  const t = useTranslations("idp");
 
   return (
     <BaseButton {...restProps} ref={ref}>
@@ -30,7 +29,13 @@ export const SignInWithAzureAd = forwardRef<
       {children ? (
         children
       ) : (
-        <span className="ml-4">{name ? name : t("signInWithAzureAD")}</span>
+        <span className="ml-4">
+          {name ? (
+            name
+          ) : (
+            <Translated i18nKey="signInWithAzureAD" namespace="idp" />
+          )}
+        </span>
       )}
     </BaseButton>
   );

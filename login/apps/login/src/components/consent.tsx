@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Alert } from "./alert";
 import { Button, ButtonVariants } from "./button";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 export function ConsentScreen({
   scope,
@@ -50,7 +51,7 @@ export function ConsentScreen({
       <ul className="list-disc space-y-2 w-full">
         {scopes?.length === 0 && (
           <span className="w-full text-sm flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light py-2 px-4 rounded-md transition-all">
-            {t("device.scope.openid")}
+            <Translated i18nKey="device.scope.openid" namespace="device" />
           </span>
         )}
         {scopes?.map((s) => {
@@ -73,7 +74,11 @@ export function ConsentScreen({
       </ul>
 
       <p className="ztdl-p text-xs text-left">
-        {t("device.request.disclaimer", { appName: appName })}
+        <Translated
+          i18nKey="request.disclaimer"
+          namespace="device"
+          data={{ appName: appName }}
+        />
       </p>
 
       {error && (
@@ -91,7 +96,7 @@ export function ConsentScreen({
           data-testid="deny-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("device.request.deny")}
+          <Translated i18nKey="device.request.deny" namespace="device" />
         </Button>
         <span className="flex-grow"></span>
 
@@ -102,7 +107,7 @@ export function ConsentScreen({
             className="self-end"
             variant={ButtonVariants.Primary}
           >
-            {t("device.request.submit")}
+            <Translated i18nKey="device.request.submit" namespace="device" />
           </Button>
         </Link>
       </div>

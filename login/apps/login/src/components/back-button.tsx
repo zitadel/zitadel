@@ -1,11 +1,10 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button, ButtonVariants } from "./button";
+import { Translated } from "./translated";
 
 export function BackButton() {
-  const t = useTranslations("common");
   const router = useRouter();
   return (
     <Button
@@ -13,7 +12,7 @@ export function BackButton() {
       type="button"
       variant={ButtonVariants.Secondary}
     >
-      {t("back")}
+      <Translated i18nKey="back" namespace="common" />
     </Button>
   );
 }
