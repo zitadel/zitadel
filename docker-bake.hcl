@@ -1,3 +1,7 @@
+variable "LOGIN_DIR" {
+  default = "./"
+}
+
 variable "DOCKERFILES_DIR" {
   default = "dockerfiles/"
 }
@@ -75,7 +79,7 @@ variable "LOGIN_CORE_MOCK_TAG" {
 }
 
 target "login-core-mock" {
-  context = "/apps/login-test-integration/core-mock"
+  context = "${LOGIN_DIR}apps/login-test-integration/core-mock"
   contexts = {
     protos = "target:proto-files"
   }
