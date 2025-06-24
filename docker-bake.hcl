@@ -1,12 +1,14 @@
-target "proto-files" {
-  context = "./"
-  dockerfile = "dockerfiles/proto-files.Dockerfile"
-}
-
 target "typescript-proto-client" {
-  context = "./"
-  dockerfile = "dockerfiles/typescript-proto-client.Dockerfile"
   contexts = {
     proto-files = "target:proto-files"
   }
+  output = [
+    "type=local,dest=login/packages/zitadel-proto"
+  ]
+}
+
+target "typescript-proto-client-out" {
+  output = [
+    "type=local,dest=login/packages/zitadel-proto"
+  ]
 }
