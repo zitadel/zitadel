@@ -151,11 +151,11 @@ You can find a more detailed documentation of the different pages [here](./apps/
 
 ## Useful Commands
 
-- `make login-quality`  - Check the quality of your code against a production build without installing any dependencies besides Docker
-- `pnpm generate`       - Build proto stubs for the client package
-- `pnpm dev`            - Develop all packages and the login app
-- `pnpm build`          - Build all packages and the login app
-- `pnpm clean`          - Clean up all `node_modules` and `dist` folders (runs each package's clean script)
+- `make login-quality` - Check the quality of your code against a production build without installing any dependencies besides Docker
+- `pnpm generate` - Build proto stubs for the client package
+- `pnpm dev` - Develop all packages and the login app
+- `pnpm build` - Build all packages and the login app
+- `pnpm clean` - Clean up all `node_modules` and `dist` folders (runs each package's clean script)
 
 Learn more about developing the login UI in the [contribution guide](/CONTRIBUTING.md).
 

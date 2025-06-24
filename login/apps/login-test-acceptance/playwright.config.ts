@@ -75,13 +75,4 @@ export default defineConfig({
     //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
     // },
   ],
-
-  /* Run local dev server before starting the tests */
-
-  /*  webServer: {
-    command: "pnpm start:built",
-    url: process.env.LOGIN_BASE_URL || "http://127.0.0.1:3000",
-    reuseExistingServer: !!process.env.LOGIN_BASE_URL,
-    timeout: 5 * 60_000,
-  },*/
 });
