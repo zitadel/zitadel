@@ -29,7 +29,7 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 	if err != nil {
 		return nil, err
 	}
-	apps, err := s.query.SearchApps(ctx, queries, false, false)
+	apps, err := s.query.SearchApps(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}

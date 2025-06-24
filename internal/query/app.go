@@ -540,8 +540,8 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string) (app *App,
 	return app, err
 }
 
-func (q *Queries) SearchAppsWithPermission(ctx context.Context, queries *AppSearchQueries, withOwnerRemoved bool, permissionCheck domain.PermissionCheck) (*Apps, error) {
-	apps, err := q.SearchApps(ctx, queries, withOwnerRemoved, PermissionV2(ctx, permissionCheck))
+func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, permissionCheck domain.PermissionCheck) (*Apps, error) {
+	apps, err := q.searchApps(ctx, queries, PermissionV2(ctx, permissionCheck))
 	if err != nil {
 		return nil, err
 	}
@@ -552,7 +552,7 @@ func (q *Queries) SearchAppsWithPermission(ctx context.Context, queries *AppSear
 	return apps, nil
 }
 
-func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, withOwnerRemoved, isPermissionV2Enabled bool) (apps *Apps, err error) {
+func (q *Queries) searchApps(ctx context.Context, queries *AppSearchQueries, isPermissionV2Enabled bool) (apps *Apps, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

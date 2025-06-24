@@ -25,7 +25,7 @@ func (s *Server) ListApplications(ctx context.Context, req *app.ListApplications
 		return nil, err
 	}
 
-	res, err := s.query.SearchAppsWithPermission(ctx, queries, false, s.checkPermission)
+	res, err := s.query.SearchApps(ctx, queries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
