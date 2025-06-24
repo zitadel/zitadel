@@ -70,6 +70,7 @@ Sample `profiles.ndjson` content:
 {"user_id":"auth0|emxdpVxozXeFb1HeEn5ThAK8","email_verified":true,"name":"Tommie Krajcik","email":"tommie_krajcik85@hotmail.com"}
 ```
 
+Run the following command in your terminal:
 ```bash
 zitadel-tools migrate auth0 --org=<ORG_ID> --users=./profiles.ndjson --passwords=./passwords.ndjson --multiline --email-verified --output=./importBody.json
 ```
