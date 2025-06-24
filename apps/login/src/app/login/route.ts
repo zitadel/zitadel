@@ -215,11 +215,24 @@ export async function GET(request: NextRequest) {
                 new URLSearchParams(params),
             },
           }).then((resp) => {
-            if (
-              resp.nextStep.value &&
-              typeof resp.nextStep.value === "string"
-            ) {
+            if (resp.nextStep.case === "authUrl" && resp.nextStep.value) {
               return NextResponse.redirect(resp.nextStep.value);
+            } else if (
+              resp.nextStep.case === "postForm" &&
+              resp.nextStep.value
+            ) {
+              const postCall = resp.nextStep.value;
+
+              const redirectUrl = constructUrl(request, "/saml-post");
+
+              redirectUrl.searchParams.set("url", url);
+              redirectUrl.searchParams.set("RelayState", postCall.relayState);
+              redirectUrl.searchParams.set(
+                "SAMLResponse",
+                postCall.samlResponse,
+              );
+
+              return NextResponse.redirect(redirectUrl.toString());
             }
           });
         }
