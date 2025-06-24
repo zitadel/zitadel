@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex pipefail
+set -e pipefail
 
 PAT_FILE=${PAT_FILE:-./pat/zitadel-admin-sa.pat}
 LOGIN_BASE_URL=${LOGIN_BASE_URL:-"http://localhost:3000"}
@@ -49,7 +49,7 @@ SA_PAT_RESPONSE=$(curl -s --request POST \
       --header "Host: ${ZITADEL_API_DOMAIN}" \
       --header "Content-Type: application/json" \
       -d "{\"expirationDate\": \"2519-04-01T08:45:00.000000Z\"}")
-echo "Received Member response: ${MEMBER_RESPONSE}"
+echo "Received PAT response: ${MEMBER_RESPONSE}"
 
 SA_PAT=$(echo ${SA_PAT_RESPONSE} | jq -r '. | .token')
 echo "Received ServiceAccount Token: ${SA_PAT}"
