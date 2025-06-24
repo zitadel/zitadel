@@ -270,6 +270,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	}
 
 	commands, _, _, _ := startCommandsQueries(ctx, eventstoreClient, eventstoreV4, dbClient, masterKey, config)
+	steps.s59SetupWebkeys = &SetupWebkeys{eventstore: eventstoreClient, commands: commands}
 
 	repeatableSteps := []migration.RepeatableMigration{
 		&externalConfigChange{
@@ -318,6 +319,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s42Apps7OIDCConfigsLoginVersion,
 		steps.s43CreateFieldsDomainIndex,
 		steps.s48Apps7SAMLConfigsLoginVersion,
+		steps.s59SetupWebkeys, // this step needs commands.
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
