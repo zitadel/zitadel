@@ -1,3 +1,7 @@
+target "zitadel" {
+  dockerfile = "build/Dockerfile"
+}
+
 target "typescript-proto-client" {
   contexts = {
     proto-files = "target:proto-files"
@@ -12,3 +16,4 @@ target "typescript-proto-client-out" {
     "type=local,dest=login/packages/zitadel-proto"
   ]
 }
+

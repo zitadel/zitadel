@@ -185,4 +185,8 @@ login-ensure-remote:
 
 export LOGIN_DIR := ./login/
 export LOGIN_BAKE_CLI_ADDITIONAL_ARGS :=  --set login-*.context=./login/ --file ./docker-bake.hcl
+export ZITADEL_TAG := "$(ZITADEL_IMAGE)"
 include login/Makefile
+
+login-test-acceptance-build: docker_image login-test-acceptance-build-compose login-test-acceptance-build-bake
+	@:
