@@ -2,12 +2,14 @@ package convert
 
 import (
 	"net/url"
+	"strings"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
@@ -160,5 +162,27 @@ func appQueryToModel(appQuery *app.ApplicationSearchFilter) (query.SearchQuery, 
 		return query.NewNotNullQuery(query.AppSAMLConfigColumnAppID)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "CONV-z2mAGy", "List.Query.Invalid")
+	}
+}
+
+func CreateAPIClientKeyRequestToDomain(key *app.CreateApplicationKeyRequest) *domain.ApplicationKey {
+	return &domain.ApplicationKey{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: strings.TrimSpace(key.GetProjectId()),
+		},
+		ExpirationDate: key.GetExpirationDate().AsTime(),
+		Type:           applicationKeyTypeToDomain(key.GetType()),
+		ApplicationID:  strings.TrimSpace(key.GetAppId()),
+	}
+}
+
+func applicationKeyTypeToDomain(t app.ApplicationKeyType) domain.AuthNKeyType {
+	switch t {
+	case app.ApplicationKeyType_APPLICATION_KEY_TYPE_JSON:
+		return domain.AuthNKeyTypeJSON
+	case app.ApplicationKeyType_APPLICATION_KEY_TYPE_UNSPECIFIED:
+		fallthrough
+	default:
+		return domain.AuthNKeyTypeNONE
 	}
 }

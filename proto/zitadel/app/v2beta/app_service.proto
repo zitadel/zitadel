@@ -356,6 +356,39 @@ service AppService {
             }
         };
     }
+
+
+    // Create Application Key 
+    //
+    // Create a new application key, which is used to authorize an API application.
+    //
+    // Key details are returned in the response.
+    //
+    // The user needs to have project.app.write permission
+    //
+    // Required permissions:
+    //   - `project.app.write`
+    rpc CreateApplicationKey(CreateApplicationKeyRequest) returns (CreateApplicationKeyResponse) {
+        option (google.api.http) = {
+            post: "/v2beta/applications/{app_id}/keys"
+            body: "*"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The created application key";
+                }
+            };
+        };
+    }
 }
 
 message CreateApplicationRequest {
@@ -785,4 +818,47 @@ message ListApplicationsResponse {
 
     // Contains the total number of apps matching the query and the applied limit.
     zitadel.filter.v2.PaginationResponse pagination = 2;
+}
+
+message CreateApplicationKeyRequest {
+    string app_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+    // TODO: Should it use authenticator.proto -> AuthNKeyType()
+    ApplicationKeyType type = 2 [
+        (validate.rules).enum = {defined_only: true, not_in: [0]},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"KEY_TYPE_JSON\"";
+        }
+    ];
+
+    string project_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+    // The date the key will expire
+    google.protobuf.Timestamp expiration_date = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2519-04-01T08:45:00.000000Z\"";
+            description: "The date the key will expire";
+        }
+    ];
+}
+
+message CreateApplicationKeyResponse {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"28746028909593987\"";
+        }
+    ];
+
+    // The timestamp of the app creation.
+    google.protobuf.Timestamp creation_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2024-12-18T07:50:47.492Z\"";
+        }
+    ];
+
+    bytes key_details = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJrZXlJZCI6IjIwMjcxMDE4NjYyMjcxNDExMyIsImtleSI6Ii0tLS0tQkVHSU4gUlNBIFBSSVZBVEUgS0VZLS0tLS1cbk1JSUVvd0lCQUFLQ0FRRUFuMUxyNStTV0pGRllURU1kaXQ2U0dNY0E2Yks5dG0xMmhlcm55V0wrZm9PWnA3eEVcbk9wcmsvWE81QVplSU5NY0x0ZVhxckJlK1NPdVVNMFpLU2xCMHFTNzNjVStDVTVMTGoycVB0UzhNOFI0N3BGdFhcbjJXRTFJNjNhZHB1N01TejA2SXduQ2lyNnJYOTVPQ2ZneHA3VU1Dd0pSTUZmYXJqdjVBRXY3NXpsSS9lYUV6bUJcbkxKWU1xanZFRmZoN2x3M2lPT3VsWW9kNjNpN3RDNWl5czNlYjNLZW4yWU0rN1FSbXB2dE5qcTJMVmlIMnkrUGJcbk9ESlI3MU9ib05TYVJDNTZDUFpWVytoWDByYXI3VzMwUjI2eGtIQ09oSytQbUpSeGtOY0g1VTdja0xXMEw0WEVcbnNNZkVUSmszeDR3Q0psbisxbElXUzkrNmw0R1E2TWRzWURyOU5RSURBUUFCQW9JQkFCSkx6WGQxMHFBZEQwekNcbnNGUFFOMnJNLzVmV3hONThONDR0YWF6QXg0VHp5K050UlZDTmxScGQvYkxuR2VjbHJIeVpDSmYycWcxcHNEMHJcbkowRGRlR2d0VXBFYWxsYk9scjNEZVBsUGkrYnNsK0RKOUk2c0VSUWwxTjZtQjVzZ0ZJZllBR3UwZjlFSXdIem9cblozR25yNnBRaEVmM0JPUVdsTVhVTlJNSksyOHp3M2E1L01nRmtKVUZUSTUzeXFwbGRtZ2hLajRZR1hLRk1LUGhcbkV3RkxrRncwK2s3K0xuSjFQNGp1ZVd1RXo3WlAyaFpvUWxCcXdSajVyTG9QZ05RbUU4UytFVDRuczlUYzByOFFcbnFyaHlacDZBczJrTDhGTytCZnF3SVpDZnpnWHN2cC9PLzRaSHIzVTB2Ymp3UW1sSzdVSm42U0J6T2hpWFpNU0lcbk5Wc0V5VUVDZ1lFQTFEaktkRGo3NTM1MWQzdlRNQlRFd2JSQ3hoUVZOdENFMnMwVUw4ckJQZ1I0K1dlblNUWmFcbnprWUprcEV0bE54VGxzYnN1Y0RTUXZqeWRYYk5nSHFBeDYzMm1vdTVkak9lR0VTUDFWVGtUdElsZFZQZWszQWxcbjVYbkpQa1dqWGVyVVJZNm5KeUQ5UWhlREx3MVp4NEFYVzNHWURiTFkrT05XV0VKUlJaQUloNjBDZ1lFQXdEQ2xcbnc1MHc4dkcvbEJ4RzNSYW9FaHdLOWNna1VXOHk2T25DekNwcEtjOEZUUmY1VE5iWjl5TzNXUmdYajhkeHRCakFcbkl5VGlzYk9NQk1VaFZKUUtGZHRQaDhoVDBwRkRjeE9ndzY0aHBtYzhyY2RTbXVKNzlYSVRTaHUySjA0N0UvNFZcbnJOTThpWVk5ZGR3VGdGUUlsdFNZL0l0RnFxWERmdjhqK1dVY25La0NnWUVBaENOUU80bDNuNjRucWR2WnBTaHBcblVrclJBTkJrWFJyOGZkZ1BaNnFSSS9KWStNSEhjVmg4dGM3NkN0NkdTUmZlbkJVRU5LeVF2czZPK1FDZCtBOU9cbnZBWGZkRjduZldlcVdtWG1RT2g0dDNNMWk1WkxFZlpVUWt2UU9BdllLcFFhMDZ4OCsyb1pCdHZvL0pVTmY2Q0xcbjZvNFNKUVZrLzZOZGtkckpDODBnNG9rQ2dZQkZsNWYrbkVYa1F0dWZVeG5wNXRGWE5XWldsM0ZuTjMvVXpRaW5cbmkxZm5OcnB4cnhPcjJrUzA4KzdwU1FzSEdpNDNDNXRQWG9UajJlTUN1eXNWaUVHYXBuNUc2YWhJb0NjdlhWVWlcblprUnpFQUR0NERZdU5ZS3pYdXBUTkhPaUNmYmtoMlhyM2RXVzZ0QUloSGRmU1k2T3AwNzZhNmYvWWVUSGNMWGpcbkVkVHBlUUtCZ0FPdnBqcDQ4TzRUWEZkU0JLSnYya005OHVhUjlSQURtdGxTWHd2cTlyQkhTV084NFk4bzE0L1Bcbkl1UmxUOHhROGRYKzhMR21UUCtjcUtiOFFRQ1grQk1YUWxMSEVtWnpnb0xFa0pGMUVIMm4vZEZ5bngxS3prdFNcbm9UZUdsRzZhbXhVOVh4eW9RVFlEVGJCbERwc2FZUlFBZ2FUQzM3UVZRUjhmK1ZoRzFHSFFcbi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tXG4iLCJhcHBJZCI6IjIwMjcwNjM5ODgxMzg4MDU3NyIsImNsaWVudElkIjoiMjAyNzA2Mzk4ODEzOTQ2MTEzQG15dGVzdHByb2plY3QifQ==\"";
+        }
+    ];
 }
