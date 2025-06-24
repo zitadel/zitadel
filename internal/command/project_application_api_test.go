@@ -410,7 +410,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 				},
 				checkPermission: newMockPermissionCheckAllowed(),
 			}
-			got, err := r.AddAPIApplication(tt.args.ctx, tt.args.apiApp, "", tt.args.resourceOwner)
+			got, err := r.AddAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

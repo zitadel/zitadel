@@ -7,12 +7,13 @@ import (
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
 
-func CreateAPIApplicationRequestToDomain(name, projectID string, app *app.CreateAPIApplicationRequest) *domain.APIApp {
+func CreateAPIApplicationRequestToDomain(name, projectID, appID string, app *app.CreateAPIApplicationRequest) *domain.APIApp {
 	return &domain.APIApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectID,
 		},
 		AppName:        name,
+		AppID:          appID,
 		AuthMethodType: apiAuthMethodTypeToDomain(app.GetAuthMethodType()),
 	}
 }
