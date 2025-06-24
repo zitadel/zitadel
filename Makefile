@@ -13,7 +13,7 @@ ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 export GOCOVERDIR ZITADEL_MASTERKEY
 
 LOGIN_REMOTE_NAME := login
-LOGIN_REMOTE_URL := https://github.com/zitadel/typescript.git
+LOGIN_REMOTE_URL ?= https://github.com/zitadel/typescript.git
 LOGIN_REMOTE_BRANCH ?= main
 
 .PHONY: compile
