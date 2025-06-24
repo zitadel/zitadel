@@ -5,13 +5,12 @@ sidebar_label: Auth0 Migration Guide
 
 ## 1. Introduction
 
-**Why migrate from Auth0 to ZITADEL?**  
-This guide will walk you through the steps to migrate users from Auth0 to ZITADEL, including password hashes (with Auth0 support assistance), so users don't need to reset their passwords.
+This guide will walk you through the steps to migrate users from Auth0 to ZITADEL, including password hashes (which requires Auth0's support assistance), so users don't need to reset their passwords.
 
 **What you'll learn with this guide**
 - How to prepare your data from Auth0
-- Use of ZITADEL migration tooling
-- Performing the user import via API
+- Use of the ZITADEL migration tooling
+- Performing the user import via ZITADEL's API
 - Troubleshooting and validating the migration
 
 ---
@@ -24,10 +23,10 @@ The migration tool is written in Go. Download and install the latest version of 
 ### 2.2. Create a ZITADEL Instance and Organization
 You'll need a target organization in ZITADEL to import your users. You can create a new organization or use an existing one.  
 
-If you don't have one, you can [sign up for free here](https://zitadel.com).  
+If you don't have a ZITADEL instance, you can [sign up for free here](https://zitadel.com) to create a new one for you.  
 See: [Managing Organizations in ZITADEL](https://zitadel.com/docs/guides/manage/console/organizations).
 
-> **Note:** Copy your Organization ID (Resource ID) for use in later steps.
+> **Note:** Copy your Organization ID (Resource ID) since you will use the id in the later steps.
 
 ---
 
@@ -54,25 +53,25 @@ Use the migration tool to convert the Auth0 export file to a ZITADEL-compatible 
 Step-by-step instructions: [Migration Tool for Auth0](https://github.com/zitadel/zitadel-tools/blob/main/cmd/migration/auth0/readme.md)
 
 Typical steps:
-- Run the migration tool with your exported Auth0 file as input.
+- Run the migration tool with your exported Auth0 files as input.
 - The tool generates a JSON file ready for import into ZITADEL.
 
 Example:
 After obtaining the 2 required input files (passwords and profile) in JSON lines format, you can run the following command:
 
-Sample `passwords.ndjson` content:
+Sample `passwords.ndjson` content, as obtained from the Auth0 Support team:
 ```json
 {"_id":{"$oid":"emxdpVxozXeFb1HeEn5ThAK8"},"email_verified":true,"email":"tommie_krajcik85@hotmail.com","passwordHash":"$2b$10$d.GvZhGwTllA7OdAmsA75uGGzqr/mhdQoU88M3zD.fX3Vb8Rcf33.","password_set_date":{"$date":"2025-06-30T00:00:00.000Z"},"tenant":"test","connection":"Username-Password-Authentication","_tmp_is_unique":true}
 ```
 
-Sample `profiles.ndjson` content:
+Sample `profiles.json` content, as obtained from the Auth0 Management API:
 ```json
 {"user_id":"auth0|emxdpVxozXeFb1HeEn5ThAK8","email_verified":true,"name":"Tommie Krajcik","email":"tommie_krajcik85@hotmail.com"}
 ```
 
-Run the following command in your terminal:
+Run the following command in your terminal (replace ORG_ID with your own organization ID):
 ```bash
-zitadel-tools migrate auth0 --org=<ORG_ID> --users=./profiles.ndjson --passwords=./passwords.ndjson --multiline --email-verified --output=./importBody.json
+zitadel-tools migrate auth0 --org=<ORG_ID> --users=./profiles.json --passwords=./passwords.ndjson --multiline --email-verified --output=./importBody.json
 ```
 
 The tool will merge both objects into a single one in the importBody.json output, this will be used in the next step to complete the import process.
@@ -141,7 +140,7 @@ curl --location 'https://<instance-domain>/admin/v1/import' \
       }
     ]
   },
-  "timeout": "30m0s"
+  "timeout": "5m0s"
 }'
 ```
 
