@@ -24,10 +24,10 @@ func (mig *SetupWebkeys) Execute(ctx context.Context, _ eventstore.Event) error 
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
 			OrderDesc().
 			AddQuery().
-			AggregateTypes("instance").
+			AggregateTypes(instance.AggregateType).
 			EventTypes(instance.InstanceAddedEventType).
 			Builder().ExcludeAggregateIDs().
-			AggregateTypes("instance").
+			AggregateTypes(instance.AggregateType).
 			EventTypes(instance.InstanceRemovedEventType).
 			Builder(),
 	)
