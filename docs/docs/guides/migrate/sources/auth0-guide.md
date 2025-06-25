@@ -71,7 +71,7 @@ Sample `profiles.json` content, as obtained from the Auth0 Management API:
 
 Run the following command in your terminal (replace ORG_ID with your own organization ID):
 ```bash
-zitadel-tools migrate auth0 --org=<ORG_ID> --users=./profiles.json --passwords=./passwords.ndjson --multiline --email-verified --output=./importBody.json
+zitadel-tools migrate auth0 --org=<ORG_ID> --users=./profiles.json --passwords=./passwords.ndjson --multiline --email-verified --output=./importBody.json --timeout=5m0s
 ```
 
 The tool will merge both objects into a single one in the importBody.json output, this will be used in the next step to complete the import process.
