@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -141,6 +142,74 @@ func Test_apiAuthMethodTypeToPb(t *testing.T) {
 
 			// Then
 			assert.Equal(t, tc.expectedResult, res)
+		})
+	}
+}
+func TestGetApplicationKeyQueriesRequestToDomain(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		testName       string
+		inputOrgID     string
+		inputProjectID string
+		inputAppID     string
+
+		expectedQueriesLength int
+	}{
+		{
+			testName:              "all IDs provided",
+			inputOrgID:            "org-1",
+			inputProjectID:        "proj-1",
+			inputAppID:            "app-1",
+			expectedQueriesLength: 3,
+		},
+		{
+			testName:              "only org ID",
+			inputOrgID:            "org-1",
+			inputProjectID:        " ",
+			inputAppID:            "",
+			expectedQueriesLength: 1,
+		},
+		{
+			testName:              "only project ID",
+			inputOrgID:            "",
+			inputProjectID:        "proj-1",
+			inputAppID:            " ",
+			expectedQueriesLength: 1,
+		},
+		{
+			testName:              "only app ID",
+			inputOrgID:            " ",
+			inputProjectID:        "",
+			inputAppID:            "app-1",
+			expectedQueriesLength: 1,
+		},
+		{
+			testName:              "empty IDs",
+			inputOrgID:            " ",
+			inputProjectID:        " ",
+			inputAppID:            " ",
+			expectedQueriesLength: 0,
+		},
+		{
+			testName:              "with spaces",
+			inputOrgID:            " org-1 ",
+			inputProjectID:        " proj-1 ",
+			inputAppID:            " app-1 ",
+			expectedQueriesLength: 3,
+		},
+	}
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			// When
+			got, err := GetApplicationKeyQueriesRequestToDomain(tc.inputOrgID, tc.inputProjectID, tc.inputAppID)
+
+			// Then
+			require.NoError(t, err)
+
+			assert.Len(t, got, tc.expectedQueriesLength)
 		})
 	}
 }

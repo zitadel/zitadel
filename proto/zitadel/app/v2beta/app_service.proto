@@ -362,7 +362,8 @@ service AppService {
     //
     // Create a new application key, which is used to authorize an API application.
     //
-    // Key details are returned in the response.
+    // Key details are returned in the response. They must be stored safely, as it will not
+    // be possible to retrieve them again.
     //
     // The user needs to have project.app.write permission
     //
@@ -422,6 +423,38 @@ service AppService {
             };
         };
     }
+
+    // Get Application Key
+    //
+    // Retrieves the application key matching the provided ID.
+    //
+    // Specifying a project, organization and app ID is optional but help with filtering/performance.
+    //
+    // The user needs to have project.app.read permission
+    //
+    // Required permissions:
+    //   - project.app.read
+    rpc GetApplicationKey(GetApplicationKeyRequest) returns (GetApplicationKeyResponse) {
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The fetched app key.";
+                }
+            };
+        };
+
+        option (google.api.http) = {
+            get: "/v2beta/application_keys/{id}"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+
 }
 
 message CreateApplicationRequest {
@@ -907,6 +940,43 @@ message DeleteApplicationKeyResponse {
     google.protobuf.Timestamp deletion_date = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+}
+
+message GetApplicationKeyRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string project_id = 2 [(validate.rules).string = {max_len: 200}];
+    string application_id = 3 [(validate.rules).string = {max_len: 200}];
+    string organization_id = 4 [(validate.rules).string = {max_len: 200}];
+}
+
+message GetApplicationKeyResponse {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+
+    // the file type of the key
+    ApplicationKeyType type = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"APPLICATION_KEY_TYPE_JSON\"";
+            description: "the file type of the key";
+        }
+    ];
+
+    google.protobuf.Timestamp creation_date = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+
+    // the date a key will expire
+    google.protobuf.Timestamp expiration_date = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the date a key will expire";
+            example: "\"3019-04-01T08:45:00.000000Z\"";
         }
     ];
 }

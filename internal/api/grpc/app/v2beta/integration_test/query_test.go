@@ -573,3 +573,89 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 		})
 	}
 }
+
+func TestGetApplicationKey(t *testing.T) {
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
+	createdApiApp := createAPIApp(t, p.GetId())
+	createdAppKey := createAppKey(t, IAMOwnerCtx, p.GetId(), createdApiApp.GetAppId())
+
+	t.Parallel()
+
+	tt := []struct {
+		testName     string
+		inputRequest *app.GetApplicationKeyRequest
+		inputCtx     context.Context
+
+		expectedErrorType codes.Code
+		expectedAppKeyID  string
+	}{
+		{
+			testName: "when unknown app ID should return not found error",
+			inputCtx: IAMOwnerCtx,
+			inputRequest: &app.GetApplicationKeyRequest{
+				Id: gofakeit.Sentence(2),
+			},
+
+			expectedErrorType: codes.NotFound,
+		},
+		{
+			testName: "when user has no permission should return membership not found error",
+			inputCtx: NoPermissionCtx,
+			inputRequest: &app.GetApplicationKeyRequest{
+				Id: createdAppKey.GetId(),
+			},
+
+			expectedErrorType: codes.NotFound,
+		},
+		{
+			testName: "when providing API app ID should return valid API app result",
+			inputCtx: projectOwnerCtx,
+			inputRequest: &app.GetApplicationKeyRequest{
+				Id: createdAppKey.GetId(),
+			},
+
+			expectedAppKeyID: createdAppKey.GetId(),
+		},
+		{
+			testName: "when user is OrgOwner should return request key",
+			inputCtx: OrgOwnerCtx,
+			inputRequest: &app.GetApplicationKeyRequest{
+				Id:        createdAppKey.GetId(),
+				ProjectId: p.GetId(),
+			},
+
+			expectedAppKeyID: createdAppKey.GetId(),
+		},
+		{
+			testName: "when user is IAMOwner should return request key",
+			inputCtx: OrgOwnerCtx,
+			inputRequest: &app.GetApplicationKeyRequest{
+				Id:             createdAppKey.GetId(),
+				OrganizationId: instance.DefaultOrg.GetId(),
+			},
+
+			expectedAppKeyID: createdAppKey.GetId(),
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				// When
+				res, err := instance.Client.AppV2Beta.GetApplicationKey(tc.inputCtx, tc.inputRequest)
+
+				// Then
+				require.Equal(t, tc.expectedErrorType, status.Code(err))
+				if tc.expectedErrorType == codes.OK {
+
+					assert.Equal(t, tc.expectedAppKeyID, res.GetId())
+					assert.NotEmpty(t, res.GetCreationDate())
+					assert.NotEmpty(t, res.GetExpirationDate())
+				}
+			}, retryDuration, tick)
+		})
+	}
+}
