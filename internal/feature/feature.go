@@ -17,8 +17,8 @@ const (
 	KeyTokenExchange
 	KeyActionsDeprecated
 	KeyImprovedPerformance
-	KeyWebKey
-	KeyDebugOIDCParentError
+	// KeyWebKey (reserving the spot)
+	KeyDebugOIDCParentError Key = iota + 1
 	KeyOIDCSingleV1SessionTermination
 	KeyDisableUserTokenEvent
 	KeyEnableBackChannelLogout

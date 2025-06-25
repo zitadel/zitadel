@@ -41,7 +41,6 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		UserSchema:                      req.UserSchema,
 		TokenExchange:                   req.OidcTokenExchange,
 		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
-		WebKey:                          req.WebKey,
 		DebugOIDCParentError:            req.DebugOidcParentError,
 		OIDCSingleV1SessionTermination:  req.OidcSingleV1SessionTermination,
 	}
@@ -56,7 +55,6 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
 		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
-		WebKey:                              featureSourceToFlagPb(&f.WebKey),
 		DebugOidcParentError:                featureSourceToFlagPb(&f.DebugOIDCParentError),
 		OidcSingleV1SessionTermination:      featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
 	}

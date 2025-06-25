@@ -7,17 +7,28 @@ import (
 	"strings"
 )
 
-const _KeyName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactions_deprecatedimproved_performanceweb_keydebug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
+const (
+	_KeyName_0      = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactions_deprecatedimproved_performance"
+	_KeyLowerName_0 = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactions_deprecatedimproved_performance"
+	_KeyName_1      = "debug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
+	_KeyLowerName_1 = "debug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
+)
 
-var _KeyIndex = [...]uint16{0, 11, 28, 61, 81, 92, 106, 124, 144, 151, 174, 208, 232, 258, 266, 285, 308}
-
-const _KeyLowerName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactions_deprecatedimproved_performanceweb_keydebug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
+var (
+	_KeyIndex_0 = [...]uint8{0, 11, 28, 61, 81, 92, 106, 124, 144}
+	_KeyIndex_1 = [...]uint8{0, 23, 57, 81, 107, 115, 134, 157}
+)
 
 func (i Key) String() string {
-	if i < 0 || i >= Key(len(_KeyIndex)-1) {
+	switch {
+	case 0 <= i && i <= 7:
+		return _KeyName_0[_KeyIndex_0[i]:_KeyIndex_0[i+1]]
+	case 9 <= i && i <= 15:
+		i -= 9
+		return _KeyName_1[_KeyIndex_1[i]:_KeyIndex_1[i+1]]
+	default:
 		return fmt.Sprintf("Key(%d)", i)
 	}
-	return _KeyName[_KeyIndex[i]:_KeyIndex[i+1]]
 }
 
 // An "invalid array index" compiler error signifies that the constant values have changed.
@@ -32,7 +43,6 @@ func _KeyNoOp() {
 	_ = x[KeyTokenExchange-(5)]
 	_ = x[KeyActionsDeprecated-(6)]
 	_ = x[KeyImprovedPerformance-(7)]
-	_ = x[KeyWebKey-(8)]
 	_ = x[KeyDebugOIDCParentError-(9)]
 	_ = x[KeyOIDCSingleV1SessionTermination-(10)]
 	_ = x[KeyDisableUserTokenEvent-(11)]
@@ -42,60 +52,57 @@ func _KeyNoOp() {
 	_ = x[KeyConsoleUseV2UserApi-(15)]
 }
 
-var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyLegacyIntrospection, KeyUserSchema, KeyTokenExchange, KeyActionsDeprecated, KeyImprovedPerformance, KeyWebKey, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyDisableUserTokenEvent, KeyEnableBackChannelLogout, KeyLoginV2, KeyPermissionCheckV2, KeyConsoleUseV2UserApi}
+var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyLegacyIntrospection, KeyUserSchema, KeyTokenExchange, KeyActionsDeprecated, KeyImprovedPerformance, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyDisableUserTokenEvent, KeyEnableBackChannelLogout, KeyLoginV2, KeyPermissionCheckV2, KeyConsoleUseV2UserApi}
 
 var _KeyNameToValueMap = map[string]Key{
-	_KeyName[0:11]:         KeyUnspecified,
-	_KeyLowerName[0:11]:    KeyUnspecified,
-	_KeyName[11:28]:        KeyLoginDefaultOrg,
-	_KeyLowerName[11:28]:   KeyLoginDefaultOrg,
-	_KeyName[28:61]:        KeyTriggerIntrospectionProjections,
-	_KeyLowerName[28:61]:   KeyTriggerIntrospectionProjections,
-	_KeyName[61:81]:        KeyLegacyIntrospection,
-	_KeyLowerName[61:81]:   KeyLegacyIntrospection,
-	_KeyName[81:92]:        KeyUserSchema,
-	_KeyLowerName[81:92]:   KeyUserSchema,
-	_KeyName[92:106]:       KeyTokenExchange,
-	_KeyLowerName[92:106]:  KeyTokenExchange,
-	_KeyName[106:124]:      KeyActionsDeprecated,
-	_KeyLowerName[106:124]: KeyActionsDeprecated,
-	_KeyName[124:144]:      KeyImprovedPerformance,
-	_KeyLowerName[124:144]: KeyImprovedPerformance,
-	_KeyName[144:151]:      KeyWebKey,
-	_KeyLowerName[144:151]: KeyWebKey,
-	_KeyName[151:174]:      KeyDebugOIDCParentError,
-	_KeyLowerName[151:174]: KeyDebugOIDCParentError,
-	_KeyName[174:208]:      KeyOIDCSingleV1SessionTermination,
-	_KeyLowerName[174:208]: KeyOIDCSingleV1SessionTermination,
-	_KeyName[208:232]:      KeyDisableUserTokenEvent,
-	_KeyLowerName[208:232]: KeyDisableUserTokenEvent,
-	_KeyName[232:258]:      KeyEnableBackChannelLogout,
-	_KeyLowerName[232:258]: KeyEnableBackChannelLogout,
-	_KeyName[258:266]:      KeyLoginV2,
-	_KeyLowerName[258:266]: KeyLoginV2,
-	_KeyName[266:285]:      KeyPermissionCheckV2,
-	_KeyLowerName[266:285]: KeyPermissionCheckV2,
-	_KeyName[285:308]:      KeyConsoleUseV2UserApi,
-	_KeyLowerName[285:308]: KeyConsoleUseV2UserApi,
+	_KeyName_0[0:11]:         KeyUnspecified,
+	_KeyLowerName_0[0:11]:    KeyUnspecified,
+	_KeyName_0[11:28]:        KeyLoginDefaultOrg,
+	_KeyLowerName_0[11:28]:   KeyLoginDefaultOrg,
+	_KeyName_0[28:61]:        KeyTriggerIntrospectionProjections,
+	_KeyLowerName_0[28:61]:   KeyTriggerIntrospectionProjections,
+	_KeyName_0[61:81]:        KeyLegacyIntrospection,
+	_KeyLowerName_0[61:81]:   KeyLegacyIntrospection,
+	_KeyName_0[81:92]:        KeyUserSchema,
+	_KeyLowerName_0[81:92]:   KeyUserSchema,
+	_KeyName_0[92:106]:       KeyTokenExchange,
+	_KeyLowerName_0[92:106]:  KeyTokenExchange,
+	_KeyName_0[106:124]:      KeyActionsDeprecated,
+	_KeyLowerName_0[106:124]: KeyActionsDeprecated,
+	_KeyName_0[124:144]:      KeyImprovedPerformance,
+	_KeyLowerName_0[124:144]: KeyImprovedPerformance,
+	_KeyName_1[0:23]:         KeyDebugOIDCParentError,
+	_KeyLowerName_1[0:23]:    KeyDebugOIDCParentError,
+	_KeyName_1[23:57]:        KeyOIDCSingleV1SessionTermination,
+	_KeyLowerName_1[23:57]:   KeyOIDCSingleV1SessionTermination,
+	_KeyName_1[57:81]:        KeyDisableUserTokenEvent,
+	_KeyLowerName_1[57:81]:   KeyDisableUserTokenEvent,
+	_KeyName_1[81:107]:       KeyEnableBackChannelLogout,
+	_KeyLowerName_1[81:107]:  KeyEnableBackChannelLogout,
+	_KeyName_1[107:115]:      KeyLoginV2,
+	_KeyLowerName_1[107:115]: KeyLoginV2,
+	_KeyName_1[115:134]:      KeyPermissionCheckV2,
+	_KeyLowerName_1[115:134]: KeyPermissionCheckV2,
+	_KeyName_1[134:157]:      KeyConsoleUseV2UserApi,
+	_KeyLowerName_1[134:157]: KeyConsoleUseV2UserApi,
 }
 
 var _KeyNames = []string{
-	_KeyName[0:11],
-	_KeyName[11:28],
-	_KeyName[28:61],
-	_KeyName[61:81],
-	_KeyName[81:92],
-	_KeyName[92:106],
-	_KeyName[106:124],
-	_KeyName[124:144],
-	_KeyName[144:151],
-	_KeyName[151:174],
-	_KeyName[174:208],
-	_KeyName[208:232],
-	_KeyName[232:258],
-	_KeyName[258:266],
-	_KeyName[266:285],
-	_KeyName[285:308],
+	_KeyName_0[0:11],
+	_KeyName_0[11:28],
+	_KeyName_0[28:61],
+	_KeyName_0[61:81],
+	_KeyName_0[81:92],
+	_KeyName_0[92:106],
+	_KeyName_0[106:124],
+	_KeyName_0[124:144],
+	_KeyName_1[0:23],
+	_KeyName_1[23:57],
+	_KeyName_1[57:81],
+	_KeyName_1[81:107],
+	_KeyName_1[107:115],
+	_KeyName_1[115:134],
+	_KeyName_1[134:157],
 }
 
 // KeyString retrieves an enum value from the enum constants string name.
