@@ -34,9 +34,6 @@ export async function redirectToIdp(
   const idpId = formData.get("id") as string;
   const provider = formData.get("provider") as string;
 
-  // const username = formData.get("username") as string;
-  // const password = formData.get("password") as string;
-
   if (linkOnly) params.set("link", "true");
   if (requestId) params.set("requestId", requestId);
   if (organization) params.set("organization", organization);
@@ -194,6 +191,7 @@ type createNewSessionForLDAPCommand = {
   username: string;
   password: string;
   idpId: string;
+  link: boolean;
 };
 
 export async function createNewSessionForLDAP(
@@ -229,13 +227,17 @@ export async function createNewSessionForLDAP(
 
   const { userId, idpIntentId, idpIntentToken } = response.nextStep.value;
 
+  const params = new URLSearchParams({
+    userId,
+    id: idpIntentId,
+    token: idpIntentToken,
+  });
+
+  if (command.link) {
+    params.set("link", "true");
+  }
+
   return {
-    redirect:
-      `/idp/ldap/success?` +
-      new URLSearchParams({
-        userId,
-        id: idpIntentId,
-        token: idpIntentToken,
-      }).toString(),
+    redirect: `/idp/ldap/success?` + params.toString(),
   };
 }

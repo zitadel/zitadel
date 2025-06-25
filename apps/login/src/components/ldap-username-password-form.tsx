@@ -18,9 +18,10 @@ type Inputs = {
 
 type Props = {
   idpId: string;
+  link?: boolean;
 };
 
-export function LDAPUsernamePasswordForm({ idpId }: Props) {
+export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -39,6 +40,7 @@ export function LDAPUsernamePasswordForm({ idpId }: Props) {
       idpId: idpId,
       username: values.loginName,
       password: values.password,
+      link: link,
     })
       .catch(() => {
         setError("Could not start LDAP flow");

@@ -46,7 +46,10 @@ export default async function Page(props: {
           <Translated i18nKey="description" namespace="ldap" />
         </p>
 
-        <LDAPUsernamePasswordForm idpId={idpId}></LDAPUsernamePasswordForm>
+        <LDAPUsernamePasswordForm
+          idpId={idpId}
+          link={link === "true"}
+        ></LDAPUsernamePasswordForm>
       </div>
     </DynamicTheme>
   );
