@@ -49,6 +49,7 @@
   "idp": {
     "title": "Mit SSO anmelden",
     "description": "Wählen Sie einen der folgenden Anbieter, um sich anzumelden",
+    "orSignInWith": "oder melden Sie sich an mit",
     "signInWithApple": "Mit Apple anmelden",
     "signInWithGoogle": "Mit Google anmelden",
     "signInWithAzureAD": "Mit AzureAD anmelden",
@@ -78,6 +79,13 @@
       "title": "Registrierung abschließen",
       "description": "Bitte vervollständige die Registrierung, um dein Konto zu erstellen."
     }
+  },
+  "ldap": {
+    "title": "LDAP Login",
+    "description": "Geben Sie Ihre LDAP-Anmeldedaten ein.",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "submit": "Weiter"
   },
   "mfa": {
     "verify": {

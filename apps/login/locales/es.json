@@ -49,6 +49,7 @@
   "idp": {
     "title": "Iniciar sesión con SSO",
     "description": "Selecciona uno de los siguientes proveedores para iniciar sesión",
+    "orSignInWith": "o iniciar sesión con",
     "signInWithApple": "Iniciar sesión con Apple",
     "signInWithGoogle": "Iniciar sesión con Google",
     "signInWithAzureAD": "Iniciar sesión con AzureAD",
@@ -78,6 +79,13 @@
       "title": "Completar registro",
       "description": "Para completar el registro, debes establecer una contraseña."
     }
+  },
+  "ldap": {
+    "title": "Iniciar sesión con LDAP",
+    "description": "Introduce tus credenciales LDAP.",
+    "username": "Nombre de usuario",
+    "password": "Contraseña",
+    "submit": "Continuar"
   },
   "mfa": {
     "verify": {
