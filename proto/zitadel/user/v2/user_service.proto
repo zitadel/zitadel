@@ -126,6 +126,40 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service UserService {
 
+  // Create a User
+  //
+  // Create a new human or machine user in the specified organization.
+  //
+  // Required permission:
+  //   - user.write
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "The user already exists.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
   // Create a new human user
   //
   // Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
@@ -463,6 +497,54 @@ service UserService {
           description: "User ID does not exist.";
         }
       }
+    };
+  }
+
+  // Update a User
+  //
+  // Partially update an existing user.
+  // If you change the users email or phone, you can specify how the ownership should be verified.
+  // If you change the users password, you can specify if the password should be changed again on the users next login.
+  //
+  // Required permission:
+  //   - user.write
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+      responses: {
+        key: "404";
+        value: {
+          description: "User ID does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      }
+      responses: {
+        key: "409"
+        value: {
+          description: "The user already exists.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
     };
   }
 
@@ -1295,6 +1377,245 @@ service UserService {
           description: "User ID does not exist.";
         }
       }
+    };
+  }
+
+
+  // Add a Users Secret
+  //
+  // Generates a client secret for the user.
+  // The client id is the users username.
+  // If the user already has a secret, it is overwritten.
+  // Only users of type machine can have a secret.
+  //
+  // Required permission:
+  //   - user.write
+  rpc AddSecret(AddSecretRequest) returns (AddSecretResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "The secret was successfully generated.";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The user ID does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
+  // Remove a Users Secret
+  //
+  // Remove the current client ID and client secret from a machine user.
+  //
+  // Required permission:
+  //   - user.write
+  rpc RemoveSecret(RemoveSecretRequest) returns (RemoveSecretResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "The secret was either successfully removed or it didn't exist in the first place.";
+        }
+      };
+    };
+  }
+
+  // Add a Key
+  //
+  // Add a keys that can be used to securely authenticate at the Zitadel APIs using JWT profile authentication using short-lived tokens.
+  // Make sure you store the returned key safely, as you won't be able to read it from the Zitadel API anymore.
+  // Only users of type machine can have keys.
+  //
+  // Required permission:
+  //   - user.write
+  rpc AddKey(AddKeyRequest) returns (AddKeyResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "The key was successfully created.";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The user ID does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
+  // Remove a Key
+  //
+  // Remove a machine users key by the given key ID and an optionally given user ID.
+  //
+  // Required permission:
+  //   - user.write
+  rpc RemoveKey(RemoveKeyRequest) returns (RemoveKeyResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "The key was either successfully removed or it not found in the first place.";
+        }
+      };
+    };
+  }
+
+  // Search Keys
+  //
+  // List all matching keys. By default all keys of the instance on which the caller has permission to read the owning users are returned.
+  // Make sure to include a limit and sorting for pagination.
+  //
+  // Required permission:
+  //   - user.read
+  rpc ListKeys(ListKeysRequest) returns (ListKeysResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all machine user keys matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+        };
+      };
+    };
+  }
+
+  // Add a Personal Access Token
+  //
+  // Personal access tokens (PAT) are the easiest way to authenticate to the Zitadel APIs.
+  // Make sure you store the returned PAT safely, as you won't be able to read it from the Zitadel API anymore.
+  // Only users of type machine can have personal access tokens.
+  //
+  // Required permission:
+  //   - user.write
+  rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "The personal access token was successfully created.";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The user ID does not exist.";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        }
+      };
+    };
+  }
+
+  // Remove a Personal Access Token
+  //
+  // Removes a machine users personal access token by the given token ID and an optionally given user ID.
+  //
+  // Required permission:
+  //   - user.write
+  rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "The personal access token was either successfully removed or it was not found in the first place.";
+        }
+      };
+    };
+  }
+
+  // Search Personal Access Tokens
+  //
+  // List all personal access tokens. By default all personal access tokens of the instance on which the caller has permission to read the owning users are returned.
+  // Make sure to include a limit and sorting for pagination.
+  //
+  // Required permission:
+  //   - user.read
+  rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all personal access tokens matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+        };
+      };
     };
   }
 
