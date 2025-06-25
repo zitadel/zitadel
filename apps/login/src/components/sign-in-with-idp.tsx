@@ -6,7 +6,6 @@ import {
   IdentityProvider,
   IdentityProviderType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { useTranslations } from "next-intl";
 import { ReactNode, useActionState } from "react";
 import { Alert } from "./alert";
 import { SignInWithIdentityProviderProps } from "./idps/base-button";
@@ -16,6 +15,7 @@ import { SignInWithGeneric } from "./idps/sign-in-with-generic";
 import { SignInWithGithub } from "./idps/sign-in-with-github";
 import { SignInWithGitlab } from "./idps/sign-in-with-gitlab";
 import { SignInWithGoogle } from "./idps/sign-in-with-google";
+import { Translated } from "./translated";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
@@ -32,7 +32,6 @@ export function SignInWithIdp({
   linkOnly,
 }: Readonly<SignInWithIDPProps>) {
   const [state, action, _isPending] = useActionState(redirectToIdp, {});
-  const t = useTranslations("idp");
 
   const renderIDPButton = (idp: IdentityProvider, index: number) => {
     const { id, name, type } = idp;
@@ -78,7 +77,9 @@ export function SignInWithIdp({
 
   return (
     <div className="flex flex-col w-full space-y-2 text-sm">
-      <p className="text-center ztdl-p">{t("orSignInWith")}</p>
+      <p className="text-center ztdl-p">
+        <Translated i18nKey="orSignInWith" namespace="idp" />
+      </p>
       {!!identityProviders.length && identityProviders?.map(renderIDPButton)}
       {state?.error && (
         <div className="py-4">
