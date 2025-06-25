@@ -238,15 +238,9 @@ module.exports = {
             organizationDisplayName: "ZITADEL",
           },
         },
-        earchSettings: {
-        tabs: [
-            "All",
-            "Docs",
-            "GitHub",
-            "Forums",
-            "Discord",
-        ]
-    }
+        SearchSettings: {
+          tabs: ["All", "Docs", "GitHub", "Forums", "Discord"],
+        },
       },
     ],
     [
