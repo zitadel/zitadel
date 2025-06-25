@@ -18,7 +18,7 @@ type Inputs = {
 
 type Props = {
   idpId: string;
-  link?: boolean;
+  link: boolean;
 };
 
 export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
