@@ -89,14 +89,6 @@ export class AuthUserDetailComponent implements OnInit {
     return '';
   });
 
-  protected savedLanguage = computed(() => {
-    const user = this.user.data();
-    if (!user || user.type.case !== 'human' || !user.type.value.profile?.preferredLanguage) {
-      return this.translate.defaultLang;
-    }
-    return user.type.value.profile?.preferredLanguage;
-  });
-
   constructor(
     private translate: TranslateService,
     private toast: ToastService,
@@ -140,10 +132,6 @@ export class AuthUserDetailComponent implements OnInit {
       if (error) {
         this.toast.showError(error);
       }
-    });
-
-    effect(() => {
-      this.translate.use(this.savedLanguage());
     });
   }
 

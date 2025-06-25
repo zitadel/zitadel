@@ -30,6 +30,8 @@
     "@fortawesome/angular-fontawesome": "^0.13.0",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@ng-icons/core": "^25.0.0",
+    "@ng-icons/heroicons": "^25.0.0",
     "@ngx-translate/core": "^15.0.0",
     "@tanstack/angular-query-experimental": "^5.75.4",
     "@zitadel/client": "1.2.0",

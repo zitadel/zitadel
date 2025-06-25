@@ -1,7 +1,14 @@
 .new-header-wrapper {
+  padding-left: 5px;
   padding-right: 5px;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 5px;
+}
+
+.new-header-title {
+  font-weight: 900;
+  letter-spacing: 3px;
+  font-size: 0.8rem;
 }

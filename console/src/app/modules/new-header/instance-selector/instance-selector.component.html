@@ -2,13 +2,13 @@
   <span class="dropdown-label">{{ 'MENU.INSTANCEOVERVIEW' | translate }}</span>
   <a (click)="setInstance(instance)" mat-button class="dropdown-button"
     >{{ instance.name }}
-    <i class="las la-1x la-angle-right"></i>
+    <ng-icon name="heroChevronRight"></ng-icon>
   </a>
 </div>
 
 <div class="footer">
   <a [routerLink]="['/instance']" (click)="settingsClicked.emit()" mat-button class="dropdown-button settings-button">
     <h3>{{ 'MENU.SETTINGS' | translate }}</h3>
-    <i class="las la-1x la-cog"></i>
+    <ng-icon name="heroCog8ToothSolid"></ng-icon>
   </a>
 </div>

@@ -1,17 +1,14 @@
 <div cdkTrapFocus class="focus-trapper">
-  <!--  <div *ngIf="organizationsQuery.isPending() || setOrgId.isPending()">-->
-  <!--    Loading organizations...-->
-  <!--  </div>-->
   <div class="org-header">
     <button *ngIf="backButton" (click)="backButtonPressed.emit()" mat-button class="dropdown-button">
       <span class="back-button">
-        <i class="las la-arrow-alt-circle-left"></i>
+        <ng-icon name="heroArrowLeftCircleSolid"></ng-icon>
         <h3>Back to {{ backButton }}</h3>
       </span>
     </button>
     <span class="dropdown-label">{{ 'MENU.ORGANIZATION' | translate }}</span>
     <form [formGroup]="form" class="form">
-      <i class="las la-1x la-search search-icon"></i>
+      <ng-icon class="search-icon" name="heroMagnifyingGlass"></ng-icon>
       <input
         class="search-input"
         autocomplete="off"
@@ -25,7 +22,7 @@
     <!-- Make sure active org is always at the top -->
     <a *ngIf="activeOrgIfSearchMatches() as org" class="dropdown-button" mat-button (click)="changeOrg(org.id)">
       {{ org.name }}
-      <i class="las la-1x la-check"></i>
+      <ng-icon name="heroCheck"></ng-icon>
     </a>
     <ng-container *ngFor="let page of organizationsQuery.data()?.pages; last as lastPage">
       <ng-container *ngFor="let org of page.result; trackBy: trackOrg">
@@ -33,15 +30,17 @@
           {{ org.name }}
         </a>
       </ng-container>
-      <button
-        class="dropdown-button"
-        mat-stroked-button
-        *ngIf="lastPage && page.details?.totalResult as totalResult"
-        (click)="organizationsQuery.fetchNextPage()"
-        [disabled]="!organizationsQuery.hasNextPage() || organizationsQuery.isFetchingNextPage()"
-      >
-        ...{{ totalResult - loadedOrgsCount() }} {{ 'PAGINATOR.MORE' | translate }}
-      </button>
+      <ng-container *ngIf="lastPage && page.details?.totalResult as totalResult">
+        <button
+          class="dropdown-button"
+          mat-stroked-button
+          *ngIf="totalResult > QUERY_LIMIT"
+          (click)="organizationsQuery.fetchNextPage()"
+          [disabled]="!organizationsQuery.hasNextPage() || organizationsQuery.isFetchingNextPage()"
+        >
+          ...{{ totalResult - loadedOrgsCount() }} {{ 'PAGINATOR.MORE' | translate }}
+        </button>
+      </ng-container>
     </ng-container>
   </div>
 </div>

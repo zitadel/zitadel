@@ -44,8 +44,6 @@ export class NewOrganizationService {
   }
 
   public async setOrgId(orgId?: string) {
-    console.log('beboop', orgId);
-    console.trace(orgId);
     const organization = await this.queryClient.fetchQuery(this.organizationByIdQueryOptions(orgId ?? this.getOrgId()()));
     if (organization) {
       this.storage.setItem(StorageKey.organizationId, orgId, StorageLocation.session);

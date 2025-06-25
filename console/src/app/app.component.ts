@@ -240,7 +240,6 @@ export class AppComponent {
 
     this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((language: LangChangeEvent) => {
       this.document.documentElement.lang = language.lang;
-      this.language = language.lang;
     });
   }
 
@@ -290,7 +289,6 @@ export class AppComponent {
         ? userprofile.human.profile?.preferredLanguage
         : fallbackLang;
       this.translate.use(lang);
-      this.language = lang;
       this.document.documentElement.lang = lang;
     });
   }

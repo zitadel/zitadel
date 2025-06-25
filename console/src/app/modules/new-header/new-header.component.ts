@@ -17,6 +17,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { NewAdminService } from '../../services/new-admin.service';
 import { NewAuthService } from '../../services/new-auth.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'cnsl-new-header',
@@ -37,6 +38,7 @@ import { NewAuthService } from '../../services/new-auth.service';
     NgTemplateOutlet,
     AsyncPipe,
     HasRolePipeModule,
+    RouterLink,
   ],
 })
 export class NewHeaderComponent {

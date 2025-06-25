@@ -4,7 +4,7 @@ import { NewOrganizationService } from 'src/app/services/new-organization.servic
 import { NgForOf, NgIf } from '@angular/common';
 import { ToastService } from 'src/app/services/toast.service';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
-import { ListOrganizationsRequestSchema } from '@zitadel/proto/zitadel/org/v2/org_service_pb';
+import { ListOrganizationsRequestSchema, ListOrganizationsResponse } from '@zitadel/proto/zitadel/org/v2/org_service_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { debounceTime } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -17,6 +17,9 @@ import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from '../../input/input.module';
 import { MatOptionModule } from '@angular/material/core';
 import { Router } from '@angular/router';
+import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import { heroCheck, heroMagnifyingGlass } from '@ng-icons/heroicons/outline';
+import { heroArrowLeftCircleSolid } from '@ng-icons/heroicons/solid';
 
 type NameQuery = Extract<
   NonNullable<MessageInitShape<typeof ListOrganizationsRequestSchema>['queries']>[number]['query'],
@@ -41,7 +44,9 @@ const QUERY_LIMIT = 5;
     MatMenuModule,
     InputModule,
     MatOptionModule,
+    NgIconComponent,
   ],
+  providers: [provideIcons({ heroCheck, heroMagnifyingGlass, heroArrowLeftCircleSolid })],
 })
 export class OrganizationSelectorComponent {
   @Input()
@@ -142,29 +147,29 @@ export class OrganizationSelectorComponent {
           queries: query ? [{ query }] : undefined,
         },
         placeholderData: keepPreviousData,
-        getNextPageParam: (lastPage, _, pageParam) =>
-          // if we received less than the limit last time we are at the end
-          lastPage.result.length < pageParam.query.limit
-            ? undefined
-            : {
+        getNextPageParam: (lastPage, pages, pageParam) =>
+          this.countLoadedOrgs(pages) < (lastPage.details?.totalResult ?? BigInt(Number.MAX_SAFE_INTEGER))
+            ? {
                 ...pageParam,
                 query: {
                   ...pageParam.query,
                   offset: pageParam.query.offset + BigInt(lastPage.result.length),
                 },
-              },
+              }
+            : undefined,
       };
     });
   }
 
   private getLoadedOrgsCount(organizationsQuery: ReturnType<typeof this.getOrganizationsQuery>) {
-    return computed(() => {
-      const pages = organizationsQuery.data()?.pages;
-      if (!pages) {
-        return BigInt(0);
-      }
-      return pages.reduce((acc, page) => acc + BigInt(page.result.length), BigInt(0));
-    });
+    return computed(() => this.countLoadedOrgs(organizationsQuery.data()?.pages));
+  }
+
+  private countLoadedOrgs(pages?: ListOrganizationsResponse[]) {
+    if (!pages) {
+      return BigInt(0);
+    }
+    return pages.reduce((acc, page) => acc + BigInt(page.result.length), BigInt(0));
   }
 
   private getActiveOrgIfSearchMatches(nameQuery: Signal<NameQuery | undefined>) {
@@ -187,4 +192,6 @@ export class OrganizationSelectorComponent {
   protected trackOrg(_: number, { id }: Organization): string {
     return id;
   }
+
+  protected readonly QUERY_LIMIT = QUERY_LIMIT;
 }
