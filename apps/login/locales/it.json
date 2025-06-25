@@ -80,6 +80,13 @@
       "description": "Completa la registrazione del tuo account."
     }
   },
+  "ldap": {
+    "title": "Accedi con LDAP",
+    "description": "Inserisci le tue credenziali LDAP.",
+    "username": "Nome utente",
+    "password": "Password",
+    "submit": "Continua"
+  },
   "mfa": {
     "verify": {
       "title": "Verifica la tua identità",

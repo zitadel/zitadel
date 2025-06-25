@@ -80,6 +80,13 @@
       "description": "Ukończ rejestrację swojego konta."
     }
   },
+  "ldap": {
+    "title": "Zaloguj się przez LDAP",
+    "description": "Wprowadź swoje dane logowania LDAP.",
+    "username": "Nazwa użytkownika",
+    "password": "Hasło",
+    "submit": "Kontynuuj"
+  },
   "mfa": {
     "verify": {
       "title": "Zweryfikuj swoją tożsamość",

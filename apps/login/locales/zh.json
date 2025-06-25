@@ -80,6 +80,13 @@
       "description": "完成您的账户注册。"
     }
   },
+  "ldap": {
+    "title": "使用 LDAP 登录",
+    "description": "请输入您的 LDAP 凭据。",
+    "username": "用户名",
+    "password": "密码",
+    "submit": "继续"
+  },
   "mfa": {
     "verify": {
       "title": "验证您的身份",

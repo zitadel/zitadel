@@ -80,6 +80,13 @@
       "description": "Bitte vervollständige die Registrierung, um dein Konto zu erstellen."
     }
   },
+  "ldap": {
+    "title": "LDAP Login",
+    "description": "Geben Sie Ihre LDAP-Anmeldedaten ein.",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "submit": "Weiter"
+  },
   "mfa": {
     "verify": {
       "title": "Bestätigen Sie Ihre Identität",

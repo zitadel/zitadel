@@ -1,7 +1,6 @@
 "use client";
 
 import { createNewSessionForLDAP } from "@/lib/server/idp";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,6 +9,7 @@ import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
+import { Translated } from "./translated";
 
 type Inputs = {
   loginName: string;
@@ -17,18 +17,10 @@ type Inputs = {
 };
 
 type Props = {
-  organization?: string;
-  requestId?: string;
   idpId: string;
 };
 
-export function LDAPUsernamePasswordForm({
-  organization,
-  requestId,
-  idpId,
-}: Props) {
-  const t = useTranslations("password");
-
+export function LDAPUsernamePasswordForm({ idpId }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -72,7 +64,7 @@ export function LDAPUsernamePasswordForm({
         type="text"
         autoComplete="username"
         {...register("loginName", { required: "This field is required" })}
-        label={"Loginname"}
+        label="Loginname"
         data-testid="username-text-input"
       />
 
@@ -104,7 +96,7 @@ export function LDAPUsernamePasswordForm({
           data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("verify.submit")}
+          <Translated i18nKey="verify.submit" namespace="ldap" />
         </Button>
       </div>
     </form>

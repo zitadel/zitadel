@@ -1,9 +1,9 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { LDAPUsernamePasswordForm } from "@/components/ldap-username-password-form";
+import { Translated } from "@/components/translated";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { getBrandingSettings, getDefaultOrg } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: {
@@ -11,9 +11,7 @@ export default async function Page(props: {
   params: Promise<{ provider: string }>;
 }) {
   const searchParams = await props.searchParams;
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "ldap" });
-  const { idpId, requestId, organization, link } = searchParams;
+  const { idpId, organization, link } = searchParams;
 
   if (!idpId) {
     throw new Error("No idpId provided in searchParams");
@@ -41,14 +39,14 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("title")}</h1>
-        <p className="ztdl-p">{t("description")}</p>
+        <h1>
+          <Translated i18nKey="title" namespace="ldap" />
+        </h1>
+        <p className="ztdl-p">
+          <Translated i18nKey="description" namespace="ldap" />
+        </p>
 
-        <LDAPUsernamePasswordForm
-          idpId={idpId}
-          requestId={requestId}
-          organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
-        ></LDAPUsernamePasswordForm>
+        <LDAPUsernamePasswordForm idpId={idpId}></LDAPUsernamePasswordForm>
       </div>
     </DynamicTheme>
   );
