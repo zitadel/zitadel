@@ -1644,8 +1644,6 @@
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om clients te informeren over het beëindigen van de sessie bij de OpenID-provider.",
       "PERMISSIONCHECKV2": "Permissiecontrole V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
-      "WEBKEY": "Websleutel",
-      "WEBKEY_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
       "STATES": {
         "INHERITED": "Overgenomen",
         "ENABLED": "Ingeschakeld",

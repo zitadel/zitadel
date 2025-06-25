@@ -1642,8 +1642,6 @@
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "A Back-Channel Logout megvalósítja az OpenID Connect Back-Channel Logout 1.0-t, és használható az ügyfelek értesítésére a munkamenet befejezéséről az OpenID szolgáltatónál.",
       "PERMISSIONCHECKV2": "Engedély ellenőrzés V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Ha a zászló engedélyezve van, használhatja az új API-t és annak funkcióit.",
-      "WEBKEY": "Webkulcs",
-      "WEBKEY_DESCRIPTION": "Ha a zászló engedélyezve van, használhatja az új API-t és annak funkcióit.",
       "STATES": {
         "INHERITED": "Örököl",
         "ENABLED": "Engedélyezve",

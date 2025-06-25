@@ -1644,8 +1644,6 @@
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "백채널 로그아웃은 OpenID Connect 백채널 로그아웃 1.0을 구현하며, OpenID 제공자에서 세션 종료에 대해 클라이언트에게 알리는 데 사용할 수 있습니다.",
       "PERMISSIONCHECKV2": "권한 확인 V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "플래그가 활성화되면 새로운 API와 그 기능을 사용할 수 있습니다.",
-      "WEBKEY": "웹 키",
-      "WEBKEY_DESCRIPTION": "플래그가 활성화되면 새로운 API와 그 기능을 사용할 수 있습니다.",
       "STATES": {
         "INHERITED": "상속",
         "ENABLED": "활성화됨",
