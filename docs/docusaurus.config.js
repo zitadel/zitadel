@@ -233,8 +233,7 @@ module.exports = {
       {
         SearchBar: {
           baseSettings: {
-            //apiKey: process.env.INKEEP_API_KEY,
-            apiKey: "9dd3ec7b3a74b43b15a0f61cfc44f3883bd01c41f5823bea",
+            apiKey: process.env.INKEEP_API_KEY,
             primaryBrandColor: "#ff2069",
             organizationDisplayName: "ZITADEL",
           },
