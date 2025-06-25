@@ -515,6 +515,10 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			if err != nil {
 				return nil, err
 			}
+			members, err := OrgMembers(ctx, filter, a.ID)
+			if err != nil {
+				return nil, err
+			}
 			domains, err := OrgDomains(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
@@ -527,7 +531,7 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			if err != nil {
 				return nil, err
 			}
-			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain, domains, links, entityIds)}, nil
+			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, members, domainPolicy.UserLoginMustBeDomain, domains, links, entityIds)}, nil
 		}, nil
 	}
 }
@@ -661,6 +665,46 @@ type userIDName struct {
 	id   string
 }
 
+func OrgMembers(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]string, error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(orgID).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		EventTypes(
+			org.MemberAddedEventType,
+			org.MemberRemovedEventType,
+			org.MemberCascadeRemovedEventType,
+		).Builder())
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]string, 0)
+	for _, event := range events {
+		switch eventTyped := event.(type) {
+		case *org.MemberAddedEvent:
+			ids = append(ids, eventTyped.UserID)
+		case *org.MemberRemovedEvent:
+			for i := range ids {
+				if ids[i] == eventTyped.UserID {
+					ids[i] = ids[len(ids)-1]
+					ids = ids[:len(ids)-1]
+					break
+				}
+			}
+		case *org.MemberCascadeRemovedEvent:
+			for i := range ids {
+				if ids[i] == eventTyped.UserID {
+					ids[i] = ids[len(ids)-1]
+					ids = ids[:len(ids)-1]
+					break
+				}
+			}
+		}
+	}
+	return ids, nil
+}
+
 func OrgUsers(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]string, error) {
 	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		InstanceID(authz.GetInstance(ctx).InstanceID()).
@@ -712,8 +756,10 @@ func OrgUsers(ctx context.Context, filter preparation.FilterToQueryReducer, orgI
 		}
 	}
 	names := make([]string, len(users))
+	ids := make([]string, len(users))
 	for i := range users {
 		names[i] = users[i].name
+		ids[i] = users[i].id
 	}
 	return names, nil
 }

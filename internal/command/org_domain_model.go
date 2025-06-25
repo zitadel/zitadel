@@ -59,6 +59,8 @@ func (wm *OrgDomainWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
+		case *org.OrgRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -76,7 +78,7 @@ func (wm *OrgDomainWriteModel) Reduce() error {
 			wm.Verified = true
 		case *org.DomainPrimarySetEvent:
 			wm.Primary = e.Domain == wm.Domain
-		case *org.DomainRemovedEvent:
+		case *org.DomainRemovedEvent, *org.OrgRemovedEvent:
 			wm.State = domain.OrgDomainStateRemoved
 			wm.Verified = false
 			wm.Primary = false
@@ -99,7 +101,8 @@ func (wm *OrgDomainWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.OrgDomainVerificationAddedEventType,
 			org.OrgDomainVerifiedEventType,
 			org.OrgDomainPrimarySetEventType,
-			org.OrgDomainRemovedEventType).
+			org.OrgDomainRemovedEventType,
+			org.OrgRemovedEventType).
 		Builder()
 }
 
