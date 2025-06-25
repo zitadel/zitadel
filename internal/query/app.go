@@ -9,6 +9,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -1239,7 +1240,7 @@ func (c sqlOIDCConfig) set(app *App) {
 	if c.loginBaseURI.Valid {
 		app.OIDCConfig.LoginBaseURI = &c.loginBaseURI.String
 	}
-	compliance := domain.GetOIDCCompliance(app.OIDCConfig.Version, app.OIDCConfig.AppType, app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, app.OIDCConfig.AuthMethodType, app.OIDCConfig.RedirectURIs)
+	compliance := domain.GetOIDCCompliance(gu.Ptr(app.OIDCConfig.Version), gu.Ptr(app.OIDCConfig.AppType), app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, gu.Ptr(app.OIDCConfig.AuthMethodType), app.OIDCConfig.RedirectURIs)
 	app.OIDCConfig.ComplianceProblems = compliance.Problems
 
 	var err error

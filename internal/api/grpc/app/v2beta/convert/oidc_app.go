@@ -1,6 +1,7 @@
 package convert
 
 import (
+	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -19,24 +20,24 @@ func CreateOIDCAppRequestToDomain(name, projectID string, req *app.CreateOIDCApp
 			AggregateID: projectID,
 		},
 		AppName:                  name,
-		OIDCVersion:              domain.OIDCVersionV1,
+		OIDCVersion:              gu.Ptr(domain.OIDCVersionV1),
 		RedirectUris:             req.GetRedirectUris(),
 		ResponseTypes:            oidcResponseTypesToDomain(req.GetResponseTypes()),
 		GrantTypes:               oidcGrantTypesToDomain(req.GetGrantTypes()),
-		ApplicationType:          oidcApplicationTypeToDomain(req.GetAppType()),
-		AuthMethodType:           oidcAuthMethodTypeToDomain(req.GetAuthMethodType()),
+		ApplicationType:          gu.Ptr(oidcApplicationTypeToDomain(req.GetAppType())),
+		AuthMethodType:           gu.Ptr(oidcAuthMethodTypeToDomain(req.GetAuthMethodType())),
 		PostLogoutRedirectUris:   req.GetPostLogoutRedirectUris(),
-		DevMode:                  req.GetDevMode(),
-		AccessTokenType:          oidcTokenTypeToDomain(req.GetAccessTokenType()),
-		AccessTokenRoleAssertion: req.GetAccessTokenRoleAssertion(),
-		IDTokenRoleAssertion:     req.GetIdTokenRoleAssertion(),
-		IDTokenUserinfoAssertion: req.GetIdTokenUserinfoAssertion(),
-		ClockSkew:                req.GetClockSkew().AsDuration(),
+		DevMode:                  &req.DevMode,
+		AccessTokenType:          gu.Ptr(oidcTokenTypeToDomain(req.GetAccessTokenType())),
+		AccessTokenRoleAssertion: gu.Ptr(req.GetAccessTokenRoleAssertion()),
+		IDTokenRoleAssertion:     gu.Ptr(req.GetIdTokenRoleAssertion()),
+		IDTokenUserinfoAssertion: gu.Ptr(req.GetIdTokenUserinfoAssertion()),
+		ClockSkew:                gu.Ptr(req.GetClockSkew().AsDuration()),
 		AdditionalOrigins:        req.GetAdditionalOrigins(),
-		SkipNativeAppSuccessPage: req.GetSkipNativeAppSuccessPage(),
-		BackChannelLogoutURI:     req.GetBackChannelLogoutUri(),
-		LoginVersion:             loginVersion,
-		LoginBaseURI:             loginBaseURI,
+		SkipNativeAppSuccessPage: gu.Ptr(req.GetSkipNativeAppSuccessPage()),
+		BackChannelLogoutURI:     gu.Ptr(req.GetBackChannelLogoutUri()),
+		LoginVersion:             gu.Ptr(loginVersion),
+		LoginBaseURI:             gu.Ptr(loginBaseURI),
 	}, nil
 }
 
@@ -53,20 +54,20 @@ func UpdateOIDCAppConfigRequestToDomain(appID, projectID string, app *app.Update
 		RedirectUris:             app.RedirectUris,
 		ResponseTypes:            oidcResponseTypesToDomain(app.ResponseTypes),
 		GrantTypes:               oidcGrantTypesToDomain(app.GrantTypes),
-		ApplicationType:          oidcApplicationTypeToDomain(app.AppType),
-		AuthMethodType:           oidcAuthMethodTypeToDomain(app.AuthMethodType),
+		ApplicationType:          oidcApplicationTypeToDomainPtr(app.AppType),
+		AuthMethodType:           oidcAuthMethodTypeToDomainPtr(app.AuthMethodType),
 		PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
 		DevMode:                  app.DevMode,
-		AccessTokenType:          oidcTokenTypeToDomain(app.AccessTokenType),
+		AccessTokenType:          oidcTokenTypeToDomainPtr(app.AccessTokenType),
 		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
 		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
 		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
-		ClockSkew:                app.ClockSkew.AsDuration(),
+		ClockSkew:                gu.Ptr(app.GetClockSkew().AsDuration()),
 		AdditionalOrigins:        app.AdditionalOrigins,
 		SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
 		BackChannelLogoutURI:     app.BackChannelLogoutUri,
-		LoginVersion:             loginVersion,
-		LoginBaseURI:             loginBaseURI,
+		LoginVersion:             gu.Ptr(loginVersion),
+		LoginBaseURI:             gu.Ptr(loginBaseURI),
 	}, nil
 }
 
@@ -112,6 +113,15 @@ func oidcGrantTypesToDomain(grantTypes []app.OIDCGrantType) []domain.OIDCGrantTy
 	return oidcGrantTypes
 }
 
+func oidcApplicationTypeToDomainPtr(appType *app.OIDCAppType) *domain.OIDCApplicationType {
+	if appType == nil {
+		return nil
+	}
+
+	res := oidcApplicationTypeToDomain(*appType)
+	return &res
+}
+
 func oidcApplicationTypeToDomain(appType app.OIDCAppType) domain.OIDCApplicationType {
 	switch appType {
 	case app.OIDCAppType_OIDC_APP_TYPE_WEB:
@@ -122,6 +132,15 @@ func oidcApplicationTypeToDomain(appType app.OIDCAppType) domain.OIDCApplication
 		return domain.OIDCApplicationTypeNative
 	}
 	return domain.OIDCApplicationTypeWeb
+}
+
+func oidcAuthMethodTypeToDomainPtr(authType *app.OIDCAuthMethodType) *domain.OIDCAuthMethodType {
+	if authType == nil {
+		return nil
+	}
+
+	res := oidcAuthMethodTypeToDomain(*authType)
+	return &res
 }
 
 func oidcAuthMethodTypeToDomain(authType app.OIDCAuthMethodType) domain.OIDCAuthMethodType {
@@ -137,6 +156,15 @@ func oidcAuthMethodTypeToDomain(authType app.OIDCAuthMethodType) domain.OIDCAuth
 	default:
 		return domain.OIDCAuthMethodTypeBasic
 	}
+}
+
+func oidcTokenTypeToDomainPtr(tokenType *app.OIDCTokenType) *domain.OIDCTokenType {
+	if tokenType == nil {
+		return nil
+	}
+
+	res := oidcTokenTypeToDomain(*tokenType)
+	return &res
 }
 
 func oidcTokenTypeToDomain(tokenType app.OIDCTokenType) domain.OIDCTokenType {

@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	authn_grpc "github.com/zitadel/zitadel/internal/api/grpc/authn"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
@@ -46,24 +48,24 @@ func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) (*domain.OIDCApp,
 			AggregateID: req.ProjectId,
 		},
 		AppName:                  req.Name,
-		OIDCVersion:              app_grpc.OIDCVersionToDomain(req.Version),
+		OIDCVersion:              gu.Ptr(app_grpc.OIDCVersionToDomain(req.Version)),
 		RedirectUris:             req.RedirectUris,
 		ResponseTypes:            app_grpc.OIDCResponseTypesToDomain(req.ResponseTypes),
 		GrantTypes:               app_grpc.OIDCGrantTypesToDomain(req.GrantTypes),
-		ApplicationType:          app_grpc.OIDCApplicationTypeToDomain(req.AppType),
-		AuthMethodType:           app_grpc.OIDCAuthMethodTypeToDomain(req.AuthMethodType),
+		ApplicationType:          gu.Ptr(app_grpc.OIDCApplicationTypeToDomain(req.AppType)),
+		AuthMethodType:           gu.Ptr(app_grpc.OIDCAuthMethodTypeToDomain(req.AuthMethodType)),
 		PostLogoutRedirectUris:   req.PostLogoutRedirectUris,
-		DevMode:                  req.DevMode,
-		AccessTokenType:          app_grpc.OIDCTokenTypeToDomain(req.AccessTokenType),
-		AccessTokenRoleAssertion: req.AccessTokenRoleAssertion,
-		IDTokenRoleAssertion:     req.IdTokenRoleAssertion,
-		IDTokenUserinfoAssertion: req.IdTokenUserinfoAssertion,
-		ClockSkew:                req.ClockSkew.AsDuration(),
+		DevMode:                  gu.Ptr(req.GetDevMode()),
+		AccessTokenType:          gu.Ptr(app_grpc.OIDCTokenTypeToDomain(req.AccessTokenType)),
+		AccessTokenRoleAssertion: gu.Ptr(req.GetAccessTokenRoleAssertion()),
+		IDTokenRoleAssertion:     gu.Ptr(req.GetIdTokenRoleAssertion()),
+		IDTokenUserinfoAssertion: gu.Ptr(req.GetIdTokenUserinfoAssertion()),
+		ClockSkew:                gu.Ptr(req.GetClockSkew().AsDuration()),
 		AdditionalOrigins:        req.AdditionalOrigins,
-		SkipNativeAppSuccessPage: req.SkipNativeAppSuccessPage,
-		BackChannelLogoutURI:     req.GetBackChannelLogoutUri(),
-		LoginVersion:             loginVersion,
-		LoginBaseURI:             loginBaseURI,
+		SkipNativeAppSuccessPage: gu.Ptr(req.GetSkipNativeAppSuccessPage()),
+		BackChannelLogoutURI:     gu.Ptr(req.GetBackChannelLogoutUri()),
+		LoginVersion:             gu.Ptr(loginVersion),
+		LoginBaseURI:             gu.Ptr(loginBaseURI),
 	}, nil
 }
 
@@ -114,20 +116,20 @@ func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest)
 		RedirectUris:             app.RedirectUris,
 		ResponseTypes:            app_grpc.OIDCResponseTypesToDomain(app.ResponseTypes),
 		GrantTypes:               app_grpc.OIDCGrantTypesToDomain(app.GrantTypes),
-		ApplicationType:          app_grpc.OIDCApplicationTypeToDomain(app.AppType),
-		AuthMethodType:           app_grpc.OIDCAuthMethodTypeToDomain(app.AuthMethodType),
+		ApplicationType:          gu.Ptr(app_grpc.OIDCApplicationTypeToDomain(app.AppType)),
+		AuthMethodType:           gu.Ptr(app_grpc.OIDCAuthMethodTypeToDomain(app.AuthMethodType)),
 		PostLogoutRedirectUris:   app.PostLogoutRedirectUris,
-		DevMode:                  app.DevMode,
-		AccessTokenType:          app_grpc.OIDCTokenTypeToDomain(app.AccessTokenType),
-		AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
-		IDTokenRoleAssertion:     app.IdTokenRoleAssertion,
-		IDTokenUserinfoAssertion: app.IdTokenUserinfoAssertion,
-		ClockSkew:                app.ClockSkew.AsDuration(),
+		DevMode:                  gu.Ptr(app.GetDevMode()),
+		AccessTokenType:          gu.Ptr(app_grpc.OIDCTokenTypeToDomain(app.AccessTokenType)),
+		AccessTokenRoleAssertion: gu.Ptr(app.GetAccessTokenRoleAssertion()),
+		IDTokenRoleAssertion:     gu.Ptr(app.GetIdTokenRoleAssertion()),
+		IDTokenUserinfoAssertion: gu.Ptr(app.GetIdTokenUserinfoAssertion()),
+		ClockSkew:                gu.Ptr(app.GetClockSkew().AsDuration()),
 		AdditionalOrigins:        app.AdditionalOrigins,
-		SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
-		BackChannelLogoutURI:     app.BackChannelLogoutUri,
-		LoginVersion:             loginVersion,
-		LoginBaseURI:             loginBaseURI,
+		SkipNativeAppSuccessPage: gu.Ptr(app.GetSkipNativeAppSuccessPage()),
+		BackChannelLogoutURI:     gu.Ptr(app.GetBackChannelLogoutUri()),
+		LoginVersion:             gu.Ptr(loginVersion),
+		LoginBaseURI:             gu.Ptr(loginBaseURI),
 	}, nil
 }
 

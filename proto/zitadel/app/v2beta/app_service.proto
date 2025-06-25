@@ -607,13 +607,13 @@ message UpdateOIDCApplicationConfigurationRequest {
             description: "The flow type the application uses to gain access";
         }
     ];
-    OIDCAppType app_type = 4 [
+    optional OIDCAppType app_type = 4 [
         (validate.rules).enum = {defined_only: true},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Determines the paradigm of the application";
         }
     ];
-    OIDCAuthMethodType auth_method_type = 5 [
+    optional OIDCAuthMethodType auth_method_type = 5 [
         (validate.rules).enum = {defined_only: true},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Defines how the application passes login credentials";
@@ -625,34 +625,34 @@ message UpdateOIDCApplicationConfigurationRequest {
             description: "ZITADEL will redirect to this link after a successful logout";
         }
     ];
-    OIDCVersion version = 7 [(validate.rules).enum = {defined_only: true}];
-    bool dev_mode = 8 [
+    optional OIDCVersion version = 7 [(validate.rules).enum = {defined_only: true}];
+    optional bool dev_mode = 8 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Used for development, some checks of the OIDC specification will not be checked.";
         }
     ];
-    OIDCTokenType access_token_type = 9 [
+    optional OIDCTokenType access_token_type = 9 [
         (validate.rules).enum = {defined_only: true},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Type of the access token returned from ZITADEL";
         }
     ];
-    bool access_token_role_assertion = 10 [
+    optional bool access_token_role_assertion = 10 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Adds roles to the claims of the access token (only if type == JWT) even if they are not requested by scopes";
         }
     ];
-    bool id_token_role_assertion = 11 [
+    optional bool id_token_role_assertion = 11 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Adds roles to the claims of the id token even if they are not requested by scopes";
         }
     ];
-    bool id_token_userinfo_assertion = 12 [
+    optional bool id_token_userinfo_assertion = 12 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Claims of profile, email, address and phone scopes are added to the id token even if an access token is issued. Attention this violates the OIDC specification";
         }
     ];
-    google.protobuf.Duration clock_skew = 13 [
+    optional google.protobuf.Duration clock_skew = 13 [
         (validate.rules).duration = {gte: {}, lte: {seconds: 5}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Used to compensate time difference of servers. Duration added to the \"exp\" claim and subtracted from \"iat\", \"auth_time\" and \"nbf\" claims";
@@ -665,18 +665,18 @@ message UpdateOIDCApplicationConfigurationRequest {
             description: "Additional origins (other than the redirect_uris) from where the API can be used, provided string has to be an origin (scheme://hostname[:port]) without path, query or fragment";
         }
     ];
-    bool skip_native_app_success_page = 15 [
+    optional bool skip_native_app_success_page = 15 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Skip the successful login page on native apps and directly redirect the user to the callback.";
         }
     ];
-    string back_channel_logout_uri = 16 [
+    optional string back_channel_logout_uri = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"https://example.com/auth/backchannel\"]";
             description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html)";
         }
     ];
-    LoginVersion login_version = 17 [
+    optional LoginVersion login_version = 17 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
         }

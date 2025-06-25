@@ -866,7 +866,7 @@ func TestDeleteApplication(t *testing.T) {
 		Name:                gofakeit.AppName(),
 		CreationRequestType: reqForAppNameCreation,
 	})
-	require.NoError(t, appNameChangeErr)
+	require.Nil(t, appNameChangeErr)
 
 	t.Parallel()
 	tt := []struct {
