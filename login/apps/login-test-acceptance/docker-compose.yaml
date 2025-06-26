@@ -2,9 +2,8 @@ services:
 
   zitadel:
     user: "${UID:-1000}:${GID:-1000}"
-    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:v3.3.0}"
+    image: "${ZITADEL_TAG:-ghcr.io/zitadel/zitadel:latest}"
     container_name: acceptance-zitadel
-    pull_policy: always
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
     labels:
       - "traefik.enable=true"

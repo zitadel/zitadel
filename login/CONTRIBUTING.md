@@ -24,7 +24,7 @@ Please consider the following guidelines when creating a pull request.
 
 - The latest changes are always in `main`, so please make your pull request against that branch.
 - pull requests should be raised for any change
-- Pull requests need approval of a ZITADEL core engineer @zitadel/engineers before merging
+- Pull requests need approval of a Zitadel core engineer @zitadel/engineers before merging
 - We use ESLint/Prettier for linting/formatting, so please run `pnpm lint:fix` before committing to make resolving conflicts easier (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
 - If you add new functionality, please provide the corresponding documentation as well and make it part of the pull request
 
@@ -37,7 +37,7 @@ pnpm install
 # Generate gRPC stubs
 pnpm generate
 
-# Start a local development server
+# Start a local development server for the login and manually configure apps/login/.env.local
 pnpm dev
 ```
 
@@ -46,23 +46,55 @@ The application is now available at `http://localhost:3000`
 Configure apps/login/.env.local to target the Zitadel instance of your choice.
 The login app live-reloads on changes, so you can start developing right away.
 
-### Developing Against Your Local ZITADEL Instance
+### <a name="latest"></a>Developing Against A Local Latest Zitadel Release
 
-The following command uses Docker to run a local ZITADEL instance and the login application in live-reloading dev mode.
+The following command uses Docker to run a local Zitadel instance and the login application in live-reloading dev mode.
 Additionally, it runs a Traefik reverse proxy that exposes the login with a self-signed certificate at https://127.0.0.1.sslip.io
 127.0.0.1.sslip.io is a special domain that resolves to your localhost, so it's safe to allow your browser to proceed with loading the page.
 
 ```sh
-# This command runs all dependencies and overwrites the file ./apps/login/.env.test.local.
-pnpm test:acceptance:setup
+# Install dependencies. Developing requires Node.js v20
+pnpm install
 
-# As soon as the setup container completed successfully, you are ready to run the login application in live-reloading dev mode
-pnpm dev
+# Generate gRPC stubs
+pnpm generate
+
+# Start a local development server and have apps/login/.env.test.local configured for you to target the local Zitadel instance.
+pnpm dev:local
 ```
 
 Log in at https://127.0.0.1.sslip.io/ui/v2/login/loginname and use the following credentials:
 **Loginname**: *zitadel-admin@zitadel.127.0.0.1.sslip.io*
 **Password**: *Password1!*.
+
+The login app live-reloads on changes, so you can start developing right away.
+
+### <a name="local"></a>Developing Against A Locally Compiled Zitadel
+
+To develop against a locally compiled version of Zitadel, you need to build the Zitadel docker image first.
+Clone the [Zitadel repository](https://github.com/zitadel/zitadel.git) and run the following command from its root:
+
+```sh
+# This compiles a Zitadel binary if it does not exist at ./zitadel already and copies it into a Docker image.
+# If you want to recompile the binary, run `make compile` first
+make login_dev
+```
+
+Open another terminal session at zitadel/zitadel/login and run the following commands to start the dev server.
+
+```bash
+# Install dependencies. Developing requires Node.js v20
+pnpm install
+
+# Start a local development server and have apps/login/.env.test.local configured for you to target the local Zitadel instance.
+NODE_ENV=test pnpm dev
+```
+
+Log in at https://127.0.0.1.sslip.io/ui/v2/login/loginname and use the following credentials:
+**Loginname**: *zitadel-admin@zitadel.127.0.0.1.sslip.io*
+**Password**: *Password1!*.
+
+The login app live-reloads on changes, so you can start developing right away.
 
 ### Quality Assurance
 
@@ -71,7 +103,7 @@ Using `make` commands, you can reproduce and debug the CI pipelines locally.
 
 ```sh
 # Reproduce the whole CI pipeline in docker
-make login-quality
+make login_quality
 # Show other options with make
 make help
 ```
@@ -83,7 +115,7 @@ Use `pnpm` commands to run the tests in dev mode with live reloading and debuggi
 Check the formatting and linting of the code in docker
 
 ```sh
-make login-lint
+make login_lint
 ```
 
 Check the linting of the code using pnpm
@@ -105,7 +137,7 @@ pnpm format:fix
 Run the tests in docker
 
 ```sh
-make login-test-unit
+make login_test_unit
 ```
 
 Run unit tests with live-reloading
@@ -119,14 +151,20 @@ pnpm test:unit
 Run the test in docker
 
 ```sh
-make login-test-integration
+make login_test_integration
 ```
 
-Open the Cypress test suite to run the integration tests in interactive mode.
+Alternatively, run a live-reloading development server with an interactive Cypress test suite.
 First, set up your local test environment.
-This runs a mock server in docker and the login application in dev mode with live-reloading enabled.
 
 ```sh
+# Install dependencies. Developing requires Node.js v20
+pnpm install
+
+# Generate gRPC stubs
+pnpm generate
+
+# Start a local development server and use apps/login/.env.test to use the locally mocked Zitadel API.
 pnpm test:integration:setup
 ```
 
@@ -140,4 +178,27 @@ Show more options with Cypress
 
 ```sh
 pnpm test:integration help
+```
+
+#### Running Acceptance Tests
+
+To run the tests in docker against the latest release of Zitadel, use the following command:
+
+```sh
+make login_test_acceptance
+```
+
+Alternatively, run can use a live-reloading development server with an interactive Playwright test suite.
+Set up your local environment by running the commands either for [developing against a local latest Zitadel release](latest) or for [developing against a locally compiled Zitadel](compiled).
+
+Now, in another terminal session, open the interactive Playwright acceptance test suite.
+
+```sh
+pnpm test:acceptance open
+```
+
+Show more options with Playwright
+
+```sh
+pnpm test:acceptance help
 ```

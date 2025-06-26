@@ -4,8 +4,7 @@
     "test:integration:setup": {
       "interactive": true,
       "cache": false,
-      "persistent": true,
-      "with": ["@zitadel/login#dev"]
+      "persistent": true
     }
   }
 }

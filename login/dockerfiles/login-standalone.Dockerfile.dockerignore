@@ -3,6 +3,7 @@
 !apps/login
 apps/login/.next
 apps/login/dist
+apps/login/.env*.local
 
 !scripts/healthcheck.js
 !packages/zitadel-tailwind-config

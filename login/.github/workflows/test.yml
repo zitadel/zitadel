@@ -57,7 +57,7 @@ jobs:
             ${{ runner.os }}-login-run-caches-${{github.ref_name}}-${{ github.sha }}-
             ${{ runner.os }}-login-run-caches-${{github.ref_name}}-
             ${{ runner.os }}-login-run-caches-
-      - run: make login-quality
+      - run: make login_quality
         env:
           FORCE: ${{ github.event.inputs.force == 'true' }}
           DOCKER_METADATA_OUTPUT_VERSION: ${{ github.event.inputs.ref-tag || env.DOCKER_METADATA_OUTPUT_VERSION || steps.meta.outputs.version }}

@@ -3,9 +3,9 @@ export CACHE_DIR ?= $(XDG_CACHE_HOME)/zitadel-make
 
 LOGIN_DIR ?= ./
 LOGIN_BAKE_CLI ?= docker buildx bake
-LOGIN_BAKE_CLI_WITH_COMMON_ARGS := $(LOGIN_BAKE_CLI) --file $(LOGIN_DIR)docker-bake.hcl --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml
+LOGIN_BAKE_CLI_WITH_ARGS := $(LOGIN_BAKE_CLI) --file $(LOGIN_DIR)docker-bake.hcl --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml
 LOGIN_BAKE_CLI_ADDITIONAL_ARGS ?=
-LOGIN_BAKE_CLI_WITH_COMMON_ARGS += $(LOGIN_BAKE_CLI_ADDITIONAL_ARGS)
+LOGIN_BAKE_CLI_WITH_ARGS += $(LOGIN_BAKE_CLI_ADDITIONAL_ARGS)
 
 export COMPOSE_BAKE=true
 export UID := $(id -u)
@@ -26,11 +26,10 @@ export LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG := login-test-acceptance-samlsp:${DOCKER
 export LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG := login-test-acceptance-samlidp:${DOCKER_METADATA_OUTPUT_VERSION}
 export POSTGRES_TAG := postgres:17.0-alpine3.19
 export GOLANG_TAG := golang:1.24-alpine
-export ZITADEL_TAG ?= ghcr.io/zitadel/zitadel:02617cf17fdde849378c1a6b5254bbfb2745b164
+export ZITADEL_TAG ?= ghcr.io/zitadel/zitadel:latest
 export CORE_MOCK_TAG := login-core-mock:${DOCKER_METADATA_OUTPUT_VERSION}
 
-.PHONY: login-help
-login-help:
+login_help:
 	@echo "Makefile for the login service"
 	@echo "Available targets:"
 	@echo "  login-help              - Show this help message."
@@ -45,85 +44,92 @@ login-help:
 	@echo "  clean-run-caches        - Remove all run caches."
 
 
-login-lint:
-	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-lint
+login_lint:
+	@echo "Running login linting and formatting checks"
+	$(LOGIN_BAKE_CLI_WITH_ARGS) login-lint
 
-login-test-unit:
-	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-test-unit
+login_test_unit:
+	@echo "Running login unit tests"
+	$(LOGIN_BAKE_CLI_WITH_ARGS) login-test-unit
 
-login-test-integration-build:
-	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) core-mock login-test-integration login-standalone
+login_test_integration_build:
+	@echo "Building login integration test environment with the local core mock image"
+	$(LOGIN_BAKE_CLI_WITH_ARGS) core-mock login-test-integration login-standalone
 
-login-test-integration-dev: login-test-integration-cleanup
-	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) core-mock && docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --service-ports --rm core-mock
+login_test_integration_dev: login_test_integration_cleanup
+	@echo "Starting login integration test environment with the local core mock image"
+	$(LOGIN_BAKE_CLI_WITH_ARGS) core-mock && docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --service-ports --rm core-mock
 
-login-test-integration-run: login-test-integration-cleanup
+login_test_integration_run: login_test_integration_cleanup
+	@echo "Running login integration tests"
 	docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml run --rm integration
 
-login-test-integration-cleanup:
+login_test_integration_cleanup:
+	@echo "Cleaning up login integration test environment"
 	docker compose --file $(LOGIN_DIR)apps/login-test-integration/docker-compose.yaml down --volumes
 
-.PHONY: login-test-integration
-login-test-integration: login-test-integration-build
-	$(LOGIN_DIR)scripts/run_or_skip.sh login-test-integration-run \
+login_test_integration: login_test_integration_build
+	$(LOGIN_DIR)scripts/run_or_skip.sh login_test_integration_run \
 	"$(LOGIN_TAG) \
 	$(CORE_MOCK_TAG) \
 	$(LOGIN_TEST_INTEGRATION_TAG)"
 
-login-test-acceptance-build-bake:
-	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) login-test-acceptance login-standalone
+login_test_acceptance_build_bake:
+	@echo "Building login test acceptance images as defined in the docker-bake.hcl"
+	$(LOGIN_BAKE_CLI_WITH_ARGS) login-test-acceptance login-standalone
 
-login-test-acceptance-build-compose:
-	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) --load setup sink
+login_test_acceptance_build_compose:
+	@echo "Building login test acceptance images as defined in the docker-compose.yaml"
+	$(LOGIN_BAKE_CLI_WITH_ARGS) --load setup sink
 
-login-test-acceptance-build: login-test-acceptance-build-compose login-test-acceptance-build-bake
-	@:
+# login_test_acceptance_build is overwritten by the login_dev target in zitadel/zitadel/Makefile
+login_test_acceptance_build: login_test_acceptance_build_compose login_test_acceptance_build_bake
 
-login-test-acceptance-env: login-test-acceptance-build-compose login-test-acceptance-cleanup
-	docker compose --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml run setup
-
-login-test-acceptance-dev:
-	docker compose --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml up zitadel traefik sink
-
-login-test-acceptance-run: login-test-acceptance-cleanup
+login_test_acceptance_run: login_test_acceptance_cleanup
+	@echo "Running login test acceptance tests"
 	docker compose --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose-ci.yaml run --rm --service-ports acceptance
 
-login-test-acceptance-cleanup:
+login_test_acceptance_cleanup:
+	@echo "Cleaning up login test acceptance environment"
 	docker compose --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose-ci.yaml down --volumes
 
-login-test-acceptance: login-test-acceptance-build
-	$(LOGIN_DIR)scripts/run_or_skip.sh login-test-acceptance-run \
+login_test_acceptance: login_test_acceptance_build
+	$(LOGIN_DIR)scripts/run_or_skip.sh login_test_acceptance_run \
 		"$(LOGIN_TAG) \
   		$(ZITADEL_TAG) \
   		$(POSTGRES_TAG) \
   		$(GOLANG_TAG) \
   		$(LOGIN_TEST_ACCEPTANCE_TAG) \
   		$(LOGIN_TEST_ACCEPTANCE_SETUP_TAG) \
-  		$(LOGIN_TEST_ACCEPTANCE_SINK_TAG) \
-  		$(LOGIN_TEST_ACCEPTANCE_OIDCRP_TAG) \
-  		$(LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG)"
+  		$(LOGIN_TEST_ACCEPTANCE_SINK_TAG)"
 
-.PHONY: login-quality
-login-quality: login-lint login-test-unit login-test-integration
-	@:
+login_test_acceptance_setup_env: login_test_acceptance_build_compose login_test_acceptance_cleanup
+	@echo "Setting up the login test acceptance environment and writing the env.test.local file"
+	docker compose --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml run setup
 
-.PHONY: login-standalone-build
-login-standalone-build:
-	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) --load login-standalone
+login_test_acceptance_setup_dev:
+	@echo "Starting the login test acceptance environment with the local zitadel image"
+	docker compose --file $(LOGIN_DIR)apps/login-test-acceptance/docker-compose.yaml up --no-recreate zitadel traefik sink
 
-login-standalone-build-tag:
+login_quality: login_lint login_test_unit login_test_integration
+	@echo "Running login quality checks: lint, unit tests, integration tests"
+
+login_standalone_build:
+	@echo "Building the login standalone docker image with tag: $(LOGIN_TAG)"
+	$(LOGIN_BAKE_CLI_WITH_ARGS) --load login-standalone
+
+login_standalone_build_tag:
 	@echo -n "$(LOGIN_TAG)"
 
-typescript-generate:
-	$(LOGIN_BAKE_CLI_WITH_COMMON_ARGS) typescript-proto-client-out
+typescript_generate:
+	@echo "Generating TypeScript client and writing to local $(LOGIN_DIR)packages/zitadel-proto"
+	$(LOGIN_BAKE_CLI_WITH_ARGS) typescript-proto-client-out
 
-.PHONY: clean-run-caches
-clean-run-caches:
+clean_run_caches:
 	@echo "Removing cache directory: $(CACHE_DIR)"
 	rm -rf "$(CACHE_DIR)"
 
-.PHONY: show-run-caches
-show-run-caches:
+show_run_caches:
 	@echo "Showing run caches with docker image ids and exit codes in $(CACHE_DIR):"
 	@find "$(CACHE_DIR)" -type f 2>/dev/null | while read file; do \
 		echo "$$file: $$(cat $$file)"; \

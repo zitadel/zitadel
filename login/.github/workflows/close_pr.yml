@@ -20,7 +20,7 @@ jobs:
             Therefore, we close this pull request automatically, but submitting your changes to the main repository is easy:
             1. Fork and clone zitadel/zitadel
             2. Create a new branch for your changes
-            3. Pull your changes into the new fork by running `make login-pull LOGIN_REMOTE_URL=<your-typescript-fork-org>/typescript LOGIN_REMOTE_BRANCH=<your-typescript-fork-branch>`.
+            3. Pull your changes into the new fork by running `make login_pull LOGIN_REMOTE_URL=<your-typescript-fork-org>/typescript LOGIN_REMOTE_BRANCH=<your-typescript-fork-branch>`.
             4. Push your changes and open a pull request to zitadel/zitadel
             `.trim();
             await github.rest.issues.createComment({
