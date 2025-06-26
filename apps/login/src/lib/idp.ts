@@ -24,6 +24,8 @@ export function idpTypeToSlug(idpType: IdentityProviderType) {
       return "oauth";
     case IdentityProviderType.OIDC:
       return "oidc";
+    case IdentityProviderType.LDAP:
+      return "ldap";
     case IdentityProviderType.JWT:
       return "jwt";
     default:

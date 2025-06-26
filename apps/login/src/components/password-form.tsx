@@ -23,8 +23,6 @@ type Props = {
   loginName: string;
   organization?: string;
   requestId?: string;
-  isAlternative?: boolean; // whether password was requested as alternative auth method
-  promptPasswordless?: boolean;
 };
 
 export function PasswordForm({
@@ -32,8 +30,6 @@ export function PasswordForm({
   loginName,
   organization,
   requestId,
-  promptPasswordless,
-  isAlternative,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",

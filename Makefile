@@ -27,7 +27,7 @@ export LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG := login-test-acceptance-samlidp:${DOCK
 export POSTGRES_TAG := postgres:17.0-alpine3.19
 export GOLANG_TAG := golang:1.24-alpine
 export ZITADEL_TAG ?= ghcr.io/zitadel/zitadel:latest
-export CORE_MOCK_TAG := login-core-mock:${DOCKER_METADATA_OUTPUT_VERSION}
+export LOGIN_CORE_MOCK_TAG := login-core-mock:${DOCKER_METADATA_OUTPUT_VERSION}
 
 login_help:
 	@echo "Makefile for the login service"

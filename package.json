@@ -13,6 +13,7 @@
     "start": "pnpm exec turbo run start",
     "start:built": "pnpm exec turbo run start:built",
     "test:unit": "pnpm exec turbo run test:unit -- --passWithNoTests",
+    "test:unit:standalone": "pnpm exec turbo run test:unit:standalone -- --passWithNoTests",
     "test:integration": "cd apps/login-test-integration && pnpm test:integration",
     "test:integration:setup": "NODE_ENV=test pnpm exec turbo run test:integration:setup",
     "test:acceptance": "cd apps/login-test-acceptance && pnpm test:acceptance",

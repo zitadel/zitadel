@@ -4,6 +4,7 @@ import {
   getLoginSettings,
   getUserByID,
   startIdentityProviderFlow,
+  startLDAPIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -18,6 +19,13 @@ export async function redirectToIdp(
   prevState: RedirectToIdpState,
   formData: FormData,
 ): Promise<RedirectToIdpState> {
+  const _headers = await headers();
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
+  if (!host) {
+    return { error: "Could not get host" };
+  }
+
   const params = new URLSearchParams();
 
   const linkOnly = formData.get("linkOnly") === "true";
@@ -30,44 +38,48 @@ export async function redirectToIdp(
   if (requestId) params.set("requestId", requestId);
   if (organization) params.set("organization", organization);
 
+  // redirect to LDAP page where username and password is requested
+  if (provider === "ldap") {
+    params.set("idpId", idpId);
+    redirect(`/idp/ldap?` + params.toString());
+  }
+
   const response = await startIDPFlow({
+    serviceUrl,
+    host,
     idpId,
     successUrl: `/idp/${provider}/success?` + params.toString(),
     failureUrl: `/idp/${provider}/failure?` + params.toString(),
   });
 
-  if (response && "error" in response && response?.error) {
-    return { error: response.error };
+  if (!response) {
+    return { error: "Could not start IDP flow" };
   }
 
   if (response && "redirect" in response && response?.redirect) {
     redirect(response.redirect);
   }
+
+  return { error: "Unexpected response from IDP flow" };
 }
 
 export type StartIDPFlowCommand = {
+  serviceUrl: string;
+  host: string;
   idpId: string;
   successUrl: string;
   failureUrl: string;
 };
 
-export async function startIDPFlow(command: StartIDPFlowCommand) {
-  const _headers = await headers();
-  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host) {
-    return { error: "Could not get host" };
-  }
-
+async function startIDPFlow(command: StartIDPFlowCommand) {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   return startIdentityProviderFlow({
-    serviceUrl,
+    serviceUrl: command.serviceUrl,
     idpId: command.idpId,
     urls: {
-      successUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}${command.successUrl}`,
-      failureUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}${command.failureUrl}`,
+      successUrl: `${command.host.includes("localhost") ? "http://" : "https://"}${command.host}${basePath}${command.successUrl}`,
+      failureUrl: `${command.host.includes("localhost") ? "http://" : "https://"}${command.host}${basePath}${command.failureUrl}`,
     },
   }).then((response) => {
     if (
@@ -173,4 +185,59 @@ export async function createNewSessionFromIdpIntent(
   if (url) {
     return { redirect: url };
   }
+}
+
+type createNewSessionForLDAPCommand = {
+  username: string;
+  password: string;
+  idpId: string;
+  link: boolean;
+};
+
+export async function createNewSessionForLDAP(
+  command: createNewSessionForLDAPCommand,
+) {
+  const _headers = await headers();
+
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
+
+  if (!host) {
+    return { error: "Could not get domain" };
+  }
+
+  if (!command.username || !command.password) {
+    return { error: "No username or password provided" };
+  }
+
+  const response = await startLDAPIdentityProviderFlow({
+    serviceUrl,
+    idpId: command.idpId,
+    username: command.username,
+    password: command.password,
+  });
+
+  if (
+    !response ||
+    response.nextStep.case !== "idpIntent" ||
+    !response.nextStep.value
+  ) {
+    return { error: "Could not start LDAP identity provider flow" };
+  }
+
+  const { userId, idpIntentId, idpIntentToken } = response.nextStep.value;
+
+  const params = new URLSearchParams({
+    userId,
+    id: idpIntentId,
+    token: idpIntentToken,
+  });
+
+  if (command.link) {
+    params.set("link", "true");
+  }
+
+  return {
+    redirect: `/idp/ldap/success?` + params.toString(),
+  };
 }
