@@ -109,8 +109,7 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		return err
 	}
 	switch key {
-	case feature.KeyUnspecified,
-		feature.KeyActionsDeprecated:
+	case feature.KeyUnspecified:
 		return nil
 	case feature.KeyLoginDefaultOrg:
 		features.LoginDefaultOrg.set(level, event.Value)

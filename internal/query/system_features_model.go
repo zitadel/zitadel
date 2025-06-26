@@ -80,8 +80,7 @@ func reduceSystemFeatureSet[T any](features *SystemFeatures, event *feature_v2.S
 		return err
 	}
 	switch key {
-	case feature.KeyUnspecified,
-		feature.KeyActionsDeprecated:
+	case feature.KeyUnspecified:
 		return nil
 	case feature.KeyLoginDefaultOrg:
 		features.LoginDefaultOrg.set(level, event.Value)

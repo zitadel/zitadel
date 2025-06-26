@@ -9,22 +9,22 @@ import (
 type Key int
 
 const (
-	KeyUnspecified Key = iota
-	KeyLoginDefaultOrg
-	KeyTriggerIntrospectionProjections
-	// KeyLegacyIntrospection (reserving the spot)
-	KeyUserSchema Key = iota + 1
-	KeyTokenExchange
-	KeyActionsDeprecated
-	KeyImprovedPerformance
-	KeyWebKey
-	KeyDebugOIDCParentError
-	KeyOIDCSingleV1SessionTermination
-	KeyDisableUserTokenEvent
-	KeyEnableBackChannelLogout
-	KeyLoginV2
-	KeyPermissionCheckV2
-	KeyConsoleUseV2UserApi
+	// Reserved: 3, 6
+
+	KeyUnspecified                     Key = 0
+	KeyLoginDefaultOrg                 Key = 1
+	KeyTriggerIntrospectionProjections Key = 2
+	KeyUserSchema                      Key = 4
+	KeyTokenExchange                   Key = 5
+	KeyImprovedPerformance             Key = 7
+	KeyWebKey                          Key = 8
+	KeyDebugOIDCParentError            Key = 9
+	KeyOIDCSingleV1SessionTermination  Key = 10
+	KeyDisableUserTokenEvent           Key = 11
+	KeyEnableBackChannelLogout         Key = 12
+	KeyLoginV2                         Key = 13
+	KeyPermissionCheckV2               Key = 14
+	KeyConsoleUseV2UserApi             Key = 15
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
