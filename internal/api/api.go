@@ -18,7 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
-	"github.com/zitadel/zitadel/internal/api/grpc/server/connect_mw"
+	"github.com/zitadel/zitadel/internal/api/grpc/server/connect_middleware"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -27,6 +27,10 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
+)
+
+var (
+	metricTypes = []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 )
 
 type API struct {
@@ -157,34 +161,11 @@ func (a *API) RegisterServer(ctx context.Context, grpcServer server.WithGatewayP
 //
 // used for >= v2 api (e.g. user, session, ...)
 func (a *API) RegisterService(ctx context.Context, srv server.Server) error {
-	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	switch service := srv.(type) {
 	case server.GrpcServer:
 		service.RegisterServer(a.grpcServer)
 	case server.ConnectServer:
-		prefix, handler := service.RegisterConnectServer(
-			connect_mw.CallDurationHandler(),
-			connect_mw.MetricsHandler(metricTypes, grpc_api.Probes...),
-			connect_mw.NoCacheInterceptor(),
-			connect_mw.InstanceInterceptor(a.queries, a.externalDomain, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
-			connect_mw.AccessStorageInterceptor(a.accessInterceptor.AccessService()),
-			connect_mw.ErrorHandler(),
-			connect_mw.LimitsInterceptor(system_pb.SystemService_ServiceDesc.ServiceName),
-			connect_mw.AuthorizationInterceptor(a.verifier, a.systemAuthZ, a.authConfig),
-			connect_mw.TranslationHandler(),
-			connect_mw.QuotaExhaustedInterceptor(a.accessInterceptor.AccessService(), system_pb.SystemService_ServiceDesc.ServiceName),
-			connect_mw.ExecutionHandler(a.queries),
-			connect_mw.ValidationHandler(),
-			connect_mw.ServiceHandler(),
-			connect_mw.ActivityInterceptor(),
-		)
-		methods := service.Methods()
-		methodNames := make([]string, methods.Len())
-		for i := 0; i < methods.Len(); i++ {
-			methodNames[i] = string(methods.Get(i).Name())
-		}
-		a.connectServices[prefix] = methodNames
-		a.RegisterHandlerPrefixes(handler, prefix)
+		a.registerConnectServer(service)
 	}
 	if withGateway, ok := srv.(server.WithGateway); ok {
 		err := server.RegisterGateway(ctx, a.grpcGateway, withGateway)
@@ -195,6 +176,32 @@ func (a *API) RegisterService(ctx context.Context, srv server.Server) error {
 	a.verifier.RegisterServer(srv.AppName(), srv.MethodPrefix(), srv.AuthMethods())
 	a.healthServer.SetServingStatus(srv.MethodPrefix(), healthpb.HealthCheckResponse_SERVING)
 	return nil
+}
+
+func (a *API) registerConnectServer(service server.ConnectServer) {
+	prefix, handler := service.RegisterConnectServer(
+		connect_middleware.CallDurationHandler(),
+		connect_middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
+		connect_middleware.NoCacheInterceptor(),
+		connect_middleware.InstanceInterceptor(a.queries, a.externalDomain, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
+		connect_middleware.AccessStorageInterceptor(a.accessInterceptor.AccessService()),
+		connect_middleware.ErrorHandler(),
+		connect_middleware.LimitsInterceptor(system_pb.SystemService_ServiceDesc.ServiceName),
+		connect_middleware.AuthorizationInterceptor(a.verifier, a.systemAuthZ, a.authConfig),
+		connect_middleware.TranslationHandler(),
+		connect_middleware.QuotaExhaustedInterceptor(a.accessInterceptor.AccessService(), system_pb.SystemService_ServiceDesc.ServiceName),
+		connect_middleware.ExecutionHandler(a.queries),
+		connect_middleware.ValidationHandler(),
+		connect_middleware.ServiceHandler(),
+		connect_middleware.ActivityInterceptor(),
+	)
+	methods := service.FileDescriptor().Services().Get(0).Methods()
+	methodNames := make([]string, methods.Len())
+	for i := 0; i < methods.Len(); i++ {
+		methodNames[i] = string(methods.Get(i).Name())
+	}
+	a.connectServices[prefix] = methodNames
+	a.RegisterHandlerPrefixes(handler, prefix)
 }
 
 // HandleFunc allows registering a [http.HandlerFunc] on an exact

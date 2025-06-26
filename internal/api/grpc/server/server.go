@@ -49,7 +49,7 @@ type WithGatewayPrefix interface {
 type ConnectServer interface {
 	Server
 	RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler)
-	Methods() protoreflect.MethodDescriptors
+	FileDescriptor() protoreflect.FileDescriptor
 }
 
 func CreateServer(

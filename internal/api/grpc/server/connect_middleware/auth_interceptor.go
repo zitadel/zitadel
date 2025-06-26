@@ -1,4 +1,4 @@
-package connect_mw
+package connect_middleware
 
 import (
 	"context"

@@ -30,10 +30,6 @@ func CreateServer(
 	}
 }
 
-//func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-//webkey.RegisterWebKeyServiceServer(grpcServer, s)
-//}
-
 func (s *Server) AppName() string {
 	return webkey.WebKeyService_ServiceDesc.ServiceName
 }
@@ -47,9 +43,6 @@ func (s *Server) AuthMethods() authz.MethodMapping {
 }
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	//return func(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	//	return nil
-	//}
 	return webkey.RegisterWebKeyServiceHandler
 }
 
@@ -57,6 +50,6 @@ func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (str
 	return webkeyconnect.NewWebKeyServiceHandler(s, connect.WithInterceptors(interceptors...))
 }
 
-func (s *Server) Methods() protoreflect.MethodDescriptors {
-	return webkey.File_zitadel_webkey_v2beta_webkey_service_proto.Services().ByName("WebKeyService").Methods()
+func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
+	return webkey.File_zitadel_webkey_v2beta_webkey_service_proto
 }
