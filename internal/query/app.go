@@ -455,27 +455,6 @@ func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (id s
 	return id, err
 }
 
-func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string) (project *Project, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	stmt, scan := prepareProjectByOIDCAppQuery()
-	eq := sq.Eq{
-		AppOIDCConfigColumnClientID.identifier(): id,
-		AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
-	}
-	query, args, err := stmt.Where(eq).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-XhJi4", "Errors.Query.SQLStatement")
-	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		project, err = scan(row)
-		return err
-	}, query, args...)
-	return project, err
-}
-
 func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (app *App, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -488,35 +467,6 @@ func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (app *
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-JgVop", "Errors.Query.SQLStatement")
-	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		app, err = scan(row)
-		return err
-	}, query, args...)
-	return app, err
-}
-
-func (q *Queries) AppByClientID(ctx context.Context, clientID string) (app *App, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	stmt, scan := prepareAppQuery(true)
-	eq := sq.Eq{
-		AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		AppColumnState.identifier():      domain.AppStateActive,
-		ProjectColumnState.identifier():  domain.ProjectStateActive,
-		OrgColumnState.identifier():      domain.OrgStateActive,
-	}
-	query, args, err := stmt.Where(sq.And{
-		eq,
-		sq.Or{
-			sq.Eq{AppOIDCConfigColumnClientID.identifier(): clientID},
-			sq.Eq{AppAPIConfigColumnClientID.identifier(): clientID},
-		},
-	}).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Dfge2", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -864,48 +814,6 @@ func prepareProjectIDByAppQuery() (sq.SelectBuilder, func(*sql.Row) (projectID s
 			}
 
 			return projectID, nil
-		}
-}
-
-func prepareProjectByOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
-	return sq.Select(
-			ProjectColumnID.identifier(),
-			ProjectColumnCreationDate.identifier(),
-			ProjectColumnChangeDate.identifier(),
-			ProjectColumnResourceOwner.identifier(),
-			ProjectColumnState.identifier(),
-			ProjectColumnSequence.identifier(),
-			ProjectColumnName.identifier(),
-			ProjectColumnProjectRoleAssertion.identifier(),
-			ProjectColumnProjectRoleCheck.identifier(),
-			ProjectColumnHasProjectCheck.identifier(),
-			ProjectColumnPrivateLabelingSetting.identifier(),
-		).From(projectsTable.identifier()).
-			Join(join(AppColumnProjectID, ProjectColumnID)).
-			Join(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Project, error) {
-			p := new(Project)
-			err := row.Scan(
-				&p.ID,
-				&p.CreationDate,
-				&p.ChangeDate,
-				&p.ResourceOwner,
-				&p.State,
-				&p.Sequence,
-				&p.Name,
-				&p.ProjectRoleAssertion,
-				&p.ProjectRoleCheck,
-				&p.HasProjectCheck,
-				&p.PrivateLabelingSetting,
-			)
-			if err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-yxTMh", "Errors.Project.NotFound")
-				}
-				return nil, zerrors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
-			}
-			return p, nil
 		}
 }
 

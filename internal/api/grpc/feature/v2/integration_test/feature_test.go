@@ -209,7 +209,6 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 			require.NoError(t, err)
 			assertFeatureFlag(t, tt.want.LoginDefaultOrg, got.LoginDefaultOrg)
 			assertFeatureFlag(t, tt.want.OidcTriggerIntrospectionProjections, got.OidcTriggerIntrospectionProjections)
-			assertFeatureFlag(t, tt.want.OidcLegacyIntrospection, got.OidcLegacyIntrospection)
 			assertFeatureFlag(t, tt.want.UserSchema, got.UserSchema)
 		})
 	}
@@ -321,7 +320,7 @@ func TestServer_ResetInstanceFeatures(t *testing.T) {
 
 func TestServer_GetInstanceFeatures(t *testing.T) {
 	_, err := Client.SetSystemFeatures(SystemCTX, &feature.SetSystemFeaturesRequest{
-		OidcLegacyIntrospection: gu.Ptr(true),
+		LoginDefaultOrg: gu.Ptr(true),
 	})
 	require.NoError(t, err)
 	t.Cleanup(func() {
@@ -358,16 +357,12 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 			},
 			want: &feature.GetInstanceFeaturesResponse{
 				LoginDefaultOrg: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_UNSPECIFIED,
+					Enabled: true,
+					Source:  feature.Source_SOURCE_SYSTEM,
 				},
 				OidcTriggerIntrospectionProjections: &feature.FeatureFlag{
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
-				},
-				OidcLegacyIntrospection: &feature.FeatureFlag{
-					Enabled: true,
-					Source:  feature.Source_SOURCE_SYSTEM,
 				},
 				UserSchema: &feature.FeatureFlag{
 					Enabled: false,
@@ -427,10 +422,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
-				OidcLegacyIntrospection: &feature.FeatureFlag{
-					Enabled: true,
-					Source:  feature.Source_SOURCE_SYSTEM,
-				},
 				UserSchema: &feature.FeatureFlag{
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
@@ -456,7 +447,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 			require.NoError(t, err)
 			assertFeatureFlag(t, tt.want.LoginDefaultOrg, got.LoginDefaultOrg)
 			assertFeatureFlag(t, tt.want.OidcTriggerIntrospectionProjections, got.OidcTriggerIntrospectionProjections)
-			assertFeatureFlag(t, tt.want.OidcLegacyIntrospection, got.OidcLegacyIntrospection)
 			assertFeatureFlag(t, tt.want.UserSchema, got.UserSchema)
 		})
 	}
