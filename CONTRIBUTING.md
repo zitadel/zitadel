@@ -96,6 +96,35 @@ Log in at https://127.0.0.1.sslip.io/ui/v2/login/loginname and use the following
 
 The login app live-reloads on changes, so you can start developing right away.
 
+The login app live-reloads on changes, so you can start developing right away.
+
+### <a name="local"></a>Developing Against A Locally Compiled Zitadel
+
+To develop against a locally compiled version of Zitadel, you need to build the Zitadel docker image first.
+Clone the [Zitadel repository](https://github.com/zitadel/zitadel.git) and run the following command from its root:
+
+```sh
+# This compiles a Zitadel binary if it does not exist at ./zitadel already and copies it into a Docker image.
+# If you want to recompile the binary, run `make compile` first
+make login_dev
+```
+
+Open another terminal session at zitadel/zitadel/login and run the following commands to start the dev server.
+
+```bash
+# Install dependencies. Developing requires Node.js v20
+pnpm install
+
+# Start a local development server and have apps/login/.env.test.local configured for you to target the local Zitadel instance.
+NODE_ENV=test pnpm dev
+```
+
+Log in at https://127.0.0.1.sslip.io/ui/v2/login/loginname and use the following credentials:
+**Loginname**: *zitadel-admin@zitadel.127.0.0.1.sslip.io*
+**Password**: *Password1!*.
+
+The login app live-reloads on changes, so you can start developing right away.
+
 ### Quality Assurance
 
 Use `make` commands to test the quality of your code against a production build without installing any dependencies besides Docker.
