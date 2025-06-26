@@ -71,7 +71,7 @@ login_test_integration_cleanup:
 login_test_integration: login_test_integration_build
 	$(LOGIN_DIR)scripts/run_or_skip.sh login_test_integration_run \
 	"$(LOGIN_TAG) \
-	$(CORE_MOCK_TAG) \
+	$(LOGIN_CORE_MOCK_TAG) \
 	$(LOGIN_TEST_INTEGRATION_TAG)"
 
 login_test_acceptance_build_bake:
