@@ -208,26 +208,26 @@ export function LoginPasskey({
             type="button"
             variant={ButtonVariants.Secondary}
             onClick={() => {
-              const params: any = { alt: "true" };
+              const params = new URLSearchParams();
 
               if (loginName) {
-                params.loginName = loginName;
+                params.append("loginName", loginName);
               }
 
               if (sessionId) {
-                params.sessionId = sessionId;
+                params.append("sessionId", sessionId);
               }
 
               if (requestId) {
-                params.requestId = requestId;
+                params.append("requestId", requestId);
               }
 
               if (organization) {
-                params.organization = organization;
+                params.append("organization", organization);
               }
 
               return router.push(
-                "/password?" + new URLSearchParams(params), // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
+                "/password?" + params, // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
               );
             }}
             data-testid="password-button"

@@ -14,6 +14,7 @@
     "test:unit": {
       "dependsOn": ["@zitadel/client#build"]
     },
+    "test:unit:standalone": {},
     "test:watch": {
       "dependsOn": ["@zitadel/client#build"]
     }
