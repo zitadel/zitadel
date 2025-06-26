@@ -76,7 +76,7 @@ login_test_integration: login_test_integration_build
 
 login_test_acceptance_build_bake:
 	@echo "Building login test acceptance images as defined in the docker-bake.hcl"
-	$(LOGIN_BAKE_CLI_WITH_ARGS) login-test-acceptance login-standalone
+	$(LOGIN_BAKE_CLI_WITH_ARGS) login-test-acceptance login-standalone --load
 
 login_test_acceptance_build_compose:
 	@echo "Building login test acceptance images as defined in the docker-compose.yaml"
@@ -116,7 +116,7 @@ login_quality: login_lint login_test_unit login_test_integration
 
 login_standalone_build:
 	@echo "Building the login standalone docker image with tag: $(LOGIN_TAG)"
-	$(LOGIN_BAKE_CLI_WITH_ARGS) --load login-standalone
+	$(LOGIN_BAKE_CLI_WITH_ARGS) login-standalone --load
 
 login_standalone_build_tag:
 	@echo -n "$(LOGIN_TAG)"
