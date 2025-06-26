@@ -20,7 +20,13 @@ LOGIN_REMOTE_BRANCH ?= main
 compile: core_build console_build compile_pipeline
 
 .PHONY: docker_image
-docker_image: compile
+docker_image:
+	@if [ ! -f ./zitadel ]; then \
+		echo "Compiling zitadel binary"; \
+		$(MAKE) compile; \
+	else \
+		echo "Reusing precompiled zitadel binary"; \
+	fi
 	DOCKER_BUILDKIT=1 docker build -f build/Dockerfile -t $(ZITADEL_IMAGE) .
 
 .PHONY: compile_pipeline
@@ -170,16 +176,18 @@ core_lint:
 		--out-format=github-actions \
 		--concurrency=$$(getconf _NPROCESSORS_ONLN)
 
-.PHONY: login-pull
-login-pull: login-ensure-remote
+.PHONY: login_pull
+login_pull: login_ensure_remote
+	@echo "Pulling changes from the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
 	git fetch $(LOGIN_REMOTE_NAME)
 	git subtree pull --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
 
-.PHONY: login-push
-login-push: login-ensure-remote
+.PHONY: login_push
+login_push: login_ensure_remote
+	@echo "Pushing changes to the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
 	git subtree push --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
 
-login-ensure-remote:
+login_ensure_remote:
 	@if ! git remote get-url $(LOGIN_REMOTE_NAME) > /dev/null 2>&1; then \
 		echo "Adding remote $(LOGIN_REMOTE_NAME)"; \
 		git remote add $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
@@ -194,9 +202,14 @@ login-ensure-remote:
 	fi
 
 export LOGIN_DIR := ./login/
-export LOGIN_BAKE_CLI_ADDITIONAL_ARGS :=  --set login-*.context=./login/ --file ./docker-bake.hcl
-export ZITADEL_TAG := "$(ZITADEL_IMAGE)"
-#include login/Makefile
+export LOGIN_BAKE_CLI_ADDITIONAL_ARGS := --set login-*.context=./login/ --file ./docker-bake.hcl
+export ZITADEL_TAG ?= $(ZITADEL_IMAGE)
+include login/Makefile
 
-#login-test-acceptance-build: docker_image login-test-acceptance-build-compose login-test-acceptance-build-bake
-#	@:
+# Intentional override of login_test_acceptance_build
+login_test_acceptance_build: docker_image
+	@echo "Building login test acceptance environment with the local zitadel image"
+	$(MAKE) login_test_acceptance_build_compose login_test_acceptance_build_bake
+
+login_dev: docker_image typescript_generate login_test_acceptance_build_compose login_test_acceptance_cleanup login_test_acceptance_setup_dev
+	@echo "Starting login test environment with the local zitadel image"

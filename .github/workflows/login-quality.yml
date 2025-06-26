@@ -7,10 +7,6 @@ on:
         description: 'Ignore run caches'
         type: boolean
         required: true
-    outputs:
-      login_build_image:
-        description: 'The image name of the built production standalone login image'
-        value: 'ghcr.io/zitadel/login:${{ github.sha }}'
 
 jobs:
   quality:
@@ -50,7 +46,11 @@ jobs:
             ${{ runner.os }}-login-run-caches-${{github.ref_name}}-${{ github.sha }}-
             ${{ runner.os }}-login-run-caches-${{github.ref_name}}-
             ${{ runner.os }}-login-run-caches-
-      - run: make login-quality
+        - uses: actions/download-artifact@v4
+        with:
+          path: .artifacts
+          name: zitadel-linux-amd64
+      - run: make login_quality
         env:
           # latest if branch is main, otherwise image version which is the pull request number
           LOGIN_BAKE_CLI: depot bake

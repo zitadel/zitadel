@@ -112,7 +112,7 @@ jobs:
       issues: write
       pull-requests: write
     needs:
-      [version, core-unit-test, core-integration-test, lint, container, e2e, login-container]
+      [version, core-unit-test, core-integration-test, lint, container, login-container, e2e]
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}

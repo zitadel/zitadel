@@ -188,7 +188,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          version: echo -n "${{ needs.version.outputs.version }}"
+          version: ${{ needs.version.outputs.version }}
           cwd: login
 
   typescript-repo:
@@ -199,4 +199,4 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Push Subtree
-        run: make login-push
+        run: make login_push
