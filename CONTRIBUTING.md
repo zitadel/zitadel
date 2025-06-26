@@ -184,6 +184,8 @@ pnpm test:integration help
 
 To run the tests in docker against the latest release of Zitadel, use the following command:
 
+:warning: The acceptance tests are not reliable at the moment :construction:
+
 ```sh
 make login_test_acceptance
 ```
