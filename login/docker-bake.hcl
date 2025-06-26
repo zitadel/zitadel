@@ -19,13 +19,14 @@ target "typescript-proto-client" {
   }
 }
 
-target "typescript-proto-client-out" {
-  dockerfile = "${DOCKERFILES_DIR}typescript-proto-client-out.Dockerfile"
+# We prefix the target with login- so we can reuse the writing of protos if we overwrite the typescript-proto-client target.
+target "login-typescript-proto-client-out" {
+  dockerfile = "${DOCKERFILES_DIR}login-typescript-proto-client-out.Dockerfile"
   contexts = {
     typescript-proto-client = "target:typescript-proto-client"
   }
   output = [
-    "type=local,dest=packages/zitadel-proto"
+    "type=local,dest=${LOGIN_DIR}packages/zitadel-proto"
   ]
 }
 
