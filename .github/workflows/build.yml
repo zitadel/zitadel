@@ -79,6 +79,7 @@ jobs:
       core_cache_path: ${{ needs.core.outputs.cache_path }}
 
   login-quality:
+    needs: [compile]
     uses: ./.github/workflows/login-quality.yml
     permissions:
       actions: write
@@ -97,6 +98,7 @@ jobs:
       build_image_name: "ghcr.io/zitadel/zitadel-build"
 
   login-container:
+    needs: [compile]
     uses: ./.github/workflows/login-container.yml
     if: ${{ github.event_name == 'workflow_dispatch' }}
 

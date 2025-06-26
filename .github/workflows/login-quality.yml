@@ -46,10 +46,14 @@ jobs:
             ${{ runner.os }}-login-run-caches-${{github.ref_name}}-${{ github.sha }}-
             ${{ runner.os }}-login-run-caches-${{github.ref_name}}-
             ${{ runner.os }}-login-run-caches-
-        - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           path: .artifacts
           name: zitadel-linux-amd64
+      - name: Unpack executable
+        run: |
+          tar -xvf .artifacts/zitadel-linux-amd64.tar.gz
+          mv zitadel-linux-amd64/zitadel ./zitadel
       - run: make login_quality
         env:
           # latest if branch is main, otherwise image version which is the pull request number
