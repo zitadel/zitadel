@@ -493,8 +493,6 @@ service ManagementService {
 
     // Create User (Machine)
     //
-    // Deprecated: use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) to create a user of type machine instead.
-    //
     // Create a new user with the type machine for your API, service or device. These users are used for non-interactive authentication flows.
     rpc AddMachineUser(AddMachineUserRequest) returns (AddMachineUserResponse) {
         option (google.api.http) = {
@@ -507,7 +505,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -693,8 +690,6 @@ service ManagementService {
 
     // Change user name
     //
-    // Deprecated: use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
-    //
     // Change the username of the user. Be aware that the user has to log in with the newly added username afterward
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
@@ -708,7 +703,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
-            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1124,8 +1118,6 @@ service ManagementService {
 
     // Update User Phone (Human)
     //
-    // Deprecated: use [user service v2 SetPhone](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
-    //
     // Change the phone number of a user. If the state is set to not verified, the user will get an SMS to verify (if a notification provider is configured). The phone number is only for informational purposes and to send messages, not for Authentication (2FA).
     rpc UpdateHumanPhone(UpdateHumanPhoneRequest) returns (UpdateHumanPhoneResponse) {
         option (google.api.http) = {
@@ -1140,7 +1132,6 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Human";
-            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1656,8 +1647,6 @@ service ManagementService {
 
     // Update Machine User
     //
-    // Deprecated: use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) to update a user of type machine instead.
-    //
     // Change a service account/machine user. It is used for accounts with non-interactive authentication possibilities.
     rpc UpdateMachine(UpdateMachineRequest) returns (UpdateMachineResponse) {
         option (google.api.http) = {
@@ -1670,7 +1659,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1692,8 +1680,6 @@ service ManagementService {
 
     // Create Secret for Machine User
     //
-    // Deprecated: use [user service v2 AddSecret](apis/resources/user_service_v2/user-service-add-secret.api.mdx) instead.
-    //
     // Create a new secret for a machine user/service account. It is used to authenticate the user (client credential grant).
     rpc GenerateMachineSecret(GenerateMachineSecretRequest) returns (GenerateMachineSecretResponse) {
         option (google.api.http) = {
@@ -1706,7 +1692,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1728,8 +1713,6 @@ service ManagementService {
 
     // Delete Secret of Machine User
     //
-    // Deprecated: use [user service v2 RemoveSecret](apis/resources/user_service_v2/user-service-remove-secret.api.mdx) instead.
-    //
     // Delete a secret of a machine user/service account. The user will not be able to authenticate with the secret afterward.
     rpc RemoveMachineSecret(RemoveMachineSecretRequest) returns (RemoveMachineSecretResponse) {
         option (google.api.http) = {
@@ -1741,7 +1724,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1763,8 +1745,6 @@ service ManagementService {
 
     // Get Machine user Key By ID
     //
-    // Deprecated: use [user service v2 ListKeys](apis/resources/user_service_v2/user-service-list-keys.api.mdx) instead.
-    //
     // Get a specific Key of a machine user by its id. Machine keys are used to authenticate with jwt profile authentication.
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
         option (google.api.http) = {
@@ -1776,7 +1756,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1796,9 +1775,7 @@ service ManagementService {
         };
     }
 
-    // Get Machine user Key By ID
-    //
-    // Deprecated: use [user service v2 ListKeys](apis/resources/user_service_v2/user-service-list-keys.api.mdx) instead.
+    // List Machine Keys
     //
     // Get the list of keys of a machine user. Machine keys are used to authenticate with jwt profile authentication.
     rpc ListMachineKeys(ListMachineKeysRequest) returns (ListMachineKeysResponse) {
@@ -1812,7 +1789,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1834,8 +1810,6 @@ service ManagementService {
 
     // Create Key for machine user
     //
-    // Deprecated: use [user service v2 AddKey](apis/resources/user_service_v2/user-service-add-key.api.mdx) instead.
-    //
     // If a public key is not supplied, a new key is generated and will be returned in the response.
     // Make sure to store the returned key.
     // If an RSA public key is supplied, the private key is omitted from the response.
@@ -1851,7 +1825,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1873,8 +1846,6 @@ service ManagementService {
 
     // Delete Key for machine user
     //
-    // Deprecated: use [user service v2 RemoveKey](apis/resources/user_service_v2/user-service-remove-key.api.mdx) instead.
-    //
     // Delete a specific key from a user.
     // The user will not be able to authenticate with that key afterward.
     rpc RemoveMachineKey(RemoveMachineKeyRequest) returns (RemoveMachineKeyResponse) {
@@ -1887,7 +1858,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1909,8 +1879,6 @@ service ManagementService {
 
     // Get Personal-Access-Token (PAT) by ID
     //
-    // Deprecated: use [user service v2 ListPersonalAccessTokens](apis/resources/user_service_v2/user-service-list-personal-access-tokens.api.mdx) instead.
-    //
     // Returns the PAT for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header.
     rpc GetPersonalAccessTokenByIDs(GetPersonalAccessTokenByIDsRequest) returns (GetPersonalAccessTokenByIDsResponse) {
         option (google.api.http) = {
@@ -1922,7 +1890,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1944,8 +1911,6 @@ service ManagementService {
 
     // List Personal-Access-Tokens (PATs)
     //
-    // Deprecated: use [user service v2 ListPersonalAccessTokens](apis/resources/user_service_v2/user-service-list-personal-access-tokens.api.mdx) instead.
-    //
     // Returns a list of PATs for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header.
     rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
         option (google.api.http) = {
@@ -1958,7 +1923,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1980,8 +1944,6 @@ service ManagementService {
 
     // Create a Personal-Access-Token (PAT)
     //
-    // Deprecated: use [user service v2 AddPersonalAccessToken](apis/resources/user_service_v2/user-service-add-personal-access-token.api.mdx) instead.
-    //
     // Generates a new PAT for the user. Currently only available for machine users.
     // The token will be returned in the response, make sure to store it.
     // PATs are ready-to-use tokens and can be sent directly in the authentication header.
@@ -1996,7 +1958,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -2018,8 +1979,6 @@ service ManagementService {
 
     // Remove a Personal-Access-Token (PAT) by ID
     //
-    // Deprecated: use [user service v2 RemovePersonalAccessToken](apis/resources/user_service_v2/user-service-remove-personal-access-token.api.mdx) instead.
-    //
     // Delete a PAT from a user. Afterward, the user will not be able to authenticate with that token anymore.
     rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
         option (google.api.http) = {
@@ -2031,7 +1990,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {

@@ -2,19 +2,14 @@ package command
 
 import (
 	"context"
-	"io"
 	"testing"
 	"time"
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/zitadel/passwap"
-	"github.com/zitadel/passwap/bcrypt"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -1301,173 +1296,4 @@ func newOIDCAppChangedEvent(ctx context.Context, appID, projectID, resourceOwner
 		changes,
 	)
 	return event
-}
-
-func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
-	t.Parallel()
-
-	hasher := &crypto.Hasher{
-		Swapper: passwap.NewSwapper(bcrypt.New(bcrypt.MinCost)),
-	}
-	hashedSecret, err := hasher.Hash("secret")
-	require.NoError(t, err)
-	agg := project.NewAggregate("projectID", "orgID")
-
-	tests := []struct {
-		name       string
-		secret     string
-		eventstore func(*testing.T) *eventstore.Eventstore
-		wantErr    error
-	}{
-		{
-			name: "filter error",
-			eventstore: expectEventstore(
-				expectFilterError(io.ErrClosedPipe),
-			),
-			wantErr: io.ErrClosedPipe,
-		},
-		{
-			name: "app not exists",
-			eventstore: expectEventstore(
-				expectFilter(),
-			),
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-D8hba", "Errors.Project.App.NotExisting"),
-		},
-		{
-			name: "wrong app type",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(
-						project.NewApplicationAddedEvent(context.Background(), &agg.Aggregate, "appID", "appName"),
-					),
-				),
-			),
-			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-BHgn2", "Errors.Project.App.IsNotOIDC"),
-		},
-		{
-			name: "no secret set",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(
-						project.NewApplicationAddedEvent(context.Background(), &agg.Aggregate, "appID", "appName"),
-					),
-					eventFromEventPusher(
-						project.NewOIDCConfigAddedEvent(context.Background(),
-							&agg.Aggregate,
-							domain.OIDCVersionV1,
-							"appID",
-							"client1@project",
-							"",
-							[]string{"https://test.ch"},
-							[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
-							[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
-							domain.OIDCApplicationTypeWeb,
-							domain.OIDCAuthMethodTypePost,
-							[]string{"https://test.ch/logout"},
-							true,
-							domain.OIDCTokenTypeBearer,
-							true,
-							true,
-							true,
-							time.Second*1,
-							[]string{"https://sub.test.ch"},
-							false,
-							"",
-							domain.LoginVersionUnspecified,
-							"",
-						),
-					),
-				),
-			),
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-D6hba", "Errors.Project.App.OIDCConfigInvalid"),
-		},
-		{
-			name:   "check succeeded",
-			secret: "secret",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(
-						project.NewApplicationAddedEvent(context.Background(), &agg.Aggregate, "appID", "appName"),
-					),
-					eventFromEventPusher(
-						project.NewOIDCConfigAddedEvent(context.Background(),
-							&agg.Aggregate,
-							domain.OIDCVersionV1,
-							"appID",
-							"client1@project",
-							hashedSecret,
-							[]string{"https://test.ch"},
-							[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
-							[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
-							domain.OIDCApplicationTypeWeb,
-							domain.OIDCAuthMethodTypePost,
-							[]string{"https://test.ch/logout"},
-							true,
-							domain.OIDCTokenTypeBearer,
-							true,
-							true,
-							true,
-							time.Second*1,
-							[]string{"https://sub.test.ch"},
-							false,
-							"",
-							domain.LoginVersionUnspecified,
-							"",
-						),
-					),
-				),
-			),
-		},
-		{
-			name:   "check failed",
-			secret: "wrong!",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(
-						project.NewApplicationAddedEvent(context.Background(), &agg.Aggregate, "appID", "appName"),
-					),
-					eventFromEventPusher(
-						project.NewOIDCConfigAddedEvent(context.Background(),
-							&agg.Aggregate,
-							domain.OIDCVersionV1,
-							"appID",
-							"client1@project",
-							hashedSecret,
-							[]string{"https://test.ch"},
-							[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
-							[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
-							domain.OIDCApplicationTypeWeb,
-							domain.OIDCAuthMethodTypePost,
-							[]string{"https://test.ch/logout"},
-							true,
-							domain.OIDCTokenTypeBearer,
-							true,
-							true,
-							true,
-							time.Second*1,
-							[]string{"https://sub.test.ch"},
-							false,
-							"",
-							domain.LoginVersionUnspecified,
-							"",
-						),
-					),
-				),
-			),
-			wantErr: zerrors.ThrowInvalidArgument(err, "COMMAND-Bz542", "Errors.Project.App.ClientSecretInvalid"),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			c := &Commands{
-				eventstore:   tt.eventstore(t),
-				secretHasher: hasher,
-			}
-			err := c.VerifyOIDCClientSecret(context.Background(), "projectID", "appID", tt.secret)
-			c.jobs.Wait()
-			require.ErrorIs(t, err, tt.wantErr)
-		})
-	}
 }

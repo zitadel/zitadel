@@ -12,7 +12,6 @@ func TestKey(t *testing.T) {
 		"unspecified",
 		"login_default_org",
 		"trigger_introspection_projections",
-		"legacy_introspection",
 	}
 	for _, want := range tests {
 		t.Run(want, func(t *testing.T) {
