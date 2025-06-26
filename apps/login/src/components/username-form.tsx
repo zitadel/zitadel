@@ -136,9 +136,6 @@ export function UsernameForm({
           <Alert>{error}</Alert>
         </div>
       )}
-
-      <div className="pt-6 pb-4">{children}</div>
-
       <div className="mt-4 flex w-full flex-row items-center">
         <BackButton data-testid="back-button" />
         <span className="flex-grow"></span>

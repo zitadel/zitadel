@@ -962,7 +962,6 @@ export async function startIdentityProviderFlow({
   urls,
 }: {
   serviceUrl: string;
-
   idpId: string;
   urls: RedirectURLsJson;
 }) {
@@ -976,6 +975,34 @@ export async function startIdentityProviderFlow({
     content: {
       case: "urls",
       value: urls,
+    },
+  });
+}
+
+export async function startLDAPIdentityProviderFlow({
+  serviceUrl,
+  idpId,
+  username,
+  password,
+}: {
+  serviceUrl: string;
+  idpId: string;
+  username: string;
+  password: string;
+}) {
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    serviceUrl,
+  );
+
+  return userService.startIdentityProviderIntent({
+    idpId,
+    content: {
+      case: "ldap",
+      value: {
+        username,
+        password,
+      },
     },
   });
 }
