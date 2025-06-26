@@ -193,6 +193,7 @@ jobs:
 
   typescript-repo:
     runs-on: ubuntu-latest
+    needs: version
     if: ${{ github.ref_name == 'next' }}
     continue-on-error: true
     steps:
