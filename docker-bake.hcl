@@ -6,6 +6,14 @@ variable "DOCKERFILES_DIR" {
   default = "dockerfiles/"
 }
 
+variable "UID" {
+  default = "1000"
+}
+
+variable "GID" {
+  default = "1000"
+}
+
 # typescript-proto-client is used to generate the client code for the login service.
 # It is not login-prefixed, so it is easily extendable.
 # To extend this bake-file.hcl, set the context of all login-prefixed targets to a different directory.
@@ -13,7 +21,6 @@ variable "DOCKERFILES_DIR" {
 # The zitadel repository uses this to generate the client and the mock server from local proto files.
 target "typescript-proto-client" {
   dockerfile = "${DOCKERFILES_DIR}typescript-proto-client.Dockerfile"
-  target = "typescript-proto-client"
   contexts = {
     # We directly generate and download the client server-side with buf, so we don't need the proto files
     login-pnpm = "target:login-pnpm"

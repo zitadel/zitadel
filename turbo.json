@@ -27,9 +27,14 @@
     "start:built": {},
     "test:unit": {},
     "test:unit:standalone": {},
-    "test:integration:setup": {},
-    "test:acceptance:env": {},
+    "test:integration": {},
+    "test:integration:setup": {
+      "with": ["dev"]
+    },
     "test:acceptance:setup": {},
+    "test:acceptance:setup:dev": {
+      "with": ["dev"]
+    },
     "test:watch": {
       "persistent": true
     },

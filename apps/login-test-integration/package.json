@@ -2,8 +2,8 @@
   "name": "login-test-integration",
   "private": true,
   "scripts": {
-    "test:integration": "pnpm exec cypress",
-    "test:integration:setup": "cd ../.. && make login-test-integration-dev"
+    "test:integration": "dotenv -e ../login/.env.test pnpm exec cypress",
+    "test:integration:setup": "cd ../.. && make login_test_integration_dev"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",

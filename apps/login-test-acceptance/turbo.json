@@ -1,11 +1,10 @@
 {
   "extends": ["//"],
   "tasks": {
-    "test:acceptance:setup": {
+    "test:acceptance:setup:dev": {
       "interactive": true,
       "cache": false,
-      "persistent": true,
-      "with": ["@zitadel/login#dev"]
+      "persistent": true
     }
   }
 }
