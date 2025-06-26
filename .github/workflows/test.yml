@@ -15,9 +15,6 @@ on:
 jobs:
   quality:
     name: Ensure Quality
-    if: github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'push' && github.repository_owner != 'zitadel') ||
-      (github.event_name == 'pull_request' && github.repository_owner != 'zitadel')
     runs-on: ubuntu-22.04
     timeout-minutes: 30
     permissions:
