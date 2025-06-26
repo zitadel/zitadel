@@ -3,6 +3,7 @@ package convert
 import (
 	"net/url"
 
+	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
@@ -108,17 +109,17 @@ func appConfigToPb(app *query.App) app.ApplicationConfig {
 	return appAPIConfigToPb(app.APIConfig)
 }
 
-func loginVersionToDomain(version *app.LoginVersion) (domain.LoginVersion, string, error) {
+func loginVersionToDomain(version *app.LoginVersion) (*domain.LoginVersion, *string, error) {
 	switch v := version.GetVersion().(type) {
 	case nil:
-		return domain.LoginVersionUnspecified, "", nil
+		return gu.Ptr(domain.LoginVersionUnspecified), gu.Ptr(""), nil
 	case *app.LoginVersion_LoginV1:
-		return domain.LoginVersion1, "", nil
+		return gu.Ptr(domain.LoginVersion1), gu.Ptr(""), nil
 	case *app.LoginVersion_LoginV2:
 		_, err := url.Parse(v.LoginV2.GetBaseUri())
-		return domain.LoginVersion2, v.LoginV2.GetBaseUri(), err
+		return gu.Ptr(domain.LoginVersion2), gu.Ptr(v.LoginV2.GetBaseUri()), err
 	default:
-		return domain.LoginVersionUnspecified, "", nil
+		return gu.Ptr(domain.LoginVersionUnspecified), gu.Ptr(""), nil
 	}
 }
 

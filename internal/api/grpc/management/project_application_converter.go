@@ -80,9 +80,9 @@ func AddSAMLAppRequestToDomain(req *mgmt_pb.AddSAMLAppRequest) (*domain.SAMLApp,
 		},
 		AppName:      req.Name,
 		Metadata:     req.GetMetadataXml(),
-		MetadataURL:  req.GetMetadataUrl(),
-		LoginVersion: loginVersion,
-		LoginBaseURI: loginBaseURI,
+		MetadataURL:  gu.Ptr(req.GetMetadataUrl()),
+		LoginVersion: gu.Ptr(loginVersion),
+		LoginBaseURI: gu.Ptr(loginBaseURI),
 	}, nil
 }
 
@@ -144,9 +144,9 @@ func UpdateSAMLAppConfigRequestToDomain(app *mgmt_pb.UpdateSAMLAppConfigRequest)
 		},
 		AppID:        app.AppId,
 		Metadata:     app.GetMetadataXml(),
-		MetadataURL:  app.GetMetadataUrl(),
-		LoginVersion: loginVersion,
-		LoginBaseURI: loginBaseURI,
+		MetadataURL:  gu.Ptr(app.GetMetadataUrl()),
+		LoginVersion: gu.Ptr(loginVersion),
+		LoginBaseURI: gu.Ptr(loginBaseURI),
 	}, nil
 }
 

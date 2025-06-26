@@ -62,10 +62,10 @@ func samlWriteModelToSAMLConfig(writeModel *SAMLApplicationWriteModel) *domain.S
 		AppName:      writeModel.AppName,
 		State:        writeModel.State,
 		Metadata:     writeModel.Metadata,
-		MetadataURL:  writeModel.MetadataURL,
+		MetadataURL:  gu.Ptr(writeModel.MetadataURL),
 		EntityID:     writeModel.EntityID,
-		LoginVersion: writeModel.LoginVersion,
-		LoginBaseURI: writeModel.LoginBaseURI,
+		LoginVersion: gu.Ptr(writeModel.LoginVersion),
+		LoginBaseURI: gu.Ptr(writeModel.LoginBaseURI),
 	}
 }
 
@@ -77,15 +77,6 @@ func apiWriteModelToAPIConfig(writeModel *APIApplicationWriteModel) *domain.APIA
 		State:          writeModel.State,
 		ClientID:       writeModel.ClientID,
 		AuthMethodType: writeModel.AuthMethodType,
-	}
-}
-
-func roleWriteModelToRole(writeModel *ProjectRoleWriteModel) *domain.ProjectRole {
-	return &domain.ProjectRole{
-		ObjectRoot:  writeModelToObjectRoot(writeModel.WriteModel),
-		Key:         writeModel.Key,
-		DisplayName: writeModel.DisplayName,
-		Group:       writeModel.Group,
 	}
 }
 

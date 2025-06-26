@@ -36,8 +36,8 @@ func CreateOIDCAppRequestToDomain(name, projectID string, req *app.CreateOIDCApp
 		AdditionalOrigins:        req.GetAdditionalOrigins(),
 		SkipNativeAppSuccessPage: gu.Ptr(req.GetSkipNativeAppSuccessPage()),
 		BackChannelLogoutURI:     gu.Ptr(req.GetBackChannelLogoutUri()),
-		LoginVersion:             gu.Ptr(loginVersion),
-		LoginBaseURI:             gu.Ptr(loginBaseURI),
+		LoginVersion:             loginVersion,
+		LoginBaseURI:             loginBaseURI,
 	}, nil
 }
 
@@ -66,8 +66,8 @@ func UpdateOIDCAppConfigRequestToDomain(appID, projectID string, app *app.Update
 		AdditionalOrigins:        app.AdditionalOrigins,
 		SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
 		BackChannelLogoutURI:     app.BackChannelLogoutUri,
-		LoginVersion:             gu.Ptr(loginVersion),
-		LoginBaseURI:             gu.Ptr(loginBaseURI),
+		LoginVersion:             loginVersion,
+		LoginBaseURI:             loginBaseURI,
 	}, nil
 }
 

@@ -323,40 +323,40 @@ func TestLoginVersionToDomain(t *testing.T) {
 	tt := []struct {
 		name          string
 		version       *app.LoginVersion
-		expectedVer   domain.LoginVersion
-		expectedURI   string
+		expectedVer   *domain.LoginVersion
+		expectedURI   *string
 		expectedError error
 	}{
 		{
 			name:        "nil version",
 			version:     nil,
-			expectedVer: domain.LoginVersionUnspecified,
-			expectedURI: "",
+			expectedVer: gu.Ptr(domain.LoginVersionUnspecified),
+			expectedURI: gu.Ptr(""),
 		},
 		{
 			name:        "login v1",
 			version:     &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
-			expectedVer: domain.LoginVersion1,
-			expectedURI: "",
+			expectedVer: gu.Ptr(domain.LoginVersion1),
+			expectedURI: gu.Ptr(""),
 		},
 		{
 			name:        "login v2 valid URI",
 			version:     &app.LoginVersion{Version: &app.LoginVersion_LoginV2{LoginV2: &app.LoginV2{BaseUri: gu.Ptr("https://valid.url")}}},
-			expectedVer: domain.LoginVersion2,
-			expectedURI: "https://valid.url",
+			expectedVer: gu.Ptr(domain.LoginVersion2),
+			expectedURI: gu.Ptr("https://valid.url"),
 		},
 		{
 			name:          "login v2 invalid URI",
 			version:       &app.LoginVersion{Version: &app.LoginVersion_LoginV2{LoginV2: &app.LoginV2{BaseUri: gu.Ptr("://invalid")}}},
-			expectedVer:   domain.LoginVersion2,
-			expectedURI:   "://invalid",
+			expectedVer:   gu.Ptr(domain.LoginVersion2),
+			expectedURI:   gu.Ptr("://invalid"),
 			expectedError: &url.Error{Op: "parse", URL: "://invalid", Err: errors.New("missing protocol scheme")},
 		},
 		{
 			name:        "unknown version type",
 			version:     &app.LoginVersion{},
-			expectedVer: domain.LoginVersionUnspecified,
-			expectedURI: "",
+			expectedVer: gu.Ptr(domain.LoginVersionUnspecified),
+			expectedURI: gu.Ptr(""),
 		},
 	}
 

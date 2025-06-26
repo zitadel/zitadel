@@ -583,7 +583,7 @@ message UpdateSAMLApplicationConfigurationRequest {
         bytes metadata_xml = 1 [(validate.rules).bytes.max_len = 500000];
         string metadata_url = 2 [(validate.rules).string.max_len = 200];
     }
-    LoginVersion login_version = 3 [
+    optional LoginVersion login_version = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
         }
