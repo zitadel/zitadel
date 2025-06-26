@@ -111,7 +111,6 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		UserSchema:                          gu.Ptr(true),
 		OidcTokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:                 nil,
-		WebKey:                              gu.Ptr(true),
 		OidcSingleV1SessionTermination:      gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
@@ -120,7 +119,6 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		UserSchema:                      gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:             nil,
-		WebKey:                          gu.Ptr(true),
 		OIDCSingleV1SessionTermination:  gu.Ptr(true),
 	}
 	got := instanceFeaturesToCommand(arg)
@@ -154,10 +152,6 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelSystem,
 			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgByID},
 		},
-		WebKey: query.FeatureSource[bool]{
-			Level: feature.LevelInstance,
-			Value: true,
-		},
 		OIDCSingleV1SessionTermination: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
 			Value: true,
@@ -188,10 +182,6 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		ImprovedPerformance: &feature_pb.ImprovedPerformanceFeatureFlag{
 			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID},
 			Source:         feature_pb.Source_SOURCE_SYSTEM,
-		},
-		WebKey: &feature_pb.FeatureFlag{
-			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 		DebugOidcParentError: &feature_pb.FeatureFlag{
 			Enabled: false,
