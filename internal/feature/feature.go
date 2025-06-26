@@ -9,21 +9,20 @@ import (
 type Key int
 
 const (
-	// Reserved: 3, 6, 8
+	// Reserved: 2, 3, 6, 8
 
-	KeyUnspecified                     Key = 0
-	KeyLoginDefaultOrg                 Key = 1
-	KeyTriggerIntrospectionProjections Key = 2
-	KeyUserSchema                      Key = 4
-	KeyTokenExchange                   Key = 5
-	KeyImprovedPerformance             Key = 7
-	KeyDebugOIDCParentError            Key = 9
-	KeyOIDCSingleV1SessionTermination  Key = 10
-	KeyDisableUserTokenEvent           Key = 11
-	KeyEnableBackChannelLogout         Key = 12
-	KeyLoginV2                         Key = 13
-	KeyPermissionCheckV2               Key = 14
-	KeyConsoleUseV2UserApi             Key = 15
+	KeyUnspecified                    Key = 0
+	KeyLoginDefaultOrg                Key = 1
+	KeyUserSchema                     Key = 4
+	KeyTokenExchange                  Key = 5
+	KeyImprovedPerformance            Key = 7
+	KeyDebugOIDCParentError           Key = 9
+	KeyOIDCSingleV1SessionTermination Key = 10
+	KeyDisableUserTokenEvent          Key = 11
+	KeyEnableBackChannelLogout        Key = 12
+	KeyLoginV2                        Key = 13
+	KeyPermissionCheckV2              Key = 14
+	KeyConsoleUseV2UserApi            Key = 15
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
