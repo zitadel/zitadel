@@ -54,7 +54,7 @@ login_test_unit:
 
 login_test_integration_build:
 	@echo "Building login integration test environment with the local core mock image"
-	$(LOGIN_BAKE_CLI_WITH_ARGS) core-mock login-test-integration login-standalone --print
+	$(LOGIN_BAKE_CLI_WITH_ARGS) core-mock login-test-integration login-standalone --load
 
 login_test_integration_dev: login_test_integration_cleanup
 	@echo "Starting login integration test environment with the local core mock image"
