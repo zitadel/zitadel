@@ -32,16 +32,16 @@ export CORE_MOCK_TAG := login-core-mock:${DOCKER_METADATA_OUTPUT_VERSION}
 login_help:
 	@echo "Makefile for the login service"
 	@echo "Available targets:"
-	@echo "  login-help              - Show this help message."
-	@echo "  login-generate			 - Generate TypeScript client code from Protobuf definitions."
-	@echo "  login-quality           - Run all quality checks (login-lint, login-test-unit, login-test-integration, login-test-acceptance)."
-	@echo "  login-standalone-build  - Build the docker image for production login containers."
-	@echo "  login-lint              - Run linting and formatting checks. FORCE=true prevents skipping."
-	@echo "  login-test-unit         - Run unit tests. Tests without any dependencies. FORCE=true prevents skipping."
-	@echo "  login-test-integration  - Run integration tests. Tests a login production build against a mocked Zitadel core API. FORCE=true prevents skipping."
-	@echo "  login-test-acceptance   - Run acceptance tests. Tests a login production build with a local Zitadel instance behind a reverse proxy. FORCE=true prevents skipping."
-	@echo "  show-run-caches         - Show all run caches with image ids and exit codes."
-	@echo "  clean-run-caches        - Remove all run caches."
+	@echo "  login_help              - Show this help message."
+	@echo "  login_generate			 - Generate TypeScript client code from Protobuf definitions."
+	@echo "  login_quality           - Run all quality checks (login_lint, login_test_unit, login_test_integration, login_test_acceptance)."
+	@echo "  login_standalone_build  - Build the docker image for production login containers."
+	@echo "  login_lint              - Run linting and formatting checks. FORCE=true prevents skipping."
+	@echo "  login_test_unit         - Run unit tests. Tests without any dependencies. FORCE=true prevents skipping."
+	@echo "  login-test_integration  - Run integration tests. Tests a login production build against a mocked Zitadel core API. FORCE=true prevents skipping."
+	@echo "  login_test_acceptance   - Run acceptance tests. Tests a login production build with a local Zitadel instance behind a reverse proxy. FORCE=true prevents skipping."
+	@echo "  show_run_caches         - Show all run caches with image ids and exit codes."
+	@echo "  clean_run_caches        - Remove all run caches."
 
 
 login_lint:
