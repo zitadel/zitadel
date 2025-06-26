@@ -35,21 +35,14 @@ func TestServer_UserInfo(t *testing.T) {
 	tests := []struct {
 		name    string
 		trigger bool
-		webKey  bool
 	}{
 		{
 			name:    "trigger enabled",
 			trigger: true,
 		},
-
-		// This is the only functional test we need to cover web keys.
-		// - By creating tokens the signer is tested
-		// - When obtaining the tokens, the RP verifies the ID Token using the key set from the jwks endpoint.
-		// - By calling userinfo with the access token as JWT, the Token Verifier with the public key cache is tested.
 		{
-			name:    "web keys",
+			name:    "trigger disabled",
 			trigger: false,
-			webKey:  true,
 		},
 	}
 
@@ -57,7 +50,6 @@ func TestServer_UserInfo(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := Instance.Client.FeatureV2.SetInstanceFeatures(iamOwnerCTX, &feature.SetInstanceFeaturesRequest{
 				OidcTriggerIntrospectionProjections: &tt.trigger,
-				WebKey:                              &tt.webKey,
 			})
 			require.NoError(t, err)
 			testServer_UserInfo(t)

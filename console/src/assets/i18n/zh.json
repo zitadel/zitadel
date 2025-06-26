@@ -1642,8 +1642,6 @@
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel 注销实现了 OpenID Connect Back-Channel Logout 1.0，可用于通知客户端在 OpenID 提供商处终止会话。",
       "PERMISSIONCHECKV2": "权限检查 V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "如果启用该标志，您将能够使用新的 API 及其功能。",
-      "WEBKEY": "Web 密钥",
-      "WEBKEY_DESCRIPTION": "如果启用该标志，您将能够使用新的 API 及其功能。",
       "STATES": {
         "INHERITED": "继承",
         "ENABLED": "已启用",

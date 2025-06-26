@@ -9,7 +9,7 @@ import (
 type Key int
 
 const (
-	// Reserved: 3, 6
+	// Reserved: 3, 6, 8
 
 	KeyUnspecified                     Key = 0
 	KeyLoginDefaultOrg                 Key = 1
@@ -17,7 +17,6 @@ const (
 	KeyUserSchema                      Key = 4
 	KeyTokenExchange                   Key = 5
 	KeyImprovedPerformance             Key = 7
-	KeyWebKey                          Key = 8
 	KeyDebugOIDCParentError            Key = 9
 	KeyOIDCSingleV1SessionTermination  Key = 10
 	KeyDisableUserTokenEvent           Key = 11
@@ -45,7 +44,6 @@ type Features struct {
 	UserSchema                     bool                      `json:"user_schema,omitempty"`
 	TokenExchange                  bool                      `json:"token_exchange,omitempty"`
 	ImprovedPerformance            []ImprovedPerformanceType `json:"improved_performance,omitempty"`
-	WebKey                         bool                      `json:"web_key,omitempty"`
 	DebugOIDCParentError           bool                      `json:"debug_oidc_parent_error,omitempty"`
 	OIDCSingleV1SessionTermination bool                      `json:"oidc_single_v1_session_termination,omitempty"`
 	DisableUserTokenEvent          bool                      `json:"disable_user_token_event,omitempty"`
