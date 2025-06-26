@@ -33,13 +33,13 @@ login_help:
 	@echo "Makefile for the login service"
 	@echo "Available targets:"
 	@echo "  login_help              - Show this help message."
-	@echo "  login_generate			 - Generate TypeScript client code from Protobuf definitions."
 	@echo "  login_quality           - Run all quality checks (login_lint, login_test_unit, login_test_integration, login_test_acceptance)."
 	@echo "  login_standalone_build  - Build the docker image for production login containers."
 	@echo "  login_lint              - Run linting and formatting checks. FORCE=true prevents skipping."
 	@echo "  login_test_unit         - Run unit tests. Tests without any dependencies. FORCE=true prevents skipping."
 	@echo "  login-test_integration  - Run integration tests. Tests a login production build against a mocked Zitadel core API. FORCE=true prevents skipping."
 	@echo "  login_test_acceptance   - Run acceptance tests. Tests a login production build with a local Zitadel instance behind a reverse proxy. FORCE=true prevents skipping."
+	@echo "  typescript_generate	 - Generate TypeScript client code from Protobuf definitions."
 	@echo "  show_run_caches         - Show all run caches with image ids and exit codes."
 	@echo "  clean_run_caches        - Remove all run caches."
 
@@ -54,7 +54,7 @@ login_test_unit:
 
 login_test_integration_build:
 	@echo "Building login integration test environment with the local core mock image"
-	$(LOGIN_BAKE_CLI_WITH_ARGS) core-mock login-test-integration login-standalone
+	$(LOGIN_BAKE_CLI_WITH_ARGS) core-mock login-test-integration login-standalone --load
 
 login_test_integration_dev: login_test_integration_cleanup
 	@echo "Starting login integration test environment with the local core mock image"
@@ -76,7 +76,7 @@ login_test_integration: login_test_integration_build
 
 login_test_acceptance_build_bake:
 	@echo "Building login test acceptance images as defined in the docker-bake.hcl"
-	$(LOGIN_BAKE_CLI_WITH_ARGS) login-test-acceptance login-standalone
+	$(LOGIN_BAKE_CLI_WITH_ARGS) login-test-acceptance login-standalone --load
 
 login_test_acceptance_build_compose:
 	@echo "Building login test acceptance images as defined in the docker-compose.yaml"
@@ -116,14 +116,14 @@ login_quality: login_lint login_test_unit login_test_integration
 
 login_standalone_build:
 	@echo "Building the login standalone docker image with tag: $(LOGIN_TAG)"
-	$(LOGIN_BAKE_CLI_WITH_ARGS) --load login-standalone
+	$(LOGIN_BAKE_CLI_WITH_ARGS) login-standalone --load
 
 login_standalone_build_tag:
 	@echo -n "$(LOGIN_TAG)"
 
 typescript_generate:
 	@echo "Generating TypeScript client and writing to local $(LOGIN_DIR)packages/zitadel-proto"
-	$(LOGIN_BAKE_CLI_WITH_ARGS) typescript-proto-client-out
+	$(LOGIN_BAKE_CLI_WITH_ARGS) login-typescript-proto-client-out
 
 clean_run_caches:
 	@echo "Removing cache directory: $(CACHE_DIR)"

@@ -19,13 +19,14 @@ target "typescript-proto-client" {
   }
 }
 
-target "typescript-proto-client-out" {
-  dockerfile = "${DOCKERFILES_DIR}typescript-proto-client-out.Dockerfile"
+# We prefix the target with login- so we can reuse the writing of protos if we overwrite the typescript-proto-client target.
+target "login-typescript-proto-client-out" {
+  dockerfile = "${DOCKERFILES_DIR}login-typescript-proto-client-out.Dockerfile"
   contexts = {
     typescript-proto-client = "target:typescript-proto-client"
   }
   output = [
-    "type=local,dest=packages/zitadel-proto"
+    "type=local,dest=${LOGIN_DIR}packages/zitadel-proto"
   ]
 }
 
@@ -86,7 +87,6 @@ target "core-mock" {
     protos = "target:proto-files"
   }
   tags   = ["${LOGIN_CORE_MOCK_TAG}"]
-  output = ["type=docker"]
 }
 
 variable "LOGIN_TEST_INTEGRATION_TAG" {
@@ -99,7 +99,6 @@ target "login-test-integration" {
     login-pnpm = "target:login-pnpm"
   }
   tags   = ["${LOGIN_TEST_INTEGRATION_TAG}"]
-  output = ["type=docker"]
 }
 
 variable "LOGIN_TEST_ACCEPTANCE_TAG" {
@@ -112,7 +111,6 @@ target "login-test-acceptance" {
     login-pnpm = "target:login-pnpm"
   }
   tags   = ["${LOGIN_TEST_ACCEPTANCE_TAG}"]
-  output = ["type=docker"]
 }
 
 variable "LOGIN_TAG" {
@@ -129,5 +127,4 @@ target "login-standalone" {
     login-client = "target:login-client"
   }
   tags   = ["${LOGIN_TAG}"]
-  output = ["type=docker"]
 }
