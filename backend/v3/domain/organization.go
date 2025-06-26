@@ -25,6 +25,12 @@ type Organization struct {
 	DeletedAt  *time.Time `json:"deletedAt,omitempty" db:"deleted_at"`
 }
 
+// orgs can be identified either using (instnaceID + ID) OR (instanceID + name)
+// OrgIdentifierCondition will either be used as the org ID or org name
+type OrgIdentifierCondition interface {
+	database.Condition
+}
+
 // organizationColumns define all the columns of the instance table.
 type organizationColumns interface {
 	// IDColumn returns the column for the id field.
@@ -46,11 +52,11 @@ type organizationColumns interface {
 // organizationConditions define all the conditions for the instance table.
 type organizationConditions interface {
 	// IDCondition returns an equal filter on the id field.
-	IDCondition(instanceID string) database.Condition
+	IDCondition(instanceID string) OrgIdentifierCondition
+	// NameCondition returns a filter on the name field.
+	NameCondition(name string) OrgIdentifierCondition
 	// InstanceIDCondition returns a filter on the instance id field.
 	InstanceIDCondition(instanceID string) database.Condition
-	// NameCondition returns a filter on the name field.
-	NameCondition(op database.TextOperation, name string) database.Condition
 	// StateCondition returns a filter on the name field.
 	StateCondition(state OrgState) database.Condition
 }
@@ -69,12 +75,12 @@ type OrganizationRepository interface {
 	organizationConditions
 	organizationChanges
 
-	Get(ctx context.Context, id, instance_id string, opts ...database.Condition) (*Organization, error)
+	Get(ctx context.Context, id OrgIdentifierCondition, instance_id string, opts ...database.Condition) (*Organization, error)
 	List(ctx context.Context, opts ...database.Condition) ([]*Organization, error)
 
 	Create(ctx context.Context, instance *Organization) error
-	Update(ctx context.Context, id, instance_id string, condition database.Condition, changes ...database.Change) (int64, error)
-	Delete(ctx context.Context, id, instance_id string, condition database.Condition) (int64, error)
+	Update(ctx context.Context, id OrgIdentifierCondition, instance_id string, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, id OrgIdentifierCondition, instance_id string) (int64, error)
 }
 
 type CreateOrganization struct {

@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
@@ -20,7 +19,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 	t.Run("test instance add reduces", func(t *testing.T) {
 		instanceName := gofakeit.Name()
 		beforeCreate := time.Now()
-		_, err := SystemClient.CreateInstance(CTX, &system.CreateInstanceRequest{
+		instance, err := SystemClient.CreateInstance(CTX, &system.CreateInstanceRequest{
 			InstanceName: instanceName,
 			Owner: &system.CreateInstanceRequest_Machine_{
 				Machine: &system.CreateInstanceRequest_Machine{
@@ -38,7 +37,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
-				instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+				instance.GetInstanceId(),
 			)
 			require.NoError(ttt, err)
 			// event instance.added
@@ -86,7 +85,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
-				instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+				res.InstanceId,
 			)
 			require.NoError(ttt, err)
 			// event instance.changed
@@ -115,7 +114,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
-				instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+				res.InstanceId,
 			)
 			require.NoError(ttt, err)
 			assert.Equal(ttt, instanceName, instance.Name)
@@ -129,7 +128,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
-				instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+				res.InstanceId,
 			)
 			// event instance.removed
 			assert.Nil(t, instance)

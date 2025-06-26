@@ -11,13 +11,14 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
-	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
 func TestServer_TestOrganizationReduces(t *testing.T) {
+	instanceID := Instance.ID()
+
 	t.Run("test org add reduces", func(t *testing.T) {
 		beforeCreate := time.Now()
 		orgName := gofakeit.Name()
@@ -33,7 +34,8 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(tt *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(database.TextOperationEqual, orgName),
+				orgRepo.NameCondition(orgName),
+				instanceID,
 			)
 			require.NoError(tt, err)
 
@@ -72,7 +74,8 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(database.TextOperationEqual, orgName),
+				orgRepo.NameCondition(orgName),
+				instanceID,
 			)
 			require.NoError(t, err)
 
@@ -105,7 +108,8 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(database.TextOperationEqual, orgName),
+				orgRepo.NameCondition(orgName),
+				instanceID,
 			)
 			require.NoError(t, err)
 
@@ -136,7 +140,8 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(database.TextOperationEqual, orgName),
+				orgRepo.NameCondition(orgName),
+				instanceID,
 			)
 			require.NoError(t, err)
 
@@ -155,7 +160,8 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(database.TextOperationEqual, orgName),
+				orgRepo.NameCondition(orgName),
+				instanceID,
 			)
 			require.NoError(t, err)
 
@@ -180,7 +186,8 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(database.TextOperationEqual, orgName),
+				orgRepo.NameCondition(orgName),
+				instanceID,
 			)
 			require.NoError(t, err)
 
@@ -199,7 +206,8 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(database.TextOperationEqual, orgName),
+				orgRepo.NameCondition(orgName),
+				instanceID,
 			)
 			require.NoError(t, err)
 

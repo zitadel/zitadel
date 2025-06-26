@@ -33,17 +33,16 @@ const queryOrganizationStmt = `SELECT id, name, instance_id, state, created_at, 
 	` FROM zitadel.organizations`
 
 // Get implements [domain.OrganizationRepository].
-func (o *org) Get(ctx context.Context, id, instanceID string, conditions ...database.Condition) (*domain.Organization, error) {
+func (o *org) Get(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, conditions ...database.Condition) (*domain.Organization, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(queryOrganizationStmt)
 
-	idCondition := o.IDCondition(id)
 	instanceIDCondition := o.InstanceIDCondition(instanceID)
 	// don't update deleted organizations
 	nonDeletedOrgs := database.IsNull(o.DeletedAtColumn())
 
-	conditions = append(conditions, idCondition, instanceIDCondition, nonDeletedOrgs)
+	conditions = append(conditions, id, instanceIDCondition, nonDeletedOrgs)
 	o.writeCondition(&builder, database.And(conditions...))
 
 	return scanOrganization(ctx, o.client, &builder)
@@ -110,19 +109,18 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 }
 
 // Update implements [domain.OrganizationRepository].
-func (o org) Update(ctx context.Context, id, instanceID string, condition database.Condition, changes ...database.Change) (int64, error) {
+func (o org) Update(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, changes ...database.Change) (int64, error) {
 	if changes == nil {
 		return 0, errors.New("Update must contain a condition") // (otherwise ALL organizations will be updated)
 	}
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.organizations SET `)
 
-	idCondition := o.IDCondition(id)
 	instanceIDCondition := o.InstanceIDCondition(instanceID)
 	// don't update deleted organizations
 	nonDeletedOrgs := database.IsNull(o.DeletedAtColumn())
 
-	conditions := []database.Condition{condition, idCondition, instanceIDCondition, nonDeletedOrgs}
+	conditions := []database.Condition{id, instanceIDCondition, nonDeletedOrgs}
 	database.Changes(changes).Write(&builder)
 	o.writeCondition(&builder, database.And(conditions...))
 
@@ -133,21 +131,17 @@ func (o org) Update(ctx context.Context, id, instanceID string, condition databa
 }
 
 // Delete implements [domain.OrganizationRepository].
-func (o org) Delete(ctx context.Context, id, instanceID string, condition database.Condition) (int64, error) {
-	if condition == nil {
-		return 0, errors.New("Delete must contain a condition") // (otherwise ALL organizations will be deleted)
-	}
+func (o org) Delete(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string) (int64, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(`UPDATE zitadel.organizations SET deleted_at = $1`)
 	builder.AppendArgs(time.Now())
 
-	idCondition := o.IDCondition(id)
 	instanceIDCondition := o.InstanceIDCondition(instanceID)
 	// don't update deleted organizations
 	nonDeletedOrgs := database.IsNull(o.DeletedAtColumn())
 
-	conditions := []database.Condition{condition, idCondition, instanceIDCondition, nonDeletedOrgs}
+	conditions := []database.Condition{id, instanceIDCondition, nonDeletedOrgs}
 	o.writeCondition(&builder, database.And(conditions...))
 
 	return o.client.Exec(ctx, builder.String(), builder.Args()...)
@@ -172,18 +166,19 @@ func (i org) SetState(state domain.OrgState) database.Change {
 // -------------------------------------------------------------
 
 // IDCondition implements [domain.organizationConditions].
-func (o org) IDCondition(id string) database.Condition {
+func (o org) IDCondition(id string) domain.OrgIdentifierCondition {
 	return database.NewTextCondition(o.IDColumn(), database.TextOperationEqual, id)
+}
+
+// NameCondition implements [domain.organizationConditions].
+func (o org) NameCondition(name string) domain.OrgIdentifierCondition {
+	// return database.NewTextCondition(o.NameColumn(), database.TextOperationEqualIgnoreCase, name)
+	return database.NewTextCondition(o.NameColumn(), database.TextOperationEqual, name)
 }
 
 // InstanceIDCondition implements [domain.organizationConditions].
 func (o org) InstanceIDCondition(instanceID string) database.Condition {
 	return database.NewTextCondition(o.InstanceIDColumn(), database.TextOperationEqual, instanceID)
-}
-
-// NameCondition implements [domain.organizationConditions].
-func (o org) NameCondition(op database.TextOperation, name string) database.Condition {
-	return database.NewTextCondition(o.NameColumn(), op, name)
 }
 
 // StateCondition implements [domain.organizationConditions].

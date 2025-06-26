@@ -82,14 +82,42 @@ func TestCreateInstance(t *testing.T) {
 			},
 			err: errors.New("instance id already exists"),
 		},
-		{
-			name: "adding instance with same name twice",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
-				instanceRepo := repository.InstanceRepository(pool)
-				instanceId := gofakeit.Name()
-				instanceName := gofakeit.Name()
+		func() struct {
+			name     string
+			testFunc func(ctx context.Context, t *testing.T) *domain.Instance
+			instance domain.Instance
+			err      error
+		} {
+			instanceId := gofakeit.Name()
+			instanceName := gofakeit.Name()
+			return struct {
+				name     string
+				testFunc func(ctx context.Context, t *testing.T) *domain.Instance
+				instance domain.Instance
+				err      error
+			}{
+				name: "adding instance with same name twice",
+				testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
+					instanceRepo := repository.InstanceRepository(pool)
 
-				inst := domain.Instance{
+					inst := domain.Instance{
+						ID:              gofakeit.Name(),
+						Name:            instanceName,
+						DefaultOrgID:    "defaultOrgId",
+						IAMProjectID:    "iamProject",
+						ConsoleClientID: "consoleCLient",
+						ConsoleAppID:    "consoleApp",
+						DefaultLanguage: "defaultLanguage",
+					}
+
+					err := instanceRepo.Create(ctx, &inst)
+					require.NoError(t, err)
+
+					// change the id
+					inst.ID = instanceId
+					return &inst
+				},
+				instance: domain.Instance{
 					ID:              instanceId,
 					Name:            instanceName,
 					DefaultOrgID:    "defaultOrgId",
@@ -97,16 +125,11 @@ func TestCreateInstance(t *testing.T) {
 					ConsoleClientID: "consoleCLient",
 					ConsoleAppID:    "consoleApp",
 					DefaultLanguage: "defaultLanguage",
-				}
-
-				err := instanceRepo.Create(ctx, &inst)
-				// change the id to make sure same name+instance causes an error
-				inst.ID = gofakeit.Name()
-				require.NoError(t, err)
-				return &inst
-			},
-			err: errors.New("organization name already exists for instance"),
-		},
+				},
+				// two instances can have the sane name
+				err: nil,
+			}
+		}(),
 		{
 			name: "adding instance with no id",
 			instance: func() domain.Instance {
@@ -149,7 +172,7 @@ func TestCreateInstance(t *testing.T) {
 
 			// check instance values
 			instance, err = instanceRepo.Get(ctx,
-				instanceRepo.NameCondition(database.TextOperationEqual, instance.Name),
+				instance.ID,
 			)
 			require.NoError(t, err)
 
@@ -220,7 +243,7 @@ func TestUpdateInstance(t *testing.T) {
 
 				// delete instance
 				affectedRows, err := instanceRepo.Delete(ctx,
-					instanceRepo.IDCondition(inst.ID),
+					inst.ID,
 				)
 				require.NoError(t, err)
 				assert.Equal(t, int64(1), affectedRows)
@@ -253,7 +276,7 @@ func TestUpdateInstance(t *testing.T) {
 			// update name
 			newName := "new_" + instance.Name
 			rowsAffected, err := instanceRepo.Update(ctx,
-				instanceRepo.IDCondition(instance.ID),
+				instance.ID,
 				instanceRepo.SetName(newName),
 			)
 			afterUpdate := time.Now()
@@ -267,7 +290,7 @@ func TestUpdateInstance(t *testing.T) {
 
 			// check instance values
 			instance, err = instanceRepo.Get(ctx,
-				instanceRepo.IDCondition(instance.ID),
+				instance.ID,
 			)
 			require.NoError(t, err)
 
@@ -281,9 +304,8 @@ func TestUpdateInstance(t *testing.T) {
 func TestGetInstance(t *testing.T) {
 	instanceRepo := repository.InstanceRepository(pool)
 	type test struct {
-		name             string
-		testFunc         func(ctx context.Context, t *testing.T) *domain.Instance
-		conditionClauses []database.Condition
+		name     string
+		testFunc func(ctx context.Context, t *testing.T) *domain.Instance
 	}
 
 	tests := []test{
@@ -309,45 +331,16 @@ func TestGetInstance(t *testing.T) {
 					require.NoError(t, err)
 					return &inst
 				},
-				conditionClauses: []database.Condition{instanceRepo.IDCondition(instanceId)},
-			}
-		}(),
-		func() test {
-			instanceName := gofakeit.Name()
-			return test{
-				name: "happy path get using name",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
-					instanceId := gofakeit.Name()
-
-					inst := domain.Instance{
-						ID:              instanceId,
-						Name:            instanceName,
-						DefaultOrgID:    "defaultOrgId",
-						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
-						DefaultLanguage: "defaultLanguage",
-					}
-
-					// create instance
-					err := instanceRepo.Create(ctx, &inst)
-					require.NoError(t, err)
-					return &inst
-				},
-				conditionClauses: []database.Condition{instanceRepo.NameCondition(database.TextOperationEqual, instanceName)},
 			}
 		}(),
 		{
 			name: "get non existent instance",
 			testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
-				instanceId := gofakeit.Name()
-
-				_ = domain.Instance{
-					ID: instanceId,
+				inst := domain.Instance{
+					ID: "get non existent instance",
 				}
-				return nil
+				return &inst
 			},
-			conditionClauses: []database.Condition{instanceRepo.NameCondition(database.TextOperationEqual, "non-existent-instance-name")},
 		},
 	}
 	for _, tt := range tests {
@@ -362,11 +355,12 @@ func TestGetInstance(t *testing.T) {
 
 			// check instance values
 			returnedInstance, err := instanceRepo.Get(ctx,
-				tt.conditionClauses...,
+				instance.ID,
+				// tt.conditionClauses...,
 			)
 			require.NoError(t, err)
-			if instance == nil {
-				assert.Nil(t, instance, returnedInstance)
+			if instance.ID == "get non existent instance" {
+				assert.Nil(t, returnedInstance)
 				return
 			}
 
@@ -552,10 +546,10 @@ func TestListInstance(t *testing.T) {
 
 func TestDeleteInstance(t *testing.T) {
 	type test struct {
-		name             string
-		testFunc         func(ctx context.Context, t *testing.T)
-		conditionClauses database.Condition
-		noOfDeletedRows  int64
+		name            string
+		testFunc        func(ctx context.Context, t *testing.T)
+		instanceID      string
+		noOfDeletedRows int64
 	}
 	tests := []test{
 		func() test {
@@ -585,78 +579,15 @@ func TestDeleteInstance(t *testing.T) {
 						instances[i] = &inst
 					}
 				},
-				conditionClauses: instanceRepo.IDCondition(instanceId),
-				noOfDeletedRows:  noOfInstances,
+				instanceID:      instanceId,
+				noOfDeletedRows: noOfInstances,
 			}
 		}(),
 		func() test {
-			instanceRepo := repository.InstanceRepository(pool)
-			instanceName := gofakeit.Name()
-			var noOfInstances int64 = 1
-			return test{
-				name: "happy path delete single instance filter name",
-				testFunc: func(ctx context.Context, t *testing.T) {
-					instances := make([]*domain.Instance, noOfInstances)
-					for i := range noOfInstances {
-
-						inst := domain.Instance{
-							ID:              gofakeit.Name(),
-							Name:            instanceName,
-							DefaultOrgID:    "defaultOrgId",
-							IAMProjectID:    "iamProject",
-							ConsoleClientID: "consoleCLient",
-							ConsoleAppID:    "consoleApp",
-							DefaultLanguage: "defaultLanguage",
-						}
-
-						// create instance
-						err := instanceRepo.Create(ctx, &inst)
-						require.NoError(t, err)
-
-						instances[i] = &inst
-					}
-				},
-				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
-				noOfDeletedRows:  noOfInstances,
-			}
-		}(),
-		func() test {
-			instanceRepo := repository.InstanceRepository(pool)
 			non_existent_instance_name := gofakeit.Name()
 			return test{
-				name:             "delete non existent instance",
-				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, non_existent_instance_name),
-			}
-		}(),
-		func() test {
-			instanceRepo := repository.InstanceRepository(pool)
-			instanceName := gofakeit.Name()
-			var noOfInstances int64 = 5
-			return test{
-				name: "multiple instance filter on name",
-				testFunc: func(ctx context.Context, t *testing.T) {
-					instances := make([]*domain.Instance, noOfInstances)
-					for i := range noOfInstances {
-
-						inst := domain.Instance{
-							ID:              gofakeit.Name(),
-							Name:            instanceName,
-							DefaultOrgID:    "defaultOrgId",
-							IAMProjectID:    "iamProject",
-							ConsoleClientID: "consoleCLient",
-							ConsoleAppID:    "consoleApp",
-							DefaultLanguage: "defaultLanguage",
-						}
-
-						// create instance
-						err := instanceRepo.Create(ctx, &inst)
-						require.NoError(t, err)
-
-						instances[i] = &inst
-					}
-				},
-				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
-				noOfDeletedRows:  noOfInstances,
+				name:       "delete non existent instance",
+				instanceID: non_existent_instance_name,
 			}
 		}(),
 		func() test {
@@ -688,12 +619,12 @@ func TestDeleteInstance(t *testing.T) {
 
 					// delete instance
 					affectedRows, err := instanceRepo.Delete(ctx,
-						instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+						instances[0].ID,
 					)
 					require.NoError(t, err)
 					assert.Equal(t, int64(1), affectedRows)
 				},
-				conditionClauses: instanceRepo.NameCondition(database.TextOperationEqual, instanceName),
+				instanceID: instanceName,
 				// this test should return 0 affected rows as the instance was already deleted
 				noOfDeletedRows: 0,
 			}
@@ -710,14 +641,14 @@ func TestDeleteInstance(t *testing.T) {
 
 			// delete instance
 			noOfDeletedRows, err := instanceRepo.Delete(ctx,
-				tt.conditionClauses,
+				tt.instanceID,
 			)
 			require.NoError(t, err)
 			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
 
 			// check instance was deleted
 			instance, err := instanceRepo.Get(ctx,
-				tt.conditionClauses,
+				tt.instanceID,
 			)
 			require.NoError(t, err)
 			assert.Nil(t, instance)

@@ -33,14 +33,15 @@ const queryInstanceStmt = `SELECT id, name, default_org_id, iam_project_id, cons
 	` FROM zitadel.instances`
 
 // Get implements [domain.InstanceRepository].
-func (i *instance) Get(ctx context.Context, opts ...database.Condition) (*domain.Instance, error) {
+func (i *instance) Get(ctx context.Context, id string) (*domain.Instance, error) {
 	var builder database.StatementBuilder
 
 	builder.WriteString(queryInstanceStmt)
 
+	idCondition := i.IDCondition(id)
 	// return only non deleted instances
-	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
-	i.writeCondition(&builder, database.And(opts...))
+	conditions := []database.Condition{idCondition, database.IsNull(i.DeletedAtColumn())}
+	i.writeCondition(&builder, database.And(conditions...))
 
 	return scanInstance(ctx, i.client, &builder)
 }
@@ -95,17 +96,19 @@ func (i *instance) Create(ctx context.Context, instance *domain.Instance) error 
 }
 
 // Update implements [domain.InstanceRepository].
-func (i instance) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
+func (i instance) Update(ctx context.Context, id string, changes ...database.Change) (int64, error) {
 	if changes == nil {
-		return 0, errors.New("Update must contain a condition") // (otherwise ALL instances will be updated)
+		return 0, errors.New("Update must contain a change")
 	}
 	var builder database.StatementBuilder
 
 	builder.WriteString(`UPDATE zitadel.instances SET `)
 
-	// don't update deleted instances
-	conditions := []database.Condition{condition, database.IsNull(i.DeletedAtColumn())}
 	database.Changes(changes).Write(&builder)
+
+	idCondition := i.IDCondition(id)
+	// don't update deleted instances
+	conditions := []database.Condition{idCondition, database.IsNull(i.DeletedAtColumn())}
 	i.writeCondition(&builder, database.And(conditions...))
 
 	stmt := builder.String()
@@ -115,17 +118,15 @@ func (i instance) Update(ctx context.Context, condition database.Condition, chan
 }
 
 // Delete implements [domain.InstanceRepository].
-func (i instance) Delete(ctx context.Context, condition database.Condition) (int64, error) {
-	if condition == nil {
-		return 0, errors.New("Delete must contain a condition") // (otherwise ALL instances will be deleted)
-	}
+func (i instance) Delete(ctx context.Context, id string) (int64, error) {
 	var builder database.StatementBuilder
 
-	// don't delete already deleted instance
 	builder.WriteString(`UPDATE zitadel.instances SET deleted_at = $1`)
 	builder.AppendArgs(time.Now())
 
-	conditions := []database.Condition{condition, database.IsNull(i.DeletedAtColumn())}
+	// don't delete already deleted instance
+	idCondition := i.IDCondition(id)
+	conditions := []database.Condition{idCondition, database.IsNull(i.DeletedAtColumn())}
 	i.writeCondition(&builder, database.And(conditions...))
 
 	return i.client.Exec(ctx, builder.String(), builder.Args()...)
