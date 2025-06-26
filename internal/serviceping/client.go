@@ -19,6 +19,11 @@ import (
 	analytics "github.com/zitadel/zitadel/pkg/grpc/analytics/v2beta"
 )
 
+const (
+	pathBaseInformation = "/instances"
+	pathResourceCounts  = "/resource_counts"
+)
+
 type Client struct {
 	httpClient *http.Client
 	endpoint   string
@@ -26,7 +31,7 @@ type Client struct {
 
 func (c Client) ReportBaseInformation(ctx context.Context, in *analytics.ReportBaseInformationRequest, opts ...grpc.CallOption) (*analytics.ReportBaseInformationResponse, error) {
 	reportResponse := new(analytics.ReportBaseInformationResponse)
-	err := c.callTelemetryService(ctx, in, reportResponse)
+	err := c.callTelemetryService(ctx, pathBaseInformation, in, reportResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -35,19 +40,19 @@ func (c Client) ReportBaseInformation(ctx context.Context, in *analytics.ReportB
 
 func (c Client) ReportResourceCounts(ctx context.Context, in *analytics.ReportResourceCountsRequest, opts ...grpc.CallOption) (*analytics.ReportResourceCountsResponse, error) {
 	reportResponse := new(analytics.ReportResourceCountsResponse)
-	err := c.callTelemetryService(ctx, in, reportResponse)
+	err := c.callTelemetryService(ctx, pathResourceCounts, in, reportResponse)
 	if err != nil {
 		return nil, err
 	}
 	return reportResponse, nil
 }
 
-func (c Client) callTelemetryService(ctx context.Context, in proto.Message, out proto.Message) error {
+func (c Client) callTelemetryService(ctx context.Context, path string, in proto.Message, out proto.Message) error {
 	requestBody, err := protojson.Marshal(in)
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.endpoint, bytes.NewReader(requestBody))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.endpoint+path, bytes.NewReader(requestBody))
 	if err != nil {
 		return err
 	}
