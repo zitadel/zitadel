@@ -6,14 +6,6 @@ variable "DOCKERFILES_DIR" {
   default = "dockerfiles/"
 }
 
-variable "UID" {
-  default = "1000"
-}
-
-variable "GID" {
-  default = "1000"
-}
-
 # typescript-proto-client is used to generate the client code for the login service.
 # It is not login-prefixed, so it is easily extendable.
 # To extend this bake-file.hcl, set the context of all login-prefixed targets to a different directory.
@@ -28,8 +20,10 @@ target "typescript-proto-client" {
 }
 
 target "typescript-proto-client-out" {
-  inherits = ["typescript-proto-client"]
-  target = "typescript-proto-client-out"
+  dockerfile = "${DOCKERFILES_DIR}typescript-proto-client-out.Dockerfile"
+  contexts = {
+    typescript-proto-client = "target:typescript-proto-client"
+  }
   output = [
     "type=local,dest=packages/zitadel-proto"
   ]
