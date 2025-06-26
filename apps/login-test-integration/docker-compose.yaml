@@ -1,6 +1,6 @@
 services:
   core-mock:
-    image: "${CORE_MOCK_TAG:-core-mock:local}"
+    image: "${LOGIN_CORE_MOCK_TAG:-login-core-mock:local}"
     container_name: integration-core-mock
     ports:
       - 22220:22220
