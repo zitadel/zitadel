@@ -82,7 +82,7 @@ target "login-client" {
 }
 
 variable "LOGIN_CORE_MOCK_TAG" {
-  default = "core-mock:local"
+  default = "login-core-mock:local"
 }
 
 # the core-mock context must not be overwritten, so we don't prefix it with login-.
