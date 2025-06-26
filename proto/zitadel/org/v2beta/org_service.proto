@@ -177,7 +177,7 @@ service OrganizationService {
       responses: {
         key: "409"
         value: {
-          description: "Organisation's name already taken";
+          description: "Organisation's name or id already taken";
         }
       };
     };
