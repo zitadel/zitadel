@@ -179,7 +179,7 @@ func (wm *SAMLApplicationWriteModel) NewChangedEvent(
 	if metadata != nil && !slices.Equal(wm.Metadata, metadata) {
 		changes = append(changes, project.ChangeMetadata(metadata))
 	}
-	if metadata != nil && wm.MetadataURL != *metadataURL {
+	if metadataURL != nil && wm.MetadataURL != *metadataURL {
 		changes = append(changes, project.ChangeMetadataURL(*metadataURL))
 	}
 	if wm.EntityID != entityID {
