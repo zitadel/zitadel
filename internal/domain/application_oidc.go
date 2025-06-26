@@ -213,11 +213,8 @@ func (a *OIDCApp) FillCompliance() {
 }
 
 func GetOIDCCompliance(version *OIDCVersion, appType *OIDCApplicationType, grantTypes []OIDCGrantType, responseTypes []OIDCResponseType, authMethod *OIDCAuthMethodType, redirectUris []string) *Compliance {
-	if version != nil {
-		switch *version {
-		case OIDCVersionV1:
-			return GetOIDCV1Compliance(appType, grantTypes, authMethod, redirectUris)
-		}
+	if version != nil && *version == OIDCVersionV1 {
+		return GetOIDCV1Compliance(appType, grantTypes, authMethod, redirectUris)
 	}
 
 	return &Compliance{
@@ -272,6 +269,8 @@ func checkApplicationType(compliance *Compliance, appType *OIDCApplicationType, 
 			GetOIDCV1NativeApplicationCompliance(compliance, authMethod)
 		case OIDCApplicationTypeUserAgent:
 			GetOIDCV1UserAgentApplicationCompliance(compliance, authMethod)
+		case OIDCApplicationTypeWeb:
+			return
 		}
 	}
 
