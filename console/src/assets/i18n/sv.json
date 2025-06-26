@@ -1628,8 +1628,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Standardorganisation för inloggning",
       "LOGINDEFAULTORG_DESCRIPTION": "Inloggningsgränssnittet kommer att använda inställningarna för standardorganisationen (och inte från instansen) om ingen organisationskontext är inställd",
-      "OIDCLEGACYINTROSPECTION": "OIDC Legacy introspection",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Vi har nyligen omarbetat introspektionsändpunkten av prestandaskäl. Denna funktion kan användas för att återgå till den äldre implementationen om oväntade buggar uppstår.",
       "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktivera den experimentella urn:ietf:params:oauth:grant-type:token-exchange grant-typen för OIDC-tokenändpunkten. Tokenutbyte kan användas för att begära tokens med en mindre omfattning eller impersonera andra användare. Se säkerhetspolicyn för att tillåta impersonation på en instans.",
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Trigger introspection Projections",

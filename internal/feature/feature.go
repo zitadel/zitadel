@@ -9,22 +9,21 @@ import (
 type Key int
 
 const (
-	KeyUnspecified Key = iota
-	KeyLoginDefaultOrg
-	KeyTriggerIntrospectionProjections
-	KeyLegacyIntrospection
-	KeyUserSchema
-	KeyTokenExchange
-	KeyActionsDeprecated
-	KeyImprovedPerformance
-	// KeyWebKey (reserving the spot)
-	KeyDebugOIDCParentError Key = iota + 1
-	KeyOIDCSingleV1SessionTermination
-	KeyDisableUserTokenEvent
-	KeyEnableBackChannelLogout
-	KeyLoginV2
-	KeyPermissionCheckV2
-	KeyConsoleUseV2UserApi
+	// Reserved: 3, 6, 8
+
+	KeyUnspecified                     Key = 0
+	KeyLoginDefaultOrg                 Key = 1
+	KeyTriggerIntrospectionProjections Key = 2
+	KeyUserSchema                      Key = 4
+	KeyTokenExchange                   Key = 5
+	KeyImprovedPerformance             Key = 7
+	KeyDebugOIDCParentError            Key = 9
+	KeyOIDCSingleV1SessionTermination  Key = 10
+	KeyDisableUserTokenEvent           Key = 11
+	KeyEnableBackChannelLogout         Key = 12
+	KeyLoginV2                         Key = 13
+	KeyPermissionCheckV2               Key = 14
+	KeyConsoleUseV2UserApi             Key = 15
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -43,7 +42,6 @@ const (
 type Features struct {
 	LoginDefaultOrg                 bool                      `json:"login_default_org,omitempty"`
 	TriggerIntrospectionProjections bool                      `json:"trigger_introspection_projections,omitempty"`
-	LegacyIntrospection             bool                      `json:"legacy_introspection,omitempty"`
 	UserSchema                      bool                      `json:"user_schema,omitempty"`
 	TokenExchange                   bool                      `json:"token_exchange,omitempty"`
 	ImprovedPerformance             []ImprovedPerformanceType `json:"improved_performance,omitempty"`

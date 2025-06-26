@@ -21,7 +21,6 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 	arg := &feature_pb.SetSystemFeaturesRequest{
 		LoginDefaultOrg:                     gu.Ptr(true),
 		OidcTriggerIntrospectionProjections: gu.Ptr(false),
-		OidcLegacyIntrospection:             nil,
 		UserSchema:                          gu.Ptr(true),
 		OidcTokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:                 nil,
@@ -34,7 +33,6 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 	want := &command.SystemFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
 		TriggerIntrospectionProjections: gu.Ptr(false),
-		LegacyIntrospection:             nil,
 		UserSchema:                      gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:             nil,
@@ -63,10 +61,6 @@ func Test_systemFeaturesToPb(t *testing.T) {
 		TriggerIntrospectionProjections: query.FeatureSource[bool]{
 			Level: feature.LevelUnspecified,
 			Value: false,
-		},
-		LegacyIntrospection: query.FeatureSource[bool]{
-			Level: feature.LevelSystem,
-			Value: true,
 		},
 		UserSchema: query.FeatureSource[bool]{
 			Level: feature.LevelSystem,
@@ -114,10 +108,6 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Enabled: false,
 			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
 		},
-		OidcLegacyIntrospection: &feature_pb.FeatureFlag{
-			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_SYSTEM,
-		},
 		UserSchema: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
@@ -160,7 +150,6 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 	arg := &feature_pb.SetInstanceFeaturesRequest{
 		LoginDefaultOrg:                     gu.Ptr(true),
 		OidcTriggerIntrospectionProjections: gu.Ptr(false),
-		OidcLegacyIntrospection:             nil,
 		UserSchema:                          gu.Ptr(true),
 		OidcTokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:                 nil,
@@ -176,7 +165,6 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
 		TriggerIntrospectionProjections: gu.Ptr(false),
-		LegacyIntrospection:             nil,
 		UserSchema:                      gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:             nil,
@@ -208,10 +196,6 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		TriggerIntrospectionProjections: query.FeatureSource[bool]{
 			Level: feature.LevelUnspecified,
 			Value: false,
-		},
-		LegacyIntrospection: query.FeatureSource[bool]{
-			Level: feature.LevelInstance,
-			Value: true,
 		},
 		UserSchema: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
@@ -262,10 +246,6 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		OidcTriggerIntrospectionProjections: &feature_pb.FeatureFlag{
 			Enabled: false,
 			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
-		},
-		OidcLegacyIntrospection: &feature_pb.FeatureFlag{
-			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 		UserSchema: &feature_pb.FeatureFlag{
 			Enabled: true,

@@ -34,21 +34,10 @@ func TestServer_UserInfo(t *testing.T) {
 	})
 	tests := []struct {
 		name    string
-		legacy  bool
 		trigger bool
 	}{
 		{
-			name:   "legacy enabled",
-			legacy: true,
-		},
-		{
-			name:    "legacy disabled, trigger disabled",
-			legacy:  false,
-			trigger: false,
-		},
-		{
-			name:    "legacy disabled, trigger enabled",
-			legacy:  false,
+			name:    "trigger enabled",
 			trigger: true,
 		},
 	}
@@ -56,7 +45,6 @@ func TestServer_UserInfo(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := Instance.Client.FeatureV2.SetInstanceFeatures(iamOwnerCTX, &feature.SetInstanceFeaturesRequest{
-				OidcLegacyIntrospection:             &tt.legacy,
 				OidcTriggerIntrospectionProjections: &tt.trigger,
 			})
 			require.NoError(t, err)
