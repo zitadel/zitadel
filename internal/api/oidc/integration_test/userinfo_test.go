@@ -40,6 +40,10 @@ func TestServer_UserInfo(t *testing.T) {
 			name:    "trigger enabled",
 			trigger: true,
 		},
+		{
+			name:    "trigger disabled",
+			trigger: false,
+		},
 	}
 
 	for _, tt := range tests {
