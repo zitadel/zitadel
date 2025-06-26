@@ -49,6 +49,7 @@
   "idp": {
     "title": "使用 SSO 登录",
     "description": "选择以下提供商中的一个进行登录",
+    "orSignInWith": "或使用以下方式登录",
     "signInWithApple": "用 Apple 登录",
     "signInWithGoogle": "用 Google 登录",
     "signInWithAzureAD": "用 AzureAD 登录",
@@ -78,6 +79,13 @@
       "title": "完成注册",
       "description": "完成您的账户注册。"
     }
+  },
+  "ldap": {
+    "title": "使用 LDAP 登录",
+    "description": "请输入您的 LDAP 凭据。",
+    "username": "用户名",
+    "password": "密码",
+    "submit": "继续"
   },
   "mfa": {
     "verify": {

@@ -66,8 +66,8 @@ You can already use the current state, and extend it with your needs.
   - [x] Generic OIDC
   - [x] Generic OAuth
   - [x] Generic JWT
-  - [ ] LDAP
-  - [ ] SAML SP
+  - [x] LDAP
+  - [x] SAML SP
 - Multifactor Registration an Login
   - [x] Passkeys
   - [x] TOTP
@@ -142,6 +142,13 @@ You can already use the current state, and extend it with your needs.
 ```
 
 You can find a more detailed documentation of the different pages [here](./apps/login/readme.md).
+
+#### Custom translations
+
+The new login uses the [SettingsApi](https://zitadel.com/docs/apis/resources/settings_service_v2/settings-service-get-hosted-login-translation) to load custom translations.
+Translations can be overriden at both the instance and organization levels.
+To find the keys more easily, you can inspect the HTML and search for a `data-i18n-key` attribute, or look at the defaults in `/apps/login/locales/[locale].ts`.
+![Custom Translations](.github/custom-i18n.png)
 
 ## Tooling
 

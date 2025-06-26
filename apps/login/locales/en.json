@@ -49,6 +49,7 @@
   "idp": {
     "title": "Sign in with SSO",
     "description": "Select one of the following providers to sign in",
+    "orSignInWith": "or sign in with",
     "signInWithApple": "Sign in with Apple",
     "signInWithGoogle": "Sign in with Google",
     "signInWithAzureAD": "Sign in with AzureAD",
@@ -78,6 +79,13 @@
       "title": "Complete your data",
       "description": "You need to complete your registration by providing your email address and name."
     }
+  },
+  "ldap": {
+    "title": "LDAP Login",
+    "description": "Enter your LDAP credentials.",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Continue"
   },
   "mfa": {
     "verify": {

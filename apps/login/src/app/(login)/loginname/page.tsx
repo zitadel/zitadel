@@ -76,15 +76,17 @@ export default async function Page(props: {
           suffix={suffix}
           submit={submit}
           allowRegister={!!loginSettings?.allowRegister}
-        >
-          {identityProviders && loginSettings?.allowExternalIdp && (
+        ></UsernameForm>
+
+        {identityProviders && loginSettings?.allowExternalIdp && (
+          <div className="w-full pt-6 pb-4">
             <SignInWithIdp
               identityProviders={identityProviders}
               requestId={requestId}
               organization={organization}
             ></SignInWithIdp>
-          )}
-        </UsernameForm>
+          </div>
+        )}
       </div>
     </DynamicTheme>
   );
