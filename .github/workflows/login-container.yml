@@ -34,7 +34,7 @@ jobs:
         with:
           oidc: true
       - name: Build Login Container
-        run: make login-standalone-build
+        run: make login_standalone_build
         env:
           # latest if branch is main, otherwise image version which is the pull request number
           BAKE_CLI: depot bake
@@ -42,4 +42,4 @@ jobs:
           FORCE: ${{ github.event.inputs.force }}
       - name: Get Login image tag
         id: get-login-tag
-        run: echo "LOGIN_TAG=$(make login-standalone-build-tag)"  >> "$GITHUB_OUTPUT"
+        run: echo "LOGIN_TAG=$(make login_standalone_build_tag)"  >> "$GITHUB_OUTPUT"

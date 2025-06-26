@@ -188,15 +188,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          version: echo -n "${{ needs.version.outputs.version }}"
+          version: ${{ needs.version.outputs.version }}
           cwd: login
 
   typescript-repo:
     runs-on: ubuntu-latest
+    needs: version
     if: ${{ github.ref_name == 'next' }}
     continue-on-error: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Push Subtree
-        run: make login-push
+        run: make login_push
