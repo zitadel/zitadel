@@ -20,7 +20,8 @@ Customer and ZITADEL may agree on an individual per-customer pricing via an Ente
 
 ### Monthly amount
 
-Monthly amount means the available usage per measure for one billing period.
+Monthly amount means the available usage per measure for one billing period. 
+This amount is based on the highest number recorded during that billing period. 
 The amount is reset to zero with the start of a new billing period.
 
 ### Custom domains
@@ -40,54 +41,40 @@ Access and runtime logs (logs) means logs that are available about your instance
 Logs may contain information about success or failure reasons for API requests and Action executions, output from Actions, rate limit violations, and system health.
 The total volume of logs you can retrieve is determined by the GB allowance included in your subscription.
 
-### Instances
+### B2C Organizations
 
-This limit defines how many separate instances you can create. 
-An instance is your own private space to manage all your organizations, users, and applications. 
-Using multiple instances is the ideal way to create completely separate environments (e.g., for Development and Production).
+We categorize an organization as Business-to-Consumer (B2C) when it contains more than 10,000 users.
 
-### Organizations
+### M2M Organizations
 
-In Zitadel, each "Organization" represents a distinct tenant, perfect for your B2B customers or for creating separate environments.
-This limit defines the total number of organizations you can create to manage your users and resources in a multi-tenancy setup.
-
-### Users per Organization
-
-This is the total number of users that can be added to any single organization.
-The count includes both human and machine accounts.
-
-### Administrator Users
-
-This limit applies to users assigned an administrative role at the instance level, giving them broad oversight and management capabilities.
-It counts all instance-wide administrators, from users with full, unrestricted access (IAM_OWNER) to those with view-only administrative permissions (IAM_OWNER_VIEWER), or any other role.
-You are billed for the total number of administrator users on your account at the time the invoice is created.
+A Machine-to-Machine (M2M) Organization is one that includes more than five machine users.
 
 ### SCIM Connections
 
-Automate user provisioning by connecting your identity sources to Zitadel. 
-This limit defines how many different SCIM clients you can configure to send user data to your instance, enabling automatic creation, updates, and deactivation of users.
+Automate user provisioning by connecting your identity sources to Zitadel.
+This metric tracks the number of unique SCIM clients you've configured to send user data to your instance, enabling automatic user creation, updates, and deactivation.
 
 ### Identity Providers (Social Login, Enterprise Login, etc.)
 
-We count all configured external identity providers, with the one exception of LDAP connections. 
-This includes social logins (like Google, GitHub, and Apple) as well as generic providers using protocols like OpenID Connect, OAuth, and SAML.
+We count all configured external identity providers, with the one exception of LDAP connections. This includes social logins (like Google, GitHub, and Apple) as well as generic providers using protocols like OpenID Connect, OAuth, and SAML.
+
+For billing purposes, your invoice reflects the peak number of Identity providers connected to your account throughout the month.
 
 ### LDAP Identity Providers
 
-We count each configured LDAP connection separately from other identity providers. 
-Your bill is based on the total number of these LDAP providers connected to your account at the time the invoice is created.
+We count each configured LDAP connection separately from other identity providers.
+Your bill is based on the highest number of LDAP providers connected to your account at any point during the billing cycle.
 
 ### Actions
 
-Your subscription plan determines the number of "Actions" you can configure. For billing, we count the total number of actions you have configured at the time your invoice is created.
+The number of 'Actions' you can configure is set by your subscription plan. We bill based on the maximum number of actions you had configured at any time within the billing period.
 
 ### Policies
 
 Policies are rules that enforce security behaviors, like password complexity or requiring multi-factor authentication (MFA).
 
 Your bill is not based on the number of policies you create, but on how many times they are actively enforced/activated.
-We calculate your usage by summing up every policy that is enabled within each of your organizations at the end of the billing cycle.
-
+Your usage is determined by the highest count of enabled policies across all your organizations recorded at any point during the billing cycle.
 List of policies:
 - Force MFA / Factors
 - Password Complexity
