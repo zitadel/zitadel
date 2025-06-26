@@ -1,6 +1,7 @@
 "use client";
 
 import { createNewSessionForLDAP } from "@/lib/server/idp";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -25,6 +26,8 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
+
+  const t = useTranslations("ldap");
 
   const [error, setError] = useState<string>("");
 
@@ -66,7 +69,7 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
         type="text"
         autoComplete="username"
         {...register("loginName", { required: "This field is required" })}
-        label="Loginname"
+        label={t("username")}
         data-testid="username-text-input"
       />
 
@@ -75,7 +78,7 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
           type="password"
           autoComplete="password"
           {...register("password", { required: "This field is required" })}
-          label="Password"
+          label={t("password")}
           data-testid="password-text-input"
         />
       </div>
@@ -98,7 +101,7 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
           data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          <Translated i18nKey="verify.submit" namespace="ldap" />
+          <Translated i18nKey="submit" namespace="ldap" />
         </Button>
       </div>
     </form>
