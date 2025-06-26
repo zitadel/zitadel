@@ -65,7 +65,7 @@ pnpm dev:local
 
 Log in at https://127.0.0.1.sslip.io/ui/v2/login/loginname and use the following credentials:
 **Loginname**: *zitadel-admin@zitadel.127.0.0.1.sslip.io*
-**Password**: *Password1!*.
+**Password**: _Password1!_.
 
 The login app live-reloads on changes, so you can start developing right away.
 
@@ -92,7 +92,7 @@ NODE_ENV=test pnpm dev
 
 Log in at https://127.0.0.1.sslip.io/ui/v2/login/loginname and use the following credentials:
 **Loginname**: *zitadel-admin@zitadel.127.0.0.1.sslip.io*
-**Password**: *Password1!*.
+**Password**: _Password1!_.
 
 The login app live-reloads on changes, so you can start developing right away.
 
