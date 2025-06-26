@@ -1626,8 +1626,6 @@
       "LOGINDEFAULTORG_DESCRIPTION": "Als er geen organisatiecontext is ingesteld, gebruikt de inlog-UI de instellingen van de standaardorganisatie (en niet van de instantie)",
       "OIDCTOKENEXCHANGE": "OIDC-tokenuitwisseling",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Schakel het experimentele type verlening urn:ietf:params:oauth:grant-type:token-exchange in voor het OIDC-tokenendpoint. Tokenuitwisseling kan worden gebruikt om tokens met een kleinere scope op te vragen of om zich voor te doen als andere gebruikers. Raadpleeg het beveiligingsbeleid om impersonation op een instantie toe te staan.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC-triggers voor introspectieprojecties",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Schakel projectietriggers in tijdens een introspectieverzoek. Dit kan dienen als een tijdelijke oplossing als er merkbare consistentieproblemen optreden in het introspectieantwoord, maar het kan wel prestaties beïnvloeden. We zijn van plan om triggers voor introspectieverzoeken in de toekomst te verwijderen.",
       "USERSCHEMA": "Gebruikerschema",
       "USERSCHEMA_DESCRIPTION": "Met gebruikerschema's kunt u de dataschema's van gebruikers beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
       "ACTIONS": "Acties",

@@ -1630,8 +1630,6 @@
       "LOGINDEFAULTORG_DESCRIPTION": "Inloggningsgränssnittet kommer att använda inställningarna för standardorganisationen (och inte från instansen) om ingen organisationskontext är inställd",
       "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktivera den experimentella urn:ietf:params:oauth:grant-type:token-exchange grant-typen för OIDC-tokenändpunkten. Tokenutbyte kan användas för att begära tokens med en mindre omfattning eller impersonera andra användare. Se säkerhetspolicyn för att tillåta impersonation på en instans.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Trigger introspection Projections",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Aktivera projektionstriggers under en introspektionsbegäran. Detta kan fungera som en lösning om det finns märkbara konsistensproblem i introspektionssvaret men kan påverka prestandan. Vi planerar att ta bort triggers för introspektionsbegäranden i framtiden.",
       "USERSCHEMA": "Användarschema",
       "USERSCHEMA_DESCRIPTION": "Användarscheman tillåter att hantera datascheman för användare. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
       "ACTIONS": "Åtgärder",
