@@ -56,18 +56,16 @@ export async function middleware(request: NextRequest) {
     securitySettings = await loadSecuritySettings(request);
 
     if (securitySettings?.embeddedIframe?.enabled) {
-      const responseHeaders = new Headers();
+      const response = NextResponse.next({
+        request: { headers: requestHeaders },
+      });
 
-      responseHeaders.set(
+      response.headers.set(
         "Content-Security-Policy",
         `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
       );
-      responseHeaders.delete("X-Frame-Options");
-
-      return NextResponse.next({
-        request: { headers: requestHeaders },
-        headers: responseHeaders,
-      });
+      response.headers.delete("X-Frame-Options");
+      return response;
     }
   }
 
