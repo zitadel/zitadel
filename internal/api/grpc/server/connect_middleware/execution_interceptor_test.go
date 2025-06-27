@@ -58,28 +58,38 @@ func (e *mockExecutionTarget) GetSigningKey() string {
 	return e.SigningKey
 }
 
-func newMockContentRequest(content string) proto.Message {
-	return &structpb.Struct{
+func newMockContentRequest(content string) *connect.Request[structpb.Struct] {
+	return connect.NewRequest(&structpb.Struct{
 		Fields: map[string]*structpb.Value{
 			"content": {
 				Kind: &structpb.Value_StringValue{StringValue: content},
 			},
 		},
-	}
+	})
+}
+
+func newMockContentResponse(content string) *connect.Response[structpb.Struct] {
+	return connect.NewResponse(&structpb.Struct{
+		Fields: map[string]*structpb.Value{
+			"content": {
+				Kind: &structpb.Value_StringValue{StringValue: content},
+			},
+		},
+	})
 }
 
 func newMockContextInfoRequest(fullMethod, request string) *ContextInfoRequest {
 	return &ContextInfoRequest{
 		FullMethod: fullMethod,
-		Request:    Message{Message: newMockContentRequest(request)},
+		Request:    Message{Message: newMockContentRequest(request).Msg},
 	}
 }
 
 func newMockContextInfoResponse(fullMethod, request, response string) *ContextInfoResponse {
 	return &ContextInfoResponse{
 		FullMethod: fullMethod,
-		Request:    Message{Message: newMockContentRequest(request)},
-		Response:   Message{Message: newMockContentRequest(response)},
+		Request:    Message{Message: newMockContentRequest(request).Msg},
+		Response:   Message{Message: newMockContentResponse(response).Msg},
 	}
 }
 
@@ -88,7 +98,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 		reqBody    execution.ContextInfo
 		sleep      time.Duration
 		statusCode int
-		respBody   interface{}
+		respBody   connect.AnyResponse
 	}
 	type args struct {
 		ctx context.Context
@@ -171,7 +181,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
+						respBody:   newMockContentResponse("content1"),
 						sleep:      0,
 						statusCode: http.StatusBadRequest,
 					},
@@ -202,7 +212,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
+						respBody:   newMockContentResponse("content1"),
 						sleep:      0,
 						statusCode: http.StatusBadRequest,
 					},
@@ -232,7 +242,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
+						respBody:   newMockContentResponse("content1"),
 						sleep:      5 * time.Second,
 						statusCode: http.StatusOK,
 					},
@@ -287,7 +297,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
+						respBody:   newMockContentResponse("content1"),
 						sleep:      0,
 						statusCode: http.StatusOK,
 					},
@@ -316,7 +326,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
+						respBody:   newMockContentResponse("content1"),
 						sleep:      5 * time.Second,
 						statusCode: http.StatusOK,
 					},
@@ -345,7 +355,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
+						respBody:   newMockContentResponse("content1"),
 						sleep:      0,
 						statusCode: http.StatusOK,
 					},
@@ -404,7 +414,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
+						respBody:   newMockContentResponse("content1"),
 						sleep:      5 * time.Second,
 						statusCode: http.StatusOK,
 					},
@@ -434,7 +444,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
+						respBody:   newMockContentResponse("content1"),
 						sleep:      0,
 						statusCode: http.StatusOK,
 					},
@@ -483,19 +493,19 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
+						respBody:   newMockContentResponse("content1"),
 						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content1"),
-						respBody:   newMockContentRequest("content2"),
+						respBody:   newMockContentResponse("content2"),
 						sleep:      0,
 						statusCode: http.StatusBadRequest,
 					},
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content2"),
-						respBody:   newMockContentRequest("content3"),
+						respBody:   newMockContentResponse("content3"),
 						sleep:      0,
 						statusCode: http.StatusOK,
 					},
@@ -543,19 +553,19 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
+						respBody:   newMockContentResponse("content1"),
 						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content1"),
-						respBody:   newMockContentRequest("content2"),
+						respBody:   newMockContentResponse("content2"),
 						sleep:      5 * time.Second,
 						statusCode: http.StatusBadRequest,
 					},
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content2"),
-						respBody:   newMockContentRequest("content3"),
+						respBody:   newMockContentResponse("content3"),
 						sleep:      5 * time.Second,
 						statusCode: http.StatusOK,
 					},
@@ -608,7 +618,7 @@ func testServerCall(
 	reqBody interface{},
 	sleep time.Duration,
 	statusCode int,
-	respBody interface{},
+	respBody connect.AnyResponse,
 ) (string, func()) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data, err := json.Marshal(reqBody)
@@ -636,7 +646,7 @@ func testServerCall(
 		time.Sleep(sleep)
 
 		w.Header().Set("Content-Type", "application/json")
-		resp, err := protojson.Marshal(respBody.(proto.Message))
+		resp, err := protojson.Marshal(respBody.Any().(proto.Message))
 		if err != nil {
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
@@ -657,7 +667,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 		reqBody    execution.ContextInfo
 		sleep      time.Duration
 		statusCode int
-		respBody   interface{}
+		respBody   connect.AnyResponse
 	}
 	type args struct {
 		ctx context.Context
@@ -684,10 +694,10 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				fullMethod:       "/service/method",
 				executionTargets: nil,
 				req:              newMockContentRequest("request"),
-				resp:             newMockContentRequest("response"),
+				resp:             newMockContentResponse("response"),
 			},
 			res{
-				want: newMockContentRequest("response"),
+				want: newMockContentResponse("response"),
 			},
 		},
 		{
@@ -697,10 +707,10 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				fullMethod:       "/service/method",
 				executionTargets: []execution.Target{},
 				req:              newMockContentRequest("request"),
-				resp:             newMockContentRequest("response"),
+				resp:             newMockContentResponse("response"),
 			},
 			res{
-				want: newMockContentRequest("response"),
+				want: newMockContentResponse("response"),
 			},
 		},
 		{
@@ -722,13 +732,13 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest(""),
+						respBody:   newMockContentResponse(""),
 						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 				},
 				req:  newMockContentRequest(""),
-				resp: newMockContentRequest(""),
+				resp: newMockContentResponse(""),
 			},
 			res{
 				wantErr: true,
@@ -753,16 +763,16 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoResponse("/service/method", "request", "response"),
-						respBody:   newMockContentRequest("response1"),
+						respBody:   newMockContentResponse("response1"),
 						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 				},
 				req:  newMockContentRequest("request"),
-				resp: newMockContentRequest("response"),
+				resp: newMockContentResponse("response"),
 			},
 			res{
-				want: newMockContentRequest("response1"),
+				want: newMockContentResponse("response1"),
 			},
 		},
 	}
