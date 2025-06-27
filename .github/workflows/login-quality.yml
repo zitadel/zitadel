@@ -7,10 +7,6 @@ on:
         description: 'Ignore run caches'
         type: boolean
         required: true
-      login_build_image:
-        description: 'The image name of the built production standalone login image'
-        type: string
-        required: true
 
 jobs:
   quality:
@@ -24,19 +20,6 @@ jobs:
       CACHE_DIR: /tmp/login-run-caches
     steps:
       - uses: actions/checkout@v4
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ghcr.io/zitadel/login
-          tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
       - uses: depot/setup-action@v1
         with:
           oidc: true
@@ -64,7 +47,6 @@ jobs:
           LOGIN_BAKE_CLI: depot bake
           DEPOT_PROJECT_ID: w47wkxzdtw
           IGNORE_RUN_CACHE: ${{ github.event.inputs.ignore-run-cache }}
-          LOGIN_TAG: ${{ inputs.login_build_image }}
 
       - name: Save Run Caches
         uses: actions/cache/save@v4
