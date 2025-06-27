@@ -2105,7 +2105,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
 				},
-				url:                "http:/localhost:8000/sso",
+				url:                "http://localhost:8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
 				postForm:           true,
 			},
@@ -2148,7 +2148,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			if tt.want.url != "" && !tt.want.postForm {
 				authUrl, err := url.Parse(got.GetAuthUrl())
 				require.NoError(t, err)
-				
+
 				assert.Equal(t, tt.want.url, authUrl.Scheme+"://"+authUrl.Host+authUrl.Path)
 				require.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
 
