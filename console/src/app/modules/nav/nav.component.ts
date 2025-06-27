@@ -5,16 +5,15 @@ import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/cor
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, map, Observable, Subject } from 'rxjs';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { EnvironmentService } from 'src/app/services/environment.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { KeyboardShortcutsService } from 'src/app/services/keyboard-shortcuts/keyboard-shortcuts.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
+import { Organization } from '@zitadel/proto/zitadel/org/v2/org_pb';
 
 @Component({
   selector: 'cnsl-nav',
@@ -83,7 +82,7 @@ export class NavComponent implements OnDestroy {
     }),
   );
 
-  @Input() public org!: Org.AsObject;
+  @Input() public org?: Organization | null;
   public filterControl: UntypedFormControl = new UntypedFormControl('');
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
   public showAccount: boolean = false;
