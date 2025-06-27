@@ -85,7 +85,7 @@ jobs:
       actions: write
       id-token: write
     with:
-      force:  ${{ github.event_name == 'workflow_dispatch' }}
+      ignore-run-cache:  ${{ github.event_name == 'workflow_dispatch' }}
 
   container:
     needs: [compile]

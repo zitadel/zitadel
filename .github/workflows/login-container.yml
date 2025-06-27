@@ -39,7 +39,6 @@ jobs:
           # latest if branch is main, otherwise image version which is the pull request number
           BAKE_CLI: depot bake
           DEPOT_PROJECT_ID: w47wkxzdtw
-          FORCE: ${{ github.event.inputs.force }}
       - name: Get Login image tag
         id: get-login-tag
         run: echo "LOGIN_TAG=$(make login_standalone_build_tag)"  >> "$GITHUB_OUTPUT"

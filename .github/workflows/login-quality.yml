@@ -3,7 +3,7 @@ name: Login Quality
 on:
   workflow_call:
     inputs:
-      force:
+      ignore-run-cache:
         description: 'Ignore run caches'
         type: boolean
         required: true
@@ -59,7 +59,7 @@ jobs:
           # latest if branch is main, otherwise image version which is the pull request number
           LOGIN_BAKE_CLI: depot bake
           DEPOT_PROJECT_ID: w47wkxzdtw
-          FORCE: ${{ github.event.inputs.force }}
+          IGNORE_RUN_CACHE: ${{ github.event.inputs.ignore-run-cache }}
       - name: Save Run Caches
         uses: actions/cache/save@v4
         with:
