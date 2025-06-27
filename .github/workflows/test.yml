@@ -15,8 +15,7 @@ jobs:
   quality:
     name: Ensure Quality
     if: github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'push' && github.repository_owner != 'zitadel') ||
-      (github.event_name == 'pull_request' && github.repository_owner != 'zitadel')
+      (github.event_name == 'pull_request' && github.repository_id != 'zitadel')
     runs-on: ubuntu-22.04
     timeout-minutes: 30
     permissions:
@@ -26,6 +25,7 @@ jobs:
       CACHE_DIR: /tmp/login-run-caches
     # Only run this job on workflow_dispatch or pushes to forks
     steps:
+      - run: echo "${{ github.repository_id }}"
       - uses: actions/checkout@v4
       - name: Docker meta
         id: meta
