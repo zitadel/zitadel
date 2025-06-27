@@ -2,10 +2,11 @@ name: Login Container
 
 on:
   workflow_call:
-    outputs:
+    inputs:
       login_build_image:
         description: 'The image name of the built production standalone login image'
-        value: ${{ jobs.login-container.outputs.login_build_image }}
+        type: string
+        required: true
 
 jobs:
   login-container:
@@ -13,23 +14,8 @@ jobs:
     runs-on: depot-ubuntu-22.04-8
     permissions:
       id-token: write
-    outputs:
-      login_build_image: ${{ steps.get-login-tag.outputs.LOGIN_TAG }}
     steps:
       - uses: actions/checkout@v4
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ghcr.io/zitadel/login
-          tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
       - uses: depot/setup-action@v1
         with:
           oidc: true
@@ -37,8 +23,6 @@ jobs:
         run: make login_standalone_build
         env:
           # latest if branch is main, otherwise image version which is the pull request number
-          BAKE_CLI: depot bake
+          LOGIN_BAKE_CLI: depot bake
           DEPOT_PROJECT_ID: w47wkxzdtw
-      - name: Get Login image tag
-        id: get-login-tag
-        run: echo "LOGIN_TAG=$(make login_standalone_build_tag)"  >> "$GITHUB_OUTPUT"
+          LOGIN_TAG: ${{ inputs.login_build_image }}
