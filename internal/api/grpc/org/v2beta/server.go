@@ -19,7 +19,6 @@ import (
 var _ orgconnect.OrganizationServiceHandler = (*Server)(nil)
 
 type Server struct {
-	org.UnimplementedOrganizationServiceServer
 	systemDefaults  systemdefaults.SystemDefaults
 	command         *command.Commands
 	query           *query.Queries
