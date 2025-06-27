@@ -88,6 +88,6 @@ func (o *OPStorage) StoreDeviceAuthorization(ctx context.Context, clientID, devi
 	return err
 }
 
-func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, _, deviceCode string) (state *op.DeviceAuthorizationState, err error) {
-	return nil, nil
+func (o *OPStorage) GetDeviceAuthorizatonState(context.Context, string, string) (*op.DeviceAuthorizationState, error) {
+	panic(o.panicErr("GetDeviceAuthorizatonState"))
 }
