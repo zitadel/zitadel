@@ -67,7 +67,7 @@ enum AppSorting {
 }
 
 message ApplicationSearchFilter {
-    oneof application_filter {
+    oneof filter {
         option (validate.required) = true;
         ApplicationNameQuery name_filter = 1;
         AppState state_filter = 2;

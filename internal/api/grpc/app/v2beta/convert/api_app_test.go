@@ -18,6 +18,7 @@ func TestCreateAPIApplicationRequestToDomain(t *testing.T) {
 		name      string
 		appName   string
 		projectID string
+		appID     string
 		req       *app.CreateAPIApplicationRequest
 		want      *domain.APIApp
 	}{
@@ -25,6 +26,7 @@ func TestCreateAPIApplicationRequestToDomain(t *testing.T) {
 			name:      "basic auth method",
 			appName:   "my-app",
 			projectID: "proj-1",
+			appID:     "someID",
 			req: &app.CreateAPIApplicationRequest{
 				AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
 			},
@@ -32,6 +34,7 @@ func TestCreateAPIApplicationRequestToDomain(t *testing.T) {
 				ObjectRoot:     models.ObjectRoot{AggregateID: "proj-1"},
 				AppName:        "my-app",
 				AuthMethodType: domain.APIAuthMethodTypeBasic,
+				AppID:          "someID",
 			},
 		},
 		{
@@ -53,7 +56,7 @@ func TestCreateAPIApplicationRequestToDomain(t *testing.T) {
 			t.Parallel()
 
 			// When
-			got := CreateAPIApplicationRequestToDomain(tt.appName, tt.projectID, tt.req)
+			got := CreateAPIApplicationRequestToDomain(tt.appName, tt.projectID, tt.appID, tt.req)
 
 			// Then
 			assert.Equal(t, tt.want, got)

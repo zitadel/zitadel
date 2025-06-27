@@ -84,8 +84,9 @@ func TestCreateSAMLAppRequestToDomain(t *testing.T) {
 				ObjectRoot:   models.ObjectRoot{AggregateID: "proj-1"},
 				AppName:      "test-app",
 				Metadata:     genMetaForValidRequest,
-				LoginVersion: 0,
-				LoginBaseURI: "",
+				MetadataURL:  gu.Ptr(""),
+				LoginVersion: gu.Ptr(domain.LoginVersionUnspecified),
+				LoginBaseURI: gu.Ptr(""),
 				State:        0,
 			},
 		},
@@ -96,8 +97,11 @@ func TestCreateSAMLAppRequestToDomain(t *testing.T) {
 			req:       nil,
 
 			expectedResponse: &domain.SAMLApp{
-				AppName:    "test-app",
-				ObjectRoot: models.ObjectRoot{AggregateID: "proj-1"},
+				AppName:      "test-app",
+				ObjectRoot:   models.ObjectRoot{AggregateID: "proj-1"},
+				MetadataURL:  gu.Ptr(""),
+				LoginVersion: gu.Ptr(domain.LoginVersionUnspecified),
+				LoginBaseURI: gu.Ptr(""),
 			},
 		},
 	}
@@ -163,8 +167,8 @@ func TestUpdateSAMLAppConfigRequestToDomain(t *testing.T) {
 				ObjectRoot:   models.ObjectRoot{AggregateID: "proj-1"},
 				AppID:        "app-1",
 				Metadata:     genMetaForValidRequest,
-				LoginVersion: 0,
-				LoginBaseURI: "",
+				LoginVersion: gu.Ptr(domain.LoginVersionUnspecified),
+				LoginBaseURI: gu.Ptr(""),
 			},
 		},
 		{
@@ -173,8 +177,10 @@ func TestUpdateSAMLAppConfigRequestToDomain(t *testing.T) {
 			projectID: "proj-1",
 			req:       nil,
 			expectedResponse: &domain.SAMLApp{
-				ObjectRoot: models.ObjectRoot{AggregateID: "proj-1"},
-				AppID:      "app-1",
+				ObjectRoot:   models.ObjectRoot{AggregateID: "proj-1"},
+				AppID:        "app-1",
+				LoginVersion: gu.Ptr(domain.LoginVersionUnspecified),
+				LoginBaseURI: gu.Ptr(""),
 			},
 		},
 	}

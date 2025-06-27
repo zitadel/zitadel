@@ -258,77 +258,77 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	postLogoutRedirectURIs []string,
 	responseTypes []domain.OIDCResponseType,
 	grantTypes []domain.OIDCGrantType,
-	appType domain.OIDCApplicationType,
-	authMethodType domain.OIDCAuthMethodType,
-	oidcVersion domain.OIDCVersion,
-	accessTokenType domain.OIDCTokenType,
+	appType *domain.OIDCApplicationType,
+	authMethodType *domain.OIDCAuthMethodType,
+	oidcVersion *domain.OIDCVersion,
+	accessTokenType *domain.OIDCTokenType,
 	devMode,
 	accessTokenRoleAssertion,
 	idTokenRoleAssertion,
-	idTokenUserinfoAssertion bool,
-	clockSkew time.Duration,
+	idTokenUserinfoAssertion *bool,
+	clockSkew *time.Duration,
 	additionalOrigins []string,
-	skipNativeAppSuccessPage bool,
-	backChannelLogoutURI string,
-	loginVersion domain.LoginVersion,
-	loginBaseURI string,
+	skipNativeAppSuccessPage *bool,
+	backChannelLogoutURI *string,
+	loginVersion *domain.LoginVersion,
+	loginBaseURI *string,
 ) (*project.OIDCConfigChangedEvent, bool, error) {
 	changes := make([]project.OIDCConfigChanges, 0)
 	var err error
 
-	if !slices.Equal(wm.RedirectUris, redirectURIS) {
+	if redirectURIS != nil && !slices.Equal(wm.RedirectUris, redirectURIS) {
 		changes = append(changes, project.ChangeRedirectURIs(redirectURIS))
 	}
-	if !slices.Equal(wm.ResponseTypes, responseTypes) {
+	if responseTypes != nil && !slices.Equal(wm.ResponseTypes, responseTypes) {
 		changes = append(changes, project.ChangeResponseTypes(responseTypes))
 	}
-	if !slices.Equal(wm.GrantTypes, grantTypes) {
+	if grantTypes != nil && !slices.Equal(wm.GrantTypes, grantTypes) {
 		changes = append(changes, project.ChangeGrantTypes(grantTypes))
 	}
-	if wm.ApplicationType != appType {
-		changes = append(changes, project.ChangeApplicationType(appType))
+	if appType != nil && wm.ApplicationType != *appType {
+		changes = append(changes, project.ChangeApplicationType(*appType))
 	}
-	if wm.AuthMethodType != authMethodType {
-		changes = append(changes, project.ChangeAuthMethodType(authMethodType))
+	if authMethodType != nil && wm.AuthMethodType != *authMethodType {
+		changes = append(changes, project.ChangeAuthMethodType(*authMethodType))
 	}
-	if !slices.Equal(wm.PostLogoutRedirectUris, postLogoutRedirectURIs) {
+	if postLogoutRedirectURIs != nil && !slices.Equal(wm.PostLogoutRedirectUris, postLogoutRedirectURIs) {
 		changes = append(changes, project.ChangePostLogoutRedirectURIs(postLogoutRedirectURIs))
 	}
-	if wm.OIDCVersion != oidcVersion {
-		changes = append(changes, project.ChangeVersion(oidcVersion))
+	if oidcVersion != nil && wm.OIDCVersion != *oidcVersion {
+		changes = append(changes, project.ChangeVersion(*oidcVersion))
 	}
-	if wm.DevMode != devMode {
-		changes = append(changes, project.ChangeDevMode(devMode))
+	if devMode != nil && wm.DevMode != *devMode {
+		changes = append(changes, project.ChangeDevMode(*devMode))
 	}
-	if wm.AccessTokenType != accessTokenType {
-		changes = append(changes, project.ChangeAccessTokenType(accessTokenType))
+	if accessTokenType != nil && wm.AccessTokenType != *accessTokenType {
+		changes = append(changes, project.ChangeAccessTokenType(*accessTokenType))
 	}
-	if wm.AccessTokenRoleAssertion != accessTokenRoleAssertion {
-		changes = append(changes, project.ChangeAccessTokenRoleAssertion(accessTokenRoleAssertion))
+	if accessTokenRoleAssertion != nil && wm.AccessTokenRoleAssertion != *accessTokenRoleAssertion {
+		changes = append(changes, project.ChangeAccessTokenRoleAssertion(*accessTokenRoleAssertion))
 	}
-	if wm.IDTokenRoleAssertion != idTokenRoleAssertion {
-		changes = append(changes, project.ChangeIDTokenRoleAssertion(idTokenRoleAssertion))
+	if idTokenRoleAssertion != nil && wm.IDTokenRoleAssertion != *idTokenRoleAssertion {
+		changes = append(changes, project.ChangeIDTokenRoleAssertion(*idTokenRoleAssertion))
 	}
-	if wm.IDTokenUserinfoAssertion != idTokenUserinfoAssertion {
-		changes = append(changes, project.ChangeIDTokenUserinfoAssertion(idTokenUserinfoAssertion))
+	if idTokenUserinfoAssertion != nil && wm.IDTokenUserinfoAssertion != *idTokenUserinfoAssertion {
+		changes = append(changes, project.ChangeIDTokenUserinfoAssertion(*idTokenUserinfoAssertion))
 	}
-	if wm.ClockSkew != clockSkew {
-		changes = append(changes, project.ChangeClockSkew(clockSkew))
+	if clockSkew != nil && wm.ClockSkew != *clockSkew {
+		changes = append(changes, project.ChangeClockSkew(*clockSkew))
 	}
-	if !slices.Equal(wm.AdditionalOrigins, additionalOrigins) {
+	if additionalOrigins != nil && !slices.Equal(wm.AdditionalOrigins, additionalOrigins) {
 		changes = append(changes, project.ChangeAdditionalOrigins(additionalOrigins))
 	}
-	if wm.SkipNativeAppSuccessPage != skipNativeAppSuccessPage {
-		changes = append(changes, project.ChangeSkipNativeAppSuccessPage(skipNativeAppSuccessPage))
+	if skipNativeAppSuccessPage != nil && wm.SkipNativeAppSuccessPage != *skipNativeAppSuccessPage {
+		changes = append(changes, project.ChangeSkipNativeAppSuccessPage(*skipNativeAppSuccessPage))
 	}
-	if wm.BackChannelLogoutURI != backChannelLogoutURI {
-		changes = append(changes, project.ChangeBackChannelLogoutURI(backChannelLogoutURI))
+	if backChannelLogoutURI != nil && wm.BackChannelLogoutURI != *backChannelLogoutURI {
+		changes = append(changes, project.ChangeBackChannelLogoutURI(*backChannelLogoutURI))
 	}
-	if wm.LoginVersion != loginVersion {
-		changes = append(changes, project.ChangeOIDCLoginVersion(loginVersion))
+	if loginVersion != nil && wm.LoginVersion != *loginVersion {
+		changes = append(changes, project.ChangeOIDCLoginVersion(*loginVersion))
 	}
-	if wm.LoginBaseURI != loginBaseURI {
-		changes = append(changes, project.ChangeOIDCLoginBaseURI(loginBaseURI))
+	if loginBaseURI != nil && wm.LoginBaseURI != *loginBaseURI {
+		changes = append(changes, project.ChangeOIDCLoginBaseURI(*loginBaseURI))
 	}
 
 	if len(changes) == 0 {

@@ -117,7 +117,7 @@ service AppService {
     // The user needs to have project.app.write permission
     //
     // Required permissions:
-    //   - `project.app.write`
+    //   - project.app.write
     rpc CreateApplication(CreateApplicationRequest) returns (CreateApplicationResponse) {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             responses: {
@@ -148,7 +148,7 @@ service AppService {
     // The user needs to have project.app.write permission
     //
     // Required permissions:
-    //   - `project.app.write`
+    //   - project.app.write
     rpc UpdateApplication(UpdateApplicationRequest) returns (UpdateApplicationResponse) {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             responses: {
@@ -178,7 +178,7 @@ service AppService {
     // The user needs to have project.app.read permission
     //
     // Required permissions:
-    //   - `project.app.read`
+    //   - project.app.read
     rpc GetApplication(GetApplicationRequest) returns (GetApplicationResponse) {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             responses: {
@@ -208,7 +208,7 @@ service AppService {
     // The user needs to have project.app.delete permission
     //
     // Required permissions:
-    //   - `project.app.delete`
+    //   - project.app.delete
     rpc DeleteApplication(DeleteApplicationRequest) returns (DeleteApplicationResponse) {
         option (google.api.http) = {
             delete: "/v2beta/applications/{id}"
@@ -238,7 +238,7 @@ service AppService {
     // The user needs to have project.app.write permission
     //
     // Required permissions:
-    //   - `project.app.write`
+    //   - project.app.write
     rpc DeactivateApplication(DeactivateApplicationRequest) returns (DeactivateApplicationResponse) {
         option (google.api.http) = {
             post: "/v2beta/applications/{id}/deactivate"
@@ -269,7 +269,7 @@ service AppService {
     // The user needs to have project.app.write permission
     //
     // Required permissions:
-    //   - `project.app.write`
+    //   - project.app.write
     rpc ReactivateApplication(ReactivateApplicationRequest) returns (ReactivateApplicationResponse) {
         option (google.api.http) = {
             post: "/v2beta/applications/{id}/reactivate"
@@ -300,7 +300,7 @@ service AppService {
     // The user needs to have project.app.write permission
     //
     // Required permissions:
-    //   - `project.app.write`
+    //   - project.app.write
     rpc RegenerateClientSecret(RegenerateClientSecretRequest) returns (RegenerateClientSecretResponse) {
         option (google.api.http) = {
             post: "/v2beta/applications/{application_id}/generate_client_secret"
@@ -334,7 +334,7 @@ service AppService {
     // The user needs to have project.app.read permission
     //
     // Required permissions:
-    //   - `project.app.read`
+    //   - project.app.read
     rpc ListApplications(ListApplicationsRequest) returns (ListApplicationsResponse) {
         option (google.api.http) = {
             post: "/v2beta/applications/search"
@@ -682,7 +682,7 @@ message UpdateSAMLApplicationConfigurationRequest {
         bytes metadata_xml = 1 [(validate.rules).bytes.max_len = 500000];
         string metadata_url = 2 [(validate.rules).string.max_len = 200];
     }
-    LoginVersion login_version = 3 [
+    optional LoginVersion login_version = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
         }
@@ -706,13 +706,13 @@ message UpdateOIDCApplicationConfigurationRequest {
             description: "The flow type the application uses to gain access";
         }
     ];
-    OIDCAppType app_type = 4 [
+    optional OIDCAppType app_type = 4 [
         (validate.rules).enum = {defined_only: true},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Determines the paradigm of the application";
         }
     ];
-    OIDCAuthMethodType auth_method_type = 5 [
+    optional OIDCAuthMethodType auth_method_type = 5 [
         (validate.rules).enum = {defined_only: true},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Defines how the application passes login credentials";
@@ -724,34 +724,34 @@ message UpdateOIDCApplicationConfigurationRequest {
             description: "ZITADEL will redirect to this link after a successful logout";
         }
     ];
-    OIDCVersion version = 7 [(validate.rules).enum = {defined_only: true}];
-    bool dev_mode = 8 [
+    optional OIDCVersion version = 7 [(validate.rules).enum = {defined_only: true}];
+    optional bool dev_mode = 8 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Used for development, some checks of the OIDC specification will not be checked.";
         }
     ];
-    OIDCTokenType access_token_type = 9 [
+    optional OIDCTokenType access_token_type = 9 [
         (validate.rules).enum = {defined_only: true},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Type of the access token returned from ZITADEL";
         }
     ];
-    bool access_token_role_assertion = 10 [
+    optional bool access_token_role_assertion = 10 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Adds roles to the claims of the access token (only if type == JWT) even if they are not requested by scopes";
         }
     ];
-    bool id_token_role_assertion = 11 [
+    optional bool id_token_role_assertion = 11 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Adds roles to the claims of the id token even if they are not requested by scopes";
         }
     ];
-    bool id_token_userinfo_assertion = 12 [
+    optional bool id_token_userinfo_assertion = 12 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Claims of profile, email, address and phone scopes are added to the id token even if an access token is issued. Attention this violates the OIDC specification";
         }
     ];
-    google.protobuf.Duration clock_skew = 13 [
+    optional google.protobuf.Duration clock_skew = 13 [
         (validate.rules).duration = {gte: {}, lte: {seconds: 5}},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Used to compensate time difference of servers. Duration added to the \"exp\" claim and subtracted from \"iat\", \"auth_time\" and \"nbf\" claims";
@@ -764,18 +764,18 @@ message UpdateOIDCApplicationConfigurationRequest {
             description: "Additional origins (other than the redirect_uris) from where the API can be used, provided string has to be an origin (scheme://hostname[:port]) without path, query or fragment";
         }
     ];
-    bool skip_native_app_success_page = 15 [
+    optional bool skip_native_app_success_page = 15 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Skip the successful login page on native apps and directly redirect the user to the callback.";
         }
     ];
-    string back_channel_logout_uri = 16 [
+    optional string back_channel_logout_uri = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"https://example.com/auth/backchannel\"]";
             description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html)";
         }
     ];
-    LoginVersion login_version = 17 [
+    optional LoginVersion login_version = 17 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
         }

@@ -21,14 +21,6 @@ func GenerateKeyPair(bits int) (*rsa.PrivateKey, *rsa.PublicKey, error) {
 	return privkey, &privkey.PublicKey, nil
 }
 
-func GenerateEncryptedKeyPair(bits int, alg EncryptionAlgorithm) (*CryptoValue, *CryptoValue, error) {
-	privateKey, publicKey, err := GenerateKeyPair(bits)
-	if err != nil {
-		return nil, nil, err
-	}
-	return EncryptKeys(privateKey, publicKey, alg)
-}
-
 type CertificateInformations struct {
 	SerialNumber *big.Int
 	Organisation []string

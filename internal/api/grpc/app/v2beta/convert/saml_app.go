@@ -1,6 +1,8 @@
 package convert
 
 import (
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -18,7 +20,7 @@ func CreateSAMLAppRequestToDomain(name, projectID string, req *app.CreateSAMLApp
 		},
 		AppName:      name,
 		Metadata:     req.GetMetadataXml(),
-		MetadataURL:  req.GetMetadataUrl(),
+		MetadataURL:  gu.Ptr(req.GetMetadataUrl()),
 		LoginVersion: loginVersion,
 		LoginBaseURI: loginBaseURI,
 	}, nil
@@ -29,16 +31,31 @@ func UpdateSAMLAppConfigRequestToDomain(appID, projectID string, app *app.Update
 	if err != nil {
 		return nil, err
 	}
+
+	metasXML, metasURL := metasToDomain(app.GetMetadata())
 	return &domain.SAMLApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectID,
 		},
 		AppID:        appID,
-		Metadata:     app.GetMetadataXml(),
-		MetadataURL:  app.GetMetadataUrl(),
+		Metadata:     metasXML,
+		MetadataURL:  metasURL,
 		LoginVersion: loginVersion,
 		LoginBaseURI: loginBaseURI,
 	}, nil
+}
+
+func metasToDomain(metas app.MetaType) ([]byte, *string) {
+	switch t := metas.(type) {
+	case *app.UpdateSAMLApplicationConfigurationRequest_MetadataXml:
+		return t.MetadataXml, nil
+	case *app.UpdateSAMLApplicationConfigurationRequest_MetadataUrl:
+		return nil, &t.MetadataUrl
+	case nil:
+		return nil, nil
+	default:
+		return nil, nil
+	}
 }
 
 func appSAMLConfigToPb(samlApp *query.SAMLApp) app.ApplicationConfig {

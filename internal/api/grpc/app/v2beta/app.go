@@ -16,7 +16,7 @@ import (
 func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicationRequest) (*app.CreateApplicationResponse, error) {
 	switch t := req.GetCreationRequestType().(type) {
 	case *app.CreateApplicationRequest_ApiRequest:
-		apiApp, err := s.command.AddAPIApplication(ctx, convert.CreateAPIApplicationRequestToDomain(req.GetName(), req.GetProjectId(), t.ApiRequest), req.GetId(), "")
+		apiApp, err := s.command.AddAPIApplication(ctx, convert.CreateAPIApplicationRequestToDomain(req.GetName(), req.GetProjectId(), req.GetId(), t.ApiRequest), "")
 		if err != nil {
 			return nil, err
 		}

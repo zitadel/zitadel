@@ -35,9 +35,6 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 	}()
 
 	features := authz.GetFeatures(ctx)
-	if features.LegacyIntrospection {
-		return s.LegacyServer.UserInfo(ctx, r)
-	}
 	if features.TriggerIntrospectionProjections {
 		query.TriggerOIDCUserInfoProjections(ctx)
 	}

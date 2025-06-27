@@ -123,7 +123,7 @@ func TestListApplicationsRequestToModel(t *testing.T) {
 				ProjectId: "project1",
 				Filters: []*app.ApplicationSearchFilter{
 					{
-						ApplicationFilter: &app.ApplicationSearchFilter_NameFilter{NameFilter: &app.ApplicationNameQuery{Name: "test"}},
+						Filter: &app.ApplicationSearchFilter_NameFilter{NameFilter: &app.ApplicationNameQuery{Name: "test"}},
 					},
 				},
 				SortingColumn: app.AppSorting_APP_SORT_BY_NAME,
@@ -323,40 +323,40 @@ func TestLoginVersionToDomain(t *testing.T) {
 	tt := []struct {
 		name          string
 		version       *app.LoginVersion
-		expectedVer   domain.LoginVersion
-		expectedURI   string
+		expectedVer   *domain.LoginVersion
+		expectedURI   *string
 		expectedError error
 	}{
 		{
 			name:        "nil version",
 			version:     nil,
-			expectedVer: domain.LoginVersionUnspecified,
-			expectedURI: "",
+			expectedVer: gu.Ptr(domain.LoginVersionUnspecified),
+			expectedURI: gu.Ptr(""),
 		},
 		{
 			name:        "login v1",
 			version:     &app.LoginVersion{Version: &app.LoginVersion_LoginV1{LoginV1: &app.LoginV1{}}},
-			expectedVer: domain.LoginVersion1,
-			expectedURI: "",
+			expectedVer: gu.Ptr(domain.LoginVersion1),
+			expectedURI: gu.Ptr(""),
 		},
 		{
 			name:        "login v2 valid URI",
 			version:     &app.LoginVersion{Version: &app.LoginVersion_LoginV2{LoginV2: &app.LoginV2{BaseUri: gu.Ptr("https://valid.url")}}},
-			expectedVer: domain.LoginVersion2,
-			expectedURI: "https://valid.url",
+			expectedVer: gu.Ptr(domain.LoginVersion2),
+			expectedURI: gu.Ptr("https://valid.url"),
 		},
 		{
 			name:          "login v2 invalid URI",
 			version:       &app.LoginVersion{Version: &app.LoginVersion_LoginV2{LoginV2: &app.LoginV2{BaseUri: gu.Ptr("://invalid")}}},
-			expectedVer:   domain.LoginVersion2,
-			expectedURI:   "://invalid",
+			expectedVer:   gu.Ptr(domain.LoginVersion2),
+			expectedURI:   gu.Ptr("://invalid"),
 			expectedError: &url.Error{Op: "parse", URL: "://invalid", Err: errors.New("missing protocol scheme")},
 		},
 		{
 			name:        "unknown version type",
 			version:     &app.LoginVersion{},
-			expectedVer: domain.LoginVersionUnspecified,
-			expectedURI: "",
+			expectedVer: gu.Ptr(domain.LoginVersionUnspecified),
+			expectedURI: gu.Ptr(""),
 		},
 	}
 
@@ -452,7 +452,7 @@ func TestAppQueryToModel(t *testing.T) {
 		{
 			name: "name query",
 			query: &app.ApplicationSearchFilter{
-				ApplicationFilter: &app.ApplicationSearchFilter_NameFilter{
+				Filter: &app.ApplicationSearchFilter_NameFilter{
 					NameFilter: &app.ApplicationNameQuery{
 						Name:   "test",
 						Method: filter_pb_v2.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS,
@@ -464,7 +464,7 @@ func TestAppQueryToModel(t *testing.T) {
 		{
 			name: "state query",
 			query: &app.ApplicationSearchFilter{
-				ApplicationFilter: &app.ApplicationSearchFilter_StateFilter{
+				Filter: &app.ApplicationSearchFilter_StateFilter{
 					StateFilter: app.AppState_APP_STATE_ACTIVE,
 				},
 			},
@@ -473,7 +473,7 @@ func TestAppQueryToModel(t *testing.T) {
 		{
 			name: "api app only query",
 			query: &app.ApplicationSearchFilter{
-				ApplicationFilter: &app.ApplicationSearchFilter_ApiAppOnly{},
+				Filter: &app.ApplicationSearchFilter_ApiAppOnly{},
 			},
 			expectedQuery: &query.NotNullQuery{
 				Column: query.AppAPIConfigColumnAppID,
@@ -482,7 +482,7 @@ func TestAppQueryToModel(t *testing.T) {
 		{
 			name: "oidc app only query",
 			query: &app.ApplicationSearchFilter{
-				ApplicationFilter: &app.ApplicationSearchFilter_OidcAppOnly{},
+				Filter: &app.ApplicationSearchFilter_OidcAppOnly{},
 			},
 			expectedQuery: &query.NotNullQuery{
 				Column: query.AppOIDCConfigColumnAppID,
@@ -491,7 +491,7 @@ func TestAppQueryToModel(t *testing.T) {
 		{
 			name: "saml app only query",
 			query: &app.ApplicationSearchFilter{
-				ApplicationFilter: &app.ApplicationSearchFilter_SamlAppOnly{},
+				Filter: &app.ApplicationSearchFilter_SamlAppOnly{},
 			},
 			expectedQuery: &query.NotNullQuery{
 				Column: query.AppSAMLConfigColumnAppID,

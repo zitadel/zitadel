@@ -33,13 +33,11 @@ const FEATURE_KEYS = [
   'enableBackChannelLogout',
   // 'improvedPerformance',
   'loginDefaultOrg',
-  'oidcLegacyIntrospection',
   'oidcSingleV1SessionTermination',
   'oidcTokenExchange',
   'oidcTriggerIntrospectionProjections',
   'permissionCheckV2',
   'userSchema',
-  'webKey',
 ] as const;
 
 export type ToggleState = { source: Source; enabled: boolean };

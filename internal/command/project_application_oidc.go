@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/muhlemmer/gu"
+
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -197,27 +199,27 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	}
 	events = append(events, project_repo.NewOIDCConfigAddedEvent(ctx,
 		projectAgg,
-		oidcApp.OIDCVersion,
+		gu.Value(oidcApp.OIDCVersion),
 		oidcApp.AppID,
 		oidcApp.ClientID,
 		oidcApp.EncodedHash,
 		trimStringSliceWhiteSpaces(oidcApp.RedirectUris),
 		oidcApp.ResponseTypes,
 		oidcApp.GrantTypes,
-		oidcApp.ApplicationType,
-		oidcApp.AuthMethodType,
+		gu.Value(oidcApp.ApplicationType),
+		gu.Value(oidcApp.AuthMethodType),
 		trimStringSliceWhiteSpaces(oidcApp.PostLogoutRedirectUris),
-		oidcApp.DevMode,
-		oidcApp.AccessTokenType,
-		oidcApp.AccessTokenRoleAssertion,
-		oidcApp.IDTokenRoleAssertion,
-		oidcApp.IDTokenUserinfoAssertion,
-		oidcApp.ClockSkew,
+		gu.Value(oidcApp.DevMode),
+		gu.Value(oidcApp.AccessTokenType),
+		gu.Value(oidcApp.AccessTokenRoleAssertion),
+		gu.Value(oidcApp.IDTokenRoleAssertion),
+		gu.Value(oidcApp.IDTokenUserinfoAssertion),
+		gu.Value(oidcApp.ClockSkew),
 		trimStringSliceWhiteSpaces(oidcApp.AdditionalOrigins),
-		oidcApp.SkipNativeAppSuccessPage,
-		strings.TrimSpace(oidcApp.BackChannelLogoutURI),
-		oidcApp.LoginVersion,
-		strings.TrimSpace(oidcApp.LoginBaseURI),
+		gu.Value(oidcApp.SkipNativeAppSuccessPage),
+		strings.TrimSpace(gu.Value(oidcApp.BackChannelLogoutURI)),
+		gu.Value(oidcApp.LoginVersion),
+		strings.TrimSpace(gu.Value(oidcApp.LoginBaseURI)),
 	))
 
 	addedApplication.AppID = oidcApp.AppID
@@ -263,6 +265,15 @@ func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingOIDC.WriteModel)
+	var backChannelLogout, loginBaseURI *string
+	if oidc.BackChannelLogoutURI != nil {
+		backChannelLogout = gu.Ptr(strings.TrimSpace(*oidc.BackChannelLogoutURI))
+	}
+
+	if oidc.LoginBaseURI != nil {
+		loginBaseURI = gu.Ptr(strings.TrimSpace(*oidc.LoginBaseURI))
+	}
+
 	changedEvent, hasChanged, err := existingOIDC.NewChangedEvent(
 		ctx,
 		projectAgg,
@@ -282,9 +293,9 @@ func (c *Commands) UpdateOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		oidc.ClockSkew,
 		trimStringSliceWhiteSpaces(oidc.AdditionalOrigins),
 		oidc.SkipNativeAppSuccessPage,
-		strings.TrimSpace(oidc.BackChannelLogoutURI),
+		backChannelLogout,
 		oidc.LoginVersion,
-		strings.TrimSpace(oidc.LoginBaseURI),
+		loginBaseURI,
 	)
 	if err != nil {
 		return nil, err
@@ -346,37 +357,6 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	result := oidcWriteModelToOIDCConfig(existingOIDC)
 	result.ClientSecretString = plain
 	return result, err
-}
-
-func (c *Commands) VerifyOIDCClientSecret(ctx context.Context, projectID, appID, secret string) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	app, err := c.getOIDCAppWriteModel(ctx, projectID, appID, "")
-	if err != nil {
-		return err
-	}
-	if !app.State.Exists() {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D8hba", "Errors.Project.App.NotExisting")
-	}
-	if !app.IsOIDC() {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-BHgn2", "Errors.Project.App.IsNotOIDC")
-	}
-	if app.HashedSecret == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D6hba", "Errors.Project.App.OIDCConfigInvalid")
-	}
-
-	projectAgg := ProjectAggregateFromWriteModel(&app.WriteModel)
-	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
-	updated, err := c.secretHasher.Verify(app.HashedSecret, secret)
-	spanPasswordComparison.EndWithError(err)
-	if err != nil {
-		return zerrors.ThrowInvalidArgument(err, "COMMAND-Bz542", "Errors.Project.App.ClientSecretInvalid")
-	}
-	if updated != "" {
-		c.oidcUpdateSecret(ctx, projectAgg, appID, updated)
-	}
-	return nil
 }
 
 func (c *Commands) OIDCUpdateSecret(ctx context.Context, appID, projectID, resourceOwner, updated string) {

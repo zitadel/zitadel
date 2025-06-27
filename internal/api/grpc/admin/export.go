@@ -783,7 +783,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 		if err != nil {
 			return nil, nil, nil, nil, nil, err
 		}
-		apps, err := s.query.SearchApps(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{appSearch}}, false, false)
+		apps, err := s.query.SearchApps(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{appSearch}}, nil)
 		if err != nil {
 			return nil, nil, nil, nil, nil, err
 		}
