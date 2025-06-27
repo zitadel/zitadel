@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"slices"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -84,20 +86,7 @@ func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGr
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.UserGrant.NotFound")
 	}
 
-	grantUnchanged := len(existingUserGrant.RoleKeys) == len(userGrant.RoleKeys)
-	if grantUnchanged {
-	outer:
-		for _, reqKey := range userGrant.RoleKeys {
-			for _, existingKey := range existingUserGrant.RoleKeys {
-				if reqKey == existingKey {
-					continue outer
-				}
-			}
-			grantUnchanged = false
-			break
-		}
-	}
-
+	grantUnchanged := slices.Equal(existingUserGrant.RoleKeys, userGrant.RoleKeys)
 	if grantUnchanged {
 		if ignoreUnchanged {
 			return userGrantWriteModelToUserGrant(existingUserGrant), nil
@@ -125,11 +114,11 @@ func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(changedUserGrant, pushedEvents...)
+	err = AppendAndReduce(existingUserGrant, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
-	return userGrantWriteModelToUserGrant(changedUserGrant), nil
+	return userGrantWriteModelToUserGrant(existingUserGrant), nil
 }
 
 func (c *Commands) removeRoleFromUserGrant(ctx context.Context, userGrantID string, roleKeys []string, cascade bool) (_ eventstore.Command, err error) {

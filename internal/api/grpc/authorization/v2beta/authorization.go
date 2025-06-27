@@ -26,7 +26,7 @@ func (s *Server) CreateAuthorization(ctx context.Context, req *authorization.Cre
 }
 
 func (s *Server) UpdateAuthorization(ctx context.Context, request *authorization.UpdateAuthorizationRequest) (*authorization.UpdateAuthorizationResponse, error) {
-	changedUserGrant, err := s.command.ChangeUserGrant(ctx, &domain.UserGrant{
+	userGrant, err := s.command.ChangeUserGrant(ctx, &domain.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: request.Id},
 		RoleKeys:   request.RoleKeys,
 	}, "", true, true, s.command.NewPermissionCheckUserGrantWrite(ctx))
@@ -34,7 +34,7 @@ func (s *Server) UpdateAuthorization(ctx context.Context, request *authorization
 		return nil, err
 	}
 	return &authorization.UpdateAuthorizationResponse{
-		ChangeDate: timestamppb.New(changedUserGrant.ChangeDate),
+		ChangeDate: timestamppb.New(userGrant.ChangeDate),
 	}, nil
 }
 
