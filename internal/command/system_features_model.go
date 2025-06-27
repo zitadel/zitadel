@@ -60,7 +60,6 @@ func (m *SystemFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			feature_v2.SystemResetEventType,
 			feature_v2.SystemLoginDefaultOrgEventType,
-			feature_v2.SystemTriggerIntrospectionProjectionsEventType,
 			feature_v2.SystemUserSchemaEventType,
 			feature_v2.SystemTokenExchangeEventType,
 			feature_v2.SystemImprovedPerformanceEventType,
@@ -84,9 +83,6 @@ func reduceSystemFeature(features *SystemFeatures, key feature.Key, value any) {
 	case feature.KeyLoginDefaultOrg:
 		v := value.(bool)
 		features.LoginDefaultOrg = &v
-	case feature.KeyTriggerIntrospectionProjections:
-		v := value.(bool)
-		features.TriggerIntrospectionProjections = &v
 	case feature.KeyUserSchema:
 		v := value.(bool)
 		features.UserSchema = &v
@@ -116,7 +112,6 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 	aggregate := feature_v2.NewAggregate(wm.AggregateID, wm.ResourceOwner)
 	cmds := make([]eventstore.Command, 0, len(feature.KeyValues())-1)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginDefaultOrg, f.LoginDefaultOrg, feature_v2.SystemLoginDefaultOrgEventType)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TriggerIntrospectionProjections, f.TriggerIntrospectionProjections, feature_v2.SystemTriggerIntrospectionProjectionsEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.SystemUserSchemaEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TokenExchange, f.TokenExchange, feature_v2.SystemTokenExchangeEventType)
 	cmds = appendFeatureSliceUpdate(ctx, cmds, aggregate, wm.ImprovedPerformance, f.ImprovedPerformance, feature_v2.SystemImprovedPerformanceEventType)

@@ -1626,8 +1626,6 @@
       "LOGINDEFAULTORG_DESCRIPTION": "L'interface de connexion utilisera les paramètres de l'organisation par défaut (et non de l'instance) si aucun contexte d'organisation n'est défini.",
       "OIDCTOKENEXCHANGE": "Échange de jetons OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Activez le type d'octroi expérimental urn:ietf:params:oauth:grant-type:token-exchange pour le point de terminaison de jeton OIDC. L'échange de jetons peut être utilisé pour demander des jetons avec une portée moindre ou pour usurper d'autres utilisateurs. Consultez la politique de sécurité pour autoriser l'usurpation sur une instance.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Déclencheurs de projections d'introspection OIDC",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Activez les déclencheurs de projection lors d'une demande d'introspection. Cela peut agir comme un contournement s'il existe des problèmes de cohérence perceptibles dans la réponse à l'introspection, mais cela peut avoir un impact sur les performances. Nous prévoyons de supprimer les déclencheurs pour les demandes d'introspection à l'avenir.",
       "USERSCHEMA": "Schéma utilisateur",
       "USERSCHEMA_DESCRIPTION": "Les schémas utilisateur permettent de gérer les schémas de données des utilisateurs. Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "ACTIONS": "Actions",

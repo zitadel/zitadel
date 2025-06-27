@@ -18,48 +18,11 @@ import (
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 )
 
-// TestServer_UserInfo is a top-level test which re-executes the actual
-// userinfo integration test against a matrix of different feature flags.
-// This ensure that the response of the different implementations remains the same.
 func TestServer_UserInfo(t *testing.T) {
-	iamOwnerCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	t.Cleanup(func() {
-		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(iamOwnerCTX, &feature.ResetInstanceFeaturesRequest{})
-		require.NoError(t, err)
-	})
-	tests := []struct {
-		name    string
-		trigger bool
-	}{
-		{
-			name:    "trigger enabled",
-			trigger: true,
-		},
-		{
-			name:    "trigger disabled",
-			trigger: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := Instance.Client.FeatureV2.SetInstanceFeatures(iamOwnerCTX, &feature.SetInstanceFeaturesRequest{
-				OidcTriggerIntrospectionProjections: &tt.trigger,
-			})
-			require.NoError(t, err)
-			testServer_UserInfo(t)
-		})
-	}
-}
-
-// testServer_UserInfo is the actual userinfo integration test,
-// which calls the userinfo endpoint with different client configurations, roles and token scopes.
-func testServer_UserInfo(t *testing.T) {
 	const (
 		roleFoo = "foo"
 		roleBar = "bar"

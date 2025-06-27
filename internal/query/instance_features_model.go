@@ -63,7 +63,6 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v1.DefaultLoginInstanceEventType,
 			feature_v2.InstanceResetEventType,
 			feature_v2.InstanceLoginDefaultOrgEventType,
-			feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
 			feature_v2.InstanceUserSchemaEventType,
 			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceImprovedPerformanceEventType,
@@ -91,7 +90,6 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 		return false
 	}
 	m.instance.LoginDefaultOrg = m.system.LoginDefaultOrg
-	m.instance.TriggerIntrospectionProjections = m.system.TriggerIntrospectionProjections
 	m.instance.UserSchema = m.system.UserSchema
 	m.instance.TokenExchange = m.system.TokenExchange
 	m.instance.ImprovedPerformance = m.system.ImprovedPerformance
@@ -112,8 +110,6 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		return nil
 	case feature.KeyLoginDefaultOrg:
 		features.LoginDefaultOrg.set(level, event.Value)
-	case feature.KeyTriggerIntrospectionProjections:
-		features.TriggerIntrospectionProjections.set(level, event.Value)
 	case feature.KeyUserSchema:
 		features.UserSchema.set(level, event.Value)
 	case feature.KeyTokenExchange:

@@ -67,7 +67,6 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v1.DefaultLoginInstanceEventType,
 			feature_v2.InstanceResetEventType,
 			feature_v2.InstanceLoginDefaultOrgEventType,
-			feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
 			feature_v2.InstanceUserSchemaEventType,
 			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceImprovedPerformanceEventType,
@@ -93,9 +92,6 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyLoginDefaultOrg:
 		v := value.(bool)
 		features.LoginDefaultOrg = &v
-	case feature.KeyTriggerIntrospectionProjections:
-		v := value.(bool)
-		features.TriggerIntrospectionProjections = &v
 	case feature.KeyTokenExchange:
 		v := value.(bool)
 		features.TokenExchange = &v
@@ -132,7 +128,6 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	aggregate := feature_v2.NewAggregate(wm.AggregateID, wm.ResourceOwner)
 	cmds := make([]eventstore.Command, 0, len(feature.KeyValues())-1)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginDefaultOrg, f.LoginDefaultOrg, feature_v2.InstanceLoginDefaultOrgEventType)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TriggerIntrospectionProjections, f.TriggerIntrospectionProjections, feature_v2.InstanceTriggerIntrospectionProjectionsEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TokenExchange, f.TokenExchange, feature_v2.InstanceTokenExchangeEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.InstanceUserSchemaEventType)
 	cmds = appendFeatureSliceUpdate(ctx, cmds, aggregate, wm.ImprovedPerformance, f.ImprovedPerformance, feature_v2.InstanceImprovedPerformanceEventType)

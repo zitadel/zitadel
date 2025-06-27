@@ -35,7 +35,6 @@ const FEATURE_KEYS = [
   'loginDefaultOrg',
   'oidcSingleV1SessionTermination',
   'oidcTokenExchange',
-  'oidcTriggerIntrospectionProjections',
   'permissionCheckV2',
   'userSchema',
 ] as const;
