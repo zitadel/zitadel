@@ -19,7 +19,6 @@ import (
 var _ projectconnect.ProjectServiceHandler = (*Server)(nil)
 
 type Server struct {
-	project.UnimplementedProjectServiceServer
 	systemDefaults systemdefaults.SystemDefaults
 	command        *command.Commands
 	query          *query.Queries
