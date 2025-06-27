@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/grpc/app/v2beta/convert"
 	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
+	"github.com/zitadel/zitadel/internal/query"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
 
@@ -35,7 +36,7 @@ func (s *Server) ListApplications(ctx context.Context, req *app.ListApplications
 
 	return &app.ListApplicationsResponse{
 		Applications: convert.AppsToPb(res.Apps),
-		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, res.SearchResponse),
+		Pagination:   filter.QueryToPaginationPb(queries.SearchRequest, res.SearchResponse),
 	}, nil
 }
 
@@ -55,5 +56,22 @@ func (s *Server) GetApplicationKey(ctx context.Context, req *app.GetApplicationK
 		Type:           app.ApplicationKeyType(key.Type),
 		CreationDate:   timestamppb.New(key.CreationDate),
 		ExpirationDate: timestamppb.New(key.Expiration),
+	}, nil
+}
+
+func (s *Server) ListApplicationKeys(ctx context.Context, req *app.ListApplicationKeysRequest) (*app.ListApplicationKeysResponse, error) {
+	queries, err := convert.ListApplicationKeysRequestToDomain(s.systemDefaults, req)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := s.query.SearchAuthNKeys(ctx, queries, query.JoinFilterUnspecified, s.checkPermission)
+	if err != nil {
+		return nil, err
+	}
+
+	return &app.ListApplicationKeysResponse{
+		Keys:       convert.ApplicationKeysToPb(res.AuthNKeys),
+		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, res.SearchResponse),
 	}, nil
 }

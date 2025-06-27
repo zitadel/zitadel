@@ -455,6 +455,38 @@ service AppService {
         };
     }
 
+    // List Application Keys
+    //
+    // Returns a list of application keys matching the input parameters.
+    //
+    // The result can be sorted by id, aggregate, creation date, expiration date, resource owner or type.
+    // It can also be filtered by app, project or organization ID.
+    //
+    // The user needs to have project.app.read permission
+    //
+    // Required permissions:
+    //   - project.app.read
+    rpc ListApplicationKeys(ListApplicationKeysRequest) returns (ListApplicationKeysResponse) {
+        option (google.api.http) = {
+            post: "/v2beta/application_keys/search"
+            body: "*"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The matching applications";
+                }
+            };
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
 }
 
 message CreateApplicationRequest {
@@ -980,4 +1012,21 @@ message GetApplicationKeyResponse {
         }
     ];
 }
+
+message ListApplicationKeysRequest {
+    // Pagination and sorting.
+    zitadel.filter.v2.PaginationRequest pagination = 1;
+
+    ApplicationKeysSorting sorting_column = 2;
+
+    string application_id = 3 [(validate.rules).string = {max_len: 200}];
+    string project_id = 4 [(validate.rules).string = {max_len: 200}];
+    string organization_id = 5 [(validate.rules).string = {max_len: 200}];
+}
+
+message ListApplicationKeysResponse {
+    repeated ApplicationKey keys = 1;
+
+    // Contains the total number of app keys matching the query and the applied limit.
+    zitadel.filter.v2.PaginationResponse pagination = 2;
 }

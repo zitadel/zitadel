@@ -151,14 +151,14 @@ func createOIDCApp(t *testing.T, baseURI, projctID string) *app.CreateApplicatio
 	return app
 }
 
-func createAPIAppWithName(t *testing.T, projectID string) (*app.CreateApplicationResponse, string) {
+func createAPIAppWithName(t *testing.T, ctx context.Context, inst *integration.Instance, projectID string) (*app.CreateApplicationResponse, string) {
 	appName := gofakeit.AppName()
 
 	reqForAPIAppCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
 
-	appForAPIConfigChange, appAPIConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
+	appForAPIConfigChange, appAPIConfigChangeErr := inst.Client.AppV2Beta.CreateApplication(ctx, &app.CreateApplicationRequest{
 		ProjectId:           projectID,
 		Name:                appName,
 		CreationRequestType: reqForAPIAppCreation,
@@ -168,8 +168,8 @@ func createAPIAppWithName(t *testing.T, projectID string) (*app.CreateApplicatio
 	return appForAPIConfigChange, appName
 }
 
-func createAPIApp(t *testing.T, projectID string) *app.CreateApplicationResponse {
-	res, _ := createAPIAppWithName(t, projectID)
+func createAPIApp(t *testing.T, ctx context.Context, inst *integration.Instance, projectID string) *app.CreateApplicationResponse {
+	res, _ := createAPIAppWithName(t, ctx, inst, projectID)
 	return res
 }
 
@@ -205,13 +205,13 @@ func ensureFeaturePermissionV2Enabled(t *testing.T, instance *integration.Instan
 	}, retryDuration, tick, "timed out waiting for ensuring instance feature")
 }
 
-func createAppKey(t *testing.T, ctx context.Context, projectID, appID string) *app.CreateApplicationKeyResponse {
-	res, err := instance.Client.AppV2Beta.CreateApplicationKey(ctx,
+func createAppKey(t *testing.T, ctx context.Context, inst *integration.Instance, projectID, appID string, expirationDate time.Time) *app.CreateApplicationKeyResponse {
+	res, err := inst.Client.AppV2Beta.CreateApplicationKey(ctx,
 		&app.CreateApplicationKeyRequest{
 			AppId:          appID,
 			Type:           app.ApplicationKeyType_APPLICATION_KEY_TYPE_JSON,
 			ProjectId:      projectID,
-			ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
+			ExpirationDate: timestamppb.New(expirationDate.UTC()),
 		},
 	)
 

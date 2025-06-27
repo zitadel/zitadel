@@ -518,3 +518,208 @@ func TestAppQueryToModel(t *testing.T) {
 		})
 	}
 }
+
+func TestListApplicationKeysRequestToDomain(t *testing.T) {
+	t.Parallel()
+
+	resourceOwnerQuery, err := query.NewAuthNKeyResourceOwnerQuery("org1")
+	require.NoError(t, err)
+
+	projectIDQuery, err := query.NewAuthNKeyAggregateIDQuery("project1")
+	require.NoError(t, err)
+
+	appIDQuery, err := query.NewAuthNKeyObjectIDQuery("app1")
+	require.NoError(t, err)
+
+	sysDefaults := systemdefaults.SystemDefaults{DefaultQueryLimit: 100, MaxQueryLimit: 150}
+
+	tt := []struct {
+		name string
+		req  *app.ListApplicationKeysRequest
+
+		expectedResult *query.AuthNKeySearchQueries
+		expectedError  error
+	}{
+		{
+			name: "invalid pagination limit",
+			req: &app.ListApplicationKeysRequest{
+				Pagination: &filter_pb_v2.PaginationRequest{Asc: true, Limit: uint32(sysDefaults.MaxQueryLimit + 1)},
+			},
+			expectedResult: nil,
+			expectedError:  zerrors.ThrowInvalidArgumentf(fmt.Errorf("given: %d, allowed: %d", sysDefaults.MaxQueryLimit+1, sysDefaults.MaxQueryLimit), "QUERY-4M0fs", "Errors.Query.LimitExceeded"),
+		},
+		{
+			name: "empty request",
+			req: &app.ListApplicationKeysRequest{
+				Pagination: &filter_pb_v2.PaginationRequest{Asc: true},
+			},
+			expectedResult: &query.AuthNKeySearchQueries{
+				SearchRequest: query.SearchRequest{
+					Offset:        0,
+					Limit:         100,
+					Asc:           true,
+					SortingColumn: query.AuthNKeyColumnID,
+				},
+				Queries: nil,
+			},
+		},
+		{
+			name: "all fields set",
+			req: &app.ListApplicationKeysRequest{
+				OrganizationId: "org1",
+				ProjectId:      "project1",
+				ApplicationId:  "app1",
+				SortingColumn:  app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_TYPE,
+				Pagination:     &filter_pb_v2.PaginationRequest{Asc: true},
+			},
+			expectedResult: &query.AuthNKeySearchQueries{
+				SearchRequest: query.SearchRequest{
+					Offset:        0,
+					Limit:         100,
+					Asc:           true,
+					SortingColumn: query.AuthNKeyColumnType,
+				},
+				Queries: []query.SearchQuery{
+					resourceOwnerQuery,
+					projectIDQuery,
+					appIDQuery,
+				},
+			},
+		},
+		{
+			name: "only organization id",
+			req: &app.ListApplicationKeysRequest{
+				OrganizationId: "org1",
+				Pagination:     &filter_pb_v2.PaginationRequest{Asc: true},
+			},
+			expectedResult: &query.AuthNKeySearchQueries{
+				SearchRequest: query.SearchRequest{
+					Offset:        0,
+					Limit:         100,
+					Asc:           true,
+					SortingColumn: query.AuthNKeyColumnID,
+				},
+				Queries: []query.SearchQuery{
+					resourceOwnerQuery,
+				},
+			},
+		},
+		{
+			name: "only project id",
+			req: &app.ListApplicationKeysRequest{
+				ProjectId:  "project1",
+				Pagination: &filter_pb_v2.PaginationRequest{Asc: true},
+			},
+			expectedResult: &query.AuthNKeySearchQueries{
+				SearchRequest: query.SearchRequest{
+					Offset:        0,
+					Limit:         100,
+					Asc:           true,
+					SortingColumn: query.AuthNKeyColumnID,
+				},
+				Queries: []query.SearchQuery{
+					projectIDQuery,
+				},
+			},
+		},
+		{
+			name: "only application id",
+			req: &app.ListApplicationKeysRequest{
+				ApplicationId: "app1",
+				Pagination:    &filter_pb_v2.PaginationRequest{Asc: true},
+			},
+			expectedResult: &query.AuthNKeySearchQueries{
+				SearchRequest: query.SearchRequest{
+					Offset:        0,
+					Limit:         100,
+					Asc:           true,
+					SortingColumn: query.AuthNKeyColumnID,
+				},
+				Queries: []query.SearchQuery{
+					appIDQuery,
+				},
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			result, err := ListApplicationKeysRequestToDomain(sysDefaults, tc.req)
+
+			assert.Equal(t, tc.expectedError, err)
+			assert.Equal(t, tc.expectedResult, result)
+		})
+	}
+}
+
+func TestApplicationKeysToPb(t *testing.T) {
+	t.Parallel()
+
+	now := time.Now()
+
+	tt := []struct {
+		name     string
+		input    []*query.AuthNKey
+		expected []*app.ApplicationKey
+	}{
+		{
+			name: "multiple keys",
+			input: []*query.AuthNKey{
+				{
+					ID:            "key1",
+					AggregateID:   "project1",
+					CreationDate:  now,
+					ResourceOwner: "org1",
+					Expiration:    now.Add(24 * time.Hour),
+					Type:          domain.AuthNKeyTypeJSON,
+				},
+				{
+					ID:            "key2",
+					AggregateID:   "project2",
+					CreationDate:  now.Add(-time.Hour),
+					ResourceOwner: "org2",
+					Expiration:    now.Add(48 * time.Hour),
+					Type:          domain.AuthNKeyTypeNONE,
+				},
+			},
+			expected: []*app.ApplicationKey{
+				{
+					Id:             "key1",
+					ProjectId:      "project1",
+					CreationDate:   timestamppb.New(now),
+					OrganizationId: "org1",
+					ExpirationDate: timestamppb.New(now.Add(24 * time.Hour)),
+					KeyType:        app.ApplicationKeyType_APPLICATION_KEY_TYPE_JSON,
+				},
+				{
+					Id:             "key2",
+					ProjectId:      "project2",
+					CreationDate:   timestamppb.New(now.Add(-time.Hour)),
+					OrganizationId: "org2",
+					ExpirationDate: timestamppb.New(now.Add(48 * time.Hour)),
+					KeyType:        app.ApplicationKeyType_APPLICATION_KEY_TYPE_UNSPECIFIED,
+				},
+			},
+		},
+		{
+			name:     "empty slice",
+			input:    []*query.AuthNKey{},
+			expected: []*app.ApplicationKey{},
+		},
+		{
+			name:     "nil input",
+			input:    nil,
+			expected: []*app.ApplicationKey{},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			result := ApplicationKeysToPb(tc.input)
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
