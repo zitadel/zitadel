@@ -66,42 +66,23 @@ func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant
 	return command, addedUserGrant, nil
 }
 
-func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner *string, ignoreUnchanged bool, check UserGrantPermissionCheck) (_ *domain.UserGrant, err error) {
-	event, changedUserGrant, err := c.changeUserGrant(ctx, userGrant, resourceOwner, false, ignoreUnchanged, check)
-	if err != nil {
-		return nil, err
-	}
-	if event == nil {
-		return userGrantWriteModelToUserGrant(changedUserGrant), nil
-	}
-	pushedEvents, err := c.eventstore.Push(ctx, event)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(changedUserGrant, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return userGrantWriteModelToUserGrant(changedUserGrant), nil
-}
-
-func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner *string, cascade, ignoreUnchanged bool, check UserGrantPermissionCheck) (_ eventstore.Command, _ *UserGrantWriteModel, err error) {
+func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner *string, cascade, ignoreUnchanged bool, check UserGrantPermissionCheck) (_ *domain.UserGrant, err error) {
 	if userGrant.AggregateID == "" {
-		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0sd", "Errors.UserGrant.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0sd", "Errors.UserGrant.Invalid")
 	}
 	existingUserGrant, err := c.userGrantWriteModelByID(ctx, userGrant.AggregateID, gu.Value(resourceOwner))
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if check == nil {
 		// checkUserGrantPreCondition checks the permission later when we have the necessary context information
 		err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 	}
 	if existingUserGrant.State == domain.UserGrantStateUnspecified || existingUserGrant.State == domain.UserGrantStateRemoved {
-		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.UserGrant.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.UserGrant.NotFound")
 	}
 
 	grantUnchanged := len(existingUserGrant.RoleKeys) == len(userGrant.RoleKeys)
@@ -120,9 +101,9 @@ func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGr
 
 	if grantUnchanged {
 		if ignoreUnchanged {
-			return nil, existingUserGrant, nil
+			return userGrantWriteModelToUserGrant(existingUserGrant), nil
 		}
-		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Rs8fy", "Errors.UserGrant.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Rs8fy", "Errors.UserGrant.NotChanged")
 	}
 	userGrant.UserID = existingUserGrant.UserID
 	userGrant.ProjectID = existingUserGrant.ProjectID
@@ -131,16 +112,25 @@ func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGr
 
 	err = c.checkUserGrantPreCondition(ctx, userGrant, &existingUserGrant.ResourceOwner, check)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	changedUserGrant := NewUserGrantWriteModel(userGrant.AggregateID, userGrant.ResourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&changedUserGrant.WriteModel)
 
+	var event eventstore.Command = usergrant.NewUserGrantChangedEvent(ctx, userGrantAgg, existingUserGrant.UserID, userGrant.RoleKeys)
 	if cascade {
-		return usergrant.NewUserGrantCascadeChangedEvent(ctx, userGrantAgg, userGrant.RoleKeys), existingUserGrant, nil
+		event = usergrant.NewUserGrantCascadeChangedEvent(ctx, userGrantAgg, userGrant.RoleKeys)
 	}
-	return usergrant.NewUserGrantChangedEvent(ctx, userGrantAgg, existingUserGrant.UserID, userGrant.RoleKeys), existingUserGrant, nil
+	pushedEvents, err := c.eventstore.Push(ctx, event)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(changedUserGrant, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return userGrantWriteModelToUserGrant(changedUserGrant), nil
 }
 
 func (c *Commands) removeRoleFromUserGrant(ctx context.Context, userGrantID string, roleKeys []string, cascade bool) (_ eventstore.Command, err error) {
