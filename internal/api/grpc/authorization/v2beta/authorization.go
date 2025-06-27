@@ -14,8 +14,11 @@ func (s *Server) CreateAuthorization(ctx context.Context, req *authorization.Cre
 		UserID:    req.UserId,
 		ProjectID: req.ProjectId,
 		RoleKeys:  req.RoleKeys,
+		ObjectRoot: models.ObjectRoot{
+			ResourceOwner: req.GetOrganizationId(),
+		},
 	}
-	grant, err := s.command.AddUserGrant(ctx, grant, req.GetOrganizationId(), s.command.NewPermissionCheckUserGrantWrite(ctx))
+	grant, err := s.command.AddUserGrant(ctx, grant, s.command.NewPermissionCheckUserGrantWrite(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -27,9 +30,11 @@ func (s *Server) CreateAuthorization(ctx context.Context, req *authorization.Cre
 
 func (s *Server) UpdateAuthorization(ctx context.Context, request *authorization.UpdateAuthorizationRequest) (*authorization.UpdateAuthorizationResponse, error) {
 	userGrant, err := s.command.ChangeUserGrant(ctx, &domain.UserGrant{
-		ObjectRoot: models.ObjectRoot{AggregateID: request.Id},
-		RoleKeys:   request.RoleKeys,
-	}, "", true, true, s.command.NewPermissionCheckUserGrantWrite(ctx))
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: request.Id,
+		},
+		RoleKeys: request.RoleKeys,
+	}, true, true, s.command.NewPermissionCheckUserGrantWrite(ctx))
 	if err != nil {
 		return nil, err
 	}

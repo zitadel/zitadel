@@ -39,9 +39,8 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 		idGenerator func(t *testing.T) id.Generator
 	}
 	type args struct {
-		ctx           context.Context
-		userGrant     *domain.UserGrant
-		resourceOwner string
+		ctx       context.Context
+		userGrant *domain.UserGrant
 	}
 	type res struct {
 		want *domain.UserGrant
@@ -62,8 +61,10 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID: "user1",
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -105,8 +106,10 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				userGrant: &domain.UserGrant{
 					UserID:    "user1",
 					ProjectID: "project1",
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -153,8 +156,10 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				userGrant: &domain.UserGrant{
 					UserID:    "user1",
 					ProjectID: "project1",
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -194,8 +199,10 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				userGrant: &domain.UserGrant{
 					UserID:    "user1",
 					ProjectID: "project1",
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org2",
+					},
 				},
-				resourceOwner: "org2",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -236,8 +243,10 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					UserID:    "user1",
 					ProjectID: "project1",
 					RoleKeys:  []string{"roleKey"},
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -279,8 +288,10 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectID:      "project1",
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"roleKey"},
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -338,8 +349,10 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectID:      "project1",
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"roleKey"},
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -397,8 +410,10 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectID:      "project1",
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"rolekey1"},
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org2",
+					},
 				},
-				resourceOwner: "org2",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -459,8 +474,10 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					UserID:    "user1",
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -609,8 +626,10 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectID:      "project1",
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"rolekey1"},
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -689,8 +708,10 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					UserID:    "user1",
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -716,7 +737,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				if tt.fields.idGenerator != nil {
 					r.idGenerator = tt.fields.idGenerator(t)
 				}
-				got, err := r.AddUserGrant(tt.args.ctx, tt.args.userGrant, tt.args.resourceOwner, nil)
+				got, err := r.AddUserGrant(tt.args.ctx, tt.args.userGrant, nil)
 				if tt.res.err == nil {
 					assert.NoError(t, err)
 				}
@@ -739,7 +760,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					r.idGenerator = tt.fields.idGenerator(t)
 				}
 				// we use an empty context and only rely on the permission check implementation
-				got, err := r.AddUserGrant(context.Background(), tt.args.userGrant, tt.args.resourceOwner, succeedingUserGrantPermissionCheck)
+				got, err := r.AddUserGrant(context.Background(), tt.args.userGrant, succeedingUserGrantPermissionCheck)
 				if tt.res.err == nil {
 					assert.NoError(t, err)
 				}
@@ -794,7 +815,10 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 			UserID:    "user1",
 			ProjectID: "project1",
 			RoleKeys:  []string{"rolekey1"},
-		}, "org1", failingUserGrantPermissionCheck)
+			ObjectRoot: models.ObjectRoot{
+				ResourceOwner: "org1",
+			},
+		}, failingUserGrantPermissionCheck)
 		assert.ErrorIs(t, err, errMockedPermissionCheck)
 	})
 }
@@ -806,7 +830,6 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 	type args struct {
 		ctx             context.Context
 		userGrant       *domain.UserGrant
-		resourceOwner   string
 		permissionCheck UserGrantPermissionCheck
 		cascade         bool
 		ignoreUnchanged bool
@@ -830,8 +853,10 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					UserID: "user1",
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -895,11 +920,11 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: context.Background(),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID: "user1",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPermissionDenied,
@@ -916,13 +941,13 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID:    "user1",
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -939,13 +964,13 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID:    "user1",
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -970,13 +995,13 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID:    "user1",
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1026,12 +1051,12 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID:    "user1",
 					ProjectID: "project1",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1086,12 +1111,12 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID:    "user1",
 					ProjectID: "project1",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1139,13 +1164,13 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID:    "user1",
 					ProjectID: "project1",
 					RoleKeys:  []string{"roleKey"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1193,14 +1218,14 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID:         "user1",
 					ProjectID:      "project1",
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"roleKey"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1264,14 +1289,14 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "org", "user", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID:         "user1",
 					ProjectID:      "project1",
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"roleKey"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1342,13 +1367,13 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID:    "user1",
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1", "rolekey2"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -1427,12 +1452,12 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					RoleKeys: []string{"rolekey1", "rolekey2"},
 				},
-				resourceOwner: "org1",
-				cascade:       true,
+				cascade: true,
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -1520,14 +1545,14 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID:         "user1",
 					ProjectID:      "project1",
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"rolekey1", "rolekey2"},
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -1693,13 +1718,13 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: context.Background(),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID:    "user1",
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1", "rolekey2"},
 				},
-				resourceOwner:   "org1",
 				permissionCheck: succeedingUserGrantPermissionCheck,
 			},
 			res: res{
@@ -1773,13 +1798,13 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: context.Background(),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID:    "user1",
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1", "rolekey2"},
 				},
-				resourceOwner:   "org1",
 				permissionCheck: failingUserGrantPermissionCheck,
 			},
 			res: res{
@@ -1815,13 +1840,13 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrant: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "usergrant1",
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
 					},
 					UserID:    "user1",
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1", "rolekey2"},
 				},
-				resourceOwner:   "org1",
 				ignoreUnchanged: true,
 			},
 			res: res{
@@ -1843,7 +1868,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.ChangeUserGrant(tt.args.ctx, tt.args.userGrant, tt.args.resourceOwner, tt.args.cascade, tt.args.ignoreUnchanged, tt.args.permissionCheck)
+			got, err := r.ChangeUserGrant(tt.args.ctx, tt.args.userGrant, tt.args.cascade, tt.args.ignoreUnchanged, tt.args.permissionCheck)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
