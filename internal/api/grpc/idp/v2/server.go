@@ -18,7 +18,6 @@ import (
 var _ idpconnect.IdentityProviderServiceHandler = (*Server)(nil)
 
 type Server struct {
-	idp.UnimplementedIdentityProviderServiceServer
 	command *command.Commands
 	query   *query.Queries
 
