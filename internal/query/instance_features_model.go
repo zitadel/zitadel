@@ -67,7 +67,6 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceUserSchemaEventType,
 			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceImprovedPerformanceEventType,
-			feature_v2.InstanceWebKeyEventType,
 			feature_v2.InstanceDebugOIDCParentErrorEventType,
 			feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
 			feature_v2.InstanceDisableUserTokenEvent,
@@ -121,8 +120,6 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.TokenExchange.set(level, event.Value)
 	case feature.KeyImprovedPerformance:
 		features.ImprovedPerformance.set(level, event.Value)
-	case feature.KeyWebKey:
-		features.WebKey.set(level, event.Value)
 	case feature.KeyDebugOIDCParentError:
 		features.DebugOIDCParentError.set(level, event.Value)
 	case feature.KeyOIDCSingleV1SessionTermination:

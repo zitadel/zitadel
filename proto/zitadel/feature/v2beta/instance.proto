@@ -11,8 +11,8 @@ import "zitadel/feature/v2beta/feature.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta;feature";
 
 message SetInstanceFeaturesRequest{
-  reserved 3, 6;
-  reserved "oidc_legacy_introspection", "actions";
+  reserved 3, 6, 8;
+  reserved "oidc_legacy_introspection", "actions", "web_key";
   optional bool login_default_org = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
@@ -46,13 +46,6 @@ message SetInstanceFeaturesRequest{
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[1]";
       description: "Improves performance of specified execution paths.";
-    }
-  ];
-
-  optional bool web_key = 8 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Enable the webkey/v3alpha API. The first time this feature is enabled, web keys are generated and activated.";
     }
   ];
 
@@ -91,8 +84,8 @@ message GetInstanceFeaturesRequest {
 }
 
 message GetInstanceFeaturesResponse {
-  reserved 4, 7;
-  reserved "oidc_legacy_introspection", "actions";
+  reserved 4, 7, 9;
+  reserved "oidc_legacy_introspection", "actions", "web_key";
   zitadel.object.v2beta.Details details = 1;
   FeatureFlag login_default_org = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -126,13 +119,6 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[1]";
       description: "Improves performance of specified execution paths.";
-    }
-  ];
-
-  FeatureFlag web_key = 9 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Enable the webkey/v3alpha API. The first time this feature is enabled, web keys are generated and activated.";
     }
   ];
 

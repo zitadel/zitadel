@@ -555,7 +555,6 @@ func startAPIs(
 		keys.OIDC,
 		keys.OIDCKey,
 		eventstore,
-		dbClient,
 		userAgentInterceptor,
 		instanceInterceptor.Handler,
 		limitingAccessInterceptor,
