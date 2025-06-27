@@ -45,6 +45,10 @@ func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
 	return settings.File_zitadel_settings_v2beta_settings_service_proto
 }
 
+func (s *Server) AppName() string {
+	return settings.SettingsService_ServiceDesc.ServiceName
+}
+
 func (s *Server) MethodPrefix() string {
 	return settings.SettingsService_ServiceDesc.ServiceName
 }
