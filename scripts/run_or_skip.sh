@@ -12,7 +12,7 @@ fi
 
 MAKE_TARGET=$1
 IMAGES=$2
-FORCE=${FORCE:-false}
+IGNORE_RUN_CACHE=${IGNORE_RUN_CACHE:-false}
 
 CACHE_FILE="$CACHE_DIR/$MAKE_TARGET.digests"
 mkdir -p "$CACHE_DIR"
@@ -41,8 +41,8 @@ CACHED_STATUS=$(echo "$CACHE_FILE_CONTENT" | cut -d ';' -f1)
 CACHED_IMAGE_CREATED_VALUES=$(echo "$CACHE_FILE_CONTENT" | cut -d ';' -f2-99)
 CURRENT_IMAGE_CREATED_VALUES="$(get_image_creation_dates)"
   if [[ "$CACHED_IMAGE_CREATED_VALUES" == "$CURRENT_IMAGE_CREATED_VALUES" ]]; then
-    if [[ "$FORCE" == "true" ]]; then
-        echo "\$FORCE=$FORCE - Running $MAKE_TARGET despite unchanged images."
+    if [[ "$IGNORE_RUN_CACHE" == "true" ]]; then
+        echo "\$IGNORE_RUN_CACHE=$IGNORE_RUN_CACHE - Running $MAKE_TARGET despite unchanged images."
     else
         echo "Skipping $MAKE_TARGET – all images unchanged, returning cached status $CACHED_STATUS"
         exit $CACHED_STATUS

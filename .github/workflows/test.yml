@@ -3,8 +3,8 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
-      force:
-        description: 'Whether to ignore the run caches'
+      ignore-run-cache:
+        description: 'Whether to ignore the run cache'
         required: false
         default: true
       ref-tag:
@@ -57,7 +57,7 @@ jobs:
             ${{ runner.os }}-login-run-caches-
       - run: make login_quality
         env:
-          FORCE: ${{ github.event.inputs.force == 'true' }}
+          IGNORE_RUN_CACHE: ${{ github.event.inputs.ignore-run-cache == 'true' }}
           DOCKER_METADATA_OUTPUT_VERSION: ${{ github.event.inputs.ref-tag || env.DOCKER_METADATA_OUTPUT_VERSION || steps.meta.outputs.version }}
       - name: Save Run Caches
         uses: actions/cache/save@v4
