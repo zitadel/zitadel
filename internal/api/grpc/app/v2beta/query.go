@@ -7,8 +7,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/app/v2beta/convert"
-	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
+	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
+	app "github.com/zitadel/zitadel/pkg/grpc/app/v2"
 )
 
 func (s *Server) GetApplication(ctx context.Context, req *app.GetApplicationRequest) (*app.GetApplicationResponse, error) {
@@ -35,10 +35,7 @@ func (s *Server) ListApplications(ctx context.Context, req *app.ListApplications
 
 	return &app.ListApplicationsResponse{
 		Applications: convert.AppsToPb(res.Apps),
-		Pagination: &filter.PaginationResponse{
-			TotalResult:  res.Count,
-			AppliedLimit: uint64(req.GetPagination().GetLimit()),
-		},
+		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, res.SearchResponse),
 	}, nil
 }
 
