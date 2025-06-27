@@ -75,13 +75,6 @@ func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	if err != nil {
 		return nil, err
 	}
-	if check == nil {
-		// checkUserGrantPreCondition checks the permission later when we have the necessary context information
-		err = checkExplicitProjectPermission(ctx, existingUserGrant.ProjectGrantID, existingUserGrant.ProjectID)
-		if err != nil {
-			return nil, err
-		}
-	}
 	if existingUserGrant.State == domain.UserGrantStateUnspecified || existingUserGrant.State == domain.UserGrantStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.UserGrant.NotFound")
 	}
@@ -350,7 +343,7 @@ func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *do
 	if check != nil {
 		return check(usergrant.ProjectID, usergrant.ProjectGrantID)(usergrant.ResourceOwner, "")
 	}
-	return nil
+	return checkExplicitProjectPermission(ctx, usergrant.ProjectGrantID, usergrant.ProjectID)
 }
 
 // this code needs to be rewritten anyways as soon as we improved the fields handling
@@ -497,7 +490,7 @@ func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant 
 	if check != nil {
 		return check(usergrant.ProjectID, usergrant.ProjectGrantID)(usergrant.ResourceOwner, "")
 	}
-	return nil
+	return checkExplicitProjectPermission(ctx, usergrant.ProjectGrantID, usergrant.ProjectID)
 }
 
 func (c *Commands) searchProjectOwnerAndGrantID(ctx context.Context, projectID string, grantedOrgID string) (projectOwner string, grantID string, err error) {
