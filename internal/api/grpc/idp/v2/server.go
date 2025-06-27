@@ -1,7 +1,10 @@
 package idp
 
 import (
-	"google.golang.org/grpc"
+	"net/http"
+
+	"connectrpc.com/connect"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -9,9 +12,10 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/idp/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/idp/v2/idpconnect"
 )
 
-var _ idp.IdentityProviderServiceServer = (*Server)(nil)
+var _ idpconnect.IdentityProviderServiceHandler = (*Server)(nil)
 
 type Server struct {
 	idp.UnimplementedIdentityProviderServiceServer
@@ -35,8 +39,12 @@ func CreateServer(
 	}
 }
 
-func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	idp.RegisterIdentityProviderServiceServer(grpcServer, s)
+func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler) {
+	return idpconnect.NewIdentityProviderServiceHandler(s, connect.WithInterceptors(interceptors...))
+}
+
+func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
+	return idp.File_zitadel_idp_v2_idp_service_proto
 }
 
 func (s *Server) AppName() string {
