@@ -322,37 +322,6 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	return result, err
 }
 
-func (c *Commands) VerifyOIDCClientSecret(ctx context.Context, projectID, appID, secret string) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	app, err := c.getOIDCAppWriteModel(ctx, projectID, appID, "")
-	if err != nil {
-		return err
-	}
-	if !app.State.Exists() {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D8hba", "Errors.Project.App.NotExisting")
-	}
-	if !app.IsOIDC() {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-BHgn2", "Errors.Project.App.IsNotOIDC")
-	}
-	if app.HashedSecret == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D6hba", "Errors.Project.App.OIDCConfigInvalid")
-	}
-
-	projectAgg := ProjectAggregateFromWriteModel(&app.WriteModel)
-	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
-	updated, err := c.secretHasher.Verify(app.HashedSecret, secret)
-	spanPasswordComparison.EndWithError(err)
-	if err != nil {
-		return zerrors.ThrowInvalidArgument(err, "COMMAND-Bz542", "Errors.Project.App.ClientSecretInvalid")
-	}
-	if updated != "" {
-		c.oidcUpdateSecret(ctx, projectAgg, appID, updated)
-	}
-	return nil
-}
-
 func (c *Commands) OIDCUpdateSecret(ctx context.Context, appID, projectID, resourceOwner, updated string) {
 	agg := project_repo.NewAggregate(projectID, resourceOwner)
 	c.oidcUpdateSecret(ctx, &agg.Aggregate, appID, updated)
