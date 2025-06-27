@@ -2,7 +2,6 @@ package authorization
 
 import (
 	"context"
-
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -16,7 +15,7 @@ func (s *Server) CreateAuthorization(ctx context.Context, req *authorization.Cre
 		ProjectID: req.ProjectId,
 		RoleKeys:  req.RoleKeys,
 	}
-	grant, err := s.command.AddUserGrant(ctx, grant, req.OrganizationId, s.command.NewPermissionCheckUserGrantWrite(ctx))
+	grant, err := s.command.AddUserGrant(ctx, grant, req.GetOrganizationId(), s.command.NewPermissionCheckUserGrantWrite(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +29,7 @@ func (s *Server) UpdateAuthorization(ctx context.Context, request *authorization
 	changedUserGrant, err := s.command.ChangeUserGrant(ctx, &domain.UserGrant{
 		ObjectRoot: models.ObjectRoot{AggregateID: request.Id},
 		RoleKeys:   request.RoleKeys,
-	}, nil, true, s.command.NewPermissionCheckUserGrantWrite(ctx))
+	}, "", true, true, s.command.NewPermissionCheckUserGrantWrite(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +39,7 @@ func (s *Server) UpdateAuthorization(ctx context.Context, request *authorization
 }
 
 func (s *Server) DeleteAuthorization(ctx context.Context, request *authorization.DeleteAuthorizationRequest) (*authorization.DeleteAuthorizationResponse, error) {
-	details, err := s.command.RemoveUserGrant(ctx, request.Id, nil, true, s.command.NewPermissionCheckUserGrantDelete(ctx))
+	details, err := s.command.RemoveUserGrant(ctx, request.Id, "", true, s.command.NewPermissionCheckUserGrantDelete(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +49,7 @@ func (s *Server) DeleteAuthorization(ctx context.Context, request *authorization
 }
 
 func (s *Server) ActivateAuthorization(ctx context.Context, request *authorization.ActivateAuthorizationRequest) (*authorization.ActivateAuthorizationResponse, error) {
-	details, err := s.command.ReactivateUserGrant(ctx, request.Id, nil, true, s.command.NewPermissionCheckUserGrantWrite(ctx))
+	details, err := s.command.ReactivateUserGrant(ctx, request.Id, "", true, s.command.NewPermissionCheckUserGrantWrite(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +59,7 @@ func (s *Server) ActivateAuthorization(ctx context.Context, request *authorizati
 }
 
 func (s *Server) DeactivateAuthorization(ctx context.Context, request *authorization.DeactivateAuthorizationRequest) (*authorization.DeactivateAuthorizationResponse, error) {
-	details, err := s.command.DeactivateUserGrant(ctx, request.Id, nil, true, s.command.NewPermissionCheckUserGrantWrite(ctx))
+	details, err := s.command.DeactivateUserGrant(ctx, request.Id, "", true, s.command.NewPermissionCheckUserGrantWrite(ctx))
 	if err != nil {
 		return nil, err
 	}

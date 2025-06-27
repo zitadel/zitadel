@@ -5,7 +5,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
@@ -42,7 +41,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		userGrant     *domain.UserGrant
-		resourceOwner *string
+		resourceOwner string
 	}
 	type res struct {
 		want *domain.UserGrant
@@ -64,7 +63,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				userGrant: &domain.UserGrant{
 					UserID: "user1",
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -107,7 +106,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					UserID:    "user1",
 					ProjectID: "project1",
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -155,7 +154,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					UserID:    "user1",
 					ProjectID: "project1",
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -196,7 +195,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					UserID:    "user1",
 					ProjectID: "project1",
 				},
-				resourceOwner: gu.Ptr("org2"),
+				resourceOwner: "org2",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -238,7 +237,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"roleKey"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -281,7 +280,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"roleKey"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -340,7 +339,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"roleKey"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -399,7 +398,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"rolekey1"},
 				},
-				resourceOwner: gu.Ptr("org2"),
+				resourceOwner: "org2",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -461,7 +460,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -611,7 +610,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"rolekey1"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -691,7 +690,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -795,7 +794,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 			UserID:    "user1",
 			ProjectID: "project1",
 			RoleKeys:  []string{"rolekey1"},
-		}, gu.Ptr("org1"), failingUserGrantPermissionCheck)
+		}, "org1", failingUserGrantPermissionCheck)
 		assert.ErrorIs(t, err, errMockedPermissionCheck)
 	})
 }
@@ -807,8 +806,9 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 	type args struct {
 		ctx             context.Context
 		userGrant       *domain.UserGrant
-		resourceOwner   *string
+		resourceOwner   string
 		permissionCheck UserGrantPermissionCheck
+		cascade         bool
 		ignoreUnchanged bool
 	}
 	type res struct {
@@ -831,7 +831,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				userGrant: &domain.UserGrant{
 					UserID: "user1",
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -860,7 +860,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					},
 					UserID: "user1",
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPermissionDenied,
@@ -883,7 +883,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -906,7 +906,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -937,7 +937,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -992,7 +992,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					UserID:    "user1",
 					ProjectID: "project1",
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1052,7 +1052,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					UserID:    "user1",
 					ProjectID: "project1",
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1106,7 +1106,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"roleKey"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1161,7 +1161,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"roleKey"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1232,7 +1232,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"roleKey"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1309,7 +1309,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1", "rolekey2"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -1321,6 +1321,87 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1", "rolekey2"},
 					State:     domain.UserGrantStateActive,
+				},
+			},
+		},
+		{
+			name: "usergrant for project cascade, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							usergrant.NewUserGrantAddedEvent(context.Background(),
+								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+								"user1",
+								"project1",
+								"", []string{"rolekey1"}),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey1",
+								"rolekey",
+								"",
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey2",
+								"rolekey 2",
+								"",
+							),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantCascadeChangedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							[]string{"rolekey1", "rolekey2"},
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				userGrant: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "usergrant1",
+					},
+					RoleKeys: []string{"rolekey1", "rolekey2"},
+				},
+				resourceOwner: "org1",
+				cascade:       true,
+			},
+			res: res{
+				want: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
+					},
+					RoleKeys: []string{"rolekey1", "rolekey2"},
 				},
 			},
 		},
@@ -1404,7 +1485,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectGrantID: "projectgrant1",
 					RoleKeys:       []string{"rolekey1", "rolekey2"},
 				},
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.UserGrant{
@@ -1576,7 +1657,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1", "rolekey2"},
 				},
-				resourceOwner:   gu.Ptr("org1"),
+				resourceOwner:   "org1",
 				permissionCheck: succeedingUserGrantPermissionCheck,
 			},
 			res: res{
@@ -1656,7 +1737,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1", "rolekey2"},
 				},
-				resourceOwner:   gu.Ptr("org1"),
+				resourceOwner:   "org1",
 				permissionCheck: failingUserGrantPermissionCheck,
 			},
 			res: res{
@@ -1698,7 +1779,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey2", "rolekey1"},
 				},
-				resourceOwner:   gu.Ptr("org1"),
+				resourceOwner:   "org1",
 				ignoreUnchanged: true,
 			},
 			res: res{
@@ -1720,7 +1801,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.ChangeUserGrant(tt.args.ctx, tt.args.userGrant, tt.args.resourceOwner, tt.args.ignoreUnchanged, tt.args.permissionCheck)
+			got, err := r.ChangeUserGrant(tt.args.ctx, tt.args.userGrant, tt.args.resourceOwner, tt.args.cascade, tt.args.ignoreUnchanged, tt.args.permissionCheck)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1741,7 +1822,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 	type args struct {
 		ctx             context.Context
 		userGrantID     string
-		resourceOwner   *string
+		resourceOwner   string
 		check           UserGrantPermissionCheck
 		ignoreNotActive bool
 	}
@@ -1762,7 +1843,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			},
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1808,7 +1889,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -1839,7 +1920,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -1863,7 +1944,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPermissionDenied,
@@ -1891,7 +1972,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -1919,7 +2000,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:             context.Background(),
 				userGrantID:     "usergrant1",
-				resourceOwner:   gu.Ptr("org1"),
+				resourceOwner:   "org1",
 				ignoreNotActive: true,
 			},
 			res: res{
@@ -1951,7 +2032,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1982,7 +2063,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 				check:         succeedingUserGrantPermissionCheck,
 			},
 			res: res{
@@ -2009,7 +2090,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 				check:         failingUserGrantPermissionCheck,
 			},
 			res: res{
@@ -2043,7 +2124,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 	type args struct {
 		ctx               context.Context
 		userGrantID       string
-		resourceOwner     *string
+		resourceOwner     string
 		ignoreNotInactive bool
 		check             UserGrantPermissionCheck
 	}
@@ -2064,7 +2145,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			},
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -2114,7 +2195,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -2145,7 +2226,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -2173,7 +2254,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPermissionDenied,
@@ -2197,7 +2278,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -2221,7 +2302,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:               authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:       "usergrant1",
-				resourceOwner:     gu.Ptr("org1"),
+				resourceOwner:     "org1",
 				ignoreNotInactive: true,
 			},
 			res: res{
@@ -2257,7 +2338,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -2292,7 +2373,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 				check:         succeedingUserGrantPermissionCheck,
 			},
 			res: res{
@@ -2323,7 +2404,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 				check:         failingUserGrantPermissionCheck,
 			},
 			res: res{
@@ -2357,7 +2438,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 	type args struct {
 		ctx            context.Context
 		userGrantID    string
-		resourceOwner  *string
+		resourceOwner  string
 		ignoreNotFound bool
 		check          UserGrantPermissionCheck
 	}
@@ -2378,7 +2459,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 			},
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -2394,7 +2475,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -2410,7 +2491,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 			args: args{
 				ctx:            authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:    "usergrant1",
-				resourceOwner:  gu.Ptr("org1"),
+				resourceOwner:  "org1",
 				ignoreNotFound: true,
 			},
 			res: res{
@@ -2444,7 +2525,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsNotFound,
@@ -2472,7 +2553,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPermissionDenied,
@@ -2504,7 +2585,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -2571,7 +2652,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 			args: args{
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -2605,7 +2686,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 				check:         succeedingUserGrantPermissionCheck,
 			},
 			res: res{
@@ -2632,7 +2713,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
-				resourceOwner: gu.Ptr("org1"),
+				resourceOwner: "org1",
 				check:         failingUserGrantPermissionCheck,
 			},
 			res: res{

@@ -3,8 +3,6 @@ package management
 import (
 	"context"
 
-	"github.com/muhlemmer/gu"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/api/grpc/user"
@@ -50,7 +48,7 @@ func (s *Server) AddUserGrant(ctx context.Context, req *mgmt_pb.AddUserGrantRequ
 	if err := checkExplicitProjectPermission(ctx, grant.ProjectGrantID, grant.ProjectID); err != nil {
 		return nil, err
 	}
-	grant, err := s.command.AddUserGrant(ctx, grant, gu.Ptr(authz.GetCtxData(ctx).OrgID), nil)
+	grant, err := s.command.AddUserGrant(ctx, grant, authz.GetCtxData(ctx).OrgID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +63,7 @@ func (s *Server) AddUserGrant(ctx context.Context, req *mgmt_pb.AddUserGrantRequ
 }
 
 func (s *Server) UpdateUserGrant(ctx context.Context, req *mgmt_pb.UpdateUserGrantRequest) (*mgmt_pb.UpdateUserGrantResponse, error) {
-	grant, err := s.command.ChangeUserGrant(ctx, UpdateUserGrantRequestToDomain(req), gu.Ptr(authz.GetCtxData(ctx).OrgID), false, nil)
+	grant, err := s.command.ChangeUserGrant(ctx, UpdateUserGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID, false, false, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +77,7 @@ func (s *Server) UpdateUserGrant(ctx context.Context, req *mgmt_pb.UpdateUserGra
 }
 
 func (s *Server) DeactivateUserGrant(ctx context.Context, req *mgmt_pb.DeactivateUserGrantRequest) (*mgmt_pb.DeactivateUserGrantResponse, error) {
-	objectDetails, err := s.command.DeactivateUserGrant(ctx, req.GrantId, gu.Ptr(authz.GetCtxData(ctx).OrgID), false, nil)
+	objectDetails, err := s.command.DeactivateUserGrant(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID, false, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +87,7 @@ func (s *Server) DeactivateUserGrant(ctx context.Context, req *mgmt_pb.Deactivat
 }
 
 func (s *Server) ReactivateUserGrant(ctx context.Context, req *mgmt_pb.ReactivateUserGrantRequest) (*mgmt_pb.ReactivateUserGrantResponse, error) {
-	objectDetails, err := s.command.ReactivateUserGrant(ctx, req.GrantId, gu.Ptr(authz.GetCtxData(ctx).OrgID), false, nil)
+	objectDetails, err := s.command.ReactivateUserGrant(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID, false, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +97,7 @@ func (s *Server) ReactivateUserGrant(ctx context.Context, req *mgmt_pb.Reactivat
 }
 
 func (s *Server) RemoveUserGrant(ctx context.Context, req *mgmt_pb.RemoveUserGrantRequest) (*mgmt_pb.RemoveUserGrantResponse, error) {
-	objectDetails, err := s.command.RemoveUserGrant(ctx, req.GrantId, gu.Ptr(authz.GetCtxData(ctx).OrgID), false, nil)
+	objectDetails, err := s.command.RemoveUserGrant(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID, false, nil)
 	if err != nil {
 		return nil, err
 	}
