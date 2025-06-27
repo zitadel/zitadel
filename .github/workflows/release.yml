@@ -106,6 +106,9 @@ jobs:
           --tag ${{ inputs.google_image_name }}:${{ needs.version.outputs.version }} \
           ${{ inputs.build_image_name }}
         docker buildx imagetools create \
+          --tag ${{ inputs.image_name_login }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.build_image_name_login }}
+        docker buildx imagetools create \
           --tag ${{ inputs.google_image_name_login }}:${{ needs.version.outputs.version }} \
           ${{ inputs.build_image_name_login }}
     -

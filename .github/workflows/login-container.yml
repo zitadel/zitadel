@@ -3,10 +3,22 @@ name: Login Container
 on:
   workflow_call:
     inputs:
-      login_build_image:
-        description: 'The image name of the built production standalone login image'
+      login_build_image_name:
+        description: 'The image repository name of the standalone login image'
         type: string
         required: true
+    outputs:
+      login_build_image:
+          description: 'The full image tag of the standalone login image'
+          value: '${{ inputs.login_build_image_name }}:${{ github.sha }}'
+
+permissions:
+  packages: write
+
+env:
+  default_labels: |
+    org.opencontainers.image.documentation=https://zitadel.com/docs
+    org.opencontainers.image.vendor=CAOS AG
 
 jobs:
   login-container:
@@ -19,10 +31,23 @@ jobs:
       - uses: depot/setup-action@v1
         with:
           oidc: true
-      - name: Build Login Container
-        run: make login_standalone_build
-        env:
-          # latest if branch is main, otherwise image version which is the pull request number
-          LOGIN_BAKE_CLI: depot bake
-          DEPOT_PROJECT_ID: w47wkxzdtw
-          LOGIN_TAG: ${{ inputs.login_build_image }}
+      - name: Login meta
+        id: login-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ inputs.login_build_image_name }}
+          labels: ${{ env.default_labels}}
+          tags: |
+            type=sha,prefix=,suffix=,format=long
+      - name: Bake login multi-arch
+        uses: depot/bake-action@v1
+        with:
+          workdir: login
+          push: false
+          targets: login-standalone
+          set: login-standalone.platforms=[linux/amd64,linux/arm64]
+          project: w47wkxzdtw
+          load: true
+          files: |
+            ./docker-bake.hcl
+            cwd://${{ steps.login-meta.outputs.bake-file }}
