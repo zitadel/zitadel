@@ -7,8 +7,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/app/v2beta/convert"
-	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
-	app "github.com/zitadel/zitadel/pkg/grpc/app/v2"
+	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
+	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
 
 func (s *Server) GetApplication(ctx context.Context, req *app.GetApplicationRequest) (*app.GetApplicationResponse, error) {
