@@ -49,7 +49,7 @@ func (s *Server) DeleteAuthorization(ctx context.Context, request *authorization
 }
 
 func (s *Server) ActivateAuthorization(ctx context.Context, request *authorization.ActivateAuthorizationRequest) (*authorization.ActivateAuthorizationResponse, error) {
-	details, err := s.command.ReactivateUserGrant(ctx, request.Id, "", true, s.command.NewPermissionCheckUserGrantWrite(ctx))
+	details, err := s.command.ReactivateUserGrant(ctx, request.Id, "", s.command.NewPermissionCheckUserGrantWrite(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (s *Server) ActivateAuthorization(ctx context.Context, request *authorizati
 }
 
 func (s *Server) DeactivateAuthorization(ctx context.Context, request *authorization.DeactivateAuthorizationRequest) (*authorization.DeactivateAuthorizationResponse, error) {
-	details, err := s.command.DeactivateUserGrant(ctx, request.Id, "", true, s.command.NewPermissionCheckUserGrantWrite(ctx))
+	details, err := s.command.DeactivateUserGrant(ctx, request.Id, "", s.command.NewPermissionCheckUserGrantWrite(ctx))
 	if err != nil {
 		return nil, err
 	}

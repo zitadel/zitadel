@@ -1823,11 +1823,10 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx             context.Context
-		userGrantID     string
-		resourceOwner   string
-		check           UserGrantPermissionCheck
-		ignoreNotActive bool
+		ctx           context.Context
+		userGrantID   string
+		resourceOwner string
+		check         UserGrantPermissionCheck
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1954,7 +1953,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			},
 		},
 		{
-			name: "already deactivated, precondition error",
+			name: "already deactivated, ignore, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -1976,35 +1975,6 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				ctx:           context.Background(),
 				userGrantID:   "usergrant1",
 				resourceOwner: "org1",
-			},
-			res: res{
-				err: zerrors.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "already deactivated, ignore, ok",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							usergrant.NewUserGrantAddedEvent(context.Background(),
-								&usergrant.NewAggregate("usergrant1", "org").Aggregate,
-								"user1",
-								"project1",
-								"", []string{"rolekey1"}),
-						),
-						eventFromEventPusher(
-							usergrant.NewUserGrantDeactivatedEvent(context.Background(),
-								&usergrant.NewAggregate("usergrant1", "org").Aggregate),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:             context.Background(),
-				userGrantID:     "usergrant1",
-				resourceOwner:   "org1",
-				ignoreNotActive: true,
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -2106,7 +2076,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.DeactivateUserGrant(tt.args.ctx, tt.args.userGrantID, tt.args.resourceOwner, tt.args.ignoreNotActive, tt.args.check)
+			got, err := r.DeactivateUserGrant(tt.args.ctx, tt.args.userGrantID, tt.args.resourceOwner, tt.args.check)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -2125,11 +2095,10 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx               context.Context
-		userGrantID       string
-		resourceOwner     string
-		ignoreNotInactive bool
-		check             UserGrantPermissionCheck
+		ctx           context.Context
+		userGrantID   string
+		resourceOwner string
+		check         UserGrantPermissionCheck
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -2264,7 +2233,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			},
 		},
 		{
-			name: "already active, precondition error",
+			name: "already active, ignore, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -2282,31 +2251,6 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				ctx:           authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
 				userGrantID:   "usergrant1",
 				resourceOwner: "org1",
-			},
-			res: res{
-				err: zerrors.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "already active, ignore, ok",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							usergrant.NewUserGrantAddedEvent(context.Background(),
-								&usergrant.NewAggregate("usergrant1", "org").Aggregate,
-								"user1",
-								"project1",
-								"", []string{"rolekey1"}),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:               authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
-				userGrantID:       "usergrant1",
-				resourceOwner:     "org1",
-				ignoreNotInactive: true,
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -2420,7 +2364,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.ReactivateUserGrant(tt.args.ctx, tt.args.userGrantID, tt.args.resourceOwner, tt.args.ignoreNotInactive, tt.args.check)
+			got, err := r.ReactivateUserGrant(tt.args.ctx, tt.args.userGrantID, tt.args.resourceOwner, tt.args.check)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

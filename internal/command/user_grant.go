@@ -154,7 +154,7 @@ func (c *Commands) removeRoleFromUserGrant(ctx context.Context, userGrantID stri
 	return usergrant.NewUserGrantChangedEvent(ctx, userGrantAgg, existingUserGrant.UserID, existingUserGrant.RoleKeys), nil
 }
 
-func (c *Commands) DeactivateUserGrant(ctx context.Context, grantID string, resourceOwner string, ignoreNotActive bool, check UserGrantPermissionCheck) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) DeactivateUserGrant(ctx context.Context, grantID string, resourceOwner string, check UserGrantPermissionCheck) (objectDetails *domain.ObjectDetails, err error) {
 	if grantID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-N2OhG", "Errors.UserGrant.IDMissing")
 	}
@@ -167,10 +167,7 @@ func (c *Commands) DeactivateUserGrant(ctx context.Context, grantID string, reso
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.UserGrant.NotFound")
 	}
 	if existingUserGrant.State != domain.UserGrantStateActive {
-		if ignoreNotActive {
-			return writeModelToObjectDetails(&existingUserGrant.WriteModel), nil
-		}
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-1S9gx", "Errors.UserGrant.NotActive")
+		return writeModelToObjectDetails(&existingUserGrant.WriteModel), nil
 	}
 	if check != nil {
 		err = check(existingUserGrant.ProjectID, existingUserGrant.ProjectGrantID)(existingUserGrant.ResourceOwner, "")
@@ -193,7 +190,7 @@ func (c *Commands) DeactivateUserGrant(ctx context.Context, grantID string, reso
 	return writeModelToObjectDetails(&existingUserGrant.WriteModel), nil
 }
 
-func (c *Commands) ReactivateUserGrant(ctx context.Context, grantID string, resourceOwner string, ignoreNotInactive bool, check UserGrantPermissionCheck) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) ReactivateUserGrant(ctx context.Context, grantID string, resourceOwner string, check UserGrantPermissionCheck) (objectDetails *domain.ObjectDetails, err error) {
 	if grantID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Qxy8v", "Errors.UserGrant.IDMissing")
 	}
@@ -206,10 +203,7 @@ func (c *Commands) ReactivateUserGrant(ctx context.Context, grantID string, reso
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Lp0gs", "Errors.UserGrant.NotFound")
 	}
 	if existingUserGrant.State != domain.UserGrantStateInactive {
-		if ignoreNotInactive {
-			return writeModelToObjectDetails(&existingUserGrant.WriteModel), nil
-		}
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-1ML0v", "Errors.UserGrant.NotInactive")
+		return writeModelToObjectDetails(&existingUserGrant.WriteModel), nil
 	}
 	if check != nil {
 		err = check(existingUserGrant.ProjectID, existingUserGrant.ProjectGrantID)(existingUserGrant.ResourceOwner, "")
