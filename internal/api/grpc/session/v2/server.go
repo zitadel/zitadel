@@ -45,6 +45,7 @@ func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (str
 func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
 	return session.File_zitadel_session_v2_session_service_proto
 }
+
 func (s *Server) AppName() string {
 	return session.SessionService_ServiceDesc.ServiceName
 }
