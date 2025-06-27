@@ -2895,11 +2895,15 @@ message StartIdentityProviderIntentResponse{
         description: "IDP Intent information"
       }
     ];
+    // POST call information
+    // Deprecated: Use form_data instead
     bytes post_form = 4 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         description: "POST call information"
       }
     ];
+    // Data for a form POST call
+    FormData form_data = 5;
   }
 }
 
