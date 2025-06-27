@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 
+	"connectrpc.com/connect"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -15,8 +16,8 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
-	human, err := AddUserRequestToAddHuman(req)
+func (s *Server) AddHumanUser(ctx context.Context, req *connect.Request[user.AddHumanUserRequest]) (_ *connect.Response[user.AddHumanUserResponse], err error) {
+	human, err := AddUserRequestToAddHuman(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -24,12 +25,12 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 	if err = s.command.AddUserHuman(ctx, orgID, human, false, s.userCodeAlg); err != nil {
 		return nil, err
 	}
-	return &user.AddHumanUserResponse{
+	return connect.NewResponse(&user.AddHumanUserResponse{
 		UserId:    human.ID,
 		Details:   object.DomainToDetailsPb(human.Details),
 		EmailCode: human.EmailCode,
 		PhoneCode: human.PhoneCode,
-	}, nil
+	}), nil
 }
 
 func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman, error) {
@@ -117,8 +118,8 @@ func genderToDomain(gender user.Gender) domain.Gender {
 	}
 }
 
-func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserRequest) (_ *user.UpdateHumanUserResponse, err error) {
-	human, err := updateHumanUserRequestToChangeHuman(req)
+func (s *Server) UpdateHumanUser(ctx context.Context, req *connect.Request[user.UpdateHumanUserRequest]) (_ *connect.Response[user.UpdateHumanUserResponse], err error) {
+	human, err := updateHumanUserRequestToChangeHuman(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -126,51 +127,51 @@ func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserR
 	if err != nil {
 		return nil, err
 	}
-	return &user.UpdateHumanUserResponse{
+	return connect.NewResponse(&user.UpdateHumanUserResponse{
 		Details:   object.DomainToDetailsPb(human.Details),
 		EmailCode: human.EmailCode,
 		PhoneCode: human.PhoneCode,
-	}, nil
+	}), nil
 }
 
-func (s *Server) LockUser(ctx context.Context, req *user.LockUserRequest) (_ *user.LockUserResponse, err error) {
-	details, err := s.command.LockUserV2(ctx, req.UserId)
+func (s *Server) LockUser(ctx context.Context, req *connect.Request[user.LockUserRequest]) (_ *connect.Response[user.LockUserResponse], err error) {
+	details, err := s.command.LockUserV2(ctx, req.Msg.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	return &user.LockUserResponse{
+	return connect.NewResponse(&user.LockUserResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
-func (s *Server) UnlockUser(ctx context.Context, req *user.UnlockUserRequest) (_ *user.UnlockUserResponse, err error) {
-	details, err := s.command.UnlockUserV2(ctx, req.UserId)
+func (s *Server) UnlockUser(ctx context.Context, req *connect.Request[user.UnlockUserRequest]) (_ *connect.Response[user.UnlockUserResponse], err error) {
+	details, err := s.command.UnlockUserV2(ctx, req.Msg.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	return &user.UnlockUserResponse{
+	return connect.NewResponse(&user.UnlockUserResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserRequest) (_ *user.DeactivateUserResponse, err error) {
-	details, err := s.command.DeactivateUserV2(ctx, req.UserId)
+func (s *Server) DeactivateUser(ctx context.Context, req *connect.Request[user.DeactivateUserRequest]) (_ *connect.Response[user.DeactivateUserResponse], err error) {
+	details, err := s.command.DeactivateUserV2(ctx, req.Msg.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	return &user.DeactivateUserResponse{
+	return connect.NewResponse(&user.DeactivateUserResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ReactivateUser(ctx context.Context, req *user.ReactivateUserRequest) (_ *user.ReactivateUserResponse, err error) {
-	details, err := s.command.ReactivateUserV2(ctx, req.UserId)
+func (s *Server) ReactivateUser(ctx context.Context, req *connect.Request[user.ReactivateUserRequest]) (_ *connect.Response[user.ReactivateUserResponse], err error) {
+	details, err := s.command.ReactivateUserV2(ctx, req.Msg.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	return &user.ReactivateUserResponse{
+	return connect.NewResponse(&user.ReactivateUserResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
 func ifNotNilPtr[v, p any](value *v, conv func(v) p) *p {
@@ -182,18 +183,18 @@ func ifNotNilPtr[v, p any](value *v, conv func(v) p) *p {
 	return &pVal
 }
 
-func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_ *user.DeleteUserResponse, err error) {
-	memberships, grants, err := s.removeUserDependencies(ctx, req.GetUserId())
+func (s *Server) DeleteUser(ctx context.Context, req *connect.Request[user.DeleteUserRequest]) (_ *connect.Response[user.DeleteUserResponse], err error) {
+	memberships, grants, err := s.removeUserDependencies(ctx, req.Msg.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveUserV2(ctx, req.UserId, "", memberships, grants...)
+	details, err := s.command.RemoveUserV2(ctx, req.Msg.GetUserId(), "", memberships, grants...)
 	if err != nil {
 		return nil, err
 	}
-	return &user.DeleteUserResponse{
+	return connect.NewResponse(&user.DeleteUserResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
 func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {
@@ -268,35 +269,35 @@ func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 	return converted
 }
 
-func (s *Server) ListAuthenticationMethodTypes(ctx context.Context, req *user.ListAuthenticationMethodTypesRequest) (*user.ListAuthenticationMethodTypesResponse, error) {
-	authMethods, err := s.query.ListUserAuthMethodTypes(ctx, req.GetUserId(), true, req.GetDomainQuery().GetIncludeWithoutDomain(), req.GetDomainQuery().GetDomain())
+func (s *Server) ListAuthenticationMethodTypes(ctx context.Context, req *connect.Request[user.ListAuthenticationMethodTypesRequest]) (*connect.Response[user.ListAuthenticationMethodTypesResponse], error) {
+	authMethods, err := s.query.ListUserAuthMethodTypes(ctx, req.Msg.GetUserId(), true, req.Msg.GetDomainQuery().GetIncludeWithoutDomain(), req.Msg.GetDomainQuery().GetDomain())
 	if err != nil {
 		return nil, err
 	}
-	return &user.ListAuthenticationMethodTypesResponse{
+	return connect.NewResponse(&user.ListAuthenticationMethodTypesResponse{
 		Details:         object.ToListDetails(authMethods.SearchResponse),
 		AuthMethodTypes: authMethodTypesToPb(authMethods.AuthMethodTypes),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListAuthenticationFactors(ctx context.Context, req *user.ListAuthenticationFactorsRequest) (*user.ListAuthenticationFactorsResponse, error) {
+func (s *Server) ListAuthenticationFactors(ctx context.Context, req *connect.Request[user.ListAuthenticationFactorsRequest]) (*connect.Response[user.ListAuthenticationFactorsResponse], error) {
 	query := new(query.UserAuthMethodSearchQueries)
 
-	if err := query.AppendUserIDQuery(req.UserId); err != nil {
+	if err := query.AppendUserIDQuery(req.Msg.GetUserId()); err != nil {
 		return nil, err
 	}
 
 	authMethodsType := []domain.UserAuthMethodType{domain.UserAuthMethodTypeU2F, domain.UserAuthMethodTypeTOTP, domain.UserAuthMethodTypeOTPSMS, domain.UserAuthMethodTypeOTPEmail}
-	if len(req.GetAuthFactors()) > 0 {
-		authMethodsType = object.AuthFactorsToPb(req.GetAuthFactors())
+	if len(req.Msg.GetAuthFactors()) > 0 {
+		authMethodsType = object.AuthFactorsToPb(req.Msg.GetAuthFactors())
 	}
 	if err := query.AppendAuthMethodsQuery(authMethodsType...); err != nil {
 		return nil, err
 	}
 
 	states := []domain.MFAState{domain.MFAStateReady}
-	if len(req.GetStates()) > 0 {
-		states = object.AuthFactorStatesToPb(req.GetStates())
+	if len(req.Msg.GetStates()) > 0 {
+		states = object.AuthFactorStatesToPb(req.Msg.GetStates())
 	}
 	if err := query.AppendStatesQuery(states...); err != nil {
 		return nil, err
@@ -307,9 +308,9 @@ func (s *Server) ListAuthenticationFactors(ctx context.Context, req *user.ListAu
 		return nil, err
 	}
 
-	return &user.ListAuthenticationFactorsResponse{
+	return connect.NewResponse(&user.ListAuthenticationFactorsResponse{
 		Result: object.AuthMethodsToPb(authMethods),
-	}, nil
+	}), nil
 }
 
 func authMethodTypesToPb(methodTypes []domain.UserAuthMethodType) []user.AuthenticationMethodType {
@@ -343,8 +344,8 @@ func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.Authenticatio
 	}
 }
 
-func (s *Server) CreateInviteCode(ctx context.Context, req *user.CreateInviteCodeRequest) (*user.CreateInviteCodeResponse, error) {
-	invite, err := createInviteCodeRequestToCommand(req)
+func (s *Server) CreateInviteCode(ctx context.Context, req *connect.Request[user.CreateInviteCodeRequest]) (*connect.Response[user.CreateInviteCodeResponse], error) {
+	invite, err := createInviteCodeRequestToCommand(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -352,30 +353,30 @@ func (s *Server) CreateInviteCode(ctx context.Context, req *user.CreateInviteCod
 	if err != nil {
 		return nil, err
 	}
-	return &user.CreateInviteCodeResponse{
+	return connect.NewResponse(&user.CreateInviteCodeResponse{
 		Details:    object.DomainToDetailsPb(details),
 		InviteCode: code,
-	}, nil
+	}), nil
 }
 
-func (s *Server) ResendInviteCode(ctx context.Context, req *user.ResendInviteCodeRequest) (*user.ResendInviteCodeResponse, error) {
-	details, err := s.command.ResendInviteCode(ctx, req.GetUserId(), "", "")
+func (s *Server) ResendInviteCode(ctx context.Context, req *connect.Request[user.ResendInviteCodeRequest]) (*connect.Response[user.ResendInviteCodeResponse], error) {
+	details, err := s.command.ResendInviteCode(ctx, req.Msg.GetUserId(), "", "")
 	if err != nil {
 		return nil, err
 	}
-	return &user.ResendInviteCodeResponse{
+	return connect.NewResponse(&user.ResendInviteCodeResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
-func (s *Server) VerifyInviteCode(ctx context.Context, req *user.VerifyInviteCodeRequest) (*user.VerifyInviteCodeResponse, error) {
-	details, err := s.command.VerifyInviteCode(ctx, req.GetUserId(), req.GetVerificationCode())
+func (s *Server) VerifyInviteCode(ctx context.Context, req *connect.Request[user.VerifyInviteCodeRequest]) (*connect.Response[user.VerifyInviteCodeResponse], error) {
+	details, err := s.command.VerifyInviteCode(ctx, req.Msg.GetUserId(), req.Msg.GetVerificationCode())
 	if err != nil {
 		return nil, err
 	}
-	return &user.VerifyInviteCodeResponse{
+	return connect.NewResponse(&user.VerifyInviteCodeResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
 func createInviteCodeRequestToCommand(req *user.CreateInviteCodeRequest) (*command.CreateUserInvite, error) {
@@ -394,33 +395,33 @@ func createInviteCodeRequestToCommand(req *user.CreateInviteCodeRequest) (*comma
 	}
 }
 
-func (s *Server) HumanMFAInitSkipped(ctx context.Context, req *user.HumanMFAInitSkippedRequest) (_ *user.HumanMFAInitSkippedResponse, err error) {
-	details, err := s.command.HumanMFAInitSkippedV2(ctx, req.UserId)
+func (s *Server) HumanMFAInitSkipped(ctx context.Context, req *connect.Request[user.HumanMFAInitSkippedRequest]) (_ *connect.Response[user.HumanMFAInitSkippedResponse], err error) {
+	details, err := s.command.HumanMFAInitSkippedV2(ctx, req.Msg.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	return &user.HumanMFAInitSkippedResponse{
+	return connect.NewResponse(&user.HumanMFAInitSkippedResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
-func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (*user.CreateUserResponse, error) {
-	switch userType := req.GetUserType().(type) {
+func (s *Server) CreateUser(ctx context.Context, req *connect.Request[user.CreateUserRequest]) (*connect.Response[user.CreateUserResponse], error) {
+	switch userType := req.Msg.GetUserType().(type) {
 	case *user.CreateUserRequest_Human_:
-		return s.createUserTypeHuman(ctx, userType.Human, req.OrganizationId, req.Username, req.UserId)
+		return s.createUserTypeHuman(ctx, userType.Human, req.Msg.GetOrganizationId(), req.Msg.Username, req.Msg.UserId)
 	case *user.CreateUserRequest_Machine_:
-		return s.createUserTypeMachine(ctx, userType.Machine, req.OrganizationId, req.GetUsername(), req.GetUserId())
+		return s.createUserTypeMachine(ctx, userType.Machine, req.Msg.GetOrganizationId(), req.Msg.GetUsername(), req.Msg.GetUserId())
 	default:
 		return nil, zerrors.ThrowInternal(nil, "", "user type is not implemented")
 	}
 }
 
-func (s *Server) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (*user.UpdateUserResponse, error) {
-	switch userType := req.GetUserType().(type) {
+func (s *Server) UpdateUser(ctx context.Context, req *connect.Request[user.UpdateUserRequest]) (*connect.Response[user.UpdateUserResponse], error) {
+	switch userType := req.Msg.GetUserType().(type) {
 	case *user.UpdateUserRequest_Human_:
-		return s.updateUserTypeHuman(ctx, userType.Human, req.UserId, req.Username)
+		return s.updateUserTypeHuman(ctx, userType.Human, req.Msg.GetUserId(), req.Msg.Username)
 	case *user.UpdateUserRequest_Machine_:
-		return s.updateUserTypeMachine(ctx, userType.Machine, req.UserId, req.Username)
+		return s.updateUserTypeMachine(ctx, userType.Machine, req.Msg.GetUserId(), req.Msg.Username)
 	default:
 		return nil, zerrors.ThrowUnimplemented(nil, "", "user type is not implemented")
 	}

@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/command"
@@ -11,16 +12,16 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) AddKey(ctx context.Context, req *user.AddKeyRequest) (*user.AddKeyResponse, error) {
+func (s *Server) AddKey(ctx context.Context, req *connect.Request[user.AddKeyRequest]) (*connect.Response[user.AddKeyResponse], error) {
 	newMachineKey := &command.MachineKey{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.UserId,
+			AggregateID: req.Msg.GetUserId(),
 		},
-		ExpirationDate:  req.GetExpirationDate().AsTime(),
+		ExpirationDate:  req.Msg.GetExpirationDate().AsTime(),
 		Type:            domain.AuthNKeyTypeJSON,
 		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx),
 	}
-	newMachineKey.PublicKey = req.PublicKey
+	newMachineKey.PublicKey = req.Msg.GetPublicKey()
 
 	pubkeySupplied := len(newMachineKey.PublicKey) > 0
 	details, err := s.command.AddUserMachineKey(ctx, newMachineKey)
@@ -37,26 +38,26 @@ func (s *Server) AddKey(ctx context.Context, req *user.AddKeyRequest) (*user.Add
 			return nil, err
 		}
 	}
-	return &user.AddKeyResponse{
+	return connect.NewResponse(&user.AddKeyResponse{
 		KeyId:        newMachineKey.KeyID,
 		KeyContent:   keyDetails,
 		CreationDate: timestamppb.New(details.EventDate),
-	}, nil
+	}), nil
 }
 
-func (s *Server) RemoveKey(ctx context.Context, req *user.RemoveKeyRequest) (*user.RemoveKeyResponse, error) {
+func (s *Server) RemoveKey(ctx context.Context, req *connect.Request[user.RemoveKeyRequest]) (*connect.Response[user.RemoveKeyResponse], error) {
 	machineKey := &command.MachineKey{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.UserId,
+			AggregateID: req.Msg.GetUserId(),
 		},
 		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx),
-		KeyID:           req.KeyId,
+		KeyID:           req.Msg.GetKeyId(),
 	}
 	objectDetails, err := s.command.RemoveUserMachineKey(ctx, machineKey)
 	if err != nil {
 		return nil, err
 	}
-	return &user.RemoveKeyResponse{
+	return connect.NewResponse(&user.RemoveKeyResponse{
 		DeletionDate: timestamppb.New(objectDetails.EventDate),
-	}, nil
+	}), nil
 }
