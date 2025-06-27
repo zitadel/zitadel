@@ -118,9 +118,6 @@ login_standalone_build:
 	@echo "Building the login standalone docker image with tag: $(LOGIN_TAG)"
 	$(LOGIN_BAKE_CLI_WITH_ARGS) login-standalone --load
 
-login_standalone_build_tag:
-	@echo -n "$(LOGIN_TAG)"
-
 typescript_generate:
 	@echo "Generating TypeScript client and writing to local $(LOGIN_DIR)packages/zitadel-proto"
 	$(LOGIN_BAKE_CLI_WITH_ARGS) login-typescript-proto-client-out
