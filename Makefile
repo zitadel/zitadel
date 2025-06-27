@@ -180,7 +180,7 @@ core_lint:
 login_pull: login_ensure_remote
 	@echo "Pulling changes from the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
 	git fetch $(LOGIN_REMOTE_NAME)
-	git subtree pull --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH) --squash
+	git subtree pull --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
 
 .PHONY: login_push
 login_push: login_ensure_remote

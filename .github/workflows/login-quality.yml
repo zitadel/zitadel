@@ -7,6 +7,10 @@ on:
         description: 'Ignore run caches'
         type: boolean
         required: true
+      login_build_image:
+        description: 'The image name of the built production standalone login image'
+        type: string
+        required: true
 
 jobs:
   quality:
@@ -60,6 +64,8 @@ jobs:
           LOGIN_BAKE_CLI: depot bake
           DEPOT_PROJECT_ID: w47wkxzdtw
           IGNORE_RUN_CACHE: ${{ github.event.inputs.ignore-run-cache }}
+          LOGIN_TAG: ${{ inputs.login_build_image }}
+
       - name: Save Run Caches
         uses: actions/cache/save@v4
         with:

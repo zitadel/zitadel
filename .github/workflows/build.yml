@@ -86,6 +86,7 @@ jobs:
       id-token: write
     with:
       ignore-run-cache:  ${{ github.event_name == 'workflow_dispatch' }}
+      login_build_image: "ghcr.io/zitadel/login:${{ github.sha }}"
 
   container:
     needs: [compile]
@@ -101,6 +102,8 @@ jobs:
     needs: [compile]
     uses: ./.github/workflows/login-container.yml
     if: ${{ github.event_name == 'workflow_dispatch' }}
+    with:
+      login_build_image: "ghcr.io/zitadel/login:${{ github.sha }}"
 
   e2e:
     uses: ./.github/workflows/e2e.yml
@@ -125,6 +128,6 @@ jobs:
       semantic_version: "23.0.7"
       image_name: "ghcr.io/zitadel/zitadel"
       google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      build_image_name_login: ${{ needs.login-container.outputs.login_build_image }}
+      build_image_name_login: ghcr.io/zitadel/zitadel:${{ github.sha }}
       image_name_login: "ghcr.io/zitadel/login"
       google_image_name_login: europe-docker.pkg.dev/zitadel-common/zitadel-repo/login
