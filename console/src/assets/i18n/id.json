@@ -1498,8 +1498,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Masuk Organisasi Default",
       "LOGINDEFAULTORG_DESCRIPTION": "UI login akan menggunakan pengaturan organisasi default (dan bukan dari instance) jika tidak ada konteks organisasi yang ditetapkan",
-      "OIDCLEGACYINTROSPECTION": "Introspeksi Warisan OIDC",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Kami baru-baru ini memfaktorkan ulang titik akhir introspeksi untuk alasan kinerja. Fitur ini dapat digunakan untuk melakukan rollback ke implementasi lama jika muncul bug yang tidak terduga.",
       "OIDCTOKENEXCHANGE": "Pertukaran Token OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktifkan jenis pemberian urn:ietf:params:oauth:grant-type:token-exchange eksperimental untuk titik akhir token OIDC. Pertukaran token dapat digunakan untuk meminta token dengan cakupan yang lebih kecil atau menyamar sebagai pengguna lain. Lihat kebijakan keamanan untuk mengizinkan peniruan identitas pada sebuah instans.",
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Memicu Proyeksi Introspeksi",
@@ -1515,8 +1513,6 @@
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify clients about session termination at the OpenID Provider.",
       "PERMISSIONCHECKV2": "Permission Check V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
-      "WEBKEY": "Web Key",
-      "WEBKEY_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
       "STATES": { "INHERITED": "Mewarisi", "ENABLED": "Diaktifkan", "DISABLED": "Dengan disabilitas" },
       "INHERITED_DESCRIPTION": "Ini menetapkan nilai ke nilai default sistem.",
       "INHERITEDINDICATOR_DESCRIPTION": {

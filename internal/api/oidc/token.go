@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -64,14 +63,13 @@ func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.C
 type SignerFunc func(ctx context.Context) (jose.Signer, jose.SignatureAlgorithm, error)
 
 func (s *Server) getSignerOnce() SignerFunc {
-	return GetSignerOnce(s.query.GetActiveSigningWebKey, s.Provider().Storage().SigningKey)
+	return GetSignerOnce(s.query.GetActiveSigningWebKey)
 }
 
 // GetSignerOnce returns a function which retrieves the instance's signer from the database once.
 // Repeated calls of the returned function return the same results.
 func GetSignerOnce(
 	getActiveSigningWebKey func(ctx context.Context) (*jose.JSONWebKey, error),
-	getSigningKey func(ctx context.Context) (op.SigningKey, error),
 ) SignerFunc {
 	var (
 		once    sync.Once
@@ -84,23 +82,12 @@ func GetSignerOnce(
 			ctx, span := tracing.NewSpan(ctx)
 			defer func() { span.EndWithError(err) }()
 
-			if authz.GetFeatures(ctx).WebKey {
-				var webKey *jose.JSONWebKey
-				webKey, err = getActiveSigningWebKey(ctx)
-				if err != nil {
-					return
-				}
-				signer, signAlg, err = signerFromWebKey(webKey)
-				return
-			}
-
-			var signingKey op.SigningKey
-			signingKey, err = getSigningKey(ctx)
+			var webKey *jose.JSONWebKey
+			webKey, err = getActiveSigningWebKey(ctx)
 			if err != nil {
 				return
 			}
-			signAlg = signingKey.SignatureAlgorithm()
-			signer, err = op.SignerFromKey(signingKey)
+			signer, signAlg, err = signerFromWebKey(webKey)
 		})
 		return signer, signAlg, err
 	}

@@ -2600,7 +2600,7 @@
     webpack "^5.95.0"
     webpackbar "^6.0.1"
 
-"@docusaurus/core@3.8.1", "@docusaurus/core@^3.8.0":
+"@docusaurus/core@3.8.1", "@docusaurus/core@^3.8.1":
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/@docusaurus/core/-/core-3.8.1.tgz#c22e47c16a22cb7d245306c64bc54083838ff3db"
   integrity sha512-ENB01IyQSqI2FLtOzqSI3qxG2B/jP4gQPahl2C3XReiLebcVh5B5cB9KYFvdoOqOWPyr5gXK4sjgTKv7peXCrA==
@@ -2658,7 +2658,7 @@
     postcss-sort-media-queries "^5.2.0"
     tslib "^2.6.0"
 
-"@docusaurus/faster@^3.8.0":
+"@docusaurus/faster@^3.8.1":
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/@docusaurus/faster/-/faster-3.8.1.tgz#4db2d426f2caa754b12fa4c1264c82ab16618685"
   integrity sha512-XYrj3qnTm+o2d5ih5drCq9s63GJoM8vZ26WbLG5FZhURsNxTSXgHJcx11Qo7nWPUStCQkuqk1HvItzscCUnd4A==
@@ -2711,7 +2711,7 @@
     vfile "^6.0.1"
     webpack "^5.88.1"
 
-"@docusaurus/module-type-aliases@3.8.1", "@docusaurus/module-type-aliases@^3.8.0":
+"@docusaurus/module-type-aliases@3.8.1", "@docusaurus/module-type-aliases@^3.8.1":
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/@docusaurus/module-type-aliases/-/module-type-aliases-3.8.1.tgz#454de577bd7f50b5eae16db0f76b49ca5e4e281a"
   integrity sha512-6xhvAJiXzsaq3JdosS7wbRt/PwEPWHr9eM4YNYqVlbgG1hSK3uQDXTVvQktasp3VO6BmfYWPozueLWuj4gB+vg==
@@ -2869,7 +2869,7 @@
     tslib "^2.6.0"
     webpack "^5.88.1"
 
-"@docusaurus/preset-classic@^3.8.0":
+"@docusaurus/preset-classic@^3.8.1":
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/@docusaurus/preset-classic/-/preset-classic-3.8.1.tgz#bb79fd12f3211363720c569a526c7e24d3aa966b"
   integrity sha512-yJSjYNHXD8POMGc2mKQuj3ApPrN+eG0rO1UPgSx7jySpYU+n4WjBikbrA2ue5ad9A7aouEtMWUoiSRXTH/g7KQ==
@@ -2940,7 +2940,7 @@
     tslib "^2.6.0"
     utility-types "^3.10.0"
 
-"@docusaurus/theme-mermaid@^3.8.0":
+"@docusaurus/theme-mermaid@^3.8.1":
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/@docusaurus/theme-mermaid/-/theme-mermaid-3.8.1.tgz#2b73b5e90057bd9fb46f267aeb2d3470b168a7c8"
   integrity sha512-IWYqjyTPjkNnHsFFu9+4YkeXS7PD1xI3Bn2shOhBq+f95mgDfWInkpfBN4aYvx4fTT67Am6cPtohRdwh4Tidtg==
@@ -2953,7 +2953,7 @@
     mermaid ">=11.6.0"
     tslib "^2.6.0"
 
-"@docusaurus/theme-search-algolia@3.8.1", "@docusaurus/theme-search-algolia@^3.8.0":
+"@docusaurus/theme-search-algolia@3.8.1", "@docusaurus/theme-search-algolia@^3.8.1":
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/@docusaurus/theme-search-algolia/-/theme-search-algolia-3.8.1.tgz#3aa3d99c35cc2d4b709fcddd4df875a9b536e29b"
   integrity sha512-NBFH5rZVQRAQM087aYSRKQ9yGEK9eHd+xOxQjqNpxMiV85OhJDD4ZGz6YJIod26Fbooy54UWVdzNU0TFeUUUzQ==
@@ -2983,7 +2983,7 @@
     fs-extra "^11.1.1"
     tslib "^2.6.0"
 
-"@docusaurus/types@3.8.1", "@docusaurus/types@^3.8.0":
+"@docusaurus/types@3.8.1", "@docusaurus/types@^3.8.1":
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/@docusaurus/types/-/types-3.8.1.tgz#83ab66c345464e003b576a49f78897482061fc26"
   integrity sha512-ZPdW5AB+pBjiVrcLuw3dOS6BFlrG0XkS2lDGsj8TizcnREQg3J8cjsgfDviszOk4CweNfwo1AEELJkYaMUuOPg==
@@ -5967,7 +5967,17 @@ browserslist@^4.0.0, browserslist@^4.21.10, browserslist@^4.22.2, browserslist@^
     node-releases "^2.0.14"
     update-browserslist-db "^1.0.16"
 
-browserslist@^4.24.0, browserslist@^4.24.2, browserslist@^4.24.4, browserslist@^4.25.0:
+browserslist@^4.24.0, browserslist@^4.24.2, browserslist@^4.24.4:
+  version "4.24.5"
+  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.24.5.tgz#aa0f5b8560fe81fde84c6dcb38f759bafba0e11b"
+  integrity sha512-FDToo4Wo82hIdgc1CQ+NQD0hEhmpPjrZ3hiUgwgOG6IuTdlpr8jdjyG24P6cNP1yJpTLzS5OcGgSw0xmDU1/Tw==
+  dependencies:
+    caniuse-lite "^1.0.30001716"
+    electron-to-chromium "^1.5.149"
+    node-releases "^2.0.19"
+    update-browserslist-db "^1.1.3"
+
+browserslist@^4.25.0:
   version "4.25.0"
   resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.25.0.tgz#986aa9c6d87916885da2b50d8eb577ac8d133b2c"
   integrity sha512-PJ8gYKeS5e/whHBh8xrwYK+dAvEj7JXtz6uTucnMRB8OiGTsKccFekoRrjajPBHV8oOY+2tI4uxeceSimKwMFA==
@@ -7494,9 +7504,9 @@ electron-to-chromium@^1.4.796:
   integrity sha512-61H9mLzGOCLLVsnLiRzCbc63uldP0AniRYPV3hbGVtONA1pI7qSGILdbofR7A8TMbOypDocEAjH/e+9k1QIe3g==
 
 electron-to-chromium@^1.5.160:
-  version "1.5.173"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.173.tgz#1aeba57204fe19425921a29946ef543653f5e896"
-  integrity sha512-2bFhXP2zqSfQHugjqJIDFVwa+qIxyNApenmXTp9EjaKtdPrES5Qcn9/aSFy/NaP2E+fWG/zxKu/LBvY36p5VNQ==
+  version "1.5.172"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.172.tgz#fe1d99028d8d6321668d0f1fed61d99ac896259c"
+  integrity sha512-fnKW9dGgmBfsebbYognQSv0CGGLFH1a5iV9EDYTBwmAQn+whbzHbLFlC+3XbHc8xaNtpO0etm8LOcRXs1qMRkQ==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
