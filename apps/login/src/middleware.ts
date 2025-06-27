@@ -1,8 +1,9 @@
+import { SecuritySettings } from "@zitadel/proto/zitadel/settings/v2/security_settings_pb";
+
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_CSP } from "../constants/csp";
 import { getServiceUrlFromHeaders } from "./lib/service-url";
-
 export const config = {
   matcher: [
     "/.well-known/:path*",
@@ -14,6 +15,29 @@ export const config = {
   ],
 };
 
+async function loadSecuritySettings(
+  request: NextRequest,
+): Promise<SecuritySettings | null> {
+  const securityResponse = await fetch(`${request.nextUrl.origin}/security`);
+
+  if (!securityResponse.ok) {
+    console.error(
+      "Failed to fetch security settings:",
+      securityResponse.statusText,
+    );
+    return null;
+  }
+
+  const response = await securityResponse.json();
+
+  if (!response || !response.settings) {
+    console.error("No security settings found in the response.");
+    return null;
+  }
+
+  return response.settings;
+}
+
 export async function middleware(request: NextRequest) {
   // Add the original URL as a header to all requests
   const requestHeaders = new Headers(request.headers);
@@ -24,8 +48,31 @@ export async function middleware(request: NextRequest) {
     requestHeaders.set("x-zitadel-i18n-organization", organization);
   }
 
+  // Check if the request is for the /login route that handles the auth request for OIDC none prompt
+  let isLoginRouteMatched = request.nextUrl.pathname.startsWith("/login/");
+
+  let securitySettings;
+  if (isLoginRouteMatched) {
+    securitySettings = await loadSecuritySettings(request);
+
+    if (securitySettings?.embeddedIframe?.enabled) {
+      const responseHeaders = new Headers();
+
+      responseHeaders.set(
+        "Content-Security-Policy",
+        `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
+      );
+      responseHeaders.delete("X-Frame-Options");
+
+      return NextResponse.next({
+        request: { headers: requestHeaders },
+        headers: responseHeaders,
+      });
+    }
+  }
+
   // Only run the rest of the logic for the original matcher paths
-  const matchedPaths = [
+  const proxyPaths = [
     "/.well-known/",
     "/oauth/",
     "/oidc/",
@@ -33,19 +80,17 @@ export async function middleware(request: NextRequest) {
     "/saml/",
   ];
 
-  const isMatched = matchedPaths.some((prefix) =>
+  const isMatched = proxyPaths.some((prefix) =>
     request.nextUrl.pathname.startsWith(prefix),
   );
 
-  if (!isMatched) {
-    // For all other routes, just add the header and continue
-    return NextResponse.next({
-      request: { headers: requestHeaders },
-    });
-  }
-
   // escape proxy if the environment is setup for multitenancy
-  if (!process.env.ZITADEL_API_URL || !process.env.ZITADEL_SERVICE_USER_TOKEN) {
+  if (
+    !isMatched ||
+    !process.env.ZITADEL_API_URL ||
+    !process.env.ZITADEL_SERVICE_USER_TOKEN
+  ) {
+    // For all other routes, just add the header and continue
     return NextResponse.next({
       request: { headers: requestHeaders },
     });
@@ -53,21 +98,6 @@ export async function middleware(request: NextRequest) {
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  // Call the /security route handler
-  const securityResponse = await fetch(`${request.nextUrl.origin}/security`);
-
-  if (!securityResponse.ok) {
-    console.error(
-      "Failed to fetch security settings:",
-      securityResponse.statusText,
-    );
-    return NextResponse.next({
-      request: { headers: requestHeaders },
-    });
-  }
-
-  const { settings: securitySettings } = await securityResponse.json();
 
   const instanceHost = `${serviceUrl}`
     .replace("https://", "")
@@ -80,6 +110,10 @@ export async function middleware(request: NextRequest) {
   const responseHeaders = new Headers();
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
+
+  if (!securitySettings) {
+    securitySettings = await loadSecuritySettings(request);
+  }
 
   if (securitySettings?.embeddedIframe?.enabled) {
     responseHeaders.set(
