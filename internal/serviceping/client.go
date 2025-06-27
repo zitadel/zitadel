@@ -74,7 +74,10 @@ func (c Client) callTelemetryService(ctx context.Context, path string, in proto.
 		}
 	}
 
-	return protojson.Unmarshal(body, out)
+	return protojson.UnmarshalOptions{
+		AllowPartial:   true,
+		DiscardUnknown: true,
+	}.Unmarshal(body, out)
 }
 
 func NewClient(config *Config) Client {
