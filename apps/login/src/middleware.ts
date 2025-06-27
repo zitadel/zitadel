@@ -49,25 +49,25 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check if the request is for the /login route that handles the auth request for OIDC none prompt
-  let isLoginRouteMatched = request.nextUrl.pathname.startsWith("/login/");
+  // let isLoginRouteMatched = request.nextUrl.pathname.startsWith("/login/");
 
-  let securitySettings;
-  if (isLoginRouteMatched) {
-    securitySettings = await loadSecuritySettings(request);
+  // let securitySettings;
+  // if (isLoginRouteMatched) {
+  //   securitySettings = await loadSecuritySettings(request);
 
-    if (securitySettings?.embeddedIframe?.enabled) {
-      const response = NextResponse.next({
-        request: { headers: requestHeaders },
-      });
+  //   if (securitySettings?.embeddedIframe?.enabled) {
+  //     const response = NextResponse.next({
+  //       request: { headers: requestHeaders },
+  //     });
 
-      response.headers.set(
-        "Content-Security-Policy",
-        `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
-      );
-      response.headers.delete("X-Frame-Options");
-      return response;
-    }
-  }
+  //     response.headers.set(
+  //       "Content-Security-Policy",
+  //       `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
+  //     );
+  //     response.headers.delete("X-Frame-Options");
+  //     return response;
+  //   }
+  // }
 
   // Only run the rest of the logic for the original matcher paths
   const proxyPaths = [
@@ -109,9 +109,7 @@ export async function middleware(request: NextRequest) {
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
 
-  if (!securitySettings) {
-    securitySettings = await loadSecuritySettings(request);
-  }
+  const securitySettings = await loadSecuritySettings(request);
 
   if (securitySettings?.embeddedIframe?.enabled) {
     responseHeaders.set(
