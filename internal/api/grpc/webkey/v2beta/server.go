@@ -14,8 +14,9 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta/webkeyconnect"
 )
 
+var _ webkeyconnect.WebKeyServiceHandler = (*Server)(nil)
+
 type Server struct {
-	webkey.UnimplementedWebKeyServiceServer
 	command *command.Commands
 	query   *query.Queries
 }
