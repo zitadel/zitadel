@@ -43,8 +43,15 @@ target "proto-files" {
   }
 }
 
+variable "NODE_VERSION" {
+  default = "20"
+}
+
 target "login-pnpm" {
   dockerfile = "${DOCKERFILES_DIR}login-pnpm.Dockerfile"
+  args = {
+    NODE_VERSION = "${NODE_VERSION}"
+  }
 }
 
 target "login-dev-base" {
