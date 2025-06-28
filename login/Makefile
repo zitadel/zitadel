@@ -14,7 +14,7 @@ export GID := $(id -g)
 export LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT := $(LOGIN_DIR)apps/login-test-acceptance
 
 export DOCKER_METADATA_OUTPUT_VERSION ?= local
-export LOGIN_TAG := login:${DOCKER_METADATA_OUTPUT_VERSION}
+export LOGIN_TAG ?= login:${DOCKER_METADATA_OUTPUT_VERSION}
 export LOGIN_TEST_UNIT_TAG := login-test-unit:${DOCKER_METADATA_OUTPUT_VERSION}
 export LOGIN_TEST_INTEGRATION_TAG := login-test-integration:${DOCKER_METADATA_OUTPUT_VERSION}
 export LOGIN_TEST_ACCEPTANCE_TAG := login-test-acceptance:${DOCKER_METADATA_OUTPUT_VERSION}
@@ -117,9 +117,6 @@ login_quality: login_lint login_test_unit login_test_integration
 login_standalone_build:
 	@echo "Building the login standalone docker image with tag: $(LOGIN_TAG)"
 	$(LOGIN_BAKE_CLI_WITH_ARGS) login-standalone --load
-
-login_standalone_build_tag:
-	@echo -n "$(LOGIN_TAG)"
 
 typescript_generate:
 	@echo "Generating TypeScript client and writing to local $(LOGIN_DIR)packages/zitadel-proto"
