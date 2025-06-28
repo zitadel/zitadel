@@ -9,6 +9,11 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 RUN cp -r ../out/full/* .
 RUN pnpm exec turbo run build:login:standalone
 
+FROM scratch AS login-standalone-out
+COPY --from=login-standalone-builder /build/docker/apps/login/.next/standalone /
+COPY --from=login-standalone-builder /build/docker/apps/login/.next/static /apps/login/.next/static
+COPY --from=login-standalone-builder /build/docker/apps/login/public /apps/login/public
+
 FROM node:20-alpine AS login-standalone
 WORKDIR /runtime
 RUN addgroup --system --gid 1001 nodejs && \
