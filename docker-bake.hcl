@@ -128,3 +128,11 @@ target "login-standalone" {
   }
   tags   = ["${LOGIN_TAG}"]
 }
+
+target "login-standalone-out" {
+  inherits   = ["login-standalone"]
+  target = "login-standalone-out"
+  output = [
+    "type=local,dest=${LOGIN_DIR}apps/login/standalone"
+  ]
+}
