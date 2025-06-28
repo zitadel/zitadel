@@ -1,4 +1,5 @@
-FROM node:20-bookworm AS login-pnpm
+ARG NODE_VERSION=20
+FROM node:${NODE_VERSION}-bookworm AS login-pnpm
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack prepare pnpm@9.1.2 --activate && \
