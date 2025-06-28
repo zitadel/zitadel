@@ -103,7 +103,7 @@ jobs:
 
   checksums:
     runs-on: ubuntu-latest
-    needs: executable
+    needs: [executable, login]
     steps:
     - 
       uses: actions/download-artifact@v4
