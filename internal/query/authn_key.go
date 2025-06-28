@@ -222,6 +222,19 @@ func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySear
 	return authNKeys, err
 }
 
+func (q *Queries) GetAuthNKeyByIDWithPermission(ctx context.Context, shouldTriggerBulk bool, id string, permissionCheck domain.PermissionCheck, queries ...SearchQuery) (*AuthNKey, error) {
+	key, err := q.GetAuthNKeyByID(ctx, shouldTriggerBulk, id, queries...)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := appCheckPermission(ctx, key.ResourceOwner, key.AggregateID, permissionCheck); err != nil {
+		return nil, err
+	}
+
+	return key, nil
+}
+
 func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, id string, queries ...SearchQuery) (key *AuthNKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

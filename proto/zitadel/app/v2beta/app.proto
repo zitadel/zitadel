@@ -92,3 +92,30 @@ message ApplicationNameQuery {
         }
     ];
 }
+
+enum ApplicationKeysSorting {
+    APPLICATION_KEYS_SORT_BY_ID = 0;
+    APPLICATION_KEYS_SORT_BY_AGGREGATE_ID = 1;
+    APPLICATION_KEYS_SORT_BY_CREATION_DATE = 2;
+    APPLICATION_KEYS_SORT_BY_RESOURCE_OWNER = 3;
+    APPLICATION_KEYS_SORT_BY_EXPIRATION = 4;
+    APPLICATION_KEYS_SORT_BY_TYPE = 5;
+}
+
+message ApplicationKey {
+    string id = 1;
+    string project_id = 2;
+    google.protobuf.Timestamp creation_date = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2024-12-18T07:50:47.492Z\"";
+        }
+    ];
+    string organization_id = 4;
+    google.protobuf.Timestamp expiration_date = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2024-12-18T07:50:47.492Z\"";
+        }
+    ];
+
+    ApplicationKeyType key_type = 6;
+}

@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
@@ -17,7 +18,7 @@ import (
 
 func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(*testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 		keySize     int
 	}
@@ -39,9 +40,7 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 		{
 			name: "no aggregateid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -57,9 +56,7 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 		{
 			name: "no appid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(func(mockRepository *mock.MockRepository) {}),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -77,10 +74,7 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 		{
 			name: "app not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
+				eventstore: expectEventstore(expectFilter()),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -99,8 +93,7 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 		{
 			name: "create key not allowed, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -140,8 +133,7 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 		{
 			name: "create key not allowed, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -183,9 +175,10 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
+				eventstore:         tt.fields.eventstore(t),
 				idGenerator:        tt.fields.idGenerator,
 				applicationKeySize: tt.fields.keySize,
+				checkPermission:    mockDomainPermissionCheck(tt.args.ctx, domain.PermissionProjectAppWrite, tt.args.resourceOwner, tt.args.key.AggregateID)(t),
 			}
 			got, err := r.AddApplicationKey(tt.args.ctx, tt.args.key, tt.args.resourceOwner)
 			if tt.res.err == nil {

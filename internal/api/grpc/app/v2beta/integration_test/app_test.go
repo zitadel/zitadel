@@ -653,9 +653,9 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 	})
 	require.Nil(t, appNameChangeErr)
 
-	appForAPIConfigChangeForProjectOwner := createAPIApp(t, p.GetId())
-	appForAPIConfigChangeForOrgOwner := createAPIApp(t, p.GetId())
-	appForAPIConfigChangeForLoginUser := createAPIApp(t, p.GetId())
+	appForAPIConfigChangeForProjectOwner := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+	appForAPIConfigChangeForOrgOwner := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+	appForAPIConfigChangeForLoginUser := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
 
 	appForOIDCConfigChangeForProjectOwner := createOIDCApp(t, baseURI, p.GetId())
 	appForOIDCConfigChangeForOrgOwner := createOIDCApp(t, baseURI, p.GetId())
@@ -914,9 +914,9 @@ func TestDeleteApplication(t *testing.T) {
 func TestDeleteApplication_WithDifferentPermissions(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
 
-	appToDeleteForLoginUser := createAPIApp(t, p.GetId())
-	appToDeleteForProjectOwner := createAPIApp(t, p.GetId())
-	appToDeleteForOrgOwner := createAPIApp(t, p.GetId())
+	appToDeleteForLoginUser := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+	appToDeleteForProjectOwner := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+	appToDeleteForOrgOwner := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
 
 	t.Parallel()
 	tt := []struct {
@@ -1035,9 +1035,9 @@ func TestDeactivateApplication(t *testing.T) {
 func TestDeactivateApplication_WithDifferentPermissions(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
 
-	appToDeactivateForLoginUser := createAPIApp(t, p.GetId())
-	appToDeactivateForPrjectOwner := createAPIApp(t, p.GetId())
-	appToDeactivateForOrgOwner := createAPIApp(t, p.GetId())
+	appToDeactivateForLoginUser := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+	appToDeactivateForPrjectOwner := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+	appToDeactivateForOrgOwner := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
 
 	t.Parallel()
 
@@ -1162,13 +1162,13 @@ func TestReactivateApplication(t *testing.T) {
 func TestReactivateApplication_WithDifferentPermissions(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
 
-	appToReactivateForLoginUser := createAPIApp(t, p.GetId())
+	appToReactivateForLoginUser := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
 	deactivateApp(t, appToReactivateForLoginUser, p.GetId())
 
-	appToReactivateForProjectOwner := createAPIApp(t, p.GetId())
+	appToReactivateForProjectOwner := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
 	deactivateApp(t, appToReactivateForProjectOwner, p.GetId())
 
-	appToReactivateForOrgOwner := createAPIApp(t, p.GetId())
+	appToReactivateForOrgOwner := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
 	deactivateApp(t, appToReactivateForOrgOwner, p.GetId())
 
 	t.Parallel()
@@ -1342,9 +1342,9 @@ func TestRegenerateClientSecret(t *testing.T) {
 func TestRegenerateClientSecret_WithDifferentPermissions(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
 
-	apiAppToRegenForLoginUser := createAPIApp(t, p.GetId())
-	apiAppToRegenForProjectOwner := createAPIApp(t, p.GetId())
-	apiAppToRegenForOrgOwner := createAPIApp(t, p.GetId())
+	apiAppToRegenForLoginUser := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+	apiAppToRegenForProjectOwner := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+	apiAppToRegenForOrgOwner := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
 
 	oidcAppToRegenForLoginUser := createOIDCApp(t, baseURI, p.GetId())
 	oidcAppToRegenForProjectOwner := createOIDCApp(t, baseURI, p.GetId())
