@@ -47,14 +47,17 @@ func TestMain(m *testing.M) {
 func TestServer_CreateOrganization(t *testing.T) {
 	idpResp := Instance.AddGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 
-	tests := []struct {
-		name    string
-		ctx     context.Context
-		req     *v2beta_org.CreateOrganizationRequest
-		id      string
-		want    *v2beta_org.CreateOrganizationResponse
-		wantErr bool
-	}{
+	type test struct {
+		name     string
+		ctx      context.Context
+		req      *v2beta_org.CreateOrganizationRequest
+		id       string
+		testfunc func(ctx context.Context, t *testing.T)
+		want     *v2beta_org.CreateOrganizationResponse
+		wantErr  bool
+	}
+
+	tests := []test{
 		{
 			name: "missing permission",
 			ctx:  Instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
@@ -73,6 +76,25 @@ func TestServer_CreateOrganization(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		func() test {
+			orgName := gofakeit.Name()
+			return test{
+				name: "adding org with same name twice",
+				ctx:  CTX,
+				req: &v2beta_org.CreateOrganizationRequest{
+					Name:   orgName,
+					Admins: nil,
+				},
+				testfunc: func(ctx context.Context, t *testing.T) {
+					// create org initally
+					_, err := Client.CreateOrganization(ctx, &v2beta_org.CreateOrganizationRequest{
+						Name: orgName,
+					})
+					require.NoError(t, err)
+				},
+				wantErr: true,
+			}
+		}(),
 		{
 			name: "invalid admin type",
 			ctx:  CTX,
@@ -210,9 +232,33 @@ func TestServer_CreateOrganization(t *testing.T) {
 			},
 			want: &v2beta_org.CreateOrganizationResponse{},
 		},
+		func() test {
+			orgID := gofakeit.Name()
+			return test{
+				name: "adding org with same ID twice",
+				ctx:  CTX,
+				req: &v2beta_org.CreateOrganizationRequest{
+					Name:   orgID,
+					Admins: nil,
+				},
+				testfunc: func(ctx context.Context, t *testing.T) {
+					// create org initally
+					_, err := Client.CreateOrganization(ctx, &v2beta_org.CreateOrganizationRequest{
+						Name: gofakeit.AppName(),
+						Id:   &orgID,
+					})
+					require.NoError(t, err)
+				},
+				wantErr: true,
+			}
+		}(),
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.testfunc != nil {
+				tt.testfunc(tt.ctx, t)
+			}
+
 			got, err := Client.CreateOrganization(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)

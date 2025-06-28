@@ -23,6 +23,19 @@ const (
 	OrgStateSearchField = "state"
 )
 
+func NewAddOrgIDUniqueConstraint(orgID string) *eventstore.UniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueOrgname,
+		orgID,
+		"Errors.Org.AlreadyExists")
+}
+
+func NewRemoveOrgIDUniqueConstraint(orgID string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
+		uniqueOrgname,
+		orgID)
+}
+
 func NewAddOrgNameUniqueConstraint(orgName string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		uniqueOrgname,
@@ -39,6 +52,7 @@ func NewRemoveOrgNameUniqueConstraint(orgName string) *eventstore.UniqueConstrai
 type OrgAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
+	ID   string `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
 }
 
@@ -47,7 +61,7 @@ func (e *OrgAddedEvent) Payload() interface{} {
 }
 
 func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name)}
+	return []*eventstore.UniqueConstraint{NewAddOrgIDUniqueConstraint(e.ID), NewAddOrgNameUniqueConstraint(e.Name)}
 }
 
 func (e *OrgAddedEvent) Fields() []*eventstore.FieldOperation {
@@ -94,6 +108,7 @@ func NewOrgAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name
 			aggregate,
 			OrgAddedEventType,
 		),
+		ID:   aggregate.ID,
 		Name: name,
 	}
 }
@@ -276,6 +291,7 @@ func OrgReactivatedEventMapper(event eventstore.Event) (eventstore.Event, error)
 
 type OrgRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	id                   string
 	name                 string
 	usernames            []string
 	loginMustBeDomain    bool
@@ -290,6 +306,7 @@ func (e *OrgRemovedEvent) Payload() interface{} {
 
 func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	constraints := []*eventstore.UniqueConstraint{
+		NewRemoveOrgIDUniqueConstraint(e.id),
 		NewRemoveOrgNameUniqueConstraint(e.name),
 	}
 	for _, name := range e.usernames {
@@ -321,6 +338,7 @@ func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, na
 			aggregate,
 			OrgRemovedEventType,
 		),
+		id:                aggregate.ID,
 		name:              name,
 		usernames:         usernames,
 		domains:           domains,
