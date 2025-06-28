@@ -94,7 +94,7 @@ jobs:
       run: |
         cp login/LICENSE login/apps/login/standalone/
         cp login/README.md login/apps/login/standalone/
-        tar -czvf login.tar.gz login/apps/login/standalone
+        tar -czvf login.tar.gz -C login/apps/login/standalone .
     -
       uses: actions/upload-artifact@v4
       with:
