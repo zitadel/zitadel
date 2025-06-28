@@ -28,7 +28,7 @@ func NewSession(provider *Provider, code string) *Session {
 }
 
 // GetAuth implements the [idp.Provider] interface by calling the wrapped [oauth.Session].
-func (s *Session) GetAuth(ctx context.Context) (content string, redirect bool) {
+func (s *Session) GetAuth(ctx context.Context) (idp.Auth, error) {
 	return s.oauth().GetAuth(ctx)
 }
 

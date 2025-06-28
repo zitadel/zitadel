@@ -432,9 +432,8 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 		samlRootURL string
 	}
 	type res struct {
-		content  string
-		redirect bool
-		err      error
+		auth idp.Auth
+		err  error
 	}
 	tests := []struct {
 		name   string
@@ -579,8 +578,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 				callbackURL: "url",
 			},
 			res{
-				content:  "auth?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&state=id",
-				redirect: true,
+				auth: &idp.RedirectAuth{RedirectURL: "auth?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&state=id"},
 			},
 		},
 		{
@@ -671,8 +669,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 				callbackURL: "url",
 			},
 			res{
-				content:  "https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&scope=openid+profile+User.Read&state=id",
-				redirect: true,
+				auth: &idp.RedirectAuth{RedirectURL: "https://login.microsoftonline.com/tenant/oauth2/v2.0/authorize?client_id=clientID&prompt=select_account&redirect_uri=url&response_type=code&scope=openid+profile+User.Read&state=id"},
 			},
 		},
 	}
@@ -686,13 +683,12 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL)
 			require.ErrorIs(t, err, tt.res.err)
 
-			var content string
-			var redirect bool
+			var got idp.Auth
 			if err == nil {
-				content, redirect = session.GetAuth(tt.args.ctx)
+				got, err = session.GetAuth(tt.args.ctx)
+				assert.Equal(t, tt.res.auth, got)
+				assert.NoError(t, err)
 			}
-			assert.Equal(t, tt.res.redirect, redirect)
-			assert.Equal(t, tt.res.content, content)
 		})
 	}
 }
@@ -822,8 +818,9 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 			_, session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.callbackURL, tt.args.samlRootURL)
 			require.ErrorIs(t, err, tt.res.err)
 
-			content, _ := session.GetAuth(tt.args.ctx)
-			authURL, err := url.Parse(content)
+			auth, err := session.GetAuth(tt.args.ctx)
+			require.NoError(t, err)
+			authURL, err := url.Parse(auth.(*idp.RedirectAuth).RedirectURL)
 			require.NoError(t, err)
 
 			assert.Equal(t, tt.res.url, authURL.Scheme+"://"+authURL.Host+authURL.Path)
