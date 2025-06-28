@@ -101,3 +101,10 @@ SystemDefaults:
   KeyConfig:
     PrivateKeyLifetime: 7200h
     PublicKeyLifetime: 14400h
+
+OIDC:
+  DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
+  DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
+
+SAML:
+  DefaultLoginURLV2: "/login?samlRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2

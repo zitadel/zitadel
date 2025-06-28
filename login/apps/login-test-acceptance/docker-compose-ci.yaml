@@ -1,0 +1,59 @@
+services:
+
+  zitadel:
+    environment:
+      ZITADEL_EXTERNALDOMAIN: traefik
+
+  traefik:
+    labels: !reset []
+
+  setup:
+    environment:
+      ZITADEL_API_DOMAIN: traefik
+      ZITADEL_API_URL: https://traefik
+      LOGIN_BASE_URL: https://traefik/ui/v2/login/
+      SINK_NOTIFICATION_URL: http://sink:3333/notification
+      ZITADEL_ADMIN_USER: zitadel-admin@zitadel.traefik
+
+  login:
+    image: "${LOGIN_TAG:-login:local}"
+    container_name: acceptance-login
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.login.rule=PathPrefix(`/ui/v2/login`)"
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+
+  acceptance:
+    image: "${LOGIN_TEST_ACCEPTANCE_TAG:-login-test-acceptance:local}"
+    container_name: acceptance
+    environment:
+      - CI
+      - LOGIN_BASE_URL=https://traefik/ui/v2/login/
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+    volumes:
+      - ../login/.env.test.local:/build/apps/login/.env.test.local
+      - ./test-results:/build/apps/login-test-acceptance/test-results
+      - ./playwright-report:/build/apps/login-test-acceptance/playwright-report
+    ports:
+      - 9323:9323
+    ipc: "host"
+    init: true
+    depends_on:
+      login:
+        condition: "service_healthy"
+      sink:
+        condition: service_healthy
+#      oidcrp:
+#        condition: service_healthy
+#      oidcop:
+#        condition: service_healthy
+#      samlsp:
+#        condition: service_healthy
+#      samlidp:
+#        condition: service_healthy

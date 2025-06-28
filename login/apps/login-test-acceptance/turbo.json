@@ -1,0 +1,10 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "test:acceptance:setup:dev": {
+      "interactive": true,
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
