@@ -7,6 +7,9 @@ on:
         description: 'The image repository name of the standalone login image'
         type: string
         required: true
+      node_version:
+        required: true
+        type: string
     outputs:
       login_build_image:
           description: 'The full image tag of the standalone login image'
@@ -47,6 +50,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Bake login multi-arch
         uses: depot/bake-action@v1
+        env:
+          NODE_VERSION: ${{ inputs.node_version }}
         with:
           workdir: login
           push: true
