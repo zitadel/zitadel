@@ -39,15 +39,20 @@ jobs:
           labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=,format=long
+      - name: Login to Docker registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Bake login multi-arch
         uses: depot/bake-action@v1
         with:
           workdir: login
-          push: false
+          push: true
           targets: login-standalone
           set: login-standalone.platforms=[linux/amd64,linux/arm64]
           project: w47wkxzdtw
-          load: true
           files: |
             ./docker-bake.hcl
             cwd://${{ steps.login-meta.outputs.bake-file }}
