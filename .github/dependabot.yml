@@ -22,6 +22,19 @@ updates:
   commit-message:
     prefix: chore
     include: scope
+- package-ecosystem: npm
+  directory: '/login'
+  open-pull-requests-limit: 3
+  schedule:
+    interval: daily
+  groups:
+    prod:
+      dependency-type: production
+    dev:
+      dependency-type: development
+  ignore:
+    - dependency-name: "eslint"
+      versions: [ "9.x" ]
 - package-ecosystem: gomod
   groups:
     go:
