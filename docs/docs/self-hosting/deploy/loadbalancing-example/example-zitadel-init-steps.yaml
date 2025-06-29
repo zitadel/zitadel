@@ -1,6 +1,6 @@
 # All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml
 FirstInstance:
-  PatPath: '/pat'
+  PatPath: '/pat-dir/pat'
   Org:
     # We want to authenticate immediately at the console without changing the password
     Human:
