@@ -2,7 +2,10 @@
 
 !apps/login
 apps/login/.next
+apps/login/dist
 apps/login/screenshots
+apps/login/standalone
+apps/login/.env*.local
 
 !apps/login-test-integration
 

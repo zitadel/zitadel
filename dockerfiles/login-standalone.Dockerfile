@@ -20,6 +20,7 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 # If /.env-file/.env is mounted into the container, its variables are made available to the server before it starts up.
 RUN mkdir -p /.env-file && touch /.env-file/.env && chown -R nextjs:nodejs /.env-file
+COPY ./scripts/entrypoint.sh ./
 COPY ./scripts/healthcheck.js ./
 COPY --chown=nextjs:nodejs --from=login-standalone-builder /build/docker/apps/login/.next/standalone ./
 COPY --chown=nextjs:nodejs --from=login-standalone-builder /build/docker/apps/login/.next/static ./apps/login/.next/static
@@ -30,4 +31,4 @@ ENV PORT=3000
 # TODO: Check healthy, not ready
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 CMD ["/bin/sh", "-c", "node ./healthcheck.js http://localhost:${PORT}/ui/v2/login/healthy"]
-CMD ["/bin/sh", "-c", "set -o allexport && . /.env-file/.env && set +o allexport && node apps/login/server.js"]
+ENTRYPOINT ["./entrypoint.sh"]
