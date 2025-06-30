@@ -215,6 +215,9 @@ func Register(
 	eventstoreClient *eventstore.Eventstore,
 	config *Config,
 ) error {
+	if !config.Enabled {
+		return nil
+	}
 	systemID := new(systemIDReducer)
 	err := eventstoreClient.FilterToQueryReducer(ctx, systemID)
 	if err != nil {
@@ -232,6 +235,9 @@ func Register(
 }
 
 func Start(config *Config, q *queue.Queue) error {
+	if !config.Enabled {
+		return nil
+	}
 	schedule, err := cron.ParseStandard(config.Interval)
 	if err != nil {
 		return err

@@ -326,7 +326,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		return err
 	}
 
-	// the scheduler / periodic jobs need to started after the queue already runs
+	// the scheduler / periodic jobs need to be started after the queue already runs
 	if err = serviceping.Start(config.ServicePing, q); err != nil {
 		return err
 	}

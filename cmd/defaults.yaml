@@ -1201,9 +1201,8 @@ AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
 # It's enabled by default, but you can opt out either completely or by disabling specific telemetry data.
 ServicePing:
   # By setting Enabled to false, the service ping is disabled completely.
-  # TODO: change to enabled by default, but as the corresponding endpoint is not yet available, we keep it disabled for now.
-  Enabled: false # ZITADEL_SERVICEPING_ENABLED
-  # The endpoint to which the reports are sent.
+  Enabled: true # ZITADEL_SERVICEPING_ENABLED
+  # The endpoint to which the reports are sent. The endpoint is used as a base path. Individual reports are sent to the endpoint with a specific path.
   Endpoint: "https://zitadel.cloud/api/ping" # ZITADEL_SERVICEPING_ENDPOINT
   # Interval at which the service ping is sent to the endpoint.
   # The interval is in the format of a cron expression.
