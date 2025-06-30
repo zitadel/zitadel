@@ -1,6 +1,6 @@
 //go:build integration
 
-package instance_test
+package app_test
 
 import (
 	"context"
@@ -577,7 +577,7 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 func TestGetApplicationKey(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
 	createdApiApp := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
-	createdAppKey := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp.GetAppId(), time.Now())
+	createdAppKey := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp.GetAppId(), time.Now().AddDate(0, 0, 1))
 
 	t.Parallel()
 
@@ -690,6 +690,7 @@ func TestListApplicationKeys(t *testing.T) {
 			testName: "when sorting by expiration date should return keys sorted by expiration date ascending",
 			inputCtx: LoginUserCtx,
 			inputRequest: &app.ListApplicationKeysRequest{
+				ProjectId:     p.GetId(),
 				Pagination:    &filter.PaginationRequest{Asc: true},
 				SortingColumn: app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_EXPIRATION,
 			},
@@ -699,6 +700,7 @@ func TestListApplicationKeys(t *testing.T) {
 			testName: "when sorting by creation date should return keys sorted by creation date descending",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.ListApplicationKeysRequest{
+				ProjectId:     p.GetId(),
 				SortingColumn: app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_CREATION_DATE,
 			},
 			expectedAppKeysIDs: []string{appKey4.GetId(), appKey3.GetId(), appKey2.GetId(), appKey1.GetId()},

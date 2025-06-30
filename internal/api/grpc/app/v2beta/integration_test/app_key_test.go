@@ -1,6 +1,6 @@
 //go:build integration
 
-package instance_test
+package app_test
 
 import (
 	"context"
@@ -134,7 +134,7 @@ func TestDeleteApplicationKey(t *testing.T) {
 			testName: "when valid app key ID should delete successfully",
 			inputCtx: IAMOwnerCtx,
 			deletionRequest: func(ttt *testing.T) *app.DeleteApplicationKeyRequest {
-				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetId(), createdApp.GetAppId(), time.Now())
+				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetId(), createdApp.GetAppId(), time.Now().AddDate(0, 0, 1))
 
 				return &app.DeleteApplicationKeyRequest{
 					Id:            createdAppKey.GetId(),
@@ -149,7 +149,7 @@ func TestDeleteApplicationKey(t *testing.T) {
 			testName: "when user has no project.app.write permission for app key deletion should return permission error",
 			inputCtx: LoginUserCtx,
 			deletionRequest: func(ttt *testing.T) *app.DeleteApplicationKeyRequest {
-				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetId(), createdApp.GetAppId(), time.Now())
+				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetId(), createdApp.GetAppId(), time.Now().AddDate(0, 0, 1))
 
 				return &app.DeleteApplicationKeyRequest{
 					Id:            createdAppKey.GetId(),
@@ -165,7 +165,7 @@ func TestDeleteApplicationKey(t *testing.T) {
 			testName: "when user is OrgOwner API request should succeed",
 			inputCtx: projectOwnerCtx,
 			deletionRequest: func(ttt *testing.T) *app.DeleteApplicationKeyRequest {
-				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetId(), createdApp.GetAppId(), time.Now())
+				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetId(), createdApp.GetAppId(), time.Now().AddDate(0, 0, 1))
 
 				return &app.DeleteApplicationKeyRequest{
 					Id:            createdAppKey.GetId(),
@@ -180,7 +180,7 @@ func TestDeleteApplicationKey(t *testing.T) {
 			testName: "when user is OrgOwner app key deletion request should succeed",
 			inputCtx: OrgOwnerCtx,
 			deletionRequest: func(ttt *testing.T) *app.DeleteApplicationKeyRequest {
-				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetId(), createdApp.GetAppId(), time.Now())
+				createdAppKey := createAppKey(ttt, IAMOwnerCtx, instance, p.GetId(), createdApp.GetAppId(), time.Now().AddDate(0, 0, 1))
 
 				return &app.DeleteApplicationKeyRequest{
 					Id:            createdAppKey.GetId(),
