@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/integration/scim"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
@@ -75,6 +76,7 @@ type Client struct {
 	SCIM           *scim.Client
 	Projectv2Beta  project_v2beta.ProjectServiceClient
 	InstanceV2Beta instance.InstanceServiceClient
+	AppV2Beta      app.AppServiceClient
 }
 
 func NewDefaultClient(ctx context.Context) (*Client, error) {
@@ -114,6 +116,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		SCIM:           scim.NewScimClient(target),
 		Projectv2Beta:  project_v2beta.NewProjectServiceClient(cc),
 		InstanceV2Beta: instance.NewInstanceServiceClient(cc),
+		AppV2Beta:      app.NewAppServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }

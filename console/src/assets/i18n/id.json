@@ -1500,8 +1500,6 @@
       "LOGINDEFAULTORG_DESCRIPTION": "UI login akan menggunakan pengaturan organisasi default (dan bukan dari instance) jika tidak ada konteks organisasi yang ditetapkan",
       "OIDCTOKENEXCHANGE": "Pertukaran Token OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktifkan jenis pemberian urn:ietf:params:oauth:grant-type:token-exchange eksperimental untuk titik akhir token OIDC. Pertukaran token dapat digunakan untuk meminta token dengan cakupan yang lebih kecil atau menyamar sebagai pengguna lain. Lihat kebijakan keamanan untuk mengizinkan peniruan identitas pada sebuah instans.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Memicu Proyeksi Introspeksi",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Aktifkan pemicu proyeksi selama permintaan introspeksi. Hal ini dapat menjadi solusi jika terdapat masalah konsistensi yang nyata dalam respons introspeksi namun dapat berdampak pada kinerja. Kami berencana untuk menghilangkan pemicu permintaan introspeksi di masa depan.",
       "USERSCHEMA": "Skema Pengguna",
       "USERSCHEMA_DESCRIPTION": "Skema Pengguna memungkinkan untuk mengelola skema data pengguna. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
       "ACTIONS": "Tindakan",

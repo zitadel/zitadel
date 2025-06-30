@@ -613,7 +613,7 @@ func setupAdmins(commands *Commands,
 			return "", nil, nil, err
 		}
 
-		setupAdminMembers(commands, validations, instanceAgg, orgAgg, machineUserID)
+		setupAdminMembers(commands, validations, instanceAgg, orgAgg, machineUserID, true)
 	}
 	if human != nil {
 		humanUserID, err := commands.idGenerator.Next()
@@ -627,7 +627,7 @@ func setupAdmins(commands *Commands,
 			commands.AddHumanCommand(human, orgAgg.ID, commands.userPasswordHasher, commands.userEncryption, true),
 		)
 
-		setupAdminMembers(commands, validations, instanceAgg, orgAgg, humanUserID)
+		setupAdminMembers(commands, validations, instanceAgg, orgAgg, humanUserID, false)
 	}
 	return owner, pat, machineKey, nil
 }
@@ -655,10 +655,14 @@ func setupMachineAdmin(commands *Commands, validations *[]preparation.Validation
 	return pat, machineKey, nil
 }
 
-func setupAdminMembers(commands *Commands, validations *[]preparation.Validation, instanceAgg *instance.Aggregate, orgAgg *org.Aggregate, userID string) {
+func setupAdminMembers(commands *Commands, validations *[]preparation.Validation, instanceAgg *instance.Aggregate, orgAgg *org.Aggregate, userID string, withIAMLoginClient bool) {
+	iamRoles := []string{domain.RoleIAMOwner}
+	if withIAMLoginClient {
+		iamRoles = append(iamRoles, domain.RoleIAMLoginClient)
+	}
 	*validations = append(*validations,
 		commands.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
-		commands.AddInstanceMemberCommand(instanceAgg, userID, domain.RoleIAMOwner),
+		commands.AddInstanceMemberCommand(instanceAgg, userID, iamRoles...),
 	)
 }
 

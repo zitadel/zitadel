@@ -1626,8 +1626,6 @@
       "LOGINDEFAULTORG_DESCRIPTION": "Die Anmelde-Benutzeroberfläche verwendet die Einstellungen der Standardorganisation (und nicht von der Instanz), wenn kein Organisationskontext festgelegt ist.",
       "OIDCTOKENEXCHANGE": "OIDC Token-Austausch",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktivieren Sie den experimentellen urn:ietf:params:oauth:grant-type:token-exchange-Grant-Typ für den OIDC-Token-Endpunkt. Der Token-Austausch kann verwendet werden, um Token mit einem geringeren Umfang anzufordern oder andere Benutzer zu impersonieren. Siehe die Sicherheitsrichtlinie, um die Impersonation auf einer Instanz zu erlauben.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Trigger-Introspektionsprojektionen",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Aktivieren Sie Projektionstrigger während einer Introspektionsanfrage. Dies kann als Workaround fungieren, wenn bemerkbare Konsistenzprobleme in der Introspektionsantwort auftreten, kann sich jedoch auf die Leistung auswirken. Wir planen, Trigger für Introspektionsanfragen in Zukunft zu entfernen.",
       "USERSCHEMA": "Benutzerschema",
       "USERSCHEMA_DESCRIPTION": "Benutzerschemata ermöglichen das Verwalten von Datenschemata von Benutzern. Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "ACTIONS": "Aktionen",

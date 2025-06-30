@@ -1627,8 +1627,6 @@
       "LOGINDEFAULTORG_DESCRIPTION": "La interfaz de inicio de sesión utilizará la configuración de la organización predeterminada (y no de la instancia) si no se establece ningún contexto de organización.",
       "OIDCTOKENEXCHANGE": "Intercambio de tokens OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Habilita el tipo de concesión experimental urn:ietf:params:oauth:grant-type:token-exchange para el punto de extremo de token OIDC. El intercambio de tokens se puede utilizar para solicitar tokens con un alcance menor o suplantar a otros usuarios. Consulta la política de seguridad para permitir la suplantación en una instancia.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Desencadenadores de proyecciones de introspección OIDC",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Habilita los desencadenadores de proyección durante una solicitud de introspección. Esto puede actuar como un mecanismo alternativo si hay problemas de coherencia perceptibles en la respuesta a la introspección, pero puede afectar al rendimiento. Estamos planeando eliminar los desencadenadores para las solicitudes de introspección en el futuro.",
       "USERSCHEMA": "Esquema de usuario",
       "USERSCHEMA_DESCRIPTION": "Los esquemas de usuario permiten gestionar los esquemas de datos de los usuarios. Si se activa la bandera, podrás utilizar la nueva API y sus funciones.",
       "ACTIONS": "Acciones",
