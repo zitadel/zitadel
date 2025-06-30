@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/app/v2beta/convert"
@@ -13,15 +14,15 @@ import (
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
 
-func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicationRequest) (*app.CreateApplicationResponse, error) {
-	switch t := req.GetCreationRequestType().(type) {
+func (s *Server) CreateApplication(ctx context.Context, req *connect.Request[app.CreateApplicationRequest]) (*connect.Response[app.CreateApplicationResponse], error) {
+	switch t := req.Msg.GetCreationRequestType().(type) {
 	case *app.CreateApplicationRequest_ApiRequest:
-		apiApp, err := s.command.AddAPIApplication(ctx, convert.CreateAPIApplicationRequestToDomain(req.GetName(), req.GetProjectId(), req.GetId(), t.ApiRequest), "")
+		apiApp, err := s.command.AddAPIApplication(ctx, convert.CreateAPIApplicationRequestToDomain(req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetId(), t.ApiRequest), "")
 		if err != nil {
 			return nil, err
 		}
 
-		return &app.CreateApplicationResponse{
+		return connect.NewResponse(&app.CreateApplicationResponse{
 			AppId:        apiApp.AppID,
 			CreationDate: timestamppb.New(apiApp.ChangeDate),
 			CreationResponseType: &app.CreateApplicationResponse_ApiResponse{
@@ -30,10 +31,10 @@ func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicati
 					ClientSecret: apiApp.ClientSecretString,
 				},
 			},
-		}, nil
+		}), nil
 
 	case *app.CreateApplicationRequest_OidcRequest:
-		oidcAppRequest, err := convert.CreateOIDCAppRequestToDomain(req.GetName(), req.GetProjectId(), req.GetOidcRequest())
+		oidcAppRequest, err := convert.CreateOIDCAppRequestToDomain(req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetOidcRequest())
 		if err != nil {
 			return nil, err
 		}
@@ -43,7 +44,7 @@ func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicati
 			return nil, err
 		}
 
-		return &app.CreateApplicationResponse{
+		return connect.NewResponse(&app.CreateApplicationResponse{
 			AppId:        oidcApp.AppID,
 			CreationDate: timestamppb.New(oidcApp.ChangeDate),
 			CreationResponseType: &app.CreateApplicationResponse_OidcResponse{
@@ -54,10 +55,10 @@ func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicati
 					ComplianceProblems: convert.ComplianceProblemsToLocalizedMessages(oidcApp.Compliance.Problems),
 				},
 			},
-		}, nil
+		}), nil
 
 	case *app.CreateApplicationRequest_SamlRequest:
-		samlAppRequest, err := convert.CreateSAMLAppRequestToDomain(req.GetName(), req.GetProjectId(), req.GetSamlRequest())
+		samlAppRequest, err := convert.CreateSAMLAppRequestToDomain(req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetSamlRequest())
 		if err != nil {
 			return nil, err
 		}
@@ -67,27 +68,27 @@ func (s *Server) CreateApplication(ctx context.Context, req *app.CreateApplicati
 			return nil, err
 		}
 
-		return &app.CreateApplicationResponse{
+		return connect.NewResponse(&app.CreateApplicationResponse{
 			AppId:        samlApp.AppID,
 			CreationDate: timestamppb.New(samlApp.ChangeDate),
 			CreationResponseType: &app.CreateApplicationResponse_SamlResponse{
 				SamlResponse: &app.CreateSAMLApplicationResponse{},
 			},
-		}, nil
+		}), nil
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "APP-0iiN46", "unknown app type")
 	}
 }
 
-func (s *Server) UpdateApplication(ctx context.Context, req *app.UpdateApplicationRequest) (*app.UpdateApplicationResponse, error) {
+func (s *Server) UpdateApplication(ctx context.Context, req *connect.Request[app.UpdateApplicationRequest]) (*connect.Response[app.UpdateApplicationResponse], error) {
 	var changedTime time.Time
 
-	if name := strings.TrimSpace(req.GetName()); name != "" {
+	if name := strings.TrimSpace(req.Msg.GetName()); name != "" {
 		updatedDetails, err := s.command.UpdateApplicationName(
 			ctx,
-			req.GetProjectId(),
+			req.Msg.GetProjectId(),
 			&domain.ChangeApp{
-				AppID:   req.GetId(),
+				AppID:   req.Msg.GetId(),
 				AppName: name,
 			},
 			"",
@@ -99,9 +100,9 @@ func (s *Server) UpdateApplication(ctx context.Context, req *app.UpdateApplicati
 		changedTime = updatedDetails.EventDate
 	}
 
-	switch t := req.GetUpdateRequestType().(type) {
+	switch t := req.Msg.GetUpdateRequestType().(type) {
 	case *app.UpdateApplicationRequest_ApiConfigurationRequest:
-		updatedAPIApp, err := s.command.UpdateAPIApplication(ctx, convert.UpdateAPIApplicationConfigurationRequestToDomain(req.GetId(), req.GetProjectId(), t.ApiConfigurationRequest), "")
+		updatedAPIApp, err := s.command.UpdateAPIApplication(ctx, convert.UpdateAPIApplicationConfigurationRequestToDomain(req.Msg.GetId(), req.Msg.GetProjectId(), t.ApiConfigurationRequest), "")
 		if err != nil {
 			return nil, err
 		}
@@ -109,7 +110,7 @@ func (s *Server) UpdateApplication(ctx context.Context, req *app.UpdateApplicati
 		changedTime = updatedAPIApp.ChangeDate
 
 	case *app.UpdateApplicationRequest_OidcConfigurationRequest:
-		oidcApp, err := convert.UpdateOIDCAppConfigRequestToDomain(req.GetId(), req.GetProjectId(), t.OidcConfigurationRequest)
+		oidcApp, err := convert.UpdateOIDCAppConfigRequestToDomain(req.Msg.GetId(), req.Msg.GetProjectId(), t.OidcConfigurationRequest)
 		if err != nil {
 			return nil, err
 		}
@@ -122,7 +123,7 @@ func (s *Server) UpdateApplication(ctx context.Context, req *app.UpdateApplicati
 		changedTime = updatedOIDCApp.ChangeDate
 
 	case *app.UpdateApplicationRequest_SamlConfigurationRequest:
-		samlApp, err := convert.UpdateSAMLAppConfigRequestToDomain(req.GetId(), req.GetProjectId(), t.SamlConfigurationRequest)
+		samlApp, err := convert.UpdateSAMLAppConfigRequestToDomain(req.Msg.GetId(), req.Msg.GetProjectId(), t.SamlConfigurationRequest)
 		if err != nil {
 			return nil, err
 		}
@@ -135,53 +136,53 @@ func (s *Server) UpdateApplication(ctx context.Context, req *app.UpdateApplicati
 		changedTime = updatedSAMLApp.ChangeDate
 	}
 
-	return &app.UpdateApplicationResponse{
+	return connect.NewResponse(&app.UpdateApplicationResponse{
 		ChangeDate: timestamppb.New(changedTime),
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeleteApplication(ctx context.Context, req *app.DeleteApplicationRequest) (*app.DeleteApplicationResponse, error) {
-	details, err := s.command.RemoveApplication(ctx, req.GetProjectId(), req.GetId(), "")
+func (s *Server) DeleteApplication(ctx context.Context, req *connect.Request[app.DeleteApplicationRequest]) (*connect.Response[app.DeleteApplicationResponse], error) {
+	details, err := s.command.RemoveApplication(ctx, req.Msg.GetProjectId(), req.Msg.GetId(), "")
 	if err != nil {
 		return nil, err
 	}
 
-	return &app.DeleteApplicationResponse{
+	return connect.NewResponse(&app.DeleteApplicationResponse{
 		DeletionDate: timestamppb.New(details.EventDate),
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeactivateApplication(ctx context.Context, req *app.DeactivateApplicationRequest) (*app.DeactivateApplicationResponse, error) {
-	details, err := s.command.DeactivateApplication(ctx, req.GetProjectId(), req.GetId(), "")
+func (s *Server) DeactivateApplication(ctx context.Context, req *connect.Request[app.DeactivateApplicationRequest]) (*connect.Response[app.DeactivateApplicationResponse], error) {
+	details, err := s.command.DeactivateApplication(ctx, req.Msg.GetProjectId(), req.Msg.GetId(), "")
 	if err != nil {
 		return nil, err
 	}
 
-	return &app.DeactivateApplicationResponse{
+	return connect.NewResponse(&app.DeactivateApplicationResponse{
 		DeactivationDate: timestamppb.New(details.EventDate),
-	}, nil
+	}), nil
 
 }
 
-func (s *Server) ReactivateApplication(ctx context.Context, req *app.ReactivateApplicationRequest) (*app.ReactivateApplicationResponse, error) {
-	details, err := s.command.ReactivateApplication(ctx, req.GetProjectId(), req.GetId(), "")
+func (s *Server) ReactivateApplication(ctx context.Context, req *connect.Request[app.ReactivateApplicationRequest]) (*connect.Response[app.ReactivateApplicationResponse], error) {
+	details, err := s.command.ReactivateApplication(ctx, req.Msg.GetProjectId(), req.Msg.GetId(), "")
 	if err != nil {
 		return nil, err
 	}
 
-	return &app.ReactivateApplicationResponse{
+	return connect.NewResponse(&app.ReactivateApplicationResponse{
 		ReactivationDate: timestamppb.New(details.EventDate),
-	}, nil
+	}), nil
 
 }
 
-func (s *Server) RegenerateClientSecret(ctx context.Context, req *app.RegenerateClientSecretRequest) (*app.RegenerateClientSecretResponse, error) {
+func (s *Server) RegenerateClientSecret(ctx context.Context, req *connect.Request[app.RegenerateClientSecretRequest]) (*connect.Response[app.RegenerateClientSecretResponse], error) {
 	var secret string
 	var changeDate time.Time
 
-	switch req.GetAppType().(type) {
+	switch req.Msg.GetAppType().(type) {
 	case *app.RegenerateClientSecretRequest_IsApi:
-		config, err := s.command.ChangeAPIApplicationSecret(ctx, req.GetProjectId(), req.GetApplicationId(), "")
+		config, err := s.command.ChangeAPIApplicationSecret(ctx, req.Msg.GetProjectId(), req.Msg.GetApplicationId(), "")
 		if err != nil {
 			return nil, err
 		}
@@ -189,7 +190,7 @@ func (s *Server) RegenerateClientSecret(ctx context.Context, req *app.Regenerate
 		changeDate = config.ChangeDate
 
 	case *app.RegenerateClientSecretRequest_IsOidc:
-		config, err := s.command.ChangeOIDCApplicationSecret(ctx, req.GetProjectId(), req.GetApplicationId(), "")
+		config, err := s.command.ChangeOIDCApplicationSecret(ctx, req.Msg.GetProjectId(), req.Msg.GetApplicationId(), "")
 		if err != nil {
 			return nil, err
 		}
@@ -201,8 +202,8 @@ func (s *Server) RegenerateClientSecret(ctx context.Context, req *app.Regenerate
 		return nil, zerrors.ThrowInvalidArgument(nil, "APP-aLWIzw", "unknown app type")
 	}
 
-	return &app.RegenerateClientSecretResponse{
+	return connect.NewResponse(&app.RegenerateClientSecretResponse{
 		ClientSecret: secret,
 		CreationDate: timestamppb.New(changeDate),
-	}, nil
+	}), nil
 }
