@@ -198,7 +198,7 @@ func TestCreateOrganization(t *testing.T) {
 			err: errors.New("instance id not provided"),
 		},
 		{
-			name: "adding organization with non existant instance id",
+			name: "adding organization with non existent instance id",
 			organization: func() domain.Organization {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
@@ -353,7 +353,7 @@ func TestUpdateOrganization(t *testing.T) {
 			rowsAffected: 1,
 		},
 		{
-			name: "update non existant organization",
+			name: "update non existent organization",
 			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
 				organizationId := gofakeit.Name()
 
@@ -489,15 +489,15 @@ func TestGetOrganization(t *testing.T) {
 			}
 		}(),
 		{
-			name: "get non existant organization",
+			name: "get non existent organization",
 			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
 				org := domain.Organization{
-					ID:   "non existant org",
-					Name: "non existant org",
+					ID:   "non existent org",
+					Name: "non existent org",
 				}
 				return &org
 			},
-			orgIdentifierCondition: orgRepo.NameCondition("non-existant-instance-name"),
+			orgIdentifierCondition: orgRepo.NameCondition("non-existent-instance-name"),
 		},
 	}
 	for _, tt := range tests {
@@ -517,7 +517,7 @@ func TestGetOrganization(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			if org.Name == "non existant org" {
+			if org.Name == "non existent org" {
 				assert.Nil(t, returnedOrg)
 				return
 			}
@@ -864,10 +864,10 @@ func TestDeleteOrganization(t *testing.T) {
 		}(),
 		func() test {
 			organizationRepo := repository.OrganizationRepository(pool)
-			non_existant_organization_name := gofakeit.Name()
+			non_existent_organization_name := gofakeit.Name()
 			return test{
-				name:                   "delete non existant organization",
-				orgIdentifierCondition: organizationRepo.NameCondition(non_existant_organization_name),
+				name:                   "delete non existent organization",
+				orgIdentifierCondition: organizationRepo.NameCondition(non_existent_organization_name),
 			}
 		}(),
 		func() test {
