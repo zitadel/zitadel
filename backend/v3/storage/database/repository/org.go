@@ -75,6 +75,7 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 	return checkCreateOrgErr(err)
 }
 
+//nolint:gocognit
 func checkCreateOrgErr(err error) error {
 	if err != nil {
 		var pgErr *pgconn.PgError

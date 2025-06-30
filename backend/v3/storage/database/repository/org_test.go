@@ -9,6 +9,7 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
@@ -138,7 +139,7 @@ func TestCreateOrganization(t *testing.T) {
 						DefaultLanguage: "defaultLanguage",
 					}
 					instanceRepo := repository.InstanceRepository(pool)
-					err := instanceRepo.Create(t.Context(), &instance)
+					err := instanceRepo.Create(ctx, &instance)
 					assert.Nil(t, err)
 
 					organizationRepo := repository.OrganizationRepository(pool)
@@ -197,7 +198,7 @@ func TestCreateOrganization(t *testing.T) {
 			err: errors.New("instance id not provided"),
 		},
 		{
-			name: "adding organization with non existent instance id",
+			name: "adding organization with non existant instance id",
 			organization: func() domain.Organization {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
@@ -352,7 +353,7 @@ func TestUpdateOrganization(t *testing.T) {
 			rowsAffected: 1,
 		},
 		{
-			name: "update non existent organization",
+			name: "update non existant organization",
 			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
 				organizationId := gofakeit.Name()
 
@@ -488,7 +489,7 @@ func TestGetOrganization(t *testing.T) {
 			}
 		}(),
 		{
-			name: "get non existent organization",
+			name: "get non existant organization",
 			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
 				org := domain.Organization{
 					ID:   "non existant org",
@@ -496,7 +497,7 @@ func TestGetOrganization(t *testing.T) {
 				}
 				return &org
 			},
-			orgIdentifierCondition: orgRepo.NameCondition("non-existent-instance-name"),
+			orgIdentifierCondition: orgRepo.NameCondition("non-existant-instance-name"),
 		},
 	}
 	for _, tt := range tests {
@@ -863,10 +864,10 @@ func TestDeleteOrganization(t *testing.T) {
 		}(),
 		func() test {
 			organizationRepo := repository.OrganizationRepository(pool)
-			non_existent_organization_name := gofakeit.Name()
+			non_existant_organization_name := gofakeit.Name()
 			return test{
-				name:                   "delete non existent organization",
-				orgIdentifierCondition: organizationRepo.NameCondition(non_existent_organization_name),
+				name:                   "delete non existant organization",
+				orgIdentifierCondition: organizationRepo.NameCondition(non_existant_organization_name),
 			}
 		}(),
 		func() test {
