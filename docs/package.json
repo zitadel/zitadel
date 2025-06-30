@@ -30,6 +30,7 @@
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
     "@signalwire/docusaurus-plugin-llms-txt": "^1.2.0",
+    "@inkeep/cxkit-docusaurus": "^0.5.89",
     "autoprefixer": "^10.4.13",
     "clsx": "^1.2.1",
     "docusaurus-plugin-image-zoom": "^3.0.1",
