@@ -921,12 +921,11 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 				for key, values := range authURL.Query() {
 					authFields[key] = values[0]
 				}
+				require.NoError(t, err)
 			case *idp.FormAuth:
 				authURL, err = url.Parse(a.URL)
 				require.NoError(t, err)
-				for key, values := range a.Fields {
-					authFields[key] = values
-				}
+				authFields = a.Fields
 			}
 
 			assert.Equal(t, tt.res.url, authURL.Scheme+"://"+authURL.Host+authURL.Path)
