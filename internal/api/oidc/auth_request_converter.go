@@ -140,13 +140,8 @@ func HttpHeadersFromContext(ctx context.Context) (userAgent, acceptLang string) 
 	if !ok {
 		return
 	}
-	if agents, ok := ctxHeaders[http_utils.UserAgentHeader]; ok {
-		userAgent = agents[0]
-	}
-	if langs, ok := ctxHeaders[http_utils.AcceptLanguage]; ok {
-		acceptLang = langs[0]
-	}
-	return userAgent, acceptLang
+	return ctxHeaders.Get(http_utils.UserAgentHeader),
+		ctxHeaders.Get(http_utils.AcceptLanguage)
 }
 
 func IpFromContext(ctx context.Context) net.IP {

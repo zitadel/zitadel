@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package zitadel.app.v2beta;
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/app/v2beta;app";
+
+enum APIAuthMethodType {
+    API_AUTH_METHOD_TYPE_BASIC = 0;
+    API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT = 1;
+}
+
+message APIConfig {
+    string client_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334@ZITADEL\"";
+            description: "generated oauth2/oidc client_id";
+        }
+    ];
+    APIAuthMethodType auth_method_type = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines how the API passes the login credentials";
+        }
+    ];
+}

@@ -21,7 +21,6 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 	arg := &feature_pb.SetSystemFeaturesRequest{
 		LoginDefaultOrg:                     gu.Ptr(true),
 		OidcTriggerIntrospectionProjections: gu.Ptr(false),
-		OidcLegacyIntrospection:             nil,
 		UserSchema:                          gu.Ptr(true),
 		OidcTokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:                 nil,
@@ -34,7 +33,6 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 	want := &command.SystemFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
 		TriggerIntrospectionProjections: gu.Ptr(false),
-		LegacyIntrospection:             nil,
 		UserSchema:                      gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:             nil,
@@ -63,10 +61,6 @@ func Test_systemFeaturesToPb(t *testing.T) {
 		TriggerIntrospectionProjections: query.FeatureSource[bool]{
 			Level: feature.LevelUnspecified,
 			Value: false,
-		},
-		LegacyIntrospection: query.FeatureSource[bool]{
-			Level: feature.LevelSystem,
-			Value: true,
 		},
 		UserSchema: query.FeatureSource[bool]{
 			Level: feature.LevelSystem,
@@ -114,10 +108,6 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Enabled: false,
 			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
 		},
-		OidcLegacyIntrospection: &feature_pb.FeatureFlag{
-			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_SYSTEM,
-		},
 		UserSchema: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
@@ -160,11 +150,9 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 	arg := &feature_pb.SetInstanceFeaturesRequest{
 		LoginDefaultOrg:                     gu.Ptr(true),
 		OidcTriggerIntrospectionProjections: gu.Ptr(false),
-		OidcLegacyIntrospection:             nil,
 		UserSchema:                          gu.Ptr(true),
 		OidcTokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:                 nil,
-		WebKey:                              gu.Ptr(true),
 		DebugOidcParentError:                gu.Ptr(true),
 		OidcSingleV1SessionTermination:      gu.Ptr(true),
 		EnableBackChannelLogout:             gu.Ptr(true),
@@ -177,11 +165,9 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
 		TriggerIntrospectionProjections: gu.Ptr(false),
-		LegacyIntrospection:             nil,
 		UserSchema:                      gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:             nil,
-		WebKey:                          gu.Ptr(true),
 		DebugOIDCParentError:            gu.Ptr(true),
 		OIDCSingleV1SessionTermination:  gu.Ptr(true),
 		EnableBackChannelLogout:         gu.Ptr(true),
@@ -211,10 +197,6 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelUnspecified,
 			Value: false,
 		},
-		LegacyIntrospection: query.FeatureSource[bool]{
-			Level: feature.LevelInstance,
-			Value: true,
-		},
 		UserSchema: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
 			Value: true,
@@ -226,10 +208,6 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		ImprovedPerformance: query.FeatureSource[[]feature.ImprovedPerformanceType]{
 			Level: feature.LevelSystem,
 			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgByID},
-		},
-		WebKey: query.FeatureSource[bool]{
-			Level: feature.LevelInstance,
-			Value: true,
 		},
 		OIDCSingleV1SessionTermination: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
@@ -269,10 +247,6 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Enabled: false,
 			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
 		},
-		OidcLegacyIntrospection: &feature_pb.FeatureFlag{
-			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_INSTANCE,
-		},
 		UserSchema: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
@@ -284,10 +258,6 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		ImprovedPerformance: &feature_pb.ImprovedPerformanceFeatureFlag{
 			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID},
 			Source:         feature_pb.Source_SOURCE_SYSTEM,
-		},
-		WebKey: &feature_pb.FeatureFlag{
-			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 		DebugOidcParentError: &feature_pb.FeatureFlag{
 			Enabled: false,

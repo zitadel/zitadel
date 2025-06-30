@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"time"
 
 	"github.com/go-jose/go-jose/v4"
 	"golang.org/x/text/language"
@@ -30,7 +29,6 @@ type Queries interface {
 	GetInstanceRestrictions(ctx context.Context) (restrictions query.Restrictions, err error)
 	InstanceByID(ctx context.Context, id string) (instance authz.Instance, err error)
 	GetActiveSigningWebKey(ctx context.Context) (*jose.JSONWebKey, error)
-	ActivePrivateSigningKey(ctx context.Context, t time.Time) (keys *query.PrivateKeys, err error)
 
 	ActiveInstances() []string
 }

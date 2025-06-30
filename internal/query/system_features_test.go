@@ -55,10 +55,6 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
-						feature_v2.SystemLegacyIntrospectionEventType, false,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, false,
 					)),
 				),
@@ -74,10 +70,6 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 				TriggerIntrospectionProjections: FeatureSource[bool]{
 					Level: feature.LevelSystem,
 					Value: true,
-				},
-				LegacyIntrospection: FeatureSource[bool]{
-					Level: feature.LevelSystem,
-					Value: false,
 				},
 				UserSchema: FeatureSource[bool]{
 					Level: feature.LevelSystem,
@@ -99,10 +91,6 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
-						feature_v2.SystemLegacyIntrospectionEventType, false,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
@@ -126,10 +114,6 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 				TriggerIntrospectionProjections: FeatureSource[bool]{
 					Level: feature.LevelSystem,
 					Value: true,
-				},
-				LegacyIntrospection: FeatureSource[bool]{
-					Level: feature.LevelUnspecified,
-					Value: false,
 				},
 				UserSchema: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
@@ -151,10 +135,6 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
-						feature_v2.SystemLegacyIntrospectionEventType, false,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
@@ -178,10 +158,6 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 				TriggerIntrospectionProjections: FeatureSource[bool]{
 					Level: feature.LevelSystem,
 					Value: true,
-				},
-				LegacyIntrospection: FeatureSource[bool]{
-					Level: feature.LevelUnspecified,
-					Value: false,
 				},
 				UserSchema: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,

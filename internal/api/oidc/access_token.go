@@ -53,7 +53,7 @@ func (s *Server) verifyAccessToken(ctx context.Context, tkn string) (_ *accessTo
 		tokenID, subject = split[0], split[1]
 	} else {
 		verifier := op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), s.accessTokenKeySet,
-			op.WithSupportedAccessTokenSigningAlgorithms(supportedSigningAlgs(ctx)...),
+			op.WithSupportedAccessTokenSigningAlgorithms(supportedSigningAlgs()...),
 		)
 		claims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](ctx, tkn, verifier)
 		if err != nil {

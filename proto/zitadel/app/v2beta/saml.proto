@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package zitadel.app.v2beta;
+
+import "zitadel/app/v2beta/login.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/app/v2beta;app";
+
+message SAMLConfig {
+    oneof metadata{
+        bytes metadata_xml = 1;
+        string metadata_url = 2;
+    }
+    LoginVersion login_version = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
+        }
+    ];
+}

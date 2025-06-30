@@ -7,10 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/crypto"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
-	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -149,7 +147,7 @@ func (u *backChannelLogoutNotifier) terminateSession(ctx context.Context, id str
 		return err
 	}
 
-	getSigner := zoidc.GetSignerOnce(u.queries.GetActiveSigningWebKey, u.signingKey)
+	getSigner := zoidc.GetSignerOnce(u.queries.GetActiveSigningWebKey)
 
 	var wg sync.WaitGroup
 	wg.Add(len(sessions.sessions))
@@ -170,20 +168,6 @@ func (u *backChannelLogoutNotifier) terminateSession(ctx context.Context, id str
 	}
 	wg.Wait()
 	return errors.Join(errs...)
-}
-
-func (u *backChannelLogoutNotifier) signingKey(ctx context.Context) (op.SigningKey, error) {
-	keys, err := u.queries.ActivePrivateSigningKey(ctx, time.Now())
-	if err != nil {
-		return nil, err
-	}
-	if len(keys.Keys) == 0 {
-		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID()).
-			Info("There's no active signing key and automatic rotation is not supported for back channel logout." +
-				"Please enable the webkey management feature on your instance")
-		return nil, zerrors.ThrowPreconditionFailed(nil, "HANDL-DF3nf", "no active signing key")
-	}
-	return zoidc.PrivateKeyToSigningKey(zoidc.SelectSigningKey(keys.Keys), u.keyEncryptionAlg)
 }
 
 func (u *backChannelLogoutNotifier) sendLogoutToken(ctx context.Context, oidcSession *backChannelLogoutOIDCSessions, e eventstore.Event, getSigner zoidc.SignerFunc) error {

@@ -194,10 +194,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
-				OidcLegacyIntrospection: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_UNSPECIFIED,
-				},
 				UserSchema: &feature.FeatureFlag{
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
@@ -256,10 +252,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
-				OidcLegacyIntrospection: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_UNSPECIFIED,
-				},
 				UserSchema: &feature.FeatureFlag{
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
@@ -285,7 +277,6 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 			require.NoError(t, err)
 			assertFeatureFlag(t, tt.want.LoginDefaultOrg, got.LoginDefaultOrg)
 			assertFeatureFlag(t, tt.want.OidcTriggerIntrospectionProjections, got.OidcTriggerIntrospectionProjections)
-			assertFeatureFlag(t, tt.want.OidcLegacyIntrospection, got.OidcLegacyIntrospection)
 			assertFeatureFlag(t, tt.want.UserSchema, got.UserSchema)
 		})
 	}

@@ -1625,8 +1625,6 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Organización predeterminada de inicio de sesión",
       "LOGINDEFAULTORG_DESCRIPTION": "La interfaz de inicio de sesión utilizará la configuración de la organización predeterminada (y no de la instancia) si no se establece ningún contexto de organización.",
-      "OIDCLEGACYINTROSPECTION": "Introspección heredada OIDC",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Recientemente hemos refactorizado el punto de introspección por razones de rendimiento. Esta función se puede utilizar para volver a la implementación heredada si surgen errores inesperados.",
       "OIDCTOKENEXCHANGE": "Intercambio de tokens OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Habilita el tipo de concesión experimental urn:ietf:params:oauth:grant-type:token-exchange para el punto de extremo de token OIDC. El intercambio de tokens se puede utilizar para solicitar tokens con un alcance menor o suplantar a otros usuarios. Consulta la política de seguridad para permitir la suplantación en una instancia.",
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Desencadenadores de proyecciones de introspección OIDC",
@@ -1645,8 +1643,6 @@
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "El Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 y se puede usar para notificar a los clientes sobre la terminación de la sesión en el proveedor de OpenID.",
       "PERMISSIONCHECKV2": "Verificación de permisos V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Si la bandera está habilitada, podrá usar la nueva API y sus funciones.",
-      "WEBKEY": "Clave web",
-      "WEBKEY_DESCRIPTION": "Si la bandera está habilitada, podrá usar la nueva API y sus funciones.",
       "STATES": {
         "INHERITED": "Heredado",
         "ENABLED": "Habilitado",
