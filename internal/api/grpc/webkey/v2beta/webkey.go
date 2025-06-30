@@ -6,9 +6,7 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/zerrors"
 	webkey "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta"
 )
 
@@ -16,9 +14,6 @@ func (s *Server) CreateWebKey(ctx context.Context, req *connect.Request[webkey.C
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if err = checkWebKeyFeature(ctx); err != nil {
-		return nil, err
-	}
 	webKey, err := s.command.CreateWebKey(ctx, createWebKeyRequestToConfig(req.Msg))
 	if err != nil {
 		return nil, err
@@ -34,9 +29,6 @@ func (s *Server) ActivateWebKey(ctx context.Context, req *connect.Request[webkey
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if err = checkWebKeyFeature(ctx); err != nil {
-		return nil, err
-	}
 	details, err := s.command.ActivateWebKey(ctx, req.Msg.GetId())
 	if err != nil {
 		return nil, err
@@ -51,9 +43,6 @@ func (s *Server) DeleteWebKey(ctx context.Context, req *connect.Request[webkey.D
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if err = checkWebKeyFeature(ctx); err != nil {
-		return nil, err
-	}
 	deletedAt, err := s.command.DeleteWebKey(ctx, req.Msg.GetId())
 	if err != nil {
 		return nil, err
@@ -72,9 +61,6 @@ func (s *Server) ListWebKeys(ctx context.Context, _ *connect.Request[webkey.List
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if err = checkWebKeyFeature(ctx); err != nil {
-		return nil, err
-	}
 	list, err := s.query.ListWebKeys(ctx)
 	if err != nil {
 		return nil, err
@@ -83,11 +69,4 @@ func (s *Server) ListWebKeys(ctx context.Context, _ *connect.Request[webkey.List
 	return connect.NewResponse(&webkey.ListWebKeysResponse{
 		WebKeys: webKeyDetailsListToPb(list),
 	}), nil
-}
-
-func checkWebKeyFeature(ctx context.Context) error {
-	if !authz.GetFeatures(ctx).WebKey {
-		return zerrors.ThrowPreconditionFailed(nil, "WEBKEY-Ohx6E", "Errors.WebKey.FeatureDisabled")
-	}
-	return nil
 }

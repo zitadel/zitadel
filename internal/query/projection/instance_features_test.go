@@ -26,7 +26,7 @@ func TestInstanceFeaturesProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						feature_v2.InstanceLegacyIntrospectionEventType,
+						feature_v2.SystemUserSchemaEventType,
 						feature_v2.AggregateType,
 						[]byte(`{"value": true}`),
 					), eventstore.GenericEventMapper[feature_v2.SetEvent[bool]]),
@@ -41,7 +41,7 @@ func TestInstanceFeaturesProjection_reduces(t *testing.T) {
 							expectedStmt: "INSERT INTO projections.instance_features2 (instance_id, key, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (instance_id, key) DO UPDATE SET (creation_date, change_date, sequence, value) = (projections.instance_features2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
 							expectedArgs: []interface{}{
 								"agg-id",
-								"legacy_introspection",
+								"user_schema",
 								anyArg{},
 								anyArg{},
 								uint64(15),
