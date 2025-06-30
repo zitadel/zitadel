@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	_KeyName_0      = "unspecifiedlogin_default_orgtrigger_introspection_projections"
-	_KeyLowerName_0 = "unspecifiedlogin_default_orgtrigger_introspection_projections"
+	_KeyName_0      = "unspecifiedlogin_default_org"
+	_KeyLowerName_0 = "unspecifiedlogin_default_org"
 	_KeyName_1      = "user_schematoken_exchange"
 	_KeyLowerName_1 = "user_schematoken_exchange"
 	_KeyName_2      = "improved_performance"
@@ -19,7 +19,7 @@ const (
 )
 
 var (
-	_KeyIndex_0 = [...]uint8{0, 11, 28, 61}
+	_KeyIndex_0 = [...]uint8{0, 11, 28}
 	_KeyIndex_1 = [...]uint8{0, 11, 25}
 	_KeyIndex_2 = [...]uint8{0, 20}
 	_KeyIndex_3 = [...]uint8{0, 23, 57, 81, 107, 115, 134, 157}
@@ -27,7 +27,7 @@ var (
 
 func (i Key) String() string {
 	switch {
-	case 0 <= i && i <= 2:
+	case 0 <= i && i <= 1:
 		return _KeyName_0[_KeyIndex_0[i]:_KeyIndex_0[i+1]]
 	case 4 <= i && i <= 5:
 		i -= 4
@@ -48,7 +48,6 @@ func _KeyNoOp() {
 	var x [1]struct{}
 	_ = x[KeyUnspecified-(0)]
 	_ = x[KeyLoginDefaultOrg-(1)]
-	_ = x[KeyTriggerIntrospectionProjections-(2)]
 	_ = x[KeyUserSchema-(4)]
 	_ = x[KeyTokenExchange-(5)]
 	_ = x[KeyImprovedPerformance-(7)]
@@ -61,15 +60,13 @@ func _KeyNoOp() {
 	_ = x[KeyConsoleUseV2UserApi-(15)]
 }
 
-var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyUserSchema, KeyTokenExchange, KeyImprovedPerformance, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyDisableUserTokenEvent, KeyEnableBackChannelLogout, KeyLoginV2, KeyPermissionCheckV2, KeyConsoleUseV2UserApi}
+var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyUserSchema, KeyTokenExchange, KeyImprovedPerformance, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyDisableUserTokenEvent, KeyEnableBackChannelLogout, KeyLoginV2, KeyPermissionCheckV2, KeyConsoleUseV2UserApi}
 
 var _KeyNameToValueMap = map[string]Key{
 	_KeyName_0[0:11]:         KeyUnspecified,
 	_KeyLowerName_0[0:11]:    KeyUnspecified,
 	_KeyName_0[11:28]:        KeyLoginDefaultOrg,
 	_KeyLowerName_0[11:28]:   KeyLoginDefaultOrg,
-	_KeyName_0[28:61]:        KeyTriggerIntrospectionProjections,
-	_KeyLowerName_0[28:61]:   KeyTriggerIntrospectionProjections,
 	_KeyName_1[0:11]:         KeyUserSchema,
 	_KeyLowerName_1[0:11]:    KeyUserSchema,
 	_KeyName_1[11:25]:        KeyTokenExchange,
@@ -95,7 +92,6 @@ var _KeyNameToValueMap = map[string]Key{
 var _KeyNames = []string{
 	_KeyName_0[0:11],
 	_KeyName_0[11:28],
-	_KeyName_0[28:61],
 	_KeyName_1[0:11],
 	_KeyName_1[11:25],
 	_KeyName_2[0:20],
