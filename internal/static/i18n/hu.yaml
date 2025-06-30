@@ -194,7 +194,7 @@ Errors:
     AlreadyExists: Az instance már létezik
     NotChanged: Az instance nem változott
   Org:
-    AlreadyExists: A szervezet neve már foglalt
+    AlreadyExists: A szervezet neve vagy azonosítója már foglalt
     Invalid: A szervezet érvénytelen
     AlreadyDeactivated: A szervezet már deaktiválva van
     AlreadyActive: A szervezet már aktív

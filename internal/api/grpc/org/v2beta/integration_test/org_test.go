@@ -52,7 +52,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 		ctx      context.Context
 		req      *v2beta_org.CreateOrganizationRequest
 		id       string
-		testfunc func(ctx context.Context, t *testing.T)
+		testFunc func(ctx context.Context, t *testing.T)
 		want     *v2beta_org.CreateOrganizationResponse
 		wantErr  bool
 	}
@@ -85,8 +85,8 @@ func TestServer_CreateOrganization(t *testing.T) {
 					Name:   orgName,
 					Admins: nil,
 				},
-				testfunc: func(ctx context.Context, t *testing.T) {
-					// create org initally
+				testFunc: func(ctx context.Context, t *testing.T) {
+					// create org initially
 					_, err := Client.CreateOrganization(ctx, &v2beta_org.CreateOrganizationRequest{
 						Name: orgName,
 					})
@@ -238,14 +238,15 @@ func TestServer_CreateOrganization(t *testing.T) {
 				name: "adding org with same ID twice",
 				ctx:  CTX,
 				req: &v2beta_org.CreateOrganizationRequest{
-					Name:   orgID,
+					Id:     &orgID,
+					Name:   gofakeit.Name(),
 					Admins: nil,
 				},
-				testfunc: func(ctx context.Context, t *testing.T) {
-					// create org initally
+				testFunc: func(ctx context.Context, t *testing.T) {
+					// create org initially
 					_, err := Client.CreateOrganization(ctx, &v2beta_org.CreateOrganizationRequest{
-						Name: gofakeit.AppName(),
 						Id:   &orgID,
+						Name: gofakeit.Name(),
 					})
 					require.NoError(t, err)
 				},
@@ -255,8 +256,8 @@ func TestServer_CreateOrganization(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.testfunc != nil {
-				tt.testfunc(tt.ctx, t)
+			if tt.testFunc != nil {
+				tt.testFunc(tt.ctx, t)
 			}
 
 			got, err := Client.CreateOrganization(tt.ctx, tt.req)
