@@ -48,7 +48,7 @@ Before submitting a request to restore access to your account, please ensure tha
 
 ### ZITADEL Cloud account (Customer Portal)
 
-If you need to recover your ZITADEL Cloud account for the customer portal, please send an email to [support@zitadel.com](mailto:support@zitadel.com?subject=ZITADEL%20Cloud%20account%20lockout):
+Please visit the [support page in the customer portal](https://zitadel.com/admin/support):
 
 - State clearly in the subject line that this is related to an account lockout for a ZITADEL Cloud account
 - The sender's email address must match the verified email address of the account owner
