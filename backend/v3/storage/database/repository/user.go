@@ -123,7 +123,7 @@ func (u *user) Create(ctx context.Context, user *domain.User) error {
 func (u *user) Delete(ctx context.Context, condition database.Condition) error {
 	builder := database.StatementBuilder{}
 	builder.WriteString("DELETE FROM users")
-	u.writeCondition(builder, condition)
+	writeCondition(&builder, condition)
 	_, err := u.client.Exec(ctx, builder.String(), builder.Args()...)
 	return err
 }
@@ -221,17 +221,6 @@ func (user) UpdatedAtColumn() database.Column {
 // DeletedAtColumn implements [domain.userColumns].
 func (user) DeletedAtColumn() database.Column {
 	return database.NewColumn("deleted_at")
-}
-
-func (u *user) writeCondition(
-	builder database.StatementBuilder,
-	condition database.Condition,
-) {
-	if condition == nil {
-		return
-	}
-	builder.WriteString(" WHERE ")
-	condition.Write(&builder)
 }
 
 func (u user) columns() database.Columns {
