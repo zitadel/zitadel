@@ -8,7 +8,7 @@ import (
 )
 
 //go:generate enumer -type OrgState -transform lower -trimprefix OrgState
-type OrgState int
+type OrgState uint8
 
 const (
 	OrgStateActive OrgState = iota
@@ -85,4 +85,18 @@ type OrganizationRepository interface {
 
 type CreateOrganization struct {
 	Name string `json:"name"`
+}
+
+// MemberRepository is a sub repository of the org repository and maybe the instance repository.
+type MemberRepository interface {
+	AddMember(ctx context.Context, orgID, userID string, roles []string) error
+	SetMemberRoles(ctx context.Context, orgID, userID string, roles []string) error
+	RemoveMember(ctx context.Context, orgID, userID string) error
+}
+
+// DomainRepository is a sub repository of the org repository and maybe the instance repository.
+type DomainRepository interface {
+	AddDomain(ctx context.Context, domain string) error
+	SetDomainVerified(ctx context.Context, domain string) error
+	RemoveDomain(ctx context.Context, domain string) error
 }

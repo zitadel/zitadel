@@ -22,7 +22,7 @@ func (m userMachine) Update(ctx context.Context, condition database.Condition, c
 	builder := database.StatementBuilder{}
 	builder.WriteString("UPDATE user_machines SET ")
 	database.Changes(changes).Write(&builder)
-	m.writeCondition(&builder, condition)
+	writeCondition(&builder, condition)
 	m.writeReturning()
 
 	_, err := m.client.Exec(ctx, builder.String(), builder.Args()...)

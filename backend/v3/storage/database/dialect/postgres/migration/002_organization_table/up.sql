@@ -12,8 +12,8 @@ CREATE TABLE zitadel.organizations(
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   deleted_at TIMESTAMPTZ DEFAULT NULL,
 
-  PRIMARY KEY (id, instance_id),
-  UNIQUE      (name, instance_id)
+  PRIMARY KEY (instance_id, id),
+  UNIQUE      (instance_id, name)
 );
 
 -- users are able to set the id for organizations

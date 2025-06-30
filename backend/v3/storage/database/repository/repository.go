@@ -6,7 +6,7 @@ type repository struct {
 	client database.QueryExecutor
 }
 
-func (r repository) writeCondition(
+func writeCondition(
 	builder *database.StatementBuilder,
 	condition database.Condition,
 ) {

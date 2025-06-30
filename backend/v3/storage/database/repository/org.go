@@ -92,7 +92,7 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 				if pgErr.ConstraintName == "organizations_pkey" {
 					return errors.New("organization id already exists")
 				}
-				if pgErr.ConstraintName == "organizations_name_instance_id_key" {
+				if pgErr.ConstraintName == "organizations_instance_id_name_key" {
 					return errors.New("organization name already exists for instance")
 				}
 			}

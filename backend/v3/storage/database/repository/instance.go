@@ -41,7 +41,7 @@ func (i *instance) Get(ctx context.Context, id string) (*domain.Instance, error)
 	idCondition := i.IDCondition(id)
 	// return only non deleted instances
 	conditions := []database.Condition{idCondition, database.IsNull(i.DeletedAtColumn())}
-	i.writeCondition(&builder, database.And(conditions...))
+	writeCondition(&builder, database.And(conditions...))
 
 	return scanInstance(ctx, i.client, &builder)
 }
@@ -55,7 +55,7 @@ func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]*dom
 	// return only non deleted instances
 	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
 	notDeletedCondition := database.And(opts...)
-	i.writeCondition(&builder, notDeletedCondition)
+	writeCondition(&builder, notDeletedCondition)
 
 	return scanInstances(ctx, i.client, &builder)
 }
@@ -109,7 +109,7 @@ func (i instance) Update(ctx context.Context, id string, changes ...database.Cha
 	idCondition := i.IDCondition(id)
 	// don't update deleted instances
 	conditions := []database.Condition{idCondition, database.IsNull(i.DeletedAtColumn())}
-	i.writeCondition(&builder, database.And(conditions...))
+	writeCondition(&builder, database.And(conditions...))
 
 	stmt := builder.String()
 
@@ -127,7 +127,7 @@ func (i instance) Delete(ctx context.Context, id string) (int64, error) {
 	// don't delete already deleted instance
 	idCondition := i.IDCondition(id)
 	conditions := []database.Condition{idCondition, database.IsNull(i.DeletedAtColumn())}
-	i.writeCondition(&builder, database.And(conditions...))
+	writeCondition(&builder, database.And(conditions...))
 
 	return i.client.Exec(ctx, builder.String(), builder.Args()...)
 }
