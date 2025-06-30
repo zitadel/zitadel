@@ -72,6 +72,10 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 	builder.WriteString(createOrganizationStmt)
 
 	err := o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
+	return checkCreateOrgErr(err)
+}
+
+func checkCreateOrgErr(err error) error {
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
