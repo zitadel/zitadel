@@ -96,42 +96,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			},
 		},
 		{
-			name: "set TriggerIntrospectionProjections",
-			eventstore: expectEventstore(
-				expectFilter(),
-				expectPush(
-					feature_v2.NewSetEvent[bool](
-						ctx, aggregate,
-						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, true,
-					),
-				),
-			),
-			args: args{ctx, &InstanceFeatures{
-				TriggerIntrospectionProjections: gu.Ptr(true),
-			}},
-			want: &domain.ObjectDetails{
-				ResourceOwner: "instance1",
-			},
-		},
-		{
-			name: "set LegacyIntrospection",
-			eventstore: expectEventstore(
-				expectFilter(),
-				expectPush(
-					feature_v2.NewSetEvent[bool](
-						ctx, aggregate,
-						feature_v2.InstanceLegacyIntrospectionEventType, true,
-					),
-				),
-			),
-			args: args{ctx, &InstanceFeatures{
-				LegacyIntrospection: gu.Ptr(true),
-			}},
-			want: &domain.ObjectDetails{
-				ResourceOwner: "instance1",
-			},
-		},
-		{
 			name: "set UserSchema",
 			eventstore: expectEventstore(
 				expectFilter(),
@@ -156,12 +120,12 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				expectPushFailed(io.ErrClosedPipe,
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
-						feature_v2.InstanceLegacyIntrospectionEventType, true,
+						feature_v2.InstanceConsoleUseV2UserApi, true,
 					),
 				),
 			),
 			args: args{ctx, &InstanceFeatures{
-				LegacyIntrospection: gu.Ptr(true),
+				ConsoleUseV2UserApi: gu.Ptr(true),
 			}},
 			wantErr: io.ErrClosedPipe,
 		},
@@ -176,14 +140,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 					),
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
-						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, false,
-					),
-					feature_v2.NewSetEvent[bool](
-						ctx, aggregate,
-						feature_v2.InstanceLegacyIntrospectionEventType, true,
-					),
-					feature_v2.NewSetEvent[bool](
-						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, true,
 					),
 					feature_v2.NewSetEvent[bool](
@@ -193,11 +149,9 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				),
 			),
 			args: args{ctx, &InstanceFeatures{
-				LoginDefaultOrg:                 gu.Ptr(true),
-				TriggerIntrospectionProjections: gu.Ptr(false),
-				LegacyIntrospection:             gu.Ptr(true),
-				UserSchema:                      gu.Ptr(true),
-				OIDCSingleV1SessionTermination:  gu.Ptr(true),
+				LoginDefaultOrg:                gu.Ptr(true),
+				UserSchema:                     gu.Ptr(true),
+				OIDCSingleV1SessionTermination: gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
@@ -212,10 +166,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
-						ctx, aggregate,
-						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, false,
-					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceResetEventType,
@@ -223,10 +173,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, false,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
-						ctx, aggregate,
-						feature_v2.InstanceLegacyIntrospectionEventType, true,
 					)),
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
@@ -238,17 +184,11 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
-						ctx, aggregate,
-						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, false,
-					),
 				),
 			),
 			args: args{ctx, &InstanceFeatures{
-				LoginDefaultOrg:                 gu.Ptr(true),
-				TriggerIntrospectionProjections: gu.Ptr(false),
-				LegacyIntrospection:             gu.Ptr(true),
-				OIDCSingleV1SessionTermination:  gu.Ptr(false),
+				LoginDefaultOrg:                gu.Ptr(true),
+				OIDCSingleV1SessionTermination: gu.Ptr(false),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",

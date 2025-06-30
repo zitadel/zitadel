@@ -1624,12 +1624,8 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "로그인 기본 조직",
       "LOGINDEFAULTORG_DESCRIPTION": "조직 컨텍스트가 설정되지 않은 경우 로그인 UI가 기본 조직의 설정을 사용합니다 (인스턴스에서 설정되지 않음).",
-      "OIDCLEGACYINTROSPECTION": "OIDC 레거시 내부 조사",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "최근 내부 조사 엔드포인트를 성능을 위해 리팩토링했습니다. 예상치 못한 버그가 발생하면 이 기능을 사용하여 레거시 구현으로 롤백할 수 있습니다.",
       "OIDCTOKENEXCHANGE": "OIDC 토큰 교환",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "OIDC 토큰 엔드포인트의 실험적 urn:ietf:params:oauth:grant-type:token-exchange 허용을 활성화합니다. 토큰 교환을 통해 범위가 좁은 토큰을 요청하거나 다른 사용자를 가장할 수 있습니다. 인스턴스에서 가장을 허용하는 보안 정책을 확인하세요.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC 트리거 내부 조사 프로젝션",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "내부 조사 요청 중 프로젝션 트리거를 활성화합니다. 이는 내부 조사 응답에서 일관성 문제가 있는 경우 임시 해결책으로 작동할 수 있으나 성능에 영향을 미칠 수 있습니다. 향후 내부 조사 요청에 대한 트리거 제거를 계획 중입니다.",
       "USERSCHEMA": "사용자 스키마",
       "USERSCHEMA_DESCRIPTION": "사용자 스키마를 통해 사용자의 데이터 스키마를 관리할 수 있습니다. 플래그가 활성화되면 새 API 및 기능을 사용할 수 있습니다.",
       "ACTIONS": "액션",
@@ -1644,8 +1640,6 @@
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "백채널 로그아웃은 OpenID Connect 백채널 로그아웃 1.0을 구현하며, OpenID 제공자에서 세션 종료에 대해 클라이언트에게 알리는 데 사용할 수 있습니다.",
       "PERMISSIONCHECKV2": "권한 확인 V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "플래그가 활성화되면 새로운 API와 그 기능을 사용할 수 있습니다.",
-      "WEBKEY": "웹 키",
-      "WEBKEY_DESCRIPTION": "플래그가 활성화되면 새로운 API와 그 기능을 사용할 수 있습니다.",
       "STATES": {
         "INHERITED": "상속",
         "ENABLED": "활성화됨",

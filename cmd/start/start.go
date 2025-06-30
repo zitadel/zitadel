@@ -36,6 +36,7 @@ import (
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	action_v2_beta "github.com/zitadel/zitadel/internal/api/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/admin"
+	app "github.com/zitadel/zitadel/internal/api/grpc/app/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	feature_v2 "github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/internal/api/grpc/feature/v2beta"
@@ -520,6 +521,10 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, debug_events.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
+	if err := apis.RegisterService(ctx, app.CreateServer(commands, queries, permissionCheck)); err != nil {
+		return nil, err
+	}
+
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.ExternalDomain, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
 	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.SystemAuthZ, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle))
@@ -561,7 +566,6 @@ func startAPIs(
 		keys.OIDC,
 		keys.OIDCKey,
 		eventstore,
-		dbClient,
 		userAgentInterceptor,
 		instanceInterceptor.Handler,
 		limitingAccessInterceptor,
