@@ -13,23 +13,21 @@ import (
 )
 
 type InstanceFeatures struct {
-	LoginDefaultOrg                 *bool
-	TriggerIntrospectionProjections *bool
-	UserSchema                      *bool
-	TokenExchange                   *bool
-	ImprovedPerformance             []feature.ImprovedPerformanceType
-	DebugOIDCParentError            *bool
-	OIDCSingleV1SessionTermination  *bool
-	DisableUserTokenEvent           *bool
-	EnableBackChannelLogout         *bool
-	LoginV2                         *feature.LoginV2
-	PermissionCheckV2               *bool
-	ConsoleUseV2UserApi             *bool
+	LoginDefaultOrg                *bool
+	UserSchema                     *bool
+	TokenExchange                  *bool
+	ImprovedPerformance            []feature.ImprovedPerformanceType
+	DebugOIDCParentError           *bool
+	OIDCSingleV1SessionTermination *bool
+	DisableUserTokenEvent          *bool
+	EnableBackChannelLogout        *bool
+	LoginV2                        *feature.LoginV2
+	PermissionCheckV2              *bool
+	ConsoleUseV2UserApi            *bool
 }
 
 func (m *InstanceFeatures) isEmpty() bool {
 	return m.LoginDefaultOrg == nil &&
-		m.TriggerIntrospectionProjections == nil &&
 		m.UserSchema == nil &&
 		m.TokenExchange == nil &&
 		// nil check to allow unset improvements
