@@ -188,7 +188,7 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 		},
 		GrantTypesSupported:                                op.GrantTypes(s.Provider()),
 		SubjectTypesSupported:                              op.SubjectTypes(s.Provider()),
-		IDTokenSigningAlgValuesSupported:                   supportedSigningAlgs(ctx),
+		IDTokenSigningAlgValuesSupported:                   supportedSigningAlgs(),
 		RequestObjectSigningAlgValuesSupported:             op.RequestObjectSigAlgorithms(s.Provider()),
 		TokenEndpointAuthMethodsSupported:                  op.AuthMethodsTokenEndpoint(s.Provider()),
 		TokenEndpointAuthSigningAlgValuesSupported:         op.TokenSigAlgorithms(s.Provider()),

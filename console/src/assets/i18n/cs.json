@@ -1642,8 +1642,6 @@
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 a může být použit k informování klientů o ukončení relace u poskytovatele OpenID.",
       "PERMISSIONCHECKV2": "Kontrola oprávnění V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
-      "WEBKEY": "Webový klíč",
-      "WEBKEY_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
       "STATES": {
         "INHERITED": "Děděno",
         "ENABLED": "Povoleno",

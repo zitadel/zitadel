@@ -29,7 +29,6 @@ var (
 	InstanceUserSchemaEventType                      = setEventTypeFromFeature(feature.LevelInstance, feature.KeyUserSchema)
 	InstanceTokenExchangeEventType                   = setEventTypeFromFeature(feature.LevelInstance, feature.KeyTokenExchange)
 	InstanceImprovedPerformanceEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyImprovedPerformance)
-	InstanceWebKeyEventType                          = setEventTypeFromFeature(feature.LevelInstance, feature.KeyWebKey)
 	InstanceDebugOIDCParentErrorEventType            = setEventTypeFromFeature(feature.LevelInstance, feature.KeyDebugOIDCParentError)
 	InstanceOIDCSingleV1SessionTerminationEventType  = setEventTypeFromFeature(feature.LevelInstance, feature.KeyOIDCSingleV1SessionTermination)
 	InstanceDisableUserTokenEvent                    = setEventTypeFromFeature(feature.LevelInstance, feature.KeyDisableUserTokenEvent)

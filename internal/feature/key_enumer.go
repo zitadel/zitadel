@@ -12,14 +12,17 @@ const (
 	_KeyLowerName_0 = "unspecifiedlogin_default_orgtrigger_introspection_projections"
 	_KeyName_1      = "user_schematoken_exchange"
 	_KeyLowerName_1 = "user_schematoken_exchange"
-	_KeyName_2      = "improved_performanceweb_keydebug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
-	_KeyLowerName_2 = "improved_performanceweb_keydebug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
+	_KeyName_2      = "improved_performance"
+	_KeyLowerName_2 = "improved_performance"
+	_KeyName_3      = "debug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
+	_KeyLowerName_3 = "debug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logoutlogin_v2permission_check_v2console_use_v2_user_api"
 )
 
 var (
 	_KeyIndex_0 = [...]uint8{0, 11, 28, 61}
 	_KeyIndex_1 = [...]uint8{0, 11, 25}
-	_KeyIndex_2 = [...]uint8{0, 20, 27, 50, 84, 108, 134, 142, 161, 184}
+	_KeyIndex_2 = [...]uint8{0, 20}
+	_KeyIndex_3 = [...]uint8{0, 23, 57, 81, 107, 115, 134, 157}
 )
 
 func (i Key) String() string {
@@ -29,9 +32,11 @@ func (i Key) String() string {
 	case 4 <= i && i <= 5:
 		i -= 4
 		return _KeyName_1[_KeyIndex_1[i]:_KeyIndex_1[i+1]]
-	case 7 <= i && i <= 15:
-		i -= 7
-		return _KeyName_2[_KeyIndex_2[i]:_KeyIndex_2[i+1]]
+	case i == 7:
+		return _KeyName_2
+	case 9 <= i && i <= 15:
+		i -= 9
+		return _KeyName_3[_KeyIndex_3[i]:_KeyIndex_3[i+1]]
 	default:
 		return fmt.Sprintf("Key(%d)", i)
 	}
@@ -47,7 +52,6 @@ func _KeyNoOp() {
 	_ = x[KeyUserSchema-(4)]
 	_ = x[KeyTokenExchange-(5)]
 	_ = x[KeyImprovedPerformance-(7)]
-	_ = x[KeyWebKey-(8)]
 	_ = x[KeyDebugOIDCParentError-(9)]
 	_ = x[KeyOIDCSingleV1SessionTermination-(10)]
 	_ = x[KeyDisableUserTokenEvent-(11)]
@@ -57,7 +61,7 @@ func _KeyNoOp() {
 	_ = x[KeyConsoleUseV2UserApi-(15)]
 }
 
-var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyUserSchema, KeyTokenExchange, KeyImprovedPerformance, KeyWebKey, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyDisableUserTokenEvent, KeyEnableBackChannelLogout, KeyLoginV2, KeyPermissionCheckV2, KeyConsoleUseV2UserApi}
+var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyUserSchema, KeyTokenExchange, KeyImprovedPerformance, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyDisableUserTokenEvent, KeyEnableBackChannelLogout, KeyLoginV2, KeyPermissionCheckV2, KeyConsoleUseV2UserApi}
 
 var _KeyNameToValueMap = map[string]Key{
 	_KeyName_0[0:11]:         KeyUnspecified,
@@ -72,22 +76,20 @@ var _KeyNameToValueMap = map[string]Key{
 	_KeyLowerName_1[11:25]:   KeyTokenExchange,
 	_KeyName_2[0:20]:         KeyImprovedPerformance,
 	_KeyLowerName_2[0:20]:    KeyImprovedPerformance,
-	_KeyName_2[20:27]:        KeyWebKey,
-	_KeyLowerName_2[20:27]:   KeyWebKey,
-	_KeyName_2[27:50]:        KeyDebugOIDCParentError,
-	_KeyLowerName_2[27:50]:   KeyDebugOIDCParentError,
-	_KeyName_2[50:84]:        KeyOIDCSingleV1SessionTermination,
-	_KeyLowerName_2[50:84]:   KeyOIDCSingleV1SessionTermination,
-	_KeyName_2[84:108]:       KeyDisableUserTokenEvent,
-	_KeyLowerName_2[84:108]:  KeyDisableUserTokenEvent,
-	_KeyName_2[108:134]:      KeyEnableBackChannelLogout,
-	_KeyLowerName_2[108:134]: KeyEnableBackChannelLogout,
-	_KeyName_2[134:142]:      KeyLoginV2,
-	_KeyLowerName_2[134:142]: KeyLoginV2,
-	_KeyName_2[142:161]:      KeyPermissionCheckV2,
-	_KeyLowerName_2[142:161]: KeyPermissionCheckV2,
-	_KeyName_2[161:184]:      KeyConsoleUseV2UserApi,
-	_KeyLowerName_2[161:184]: KeyConsoleUseV2UserApi,
+	_KeyName_3[0:23]:         KeyDebugOIDCParentError,
+	_KeyLowerName_3[0:23]:    KeyDebugOIDCParentError,
+	_KeyName_3[23:57]:        KeyOIDCSingleV1SessionTermination,
+	_KeyLowerName_3[23:57]:   KeyOIDCSingleV1SessionTermination,
+	_KeyName_3[57:81]:        KeyDisableUserTokenEvent,
+	_KeyLowerName_3[57:81]:   KeyDisableUserTokenEvent,
+	_KeyName_3[81:107]:       KeyEnableBackChannelLogout,
+	_KeyLowerName_3[81:107]:  KeyEnableBackChannelLogout,
+	_KeyName_3[107:115]:      KeyLoginV2,
+	_KeyLowerName_3[107:115]: KeyLoginV2,
+	_KeyName_3[115:134]:      KeyPermissionCheckV2,
+	_KeyLowerName_3[115:134]: KeyPermissionCheckV2,
+	_KeyName_3[134:157]:      KeyConsoleUseV2UserApi,
+	_KeyLowerName_3[134:157]: KeyConsoleUseV2UserApi,
 }
 
 var _KeyNames = []string{
@@ -97,14 +99,13 @@ var _KeyNames = []string{
 	_KeyName_1[0:11],
 	_KeyName_1[11:25],
 	_KeyName_2[0:20],
-	_KeyName_2[20:27],
-	_KeyName_2[27:50],
-	_KeyName_2[50:84],
-	_KeyName_2[84:108],
-	_KeyName_2[108:134],
-	_KeyName_2[134:142],
-	_KeyName_2[142:161],
-	_KeyName_2[161:184],
+	_KeyName_3[0:23],
+	_KeyName_3[23:57],
+	_KeyName_3[57:81],
+	_KeyName_3[81:107],
+	_KeyName_3[107:115],
+	_KeyName_3[115:134],
+	_KeyName_3[134:157],
 }
 
 // KeyString retrieves an enum value from the enum constants string name.
