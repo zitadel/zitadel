@@ -132,18 +132,6 @@ func TestProvider_BeginAuth(t *testing.T) {
 					ssoURL = gotRedirect.Scheme + "://" + gotRedirect.Host + gotRedirect.Path
 					relayState = gotQuery.Get("RelayState")
 					samlRequest = gotQuery.Get("SAMLRequest")
-
-					/*
-						wantRedirect, err := url.Parse(auth.RedirectURL)
-						a.NoError(err)
-						wantQuery := wantRedirect.Query()
-
-						params = gotQuery
-
-						for key, value := range wantQuery {
-							a.Equal(value, gotQuery[key], "query parameter %s does not match", key)
-						}
-						a.NotEmpty(gotQuery.Get("SAMLRequest"))*/
 				case *idp.FormAuth:
 					ssoURL = auth.URL
 					relayState = auth.Fields["RelayState"]
@@ -157,10 +145,6 @@ func TestProvider_BeginAuth(t *testing.T) {
 	}
 }
 
-// &idp.RedirectAuth{RedirectURL:"http://localhost:8000/sso?SAMLRequest=nJLBjtMwEIZfxZp7Gm9oUsfaRCpbISotUG0LB25TZ0otOXbxTIB9e9R2kRYOPXC15%2FPvz%2F7vGcdwsstJjvGJvk%2FEon6NIbI9b3Qw5WgTsmcbcSS24ux2%2BeHRVjNtkZmy%2BBThFXK6zZxykuRSALVedeCHwpjFYd9U5m7v3JwG1O2baqDaNLrW7WKOzWHRmvZOg%2FpCmX2KHVQzDWrNPNE6smCUDipd1YVuimqx07Wt53ZezdrGfAW1IhYfUS7kUeRkyzIkh%2BGYWKzRWpfMCdTyj8xDijyNlLeUf3hHn58erxz%2FAxpdnn1LdAxq86L11sfBx2%2B332B%2FHWL7frfbFJtP2x30l3%2BwF6ms3qU8otw%2B5Lzih%2BJwGbUUxcsz9LcuOpLggIL35aus%2FqUAH3Gk9WqTgnfP%2F5EvGSN7igJqGUL6%2BZAJhTqQPBGU%2FTXy75r1vwMAAP%2F%2F&RelayState=state"}
-// &idp.RedirectAuth{RedirectURL:"http://localhost:8000/sso?SAMLRequest=nJLBjtMwEIZfxZp7GuNs2q61iVS2QlRaoNoWDtym8ZRacuzimQD79qjpIhUOOXC15%2FPvz%2F4fGPtwtqtBTvGZvg%2FEon71IbK9bDQw5GgTsmcbsSe20tnd6sOTNTNtkZmy%2BBThBjlPM%2BecJHUpgNqsG%2FCumFd6Yd6Y2uABD%2FpIRM65eU1Lcl1VLe7dke6O1f0dqC%2BU2afYgJlpUBvmgTaRBaM0YLSpCz0vzGKva1vX1lSzhTZfQa2JxUeUkTyJnG1ZhtRhOCUWu9Ral8wJ1OqPzGOKPPSUd5R%2F%2BI4%2BPz9dOf4HXOry4ltix6C2r1pvfXQ%2Bfpt%2Bg8N1iO37%2FX5bbD%2Ft9tCO%2F2BHqazepdyjTB9yWfGuOI6jlqJ4eYF26qI9CToUfChvstrXAnzEnjbrbQq%2Be%2FmPfMkY2VMUUKsQ0s%2FHTCjUgOSBoGyvkX%2FXrP0dAAD%2F%2Fw%3D%3D&RelayState=state"}
-
-// &idp.RedirectAuth{RedirectURL:"http://localhost:8000/sso?SAMLRequest=nJLBjtMwEIZfxZp7Gq9ptqm1iVS2QlRaoNoWDtxmnQm15NjBMwH27VHbRVo45MDVns%2B%2FP%2F%2B%2BYxzCaDeTnOIjfZ%2BIRf0aQmR73mhgytEmZM824kBsxdnD5sODNQttkZmy%2BBThFTLOM2NOklwKoHbbBnxXLFeurnuquzfLqn%2B6cb1eY4VdXa%2FXVWfImfr2pte9AfWFMvsUGzALDWrHPNEusmCUBow2VaFvC7M66spWS7s0i%2FXqK6gtsfiIcgFPIqMty5AchlNisbXWumROoDZ%2FXO5T5GmgfKD8wzv6%2FPhw5fgfsNblWbdEx6D2L1Zvfex8%2FDb%2FBE%2FXIbbvj8d9sf90OEJ7qcFenLJ6l%2FKAMn%2FIecV3RX8ZtRTFyzO0cxcdSLBDwbvyVVb70v9HHGi33afg3fN%2F5I%2FnalgoCqhNCOnnfSYUakDyRFC218y%2Fv1n7OwAA%2F%2F8%3D&RelayState=state"}
 func TestProvider_Options(t *testing.T) {
 	type fields struct {
 		name        string
