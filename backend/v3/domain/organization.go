@@ -25,8 +25,9 @@ type Organization struct {
 	DeletedAt  *time.Time `json:"deletedAt,omitempty" db:"deleted_at"`
 }
 
-// orgs can be identified either using (instnaceID + ID) OR (instanceID + name)
-// OrgIdentifierCondition will either be used as the org ID or org name
+// OrgIdentifierCondition is used to help specify a single Organization,
+// it will either be used as the organization ID or organization name,
+// as organizations can be identified either using (instnaceID + ID) OR (instanceID + name)
 type OrgIdentifierCondition interface {
 	database.Condition
 }
