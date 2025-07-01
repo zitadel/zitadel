@@ -52,8 +52,6 @@ func startCaches(background context.Context, connectors connector.Connectors, in
 if err != nil {
 	return nil, err
 }
-
-
 	caches.org, err = connector.StartCache[orgIndex, string, *Org](background, orgIndexValues(), cache.PurposeOrganization, connectors.Config.Organization, connectors)
 	if err != nil {
 		return nil, err
