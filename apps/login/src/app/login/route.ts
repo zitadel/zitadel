@@ -25,7 +25,6 @@ import {
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { FormData } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_CSP } from "../../../constants/csp";
@@ -218,7 +217,7 @@ export async function GET(request: NextRequest) {
             params.set("organization", organization);
           }
 
-          return startIdentityProviderFlow({
+          const url = await startIdentityProviderFlow({
             serviceUrl,
             idpId,
             urls: {
@@ -229,25 +228,18 @@ export async function GET(request: NextRequest) {
                 `${origin}/idp/${provider}/failure?` +
                 new URLSearchParams(params),
             },
-          }).then((resp) => {
-            if (resp.nextStep.case === "authUrl" && resp.nextStep.value) {
-              return NextResponse.redirect(resp.nextStep.value);
-            } else if (
-              resp.nextStep.case === "formData" &&
-              resp.nextStep.value
-            ) {
-              const formData: FormData = resp.nextStep.value;
-
-              const redirectUrl = constructUrl(request, "/saml-post");
-
-              redirectUrl.searchParams.set("url", formData.url);
-              Object.entries(formData.fields).forEach(([k, v]) => {
-                redirectUrl.searchParams.set(k, v);
-              });
-
-              return NextResponse.redirect(redirectUrl.toString());
-            }
           });
+
+          if (!url) {
+            return NextResponse.json(
+              { error: "Could not start IDP flow" },
+              { status: 500 },
+            );
+          }
+
+          const absoluteUrl = constructUrl(request, url);
+
+          return NextResponse.redirect(absoluteUrl);
         }
       }
     }
