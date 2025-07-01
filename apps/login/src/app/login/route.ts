@@ -25,6 +25,7 @@ import {
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { FormData } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_CSP } from "../../../constants/csp";
@@ -232,19 +233,17 @@ export async function GET(request: NextRequest) {
             if (resp.nextStep.case === "authUrl" && resp.nextStep.value) {
               return NextResponse.redirect(resp.nextStep.value);
             } else if (
-              resp.nextStep.case === "postForm" &&
+              resp.nextStep.case === "formData" &&
               resp.nextStep.value
             ) {
-              const postCall = resp.nextStep.value;
+              const formData: FormData = resp.nextStep.value;
 
               const redirectUrl = constructUrl(request, "/saml-post");
 
-              redirectUrl.searchParams.set("url", url);
-              redirectUrl.searchParams.set("RelayState", postCall.relayState);
-              redirectUrl.searchParams.set(
-                "SAMLResponse",
-                postCall.samlResponse,
-              );
+              redirectUrl.searchParams.set("url", formData.url);
+              Object.entries(formData.fields).forEach(([k, v]) => {
+                redirectUrl.searchParams.set(k, v);
+              });
 
               return NextResponse.redirect(redirectUrl.toString());
             }
