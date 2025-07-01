@@ -107,4 +107,4 @@ OIDC:
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
 
 SAML:
-  DefaultLoginURLV2: "/login?samlRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
+  DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
