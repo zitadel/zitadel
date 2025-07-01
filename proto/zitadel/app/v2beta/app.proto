@@ -105,14 +105,15 @@ enum ApplicationKeysSorting {
 
 message ApplicationKey {
     string id = 1;
-    string project_id = 2;
-    google.protobuf.Timestamp creation_date = 3 [
+    string application_id = 2;
+    string project_id = 3;
+    google.protobuf.Timestamp creation_date = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example: "\"2024-12-18T07:50:47.492Z\"";
         }
     ];
-    string organization_id = 4;
-    google.protobuf.Timestamp expiration_date = 5 [
+    string organization_id = 5;
+    google.protobuf.Timestamp expiration_date = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         example: "\"2024-12-18T07:50:47.492Z\"";
         }

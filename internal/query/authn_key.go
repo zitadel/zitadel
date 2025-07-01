@@ -98,6 +98,7 @@ type AuthNKey struct {
 	ChangeDate    time.Time
 	ResourceOwner string
 	Sequence      uint64
+	ApplicationID string
 
 	Expiration time.Time
 	Type       domain.AuthNKeyType
@@ -343,6 +344,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 		AuthNKeyColumnSequence.identifier(),
 		AuthNKeyColumnExpiration.identifier(),
 		AuthNKeyColumnType.identifier(),
+		AuthNKeyColumnObjectID.identifier(),
 		countColumn.identifier(),
 	).From(authNKeyTable.identifier()).
 		PlaceholderFormat(sq.Dollar)
@@ -361,6 +363,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 				&authNKey.Sequence,
 				&authNKey.Expiration,
 				&authNKey.Type,
+				&authNKey.ApplicationID,
 				&count,
 			)
 			if err != nil {

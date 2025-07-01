@@ -647,6 +647,7 @@ func TestApplicationKeysToPb(t *testing.T) {
 				{
 					ID:            "key1",
 					AggregateID:   "project1",
+					ApplicationID: "app1",
 					CreationDate:  now,
 					ResourceOwner: "org1",
 					Expiration:    now.Add(24 * time.Hour),
@@ -655,6 +656,7 @@ func TestApplicationKeysToPb(t *testing.T) {
 				{
 					ID:            "key2",
 					AggregateID:   "project2",
+					ApplicationID: "app1",
 					CreationDate:  now.Add(-time.Hour),
 					ResourceOwner: "org2",
 					Expiration:    now.Add(48 * time.Hour),
@@ -664,6 +666,7 @@ func TestApplicationKeysToPb(t *testing.T) {
 			expected: []*app.ApplicationKey{
 				{
 					Id:             "key1",
+					ApplicationId:  "app1",
 					ProjectId:      "project1",
 					CreationDate:   timestamppb.New(now),
 					OrganizationId: "org1",
@@ -671,6 +674,7 @@ func TestApplicationKeysToPb(t *testing.T) {
 				},
 				{
 					Id:             "key2",
+					ApplicationId:  "app1",
 					ProjectId:      "project2",
 					CreationDate:   timestamppb.New(now.Add(-time.Hour)),
 					OrganizationId: "org2",

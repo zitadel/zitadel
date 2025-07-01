@@ -249,6 +249,7 @@ func ApplicationKeysToPb(keys []*query.AuthNKey) []*app.ApplicationKey {
 	for i, k := range keys {
 		pbKey := &app.ApplicationKey{
 			Id:             k.ID,
+			ApplicationId:  k.ApplicationID,
 			ProjectId:      k.AggregateID,
 			CreationDate:   timestamppb.New(k.CreationDate),
 			OrganizationId: k.ResourceOwner,
