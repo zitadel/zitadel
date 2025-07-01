@@ -985,16 +985,18 @@ export async function startIdentityProviderFlow({
         return resp.nextStep.value;
       } else if (resp.nextStep.case === "formData" && resp.nextStep.value) {
         const formData: FormData = resp.nextStep.value;
-        const redirectUrl = new URL("/saml-post");
+        const redirectUrl = "/saml-post";
 
-        redirectUrl.searchParams.set("url", formData.url);
+        const params = new URLSearchParams({ url: formData.url });
+
         Object.entries(formData.fields).forEach(([k, v]) => {
-          redirectUrl.searchParams.set(k, v);
+          params.append(k, v);
         });
 
-        return redirectUrl.toString();
+        return `${redirectUrl}?${params.toString()}`;
+      } else {
+        return null;
       }
-      return null;
     });
 }
 

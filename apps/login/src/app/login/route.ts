@@ -217,7 +217,7 @@ export async function GET(request: NextRequest) {
             params.set("organization", organization);
           }
 
-          const url = await startIdentityProviderFlow({
+          let url: string | null = await startIdentityProviderFlow({
             serviceUrl,
             idpId,
             urls: {
@@ -237,9 +237,12 @@ export async function GET(request: NextRequest) {
             );
           }
 
-          const absoluteUrl = constructUrl(request, url);
+          if (url.startsWith("/")) {
+            // if the url is a relative path, construct the absolute url
+            url = constructUrl(request, url).toString();
+          }
 
-          return NextResponse.redirect(absoluteUrl);
+          return NextResponse.redirect(url);
         }
       }
     }
