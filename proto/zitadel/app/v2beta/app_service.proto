@@ -979,9 +979,11 @@ message ListApplicationKeysRequest {
 
     ApplicationKeysSorting sorting_column = 2;
 
-    string application_id = 3 [(validate.rules).string = {max_len: 200}];
-    string project_id = 4 [(validate.rules).string = {max_len: 200}];
-    string organization_id = 5 [(validate.rules).string = {max_len: 200}];
+    oneof resource_id {
+        string application_id = 3 [(validate.rules).string = {min_len: 1; max_len: 200}];
+        string project_id = 4 [(validate.rules).string = {min_len: 1; max_len: 200}];
+        string organization_id = 5 [(validate.rules).string = {min_len: 1; max_len: 200}];
+    }
 }
 
 message ListApplicationKeysResponse {

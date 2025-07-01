@@ -179,28 +179,30 @@ func CreateAPIClientKeyRequestToDomain(key *app.CreateApplicationKeyRequest) *do
 
 func ListApplicationKeysRequestToDomain(sysDefaults systemdefaults.SystemDefaults, req *app.ListApplicationKeysRequest) (*query.AuthNKeySearchQueries, error) {
 	var queries []query.SearchQuery
-	if orgID := strings.TrimSpace(req.GetOrganizationId()); orgID != "" {
-		resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(orgID)
-		if err != nil {
-			return nil, err
-		}
-		queries = append(queries, resourceOwner)
-	}
 
-	if projectID := strings.TrimSpace(req.GetProjectId()); projectID != "" {
-		aggregate, err := query.NewAuthNKeyAggregateIDQuery(projectID)
-		if err != nil {
-			return nil, err
-		}
-		queries = append(queries, aggregate)
-	}
-
-	if appID := strings.TrimSpace(req.GetApplicationId()); appID != "" {
-		object, err := query.NewAuthNKeyObjectIDQuery(appID)
+	switch req.GetResourceId().(type) {
+	case *app.ListApplicationKeysRequest_ApplicationId:
+		object, err := query.NewAuthNKeyObjectIDQuery(strings.TrimSpace(req.GetApplicationId()))
 		if err != nil {
 			return nil, err
 		}
 		queries = append(queries, object)
+	case *app.ListApplicationKeysRequest_OrganizationId:
+		resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(strings.TrimSpace(req.GetOrganizationId()))
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, resourceOwner)
+	case *app.ListApplicationKeysRequest_ProjectId:
+		aggregate, err := query.NewAuthNKeyAggregateIDQuery(strings.TrimSpace(req.GetProjectId()))
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, aggregate)
+	case nil:
+
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "CONV-t3ENme", "unexpected resource id")
 	}
 
 	offset, limit, asc, err := filter.PaginationPbToQuery(sysDefaults, req.GetPagination())

@@ -564,33 +564,10 @@ func TestListApplicationKeysRequestToDomain(t *testing.T) {
 			},
 		},
 		{
-			name: "all fields set",
-			req: &app.ListApplicationKeysRequest{
-				OrganizationId: "org1",
-				ProjectId:      "project1",
-				ApplicationId:  "app1",
-				SortingColumn:  app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_TYPE,
-				Pagination:     &filter_pb_v2.PaginationRequest{Asc: true},
-			},
-			expectedResult: &query.AuthNKeySearchQueries{
-				SearchRequest: query.SearchRequest{
-					Offset:        0,
-					Limit:         100,
-					Asc:           true,
-					SortingColumn: query.AuthNKeyColumnType,
-				},
-				Queries: []query.SearchQuery{
-					resourceOwnerQuery,
-					projectIDQuery,
-					appIDQuery,
-				},
-			},
-		},
-		{
 			name: "only organization id",
 			req: &app.ListApplicationKeysRequest{
-				OrganizationId: "org1",
-				Pagination:     &filter_pb_v2.PaginationRequest{Asc: true},
+				ResourceId: &app.ListApplicationKeysRequest_OrganizationId{OrganizationId: "org1"},
+				Pagination: &filter_pb_v2.PaginationRequest{Asc: true},
 			},
 			expectedResult: &query.AuthNKeySearchQueries{
 				SearchRequest: query.SearchRequest{
@@ -607,7 +584,7 @@ func TestListApplicationKeysRequestToDomain(t *testing.T) {
 		{
 			name: "only project id",
 			req: &app.ListApplicationKeysRequest{
-				ProjectId:  "project1",
+				ResourceId: &app.ListApplicationKeysRequest_ProjectId{ProjectId: "project1"},
 				Pagination: &filter_pb_v2.PaginationRequest{Asc: true},
 			},
 			expectedResult: &query.AuthNKeySearchQueries{
@@ -625,8 +602,8 @@ func TestListApplicationKeysRequestToDomain(t *testing.T) {
 		{
 			name: "only application id",
 			req: &app.ListApplicationKeysRequest{
-				ApplicationId: "app1",
-				Pagination:    &filter_pb_v2.PaginationRequest{Asc: true},
+				ResourceId: &app.ListApplicationKeysRequest_ApplicationId{ApplicationId: "app1"},
+				Pagination: &filter_pb_v2.PaginationRequest{Asc: true},
 			},
 			expectedResult: &query.AuthNKeySearchQueries{
 				SearchRequest: query.SearchRequest{

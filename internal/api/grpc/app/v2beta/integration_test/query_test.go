@@ -690,7 +690,7 @@ func TestListApplicationKeys(t *testing.T) {
 			testName: "when sorting by expiration date should return keys sorted by expiration date ascending",
 			inputCtx: LoginUserCtx,
 			inputRequest: &app.ListApplicationKeysRequest{
-				ProjectId:     p.GetId(),
+				ResourceId:    &app.ListApplicationKeysRequest_ProjectId{ProjectId: p.GetId()},
 				Pagination:    &filter.PaginationRequest{Asc: true},
 				SortingColumn: app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_EXPIRATION,
 			},
@@ -700,7 +700,7 @@ func TestListApplicationKeys(t *testing.T) {
 			testName: "when sorting by creation date should return keys sorted by creation date descending",
 			inputCtx: IAMOwnerCtx,
 			inputRequest: &app.ListApplicationKeysRequest{
-				ProjectId:     p.GetId(),
+				ResourceId:    &app.ListApplicationKeysRequest_ProjectId{ProjectId: p.GetId()},
 				SortingColumn: app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_CREATION_DATE,
 			},
 			expectedAppKeysIDs: []string{appKey4.GetId(), appKey3.GetId(), appKey2.GetId(), appKey1.GetId()},
@@ -709,8 +709,8 @@ func TestListApplicationKeys(t *testing.T) {
 			testName: "when filtering by app ID should return keys matching app ID sorted by ID",
 			inputCtx: projectOwnerCtx,
 			inputRequest: &app.ListApplicationKeysRequest{
-				Pagination:    &filter.PaginationRequest{Asc: true},
-				ApplicationId: createdApiApp1.GetAppId(),
+				Pagination: &filter.PaginationRequest{Asc: true},
+				ResourceId: &app.ListApplicationKeysRequest_ApplicationId{ApplicationId: createdApiApp1.GetAppId()},
 			},
 			expectedAppKeysIDs: []string{appKey1.GetId(), appKey2.GetId(), appKey3.GetId()},
 		},
@@ -789,8 +789,8 @@ func TestListApplicationKeys_WithPermissionV2(t *testing.T) {
 			testName: "when filtering by app ID should return keys matching app ID sorted by ID",
 			inputCtx: projectOwnerCtx,
 			inputRequest: &app.ListApplicationKeysRequest{
-				Pagination:    &filter.PaginationRequest{Asc: true},
-				ApplicationId: createdApiApp1.GetAppId(),
+				Pagination: &filter.PaginationRequest{Asc: true},
+				ResourceId: &app.ListApplicationKeysRequest_ApplicationId{ApplicationId: createdApiApp1.GetAppId()},
 			},
 			expectedAppKeysIDs: []string{appKey1.GetId(), appKey2.GetId(), appKey3.GetId()},
 		},
@@ -798,7 +798,7 @@ func TestListApplicationKeys_WithPermissionV2(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
-			t.Parallel()
+			// t.Parallel()
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 5*time.Second)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
