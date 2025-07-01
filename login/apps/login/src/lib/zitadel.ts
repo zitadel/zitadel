@@ -1,4 +1,5 @@
 import { Client, create, Duration } from "@zitadel/client";
+import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import {
@@ -23,7 +24,10 @@ import {
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
-import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
+import type {
+  FormData,
+  RedirectURLsJson,
+} from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   NotificationType,
   SendPasswordResetLinkSchema,
@@ -88,7 +92,6 @@ export async function getHostedLoginTranslation({
       {},
     )
     .then((resp) => {
-      console.log(resp);
       return resp.translations ? resp.translations : undefined;
     });
 
@@ -964,19 +967,38 @@ export async function startIdentityProviderFlow({
   serviceUrl: string;
   idpId: string;
   urls: RedirectURLsJson;
-}) {
+}): Promise<string | null> {
   const userService: Client<typeof UserService> = await createServiceForHost(
     UserService,
     serviceUrl,
   );
 
-  return userService.startIdentityProviderIntent({
-    idpId,
-    content: {
-      case: "urls",
-      value: urls,
-    },
-  });
+  return userService
+    .startIdentityProviderIntent({
+      idpId,
+      content: {
+        case: "urls",
+        value: urls,
+      },
+    })
+    .then((resp) => {
+      if (resp.nextStep.case === "authUrl" && resp.nextStep.value) {
+        return resp.nextStep.value;
+      } else if (resp.nextStep.case === "formData" && resp.nextStep.value) {
+        const formData: FormData = resp.nextStep.value;
+        const redirectUrl = "/saml-post";
+
+        const params = new URLSearchParams({ url: formData.url });
+
+        Object.entries(formData.fields).forEach(([k, v]) => {
+          params.append(k, v);
+        });
+
+        return `${redirectUrl}?${params.toString()}`;
+      } else {
+        return null;
+      }
+    });
 }
 
 export async function startLDAPIdentityProviderFlow({
@@ -1474,5 +1496,30 @@ export async function listAuthenticationMethodTypes({
 
   return userService.listAuthenticationMethodTypes({
     userId,
+  });
+}
+
+export function createServerTransport(token: string, baseUrl: string) {
+  return libCreateServerTransport(token, {
+    baseUrl,
+    interceptors: !process.env.CUSTOM_REQUEST_HEADERS
+      ? undefined
+      : [
+          (next) => {
+            return (req) => {
+              process.env
+                .CUSTOM_REQUEST_HEADERS!.split(",")
+                .forEach((header) => {
+                  const kv = header.split(":");
+                  if (kv.length === 2) {
+                    req.header.set(kv[0].trim(), kv[1].trim());
+                  } else {
+                    console.warn(`Skipping malformed header: ${header}`);
+                  }
+                });
+              return next(req);
+            };
+          },
+        ],
   });
 }
