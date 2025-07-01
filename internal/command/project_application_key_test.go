@@ -95,7 +95,7 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 			},
 		},
 		{
-			name: "create key not allowed, precondition error",
+			name: "create key not allowed, precondition error 1",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -178,7 +178,7 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 			},
 		},
 		{
-			name: "create key not allowed, precondition error",
+			name: "create key not allowed, precondition error 2",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -213,7 +213,6 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 					},
 					ApplicationID: "app1",
 				},
-				resourceOwner: "org1",
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
