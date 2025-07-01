@@ -309,7 +309,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 							true,
 							user.ID,
 							&query.UserMetadataSearchQueries{Queries: []query.SearchQuery{resourceOwnerQuery}},
-							false,
+							nil,
 						)
 						if err != nil {
 							logging.WithError(err).Info("unable to get md in action")

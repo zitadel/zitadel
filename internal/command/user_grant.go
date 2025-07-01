@@ -315,7 +315,7 @@ func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *do
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if err := c.checkUserExists(ctx, usergrant.UserID, ""); err != nil {
+	if _, err := c.checkUserExists(ctx, usergrant.UserID, ""); err != nil {
 		return err
 	}
 	if usergrant.ProjectGrantID != "" || usergrant.ResourceOwner == "" {

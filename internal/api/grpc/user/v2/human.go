@@ -15,6 +15,14 @@ import (
 )
 
 func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUserRequest_Human, orgId string, userName, userId *string) (*user.CreateUserResponse, error) {
+	metadataEntries := make([]*user.SetMetadataEntry, len(humanPb.Metadata))
+	for i, metadataEntry := range humanPb.Metadata {
+		metadataEntries[i] = &user.SetMetadataEntry{
+			Key:   metadataEntry.GetKey(),
+			Value: metadataEntry.GetValue(),
+		}
+	}
+
 	addHumanPb := &user.AddHumanUserRequest{
 		Username: userName,
 		UserId:   userId,
@@ -26,6 +34,7 @@ func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUs
 		Phone:      humanPb.Phone,
 		IdpLinks:   humanPb.IdpLinks,
 		TotpSecret: humanPb.TotpSecret,
+		Metadata:   metadataEntries,
 	}
 	switch pwType := humanPb.GetPasswordType().(type) {
 	case *user.CreateUserRequest_Human_HashedPassword:

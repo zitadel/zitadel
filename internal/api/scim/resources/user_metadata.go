@@ -45,7 +45,7 @@ func (h *UsersHandler) queryMetadataForUsers(ctx context.Context, userIds []stri
 func (h *UsersHandler) queryMetadataForUser(ctx context.Context, id string) (map[metadata.ScopedKey][]byte, error) {
 	queries := h.buildMetadataQueries(ctx)
 
-	md, err := h.query.SearchUserMetadata(ctx, false, id, queries, false)
+	md, err := h.query.SearchUserMetadata(ctx, false, id, queries, nil)
 	if err != nil {
 		return nil, err
 	}

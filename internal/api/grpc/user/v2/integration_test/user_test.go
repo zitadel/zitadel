@@ -4,6 +4,7 @@ package user_test
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/url"
 	"os"
@@ -3934,6 +3935,44 @@ func TestServer_CreateUser(t *testing.T) {
 			},
 		},
 		{
+			name: "with metadata",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+									Metadata: []*user.Metadata{
+										{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+										{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
+										{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))},
+									},
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+				}
+			},
+		},
+		{
 			name: "with idp",
 			testCase: func(runId string) testCase {
 				username := fmt.Sprintf("donald.duck+%s", runId)
@@ -4878,7 +4917,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			now := time.Now()
 			runId := fmt.Sprint(now.UnixNano() + int64(i))
-			userId := Instance.CreateUserTypeHuman(CTX).GetId()
+			userId := Instance.CreateUserTypeHuman(CTX, gofakeit.Email()).GetId()
 			test := tt.testCase(runId, userId)
 			got, err := Client.UpdateUser(test.args.ctx, test.args.req)
 			if test.wantErr {

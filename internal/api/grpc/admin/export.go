@@ -8,7 +8,9 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	authn_grpc "github.com/zitadel/zitadel/internal/api/grpc/authn"
+	"github.com/zitadel/zitadel/internal/api/grpc/org"
 	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
+	user_converter "github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -65,7 +67,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		/******************************************************************************************************************
 		Organization
 		******************************************************************************************************************/
-		org := &admin_pb.DataOrg{OrgId: queriedOrg.ID, Org: &management_pb.AddOrgRequest{Name: queriedOrg.Name}}
+		org := &admin_pb.DataOrg{OrgId: queriedOrg.ID, OrgState: org.OrgStateToPb(queriedOrg.State), Org: &management_pb.AddOrgRequest{Name: queriedOrg.Name}}
 		orgs[i] = org
 	}
 
@@ -567,6 +569,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 		case domain.UserTypeHuman:
 			dataUser := &v1_pb.DataHumanUser{
 				UserId: user.ID,
+				State:  user_converter.UserStateToPb(user.State),
 				User: &management_pb.ImportHumanUserRequest{
 					UserName: user.Username,
 					Profile: &management_pb.ImportHumanUserRequest_Profile{
@@ -620,6 +623,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 		case domain.UserTypeMachine:
 			machineUsers = append(machineUsers, &v1_pb.DataMachineUser{
 				UserId: user.ID,
+				State:  user_converter.UserStateToPb(user.State),
 				User: &management_pb.AddMachineUserRequest{
 					UserName:    user.Username,
 					Name:        user.Machine.Name,
@@ -647,7 +651,6 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 					ExpirationDate: timestamppb.New(key.Expiration),
 					PublicKey:      key.PublicKey,
 				})
-
 			}
 		}
 
@@ -656,7 +659,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
-		metadataList, err := s.query.SearchUserMetadata(ctx, false, user.ID, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}}, false)
+		metadataList, err := s.query.SearchUserMetadata(ctx, false, user.ID, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}}, nil)
 		metaspan.EndWithError(err)
 		if err != nil {
 			return nil, nil, nil, nil, err
@@ -888,7 +891,6 @@ func (s *Server) getNecessaryProjectGrantMembersForOrg(ctx context.Context, org 
 						break
 					}
 				}
-
 			}
 		}
 	}
@@ -940,7 +942,6 @@ func (s *Server) getNecessaryOrgMembersForOrg(ctx context.Context, org string, p
 }
 
 func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string, processedOrgs []string, processedProjects []string) ([]*v1_pb.DataProjectGrant, error) {
-
 	projectGrantSearchOrg, err := query.NewProjectGrantResourceOwnerSearchQuery(org)
 	if err != nil {
 		return nil, err
@@ -991,7 +992,7 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 	for _, userGrant := range queriedUserGrants.UserGrants {
 		for _, projectID := range processedProjects {
 			if projectID == userGrant.ProjectID {
-				//if usergrant is on a granted project
+				// if usergrant is on a granted project
 				if userGrant.GrantID != "" {
 					for _, grantID := range processedGrants {
 						if grantID == userGrant.GrantID {
@@ -1024,6 +1025,7 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 	}
 	return userGrants, nil
 }
+
 func (s *Server) getCustomLoginTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomLoginTextsRequest, error) {
 	customTexts := make([]*management_pb.SetCustomLoginTextsRequest, 0, len(languages))
 	for _, lang := range languages {

@@ -176,35 +176,35 @@ func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListP
 }
 
 func (s *Server) AddProjectGrantMember(ctx context.Context, req *mgmt_pb.AddProjectGrantMemberRequest) (*mgmt_pb.AddProjectGrantMemberResponse, error) {
-	member, err := s.command.AddProjectGrantMember(ctx, AddProjectGrantMemberRequestToDomain(req))
+	member, err := s.command.AddProjectGrantMember(ctx, AddProjectGrantMemberRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectGrantMemberResponse{
 		Details: object_grpc.AddToDetailsPb(
 			member.Sequence,
-			member.ChangeDate,
+			member.EventDate,
 			member.ResourceOwner,
 		),
 	}, nil
 }
 
 func (s *Server) UpdateProjectGrantMember(ctx context.Context, req *mgmt_pb.UpdateProjectGrantMemberRequest) (*mgmt_pb.UpdateProjectGrantMemberResponse, error) {
-	member, err := s.command.ChangeProjectGrantMember(ctx, UpdateProjectGrantMemberRequestToDomain(req))
+	member, err := s.command.ChangeProjectGrantMember(ctx, UpdateProjectGrantMemberRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectGrantMemberResponse{
 		Details: object_grpc.ChangeToDetailsPb(
 			member.Sequence,
-			member.ChangeDate,
+			member.EventDate,
 			member.ResourceOwner,
 		),
 	}, nil
 }
 
 func (s *Server) RemoveProjectGrantMember(ctx context.Context, req *mgmt_pb.RemoveProjectGrantMemberRequest) (*mgmt_pb.RemoveProjectGrantMemberResponse, error) {
-	details, err := s.command.RemoveProjectGrantMember(ctx, req.ProjectId, req.UserId, req.GrantId)
+	details, err := s.command.RemoveProjectGrantMember(ctx, req.ProjectId, req.UserId, req.GrantId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

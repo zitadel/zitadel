@@ -390,8 +390,7 @@ func TestServer_ListProjects(t *testing.T) {
 					resp3 := createProject(iamOwnerCtx, instance, t, orgResp.GetOrganizationId(), false, true)
 					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
 						InProjectIdsFilter: &filter.InIDsFilter{
-							Ids: []string{resp1.GetId(), resp2.GetId(), resp3.GetId(), projectResp.GetId()},
-						},
+							Ids: []string{resp1.GetId(), resp2.GetId(), resp3.GetId(), projectResp.GetId()}},
 					}
 					response.Projects[0] = grantedProjectResp
 					response.Projects[1] = projectResp
@@ -1228,8 +1227,7 @@ func TestServer_ListProjectGrants(t *testing.T) {
 					project3Resp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name3, false, false)
 					request.Filters[0].Filter = &project.ProjectGrantSearchFilter_InProjectIdsFilter{
 						InProjectIdsFilter: &filter.InIDsFilter{
-							Ids: []string{project1Resp.GetId(), project2Resp.GetId(), project3Resp.GetId(), projectResp.GetId()},
-						},
+							Ids: []string{project1Resp.GetId(), project2Resp.GetId(), project3Resp.GetId(), projectResp.GetId()}},
 					}
 
 					createProjectGrant(iamOwnerCtx, instance, t, orgID, project1Resp.GetId(), name1)

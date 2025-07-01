@@ -108,7 +108,7 @@ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
 					ExpirationDate: expirationDate,
 				},
 				func(request *user.AddKeyRequest) error {
-					resp := Instance.CreateUserTypeHuman(IamCTX)
+					resp := Instance.CreateUserTypeHuman(IamCTX, gofakeit.Email())
 					request.UserId = resp.Id
 					return nil
 				},

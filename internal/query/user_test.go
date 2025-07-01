@@ -222,87 +222,6 @@ func TestUser_userCheckPermission(t *testing.T) {
 }
 
 var (
-	loginNamesQuery = `SELECT login_names.user_id, ARRAY_AGG(login_names.login_name)::TEXT[] AS loginnames, ARRAY_AGG(LOWER(login_names.login_name))::TEXT[] AS loginnames_lower, login_names.instance_id` +
-		` FROM projections.login_names3 AS login_names` +
-		` GROUP BY login_names.user_id, login_names.instance_id`
-	preferredLoginNameQuery = `SELECT preferred_login_name.user_id, preferred_login_name.login_name, preferred_login_name.instance_id` +
-		` FROM projections.login_names3 AS preferred_login_name` +
-		` WHERE  preferred_login_name.is_primary = $1`
-	userQuery = `SELECT projections.users14.id,` +
-		` projections.users14.creation_date,` +
-		` projections.users14.change_date,` +
-		` projections.users14.resource_owner,` +
-		` projections.users14.sequence,` +
-		` projections.users14.state,` +
-		` projections.users14.type,` +
-		` projections.users14.username,` +
-		` login_names.loginnames,` +
-		` preferred_login_name.login_name,` +
-		` projections.users14_humans.user_id,` +
-		` projections.users14_humans.first_name,` +
-		` projections.users14_humans.last_name,` +
-		` projections.users14_humans.nick_name,` +
-		` projections.users14_humans.display_name,` +
-		` projections.users14_humans.preferred_language,` +
-		` projections.users14_humans.gender,` +
-		` projections.users14_humans.avatar_key,` +
-		` projections.users14_humans.email,` +
-		` projections.users14_humans.is_email_verified,` +
-		` projections.users14_humans.phone,` +
-		` projections.users14_humans.is_phone_verified,` +
-		` projections.users14_humans.password_change_required,` +
-		` projections.users14_humans.password_changed,` +
-		` projections.users14_humans.mfa_init_skipped,` +
-		` projections.users14_machines.user_id,` +
-		` projections.users14_machines.name,` +
-		` projections.users14_machines.description,` +
-		` projections.users14_machines.secret,` +
-		` projections.users14_machines.access_token_type,` +
-		` COUNT(*) OVER ()` +
-		` FROM projections.users14` +
-		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
-		` LEFT JOIN projections.users14_machines ON projections.users14.id = projections.users14_machines.user_id AND projections.users14.instance_id = projections.users14_machines.instance_id` +
-		` LEFT JOIN` +
-		` (` + loginNamesQuery + `) AS login_names` +
-		` ON login_names.user_id = projections.users14.id AND login_names.instance_id = projections.users14.instance_id` +
-		` LEFT JOIN` +
-		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
-		` ON preferred_login_name.user_id = projections.users14.id AND preferred_login_name.instance_id = projections.users14.instance_id`
-	userCols = []string{
-		"id",
-		"creation_date",
-		"change_date",
-		"resource_owner",
-		"sequence",
-		"state",
-		"type",
-		"username",
-		"loginnames",
-		"login_name",
-		// human
-		"user_id",
-		"first_name",
-		"last_name",
-		"nick_name",
-		"display_name",
-		"preferred_language",
-		"gender",
-		"avatar_key",
-		"email",
-		"is_email_verified",
-		"phone",
-		"is_phone_verified",
-		"password_change_required",
-		"password_changed",
-		"mfa_init_skipped",
-		// machine
-		"user_id",
-		"name",
-		"description",
-		"secret",
-		"access_token_type",
-		"count",
-	}
 	profileQuery = `SELECT projections.users14.id,` +
 		` projections.users14.creation_date,` +
 		` projections.users14.change_date,` +
@@ -397,8 +316,8 @@ var (
 		` projections.users14.state,` +
 		` projections.users14.type,` +
 		` projections.users14.username,` +
-		` login_names.loginnames,` +
-		` preferred_login_name.login_name,` +
+		` login_names.login_names,` +
+		` login_names.preferred_login_name,` +
 		` projections.users14_humans.user_id,` +
 		` projections.users14_humans.first_name,` +
 		` projections.users14_humans.last_name,` +
@@ -417,12 +336,7 @@ var (
 		` FROM projections.users14` +
 		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
 		` LEFT JOIN projections.users14_notifications ON projections.users14.id = projections.users14_notifications.user_id AND projections.users14.instance_id = projections.users14_notifications.instance_id` +
-		` LEFT JOIN` +
-		` (` + loginNamesQuery + `) AS login_names` +
-		` ON login_names.user_id = projections.users14.id AND login_names.instance_id = projections.users14.instance_id` +
-		` LEFT JOIN` +
-		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
-		` ON preferred_login_name.user_id = projections.users14.id AND preferred_login_name.instance_id = projections.users14.instance_id`
+		` LEFT JOIN LATERAL (SELECT ARRAY_AGG(ln.login_name ORDER BY ln.login_name) AS login_names, MAX(CASE WHEN ln.is_primary THEN ln.login_name ELSE NULL END) AS preferred_login_name FROM projections.login_names3 AS ln WHERE ln.user_id = projections.users14.id AND ln.instance_id = projections.users14.instance_id) AS login_names ON TRUE`
 	notifyUserCols = []string{
 		"id",
 		"creation_date",
@@ -432,8 +346,8 @@ var (
 		"state",
 		"type",
 		"username",
-		"loginnames",
-		"login_name",
+		"login_names",
+		"preferred_login_name",
 		// human
 		"user_id",
 		"first_name",
@@ -460,8 +374,8 @@ var (
 		` projections.users14.state,` +
 		` projections.users14.type,` +
 		` projections.users14.username,` +
-		` login_names.loginnames,` +
-		` preferred_login_name.login_name,` +
+		` login_names.login_names,` +
+		` login_names.preferred_login_name,` +
 		` projections.users14_humans.user_id,` +
 		` projections.users14_humans.first_name,` +
 		` projections.users14_humans.last_name,` +
@@ -485,12 +399,7 @@ var (
 		` FROM projections.users14` +
 		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
 		` LEFT JOIN projections.users14_machines ON projections.users14.id = projections.users14_machines.user_id AND projections.users14.instance_id = projections.users14_machines.instance_id` +
-		` LEFT JOIN` +
-		` (` + loginNamesQuery + `) AS login_names` +
-		` ON login_names.user_id = projections.users14.id AND login_names.instance_id = projections.users14.instance_id` +
-		` LEFT JOIN` +
-		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
-		` ON preferred_login_name.user_id = projections.users14.id AND preferred_login_name.instance_id = projections.users14.instance_id`
+		` LEFT JOIN LATERAL (SELECT ARRAY_AGG(ln.login_name ORDER BY ln.login_name) AS login_names, MAX(CASE WHEN ln.is_primary THEN ln.login_name ELSE NULL END) AS preferred_login_name FROM projections.login_names3 AS ln WHERE ln.user_id = projections.users14.id AND ln.instance_id = projections.users14.instance_id) AS login_names ON TRUE`
 	usersCols = []string{
 		"id",
 		"creation_date",
@@ -500,8 +409,8 @@ var (
 		"state",
 		"type",
 		"username",
-		"loginnames",
-		"login_name",
+		"login_names",
+		"preferred_login_name",
 		// human
 		"user_id",
 		"first_name",
@@ -540,240 +449,6 @@ func Test_UserPrepares(t *testing.T) {
 		want    want
 		object  interface{}
 	}{
-		{
-			name:    "prepareUserQuery no result",
-			prepare: prepareUserQuery,
-			want: want{
-				sqlExpectations: mockQueryScanErr(
-					regexp.QuoteMeta(userQuery),
-					nil,
-					nil,
-				),
-				err: func(err error) (error, bool) {
-					if !zerrors.IsNotFound(err) {
-						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
-					}
-					return nil, true
-				},
-			},
-			object: (*User)(nil),
-		},
-		{
-			name:    "prepareUserQuery human found",
-			prepare: prepareUserQuery,
-			want: want{
-				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(userQuery),
-					userCols,
-					[]driver.Value{
-						"id",
-						testNow,
-						testNow,
-						"resource_owner",
-						uint64(20211108),
-						domain.UserStateActive,
-						domain.UserTypeHuman,
-						"username",
-						database.TextArray[string]{"login_name1", "login_name2"},
-						"login_name1",
-						// human
-						"id",
-						"first_name",
-						"last_name",
-						"nick_name",
-						"display_name",
-						"de",
-						domain.GenderUnspecified,
-						"avatar_key",
-						"email",
-						true,
-						"phone",
-						true,
-						true,
-						testNow,
-						testNow,
-						// machine
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						1,
-					},
-				),
-			},
-			object: &User{
-				ID:                 "id",
-				CreationDate:       testNow,
-				ChangeDate:         testNow,
-				ResourceOwner:      "resource_owner",
-				Sequence:           20211108,
-				State:              domain.UserStateActive,
-				Type:               domain.UserTypeHuman,
-				Username:           "username",
-				LoginNames:         database.TextArray[string]{"login_name1", "login_name2"},
-				PreferredLoginName: "login_name1",
-				Human: &Human{
-					FirstName:              "first_name",
-					LastName:               "last_name",
-					NickName:               "nick_name",
-					DisplayName:            "display_name",
-					AvatarKey:              "avatar_key",
-					PreferredLanguage:      language.German,
-					Gender:                 domain.GenderUnspecified,
-					Email:                  "email",
-					IsEmailVerified:        true,
-					Phone:                  "phone",
-					IsPhoneVerified:        true,
-					PasswordChangeRequired: true,
-					PasswordChanged:        testNow,
-					MFAInitSkipped:         testNow,
-				},
-			},
-		},
-		{
-			name:    "prepareUserQuery machine found",
-			prepare: prepareUserQuery,
-			want: want{
-				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(userQuery),
-					userCols,
-					[]driver.Value{
-						"id",
-						testNow,
-						testNow,
-						"resource_owner",
-						uint64(20211108),
-						domain.UserStateActive,
-						domain.UserTypeMachine,
-						"username",
-						database.TextArray[string]{"login_name1", "login_name2"},
-						"login_name1",
-						// human
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						// machine
-						"id",
-						"name",
-						"description",
-						nil,
-						domain.OIDCTokenTypeBearer,
-						1,
-					},
-				),
-			},
-			object: &User{
-				ID:                 "id",
-				CreationDate:       testNow,
-				ChangeDate:         testNow,
-				ResourceOwner:      "resource_owner",
-				Sequence:           20211108,
-				State:              domain.UserStateActive,
-				Type:               domain.UserTypeMachine,
-				Username:           "username",
-				LoginNames:         database.TextArray[string]{"login_name1", "login_name2"},
-				PreferredLoginName: "login_name1",
-				Machine: &Machine{
-					Name:            "name",
-					Description:     "description",
-					EncodedSecret:   "",
-					AccessTokenType: domain.OIDCTokenTypeBearer,
-				},
-			},
-		},
-		{
-			name:    "prepareUserQuery machine with secret found",
-			prepare: prepareUserQuery,
-			want: want{
-				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(userQuery),
-					userCols,
-					[]driver.Value{
-						"id",
-						testNow,
-						testNow,
-						"resource_owner",
-						uint64(20211108),
-						domain.UserStateActive,
-						domain.UserTypeMachine,
-						"username",
-						database.TextArray[string]{"login_name1", "login_name2"},
-						"login_name1",
-						// human
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						nil,
-						// machine
-						"id",
-						"name",
-						"description",
-						"secret",
-						domain.OIDCTokenTypeBearer,
-						1,
-					},
-				),
-			},
-			object: &User{
-				ID:                 "id",
-				CreationDate:       testNow,
-				ChangeDate:         testNow,
-				ResourceOwner:      "resource_owner",
-				Sequence:           20211108,
-				State:              domain.UserStateActive,
-				Type:               domain.UserTypeMachine,
-				Username:           "username",
-				LoginNames:         database.TextArray[string]{"login_name1", "login_name2"},
-				PreferredLoginName: "login_name1",
-				Machine: &Machine{
-					Name:            "name",
-					Description:     "description",
-					EncodedSecret:   "secret",
-					AccessTokenType: domain.OIDCTokenTypeBearer,
-				},
-			},
-		},
-		{
-			name:    "prepareUserQuery sql err",
-			prepare: prepareUserQuery,
-			want: want{
-				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(userQuery),
-					sql.ErrConnDone,
-				),
-				err: func(err error) (error, bool) {
-					if !errors.Is(err, sql.ErrConnDone) {
-						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
-					}
-					return nil, true
-				},
-			},
-			object: (*User)(nil),
-		},
 		{
 			name:    "prepareProfileQuery no result",
 			prepare: prepareProfileQuery,

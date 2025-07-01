@@ -482,7 +482,7 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGra
 							true,
 							userInfo.Subject,
 							&query.UserMetadataSearchQueries{Queries: []query.SearchQuery{resourceOwnerQuery}},
-							false,
+							nil,
 						)
 						if err != nil {
 							logging.WithError(err).Info("unable to get md in action")
@@ -696,7 +696,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 							true,
 							userID,
 							&query.UserMetadataSearchQueries{Queries: []query.SearchQuery{resourceOwnerQuery}},
-							false,
+							nil,
 						)
 						if err != nil {
 							logging.WithError(err).Info("unable to get md in action")
@@ -844,7 +844,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 }
 
 func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[string]string, error) {
-	metaData, err := o.query.SearchUserMetadata(ctx, true, userID, &query.UserMetadataSearchQueries{}, false)
+	metaData, err := o.query.SearchUserMetadata(ctx, true, userID, &query.UserMetadataSearchQueries{}, nil)
 	if err != nil {
 		return nil, err
 	}
