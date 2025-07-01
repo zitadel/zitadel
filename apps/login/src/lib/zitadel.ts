@@ -1,4 +1,6 @@
+import { Transport } from "@connectrpc/connect";
 import { Client, create, Duration } from "@zitadel/client";
+import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import {
@@ -52,8 +54,6 @@ import {
 import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getUserAgent } from "./fingerprint";
 import { createServiceForHost } from "./service";
-import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
-import { Transport } from '@connectrpc/connect';
 
 const useCache = process.env.DEBUG !== "true";
 
@@ -1500,20 +1500,23 @@ export async function listAuthenticationMethodTypes({
   });
 }
 
-export function createServerTransport(token: string, baseUrl: string): Transport {
+export function createServerTransport(
+  token: string,
+  baseUrl: string,
+): Transport {
   return libCreateServerTransport(token, {
     baseUrl,
     interceptors: !process.env.CUSTOM_REQUEST_HEADERS
-        ? undefined
-        : [
+      ? undefined
+      : [
           (next) => {
             return (req) => {
-              process.env.CUSTOM_REQUEST_HEADERS!.split(",").forEach(
-                  (header) => {
-                    const kv = header.split(":");
-                    req.header.set(kv[0], kv[1]);
-                  },
-              );
+              process.env
+                .CUSTOM_REQUEST_HEADERS!.split(",")
+                .forEach((header) => {
+                  const kv = header.split(":");
+                  req.header.set(kv[0], kv[1]);
+                });
               return next(req);
             };
           },

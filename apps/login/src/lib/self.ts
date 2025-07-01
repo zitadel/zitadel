@@ -1,14 +1,16 @@
 "use server";
 
-import { createServerTransport } from "./zitadel";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import { headers } from "next/headers";
 import { getSessionCookieById } from "./cookies";
 import { getServiceUrlFromHeaders } from "./service-url";
-import { getSession } from "./zitadel";
+import { createServerTransport, getSession } from "./zitadel";
 
 const myUserService = async (serviceUrl: string, sessionToken: string) => {
-  const transportPromise = await createServerTransport(sessionToken, serviceUrl);
+  const transportPromise = await createServerTransport(
+    sessionToken,
+    serviceUrl,
+  );
   return createUserServiceClient(transportPromise);
 };
 

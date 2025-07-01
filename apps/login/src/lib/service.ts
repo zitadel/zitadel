@@ -1,5 +1,4 @@
 import { createClientFor } from "@zitadel/client";
-import { createServerTransport } from "./zitadel";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { OIDCService } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
@@ -8,6 +7,7 @@ import { SessionService } from "@zitadel/proto/zitadel/session/v2/session_servic
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { systemAPIToken } from "./api";
+import { createServerTransport } from "./zitadel";
 
 type ServiceClass =
   | typeof IdentityProviderService

@@ -17,7 +17,6 @@ import {
   setUserPassword,
 } from "@/lib/zitadel";
 import { ConnectError, create } from "@zitadel/client";
-import { createServerTransport } from "../zitadel";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import {
   Checks,
@@ -39,6 +38,7 @@ import {
   checkPasswordChangeRequired,
   checkUserVerification,
 } from "../verify-helper";
+import { createServerTransport } from "../zitadel";
 
 type ResetPasswordCommand = {
   loginName: string;
