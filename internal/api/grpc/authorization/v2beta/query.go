@@ -162,13 +162,24 @@ func userGrantsToPb(userGrants []*query.UserGrant) []*authorization.Authorizatio
 }
 
 func userGrantToPb(userGrant *query.UserGrant) *authorization.Authorization {
+	var grantID, grantedOrgID *string
+	if userGrant.GrantID != "" {
+		grantID = &userGrant.GrantID
+	}
+	if userGrant.GrantedOrgID != "" {
+		grantedOrgID = &userGrant.GrantedOrgID
+	}
 	return &authorization.Authorization{
-		Id:             userGrant.ID,
-		Grant:          userGrantToGrantType(userGrant),
-		OrganizationId: userGrant.ResourceOwner,
-		CreationDate:   timestamppb.New(userGrant.CreationDate),
-		ChangeDate:     timestamppb.New(userGrant.ChangeDate),
-		State:          userGrantStateToPb(userGrant.State),
+		Id:                    userGrant.ID,
+		ProjectId:             userGrant.ProjectID,
+		ProjectName:           userGrant.ProjectName,
+		ProjectOrganizationId: userGrant.ProjectResourceOwner,
+		ProjectGrantId:        grantID,
+		GrantedOrganizationId: grantedOrgID,
+		OrganizationId:        userGrant.ResourceOwner,
+		CreationDate:          timestamppb.New(userGrant.CreationDate),
+		ChangeDate:            timestamppb.New(userGrant.ChangeDate),
+		State:                 userGrantStateToPb(userGrant.State),
 		User: &authorization.User{
 			Id:                 userGrant.UserID,
 			PreferredLoginName: userGrant.PreferredLoginName,
@@ -177,26 +188,6 @@ func userGrantToPb(userGrant *query.UserGrant) *authorization.Authorization {
 			OrganizationId:     userGrant.UserResourceOwner,
 		},
 		Roles: userGrant.Roles,
-	}
-}
-
-func userGrantToGrantType(userGrant *query.UserGrant) authorization.GrantType {
-	if userGrant.GrantID != "" {
-		return &authorization.Authorization_ProjectGrant{
-			ProjectGrant: &authorization.ProjectGrant{
-				Id:             userGrant.GrantID,
-				ProjectId:      userGrant.ProjectID,
-				ProjectName:    userGrant.ProjectName,
-				OrganizationId: userGrant.GrantedOrgID,
-			},
-		}
-	}
-	return &authorization.Authorization_Project{
-		Project: &authorization.Project{
-			Id:             userGrant.ProjectID,
-			Name:           userGrant.ProjectName,
-			OrganizationId: userGrant.ProjectResourceOwner,
-		},
 	}
 }
 

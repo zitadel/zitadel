@@ -68,25 +68,25 @@ func userGrantsCheckPermission(ctx context.Context, grants *UserGrants, permissi
 }
 
 func userGrantCheckPermission(ctx context.Context, resourceOwner string, projectID, grantedOrgID, grantID, userID string, permissionCheck domain.PermissionCheck) error {
-	ctxData := authz.GetCtxData(ctx)
 	// you should always be able to read your own permissions
-	if ctxData.UserID != userID {
-		// check permission on the underlying project
-		if err := permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, projectID); err != nil {
-			// only check for project grant permissions if user grant is for a project grant
-			if grantedOrgID != "" && grantID != "" {
-				// permissions can be available on the project grant
-				if err := permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, grantID); err != nil {
-					// or the organization the project is granted to
-					if err := permissionCheck(ctx, domain.PermissionUserGrantRead, grantedOrgID, grantID); err != nil {
-						return err
-					}
-				}
-			} else { // if the user grant is for a project then return with the error
+	if authz.GetCtxData(ctx).UserID == userID {
+		return nil
+	}
+	// check permission on the underlying project
+	if err := permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, projectID); err != nil {
+		// only check for project grant permissions if user grant is for a project grant
+		if grantedOrgID == "" && grantID == "" {
+			return err
+		}
+		// permissions can be available on the project grant
+		if err := permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, grantID); err != nil {
+			// or the organization the project is granted to
+			if err := permissionCheck(ctx, domain.PermissionUserGrantRead, grantedOrgID, grantID); err != nil {
 				return err
 			}
 		}
 	}
+
 	return nil
 }
 
@@ -408,7 +408,8 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
-			LeftJoin(join(GrantedOrgColumnId, UserResourceOwnerCol)).
+			LeftJoin(join(ProjectGrantColumnGrantID, UserGrantGrantID) + " AND " + ProjectGrantColumnProjectID.identifier() + " = " + UserGrantProjectID.identifier()).
+			LeftJoin(join(GrantedOrgColumnId, ProjectGrantColumnGrantedOrgID)).
 			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
@@ -537,7 +538,8 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
-			LeftJoin(join(GrantedOrgColumnId, UserResourceOwnerCol)).
+			LeftJoin(join(ProjectGrantColumnGrantID, UserGrantGrantID) + " AND " + ProjectGrantColumnProjectID.identifier() + " = " + UserGrantProjectID.identifier()).
+			LeftJoin(join(GrantedOrgColumnId, ProjectGrantColumnGrantedOrgID)).
 			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},

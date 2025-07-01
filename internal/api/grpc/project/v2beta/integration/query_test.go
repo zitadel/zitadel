@@ -389,8 +389,8 @@ func TestServer_ListProjects(t *testing.T) {
 					resp2 := createProject(iamOwnerCtx, instance, t, orgID, true, false)
 					resp3 := createProject(iamOwnerCtx, instance, t, orgResp.GetOrganizationId(), false, true)
 					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
-						InProjectIdsFilter: &project.InProjectIDsFilter{
-							ProjectIds: []string{resp1.GetId(), resp2.GetId(), resp3.GetId(), projectResp.GetId()},
+						InProjectIdsFilter: &filter.InIDsFilter{
+							Ids: []string{resp1.GetId(), resp2.GetId(), resp3.GetId(), projectResp.GetId()},
 						},
 					}
 					response.Projects[0] = grantedProjectResp
@@ -516,7 +516,7 @@ func TestServer_ListProjects(t *testing.T) {
 					projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), projectName, true, true)
 					projectGrantResp := instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgID)
 					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
-						InProjectIdsFilter: &project.InProjectIDsFilter{ProjectIds: []string{projectResp.GetId()}},
+						InProjectIdsFilter: &filter.InIDsFilter{Ids: []string{projectResp.GetId()}},
 					}
 					response.Projects[0] = &project.Project{
 						Id:                      projectResp.GetId(),
@@ -892,7 +892,7 @@ func TestServer_ListProjects_PermissionV2(t *testing.T) {
 					// projectGrantResp :=
 					instancePermissionV2.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgID)
 					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
-						InProjectIdsFilter: &project.InProjectIDsFilter{ProjectIds: []string{projectResp.GetId()}},
+						InProjectIdsFilter: &filter.InIDsFilter{Ids: []string{projectResp.GetId()}},
 					}
 					/*
 						response.Projects[0] = &project.Project{
@@ -1227,8 +1227,8 @@ func TestServer_ListProjectGrants(t *testing.T) {
 					project2Resp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name2, false, false)
 					project3Resp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name3, false, false)
 					request.Filters[0].Filter = &project.ProjectGrantSearchFilter_InProjectIdsFilter{
-						InProjectIdsFilter: &project.InProjectIDsFilter{
-							ProjectIds: []string{project1Resp.GetId(), project2Resp.GetId(), project3Resp.GetId(), projectResp.GetId()},
+						InProjectIdsFilter: &filter.InIDsFilter{
+							Ids: []string{project1Resp.GetId(), project2Resp.GetId(), project3Resp.GetId(), projectResp.GetId()},
 						},
 					}
 

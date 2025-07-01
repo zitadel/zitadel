@@ -180,7 +180,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 					resp := createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_ProjectId{
 						ProjectId: &filter.IDFilter{
-							Id: resp.GetProject().GetId(),
+							Id: resp.GetProjectId(),
 						},
 					}
 					response.Authorizations[0] = resp
@@ -209,7 +209,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 					resp := createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_ProjectName{
 						ProjectName: &authorization.ProjectNameQuery{
-							Name:   resp.GetProject().GetName(),
+							Name:   resp.GetProjectName(),
 							Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS,
 						},
 					}
@@ -267,7 +267,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 					resp := createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), true)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_ProjectGrantId{
 						ProjectGrantId: &filter.IDFilter{
-							Id: resp.GetProjectGrant().GetId(),
+							Id: resp.GetProjectGrantId(),
 						},
 					}
 					response.Authorizations[0] = resp
@@ -461,18 +461,14 @@ func createAuthorizationForProject(ctx context.Context, instance *integration.In
 
 	userGrantResp := instance.CreateProjectUserGrant(t, ctx, projectID, userID)
 	return &authorization.Authorization{
-		Id: userGrantResp.GetUserGrantId(),
-		Grant: &authorization.Authorization_Project{
-			Project: &authorization.Project{
-				Id:             projectID,
-				Name:           projectName,
-				OrganizationId: orgID,
-			},
-		},
-		OrganizationId: orgID,
-		CreationDate:   userGrantResp.Details.GetCreationDate(),
-		ChangeDate:     userGrantResp.Details.GetCreationDate(),
-		State:          1,
+		Id:                    userGrantResp.GetUserGrantId(),
+		ProjectId:             projectID,
+		ProjectName:           projectName,
+		ProjectOrganizationId: orgID,
+		OrganizationId:        orgID,
+		CreationDate:          userGrantResp.Details.GetCreationDate(),
+		ChangeDate:            userGrantResp.Details.GetCreationDate(),
+		State:                 1,
 		User: &authorization.User{
 			Id:                 userID,
 			PreferredLoginName: userResp.User.GetPreferredLoginName(),
@@ -493,19 +489,16 @@ func createAuthorizationForProjectGrant(ctx context.Context, instance *integrati
 	userGrantResp := instance.CreateProjectGrantUserGrant(ctx, orgID, projectID, grantedOrg.GetOrganizationId(), userID)
 	require.NoError(t, err)
 	return &authorization.Authorization{
-		Id: userGrantResp.GetUserGrantId(),
-		Grant: &authorization.Authorization_ProjectGrant{
-			ProjectGrant: &authorization.ProjectGrant{
-				Id:             grantedOrg.GetOrganizationId(),
-				ProjectId:      projectID,
-				ProjectName:    projectName,
-				OrganizationId: orgID,
-			},
-		},
-		OrganizationId: orgID,
-		CreationDate:   userGrantResp.Details.GetCreationDate(),
-		ChangeDate:     userGrantResp.Details.GetCreationDate(),
-		State:          1,
+		Id:                    userGrantResp.GetUserGrantId(),
+		ProjectId:             projectID,
+		ProjectName:           projectName,
+		ProjectOrganizationId: orgID,
+		ProjectGrantId:        gu.Ptr(grantedOrg.GetOrganizationId()),
+		GrantedOrganizationId: gu.Ptr(grantedOrg.GetOrganizationId()),
+		OrganizationId:        orgID,
+		CreationDate:          userGrantResp.Details.GetCreationDate(),
+		ChangeDate:            userGrantResp.Details.GetCreationDate(),
+		State:                 1,
 		User: &authorization.User{
 			Id:                 userID,
 			PreferredLoginName: userResp.User.GetPreferredLoginName(),
@@ -717,7 +710,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 					resp := createAuthorization(iamOwnerCtx, InstancePermissionV2, t, InstancePermissionV2.DefaultOrg.GetId(), userResp.GetId(), false)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_ProjectId{
 						ProjectId: &filter.IDFilter{
-							Id: resp.GetProject().GetId(),
+							Id: resp.GetProjectId(),
 						},
 					}
 					response.Authorizations[0] = resp
@@ -746,7 +739,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 					resp := createAuthorization(iamOwnerCtx, InstancePermissionV2, t, InstancePermissionV2.DefaultOrg.GetId(), userResp.GetId(), false)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_ProjectName{
 						ProjectName: &authorization.ProjectNameQuery{
-							Name:   resp.GetProject().GetName(),
+							Name:   resp.GetProjectName(),
 							Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS,
 						},
 					}
@@ -804,7 +797,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 					resp := createAuthorization(iamOwnerCtx, InstancePermissionV2, t, InstancePermissionV2.DefaultOrg.GetId(), userResp.GetId(), true)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_ProjectGrantId{
 						ProjectGrantId: &filter.IDFilter{
-							Id: resp.GetProjectGrant().GetId(),
+							Id: resp.GetProjectGrantId(),
 						},
 					}
 					response.Authorizations[0] = resp

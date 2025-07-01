@@ -347,6 +347,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole3, projectRole3, "")
 					Instance.CreateProjectGrant(IAMCTX, t, projectId, Instance.DefaultOrg.Id, projectRole1, projectRole2)
+
 					preparedAuthorization, err := Instance.Client.AuthorizationV2Beta.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
@@ -356,11 +357,8 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
 					request.RoleKeys = []string{projectRole1}
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, Instance.DefaultOrg.Id, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
-					require.NoError(t, err)
-					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
+					return integration.WithAuthorizationToken(EmptyCTX, createUserWithProjectGrantMembership(IAMCTX, t, Instance, projectId, Instance.DefaultOrg.Id))
+
 				},
 			},
 		},
@@ -557,6 +555,7 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole3, projectRole3, "")
 					Instance.CreateProjectGrant(IAMCTX, t, projectId, Instance.DefaultOrg.Id, projectRole1, projectRole2)
+
 					preparedAuthorization, err := Instance.Client.AuthorizationV2Beta.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
@@ -565,11 +564,8 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, Instance.DefaultOrg.Id, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
-					require.NoError(t, err)
-					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
+					return integration.WithAuthorizationToken(EmptyCTX, createUserWithProjectGrantMembership(IAMCTX, t, Instance, projectId, Instance.DefaultOrg.Id))
+
 				},
 			},
 		},
@@ -728,6 +724,7 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole3, projectRole3, "")
 					Instance.CreateProjectGrant(IAMCTX, t, projectId, Instance.DefaultOrg.Id, projectRole1, projectRole2)
+
 					preparedAuthorization, err := Instance.Client.AuthorizationV2Beta.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
@@ -736,11 +733,7 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, Instance.DefaultOrg.Id, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
-					require.NoError(t, err)
-					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
+					return integration.WithAuthorizationToken(EmptyCTX, createUserWithProjectGrantMembership(IAMCTX, t, Instance, projectId, Instance.DefaultOrg.Id))
 				},
 			},
 		},
@@ -919,15 +912,11 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, Instance.DefaultOrg.Id, callingUser.UserId)
 					_, err = Instance.Client.AuthorizationV2Beta.DeactivateAuthorization(IAMCTX, &authorization.DeactivateAuthorizationRequest{
 						Id: preparedAuthorization.Id,
 					})
 					require.NoError(t, err)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
-					require.NoError(t, err)
-					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
+					return integration.WithAuthorizationToken(EmptyCTX, createUserWithProjectGrantMembership(IAMCTX, t, Instance, projectId, Instance.DefaultOrg.Id))
 				},
 			},
 		},
@@ -979,4 +968,22 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 			}
 		})
 	}
+}
+
+func createUserWithProjectGrantMembership(ctx context.Context, t *testing.T, instance *integration.Instance, projectID, grantID string) string {
+	callingUser := instance.CreateMachineUser(ctx)
+	instance.CreateProjectGrantMembership(t, ctx, projectID, grantID, callingUser.UserId)
+	token, err := instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+	require.NoError(t, err)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, 10*time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		got, err := instance.Client.AuthorizationV2Beta.ListAuthorizations(ctx, &authorization.ListAuthorizationsRequest{
+			Filters: nil,
+		})
+		assert.NoError(tt, err)
+		if !assert.NotEmpty(tt, got.Pagination.TotalResult) {
+			return
+		}
+	}, retryDuration, tick)
+	return token.GetToken()
 }

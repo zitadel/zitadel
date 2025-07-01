@@ -17,57 +17,42 @@ message Authorization {
       example: "\"69629012906488334\"";
     }
   ];
-  // Grant contains the project or project grant the user was granted the authorization for.
-  oneof grant {
-    // Project represents the project the user was granted the authorization for.
-    Project project = 2;
-    // ProjectGrant represents the project grant the user was granted the authorization for.
-    ProjectGrant project_grant = 3;
-  }
+
+  // ID is the unique identifier of the project the user was granted the authorization for.
+  string project_id = 2;
+  // Name is the name of the project the user was granted the authorization for.
+  string project_name = 3;
+  // OrganizationID is the ID of the organization the project belongs to.
+  string project_organization_id = 4;
+  // ID of the granted project, only provided if it is a granted project.
+  optional string project_grant_id = 5;
+  // ID of the organization the project is granted to, only provided if it is a granted project.
+  optional string granted_organization_id = 6;
+
   // The unique identifier of the organization the authorization belongs to.
-  string organization_id = 4 [
+  string organization_id = 7 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629012906488334\"";
     }
   ];
   // CreationDate is the timestamp when the authorization was created.
-  google.protobuf.Timestamp creation_date = 5 [
+  google.protobuf.Timestamp creation_date = 8 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
   // ChangeDate is the timestamp when the authorization was last updated.
   // In case the authorization was not updated, this field is equal to the creation date.
-  google.protobuf.Timestamp change_date = 6 [
+  google.protobuf.Timestamp change_date = 9 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
   ];
   // State is the current state of the authorization.
-  State state = 7;
-  User user = 8;
+  State state = 10;
+  User user = 11;
   // Roles contains the roles the user was granted for the project.
-  repeated string roles = 9;
-}
-
-message Project {
-  // ID is the unique identifier of the project the user was granted the authorization for.
-  string id = 1;
-  // Name is the name of the project the user was granted the authorization for.
-  string name = 2;
-  // OrganizationID is the ID of the organization the project belongs to.
-  string organization_id = 3;
-}
-
-message ProjectGrant {
-  // ID is the unique identifier of the project grant the user was granted the authorization for.
-  string id = 1;
-  // ProjectID is the ID of the project the project grant belongs to.
-  string project_id = 2;
-  // ProjectName is the name of the project the project grant belongs to.
-  string project_name = 3;
-  // OrganizationID is the ID of the organization the project grant belongs to.
-  string organization_id = 4;
+  repeated string roles = 12;
 }
 
 enum State {
