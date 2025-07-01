@@ -428,9 +428,7 @@ export async function checkSessionAndSetPassword({
     });
   } else {
     const transport = async (serviceUrl: string, token: string) => {
-      return createServerTransport(token, {
-        baseUrl: serviceUrl,
-      });
+      return createServerTransport(token, serviceUrl);
     };
 
     const myUserService = async (serviceUrl: string, sessionToken: string) => {

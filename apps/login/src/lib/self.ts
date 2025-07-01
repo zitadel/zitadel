@@ -7,14 +7,8 @@ import { getSessionCookieById } from "./cookies";
 import { getServiceUrlFromHeaders } from "./service-url";
 import { getSession } from "./zitadel";
 
-const transport = async (serviceUrl: string, token: string) => {
-  return createServerTransport(token, {
-    baseUrl: serviceUrl,
-  });
-};
-
 const myUserService = async (serviceUrl: string, sessionToken: string) => {
-  const transportPromise = await transport(serviceUrl, sessionToken);
+  const transportPromise = await createServerTransport(sessionToken, serviceUrl);
   return createUserServiceClient(transportPromise);
 };
 
