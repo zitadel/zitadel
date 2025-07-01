@@ -93,6 +93,12 @@ jobs:
         uses: docker/setup-buildx-action@v3
         if: ${{ matrix.command == 'test:acceptance' }}
 
+      - name: Build acceptance setup image
+        run: |
+          cd acceptance
+          docker build -t acceptance-setup:latest .
+        if: ${{ matrix.command == 'test:acceptance' }}
+
       - name: Run ZITADEL
         run: ZITADEL_DEV_UID=root pnpm run-sink
         if: ${{ matrix.command == 'test:acceptance' }}

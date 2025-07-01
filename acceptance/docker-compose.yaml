@@ -41,7 +41,7 @@ services:
   setup:
     user: "${ZITADEL_DEV_UID}"
     container_name: setup
-    build: .
+    image: acceptance-setup:latest
     environment:
       PAT_FILE: /pat/zitadel-admin-sa.pat
       ZITADEL_API_INTERNAL_URL: http://zitadel:8080
