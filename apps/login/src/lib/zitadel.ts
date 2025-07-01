@@ -52,6 +52,8 @@ import {
 import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getUserAgent } from "./fingerprint";
 import { createServiceForHost } from "./service";
+import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
+import { Transport } from '@connectrpc/connect';
 
 const useCache = process.env.DEBUG !== "true";
 
@@ -1495,5 +1497,26 @@ export async function listAuthenticationMethodTypes({
 
   return userService.listAuthenticationMethodTypes({
     userId,
+  });
+}
+
+export function createServerTransport(token: string, baseUrl: string): Transport {
+  return libCreateServerTransport(token, {
+    baseUrl,
+    interceptors: !process.env.CUSTOM_REQUEST_HEADERS
+        ? undefined
+        : [
+          (next) => {
+            return (req) => {
+              process.env.CUSTOM_REQUEST_HEADERS!.split(",").forEach(
+                  (header) => {
+                    const kv = header.split(":");
+                    req.header.set(kv[0], kv[1]);
+                  },
+              );
+              return next(req);
+            };
+          },
+        ],
   });
 }

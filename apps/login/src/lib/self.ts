@@ -1,6 +1,6 @@
 "use server";
 
-import { createServerTransport } from "@zitadel/client/node";
+import { createServerTransport } from "./zitadel";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import { headers } from "next/headers";
 import { getSessionCookieById } from "./cookies";

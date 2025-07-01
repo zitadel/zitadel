@@ -1,5 +1,5 @@
 import { createClientFor } from "@zitadel/client";
-import { createServerTransport } from "@zitadel/client/node";
+import { createServerTransport } from "./zitadel";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { OIDCService } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
@@ -50,7 +50,7 @@ export async function createServiceForHost<T extends ServiceClass>(
       : [
           (next) => {
             return (req) => {
-              process.env.CUSTOM_REQUEST_HEADERS.split(",").forEach(
+              process.env.CUSTOM_REQUEST_HEADERS!.split(",").forEach(
                 (header) => {
                   const kv = header.split(":");
                   req.header.set(kv[0], kv[1]);
