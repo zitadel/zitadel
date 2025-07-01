@@ -4,3 +4,8 @@ packages/zitadel-proto/google
 packages/zitadel-proto/zitadel
 packages/zitadel-proto/protoc-gen-openapiv2
 packages/zitadel-proto/validate
+
+**/*.md
+**/*.png
+**/node_modules
+**/.turbo
