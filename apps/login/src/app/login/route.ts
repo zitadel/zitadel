@@ -24,6 +24,7 @@ import {
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_CSP } from "../../../constants/csp";
@@ -191,6 +192,19 @@ export async function GET(request: NextRequest) {
           const origin = request.nextUrl.origin;
 
           const identityProviderType = identityProviders[0].type;
+
+          if (identityProviderType === IdentityProviderType.LDAP) {
+            const ldapUrl = constructUrl(request, "/ldap");
+            if (authRequest.id) {
+              ldapUrl.searchParams.set("requestId", `oidc_${authRequest.id}`);
+            }
+            if (organization) {
+              ldapUrl.searchParams.set("organization", organization);
+            }
+
+            return NextResponse.redirect(ldapUrl);
+          }
+
           let provider = idpTypeToSlug(identityProviderType);
 
           const params = new URLSearchParams();
