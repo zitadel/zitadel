@@ -23,7 +23,10 @@ import {
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
-import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
+import type {
+  FormData,
+  RedirectURLsJson,
+} from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   NotificationType,
   SendPasswordResetLinkSchema,
@@ -88,7 +91,6 @@ export async function getHostedLoginTranslation({
       {},
     )
     .then((resp) => {
-      console.log(resp);
       return resp.translations ? resp.translations : undefined;
     });
 
@@ -964,19 +966,38 @@ export async function startIdentityProviderFlow({
   serviceUrl: string;
   idpId: string;
   urls: RedirectURLsJson;
-}) {
+}): Promise<string | null> {
   const userService: Client<typeof UserService> = await createServiceForHost(
     UserService,
     serviceUrl,
   );
 
-  return userService.startIdentityProviderIntent({
-    idpId,
-    content: {
-      case: "urls",
-      value: urls,
-    },
-  });
+  return userService
+    .startIdentityProviderIntent({
+      idpId,
+      content: {
+        case: "urls",
+        value: urls,
+      },
+    })
+    .then((resp) => {
+      if (resp.nextStep.case === "authUrl" && resp.nextStep.value) {
+        return resp.nextStep.value;
+      } else if (resp.nextStep.case === "formData" && resp.nextStep.value) {
+        const formData: FormData = resp.nextStep.value;
+        const redirectUrl = "/saml-post";
+
+        const params = new URLSearchParams({ url: formData.url });
+
+        Object.entries(formData.fields).forEach(([k, v]) => {
+          params.append(k, v);
+        });
+
+        return `${redirectUrl}?${params.toString()}`;
+      } else {
+        return null;
+      }
+    });
 }
 
 export async function startLDAPIdentityProviderFlow({
