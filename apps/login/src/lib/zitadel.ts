@@ -1,4 +1,5 @@
 import { Client, create, Duration } from "@zitadel/client";
+import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import {
@@ -1495,5 +1496,30 @@ export async function listAuthenticationMethodTypes({
 
   return userService.listAuthenticationMethodTypes({
     userId,
+  });
+}
+
+export function createServerTransport(token: string, baseUrl: string) {
+  return libCreateServerTransport(token, {
+    baseUrl,
+    interceptors: !process.env.CUSTOM_REQUEST_HEADERS
+      ? undefined
+      : [
+          (next) => {
+            return (req) => {
+              process.env
+                .CUSTOM_REQUEST_HEADERS!.split(",")
+                .forEach((header) => {
+                  const kv = header.split(":");
+                  if (kv.length === 2) {
+                    req.header.set(kv[0].trim(), kv[1].trim());
+                  } else {
+                    console.warn(`Skipping malformed header: ${header}`);
+                  }
+                });
+              return next(req);
+            };
+          },
+        ],
   });
 }
