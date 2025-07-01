@@ -1,4 +1,3 @@
-import { Transport } from "@connectrpc/connect";
 import { Client, create, Duration } from "@zitadel/client";
 import { createServerTransport as libCreateServerTransport } from "@zitadel/client/node";
 import { makeReqCtx } from "@zitadel/client/v2";
@@ -1503,7 +1502,7 @@ export async function listAuthenticationMethodTypes({
 export function createServerTransport(
   token: string,
   baseUrl: string,
-): Transport {
+) {
   return libCreateServerTransport(token, {
     baseUrl,
     interceptors: !process.env.CUSTOM_REQUEST_HEADERS
