@@ -93,9 +93,9 @@ services:
       - ZITADEL_API_URL=http://zitadel:8080
       - CUSTOM_REQUEST_HEADERS=Host:127.0.0.1.sslip.io
       - NEXT_PUBLIC_BASE_PATH="/ui/v2/login"
-      - ZITADEL_SERVICE_USER_TOKEN_FILE=/run/secrets/pat
+      - ZITADEL_SERVICE_USER_TOKEN_FILE=/run/secrets/login-client-pat
     secrets:
-      - pat
+      - login-client-pat
     depends_on:
       zitadel:
         condition: 'service_healthy'
@@ -118,8 +118,8 @@ services:
         condition: 'service_started'
 
 secrets:
-    pat:
-      file: './pat'
+    login-client-pat:
+      file: './login-client-pat'
 
 
 networks:

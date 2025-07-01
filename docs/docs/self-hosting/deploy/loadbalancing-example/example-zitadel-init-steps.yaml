@@ -1,12 +1,13 @@
 # All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml
 FirstInstance:
   PatPath: '/pat-dir/pat'
+  LoginClientPatPath: '/pat-dir/login-client-pat'
   Org:
     # We want to authenticate immediately at the console without changing the password
     Human:
       PasswordChangeRequired: false
-    Machine:
+    LoginClient:
       Machine:
-        Username: 'login-container'
-        Name: 'Login Container'
+        Username: 'login-client'
+        Name: 'Login Client'
       Pat.ExpirationDate: '2029-01-01T00:00:00Z'

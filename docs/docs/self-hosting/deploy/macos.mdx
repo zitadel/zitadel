@@ -26,13 +26,14 @@ sudo pg_ctl start -D /tmp/postgresql
 
 ```bash
 brew install zitadel/tap/zitadel
+brew install node
 ```
 
 ### Download from GitHub
 
 Download the ZITADEL release according to your architecture from [Github](https://github.com/zitadel/zitadel/releases/latest)
 
-## Unpack the archive
+#### Unpack the archive
 move to your download location and unpack the archive
 
 ```bash
@@ -40,10 +41,26 @@ move to your download location and unpack the archive
 LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep location: | cut -d '/' -f 8 | tr -d '\r'); wget -qO-  https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel_Darwin_$(uname -m).tar.gz  | tar -xJ zitadel && sudo mv zitadel /usr/local/bin
 ```
 
-## Run ZITADEL
+#### Run ZITADEL
 
 ```bash
-ZITADEL_DATABASE_POSTGRES_HOST=localhost ZITADEL_DATABASE_POSTGRES_PORT=5432 ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=$(whoami) ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+export ZITADEL_LOGIN_CLIENT_PAT_PATH=$(pwd)/login-client-pat
+ZITADEL_DATABASE_POSTGRES_HOST=localhost ZITADEL_DATABASE_POSTGRES_PORT=5432 ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=$(whoami) ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable ZITADEL_EXTERNALSECURE=false ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH=$(echo $ZITADEL_LOGIN_CLIENT_PAT_PATH) ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME=zitadel-login-client ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME=zitadel-login-client ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE=2099-01-01T00:00:00Z zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+```
+
+#### Unpack the login archive
+
+```bash
+mkdir zitadel-login
+#unpack and copy to /usr/local/bin
+LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep location: | cut -d '/' -f 8 | tr -d '\r'); wget -qO-  https://github.com/zitadel/zitadel/releases/download/$LATEST/login.tar.gz  |  tar -xzv -C zitadel-login
+
+```
+
+#### Run ZITADEL Login
+
+```bash
+ZITADEL_API_URL=http://localhost:8080 ZITADEL_SERVICE_USER_TOKEN=$(cat $ZITADEL_LOGIN_CLIENT_PAT_PATH) node apps/login/server.js
 ```
 
 <DefaultUser components={props.components} />
