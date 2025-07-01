@@ -36,7 +36,6 @@ func TestCreateApplicationKey(t *testing.T) {
 			creationRequest: &app.CreateApplicationKeyRequest{
 				ProjectId:      p.GetId(),
 				AppId:          gofakeit.UUID(),
-				Type:           app.ApplicationKeyType_APPLICATION_KEY_TYPE_JSON,
 				ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
 			},
 			expectedErrorType: codes.FailedPrecondition,
@@ -47,7 +46,6 @@ func TestCreateApplicationKey(t *testing.T) {
 			creationRequest: &app.CreateApplicationKeyRequest{
 				ProjectId:      p.GetId(),
 				AppId:          createdApp.GetAppId(),
-				Type:           app.ApplicationKeyType_APPLICATION_KEY_TYPE_JSON,
 				ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
 			},
 		},
@@ -59,7 +57,6 @@ func TestCreateApplicationKey(t *testing.T) {
 			creationRequest: &app.CreateApplicationKeyRequest{
 				ProjectId:      p.GetId(),
 				AppId:          createdApp.GetAppId(),
-				Type:           app.ApplicationKeyType_APPLICATION_KEY_TYPE_JSON,
 				ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
 			},
 			expectedErrorType: codes.PermissionDenied,
@@ -72,7 +69,6 @@ func TestCreateApplicationKey(t *testing.T) {
 			creationRequest: &app.CreateApplicationKeyRequest{
 				ProjectId:      p.GetId(),
 				AppId:          createdApp.GetAppId(),
-				Type:           app.ApplicationKeyType_APPLICATION_KEY_TYPE_JSON,
 				ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
 			},
 		},
@@ -84,7 +80,6 @@ func TestCreateApplicationKey(t *testing.T) {
 			creationRequest: &app.CreateApplicationKeyRequest{
 				ProjectId:      p.GetId(),
 				AppId:          createdApp.GetAppId(),
-				Type:           app.ApplicationKeyType_APPLICATION_KEY_TYPE_JSON,
 				ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
 			},
 		},

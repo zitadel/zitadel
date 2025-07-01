@@ -172,19 +172,8 @@ func CreateAPIClientKeyRequestToDomain(key *app.CreateApplicationKeyRequest) *do
 			AggregateID: strings.TrimSpace(key.GetProjectId()),
 		},
 		ExpirationDate: key.GetExpirationDate().AsTime(),
-		Type:           applicationKeyTypeToDomain(key.GetType()),
+		Type:           domain.AuthNKeyTypeJSON,
 		ApplicationID:  strings.TrimSpace(key.GetAppId()),
-	}
-}
-
-func applicationKeyTypeToDomain(t app.ApplicationKeyType) domain.AuthNKeyType {
-	switch t {
-	case app.ApplicationKeyType_APPLICATION_KEY_TYPE_JSON:
-		return domain.AuthNKeyTypeJSON
-	case app.ApplicationKeyType_APPLICATION_KEY_TYPE_UNSPECIFIED:
-		fallthrough
-	default:
-		return domain.AuthNKeyTypeNONE
 	}
 }
 
@@ -233,16 +222,18 @@ func ListApplicationKeysRequestToDomain(sysDefaults systemdefaults.SystemDefault
 
 func appKeysSortingToColumn(sortingCriteria app.ApplicationKeysSorting) query.Column {
 	switch sortingCriteria {
-	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_AGGREGATE_ID:
+	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_PROJECT_ID:
 		return query.AuthNKeyColumnAggregateID
 	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_CREATION_DATE:
 		return query.AuthNKeyColumnCreationDate
 	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_EXPIRATION:
 		return query.AuthNKeyColumnExpiration
-	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_RESOURCE_OWNER:
+	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_ORGANIZATION_ID:
 		return query.AuthNKeyColumnResourceOwner
 	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_TYPE:
 		return query.AuthNKeyColumnType
+	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_APPLICATION_ID:
+		return query.AuthNKeyColumnObjectID
 	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_ID:
 		fallthrough
 	default:
@@ -260,7 +251,6 @@ func ApplicationKeysToPb(keys []*query.AuthNKey) []*app.ApplicationKey {
 			CreationDate:   timestamppb.New(k.CreationDate),
 			OrganizationId: k.ResourceOwner,
 			ExpirationDate: timestamppb.New(k.Expiration),
-			KeyType:        app.ApplicationKeyType(k.Type),
 		}
 		pbAppKeys[i] = pbKey
 	}

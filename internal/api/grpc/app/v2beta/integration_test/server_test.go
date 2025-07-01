@@ -209,7 +209,6 @@ func createAppKey(t *testing.T, ctx context.Context, inst *integration.Instance,
 	res, err := inst.Client.AppV2Beta.CreateApplicationKey(ctx,
 		&app.CreateApplicationKeyRequest{
 			AppId:          appID,
-			Type:           app.ApplicationKeyType_APPLICATION_KEY_TYPE_JSON,
 			ProjectId:      projectID,
 			ExpirationDate: timestamppb.New(expirationDate.UTC()),
 		},

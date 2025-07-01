@@ -11,11 +11,6 @@ enum APIAuthMethodType {
     API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT = 1;
 }
 
-enum ApplicationKeyType {
-  APPLICATION_KEY_TYPE_UNSPECIFIED = 0;
-  APPLICATION_KEY_TYPE_JSON = 1;
-}
-
 message APIConfig {
     string client_id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

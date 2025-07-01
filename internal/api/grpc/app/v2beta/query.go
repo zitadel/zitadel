@@ -53,7 +53,6 @@ func (s *Server) GetApplicationKey(ctx context.Context, req *app.GetApplicationK
 
 	return &app.GetApplicationKeyResponse{
 		Id:             key.ID,
-		Type:           app.ApplicationKeyType(key.Type),
 		CreationDate:   timestamppb.New(key.CreationDate),
 		ExpirationDate: timestamppb.New(key.Expiration),
 	}, nil

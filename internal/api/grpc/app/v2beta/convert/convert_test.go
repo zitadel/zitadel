@@ -691,7 +691,6 @@ func TestApplicationKeysToPb(t *testing.T) {
 					CreationDate:   timestamppb.New(now),
 					OrganizationId: "org1",
 					ExpirationDate: timestamppb.New(now.Add(24 * time.Hour)),
-					KeyType:        app.ApplicationKeyType_APPLICATION_KEY_TYPE_JSON,
 				},
 				{
 					Id:             "key2",
@@ -699,7 +698,6 @@ func TestApplicationKeysToPb(t *testing.T) {
 					CreationDate:   timestamppb.New(now.Add(-time.Hour)),
 					OrganizationId: "org2",
 					ExpirationDate: timestamppb.New(now.Add(48 * time.Hour)),
-					KeyType:        app.ApplicationKeyType_APPLICATION_KEY_TYPE_UNSPECIFIED,
 				},
 			},
 		},
