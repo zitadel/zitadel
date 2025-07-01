@@ -18,7 +18,8 @@ The following files and directories, including their subdirectories, are license
 proto/
 ```
 
-The following files are licensed under the [MIT License](https://opensource.org/license/mit/):
+
+The following files and directories, including their subdirectories, are licensed under the [MIT License](https://opensource.org/license/mit/):
 
 ```
 login/
