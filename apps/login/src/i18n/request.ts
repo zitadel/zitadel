@@ -16,7 +16,7 @@ export default getRequestConfig(async () => {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const i18nOrganization = _headers.get("x-zitadel-i18n-organization") || ""; // You may need to set this header in middleware
-  console.log("i18nOrganization:", i18nOrganization);
+
   let translations: JsonObject | {} = {};
   try {
     const i18nJSON = await getHostedLoginTranslation({

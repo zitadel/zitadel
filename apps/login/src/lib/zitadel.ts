@@ -91,7 +91,6 @@ export async function getHostedLoginTranslation({
       {},
     )
     .then((resp) => {
-      console.log(resp);
       return resp.translations ? resp.translations : undefined;
     });
 
