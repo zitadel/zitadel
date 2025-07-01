@@ -102,7 +102,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-      const resp = await startIdentityProviderFlow({
+      const url = await startIdentityProviderFlow({
         serviceUrl,
         idpId: identityProviders[0].id,
         urls: {
@@ -115,9 +115,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         },
       });
 
-      if (resp?.nextStep.case === "authUrl") {
-        return { redirect: resp.nextStep.value };
+      if (!url) {
+        return { error: "Could not start IDP flow" };
       }
+
+      return { redirect: url };
     }
   };
 
@@ -166,7 +168,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-      const resp = await startIdentityProviderFlow({
+      const url = await startIdentityProviderFlow({
         serviceUrl,
         idpId: idp.id,
         urls: {
@@ -179,9 +181,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         },
       });
 
-      if (resp?.nextStep.case === "authUrl") {
-        return { redirect: resp.nextStep.value };
+      if (!url) {
+        return { error: "Could not start IDP flow" };
       }
+
+      return { redirect: url };
     }
   };
 

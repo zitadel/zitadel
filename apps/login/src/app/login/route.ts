@@ -217,7 +217,7 @@ export async function GET(request: NextRequest) {
             params.set("organization", organization);
           }
 
-          return startIdentityProviderFlow({
+          let url: string | null = await startIdentityProviderFlow({
             serviceUrl,
             idpId,
             urls: {
@@ -228,14 +228,21 @@ export async function GET(request: NextRequest) {
                 `${origin}/idp/${provider}/failure?` +
                 new URLSearchParams(params),
             },
-          }).then((resp) => {
-            if (
-              resp.nextStep.value &&
-              typeof resp.nextStep.value === "string"
-            ) {
-              return NextResponse.redirect(resp.nextStep.value);
-            }
           });
+
+          if (!url) {
+            return NextResponse.json(
+              { error: "Could not start IDP flow" },
+              { status: 500 },
+            );
+          }
+
+          if (url.startsWith("/")) {
+            // if the url is a relative path, construct the absolute url
+            url = constructUrl(request, url).toString();
+          }
+
+          return NextResponse.redirect(url);
         }
       }
     }

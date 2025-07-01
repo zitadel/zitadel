@@ -74,22 +74,20 @@ export type StartIDPFlowCommand = {
 async function startIDPFlow(command: StartIDPFlowCommand) {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-  return startIdentityProviderFlow({
+  const url = await startIdentityProviderFlow({
     serviceUrl: command.serviceUrl,
     idpId: command.idpId,
     urls: {
       successUrl: `${command.host.includes("localhost") ? "http://" : "https://"}${command.host}${basePath}${command.successUrl}`,
       failureUrl: `${command.host.includes("localhost") ? "http://" : "https://"}${command.host}${basePath}${command.failureUrl}`,
     },
-  }).then((response) => {
-    if (
-      response &&
-      response.nextStep.case === "authUrl" &&
-      response?.nextStep.value
-    ) {
-      return { redirect: response.nextStep.value };
-    }
   });
+
+  if (!url) {
+    return { error: "Could not start IDP flow" };
+  }
+
+  return { redirect: url };
 }
 
 type CreateNewSessionCommand = {
