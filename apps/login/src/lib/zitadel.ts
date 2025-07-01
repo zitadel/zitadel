@@ -1499,10 +1499,7 @@ export async function listAuthenticationMethodTypes({
   });
 }
 
-export function createServerTransport(
-  token: string,
-  baseUrl: string,
-) {
+export function createServerTransport(token: string, baseUrl: string) {
   return libCreateServerTransport(token, {
     baseUrl,
     interceptors: !process.env.CUSTOM_REQUEST_HEADERS
