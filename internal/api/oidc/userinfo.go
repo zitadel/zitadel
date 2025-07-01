@@ -33,12 +33,6 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 		err = oidcError(err)
 		span.EndWithError(err)
 	}()
-
-	features := authz.GetFeatures(ctx)
-	if features.TriggerIntrospectionProjections {
-		query.TriggerOIDCUserInfoProjections(ctx)
-	}
-
 	token, err := s.verifyAccessToken(ctx, r.Data.AccessToken)
 	if err != nil {
 		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("access token invalid").WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError), http.StatusUnauthorized)

@@ -1626,8 +1626,6 @@
       "LOGINDEFAULTORG_DESCRIPTION": "L'interfaccia di accesso utilizzerà le impostazioni dell'organizzazione predefinita (e non dell'istanza) se non è impostato alcun contesto organizzativo.",
       "OIDCTOKENEXCHANGE": "Scambio token OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Abilita il tipo di concessione sperimentale urn:ietf:params:oauth:grant-type:token-exchange per il punto finale del token OIDC. Lo scambio di token può essere utilizzato per richiedere token con uno scopo inferiore o impersonare altri utenti. Consultare la policy di sicurezza per consentire l'impersonificazione su un'istanza.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Proiezioni trigger OIDC per l'introspezione",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Abilita i trigger di proiezione durante una richiesta di introspezione. Questo può agire come soluzione alternativa se ci sono problemi di coerenza evidenti nella risposta all'introspezione, ma può influire sulle prestazioni. Stiamo pianificando di rimuovere i trigger per le richieste di introspezione in futuro.",
       "USERSCHEMA": "Schema utente",
       "USERSCHEMA_DESCRIPTION": "Gli schemi utente consentono di gestire gli schemi di dati degli utenti. Se la flag è attivata, sarà possibile utilizzare la nuova API e le sue funzionalità.",
       "ACTIONS": "Azioni",

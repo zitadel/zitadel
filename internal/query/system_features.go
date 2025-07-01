@@ -20,16 +20,15 @@ func (f *FeatureSource[T]) set(level feature.Level, value any) {
 type SystemFeatures struct {
 	Details *domain.ObjectDetails
 
-	LoginDefaultOrg                 FeatureSource[bool]
-	TriggerIntrospectionProjections FeatureSource[bool]
-	UserSchema                      FeatureSource[bool]
-	TokenExchange                   FeatureSource[bool]
-	ImprovedPerformance             FeatureSource[[]feature.ImprovedPerformanceType]
-	OIDCSingleV1SessionTermination  FeatureSource[bool]
-	DisableUserTokenEvent           FeatureSource[bool]
-	EnableBackChannelLogout         FeatureSource[bool]
-	LoginV2                         FeatureSource[*feature.LoginV2]
-	PermissionCheckV2               FeatureSource[bool]
+	LoginDefaultOrg                FeatureSource[bool]
+	UserSchema                     FeatureSource[bool]
+	TokenExchange                  FeatureSource[bool]
+	ImprovedPerformance            FeatureSource[[]feature.ImprovedPerformanceType]
+	OIDCSingleV1SessionTermination FeatureSource[bool]
+	DisableUserTokenEvent          FeatureSource[bool]
+	EnableBackChannelLogout        FeatureSource[bool]
+	LoginV2                        FeatureSource[*feature.LoginV2]
+	PermissionCheckV2              FeatureSource[bool]
 }
 
 func (q *Queries) GetSystemFeatures(ctx context.Context) (_ *SystemFeatures, err error) {

@@ -51,10 +51,6 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
-						feature_v2.SystemTriggerIntrospectionProjectionsEventType, true,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, false,
 					)),
 				),
@@ -66,10 +62,6 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 				LoginDefaultOrg: FeatureSource[bool]{
 					Level: feature.LevelSystem,
 					Value: false,
-				},
-				TriggerIntrospectionProjections: FeatureSource[bool]{
-					Level: feature.LevelSystem,
-					Value: true,
 				},
 				UserSchema: FeatureSource[bool]{
 					Level: feature.LevelSystem,
@@ -87,19 +79,11 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
-						feature_v2.SystemTriggerIntrospectionProjectionsEventType, true,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemResetEventType,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						context.Background(), aggregate,
-						feature_v2.SystemTriggerIntrospectionProjectionsEventType, true,
 					)),
 				),
 			),
@@ -110,10 +94,6 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 				LoginDefaultOrg: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
 					Value: false,
-				},
-				TriggerIntrospectionProjections: FeatureSource[bool]{
-					Level: feature.LevelSystem,
-					Value: true,
 				},
 				UserSchema: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
@@ -131,19 +111,11 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
-						feature_v2.SystemTriggerIntrospectionProjectionsEventType, true,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemResetEventType,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						context.Background(), aggregate,
-						feature_v2.SystemTriggerIntrospectionProjectionsEventType, true,
 					)),
 				),
 			),
@@ -154,10 +126,6 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 				LoginDefaultOrg: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
 					Value: false,
-				},
-				TriggerIntrospectionProjections: FeatureSource[bool]{
-					Level: feature.LevelSystem,
-					Value: true,
 				},
 				UserSchema: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,

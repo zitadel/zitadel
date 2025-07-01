@@ -10,21 +10,19 @@ import (
 )
 
 type SystemFeatures struct {
-	LoginDefaultOrg                 *bool
-	TriggerIntrospectionProjections *bool
-	TokenExchange                   *bool
-	UserSchema                      *bool
-	ImprovedPerformance             []feature.ImprovedPerformanceType
-	OIDCSingleV1SessionTermination  *bool
-	DisableUserTokenEvent           *bool
-	EnableBackChannelLogout         *bool
-	LoginV2                         *feature.LoginV2
-	PermissionCheckV2               *bool
+	LoginDefaultOrg                *bool
+	TokenExchange                  *bool
+	UserSchema                     *bool
+	ImprovedPerformance            []feature.ImprovedPerformanceType
+	OIDCSingleV1SessionTermination *bool
+	DisableUserTokenEvent          *bool
+	EnableBackChannelLogout        *bool
+	LoginV2                        *feature.LoginV2
+	PermissionCheckV2              *bool
 }
 
 func (m *SystemFeatures) isEmpty() bool {
 	return m.LoginDefaultOrg == nil &&
-		m.TriggerIntrospectionProjections == nil &&
 		m.UserSchema == nil &&
 		m.TokenExchange == nil &&
 		// nil check to allow unset improvements

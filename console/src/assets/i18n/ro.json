@@ -1624,8 +1624,6 @@
       "LOGINDEFAULTORG_DESCRIPTION": "UI-ul de conectare va utiliza setările organizației implicite (și nu din instanță) dacă nu este setat niciun context de organizație",
       "OIDCTOKENEXCHANGE": "Schimb de token OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Activați tipul de grant experimental urn:ietf:params:oauth:grant-type:token-exchange pentru endpointul token OIDC. Schimbul de tokenuri poate fi utilizat pentru a solicita tokenuri cu o rază de acțiune mai mică sau pentru a impersona alți utilizatori. Consultați politica de securitate pentru a permite impersonarea pe o instanță.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Proiecții de introspecție OIDC Trigger",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Activați declanșatoarele de proiecție în timpul unei solicitări de introspecție. Acest lucru poate acționa ca o soluție dacă există probleme notabile de consistență în răspunsul de introspecție, dar poate avea un impact asupra performanței. Planificăm să eliminăm declanșatoarele pentru solicitările de introspecție în viitor.",
       "USERSCHEMA": "Schema de utilizator",
       "USERSCHEMA_DESCRIPTION": "Schemele de utilizator permit gestionarea schemelor de date ale utilizatorului. Dacă indicatorul este activat, veți putea utiliza noul API și caracteristicile sale.",
       "ACTIONS": "Acțiuni",

@@ -1624,8 +1624,6 @@
       "LOGINDEFAULTORG_DESCRIPTION": "A bejelentkezési felület az alapértelmezett org beállításait fogja használni (és nem az instance-tól), ha nincs megadva szervezeti kontextus",
       "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Engedélyezd a kísérleti urn:ietf:params:oauth:grant-type:token-exchange támogatását az OIDC token végpont számára. A token csere használható kisebb hatókörű tokenek kérésére vagy más felhasználók megszemélyesítésére. Tekintsd meg a biztonsági irányelvet az impersonáció engedélyezéséhez egy példányon.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Introspekciós Projekciók Indítása",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Engedélyezd a projekciós indítókat az introspekciós kérés során. Ez lehet egy megoldás, ha észrevehető konzisztenciaproblémák vannak az introspekciós válaszban, de hatással lehet a teljesítményre. Tervezzük, hogy a jövőben eltávolítjuk a triggereket az introspekciós kérésből.",
       "USERSCHEMA": "Felhasználói Séma",
       "USERSCHEMA_DESCRIPTION": "A Felhasználói Sémák lehetővé teszik a felhasználói adat sémák kezelését. Ha az opció engedélyezve van, használhatod az új API-t és annak funkcióit.",
       "ACTIONS": "Műveletek",

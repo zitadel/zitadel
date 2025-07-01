@@ -31,12 +31,6 @@ var oidcUserInfoTriggerHandlers = sync.OnceValue(func() []*handler.Handler {
 	}
 })
 
-// TriggerOIDCUserInfoProjections triggers all projections
-// relevant to userinfo queries concurrently.
-func TriggerOIDCUserInfoProjections(ctx context.Context) {
-	triggerBatch(ctx, oidcUserInfoTriggerHandlers()...)
-}
-
 var (
 	//go:embed userinfo_by_id.sql
 	oidcUserInfoQueryTmpl           string
