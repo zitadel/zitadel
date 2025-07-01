@@ -49,6 +49,7 @@ jobs:
       core_cache_path: ${{ needs.core.outputs.cache_path }}
       console_cache_path: ${{ needs.console.outputs.cache_path }}
       version: ${{ needs.version.outputs.version }}
+      node_version: "20"
 
   core-unit-test:
     needs: core
@@ -86,6 +87,7 @@ jobs:
       id-token: write
     with:
       ignore-run-cache:  ${{ github.event_name == 'workflow_dispatch' }}
+      node_version: "20"
 
   container:
     needs: [compile]
@@ -105,6 +107,7 @@ jobs:
       id-token: write
     with:
       login_build_image_name: "ghcr.io/zitadel/login-build"
+      node_version: "20"
 
   e2e:
     uses: ./.github/workflows/e2e.yml

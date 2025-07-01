@@ -18,7 +18,9 @@ on:
       version:
         required: true
         type: string
-
+      node_version:
+        required: true
+        type: string
 jobs:
   executable:
     runs-on: ubuntu-latest
@@ -89,6 +91,7 @@ jobs:
         # latest if branch is main, otherwise image version which is the pull request number
         LOGIN_BAKE_CLI: depot bake
         DEPOT_PROJECT_ID: w47wkxzdtw
+        NODE_VERSION: ${{ inputs.node_version }}
     -
       name: move files
       run: |
