@@ -19,7 +19,7 @@
     "generate:configdocs": "cp -r ../cmd/defaults.yaml ./docs/self-hosting/manage/configure/ && cp -r ../cmd/setup/steps.yaml ./docs/self-hosting/manage/configure/",
     "generate:re-gen": "yarn generate:clean-all && yarn generate",
     "generate:clean-all": "docusaurus clean-api-docs all",
-    "prebuild": "sh ./plugin-download.sh"
+    "postinstall": "sh ./plugin-download.sh"
   },
   "dependencies": {
     "@bufbuild/buf": "^1.14.0",
