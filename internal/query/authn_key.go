@@ -98,6 +98,7 @@ type AuthNKey struct {
 	ChangeDate    time.Time
 	ResourceOwner string
 	Sequence      uint64
+	ApplicationID string
 
 	Expiration time.Time
 	Type       domain.AuthNKeyType
@@ -222,6 +223,19 @@ func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySear
 	return authNKeys, err
 }
 
+func (q *Queries) GetAuthNKeyByIDWithPermission(ctx context.Context, shouldTriggerBulk bool, id string, permissionCheck domain.PermissionCheck, queries ...SearchQuery) (*AuthNKey, error) {
+	key, err := q.GetAuthNKeyByID(ctx, shouldTriggerBulk, id, queries...)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := appCheckPermission(ctx, key.ResourceOwner, key.AggregateID, permissionCheck); err != nil {
+		return nil, err
+	}
+
+	return key, nil
+}
+
 func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, id string, queries ...SearchQuery) (key *AuthNKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -330,6 +344,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 		AuthNKeyColumnSequence.identifier(),
 		AuthNKeyColumnExpiration.identifier(),
 		AuthNKeyColumnType.identifier(),
+		AuthNKeyColumnObjectID.identifier(),
 		countColumn.identifier(),
 	).From(authNKeyTable.identifier()).
 		PlaceholderFormat(sq.Dollar)
@@ -348,6 +363,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 				&authNKey.Sequence,
 				&authNKey.Expiration,
 				&authNKey.Type,
+				&authNKey.ApplicationID,
 				&count,
 			)
 			if err != nil {
