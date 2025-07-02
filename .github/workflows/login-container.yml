@@ -58,6 +58,8 @@ jobs:
           NODE_VERSION: ${{ inputs.node_version }}
         with:
           push: true
+          provenance: true
+          sbom: true
           targets: login-standalone
           set: login-*.context=./login/
           project: w47wkxzdtw
