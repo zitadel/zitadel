@@ -177,7 +177,7 @@ func AddAPIClientKeyRequestToDomain(key *mgmt_pb.AddAppKeyRequest) *domain.Appli
 }
 
 func ListAPIClientKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListAppKeysRequest) (*query.AuthNKeySearchQueries, error) {
-	resourcOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +197,7 @@ func ListAPIClientKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListAppKe
 			Asc:    asc,
 		},
 		Queries: []query.SearchQuery{
-			resourcOwner,
+			resourceOwner,
 			projectID,
 			appID,
 		},
