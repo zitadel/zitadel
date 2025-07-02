@@ -124,7 +124,10 @@ variable "LOGIN_TAG" {
   default = "zitadel-login:local"
 }
 
-target "docker-metadata-action" {}
+target "docker-metadata-action" {
+  # In the pipeline, this target is overwritten by the docker metadata action.
+  tags   = [ "${LOGIN_TAG}" ]
+}
 
 # We run integration and acceptance tests against the next standalone server for docker.
 target "login-standalone" {
@@ -133,7 +136,6 @@ target "login-standalone" {
   contexts = {
     login-client = "target:login-client"
   }
-  tags   = ["${LOGIN_TAG}"]
 }
 
 target "login-standalone-out" {
