@@ -25,7 +25,7 @@ var (
 	addConstraintStmt string
 )
 
-func handleUniqueConstraints(ctx context.Context, tx database.Tx, commands []eventstore.Command) (err error) {
+func HandleUniqueConstraints(ctx context.Context, tx database.Tx, commands []eventstore.Command) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

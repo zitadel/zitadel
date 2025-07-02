@@ -12,6 +12,7 @@ import (
 
 const (
 	uniqueOrgname           = "org_name"
+	uniqueOrgID             = "org_id"
 	OrgAddedEventType       = orgEventTypePrefix + "added"
 	OrgChangedEventType     = orgEventTypePrefix + "changed"
 	OrgDeactivatedEventType = orgEventTypePrefix + "deactivated"
@@ -25,14 +26,14 @@ const (
 
 func NewAddOrgIDUniqueConstraint(orgID string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		uniqueOrgname,
+		uniqueOrgID,
 		orgID,
 		"Errors.Org.AlreadyExists")
 }
 
 func NewRemoveOrgIDUniqueConstraint(orgID string) *eventstore.UniqueConstraint {
 	return eventstore.NewRemoveUniqueConstraint(
-		uniqueOrgname,
+		uniqueOrgID,
 		orgID)
 }
 

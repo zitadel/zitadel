@@ -67,7 +67,7 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 		return nil, err
 	}
 
-	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+	if err = HandleUniqueConstraints(ctx, tx, commands); err != nil {
 		return nil, err
 	}
 
