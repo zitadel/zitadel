@@ -52,19 +52,28 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 	if err != nil {
 		return nil, err
 	}
-	content, redirect := session.GetAuth(ctx)
-	if redirect {
+	auth, err := session.GetAuth(ctx)
+	if err != nil {
+		return nil, err
+	}
+	switch a := auth.(type) {
+	case *idp.RedirectAuth:
 		return &user.StartIdentityProviderIntentResponse{
 			Details:  object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: content},
+			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: a.RedirectURL},
+		}, nil
+	case *idp.FormAuth:
+		return &user.StartIdentityProviderIntentResponse{
+			Details: object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderIntentResponse_FormData{
+				FormData: &user.FormData{
+					Url:    a.URL,
+					Fields: a.Fields,
+				},
+			},
 		}, nil
 	}
-	return &user.StartIdentityProviderIntentResponse{
-		Details: object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
-			PostForm: []byte(content),
-		},
-	}, nil
+	return nil, zerrors.ThrowInvalidArgumentf(nil, "USERv2-3g2j3", "type oneOf %T in method StartIdentityProviderIntent not implemented", auth)
 }
 
 func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
