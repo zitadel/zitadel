@@ -22,11 +22,15 @@ env:
   default_labels: |
     org.opencontainers.image.documentation=https://zitadel.com/docs
     org.opencontainers.image.vendor=CAOS AG
+    org.opencontainers.image.licenses=MIT
 
 jobs:
   login-container:
     name: Build Login Container
     runs-on: depot-ubuntu-22.04-8
+    strategy:
+      matrix:
+        arch: [ amd64, arm64 ]
     permissions:
       id-token: write
     steps:
@@ -40,6 +44,8 @@ jobs:
         with:
           images: ${{ inputs.login_build_image_name }}
           labels: ${{ env.default_labels}}
+          annotations: |
+            manifest:org.opencontainers.image.licenses=MIT
           tags: |
             type=sha,prefix=,suffix=,format=long
       - name: Login to Docker registry
@@ -53,11 +59,12 @@ jobs:
         env:
           NODE_VERSION: ${{ inputs.node_version }}
         with:
-          workdir: login
           push: true
           targets: login-standalone
-          set: login-standalone.platforms=[linux/amd64,linux/arm64]
+          build-platform: linux/${{ matrix.arch }}
+          set: --set login-*.context=./login/
           project: w47wkxzdtw
           files: |
+            ./login/docker-bake.hcl
             ./docker-bake.hcl
             cwd://${{ steps.login-meta.outputs.bake-file }}
