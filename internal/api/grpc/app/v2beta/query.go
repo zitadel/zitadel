@@ -4,9 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"google.golang.org/protobuf/types/known/timestamppb"
-
 	"connectrpc.com/connect"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/app/v2beta/convert"
 	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2"

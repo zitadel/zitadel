@@ -651,7 +651,7 @@ func testServerCall(
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
-		if _, err := io.WriteString(w, string(resp)); err != nil {
+		if _, err := w.Write(resp); err != nil {
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}

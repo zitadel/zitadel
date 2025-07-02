@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
-	//import to make sure go.mod does not lose it
-	//because dependency is only needed for generated code
+	// import to make sure go.mod does not lose it
+	// because dependency is only needed for generated code
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 )
 

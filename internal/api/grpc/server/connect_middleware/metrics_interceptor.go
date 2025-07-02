@@ -6,6 +6,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/zitadel/logging"
 	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/grpc/codes"
 
@@ -60,13 +61,17 @@ func RegisterGrpcRequestCounter(ctx context.Context, path string) {
 	var labels = map[string]attribute.Value{
 		GrpcMethod: attribute.StringValue(path),
 	}
-	metrics.RegisterCounter(GrpcRequestCounter, GrpcRequestCounterDescription)
-	metrics.AddCount(ctx, GrpcRequestCounter, 1, labels)
+	err := metrics.RegisterCounter(GrpcRequestCounter, GrpcRequestCounterDescription)
+	logging.OnError(err).Warn("failed to register grpc request counter")
+	err = metrics.AddCount(ctx, GrpcRequestCounter, 1, labels)
+	logging.OnError(err).Warn("failed to add grpc request count")
 }
 
 func RegisterGrpcTotalRequestCounter(ctx context.Context) {
-	metrics.RegisterCounter(TotalGrpcRequestCounter, TotalGrpcRequestCounterDescription)
-	metrics.AddCount(ctx, TotalGrpcRequestCounter, 1, nil)
+	err := metrics.RegisterCounter(TotalGrpcRequestCounter, TotalGrpcRequestCounterDescription)
+	logging.OnError(err).Warn("failed to register total grpc request counter")
+	err = metrics.AddCount(ctx, TotalGrpcRequestCounter, 1, nil)
+	logging.OnError(err).Warn("failed to add total grpc request count")
 }
 
 func RegisterGrpcRequestCodeCounter(ctx context.Context, path string, err error) {
@@ -75,8 +80,10 @@ func RegisterGrpcRequestCodeCounter(ctx context.Context, path string, err error)
 		GrpcMethod: attribute.StringValue(path),
 		ReturnCode: attribute.IntValue(runtime.HTTPStatusFromCode(codes.Code(statusCode))),
 	}
-	metrics.RegisterCounter(GrpcStatusCodeCounter, GrpcStatusCodeCounterDescription)
-	metrics.AddCount(ctx, GrpcStatusCodeCounter, 1, labels)
+	err = metrics.RegisterCounter(GrpcStatusCodeCounter, GrpcStatusCodeCounterDescription)
+	logging.OnError(err).Warn("failed to register grpc status code counter")
+	err = metrics.AddCount(ctx, GrpcStatusCodeCounter, 1, labels)
+	logging.OnError(err).Warn("failed to add grpc status code count")
 }
 
 func containsMetricsMethod(metricType metrics.MetricType, metricTypes []metrics.MetricType) bool {

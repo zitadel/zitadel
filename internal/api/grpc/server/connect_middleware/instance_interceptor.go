@@ -99,7 +99,7 @@ func addInstanceByRequestedHost(ctx context.Context, req connect.AnyRequest, han
 		if errors.As(err, &zErr) {
 			zErr.SetMessage(translator.LocalizeFromCtx(ctx, zErr.GetMessage(), nil))
 			zErr.Parent = err
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, externalDomain, zErr))
+			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, externalDomain, zErr.Error()))
 		}
 		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
 	}
