@@ -64,42 +64,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			},
 		},
 		{
-			name: "set TriggerIntrospectionProjections",
-			eventstore: expectEventstore(
-				expectFilter(),
-				expectPush(
-					feature_v2.NewSetEvent[bool](
-						context.Background(), aggregate,
-						feature_v2.SystemTriggerIntrospectionProjectionsEventType, true,
-					),
-				),
-			),
-			args: args{context.Background(), &SystemFeatures{
-				TriggerIntrospectionProjections: gu.Ptr(true),
-			}},
-			want: &domain.ObjectDetails{
-				ResourceOwner: "SYSTEM",
-			},
-		},
-		{
-			name: "set LegacyIntrospection",
-			eventstore: expectEventstore(
-				expectFilter(),
-				expectPush(
-					feature_v2.NewSetEvent[bool](
-						context.Background(), aggregate,
-						feature_v2.SystemLegacyIntrospectionEventType, true,
-					),
-				),
-			),
-			args: args{context.Background(), &SystemFeatures{
-				LegacyIntrospection: gu.Ptr(true),
-			}},
-			want: &domain.ObjectDetails{
-				ResourceOwner: "SYSTEM",
-			},
-		},
-		{
 			name: "set UserSchema",
 			eventstore: expectEventstore(
 				expectFilter(),
@@ -124,12 +88,12 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				expectPushFailed(io.ErrClosedPipe,
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemLegacyIntrospectionEventType, true,
+						feature_v2.SystemEnableBackChannelLogout, true,
 					),
 				),
 			),
 			args: args{context.Background(), &SystemFeatures{
-				LegacyIntrospection: gu.Ptr(true),
+				EnableBackChannelLogout: gu.Ptr(true),
 			}},
 			wantErr: io.ErrClosedPipe,
 		},
@@ -144,14 +108,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 					),
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemTriggerIntrospectionProjectionsEventType, false,
-					),
-					feature_v2.NewSetEvent[bool](
-						context.Background(), aggregate,
-						feature_v2.SystemLegacyIntrospectionEventType, true,
-					),
-					feature_v2.NewSetEvent[bool](
-						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, true,
 					),
 					feature_v2.NewSetEvent[bool](
@@ -161,11 +117,9 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				),
 			),
 			args: args{context.Background(), &SystemFeatures{
-				LoginDefaultOrg:                 gu.Ptr(true),
-				TriggerIntrospectionProjections: gu.Ptr(false),
-				LegacyIntrospection:             gu.Ptr(true),
-				UserSchema:                      gu.Ptr(true),
-				OIDCSingleV1SessionTermination:  gu.Ptr(true),
+				LoginDefaultOrg:                gu.Ptr(true),
+				UserSchema:                     gu.Ptr(true),
+				OIDCSingleV1SessionTermination: gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",
@@ -180,10 +134,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
-						context.Background(), aggregate,
-						feature_v2.SystemTriggerIntrospectionProjectionsEventType, false,
-					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemResetEventType,
@@ -192,19 +142,11 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, false,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
-						context.Background(), aggregate,
-						feature_v2.SystemLegacyIntrospectionEventType, true,
-					)),
 				),
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
-					),
-					feature_v2.NewSetEvent[bool](
-						context.Background(), aggregate,
-						feature_v2.SystemTriggerIntrospectionProjectionsEventType, false,
 					),
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
@@ -217,11 +159,9 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				),
 			),
 			args: args{context.Background(), &SystemFeatures{
-				LoginDefaultOrg:                 gu.Ptr(true),
-				TriggerIntrospectionProjections: gu.Ptr(false),
-				LegacyIntrospection:             gu.Ptr(true),
-				UserSchema:                      gu.Ptr(true),
-				OIDCSingleV1SessionTermination:  gu.Ptr(false),
+				LoginDefaultOrg:                gu.Ptr(true),
+				UserSchema:                     gu.Ptr(true),
+				OIDCSingleV1SessionTermination: gu.Ptr(false),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",

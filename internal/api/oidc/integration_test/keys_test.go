@@ -14,12 +14,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
-	"google.golang.org/protobuf/proto"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 )
 
@@ -53,25 +51,16 @@ func TestServer_Keys(t *testing.T) {
 	require.NoError(t, err)
 
 	tests := []struct {
-		name          string
-		webKeyFeature bool
-		wantLen       int
+		name    string
+		wantLen int
 	}{
 		{
-			name:          "legacy only",
-			webKeyFeature: false,
-			wantLen:       1,
-		},
-		{
-			name:          "webkeys with legacy",
-			webKeyFeature: true,
-			wantLen:       3, // 1 legacy + 2 created by enabling feature flag
+			name:    "webkeys",
+			wantLen: 2, // 2 from instance creation.
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ensureWebKeyFeature(t, instance, tt.webKeyFeature)
-
 			assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				resp, err := http.Get(discovery.JwksURI)
 				require.NoError(ttt, err)
@@ -92,30 +81,10 @@ func TestServer_Keys(t *testing.T) {
 				}
 
 				cacheControl := resp.Header.Get("cache-control")
-				if tt.webKeyFeature {
-					require.Equal(ttt, "max-age=300, must-revalidate", cacheControl)
-					return
-				}
-				require.Equal(ttt, "no-store", cacheControl)
+				require.Equal(ttt, "max-age=300, must-revalidate", cacheControl)
 
 			}, time.Minute, time.Second/10)
 		})
 
 	}
-}
-
-func ensureWebKeyFeature(t *testing.T, instance *integration.Instance, set bool) {
-	ctxIam := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-
-	_, err := instance.Client.FeatureV2.SetInstanceFeatures(ctxIam, &feature.SetInstanceFeaturesRequest{
-		WebKey: proto.Bool(set),
-	})
-	require.NoError(t, err)
-
-	t.Cleanup(func() {
-		_, err := instance.Client.FeatureV2.SetInstanceFeatures(ctxIam, &feature.SetInstanceFeaturesRequest{
-			WebKey: proto.Bool(false),
-		})
-		require.NoError(t, err)
-	})
 }

@@ -23,15 +23,6 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		err = oidcError(err)
 		span.EndWithError(err)
 	}()
-
-	features := authz.GetFeatures(ctx)
-	if features.LegacyIntrospection {
-		return s.LegacyServer.Introspect(ctx, r)
-	}
-	if features.TriggerIntrospectionProjections {
-		query.TriggerIntrospectionProjections(ctx)
-	}
-
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 

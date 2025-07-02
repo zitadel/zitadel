@@ -40,7 +40,7 @@ func (s *Server) GetInstance(ctx context.Context, req *system_pb.GetInstanceRequ
 }
 
 func (s *Server) AddInstance(ctx context.Context, req *system_pb.AddInstanceRequest) (*system_pb.AddInstanceResponse, error) {
-	id, _, _, details, err := s.command.SetUpInstance(ctx, AddInstancePbToSetupInstance(req, s.defaultInstance, s.externalDomain))
+	id, _, _, _, details, err := s.command.SetUpInstance(ctx, AddInstancePbToSetupInstance(req, s.defaultInstance, s.externalDomain))
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (s *Server) UpdateInstance(ctx context.Context, req *system_pb.UpdateInstan
 }
 
 func (s *Server) CreateInstance(ctx context.Context, req *system_pb.CreateInstanceRequest) (*system_pb.CreateInstanceResponse, error) {
-	id, pat, key, details, err := s.command.SetUpInstance(ctx, CreateInstancePbToSetupInstance(req, s.defaultInstance, s.externalDomain))
+	id, pat, key, _, details, err := s.command.SetUpInstance(ctx, CreateInstancePbToSetupInstance(req, s.defaultInstance, s.externalDomain))
 	if err != nil {
 		return nil, err
 	}

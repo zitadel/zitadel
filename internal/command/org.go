@@ -24,7 +24,13 @@ type InstanceOrgSetup struct {
 	CustomDomain string
 	Human        *AddHuman
 	Machine      *AddMachine
+	LoginClient  *AddLoginClient
 	Roles        []string
+}
+
+type AddLoginClient struct {
+	Machine *Machine
+	Pat     *AddPat
 }
 
 type OrgSetup struct {
