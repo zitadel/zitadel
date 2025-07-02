@@ -106,7 +106,7 @@ jobs:
       packages: write
       id-token: write
     with:
-      login_build_image_name: "ghcr.io/zitadel/login-build"
+      login_build_image_name: "ghcr.io/zitadel/zitadel-login-build"
       node_version: "20"
 
   e2e:
@@ -133,5 +133,5 @@ jobs:
       image_name: "ghcr.io/zitadel/zitadel"
       google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
       build_image_name_login: ${{ needs.login-container.outputs.login_build_image }}
-      image_name_login: "ghcr.io/zitadel/login"
+      image_name_login: "ghcr.io/zitadel/zitadel-login"
       google_image_name_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
