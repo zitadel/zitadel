@@ -48,6 +48,18 @@ const (
 	tmplExternalNotFoundOption = "externalnotfoundoption"
 )
 
+var (
+	samlFormPost = template.Must(template.New("saml-post-form").Parse(`<!DOCTYPE html><html><body>
+<form method="post" action="{{.URL}}" id="SAMLRequestForm">
+{{range $key, $value := .Fields}}
+<input type="hidden" name="{{$key}}" value="{{$value}}" />
+{{end}}
+<input id="SAMLSubmitButton" type="submit" value="Submit" />
+</form>
+<script>document.getElementById('SAMLSubmitButton').style.visibility="hidden";document.getElementById('SAMLRequestForm').submit();</script>
+</body></html>`))
+)
+
 type externalIDPData struct {
 	IDPConfigID string `schema:"idpConfigID"`
 }
@@ -201,15 +213,21 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.externalAuthFailed(w, r, authReq, err)
 		return
 	}
-
-	content, redirect := session.GetAuth(r.Context())
-	if redirect {
-		http.Redirect(w, r, content, http.StatusFound)
+	auth, err := session.GetAuth(r.Context())
+	if err != nil {
+		l.renderInternalError(w, r, authReq, err)
 		return
 	}
-	_, err = w.Write([]byte(content))
-	if err != nil {
-		l.renderError(w, r, authReq, err)
+	switch a := auth.(type) {
+	case *idp.RedirectAuth:
+		http.Redirect(w, r, a.RedirectURL, http.StatusFound)
+		return
+	case *idp.FormAuth:
+		err = samlFormPost.Execute(w, a)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
+		}
 		return
 	}
 }
