@@ -44,7 +44,7 @@ jobs:
     needs: [core, console, version]
     uses: ./.github/workflows/compile.yml
     with:
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      core_cache_key: ${{ needs.core.outputs.cache_key }}-${{ github.sha }}
       console_cache_key: ${{ needs.console.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
       console_cache_path: ${{ needs.console.outputs.cache_path }}
