@@ -33,6 +33,7 @@ jobs:
         arch: [ amd64, arm64 ]
     permissions:
       id-token: write
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - uses: depot/setup-action@v1
