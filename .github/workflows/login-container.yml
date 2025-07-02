@@ -58,10 +58,11 @@ jobs:
           NODE_VERSION: ${{ inputs.node_version }}
         with:
           push: true
-          targets: login-standalone-release
+          targets: login-standalone
           set: login-*.context=./login/
           project: w47wkxzdtw
           files: |
             ./login/docker-bake.hcl
+            ./login/docker-bake-release.hcl
             ./docker-bake.hcl
             cwd://${{ steps.login-meta.outputs.bake-file }}
