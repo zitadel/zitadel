@@ -57,7 +57,7 @@ func (w *Config) BeginRegistration(ctx context.Context, user *domain.Human, acco
 	if err != nil {
 		return nil, err
 	}
-	creds := WebAuthNsToCredentials(webAuthNs, rpID)
+	creds := WebAuthNsToCredentials(ctx, webAuthNs, rpID)
 	existing := make([]protocol.CredentialDescriptor, len(creds))
 	for i, cred := range creds {
 		existing[i] = protocol.CredentialDescriptor{
@@ -136,7 +136,7 @@ func (w *Config) BeginLogin(ctx context.Context, user *domain.Human, userVerific
 	}
 	assertion, sessionData, err := webAuthNServer.BeginLogin(&webUser{
 		Human:       user,
-		credentials: WebAuthNsToCredentials(webAuthNs, rpID),
+		credentials: WebAuthNsToCredentials(ctx, webAuthNs, rpID),
 	}, webauthn.WithUserVerification(UserVerificationFromDomain(userVerification)))
 	if err != nil {
 		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn login could not be started")
@@ -163,7 +163,7 @@ func (w *Config) FinishLogin(ctx context.Context, user *domain.Human, webAuthN *
 	}
 	webUser := &webUser{
 		Human:       user,
-		credentials: WebAuthNsToCredentials(webAuthNs, webAuthN.RPID),
+		credentials: WebAuthNsToCredentials(ctx, webAuthNs, webAuthN.RPID),
 	}
 	webAuthNServer, err := w.serverFromContext(ctx, webAuthN.RPID, assertionData.Response.CollectedClientData.Origin)
 	if err != nil {
