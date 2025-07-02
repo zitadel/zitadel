@@ -2,6 +2,7 @@ package setup
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -42,7 +43,7 @@ func (e *OrgRemoveEventUpdateIDUniqueConstraint) UniqueConstraints() []*eventsto
 	return []*eventstore.UniqueConstraint{org.NewRemoveOrgIDUniqueConstraint(e.Aggregate().ID)}
 }
 
-func (mig *AddIDUniqueConstraintsForOrgs) Execute(ctx context.Context, _ eventstore.Event) error {
+func (mig *AddIDUniqueConstraintsForOrgs) Execute(ctx context.Context, _ eventstore.Event) (err error) {
 	orm := orgsReadModel{}
 	sqb := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
@@ -52,18 +53,19 @@ func (mig *AddIDUniqueConstraintsForOrgs) Execute(ctx context.Context, _ eventst
 		).
 		Builder()
 
-	err := mig.eventstore.FilterToReducer(context.Background(), sqb, &orm)
+	err = mig.eventstore.FilterToReducer(ctx, sqb, &orm)
 	if err != nil {
 	}
 
-	tx, err := mig.dbClient.BeginTx(ctx, nil)
+	var tx *sql.Tx
+	tx, err = mig.dbClient.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
 		if err == nil {
-			tx.Commit()
+			err = tx.Commit()
 		}
 	}()
 
