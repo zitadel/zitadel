@@ -15,6 +15,15 @@ on:
       google_image_name:
         required: true
         type: string
+      build_image_name_login:
+        required: true
+        type: string
+      image_name_login:
+        required: true
+        type: string
+      google_image_name_login:
+        required: true
+        type: string
     secrets:
       GCR_JSON_KEY_BASE64:
         description: 'base64 endcrypted key to connect to Google'
@@ -96,6 +105,12 @@ jobs:
         docker buildx imagetools create \
           --tag ${{ inputs.google_image_name }}:${{ needs.version.outputs.version }} \
           ${{ inputs.build_image_name }}
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name_login }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.build_image_name_login }}
+        docker buildx imagetools create \
+          --tag ${{ inputs.google_image_name_login }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.build_image_name_login }}
     -
       name: Publish latest
       if: ${{ github.ref_name == 'next' }}
@@ -106,6 +121,9 @@ jobs:
         docker buildx imagetools create \
           --tag ${{ inputs.image_name }}:latest-debug \
           ${{ inputs.build_image_name }}-debug
+        docker buildx imagetools create \
+          --tag ${{ inputs.image_name_login }}:latest \
+          ${{ inputs.build_image_name_login }}
 
   homebrew-tap:
     runs-on: ubuntu-22.04
@@ -146,3 +164,55 @@ jobs:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           gh workflow -R zitadel/zitadel-charts run bump.yml
+
+  typescript-packages:
+    runs-on: ubuntu-latest
+    needs: version
+    if: ${{ github.ref_name == 'next' }}
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        working-directory: login
+        run: pnpm install
+
+      - name: Create Release Pull Request
+        uses: changesets/action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          version: ${{ needs.version.outputs.version }}
+          cwd: login
+
+  typescript-repo:
+    runs-on: ubuntu-latest
+    needs: version
+    if: ${{ github.ref_name == 'next' }}
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Push Subtree
+        run: make login_push LOGIN_REMOTE_BRANCH=mirror-zitadel-repo
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: mirror zitadel repo'
+          branch: mirror-zitadel-repo
+          title: 'chore: mirror zitadel repo'
+          body: 'This PR updates the login repository with the latest changes from the zitadel repository.'
+          base: main
+          reviewers: |
+            @peintnermax
+            @eliobischof

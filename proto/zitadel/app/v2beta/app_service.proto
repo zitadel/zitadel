@@ -114,8 +114,6 @@ service AppService {
     //
     // Create an application. The application can be OIDC, API or SAML type, based on the input.
     //
-    // The user needs to have project.app.write permission
-    //
     // Required permissions:
     //   - project.app.write
     rpc CreateApplication(CreateApplicationRequest) returns (CreateApplicationResponse) {
@@ -145,8 +143,6 @@ service AppService {
     // Changes the configuration of an OIDC, API or SAML type application, as well as
     // the application name, based on the input provided.
     //
-    // The user needs to have project.app.write permission
-    //
     // Required permissions:
     //   - project.app.write
     rpc UpdateApplication(UpdateApplicationRequest) returns (UpdateApplicationResponse) {
@@ -175,8 +171,6 @@ service AppService {
     //
     // Retrieves the application matching the provided ID.
     //
-    // The user needs to have project.app.read permission
-    //
     // Required permissions:
     //   - project.app.read
     rpc GetApplication(GetApplicationRequest) returns (GetApplicationResponse) {
@@ -203,9 +197,7 @@ service AppService {
     // Delete Application
     //
     // Deletes the application belonging to the input project and matching the provided
-    // application ID
-    //
-    // The user needs to have project.app.delete permission
+    // application ID.
     //
     // Required permissions:
     //   - project.app.delete
@@ -233,9 +225,7 @@ service AppService {
     // Deactivate Application
     //
     // Deactivates the application belonging to the input project and matching the provided
-    // application ID
-    //
-    // The user needs to have project.app.write permission
+    // application ID.
     //
     // Required permissions:
     //   - project.app.write
@@ -264,9 +254,7 @@ service AppService {
     // Reactivate Application
     //
     // Reactivates the application belonging to the input project and matching the provided
-    // application ID
-    //
-    // The user needs to have project.app.write permission
+    // application ID.
     //
     // Required permissions:
     //   - project.app.write
@@ -297,8 +285,6 @@ service AppService {
     //
     // Regenerates the client secret of an API or OIDC application that belongs to the input project.
     // 
-    // The user needs to have project.app.write permission
-    //
     // Required permissions:
     //   - project.app.write
     rpc RegenerateClientSecret(RegenerateClientSecretRequest) returns (RegenerateClientSecretResponse) {
@@ -331,13 +317,134 @@ service AppService {
     // The result can be sorted by app id, name, creation date, change date or state. It can also
     // be filtered by app state, app type and app name.
     //
-    // The user needs to have project.app.read permission
-    //
     // Required permissions:
     //   - project.app.read
     rpc ListApplications(ListApplicationsRequest) returns (ListApplicationsResponse) {
         option (google.api.http) = {
             post: "/v2beta/applications/search"
+            body: "*"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The matching applications";
+                }
+            };
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+
+
+    // Create Application Key 
+    //
+    // Create a new application key, which is used to authorize an API application.
+    //
+    // Key details are returned in the response. They must be stored safely, as it will not
+    // be possible to retrieve them again.
+    //
+    // Required permissions:
+    //   - `project.app.write`
+    rpc CreateApplicationKey(CreateApplicationKeyRequest) returns (CreateApplicationKeyResponse) {
+        option (google.api.http) = {
+            post: "/v2beta/application_keys"
+            body: "*"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The created application key";
+                }
+            };
+        };
+    }
+
+    // Delete Application Key 
+    //
+    // Deletes an application key matching the provided ID.
+    //
+    // Organization ID is not mandatory, but helps with filtering/performance.
+    //
+    // The deletion time is returned in response message.
+    //
+    // Required permissions:
+    //   - `project.app.write`
+    rpc DeleteApplicationKey(DeleteApplicationKeyRequest) returns (DeleteApplicationKeyResponse) {
+        option (google.api.http) = {
+            delete: "/v2beta/application_keys/{id}"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The time of deletion.";
+                }
+            };
+        };
+    }
+
+    // Get Application Key
+    //
+    // Retrieves the application key matching the provided ID.
+    //
+    // Specifying a project, organization and app ID is optional but help with filtering/performance.
+    //
+    // Required permissions:
+    //   - project.app.read
+    rpc GetApplicationKey(GetApplicationKeyRequest) returns (GetApplicationKeyResponse) {
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The fetched app key.";
+                }
+            };
+        };
+
+        option (google.api.http) = {
+            get: "/v2beta/application_keys/{id}"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+
+    // List Application Keys
+    //
+    // Returns a list of application keys matching the input parameters.
+    //
+    // The result can be sorted by id, aggregate, creation date, expiration date, resource owner or type.
+    // It can also be filtered by app, project or organization ID.
+    //
+    // Required permissions:
+    //   - project.app.read
+    rpc ListApplicationKeys(ListApplicationKeysRequest) returns (ListApplicationKeysResponse) {
+        option (google.api.http) = {
+            post: "/v2beta/application_keys/search"
             body: "*"
         };
 
@@ -784,5 +891,104 @@ message ListApplicationsResponse {
     repeated Application applications = 1;
 
     // Contains the total number of apps matching the query and the applied limit.
+    zitadel.filter.v2.PaginationResponse pagination = 2;
+}
+
+message CreateApplicationKeyRequest {
+    string app_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+    string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+    // The date the key will expire
+    google.protobuf.Timestamp expiration_date = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2519-04-01T08:45:00.000000Z\"";
+            description: "The date the key will expire";
+        }
+    ];
+}
+
+message CreateApplicationKeyResponse {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"28746028909593987\"";
+        }
+    ];
+
+    // The timestamp of the app creation.
+    google.protobuf.Timestamp creation_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2024-12-18T07:50:47.492Z\"";
+        }
+    ];
+
+    bytes key_details = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJrZXlJZCI6IjIwMjcxMDE4NjYyMjcxNDExMyIsImtleSI6Ii0tLS0tQkVHSU4gUlNBIFBSSVZBVEUgS0VZLS0tLS1cbk1JSUVvd0lCQUFLQ0FRRUFuMUxyNStTV0pGRllURU1kaXQ2U0dNY0E2Yks5dG0xMmhlcm55V0wrZm9PWnA3eEVcbk9wcmsvWE81QVplSU5NY0x0ZVhxckJlK1NPdVVNMFpLU2xCMHFTNzNjVStDVTVMTGoycVB0UzhNOFI0N3BGdFhcbjJXRTFJNjNhZHB1N01TejA2SXduQ2lyNnJYOTVPQ2ZneHA3VU1Dd0pSTUZmYXJqdjVBRXY3NXpsSS9lYUV6bUJcbkxKWU1xanZFRmZoN2x3M2lPT3VsWW9kNjNpN3RDNWl5czNlYjNLZW4yWU0rN1FSbXB2dE5qcTJMVmlIMnkrUGJcbk9ESlI3MU9ib05TYVJDNTZDUFpWVytoWDByYXI3VzMwUjI2eGtIQ09oSytQbUpSeGtOY0g1VTdja0xXMEw0WEVcbnNNZkVUSmszeDR3Q0psbisxbElXUzkrNmw0R1E2TWRzWURyOU5RSURBUUFCQW9JQkFCSkx6WGQxMHFBZEQwekNcbnNGUFFOMnJNLzVmV3hONThONDR0YWF6QXg0VHp5K050UlZDTmxScGQvYkxuR2VjbHJIeVpDSmYycWcxcHNEMHJcbkowRGRlR2d0VXBFYWxsYk9scjNEZVBsUGkrYnNsK0RKOUk2c0VSUWwxTjZtQjVzZ0ZJZllBR3UwZjlFSXdIem9cblozR25yNnBRaEVmM0JPUVdsTVhVTlJNSksyOHp3M2E1L01nRmtKVUZUSTUzeXFwbGRtZ2hLajRZR1hLRk1LUGhcbkV3RkxrRncwK2s3K0xuSjFQNGp1ZVd1RXo3WlAyaFpvUWxCcXdSajVyTG9QZ05RbUU4UytFVDRuczlUYzByOFFcbnFyaHlacDZBczJrTDhGTytCZnF3SVpDZnpnWHN2cC9PLzRaSHIzVTB2Ymp3UW1sSzdVSm42U0J6T2hpWFpNU0lcbk5Wc0V5VUVDZ1lFQTFEaktkRGo3NTM1MWQzdlRNQlRFd2JSQ3hoUVZOdENFMnMwVUw4ckJQZ1I0K1dlblNUWmFcbnprWUprcEV0bE54VGxzYnN1Y0RTUXZqeWRYYk5nSHFBeDYzMm1vdTVkak9lR0VTUDFWVGtUdElsZFZQZWszQWxcbjVYbkpQa1dqWGVyVVJZNm5KeUQ5UWhlREx3MVp4NEFYVzNHWURiTFkrT05XV0VKUlJaQUloNjBDZ1lFQXdEQ2xcbnc1MHc4dkcvbEJ4RzNSYW9FaHdLOWNna1VXOHk2T25DekNwcEtjOEZUUmY1VE5iWjl5TzNXUmdYajhkeHRCakFcbkl5VGlzYk9NQk1VaFZKUUtGZHRQaDhoVDBwRkRjeE9ndzY0aHBtYzhyY2RTbXVKNzlYSVRTaHUySjA0N0UvNFZcbnJOTThpWVk5ZGR3VGdGUUlsdFNZL0l0RnFxWERmdjhqK1dVY25La0NnWUVBaENOUU80bDNuNjRucWR2WnBTaHBcblVrclJBTkJrWFJyOGZkZ1BaNnFSSS9KWStNSEhjVmg4dGM3NkN0NkdTUmZlbkJVRU5LeVF2czZPK1FDZCtBOU9cbnZBWGZkRjduZldlcVdtWG1RT2g0dDNNMWk1WkxFZlpVUWt2UU9BdllLcFFhMDZ4OCsyb1pCdHZvL0pVTmY2Q0xcbjZvNFNKUVZrLzZOZGtkckpDODBnNG9rQ2dZQkZsNWYrbkVYa1F0dWZVeG5wNXRGWE5XWldsM0ZuTjMvVXpRaW5cbmkxZm5OcnB4cnhPcjJrUzA4KzdwU1FzSEdpNDNDNXRQWG9UajJlTUN1eXNWaUVHYXBuNUc2YWhJb0NjdlhWVWlcblprUnpFQUR0NERZdU5ZS3pYdXBUTkhPaUNmYmtoMlhyM2RXVzZ0QUloSGRmU1k2T3AwNzZhNmYvWWVUSGNMWGpcbkVkVHBlUUtCZ0FPdnBqcDQ4TzRUWEZkU0JLSnYya005OHVhUjlSQURtdGxTWHd2cTlyQkhTV084NFk4bzE0L1Bcbkl1UmxUOHhROGRYKzhMR21UUCtjcUtiOFFRQ1grQk1YUWxMSEVtWnpnb0xFa0pGMUVIMm4vZEZ5bngxS3prdFNcbm9UZUdsRzZhbXhVOVh4eW9RVFlEVGJCbERwc2FZUlFBZ2FUQzM3UVZRUjhmK1ZoRzFHSFFcbi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tXG4iLCJhcHBJZCI6IjIwMjcwNjM5ODgxMzg4MDU3NyIsImNsaWVudElkIjoiMjAyNzA2Mzk4ODEzOTQ2MTEzQG15dGVzdHByb2plY3QifQ==\"";
+        }
+    ];
+}
+
+message DeleteApplicationKeyRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string application_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string organization_id = 4 [(validate.rules).string = {max_len: 200}];
+}
+
+message DeleteApplicationKeyResponse {
+    google.protobuf.Timestamp deletion_date = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+}
+
+message GetApplicationKeyRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string project_id = 2 [(validate.rules).string = {max_len: 200}];
+    string application_id = 3 [(validate.rules).string = {max_len: 200}];
+    string organization_id = 4 [(validate.rules).string = {max_len: 200}];
+}
+
+message GetApplicationKeyResponse {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+
+    google.protobuf.Timestamp creation_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+
+    // the date a key will expire
+    google.protobuf.Timestamp expiration_date = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the date a key will expire";
+            example: "\"3019-04-01T08:45:00.000000Z\"";
+        }
+    ];
+}
+
+message ListApplicationKeysRequest {
+    // Pagination and sorting.
+    zitadel.filter.v2.PaginationRequest pagination = 1;
+
+    ApplicationKeysSorting sorting_column = 2;
+
+    oneof resource_id {
+        string application_id = 3 [(validate.rules).string = {min_len: 1; max_len: 200}];
+        string project_id = 4 [(validate.rules).string = {min_len: 1; max_len: 200}];
+        string organization_id = 5 [(validate.rules).string = {min_len: 1; max_len: 200}];
+    }
+}
+
+message ListApplicationKeysResponse {
+    repeated ApplicationKey keys = 1;
+
+    // Contains the total number of app keys matching the query and the applied limit.
     zitadel.filter.v2.PaginationResponse pagination = 2;
 }

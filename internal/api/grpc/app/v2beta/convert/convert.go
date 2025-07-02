@@ -2,6 +2,7 @@ package convert
 
 import (
 	"net/url"
+	"strings"
 
 	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -9,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
@@ -162,4 +164,99 @@ func appQueryToModel(appQuery *app.ApplicationSearchFilter) (query.SearchQuery, 
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "CONV-z2mAGy", "List.Query.Invalid")
 	}
+}
+
+func CreateAPIClientKeyRequestToDomain(key *app.CreateApplicationKeyRequest) *domain.ApplicationKey {
+	return &domain.ApplicationKey{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: strings.TrimSpace(key.GetProjectId()),
+		},
+		ExpirationDate: key.GetExpirationDate().AsTime(),
+		Type:           domain.AuthNKeyTypeJSON,
+		ApplicationID:  strings.TrimSpace(key.GetAppId()),
+	}
+}
+
+func ListApplicationKeysRequestToDomain(sysDefaults systemdefaults.SystemDefaults, req *app.ListApplicationKeysRequest) (*query.AuthNKeySearchQueries, error) {
+	var queries []query.SearchQuery
+
+	switch req.GetResourceId().(type) {
+	case *app.ListApplicationKeysRequest_ApplicationId:
+		object, err := query.NewAuthNKeyObjectIDQuery(strings.TrimSpace(req.GetApplicationId()))
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, object)
+	case *app.ListApplicationKeysRequest_OrganizationId:
+		resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(strings.TrimSpace(req.GetOrganizationId()))
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, resourceOwner)
+	case *app.ListApplicationKeysRequest_ProjectId:
+		aggregate, err := query.NewAuthNKeyAggregateIDQuery(strings.TrimSpace(req.GetProjectId()))
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, aggregate)
+	case nil:
+
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "CONV-t3ENme", "unexpected resource id")
+	}
+
+	offset, limit, asc, err := filter.PaginationPbToQuery(sysDefaults, req.GetPagination())
+	if err != nil {
+		return nil, err
+	}
+
+	return &query.AuthNKeySearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: appKeysSortingToColumn(req.GetSortingColumn()),
+		},
+
+		Queries: queries,
+	}, nil
+}
+
+func appKeysSortingToColumn(sortingCriteria app.ApplicationKeysSorting) query.Column {
+	switch sortingCriteria {
+	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_PROJECT_ID:
+		return query.AuthNKeyColumnAggregateID
+	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_CREATION_DATE:
+		return query.AuthNKeyColumnCreationDate
+	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_EXPIRATION:
+		return query.AuthNKeyColumnExpiration
+	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_ORGANIZATION_ID:
+		return query.AuthNKeyColumnResourceOwner
+	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_TYPE:
+		return query.AuthNKeyColumnType
+	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_APPLICATION_ID:
+		return query.AuthNKeyColumnObjectID
+	case app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_ID:
+		fallthrough
+	default:
+		return query.AuthNKeyColumnID
+	}
+}
+
+func ApplicationKeysToPb(keys []*query.AuthNKey) []*app.ApplicationKey {
+	pbAppKeys := make([]*app.ApplicationKey, len(keys))
+
+	for i, k := range keys {
+		pbKey := &app.ApplicationKey{
+			Id:             k.ID,
+			ApplicationId:  k.ApplicationID,
+			ProjectId:      k.AggregateID,
+			CreationDate:   timestamppb.New(k.CreationDate),
+			OrganizationId: k.ResourceOwner,
+			ExpirationDate: timestamppb.New(k.Expiration),
+		}
+		pbAppKeys[i] = pbKey
+	}
+
+	return pbAppKeys
 }
