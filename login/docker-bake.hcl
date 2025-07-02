@@ -8,7 +8,7 @@ variable "DOCKERFILES_DIR" {
 
 # The release target is overwritten in docker-bake-release.hcl
 # It makes sure the image is built for multiple platforms.
-# By default the platforms property it's empty, so images are only built for the current bake runtime platform.
+# By default the platforms property is empty, so images are only built for the current bake runtime platform.
 target "release" {}
 
 # typescript-proto-client is used to generate the client code for the login service.
