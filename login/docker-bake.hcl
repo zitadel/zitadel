@@ -142,7 +142,6 @@ target "docker-metadata-action" {
 target "login-standalone" {
   inherits = [
     "docker-metadata-action",
-    "login-standalone",
     "release",
   ]
   dockerfile = "${DOCKERFILES_DIR}login-standalone.Dockerfile"
