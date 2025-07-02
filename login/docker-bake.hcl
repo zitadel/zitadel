@@ -93,7 +93,7 @@ target "core-mock" {
   contexts = {
     protos = "target:proto-files"
   }
-  tags   = ["${LOGIN_CORE_MOCK_TAG}"]
+  tags = ["${LOGIN_CORE_MOCK_TAG}"]
 }
 
 variable "LOGIN_TEST_INTEGRATION_TAG" {
@@ -105,7 +105,7 @@ target "login-test-integration" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-  tags   = ["${LOGIN_TEST_INTEGRATION_TAG}"]
+  tags = ["${LOGIN_TEST_INTEGRATION_TAG}"]
 }
 
 variable "LOGIN_TEST_ACCEPTANCE_TAG" {
@@ -117,7 +117,7 @@ target "login-test-acceptance" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-  tags   = ["${LOGIN_TEST_ACCEPTANCE_TAG}"]
+  tags = ["${LOGIN_TEST_ACCEPTANCE_TAG}"]
 }
 
 variable "LOGIN_TAG" {
@@ -126,7 +126,7 @@ variable "LOGIN_TAG" {
 
 target "docker-metadata-action" {
   # In the pipeline, this target is overwritten by the docker metadata action.
-  tags   = [ "${LOGIN_TAG}" ]
+  tags = ["${LOGIN_TAG}"]
 }
 
 # We run integration and acceptance tests against the next standalone server for docker.
@@ -138,9 +138,14 @@ target "login-standalone" {
   }
 }
 
+target "login-standalone-release" {
+  inherits  = ["login-standalone"]
+  platforms = ["linux/amd64", "linux/arm64"]
+}
+
 target "login-standalone-out" {
-  inherits   = ["login-standalone"]
-  target = "login-standalone-out"
+  inherits = ["login-standalone"]
+  target   = "login-standalone-out"
   output = [
     "type=local,dest=${LOGIN_DIR}apps/login/standalone"
   ]

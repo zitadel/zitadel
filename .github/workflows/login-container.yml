@@ -28,9 +28,6 @@ jobs:
   login-container:
     name: Build Login Container
     runs-on: depot-ubuntu-22.04-8
-    strategy:
-      matrix:
-        arch: [ amd64, arm64 ]
     permissions:
       id-token: write
       packages: write
@@ -61,7 +58,7 @@ jobs:
           NODE_VERSION: ${{ inputs.node_version }}
         with:
           push: true
-          targets: login-standalone
+          targets: login-standalone-release
           build-platform: linux/${{ matrix.arch }}
           set: login-*.context=./login/
           project: w47wkxzdtw

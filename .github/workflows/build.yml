@@ -134,4 +134,4 @@ jobs:
       google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
       build_image_name_login: ${{ needs.login-container.outputs.login_build_image }}
       image_name_login: "ghcr.io/zitadel/login"
-      google_image_name_login: europe-docker.pkg.dev/zitadel-common/zitadel-repo/login
+      google_image_name_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
