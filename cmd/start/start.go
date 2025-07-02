@@ -59,7 +59,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
 	user_v2 "github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
-	webkey "github.com/zitadel/zitadel/internal/api/grpc/webkey/v2beta"
+	webkey_v2 "github.com/zitadel/zitadel/internal/api/grpc/webkey/v2"
+	webkey_v2beta "github.com/zitadel/zitadel/internal/api/grpc/webkey/v2beta"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/idp"
@@ -504,7 +505,10 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, user_v3_alpha.CreateServer(commands)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, webkey.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, webkey_v2beta.CreateServer(commands, queries)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, webkey_v2.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, debug_events.CreateServer(commands, queries)); err != nil {

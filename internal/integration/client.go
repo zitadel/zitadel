@@ -47,6 +47,7 @@ import (
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	webkey_v2 "github.com/zitadel/zitadel/pkg/grpc/webkey/v2"
 	webkey_v2beta "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta"
 )
 
@@ -70,6 +71,7 @@ type Client struct {
 	FeatureV2      feature.FeatureServiceClient
 	UserSchemaV3   userschema_v3alpha.ZITADELUserSchemasClient
 	WebKeyV2Beta   webkey_v2beta.WebKeyServiceClient
+	WebKeyV2       webkey_v2.WebKeyServiceClient
 	IDPv2          idp_pb.IdentityProviderServiceClient
 	UserV3Alpha    user_v3alpha.ZITADELUsersClient
 	SAMLv2         saml_pb.SAMLServiceClient
@@ -110,6 +112,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		FeatureV2:      feature.NewFeatureServiceClient(cc),
 		UserSchemaV3:   userschema_v3alpha.NewZITADELUserSchemasClient(cc),
 		WebKeyV2Beta:   webkey_v2beta.NewWebKeyServiceClient(cc),
+		WebKeyV2:       webkey_v2.NewWebKeyServiceClient(cc),
 		IDPv2:          idp_pb.NewIdentityProviderServiceClient(cc),
 		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
 		SAMLv2:         saml_pb.NewSAMLServiceClient(cc),

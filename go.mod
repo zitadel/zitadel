@@ -7,6 +7,8 @@ toolchain go1.24.1
 require (
 	cloud.google.com/go/profiler v0.4.2
 	cloud.google.com/go/storage v1.54.0
+	connectrpc.com/connect v1.18.1
+	connectrpc.com/grpcreflect v1.3.0
 	dario.cat/mergo v1.0.2
 	github.com/BurntSushi/toml v1.5.0
 	github.com/DATA-DOG/go-sqlmock v1.5.2
@@ -112,8 +114,6 @@ require (
 	cloud.google.com/go/auth v0.16.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/monitoring v1.24.0 // indirect
-	connectrpc.com/connect v1.18.1 // indirect
-	connectrpc.com/grpcreflect v1.3.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.27.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.51.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.51.0 // indirect
