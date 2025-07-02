@@ -62,32 +62,23 @@ type UserGrants struct {
 func userGrantsCheckPermission(ctx context.Context, grants *UserGrants, permissionCheck domain.PermissionCheck) {
 	grants.UserGrants = slices.DeleteFunc(grants.UserGrants,
 		func(grant *UserGrant) bool {
-			return userGrantCheckPermission(ctx, grant.ResourceOwner, grant.ProjectID, grant.GrantID, grant.GrantedOrgID, grant.UserID, permissionCheck) != nil
+			return userGrantCheckPermission(ctx, grant.ResourceOwner, grant.ProjectID, grant.GrantID, grant.UserID, permissionCheck) != nil
 		},
 	)
 }
 
-func userGrantCheckPermission(ctx context.Context, resourceOwner string, projectID, grantedOrgID, grantID, userID string, permissionCheck domain.PermissionCheck) error {
+func userGrantCheckPermission(ctx context.Context, resourceOwner, projectID, grantID, userID string, permissionCheck domain.PermissionCheck) error {
 	// you should always be able to read your own permissions
 	if authz.GetCtxData(ctx).UserID == userID {
 		return nil
 	}
-	// check permission on the underlying project
-	if err := permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, projectID); err != nil {
-		// only check for project grant permissions if user grant is for a project grant
-		if grantedOrgID == "" && grantID == "" {
-			return err
-		}
+	// only check for project grant permissions if user grant is for a project grant
+	if grantID == "" {
 		// permissions can be available on the project grant
-		if err := permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, grantID); err != nil {
-			// or the organization the project is granted to
-			if err := permissionCheck(ctx, domain.PermissionUserGrantRead, grantedOrgID, grantID); err != nil {
-				return err
-			}
-		}
+		return permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, grantID)
 	}
-
-	return nil
+	// check permission on the underlying project
+	return permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, projectID)
 }
 
 type UserGrantsQueries struct {

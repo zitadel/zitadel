@@ -50,7 +50,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			args: args{
 				ctx: EmptyCTX,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -70,7 +70,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			args: args{
 				ctx: Instance.WithAuthorizationToken(EmptyCTX, integration.UserTypeNoPermission),
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -118,7 +118,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -146,7 +146,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					resp := createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_AuthorizationIds{
@@ -175,7 +175,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					resp := createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_ProjectId{
@@ -204,7 +204,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					resp := createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), false)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_ProjectName{
@@ -234,7 +234,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -262,7 +262,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					resp := createAuthorization(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), true)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_ProjectGrantId{
@@ -291,7 +291,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -324,7 +324,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			args: args{
 				ctx: Instance.WithAuthorizationToken(EmptyCTX, integration.UserTypeOrgOwner),
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -354,7 +354,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 			args: args{
 				ctx: projectOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -386,7 +386,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 				args: args{
 					ctx: projectGrantOwnerCtx,
 					dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-						userResp := Instance.CreateUserTypeHuman(iamOwnerCtx)
+						userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 						request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 							UserId: &filter.IDFilter{
@@ -580,7 +580,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			args: args{
 				ctx: EmptyCTX,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -600,7 +600,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			args: args{
 				ctx: InstancePermissionV2.WithAuthorizationToken(EmptyCTX, integration.UserTypeNoPermission),
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -648,7 +648,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -676,7 +676,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					resp := createAuthorization(iamOwnerCtx, InstancePermissionV2, t, InstancePermissionV2.DefaultOrg.GetId(), userResp.GetId(), false)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_AuthorizationIds{
@@ -705,7 +705,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					resp := createAuthorization(iamOwnerCtx, InstancePermissionV2, t, InstancePermissionV2.DefaultOrg.GetId(), userResp.GetId(), false)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_ProjectId{
@@ -734,7 +734,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					resp := createAuthorization(iamOwnerCtx, InstancePermissionV2, t, InstancePermissionV2.DefaultOrg.GetId(), userResp.GetId(), false)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_ProjectName{
@@ -764,7 +764,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -792,7 +792,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					resp := createAuthorization(iamOwnerCtx, InstancePermissionV2, t, InstancePermissionV2.DefaultOrg.GetId(), userResp.GetId(), true)
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_ProjectGrantId{
@@ -821,7 +821,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -854,7 +854,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			args: args{
 				ctx: InstancePermissionV2.WithAuthorizationToken(EmptyCTX, integration.UserTypeOrgOwner),
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -884,7 +884,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 			args: args{
 				ctx: projectOwnerCtx,
 				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx)
+					userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 						UserId: &filter.IDFilter{
@@ -916,7 +916,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 				args: args{
 					ctx: projectGrantOwnerCtx,
 					dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-						userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx)
+						userResp := InstancePermissionV2.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
 						request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
 							UserId: &filter.IDFilter{
