@@ -55,6 +55,7 @@ func (mig *AddIDUniqueConstraintsForOrgs) Execute(ctx context.Context, _ eventst
 
 	err = mig.eventstore.FilterToReducer(ctx, sqb, &orm)
 	if err != nil {
+		return err
 	}
 
 	var tx *sql.Tx
