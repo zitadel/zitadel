@@ -820,19 +820,15 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Web key (Beta)",
+              label: "Web Key",
               link: {
                 type: "generated-index",
-                title: "Web Key Service API (Beta)",
+                title: "Web Key Service API",
                 slug: "/apis/resources/webkey_service_v2",
                 description:
                     "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
-                    "\n" +
-                    "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
                     "\n"+
-                    "The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n"+
-                    "\n"+
-                    "Please make sure to enable the `web_key` feature flag on your instance to use this service and that you're running ZITADEL V3.",
+                    "The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n",
               },
               items: sidebar_api_webkey_service_v2
             },
