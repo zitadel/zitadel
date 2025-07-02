@@ -117,7 +117,7 @@ func (c *Commands) ChangeProjectMember(ctx context.Context, member *ChangeProjec
 	if slices.Compare(existingMember.Roles, member.Roles) == 0 {
 		return writeModelToObjectDetails(&existingMember.WriteModel), nil
 	}
-	projectAgg := ProjectAggregateFromWriteModel(&existingMember.WriteModel)
+	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingMember.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectMemberChangedEvent(ctx, projectAgg, member.UserID, member.Roles...))
 	if err != nil {
 		return nil, err
