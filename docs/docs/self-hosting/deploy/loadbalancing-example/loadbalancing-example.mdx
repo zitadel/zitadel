@@ -60,8 +60,12 @@ wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosti
 
 # A single ZITADEL instance always needs the same 32 bytes long masterkey
 # Generate one to a file if you haven't done so already and pass it as environment variable
-LC_ALL=C tr -dc '[:graph:]' </dev/urandom | head -c 32 > ./zitadel-masterkey
+LC_ALL=C tr -dc '[:alpha:]' </dev/urandom | head -c 32 > ./zitadel-masterkey
 export ZITADEL_MASTERKEY="$(cat ./zitadel-masterkey)"
+
+# make sure the file ./pat exists so docker compose doesn't complain
+# it will be overwritten by the setup job
+echo "overwritten" > ./pat
 
 # Run the database and application containers
 docker compose up --detach --wait

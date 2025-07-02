@@ -22,7 +22,10 @@ services:
     networks:
       - 'storage'
     image: 'ghcr.io/zitadel/zitadel:latest'
-    command: 'init --config /example-zitadel-config.yaml --config /example-zitadel-secrets.yaml'
+    command: >
+      init
+      --config /example-zitadel-config.yaml
+      --config /example-zitadel-secrets.yaml
     depends_on:
       db:
         condition: 'service_healthy'
@@ -34,32 +37,18 @@ services:
     restart: 'no'
     networks:
       - 'storage'
-    # We use the debug image so we have the environment to
-    # - create the .env file for the login to authenticate at Zitadel
-    # - set the correct permissions for the .env-file folder
-    image: 'ghcr.io/zitadel/zitadel:latest-debug'
-    user: root
-    entrypoint: '/bin/sh'
-    command:
-    - -c
-    - >
-      /app/zitadel setup
+    image: 'ghcr.io/zitadel/zitadel:latest'
+    command: >
+      setup 
       --config /example-zitadel-config.yaml
       --config /example-zitadel-secrets.yaml
       --steps /example-zitadel-init-steps.yaml
-      --masterkey ${ZITADEL_MASTERKEY} &&
-      mv /pat /.env-file/pat || exit 0 &&
-      echo ZITADEL_SERVICE_USER_TOKEN=$(cat /.env-file/pat) > /.env-file/.env &&
-      chown -R 1001:${GID} /.env-file &&
-      chmod -R 770 /.env-file
-    environment:
-      - GID
+      --masterkey ${ZITADEL_MASTERKEY}
     depends_on:
       zitadel-init:
         condition: 'service_completed_successfully'
-        restart: false
     volumes:
-      - './.env-file:/.env-file:rw'
+      - '.:/pat-dir:rw'
       - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
       - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
       - './example-zitadel-init-steps.yaml:/example-zitadel-init-steps.yaml:ro'
@@ -71,7 +60,8 @@ services:
       - 'storage'
     image: 'ghcr.io/zitadel/zitadel:latest'
     command: >
-      start --config /example-zitadel-config.yaml
+      start
+      --config /example-zitadel-config.yaml
       --config /example-zitadel-secrets.yaml
       --masterkey ${ZITADEL_MASTERKEY}
     depends_on:
@@ -94,40 +84,18 @@ services:
       retries: 5
       start_period: 10s
 
-  # The use-new-login service configures Zitadel to use the new login v2 for all applications.
-  # It also gives the setupped machine user the necessary IAM_LOGIN_CLIENT role.
-  use-new-login:
-    restart: 'on-failure'
-    user: "1001"
-    networks:
-      - 'backend'
-    image: 'badouralix/curl-jq:alpine'
-    entrypoint: '/bin/sh'
-    command:
-      - -c
-      - >
-        curl -X PUT -H "Host: 127.0.0.1.sslip.io" -H "Authorization: Bearer $(cat ./.env-file/pat)" --insecure http://zitadel:8080/v2/features/instance -d '{"loginV2": {"required": true}}' &&
-        LOGIN_USER=$(curl --fail-with-body  -H "Host: 127.0.0.1.sslip.io" -H "Authorization: Bearer $(cat ./.env-file/pat)" --insecure http://zitadel:8080/auth/v1/users/me | jq -r '.user.id') &&
-        curl -X PUT  -H "Host: 127.0.0.1.sslip.io" -H "Authorization: Bearer $(cat ./.env-file/pat)" --insecure http://zitadel:8080/admin/v1/members/$${LOGIN_USER} -d '{"roles": ["IAM_OWNER", "IAM_LOGIN_CLIENT"]}'
-    volumes:
-      - './.env-file:/.env-file:ro'
-    depends_on:
-      zitadel:
-        condition: 'service_healthy'
-        restart: false
-
   login:
     restart: 'unless-stopped'
     networks:
       - 'backend'
-    image: 'ghcr.io/zitadel/login:main'
+    image: 'ghcr.io/zitadel/login:latest'
     environment:
       - ZITADEL_API_URL=http://zitadel:8080
       - CUSTOM_REQUEST_HEADERS=Host:127.0.0.1.sslip.io
       - NEXT_PUBLIC_BASE_PATH="/ui/v2/login"
-    user: "${UID:-1000}"
-    volumes:
-      - './.env-file:/.env-file:ro'
+      - ZITADEL_SERVICE_USER_TOKEN_FILE=/run/secrets/login-client-pat
+    secrets:
+      - login-client-pat
     depends_on:
       zitadel:
         condition: 'service_healthy'
@@ -148,6 +116,11 @@ services:
         condition: 'service_healthy'
       login:
         condition: 'service_started'
+
+secrets:
+  login-client-pat:
+    file: './login-client-pat'
+
 
 networks:
   storage:
