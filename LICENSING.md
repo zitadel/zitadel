@@ -18,6 +18,13 @@ The following files and directories, including their subdirectories, are license
 proto/
 ```
 
+
+The following files and directories, including their subdirectories, are licensed under the [MIT License](https://opensource.org/license/mit/):
+
+```
+login/
+```
+
 ## Community Contributions
 
 To maintain a clear licensing structure and facilitate community contributions, all contributions must be licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) to be accepted. By submitting a contribution, you agree to this licensing.
