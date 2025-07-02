@@ -28,11 +28,11 @@ func TestServer_ListAuthorizations(t *testing.T) {
 	Instance.CreateProjectMembership(t, iamOwnerCtx, projectResp.GetId(), projectOwnerResp.GetUserId())
 	projectOwnerCtx := integration.WithAuthorizationToken(EmptyCTX, projectOwnerPatResp.Token)
 
-	//projectGrantOwnerResp := Instance.CreateMachineUser(iamOwnerCtx)
-	//projectGrantOwnerPatResp := Instance.CreatePersonalAccessToken(iamOwnerCtx, projectGrantOwnerResp.GetUserId())
+	projectGrantOwnerResp := Instance.CreateMachineUser(iamOwnerCtx)
+	projectGrantOwnerPatResp := Instance.CreatePersonalAccessToken(iamOwnerCtx, projectGrantOwnerResp.GetUserId())
 	grantedProjectResp := createGrantedProject(iamOwnerCtx, Instance, t, projectResp)
-	//Instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), grantedProjectResp.GetGrantedOrganizationId(), projectGrantOwnerResp.GetUserId())
-	//projectGrantOwnerCtx := integration.WithAuthorizationToken(EmptyCTX, projectGrantOwnerPatResp.Token)
+	Instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), grantedProjectResp.GetGrantedOrganizationId(), projectGrantOwnerResp.GetUserId())
+	projectGrantOwnerCtx := integration.WithAuthorizationToken(EmptyCTX, projectGrantOwnerPatResp.Token)
 
 	type args struct {
 		ctx context.Context
@@ -333,7 +333,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 					}
 
 					response.Authorizations[1] = createAuthorizationForProject(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), projectResp.GetName(), projectResp.GetId())
-					response.Authorizations[0] = createAuthorizationForProjectGrant(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), grantedProjectResp.GetName(), grantedProjectResp.GetId())
+					response.Authorizations[0] = createAuthorizationWithProjectGrant(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), grantedProjectResp.GetName(), grantedProjectResp.GetId())
 				},
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{{}},
@@ -363,7 +363,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 					}
 
 					response.Authorizations[1] = createAuthorizationForProject(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), projectResp.GetName(), projectResp.GetId())
-					response.Authorizations[0] = createAuthorizationForProjectGrant(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), grantedProjectResp.GetName(), grantedProjectResp.GetId())
+					response.Authorizations[0] = createAuthorizationWithProjectGrant(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), grantedProjectResp.GetName(), grantedProjectResp.GetId())
 				},
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{{}},
@@ -379,39 +379,36 @@ func TestServer_ListAuthorizations(t *testing.T) {
 				},
 			},
 		},
-		/*
-			TODO: correct when permission check is added for project grants https://github.com/zitadel/zitadel/issues/9972
-			{
-				name: "list single id, project and project grant, project grant owner",
-				args: args{
-					ctx: projectGrantOwnerCtx,
-					dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
-						userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
+		{
+			name: "list single id, project and project grant, project grant owner",
+			args: args{
+				ctx: projectGrantOwnerCtx,
+				dep: func(request *authorization.ListAuthorizationsRequest, response *authorization.ListAuthorizationsResponse) {
+					userResp := Instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 
-						request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
-							UserId: &filter.IDFilter{
-								Id: userResp.GetId(),
-							},
-						}
+					request.Filters[0].Filter = &authorization.AuthorizationsSearchFilter_UserId{
+						UserId: &filter.IDFilter{
+							Id: userResp.GetId(),
+						},
+					}
 
-						createAuthorizationForProject(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), projectResp.GetName(), projectResp.GetId())
-						response.Authorizations[0] = createAuthorizationForProjectGrant(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), grantedProjectResp.GetName(), grantedProjectResp.GetId())
-					},
-					req: &authorization.ListAuthorizationsRequest{
-						Filters: []*authorization.AuthorizationsSearchFilter{{}},
-					},
+					createAuthorizationForProject(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), projectResp.GetName(), projectResp.GetId())
+					response.Authorizations[0] = createAuthorizationForProjectGrant(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), grantedProjectResp.GetName(), grantedProjectResp.GetId(), grantedProjectResp.GetGrantedOrganizationId())
 				},
-				want: &authorization.ListAuthorizationsResponse{
-					Pagination: &filter.PaginationResponse{
-						TotalResult:  2,
-						AppliedLimit: 100,
-					},
-					Authorizations: []*authorization.Authorization{
-						{},
-					},
+				req: &authorization.ListAuthorizationsRequest{
+					Filters: []*authorization.AuthorizationsSearchFilter{{}},
 				},
 			},
-		*/
+			want: &authorization.ListAuthorizationsResponse{
+				Pagination: &filter.PaginationResponse{
+					TotalResult:  2,
+					AppliedLimit: 100,
+				},
+				Authorizations: []*authorization.Authorization{
+					{},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -450,7 +447,7 @@ func createAuthorization(ctx context.Context, instance *integration.Instance, t 
 	projectResp := instance.CreateProject(ctx, t, orgID, projectName, false, false)
 
 	if grant {
-		return createAuthorizationForProjectGrant(ctx, instance, t, orgID, userID, projectName, projectResp.GetId())
+		return createAuthorizationWithProjectGrant(ctx, instance, t, orgID, userID, projectName, projectResp.GetId())
 	}
 	return createAuthorizationForProject(ctx, instance, t, orgID, userID, projectName, projectResp.GetId())
 }
@@ -479,22 +476,26 @@ func createAuthorizationForProject(ctx context.Context, instance *integration.In
 	}
 }
 
-func createAuthorizationForProjectGrant(ctx context.Context, instance *integration.Instance, t *testing.T, orgID, userID, projectName, projectID string) *authorization.Authorization {
-	userResp, err := instance.Client.UserV2.GetUserByID(ctx, &user.GetUserByIDRequest{UserId: userID})
-
+func createAuthorizationWithProjectGrant(ctx context.Context, instance *integration.Instance, t *testing.T, orgID, userID, projectName, projectID string) *authorization.Authorization {
 	grantedOrgName := gofakeit.Company()
 	grantedOrg := instance.CreateOrganization(ctx, grantedOrgName, gofakeit.Email())
 	instance.CreateProjectGrant(ctx, t, projectID, grantedOrg.GetOrganizationId())
 
-	userGrantResp := instance.CreateProjectGrantUserGrant(ctx, orgID, projectID, grantedOrg.GetOrganizationId(), userID)
+	return createAuthorizationForProjectGrant(ctx, instance, t, orgID, userID, projectName, projectID, grantedOrg.GetOrganizationId())
+}
+
+func createAuthorizationForProjectGrant(ctx context.Context, instance *integration.Instance, t *testing.T, orgID, userID, projectName, projectID, grantedOrgID string) *authorization.Authorization {
+	userResp, err := instance.Client.UserV2.GetUserByID(ctx, &user.GetUserByIDRequest{UserId: userID})
 	require.NoError(t, err)
+
+	userGrantResp := instance.CreateProjectGrantUserGrant(ctx, orgID, projectID, grantedOrgID, userID)
 	return &authorization.Authorization{
 		Id:                    userGrantResp.GetUserGrantId(),
 		ProjectId:             projectID,
 		ProjectName:           projectName,
 		ProjectOrganizationId: orgID,
-		ProjectGrantId:        gu.Ptr(grantedOrg.GetOrganizationId()),
-		GrantedOrganizationId: gu.Ptr(grantedOrg.GetOrganizationId()),
+		ProjectGrantId:        gu.Ptr(grantedOrgID),
+		GrantedOrganizationId: gu.Ptr(grantedOrgID),
 		OrganizationId:        orgID,
 		CreationDate:          userGrantResp.Details.GetCreationDate(),
 		ChangeDate:            userGrantResp.Details.GetCreationDate(),
@@ -863,7 +864,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 					}
 
 					response.Authorizations[1] = createAuthorizationForProject(iamOwnerCtx, InstancePermissionV2, t, InstancePermissionV2.DefaultOrg.GetId(), userResp.GetId(), projectResp.GetName(), projectResp.GetId())
-					response.Authorizations[0] = createAuthorizationForProjectGrant(iamOwnerCtx, InstancePermissionV2, t, InstancePermissionV2.DefaultOrg.GetId(), userResp.GetId(), grantedProjectResp.GetName(), grantedProjectResp.GetId())
+					response.Authorizations[0] = createAuthorizationWithProjectGrant(iamOwnerCtx, InstancePermissionV2, t, InstancePermissionV2.DefaultOrg.GetId(), userResp.GetId(), grantedProjectResp.GetName(), grantedProjectResp.GetId())
 				},
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{{}},
@@ -893,7 +894,7 @@ func TestServer_ListAuthorizations_PermissionsV2(t *testing.T) {
 					}
 
 					response.Authorizations[1] = createAuthorizationForProject(iamOwnerCtx, InstancePermissionV2, t, InstancePermissionV2.DefaultOrg.GetId(), userResp.GetId(), projectResp.GetName(), projectResp.GetId())
-					response.Authorizations[0] = createAuthorizationForProjectGrant(iamOwnerCtx, InstancePermissionV2, t, InstancePermissionV2.DefaultOrg.GetId(), userResp.GetId(), grantedProjectResp.GetName(), grantedProjectResp.GetId())
+					response.Authorizations[0] = createAuthorizationWithProjectGrant(iamOwnerCtx, InstancePermissionV2, t, InstancePermissionV2.DefaultOrg.GetId(), userResp.GetId(), grantedProjectResp.GetName(), grantedProjectResp.GetId())
 				},
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{{}},
