@@ -88,7 +88,7 @@ func (mig *AddIDUniqueConstraintsForOrgs) Execute(ctx context.Context, _ eventst
 }
 
 func (*AddIDUniqueConstraintsForOrgs) String() string {
-	return "60_add_id_unique_constraints_for_orgs"
+	return "61_add_id_unique_constraints_for_orgs"
 }
 
 func (f *AddIDUniqueConstraintsForOrgs) Check(lastRun map[string]interface{}) bool {
