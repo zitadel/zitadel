@@ -62,7 +62,7 @@ jobs:
           push: true
           targets: login-standalone
           build-platform: linux/${{ matrix.arch }}
-          set: --set login-*.context=./login/
+          set: login-*.context=./login/
           project: w47wkxzdtw
           files: |
             ./login/docker-bake.hcl
