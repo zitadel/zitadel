@@ -124,23 +124,13 @@ variable "LOGIN_TAG" {
   default = "zitadel-login:local"
 }
 
-target "docker-metadata-action" {
-  # In the pipeline, this target is overwritten by the docker metadata action.
-  tags = ["${LOGIN_TAG}"]
-}
-
 # We run integration and acceptance tests against the next standalone server for docker.
 target "login-standalone" {
-  inherits   = ["docker-metadata-action"]
+  tags = ["${LOGIN_TAG}"]
   dockerfile = "${DOCKERFILES_DIR}login-standalone.Dockerfile"
   contexts = {
     login-client = "target:login-client"
   }
-}
-
-target "login-standalone-release" {
-  inherits  = ["login-standalone"]
-  platforms = ["linux/amd64", "linux/arm64"]
 }
 
 target "login-standalone-out" {
@@ -149,4 +139,15 @@ target "login-standalone-out" {
   output = [
     "type=local,dest=${LOGIN_DIR}apps/login/standalone"
   ]
+}
+
+target "docker-metadata-action" {}
+
+target "login-standalone-release" {
+  inherits   = [
+      "docker-metadata-action",
+      "login-standalone",
+  ]
+  inherits  = ["login-standalone"]
+  platforms = ["linux/amd64", "linux/arm64"]
 }
