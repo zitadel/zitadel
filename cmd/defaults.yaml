@@ -1203,6 +1203,37 @@ DefaultInstance:
 # If an audit log retention is set using an instance limit, it will overwrite the system default.
 AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
 
+# The ServicePing are periodic reports of analytics data and the usage of ZITADEL.
+# It is sent to a central endpoint to help us improve ZITADEL.
+# It's enabled by default, but you can opt out either completely or by disabling specific telemetry data.
+ServicePing:
+  # By setting Enabled to false, the service ping is disabled completely.
+  Enabled: true # ZITADEL_SERVICEPING_ENABLED
+  # The endpoint to which the reports are sent. The endpoint is used as a base path. Individual reports are sent to the endpoint with a specific path.
+  Endpoint: "https://zitadel.cloud/api/ping" # ZITADEL_SERVICEPING_ENDPOINT
+  # Interval at which the service ping is sent to the endpoint.
+  # The interval is in the format of a cron expression.
+  # By default, it is set to every day at midnight:
+  Interval: "0 0 * * *" # ZITADEL_SERVICEPING_INTERVAL
+  # Maximum number of attempts for each individual report to be sent.
+  # If one report fails, it will be retried up to this number of times.
+  # Other reports will still be handled in parallel and have their own retry count.
+  # This means if the base information only succeeded after 3 attempts,
+  # the resource count still has 5 attempts to be sent.
+  MaxAttempts: 5 # ZITADEL_SERVICEPING_MAXATTEMPTS
+  # The following features can be enabled or disabled individually.
+  # By default, all features are enabled.
+  # Note that if the service ping is enabled, base information about the system is always sent.
+  # This includes the version and the id, creation date and domains of all instances.
+  # If you disable a feature, it will not be sent in the service ping.
+  # Some features provide additional configuration options, if enabled.
+  Telemetry:
+    # ResourceCount is a periodic report of the number of resources in ZITADEL.
+    # This includes the number of users, organizations, projects, and other resources.
+    ResourceCount:
+        Enabled: true # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_ENABLED
+        BulkSize: 10000 # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_BULKSIZE
+
 InternalAuthZ:
   # Configure the RolePermissionMappings by environment variable using JSON notation:
   # ZITADEL_INTERNALAUTHZ_ROLEPERMISSIONMAPPINGS='[{"role": "IAM_OWNER", "permissions": ["iam.write"]}, {"role": "ORG_OWNER", "permissions": ["org.write"]}]'
