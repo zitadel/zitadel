@@ -1,129 +1,67 @@
 name: Quality
-
 on:
   pull_request:
-  # schedule:
-    # Every morning at 6:00 AM CET
-    # - cron: '0 4 * * *'
   workflow_dispatch:
     inputs:
-      target-env:
-        description: 'Zitadel target environment to run the acceptance tests against.'
-        required: true
-        type: choice
-        options:
-          - 'qa'
-          - 'prod'
-
+      ignore-run-cache:
+        description: 'Whether to ignore the run cache'
+        required: false
+        default: true
+      ref-tag:
+        description: 'overwrite the DOCKER_METADATA_OUTPUT_VERSION environment variable used by the make file'
+        required: false
+        default: ''
 jobs:
-  matrix:
-    # If the workflow is triggered by a schedule event, only the acceptance tests run against QA and Prod.
-    name: Matrix
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
-    steps:
-      - name: Matrix
-        id: matrix
-        run: |
-          if [ -n "${{ github.event.schedule }}" ]; then
-            echo 'matrix=["test:acceptance:qa", "test:acceptance:prod"]' >> $GITHUB_OUTPUT
-          elif [ -n "${{ github.event.inputs.target-env }}" ]; then
-            echo 'matrix=["test:acceptance:${{ github.event.inputs.target-env }}"]' >> $GITHUB_OUTPUT
-          else
-            echo 'matrix=["format --check", "lint", "test:unit", "test:integration", "test:acceptance"]' >> $GITHUB_OUTPUT
-          fi
-
   quality:
     name: Ensure Quality
-
-    runs-on: ubuntu-latest
-
+    if: github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.repository_id != '622995060')
+    runs-on: ubuntu-22.04
     timeout-minutes: 30
-
     permissions:
-      contents: "read"
-
-    needs:
-      - matrix
-
-    strategy:
-      fail-fast: false
-      matrix:
-        command: ${{ fromJson( needs.matrix.outputs.matrix ) }}
-
+      contents: read # We only need read access to the repository contents
+      actions: write # We need write access to the actions cache
+    env:
+      CACHE_DIR: /tmp/login-run-caches
+    # Only run this job on workflow_dispatch or pushes to forks
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Setup Buf
-        uses: bufbuild/buf-setup-action@v1.45.0
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.0.0
-
-      - name: Setup Node.js 20.x
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          node-version: 20.x
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-        # We can cache the Playwright binary independently from the pnpm cache, because we install it separately.
-        # After pnpm install --frozen-lockfile, we can get the version so we only have to download the binary once per version.
-      - run: echo "PLAYWRIGHT_VERSION=$(npx playwright --version | cut -d ' ' -f 2)" >> $GITHUB_ENV
-        if: ${{ startsWith(matrix.command, 'test:acceptance') }}
-
-      - name: Setup Playwright binary cache
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-binary-${{ env.PLAYWRIGHT_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-binary-
-        if: ${{ startsWith(matrix.command, 'test:acceptance') }}
-
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
-        if: ${{ startsWith(matrix.command, 'test:acceptance') && steps.playwright-cache.outputs.cache-hit != 'true' }}
-
-      - name: Set up Docker Buildx
+          images: |
+            ghcr.io/zitadel/login
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+      - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
-        if: ${{ matrix.command == 'test:acceptance' }}
-
-      - name: Build acceptance setup image
-        run: |
-          cd acceptance
-          docker build -t acceptance-setup:latest .
-        if: ${{ matrix.command == 'test:acceptance' }}
-
-      - name: Run ZITADEL
-        run: ZITADEL_DEV_UID=root pnpm run-sink
-        if: ${{ matrix.command == 'test:acceptance' }}
-
-      - name: Create Cloud Env File
-        run: |
-          if [ "${{ matrix.command }}" == "test:acceptance:prod" ]; then
-            echo "${{ secrets.ENV_FILE_CONTENT_ACCEPTANCE_PROD }}" | tee apps/login/.env.local acceptance/tests/.env.local > /dev/null
-          else
-            echo "${{ secrets.ENV_FILE_CONTENT_ACCEPTANCE_QA }}" | tee apps/login/.env.local acceptance/tests/.env.local > /dev/null
-          fi
-        if: ${{ matrix.command == 'test:acceptance:qa' || matrix.command == 'test:acceptance:prod' }}
-
-      - name: Create Production Build
-        run: pnpm build
-        if: ${{ startsWith(matrix.command, 'test:acceptance') }}
-
-      - name: Run SAML SP
-        run: ZITADEL_DEV_UID=root pnpm run-samlsp
-        if: ${{ matrix.command == 'test:acceptance' }}
-
-      - name: Run OIDC RP
-        run: ZITADEL_DEV_UID=root pnpm run-oidcrp
-        if: ${{ matrix.command == 'test:acceptance' }}
-
-      - name: Check
-        id: check
-        run: pnpm ${{ contains(matrix.command, 'test:acceptance') && 'test:acceptance' || matrix.command }}
+      # Only with correctly restored build cache layers, the run caches work as expected.
+      # To restore docker build layer caches, extend the docker-bake.hcl to use the cache-from and cache-to options.
+      # https://docs.docker.com/build/ci/github-actions/cache/
+      # Alternatively, you can use a self-hosted runner or a third-party builder that restores build layer caches out-of-the-box, like https://depot.dev/
+      - name: Restore Run Caches
+        uses: actions/cache/restore@v4
+        id: run-caches-restore
+        with:
+          path: ${{ env.CACHE_DIR }}
+          key: ${{ runner.os }}-login-run-caches-${{github.ref_name}}-${{ github.sha }}-${{github.run_attempt}}
+          restore-keys: |
+            ${{ runner.os }}-login-run-caches-${{github.ref_name}}-${{ github.sha }}-
+            ${{ runner.os }}-login-run-caches-${{github.ref_name}}-
+            ${{ runner.os }}-login-run-caches-
+      - run: make login_quality
+        env:
+          IGNORE_RUN_CACHE: ${{ github.event.inputs.ignore-run-cache == 'true' }}
+          DOCKER_METADATA_OUTPUT_VERSION: ${{ github.event.inputs.ref-tag || env.DOCKER_METADATA_OUTPUT_VERSION || steps.meta.outputs.version }}
+      - name: Save Run Caches
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.CACHE_DIR }}
+          key: ${{ steps.run-caches-restore.outputs.cache-primary-key }}
+        if: always()

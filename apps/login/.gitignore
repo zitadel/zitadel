@@ -1,2 +1,3 @@
 custom-config.js
-.env.local
+.env*.local
+standalone

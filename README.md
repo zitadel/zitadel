@@ -158,14 +158,13 @@ To find the keys more easily, you can inspect the HTML and search for a `data-i1
 
 ## Useful Commands
 
-- `pnpm generate` - Build proto stubs for server and client package
-- `pnpm build` - Build all packages and the login app
-- `pnpm test` - Test all packages and the login app
-- `pnpm test:watch` - Rerun tests on file change
+- `make login-quality` - Check the quality of your code against a production build without installing any dependencies besides Docker
+- `pnpm generate` - Build proto stubs for the client package
 - `pnpm dev` - Develop all packages and the login app
-- `pnpm lint` - Lint all packages
-- `pnpm changeset` - Generate a changeset
+- `pnpm build` - Build all packages and the login app
 - `pnpm clean` - Clean up all `node_modules` and `dist` folders (runs each package's clean script)
+
+Learn more about developing the login UI in the [contribution guide](/CONTRIBUTING.md).
 
 ## Versioning And Publishing Packages
 

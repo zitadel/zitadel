@@ -24,42 +24,9 @@ Please consider the following guidelines when creating a pull request.
 
 - The latest changes are always in `main`, so please make your pull request against that branch.
 - pull requests should be raised for any change
-- Pull requests need approval of a ZITADEL core engineer @zitadel/engineers before merging
+- Pull requests need approval of a Zitadel core engineer @zitadel/engineers before merging
 - We use ESLint/Prettier for linting/formatting, so please run `pnpm lint:fix` before committing to make resolving conflicts easier (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
 - If you add new functionality, please provide the corresponding documentation as well and make it part of the pull request
-
-## Setting Up The ZITADEL API
-
-If you want to have a one-liner to get you up and running,
-or if you want to develop against a ZITADEL API with the latest features,
-or even add changes to ZITADEL itself at the same time,
-you should develop against your local ZITADEL process.
-However, it might be easier to develop against your ZITADEL Cloud instance
-if you don't have docker installed
-or have limited resources on your local machine.
-
-### Developing Against Your Local ZITADEL Instance
-
-```sh
-# To have your service user key and environment file written with the correct ownership, export your current users ID.
-export ZITADEL_DEV_UID="$(id -u)"
-
-# Pull images
-docker compose --file ./acceptance/docker-compose.yaml pull
-
-# Run ZITADEL with local notification sink and configure ./apps/login/.env.local
-pnpm run-sink
-```
-
-### Developing Against Your ZITADEL Cloud Instance
-
-Configure your shell by exporting the following environment variables:
-
-```sh
-export ZITADEL_API_URL=<your cloud instance URL here>
-export ZITADEL_ORG_ID=<your service accounts organization id here>
-export ZITADEL_SERVICE_USER_TOKEN=<your service account personal access token here>
-```
 
 ### Setting up local environment
 
@@ -70,40 +37,170 @@ pnpm install
 # Generate gRPC stubs
 pnpm generate
 
-# Start a local development server
+# Start a local development server for the login and manually configure apps/login/.env.local
 pnpm dev
 ```
 
 The application is now available at `http://localhost:3000`
 
-### Adding applications and IDPs
+Configure apps/login/.env.local to target the Zitadel instance of your choice.
+The login app live-reloads on changes, so you can start developing right away.
+
+### <a name="latest"></a>Developing Against A Local Latest Zitadel Release
+
+The following command uses Docker to run a local Zitadel instance and the login application in live-reloading dev mode.
+Additionally, it runs a Traefik reverse proxy that exposes the login with a self-signed certificate at https://127.0.0.1.sslip.io
+127.0.0.1.sslip.io is a special domain that resolves to your localhost, so it's safe to allow your browser to proceed with loading the page.
 
 ```sh
-# OPTIONAL Run SAML SP
-pnpm run-samlsp
+# Install dependencies. Developing requires Node.js v20
+pnpm install
 
-# OPTIONAL Run OIDC RP
-pnpm run-oidcrp
+# Generate gRPC stubs
+pnpm generate
 
-# OPTIONAL Run SAML IDP
-pnpm run-samlidp
-
-# OPTIONAL Run OIDC OP
-pnpm run-oidcop
+# Start a local development server and have apps/login/.env.test.local configured for you to target the local Zitadel instance.
+pnpm dev:local
 ```
 
-### Testing
+Log in at https://127.0.0.1.sslip.io/ui/v2/login/loginname and use the following credentials:
+**Loginname**: *zitadel-admin@zitadel.127.0.0.1.sslip.io*
+**Password**: _Password1!_.
 
-You can execute the following commands `pnpm test` for a single test run or `pnpm test:watch` in the following directories:
+The login app live-reloads on changes, so you can start developing right away.
 
-- apps/login
-- packages/zitadel-proto
-- packages/zitadel-client
-- packages/zitadel-node
-- The projects root directory: all tests in the project are executed
+### <a name="local"></a>Developing Against A Locally Compiled Zitadel
 
-In apps/login, these commands also spin up the application and a ZITADEL gRPC API mock server to run integration tests using [Cypress](https://www.cypress.io/) against them.
-If you want to run the integration tests standalone against an environment of your choice, navigate to ./apps/login, [configure your shell as you like](# Developing Against Your ZITADEL Cloud Instance) and run `pnpm test:integration:run` or `pnpm test:integration:open`.
-Then you need to lifecycle the mock process using the command `pnpm mock` or the more fine grained commands `pnpm mock:build`, `pnpm mock:build:nocache`, `pnpm mock:run` and `pnpm mock:destroy`.
+To develop against a locally compiled version of Zitadel, you need to build the Zitadel docker image first.
+Clone the [Zitadel repository](https://github.com/zitadel/zitadel.git) and run the following command from its root:
 
-That's it! 🎉
+```sh
+# This compiles a Zitadel binary if it does not exist at ./zitadel already and copies it into a Docker image.
+# If you want to recompile the binary, run `make compile` first
+make login_dev
+```
+
+Open another terminal session at zitadel/zitadel/login and run the following commands to start the dev server.
+
+```bash
+# Install dependencies. Developing requires Node.js v20
+pnpm install
+
+# Start a local development server and have apps/login/.env.test.local configured for you to target the local Zitadel instance.
+NODE_ENV=test pnpm dev
+```
+
+Log in at https://127.0.0.1.sslip.io/ui/v2/login/loginname and use the following credentials:
+**Loginname**: *zitadel-admin@zitadel.127.0.0.1.sslip.io*
+**Password**: _Password1!_.
+
+The login app live-reloads on changes, so you can start developing right away.
+
+### Quality Assurance
+
+Use `make` commands to test the quality of your code against a production build without installing any dependencies besides Docker.
+Using `make` commands, you can reproduce and debug the CI pipelines locally.
+
+```sh
+# Reproduce the whole CI pipeline in docker
+make login_quality
+# Show other options with make
+make help
+```
+
+Use `pnpm` commands to run the tests in dev mode with live reloading and debugging capabilities.
+
+#### Linting and formatting
+
+Check the formatting and linting of the code in docker
+
+```sh
+make login_lint
+```
+
+Check the linting of the code using pnpm
+
+```sh
+pnpm lint
+pnpm format
+```
+
+Fix the linting of your code
+
+```sh
+pnpm lint:fix
+pnpm format:fix
+```
+
+#### Running Unit Tests
+
+Run the tests in docker
+
+```sh
+make login_test_unit
+```
+
+Run unit tests with live-reloading
+
+```sh
+pnpm test:unit
+```
+
+#### Running Integration Tests
+
+Run the test in docker
+
+```sh
+make login_test_integration
+```
+
+Alternatively, run a live-reloading development server with an interactive Cypress test suite.
+First, set up your local test environment.
+
+```sh
+# Install dependencies. Developing requires Node.js v20
+pnpm install
+
+# Generate gRPC stubs
+pnpm generate
+
+# Start a local development server and use apps/login/.env.test to use the locally mocked Zitadel API.
+pnpm test:integration:setup
+```
+
+Now, in another terminal session, open the interactive Cypress integration test suite.
+
+```sh
+pnpm test:integration open
+```
+
+Show more options with Cypress
+
+```sh
+pnpm test:integration help
+```
+
+#### Running Acceptance Tests
+
+To run the tests in docker against the latest release of Zitadel, use the following command:
+
+:warning: The acceptance tests are not reliable at the moment :construction:
+
+```sh
+make login_test_acceptance
+```
+
+Alternatively, run can use a live-reloading development server with an interactive Playwright test suite.
+Set up your local environment by running the commands either for [developing against a local latest Zitadel release](latest) or for [developing against a locally compiled Zitadel](compiled).
+
+Now, in another terminal session, open the interactive Playwright acceptance test suite.
+
+```sh
+pnpm test:acceptance open
+```
+
+Show more options with Playwright
+
+```sh
+pnpm test:acceptance help
+```

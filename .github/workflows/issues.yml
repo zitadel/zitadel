@@ -4,14 +4,12 @@ on:
   issues:
     types:
       - opened
-  pull_request_target:
-    types:
-      - opened
 
 jobs:
   add-to-project:
     name: Add issue and community pr to project
     runs-on: ubuntu-latest
+    if: github.repository_id == '622995060'
     steps:
       - name: add issue
         uses: actions/add-to-project@v1.0.2

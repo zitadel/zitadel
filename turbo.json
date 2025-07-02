@@ -20,12 +20,21 @@
       "cache": true
     },
     "build": {},
-    "build:standalone": {},
+    "build:login:standalone": {},
+    "build:client:standalone": {},
     "test": {},
     "start": {},
     "start:built": {},
     "test:unit": {},
+    "test:unit:standalone": {},
     "test:integration": {},
+    "test:integration:setup": {
+      "with": ["dev"]
+    },
+    "test:acceptance:setup": {},
+    "test:acceptance:setup:dev": {
+      "with": ["dev"]
+    },
     "test:watch": {
       "persistent": true
     },

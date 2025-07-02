@@ -5,19 +5,16 @@
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
       "dependsOn": ["^build"]
     },
-    "build:standalone": {
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
-      "dependsOn": ["^build"]
+    "build:login:standalone": {
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "test": {
-      "dependsOn": ["@zitadel/client#build"]
-    },
-    "test:integration": {
       "dependsOn": ["@zitadel/client#build"]
     },
     "test:unit": {
       "dependsOn": ["@zitadel/client#build"]
     },
+    "test:unit:standalone": {},
     "test:watch": {
       "dependsOn": ["@zitadel/client#build"]
     }
