@@ -84,7 +84,7 @@ core_grpc_dependencies:
 core_api: core_api_generator core_grpc_dependencies
 	buf generate
 	mkdir -p pkg/grpc
-	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/
+	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/
 	mkdir -p openapi/v2/zitadel
 	cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel
 
