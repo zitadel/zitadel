@@ -7,6 +7,7 @@ toolchain go1.24.1
 require (
 	cloud.google.com/go/profiler v0.4.2
 	cloud.google.com/go/storage v1.54.0
+	dario.cat/mergo v1.0.2
 	github.com/BurntSushi/toml v1.5.0
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.27.0
@@ -65,6 +66,7 @@ require (
 	github.com/riverqueue/river v0.22.0
 	github.com/riverqueue/river/riverdriver v0.22.0
 	github.com/riverqueue/river/rivertype v0.22.0
+	github.com/riverqueue/rivercontrib/otelriver v0.5.0
 	github.com/rs/cors v1.11.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/shopspring/decimal v1.3.1
@@ -146,7 +148,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/riverqueue/river/rivershared v0.22.0 // indirect
-	github.com/riverqueue/rivercontrib/otelriver v0.5.0 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.5.0 // indirect

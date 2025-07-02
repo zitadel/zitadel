@@ -204,6 +204,7 @@ module.exports = {
           items: [
             "guides/migrate/sources/zitadel",
             "guides/migrate/sources/auth0",
+            "guides/migrate/sources/auth0-guide",
             "guides/migrate/sources/keycloak",
           ],
         },
