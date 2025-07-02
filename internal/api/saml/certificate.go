@@ -14,13 +14,14 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
-	locksTable = "projections.locks"
+	locksTable = projection.LocksTable
 	signingKey = "signing_key"
 	samlUser   = "SAML"
 
