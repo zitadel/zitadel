@@ -42,26 +42,26 @@ func (s *Server) ListApplications(ctx context.Context, req *connect.Request[app.
 	}), nil
 }
 
-func (s *Server) GetApplicationKey(ctx context.Context, req *app.GetApplicationKeyRequest) (*app.GetApplicationKeyResponse, error) {
-	queries, err := convert.GetApplicationKeyQueriesRequestToDomain(req.GetOrganizationId(), req.GetProjectId(), req.GetApplicationId())
+func (s *Server) GetApplicationKey(ctx context.Context, req *connect.Request[app.GetApplicationKeyRequest]) (*connect.Response[app.GetApplicationKeyResponse], error) {
+	queries, err := convert.GetApplicationKeyQueriesRequestToDomain(req.Msg.GetOrganizationId(), req.Msg.GetProjectId(), req.Msg.GetApplicationId())
 	if err != nil {
 		return nil, err
 	}
 
-	key, err := s.query.GetAuthNKeyByIDWithPermission(ctx, true, strings.TrimSpace(req.GetId()), s.checkPermission, queries...)
+	key, err := s.query.GetAuthNKeyByIDWithPermission(ctx, true, strings.TrimSpace(req.Msg.GetId()), s.checkPermission, queries...)
 	if err != nil {
 		return nil, err
 	}
 
-	return &app.GetApplicationKeyResponse{
+	return connect.NewResponse(&app.GetApplicationKeyResponse{
 		Id:             key.ID,
 		CreationDate:   timestamppb.New(key.CreationDate),
 		ExpirationDate: timestamppb.New(key.Expiration),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListApplicationKeys(ctx context.Context, req *app.ListApplicationKeysRequest) (*app.ListApplicationKeysResponse, error) {
-	queries, err := convert.ListApplicationKeysRequestToDomain(s.systemDefaults, req)
+func (s *Server) ListApplicationKeys(ctx context.Context, req *connect.Request[app.ListApplicationKeysRequest]) (*connect.Response[app.ListApplicationKeysResponse], error) {
+	queries, err := convert.ListApplicationKeysRequestToDomain(s.systemDefaults, req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +71,8 @@ func (s *Server) ListApplicationKeys(ctx context.Context, req *app.ListApplicati
 		return nil, err
 	}
 
-	return &app.ListApplicationKeysResponse{
+	return connect.NewResponse(&app.ListApplicationKeysResponse{
 		Keys:       convert.ApplicationKeysToPb(res.AuthNKeys),
 		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, res.SearchResponse),
-	}, nil
+	}), nil
 }
