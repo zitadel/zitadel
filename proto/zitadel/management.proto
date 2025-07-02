@@ -3709,6 +3709,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: Use [GetApplicationKey](/apis/resources/application_service_v2/application-service-get-application-key.api.mdx) instead to get an application key
     rpc GetAppKey(GetAppKeyRequest) returns (GetAppKeyResponse) {
         option (google.api.http) = {
             get: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
@@ -3731,9 +3732,11 @@ service ManagementService {
                     required: false;
                 };
             };
+            deprecated: true;
         };
     }
 
+    // Deprecated: Use [ListApplicationKeys](/apis/resources/application_service_v2/application-service-list-application-keys.api.mdx) instead to list application keys
     rpc ListAppKeys(ListAppKeysRequest) returns (ListAppKeysResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/keys/_search"
@@ -3760,6 +3763,8 @@ service ManagementService {
         };
     }
 
+    // Deprecated: Use [CreateApplicationKey](/apis/resources/application_service_v2/application-service-create-application-key.api.mdx) instead to
+    // create an application key
     rpc AddAppKey(AddAppKeyRequest) returns (AddAppKeyResponse){
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/keys"
@@ -3783,9 +3788,12 @@ service ManagementService {
                     required: false;
                 };
             };
+            deprecated: true;
         };
     }
 
+    // Deprecated: Use [DeleteApplicationKey](/apis/resources/application_service_v2/application-service-delete-application-key.api.mdx) instead to
+    // delete an application key
     rpc RemoveAppKey(RemoveAppKeyRequest) returns (RemoveAppKeyResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
@@ -3808,6 +3816,7 @@ service ManagementService {
                     required: false;
                 };
             };
+            deprecated: true;
         };
     }
 
