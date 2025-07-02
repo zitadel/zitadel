@@ -1,0 +1,51 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "globalDependencies": ["**/.env.*local"],
+  "globalEnv": [
+    "DEBUG",
+    "VERCEL_URL",
+    "EMAIL_VERIFICATION",
+    "AUDIENCE",
+    "SYSTEM_USER_ID",
+    "SYSTEM_USER_PRIVATE_KEY",
+    "ZITADEL_API_URL",
+    "ZITADEL_SERVICE_USER_TOKEN",
+    "NEXT_PUBLIC_BASE_PATH",
+    "CUSTOM_REQUEST_HEADERS",
+    "NODE_ENV"
+  ],
+  "tasks": {
+    "generate": {
+      "cache": true
+    },
+    "build": {},
+    "build:login:standalone": {},
+    "build:client:standalone": {},
+    "test": {},
+    "start": {},
+    "start:built": {},
+    "test:unit": {},
+    "test:unit:standalone": {},
+    "test:integration": {},
+    "test:integration:setup": {
+      "with": ["dev"]
+    },
+    "test:acceptance:setup": {},
+    "test:acceptance:setup:dev": {
+      "with": ["dev"]
+    },
+    "test:watch": {
+      "persistent": true
+    },
+    "lint": {},
+    "lint:fix": {},
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}
