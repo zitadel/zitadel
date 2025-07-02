@@ -69,6 +69,7 @@ require (
 	github.com/riverqueue/river/riverdriver v0.22.0
 	github.com/riverqueue/river/rivertype v0.22.0
 	github.com/riverqueue/rivercontrib/otelriver v0.5.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/cors v1.11.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/shopspring/decimal v1.3.1
