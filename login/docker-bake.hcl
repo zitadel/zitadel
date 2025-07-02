@@ -126,7 +126,7 @@ variable "LOGIN_TAG" {
 
 # We run integration and acceptance tests against the next standalone server for docker.
 target "login-standalone" {
-  tags = ["${LOGIN_TAG}"]
+  tags       = ["${LOGIN_TAG}"]
   dockerfile = "${DOCKERFILES_DIR}login-standalone.Dockerfile"
   contexts = {
     login-client = "target:login-client"
@@ -144,10 +144,9 @@ target "login-standalone-out" {
 target "docker-metadata-action" {}
 
 target "login-standalone-release" {
-  inherits   = [
-      "docker-metadata-action",
-      "login-standalone",
+  inherits = [
+    "docker-metadata-action",
+    "login-standalone",
   ]
-  inherits  = ["login-standalone"]
   platforms = ["linux/amd64", "linux/arm64"]
 }
