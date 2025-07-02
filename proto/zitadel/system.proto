@@ -118,7 +118,7 @@ service SystemService {
 
   // Returns a list of ZITADEL instances
   //
-  // Deprecated: Use [ListInstances](apis/resources/instance_service_v2/zitadel-instance-v-2-beta-instance-service-v2-beta-instance-service-v2-beta-instance-service-list-instances.api.mdx) instead to list instances
+  // Deprecated: Use [ListInstances](apis/resources/instance_service_v2/zitadel-instance-v-2-beta-instance-service-list-instances.api.mdx) instead to list instances
   rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {
     option (google.api.http) = {
       post: "/instances/_search"
