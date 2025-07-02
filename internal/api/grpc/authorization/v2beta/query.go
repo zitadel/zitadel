@@ -50,6 +50,8 @@ func (s *Server) listAuthorizationsRequestToModel(req *authorization.ListAuthori
 
 func authorizationFieldNameToSortingColumn(field authorization.AuthorizationFieldName) query.Column {
 	switch field {
+	case authorization.AuthorizationFieldName_AUTHORIZATION_FIELD_NAME_UNSPECIFIED:
+		return query.UserGrantCreationDate
 	case authorization.AuthorizationFieldName_AUTHORIZATION_FIELD_NAME_CREATED_DATE:
 		return query.UserGrantCreationDate
 	case authorization.AuthorizationFieldName_AUTHORIZATION_FIELD_NAME_CHANGED_DATE:

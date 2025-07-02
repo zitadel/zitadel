@@ -2,6 +2,7 @@ package authorization
 
 import (
 	"context"
+
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
