@@ -79,7 +79,7 @@ func AddMachineWithUsernameToIDFallback() addMachineOption {
 	}
 }
 
-func (c *Commands) AddMachine(ctx context.Context, machine *Machine, check PermissionCheck, options ...addMachineOption) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) AddMachine(ctx context.Context, machine *Machine, state *domain.UserState, check PermissionCheck, options ...addMachineOption) (_ *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -105,6 +105,29 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine, check Permi
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddMachineCommand(agg, machine))
 	if err != nil {
 		return nil, err
+	}
+
+	if state != nil {
+		var cmd eventstore.Command
+		switch *state {
+		case domain.UserStateInactive:
+			cmd = user.NewUserDeactivatedEvent(ctx, &agg.Aggregate)
+		case domain.UserStateLocked:
+			cmd = user.NewUserLockedEvent(ctx, &agg.Aggregate)
+		case domain.UserStateDeleted:
+		// users are never imported if deleted
+		case domain.UserStateActive:
+		// added because of the linter
+		case domain.UserStateSuspend:
+		// added because of the linter
+		case domain.UserStateInitial:
+		// added because of the linter
+		case domain.UserStateUnspecified:
+			// added because of the linter
+		}
+		if cmd != nil {
+			cmds = append(cmds, cmd)
+		}
 	}
 
 	events, err := c.eventstore.Push(ctx, cmds...)
