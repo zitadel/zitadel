@@ -5,19 +5,19 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "start:api": "yarn run generate && docusaurus start",
-    "build": "yarn run generate && docusaurus build",
+    "start:api": "pnpm run generate && docusaurus start",
+    "build": "pnpm run generate && docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "generate": "yarn run generate:grpc && yarn run generate:apidocs && yarn run generate:configdocs",
+    "generate": "pnpm run generate:grpc && pnpm run generate:apidocs && pnpm run generate:configdocs",
     "generate:grpc": "buf generate ../proto",
     "generate:apidocs": "docusaurus gen-api-docs all",
     "generate:configdocs": "cp -r ../cmd/defaults.yaml ./docs/self-hosting/manage/configure/ && cp -r ../cmd/setup/steps.yaml ./docs/self-hosting/manage/configure/",
-    "generate:re-gen": "yarn generate:clean-all && yarn generate",
+    "generate:re-gen": "pnpm generate:clean-all && pnpm generate",
     "generate:clean-all": "docusaurus clean-api-docs all"
   },
   "dependencies": {
@@ -62,5 +62,5 @@
     "@docusaurus/types": "^3.8.1",
     "tailwindcss": "^3.2.4"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "pnpm@9.1.2+sha256.19c17528f9ca20bd442e4ca42f00f1b9808a9cb419383cd04ba32ef19322aba7"
 }

@@ -83,7 +83,11 @@ go.work.sum
 .netlify
 
 load-test/node_modules
-load-test/yarn-error.log
+load-test/pnpm-debug.log
 load-test/dist
 load-test/output/*
 .vercel
+
+# Turbo
+.turbo/
+**/.turbo/
