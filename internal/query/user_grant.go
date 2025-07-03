@@ -72,18 +72,12 @@ func userGrantCheckPermission(ctx context.Context, resourceOwner, projectID, gra
 	if authz.GetCtxData(ctx).UserID == userID {
 		return nil
 	}
-	// check permission on the underlying project
-	if err := permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, projectID); err != nil {
-		// only check for project grant permissions if user grant is for a project grant
-		if grantID == "" {
-			return err
-		}
-		// check for project grant permissions
-		if err := permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, grantID); err != nil {
-			return err
-		}
+	// check permission on the project grant
+	if grantID != "" {
+		return permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, grantID)
 	}
-	return nil
+	// check on project
+	return permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, projectID)
 }
 
 type UserGrantsQueries struct {

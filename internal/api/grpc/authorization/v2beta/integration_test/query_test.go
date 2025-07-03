@@ -361,8 +361,8 @@ func TestServer_ListAuthorizations(t *testing.T) {
 						},
 					}
 
-					response.Authorizations[1] = createAuthorizationForProject(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), projectResp.GetName(), projectResp.GetId())
-					response.Authorizations[0] = createAuthorizationWithProjectGrant(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), grantedProjectResp.GetName(), grantedProjectResp.GetId())
+					response.Authorizations[0] = createAuthorizationForProject(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), projectResp.GetName(), projectResp.GetId())
+					createAuthorizationWithProjectGrant(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), userResp.GetId(), grantedProjectResp.GetName(), grantedProjectResp.GetId())
 				},
 				req: &authorization.ListAuthorizationsRequest{
 					Filters: []*authorization.AuthorizationsSearchFilter{{}},
@@ -374,7 +374,7 @@ func TestServer_ListAuthorizations(t *testing.T) {
 					AppliedLimit: 100,
 				},
 				Authorizations: []*authorization.Authorization{
-					{}, {},
+					{},
 				},
 			},
 		},
