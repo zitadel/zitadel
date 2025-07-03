@@ -1624,12 +1624,8 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Výchozí organizace pro přihlášení",
       "LOGINDEFAULTORG_DESCRIPTION": "Přihlašovací rozhraní použije nastavení výchozí organizace (a ne z instance), pokud není nastaven žádný kontext organizace.",
-      "OIDCLEGACYINTROSPECTION": "Dědictví OIDC introspekce",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Nedávno jsme přepracovali bod introspekce z výkonnostních důvodů. Tato funkce lze použít k rollbacku na dědickou implementaci, pokud se objeví neočekávané chyby.",
       "OIDCTOKENEXCHANGE": "Výměna tokenů OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Povolit experimentální typ udělení urn:ietf:params:oauth:grant-type:token-exchange pro bod tokenového bodu OIDC. Výměna tokenů lze použít k žádosti o tokeny s menším rozsahem nebo k impersonaci jiných uživatelů. Podívejte se na bezpečnostní politiku, abyste umožnili impersonaci na instanci.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Spouštěče projekcí introspekce OIDC",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Povolit spouštěče projekcí během požadavku na introspekci. To může sloužit jako obcházení, pokud existují zjevné problémy s konzistencí v odpovědi na introspekci, ale může to mít vliv na výkon. Plánujeme odstranit spouštěče pro požadavky na introspekci v budoucnosti.",
       "USERSCHEMA": "Schéma uživatele",
       "USERSCHEMA_DESCRIPTION": "Schémata uživatelů umožňují spravovat datová schémata uživatelů. Pokud je příznak povolen, budete moci používat nové API a jeho funkce.",
       "ACTIONS": "Akce",
@@ -1644,8 +1640,6 @@
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 a může být použit k informování klientů o ukončení relace u poskytovatele OpenID.",
       "PERMISSIONCHECKV2": "Kontrola oprávnění V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
-      "WEBKEY": "Webový klíč",
-      "WEBKEY_DESCRIPTION": "Pokud je příznak povolen, budete moci používat nový API a jeho funkce.",
       "STATES": {
         "INHERITED": "Děděno",
         "ENABLED": "Povoleno",
@@ -2345,6 +2339,8 @@
     "REMOVE_WARN_DESCRIPTION": "Chystáte se odebrat poskytovatele identity. To odstraní výběr dostupného IDP pro vaše uživatele a již registrovaní uživatelé se nebudou moci znovu přihlásit. Jste si jisti, že chcete pokračovat?",
     "DELETE_SELECTION_TITLE": "Odstranit IDP",
     "DELETE_SELECTION_DESCRIPTION": "Chystáte se odstranit poskytovatele identity. Výsledné změny jsou nevratné. Opravdu to chcete udělat?",
+    "FEDERATEDLOGOUTENABLED": "Federované odhlášení povoleno",
+    "FEDERATEDLOGOUTENABLED_DESC": "Je-li povoleno, uživatel bude odhlášen i z IdP, pokud ukončí relaci v ZITADEL.",
     "EMPTY": "Žádný IDP není dostupný",
     "OIDC": {
       "GENERAL": "Obecné informace",

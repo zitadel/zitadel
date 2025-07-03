@@ -1624,12 +1624,8 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Organisation par défaut de connexion",
       "LOGINDEFAULTORG_DESCRIPTION": "L'interface de connexion utilisera les paramètres de l'organisation par défaut (et non de l'instance) si aucun contexte d'organisation n'est défini.",
-      "OIDCLEGACYINTROSPECTION": "Introspection héritée OIDC",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Nous avons récemment refondu le point d'introspection pour des raisons de performances. Cette fonctionnalité peut être utilisée pour revenir à l'implémentation héritée en cas de bogues inattendus.",
       "OIDCTOKENEXCHANGE": "Échange de jetons OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Activez le type d'octroi expérimental urn:ietf:params:oauth:grant-type:token-exchange pour le point de terminaison de jeton OIDC. L'échange de jetons peut être utilisé pour demander des jetons avec une portée moindre ou pour usurper d'autres utilisateurs. Consultez la politique de sécurité pour autoriser l'usurpation sur une instance.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Déclencheurs de projections d'introspection OIDC",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Activez les déclencheurs de projection lors d'une demande d'introspection. Cela peut agir comme un contournement s'il existe des problèmes de cohérence perceptibles dans la réponse à l'introspection, mais cela peut avoir un impact sur les performances. Nous prévoyons de supprimer les déclencheurs pour les demandes d'introspection à l'avenir.",
       "USERSCHEMA": "Schéma utilisateur",
       "USERSCHEMA_DESCRIPTION": "Les schémas utilisateur permettent de gérer les schémas de données des utilisateurs. Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "ACTIONS": "Actions",
@@ -1644,8 +1640,6 @@
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Le Back-Channel Logout implémente OpenID Connect Back-Channel Logout 1.0 et peut être utilisé pour notifier les clients de la fin de session chez le fournisseur OpenID.",
       "PERMISSIONCHECKV2": "Vérification des permissions V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
-      "WEBKEY": "Clé web",
-      "WEBKEY_DESCRIPTION": "Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "STATES": {
         "INHERITED": "Hérité",
         "ENABLED": "Activé",
@@ -2345,6 +2339,8 @@
     "REMOVE_WARN_DESCRIPTION": "Vous êtes sur le point de supprimer un fournisseur d'identité. Cela supprimera la sélection de l'IDP disponible pour vos utilisateurs et les utilisateurs déjà enregistrés ne pourront plus se reconnecter. Êtes-vous sûr de continuer ?",
     "DELETE_SELECTION_TITLE": "Supprimer Idp",
     "DELETE_SELECTION_DESCRIPTION": "Vous êtes sur le point de supprimer un fournisseur d'identité. Les changements qui en résultent sont irrévocables. Voulez-vous vraiment le faire ?",
+    "FEDERATEDLOGOUTENABLED": "Déconnexion fédérée activée",
+    "FEDERATEDLOGOUTENABLED_DESC": "Si activé, l'utilisateur sera également déconnecté de l'IdP s'il termine la session dans ZITADEL.",
     "EMPTY": "Aucun IDP disponible",
     "OIDC": {
       "GENERAL": "Informations générales",

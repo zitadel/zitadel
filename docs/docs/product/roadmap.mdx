@@ -1,0 +1,705 @@
+---
+title: Zitadel Release Versions and Roadmap
+sidebar_label: Release Versions and Roadmap
+---
+
+
+import NewFeature from './_new-feature.mdx';
+import BreakingChanges from './_breaking-changes.mdx';
+import Deprecated from './_deprecated.mdx';
+import BetaToGA from './_beta-ga.mdx';
+import SDKv3 from './_sdk_v3.mdx';
+
+
+## Timeline and Overview
+
+<table id="zitadel-versions">
+    <thead>
+        <tr id="zitadel-versions-year">
+            <th scope="col"></th>
+            <th scope="col" colSpan={12}>2025</th>
+            <th scope="col" colSpan={12}>2026</th>
+        </tr>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col" colSpan={3}>Q1</th>
+            <th scope="col" colSpan={3}>Q2</th>
+            <th scope="col" colSpan={3}>Q3</th>
+            <th scope="col" colSpan={3}>Q4</th>
+            <th scope="col" colSpan={3}>Q1</th>
+            <th scope="col" colSpan={3}>Q2</th>
+            <th scope="col" colSpan={3}>Q3</th>
+            <th scope="col" colSpan={3}>Q4</th>
+        </tr>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Jan</th>
+            <th scope="col">Feb</th>
+            <th scope="col">Mar</th>
+            <th scope="col">Apr</th>
+            <th scope="col">May</th>
+            <th scope="col">Jun</th>
+            <th scope="col">Jul</th>
+            <th scope="col">Aug</th>
+            <th scope="col">Sep</th>
+            <th scope="col">Oct</th>
+            <th scope="col">Nov</th>
+            <th scope="col">Dec</th>
+            <th scope="col">Jan</th>
+            <th scope="col">Feb</th>
+            <th scope="col">Mar</th>
+            <th scope="col">Apr</th>
+            <th scope="col">May</th>
+            <th scope="col">Jun</th>
+            <th scope="col">Jul</th>
+            <th scope="col">Aug</th>
+            <th scope="col">Sep</th>
+            <th scope="col">Oct</th>
+            <th scope="col">Nov</th>
+            <th scope="col">Dec</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td colspan={25}>Zitadel Versions</td>
+        </tr>
+        <tr>
+            <th scope="row">[v2.x](/docs/product/roadmap#v2x)</th>
+            <td colspan={6} class="release-stable">GA / Stable </td>
+            <td colSpan={3} class="release-deprecated">Deprecated</td>
+            <td colSpan={16}></td>
+        </tr>
+        <tr>
+            <th scope="row">[v3.x](/docs/product/roadmap#v3x)</th>
+            <td colspan={3} class="release-impl">Implementation</td>
+            <td class="release-rc">RC</td>
+            <td colspan={5} class="release-stable">GA / Stable </td>
+            <td colSpan={3} class="release-deprecated">Deprecated</td>
+            <td colSpan={12}></td>
+        </tr>
+        <tr>
+            <th scope="row">[v4.x](/docs/product/roadmap#v4x)</th>
+            <td colSpan={3}></td>
+            <td colSpan={3} class="release-impl">Implementation</td>
+            <td class="release-rc">RC</td>
+            <td colspan={5} class="release-stable">GA / Stable </td>
+            <td colSpan={3} class="release-deprecated">Deprecated</td>
+            <td colSpan={9}></td>
+        </tr>
+        <tr>
+            <th scope="row">[v5.x](/docs/product/roadmap#v5x)</th><td colSpan={3}></td>
+            <td colSpan={3}></td>
+            <td colSpan={3} class="release-impl">Implementation</td>
+            <td class="release-rc">RC</td>
+            <td colspan={5} class="release-stable">GA / Stable </td>
+            <td colSpan={3} class="release-deprecated">Deprecated</td>
+            <td colSpan={6}></td>
+        </tr>
+    </tbody>
+</table>
+
+For more detailed description about the different stages and the release cycle check out the following Page: [Release Cycle](/docs/product/release-cycle)
+
+
+
+
+<table id="zitadel-versions">
+    <thead>
+    <tr>
+        <th scope="col">25-Q1</th>
+        <th scope="col">25-Q2</th>
+        <th scope="col">25-Q3</th>
+        <th scope="col">25-Q4</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td colspan={4}>Zitadel Core</td>
+        </tr>
+        <tr>
+            <td scope="row">
+                [v2.x](/docs/product/roadmap#v2x)
+            </td>
+            <td scope="row">
+                [v3.x](/docs/product/roadmap#v3x)
+                <ul>
+                    <li>
+                        Actions V2
+                    </li>
+                    <li>
+                        Removed CockroachDB Support
+                    </li>
+                    <li>
+                        License Change
+                    </li>
+                    <li>
+                        Login v2
+                        <ul>
+                            <li>
+                                Initial Release
+                            </li>
+                            <li>
+                                All standard authentication methods
+                            </li>
+                            <li>
+                                OIDC & SAML
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </td>
+            <td scope="row">
+                [v4.x](/docs/product/roadmap#v4x)
+                <ul>
+                    <li>Resource API</li>
+                    <li>
+                        Login v2 as default
+
+                        <ul>
+                            <li>
+                                Device Authorization Flow
+                            </li>
+                            <li>
+                                LDAP IDP
+                            </li>
+                            <li>
+                                JWT IDP
+                            </li>
+                            <li>
+                                Custom Login UI Texts
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+            </td>
+            <td scope="row">
+                [v5.x](/docs/product/roadmap#v5x)
+                <ul>
+                    <li>Analytics</li>
+                    <li>User Groups</li>
+                    <li>User Uniqueness on Instance Level</li>
+                    <li>Remove Required Fields from User</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td colspan={4}>Zitadel SDKs</td>
+        </tr>
+        <tr>
+            <td scope="row">
+
+            </td>
+            <td scope="row">
+
+            </td>
+            <td scope="row">
+                <ul>
+                    <li>
+                        [Initial Version of PHP SDK](/docs/product/roadmap#v3x-1)
+                    </li>
+                    <li>
+                        [Initial Version of Java SDK](/docs/product/roadmap#v3x-2)
+                    </li>
+                    <li>
+                        [Initial Version of Ruby SDK](/docs/product/roadmap#v3x-3)
+                    </li>
+                    <li>
+                        [Initial Version of Python SDK](/docs/product/roadmap#v3x-4)
+                    </li>
+                </ul>
+            </td>
+            <td scope="row">
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+## Zitadel Core
+
+Check out all [Zitadel Release Versions](https://github.com/zitadel/zitadel/releases)
+
+### v2.x
+
+**Current State**: General Availability / Stable
+
+**Release**: [v2.x](https://github.com/zitadel/zitadel/releases?q=v2.&expanded=true)
+
+In Zitadel versions 2.x and earlier, new releases were deployed with a minimum frequency of every two weeks.
+This practice resulted in a significant number of individual versions.
+To review the features and bug fixes for these releases, please consult the linked release information provided above.
+
+### v3.x
+
+ZITADEL v3 is here, bringing key changes designed to empower your identity management experience.
+This release transitions our licensing to AGPLv3, reinforcing our commitment to open and collaborative development.
+We've streamlined our database support by removing CockroachDB.
+Excitingly, v3 introduces the foundational elements for Actions V2, opening up a world of possibilities for tailoring and extending ZITADEL to perfectly fit your unique use cases.
+
+**Current State**: General Availability / Stable
+
+**Release**: [v3.x](https://github.com/zitadel/zitadel/releases?q=v3.&expanded=true)
+
+**Blog**: [Zitadel v3: AGPL License, Streamlined Releases, and Platform Updates](https://zitadel.com/blog/zitadel-v3-announcement)
+
+
+<details>
+    <summary>New Features</summary>
+
+    <NewFeature/>
+
+    <details>
+        <summary>Actions V2</summary>
+
+        Zitadel Actions V2 empowers you to customize Zitadel's workflows by executing your own logic at specific points. You define external Endpoints containing your code and configure Targets and Executions within Zitadel to trigger them based on various conditions and events.
+
+        Why we built it: To provide greater flexibility and control, allowing you to implement custom business rules, automate tasks, enrich user data, control access, and integrate with other systems seamlessly. Actions V2 enables you to tailor Zitadel precisely to your unique needs.
+
+        Read more in our [documentation](https://zitadel.com/docs/concepts/features/actions_v2)
+    </details>
+
+    <details>
+        <summary>License Change Apache 2.0 to AGPL3</summary>
+
+        Zitadel is switching to the AGPL 3.0 license to ensure the project's sustainability and encourage community contributions from commercial users, while keeping the core free and open source.
+
+        Read more about our [decision](https://zitadel.com/blog/apache-to-agpl)
+    </details>
+</details>
+
+<details>
+    <summary>Breaking Changes</summary>
+
+    <BreakingChanges/>
+
+    <details>
+        <summary>CockroachDB Support removed</summary>
+
+        After careful consideration, we have made the decision to discontinue support for CockroachDB in Zitadel v3 and beyond.
+        While CockroachDB is an excellent distributed SQL database, supporting multiple database backends has increased our maintenance burden and complicated our testing matrix.
+        Check out our [migration guide](https://zitadel.com/docs/self-hosting/manage/cli/mirror) to migrate from CockroachDB to PostgreSQL.
+
+        More details can be found [here](https://github.com/zitadel/zitadel/issues/9414)
+    </details>
+
+    <details>
+        <summary>Actions API v3 alpha removed</summary>
+
+        With the current release we have published the Actions V2 API as a beta version, and got rid of the previously published alpha API.
+        Check out the [new API](http://localhost:3000/docs/apis/resources/action_service_v2)
+
+    </details>
+</details>
+
+### v4.x
+
+**Current State**: Implementation
+
+
+<details>
+    <summary>New Features</summary>
+
+    <NewFeature/>
+
+    <details>
+        <summary>Resource API (v2)</summary>
+
+        We are revamping our APIs to improve the developer experience.
+        Currently, our use-case-based APIs are complex and inconsistent, causing confusion and slowing down integration.
+        To fix this, we're shifting to a resource-based approach.
+        This means developers will use consistent endpoints (e.g., /users) to manage resources, regardless of their own role.
+        This change, along with standardized naming and improved documentation, will simplify integration, accelerate development, and create a more intuitive experience for our customers and community.
+
+        Resources integrated in this release:
+        - Instances
+        - Organizations
+        - Projects
+        - Users
+
+        For more details read the [Github Issue](https://github.com/zitadel/zitadel/issues/6305)
+    </details>
+
+    <details>
+        <summary>Login V2</summary>
+
+        Our new login UI has been enhanced with additional features, bringing it to feature parity with Version 1.
+
+        <details>
+            <summary>Device Authorization Flow</summary>
+
+            The Device Authorization Grant is an OAuth 2.0 flow designed for devices that have limited input capabilities (like smart TVs, gaming consoles, or IoT devices) or lack a browser.
+
+            Read our docs about how to integrate your application using the [Device Authorization Flow](https://zitadel.com/docs/guides/integrate/login/oidc/device-authorization)
+        </details>
+
+        <details>
+            <summary>LDAP IDP</summary>
+
+            This feature enables users to log in using their existing LDAP (Lightweight Directory Access Protocol) credentials.
+            It integrates your system with an LDAP directory, allowing it to act as an Identity Provider (IdP) solely for authentication purposes.
+            This means users can securely access the service with their familiar LDAP username and password, streamlining the login process.
+        </details>
+
+        <details>
+            <summary>JWT IDP</summary>
+
+            This "JSON Web Token Identity Provider (JWT IdP)" feature allows you to use an existing JSON Web Token (JWT) from another system (like a Web Application Firewall managing a session) as a federated identity for authentication in new applications managed by ZITADEL.
+
+            Essentially, it enables session reuse by letting ZITADEL trust and validate a JWT issued by an external source. This allows users already authenticated in an existing system to seamlessly access new applications without re-logging in.
+
+            Read more in our docs about how to login users with [JWT IDP](https://zitadel.com/docs/guides/integrate/identity-providers/jwt_idp)
+        </details>
+
+        <details>
+            <summary>Custom Login UI Texts</summary>
+
+            This feature provides customers with the flexibility to personalize the user experience by customizing various text elements across different screens of the login UI. Administrators can modify default messages, labels, and instructions to align with their branding, provide specific guidance, or cater to unique regional or organizational needs, ensuring a more tailored and intuitive authentication process for their users.
+        </details>
+    </details>
+</details>
+
+
+<details>
+    <summary>General Availability</summary>
+
+    <BetaToGA/>
+
+    <details>
+        <summary>Hosted Login v2</summary>
+
+        We're officially moving our new Login UI v2 from beta to General Availability.
+        Starting now, it will be the default login experience for all new customers.
+        With this release, 8.0we are also focused on implementing previously missing features, such as device authorization and LDAP IDP support, to make the new UI fully feature-complete.
+
+        - [Hosted Login V2](http://localhost:3000/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta)
+    </details>
+
+    <details>
+        <summary>Web Keys</summary>
+
+        Web Keys in ZITADEL are used to sign and verify JSON Web Tokens (JWT).
+        ID tokens are created, signed and returned by ZITADEL when a OpenID connect (OIDC) or OAuth2 authorization flow completes and a user is authenticated.
+        Based on customer and community feedback, we've updated our key management system. You now have full manual control over key generation and rotation, instead of the previous automatic process.
+
+        Read the full description about Web Keys in our [Documentation](https://zitadel.com/docs/guides/integrate/login/oidc/webkeys).
+    </details>
+
+    <details>
+        <summary>SCIM 2.0 Server - User Resource</summary>
+
+        The Zitadel SCIM v2 service provider interface enables seamless integration of identity and access management (IAM) systems with Zitadel, following the System for Cross-domain Identity Management (SCIM) v2.0 specification.
+        This interface allows standardized management of IAM resources, making it easier to automate user provisioning and deprovisioning.
+
+        - [SCIM 2.0 API](https://zitadel.com/docs/apis/scim2)
+        - [Manage Users Guide](https://zitadel.com/docs/guides/manage/user/scim2)
+    </details>
+
+    <details>
+        <summary>Caches</summary>
+
+        ZITADEL supports the use of a caches to speed up the lookup of frequently needed objects.
+        As opposed to HTTP caches which might reside between ZITADEL and end-user applications, the cache build into ZITADEL uses active invalidation when an object gets updated.
+        Another difference is that HTTP caches only cache the result of a complete request and the built-in cache stores objects needed for the internal business logic.
+        For example, each request made to ZITADEL needs to retrieve and set instance information in middleware.
+
+        Read more about Zitadel Caches [here](https://zitadel.com/docs/self-hosting/manage/cache)
+    </details>
+</details>
+
+### v5.x
+
+**Current State**: Planning
+
+<details>
+    <summary>New Features</summary>
+
+    <NewFeature/>
+
+    <details>
+        <summary>Analytics</summary>
+
+        We provide comprehensive and insightful analytics capabilities that empower you with the information needed to understand platform usage, monitor system health, and make data-driven decisions.
+
+        <details>
+            <summary>Daily Active Users (DAU) & Monthly Active Users (MAU)</summary>
+
+            Administrators need to track user activity to understand platform usage and identify trends.
+            This feature provides basic metrics for daily and monthly active users, allowing for filtering by date range and scope (instance-wide or within a specific organization).
+            The metrics should ensure that each user is counted only once per day or month, respectively, regardless of how many actions they performed.
+            This minimal feature serves as a foundation for future expansion into more detailed analytics.
+
+            For more details track our [github issue](https://github.com/zitadel/zitadel/issues/7506).
+        </details>
+
+        <details>
+            <summary>Resource Count Metrics</summary>
+
+            To effectively manage a Zitadel instance, administrators need to understand resource utilization.
+            This feature provides metrics for resource counts, including organizations, users (with filtering options), projects, applications, and authorizations.
+            For users, we will offer filters to retrieve the total count, counts per organization, and counts by user type (human or machine).
+            These metrics will provide administrators with valuable insights into the scale and complexity of their Zitadel instance.
+
+
+            For more details track our [github issue](https://github.com/zitadel/zitadel/issues/9709).
+        </details>
+
+        <details>
+            <summary>Operational Metrics</summary>
+
+            To empower customers to better manage and optimize their Zitadel instances, we will provide access to detailed operational metrics.
+            This data will help customers identify potential issues, optimize performance, and ensure the stability of their deployments.
+            The provided data will encompass basic system information, infrastructure details, configuration settings, error reports, and the health status of various Zitadel components, accessible via a user interface or an API.
+
+
+            For more details track our [github issue](https://github.com/zitadel/zitadel/issues/9476).
+
+        </details>
+    </details>
+
+    <details>
+        <summary>User Groups</summary>
+
+        Administrators will be able to define groups within an organization and assign users to these groups.
+        More details about the feature can be found [here](https://github.com/zitadel/zitadel/issues/9702)
+    </details>
+
+    <details>
+        <summary>User Uniqueness on Organization Level</summary>
+
+        Administrators will be able to define weather users should be unique across the instance or within an organization.
+        This allows managing users independently and avoids conflicts due to shared user identifiers.
+        Example: The user with the username user@gmail.com can be created in the Organization "Customer A" and "Customer B" if uniqueness is defined on the organization level.
+
+        Stay updated on the progress and details on our [GitHub Issue](https://github.com/zitadel/zitadel/issues/9535)
+    </details>
+
+
+    <details>
+        <summary>Remove Required Fields</summary>
+
+        Currently, the user creation process requires several fields, such as email, first name, and last name, which can be restrictive in certain scenarios. This feature allows administrators to create users with only a username, making other fields optional.
+        This provides flexibility for systems that don't require complete user profiles upon initial creation for example simplified onboarding flows.
+
+        For more details check out our [GitHub Issue](https://github.com/zitadel/zitadel/issues/4386)
+    </details>
+</details>
+
+<details>
+    <summary>Feature Deprecation</summary>
+
+    <Deprecated/>
+
+    <details>
+        <summary>Actions V1</summary>
+    </details>
+</details>
+
+<details>
+    <summary>Breaking Changes</summary>
+
+    <BreakingChanges/>
+
+    <details>
+        <summary>Hosted Login v1 will be removed</summary>
+    </details>
+
+
+    <details>
+        <summary>Zitadel APIs v1 will be removed</summary>
+    </details>
+</details>
+
+
+### v6.x
+
+<details>
+    <summary>New Features</summary>
+
+    <NewFeature/>
+
+    <details>
+        <summary>Basic Threat Detection Framework</summary>
+
+        This initial version of our Threat Detection Framework is designed to enhance the security of your account by identifying and challenging potentially anomalous user behavior.
+        When the system detects unusual activity, it will present a challenge, such as a reCAPTCHA, to verify that the user is legitimate and not a bot or malicious actor.
+        Security administrators will also have the ability to revoke user sessions based on the output of the threat detection model, providing a crucial tool to mitigate potential security risks in real-time.
+
+        We are beginning with a straightforward reCAPTCHA-style challenge to build and refine the core framework.
+        This foundational step will allow us to gather insights into how the system performs and how it can be improved.
+        Future iterations will build upon this groundwork to incorporate more sophisticated detection methods and a wider range of challenge and response mechanisms, ensuring an increasingly robust and intelligent security posture for all users.
+
+        More details can be found in the (GitHub Issue](https://github.com/zitadel/zitadel/issues/9707)
+    </details>
+
+    <details>
+        <summary>SCIM Outbound</summary>
+
+        Automate user provisioning to your external applications with our new SCIM Client.
+        This feature ensures users are automatically created in downstream systems before their first SSO login, preventing access issues and streamlining onboarding.
+
+        It also synchronizes user lifecycle events, so changes like deactivations or deletions are instantly reflected across all connected applications for consistent and secure access management.
+        The initial release will focus on provisioning the user resource.
+
+        More details can be found in the (GitHub Issue](https://github.com/zitadel/zitadel/issues/6601)
+    </details>
+
+    <details>
+        <summary>Analytics</summary>
+
+        We provide comprehensive and insightful analytics capabilities that empower you with the information needed to understand platform usage, monitor system health, and make data-driven decisions.
+
+        <details>
+            <summary>Login Insights: Successful and Failed Login Metrics</summary>
+
+            To enhance security monitoring and gain insights into user authentication patterns, administrators need access to login metrics.
+            This feature provides data on successful and failed login attempts, allowing for filtering by time range and level (overall instance, within a specific organization, or for a particular application).
+            This will enable administrators to detect suspicious login activity, analyze authentication trends, and proactively address potential security concerns.
+
+            For more details track our [GitHub issue](https://github.com/zitadel/zitadel/issues/9711).
+        </details>
+    </details>
+
+    <details>
+        <summary>Impersonation: External Token Exchange</summary>
+
+        This feature expands our existing impersonation capabilities to support seamless and secure integration with external, third-party applications.
+        Currently, our platform supports impersonation for internal use cases, allowing administrators or support staff to obtain a temporary token for an end-user to troubleshoot issues or provide assistance within applications that already use ZITADEL for authentication. (You can find more details in our [existing documentation](/docs/guides/integrate/token-exchange)).
+
+        The next evolution of this feature will focus on external applications.
+        This enables scenarios where a user, already authenticated in a third-party system (like their primary e-banking portal), can seamlessly access a connected application that is secured by ZITADEL without needing to log in again.
+
+        For example, a user in their e-banking app could click to open an integrated "Budget Planning" tool that relies on ZITADEL for access.
+        Using a secure token exchange, the budget app will grant the user a valid session on their behalf, creating a smooth, uninterrupted user experience while maintaining a high level of security.
+        This enhancement bridges the authentication gap between external platforms and ZITADEL-powered applications.
+    </details>
+</details>
+
+### Future Vision / Upcoming Features
+
+#### Fine Grained Authorization
+
+We're planning the future of Zitadel and fine-grained authorization is high on our list.
+While Zitadel already offers strong role-based access (RBAC), we know many of you need more granular control.
+
+**What is Fine-Grained Authorization?**
+
+It's about moving beyond broad roles to define precise access based on:
+
+- Attributes (ABAC): User details (department, location), resource characteristics (sensitivity), or context (time of day).
+- Relationships (ReBAC): Connections between users and resources (e.g., "owner" of a document, "manager" of a team).
+- Policies (PBAC): Explicit rules combining attributes and relationships.
+
+**Why Explore This?**
+
+Fine-grained authorization can offer:
+- Tighter Security: Minimize access to only what's essential.
+- Greater Flexibility: Adapt to complex and dynamic business rules.
+- Easier Compliance: Meet strict regulatory demands.
+- Scalable Permissions: Manage access effectively as you grow.
+
+**We Need Your Input!** 🗣️
+
+As we explore the best way to bring this to Zitadel, tell us:
+- Your Use Cases: Where do you need more detailed access control than standard roles provide?
+- Preferred Models: Are you thinking attribute-based, relationship-based, or something else?
+- Integration Preferences:
+    - A fully integrated solution within Zitadel?
+    - Or integration with existing authorization vendors (e.g. openFGA, cerbos, etc.)?
+
+Your feedback is crucial for shaping our roadmap.
+
+🔗 Share your thoughts and needs in our [discussion forum](https://discord.com/channels/927474939156643850/1368861057669533736)
+
+#### Threat Detection
+
+We're taking the next step in securing your applications by exploring a new Threat Detection framework for Zitadel.
+Our goal is to proactively identify and stop malicious activity in real-time.
+
+**Our First Step: A Modern reCAPTCHA Alternative**
+We will begin by building a system to detect and mitigate malicious bots, serving as a smart, privacy-focused alternative to CAPTCHA.
+This initial use case will help us combat credential stuffing, spam registrations, and other automated attacks, forming the foundation of our larger framework.
+
+**How We Envision It**
+
+Our exploration is focused on creating an intelligent system that:
+- **Analyzes Signals**: Gathers data points like IP reputation, device characteristics, and user behavior to spot suspicious activity.
+- **Uses AI/**: Trains models to distinguish between legitimate users and bots, reducing friction for real users.
+- **Mitigates Threats**: Enables flexible responses when a threat is detected, such as blocking the attempt, requiring MFA, or sending an alert.
+
+**Help Us Shape the Future** 🤝
+
+As we design this framework, we need to know:
+- What are your biggest security threats today?
+- What kind of automated responses (e.g., block, notification) would be most useful for you?
+- What are your key privacy or compliance concerns regarding threat detection?
+
+Your feedback will directly influence our development and ensure we build a solution that truly meets your needs.
+
+🔗 Join the conversation and share your insights [here](https://discord.com/channels/927474939156643850/1375383775164235806)
+
+
+#### The Role of AI in Zitadel
+
+As we look to the future, we believe Artificial Intelligence will be a critical tool for enhancing both user experience and security within Zitadel.
+Our vision for AI is focused on two key areas: providing intelligent, contextual assistance and building a collective defense against emerging threats.
+
+1. **AI-Powered Support**
+
+    We want you to get fast, accurate answers to your questions without ever having to leave your workflow.
+    To achieve this, we are integrating an AI-powered support assistant trained on our knowledge base, including our documentation, tutorials, and community discussions.
+
+    Our rollout is planned in phases to ensure we deliver a helpful experience:
+    - **Phase 1 (Happening Now)**: We are currently testing a preliminary version of our AI bot within our [community channels](https://discord.com/channels/927474939156643850/1357076488825995477). This allows us to gather real-world questions and answers, refining the AI's accuracy and helpfulness based on direct feedback.
+    - **Phase 2 (Next Steps)**: Once we are confident in its capabilities, we will integrate this AI assistant directly into our documentation. You'll be able to ask complex questions and get immediate, well-sourced answers.
+    - **Phase 3 (The Ultimate Goal)**: The final step is to embed the assistant directly into the Zitadel Console/Customer Portal. Imagine getting help based on the exact context of what you're doing—whether you're configuring an action, setting up a new organization, or integrating social login.
+
+2. **Decentralized AI for Threat Detection**
+
+    Security threats are constantly evolving.
+    A threat vector that targets one customer today might target another tomorrow.
+    We believe in the power of collective intelligence to provide proactive security for everyone.
+
+    This leads to our second major AI initiative: **decentralized model training** for our Threat Detection framework.
+
+    Here’s how it would work:
+    - **Collective Data, Anonymously**: Customers across our cloud and self-hosted environments experience different user behaviors and threat vectors. We plan to offer an opt-in system where anonymized, non-sensitive data (like behavioral patterns and threat signals) can be collected from participating instances.
+    - **Centralized Training**: This collective, anonymized data will be used to train powerful, next-generation AI security models. With a much larger and more diverse dataset, these models can learn to identify subtle and emerging threats far more effectively than a model trained on a single instance's data.
+    - **Shared Protection**: These constantly improving models would then be distributed to all participating Zitadel instances.
+
+    The result is a powerful security network effect. You could receive protection from a threat vector you haven't even experienced yet, simply because the system learned from an attack on another member of the community.
+
+
+
+## Zitadel Ecosystem
+
+### PHP SDK
+
+GitHub Repository: [PHP SDK](https://github.com/zitadel/client-php)
+
+#### v3.x
+
+<SDKv3/>
+
+### Java SDK
+
+GitHub Repository: [Java SDK](https://github.com/zitadel/client-java)
+
+#### v3.x
+
+<SDKv3/>
+
+### Ruby SDK
+
+GitHub Repository: [Ruby SDK](https://github.com/zitadel/client-ruby)
+
+#### v3.x
+
+<SDKv3/>
+
+### Python SDK
+
+GitHub Repository: [Python SDK](https://github.com/zitadel/client-python)
+
+#### v3.x
+
+<SDKv3/>

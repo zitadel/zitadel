@@ -2,8 +2,10 @@ package projection
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
@@ -84,6 +86,7 @@ var (
 	UserSchemaProjection                *handler.Handler
 	WebKeyProjection                    *handler.Handler
 	DebugEventsProjection               *handler.Handler
+	HostedLoginTranslationProjection    *handler.Handler
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
@@ -177,6 +180,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	UserSchemaProjection = newUserSchemaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_schemas"]))
 	WebKeyProjection = newWebKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["web_keys"]))
 	DebugEventsProjection = newDebugEventsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_events"]))
+	HostedLoginTranslationProjection = newHostedLoginTranslationProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["hosted_login_translation"]))
 
 	ProjectGrantFields = newFillProjectGrantFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsProjectGrant]))
 	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
@@ -212,11 +216,19 @@ func Start(ctx context.Context) {
 func ProjectInstance(ctx context.Context) error {
 	for i, projection := range projections {
 		logging.WithFields("name", projection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("starting projection")
-		_, err := projection.Trigger(ctx)
-		if err != nil {
-			return err
+		for {
+			_, err := projection.Trigger(ctx)
+			if err == nil {
+				break
+			}
+			var pgErr *pgconn.PgError
+			errors.As(err, &pgErr)
+			if pgErr.Code != database.PgUniqueConstraintErrorCode {
+				return err
+			}
+			logging.WithFields("name", projection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).WithError(err).Debug("projection failed because of unique constraint, retrying")
 		}
-		logging.WithFields("name", projection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).Info("projection done")
+		logging.WithFields("name", projection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(projections))).Info("projection done")
 	}
 	return nil
 }
@@ -224,11 +236,19 @@ func ProjectInstance(ctx context.Context) error {
 func ProjectInstanceFields(ctx context.Context) error {
 	for i, fieldProjection := range fields {
 		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(fields))).Info("starting fields projection")
-		err := fieldProjection.Trigger(ctx)
-		if err != nil {
-			return err
+		for {
+			err := fieldProjection.Trigger(ctx)
+			if err == nil {
+				break
+			}
+			var pgErr *pgconn.PgError
+			errors.As(err, &pgErr)
+			if pgErr.Code != database.PgUniqueConstraintErrorCode {
+				return err
+			}
+			logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).WithError(err).Debug("fields projection failed because of unique constraint, retrying")
 		}
-		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID()).Info("fields projection done")
+		logging.WithFields("name", fieldProjection.ProjectionName(), "instance", internal_authz.GetInstance(ctx).InstanceID(), "index", fmt.Sprintf("%d/%d", i, len(fields))).Info("fields projection done")
 	}
 	return nil
 }
@@ -257,6 +277,10 @@ func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler
 	return config
 }
 
+// we know this is ugly, but we need to have a singleton slice of all projections
+// and are only able to initialize it after all projections are created
+// as setup and start currently create them individually, we make sure we get the right one
+// will be refactored when changing to new id based projections
 func newFieldsList() {
 	fields = []*handler.FieldHandler{
 		ProjectGrantFields,
@@ -335,5 +359,6 @@ func newProjectionsList() {
 		UserSchemaProjection,
 		WebKeyProjection,
 		DebugEventsProjection,
+		HostedLoginTranslationProjection,
 	}
 }

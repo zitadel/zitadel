@@ -24,6 +24,9 @@ func TestCommandSide_AddMachine(t *testing.T) {
 	type args struct {
 		ctx     context.Context
 		machine *Machine
+		state   *domain.UserState
+		check   PermissionCheck
+		options func(*Commands) []addMachineOption
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -194,14 +197,348 @@ func TestCommandSide_AddMachine(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "with username fallback to given username",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "aggregateID"),
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("aggregateID", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewMachineAddedEvent(context.Background(),
+							&user.NewAggregate("aggregateID", "org1").Aggregate,
+							"username",
+							"name",
+							"",
+							true,
+							domain.OIDCTokenTypeBearer,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Name:     "name",
+					Username: "username",
+				},
+				options: func(commands *Commands) []addMachineOption {
+					return []addMachineOption{
+						AddMachineWithUsernameToIDFallback(),
+					}
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "with username fallback to generated id",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "aggregateID"),
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("aggregateID", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewMachineAddedEvent(context.Background(),
+							&user.NewAggregate("aggregateID", "org1").Aggregate,
+							"aggregateID",
+							"name",
+							"",
+							true,
+							domain.OIDCTokenTypeBearer,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Name: "name",
+				},
+				options: func(commands *Commands) []addMachineOption {
+					return []addMachineOption{
+						AddMachineWithUsernameToIDFallback(),
+					}
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "with username fallback to given id",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("aggregateID", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewMachineAddedEvent(context.Background(),
+							&user.NewAggregate("aggregateID", "org1").Aggregate,
+							"aggregateID",
+							"name",
+							"",
+							true,
+							domain.OIDCTokenTypeBearer,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+						AggregateID:   "aggregateID",
+					},
+					Name: "name",
+				},
+				options: func(commands *Commands) []addMachineOption {
+					return []addMachineOption{
+						AddMachineWithUsernameToIDFallback(),
+					}
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "with succeeding permission check, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewMachineAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"name",
+							"description",
+							true,
+							domain.OIDCTokenTypeBearer,
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Description: "description",
+					Name:        "name",
+					Username:    "username",
+				},
+				check: func(resourceOwner, aggregateID string) error {
+					return nil
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "with failing permission check, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Description: "description",
+					Name:        "name",
+					Username:    "username",
+				},
+				check: func(resourceOwner, aggregateID string) error {
+					return zerrors.ThrowPermissionDenied(nil, "", "")
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
+		{
+			name: "add machine, ok + deactive state",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewMachineAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"name",
+							"description",
+							true,
+							domain.OIDCTokenTypeBearer,
+						),
+						user.NewUserDeactivatedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Description: "description",
+					Name:        "name",
+					Username:    "username",
+				},
+				state: func() *domain.UserState {
+					state := domain.UserStateInactive
+					return &state
+				}(),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "add machine, ok + locked state",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewMachineAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"name",
+							"description",
+							true,
+							domain.OIDCTokenTypeBearer,
+						),
+						user.NewUserLockedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Description: "description",
+					Name:        "name",
+					Username:    "username",
+				},
+				state: func() *domain.UserState {
+					state := domain.UserStateLocked
+					return &state
+				}(),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
+				eventstore:      tt.fields.eventstore,
+				idGenerator:     tt.fields.idGenerator,
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
-			got, err := r.AddMachine(tt.args.ctx, tt.args.machine)
+			var options []addMachineOption
+			if tt.args.options != nil {
+				options = tt.args.options(r)
+			}
+			got, err := r.AddMachine(tt.args.ctx, tt.args.machine, tt.args.state, tt.args.check, options...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -391,7 +728,7 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 }
 
 func newMachineChangedEvent(ctx context.Context, userID, resourceOwner, name, description string) *user.MachineChangedEvent {
-	event, _ := user.NewMachineChangedEvent(ctx,
+	event := user.NewMachineChangedEvent(ctx,
 		&user.NewAggregate(userID, resourceOwner).Aggregate,
 		[]user.MachineChanges{
 			user.ChangeName(name),

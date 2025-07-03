@@ -1,6 +1,8 @@
 package start
 
 import (
+	"context"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -34,7 +36,10 @@ Requirements:
 
 			setupConfig := setup.MustNewConfig(viper.GetViper())
 			setupSteps := setup.MustNewSteps(viper.New())
-			setup.Setup(cmd.Context(), setupConfig, setupSteps, masterKey)
+
+			setupCtx, cancel := context.WithCancel(cmd.Context())
+			setup.Setup(setupCtx, setupConfig, setupSteps, masterKey)
+			cancel()
 
 			startConfig := MustNewConfig(viper.GetViper())
 

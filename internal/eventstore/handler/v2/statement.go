@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 	"golang.org/x/exp/constraints"
 
@@ -52,7 +53,7 @@ func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, curr
 			return statements, err
 		}
 		offset++
-		if previousPosition != event.Position() {
+		if !previousPosition.Equal(event.Position()) {
 			// offset is 1 because we want to skip this event
 			offset = 1
 		}
@@ -82,7 +83,7 @@ func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
 type Statement struct {
 	Aggregate    *eventstore.Aggregate
 	Sequence     uint64
-	Position     float64
+	Position     decimal.Decimal
 	CreationDate time.Time
 
 	offset uint32

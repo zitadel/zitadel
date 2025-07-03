@@ -1624,12 +1624,8 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Standardorganisation für die Anmeldung",
       "LOGINDEFAULTORG_DESCRIPTION": "Die Anmelde-Benutzeroberfläche verwendet die Einstellungen der Standardorganisation (und nicht von der Instanz), wenn kein Organisationskontext festgelegt ist.",
-      "OIDCLEGACYINTROSPECTION": "OIDC Legacy-Introspektion",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Wir haben kürzlich den Introspektionsendpunkt aus Leistungsgründen neu strukturiert. Mit diesem Feature können Sie zur alten Implementierung zurückkehren, falls unerwartete Fehler auftreten.",
       "OIDCTOKENEXCHANGE": "OIDC Token-Austausch",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktivieren Sie den experimentellen urn:ietf:params:oauth:grant-type:token-exchange-Grant-Typ für den OIDC-Token-Endpunkt. Der Token-Austausch kann verwendet werden, um Token mit einem geringeren Umfang anzufordern oder andere Benutzer zu impersonieren. Siehe die Sicherheitsrichtlinie, um die Impersonation auf einer Instanz zu erlauben.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Trigger-Introspektionsprojektionen",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Aktivieren Sie Projektionstrigger während einer Introspektionsanfrage. Dies kann als Workaround fungieren, wenn bemerkbare Konsistenzprobleme in der Introspektionsantwort auftreten, kann sich jedoch auf die Leistung auswirken. Wir planen, Trigger für Introspektionsanfragen in Zukunft zu entfernen.",
       "USERSCHEMA": "Benutzerschema",
       "USERSCHEMA_DESCRIPTION": "Benutzerschemata ermöglichen das Verwalten von Datenschemata von Benutzern. Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "ACTIONS": "Aktionen",
@@ -1644,8 +1640,6 @@
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Der Back-Channel-Logout implementiert OpenID Connect Back-Channel Logout 1.0 und kann verwendet werden, um Clients über die Beendigung der Sitzung beim OpenID-Provider zu benachrichtigen.",
       "PERMISSIONCHECKV2": "Berechtigungsprüfung V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
-      "WEBKEY": "Web-Schlüssel",
-      "WEBKEY_DESCRIPTION": "Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "STATES": {
         "INHERITED": "Erben",
         "ENABLED": "Aktiviert",
@@ -2341,6 +2335,8 @@
     "REMOVE_WARN_DESCRIPTION": "Sie sind dabei, einen Identitätsanbieter zu entfernen. Dadurch wird die Auswahl des verfügbaren IDP für Ihre Benutzer entfernt und bereits registrierte Benutzer können sich nicht erneut anmelden. Wollen Sie wirklich fortfahren?",
     "DELETE_SELECTION_TITLE": "Identitätsanbieter löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identitätsanbieter zu löschen. Die dadurch hervorgerufenen Änderungen sind unwiderruflich. Wollen Sie dies wirklich tun?",
+    "FEDERATEDLOGOUTENABLED": "Federated Logout aktiviert",
+    "FEDERATEDLOGOUTENABLED_DESC": "Wenn aktiviert, wird der Benutzer auch vom IdP abgemeldet, wenn der Benutzer die Sitzung in ZITADEL beendet.",
     "EMPTY": "Kein IDP vorhanden",
     "OIDC": {
       "TITLE": "OIDC Konfiguration",

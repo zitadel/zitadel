@@ -7,6 +7,7 @@ toolchain go1.24.1
 require (
 	cloud.google.com/go/profiler v0.4.2
 	cloud.google.com/go/storage v1.54.0
+	dario.cat/mergo v1.0.2
 	github.com/BurntSushi/toml v1.5.0
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.27.0
@@ -34,6 +35,7 @@ require (
 	github.com/go-webauthn/webauthn v0.10.2
 	github.com/goccy/go-json v0.10.5
 	github.com/golang/protobuf v1.5.4
+	github.com/google/go-cmp v0.7.0
 	github.com/gorilla/csrf v1.7.2
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.4.1
@@ -45,6 +47,7 @@ require (
 	github.com/h2non/gock v1.2.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/improbable-eng/grpc-web v0.15.0
+	github.com/jackc/pgx-shopspring-decimal v0.0.0-20220624020537-1d36b5a1853e
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/jarcoal/jpath v0.0.0-20140328210829-f76b8b2dbf52
 	github.com/jinzhu/gorm v1.9.16
@@ -63,8 +66,11 @@ require (
 	github.com/riverqueue/river v0.22.0
 	github.com/riverqueue/river/riverdriver v0.22.0
 	github.com/riverqueue/river/rivertype v0.22.0
+	github.com/riverqueue/rivercontrib/otelriver v0.5.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/cors v1.11.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
+	github.com/shopspring/decimal v1.3.1
 	github.com/sony/gobreaker/v2 v2.1.0
 	github.com/sony/sonyflake v1.2.1
 	github.com/spf13/cobra v1.9.1

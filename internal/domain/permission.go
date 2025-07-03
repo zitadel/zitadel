@@ -24,7 +24,7 @@ func (p *Permissions) appendPermission(ctxID, permission string) {
 	p.Permissions = append(p.Permissions, permission)
 }
 
-type PermissionCheck func(ctx context.Context, permission, orgID, resourceID string) (err error)
+type PermissionCheck func(ctx context.Context, permission, resourceOwnerID, aggregateID string) (err error)
 
 const (
 	PermissionUserWrite           = "user.write"
@@ -47,6 +47,9 @@ const (
 	PermissionProjectRoleWrite    = "project.role.write"
 	PermissionProjectRoleRead     = "project.role.read"
 	PermissionProjectRoleDelete   = "project.role.delete"
+	PermissionProjectAppWrite     = "project.app.write"
+	PermissionProjectAppDelete    = "project.app.delete"
+	PermissionProjectAppRead      = "project.app.read"
 )
 
 // ProjectPermissionCheck is used as a check for preconditions dependent on application, project, user resourceowner and usergrants.

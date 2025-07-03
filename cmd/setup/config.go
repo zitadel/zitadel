@@ -152,6 +152,11 @@ type Steps struct {
 	s53InitPermittedOrgsFunction            *InitPermittedOrgsFunction53
 	s54InstancePositionIndex                *InstancePositionIndex
 	s55ExecutionHandlerStart                *ExecutionHandlerStart
+	s56IDPTemplate6SAMLFederatedLogout      *IDPTemplate6SAMLFederatedLogout
+	s57CreateResourceCounts                 *CreateResourceCounts
+	s58ReplaceLoginNames3View               *ReplaceLoginNames3View
+	s59SetupWebkeys                         *SetupWebkeys
+	s60GenerateSystemID                     *GenerateSystemID
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
