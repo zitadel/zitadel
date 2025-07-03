@@ -6,13 +6,15 @@ import (
 	"testing"
 
 	"connectrpc.com/connect"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 )
 
 func Test_toGRPCError(t *testing.T) {
 	type args struct {
 		ctx     context.Context
 		req     connect.AnyRequest
-		handler connect.UnaryFunc
+		handler func(t *testing.T) connect.UnaryFunc
 	}
 	type res struct {
 		want    interface{}
@@ -27,8 +29,8 @@ func Test_toGRPCError(t *testing.T) {
 			"no error",
 			args{
 				ctx:     context.Background(),
-				req:     &mockReq{},
-				handler: emptyMockHandler(&connect.Response[struct{}]{}),
+				req:     &mockReq[struct{}]{},
+				handler: emptyMockHandler(&connect.Response[struct{}]{}, authz.CtxData{}),
 			},
 			res{
 				&connect.Response[struct{}]{},
@@ -39,8 +41,8 @@ func Test_toGRPCError(t *testing.T) {
 			"error",
 			args{
 				ctx:     context.Background(),
-				req:     &mockReq{},
-				handler: errorMockHandler,
+				req:     &mockReq[struct{}]{},
+				handler: errorMockHandler(),
 			},
 			res{
 				nil,
@@ -50,7 +52,7 @@ func Test_toGRPCError(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := toConnectError(tt.args.ctx, tt.args.req, tt.args.handler)
+			got, err := toConnectError(tt.args.ctx, tt.args.req, tt.args.handler(t))
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("toGRPCError() error = %v, wantErr %v", err, tt.res.wantErr)
 				return

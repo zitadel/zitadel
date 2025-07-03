@@ -46,8 +46,8 @@ func orgIDAndDomainFromRequest(req connect.AnyRequest) (id, domain string) {
 	orgID := req.Header().Get(http.ZitadelOrgID)
 	oz, ok := req.Any().(OrganizationFromRequest)
 	if ok {
-		id = oz.OrganizationFromRequest().ID
-		domain = oz.OrganizationFromRequest().Domain
+		id = oz.OrganizationFromRequestConnect().ID
+		domain = oz.OrganizationFromRequestConnect().Domain
 		if id != "" || domain != "" {
 			return id, domain
 		}
@@ -61,5 +61,5 @@ type Organization struct {
 }
 
 type OrganizationFromRequest interface {
-	OrganizationFromRequest() *Organization
+	OrganizationFromRequestConnect() *Organization
 }

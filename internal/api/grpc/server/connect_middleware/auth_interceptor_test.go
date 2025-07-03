@@ -53,11 +53,22 @@ var (
 	})
 )
 
+type mockOrgFromRequest struct {
+	id string
+}
+
+func (m *mockOrgFromRequest) OrganizationFromRequestConnect() *Organization {
+	return &Organization{
+		ID:     m.id,
+		Domain: "",
+	}
+}
+
 func Test_authorize(t *testing.T) {
 	type args struct {
 		ctx        context.Context
 		req        connect.AnyRequest
-		handler    connect.UnaryFunc
+		handler    func(t *testing.T) connect.UnaryFunc
 		verifier   func() authz.APITokenVerifier
 		authConfig authz.Config
 	}
@@ -74,8 +85,8 @@ func Test_authorize(t *testing.T) {
 			"no token needed ok",
 			args{
 				ctx:     context.Background(),
-				req:     &mockReq{procedure: "/no/token/needed"},
-				handler: emptyMockHandler(&connect.Response[struct{}]{}),
+				req:     &mockReq[struct{}]{procedure: "/no/token/needed"},
+				handler: emptyMockHandler(&connect.Response[struct{}]{}, authz.CtxData{}),
 				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{})
@@ -91,8 +102,8 @@ func Test_authorize(t *testing.T) {
 			"auth header missing error",
 			args{
 				ctx:     context.Background(),
-				req:     &mockReq{procedure: "/need/authentication"},
-				handler: emptyMockHandler(&connect.Response[struct{}]{}),
+				req:     &mockReq[struct{}]{procedure: "/need/authentication"},
+				handler: emptyMockHandler(&connect.Response[struct{}]{}, authz.CtxData{}),
 				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
@@ -109,8 +120,8 @@ func Test_authorize(t *testing.T) {
 			"unauthorized error",
 			args{
 				ctx:     context.Background(),
-				req:     &mockReq{procedure: "/need/authentication", header: http.Header{"Authorization": []string{"wrong"}}},
-				handler: emptyMockHandler(&connect.Response[struct{}]{}),
+				req:     &mockReq[struct{}]{procedure: "/need/authentication", header: http.Header{"Authorization": []string{"wrong"}}},
+				handler: emptyMockHandler(&connect.Response[struct{}]{}, authz.CtxData{}),
 				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
@@ -126,9 +137,13 @@ func Test_authorize(t *testing.T) {
 		{
 			"authorized ok",
 			args{
-				ctx:     context.Background(),
-				req:     &mockReq{procedure: "/need/authentication", header: http.Header{"Authorization": []string{"Bearer token"}}},
-				handler: emptyMockHandler(&connect.Response[struct{}]{}),
+				ctx: context.Background(),
+				req: &mockReq[struct{}]{procedure: "/need/authentication", header: http.Header{"Authorization": []string{"Bearer token"}}},
+				handler: emptyMockHandler(&connect.Response[struct{}]{}, authz.CtxData{
+					UserID:        "user1",
+					OrgID:         "org1",
+					ResourceOwner: "org1",
+				}),
 				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
@@ -142,11 +157,41 @@ func Test_authorize(t *testing.T) {
 			},
 		},
 		{
+			"authorized ok, org by request",
+			args{
+				ctx: context.Background(),
+				req: &mockReq[mockOrgFromRequest]{
+					Request:   connect.Request[mockOrgFromRequest]{Msg: &mockOrgFromRequest{"id"}},
+					procedure: "/need/authentication",
+					header:    http.Header{"Authorization": []string{"Bearer token"}},
+				},
+				handler: emptyMockHandler(&connect.Response[mockOrgFromRequest]{Msg: &mockOrgFromRequest{"id"}}, authz.CtxData{
+					UserID:        "user1",
+					OrgID:         "id",
+					ResourceOwner: "org1",
+				}),
+				verifier: func() authz.APITokenVerifier {
+					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
+					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
+					return verifier
+				},
+				authConfig: authz.Config{},
+			},
+			res{
+				&connect.Response[mockOrgFromRequest]{Msg: &mockOrgFromRequest{"id"}},
+				false,
+			},
+		},
+		{
 			"permission denied error",
 			args{
-				ctx:     context.Background(),
-				req:     &mockReq{procedure: "/need/authentication", header: http.Header{"Authorization": []string{"Bearer token"}}},
-				handler: emptyMockHandler(&connect.Response[struct{}]{}),
+				ctx: context.Background(),
+				req: &mockReq[struct{}]{procedure: "/need/authentication", header: http.Header{"Authorization": []string{"Bearer token"}}},
+				handler: emptyMockHandler(&connect.Response[struct{}]{}, authz.CtxData{
+					UserID:        "user1",
+					OrgID:         "org1",
+					ResourceOwner: "org1",
+				}),
 				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "to.do.something"}})
@@ -167,9 +212,13 @@ func Test_authorize(t *testing.T) {
 		{
 			"permission ok",
 			args{
-				ctx:     context.Background(),
-				req:     &mockReq{procedure: "/need/authentication", header: http.Header{"Authorization": []string{"Bearer token"}}},
-				handler: emptyMockHandler(&connect.Response[struct{}]{}),
+				ctx: context.Background(),
+				req: &mockReq[struct{}]{procedure: "/need/authentication", header: http.Header{"Authorization": []string{"Bearer token"}}},
+				handler: emptyMockHandler(&connect.Response[struct{}]{}, authz.CtxData{
+					UserID:        "user1",
+					OrgID:         "org1",
+					ResourceOwner: "org1",
+				}),
 				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenOK, systemTokenNOK)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "to.do.something"}})
@@ -191,8 +240,8 @@ func Test_authorize(t *testing.T) {
 			"system token permission denied error",
 			args{
 				ctx:     context.Background(),
-				req:     &mockReq{procedure: "/need/authentication", header: http.Header{"Authorization": []string{"Bearer token"}}},
-				handler: emptyMockHandler(&connect.Response[struct{}]{}),
+				req:     &mockReq[struct{}]{procedure: "/need/authentication", header: http.Header{"Authorization": []string{"Bearer token"}}},
+				handler: emptyMockHandler(&connect.Response[struct{}]{}, authz.CtxData{}),
 				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenNOK, authz.SystemTokenVerifierFunc(func(ctx context.Context, token string, orgID string) (memberships authz.Memberships, userID string, err error) {
 						return authz.Memberships{{
@@ -218,9 +267,19 @@ func Test_authorize(t *testing.T) {
 		{
 			"system token permission denied error",
 			args{
-				ctx:     context.Background(),
-				req:     &mockReq{procedure: "/need/authentication", header: http.Header{"Authorization": []string{"Bearer token"}}},
-				handler: emptyMockHandler(&connect.Response[struct{}]{}),
+				ctx: context.Background(),
+				req: &mockReq[struct{}]{procedure: "/need/authentication", header: http.Header{"Authorization": []string{"Bearer token"}}},
+				handler: emptyMockHandler(&connect.Response[struct{}]{}, authz.CtxData{
+					UserID: "systemuser",
+					SystemMemberships: authz.Memberships{{
+						MemberType: authz.MemberTypeSystem,
+						Roles:      []string{"A_SYSTEM_ROLE"},
+					}},
+					SystemUserPermissions: []authz.SystemUserPermissions{{
+						MemberType:  authz.MemberTypeSystem,
+						Permissions: []string{"to.do.something"},
+					}},
+				}),
 				verifier: func() authz.APITokenVerifier {
 					verifier := authz.StartAPITokenVerifier(&authzRepoMock{}, accessTokenNOK, authz.SystemTokenVerifierFunc(func(ctx context.Context, token string, orgID string) (memberships authz.Memberships, userID string, err error) {
 						return authz.Memberships{{
@@ -246,7 +305,7 @@ func Test_authorize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := authorize(tt.args.ctx, tt.args.req, tt.args.handler, tt.args.verifier(), tt.args.authConfig, tt.args.authConfig)
+			got, err := authorize(tt.args.ctx, tt.args.req, tt.args.handler(t), tt.args.verifier(), tt.args.authConfig, tt.args.authConfig)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("authorize() error = %v, wantErr %v", err, tt.res.wantErr)
 				return
