@@ -1233,9 +1233,9 @@ ServicePing:
     # ResourceCount is a periodic report of the number of resources in ZITADEL.
     # This includes the number of users, organizations, projects, and other resources.
     ResourceCount:
-        Enabled: true # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_ENABLED
-        # The number of counts that are sent in one batch.
-        BulkSize: 10000 # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_BULKSIZE
+      Enabled: true # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_ENABLED
+      # The number of counts that are sent in one batch.
+      BulkSize: 10000 # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_BULKSIZE
 
 InternalAuthZ:
   # Configure the RolePermissionMappings by environment variable using JSON notation:
