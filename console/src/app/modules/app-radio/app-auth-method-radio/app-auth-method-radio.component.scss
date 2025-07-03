@@ -28,6 +28,7 @@
     opacity: 0;
     display: none;
     box-sizing: border-box;
+    cursor: pointer;
 
     &:focus {
       border: 1px solid if($is-dark-theme, white, black);
@@ -38,6 +39,7 @@
     border-color: $primary-color;
     border-width: 2px;
     box-shadow: 0 0 6px rgb(0 0 0 / 10%);
+    cursor: pointer;
 
     .cnsl-radio-header span {
       color: if($is-dark-theme, white, white);

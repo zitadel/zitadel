@@ -18,5 +18,19 @@
 
     </div>
 </div>
+{{else}}
+<div class="lgn-login-profile lgn-login-profile-empty">
+    <div class="lgn-profile-image"></div>
+    <div class="lgn-names">
+        <div class="inline-block">
+            <div class="lgn-avatar lgn-primary">
+                <span class="initials lgn-primary">A</span>
+            </div>
+        </div>
+        <div class="lgn-loginname">
+            <p class="lgn-loginname-empty">{{ t "UserProfile.Anonymous" }}</p>
+        </div>
+    </div>
+</div>
 {{end}}
 {{end}}
