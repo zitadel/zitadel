@@ -9,18 +9,14 @@ import (
 
 	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/cache/connector"
-	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/authncache"
-    "github.com/zitadel/zitadel/internal/cachekey"
-
-
+	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 type Caches struct {
-	authnKeys cache.Cache[cachekey.AuthnKeyIndex, string, *authncache.CachedPublicKey]	
-	instance cache.Cache[instanceIndex, string, *authzInstance]
-	org      cache.Cache[orgIndex, string, *Org]
+	authnKeys cache.Cache[authnKeyIndex, string, *CachedPublicKey]
+	instance  cache.Cache[instanceIndex, string, *authzInstance]
+	org       cache.Cache[orgIndex, string, *Org]
 
 	activeInstances *expirable.LRU[string, bool]
 }
@@ -37,21 +33,21 @@ func startCaches(background context.Context, connectors connector.Connectors, in
 		return nil, err
 	}
 	caches.authnKeys, err = connector.StartCache[
-	cachekey.AuthnKeyIndex,
-	string,
-	*authncache.CachedPublicKey](
-	background,
-	[]cachekey.AuthnKeyIndex{
-		cachekey.InstanceID,
-		cachekey.KeyID,
-	},
-	cache.PurposeAuthNKeys,
-	connectors.Config.Instance, 
-	connectors,
-)
-if err != nil {
-	return nil, err
-}
+		AuthnKeyIndex,
+		string,
+		*CachedPublicKey](
+		background,
+		[]AuthnKeyIndex{
+			AuthnKeyIndexInstanceID,
+			AuthnKeyIndexKeyID,
+		},
+		cache.PurposeAuthNKeys,
+		connectors.Config.Instance,
+		connectors,
+	)
+	if err != nil {
+		return nil, err
+	}
 	caches.org, err = connector.StartCache[orgIndex, string, *Org](background, orgIndexValues(), cache.PurposeOrganization, connectors.Config.Organization, connectors)
 	if err != nil {
 		return nil, err
@@ -90,8 +86,8 @@ func getResourceOwner(aggregate *eventstore.Aggregate) string {
 func (c *Caches) registerAuthNKeyInvalidation() {
 	invalidate := cacheInvalidationFunc(
 		c.authnKeys,
-		cachekey.KeyID, 
-		getAggregateID, 
+		AuthnKeyIndexKeyID,
+		getAggregateID,
 	)
 	projection.AuthNKeyProjection.RegisterCacheInvalidation(invalidate)
 }

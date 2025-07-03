@@ -9,14 +9,13 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/cachekey"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	"github.com/zitadel/zitadel/internal/cachekey"
-
 )
 
 type Key interface {
@@ -414,7 +413,7 @@ func (q *Queries) GetPublicKeyByID(ctx context.Context, keyID string) (_ PublicK
 					return nil, zerrors.ThrowInvalidArgumentf(nil, "QUERY-1a92k", "invalid key usage: %s", cached.Use)
 
 				}
-	
+
 				return &rsaPublicKey{
 					key: key{
 						id:        cached.KeyID,
@@ -427,12 +426,7 @@ func (q *Queries) GetPublicKeyByID(ctx context.Context, keyID string) (_ PublicK
 			}
 		}
 	}
-	
-	
-	
 
-	
-	
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

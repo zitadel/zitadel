@@ -498,3 +498,39 @@ func prepareAuthNKeysDataQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthN
 			}, nil
 		}
 }
+
+type CachedPublicKey struct {
+	KeyID      string
+	InstanceID string
+	Key        []byte
+	Expiry     int64
+}
+
+type AuthnKeyIndex int
+
+const (
+	AuthnKeyIndexInstanceID AuthnKeyIndex = iota
+	AuthnKeyIndexKeyID
+)
+
+func (i AuthnKeyIndex) Key() string {
+	switch i {
+	case AuthnKeyIndexInstanceID:
+		return "instance_id"
+	case AuthnKeyIndexKeyID:
+		return "key_id"
+	default:
+		return "unknown"
+	}
+}
+
+func (c *CachedPublicKey) Keys(index AuthnKeyIndex) []string {
+	switch index {
+	case AuthnKeyIndexInstanceID:
+		return []string{c.InstanceID}
+	case AuthnKeyIndexKeyID:
+		return []string{c.KeyID}
+	default:
+		return nil
+	}
+}
