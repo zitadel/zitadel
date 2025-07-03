@@ -86,7 +86,7 @@ jobs:
       actions: write
       id-token: write
     with:
-      ignore-run-cache:  ${{ github.event_name == 'workflow_dispatch' }}
+      ignore-run-cache:  ${{ github.event_name == 'workflow_dispatch' || fromJSON(github.run_attempt) > 1 }}
       node_version: "20"
 
   container:
