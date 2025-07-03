@@ -318,7 +318,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             };
           }
 
-          const paramsPasskey: any = { loginName: command.loginName };
+          const paramsPasskey: any = {
+            loginName: session.factors?.user?.loginName,
+          };
           if (command.requestId) {
             paramsPasskey.requestId = command.requestId;
           }
@@ -334,7 +336,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       // prefer passkey in favor of other methods
       if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSKEY)) {
         const passkeyParams: any = {
-          loginName: command.loginName,
+          loginName: session.factors?.user?.loginName,
           altPassword: `${methods.authMethodTypes.includes(1)}`, // show alternative password option
         };
 
@@ -356,7 +358,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)
       ) {
         // user has no passkey setup and login settings allow passkeys
-        const paramsPasswordDefault: any = { loginName: command.loginName };
+        const paramsPasswordDefault: any = {
+          loginName: session.factors?.user?.loginName,
+        };
 
         if (command.requestId) {
           paramsPasswordDefault.requestId = command.requestId;

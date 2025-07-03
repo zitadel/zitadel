@@ -854,15 +854,15 @@ export async function searchUsers({
     const emailQuery = EmailQuery(searchValue);
     emailAndPhoneQueries.push(emailQuery);
   } else {
-    const emailAndPhoneOrQueries: SearchQuery[] = [];
+    const orQuery: SearchQuery[] = [];
 
     const emailQuery = EmailQuery(searchValue);
-    emailAndPhoneOrQueries.push(emailQuery);
+    orQuery.push(emailQuery);
 
     let phoneQuery;
     if (searchValue.length <= 20) {
       phoneQuery = PhoneQuery(searchValue);
-      emailAndPhoneOrQueries.push(phoneQuery);
+      orQuery.push(phoneQuery);
     }
 
     emailAndPhoneQueries.push(
@@ -870,7 +870,7 @@ export async function searchUsers({
         query: {
           case: "orQuery",
           value: {
-            queries: emailAndPhoneOrQueries,
+            queries: orQuery,
           },
         },
       }),
@@ -903,7 +903,7 @@ export async function searchUsers({
   }
 
   if (emailOrPhoneResult.result.length == 1) {
-    return loginNameResult;
+    return emailOrPhoneResult;
   }
 
   return { error: "User not found in the system" };
