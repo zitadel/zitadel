@@ -29,7 +29,7 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/fergusstrange/embedded-postgres v1.30.0
 	github.com/gabriel-vasile/mimetype v1.4.9
-	github.com/go-chi/chi/v5 v5.2.1
+	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-jose/go-jose/v4 v4.1.0
 	github.com/go-ldap/ldap/v3 v3.4.11
 	github.com/go-webauthn/webauthn v0.10.2
@@ -80,7 +80,7 @@ require (
 	github.com/twilio/twilio-go v1.26.1
 	github.com/zitadel/exifremove v0.1.0
 	github.com/zitadel/logging v0.6.2
-	github.com/zitadel/oidc/v3 v3.37.0
+	github.com/zitadel/oidc/v3 v3.39.1
 	github.com/zitadel/passwap v0.9.0
 	github.com/zitadel/saml v0.3.5
 	github.com/zitadel/schema v1.3.1
@@ -99,8 +99,8 @@ require (
 	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6
 	golang.org/x/net v0.40.0
 	golang.org/x/oauth2 v0.30.0
-	golang.org/x/sync v0.14.0
-	golang.org/x/text v0.25.0
+	golang.org/x/sync v0.15.0
+	golang.org/x/text v0.26.0
 	google.golang.org/api v0.233.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250512202823-5a2f75b736a9
 	google.golang.org/grpc v1.72.1
