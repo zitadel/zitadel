@@ -61,7 +61,7 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1 data-i18n-key="error.tryagain">
+        <h1>
           <Translated i18nKey="title" namespace="loginname" />
         </h1>
         <p className="ztdl-p">
