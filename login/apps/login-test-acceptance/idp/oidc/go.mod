@@ -6,7 +6,7 @@ require github.com/zitadel/oidc/v3 v3.37.0
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.8.1 // indirect
-	github.com/go-chi/chi/v5 v5.2.1 // indirect
+	github.com/go-chi/chi/v5 v5.2.2 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
