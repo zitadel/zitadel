@@ -224,7 +224,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	logging.OnError(err).Fatal("unable to start projections")
 
 	for _, step := range []migration.Migration{
-		// steps.s61AddUIDniqueConstraintsForOrgs,
+		steps.s61AddUIDniqueConstraintsForOrgs,
 		steps.s14NewEventsTable,
 		steps.s40InitPushFunc,
 		steps.s1ProjectionTable,
