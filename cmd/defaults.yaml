@@ -1213,8 +1213,10 @@ ServicePing:
   Endpoint: "https://zitadel.com/api/ping" # ZITADEL_SERVICEPING_ENDPOINT
   # Interval at which the service ping is sent to the endpoint.
   # The interval is in the format of a cron expression.
-  # By default, it is set to every day at midnight:
-  Interval: "0 0 * * *" # ZITADEL_SERVICEPING_INTERVAL
+  # By default, it is set to every daily.
+  # Note that if the interval is set to `@daily`, we randomize the time to prevent all systems from sending their reports at the same time.
+  # If you want to send the service ping at a specific time, you can set the interval to a cron expression like "@midnight" or "15 4 * * *".
+  Interval: "@daily" # ZITADEL_SERVICEPING_INTERVAL
   # Maximum number of attempts for each individual report to be sent.
   # If one report fails, it will be retried up to this number of times.
   # Other reports will still be handled in parallel and have their own retry count.
@@ -1232,6 +1234,7 @@ ServicePing:
     # This includes the number of users, organizations, projects, and other resources.
     ResourceCount:
         Enabled: true # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_ENABLED
+        # The number of counts that are sent in one batch.
         BulkSize: 10000 # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_BULKSIZE
 
 InternalAuthZ:
