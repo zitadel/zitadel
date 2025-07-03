@@ -258,6 +258,12 @@ func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	if q.caches != nil && q.caches.authnKeys != nil {
+		if cached, ok := q.caches.authnKeys.Get(ctx, AuthnKeyIndexKeyID, id); ok && cached != nil {
+			return cached.Key, nil
+		}
+	}
+
 	stmt, scan := prepareAuthNKeyPublicKeyQuery()
 	eq := sq.And{
 		sq.Eq{
@@ -279,6 +285,15 @@ func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id 
 		key, err = scan(row)
 		return err
 	}, query, args...)
+	
+	if err == nil && q.caches != nil && q.caches.authnKeys != nil && key != nil {
+	q.caches.authnKeys.Put(&CachedPublicKey{
+		KeyID:      id,
+		InstanceID: authz.GetInstance(ctx).InstanceID(),
+		Key:        key,
+		Expiry:     time.Now().Add(time.Hour).Unix(),
+	})
+}
 	return key, err
 }
 
