@@ -291,23 +291,25 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             };
           }
 
-          const paramsPassword: any = {
+          const paramsPassword = new URLSearchParams({
             loginName: session.factors?.user?.loginName,
-          };
+          });
 
           // TODO: does this have to be checked in loginSettings.allowDomainDiscovery
 
           if (command.organization || session.factors?.user?.organizationId) {
-            paramsPassword.organization =
-              command.organization ?? session.factors?.user?.organizationId;
+            paramsPassword.append(
+              "organization",
+              command.organization ?? session.factors?.user?.organizationId,
+            );
           }
 
           if (command.requestId) {
-            paramsPassword.requestId = command.requestId;
+            paramsPassword.append("requestId", command.requestId);
           }
 
           return {
-            redirect: "/password?" + new URLSearchParams(paramsPassword),
+            redirect: "/password?" + paramsPassword,
           };
 
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
@@ -318,36 +320,42 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             };
           }
 
-          const paramsPasskey: any = { loginName: command.loginName };
+          const paramsPasskey = new URLSearchParams({
+            loginName: session.factors?.user?.loginName,
+          });
           if (command.requestId) {
-            paramsPasskey.requestId = command.requestId;
+            paramsPasskey.append("requestId", command.requestId);
           }
 
           if (command.organization || session.factors?.user?.organizationId) {
-            paramsPasskey.organization =
-              command.organization ?? session.factors?.user?.organizationId;
+            paramsPasskey.append(
+              "organization",
+              command.organization ?? session.factors?.user?.organizationId,
+            );
           }
 
-          return { redirect: "/passkey?" + new URLSearchParams(paramsPasskey) };
+          return { redirect: "/passkey?" + paramsPasskey };
       }
     } else {
       // prefer passkey in favor of other methods
       if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSKEY)) {
-        const passkeyParams: any = {
-          loginName: command.loginName,
+        const passkeyParams = new URLSearchParams({
+          loginName: session.factors?.user?.loginName,
           altPassword: `${methods.authMethodTypes.includes(1)}`, // show alternative password option
-        };
+        });
 
         if (command.requestId) {
-          passkeyParams.requestId = command.requestId;
+          passkeyParams.append("requestId", command.requestId);
         }
 
         if (command.organization || session.factors?.user?.organizationId) {
-          passkeyParams.organization =
-            command.organization ?? session.factors?.user?.organizationId;
+          passkeyParams.append(
+            "organization",
+            command.organization ?? session.factors?.user?.organizationId,
+          );
         }
 
-        return { redirect: "/passkey?" + new URLSearchParams(passkeyParams) };
+        return { redirect: "/passkey?" + passkeyParams };
       } else if (
         methods.authMethodTypes.includes(AuthenticationMethodType.IDP)
       ) {
@@ -356,19 +364,23 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)
       ) {
         // user has no passkey setup and login settings allow passkeys
-        const paramsPasswordDefault: any = { loginName: command.loginName };
+        const paramsPasswordDefault = new URLSearchParams({
+          loginName: session.factors?.user?.loginName,
+        });
 
         if (command.requestId) {
-          paramsPasswordDefault.requestId = command.requestId;
+          paramsPasswordDefault.append("requestId", command.requestId);
         }
 
         if (command.organization || session.factors?.user?.organizationId) {
-          paramsPasswordDefault.organization =
-            command.organization ?? session.factors?.user?.organizationId;
+          paramsPasswordDefault.append(
+            "organization",
+            command.organization ?? session.factors?.user?.organizationId,
+          );
         }
 
         return {
-          redirect: "/password?" + new URLSearchParams(paramsPasswordDefault),
+          redirect: "/password?" + paramsPasswordDefault,
         };
       }
     }

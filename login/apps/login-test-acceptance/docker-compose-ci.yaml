@@ -16,7 +16,7 @@ services:
       ZITADEL_ADMIN_USER: zitadel-admin@zitadel.traefik
 
   login:
-    image: "${LOGIN_TAG:-login:local}"
+    image: "${LOGIN_TAG:-zitadel-login:local}"
     container_name: acceptance-login
     labels:
       - "traefik.enable=true"
