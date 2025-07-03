@@ -509,7 +509,7 @@ Errors:
       LinkingNotAllowed: 在此提供者上不允许链接一个用户
       NoOptionAllowed: 此提供商不允许创建或链接。请联系您的管理员。
       LoginFailedSwitchLocal: |
-        外部身份提供商的登录失败。返回到本地登录。
+        外部身份提供者的登录失败。返回到本地登录。
 
         错误详情: {{.Details}}
     GrantRequired: 无法登录，用户需要在应用程序上拥有至少一项授权，请联系您的管理员。
