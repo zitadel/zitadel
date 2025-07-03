@@ -144,20 +144,9 @@ func (c *Commands) newUserGrantPermissionCheck(ctx context.Context, permission s
 	return func(projectID, projectGrantID string) PermissionCheck {
 		return func(resourceOwner, _ string) error {
 			if projectGrantID != "" {
-				grantErr := check(resourceOwner, projectGrantID)
-				if grantErr != nil {
-					projectErr := check(resourceOwner, projectID)
-					if projectErr != nil {
-						return grantErr
-					}
-				}
-			} else {
-				projectErr := check(resourceOwner, projectID)
-				if projectErr != nil {
-					return projectErr
-				}
+				return check(resourceOwner, projectGrantID)
 			}
-			return nil
+			return check(resourceOwner, projectID)
 		}
 	}
 }
