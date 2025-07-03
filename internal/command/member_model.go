@@ -4,6 +4,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/member"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 type MemberWriteModel struct {
@@ -30,7 +31,7 @@ func (wm *MemberWriteModel) Reduce() error {
 			wm.State = domain.MemberStateActive
 		case *member.MemberChangedEvent:
 			wm.Roles = e.Roles
-		case *member.MemberRemovedEvent:
+		case *member.MemberRemovedEvent, *org.OrgRemovedEvent:
 			wm.Roles = nil
 			wm.State = domain.MemberStateRemoved
 		}
