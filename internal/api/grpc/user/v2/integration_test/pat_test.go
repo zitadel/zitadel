@@ -22,7 +22,7 @@ import (
 )
 
 func TestServer_AddPersonalAccessToken(t *testing.T) {
-	resp := Instance.CreateUserTypeMachine(IamCTX)
+	resp := Instance.CreateUserTypeMachine(IamCTX, Instance.DefaultOrg.Id)
 	userId := resp.GetId()
 	expirationDate := timestamppb.New(time.Now().Add(time.Hour * 24))
 	type args struct {
@@ -172,7 +172,7 @@ func TestServer_AddPersonalAccessToken_Permission(t *testing.T) {
 }
 
 func TestServer_RemovePersonalAccessToken(t *testing.T) {
-	resp := Instance.CreateUserTypeMachine(IamCTX)
+	resp := Instance.CreateUserTypeMachine(IamCTX, Instance.DefaultOrg.Id)
 	userId := resp.GetId()
 	expirationDate := timestamppb.New(time.Now().Add(time.Hour * 24))
 	type args struct {
@@ -339,7 +339,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 	})
 	require.NoError(t, err)
 	otherOrgUserId := otherOrgUser.GetId()
-	otherUserId := Instance.CreateUserTypeMachine(SystemCTX).GetId()
+	otherUserId := Instance.CreateUserTypeMachine(SystemCTX, Instance.DefaultOrg.Id).GetId()
 	onlySinceTestStartFilter := &user.PersonalAccessTokensSearchFilter{Filter: &user.PersonalAccessTokensSearchFilter_CreatedDateFilter{CreatedDateFilter: &filter.TimestampFilter{
 		Timestamp: timestamppb.Now(),
 		Method:    filter.TimestampFilterMethod_TIMESTAMP_FILTER_METHOD_AFTER_OR_EQUALS,

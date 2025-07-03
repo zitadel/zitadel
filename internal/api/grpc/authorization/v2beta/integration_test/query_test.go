@@ -21,7 +21,6 @@ import (
 
 func TestServer_ListAuthorizations(t *testing.T) {
 	iamOwnerCtx := Instance.WithAuthorizationToken(EmptyCTX, integration.UserTypeIAMOwner)
-
 	projectOwnerResp := Instance.CreateMachineUser(iamOwnerCtx)
 	projectOwnerPatResp := Instance.CreatePersonalAccessToken(iamOwnerCtx, projectOwnerResp.GetUserId())
 	projectResp := createProject(iamOwnerCtx, Instance, t, Instance.DefaultOrg.GetId(), false, false)

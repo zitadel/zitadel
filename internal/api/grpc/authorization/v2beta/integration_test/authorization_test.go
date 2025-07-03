@@ -33,14 +33,15 @@ func TestServer_CreateAuthorization(t *testing.T) {
 			name: "add authorization, project owned, PROJECT_OWNER, ok",
 			args: args{
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
-					request.OrganizationId = &Instance.DefaultOrg.Id
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					request.OrganizationId = &selfOrgId
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					request.RoleKeys = []string{gofakeit.AppName()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], gofakeit.AppName(), "")
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -50,13 +51,14 @@ func TestServer_CreateAuthorization(t *testing.T) {
 			name: "add authorization, project owned, PROJECT_OWNER, no org id, ok",
 			args: args{
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					request.RoleKeys = []string{gofakeit.AppName()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], gofakeit.AppName(), "")
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -66,14 +68,15 @@ func TestServer_CreateAuthorization(t *testing.T) {
 			name: "add authorization, project owned, ORG_OWNER, ok",
 			args: args{
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
-					request.OrganizationId = &Instance.DefaultOrg.Id
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					request.OrganizationId = &selfOrgId
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					request.RoleKeys = []string{gofakeit.AppName()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], gofakeit.AppName(), "")
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateOrgMembership(t, IAMCTX, Instance.DefaultOrg.Id, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateOrgMembership(t, IAMCTX, selfOrgId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -84,13 +87,14 @@ func TestServer_CreateAuthorization(t *testing.T) {
 			args: args{
 
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
-					request.OrganizationId = &Instance.DefaultOrg.Id
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					request.OrganizationId = &selfOrgId
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					request.RoleKeys = []string{gofakeit.AppName()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], gofakeit.AppName(), "")
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -101,13 +105,14 @@ func TestServer_CreateAuthorization(t *testing.T) {
 			name: "add authorization, role does not exist, error",
 			args: args{
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
-					request.OrganizationId = &Instance.DefaultOrg.Id
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					request.OrganizationId = &selfOrgId
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					request.RoleKeys = []string{gofakeit.AppName()}
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -118,11 +123,12 @@ func TestServer_CreateAuthorization(t *testing.T) {
 			name: "add authorization, project does not exist, error",
 			args: args{
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
-					request.OrganizationId = &Instance.DefaultOrg.Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					request.OrganizationId = &selfOrgId
 					request.ProjectId = gofakeit.AppName()
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -133,12 +139,13 @@ func TestServer_CreateAuthorization(t *testing.T) {
 			name: "add authorization, org does not exist, error",
 			args: args{
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					request.OrganizationId = gu.Ptr(gofakeit.AppName())
-					request.ProjectId = Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					request.ProjectId = Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 
@@ -150,16 +157,17 @@ func TestServer_CreateAuthorization(t *testing.T) {
 			name: "add authorization, project owner, project granted, no permission",
 			args: args{
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
-					request.OrganizationId = &Instance.DefaultOrg.Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					request.OrganizationId = &selfOrgId
 					foreignOrg := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email())
 					request.ProjectId = Instance.CreateProject(IAMCTX, t, foreignOrg.OrganizationId, gofakeit.AppName(), false, false).Id
 					request.RoleKeys = []string{gofakeit.AppName()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], gofakeit.AppName(), "")
-					Instance.CreateProjectGrant(IAMCTX, t, request.ProjectId, Instance.DefaultOrg.Id, request.RoleKeys...)
+					Instance.CreateProjectGrant(IAMCTX, t, request.ProjectId, selfOrgId, request.RoleKeys...)
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -170,16 +178,17 @@ func TestServer_CreateAuthorization(t *testing.T) {
 			name: "add authorization, role key not granted, error",
 			args: args{
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
-					request.OrganizationId = &Instance.DefaultOrg.Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					request.OrganizationId = &selfOrgId
 					foreignOrg := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email())
 					request.ProjectId = Instance.CreateProject(IAMCTX, t, foreignOrg.OrganizationId, gofakeit.AppName(), false, false).Id
 					request.RoleKeys = []string{gofakeit.AppName()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], gofakeit.AppName(), "")
-					Instance.CreateProjectGrant(IAMCTX, t, request.ProjectId, Instance.DefaultOrg.Id)
+					Instance.CreateProjectGrant(IAMCTX, t, request.ProjectId, selfOrgId)
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, request.ProjectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -190,16 +199,17 @@ func TestServer_CreateAuthorization(t *testing.T) {
 			name: "add authorization, grant does not exist, error",
 			args: args{
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
-					request.OrganizationId = &Instance.DefaultOrg.Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					request.OrganizationId = &selfOrgId
 					foreignOrg := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email())
 					projectID := Instance.CreateProject(IAMCTX, t, foreignOrg.OrganizationId, gofakeit.AppName(), false, false).Id
 					request.ProjectId = projectID
 					request.RoleKeys = []string{gofakeit.AppName()}
 					Instance.AddProjectRole(IAMCTX, t, projectID, request.RoleKeys[0], gofakeit.AppName(), "")
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectID, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, projectID, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 
@@ -211,15 +221,16 @@ func TestServer_CreateAuthorization(t *testing.T) {
 			name: "add authorization, PROJECT_OWNER on wrong org, error",
 			args: args{
 				func(t *testing.T, request *authorization.CreateAuthorizationRequest) context.Context {
-					request.OrganizationId = &Instance.DefaultOrg.Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					request.OrganizationId = &selfOrgId
 					foreignOrg := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email())
 					request.ProjectId = Instance.CreateProject(IAMCTX, t, foreignOrg.OrganizationId, gofakeit.AppName(), false, false).Id
 					request.RoleKeys = []string{gofakeit.AppName()}
 					Instance.AddProjectRole(IAMCTX, t, request.ProjectId, request.RoleKeys[0], gofakeit.AppName(), "")
 					request.UserId = Instance.Users.Get(integration.UserTypeIAMOwner).ID
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrg.OrganizationId}), request.ProjectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrg.OrganizationId}), request.ProjectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 
@@ -261,7 +272,8 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 			name: "update authorization, owned project, ok",
 			args: args{
 				func(t *testing.T, request *authorization.UpdateAuthorizationRequest) context.Context {
-					projectId := Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
 					projectRole2 := gofakeit.AppName()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -274,9 +286,9 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
 					request.RoleKeys = []string{projectRole1}
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -286,7 +298,8 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 			name: "update authorization, owned project, role not found, error",
 			args: args{
 				func(t *testing.T, request *authorization.UpdateAuthorizationRequest) context.Context {
-					projectId := Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
 					projectRole2 := gofakeit.AppName()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -299,9 +312,9 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
 					request.RoleKeys = []string{projectRole1, projectRole2, gofakeit.AppName()}
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -312,7 +325,8 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 			name: "update authorization, owned project, unchanged, ok, changed date is creation date",
 			args: args{
 				func(t *testing.T, request *authorization.UpdateAuthorizationRequest) context.Context {
-					projectId := Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
 					projectRole2 := gofakeit.AppName()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -325,9 +339,9 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
 					request.RoleKeys = []string{projectRole1, projectRole2}
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -338,6 +352,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 			name: "update authorization, granted project, ok",
 			args: args{
 				func(t *testing.T, request *authorization.UpdateAuthorizationRequest) context.Context {
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
@@ -346,18 +361,18 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole3, projectRole3, "")
-					Instance.CreateProjectGrant(IAMCTX, t, projectId, Instance.DefaultOrg.Id, projectRole1, projectRole2)
+					Instance.CreateProjectGrant(IAMCTX, t, projectId, selfOrgId, projectRole1, projectRole2)
 
 					preparedAuthorization, err := Instance.Client.AuthorizationV2Beta.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
-						OrganizationId: &Instance.DefaultOrg.Id,
+						OrganizationId: &selfOrgId,
 						RoleKeys:       []string{projectRole1, projectRole2},
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
 					request.RoleKeys = []string{projectRole1}
-					token := createUserWithProjectGrantMembership(IAMCTX, t, Instance, projectId, Instance.DefaultOrg.Id)
+					token := createUserWithProjectGrantMembership(IAMCTX, t, Instance, projectId, selfOrgId)
 					return integration.WithAuthorizationToken(EmptyCTX, token)
 
 				},
@@ -367,6 +382,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 			name: "update authorization, granted project, role not granted, error",
 			args: args{
 				func(t *testing.T, request *authorization.UpdateAuthorizationRequest) context.Context {
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
@@ -375,19 +391,19 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole3, projectRole3, "")
-					Instance.CreateProjectGrant(IAMCTX, t, projectId, Instance.DefaultOrg.Id, projectRole1, projectRole2)
+					Instance.CreateProjectGrant(IAMCTX, t, projectId, selfOrgId, projectRole1, projectRole2)
 					preparedAuthorization, err := Instance.Client.AuthorizationV2Beta.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
-						OrganizationId: &Instance.DefaultOrg.Id,
+						OrganizationId: &selfOrgId,
 						RoleKeys:       []string{projectRole1, projectRole2},
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
 					request.RoleKeys = []string{projectId, projectRole3, projectRole3}
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, Instance.DefaultOrg.Id, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, selfOrgId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -398,6 +414,7 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 			name: "update authorization, granted project, grant removed, error",
 			args: args{
 				func(t *testing.T, request *authorization.UpdateAuthorizationRequest) context.Context {
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
@@ -406,24 +423,24 @@ func TestServer_UpdateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole3, projectRole3, "")
-					Instance.CreateProjectGrant(IAMCTX, t, projectId, Instance.DefaultOrg.Id, projectRole1, projectRole2)
+					Instance.CreateProjectGrant(IAMCTX, t, projectId, selfOrgId, projectRole1, projectRole2)
 					preparedAuthorization, err := Instance.Client.AuthorizationV2Beta.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
-						OrganizationId: &Instance.DefaultOrg.Id,
+						OrganizationId: &selfOrgId,
 						RoleKeys:       []string{projectRole1, projectRole2},
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
 					request.RoleKeys = []string{projectRole1}
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, Instance.DefaultOrg.Id, callingUser.UserId)
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectGrantMembership(t, IAMCTX, projectId, selfOrgId, callingUser.Id)
 					_, err = Instance.Client.Projectv2Beta.DeleteProjectGrant(IAMCTX, &project.DeleteProjectGrantRequest{
 						ProjectId:             projectId,
-						GrantedOrganizationId: Instance.DefaultOrg.Id,
+						GrantedOrganizationId: selfOrgId,
 					})
 					require.NoError(t, err)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -469,7 +486,8 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 			name: "delete authorization, project owned by calling users org, ok",
 			args: args{
 				func(t *testing.T, request *authorization.DeleteAuthorizationRequest) context.Context {
-					projectId := Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
 					projectRole2 := gofakeit.AppName()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -481,9 +499,9 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -492,6 +510,7 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 			name: "delete authorization, owned project, user membership on project owning org, ok",
 			args: args{
 				func(t *testing.T, request *authorization.DeleteAuthorizationRequest) context.Context {
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
@@ -505,9 +524,9 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -517,6 +536,7 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 			name: "delete authorization, granted project, user membership on project owning org, error",
 			args: args{
 				func(t *testing.T, request *authorization.DeleteAuthorizationRequest) context.Context {
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
@@ -525,18 +545,18 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole3, projectRole3, "")
-					Instance.CreateProjectGrant(IAMCTX, t, projectId, Instance.DefaultOrg.Id, projectRole1, projectRole2)
+					Instance.CreateProjectGrant(IAMCTX, t, projectId, selfOrgId, projectRole1, projectRole2)
 					preparedAuthorization, err := Instance.Client.AuthorizationV2Beta.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
-						OrganizationId: &Instance.DefaultOrg.Id,
+						OrganizationId: &selfOrgId,
 						RoleKeys:       []string{projectRole1, projectRole2},
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -547,6 +567,7 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 			name: "delete authorization, granted project, user membership on project granted org, ok",
 			args: args{
 				func(t *testing.T, request *authorization.DeleteAuthorizationRequest) context.Context {
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
@@ -555,17 +576,17 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole3, projectRole3, "")
-					Instance.CreateProjectGrant(IAMCTX, t, projectId, Instance.DefaultOrg.Id, projectRole1, projectRole2)
+					Instance.CreateProjectGrant(IAMCTX, t, projectId, selfOrgId, projectRole1, projectRole2)
 
 					preparedAuthorization, err := Instance.Client.AuthorizationV2Beta.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
-						OrganizationId: &Instance.DefaultOrg.Id,
+						OrganizationId: &selfOrgId,
 						RoleKeys:       []string{projectRole1, projectRole2},
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					return integration.WithAuthorizationToken(EmptyCTX, createUserWithProjectGrantMembership(IAMCTX, t, Instance, projectId, Instance.DefaultOrg.Id))
+					return integration.WithAuthorizationToken(EmptyCTX, createUserWithProjectGrantMembership(IAMCTX, t, Instance, projectId, selfOrgId))
 
 				},
 			},
@@ -574,7 +595,8 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 			name: "delete authorization, already deleted, ok, deletion date is creation date",
 			args: args{
 				func(t *testing.T, request *authorization.DeleteAuthorizationRequest) context.Context {
-					projectId := Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
 					projectRole2 := gofakeit.AppName()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -590,9 +612,9 @@ func TestServer_DeleteAuthorization(t *testing.T) {
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -638,7 +660,8 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 			name: "deactivate authorization, project owned by calling users org, ok",
 			args: args{
 				func(t *testing.T, request *authorization.DeactivateAuthorizationRequest) context.Context {
-					projectId := Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
 					projectRole2 := gofakeit.AppName()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -650,9 +673,9 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -661,6 +684,7 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 			name: "deactivate authorization, owned project, user membership on project owning org, ok",
 			args: args{
 				func(t *testing.T, request *authorization.DeactivateAuthorizationRequest) context.Context {
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
@@ -674,9 +698,9 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -686,6 +710,7 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 			name: "deactivate authorization, granted project, user membership on project owning org, error",
 			args: args{
 				func(t *testing.T, request *authorization.DeactivateAuthorizationRequest) context.Context {
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
@@ -694,18 +719,18 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole3, projectRole3, "")
-					Instance.CreateProjectGrant(IAMCTX, t, projectId, Instance.DefaultOrg.Id, projectRole1, projectRole2)
+					Instance.CreateProjectGrant(IAMCTX, t, projectId, selfOrgId, projectRole1, projectRole2)
 					preparedAuthorization, err := Instance.Client.AuthorizationV2Beta.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
-						OrganizationId: &Instance.DefaultOrg.Id,
+						OrganizationId: &selfOrgId,
 						RoleKeys:       []string{projectRole1, projectRole2},
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -716,6 +741,7 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 			name: "deactivate authorization, granted project, user membership on project granted org, ok",
 			args: args{
 				func(t *testing.T, request *authorization.DeactivateAuthorizationRequest) context.Context {
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
@@ -724,17 +750,17 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole3, projectRole3, "")
-					Instance.CreateProjectGrant(IAMCTX, t, projectId, Instance.DefaultOrg.Id, projectRole1, projectRole2)
+					Instance.CreateProjectGrant(IAMCTX, t, projectId, selfOrgId, projectRole1, projectRole2)
 
 					preparedAuthorization, err := Instance.Client.AuthorizationV2Beta.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
-						OrganizationId: &Instance.DefaultOrg.Id,
+						OrganizationId: &selfOrgId,
 						RoleKeys:       []string{projectRole1, projectRole2},
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					return integration.WithAuthorizationToken(EmptyCTX, createUserWithProjectGrantMembership(IAMCTX, t, Instance, projectId, Instance.DefaultOrg.Id))
+					return integration.WithAuthorizationToken(EmptyCTX, createUserWithProjectGrantMembership(IAMCTX, t, Instance, projectId, selfOrgId))
 				},
 			},
 		},
@@ -742,7 +768,8 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 			name: "deactivate authorization, already inactive, ok, change date is creation date",
 			args: args{
 				func(t *testing.T, request *authorization.DeactivateAuthorizationRequest) context.Context {
-					projectId := Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
 					projectRole2 := gofakeit.AppName()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -758,9 +785,9 @@ func TestServer_DeactivateAuthorization(t *testing.T) {
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -806,7 +833,8 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 			name: "activate authorization, project owned by calling users org, ok",
 			args: args{
 				func(t *testing.T, request *authorization.ActivateAuthorizationRequest) context.Context {
-					projectId := Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
 					projectRole2 := gofakeit.AppName()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -818,13 +846,13 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.Id)
 					_, err = Instance.Client.AuthorizationV2Beta.DeactivateAuthorization(IAMCTX, &authorization.DeactivateAuthorizationRequest{
 						Id: preparedAuthorization.Id,
 					})
 					require.NoError(t, err)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -833,6 +861,7 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 			name: "activate authorization, owned project, user membership on project owning org, ok",
 			args: args{
 				func(t *testing.T, request *authorization.ActivateAuthorizationRequest) context.Context {
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
@@ -846,13 +875,13 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.UserId)
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.Id)
 					_, err = Instance.Client.AuthorizationV2Beta.DeactivateAuthorization(IAMCTX, &authorization.DeactivateAuthorizationRequest{
 						Id: preparedAuthorization.Id,
 					})
 					require.NoError(t, err)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -862,6 +891,7 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 			name: "activate authorization, granted project, user membership on project owning org, error",
 			args: args{
 				func(t *testing.T, request *authorization.ActivateAuthorizationRequest) context.Context {
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
@@ -870,22 +900,22 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole3, projectRole3, "")
-					Instance.CreateProjectGrant(IAMCTX, t, projectId, Instance.DefaultOrg.Id, projectRole1, projectRole2)
+					Instance.CreateProjectGrant(IAMCTX, t, projectId, selfOrgId, projectRole1, projectRole2)
 					preparedAuthorization, err := Instance.Client.AuthorizationV2Beta.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
-						OrganizationId: &Instance.DefaultOrg.Id,
+						OrganizationId: &selfOrgId,
 						RoleKeys:       []string{projectRole1, projectRole2},
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.UserId)
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, authz.SetCtxData(IAMCTX, authz.CtxData{OrgID: foreignOrgId}), projectId, callingUser.Id)
 					_, err = Instance.Client.AuthorizationV2Beta.DeactivateAuthorization(IAMCTX, &authorization.DeactivateAuthorizationRequest{
 						Id: preparedAuthorization.Id,
 					})
 					require.NoError(t, err)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -896,6 +926,7 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 			name: "activate authorization, granted project, user membership on project granted org, ok",
 			args: args{
 				func(t *testing.T, request *authorization.ActivateAuthorizationRequest) context.Context {
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					foreignOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
 					projectId := Instance.CreateProject(IAMCTX, t, foreignOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
@@ -904,11 +935,11 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole2, projectRole2, "")
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole3, projectRole3, "")
-					Instance.CreateProjectGrant(IAMCTX, t, projectId, Instance.DefaultOrg.Id, projectRole1, projectRole2)
+					Instance.CreateProjectGrant(IAMCTX, t, projectId, selfOrgId, projectRole1, projectRole2)
 					preparedAuthorization, err := Instance.Client.AuthorizationV2Beta.CreateAuthorization(IAMCTX, &authorization.CreateAuthorizationRequest{
 						UserId:         Instance.Users.Get(integration.UserTypeIAMOwner).ID,
 						ProjectId:      projectId,
-						OrganizationId: &Instance.DefaultOrg.Id,
+						OrganizationId: &selfOrgId,
 						RoleKeys:       []string{projectRole1, projectRole2},
 					})
 					require.NoError(t, err)
@@ -917,7 +948,7 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 						Id: preparedAuthorization.Id,
 					})
 					require.NoError(t, err)
-					return integration.WithAuthorizationToken(EmptyCTX, createUserWithProjectGrantMembership(IAMCTX, t, Instance, projectId, Instance.DefaultOrg.Id))
+					return integration.WithAuthorizationToken(EmptyCTX, createUserWithProjectGrantMembership(IAMCTX, t, Instance, projectId, selfOrgId))
 				},
 			},
 		},
@@ -925,7 +956,8 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 			name: "activate authorization, already active, ok, change date is creation date",
 			args: args{
 				func(t *testing.T, request *authorization.ActivateAuthorizationRequest) context.Context {
-					projectId := Instance.CreateProject(IAMCTX, t, Instance.DefaultOrg.Id, gofakeit.AppName(), false, false).Id
+					selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+					projectId := Instance.CreateProject(IAMCTX, t, selfOrgId, gofakeit.AppName(), false, false).Id
 					projectRole1 := gofakeit.AppName()
 					projectRole2 := gofakeit.AppName()
 					Instance.AddProjectRole(IAMCTX, t, projectId, projectRole1, projectRole1, "")
@@ -937,9 +969,9 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 					})
 					require.NoError(t, err)
 					request.Id = preparedAuthorization.Id
-					callingUser := Instance.CreateMachineUser(IAMCTX)
-					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.UserId)
-					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+					callingUser := Instance.CreateUserTypeMachine(IAMCTX, selfOrgId)
+					Instance.CreateProjectMembership(t, IAMCTX, projectId, callingUser.Id)
+					token, err := Instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 					require.NoError(t, err)
 					return integration.WithAuthorizationToken(EmptyCTX, token.Token)
 				},
@@ -972,9 +1004,10 @@ func TestServer_ActivateAuthorization(t *testing.T) {
 }
 
 func createUserWithProjectGrantMembership(ctx context.Context, t *testing.T, instance *integration.Instance, projectID, grantID string) string {
-	callingUser := instance.CreateMachineUser(ctx)
-	instance.CreateProjectGrantMembership(t, ctx, projectID, grantID, callingUser.UserId)
-	token, err := instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.UserId, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
+	selfOrgId := Instance.CreateOrganization(IAMCTX, gofakeit.AppName(), gofakeit.Email()).OrganizationId
+	callingUser := instance.CreateUserTypeMachine(ctx, selfOrgId)
+	instance.CreateProjectGrantMembership(t, ctx, projectID, grantID, callingUser.Id)
+	token, err := instance.Client.UserV2.AddPersonalAccessToken(IAMCTX, &user.AddPersonalAccessTokenRequest{UserId: callingUser.Id, ExpirationDate: timestamppb.New(time.Now().Add(24 * time.Hour))})
 	require.NoError(t, err)
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, 10*time.Minute)
 	require.EventuallyWithT(t, func(tt *assert.CollectT) {
