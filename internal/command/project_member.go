@@ -54,7 +54,7 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *AddProjectMembe
 	}
 	// error if provided resourceowner is not equal to the resourceowner of the project
 	if projectResourceOwner != addedMember.ResourceOwner {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-0l10S9OmZV", "Errors.Project.Grant.Invalid")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-0l10S9OmZV", "Errors.Project.Member.Invalid")
 	}
 	if err := c.checkPermissionUpdateProjectMember(ctx, addedMember.ResourceOwner, addedMember.AggregateID); err != nil {
 		return nil, err

@@ -41,19 +41,19 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *AddProject
 	if err != nil {
 		return nil, err
 	}
-	projectGrantResourceOwner, err := c.checkProjectGrantExists(ctx, member.GrantID, "", member.ProjectID, member.ResourceOwner)
+	grantedOrgID, projectGrantResourceOwner, err := c.checkProjectGrantExists(ctx, member.GrantID, "", member.ProjectID, member.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if member.ResourceOwner == "" {
-		member.ResourceOwner = projectGrantResourceOwner
+		member.ResourceOwner = grantedOrgID
 	}
 	addedMember, err := c.projectGrantMemberWriteModelByID(ctx, member.ProjectID, member.UserID, member.GrantID, member.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	// error if provided resourceowner is not equal to the resourceowner of the project grant
-	if projectGrantResourceOwner != addedMember.ResourceOwner {
+	if grantedOrgID != addedMember.ResourceOwner && projectGrantResourceOwner != addedMember.ResourceOwner {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-0l10S9OmZV", "Errors.Project.Grant.Invalid")
 	}
 	if addedMember.State.Exists() {

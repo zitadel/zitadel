@@ -234,15 +234,15 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	return writeModelToObjectDetails(&existingGrant.WriteModel), nil
 }
 
-func (c *Commands) checkProjectGrantExists(ctx context.Context, grantID, grantedOrgID, projectID, resourceOwner string) (string, error) {
+func (c *Commands) checkProjectGrantExists(ctx context.Context, grantID, grantedOrgID, projectID, resourceOwner string) (string, string, error) {
 	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, grantedOrgID, projectID, resourceOwner)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	if !existingGrant.State.Exists() {
-		return "", zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.Project.Grant.NotFound")
+		return "", "", zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.Project.Grant.NotFound")
 	}
-	return existingGrant.ResourceOwner, nil
+	return existingGrant.GrantedOrgID, existingGrant.ResourceOwner, nil
 }
 
 func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantID, grantedOrgID, resourceOwner string) (details *domain.ObjectDetails, err error) {

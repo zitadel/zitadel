@@ -920,8 +920,11 @@ func (i *Instance) CreateProjectGrantUserGrant(ctx context.Context, orgID, proje
 	return resp
 }
 
-func (i *Instance) CreateInstanceMembership(t *testing.T, ctx context.Context, userID string) *admin.AddIAMMemberResponse {
-	resp, err := i.Client.Admin.AddIAMMember(ctx, &admin.AddIAMMemberRequest{
+func (i *Instance) CreateInstanceMembership(t *testing.T, ctx context.Context, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
+	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
+		Resource: &internal_permission_v2beta.ResourceType{
+			Resource: &internal_permission_v2beta.ResourceType_Instance{Instance: true},
+		},
 		UserId: userID,
 		Roles:  []string{domain.RoleIAMOwner},
 	})
@@ -936,8 +939,11 @@ func (i *Instance) DeleteInstanceMembership(t *testing.T, ctx context.Context, u
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, userID string) *mgmt.AddOrgMemberResponse {
-	resp, err := i.Client.Mgmt.AddOrgMember(ctx, &mgmt.AddOrgMemberRequest{
+func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, orgID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
+	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
+		Resource: &internal_permission_v2beta.ResourceType{
+			Resource: &internal_permission_v2beta.ResourceType_OrganizationId{OrganizationId: orgID},
+		},
 		UserId: userID,
 		Roles:  []string{domain.RoleOrgOwner},
 	})
@@ -952,40 +958,50 @@ func (i *Instance) DeleteOrgMembership(t *testing.T, ctx context.Context, userID
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) *mgmt.AddProjectMemberResponse {
-	resp, err := i.Client.Mgmt.AddProjectMember(ctx, &mgmt.AddProjectMemberRequest{
-		ProjectId: projectID,
-		UserId:    userID,
-		Roles:     []string{domain.RoleProjectOwner},
+func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
+	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
+		Resource: &internal_permission_v2beta.ResourceType{
+			Resource: &internal_permission_v2beta.ResourceType_ProjectId{ProjectId: projectID},
+		},
+		UserId: userID,
+		Roles:  []string{domain.RoleProjectOwner},
 	})
 	require.NoError(t, err)
 	return resp
 }
 
 func (i *Instance) DeleteProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) {
-	_, err := i.Client.Mgmt.RemoveProjectMember(ctx, &mgmt.RemoveProjectMemberRequest{
-		ProjectId: projectID,
-		UserId:    userID,
+	_, err := i.Client.InternalPermissionv2Beta.DeleteAdministrator(ctx, &internal_permission_v2beta.DeleteAdministratorRequest{
+		Resource: &internal_permission_v2beta.ResourceType{Resource: &internal_permission_v2beta.ResourceType_ProjectId{ProjectId: projectID}},
+		UserId:   userID,
 	})
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) *mgmt.AddProjectGrantMemberResponse {
-	resp, err := i.Client.Mgmt.AddProjectGrantMember(ctx, &mgmt.AddProjectGrantMemberRequest{
-		ProjectId: projectID,
-		GrantId:   grantID,
-		UserId:    userID,
-		Roles:     []string{domain.RoleProjectGrantOwner},
+func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
+	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
+		Resource: &internal_permission_v2beta.ResourceType{
+			Resource: &internal_permission_v2beta.ResourceType_ProjectGrant_{ProjectGrant: &internal_permission_v2beta.ResourceType_ProjectGrant{
+				ProjectId:      projectID,
+				ProjectGrantId: grantID,
+			}},
+		},
+		UserId: userID,
+		Roles:  []string{domain.RoleProjectGrantOwner},
 	})
 	require.NoError(t, err)
 	return resp
 }
 
 func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) {
-	_, err := i.Client.Mgmt.RemoveProjectGrantMember(ctx, &mgmt.RemoveProjectGrantMemberRequest{
-		ProjectId: projectID,
-		GrantId:   grantID,
-		UserId:    userID,
+	_, err := i.Client.InternalPermissionv2Beta.DeleteAdministrator(ctx, &internal_permission_v2beta.DeleteAdministratorRequest{
+		Resource: &internal_permission_v2beta.ResourceType{
+			Resource: &internal_permission_v2beta.ResourceType_ProjectGrant_{ProjectGrant: &internal_permission_v2beta.ResourceType_ProjectGrant{
+				ProjectId:      projectID,
+				ProjectGrantId: grantID,
+			}},
+		},
+		UserId: userID,
 	})
 	require.NoError(t, err)
 }

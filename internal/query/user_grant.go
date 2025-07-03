@@ -62,12 +62,12 @@ type UserGrants struct {
 func userGrantsCheckPermission(ctx context.Context, grants *UserGrants, permissionCheck domain.PermissionCheck) {
 	grants.UserGrants = slices.DeleteFunc(grants.UserGrants,
 		func(grant *UserGrant) bool {
-			return userGrantCheckPermission(ctx, grant.ResourceOwner, grant.ProjectID, grant.GrantID, grant.GrantedOrgID, grant.UserID, permissionCheck) != nil
+			return userGrantCheckPermission(ctx, grant.ResourceOwner, grant.ProjectID, grant.GrantID, grant.UserID, permissionCheck) != nil
 		},
 	)
 }
 
-func userGrantCheckPermission(ctx context.Context, resourceOwner, projectID, grantID, grantedOrgID, userID string, permissionCheck domain.PermissionCheck) error {
+func userGrantCheckPermission(ctx context.Context, resourceOwner, projectID, grantID, userID string, permissionCheck domain.PermissionCheck) error {
 	// you should always be able to read your own permissions
 	if authz.GetCtxData(ctx).UserID == userID {
 		return nil
@@ -80,10 +80,7 @@ func userGrantCheckPermission(ctx context.Context, resourceOwner, projectID, gra
 		}
 		// check for project grant permissions
 		if err := permissionCheck(ctx, domain.PermissionUserGrantRead, resourceOwner, grantID); err != nil {
-			// check for permission in the granted org
-			if err := permissionCheck(ctx, domain.PermissionUserGrantRead, grantedOrgID, grantID); err != nil {
-				return err
-			}
+			return err
 		}
 	}
 	return nil
