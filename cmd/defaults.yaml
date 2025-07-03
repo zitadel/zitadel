@@ -302,10 +302,11 @@ Caches:
       AddSource: true
       Formatter:
         Format: text
-    AuthNKey:
-      Connector: memory
-      MaxAge: 1h
-      LastUsedAge: 10m      
+  # Authentication key cache for clients
+  AuthNKey:
+    Connector: memory
+    MaxAge: 1h
+    LastUsedAge: 10m      
   # IdP callbacks using form POST cache, required for handling them securely and without possible too big request urls.
   IdPFormCallbacks:
     Connector: "postgres"
