@@ -6,12 +6,18 @@ variable "DOCKERFILES_DIR" {
   default = "dockerfiles/"
 }
 
+# The release target is overwritten in docker-bake-release.hcl
+# It makes sure the image is built for multiple platforms.
+# By default the platforms property is empty, so images are only built for the current bake runtime platform.
+target "release" {}
+
 # typescript-proto-client is used to generate the client code for the login service.
 # It is not login-prefixed, so it is easily extendable.
 # To extend this bake-file.hcl, set the context of all login-prefixed targets to a different directory.
 # For example docker bake --file login/docker-bake.hcl --file docker-bake.hcl --set login-*.context=./login/
 # The zitadel repository uses this to generate the client and the mock server from local proto files.
 target "typescript-proto-client" {
+  inherits   = ["release"]
   dockerfile = "${DOCKERFILES_DIR}typescript-proto-client.Dockerfile"
   contexts = {
     # We directly generate and download the client server-side with buf, so we don't need the proto files
@@ -37,6 +43,7 @@ target "login-typescript-proto-client-out" {
 # For example docker bake --file login/docker-bake.hcl --file docker-bake.hcl --set login-*.context=./login/
 # The zitadel repository uses this to generate the client and the mock server from local proto files.
 target "proto-files" {
+  inherits   = ["release"]
   dockerfile = "${DOCKERFILES_DIR}proto-files.Dockerfile"
   contexts = {
     login-pnpm = "target:login-pnpm"
@@ -48,6 +55,7 @@ variable "NODE_VERSION" {
 }
 
 target "login-pnpm" {
+  inherits   = ["release"]
   dockerfile = "${DOCKERFILES_DIR}login-pnpm.Dockerfile"
   args = {
     NODE_VERSION = "${NODE_VERSION}"
@@ -76,6 +84,7 @@ target "login-test-unit" {
 }
 
 target "login-client" {
+  inherits   = ["release"]
   dockerfile = "${DOCKERFILES_DIR}login-client.Dockerfile"
   contexts = {
     login-pnpm              = "target:login-pnpm"
@@ -93,7 +102,7 @@ target "core-mock" {
   contexts = {
     protos = "target:proto-files"
   }
-  tags   = ["${LOGIN_CORE_MOCK_TAG}"]
+  tags = ["${LOGIN_CORE_MOCK_TAG}"]
 }
 
 variable "LOGIN_TEST_INTEGRATION_TAG" {
@@ -105,7 +114,7 @@ target "login-test-integration" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-  tags   = ["${LOGIN_TEST_INTEGRATION_TAG}"]
+  tags = ["${LOGIN_TEST_INTEGRATION_TAG}"]
 }
 
 variable "LOGIN_TEST_ACCEPTANCE_TAG" {
@@ -117,28 +126,33 @@ target "login-test-acceptance" {
   contexts = {
     login-pnpm = "target:login-pnpm"
   }
-  tags   = ["${LOGIN_TEST_ACCEPTANCE_TAG}"]
+  tags = ["${LOGIN_TEST_ACCEPTANCE_TAG}"]
 }
 
 variable "LOGIN_TAG" {
   default = "zitadel-login:local"
 }
 
-target "docker-metadata-action" {}
+target "docker-metadata-action" {
+  # In the pipeline, this target is overwritten by the docker metadata action.
+  tags = ["${LOGIN_TAG}"]
+}
 
 # We run integration and acceptance tests against the next standalone server for docker.
 target "login-standalone" {
-  inherits   = ["docker-metadata-action"]
+  inherits = [
+    "docker-metadata-action",
+    "release",
+  ]
   dockerfile = "${DOCKERFILES_DIR}login-standalone.Dockerfile"
   contexts = {
     login-client = "target:login-client"
   }
-  tags   = ["${LOGIN_TAG}"]
 }
 
 target "login-standalone-out" {
-  inherits   = ["login-standalone"]
-  target = "login-standalone-out"
+  inherits = ["login-standalone"]
+  target   = "login-standalone-out"
   output = [
     "type=local,dest=${LOGIN_DIR}apps/login/standalone"
   ]
