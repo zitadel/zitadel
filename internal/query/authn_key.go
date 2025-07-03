@@ -10,7 +10,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -285,14 +284,17 @@ func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id 
 		key, err = scan(row)
 		return err
 	}, query, args...)
-	
+
 	if err == nil && q.caches != nil && q.caches.authnKeys != nil && key != nil {
-	q.caches.authnKeys.Put(&CachedPublicKey{
+		q.caches.authnKeys.Set(ctx, &CachedPublicKey{
 		KeyID:      id,
 		InstanceID: authz.GetInstance(ctx).InstanceID(),
 		Key:        key,
 		Expiry:     time.Now().Add(time.Hour).Unix(),
-	})
+})
+
+
+
 }
 	return key, err
 }

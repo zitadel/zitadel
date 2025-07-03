@@ -14,7 +14,7 @@ import (
 )
 
 type Caches struct {
-	authnKeys cache.Cache[authnKeyIndex, string, *CachedPublicKey]
+	authnKeys cache.Cache[AuthnKeyIndex, string, *CachedPublicKey]
 	instance  cache.Cache[instanceIndex, string, *authzInstance]
 	org       cache.Cache[orgIndex, string, *Org]
 
