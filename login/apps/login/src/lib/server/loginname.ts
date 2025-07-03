@@ -358,21 +358,23 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)
       ) {
         // user has no passkey setup and login settings allow passkeys
-        const paramsPasswordDefault: any = {
+        const paramsPasswordDefault = new URLSearchParams({
           loginName: session.factors?.user?.loginName,
-        };
+        });
 
         if (command.requestId) {
-          paramsPasswordDefault.requestId = command.requestId;
+          paramsPasswordDefault.append("requestId", command.requestId);
         }
 
         if (command.organization || session.factors?.user?.organizationId) {
-          paramsPasswordDefault.organization =
-            command.organization ?? session.factors?.user?.organizationId;
+          paramsPasswordDefault.append(
+            "organization",
+            command.organization ?? session.factors?.user?.organizationId,
+          );
         }
 
         return {
-          redirect: "/password?" + new URLSearchParams(paramsPasswordDefault),
+          redirect: "/password?" + paramsPasswordDefault,
         };
       }
     }
