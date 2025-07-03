@@ -224,6 +224,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	logging.OnError(err).Fatal("unable to start projections")
 
 	for _, step := range []migration.Migration{
+		// steps.s61AddUIDniqueConstraintsForOrgs,
 		steps.s14NewEventsTable,
 		steps.s40InitPushFunc,
 		steps.s1ProjectionTable,
@@ -267,7 +268,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s57CreateResourceCounts,
 		steps.s58ReplaceLoginNames3View,
 		steps.s60GenerateSystemID,
-		steps.s61AddUIDniqueConstraintsForOrgs,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
