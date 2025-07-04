@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -19,7 +20,6 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/scim"
 	"github.com/zitadel/zitadel/internal/test"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 var (
@@ -34,14 +34,8 @@ func init() {
 }
 
 func TestUpdateUser(t *testing.T) {
-	fullUserCreated, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, fullUserJson)
+	fullUserCreated, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, gofakeit.Username()))
 	require.NoError(t, err)
-
-	defer func() {
-		_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: fullUserCreated.ID})
-		require.NoError(t, err)
-	}()
-
 	tests := []struct {
 		name          string
 		body          []byte
