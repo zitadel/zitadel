@@ -4,7 +4,6 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { ToastService } from 'src/app/services/toast.service';
 import { Metadata as MetadataV2 } from '@zitadel/proto/zitadel/metadata_pb';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
-import { Buffer } from 'buffer';
 
 export type MetadataDialogData = {
   metadata: (Metadata.AsObject | MetadataV2)[];
@@ -26,9 +25,10 @@ export class MetadataDialogComponent {
     public dialogRef: MatDialogRef<MetadataDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: MetadataDialogData,
   ) {
+    const decoder = new TextDecoder();
     this.metadata = data.metadata.map(({ key, value }) => ({
       key,
-      value: typeof value === 'string' ? value : Buffer.from(value as unknown as string, 'base64').toString('utf8'),
+      value: typeof value === 'string' ? value : decoder.decode(value),
     }));
   }
 

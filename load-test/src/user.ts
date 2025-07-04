@@ -30,7 +30,7 @@ export function createHuman(username: string, org: Org, accessToken: string): Pr
           familyName: 'Zitizen',
         },
         email: {
-          email: `zitizen-@caos.ch`,
+          email: `${username}@zitadel.com`,
           isVerified: true,
         },
         password: {
@@ -50,11 +50,11 @@ export function createHuman(username: string, org: Org, accessToken: string): Pr
     response
       .then((res) => {
         check(res, {
-          'create user is status ok': (r) => r.status === 201,
+          'create user is status ok': (r) => r.status === 200,
         }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
         createHumanTrend.add(res.timings.duration);
 
-        const user = http.get(url(`/v2beta/users/${res.json('userId')!}`), {
+        const user = http.get(url(`/v2/users/${res.json('userId')!}`), {
           headers: {
             authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',

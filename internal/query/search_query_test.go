@@ -1204,7 +1204,7 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextEqualsIgnoreCase,
 			},
 			want: want{
-				query: sq.ILike{"test_table.test_col": "Hurst"},
+				query: sq.Like{"LOWER(test_table.test_col)": "hurst"},
 			},
 		},
 		{
@@ -1226,7 +1226,7 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextNotEqualsIgnoreCase,
 			},
 			want: want{
-				query: sq.NotILike{"test_table.test_col": "Hurst"},
+				query: sq.NotLike{"LOWER(test_table.test_col)": "hurst"},
 			},
 		},
 		{
@@ -1237,7 +1237,7 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextEqualsIgnoreCase,
 			},
 			want: want{
-				query: sq.ILike{"test_table.test_col": "Hu\\%\\%rst"},
+				query: sq.Like{"LOWER(test_table.test_col)": "hu\\%\\%rst"},
 			},
 		},
 		{
@@ -1270,7 +1270,7 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextStartsWithIgnoreCase,
 			},
 			want: want{
-				query: sq.ILike{"test_table.test_col": "Hurst%"},
+				query: sq.Like{"LOWER(test_table.test_col)": "hurst%"},
 			},
 		},
 		{
@@ -1281,7 +1281,7 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextStartsWithIgnoreCase,
 			},
 			want: want{
-				query: sq.ILike{"test_table.test_col": "Hurst\\%%"},
+				query: sq.Like{"LOWER(test_table.test_col)": "hurst\\%%"},
 			},
 		},
 		{
@@ -1314,7 +1314,7 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextEndsWithIgnoreCase,
 			},
 			want: want{
-				query: sq.ILike{"test_table.test_col": "%Hurst"},
+				query: sq.Like{"LOWER(test_table.test_col)": "%hurst"},
 			},
 		},
 		{
@@ -1325,7 +1325,7 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextEndsWithIgnoreCase,
 			},
 			want: want{
-				query: sq.ILike{"test_table.test_col": "%\\%Hurst"},
+				query: sq.Like{"LOWER(test_table.test_col)": "%\\%hurst"},
 			},
 		},
 		{
@@ -1351,14 +1351,14 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 		},
 		{
-			name: "containts ignore case",
+			name: "contains ignore case",
 			fields: fields{
 				Column:  testCol,
 				Text:    "Hurst",
 				Compare: TextContainsIgnoreCase,
 			},
 			want: want{
-				query: sq.ILike{"test_table.test_col": "%Hurst%"},
+				query: sq.Like{"LOWER(test_table.test_col)": "%hurst%"},
 			},
 		},
 		{
@@ -1369,11 +1369,11 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextContainsIgnoreCase,
 			},
 			want: want{
-				query: sq.ILike{"test_table.test_col": "%\\%Hurst\\%%"},
+				query: sq.Like{"LOWER(test_table.test_col)": "%\\%hurst\\%%"},
 			},
 		},
 		{
-			name: "list containts",
+			name: "list contains",
 			fields: fields{
 				Column:  testCol,
 				Text:    "Hurst",

@@ -68,6 +68,28 @@ func (c *Commands) checkPermissionUpdateProject(ctx context.Context, resourceOwn
 	return c.newPermissionCheck(ctx, domain.PermissionProjectWrite, project.AggregateType)(resourceOwner, projectID)
 }
 
-func (c *Commands) checkPermissionWriteProjectGrant(ctx context.Context, resourceOwner, projectGrantID string) error {
-	return c.newPermissionCheck(ctx, domain.PermissionProjectGrantWrite, project.AggregateType)(resourceOwner, projectGrantID)
+func (c *Commands) checkPermissionUpdateProjectGrant(ctx context.Context, resourceOwner, projectID, projectGrantID string) (err error) {
+	if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantWrite, project.AggregateType)(resourceOwner, projectGrantID); err != nil {
+		if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantWrite, project.AggregateType)(resourceOwner, projectID); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Commands) checkPermissionDeleteProjectGrant(ctx context.Context, resourceOwner, projectID, projectGrantID string) (err error) {
+	if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantDelete, project.AggregateType)(resourceOwner, projectGrantID); err != nil {
+		if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantDelete, project.AggregateType)(resourceOwner, projectID); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Commands) checkPermissionUpdateApplication(ctx context.Context, resourceOwner, appID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionProjectAppWrite, project.AggregateType)(resourceOwner, appID)
+}
+
+func (c *Commands) checkPermissionDeleteApp(ctx context.Context, resourceOwner, appID string) error {
+	return c.newPermissionCheck(ctx, domain.PermissionProjectAppDelete, project.AggregateType)(resourceOwner, appID)
 }

@@ -1,0 +1,10 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "test:integration:setup": {
+      "interactive": true,
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

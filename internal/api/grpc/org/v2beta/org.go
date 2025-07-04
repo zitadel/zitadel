@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	metadata "github.com/zitadel/zitadel/internal/api/grpc/metadata/v2beta"
@@ -17,8 +18,8 @@ import (
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
-func (s *Server) CreateOrganization(ctx context.Context, request *v2beta_org.CreateOrganizationRequest) (*v2beta_org.CreateOrganizationResponse, error) {
-	orgSetup, err := createOrganizationRequestToCommand(request)
+func (s *Server) CreateOrganization(ctx context.Context, request *connect.Request[v2beta_org.CreateOrganizationRequest]) (*connect.Response[v2beta_org.CreateOrganizationResponse], error) {
+	orgSetup, err := createOrganizationRequestToCommand(request.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -29,19 +30,19 @@ func (s *Server) CreateOrganization(ctx context.Context, request *v2beta_org.Cre
 	return createdOrganizationToPb(createdOrg)
 }
 
-func (s *Server) UpdateOrganization(ctx context.Context, request *v2beta_org.UpdateOrganizationRequest) (*v2beta_org.UpdateOrganizationResponse, error) {
-	org, err := s.command.ChangeOrg(ctx, request.Id, request.Name)
+func (s *Server) UpdateOrganization(ctx context.Context, request *connect.Request[v2beta_org.UpdateOrganizationRequest]) (*connect.Response[v2beta_org.UpdateOrganizationResponse], error) {
+	org, err := s.command.ChangeOrg(ctx, request.Msg.GetId(), request.Msg.GetName())
 	if err != nil {
 		return nil, err
 	}
 
-	return &v2beta_org.UpdateOrganizationResponse{
+	return connect.NewResponse(&v2beta_org.UpdateOrganizationResponse{
 		ChangeDate: timestamppb.New(org.EventDate),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListOrganizations(ctx context.Context, request *v2beta_org.ListOrganizationsRequest) (*v2beta_org.ListOrganizationsResponse, error) {
-	queries, err := listOrgRequestToModel(s.systemDefaults, request)
+func (s *Server) ListOrganizations(ctx context.Context, request *connect.Request[v2beta_org.ListOrganizationsRequest]) (*connect.Response[v2beta_org.ListOrganizationsResponse], error) {
+	queries, err := listOrgRequestToModel(s.systemDefaults, request.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -49,107 +50,107 @@ func (s *Server) ListOrganizations(ctx context.Context, request *v2beta_org.List
 	if err != nil {
 		return nil, err
 	}
-	return &v2beta_org.ListOrganizationsResponse{
+	return connect.NewResponse(&v2beta_org.ListOrganizationsResponse{
 		Organizations: OrgViewsToPb(orgs.Orgs),
 		Pagination: &filter.PaginationResponse{
 			TotalResult:  orgs.Count,
-			AppliedLimit: uint64(request.GetPagination().GetLimit()),
+			AppliedLimit: uint64(request.Msg.GetPagination().GetLimit()),
 		},
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeleteOrganization(ctx context.Context, request *v2beta_org.DeleteOrganizationRequest) (*v2beta_org.DeleteOrganizationResponse, error) {
-	details, err := s.command.RemoveOrg(ctx, request.Id)
+func (s *Server) DeleteOrganization(ctx context.Context, request *connect.Request[v2beta_org.DeleteOrganizationRequest]) (*connect.Response[v2beta_org.DeleteOrganizationResponse], error) {
+	details, err := s.command.RemoveOrg(ctx, request.Msg.GetId())
 	if err != nil {
 		var notFoundError *zerrors.NotFoundError
 		if errors.As(err, &notFoundError) {
-			return &v2beta_org.DeleteOrganizationResponse{}, nil
+			return connect.NewResponse(&v2beta_org.DeleteOrganizationResponse{}), nil
 		}
 		return nil, err
 	}
-	return &v2beta_org.DeleteOrganizationResponse{
+	return connect.NewResponse(&v2beta_org.DeleteOrganizationResponse{
 		DeletionDate: timestamppb.New(details.EventDate),
-	}, nil
+	}), nil
 }
 
-func (s *Server) SetOrganizationMetadata(ctx context.Context, request *v2beta_org.SetOrganizationMetadataRequest) (*v2beta_org.SetOrganizationMetadataResponse, error) {
-	result, err := s.command.BulkSetOrgMetadata(ctx, request.OrganizationId, BulkSetOrgMetadataToDomain(request)...)
+func (s *Server) SetOrganizationMetadata(ctx context.Context, request *connect.Request[v2beta_org.SetOrganizationMetadataRequest]) (*connect.Response[v2beta_org.SetOrganizationMetadataResponse], error) {
+	result, err := s.command.BulkSetOrgMetadata(ctx, request.Msg.GetOrganizationId(), BulkSetOrgMetadataToDomain(request.Msg)...)
 	if err != nil {
 		return nil, err
 	}
-	return &org.SetOrganizationMetadataResponse{
+	return connect.NewResponse(&org.SetOrganizationMetadataResponse{
 		SetDate: timestamppb.New(result.EventDate),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListOrganizationMetadata(ctx context.Context, request *v2beta_org.ListOrganizationMetadataRequest) (*v2beta_org.ListOrganizationMetadataResponse, error) {
-	metadataQueries, err := ListOrgMetadataToDomain(s.systemDefaults, request)
+func (s *Server) ListOrganizationMetadata(ctx context.Context, request *connect.Request[v2beta_org.ListOrganizationMetadataRequest]) (*connect.Response[v2beta_org.ListOrganizationMetadataResponse], error) {
+	metadataQueries, err := ListOrgMetadataToDomain(s.systemDefaults, request.Msg)
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchOrgMetadata(ctx, true, request.OrganizationId, metadataQueries, false)
+	res, err := s.query.SearchOrgMetadata(ctx, true, request.Msg.GetOrganizationId(), metadataQueries, false)
 	if err != nil {
 		return nil, err
 	}
-	return &v2beta_org.ListOrganizationMetadataResponse{
+	return connect.NewResponse(&v2beta_org.ListOrganizationMetadataResponse{
 		Metadata: metadata.OrgMetadataListToPb(res.Metadata),
 		Pagination: &filter.PaginationResponse{
 			TotalResult:  res.Count,
-			AppliedLimit: uint64(request.GetPagination().GetLimit()),
+			AppliedLimit: uint64(request.Msg.GetPagination().GetLimit()),
 		},
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeleteOrganizationMetadata(ctx context.Context, request *v2beta_org.DeleteOrganizationMetadataRequest) (*v2beta_org.DeleteOrganizationMetadataResponse, error) {
-	result, err := s.command.BulkRemoveOrgMetadata(ctx, request.OrganizationId, request.Keys...)
+func (s *Server) DeleteOrganizationMetadata(ctx context.Context, request *connect.Request[v2beta_org.DeleteOrganizationMetadataRequest]) (*connect.Response[v2beta_org.DeleteOrganizationMetadataResponse], error) {
+	result, err := s.command.BulkRemoveOrgMetadata(ctx, request.Msg.GetOrganizationId(), request.Msg.Keys...)
 	if err != nil {
 		return nil, err
 	}
-	return &v2beta_org.DeleteOrganizationMetadataResponse{
+	return connect.NewResponse(&v2beta_org.DeleteOrganizationMetadataResponse{
 		DeletionDate: timestamppb.New(result.EventDate),
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeactivateOrganization(ctx context.Context, request *org.DeactivateOrganizationRequest) (*org.DeactivateOrganizationResponse, error) {
-	objectDetails, err := s.command.DeactivateOrg(ctx, request.Id)
+func (s *Server) DeactivateOrganization(ctx context.Context, request *connect.Request[org.DeactivateOrganizationRequest]) (*connect.Response[org.DeactivateOrganizationResponse], error) {
+	objectDetails, err := s.command.DeactivateOrg(ctx, request.Msg.GetId())
 	if err != nil {
 		return nil, err
 	}
-	return &org.DeactivateOrganizationResponse{
+	return connect.NewResponse(&org.DeactivateOrganizationResponse{
 		ChangeDate: timestamppb.New(objectDetails.EventDate),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ActivateOrganization(ctx context.Context, request *org.ActivateOrganizationRequest) (*org.ActivateOrganizationResponse, error) {
-	objectDetails, err := s.command.ReactivateOrg(ctx, request.Id)
+func (s *Server) ActivateOrganization(ctx context.Context, request *connect.Request[org.ActivateOrganizationRequest]) (*connect.Response[org.ActivateOrganizationResponse], error) {
+	objectDetails, err := s.command.ReactivateOrg(ctx, request.Msg.GetId())
 	if err != nil {
 		return nil, err
 	}
-	return &org.ActivateOrganizationResponse{
+	return connect.NewResponse(&org.ActivateOrganizationResponse{
 		ChangeDate: timestamppb.New(objectDetails.EventDate),
-	}, err
+	}), err
 }
 
-func (s *Server) AddOrganizationDomain(ctx context.Context, request *org.AddOrganizationDomainRequest) (*org.AddOrganizationDomainResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Domain, request.OrganizationId)
+func (s *Server) AddOrganizationDomain(ctx context.Context, request *connect.Request[org.AddOrganizationDomainRequest]) (*connect.Response[org.AddOrganizationDomainResponse], error) {
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Msg.GetDomain(), request.Msg.GetOrganizationId())
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.AddOrgDomain(ctx, request.OrganizationId, request.Domain, userIDs)
+	details, err := s.command.AddOrgDomain(ctx, request.Msg.GetOrganizationId(), request.Msg.GetDomain(), userIDs)
 	if err != nil {
 		return nil, err
 	}
-	return &org.AddOrganizationDomainResponse{
+	return connect.NewResponse(&org.AddOrganizationDomainResponse{
 		CreationDate: timestamppb.New(details.EventDate),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListOrganizationDomains(ctx context.Context, req *org.ListOrganizationDomainsRequest) (*org.ListOrganizationDomainsResponse, error) {
-	queries, err := ListOrgDomainsRequestToModel(s.systemDefaults, req)
+func (s *Server) ListOrganizationDomains(ctx context.Context, req *connect.Request[org.ListOrganizationDomainsRequest]) (*connect.Response[org.ListOrganizationDomainsResponse], error) {
+	queries, err := ListOrgDomainsRequestToModel(s.systemDefaults, req.Msg)
 	if err != nil {
 		return nil, err
 	}
-	orgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(req.OrganizationId)
+	orgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(req.Msg.GetOrganizationId())
 	if err != nil {
 		return nil, err
 	}
@@ -159,48 +160,48 @@ func (s *Server) ListOrganizationDomains(ctx context.Context, req *org.ListOrgan
 	if err != nil {
 		return nil, err
 	}
-	return &org.ListOrganizationDomainsResponse{
+	return connect.NewResponse(&org.ListOrganizationDomainsResponse{
 		Domains: object.DomainsToPb(domains.Domains),
 		Pagination: &filter.PaginationResponse{
 			TotalResult:  domains.Count,
-			AppliedLimit: uint64(req.GetPagination().GetLimit()),
+			AppliedLimit: uint64(req.Msg.GetPagination().GetLimit()),
 		},
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeleteOrganizationDomain(ctx context.Context, req *org.DeleteOrganizationDomainRequest) (*org.DeleteOrganizationDomainResponse, error) {
-	details, err := s.command.RemoveOrgDomain(ctx, RemoveOrgDomainRequestToDomain(ctx, req))
+func (s *Server) DeleteOrganizationDomain(ctx context.Context, req *connect.Request[org.DeleteOrganizationDomainRequest]) (*connect.Response[org.DeleteOrganizationDomainResponse], error) {
+	details, err := s.command.RemoveOrgDomain(ctx, RemoveOrgDomainRequestToDomain(ctx, req.Msg))
 	if err != nil {
 		return nil, err
 	}
-	return &org.DeleteOrganizationDomainResponse{
+	return connect.NewResponse(&org.DeleteOrganizationDomainResponse{
 		DeletionDate: timestamppb.New(details.EventDate),
-	}, err
+	}), err
 }
 
-func (s *Server) GenerateOrganizationDomainValidation(ctx context.Context, req *org.GenerateOrganizationDomainValidationRequest) (*org.GenerateOrganizationDomainValidationResponse, error) {
-	token, url, err := s.command.GenerateOrgDomainValidation(ctx, GenerateOrgDomainValidationRequestToDomain(ctx, req))
+func (s *Server) GenerateOrganizationDomainValidation(ctx context.Context, req *connect.Request[org.GenerateOrganizationDomainValidationRequest]) (*connect.Response[org.GenerateOrganizationDomainValidationResponse], error) {
+	token, url, err := s.command.GenerateOrgDomainValidation(ctx, GenerateOrgDomainValidationRequestToDomain(ctx, req.Msg))
 	if err != nil {
 		return nil, err
 	}
-	return &org.GenerateOrganizationDomainValidationResponse{
+	return connect.NewResponse(&org.GenerateOrganizationDomainValidationResponse{
 		Token: token,
 		Url:   url,
-	}, nil
+	}), nil
 }
 
-func (s *Server) VerifyOrganizationDomain(ctx context.Context, request *org.VerifyOrganizationDomainRequest) (*org.VerifyOrganizationDomainResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Domain, request.OrganizationId)
+func (s *Server) VerifyOrganizationDomain(ctx context.Context, request *connect.Request[org.VerifyOrganizationDomainRequest]) (*connect.Response[org.VerifyOrganizationDomainResponse], error) {
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, request.Msg.GetDomain(), request.Msg.GetOrganizationId())
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.ValidateOrgDomain(ctx, ValidateOrgDomainRequestToDomain(ctx, request), userIDs)
+	details, err := s.command.ValidateOrgDomain(ctx, ValidateOrgDomainRequestToDomain(ctx, request.Msg), userIDs)
 	if err != nil {
 		return nil, err
 	}
-	return &org.VerifyOrganizationDomainResponse{
+	return connect.NewResponse(&org.VerifyOrganizationDomainResponse{
 		ChangeDate: timestamppb.New(details.EventDate),
-	}, nil
+	}), nil
 }
 
 func createOrganizationRequestToCommand(request *v2beta_org.CreateOrganizationRequest) (*command.OrgSetup, error) {

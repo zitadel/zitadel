@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { ProviderOAuthComponent } from './provider-oauth.component';
+import { ProviderGithubESComponent } from './provider-github-es.component';
 
 describe('ProviderOAuthComponent', () => {
-  let component: ProviderOAuthComponent;
-  let fixture: ComponentFixture<ProviderOAuthComponent>;
+  let component: ProviderGithubESComponent;
+  let fixture: ComponentFixture<ProviderGithubESComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ProviderOAuthComponent],
+      declarations: [ProviderGithubESComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ProviderOAuthComponent);
+    fixture = TestBed.createComponent(ProviderGithubESComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
