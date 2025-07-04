@@ -476,7 +476,7 @@ func createAuthorizationForProject(ctx context.Context, instance *integration.In
 }
 
 func createAuthorizationWithProjectGrant(ctx context.Context, instance *integration.Instance, t *testing.T, orgID, userID, projectName, projectID string) *authorization.Authorization {
-	grantedOrgName := gofakeit.Company()
+	grantedOrgName := gofakeit.Company() + integration.RandString(10)
 	grantedOrg := instance.CreateOrganization(ctx, grantedOrgName, gofakeit.Email())
 	instance.CreateProjectGrant(ctx, t, projectID, grantedOrg.GetOrganizationId())
 
