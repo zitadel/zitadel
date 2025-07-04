@@ -22,16 +22,6 @@ func (i Purpose) String() string {
 
 // An "invalid array index" compiler error signifies that the constant values have changed.
 // Re-run the stringer command to generate them again.
-func _PurposeNoOp() {
-	var x [1]struct{}
-	_ = x[PurposeUnspecified-(0)]
-	_ = x[PurposeAuthzInstance-(1)]
-	_ = x[PurposeMilestones-(2)]
-	_ = x[PurposeOrganization-(3)]
-	_ = x[PurposeIdPFormCallback-(4)]
-	_ = x[PurposeFederatedLogout-(5)]
-}
-
 var _PurposeValues = []Purpose{PurposeUnspecified, PurposeAuthzInstance, PurposeMilestones, PurposeOrganization, PurposeIdPFormCallback, PurposeFederatedLogout}
 
 var _PurposeNameToValueMap = map[string]Purpose{

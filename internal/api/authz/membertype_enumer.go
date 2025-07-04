@@ -24,15 +24,7 @@ func (i MemberType) String() string {
 
 // An "invalid array index" compiler error signifies that the constant values have changed.
 // Re-run the stringer command to generate them again.
-func _MemberTypeNoOp() {
-	var x [1]struct{}
-	_ = x[MemberTypeUnspecified-(0)]
-	_ = x[MemberTypeOrganization-(1)]
-	_ = x[MemberTypeProject-(2)]
-	_ = x[MemberTypeProjectGrant-(3)]
-	_ = x[MemberTypeIAM-(4)]
-	_ = x[MemberTypeSystem-(5)]
-}
+
 
 var _MemberTypeValues = []MemberType{MemberTypeUnspecified, MemberTypeOrganization, MemberTypeProject, MemberTypeProjectGrant, MemberTypeIAM, MemberTypeSystem}
 
