@@ -3,6 +3,7 @@ package internal_permission
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
@@ -12,8 +13,8 @@ import (
 	internal_permission "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2beta"
 )
 
-func (s *Server) ListAdministrators(ctx context.Context, req *internal_permission.ListAdministratorsRequest) (*internal_permission.ListAdministratorsResponse, error) {
-	queries, err := s.listAdministratorsRequestToModel(req)
+func (s *Server) ListAdministrators(ctx context.Context, req *connect.Request[internal_permission.ListAdministratorsRequest]) (*connect.Response[internal_permission.ListAdministratorsResponse], error) {
+	queries, err := s.listAdministratorsRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -21,10 +22,10 @@ func (s *Server) ListAdministrators(ctx context.Context, req *internal_permissio
 	if err != nil {
 		return nil, err
 	}
-	return &internal_permission.ListAdministratorsResponse{
+	return connect.NewResponse(&internal_permission.ListAdministratorsResponse{
 		Administrators: administratorsToPb(resp.Administrators),
 		Pagination:     filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
-	}, nil
+	}), nil
 }
 
 func (s *Server) listAdministratorsRequestToModel(req *internal_permission.ListAdministratorsRequest) (*query.MembershipSearchQuery, error) {

@@ -3,6 +3,7 @@ package internal_permission
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -11,13 +12,13 @@ import (
 	internal_permission "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2beta"
 )
 
-func (s *Server) CreateAdministrator(ctx context.Context, req *internal_permission.CreateAdministratorRequest) (*internal_permission.CreateAdministratorResponse, error) {
+func (s *Server) CreateAdministrator(ctx context.Context, req *connect.Request[internal_permission.CreateAdministratorRequest]) (*connect.Response[internal_permission.CreateAdministratorResponse], error) {
 	var creationDate *timestamppb.Timestamp
 
-	switch resource := req.GetResource().GetResource().(type) {
+	switch resource := req.Msg.GetResource().GetResource().(type) {
 	case *internal_permission.ResourceType_Instance:
 		if resource.Instance {
-			member, err := s.command.AddInstanceMember(ctx, createAdministratorInstanceToCommand(authz.GetInstance(ctx).InstanceID(), req.UserId, req.Roles))
+			member, err := s.command.AddInstanceMember(ctx, createAdministratorInstanceToCommand(authz.GetInstance(ctx).InstanceID(), req.Msg.UserId, req.Msg.Roles))
 			if err != nil {
 				return nil, err
 			}
@@ -26,7 +27,7 @@ func (s *Server) CreateAdministrator(ctx context.Context, req *internal_permissi
 			}
 		}
 	case *internal_permission.ResourceType_OrganizationId:
-		member, err := s.command.AddOrgMember(ctx, createAdministratorOrganizationToCommand(resource, req.UserId, req.Roles))
+		member, err := s.command.AddOrgMember(ctx, createAdministratorOrganizationToCommand(resource, req.Msg.UserId, req.Msg.Roles))
 		if err != nil {
 			return nil, err
 		}
@@ -34,7 +35,7 @@ func (s *Server) CreateAdministrator(ctx context.Context, req *internal_permissi
 			creationDate = timestamppb.New(member.EventDate)
 		}
 	case *internal_permission.ResourceType_ProjectId:
-		member, err := s.command.AddProjectMember(ctx, createAdministratorProjectToCommand(resource, req.UserId, req.Roles))
+		member, err := s.command.AddProjectMember(ctx, createAdministratorProjectToCommand(resource, req.Msg.UserId, req.Msg.Roles))
 		if err != nil {
 			return nil, err
 		}
@@ -42,7 +43,7 @@ func (s *Server) CreateAdministrator(ctx context.Context, req *internal_permissi
 			creationDate = timestamppb.New(member.EventDate)
 		}
 	case *internal_permission.ResourceType_ProjectGrant_:
-		member, err := s.command.AddProjectGrantMember(ctx, createAdministratorProjectGrantToCommand(resource, req.UserId, req.Roles))
+		member, err := s.command.AddProjectGrantMember(ctx, createAdministratorProjectGrantToCommand(resource, req.Msg.UserId, req.Msg.Roles))
 		if err != nil {
 			return nil, err
 		}
@@ -53,9 +54,9 @@ func (s *Server) CreateAdministrator(ctx context.Context, req *internal_permissi
 		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-IbPp47HDP5", "Errors.Invalid.Argument")
 	}
 
-	return &internal_permission.CreateAdministratorResponse{
+	return connect.NewResponse(&internal_permission.CreateAdministratorResponse{
 		CreationDate: creationDate,
-	}, nil
+	}), nil
 }
 
 func createAdministratorInstanceToCommand(instanceID, userID string, roles []string) *command.AddInstanceMember {
@@ -91,13 +92,13 @@ func createAdministratorProjectGrantToCommand(req *internal_permission.ResourceT
 	}
 }
 
-func (s *Server) UpdateAdministrator(ctx context.Context, req *internal_permission.UpdateAdministratorRequest) (*internal_permission.UpdateAdministratorResponse, error) {
+func (s *Server) UpdateAdministrator(ctx context.Context, req *connect.Request[internal_permission.UpdateAdministratorRequest]) (*connect.Response[internal_permission.UpdateAdministratorResponse], error) {
 	var changeDate *timestamppb.Timestamp
 
-	switch resource := req.GetResource().GetResource().(type) {
+	switch resource := req.Msg.GetResource().GetResource().(type) {
 	case *internal_permission.ResourceType_Instance:
 		if resource.Instance {
-			member, err := s.command.ChangeInstanceMember(ctx, updateAdministratorInstanceToCommand(authz.GetInstance(ctx).InstanceID(), req.UserId, req.Roles))
+			member, err := s.command.ChangeInstanceMember(ctx, updateAdministratorInstanceToCommand(authz.GetInstance(ctx).InstanceID(), req.Msg.UserId, req.Msg.Roles))
 			if err != nil {
 				return nil, err
 			}
@@ -106,7 +107,7 @@ func (s *Server) UpdateAdministrator(ctx context.Context, req *internal_permissi
 			}
 		}
 	case *internal_permission.ResourceType_OrganizationId:
-		member, err := s.command.ChangeOrgMember(ctx, updateAdministratorOrganizationToCommand(resource, req.UserId, req.Roles))
+		member, err := s.command.ChangeOrgMember(ctx, updateAdministratorOrganizationToCommand(resource, req.Msg.UserId, req.Msg.Roles))
 		if err != nil {
 			return nil, err
 		}
@@ -114,7 +115,7 @@ func (s *Server) UpdateAdministrator(ctx context.Context, req *internal_permissi
 			changeDate = timestamppb.New(member.EventDate)
 		}
 	case *internal_permission.ResourceType_ProjectId:
-		member, err := s.command.ChangeProjectMember(ctx, updateAdministratorProjectToCommand(resource, req.UserId, req.Roles))
+		member, err := s.command.ChangeProjectMember(ctx, updateAdministratorProjectToCommand(resource, req.Msg.UserId, req.Msg.Roles))
 		if err != nil {
 			return nil, err
 		}
@@ -122,7 +123,7 @@ func (s *Server) UpdateAdministrator(ctx context.Context, req *internal_permissi
 			changeDate = timestamppb.New(member.EventDate)
 		}
 	case *internal_permission.ResourceType_ProjectGrant_:
-		member, err := s.command.ChangeProjectGrantMember(ctx, updateAdministratorProjectGrantToCommand(resource, req.UserId, req.Roles))
+		member, err := s.command.ChangeProjectGrantMember(ctx, updateAdministratorProjectGrantToCommand(resource, req.Msg.UserId, req.Msg.Roles))
 		if err != nil {
 			return nil, err
 		}
@@ -133,9 +134,9 @@ func (s *Server) UpdateAdministrator(ctx context.Context, req *internal_permissi
 		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-i0V2IbdloZ", "Errors.Invalid.Argument")
 	}
 
-	return &internal_permission.UpdateAdministratorResponse{
+	return connect.NewResponse(&internal_permission.UpdateAdministratorResponse{
 		ChangeDate: changeDate,
-	}, nil
+	}), nil
 }
 
 func updateAdministratorInstanceToCommand(instanceID, userID string, roles []string) *command.ChangeInstanceMember {
@@ -171,13 +172,13 @@ func updateAdministratorProjectGrantToCommand(req *internal_permission.ResourceT
 	}
 }
 
-func (s *Server) DeleteAdministrator(ctx context.Context, req *internal_permission.DeleteAdministratorRequest) (*internal_permission.DeleteAdministratorResponse, error) {
+func (s *Server) DeleteAdministrator(ctx context.Context, req *connect.Request[internal_permission.DeleteAdministratorRequest]) (*connect.Response[internal_permission.DeleteAdministratorResponse], error) {
 	var deletionDate *timestamppb.Timestamp
 
-	switch resource := req.GetResource().GetResource().(type) {
+	switch resource := req.Msg.GetResource().GetResource().(type) {
 	case *internal_permission.ResourceType_Instance:
 		if resource.Instance {
-			member, err := s.command.RemoveInstanceMember(ctx, authz.GetInstance(ctx).InstanceID(), req.UserId)
+			member, err := s.command.RemoveInstanceMember(ctx, authz.GetInstance(ctx).InstanceID(), req.Msg.UserId)
 			if err != nil {
 				return nil, err
 			}
@@ -186,7 +187,7 @@ func (s *Server) DeleteAdministrator(ctx context.Context, req *internal_permissi
 			}
 		}
 	case *internal_permission.ResourceType_OrganizationId:
-		member, err := s.command.RemoveOrgMember(ctx, resource.OrganizationId, req.UserId)
+		member, err := s.command.RemoveOrgMember(ctx, resource.OrganizationId, req.Msg.UserId)
 		if err != nil {
 			return nil, err
 		}
@@ -194,7 +195,7 @@ func (s *Server) DeleteAdministrator(ctx context.Context, req *internal_permissi
 			deletionDate = timestamppb.New(member.EventDate)
 		}
 	case *internal_permission.ResourceType_ProjectId:
-		member, err := s.command.RemoveProjectMember(ctx, resource.ProjectId, req.UserId, "")
+		member, err := s.command.RemoveProjectMember(ctx, resource.ProjectId, req.Msg.UserId, "")
 		if err != nil {
 			return nil, err
 		}
@@ -202,7 +203,7 @@ func (s *Server) DeleteAdministrator(ctx context.Context, req *internal_permissi
 			deletionDate = timestamppb.New(member.EventDate)
 		}
 	case *internal_permission.ResourceType_ProjectGrant_:
-		member, err := s.command.RemoveProjectGrantMember(ctx, resource.ProjectGrant.ProjectId, req.UserId, resource.ProjectGrant.ProjectGrantId, "")
+		member, err := s.command.RemoveProjectGrantMember(ctx, resource.ProjectGrant.ProjectId, req.Msg.UserId, resource.ProjectGrant.ProjectGrantId, "")
 		if err != nil {
 			return nil, err
 		}
@@ -213,7 +214,7 @@ func (s *Server) DeleteAdministrator(ctx context.Context, req *internal_permissi
 		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-3UOjLtuohh", "Errors.Invalid.Argument")
 	}
 
-	return &internal_permission.DeleteAdministratorResponse{
+	return connect.NewResponse(&internal_permission.DeleteAdministratorResponse{
 		DeletionDate: deletionDate,
-	}, nil
+	}), nil
 }
