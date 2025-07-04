@@ -272,13 +272,15 @@ func parseAndValidateSchedule(interval string) (cron.Schedule, error) {
 		// This is because the schedule could be a specific time, that is less than 30 minutes away,
 		// but still run only once a day and therefore is valid.
 		next := s.Next(time.Now())
-		intervalDuration = s.Next(next).Sub(next)
+		nextAfter := s.Next(next)
+		intervalDuration = nextAfter.Sub(next)
 	case cron.ConstantDelaySchedule:
 		intervalDuration = s.Delay
 	}
 	if intervalDuration < minInterval {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "SERV-FJ12", "interval must be at least %s", minInterval)
 	}
+	logging.WithFields("interval", interval).Info("scheduling service ping")
 	return schedule, nil
 }
 
