@@ -1,0 +1,994 @@
+syntax = "proto3";
+
+package zitadel.app.v2beta;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/app/v2beta/login.proto";
+import "zitadel/app/v2beta/oidc.proto";
+import "zitadel/app/v2beta/api.proto";
+import "zitadel/app/v2beta/app.proto";
+import "google/protobuf/timestamp.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+import "zitadel/filter/v2/filter.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/app/v2beta;app";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Application Service";
+    version: "2.0-beta";
+    description: "This API is intended to manage apps (SAML, OIDC, etc..) in a ZITADEL instance. This service is in beta state. It can AND will continue breaking until a stable version is released.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$CUSTOM-DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+// Service to manage apps.
+// The service provides methods to create, update, delete and list apps and app keys.
+service AppService {
+
+    // Create Application
+    //
+    // Create an application. The application can be OIDC, API or SAML type, based on the input.
+    //
+    // Required permissions:
+    //   - project.app.write
+    rpc CreateApplication(CreateApplicationRequest) returns (CreateApplicationResponse) {
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The created application";
+                }
+            };
+        };
+
+        option (google.api.http) = {
+            post: "/v2beta/applications"
+            body: "*"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+
+    // Update Application
+    //
+    // Changes the configuration of an OIDC, API or SAML type application, as well as
+    // the application name, based on the input provided.
+    //
+    // Required permissions:
+    //   - project.app.write
+    rpc UpdateApplication(UpdateApplicationRequest) returns (UpdateApplicationResponse) {
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The updated app.";
+                }
+            };
+        };
+
+        option (google.api.http) = {
+            patch: "/v2beta/applications/{id}"
+            body: "*"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+
+    // Get Application
+    //
+    // Retrieves the application matching the provided ID.
+    //
+    // Required permissions:
+    //   - project.app.read
+    rpc GetApplication(GetApplicationRequest) returns (GetApplicationResponse) {
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The fetched app.";
+                }
+            };
+        };
+
+        option (google.api.http) = {
+            get: "/v2beta/applications/{id}"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+
+    // Delete Application
+    //
+    // Deletes the application belonging to the input project and matching the provided
+    // application ID.
+    //
+    // Required permissions:
+    //   - project.app.delete
+    rpc DeleteApplication(DeleteApplicationRequest) returns (DeleteApplicationResponse) {
+        option (google.api.http) = {
+            delete: "/v2beta/applications/{id}"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                description: "The time of deletion.";
+                }
+            };
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+
+    // Deactivate Application
+    //
+    // Deactivates the application belonging to the input project and matching the provided
+    // application ID.
+    //
+    // Required permissions:
+    //   - project.app.write
+    rpc DeactivateApplication(DeactivateApplicationRequest) returns (DeactivateApplicationResponse) {
+        option (google.api.http) = {
+            post: "/v2beta/applications/{id}/deactivate"
+            body: "*"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                description: "The time of deactivation.";
+                }
+            };
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+
+    // Reactivate Application
+    //
+    // Reactivates the application belonging to the input project and matching the provided
+    // application ID.
+    //
+    // Required permissions:
+    //   - project.app.write
+    rpc ReactivateApplication(ReactivateApplicationRequest) returns (ReactivateApplicationResponse) {
+        option (google.api.http) = {
+            post: "/v2beta/applications/{id}/reactivate"
+            body: "*"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                description: "The time of reactivation.";
+                }
+            };
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+
+
+    // Regenerate Client Secret
+    //
+    // Regenerates the client secret of an API or OIDC application that belongs to the input project.
+    // 
+    // Required permissions:
+    //   - project.app.write
+    rpc RegenerateClientSecret(RegenerateClientSecretRequest) returns (RegenerateClientSecretResponse) {
+        option (google.api.http) = {
+            post: "/v2beta/applications/{application_id}/generate_client_secret"
+            body: "*"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                description: "The regenerated client secret.";
+                }
+            };
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+
+    // List Applications
+    //
+    // Returns a list of applications matching the input parameters that belong to the provided
+    // project.
+    //
+    // The result can be sorted by app id, name, creation date, change date or state. It can also
+    // be filtered by app state, app type and app name.
+    //
+    // Required permissions:
+    //   - project.app.read
+    rpc ListApplications(ListApplicationsRequest) returns (ListApplicationsResponse) {
+        option (google.api.http) = {
+            post: "/v2beta/applications/search"
+            body: "*"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The matching applications";
+                }
+            };
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+
+
+    // Create Application Key 
+    //
+    // Create a new application key, which is used to authorize an API application.
+    //
+    // Key details are returned in the response. They must be stored safely, as it will not
+    // be possible to retrieve them again.
+    //
+    // Required permissions:
+    //   - `project.app.write`
+    rpc CreateApplicationKey(CreateApplicationKeyRequest) returns (CreateApplicationKeyResponse) {
+        option (google.api.http) = {
+            post: "/v2beta/application_keys"
+            body: "*"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The created application key";
+                }
+            };
+        };
+    }
+
+    // Delete Application Key 
+    //
+    // Deletes an application key matching the provided ID.
+    //
+    // Organization ID is not mandatory, but helps with filtering/performance.
+    //
+    // The deletion time is returned in response message.
+    //
+    // Required permissions:
+    //   - `project.app.write`
+    rpc DeleteApplicationKey(DeleteApplicationKeyRequest) returns (DeleteApplicationKeyResponse) {
+        option (google.api.http) = {
+            delete: "/v2beta/application_keys/{id}"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The time of deletion.";
+                }
+            };
+        };
+    }
+
+    // Get Application Key
+    //
+    // Retrieves the application key matching the provided ID.
+    //
+    // Specifying a project, organization and app ID is optional but help with filtering/performance.
+    //
+    // Required permissions:
+    //   - project.app.read
+    rpc GetApplicationKey(GetApplicationKeyRequest) returns (GetApplicationKeyResponse) {
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The fetched app key.";
+                }
+            };
+        };
+
+        option (google.api.http) = {
+            get: "/v2beta/application_keys/{id}"
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+
+    // List Application Keys
+    //
+    // Returns a list of application keys matching the input parameters.
+    //
+    // The result can be sorted by id, aggregate, creation date, expiration date, resource owner or type.
+    // It can also be filtered by app, project or organization ID.
+    //
+    // Required permissions:
+    //   - project.app.read
+    rpc ListApplicationKeys(ListApplicationKeysRequest) returns (ListApplicationKeysResponse) {
+        option (google.api.http) = {
+            post: "/v2beta/application_keys/search"
+            body: "*"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "200";
+                value: {
+                    description: "The matching applications";
+                }
+            };
+        };
+
+        option (zitadel.protoc_gen_zitadel.v2.options) = {
+            auth_option: {
+                permission: "authenticated"
+            }
+        };
+    }
+}
+
+message CreateApplicationRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 2 [(validate.rules).string = {max_len: 200}];
+    string name = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"MyApp\"";
+        }
+    ];
+    oneof creation_request_type {
+        option (validate.required) = true;
+        CreateOIDCApplicationRequest oidc_request = 4;
+        CreateSAMLApplicationRequest saml_request = 5;
+        CreateAPIApplicationRequest api_request = 6;
+    }
+}
+
+message CreateApplicationResponse {
+    string app_id = 1;
+    // The timestamp of the app creation.
+    google.protobuf.Timestamp creation_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2024-12-18T07:50:47.492Z\"";
+        }
+    ];
+
+    oneof creation_response_type {
+        CreateOIDCApplicationResponse oidc_response = 3;
+        CreateSAMLApplicationResponse saml_response = 4;
+        CreateAPIApplicationResponse api_response = 5;
+    }
+}
+
+message CreateOIDCApplicationRequest {
+    // Callback URI of the authorization request where the code or tokens will be sent to
+    repeated string redirect_uris = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"http://localhost:4200/auth/callback\"]";
+            description: "Callback URI of the authorization request where the code or tokens will be sent to";
+        }
+    ];
+    repeated OIDCResponseType response_types = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Determines whether a code, id_token token or just id_token will be returned"
+        }
+    ];
+    repeated OIDCGrantType grant_types = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The flow type the application uses to gain access";
+        }
+    ];
+    OIDCAppType app_type = 4 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Determines the paradigm of the application";
+        }
+    ];
+    OIDCAuthMethodType auth_method_type = 5 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines how the application passes login credentials";
+        }
+    ];
+
+    // ZITADEL will redirect to this link after a successful logout
+    repeated string post_logout_redirect_uris = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"http://localhost:4200/signedout\"]";
+            description: "ZITADEL will redirect to this link after a successful logout";
+        }
+    ];
+    OIDCVersion version = 7 [(validate.rules).enum = {defined_only: true}];
+    bool dev_mode = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Used for development, some checks of the OIDC specification will not be checked.";
+        }
+    ];
+    OIDCTokenType access_token_type = 9 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Type of the access token returned from ZITADEL";
+        }
+    ];
+    bool access_token_role_assertion = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Adds roles to the claims of the access token (only if type == JWT) even if they are not requested by scopes";
+        }
+    ];
+    bool id_token_role_assertion = 11 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Adds roles to the claims of the id token even if they are not requested by scopes";
+        }
+    ];
+    bool id_token_userinfo_assertion = 12 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Claims of profile, email, address and phone scopes are added to the id token even if an access token is issued. Attention this violates the OIDC specification";
+        }
+    ];
+    google.protobuf.Duration clock_skew = 13 [
+        (validate.rules).duration = {gte: {}, lte: {seconds: 5}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Used to compensate time difference of servers. Duration added to the \"exp\" claim and subtracted from \"iat\", \"auth_time\" and \"nbf\" claims";
+            example: "\"1s\"";
+        }
+    ];
+    repeated string additional_origins = 14 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"scheme://localhost:8080\"]";
+            description: "Additional origins (other than the redirect_uris) from where the API can be used, provided string has to be an origin (scheme://hostname[:port]) without path, query or fragment";
+        }
+    ];
+    bool skip_native_app_success_page = 15 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Skip the successful login page on native apps and directly redirect the user to the callback.";
+        }
+    ];
+    string back_channel_logout_uri = 16 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"https://example.com/auth/backchannel\"]";
+            description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html)";
+        }
+    ];
+    LoginVersion login_version = 17 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
+        }
+    ];
+}
+
+message CreateOIDCApplicationResponse {
+    string client_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"1035496534033449\"";
+            description: "generated client id for this config";
+        }
+    ];
+    string client_secret = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gjoq34589uasgh\"";
+            description: "generated secret for this config";
+        }
+    ];
+    bool none_compliant = 3;
+    repeated OIDCLocalizedMessage compliance_problems = 4;
+}
+
+message CreateSAMLApplicationRequest {
+    oneof metadata {
+        option (validate.required) = true;
+        bytes metadata_xml = 1 [(validate.rules).bytes.max_len = 500000];
+        string metadata_url = 2 [(validate.rules).string.max_len = 200];
+    }
+    LoginVersion login_version = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
+        }
+    ];    
+}
+
+message CreateSAMLApplicationResponse {}
+
+message CreateAPIApplicationRequest {
+    APIAuthMethodType auth_method_type = 1 [(validate.rules).enum = {defined_only: true}];
+}
+
+message CreateAPIApplicationResponse {
+    string client_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"3950723409029374\"";
+            description: "generated secret for this config";
+        }
+    ];
+    string client_secret = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gjoq34589uasgh\"";
+            description: "generated secret for this config";
+        }
+    ];
+}
+
+message UpdateApplicationRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"45984352431\"";
+        }
+    ];
+    string name = 3 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"MyApplicationName\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+
+    oneof update_request_type {
+        UpdateSAMLApplicationConfigurationRequest saml_configuration_request = 4;
+        UpdateOIDCApplicationConfigurationRequest oidc_configuration_request = 5;
+        UpdateAPIApplicationConfigurationRequest api_configuration_request = 6;
+    }
+}
+
+message UpdateApplicationResponse {
+    // The timestamp of the app update.
+    google.protobuf.Timestamp change_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2024-12-18T07:50:47.492Z\"";
+        }
+    ];
+}
+
+message UpdateSAMLApplicationConfigurationRequest {
+    oneof metadata {
+        option (validate.required) = true;
+        bytes metadata_xml = 1 [(validate.rules).bytes.max_len = 500000];
+        string metadata_url = 2 [(validate.rules).string.max_len = 200];
+    }
+    optional LoginVersion login_version = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
+        }
+    ];    
+}
+
+message UpdateOIDCApplicationConfigurationRequest {
+    repeated string redirect_uris = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"http://localhost:4200/auth/callback\"]";
+            description: "Callback URI of the authorization request where the code or tokens will be sent to";
+        }
+    ];
+    repeated OIDCResponseType response_types = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Determines whether a code, id_token token or just id_token will be returned"
+        }
+    ];
+    repeated OIDCGrantType grant_types = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The flow type the application uses to gain access";
+        }
+    ];
+    optional OIDCAppType app_type = 4 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Determines the paradigm of the application";
+        }
+    ];
+    optional OIDCAuthMethodType auth_method_type = 5 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines how the application passes login credentials";
+        }
+    ];
+    repeated string post_logout_redirect_uris = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"http://localhost:4200/signedout\"]";
+            description: "ZITADEL will redirect to this link after a successful logout";
+        }
+    ];
+    optional OIDCVersion version = 7 [(validate.rules).enum = {defined_only: true}];
+    optional bool dev_mode = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Used for development, some checks of the OIDC specification will not be checked.";
+        }
+    ];
+    optional OIDCTokenType access_token_type = 9 [
+        (validate.rules).enum = {defined_only: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Type of the access token returned from ZITADEL";
+        }
+    ];
+    optional bool access_token_role_assertion = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Adds roles to the claims of the access token (only if type == JWT) even if they are not requested by scopes";
+        }
+    ];
+    optional bool id_token_role_assertion = 11 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Adds roles to the claims of the id token even if they are not requested by scopes";
+        }
+    ];
+    optional bool id_token_userinfo_assertion = 12 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Claims of profile, email, address and phone scopes are added to the id token even if an access token is issued. Attention this violates the OIDC specification";
+        }
+    ];
+    optional google.protobuf.Duration clock_skew = 13 [
+        (validate.rules).duration = {gte: {}, lte: {seconds: 5}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Used to compensate time difference of servers. Duration added to the \"exp\" claim and subtracted from \"iat\", \"auth_time\" and \"nbf\" claims";
+            example: "\"1s\"";
+        }
+    ];
+    repeated string additional_origins = 14 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"scheme://localhost:8080\"]";
+            description: "Additional origins (other than the redirect_uris) from where the API can be used, provided string has to be an origin (scheme://hostname[:port]) without path, query or fragment";
+        }
+    ];
+    optional bool skip_native_app_success_page = 15 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Skip the successful login page on native apps and directly redirect the user to the callback.";
+        }
+    ];
+    optional string back_channel_logout_uri = 16 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"https://example.com/auth/backchannel\"]";
+            description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html)";
+        }
+    ];
+    optional LoginVersion login_version = 17 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
+        }
+    ];
+}
+
+message UpdateAPIApplicationConfigurationRequest {
+    APIAuthMethodType auth_method_type = 1 [(validate.rules).enum = {defined_only: true}];
+}
+
+message GetApplicationRequest {
+    string id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"45984352431\"";
+        }
+    ];
+}
+
+message GetApplicationResponse {
+    Application app = 1;
+}
+
+message DeleteApplicationRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeleteApplicationResponse {
+    google.protobuf.Timestamp deletion_date = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+}
+
+message DeactivateApplicationRequest{
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeactivateApplicationResponse{
+    google.protobuf.Timestamp deactivation_date = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+}
+
+message ReactivateApplicationRequest{
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ReactivateApplicationResponse{
+    google.protobuf.Timestamp reactivation_date = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+}
+
+message RegenerateClientSecretRequest{
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string application_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    oneof app_type {
+        option (validate.required) = true;
+        bool is_oidc = 3;
+        bool is_api = 4;
+    }
+}
+
+message RegenerateClientSecretResponse{
+    string client_secret = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gjoq34589uasgh\"";
+            description: "generated secret for the client";
+        }
+    ];
+
+    // The timestamp of the creation of the new client secret
+    google.protobuf.Timestamp creation_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+}
+
+message ListApplicationsRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+    // Pagination and sorting.
+    zitadel.filter.v2.PaginationRequest pagination = 2;
+
+    //criteria the client is looking for
+    repeated ApplicationSearchFilter filters = 3;
+
+    AppSorting sorting_column = 4;
+}
+
+message ListApplicationsResponse {
+    repeated Application applications = 1;
+
+    // Contains the total number of apps matching the query and the applied limit.
+    zitadel.filter.v2.PaginationResponse pagination = 2;
+}
+
+message CreateApplicationKeyRequest {
+    string app_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+    string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+    // The date the key will expire
+    google.protobuf.Timestamp expiration_date = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2519-04-01T08:45:00.000000Z\"";
+            description: "The date the key will expire";
+        }
+    ];
+}
+
+message CreateApplicationKeyResponse {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"28746028909593987\"";
+        }
+    ];
+
+    // The timestamp of the app creation.
+    google.protobuf.Timestamp creation_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"2024-12-18T07:50:47.492Z\"";
+        }
+    ];
+
+    bytes key_details = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJrZXlJZCI6IjIwMjcxMDE4NjYyMjcxNDExMyIsImtleSI6Ii0tLS0tQkVHSU4gUlNBIFBSSVZBVEUgS0VZLS0tLS1cbk1JSUVvd0lCQUFLQ0FRRUFuMUxyNStTV0pGRllURU1kaXQ2U0dNY0E2Yks5dG0xMmhlcm55V0wrZm9PWnA3eEVcbk9wcmsvWE81QVplSU5NY0x0ZVhxckJlK1NPdVVNMFpLU2xCMHFTNzNjVStDVTVMTGoycVB0UzhNOFI0N3BGdFhcbjJXRTFJNjNhZHB1N01TejA2SXduQ2lyNnJYOTVPQ2ZneHA3VU1Dd0pSTUZmYXJqdjVBRXY3NXpsSS9lYUV6bUJcbkxKWU1xanZFRmZoN2x3M2lPT3VsWW9kNjNpN3RDNWl5czNlYjNLZW4yWU0rN1FSbXB2dE5qcTJMVmlIMnkrUGJcbk9ESlI3MU9ib05TYVJDNTZDUFpWVytoWDByYXI3VzMwUjI2eGtIQ09oSytQbUpSeGtOY0g1VTdja0xXMEw0WEVcbnNNZkVUSmszeDR3Q0psbisxbElXUzkrNmw0R1E2TWRzWURyOU5RSURBUUFCQW9JQkFCSkx6WGQxMHFBZEQwekNcbnNGUFFOMnJNLzVmV3hONThONDR0YWF6QXg0VHp5K050UlZDTmxScGQvYkxuR2VjbHJIeVpDSmYycWcxcHNEMHJcbkowRGRlR2d0VXBFYWxsYk9scjNEZVBsUGkrYnNsK0RKOUk2c0VSUWwxTjZtQjVzZ0ZJZllBR3UwZjlFSXdIem9cblozR25yNnBRaEVmM0JPUVdsTVhVTlJNSksyOHp3M2E1L01nRmtKVUZUSTUzeXFwbGRtZ2hLajRZR1hLRk1LUGhcbkV3RkxrRncwK2s3K0xuSjFQNGp1ZVd1RXo3WlAyaFpvUWxCcXdSajVyTG9QZ05RbUU4UytFVDRuczlUYzByOFFcbnFyaHlacDZBczJrTDhGTytCZnF3SVpDZnpnWHN2cC9PLzRaSHIzVTB2Ymp3UW1sSzdVSm42U0J6T2hpWFpNU0lcbk5Wc0V5VUVDZ1lFQTFEaktkRGo3NTM1MWQzdlRNQlRFd2JSQ3hoUVZOdENFMnMwVUw4ckJQZ1I0K1dlblNUWmFcbnprWUprcEV0bE54VGxzYnN1Y0RTUXZqeWRYYk5nSHFBeDYzMm1vdTVkak9lR0VTUDFWVGtUdElsZFZQZWszQWxcbjVYbkpQa1dqWGVyVVJZNm5KeUQ5UWhlREx3MVp4NEFYVzNHWURiTFkrT05XV0VKUlJaQUloNjBDZ1lFQXdEQ2xcbnc1MHc4dkcvbEJ4RzNSYW9FaHdLOWNna1VXOHk2T25DekNwcEtjOEZUUmY1VE5iWjl5TzNXUmdYajhkeHRCakFcbkl5VGlzYk9NQk1VaFZKUUtGZHRQaDhoVDBwRkRjeE9ndzY0aHBtYzhyY2RTbXVKNzlYSVRTaHUySjA0N0UvNFZcbnJOTThpWVk5ZGR3VGdGUUlsdFNZL0l0RnFxWERmdjhqK1dVY25La0NnWUVBaENOUU80bDNuNjRucWR2WnBTaHBcblVrclJBTkJrWFJyOGZkZ1BaNnFSSS9KWStNSEhjVmg4dGM3NkN0NkdTUmZlbkJVRU5LeVF2czZPK1FDZCtBOU9cbnZBWGZkRjduZldlcVdtWG1RT2g0dDNNMWk1WkxFZlpVUWt2UU9BdllLcFFhMDZ4OCsyb1pCdHZvL0pVTmY2Q0xcbjZvNFNKUVZrLzZOZGtkckpDODBnNG9rQ2dZQkZsNWYrbkVYa1F0dWZVeG5wNXRGWE5XWldsM0ZuTjMvVXpRaW5cbmkxZm5OcnB4cnhPcjJrUzA4KzdwU1FzSEdpNDNDNXRQWG9UajJlTUN1eXNWaUVHYXBuNUc2YWhJb0NjdlhWVWlcblprUnpFQUR0NERZdU5ZS3pYdXBUTkhPaUNmYmtoMlhyM2RXVzZ0QUloSGRmU1k2T3AwNzZhNmYvWWVUSGNMWGpcbkVkVHBlUUtCZ0FPdnBqcDQ4TzRUWEZkU0JLSnYya005OHVhUjlSQURtdGxTWHd2cTlyQkhTV084NFk4bzE0L1Bcbkl1UmxUOHhROGRYKzhMR21UUCtjcUtiOFFRQ1grQk1YUWxMSEVtWnpnb0xFa0pGMUVIMm4vZEZ5bngxS3prdFNcbm9UZUdsRzZhbXhVOVh4eW9RVFlEVGJCbERwc2FZUlFBZ2FUQzM3UVZRUjhmK1ZoRzFHSFFcbi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tXG4iLCJhcHBJZCI6IjIwMjcwNjM5ODgxMzg4MDU3NyIsImNsaWVudElkIjoiMjAyNzA2Mzk4ODEzOTQ2MTEzQG15dGVzdHByb2plY3QifQ==\"";
+        }
+    ];
+}
+
+message DeleteApplicationKeyRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string application_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string organization_id = 4 [(validate.rules).string = {max_len: 200}];
+}
+
+message DeleteApplicationKeyResponse {
+    google.protobuf.Timestamp deletion_date = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+}
+
+message GetApplicationKeyRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string project_id = 2 [(validate.rules).string = {max_len: 200}];
+    string application_id = 3 [(validate.rules).string = {max_len: 200}];
+    string organization_id = 4 [(validate.rules).string = {max_len: 200}];
+}
+
+message GetApplicationKeyResponse {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+
+    google.protobuf.Timestamp creation_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2025-01-23T10:34:18.051Z\"";
+        }
+    ];
+
+    // the date a key will expire
+    google.protobuf.Timestamp expiration_date = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the date a key will expire";
+            example: "\"3019-04-01T08:45:00.000000Z\"";
+        }
+    ];
+}
+
+message ListApplicationKeysRequest {
+    // Pagination and sorting.
+    zitadel.filter.v2.PaginationRequest pagination = 1;
+
+    ApplicationKeysSorting sorting_column = 2;
+
+    oneof resource_id {
+        string application_id = 3 [(validate.rules).string = {min_len: 1; max_len: 200}];
+        string project_id = 4 [(validate.rules).string = {min_len: 1; max_len: 200}];
+        string organization_id = 5 [(validate.rules).string = {min_len: 1; max_len: 200}];
+    }
+}
+
+message ListApplicationKeysResponse {
+    repeated ApplicationKey keys = 1;
+
+    // Contains the total number of app keys matching the query and the applied limit.
+    zitadel.filter.v2.PaginationResponse pagination = 2;
+}

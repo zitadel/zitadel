@@ -1,4 +1,4 @@
-//go:generate enumer -type MemberType -trimprefix MemberType
+//go:generate enumer -type MemberType -trimprefix MemberType -json -sql
 
 package authz
 
@@ -22,17 +22,17 @@ const (
 	dataKey               key = 2
 	allPermissionsKey     key = 3
 	instanceKey           key = 4
-	systemUserRolesKey    key = 5
 )
 
 type CtxData struct {
-	UserID            string
-	OrgID             string
-	ProjectID         string
-	AgentID           string
-	PreferredLanguage string
-	ResourceOwner     string
-	SystemMemberships Memberships
+	UserID                string
+	OrgID                 string
+	ProjectID             string
+	AgentID               string
+	PreferredLanguage     string
+	ResourceOwner         string
+	SystemMemberships     Memberships
+	SystemUserPermissions []SystemUserPermissions
 }
 
 func (ctxData CtxData) IsZero() bool {
@@ -98,7 +98,7 @@ func (s SystemTokenVerifierFunc) VerifySystemToken(ctx context.Context, token st
 	return s(ctx, token, orgID)
 }
 
-func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t APITokenVerifier) (_ CtxData, err error) {
+func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain string, t APITokenVerifier, systemRoleMap []RoleMapping) (_ CtxData, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	tokenWOBearer, err := extractBearerToken(token)
@@ -133,13 +133,14 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 		}
 	}
 	return CtxData{
-		UserID:            userID,
-		OrgID:             orgID,
-		ProjectID:         projectID,
-		AgentID:           agentID,
-		PreferredLanguage: prefLang,
-		ResourceOwner:     resourceOwner,
-		SystemMemberships: sysMemberships,
+		UserID:                userID,
+		OrgID:                 orgID,
+		ProjectID:             projectID,
+		AgentID:               agentID,
+		PreferredLanguage:     prefLang,
+		ResourceOwner:         resourceOwner,
+		SystemMemberships:     sysMemberships,
+		SystemUserPermissions: systemMembershipsToUserPermissions(sysMemberships, systemRoleMap),
 	}, nil
 }
 

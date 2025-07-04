@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefoon is al geverifieerd
       Empty: Telefoon is leeg
       NotChanged: Telefoon niet veranderd
+      VerifyingRemovalIsNotSupported: Verwijderen van verificatie is niet ondersteund
     Address:
       NotFound: Adres niet gevonden
       NotChanged: Adres niet veranderd

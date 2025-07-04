@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"connectrpc.com/connect"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -37,6 +38,21 @@ func Test_addOrganizationRequestToCommand(t *testing.T) {
 				},
 			},
 			wantErr: zerrors.ThrowUnimplementedf(nil, "ORGv2-SD2r1", "userType oneOf %T in method AddOrganization not implemented", nil),
+		},
+		{
+			name: "custom org ID",
+			args: args{
+				request: &org.AddOrganizationRequest{
+					Name:  "custom org ID",
+					OrgId: gu.Ptr("org-ID"),
+				},
+			},
+			want: &command.OrgSetup{
+				Name:         "custom org ID",
+				CustomDomain: "",
+				Admins:       []*command.OrgSetupAdmin{},
+				OrgID:        "org-ID",
+			},
 		},
 		{
 			name: "user ID",
@@ -123,7 +139,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *org.AddOrganizationResponse
+		want    *connect.Response[org.AddOrganizationResponse]
 		wantErr error
 	}{
 		{
@@ -135,8 +151,8 @@ func Test_createdOrganizationToPb(t *testing.T) {
 						EventDate:     now,
 						ResourceOwner: "orgID",
 					},
-					CreatedAdmins: []*command.CreatedOrgAdmin{
-						{
+					OrgAdmins: []command.OrgAdmin{
+						&command.CreatedOrgAdmin{
 							ID:        "id",
 							EmailCode: gu.Ptr("emailCode"),
 							PhoneCode: gu.Ptr("phoneCode"),
@@ -144,7 +160,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 					},
 				},
 			},
-			want: &org.AddOrganizationResponse{
+			want: connect.NewResponse(&org.AddOrganizationResponse{
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.New(now),
@@ -158,7 +174,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 						PhoneCode: gu.Ptr("phoneCode"),
 					},
 				},
-			},
+			}),
 		},
 	}
 	for _, tt := range tests {

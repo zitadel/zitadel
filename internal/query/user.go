@@ -132,6 +132,24 @@ func usersCheckPermission(ctx context.Context, users *Users, permissionCheck dom
 	)
 }
 
+func userPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, filters []SearchQuery) sq.SelectBuilder {
+	return userPermissionCheckV2WithCustomColumns(ctx, query, enabled, filters, UserResourceOwnerCol, UserIDCol)
+}
+
+func userPermissionCheckV2WithCustomColumns(ctx context.Context, query sq.SelectBuilder, enabled bool, filters []SearchQuery, userResourceOwnerCol, userID Column) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		userResourceOwnerCol,
+		domain.PermissionUserRead,
+		SingleOrgPermissionOption(filters),
+		OwnedRowsPermissionOption(userID),
+	)
+	return query.JoinClause(join, args...)
+}
+
 type UserSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
@@ -600,8 +618,9 @@ func (q *Queries) CountUsers(ctx context.Context, queries *UserSearchQueries) (c
 	return count, err
 }
 
-func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, filterOrgIds string, permissionCheck domain.PermissionCheck) (*Users, error) {
-	users, err := q.searchUsers(ctx, queries, filterOrgIds, permissionCheck != nil && authz.GetFeatures(ctx).PermissionCheckV2)
+func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheck domain.PermissionCheck) (*Users, error) {
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	users, err := q.searchUsers(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
@@ -611,22 +630,15 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, f
 	return users, nil
 }
 
-func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, filterOrgIds string, permissionCheckV2 bool) (users *Users, err error) {
+func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheckV2 bool) (users *Users, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareUsersQuery()
-	query = queries.toQuery(query).Where(sq.Eq{
+	query = userPermissionCheckV2(ctx, query, permissionCheckV2, queries.Queries)
+	stmt, args, err := queries.toQuery(query).Where(sq.Eq{
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	})
-	if permissionCheckV2 {
-		query, err = wherePermittedOrgsOrCurrentUser(ctx, query, filterOrgIds, UserResourceOwnerCol.identifier(), UserIDCol.identifier(), domain.PermissionUserRead)
-		if err != nil {
-			return nil, zerrors.ThrowInternal(err, "AUTHZ-HS4us", "Errors.Internal")
-		}
-	}
-
-	stmt, args, err := query.ToSql()
+	}).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatement")
 	}

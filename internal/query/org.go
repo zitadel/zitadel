@@ -96,6 +96,18 @@ func orgsCheckPermission(ctx context.Context, orgs *Orgs, permissionCheck domain
 	)
 }
 
+func orgsPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		OrgColumnID,
+		domain_pkg.PermissionOrgRead,
+	)
+	return query.JoinClause(join, args...)
+}
+
 type OrgSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
@@ -287,21 +299,23 @@ func (q *Queries) ExistsOrg(ctx context.Context, id, domain string) (verifiedID 
 }
 
 func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries, permissionCheck domain_pkg.PermissionCheck) (*Orgs, error) {
-	orgs, err := q.searchOrgs(ctx, queries)
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	orgs, err := q.searchOrgs(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil {
+	if permissionCheck != nil && !permissionCheckV2 {
 		orgsCheckPermission(ctx, orgs, permissionCheck)
 	}
 	return orgs, nil
 }
 
-func (q *Queries) searchOrgs(ctx context.Context, queries *OrgSearchQueries) (orgs *Orgs, err error) {
+func (q *Queries) searchOrgs(ctx context.Context, queries *OrgSearchQueries, permissionCheckV2 bool) (orgs *Orgs, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareOrgsQuery()
+	query = orgsPermissionCheckV2(ctx, query, permissionCheckV2)
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.And{
 			sq.Eq{

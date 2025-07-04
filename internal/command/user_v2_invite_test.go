@@ -322,7 +322,21 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 			"missing permission",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
@@ -338,6 +352,7 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 			"user does not exist",
 			fields{
 				eventstore: expectEventstore(
+					// The write model doesn't query any events
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),

@@ -12,11 +12,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	webkey "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta"
 )
 
@@ -33,34 +31,8 @@ func TestMain(m *testing.M) {
 	}())
 }
 
-func TestServer_Feature_Disabled(t *testing.T) {
-	instance, iamCtx, _ := createInstance(t, false)
-	client := instance.Client.WebKeyV2Beta
-
-	t.Run("CreateWebKey", func(t *testing.T) {
-		_, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{})
-		assertFeatureDisabledError(t, err)
-	})
-	t.Run("ActivateWebKey", func(t *testing.T) {
-		_, err := client.ActivateWebKey(iamCtx, &webkey.ActivateWebKeyRequest{
-			Id: "1",
-		})
-		assertFeatureDisabledError(t, err)
-	})
-	t.Run("DeleteWebKey", func(t *testing.T) {
-		_, err := client.DeleteWebKey(iamCtx, &webkey.DeleteWebKeyRequest{
-			Id: "1",
-		})
-		assertFeatureDisabledError(t, err)
-	})
-	t.Run("ListWebKeys", func(t *testing.T) {
-		_, err := client.ListWebKeys(iamCtx, &webkey.ListWebKeysRequest{})
-		assertFeatureDisabledError(t, err)
-	})
-}
-
 func TestServer_ListWebKeys(t *testing.T) {
-	instance, iamCtx, creationDate := createInstance(t, true)
+	instance, iamCtx, creationDate := createInstance(t)
 	// After the feature is first enabled, we can expect 2 generated keys with the default config.
 	checkWebKeyListState(iamCtx, t, instance, 2, "", &webkey.WebKey_Rsa{
 		Rsa: &webkey.RSA{
@@ -71,7 +43,7 @@ func TestServer_ListWebKeys(t *testing.T) {
 }
 
 func TestServer_CreateWebKey(t *testing.T) {
-	instance, iamCtx, creationDate := createInstance(t, true)
+	instance, iamCtx, creationDate := createInstance(t)
 	client := instance.Client.WebKeyV2Beta
 
 	_, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{
@@ -93,7 +65,7 @@ func TestServer_CreateWebKey(t *testing.T) {
 }
 
 func TestServer_ActivateWebKey(t *testing.T) {
-	instance, iamCtx, creationDate := createInstance(t, true)
+	instance, iamCtx, creationDate := createInstance(t)
 	client := instance.Client.WebKeyV2Beta
 
 	resp, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{
@@ -120,7 +92,7 @@ func TestServer_ActivateWebKey(t *testing.T) {
 }
 
 func TestServer_DeleteWebKey(t *testing.T) {
-	instance, iamCtx, creationDate := createInstance(t, true)
+	instance, iamCtx, creationDate := createInstance(t)
 	client := instance.Client.WebKeyV2Beta
 
 	keyIDs := make([]string, 2)
@@ -197,38 +169,20 @@ func TestServer_DeleteWebKey(t *testing.T) {
 	}, creationDate)
 }
 
-func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, context.Context, *timestamppb.Timestamp) {
+func createInstance(t *testing.T) (*integration.Instance, context.Context, *timestamppb.Timestamp) {
 	instance := integration.NewInstance(CTX)
 	creationDate := timestamppb.Now()
 	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
-	if enableFeature {
-		_, err := instance.Client.FeatureV2.SetInstanceFeatures(iamCTX, &feature.SetInstanceFeaturesRequest{
-			WebKey: proto.Bool(true),
-		})
-		require.NoError(t, err)
-	}
-
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamCTX, time.Minute)
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		resp, err := instance.Client.WebKeyV2Beta.ListWebKeys(iamCTX, &webkey.ListWebKeysRequest{})
-		if enableFeature {
-			assert.NoError(collect, err)
-			assert.Len(collect, resp.GetWebKeys(), 2)
-		} else {
-			assert.Error(collect, err)
-		}
+		assert.NoError(collect, err)
+		assert.Len(collect, resp.GetWebKeys(), 2)
+
 	}, retryDuration, tick)
 
 	return instance, iamCTX, creationDate
-}
-
-func assertFeatureDisabledError(t *testing.T, err error) {
-	t.Helper()
-	require.Error(t, err)
-	s := status.Convert(err)
-	assert.Equal(t, codes.FailedPrecondition, s.Code())
-	assert.Contains(t, s.Message(), "WEBKEY-Ohx6E")
 }
 
 func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integration.Instance, nKeys int, expectActiveKeyID string, config any, creationDate *timestamppb.Timestamp) {

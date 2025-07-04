@@ -6,6 +6,7 @@ import (
 	"io"
 	"time"
 
+	"connectrpc.com/connect"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -23,8 +24,8 @@ import (
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
-func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
-	human, err := AddUserRequestToAddHuman(req)
+func (s *Server) AddHumanUser(ctx context.Context, req *connect.Request[user.AddHumanUserRequest]) (_ *connect.Response[user.AddHumanUserResponse], err error) {
+	human, err := AddUserRequestToAddHuman(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -32,12 +33,12 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 	if err = s.command.AddUserHuman(ctx, orgID, human, false, s.userCodeAlg); err != nil {
 		return nil, err
 	}
-	return &user.AddHumanUserResponse{
+	return connect.NewResponse(&user.AddHumanUserResponse{
 		UserId:    human.ID,
 		Details:   object.DomainToDetailsPb(human.Details),
 		EmailCode: human.EmailCode,
 		PhoneCode: human.PhoneCode,
-	}, nil
+	}), nil
 }
 
 func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman, error) {
@@ -115,8 +116,8 @@ func genderToDomain(gender user.Gender) domain.Gender {
 	}
 }
 
-func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserRequest) (_ *user.UpdateHumanUserResponse, err error) {
-	human, err := UpdateUserRequestToChangeHuman(req)
+func (s *Server) UpdateHumanUser(ctx context.Context, req *connect.Request[user.UpdateHumanUserRequest]) (_ *connect.Response[user.UpdateHumanUserResponse], err error) {
+	human, err := UpdateUserRequestToChangeHuman(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -124,51 +125,51 @@ func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserR
 	if err != nil {
 		return nil, err
 	}
-	return &user.UpdateHumanUserResponse{
+	return connect.NewResponse(&user.UpdateHumanUserResponse{
 		Details:   object.DomainToDetailsPb(human.Details),
 		EmailCode: human.EmailCode,
 		PhoneCode: human.PhoneCode,
-	}, nil
+	}), nil
 }
 
-func (s *Server) LockUser(ctx context.Context, req *user.LockUserRequest) (_ *user.LockUserResponse, err error) {
-	details, err := s.command.LockUserV2(ctx, req.UserId)
+func (s *Server) LockUser(ctx context.Context, req *connect.Request[user.LockUserRequest]) (_ *connect.Response[user.LockUserResponse], err error) {
+	details, err := s.command.LockUserV2(ctx, req.Msg.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	return &user.LockUserResponse{
+	return connect.NewResponse(&user.LockUserResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
-func (s *Server) UnlockUser(ctx context.Context, req *user.UnlockUserRequest) (_ *user.UnlockUserResponse, err error) {
-	details, err := s.command.UnlockUserV2(ctx, req.UserId)
+func (s *Server) UnlockUser(ctx context.Context, req *connect.Request[user.UnlockUserRequest]) (_ *connect.Response[user.UnlockUserResponse], err error) {
+	details, err := s.command.UnlockUserV2(ctx, req.Msg.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	return &user.UnlockUserResponse{
+	return connect.NewResponse(&user.UnlockUserResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserRequest) (_ *user.DeactivateUserResponse, err error) {
-	details, err := s.command.DeactivateUserV2(ctx, req.UserId)
+func (s *Server) DeactivateUser(ctx context.Context, req *connect.Request[user.DeactivateUserRequest]) (_ *connect.Response[user.DeactivateUserResponse], err error) {
+	details, err := s.command.DeactivateUserV2(ctx, req.Msg.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	return &user.DeactivateUserResponse{
+	return connect.NewResponse(&user.DeactivateUserResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ReactivateUser(ctx context.Context, req *user.ReactivateUserRequest) (_ *user.ReactivateUserResponse, err error) {
-	details, err := s.command.ReactivateUserV2(ctx, req.UserId)
+func (s *Server) ReactivateUser(ctx context.Context, req *connect.Request[user.ReactivateUserRequest]) (_ *connect.Response[user.ReactivateUserResponse], err error) {
+	details, err := s.command.ReactivateUserV2(ctx, req.Msg.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	return &user.ReactivateUserResponse{
+	return connect.NewResponse(&user.ReactivateUserResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
 func ifNotNilPtr[v, p any](value *v, conv func(v) p) *p {
@@ -260,32 +261,32 @@ func SetHumanPasswordToPassword(password *user.SetPassword) *command.Password {
 	}
 }
 
-func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {
-	details, err := s.command.AddUserIDPLink(ctx, req.UserId, "", &command.AddLink{
-		IDPID:         req.GetIdpLink().GetIdpId(),
-		DisplayName:   req.GetIdpLink().GetUserName(),
-		IDPExternalID: req.GetIdpLink().GetUserId(),
+func (s *Server) AddIDPLink(ctx context.Context, req *connect.Request[user.AddIDPLinkRequest]) (_ *connect.Response[user.AddIDPLinkResponse], err error) {
+	details, err := s.command.AddUserIDPLink(ctx, req.Msg.GetUserId(), "", &command.AddLink{
+		IDPID:         req.Msg.GetIdpLink().GetIdpId(),
+		DisplayName:   req.Msg.GetIdpLink().GetUserName(),
+		IDPExternalID: req.Msg.GetIdpLink().GetUserId(),
 	})
 	if err != nil {
 		return nil, err
 	}
-	return &user.AddIDPLinkResponse{
+	return connect.NewResponse(&user.AddIDPLinkResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_ *user.DeleteUserResponse, err error) {
-	memberships, grants, err := s.removeUserDependencies(ctx, req.GetUserId())
+func (s *Server) DeleteUser(ctx context.Context, req *connect.Request[user.DeleteUserRequest]) (_ *connect.Response[user.DeleteUserResponse], err error) {
+	memberships, grants, err := s.removeUserDependencies(ctx, req.Msg.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveUserV2(ctx, req.UserId, "", memberships, grants...)
+	details, err := s.command.RemoveUserV2(ctx, req.Msg.GetUserId(), "", memberships, grants...)
 	if err != nil {
 		return nil, err
 	}
-	return &user.DeleteUserResponse{
+	return connect.NewResponse(&user.DeleteUserResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
 func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {
@@ -360,18 +361,18 @@ func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 	return converted
 }
 
-func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.StartIdentityProviderIntentRequest) (_ *user.StartIdentityProviderIntentResponse, err error) {
-	switch t := req.GetContent().(type) {
+func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *connect.Request[user.StartIdentityProviderIntentRequest]) (_ *connect.Response[user.StartIdentityProviderIntentResponse], err error) {
+	switch t := req.Msg.GetContent().(type) {
 	case *user.StartIdentityProviderIntentRequest_Urls:
-		return s.startIDPIntent(ctx, req.GetIdpId(), t.Urls)
+		return s.startIDPIntent(ctx, req.Msg.GetIdpId(), t.Urls)
 	case *user.StartIdentityProviderIntentRequest_Ldap:
-		return s.startLDAPIntent(ctx, req.GetIdpId(), t.Ldap)
+		return s.startLDAPIntent(ctx, req.Msg.GetIdpId(), t.Ldap)
 	default:
 		return nil, zerrors.ThrowUnimplementedf(nil, "USERv2-S2g21", "type oneOf %T in method StartIdentityProviderIntent not implemented", t)
 	}
 }
 
-func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderIntentResponse, error) {
+func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*connect.Response[user.StartIdentityProviderIntentResponse], error) {
 	state, session, err := s.command.AuthFromProvider(ctx, idpID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
 	if err != nil {
 		return nil, err
@@ -380,22 +381,31 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 	if err != nil {
 		return nil, err
 	}
-	content, redirect := session.GetAuth(ctx)
-	if redirect {
-		return &user.StartIdentityProviderIntentResponse{
-			Details:  object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: content},
-		}, nil
+	auth, err := session.GetAuth(ctx)
+	if err != nil {
+		return nil, err
 	}
-	return &user.StartIdentityProviderIntentResponse{
-		Details: object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
-			PostForm: []byte(content),
-		},
-	}, nil
+	switch a := auth.(type) {
+	case *idp.RedirectAuth:
+		return connect.NewResponse(&user.StartIdentityProviderIntentResponse{
+			Details:  object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: a.RedirectURL},
+		}), nil
+	case *idp.FormAuth:
+		return connect.NewResponse(&user.StartIdentityProviderIntentResponse{
+			Details: object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderIntentResponse_FormData{
+				FormData: &user.FormData{
+					Url:    a.URL,
+					Fields: a.Fields,
+				},
+			},
+		}), nil
+	}
+	return nil, zerrors.ThrowInvalidArgumentf(nil, "USERv2-3g2j3", "type oneOf %T in method StartIdentityProviderIntent not implemented", auth)
 }
 
-func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
+func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*connect.Response[user.StartIdentityProviderIntentResponse], error) {
 	intentWriteModel, details, err := s.command.CreateIntent(ctx, "", idpID, "", "", authz.GetInstance(ctx).InstanceID(), nil)
 	if err != nil {
 		return nil, err
@@ -411,7 +421,7 @@ func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredenti
 	if err != nil {
 		return nil, err
 	}
-	return &user.StartIdentityProviderIntentResponse{
+	return connect.NewResponse(&user.StartIdentityProviderIntentResponse{
 		Details: object.DomainToDetailsPb(details),
 		NextStep: &user.StartIdentityProviderIntentResponse_IdpIntent{
 			IdpIntent: &user.IDPIntent{
@@ -420,7 +430,7 @@ func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredenti
 				UserId:         userID,
 			},
 		},
-	}, nil
+	}), nil
 }
 
 func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUserID string) (string, error) {
@@ -474,12 +484,12 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 	return externalUser, userID, session, nil
 }
 
-func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.RetrieveIdentityProviderIntentRequest) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
-	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), "")
+func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *connect.Request[user.RetrieveIdentityProviderIntentRequest]) (_ *connect.Response[user.RetrieveIdentityProviderIntentResponse], err error) {
+	intent, err := s.command.GetIntentWriteModel(ctx, req.Msg.GetIdpIntentId(), "")
 	if err != nil {
 		return nil, err
 	}
-	if err := s.checkIntentToken(req.GetIdpIntentToken(), intent.AggregateID); err != nil {
+	if err := s.checkIntentToken(req.Msg.GetIdpIntentToken(), intent.AggregateID); err != nil {
 		return nil, err
 	}
 	if intent.State != domain.IDPIntentStateSucceeded {
@@ -491,7 +501,7 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 	return idpIntentToIDPIntentPb(intent, s.idpAlg)
 }
 
-func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
+func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *connect.Response[user.RetrieveIdentityProviderIntentResponse], err error) {
 	rawInformation := new(structpb.Struct)
 	err = rawInformation.UnmarshalJSON(intent.IDPUser)
 	if err != nil {
@@ -530,7 +540,7 @@ func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.Encr
 		information.IdpInformation.Access = IDPSAMLResponseToPb(assertion)
 	}
 
-	return information, nil
+	return connect.NewResponse(information), nil
 }
 
 func idpOAuthTokensToPb(idpIDToken string, idpAccessToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
@@ -593,15 +603,15 @@ func (s *Server) checkIntentToken(token string, intentID string) error {
 	return crypto.CheckToken(s.idpAlg, token, intentID)
 }
 
-func (s *Server) ListAuthenticationMethodTypes(ctx context.Context, req *user.ListAuthenticationMethodTypesRequest) (*user.ListAuthenticationMethodTypesResponse, error) {
-	authMethods, err := s.query.ListUserAuthMethodTypes(ctx, req.GetUserId(), true, false, "")
+func (s *Server) ListAuthenticationMethodTypes(ctx context.Context, req *connect.Request[user.ListAuthenticationMethodTypesRequest]) (*connect.Response[user.ListAuthenticationMethodTypesResponse], error) {
+	authMethods, err := s.query.ListUserAuthMethodTypes(ctx, req.Msg.GetUserId(), true, false, "")
 	if err != nil {
 		return nil, err
 	}
-	return &user.ListAuthenticationMethodTypesResponse{
+	return connect.NewResponse(&user.ListAuthenticationMethodTypesResponse{
 		Details:         object.ToListDetails(authMethods.SearchResponse),
 		AuthMethodTypes: authMethodTypesToPb(authMethods.AuthMethodTypes),
-	}, nil
+	}), nil
 }
 
 func authMethodTypesToPb(methodTypes []domain.UserAuthMethodType) []user.AuthenticationMethodType {

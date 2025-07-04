@@ -10,9 +10,13 @@ const sidebar_api_oidc_service_v2 = require("./docs/apis/resources/oidc_service_
 const sidebar_api_settings_service_v2 = require("./docs/apis/resources/settings_service_v2/sidebar.ts").default
 const sidebar_api_feature_service_v2 = require("./docs/apis/resources/feature_service_v2/sidebar.ts").default
 const sidebar_api_org_service_v2 = require("./docs/apis/resources/org_service_v2/sidebar.ts").default
+const sidebar_api_org_service_v2beta = require("./docs/apis/resources/org_service_v2beta/sidebar.ts").default
 const sidebar_api_idp_service_v2 = require("./docs/apis/resources/idp_service_v2/sidebar.ts").default
 const sidebar_api_actions_v2 = require("./docs/apis/resources/action_service_v2/sidebar.ts").default
+const sidebar_api_project_service_v2 = require("./docs/apis/resources/project_service_v2/sidebar.ts").default
 const sidebar_api_webkey_service_v2 = require("./docs/apis/resources/webkey_service_v2/sidebar.ts").default
+const sidebar_api_instance_service_v2 = require("./docs/apis/resources/instance_service_v2/sidebar.ts").default
+const sidebar_api_app_v2 = require("./docs/apis/resources/application_service_v2/sidebar.ts").default
 
 module.exports = {
   guides: [
@@ -180,7 +184,6 @@ module.exports = {
           items: [
             "guides/manage/user/reg-create-user",
             "guides/manage/customize/user-metadata",
-            "guides/manage/customize/user-schema",
             "guides/manage/user/scim2",
           ],
         },
@@ -201,6 +204,7 @@ module.exports = {
           items: [
             "guides/migrate/sources/zitadel",
             "guides/migrate/sources/auth0",
+            "guides/migrate/sources/auth0-guide",
             "guides/migrate/sources/keycloak",
           ],
         },
@@ -610,6 +614,20 @@ module.exports = {
     },
     {
       type: "category",
+      label: "Product Information",
+      collapsed: true,
+      items: [
+        "product/roadmap",
+        "product/release-cycle",
+        {
+          type: "link",
+          label: "Changelog",
+          href: "https://zitadel.com/changelog",
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "Support",
       collapsed: true,
       items: [
@@ -791,6 +809,18 @@ module.exports = {
             },
             {
               type: "category",
+              label: "Organization (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Organization Service beta API",
+                slug: "/apis/resources/org_service/v2beta",
+                description:
+                    "This API is intended to manage organizations for ZITADEL. \n",
+              },
+              items: sidebar_api_org_service_v2beta,
+            },
+            {
+              type: "category",
               label: "Identity Provider",
               link: {
                 type: "generated-index",
@@ -803,19 +833,15 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Web key (Beta)",
+              label: "Web Key",
               link: {
                 type: "generated-index",
-                title: "Web Key Service API (Beta)",
+                title: "Web Key Service API",
                 slug: "/apis/resources/webkey_service_v2",
                 description:
                     "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
-                    "\n" +
-                    "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
                     "\n"+
-                    "The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n"+
-                    "\n"+
-                    "Please make sure to enable the `web_key` feature flag on your instance to use this service and that you're running ZITADEL V3.",
+                    "The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n",
               },
               items: sidebar_api_webkey_service_v2
             },
@@ -839,6 +865,54 @@ module.exports = {
                     "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running Zitadel V3.",
               },
               items: sidebar_api_actions_v2,
+            },
+            {
+              type: "category",
+              label: "Project (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Project Service API (Beta)",
+                slug: "/apis/resources/project_service_v2",
+                description:
+                    "This API is intended to manage projects and subresources for ZITADEL. \n" +
+                    "\n" +
+                    "This service is in beta state. It can AND will continue breaking until a stable version is released.",
+              },
+              items: sidebar_api_project_service_v2,
+            },
+            {
+              type: "category",
+              label: "Instance (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Instance Service API (Beta)",
+                slug: "/apis/resources/instance_service_v2",
+                description:
+                    "This API is intended to manage instances, custom domains and trusted domains in ZITADEL.\n" +
+                    "\n" +
+                    "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
+                    "\n" +
+                    "This v2 of the API provides the same functionalities as the v1, but organised on a per resource basis.\n" +
+                    "The whole functionality related to domains (custom and trusted) has been moved under this instance API."
+                ,
+              },
+              items: sidebar_api_instance_service_v2,
+            },
+            {
+              type: "category",
+              label: "App (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Application Service API (Beta)",
+                slug: "/apis/resources/application_service_v2",
+                description:
+                    "This API lets you manage Zitadel applications (API, SAML, OIDC).\n"+
+                    "\n"+
+                    "The API offers generic endpoints that work for all app types (API, SAML, OIDC), "+
+                    "\n"+
+                    "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+              },
+              items: sidebar_api_app_v2,
             },
           ],
         },

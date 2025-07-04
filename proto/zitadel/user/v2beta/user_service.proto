@@ -563,7 +563,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.delete"
+        permission: "authenticated"
       }
     };
 
@@ -1788,22 +1788,23 @@ message StartIdentityProviderIntentRequest{
 message StartIdentityProviderIntentResponse{
   zitadel.object.v2beta.Details details = 1;
   oneof next_step {
+    // URL to which the client should redirect
     string auth_url = 2 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "URL to which the client should redirect"
         example: "\"https://accounts.google.com/o/oauth2/v2/auth?client_id=clientID&callback=https%3A%2F%2Fzitadel.cloud%2Fidps%2Fcallback\"";
       }
     ];
-    IDPIntent idp_intent = 3 [
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        description: "IDP Intent information"
-      }
-    ];
+    // IDP Intent information
+    IDPIntent idp_intent = 3;
+    // POST call information
+    // Deprecated: Use form_data instead
     bytes post_form = 4 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         description: "POST call information"
       }
     ];
+    // Data for a form POST call
+    FormData form_data = 5;
   }
 }
 

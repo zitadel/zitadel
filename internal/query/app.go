@@ -5,9 +5,11 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -307,6 +309,19 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 	return app, err
 }
 
+func (q *Queries) AppByIDWithPermission(ctx context.Context, appID string, activeOnly bool, permissionCheck domain.PermissionCheck) (*App, error) {
+	app, err := q.AppByID(ctx, appID, activeOnly)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := appCheckPermission(ctx, app.ResourceOwner, app.ProjectID, permissionCheck); err != nil {
+		return nil, err
+	}
+
+	return app, nil
+}
+
 func (q *Queries) AppByID(ctx context.Context, appID string, activeOnly bool) (app *App, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -455,27 +470,6 @@ func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (id s
 	return id, err
 }
 
-func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string) (project *Project, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	stmt, scan := prepareProjectByOIDCAppQuery()
-	eq := sq.Eq{
-		AppOIDCConfigColumnClientID.identifier(): id,
-		AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
-	}
-	query, args, err := stmt.Where(eq).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-XhJi4", "Errors.Query.SQLStatement")
-	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		project, err = scan(row)
-		return err
-	}, query, args...)
-	return project, err
-}
-
 func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (app *App, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -526,11 +520,25 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string) (app *App,
 	return app, err
 }
 
-func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, withOwnerRemoved bool) (apps *Apps, err error) {
+func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, permissionCheck domain.PermissionCheck) (*Apps, error) {
+	apps, err := q.searchApps(ctx, queries, PermissionV2(ctx, permissionCheck))
+	if err != nil {
+		return nil, err
+	}
+
+	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+		apps.Apps = appsCheckPermission(ctx, apps.Apps, permissionCheck)
+	}
+	return apps, nil
+}
+
+func (q *Queries) searchApps(ctx context.Context, queries *AppSearchQueries, isPermissionV2Enabled bool) (apps *Apps, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareAppsQuery()
+	query = appPermissionCheckV2(ctx, query, isPermissionV2Enabled, queries)
+
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -546,6 +554,21 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 	}
 	apps.State, err = q.latestState(ctx, appsTable)
 	return apps, err
+}
+
+func appPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *AppSearchQueries) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+
+	join, args := PermissionClause(
+		ctx,
+		AppColumnResourceOwner,
+		domain.PermissionProjectAppRead,
+		SingleOrgPermissionOption(queries.Queries),
+		WithProjectsPermissionOption(AppColumnProjectID),
+	)
+	return query.JoinClause(join, args...)
 }
 
 func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries, shouldTriggerBulk bool) (ids []string, err error) {
@@ -624,8 +647,23 @@ func (q *Queries) SAMLAppLoginVersion(ctx context.Context, appID string) (loginV
 	return loginVersion, nil
 }
 
+func appCheckPermission(ctx context.Context, resourceOwner string, projectID string, permissionCheck domain.PermissionCheck) error {
+	return permissionCheck(ctx, domain.PermissionProjectAppRead, resourceOwner, projectID)
+}
+
+// appsCheckPermission returns only the apps that the user in context has permission to read
+func appsCheckPermission(ctx context.Context, apps []*App, permissionCheck domain.PermissionCheck) []*App {
+	return slices.DeleteFunc(apps, func(app *App) bool {
+		return permissionCheck(ctx, domain.PermissionProjectAppRead, app.ResourceOwner, app.ProjectID) != nil
+	})
+}
+
 func NewAppNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(AppColumnName, value, method)
+}
+
+func NewAppStateSearchQuery(value domain.AppState) (SearchQuery, error) {
+	return NewNumberQuery(AppColumnState, int(value), NumberEquals)
 }
 
 func NewAppProjectIDSearchQuery(id string) (SearchQuery, error) {
@@ -864,48 +902,6 @@ func prepareProjectIDByAppQuery() (sq.SelectBuilder, func(*sql.Row) (projectID s
 			}
 
 			return projectID, nil
-		}
-}
-
-func prepareProjectByOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
-	return sq.Select(
-			ProjectColumnID.identifier(),
-			ProjectColumnCreationDate.identifier(),
-			ProjectColumnChangeDate.identifier(),
-			ProjectColumnResourceOwner.identifier(),
-			ProjectColumnState.identifier(),
-			ProjectColumnSequence.identifier(),
-			ProjectColumnName.identifier(),
-			ProjectColumnProjectRoleAssertion.identifier(),
-			ProjectColumnProjectRoleCheck.identifier(),
-			ProjectColumnHasProjectCheck.identifier(),
-			ProjectColumnPrivateLabelingSetting.identifier(),
-		).From(projectsTable.identifier()).
-			Join(join(AppColumnProjectID, ProjectColumnID)).
-			Join(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Project, error) {
-			p := new(Project)
-			err := row.Scan(
-				&p.ID,
-				&p.CreationDate,
-				&p.ChangeDate,
-				&p.ResourceOwner,
-				&p.State,
-				&p.Sequence,
-				&p.Name,
-				&p.ProjectRoleAssertion,
-				&p.ProjectRoleCheck,
-				&p.HasProjectCheck,
-				&p.PrivateLabelingSetting,
-			)
-			if err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-yxTMh", "Errors.Project.NotFound")
-				}
-				return nil, zerrors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
-			}
-			return p, nil
 		}
 }
 
@@ -1181,7 +1177,7 @@ func (c sqlOIDCConfig) set(app *App) {
 	if c.loginBaseURI.Valid {
 		app.OIDCConfig.LoginBaseURI = &c.loginBaseURI.String
 	}
-	compliance := domain.GetOIDCCompliance(app.OIDCConfig.Version, app.OIDCConfig.AppType, app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, app.OIDCConfig.AuthMethodType, app.OIDCConfig.RedirectURIs)
+	compliance := domain.GetOIDCCompliance(gu.Ptr(app.OIDCConfig.Version), gu.Ptr(app.OIDCConfig.AppType), app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, gu.Ptr(app.OIDCConfig.AuthMethodType), app.OIDCConfig.RedirectURIs)
 	app.OIDCConfig.ComplianceProblems = compliance.Problems
 
 	var err error

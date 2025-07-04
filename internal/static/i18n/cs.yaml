@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefon již ověřen
       Empty: Telefon je prázdný
       NotChanged: Telefon nezměněn
+      VerifyingRemovalIsNotSupported: Ověření odstranění telefonu není podporováno
     Address:
       NotFound: Adresa nenalezena
       NotChanged: Adresa nezměněna

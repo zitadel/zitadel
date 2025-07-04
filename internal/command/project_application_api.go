@@ -79,7 +79,7 @@ func (c *Commands) AddAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-mabu12", "Errors.Project.App.AlreadyExisting")
 	}
 
-	if err := c.checkProjectExists(ctx, apiApp.AggregateID, resourceOwner); err != nil {
+	if _, err := c.checkProjectExists(ctx, apiApp.AggregateID, resourceOwner); err != nil {
 		return nil, err
 	}
 	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, appID)
@@ -90,16 +90,24 @@ func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp,
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Project.App.Invalid")
 	}
 
-	if err := c.checkProjectExists(ctx, apiApp.AggregateID, resourceOwner); err != nil {
+	projectResOwner, err := c.checkProjectExists(ctx, apiApp.AggregateID, resourceOwner)
+	if err != nil {
 		return nil, err
 	}
+	if resourceOwner == "" {
+		resourceOwner = projectResOwner
+	}
+
 	if !apiApp.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Project.App.Invalid")
 	}
 
-	appID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
+	appID := apiApp.AppID
+	if appID == "" {
+		appID, err = c.idGenerator.Next()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, appID)
@@ -112,6 +120,13 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	apiApp.AppID = appID
 
 	addedApplication := NewAPIApplicationWriteModel(apiApp.AggregateID, resourceOwner)
+	if err := c.eventstore.FilterToQueryReducer(ctx, addedApplication); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionUpdateApplication(ctx, addedApplication.ResourceOwner, addedApplication.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 
 	events := []eventstore.Command{
@@ -150,7 +165,7 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	return result, nil
 }
 
-func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string) (*domain.APIApp, error) {
+func (c *Commands) UpdateAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string) (*domain.APIApp, error) {
 	if apiApp.AppID == "" || apiApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-1m900", "Errors.Project.App.APIConfigInvalid")
 	}
@@ -165,6 +180,13 @@ func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIA
 	if !existingAPI.IsAPI() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Gnwt3", "Errors.Project.App.IsNotAPI")
 	}
+	if err := c.eventstore.FilterToQueryReducer(ctx, existingAPI); err != nil {
+		return nil, err
+	}
+	if err := c.checkPermissionUpdateApplication(ctx, existingAPI.ResourceOwner, existingAPI.AggregateID); err != nil {
+		return nil, err
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&existingAPI.WriteModel)
 	changedEvent, hasChanged, err := existingAPI.NewChangedEvent(
 		ctx,
@@ -205,6 +227,11 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 	if !existingAPI.IsAPI() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-aeH4", "Errors.Project.App.IsNotAPI")
 	}
+
+	if err := c.checkPermissionUpdateApplication(ctx, existingAPI.ResourceOwner, existingAPI.AggregateID); err != nil {
+		return nil, err
+	}
+
 	encodedHash, plain, err := c.newHashedSecret(ctx, c.eventstore.Filter) //nolint:staticcheck
 	if err != nil {
 		return nil, err
@@ -224,37 +251,6 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 	result := apiWriteModelToAPIConfig(existingAPI)
 	result.ClientSecretString = plain
 	return result, err
-}
-
-func (c *Commands) VerifyAPIClientSecret(ctx context.Context, projectID, appID, secret string) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	app, err := c.getAPIAppWriteModel(ctx, projectID, appID, "")
-	if err != nil {
-		return err
-	}
-	if !app.State.Exists() {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-DFnbf", "Errors.Project.App.NotExisting")
-	}
-	if !app.IsAPI() {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Bf3fw", "Errors.Project.App.IsNotAPI")
-	}
-	if app.HashedSecret == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D3t5g", "Errors.Project.App.APIConfigInvalid")
-	}
-
-	projectAgg := ProjectAggregateFromWriteModel(&app.WriteModel)
-	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
-	updated, err := c.secretHasher.Verify(app.HashedSecret, secret)
-	spanPasswordComparison.EndWithError(err)
-	if err != nil {
-		return zerrors.ThrowInvalidArgument(err, "COMMAND-SADfg", "Errors.Project.App.ClientSecretInvalid")
-	}
-	if updated != "" {
-		c.apiUpdateSecret(ctx, projectAgg, app.AppID, updated)
-	}
-	return nil
 }
 
 func (c *Commands) APIUpdateSecret(ctx context.Context, appID, projectID, resourceOwner, updated string) {
