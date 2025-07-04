@@ -532,8 +532,6 @@ const (
 
 func (i AuthnKeyIndex) Key() string {
 	switch i {
-	case AuthnKeyIndexInstanceID:
-		return "instance_id"
 	case AuthnKeyIndexKeyID:
 		return "key_id"
 	default:
@@ -543,8 +541,6 @@ func (i AuthnKeyIndex) Key() string {
 
 func (c *CachedPublicKey) Keys(index AuthnKeyIndex) []string {
 	switch index {
-	case AuthnKeyIndexInstanceID:
-		return []string{c.InstanceID}
 	case AuthnKeyIndexKeyID:
 		return []string{c.KeyID}
 	default:
