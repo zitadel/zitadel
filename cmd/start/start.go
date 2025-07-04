@@ -101,6 +101,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/queue"
+	"github.com/zitadel/zitadel/internal/serviceping"
 	"github.com/zitadel/zitadel/internal/static"
 	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
 	es_v4_pg "github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
@@ -319,7 +320,17 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	)
 	execution.Start(ctx)
 
+	// the service ping and it's workers need to be registered before starting the queue
+	if err := serviceping.Register(ctx, q, queries, eventstoreClient, config.ServicePing); err != nil {
+		return err
+	}
+
 	if err = q.Start(ctx); err != nil {
+		return err
+	}
+
+	// the scheduler / periodic jobs need to be started after the queue already runs
+	if err = serviceping.Start(config.ServicePing, q); err != nil {
 		return err
 	}
 
