@@ -15,7 +15,7 @@ export async function setup() {
 }
 
 export default async function (data: any) {
-  const human = await createHuman(`vu-${__VU}`, data.org, data.tokens.accessToken);
+  const human = await createHuman(`vu-${__VU}-${new Date(Date.now()).getTime()}`, data.org, data.tokens.accessToken);
   const updateRes = await updateHuman(
     {
       profile: {

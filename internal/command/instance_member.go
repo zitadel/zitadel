@@ -22,7 +22,7 @@ func (c *Commands) AddInstanceMemberCommand(a *instance.Aggregate, userID string
 			return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-4m0fS", "Errors.IAM.MemberInvalid")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-				if exists, err := ExistsUser(ctx, filter, userID, ""); err != nil || !exists {
+				if exists, err := ExistsUser(ctx, filter, userID, "", false); err != nil || !exists {
 					return nil, zerrors.ThrowPreconditionFailed(err, "INSTA-GSXOn", "Errors.User.NotFound")
 				}
 				if isMember, err := IsInstanceMember(ctx, filter, a.ID, userID); err != nil || isMember {

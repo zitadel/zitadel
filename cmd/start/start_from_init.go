@@ -1,6 +1,8 @@
 package start
 
 import (
+	"context"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -29,14 +31,19 @@ Requirements:
 			masterKey, err := key.MasterKey(cmd)
 			logging.OnError(err).Panic("No master key provided")
 
-			initialise.InitAll(cmd.Context(), initialise.MustNewConfig(viper.GetViper()))
+			initCtx, cancel := context.WithCancel(cmd.Context())
+			initialise.InitAll(initCtx, initialise.MustNewConfig(viper.GetViper()))
+			cancel()
 
 			err = setup.BindInitProjections(cmd)
 			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
 
 			setupConfig := setup.MustNewConfig(viper.GetViper())
 			setupSteps := setup.MustNewSteps(viper.New())
-			setup.Setup(cmd.Context(), setupConfig, setupSteps, masterKey)
+
+			setupCtx, cancel := context.WithCancel(cmd.Context())
+			setup.Setup(setupCtx, setupConfig, setupSteps, masterKey)
+			cancel()
 
 			startConfig := MustNewConfig(viper.GetViper())
 

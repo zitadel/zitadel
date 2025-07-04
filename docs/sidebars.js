@@ -10,9 +10,12 @@ const sidebar_api_oidc_service_v2 = require("./docs/apis/resources/oidc_service_
 const sidebar_api_settings_service_v2 = require("./docs/apis/resources/settings_service_v2/sidebar.ts").default
 const sidebar_api_feature_service_v2 = require("./docs/apis/resources/feature_service_v2/sidebar.ts").default
 const sidebar_api_org_service_v2 = require("./docs/apis/resources/org_service_v2/sidebar.ts").default
+const sidebar_api_org_service_v2beta = require("./docs/apis/resources/org_service_v2beta/sidebar.ts").default
 const sidebar_api_idp_service_v2 = require("./docs/apis/resources/idp_service_v2/sidebar.ts").default
 const sidebar_api_actions_v2 = require("./docs/apis/resources/action_service_v2/sidebar.ts").default
+const sidebar_api_project_service_v2 = require("./docs/apis/resources/project_service_v2/sidebar.ts").default
 const sidebar_api_webkey_service_v2 = require("./docs/apis/resources/webkey_service_v2/sidebar.ts").default
+const sidebar_api_instance_service_v2 = require("./docs/apis/resources/instance_service_v2/sidebar.ts").default
 
 module.exports = {
   guides: [
@@ -180,7 +183,6 @@ module.exports = {
           items: [
             "guides/manage/user/reg-create-user",
             "guides/manage/customize/user-metadata",
-            "guides/manage/customize/user-schema",
             "guides/manage/user/scim2",
           ],
         },
@@ -201,6 +203,7 @@ module.exports = {
           items: [
             "guides/migrate/sources/zitadel",
             "guides/migrate/sources/auth0",
+            "guides/migrate/sources/auth0-guide",
             "guides/migrate/sources/keycloak",
           ],
         },
@@ -605,6 +608,20 @@ module.exports = {
             "concepts/eventstore/overview",
             "concepts/eventstore/implementation",
           ],
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Product Information",
+      collapsed: true,
+      items: [
+        "product/roadmap",
+        "product/release-cycle",
+        {
+          type: "link",
+          label: "Changelog",
+          href: "https://zitadel.com/changelog",
         },
       ],
     },

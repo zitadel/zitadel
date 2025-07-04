@@ -71,14 +71,6 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},
-				TriggerIntrospectionProjections: FeatureSource[bool]{
-					Level: feature.LevelUnspecified,
-					Value: false,
-				},
-				LegacyIntrospection: FeatureSource[bool]{
-					Level: feature.LevelUnspecified,
-					Value: false,
-				},
 			},
 		},
 		{
@@ -95,14 +87,6 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
-						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, true,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						ctx, aggregate,
-						feature_v2.InstanceLegacyIntrospectionEventType, false,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, false,
 					)),
 				),
@@ -113,14 +97,6 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					ResourceOwner: "instance1",
 				},
 				LoginDefaultOrg: FeatureSource[bool]{
-					Level: feature.LevelInstance,
-					Value: false,
-				},
-				TriggerIntrospectionProjections: FeatureSource[bool]{
-					Level: feature.LevelInstance,
-					Value: true,
-				},
-				LegacyIntrospection: FeatureSource[bool]{
 					Level: feature.LevelInstance,
 					Value: false,
 				},
@@ -144,23 +120,11 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
-						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, true,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						ctx, aggregate,
-						feature_v2.InstanceLegacyIntrospectionEventType, false,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceResetEventType,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						ctx, aggregate,
-						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, true,
 					)),
 				),
 			),
@@ -172,14 +136,6 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 				LoginDefaultOrg: FeatureSource[bool]{
 					Level: feature.LevelSystem,
 					Value: true,
-				},
-				TriggerIntrospectionProjections: FeatureSource[bool]{
-					Level: feature.LevelInstance,
-					Value: true,
-				},
-				LegacyIntrospection: FeatureSource[bool]{
-					Level: feature.LevelUnspecified,
-					Value: false,
 				},
 				UserSchema: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
@@ -197,23 +153,11 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
-						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, true,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						ctx, aggregate,
-						feature_v2.InstanceLegacyIntrospectionEventType, false,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceResetEventType,
-					)),
-					eventFromEventPusher(feature_v2.NewSetEvent(
-						ctx, aggregate,
-						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, true,
 					)),
 				),
 			),
@@ -223,14 +167,6 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					ResourceOwner: "instance1",
 				},
 				LoginDefaultOrg: FeatureSource[bool]{
-					Level: feature.LevelUnspecified,
-					Value: false,
-				},
-				TriggerIntrospectionProjections: FeatureSource[bool]{
-					Level: feature.LevelInstance,
-					Value: true,
-				},
-				LegacyIntrospection: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},

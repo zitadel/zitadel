@@ -15,11 +15,11 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/auth/repository"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -73,9 +73,9 @@ type OPStorage struct {
 	defaultRefreshTokenIdleExpiration time.Duration
 	defaultRefreshTokenExpiration     time.Duration
 	encAlg                            crypto.EncryptionAlgorithm
-	locker                            crdb.Locker
 	assetAPIPrefix                    func(ctx context.Context) string
 	contextToIssuer                   func(context.Context) string
+	federateLogoutCache               cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout]
 }
 
 // Provider is used to overload certain [op.Provider] methods
@@ -88,14 +88,14 @@ type Provider struct {
 // IDTokenHintVerifier configures a Verifier and supported signing algorithms based on the Web Key feature in the context.
 func (o *Provider) IDTokenHintVerifier(ctx context.Context) *op.IDTokenHintVerifier {
 	return op.NewIDTokenHintVerifier(op.IssuerFromContext(ctx), o.idTokenHintKeySet, op.WithSupportedIDTokenHintSigningAlgorithms(
-		supportedSigningAlgs(ctx)...,
+		supportedSigningAlgs()...,
 	))
 }
 
 // AccessTokenVerifier configures a Verifier and supported signing algorithms based on the Web Key feature in the context.
 func (o *Provider) AccessTokenVerifier(ctx context.Context) *op.AccessTokenVerifier {
 	return op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), o.accessTokenKeySet, op.WithSupportedAccessTokenSigningAlgorithms(
-		supportedSigningAlgs(ctx)...,
+		supportedSigningAlgs()...,
 	))
 }
 
@@ -110,17 +110,17 @@ func NewServer(
 	encryptionAlg crypto.EncryptionAlgorithm,
 	cryptoKey []byte,
 	es *eventstore.Eventstore,
-	projections *database.DB,
 	userAgentCookie, instanceHandler func(http.Handler) http.Handler,
 	accessHandler *middleware.AccessInterceptor,
 	fallbackLogger *slog.Logger,
 	hashConfig crypto.HashConfig,
+	federatedLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
 ) (*Server, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, ContextToIssuer)
+	storage := newStorage(config, command, query, repo, encryptionAlg, es, ContextToIssuer, federatedLogoutCache)
 	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, queryKeyFunc(query))
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
@@ -225,7 +225,16 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 	return opConfig, nil
 }
 
-func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, db *database.DB, contextToIssuer func(context.Context) string) *OPStorage {
+func newStorage(
+	config Config,
+	command *command.Commands,
+	query *query.Queries,
+	repo repository.Repository,
+	encAlg crypto.EncryptionAlgorithm,
+	es *eventstore.Eventstore,
+	contextToIssuer func(context.Context) string,
+	federateLogoutCache cache.Cache[federatedlogout.Index, string, *federatedlogout.FederatedLogout],
+) *OPStorage {
 	return &OPStorage{
 		repo:                              repo,
 		command:                           command,
@@ -239,9 +248,9 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 		defaultRefreshTokenIdleExpiration: config.DefaultRefreshTokenIdleExpiration,
 		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration,
 		encAlg:                            encAlg,
-		locker:                            crdb.NewLocker(db.DB, locksTable, signingKey),
 		assetAPIPrefix:                    assets.AssetAPI(),
 		contextToIssuer:                   contextToIssuer,
+		federateLogoutCache:               federateLogoutCache,
 	}
 }
 

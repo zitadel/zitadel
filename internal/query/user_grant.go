@@ -78,14 +78,6 @@ func NewUserGrantProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantProjectID, id, TextEquals)
 }
 
-func NewUserGrantProjectIDsSearchQuery(ids []string) (SearchQuery, error) {
-	list := make([]interface{}, len(ids))
-	for i, value := range ids {
-		list[i] = value
-	}
-	return NewListQuery(UserGrantProjectID, list, ListIn)
-}
-
 func NewUserGrantProjectOwnerSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(ProjectColumnResourceOwner, id, TextEquals)
 }
@@ -280,7 +272,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 		return nil, zerrors.ThrowInternal(err, "QUERY-wXnQR", "Errors.Query.SQLStatement")
 	}
 
-	latestSequence, err := q.latestState(ctx, userGrantTable)
+	latestState, err := q.latestState(ctx, userGrantTable)
 	if err != nil {
 		return nil, err
 	}
@@ -293,7 +285,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 		return nil, err
 	}
 
-	grants.State = latestSequence
+	grants.State = latestState
 	return grants, nil
 }
 

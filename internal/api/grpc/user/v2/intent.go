@@ -52,19 +52,28 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 	if err != nil {
 		return nil, err
 	}
-	content, redirect := session.GetAuth(ctx)
-	if redirect {
+	auth, err := session.GetAuth(ctx)
+	if err != nil {
+		return nil, err
+	}
+	switch a := auth.(type) {
+	case *idp.RedirectAuth:
 		return &user.StartIdentityProviderIntentResponse{
 			Details:  object.DomainToDetailsPb(details),
-			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: content},
+			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: a.RedirectURL},
+		}, nil
+	case *idp.FormAuth:
+		return &user.StartIdentityProviderIntentResponse{
+			Details: object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderIntentResponse_FormData{
+				FormData: &user.FormData{
+					Url:    a.URL,
+					Fields: a.Fields,
+				},
+			},
 		}, nil
 	}
-	return &user.StartIdentityProviderIntentResponse{
-		Details: object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
-			PostForm: []byte(content),
-		},
-	}, nil
+	return nil, zerrors.ThrowInvalidArgumentf(nil, "USERv2-3g2j3", "type oneOf %T in method StartIdentityProviderIntent not implemented", auth)
 }
 
 func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
@@ -167,21 +176,21 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 		var idpUser idp.User
 		switch p := provider.(type) {
 		case *apple.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &apple.User{})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, apple.InitUser())
 		case *oauth.Provider:
 			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
 		case *oidc.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
 		case *jwt.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &jwt.User{})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, jwt.InitUser())
 		case *azuread.Provider:
 			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
 		case *github.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, &github.User{})
 		case *gitlab.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &oidc.User{UserInfo: &oidc_pkg.UserInfo{}})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
 		case *google.Provider:
-			idpUser, err = unmarshalIdpUser(intent.IDPUser, &google.User{User: &oidc.User{UserInfo: &oidc_pkg.UserInfo{}}})
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, google.InitUser())
 		case *saml.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, &saml.UserMapper{})
 		case *ldap.Provider:

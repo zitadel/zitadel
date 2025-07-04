@@ -27,6 +27,9 @@ var (
 	//go:embed testdata/users_replace_test_minimal_with_external_id.json
 	minimalUserWithExternalIDJson []byte
 
+	//go:embed testdata/users_replace_test_minimal_with_email_type.json
+	minimalUserWithEmailTypeReplaceJson []byte
+
 	//go:embed testdata/users_replace_test_minimal.json
 	minimalUserReplaceJson []byte
 
@@ -303,7 +306,42 @@ func TestReplaceUser_removeOldMetadata(t *testing.T) {
 			Id: createdUser.ID,
 		})
 		require.NoError(tt, err)
-		require.Equal(tt, 0, len(md.Result))
+		require.Equal(tt, 1, len(md.Result))
+
+		mdMap := make(map[string]string)
+		for i := range md.Result {
+			mdMap[md.Result[i].Key] = string(md.Result[i].Value)
+		}
+
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:emails", "[{\"value\":\"user1@example.com\",\"primary\":true}]")
+	}, retryDuration, tick)
+
+	_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
+	require.NoError(t, err)
+}
+
+func TestReplaceUser_emailType(t *testing.T) {
+	// ensure old metadata is removed correctly
+	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, fullUserJson)
+	require.NoError(t, err)
+
+	_, err = Instance.Client.SCIM.Users.Replace(CTX, Instance.DefaultOrg.Id, createdUser.ID, minimalUserWithEmailTypeReplaceJson)
+	require.NoError(t, err)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		md, err := Instance.Client.Mgmt.ListUserMetadata(CTX, &management.ListUserMetadataRequest{
+			Id: createdUser.ID,
+		})
+		require.NoError(tt, err)
+		require.Equal(tt, 1, len(md.Result))
+
+		mdMap := make(map[string]string)
+		for i := range md.Result {
+			mdMap[md.Result[i].Key] = string(md.Result[i].Value)
+		}
+
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:emails", "[{\"value\":\"user1-minimal-replaced@example.com\",\"primary\":true,\"type\":\"work\"}]")
 	}, retryDuration, tick)
 
 	_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})

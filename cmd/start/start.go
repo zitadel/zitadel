@@ -36,15 +36,18 @@ import (
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	action_v2_beta "github.com/zitadel/zitadel/internal/api/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/admin"
+	app "github.com/zitadel/zitadel/internal/api/grpc/app/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	feature_v2 "github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/internal/api/grpc/feature/v2beta"
 	idp_v2 "github.com/zitadel/zitadel/internal/api/grpc/idp/v2"
+	instance "github.com/zitadel/zitadel/internal/api/grpc/instance/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	oidc_v2 "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2"
 	oidc_v2beta "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2beta"
 	org_v2 "github.com/zitadel/zitadel/internal/api/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/internal/api/grpc/org/v2beta"
+	project_v2beta "github.com/zitadel/zitadel/internal/api/grpc/project/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/resources/debug_events/debug_events"
 	user_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/user/v3alpha"
 	userschema_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/userschema/v3alpha"
@@ -72,12 +75,14 @@ import (
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
 	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain/federatedlogout"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
@@ -94,6 +99,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/queue"
+	"github.com/zitadel/zitadel/internal/serviceping"
 	"github.com/zitadel/zitadel/internal/static"
 	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
 	es_v4_pg "github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
@@ -304,7 +310,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	execution.Register(
 		ctx,
-		config.Projections.Customizations["executions"],
+		config.Projections.Customizations["execution_handler"],
 		config.Executions,
 		queries,
 		eventstoreClient.EventTypes(),
@@ -312,7 +318,17 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	)
 	execution.Start(ctx)
 
+	// the service ping and it's workers need to be registered before starting the queue
+	if err := serviceping.Register(ctx, q, queries, eventstoreClient, config.ServicePing); err != nil {
+		return err
+	}
+
 	if err = q.Start(ctx); err != nil {
+		return err
+	}
+
+	// the scheduler / periodic jobs need to be started after the queue already runs
+	if err = serviceping.Start(config.ServicePing, q); err != nil {
 		return err
 	}
 
@@ -442,6 +458,9 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain), tlsConfig); err != nil {
 		return nil, err
 	}
+	if err := apis.RegisterService(ctx, instance.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain)); err != nil {
+		return nil, err
+	}
 	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, keys.User, config.AuditLogRetention), tlsConfig); err != nil {
 		return nil, err
 	}
@@ -454,7 +473,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, user_v2beta.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(), idp.SAMLRootURL(), assets.AssetAPI(), permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(), idp.SAMLRootURL(), assets.AssetAPI(), permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, user_v2.CreateServer(config.SystemDefaults, commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(), idp.SAMLRootURL(), assets.AssetAPI(), permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, session_v2beta.CreateServer(commands, queries, permissionCheck)); err != nil {
@@ -463,7 +482,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, settings_v2beta.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, org_v2beta.CreateServer(commands, queries, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, org_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, feature_v2beta.CreateServer(commands, queries)); err != nil {
@@ -487,6 +506,9 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, action_v2_beta.CreateServer(config.SystemDefaults, commands, queries, domain.AllActionFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
 		return nil, err
 	}
+	if err := apis.RegisterService(ctx, project_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
+		return nil, err
+	}
 	if err := apis.RegisterService(ctx, userschema_v3_alpha.CreateServer(config.SystemDefaults, commands, queries)); err != nil {
 		return nil, err
 	}
@@ -499,11 +521,20 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, debug_events.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
+	if err := apis.RegisterService(ctx, app.CreateServer(commands, queries, permissionCheck)); err != nil {
+		return nil, err
+	}
+
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.ExternalDomain, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
 	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.SystemAuthZ, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle))
 
-	apis.RegisterHandlerOnPrefix(idp.HandlerPrefix, idp.NewHandler(commands, queries, keys.IDPConfig, instanceInterceptor.Handler))
+	federatedLogoutsCache, err := connector.StartCache[federatedlogout.Index, string, *federatedlogout.FederatedLogout](ctx, []federatedlogout.Index{federatedlogout.IndexRequestID}, cache.PurposeFederatedLogout, cacheConnectors.Config.FederatedLogouts, cacheConnectors)
+	if err != nil {
+		return nil, err
+	}
+
+	apis.RegisterHandlerOnPrefix(idp.HandlerPrefix, idp.NewHandler(commands, queries, keys.IDPConfig, instanceInterceptor.Handler, federatedLogoutsCache))
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources, login.EndpointExternalLoginCallbackFormPost, login.EndpointSAMLACS)
 	if err != nil {
@@ -524,7 +555,24 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(openapi.HandlerPrefix, openAPIHandler)
 
-	oidcServer, err := oidc.NewServer(ctx, config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler, limitingAccessInterceptor, config.Log.Slog(), config.SystemDefaults.SecretHasher)
+	oidcServer, err := oidc.NewServer(
+		ctx,
+		config.OIDC,
+		login.DefaultLoggedOutPath,
+		config.ExternalSecure,
+		commands,
+		queries,
+		authRepo,
+		keys.OIDC,
+		keys.OIDCKey,
+		eventstore,
+		userAgentInterceptor,
+		instanceInterceptor.Handler,
+		limitingAccessInterceptor,
+		config.Log.Slog(),
+		config.SystemDefaults.SecretHasher,
+		federatedLogoutsCache,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start oidc provider: %w", err)
 	}
@@ -573,6 +621,7 @@ func startAPIs(
 		keys.IDPConfig,
 		keys.CSRFCookieKey,
 		cacheConnectors,
+		federatedLogoutsCache,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start login: %w", err)

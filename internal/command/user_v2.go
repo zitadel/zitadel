@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -117,36 +116,6 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain
 	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
 }
 
-func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *Commands) checkPermissionDeleteUser(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserDelete, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (c *Commands) userStateWriteModel(ctx context.Context, userID string) (writeModel *UserV2WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -163,7 +132,6 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-vaipl7s13l", "Errors.User.UserIDMissing")
 	}
-
 	existingUser, err := c.userRemoveWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -174,7 +142,6 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	if err := c.checkPermissionDeleteUser(ctx, existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
 		return nil, err
 	}
-
 	domainPolicy, err := c.domainPolicyWriteModel(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-l40ykb3xh2", "Errors.Org.DomainPolicy.NotExisting")
