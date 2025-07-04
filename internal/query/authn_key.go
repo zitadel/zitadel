@@ -527,8 +527,7 @@ type CachedPublicKey struct {
 type AuthnKeyIndex int
 
 const (
-	AuthnKeyIndexInstanceID AuthnKeyIndex = iota
-	AuthnKeyIndexKeyID
+	AuthnKeyIndexKeyID = iota + 1
 )
 
 func (i AuthnKeyIndex) Key() string {
