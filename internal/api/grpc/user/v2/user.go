@@ -204,7 +204,7 @@ func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*
 	}
 	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{userGrantUserQuery},
-	}, true)
+	}, true, nil)
 	if err != nil {
 		return nil, nil, err
 	}
