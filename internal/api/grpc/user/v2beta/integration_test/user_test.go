@@ -1773,7 +1773,7 @@ func TestServer_DeleteUser(t *testing.T) {
 					request.UserId = resp.GetUserId()
 					Instance.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
-					Instance.CreateOrgMembership(t, CTX, request.UserId)
+					Instance.CreateOrgMembership(t, CTX, Instance.DefaultOrg.Id, request.UserId)
 				},
 			},
 			want: &user.DeleteUserResponse{
