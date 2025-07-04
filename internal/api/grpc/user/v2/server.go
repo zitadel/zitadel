@@ -32,7 +32,6 @@ type Server struct {
 	assetAPIPrefix func(context.Context) string
 
 	checkPermission domain.PermissionCheck
-	systemDefaults  systemdefaults.SystemDefaults
 }
 
 type Config struct{}
