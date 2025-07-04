@@ -32,6 +32,7 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/serviceping"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
 	profiler "github.com/zitadel/zitadel/internal/telemetry/profiler/config"
@@ -81,6 +82,7 @@ type Config struct {
 	LogStore            *logstore.Configs
 	Quotas              *QuotasConfig
 	Telemetry           *handlers.TelemetryPusherConfig
+	ServicePing         *serviceping.Config
 }
 
 type QuotasConfig struct {
