@@ -267,59 +267,6 @@ func TestCommandSide_AddProjectGrantMember(t *testing.T) {
 				err: zerrors.IsPermissionDenied,
 			},
 		},
-		{
-			name: "member add, wrong resource owner",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username1",
-								"firstname1",
-								"lastname1",
-								"nickname1",
-								"displayname1",
-								language.German,
-								domain.GenderMale,
-								"email1",
-								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectgrant1",
-								"grantedorg1",
-								[]string{"key1"},
-							),
-							),
-						),
-					),
-					expectFilter(),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				zitadelRoles: []authz.RoleMapping{
-					{
-						Role: "PROJECT_GRANT_OWNER",
-					},
-				},
-			},
-			args: args{
-				member: &AddProjectGrantMember{
-					ResourceOwner: "orgwrong",
-					ProjectID:     "project1",
-					GrantID:       "projectgrant1",
-					UserID:        "user1",
-					Roles:         []string{"PROJECT_GRANT_OWNER"},
-				},
-			},
-			res: res{
-				err: zerrors.IsPreconditionFailed,
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

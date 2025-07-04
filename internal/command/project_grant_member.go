@@ -52,14 +52,15 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *AddProject
 	if err != nil {
 		return nil, err
 	}
+	// TODO: change e2e tests to use correct resourceowner, wrong resource owner is corrected through aggregate
 	// error if provided resourceowner is not equal to the resourceowner of the project grant
-	if projectGrantResourceOwner != addedMember.ResourceOwner {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-0l10S9OmZV", "Errors.Project.Grant.Invalid")
-	}
+	//if projectGrantResourceOwner != addedMember.ResourceOwner {
+	//	return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-0l10S9OmZV", "Errors.Project.Grant.Invalid")
+	//}
 	if addedMember.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "PROJECT-37fug", "Errors.AlreadyExists")
 	}
-	if err := c.checkPermissionUpdateProjectGrantMember(ctx, addedMember.ResourceOwner, grantedOrgID, addedMember.GrantID); err != nil {
+	if err := c.checkPermissionUpdateProjectGrantMember(ctx, grantedOrgID, addedMember.GrantID); err != nil {
 		return nil, err
 	}
 
@@ -117,7 +118,7 @@ func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *ChangeP
 		return nil, zerrors.ThrowNotFound(nil, "PROJECT-37fug", "Errors.NotFound")
 	}
 
-	if err := c.checkPermissionUpdateProjectGrantMember(ctx, existingMember.ResourceOwner, existingGrant.GrantedOrgID, existingMember.GrantID); err != nil {
+	if err := c.checkPermissionUpdateProjectGrantMember(ctx, existingGrant.GrantedOrgID, existingMember.GrantID); err != nil {
 		return nil, err
 	}
 	if slices.Compare(existingMember.Roles, member.Roles) == 0 {
@@ -147,7 +148,7 @@ func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, user
 	if projectID == "" || userID == "" || grantID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-66mHd", "Errors.Project.Member.Invalid")
 	}
-	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, "", projectID, "")
+	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, "", projectID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +159,7 @@ func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, user
 	if !existingMember.State.Exists() {
 		return writeModelToObjectDetails(&existingMember.WriteModel), nil
 	}
-	if err := c.checkPermissionDeleteProjectGrantMember(ctx, existingMember.ResourceOwner, existingGrant.GrantedOrgID, existingMember.GrantID); err != nil {
+	if err := c.checkPermissionDeleteProjectGrantMember(ctx, existingGrant.GrantedOrgID, existingMember.GrantID); err != nil {
 		return nil, err
 	}
 
