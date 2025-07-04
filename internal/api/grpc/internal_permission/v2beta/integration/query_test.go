@@ -555,8 +555,8 @@ func createInstanceAdministrator(ctx context.Context, instance *integration.Inst
 	userResp := instance.CreateUserTypeHuman(ctx, email)
 	memberResp := instance.CreateInstanceMembership(t, ctx, userResp.GetId())
 	return &internal_permission.Administrator{
-		CreationDate: memberResp.Details.GetCreationDate(),
-		ChangeDate:   memberResp.Details.GetCreationDate(),
+		CreationDate: memberResp.GetCreationDate(),
+		ChangeDate:   memberResp.GetCreationDate(),
 		User: &internal_permission.User{
 			Id:                 userResp.GetId(),
 			PreferredLoginName: email,
@@ -573,10 +573,10 @@ func createInstanceAdministrator(ctx context.Context, instance *integration.Inst
 func createOrganizationAdministrator(ctx context.Context, instance *integration.Instance, t *testing.T) *internal_permission.Administrator {
 	email := gofakeit.Email()
 	userResp := instance.CreateUserTypeHuman(ctx, email)
-	memberResp := instance.CreateOrgMembership(t, ctx, userResp.GetId())
+	memberResp := instance.CreateOrgMembership(t, ctx, instance.DefaultOrg.Id, userResp.GetId())
 	return &internal_permission.Administrator{
-		CreationDate: memberResp.Details.GetCreationDate(),
-		ChangeDate:   memberResp.Details.GetCreationDate(),
+		CreationDate: memberResp.GetCreationDate(),
+		ChangeDate:   memberResp.GetCreationDate(),
 		User: &internal_permission.User{
 			Id:                 userResp.GetId(),
 			PreferredLoginName: email,
@@ -598,8 +598,8 @@ func createProjectAdministrator(ctx context.Context, instance *integration.Insta
 	userResp := instance.CreateUserTypeHuman(ctx, email)
 	memberResp := instance.CreateProjectMembership(t, ctx, projectID, userResp.GetId())
 	return &internal_permission.Administrator{
-		CreationDate: memberResp.Details.GetCreationDate(),
-		ChangeDate:   memberResp.Details.GetCreationDate(),
+		CreationDate: memberResp.GetCreationDate(),
+		ChangeDate:   memberResp.GetCreationDate(),
 		User: &internal_permission.User{
 			Id:                 userResp.GetId(),
 			PreferredLoginName: email,
@@ -622,8 +622,8 @@ func createProjectGrantAdministrator(ctx context.Context, instance *integration.
 	userResp := instance.CreateUserTypeHuman(ctx, email)
 	memberResp := instance.CreateProjectGrantMembership(t, ctx, projectID, grantedOrgID, userResp.GetId())
 	return &internal_permission.Administrator{
-		CreationDate: memberResp.Details.GetCreationDate(),
-		ChangeDate:   memberResp.Details.GetCreationDate(),
+		CreationDate: memberResp.GetCreationDate(),
+		ChangeDate:   memberResp.GetCreationDate(),
 		User: &internal_permission.User{
 			Id:                 userResp.GetId(),
 			PreferredLoginName: email,

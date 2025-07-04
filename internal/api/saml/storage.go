@@ -490,7 +490,7 @@ func (p *Storage) getGrants(ctx context.Context, userID, applicationID string) (
 			userIDQuery,
 			activeQuery,
 		},
-	}, true)
+	}, true, nil)
 }
 
 type customAttribute struct {

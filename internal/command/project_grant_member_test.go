@@ -345,6 +345,16 @@ func TestCommandSide_ChangeProjectGrantMember(t *testing.T) {
 			name: "member not existing, not found error",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org2",
+								[]string{"rol1", "role2"},
+							),
+						),
+					),
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -370,6 +380,16 @@ func TestCommandSide_ChangeProjectGrantMember(t *testing.T) {
 			name: "member not changed, precondition error",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org2",
+								[]string{"rol1", "role2"},
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectGrantMemberAddedEvent(context.Background(),
@@ -406,6 +426,16 @@ func TestCommandSide_ChangeProjectGrantMember(t *testing.T) {
 			name: "member change, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org2",
+								[]string{"rol1", "role2"},
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectGrantMemberAddedEvent(context.Background(),
@@ -453,6 +483,16 @@ func TestCommandSide_ChangeProjectGrantMember(t *testing.T) {
 			name: "member change, no permission",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org2",
+								[]string{"rol1", "role2"},
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectGrantMemberAddedEvent(context.Background(),
@@ -579,19 +619,28 @@ func TestCommandSide_RemoveProjectGrantMember(t *testing.T) {
 			},
 		},
 		{
-			name: "member not existing, not found err",
+			name: "member not existing, not found ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org2",
+								[]string{"rol1", "role2"},
+							),
+						),
+					),
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:           context.Background(),
-				resourceOwner: "org1",
-				projectID:     "project1",
-				userID:        "user1",
-				grantID:       "projectgrant1",
+				ctx:       context.Background(),
+				projectID: "project1",
+				userID:    "user1",
+				grantID:   "projectgrant1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -600,9 +649,19 @@ func TestCommandSide_RemoveProjectGrantMember(t *testing.T) {
 			},
 		},
 		{
-			name: "member remove, ok",
+			name: "member remove, without resourceowner, ok",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org2",
+								[]string{"rol1", "role2"},
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectGrantMemberAddedEvent(context.Background(),
@@ -636,9 +695,66 @@ func TestCommandSide_RemoveProjectGrantMember(t *testing.T) {
 			},
 		},
 		{
+			name: "member remove, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org2",
+								[]string{"rol1", "role2"},
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectGrantMemberAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"user1",
+								"projectgrant1",
+								[]string{"PROJECT_OWNER"}...,
+							),
+						),
+					),
+					expectPush(
+						project.NewProjectGrantMemberRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"user1",
+							"projectgrant1",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				projectID:     "project1",
+				userID:        "user1",
+				grantID:       "projectgrant1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
 			name: "member remove, no permission",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org2",
+								[]string{"rol1", "role2"},
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectGrantMemberAddedEvent(context.Background(),

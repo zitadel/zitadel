@@ -234,15 +234,15 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	return writeModelToObjectDetails(&existingGrant.WriteModel), nil
 }
 
-func (c *Commands) checkProjectGrantExists(ctx context.Context, grantID, grantedOrgID, projectID, resourceOwner string) (string, error) {
+func (c *Commands) checkProjectGrantExists(ctx context.Context, grantID, grantedOrgID, projectID, resourceOwner string) (string, string, error) {
 	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, grantedOrgID, projectID, resourceOwner)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	if !existingGrant.State.Exists() {
-		return "", zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.Project.Grant.NotFound")
+		return "", "", zerrors.ThrowNotFound(nil, "PROJECT-D8JxR", "Errors.Project.Grant.NotFound")
 	}
-	return existingGrant.ResourceOwner, nil
+	return existingGrant.GrantedOrgID, existingGrant.ResourceOwner, nil
 }
 
 func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantID, grantedOrgID, resourceOwner string) (details *domain.ObjectDetails, err error) {
@@ -313,16 +313,17 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 		ProjectAggregateFromWriteModelWithCTX(ctx, &existingGrant.WriteModel),
 		existingGrant.GrantID,
 		existingGrant.GrantedOrgID,
-	),
-	)
+	))
 
 	for _, userGrantID := range cascadeUserGrantIDs {
-		event, _, err := c.removeUserGrant(ctx, userGrantID, "", true)
+		event, _, err := c.removeUserGrant(ctx, userGrantID, "", true, true, nil)
 		if err != nil {
 			logging.WithFields("id", "COMMAND-3m8sG", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
-		events = append(events, event)
+		if event != nil {
+			events = append(events, event)
+		}
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
@@ -359,12 +360,14 @@ func (c *Commands) DeleteProjectGrant(ctx context.Context, projectID, grantID, g
 	)
 
 	for _, userGrantID := range cascadeUserGrantIDs {
-		event, _, err := c.removeUserGrant(ctx, userGrantID, "", true)
+		event, _, err := c.removeUserGrant(ctx, userGrantID, "", true, true, nil)
 		if err != nil {
 			logging.WithFields("id", "COMMAND-3m8sG", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
-		events = append(events, event)
+		if event != nil {
+			events = append(events, event)
+		}
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {

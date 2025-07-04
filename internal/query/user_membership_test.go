@@ -86,7 +86,7 @@ var (
 			") AS members" +
 			" LEFT JOIN projections.projects4 ON members.project_id = projections.projects4.id AND members.instance_id = projections.projects4.instance_id" +
 			" LEFT JOIN projections.orgs1 ON members.org_id = projections.orgs1.id AND members.instance_id = projections.orgs1.instance_id" +
-			" LEFT JOIN projections.project_grants4 ON members.grant_id = projections.project_grants4.grant_id AND members.instance_id = projections.project_grants4.instance_id" +
+			" LEFT JOIN projections.project_grants4 ON members.grant_id = projections.project_grants4.grant_id AND members.instance_id = projections.project_grants4.instance_id AND members.project_id = projections.project_grants4.project_id" +
 			" LEFT JOIN projections.instances ON members.instance_id = projections.instances.id")
 	membershipCols = []string{
 		"user_id",

@@ -265,7 +265,7 @@ func prepareMembershipsQuery(ctx context.Context, queries *MembershipSearchQuery
 		).From(query).
 			LeftJoin(join(ProjectColumnID, membershipProjectID)).
 			LeftJoin(join(OrgColumnID, membershipOrgID)).
-			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID)).
+			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID) + " AND " + membershipProjectID.identifier() + " = " + ProjectGrantColumnProjectID.identifier()).
 			LeftJoin(join(InstanceColumnID, membershipInstanceID)).
 			PlaceholderFormat(sq.Dollar),
 		args,

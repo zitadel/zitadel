@@ -15,6 +15,8 @@ import (
 
 type PermissionCheck func(resourceOwner, aggregateID string) error
 
+type UserGrantPermissionCheck func(projectID, projectGrantID string) PermissionCheck
+
 func (c *Commands) newPermissionCheck(ctx context.Context, permission string, aggregateType eventstore.AggregateType) PermissionCheck {
 	return func(resourceOwner, aggregateID string) error {
 		if aggregateID == "" {
@@ -119,20 +121,38 @@ func (c *Commands) checkPermissionDeleteProjectMember(ctx context.Context, resou
 	return c.newPermissionCheck(ctx, domain.PermissionProjectMemberDelete, project.AggregateType)(resourceOwner, projectID)
 }
 
-func (c *Commands) checkPermissionUpdateProjectGrantMember(ctx context.Context, resourceOwner, projectID, projectGrantID string) (err error) {
-	if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberWrite, project.AggregateType)(resourceOwner, projectGrantID); err != nil {
-		if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberWrite, project.AggregateType)(resourceOwner, projectID); err != nil {
-			return err
-		}
-	}
-	return nil
+func (c *Commands) checkPermissionUpdateProjectGrantMember(ctx context.Context, grantedOrgID, projectGrantID string) (err error) {
+	// TODO: add permission check for project grant owners
+	//if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberWrite, project.AggregateType)(resourceOwner, projectGrantID); err != nil {
+	return c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberWrite, project.AggregateType)(grantedOrgID, projectGrantID)
+	//}
+	//return nil
 }
 
-func (c *Commands) checkPermissionDeleteProjectGrantMember(ctx context.Context, resourceOwner, projectID, projectGrantID string) (err error) {
-	if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberDelete, project.AggregateType)(resourceOwner, projectGrantID); err != nil {
-		if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberDelete, project.AggregateType)(resourceOwner, projectID); err != nil {
-			return err
+func (c *Commands) checkPermissionDeleteProjectGrantMember(ctx context.Context, grantedOrgID, projectGrantID string) (err error) {
+	// TODO: add permission check for project grant owners
+	//if err := c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberDelete, project.AggregateType)(resourceOwner, projectGrantID); err != nil {
+	return c.newPermissionCheck(ctx, domain.PermissionProjectGrantMemberDelete, project.AggregateType)(grantedOrgID, projectGrantID)
+	//}
+	//return nil
+}
+
+func (c *Commands) newUserGrantPermissionCheck(ctx context.Context, permission string) UserGrantPermissionCheck {
+	check := c.newPermissionCheck(ctx, permission, project.AggregateType)
+	return func(projectID, projectGrantID string) PermissionCheck {
+		return func(resourceOwner, _ string) error {
+			if projectGrantID != "" {
+				return check(resourceOwner, projectGrantID)
+			}
+			return check(resourceOwner, projectID)
 		}
 	}
-	return nil
+}
+
+func (c *Commands) NewPermissionCheckUserGrantWrite(ctx context.Context) UserGrantPermissionCheck {
+	return c.newUserGrantPermissionCheck(ctx, domain.PermissionUserGrantWrite)
+}
+
+func (c *Commands) NewPermissionCheckUserGrantDelete(ctx context.Context) UserGrantPermissionCheck {
+	return c.newUserGrantPermissionCheck(ctx, domain.PermissionUserGrantDelete)
 }

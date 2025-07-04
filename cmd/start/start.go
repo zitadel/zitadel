@@ -38,6 +38,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/admin"
 	app "github.com/zitadel/zitadel/internal/api/grpc/app/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
+	authorization_v2beta "github.com/zitadel/zitadel/internal/api/grpc/authorization/v2beta"
 	feature_v2 "github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/internal/api/grpc/feature/v2beta"
 	idp_v2 "github.com/zitadel/zitadel/internal/api/grpc/idp/v2"
@@ -523,6 +524,9 @@ func startAPIs(
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, debug_events.CreateServer(commands, queries)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, authorization_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, app.CreateServer(commands, queries, permissionCheck)); err != nil {
