@@ -2,8 +2,10 @@ package user
 
 import (
 	"context"
+	"net/http"
 
-	"google.golang.org/grpc"
+	"connectrpc.com/connect"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -13,18 +15,19 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2/userconnect"
 )
 
-var _ user.UserServiceServer = (*Server)(nil)
+var _ userconnect.UserServiceHandler = (*Server)(nil)
 
 type Server struct {
-	user.UnimplementedUserServiceServer
-	command     *command.Commands
-	query       *query.Queries
-	userCodeAlg crypto.EncryptionAlgorithm
-	idpAlg      crypto.EncryptionAlgorithm
-	idpCallback func(ctx context.Context) string
-	samlRootURL func(ctx context.Context, idpID string) string
+	systemDefaults systemdefaults.SystemDefaults
+	command        *command.Commands
+	query          *query.Queries
+	userCodeAlg    crypto.EncryptionAlgorithm
+	idpAlg         crypto.EncryptionAlgorithm
+	idpCallback    func(ctx context.Context) string
+	samlRootURL    func(ctx context.Context, idpID string) string
 
 	assetAPIPrefix func(context.Context) string
 
@@ -58,8 +61,12 @@ func CreateServer(
 	}
 }
 
-func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	user.RegisterUserServiceServer(grpcServer, s)
+func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler) {
+	return userconnect.NewUserServiceHandler(s, connect.WithInterceptors(interceptors...))
+}
+
+func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
+	return user.File_zitadel_user_v2_user_service_proto
 }
 
 func (s *Server) AppName() string {

@@ -3,6 +3,7 @@ package project
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/command"
@@ -11,8 +12,8 @@ import (
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 )
 
-func (s *Server) AddProjectRole(ctx context.Context, req *project_pb.AddProjectRoleRequest) (*project_pb.AddProjectRoleResponse, error) {
-	role, err := s.command.AddProjectRole(ctx, addProjectRoleRequestToCommand(req))
+func (s *Server) AddProjectRole(ctx context.Context, req *connect.Request[project_pb.AddProjectRoleRequest]) (*connect.Response[project_pb.AddProjectRoleResponse], error) {
+	role, err := s.command.AddProjectRole(ctx, addProjectRoleRequestToCommand(req.Msg))
 	if err != nil {
 		return nil, err
 	}
@@ -20,9 +21,9 @@ func (s *Server) AddProjectRole(ctx context.Context, req *project_pb.AddProjectR
 	if !role.EventDate.IsZero() {
 		creationDate = timestamppb.New(role.EventDate)
 	}
-	return &project_pb.AddProjectRoleResponse{
+	return connect.NewResponse(&project_pb.AddProjectRoleResponse{
 		CreationDate: creationDate,
-	}, nil
+	}), nil
 }
 
 func addProjectRoleRequestToCommand(req *project_pb.AddProjectRoleRequest) *command.AddProjectRole {
@@ -41,8 +42,8 @@ func addProjectRoleRequestToCommand(req *project_pb.AddProjectRoleRequest) *comm
 	}
 }
 
-func (s *Server) UpdateProjectRole(ctx context.Context, req *project_pb.UpdateProjectRoleRequest) (*project_pb.UpdateProjectRoleResponse, error) {
-	role, err := s.command.ChangeProjectRole(ctx, updateProjectRoleRequestToCommand(req))
+func (s *Server) UpdateProjectRole(ctx context.Context, req *connect.Request[project_pb.UpdateProjectRoleRequest]) (*connect.Response[project_pb.UpdateProjectRoleResponse], error) {
+	role, err := s.command.ChangeProjectRole(ctx, updateProjectRoleRequestToCommand(req.Msg))
 	if err != nil {
 		return nil, err
 	}
@@ -50,9 +51,9 @@ func (s *Server) UpdateProjectRole(ctx context.Context, req *project_pb.UpdatePr
 	if !role.EventDate.IsZero() {
 		changeDate = timestamppb.New(role.EventDate)
 	}
-	return &project_pb.UpdateProjectRoleResponse{
+	return connect.NewResponse(&project_pb.UpdateProjectRoleResponse{
 		ChangeDate: changeDate,
-	}, nil
+	}), nil
 }
 
 func updateProjectRoleRequestToCommand(req *project_pb.UpdateProjectRoleRequest) *command.ChangeProjectRole {
@@ -75,16 +76,16 @@ func updateProjectRoleRequestToCommand(req *project_pb.UpdateProjectRoleRequest)
 	}
 }
 
-func (s *Server) RemoveProjectRole(ctx context.Context, req *project_pb.RemoveProjectRoleRequest) (*project_pb.RemoveProjectRoleResponse, error) {
-	userGrantIDs, err := s.userGrantsFromProjectAndRole(ctx, req.ProjectId, req.RoleKey)
+func (s *Server) RemoveProjectRole(ctx context.Context, req *connect.Request[project_pb.RemoveProjectRoleRequest]) (*connect.Response[project_pb.RemoveProjectRoleResponse], error) {
+	userGrantIDs, err := s.userGrantsFromProjectAndRole(ctx, req.Msg.GetProjectId(), req.Msg.GetRoleKey())
 	if err != nil {
 		return nil, err
 	}
-	projectGrantIDs, err := s.projectGrantsFromProjectAndRole(ctx, req.ProjectId, req.RoleKey)
+	projectGrantIDs, err := s.projectGrantsFromProjectAndRole(ctx, req.Msg.GetProjectId(), req.Msg.GetRoleKey())
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveProjectRole(ctx, req.ProjectId, req.RoleKey, "", projectGrantIDs, userGrantIDs...)
+	details, err := s.command.RemoveProjectRole(ctx, req.Msg.GetProjectId(), req.Msg.GetRoleKey(), "", projectGrantIDs, userGrantIDs...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,9 +93,9 @@ func (s *Server) RemoveProjectRole(ctx context.Context, req *project_pb.RemovePr
 	if !details.EventDate.IsZero() {
 		deletionDate = timestamppb.New(details.EventDate)
 	}
-	return &project_pb.RemoveProjectRoleResponse{
+	return connect.NewResponse(&project_pb.RemoveProjectRoleResponse{
 		RemovalDate: deletionDate,
-	}, nil
+	}), nil
 }
 
 func (s *Server) userGrantsFromProjectAndRole(ctx context.Context, projectID, roleKey string) ([]string, error) {

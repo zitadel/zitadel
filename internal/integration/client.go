@@ -50,6 +50,7 @@ import (
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	webkey_v2 "github.com/zitadel/zitadel/pkg/grpc/webkey/v2"
 	webkey_v2beta "github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta"
 )
 

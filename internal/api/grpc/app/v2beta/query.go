@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/app/v2beta/convert"
@@ -12,19 +13,19 @@ import (
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
 
-func (s *Server) GetApplication(ctx context.Context, req *app.GetApplicationRequest) (*app.GetApplicationResponse, error) {
-	res, err := s.query.AppByIDWithPermission(ctx, req.GetId(), false, s.checkPermission)
+func (s *Server) GetApplication(ctx context.Context, req *connect.Request[app.GetApplicationRequest]) (*connect.Response[app.GetApplicationResponse], error) {
+	res, err := s.query.AppByIDWithPermission(ctx, req.Msg.GetId(), false, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
 
-	return &app.GetApplicationResponse{
+	return connect.NewResponse(&app.GetApplicationResponse{
 		App: convert.AppToPb(res),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListApplications(ctx context.Context, req *app.ListApplicationsRequest) (*app.ListApplicationsResponse, error) {
-	queries, err := convert.ListApplicationsRequestToModel(s.systemDefaults, req)
+func (s *Server) ListApplications(ctx context.Context, req *connect.Request[app.ListApplicationsRequest]) (*connect.Response[app.ListApplicationsResponse], error) {
+	queries, err := convert.ListApplicationsRequestToModel(s.systemDefaults, req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -34,32 +35,32 @@ func (s *Server) ListApplications(ctx context.Context, req *app.ListApplications
 		return nil, err
 	}
 
-	return &app.ListApplicationsResponse{
+	return connect.NewResponse(&app.ListApplicationsResponse{
 		Applications: convert.AppsToPb(res.Apps),
 		Pagination:   filter.QueryToPaginationPb(queries.SearchRequest, res.SearchResponse),
-	}, nil
+	}), nil
 }
 
-func (s *Server) GetApplicationKey(ctx context.Context, req *app.GetApplicationKeyRequest) (*app.GetApplicationKeyResponse, error) {
-	queries, err := convert.GetApplicationKeyQueriesRequestToDomain(req.GetOrganizationId(), req.GetProjectId(), req.GetApplicationId())
+func (s *Server) GetApplicationKey(ctx context.Context, req *connect.Request[app.GetApplicationKeyRequest]) (*connect.Response[app.GetApplicationKeyResponse], error) {
+	queries, err := convert.GetApplicationKeyQueriesRequestToDomain(req.Msg.GetOrganizationId(), req.Msg.GetProjectId(), req.Msg.GetApplicationId())
 	if err != nil {
 		return nil, err
 	}
 
-	key, err := s.query.GetAuthNKeyByIDWithPermission(ctx, true, strings.TrimSpace(req.GetId()), s.checkPermission, queries...)
+	key, err := s.query.GetAuthNKeyByIDWithPermission(ctx, true, strings.TrimSpace(req.Msg.GetId()), s.checkPermission, queries...)
 	if err != nil {
 		return nil, err
 	}
 
-	return &app.GetApplicationKeyResponse{
+	return connect.NewResponse(&app.GetApplicationKeyResponse{
 		Id:             key.ID,
 		CreationDate:   timestamppb.New(key.CreationDate),
 		ExpirationDate: timestamppb.New(key.Expiration),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListApplicationKeys(ctx context.Context, req *app.ListApplicationKeysRequest) (*app.ListApplicationKeysResponse, error) {
-	queries, err := convert.ListApplicationKeysRequestToDomain(s.systemDefaults, req)
+func (s *Server) ListApplicationKeys(ctx context.Context, req *connect.Request[app.ListApplicationKeysRequest]) (*connect.Response[app.ListApplicationKeysResponse], error) {
+	queries, err := convert.ListApplicationKeysRequestToDomain(s.systemDefaults, req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -69,8 +70,8 @@ func (s *Server) ListApplicationKeys(ctx context.Context, req *app.ListApplicati
 		return nil, err
 	}
 
-	return &app.ListApplicationKeysResponse{
+	return connect.NewResponse(&app.ListApplicationKeysResponse{
 		Keys:       convert.ApplicationKeysToPb(res.AuthNKeys),
 		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, res.SearchResponse),
-	}, nil
+	}), nil
 }
