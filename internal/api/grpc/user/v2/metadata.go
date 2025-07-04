@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
@@ -12,19 +13,19 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) ListUserMetadata(ctx context.Context, req *user.ListUserMetadataRequest) (*user.ListUserMetadataResponse, error) {
-	metadataQueries, err := s.listUserMetadataRequestToModel(req)
+func (s *Server) ListUserMetadata(ctx context.Context, req *connect.Request[user.ListUserMetadataRequest]) (*connect.Response[user.ListUserMetadataResponse], error) {
+	metadataQueries, err := s.listUserMetadataRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUserMetadata(ctx, true, req.UserId, metadataQueries, s.checkPermission)
+	res, err := s.query.SearchUserMetadata(ctx, true, req.Msg.UserId, metadataQueries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	return &user.ListUserMetadataResponse{
+	return connect.NewResponse(&user.ListUserMetadataResponse{
 		Metadata:   metadata.UserMetadataListToPb(res.Metadata),
 		Pagination: filter.QueryToPaginationPb(metadataQueries.SearchRequest, res.SearchResponse),
-	}, nil
+	}), nil
 }
 
 func (s *Server) listUserMetadataRequestToModel(req *user.ListUserMetadataRequest) (*query.UserMetadataSearchQueries, error) {
@@ -47,14 +48,14 @@ func (s *Server) listUserMetadataRequestToModel(req *user.ListUserMetadataReques
 	}, nil
 }
 
-func (s *Server) SetUserMetadata(ctx context.Context, req *user.SetUserMetadataRequest) (*user.SetUserMetadataResponse, error) {
-	result, err := s.command.BulkSetUserMetadata(ctx, req.UserId, "", setUserMetadataToDomain(req)...)
+func (s *Server) SetUserMetadata(ctx context.Context, req *connect.Request[user.SetUserMetadataRequest]) (*connect.Response[user.SetUserMetadataResponse], error) {
+	result, err := s.command.BulkSetUserMetadata(ctx, req.Msg.UserId, "", setUserMetadataToDomain(req.Msg)...)
 	if err != nil {
 		return nil, err
 	}
-	return &user.SetUserMetadataResponse{
+	return connect.NewResponse(&user.SetUserMetadataResponse{
 		SetDate: timestamppb.New(result.EventDate),
-	}, nil
+	}), nil
 }
 
 func setUserMetadataToDomain(req *user.SetUserMetadataRequest) []*domain.Metadata {
@@ -68,12 +69,12 @@ func setUserMetadataToDomain(req *user.SetUserMetadataRequest) []*domain.Metadat
 	return metadata
 }
 
-func (s *Server) DeleteUserMetadata(ctx context.Context, req *user.DeleteUserMetadataRequest) (*user.DeleteUserMetadataResponse, error) {
-	result, err := s.command.BulkRemoveUserMetadata(ctx, req.UserId, "", req.Keys...)
+func (s *Server) DeleteUserMetadata(ctx context.Context, req *connect.Request[user.DeleteUserMetadataRequest]) (*connect.Response[user.DeleteUserMetadataResponse], error) {
+	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Msg.UserId, "", req.Msg.Keys...)
 	if err != nil {
 		return nil, err
 	}
-	return &user.DeleteUserMetadataResponse{
+	return connect.NewResponse(&user.DeleteUserMetadataResponse{
 		DeletionDate: timestamppb.New(result.EventDate),
-	}, nil
+	}), nil
 }

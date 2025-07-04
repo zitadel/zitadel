@@ -15,7 +15,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUserRequest_Human, orgId string, userName, userId *string) (*user.CreateUserResponse, error) {
+func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUserRequest_Human, orgId string, userName, userId *string) (*connect.Response[user.CreateUserResponse], error) {
 	metadataEntries := make([]*user.SetMetadataEntry, len(humanPb.Metadata))
 	for i, metadataEntry := range humanPb.Metadata {
 		metadataEntries[i] = &user.SetMetadataEntry{
