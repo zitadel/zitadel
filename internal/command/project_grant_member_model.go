@@ -83,6 +83,7 @@ func (wm *ProjectGrantMemberWriteModel) Reduce() error {
 
 func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
@@ -94,8 +95,5 @@ func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.GrantRemovedType,
 			project.ProjectRemovedType).
 		Builder()
-	if wm.ResourceOwner != "" {
-		query = query.ResourceOwner(wm.ResourceOwner)
-	}
 	return query
 }

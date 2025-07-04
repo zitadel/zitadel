@@ -1112,7 +1112,7 @@ func importProjectGrantMembers(ctx context.Context, s *Server, errors *[]*admin_
 	}
 	for _, member := range org.GetProjectGrantMembers() {
 		logging.Debugf("import projectgrantmember: %s", member.GetProjectId()+"_"+member.GetGrantId()+"_"+member.GetUserId())
-		_, err := s.command.AddProjectGrantMember(ctx, management.AddProjectGrantMemberRequestToCommand(member))
+		_, err := s.command.AddProjectGrantMember(ctx, management.AddProjectGrantMemberRequestToCommand(member, org.GetOrgId()))
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_grant_member", Id: org.GetOrgId() + "_" + member.GetProjectId() + "_" + member.GetGrantId() + "_" + member.GetUserId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {

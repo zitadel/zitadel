@@ -267,6 +267,59 @@ func TestCommandSide_AddProjectGrantMember(t *testing.T) {
 				err: zerrors.IsPermissionDenied,
 			},
 		},
+		{
+			name: "member add, wrong resource owner",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"grantedorg1",
+								[]string{"key1"},
+							),
+							),
+						),
+					),
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				zitadelRoles: []authz.RoleMapping{
+					{
+						Role: "PROJECT_GRANT_OWNER",
+					},
+				},
+			},
+			args: args{
+				member: &AddProjectGrantMember{
+					ResourceOwner: "orgwrong",
+					ProjectID:     "project1",
+					GrantID:       "projectgrant1",
+					UserID:        "user1",
+					Roles:         []string{"PROJECT_GRANT_OWNER"},
+				},
+			},
+			res: res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -554,10 +607,11 @@ func TestCommandSide_RemoveProjectGrantMember(t *testing.T) {
 		checkPermission domain.PermissionCheck
 	}
 	type args struct {
-		ctx       context.Context
-		projectID string
-		grantID   string
-		userID    string
+		ctx           context.Context
+		resourceOwner string
+		projectID     string
+		grantID       string
+		userID        string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -648,7 +702,7 @@ func TestCommandSide_RemoveProjectGrantMember(t *testing.T) {
 			},
 		},
 		{
-			name: "member remove, ok",
+			name: "member remove, without resourceowner, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -686,6 +740,53 @@ func TestCommandSide_RemoveProjectGrantMember(t *testing.T) {
 				projectID: "project1",
 				userID:    "user1",
 				grantID:   "projectgrant1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "member remove, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org2",
+								[]string{"rol1", "role2"},
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectGrantMemberAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"user1",
+								"projectgrant1",
+								[]string{"PROJECT_OWNER"}...,
+							),
+						),
+					),
+					expectPush(
+						project.NewProjectGrantMemberRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"user1",
+							"projectgrant1",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				projectID:     "project1",
+				userID:        "user1",
+				grantID:       "projectgrant1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -737,7 +838,7 @@ func TestCommandSide_RemoveProjectGrantMember(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.RemoveProjectGrantMember(tt.args.ctx, tt.args.projectID, tt.args.userID, tt.args.grantID)
+			got, err := r.RemoveProjectGrantMember(tt.args.ctx, tt.args.projectID, tt.args.userID, tt.args.grantID, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
