@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"connectrpc.com/connect"
-	"google.golang.org/grpc"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/zitadel/zitadel/internal/api/authz"

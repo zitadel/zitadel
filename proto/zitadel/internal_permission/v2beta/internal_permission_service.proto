@@ -148,42 +148,6 @@ service InternalPermissionService {
     };
   }
 
-  // GetAdministrator returns the administrator role by its ID.
-  //
-  // Required permissions depend on the resource type:
-  //   - "iam.member.read" for instance administrators
-  //   - "org.member.read" for organization administrators
-  //   - "project.member.read" for project administrators
-  //   - "project.grant.member.read" for project grant administrators
-  //   - no permissions required for getting own administrator roles
-  rpc GetAdministrator(GetAdministratorRequest) returns (GetAdministratorResponse) {
-    option (google.api.http) = {
-      get: "/v2beta/administrators/{id}"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "authenticated"
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
-        key: "200"
-        value: {
-          description: "Administrator retrieved successfully";
-        }
-      };
-      responses: {
-        key: "404"
-        value: {
-          description: "The administrator to get does not exist.";
-        }
-      };
-    };
-
-  }
-
   // CreateAdministrator grants a administrator role to a user for a specific resource.
   //
   // Note that the roles are specific to the resource type.
