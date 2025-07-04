@@ -17,6 +17,7 @@ const sidebar_api_project_service_v2 = require("./docs/apis/resources/project_se
 const sidebar_api_webkey_service_v2 = require("./docs/apis/resources/webkey_service_v2/sidebar.ts").default
 const sidebar_api_instance_service_v2 = require("./docs/apis/resources/instance_service_v2/sidebar.ts").default
 const sidebar_api_authorization_service_v2 = require("./docs/apis/resources/authorization_service_v2/sidebar.ts").default
+const sidebar_api_permission_service_v2 = require("./docs/apis/resources/internal_permission_service_v2/sidebar.ts").default
 const sidebar_api_app_v2 = require("./docs/apis/resources/application_service_v2/sidebar.ts").default
 
 module.exports = {
@@ -914,6 +915,37 @@ module.exports = {
                     "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
               },
               items: sidebar_api_app_v2,
+            },
+            {
+              type: "category",
+              label: "Authorizations (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Authorization Service API (Beta)",
+                slug: "/apis/resources/authorization_service_v2",
+                description:
+                    "AuthorizationService provides methods to manage authorizations for users within your projects and applications.\n" +
+                    "\n" +
+                    "For managing permissions and roles for ZITADEL internal resources, like organizations, projects,\n" +
+                    "users, etc., please use the InternalPermissionService."+
+                    "\n"+
+                    "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+              },
+              items: sidebar_api_authorization_service_v2,
+            },
+            {
+              type: "category",
+              label: "Permissions (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Permission Service API (Beta)",
+                slug: "/apis/resources/permission_service_v2",
+                description:
+                    "This API is intended to manage internal permissions in ZITADEL.\n" +
+                    "\n"+
+                    "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+              },
+              items: sidebar_api_permission_service_v2,
             },
           ],
         },

@@ -406,6 +406,24 @@ module.exports = {
               categoryLinkSource: "auto",
             },
           },
+          authorization_v2: {
+            specPath:
+              ".artifacts/openapi3/zitadel/authorization/v2beta/authorization_service.openapi.yaml",
+            outputDir: "docs/apis/resources/authorization_service_v2",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
+            },
+          },
+          internal_permission_v2: {
+            specPath:
+              ".artifacts/openapi3/zitadel/internal_permission/v2beta/internal_permission_service.openapi.yaml",
+            outputDir: "docs/apis/resources/internal_permission_service_v2",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
+            },
+          },
         },
       },
     ],
