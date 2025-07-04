@@ -438,8 +438,6 @@ Errors:
     Invalid: 無効なユーザーグラントです
     NotChanged: ユーザーグラントは変更されていません
     IDMissing: IDがありません
-    NotActive: ユーザーグラントはアクティブではありません
-    NotInactive: ユーザーグラントは非アクティブではありません
     NoPermissionForProject: ユーザーにはこのプロジェクトに許可がありません
     RoleKeyNotFound: ロールが見つかりません
   Member:

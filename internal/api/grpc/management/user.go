@@ -142,7 +142,7 @@ func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMeta
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUserMetadata(ctx, true, req.Id, metadataQueries, false)
+	res, err := s.query.SearchUserMetadata(ctx, true, req.Id, metadataQueries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -369,7 +369,7 @@ func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*
 	}
 	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{userGrantUserQuery},
-	}, true)
+	}, true, nil)
 	if err != nil {
 		return nil, nil, err
 	}

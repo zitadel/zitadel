@@ -437,8 +437,6 @@ Errors:
         Invalid: Acordarea utilizatorului este invalidă
         NotChanged: Acordarea utilizatorului nu a fost schimbată
         IDMissing: Id lipsă
-        NotActive: Acordarea utilizatorului nu este activă
-        NotInactive: Acordarea utilizatorului nu este dezactivată
         NoPermissionForProject: Utilizatorul nu are permisiuni pentru acest proiect
         RoleKeyNotFound: Rolul nu a fost găsit
       Member:

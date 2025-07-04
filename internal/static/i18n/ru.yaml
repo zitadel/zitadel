@@ -431,8 +431,6 @@ Errors:
     Invalid: Допуск пользователя недействителен
     NotChanged: Допуск пользователя не был изменён
     IDMissing: ID отсутствует
-    NotActive: Допуск пользователя неактивен
-    NotInactive: Допуск пользователя не деактивирован
     NoPermissionForProject: Пользователь не имеет прав доступа к данному проекту
     RoleKeyNotFound: Роль не найдена
   Member:
