@@ -67,6 +67,7 @@ func (wm *ProjectGrantMemberWriteModel) Reduce() error {
 		case *project.GrantMemberAddedEvent:
 			wm.Roles = e.Roles
 			wm.State = domain.MemberStateActive
+			wm.ResourceOwner = e.Aggregate().ResourceOwner
 		case *project.GrantMemberChangedEvent:
 			wm.Roles = e.Roles
 		case *project.GrantMemberRemovedEvent:
@@ -81,8 +82,7 @@ func (wm *ProjectGrantMemberWriteModel) Reduce() error {
 }
 
 func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		ResourceOwner(wm.ResourceOwner).
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.AggregateID).
@@ -94,4 +94,8 @@ func (wm *ProjectGrantMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.GrantRemovedType,
 			project.ProjectRemovedType).
 		Builder()
+	if wm.ResourceOwner != "" {
+		query = query.ResourceOwner(wm.ResourceOwner)
+	}
+	return query
 }

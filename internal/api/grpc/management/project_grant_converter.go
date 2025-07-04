@@ -145,22 +145,20 @@ func ListProjectGrantMembersRequestToModel(ctx context.Context, req *mgmt_pb.Lis
 	}, nil
 }
 
-func AddProjectGrantMemberRequestToCommand(req *mgmt_pb.AddProjectGrantMemberRequest, orgID string) *command.AddProjectGrantMember {
+func AddProjectGrantMemberRequestToCommand(req *mgmt_pb.AddProjectGrantMemberRequest) *command.AddProjectGrantMember {
 	return &command.AddProjectGrantMember{
-		ResourceOwner: orgID,
-		ProjectID:     req.ProjectId,
-		GrantID:       req.GrantId,
-		UserID:        req.UserId,
-		Roles:         req.Roles,
+		ProjectID: req.ProjectId,
+		GrantID:   req.GrantId,
+		UserID:    req.UserId,
+		Roles:     req.Roles,
 	}
 }
 
-func UpdateProjectGrantMemberRequestToCommand(req *mgmt_pb.UpdateProjectGrantMemberRequest, orgID string) *command.ChangeProjectGrantMember {
+func UpdateProjectGrantMemberRequestToCommand(req *mgmt_pb.UpdateProjectGrantMemberRequest) *command.ChangeProjectGrantMember {
 	return &command.ChangeProjectGrantMember{
-		ResourceOwner: orgID,
-		ProjectID:     req.ProjectId,
-		GrantID:       req.GrantId,
-		UserID:        req.UserId,
-		Roles:         req.Roles,
+		ProjectID: req.ProjectId,
+		GrantID:   req.GrantId,
+		UserID:    req.UserId,
+		Roles:     req.Roles,
 	}
 }

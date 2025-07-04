@@ -13,11 +13,10 @@ import (
 )
 
 type AddProjectGrantMember struct {
-	ResourceOwner string
-	UserID        string
-	GrantID       string
-	ProjectID     string
-	Roles         []string
+	UserID    string
+	GrantID   string
+	ProjectID string
+	Roles     []string
 }
 
 func (i *AddProjectGrantMember) IsValid(zitadelRoles []authz.RoleMapping) error {
@@ -41,25 +40,18 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *AddProject
 	if err != nil {
 		return nil, err
 	}
-	grantedOrgID, projectGrantResourceOwner, err := c.checkProjectGrantExists(ctx, member.GrantID, member.ResourceOwner, member.ProjectID, "")
+	grantedOrgID, projectGrantResourceOwner, err := c.checkProjectGrantExists(ctx, member.GrantID, "", member.ProjectID, "")
 	if err != nil {
 		return nil, err
 	}
-	if member.ResourceOwner == "" {
-		member.ResourceOwner = grantedOrgID
-	}
-	addedMember, err := c.projectGrantMemberWriteModelByID(ctx, member.ProjectID, member.UserID, member.GrantID, member.ResourceOwner)
+	addedMember, err := c.projectGrantMemberWriteModelByID(ctx, member.ProjectID, member.UserID, member.GrantID, projectGrantResourceOwner)
 	if err != nil {
 		return nil, err
-	}
-	// error if provided resourceowner is not equal to the resourceowner of the project grant
-	if grantedOrgID != addedMember.ResourceOwner && projectGrantResourceOwner != addedMember.ResourceOwner {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-0l10S9OmZV", "Errors.Project.Grant.Invalid")
 	}
 	if addedMember.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "PROJECT-37fug", "Errors.AlreadyExists")
 	}
-	if err := c.checkPermissionUpdateProjectGrantMember(ctx, addedMember.ResourceOwner, addedMember.AggregateID, addedMember.GrantID); err != nil {
+	if err := c.checkPermissionUpdateProjectGrantMember(ctx, grantedOrgID, addedMember.GrantID); err != nil {
 		return nil, err
 	}
 
@@ -83,11 +75,10 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *AddProject
 }
 
 type ChangeProjectGrantMember struct {
-	ResourceOwner string
-	UserID        string
-	GrantID       string
-	ProjectID     string
-	Roles         []string
+	UserID    string
+	GrantID   string
+	ProjectID string
+	Roles     []string
 }
 
 func (i *ChangeProjectGrantMember) IsValid(zitadelRoles []authz.RoleMapping) error {
@@ -105,8 +96,11 @@ func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *ChangeP
 	if err := member.IsValid(c.zitadelRoles); err != nil {
 		return nil, err
 	}
-
-	existingMember, err := c.projectGrantMemberWriteModelByID(ctx, member.ProjectID, member.UserID, member.GrantID, member.ResourceOwner)
+	existingGrant, err := c.projectGrantWriteModelByID(ctx, member.GrantID, "", member.ProjectID, "")
+	if err != nil {
+		return nil, err
+	}
+	existingMember, err := c.projectGrantMemberWriteModelByID(ctx, member.ProjectID, member.UserID, member.GrantID, existingGrant.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +108,7 @@ func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *ChangeP
 		return nil, zerrors.ThrowNotFound(nil, "PROJECT-37fug", "Errors.NotFound")
 	}
 
-	if err := c.checkPermissionUpdateProjectGrantMember(ctx, existingMember.ResourceOwner, existingMember.AggregateID, existingMember.GrantID); err != nil {
+	if err := c.checkPermissionUpdateProjectGrantMember(ctx, existingGrant.GrantedOrgID, existingMember.GrantID); err != nil {
 		return nil, err
 	}
 	if slices.Compare(existingMember.Roles, member.Roles) == 0 {
@@ -140,18 +134,22 @@ func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *ChangeP
 	return writeModelToObjectDetails(&existingMember.WriteModel), nil
 }
 
-func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, userID, grantID, resourceOwner string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, userID, grantID string) (*domain.ObjectDetails, error) {
 	if projectID == "" || userID == "" || grantID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-66mHd", "Errors.Project.Member.Invalid")
 	}
-	existingMember, err := c.projectGrantMemberWriteModelByID(ctx, projectID, userID, grantID, resourceOwner)
+	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, "", projectID, "")
+	if err != nil {
+		return nil, err
+	}
+	existingMember, err := c.projectGrantMemberWriteModelByID(ctx, projectID, userID, grantID, existingGrant.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if !existingMember.State.Exists() {
 		return writeModelToObjectDetails(&existingMember.WriteModel), nil
 	}
-	if err := c.checkPermissionDeleteProjectGrantMember(ctx, existingMember.ResourceOwner, existingMember.AggregateID, existingMember.GrantID); err != nil {
+	if err := c.checkPermissionDeleteProjectGrantMember(ctx, existingGrant.GrantedOrgID, existingMember.GrantID); err != nil {
 		return nil, err
 	}
 

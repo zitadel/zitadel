@@ -176,7 +176,7 @@ func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListP
 }
 
 func (s *Server) AddProjectGrantMember(ctx context.Context, req *mgmt_pb.AddProjectGrantMemberRequest) (*mgmt_pb.AddProjectGrantMemberResponse, error) {
-	member, err := s.command.AddProjectGrantMember(ctx, AddProjectGrantMemberRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
+	member, err := s.command.AddProjectGrantMember(ctx, AddProjectGrantMemberRequestToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +190,7 @@ func (s *Server) AddProjectGrantMember(ctx context.Context, req *mgmt_pb.AddProj
 }
 
 func (s *Server) UpdateProjectGrantMember(ctx context.Context, req *mgmt_pb.UpdateProjectGrantMemberRequest) (*mgmt_pb.UpdateProjectGrantMemberResponse, error) {
-	member, err := s.command.ChangeProjectGrantMember(ctx, UpdateProjectGrantMemberRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
+	member, err := s.command.ChangeProjectGrantMember(ctx, UpdateProjectGrantMemberRequestToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +204,7 @@ func (s *Server) UpdateProjectGrantMember(ctx context.Context, req *mgmt_pb.Upda
 }
 
 func (s *Server) RemoveProjectGrantMember(ctx context.Context, req *mgmt_pb.RemoveProjectGrantMemberRequest) (*mgmt_pb.RemoveProjectGrantMemberResponse, error) {
-	details, err := s.command.RemoveProjectGrantMember(ctx, req.ProjectId, req.UserId, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.RemoveProjectGrantMember(ctx, req.ProjectId, req.UserId, req.GrantId)
 	if err != nil {
 		return nil, err
 	}
