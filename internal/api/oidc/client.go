@@ -108,7 +108,7 @@ type projectsRoles struct {
 
 	requestProjectID string
 
-	requestAudIDs map[string]bool
+	requestAudIDs map[string]struct{}
 }
 
 func newProjectRoles(projectID string, grants []query.UserGrant, requestedRoles []string, roleAudience []string) *projectsRoles {
@@ -144,10 +144,10 @@ func (p *projectsRoles) Add(projectID, roleKey, orgID, domain string, isRequeste
 		p.requestProjectID = projectID
 	}
 	if p.requestAudIDs == nil {
-		p.requestAudIDs = make(map[string]bool, 1)
+		p.requestAudIDs = make(map[string]struct{}, 1)
 	}
 	if isAudienceReq {
-		p.requestAudIDs[projectID] = true
+		p.requestAudIDs[projectID] = struct{}{}
 	}
 	p.projects[projectID].Add(roleKey, orgID, domain)
 }
