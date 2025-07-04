@@ -37,9 +37,9 @@ type Server struct {
 type Config struct{}
 
 func CreateServer(
-	systemDefaults systemdefaults.SystemDefaults,
 	command *command.Commands,
 	query *query.Queries,
+	systemDefaults systemdefaults.SystemDefaults,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpAlg crypto.EncryptionAlgorithm,
 	idpCallback func(ctx context.Context) string,
@@ -48,7 +48,6 @@ func CreateServer(
 	checkPermission domain.PermissionCheck,
 ) *Server {
 	return &Server{
-		systemDefaults:  systemDefaults,
 		command:         command,
 		query:           query,
 		userCodeAlg:     userCodeAlg,
@@ -57,6 +56,7 @@ func CreateServer(
 		samlRootURL:     samlRootURL,
 		assetAPIPrefix:  assetAPIPrefix,
 		checkPermission: checkPermission,
+		systemDefaults:  systemDefaults,
 	}
 }
 

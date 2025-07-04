@@ -119,7 +119,7 @@ func (s *Server) userGrantsFromProjectGrant(ctx context.Context, projectID, gran
 	}
 	userGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{projectQuery, grantQuery},
-	}, false)
+	}, false, nil)
 	if err != nil {
 		return nil, err
 	}
