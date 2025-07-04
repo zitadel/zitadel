@@ -1,7 +1,10 @@
 package authorization
 
 import (
-	"google.golang.org/grpc"
+	"net/http"
+
+	"connectrpc.com/connect"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -10,12 +13,12 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	authorization "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta/authorizationconnect"
 )
 
-var _ authorization.AuthorizationServiceServer = (*Server)(nil)
+var _ authorizationconnect.AuthorizationServiceHandler = (*Server)(nil)
 
 type Server struct {
-	authorization.UnimplementedAuthorizationServiceServer
 	systemDefaults systemdefaults.SystemDefaults
 	command        *command.Commands
 	query          *query.Queries
@@ -39,8 +42,12 @@ func CreateServer(
 	}
 }
 
-func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	authorization.RegisterAuthorizationServiceServer(grpcServer, s)
+func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler) {
+	return authorizationconnect.NewAuthorizationServiceHandler(s, connect.WithInterceptors(interceptors...))
+}
+
+func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
+	return authorization.File_zitadel_authorization_v2beta_authorization_service_proto
 }
 
 func (s *Server) AppName() string {

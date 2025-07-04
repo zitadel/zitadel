@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
@@ -13,8 +14,8 @@ import (
 	filter_pb "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 )
 
-func (s *Server) ListAuthorizations(ctx context.Context, req *authorization.ListAuthorizationsRequest) (*authorization.ListAuthorizationsResponse, error) {
-	queries, err := s.listAuthorizationsRequestToModel(req)
+func (s *Server) ListAuthorizations(ctx context.Context, req *connect.Request[authorization.ListAuthorizationsRequest]) (*connect.Response[authorization.ListAuthorizationsResponse], error) {
+	queries, err := s.listAuthorizationsRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -22,10 +23,10 @@ func (s *Server) ListAuthorizations(ctx context.Context, req *authorization.List
 	if err != nil {
 		return nil, err
 	}
-	return &authorization.ListAuthorizationsResponse{
+	return connect.NewResponse(&authorization.ListAuthorizationsResponse{
 		Authorizations: userGrantsToPb(resp.UserGrants),
 		Pagination:     filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
-	}, nil
+	}), nil
 }
 
 func (s *Server) listAuthorizationsRequestToModel(req *authorization.ListAuthorizationsRequest) (*query.UserGrantsQueries, error) {
