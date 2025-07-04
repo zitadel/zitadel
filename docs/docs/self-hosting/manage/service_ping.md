@@ -9,11 +9,12 @@ This data helps improve ZITADEL by providing insights into its usage patterns.
 The feature is enabled by default, but can be disabled either completely or for specific reports.
 Checkout the configuration options below.
 
-## What data is sent?
+## Data Sent by Service Ping
 
 ### Base Information
 
-If the feature is enabled, the base information will always be sent. To prevent that, disable the feature completely:
+If the feature is enabled, the base information will always be sent. To prevent that, you can opt out by disabling the entire Service Ping:
+
 ```yaml
 ServicePing:
   Enabled: false # ZITADEL_SERVICEPING_ENABLED
@@ -49,6 +50,7 @@ The following resources are counted:
 The list might be extended in the future to include more resources.
 
 To disable this report, set the following in your configuration file:
+
 ```yaml
 ServicePing:
   Telemetry:
@@ -69,7 +71,7 @@ all systems from sending data at the same time.
 
 You can adjust it to your needs to make sure there is no performance impact on your system.
 For example, if you already have some scheduled job syncing data in and out of ZITADEL around a specific time or have regularly a
-lot of traffic during the day, you might want to change it to a different time, e.g. 15 4 * * *` to send it every day at 4:15 AM.
+lot of traffic during the day, you might want to change it to a different time, e.g. `15 4 * * *` to send it every day at 4:15 AM.
 
 The interval must be at least 30 minutes to prevent too frequent requests to the central endpoint.
 
