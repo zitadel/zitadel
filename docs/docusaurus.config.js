@@ -406,14 +406,6 @@ module.exports = {
               categoryLinkSource: "auto",
             },
           },
-          application_v2: {
-            specPath: ".artifacts/openapi/zitadel/app/v2beta/app_service.swagger.json",
-            outputDir: "docs/apis/resources/application_service_v2",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
         },
       },
     ],
