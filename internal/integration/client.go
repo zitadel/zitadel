@@ -73,6 +73,7 @@ type Client struct {
 	FeatureV2beta            feature_v2beta.FeatureServiceClient
 	FeatureV2                feature.FeatureServiceClient
 	UserSchemaV3             userschema_v3alpha.ZITADELUserSchemasClient
+	WebKeyV2                 webkey_v2.WebKeyServiceClient
 	WebKeyV2Beta             webkey_v2beta.WebKeyServiceClient
 	IDPv2                    idp_pb.IdentityProviderServiceClient
 	UserV3Alpha              user_v3alpha.ZITADELUsersClient
@@ -115,6 +116,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		FeatureV2beta:            feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:                feature.NewFeatureServiceClient(cc),
 		UserSchemaV3:             userschema_v3alpha.NewZITADELUserSchemasClient(cc),
+		WebKeyV2:                 webkey_v2.NewWebKeyServiceClient(cc),
 		WebKeyV2Beta:             webkey_v2beta.NewWebKeyServiceClient(cc),
 		IDPv2:                    idp_pb.NewIdentityProviderServiceClient(cc),
 		UserV3Alpha:              user_v3alpha.NewZITADELUsersClient(cc),
