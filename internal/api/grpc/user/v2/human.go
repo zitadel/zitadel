@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 
+	"connectrpc.com/connect"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -14,7 +15,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUserRequest_Human, orgId string, userName, userId *string) (*user.CreateUserResponse, error) {
+func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUserRequest_Human, orgId string, userName, userId *string) (*connect.Response[user.CreateUserResponse], error) {
 	addHumanPb := &user.AddHumanUserRequest{
 		Username: userName,
 		UserId:   userId,
@@ -52,15 +53,15 @@ func (s *Server) createUserTypeHuman(ctx context.Context, humanPb *user.CreateUs
 	); err != nil {
 		return nil, err
 	}
-	return &user.CreateUserResponse{
+	return connect.NewResponse(&user.CreateUserResponse{
 		Id:           newHuman.ID,
 		CreationDate: timestamppb.New(newHuman.Details.EventDate),
 		EmailCode:    newHuman.EmailCode,
 		PhoneCode:    newHuman.PhoneCode,
-	}, nil
+	}), nil
 }
 
-func (s *Server) updateUserTypeHuman(ctx context.Context, humanPb *user.UpdateUserRequest_Human, userId string, userName *string) (*user.UpdateUserResponse, error) {
+func (s *Server) updateUserTypeHuman(ctx context.Context, humanPb *user.UpdateUserRequest_Human, userId string, userName *string) (*connect.Response[user.UpdateUserResponse], error) {
 	cmd, err := updateHumanUserToCommand(userId, userName, humanPb)
 	if err != nil {
 		return nil, err
@@ -68,11 +69,11 @@ func (s *Server) updateUserTypeHuman(ctx context.Context, humanPb *user.UpdateUs
 	if err = s.command.ChangeUserHuman(ctx, cmd, s.userCodeAlg); err != nil {
 		return nil, err
 	}
-	return &user.UpdateUserResponse{
+	return connect.NewResponse(&user.UpdateUserResponse{
 		ChangeDate: timestamppb.New(cmd.Details.EventDate),
 		EmailCode:  cmd.EmailCode,
 		PhoneCode:  cmd.PhoneCode,
-	}, nil
+	}), nil
 }
 
 func updateHumanUserToCommand(userId string, userName *string, human *user.UpdateUserRequest_Human) (*command.ChangeHuman, error) {
