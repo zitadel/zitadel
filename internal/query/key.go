@@ -398,7 +398,6 @@ func (wm *PublicKeyReadModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 func (q *Queries) GetPublicKeyByID(ctx context.Context, keyID string) (_ PublicKey, err error) {
-
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
