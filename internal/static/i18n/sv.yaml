@@ -194,7 +194,7 @@ Errors:
     AlreadyExists: Instans finns redan
     NotChanged: Instans ändrades inte
   Org:
-    AlreadyExists: Organisationens namn är redan taget
+    AlreadyExists: Organisationens namn eller ID är redan upptaget
     Invalid: Organisationen är ogiltigt
     AlreadyDeactivated: Organisation är redan avaktiverad
     AlreadyActive: Organisationen är redan aktiv

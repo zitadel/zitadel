@@ -194,7 +194,7 @@ Errors:
     AlreadyExists: 实例已经存在
     NotChanged: 实例没有改变
   Org:
-    AlreadyExists: 组织名称已被占用
+    AlreadyExists: 该组织名称或 ID 已被占用
     Invalid: 组织无效
     AlreadyDeactivated: 组织已停用
     AlreadyActive: 组织已处于启用状态

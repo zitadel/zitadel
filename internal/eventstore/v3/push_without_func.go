@@ -57,7 +57,7 @@ func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.Conte
 		return nil, err
 	}
 
-	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+	if err = HandleUniqueConstraints(ctx, tx, commands); err != nil {
 		return nil, err
 	}
 
