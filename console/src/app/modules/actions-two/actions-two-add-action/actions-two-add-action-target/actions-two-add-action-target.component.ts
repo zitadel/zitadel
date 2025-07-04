@@ -21,7 +21,6 @@ import { ToastService } from 'src/app/services/toast.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MessageInitShape } from '@bufbuild/protobuf';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
 import { MatSelectModule } from '@angular/material/select';
 import { ActionConditionPipeModule } from 'src/app/pipes/action-condition-pipe/action-condition-pipe.module';

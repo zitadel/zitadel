@@ -1,0 +1,46 @@
+<div cdkTrapFocus class="focus-trapper">
+  <div class="org-header">
+    <button *ngIf="backButton" (click)="backButtonPressed.emit()" mat-button class="dropdown-button">
+      <span class="back-button">
+        <ng-icon name="heroArrowLeftCircleSolid"></ng-icon>
+        <h3>Back to {{ backButton }}</h3>
+      </span>
+    </button>
+    <span class="dropdown-label">{{ 'MENU.ORGANIZATION' | translate }}</span>
+    <form [formGroup]="form" class="form">
+      <ng-icon class="search-icon" name="heroMagnifyingGlass"></ng-icon>
+      <input
+        class="search-input"
+        autocomplete="off"
+        cnslInput
+        [formControl]="form.controls.name"
+        [placeholder]="'PROJECT.GRANT.CREATE.SEL_ORG' | translate"
+      />
+    </form>
+  </div>
+  <div class="org-list">
+    <!-- Make sure active org is always at the top -->
+    <a *ngIf="activeOrgIfSearchMatches() as org" class="dropdown-button" mat-button (click)="changeOrg(org.id)">
+      {{ org.name }}
+      <ng-icon name="heroCheck"></ng-icon>
+    </a>
+    <ng-container *ngFor="let page of organizationsQuery.data()?.pages; last as lastPage">
+      <ng-container *ngFor="let org of page.result; trackBy: trackOrg">
+        <a *ngIf="org.id !== activeOrg.data()?.id" class="dropdown-button" mat-button (click)="changeOrg(org.id)">
+          {{ org.name }}
+        </a>
+      </ng-container>
+      <ng-container *ngIf="lastPage && page.details?.totalResult as totalResult">
+        <button
+          class="dropdown-button"
+          mat-stroked-button
+          *ngIf="totalResult > QUERY_LIMIT"
+          (click)="organizationsQuery.fetchNextPage()"
+          [disabled]="!organizationsQuery.hasNextPage() || organizationsQuery.isFetchingNextPage()"
+        >
+          ...{{ totalResult - loadedOrgsCount() }} {{ 'PAGINATOR.MORE' | translate }}
+        </button>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>
