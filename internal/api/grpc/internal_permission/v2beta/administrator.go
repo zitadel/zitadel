@@ -203,7 +203,7 @@ func (s *Server) DeleteAdministrator(ctx context.Context, req *connect.Request[i
 			deletionDate = timestamppb.New(member.EventDate)
 		}
 	case *internal_permission.ResourceType_ProjectGrant_:
-		member, err := s.command.RemoveProjectGrantMember(ctx, resource.ProjectGrant.ProjectId, req.Msg.UserId, resource.ProjectGrant.ProjectGrantId, "")
+		member, err := s.command.RemoveProjectGrantMember(ctx, resource.ProjectGrant.ProjectId, req.Msg.UserId, resource.ProjectGrant.ProjectGrantId)
 		if err != nil {
 			return nil, err
 		}

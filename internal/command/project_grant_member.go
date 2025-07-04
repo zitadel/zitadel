@@ -84,11 +84,10 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *AddProject
 }
 
 type ChangeProjectGrantMember struct {
-	ResourceOwner string
-	UserID        string
-	GrantID       string
-	ProjectID     string
-	Roles         []string
+	UserID    string
+	GrantID   string
+	ProjectID string
+	Roles     []string
 }
 
 func (i *ChangeProjectGrantMember) IsValid(zitadelRoles []authz.RoleMapping) error {
@@ -106,7 +105,7 @@ func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *ChangeP
 	if err := member.IsValid(c.zitadelRoles); err != nil {
 		return nil, err
 	}
-	existingGrant, err := c.projectGrantWriteModelByID(ctx, member.GrantID, "", member.ProjectID, member.ResourceOwner)
+	existingGrant, err := c.projectGrantWriteModelByID(ctx, member.GrantID, "", member.ProjectID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -144,11 +143,11 @@ func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *ChangeP
 	return writeModelToObjectDetails(&existingMember.WriteModel), nil
 }
 
-func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, userID, grantID, resourceOwner string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, userID, grantID string) (*domain.ObjectDetails, error) {
 	if projectID == "" || userID == "" || grantID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-66mHd", "Errors.Project.Member.Invalid")
 	}
-	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, "", projectID, resourceOwner)
+	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, "", projectID, "")
 	if err != nil {
 		return nil, err
 	}

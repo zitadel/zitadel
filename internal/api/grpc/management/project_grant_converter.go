@@ -155,12 +155,11 @@ func AddProjectGrantMemberRequestToCommand(req *mgmt_pb.AddProjectGrantMemberReq
 	}
 }
 
-func UpdateProjectGrantMemberRequestToCommand(req *mgmt_pb.UpdateProjectGrantMemberRequest, orgID string) *command.ChangeProjectGrantMember {
+func UpdateProjectGrantMemberRequestToCommand(req *mgmt_pb.UpdateProjectGrantMemberRequest) *command.ChangeProjectGrantMember {
 	return &command.ChangeProjectGrantMember{
-		ResourceOwner: orgID,
-		ProjectID:     req.ProjectId,
-		GrantID:       req.GrantId,
-		UserID:        req.UserId,
-		Roles:         req.Roles,
+		ProjectID: req.ProjectId,
+		GrantID:   req.GrantId,
+		UserID:    req.UserId,
+		Roles:     req.Roles,
 	}
 }
