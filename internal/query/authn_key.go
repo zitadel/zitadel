@@ -254,12 +254,13 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, i
 	return key, err
 }
 
+
 func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id string, identifier string) (key []byte, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if q.caches != nil && q.caches.authnKeys != nil {
-		if cached, ok := q.caches.authnKeys.Get(ctx, AuthnKeyIndexKeyID, id); ok && cached != nil {
+		if cached, ok := q.caches.authnKeys.Get(ctx, AuthnKeyIndexKeyIDAndIdentifier, authz.GetInstance(ctx).InstanceID() + ":" + id + ":" + identifier); ok && cached != nil {
 			return cached.Key, nil
 		}
 	}
@@ -280,9 +281,10 @@ func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id 
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-DAb32", "Errors.Query.SQLStatement")
 	}
-
+	
+    var expiry time.Time
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		key, err = scan(row)
+		key, expiry, err = scan(row)
 		return err
 	}, query, args...)
 
@@ -290,8 +292,9 @@ func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id 
 		q.caches.authnKeys.Set(ctx, &CachedPublicKey{
 		KeyID:      id,
 		InstanceID: authz.GetInstance(ctx).InstanceID(),
+		Identifier: identifier,
 		Key:        key,
-		Expiry:     time.Now().Add(time.Hour).Unix(),
+		Expiry:     expiry.Unix(),
 })
 
 
@@ -447,23 +450,26 @@ func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, er
 		}
 }
 
-func prepareAuthNKeyPublicKeyQuery() (sq.SelectBuilder, func(row *sql.Row) ([]byte, error)) {
+func prepareAuthNKeyPublicKeyQuery() (sq.SelectBuilder, func(row *sql.Row) ([]byte, time.Time, error)) {
 	return sq.Select(
 			AuthNKeyColumnPublicKey.identifier(),
+			AuthNKeyColumnExpiration.identifier(),
 		).From(authNKeyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) ([]byte, error) {
+		func(row *sql.Row) ([]byte, time.Time, error) {
 			var publicKey []byte
+			var expiration time.Time
 			err := row.Scan(
 				&publicKey,
+				&expiration,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-SDf32", "Errors.AuthNKey.NotFound")
+					return nil, time.Time{}, zerrors.ThrowNotFound(err, "QUERY-SDf32", "Errors.AuthNKey.NotFound")
 				}
-				return nil, zerrors.ThrowInternal(err, "QUERY-Bfs2a", "Errors.Internal")
+				return nil, time.Time{}, zerrors.ThrowInternal(err, "QUERY-Bfs2a", "Errors.Internal")
 			}
-			return publicKey, nil
+			return publicKey, expiration, nil
 		}
 }
 
@@ -521,6 +527,7 @@ type CachedPublicKey struct {
 	KeyID      string
 	InstanceID string
 	Key        []byte
+	Identifier string
 	Expiry     int64
 }
 
@@ -528,12 +535,15 @@ type AuthnKeyIndex int
 
 const (
 	AuthnKeyIndexKeyID = iota + 1
+	AuthnKeyIndexKeyIDAndIdentifier
 )
 
 func (i AuthnKeyIndex) Key() string {
 	switch i {
 	case AuthnKeyIndexKeyID:
 		return "key_id"
+	case AuthnKeyIndexKeyIDAndIdentifier:
+		return "key_id:identifier"
 	default:
 		return "unknown"
 	}
@@ -541,8 +551,8 @@ func (i AuthnKeyIndex) Key() string {
 
 func (c *CachedPublicKey) Keys(index AuthnKeyIndex) []string {
 	switch index {
-	case AuthnKeyIndexKeyID:
-		return []string{c.KeyID}
+	case AuthnKeyIndexKeyIDAndIdentifier:
+		return []string{c.InstanceID + ":" + c.KeyID + ":" + c.Identifier}
 	default:
 		return nil
 	}

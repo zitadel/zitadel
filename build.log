@@ -1,0 +1,169 @@
+cp -r console/dist/console/* internal/api/ui/console/static
+CGO_ENABLED=0 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=cc02f90ac918d673590db572bedefd1080fff75c' -X 'github.com/zitadel/zitadel/cmd/build.date=2025-07-04T13:38:03-00:00' -X 'github.com/zitadel/zitadel/cmd/build.version=development-2025-07-04T13:38:03-00:00' "
+github.com/zitadel/zitadel/internal/queue
+github.com/zitadel/zitadel/pkg/grpc/idp/v2
+# github.com/zitadel/zitadel/internal/queue
+internal/queue/migrate.go:25:12: assignment mismatch: 2 variables but m.driver.GetExecutor().Exec returns 1 value
+github.com/zitadel/zitadel/pkg/grpc/action/v2beta
+# github.com/zitadel/zitadel/pkg/grpc/idp/v2
+pkg/grpc/idp/v2/idp_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/idp/v2/idp_service_grpc.pb.go:44:41: undefined: grpc.StaticMethod
+pkg/grpc/idp/v2/idp_service.pb.gw.go:124:20: undefined: grpc.NewClient
+github.com/zitadel/zitadel/pkg/grpc/oidc/v2
+github.com/zitadel/zitadel/pkg/grpc/instance/v2beta
+github.com/zitadel/zitadel/pkg/grpc/saml/v2
+github.com/zitadel/zitadel/pkg/grpc/project/v2beta
+github.com/zitadel/zitadel/pkg/grpc/resources/debug_events/v3alpha
+github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta
+github.com/zitadel/zitadel/pkg/grpc/feature/v2
+github.com/zitadel/zitadel/pkg/grpc/feature/v2beta
+# github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta
+pkg/grpc/oidc/v2beta/oidc_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/oidc/v2beta/oidc_service_grpc.pb.go:43:41: undefined: grpc.StaticMethod
+pkg/grpc/oidc/v2beta/oidc_service_grpc.pb.go:53:41: undefined: grpc.StaticMethod
+pkg/grpc/oidc/v2beta/oidc_service.pb.gw.go:209:20: undefined: grpc.NewClient
+# github.com/zitadel/zitadel/pkg/grpc/saml/v2
+pkg/grpc/saml/v2/saml_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/saml/v2/saml_service_grpc.pb.go:43:41: undefined: grpc.StaticMethod
+pkg/grpc/saml/v2/saml_service_grpc.pb.go:53:41: undefined: grpc.StaticMethod
+pkg/grpc/saml/v2/saml_service.pb.gw.go:209:20: undefined: grpc.NewClient
+# github.com/zitadel/zitadel/pkg/grpc/resources/debug_events/v3alpha
+pkg/grpc/resources/debug_events/v3alpha/debug_events_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/resources/debug_events/v3alpha/debug_events_service_grpc.pb.go:45:41: undefined: grpc.StaticMethod
+pkg/grpc/resources/debug_events/v3alpha/debug_events_service_grpc.pb.go:55:41: undefined: grpc.StaticMethod
+pkg/grpc/resources/debug_events/v3alpha/debug_events_service_grpc.pb.go:65:41: undefined: grpc.StaticMethod
+pkg/grpc/resources/debug_events/v3alpha/debug_events_service.pb.gw.go:272:20: undefined: grpc.NewClient
+# github.com/zitadel/zitadel/pkg/grpc/instance/v2beta
+pkg/grpc/instance/v2beta/instance_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/instance/v2beta/instance_service_grpc.pb.go:140:41: undefined: grpc.StaticMethod
+pkg/grpc/instance/v2beta/instance_service_grpc.pb.go:150:41: undefined: grpc.StaticMethod
+pkg/grpc/instance/v2beta/instance_service_grpc.pb.go:160:41: undefined: grpc.StaticMethod
+pkg/grpc/instance/v2beta/instance_service_grpc.pb.go:170:41: undefined: grpc.StaticMethod
+pkg/grpc/instance/v2beta/instance_service_grpc.pb.go:180:41: undefined: grpc.StaticMethod
+pkg/grpc/instance/v2beta/instance_service_grpc.pb.go:190:41: undefined: grpc.StaticMethod
+pkg/grpc/instance/v2beta/instance_service_grpc.pb.go:200:41: undefined: grpc.StaticMethod
+pkg/grpc/instance/v2beta/instance_service_grpc.pb.go:210:41: undefined: grpc.StaticMethod
+pkg/grpc/instance/v2beta/instance_service.pb.gw.go:871:20: undefined: grpc.NewClient
+pkg/grpc/instance/v2beta/instance_service_grpc.pb.go:210:41: too many errors
+github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha
+# github.com/zitadel/zitadel/pkg/grpc/action/v2beta
+pkg/grpc/action/v2beta/action_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/action/v2beta/action_service_grpc.pb.go:140:41: undefined: grpc.StaticMethod
+pkg/grpc/action/v2beta/action_service_grpc.pb.go:150:41: undefined: grpc.StaticMethod
+pkg/grpc/action/v2beta/action_service_grpc.pb.go:160:41: undefined: grpc.StaticMethod
+pkg/grpc/action/v2beta/action_service_grpc.pb.go:170:41: undefined: grpc.StaticMethod
+pkg/grpc/action/v2beta/action_service_grpc.pb.go:180:41: undefined: grpc.StaticMethod
+pkg/grpc/action/v2beta/action_service_grpc.pb.go:190:41: undefined: grpc.StaticMethod
+pkg/grpc/action/v2beta/action_service_grpc.pb.go:200:41: undefined: grpc.StaticMethod
+pkg/grpc/action/v2beta/action_service_grpc.pb.go:210:41: undefined: grpc.StaticMethod
+pkg/grpc/action/v2beta/action_service.pb.gw.go:629:20: undefined: grpc.NewClient
+pkg/grpc/action/v2beta/action_service_grpc.pb.go:210:41: too many errors
+# github.com/zitadel/zitadel/pkg/grpc/oidc/v2
+pkg/grpc/oidc/v2/oidc_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/oidc/v2/oidc_service_grpc.pb.go:55:41: undefined: grpc.StaticMethod
+pkg/grpc/oidc/v2/oidc_service_grpc.pb.go:65:41: undefined: grpc.StaticMethod
+pkg/grpc/oidc/v2/oidc_service_grpc.pb.go:75:41: undefined: grpc.StaticMethod
+pkg/grpc/oidc/v2/oidc_service_grpc.pb.go:85:41: undefined: grpc.StaticMethod
+pkg/grpc/oidc/v2/oidc_service.pb.gw.go:371:20: undefined: grpc.NewClient
+github.com/zitadel/zitadel/pkg/grpc/session/v2beta
+github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta
+github.com/zitadel/zitadel/pkg/grpc/session/v2
+# github.com/zitadel/zitadel/pkg/grpc/project/v2beta
+pkg/grpc/project/v2beta/project_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/project/v2beta/project_service_grpc.pb.go:187:41: undefined: grpc.StaticMethod
+pkg/grpc/project/v2beta/project_service_grpc.pb.go:197:41: undefined: grpc.StaticMethod
+pkg/grpc/project/v2beta/project_service_grpc.pb.go:207:41: undefined: grpc.StaticMethod
+pkg/grpc/project/v2beta/project_service_grpc.pb.go:217:41: undefined: grpc.StaticMethod
+pkg/grpc/project/v2beta/project_service_grpc.pb.go:227:41: undefined: grpc.StaticMethod
+pkg/grpc/project/v2beta/project_service_grpc.pb.go:237:41: undefined: grpc.StaticMethod
+pkg/grpc/project/v2beta/project_service_grpc.pb.go:247:41: undefined: grpc.StaticMethod
+pkg/grpc/project/v2beta/project_service_grpc.pb.go:257:41: undefined: grpc.StaticMethod
+pkg/grpc/project/v2beta/project_service.pb.gw.go:1488:20: undefined: grpc.NewClient
+pkg/grpc/project/v2beta/project_service_grpc.pb.go:257:41: too many errors
+github.com/zitadel/zitadel/pkg/grpc/settings/v2beta
+# github.com/zitadel/zitadel/pkg/grpc/feature/v2
+pkg/grpc/feature/v2/feature_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/feature/v2/feature_service_grpc.pb.go:149:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2/feature_service_grpc.pb.go:159:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2/feature_service_grpc.pb.go:169:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2/feature_service_grpc.pb.go:179:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2/feature_service_grpc.pb.go:189:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2/feature_service_grpc.pb.go:199:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2/feature_service_grpc.pb.go:209:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2/feature_service_grpc.pb.go:219:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2/feature_service.pb.gw.go:853:20: undefined: grpc.NewClient
+pkg/grpc/feature/v2/feature_service_grpc.pb.go:219:41: too many errors
+# github.com/zitadel/zitadel/pkg/grpc/feature/v2beta
+pkg/grpc/feature/v2beta/feature_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/feature/v2beta/feature_service_grpc.pb.go:75:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2beta/feature_service_grpc.pb.go:85:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2beta/feature_service_grpc.pb.go:95:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2beta/feature_service_grpc.pb.go:105:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2beta/feature_service_grpc.pb.go:115:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2beta/feature_service_grpc.pb.go:125:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2beta/feature_service_grpc.pb.go:135:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2beta/feature_service_grpc.pb.go:145:41: undefined: grpc.StaticMethod
+pkg/grpc/feature/v2beta/feature_service.pb.gw.go:853:20: undefined: grpc.NewClient
+pkg/grpc/feature/v2beta/feature_service_grpc.pb.go:145:41: too many errors
+# github.com/zitadel/zitadel/pkg/grpc/webkey/v2beta
+pkg/grpc/webkey/v2beta/webkey_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/webkey/v2beta/webkey_service_grpc.pb.go:102:41: undefined: grpc.StaticMethod
+pkg/grpc/webkey/v2beta/webkey_service_grpc.pb.go:112:41: undefined: grpc.StaticMethod
+pkg/grpc/webkey/v2beta/webkey_service_grpc.pb.go:122:41: undefined: grpc.StaticMethod
+pkg/grpc/webkey/v2beta/webkey_service_grpc.pb.go:132:41: undefined: grpc.StaticMethod
+pkg/grpc/webkey/v2beta/webkey_service.pb.gw.go:295:20: undefined: grpc.NewClient
+# github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha
+pkg/grpc/resources/userschema/v3alpha/user_schema_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/resources/userschema/v3alpha/user_schema_service_grpc.pb.go:74:41: undefined: grpc.StaticMethod
+pkg/grpc/resources/userschema/v3alpha/user_schema_service_grpc.pb.go:84:41: undefined: grpc.StaticMethod
+pkg/grpc/resources/userschema/v3alpha/user_schema_service_grpc.pb.go:94:41: undefined: grpc.StaticMethod
+pkg/grpc/resources/userschema/v3alpha/user_schema_service_grpc.pb.go:104:41: undefined: grpc.StaticMethod
+pkg/grpc/resources/userschema/v3alpha/user_schema_service_grpc.pb.go:114:41: undefined: grpc.StaticMethod
+pkg/grpc/resources/userschema/v3alpha/user_schema_service_grpc.pb.go:124:41: undefined: grpc.StaticMethod
+pkg/grpc/resources/userschema/v3alpha/user_schema_service_grpc.pb.go:134:41: undefined: grpc.StaticMethod
+pkg/grpc/resources/userschema/v3alpha/user_schema_service.pb.gw.go:650:20: undefined: grpc.NewClient
+# github.com/zitadel/zitadel/pkg/grpc/session/v2
+pkg/grpc/session/v2/session_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/session/v2/session_service_grpc.pb.go:54:41: undefined: grpc.StaticMethod
+pkg/grpc/session/v2/session_service_grpc.pb.go:64:41: undefined: grpc.StaticMethod
+pkg/grpc/session/v2/session_service_grpc.pb.go:74:41: undefined: grpc.StaticMethod
+pkg/grpc/session/v2/session_service_grpc.pb.go:84:41: undefined: grpc.StaticMethod
+pkg/grpc/session/v2/session_service_grpc.pb.go:94:41: undefined: grpc.StaticMethod
+pkg/grpc/session/v2/session_service.pb.gw.go:414:20: undefined: grpc.NewClient
+# github.com/zitadel/zitadel/pkg/grpc/settings/v2beta
+pkg/grpc/settings/v2beta/settings_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/settings/v2beta/settings_service_grpc.pb.go:72:41: undefined: grpc.StaticMethod
+pkg/grpc/settings/v2beta/settings_service_grpc.pb.go:82:41: undefined: grpc.StaticMethod
+pkg/grpc/settings/v2beta/settings_service_grpc.pb.go:92:41: undefined: grpc.StaticMethod
+pkg/grpc/settings/v2beta/settings_service_grpc.pb.go:102:41: undefined: grpc.StaticMethod
+pkg/grpc/settings/v2beta/settings_service_grpc.pb.go:112:41: undefined: grpc.StaticMethod
+pkg/grpc/settings/v2beta/settings_service_grpc.pb.go:122:41: undefined: grpc.StaticMethod
+pkg/grpc/settings/v2beta/settings_service_grpc.pb.go:132:41: undefined: grpc.StaticMethod
+pkg/grpc/settings/v2beta/settings_service_grpc.pb.go:142:41: undefined: grpc.StaticMethod
+pkg/grpc/settings/v2beta/settings_service.pb.gw.go:672:20: undefined: grpc.NewClient
+pkg/grpc/settings/v2beta/settings_service_grpc.pb.go:142:41: too many errors
+github.com/zitadel/zitadel/internal/api/grpc/client/middleware
+# github.com/zitadel/zitadel/pkg/grpc/session/v2beta
+pkg/grpc/session/v2beta/session_service_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/session/v2beta/session_service_grpc.pb.go:54:41: undefined: grpc.StaticMethod
+pkg/grpc/session/v2beta/session_service_grpc.pb.go:64:41: undefined: grpc.StaticMethod
+pkg/grpc/session/v2beta/session_service_grpc.pb.go:74:41: undefined: grpc.StaticMethod
+pkg/grpc/session/v2beta/session_service_grpc.pb.go:84:41: undefined: grpc.StaticMethod
+pkg/grpc/session/v2beta/session_service_grpc.pb.go:94:41: undefined: grpc.StaticMethod
+pkg/grpc/session/v2beta/session_service.pb.gw.go:414:20: undefined: grpc.NewClient
+# github.com/zitadel/zitadel/internal/api/grpc/client/middleware
+internal/api/grpc/client/middleware/tracing.go:19:48: undefined: grpc_trace.WithFilter
+github.com/zitadel/zitadel/pkg/grpc/system
+# github.com/zitadel/zitadel/pkg/grpc/system
+pkg/grpc/system/system_grpc.pb.go:19:16: undefined: grpc.SupportPackageIsVersion9
+pkg/grpc/system/system_grpc.pb.go:148:41: undefined: grpc.StaticMethod
+pkg/grpc/system/system_grpc.pb.go:158:41: undefined: grpc.StaticMethod
+pkg/grpc/system/system_grpc.pb.go:168:41: undefined: grpc.StaticMethod
+pkg/grpc/system/system_grpc.pb.go:178:41: undefined: grpc.StaticMethod
+pkg/grpc/system/system_grpc.pb.go:188:41: undefined: grpc.StaticMethod
+pkg/grpc/system/system_grpc.pb.go:198:41: undefined: grpc.StaticMethod
+pkg/grpc/system/system_grpc.pb.go:208:41: undefined: grpc.StaticMethod
+pkg/grpc/system/system_grpc.pb.go:218:41: undefined: grpc.StaticMethod
+pkg/grpc/system/system.pb.gw.go:1937:20: undefined: grpc.NewClient
+pkg/grpc/system/system_grpc.pb.go:218:41: too many errors
+make: *** [Makefile:24: compile_pipeline] Error 1

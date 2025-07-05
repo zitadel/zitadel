@@ -38,7 +38,6 @@ func startCaches(background context.Context, connectors connector.Connectors, in
 		*CachedPublicKey](
 		background,
 		[]AuthnKeyIndex{
-			AuthnKeyIndexInstanceID,
 			AuthnKeyIndexKeyID,
 		},
 		cache.PurposeAuthNKeys,
