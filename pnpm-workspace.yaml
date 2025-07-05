@@ -1,0 +1,6 @@
+packages:
+  - "console"
+  - "docs"
+  - "login"
+  - "login/apps/*"
+  - "login/packages/*"
