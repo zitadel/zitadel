@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
@@ -13,17 +14,17 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) RegisterPasskey(ctx context.Context, req *user.RegisterPasskeyRequest) (resp *user.RegisterPasskeyResponse, err error) {
+func (s *Server) RegisterPasskey(ctx context.Context, req *connect.Request[user.RegisterPasskeyRequest]) (resp *connect.Response[user.RegisterPasskeyResponse], err error) {
 	var (
-		authenticator = passkeyAuthenticatorToDomain(req.GetAuthenticator())
+		authenticator = passkeyAuthenticatorToDomain(req.Msg.GetAuthenticator())
 	)
-	if code := req.GetCode(); code != nil {
+	if code := req.Msg.GetCode(); code != nil {
 		return passkeyRegistrationDetailsToPb(
-			s.command.RegisterUserPasskeyWithCode(ctx, req.GetUserId(), "", authenticator, code.Id, code.Code, req.GetDomain(), s.userCodeAlg),
+			s.command.RegisterUserPasskeyWithCode(ctx, req.Msg.GetUserId(), "", authenticator, code.Id, code.Code, req.Msg.GetDomain(), s.userCodeAlg),
 		)
 	}
 	return passkeyRegistrationDetailsToPb(
-		s.command.RegisterUserPasskey(ctx, req.GetUserId(), "", req.GetDomain(), authenticator),
+		s.command.RegisterUserPasskey(ctx, req.Msg.GetUserId(), "", req.Msg.GetDomain(), authenticator),
 	)
 }
 
@@ -51,86 +52,86 @@ func webAuthNRegistrationDetailsToPb(details *domain.WebAuthNRegistrationDetails
 	return object.DomainToDetailsPb(details.ObjectDetails), options, nil
 }
 
-func passkeyRegistrationDetailsToPb(details *domain.WebAuthNRegistrationDetails, err error) (*user.RegisterPasskeyResponse, error) {
+func passkeyRegistrationDetailsToPb(details *domain.WebAuthNRegistrationDetails, err error) (*connect.Response[user.RegisterPasskeyResponse], error) {
 	objectDetails, options, err := webAuthNRegistrationDetailsToPb(details, err)
 	if err != nil {
 		return nil, err
 	}
-	return &user.RegisterPasskeyResponse{
+	return connect.NewResponse(&user.RegisterPasskeyResponse{
 		Details:                            objectDetails,
 		PasskeyId:                          details.ID,
 		PublicKeyCredentialCreationOptions: options,
-	}, nil
+	}), nil
 }
 
-func (s *Server) VerifyPasskeyRegistration(ctx context.Context, req *user.VerifyPasskeyRegistrationRequest) (*user.VerifyPasskeyRegistrationResponse, error) {
-	pkc, err := req.GetPublicKeyCredential().MarshalJSON()
+func (s *Server) VerifyPasskeyRegistration(ctx context.Context, req *connect.Request[user.VerifyPasskeyRegistrationRequest]) (*connect.Response[user.VerifyPasskeyRegistrationResponse], error) {
+	pkc, err := req.Msg.GetPublicKeyCredential().MarshalJSON()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "USERv2-Pha2o", "Errors.Internal")
 	}
-	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, req.GetUserId(), "", req.GetPasskeyName(), "", pkc)
+	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, req.Msg.GetUserId(), "", req.Msg.GetPasskeyName(), "", pkc)
 	if err != nil {
 		return nil, err
 	}
-	return &user.VerifyPasskeyRegistrationResponse{
+	return connect.NewResponse(&user.VerifyPasskeyRegistrationResponse{
 		Details: object.DomainToDetailsPb(objectDetails),
-	}, nil
+	}), nil
 }
 
-func (s *Server) CreatePasskeyRegistrationLink(ctx context.Context, req *user.CreatePasskeyRegistrationLinkRequest) (resp *user.CreatePasskeyRegistrationLinkResponse, err error) {
-	switch medium := req.Medium.(type) {
+func (s *Server) CreatePasskeyRegistrationLink(ctx context.Context, req *connect.Request[user.CreatePasskeyRegistrationLinkRequest]) (resp *connect.Response[user.CreatePasskeyRegistrationLinkResponse], err error) {
+	switch medium := req.Msg.Medium.(type) {
 	case nil:
 		return passkeyDetailsToPb(
-			s.command.AddUserPasskeyCode(ctx, req.GetUserId(), "", s.userCodeAlg),
+			s.command.AddUserPasskeyCode(ctx, req.Msg.GetUserId(), "", s.userCodeAlg),
 		)
 	case *user.CreatePasskeyRegistrationLinkRequest_SendLink:
 		return passkeyDetailsToPb(
-			s.command.AddUserPasskeyCodeURLTemplate(ctx, req.GetUserId(), "", s.userCodeAlg, medium.SendLink.GetUrlTemplate()),
+			s.command.AddUserPasskeyCodeURLTemplate(ctx, req.Msg.GetUserId(), "", s.userCodeAlg, medium.SendLink.GetUrlTemplate()),
 		)
 	case *user.CreatePasskeyRegistrationLinkRequest_ReturnCode:
 		return passkeyCodeDetailsToPb(
-			s.command.AddUserPasskeyCodeReturn(ctx, req.GetUserId(), "", s.userCodeAlg),
+			s.command.AddUserPasskeyCodeReturn(ctx, req.Msg.GetUserId(), "", s.userCodeAlg),
 		)
 	default:
 		return nil, zerrors.ThrowUnimplementedf(nil, "USERv2-gaD8y", "verification oneOf %T in method CreatePasskeyRegistrationLink not implemented", medium)
 	}
 }
 
-func passkeyDetailsToPb(details *domain.ObjectDetails, err error) (*user.CreatePasskeyRegistrationLinkResponse, error) {
+func passkeyDetailsToPb(details *domain.ObjectDetails, err error) (*connect.Response[user.CreatePasskeyRegistrationLinkResponse], error) {
 	if err != nil {
 		return nil, err
 	}
-	return &user.CreatePasskeyRegistrationLinkResponse{
+	return connect.NewResponse(&user.CreatePasskeyRegistrationLinkResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
-func passkeyCodeDetailsToPb(details *domain.PasskeyCodeDetails, err error) (*user.CreatePasskeyRegistrationLinkResponse, error) {
+func passkeyCodeDetailsToPb(details *domain.PasskeyCodeDetails, err error) (*connect.Response[user.CreatePasskeyRegistrationLinkResponse], error) {
 	if err != nil {
 		return nil, err
 	}
-	return &user.CreatePasskeyRegistrationLinkResponse{
+	return connect.NewResponse(&user.CreatePasskeyRegistrationLinkResponse{
 		Details: object.DomainToDetailsPb(details.ObjectDetails),
 		Code: &user.PasskeyRegistrationCode{
 			Id:   details.CodeID,
 			Code: details.Code,
 		},
-	}, nil
+	}), nil
 }
 
-func (s *Server) RemovePasskey(ctx context.Context, req *user.RemovePasskeyRequest) (*user.RemovePasskeyResponse, error) {
-	objectDetails, err := s.command.HumanRemovePasswordless(ctx, req.GetUserId(), req.GetPasskeyId(), "")
+func (s *Server) RemovePasskey(ctx context.Context, req *connect.Request[user.RemovePasskeyRequest]) (*connect.Response[user.RemovePasskeyResponse], error) {
+	objectDetails, err := s.command.HumanRemovePasswordless(ctx, req.Msg.GetUserId(), req.Msg.GetPasskeyId(), "")
 	if err != nil {
 		return nil, err
 	}
-	return &user.RemovePasskeyResponse{
+	return connect.NewResponse(&user.RemovePasskeyResponse{
 		Details: object.DomainToDetailsPb(objectDetails),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListPasskeys(ctx context.Context, req *user.ListPasskeysRequest) (*user.ListPasskeysResponse, error) {
+func (s *Server) ListPasskeys(ctx context.Context, req *connect.Request[user.ListPasskeysRequest]) (*connect.Response[user.ListPasskeysResponse], error) {
 	query := new(query.UserAuthMethodSearchQueries)
-	err := query.AppendUserIDQuery(req.UserId)
+	err := query.AppendUserIDQuery(req.Msg.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -146,10 +147,10 @@ func (s *Server) ListPasskeys(ctx context.Context, req *user.ListPasskeysRequest
 	if err != nil {
 		return nil, err
 	}
-	return &user.ListPasskeysResponse{
+	return connect.NewResponse(&user.ListPasskeysResponse{
 		Details: object.ToListDetails(authMethods.SearchResponse),
 		Result:  authMethodsToPasskeyPb(authMethods),
-	}, nil
+	}), nil
 }
 
 func authMethodsToPasskeyPb(methods *query.AuthMethods) []*user.Passkey {

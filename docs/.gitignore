@@ -26,3 +26,4 @@ package-lock.json
 npm-debug.log*
 pnpm-debug.log*
 .vercel
+/protoc-gen-connect-openapi*

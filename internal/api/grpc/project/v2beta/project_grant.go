@@ -3,6 +3,7 @@ package project
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/command"
@@ -11,8 +12,8 @@ import (
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 )
 
-func (s *Server) CreateProjectGrant(ctx context.Context, req *project_pb.CreateProjectGrantRequest) (*project_pb.CreateProjectGrantResponse, error) {
-	add := projectGrantCreateToCommand(req)
+func (s *Server) CreateProjectGrant(ctx context.Context, req *connect.Request[project_pb.CreateProjectGrantRequest]) (*connect.Response[project_pb.CreateProjectGrantResponse], error) {
+	add := projectGrantCreateToCommand(req.Msg)
 	project, err := s.command.AddProjectGrant(ctx, add)
 	if err != nil {
 		return nil, err
@@ -21,9 +22,9 @@ func (s *Server) CreateProjectGrant(ctx context.Context, req *project_pb.CreateP
 	if !project.EventDate.IsZero() {
 		creationDate = timestamppb.New(project.EventDate)
 	}
-	return &project_pb.CreateProjectGrantResponse{
+	return connect.NewResponse(&project_pb.CreateProjectGrantResponse{
 		CreationDate: creationDate,
-	}, nil
+	}), nil
 }
 
 func projectGrantCreateToCommand(req *project_pb.CreateProjectGrantRequest) *command.AddProjectGrant {
@@ -37,8 +38,8 @@ func projectGrantCreateToCommand(req *project_pb.CreateProjectGrantRequest) *com
 	}
 }
 
-func (s *Server) UpdateProjectGrant(ctx context.Context, req *project_pb.UpdateProjectGrantRequest) (*project_pb.UpdateProjectGrantResponse, error) {
-	project, err := s.command.ChangeProjectGrant(ctx, projectGrantUpdateToCommand(req))
+func (s *Server) UpdateProjectGrant(ctx context.Context, req *connect.Request[project_pb.UpdateProjectGrantRequest]) (*connect.Response[project_pb.UpdateProjectGrantResponse], error) {
+	project, err := s.command.ChangeProjectGrant(ctx, projectGrantUpdateToCommand(req.Msg))
 	if err != nil {
 		return nil, err
 	}
@@ -46,9 +47,9 @@ func (s *Server) UpdateProjectGrant(ctx context.Context, req *project_pb.UpdateP
 	if !project.EventDate.IsZero() {
 		changeDate = timestamppb.New(project.EventDate)
 	}
-	return &project_pb.UpdateProjectGrantResponse{
+	return connect.NewResponse(&project_pb.UpdateProjectGrantResponse{
 		ChangeDate: changeDate,
-	}, nil
+	}), nil
 }
 
 func projectGrantUpdateToCommand(req *project_pb.UpdateProjectGrantRequest) *command.ChangeProjectGrant {
@@ -61,8 +62,8 @@ func projectGrantUpdateToCommand(req *project_pb.UpdateProjectGrantRequest) *com
 	}
 }
 
-func (s *Server) DeactivateProjectGrant(ctx context.Context, req *project_pb.DeactivateProjectGrantRequest) (*project_pb.DeactivateProjectGrantResponse, error) {
-	details, err := s.command.DeactivateProjectGrant(ctx, req.ProjectId, "", req.GrantedOrganizationId, "")
+func (s *Server) DeactivateProjectGrant(ctx context.Context, req *connect.Request[project_pb.DeactivateProjectGrantRequest]) (*connect.Response[project_pb.DeactivateProjectGrantResponse], error) {
+	details, err := s.command.DeactivateProjectGrant(ctx, req.Msg.GetProjectId(), "", req.Msg.GetGrantedOrganizationId(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -70,13 +71,13 @@ func (s *Server) DeactivateProjectGrant(ctx context.Context, req *project_pb.Dea
 	if !details.EventDate.IsZero() {
 		changeDate = timestamppb.New(details.EventDate)
 	}
-	return &project_pb.DeactivateProjectGrantResponse{
+	return connect.NewResponse(&project_pb.DeactivateProjectGrantResponse{
 		ChangeDate: changeDate,
-	}, nil
+	}), nil
 }
 
-func (s *Server) ActivateProjectGrant(ctx context.Context, req *project_pb.ActivateProjectGrantRequest) (*project_pb.ActivateProjectGrantResponse, error) {
-	details, err := s.command.ReactivateProjectGrant(ctx, req.ProjectId, "", req.GrantedOrganizationId, "")
+func (s *Server) ActivateProjectGrant(ctx context.Context, req *connect.Request[project_pb.ActivateProjectGrantRequest]) (*connect.Response[project_pb.ActivateProjectGrantResponse], error) {
+	details, err := s.command.ReactivateProjectGrant(ctx, req.Msg.GetProjectId(), "", req.Msg.GetGrantedOrganizationId(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -84,17 +85,17 @@ func (s *Server) ActivateProjectGrant(ctx context.Context, req *project_pb.Activ
 	if !details.EventDate.IsZero() {
 		changeDate = timestamppb.New(details.EventDate)
 	}
-	return &project_pb.ActivateProjectGrantResponse{
+	return connect.NewResponse(&project_pb.ActivateProjectGrantResponse{
 		ChangeDate: changeDate,
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeleteProjectGrant(ctx context.Context, req *project_pb.DeleteProjectGrantRequest) (*project_pb.DeleteProjectGrantResponse, error) {
-	userGrantIDs, err := s.userGrantsFromProjectGrant(ctx, req.ProjectId, req.GrantedOrganizationId)
+func (s *Server) DeleteProjectGrant(ctx context.Context, req *connect.Request[project_pb.DeleteProjectGrantRequest]) (*connect.Response[project_pb.DeleteProjectGrantResponse], error) {
+	userGrantIDs, err := s.userGrantsFromProjectGrant(ctx, req.Msg.GetProjectId(), req.Msg.GetGrantedOrganizationId())
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.DeleteProjectGrant(ctx, req.ProjectId, "", req.GrantedOrganizationId, "", userGrantIDs...)
+	details, err := s.command.DeleteProjectGrant(ctx, req.Msg.GetProjectId(), "", req.Msg.GetGrantedOrganizationId(), "", userGrantIDs...)
 	if err != nil {
 		return nil, err
 	}
@@ -102,9 +103,9 @@ func (s *Server) DeleteProjectGrant(ctx context.Context, req *project_pb.DeleteP
 	if !details.EventDate.IsZero() {
 		deletionDate = timestamppb.New(details.EventDate)
 	}
-	return &project_pb.DeleteProjectGrantResponse{
+	return connect.NewResponse(&project_pb.DeleteProjectGrantResponse{
 		DeletionDate: deletionDate,
-	}, nil
+	}), nil
 }
 
 func (s *Server) userGrantsFromProjectGrant(ctx context.Context, projectID, grantedOrganizationID string) ([]string, error) {
@@ -118,7 +119,7 @@ func (s *Server) userGrantsFromProjectGrant(ctx context.Context, projectID, gran
 	}
 	userGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{projectQuery, grantQuery},
-	}, false)
+	}, false, nil)
 	if err != nil {
 		return nil, err
 	}
