@@ -261,7 +261,15 @@ func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id 
 
 	if q.caches != nil && q.caches.authnKeys != nil {
 		if cached, ok := q.caches.authnKeys.Get(ctx, AuthnKeyIndexKeyIDAndIdentifier, authz.GetInstance(ctx).InstanceID() + ":" + id + ":" + identifier); ok && cached != nil {
-			return cached.Key, nil
+			if time.Now().Unix() < cached.Expiry {
+				return cached.Key, nil
+			}
+		logging.WithFields(
+			"logger", "query.authnkey",
+			"key_id", id,
+			"identifier", identifier,
+		).Debug("cached authn key expired")
+
 		}
 	}
 
@@ -296,7 +304,6 @@ func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id 
 		Key:        key,
 		Expiry:     expiry.Unix(),
 })
-
 
 
 }
