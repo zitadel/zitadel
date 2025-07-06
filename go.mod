@@ -240,5 +240,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	nhooyr.io/websocket v1.8.11 // indirect
 )
-
-replace crypto/pbkdf2 => golang.org/x/crypto/pbkdf2 v0.39.0
+replace crypto/pbkdf2 => golang.org/x/crypto/pbkdf2 v0.22.0

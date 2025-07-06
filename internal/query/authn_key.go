@@ -281,7 +281,7 @@ func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id 
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-DAb32", "Errors.Query.SQLStatement")
 	}
-	
+
     var expiry time.Time
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		key, expiry, err = scan(row)
@@ -540,8 +540,6 @@ const (
 
 func (i AuthnKeyIndex) Key() string {
 	switch i {
-	case AuthnKeyIndexKeyID:
-		return "key_id"
 	case AuthnKeyIndexKeyIDAndIdentifier:
 		return "key_id:identifier"
 	default:
