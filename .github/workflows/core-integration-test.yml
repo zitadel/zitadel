@@ -12,7 +12,6 @@ on:
     outputs:
       integration_test_report:
         value: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        type: boolean
 
 jobs:
   postgres:
