@@ -1,0 +1,173 @@
+---
+title: Migrate from v1 APIs to v2 APIs
+---
+
+This guide gives you an overview for migrating from our v1 API to the new and improved v2 API.
+This upgrade introduces some significant architectural changes designed to make your development experience smoother, more intuitive, and efficient.
+
+## The v1 Approach: Use-Case Based APIs
+Our v1 API was structured around use cases, meaning we provided distinct APIs tailored to different user roles:
+
+- Auth API: For authenticated users.
+- Management API: For administrators of an organization.
+- Admin API: For administrators of an instance.
+- System API: For managing multiple instances.
+
+While this approach served its initial purpose, it presented a few challenges.
+Developers often found it difficult to determine which specific API endpoint to use for their needs.
+Additionally, this model sometimes led to redundant implementations of similar functionalities across different APIs – for example, listing users might have existed in slightly different forms for an instance context versus an organization context.
+This often required more extensive reading of documentation and further explanation to ensure correct usage.
+
+## The v2 Approach: A Resource-Based API
+With our v2 API, we introduce a resource-based architecture.
+This means instead of organizing by user type, we now structure our API around logical resources, such as:
+- Users API
+- Instance API
+- Organization API
+- And more...
+
+A key improvement in v2 is how context and permissions are handled.
+The data you receive from an endpoint will now automatically be scoped based on the role and permissions of the authenticated user.
+
+For example:
+- An instance administrator calling a GET /users endpoint will receive a list of all users within that instance.
+- An organization administrator calling the exact same GET /users endpoint will receive a list of users belonging only to their specific organization.
+
+## Why the Change
+The primary goals behind this architectural shift are to make our API:
+- More Intuitive: Finding the right endpoint should feel natural. If you want to interact with users, you look at the Users API.
+- Self-Explanatory: The structure itself guides you, reducing the need to sift through extensive documentation to understand which API "hat" you need to wear.
+- Developer-Friendly: A cleaner, more consistent API surface means faster integration and less room for confusion.
+
+We're confident that these changes will significantly enhance your experience working with our platform.
+The following sections will detail the specific resources that have been migrated and outline any changes you'll need to be aware of.
+
+## Resource Migration
+
+This section details the migrated resources, including any breaking changes and other important considerations for your transition from v1 to v2.
+
+### General Changes
+
+#### Sunsetting OpenAPI/REST Support in Favor of Connect RPC
+While our v1 API already offered gRPC, it also provided a parallel REST/OpenAPI interface for clients who preferred making traditional HTTP calls.
+
+In our v2 API, we are consolidating our efforts to provide a more streamlined and efficient development experience.
+The primary change is the removal of the OpenAPI/REST interface.
+We will now exclusively support interaction with our gRPC services directly or through [Connect RPC](https://connectrpc.com/).
+
+Connect RPC is being introduced as the new, official way to interact with our gRPC services using familiar, plain HTTP/1.1.
+It effectively replaces the previous REST gateway.
+
+For teams already using gRPC, your transition will be minimal.
+For teams who were using the v1 REST API, migrating to v2 will involve adopting one of the following methods:
+
+- Native gRPC: For the highest performance and to leverage features like bi-directional streaming.
+- Connect RPC: For making CRUD-like (Create, Read, Update, Delete) calls over HTTP. This is the recommended path for most clients migrating from our v1 REST API.
+
+A significant advantage of this new architecture remains the automatic generation of client libraries.
+Based on our .proto service definitions, you can generate type-safe clients for your specific programming language, whether you use native gRPC or Connect RPC.
+This eliminates the need to write boilerplate code for handling HTTP requests and parsing responses, leading to a more streamlined and less error-prone development process.
+
+#### Contextual Information in the Request Body
+
+A key change in v2 is that contextual data, like organization_id, must now be sent in the request body.
+Previously, this was sent in the request headers.
+
+**v1 (Header)**
+```
+x-zitadel-orgid: 1234567890
+```
+
+**v2 (Request Body)**
+```
+{
+    "organization_id": "1234567890"
+}
+```
+
+### Instances
+
+No major changes have been made to the organization requests.
+
+### Organizations
+
+No major changes have been made to the organization requests.
+
+### Users
+
+When migrating your user management from v1 to v2, the most significant updates involve user states and the initial onboarding process:
+
+- **Unified User Creation Endpoint**:
+  - A significant simplification in v2 is the consolidation of user creation. There is now one primary endpoint for creating users, regardless of whether they are human or machine users.
+  - You can use this single endpoint to provision both human users (individuals interacting with your application) and machine users (e.g., service accounts, API clients), typically by specifying the user type in the request payload.
+- **No More "Initial" State**:
+  - In v1, new users without a password or verified email were automatically assigned an initial state. This default assumption wasn't always ideal.
+  - In v2, this initial state has been removed. All newly created users are now active by default, regardless of their initial attributes.
+- **New Onboarding Process**:
+  - To enable users to set up their accounts, you can now send them an invitation code. This allows them to securely add their authentication methods.
+- **Flexible Email Verification**:
+  - v2 provides more control over email verification:
+    - You can choose at user creation whether an email verification code should be sent automatically.
+    - Alternatively, the API can return the verification code directly to you, empowering you to send a customized verification email.
+
+[Users API v2 Documentation](/docs/apis/resources/user_service_v2)
+
+### Projects
+
+We've simplified how you interact with projects by unifying projects and granted_projects into a single resource.
+From a consumer's perspective, it no longer matters if you own a project or if it was granted to you by another organization; it's all just a project.
+
+The main difference now is your level of permission.
+Your permissions determine whether you have administrative rights (like updating the project's details) or if you can only view the project and manage authorizations for your users.
+
+This change significantly streamlines API calls.
+For example, where you previously had to make two separate requests to see all projects, you now make one.
+
+**v1 (Separate Requests):**
+```
+- ListProjects
+- ListGrantedProjects
+```
+
+**v2 (Single Request with Filter):**
+```
+- ListProjects (returns all projects you have access to)
+```
+
+You can now use filters within the single ListProjects request if you need to differentiate between project types, such as filtering by projects you own versus those that have been granted to you.
+Update your code to use this new unified ListProjects endpoint.
+
+### Applications
+
+We have streamlined the creation and management of applications.
+In v1, each application type had its own unique endpoints.
+In v2, we have unified these into a single set of endpoints for all application types.
+
+The biggest change is in how you create/update applications.
+Instead of calling a specific endpoint for each type (e.g., CreateOidcApp, CreateSamlApp), you will now use a single CreateApp endpoint.
+
+To specify the type of application, you will include its specific configuration object within the request body.
+For example, to create a OIDC app, you will provide a oidc object in the request.
+All properties that are common to every application, such as name, are now top-level fields in the request body, consistent across all types.
+
+This approach simplifies client-side logic, as you no longer need to route requests to different endpoints.
+
+**v1 (Multiple, Type-Specific Endpoints):**
+
+```
+- AddOIDCApp
+- AddSAMLApp
+- AddAPIApp
+```
+
+**v2 (Single Endpoint with Type-Specific Body):**
+
+```
+- CreateApplication
+  - ProjectID
+  - Name
+  - Type
+    - OIDC
+    - SAML
+    - API
+```
