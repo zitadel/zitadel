@@ -4483,14 +4483,14 @@ message ListInstanceDomainsResponse {
 message ListInstanceTrustedDomainsRequest {
     zitadel.v1.ListQuery query = 1;
     // the field the result is sorted
-    zitadel.instance.v1.DomainFieldName sorting_column = 2;
+    zitadel.instance.v1.TrustedDomainFieldName sorting_column = 2;
     //criteria the client is looking for
     repeated zitadel.instance.v1.TrustedDomainSearchQuery queries = 3;
 }
 
 message ListInstanceTrustedDomainsResponse {
     zitadel.v1.ListDetails details = 1;
-    zitadel.instance.v1.DomainFieldName sorting_column = 2;
+    zitadel.instance.v1.TrustedDomainFieldName sorting_column = 2;
     repeated zitadel.instance.v1.TrustedDomain result = 3;
 }
 
