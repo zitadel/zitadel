@@ -12,9 +12,10 @@ on:
       crdb_version:
         required: false
         type: string
-    secrets:
-      CODECOV_TOKEN:
-        required: true
+    outputs:
+      unit_test_report:
+        value: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        type: boolean
 
 jobs:
   test:
@@ -54,14 +55,12 @@ jobs:
         name: test
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         run: make core_unit_test
-      - 
-        name: publish coverage
-        uses: codecov/codecov-action@v4.3.0
+      -
+        uses: actions/upload-artifact@v4
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         with:
-          file: profile.cov
-          name: core-unit-tests
-          flags: core-unit-tests
-          token: ${{ secrets.CODECOV_TOKEN }}
+          name: unit-coverage
+          path: tmp/coverage/unit
       - 
         uses: actions/cache/save@v4
         name: cache results
