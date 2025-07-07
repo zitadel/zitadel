@@ -14,10 +14,12 @@ on:
         type: string
     outputs:
       unit_test_report:
-        value: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        value: ${{ jobs.test.outputs.unit_test_report }}
 
 jobs:
   test:
+    outputs:
+      unit_test_report: ${{ steps.cache.outputs.cache-hit != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - 

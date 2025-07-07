@@ -1,6 +1,6 @@
 name: Integration test core
 
-on: 
+on:
   workflow_call:
     inputs:
       core_cache_key:
@@ -11,10 +11,12 @@ on:
         type: string
     outputs:
       integration_test_report:
-        value: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        value: ${{ jobs.postgres.outputs.integration_test_report }}
 
 jobs:
   postgres:
+    outputs:
+      integration_test_report: ${{ steps.cache.outputs.cache-hit != 'true' }}
     runs-on:
       group: zitadel-public
     services:
@@ -38,13 +40,13 @@ jobs:
         ports:
           - 6379:6379
     steps:
-      - 
+      -
         uses: actions/checkout@v4
       -
         uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-      - 
+      -
         uses: actions/cache/restore@v4
         timeout-minutes: 1
         name: restore core
@@ -57,7 +59,7 @@ jobs:
         id: go-cache-path
         name: set cache path
         run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
-      - 
+      -
         uses: actions/cache/restore@v4
         id: cache
         timeout-minutes: 1
@@ -68,7 +70,7 @@ jobs:
           restore-keys: |
             integration-test-postgres-core-
           path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
-      - 
+      -
         name: test
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         env:
@@ -89,7 +91,7 @@ jobs:
           path: |
            tmp/zitadel.log
            tmp/race.log.*
-      - 
+      -
         uses: actions/cache/save@v4
         name: cache results
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
