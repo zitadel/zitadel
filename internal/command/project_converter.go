@@ -4,27 +4,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
-func projectWriteModelToProject(writeModel *ProjectWriteModel) *domain.Project {
-	return &domain.Project{
-		ObjectRoot:             writeModelToObjectRoot(writeModel.WriteModel),
-		Name:                   writeModel.Name,
-		ProjectRoleAssertion:   writeModel.ProjectRoleAssertion,
-		ProjectRoleCheck:       writeModel.ProjectRoleCheck,
-		HasProjectCheck:        writeModel.HasProjectCheck,
-		PrivateLabelingSetting: writeModel.PrivateLabelingSetting,
-	}
-}
-
-func projectGrantWriteModelToProjectGrant(writeModel *ProjectGrantWriteModel) *domain.ProjectGrant {
-	return &domain.ProjectGrant{
-		ObjectRoot:   writeModelToObjectRoot(writeModel.WriteModel),
-		GrantID:      writeModel.GrantID,
-		GrantedOrgID: writeModel.GrantedOrgID,
-		RoleKeys:     writeModel.RoleKeys,
-		State:        writeModel.State,
-	}
-}
-
 func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.OIDCApp {
 	return &domain.OIDCApp{
 		ObjectRoot:               writeModelToObjectRoot(writeModel.WriteModel),
@@ -75,15 +54,6 @@ func apiWriteModelToAPIConfig(writeModel *APIApplicationWriteModel) *domain.APIA
 		State:          writeModel.State,
 		ClientID:       writeModel.ClientID,
 		AuthMethodType: writeModel.AuthMethodType,
-	}
-}
-
-func roleWriteModelToRole(writeModel *ProjectRoleWriteModel) *domain.ProjectRole {
-	return &domain.ProjectRole{
-		ObjectRoot:  writeModelToObjectRoot(writeModel.WriteModel),
-		Key:         writeModel.Key,
-		DisplayName: writeModel.DisplayName,
-		Group:       writeModel.Group,
 	}
 }
 

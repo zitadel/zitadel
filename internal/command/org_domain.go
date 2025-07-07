@@ -69,27 +69,6 @@ func verifyOrgDomain(a *org.Aggregate, domain string) preparation.Validation {
 	}
 }
 
-func setPrimaryOrgDomain(a *org.Aggregate, domain string) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		if domain = strings.TrimSpace(domain); domain == "" {
-			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-gmNqY", "Errors.Invalid.Argument")
-		}
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			existing, err := orgDomain(ctx, filter, a.ID, domain)
-			if err != nil {
-				return nil, zerrors.ThrowAlreadyExists(err, "V2-d0Gyw", "Errors.Already.Exists")
-			}
-			if existing.Primary {
-				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-FfoZO", "Errors.Org.DomainAlreadyPrimary")
-			}
-			if !existing.Verified {
-				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-yKA80", "Errors.Org.DomainNotVerified")
-			}
-			return []eventstore.Command{org.NewDomainPrimarySetEvent(ctx, &a.Aggregate, domain)}, nil
-		}, nil
-	}
-}
-
 func orgDomain(ctx context.Context, filter preparation.FilterToQueryReducer, orgID, domain string) (*OrgDomainWriteModel, error) {
 	wm := NewOrgDomainWriteModel(orgID, domain)
 	events, err := filter(ctx, wm.Query())
