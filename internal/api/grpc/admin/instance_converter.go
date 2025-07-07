@@ -63,6 +63,8 @@ func fieldNameToInstanceTrustedDomainColumn(fieldName instance.TrustedDomainFiel
 		return query.InstanceTrustedDomainDomainCol
 	case instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE:
 		return query.InstanceTrustedDomainCreationDateCol
+	case instance.TrustedDomainFieldName_TRUSTED_DOMAIN_FIELD_NAME_UNSPECIFIED:
+		fallthrough
 	default:
 		return query.Column{}
 	}
