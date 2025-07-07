@@ -18,4 +18,4 @@ else
   esac
   curl -L -o protoc-gen-connect-openapi.tar.gz https://github.com/sudorandom/protoc-gen-connect-openapi/releases/download/v0.18.0/protoc-gen-connect-openapi_0.18.0_linux_${ARCH}.tar.gz
 fi
-tar -xvf protoc-gen-connect-openapi.tar.gz
+tar -xvf protoc-gen-connect-openapi.tar.gz protoc-gen-connect-openapi
