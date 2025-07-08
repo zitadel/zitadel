@@ -3709,6 +3709,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: Use [GetApplicationKey](/apis/resources/application_service_v2/application-service-get-application-key.api.mdx) instead to get an application key
     rpc GetAppKey(GetAppKeyRequest) returns (GetAppKeyResponse) {
         option (google.api.http) = {
             get: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
@@ -3731,9 +3732,11 @@ service ManagementService {
                     required: false;
                 };
             };
+            deprecated: true;
         };
     }
 
+    // Deprecated: Use [ListApplicationKeys](/apis/resources/application_service_v2/application-service-list-application-keys.api.mdx) instead to list application keys
     rpc ListAppKeys(ListAppKeysRequest) returns (ListAppKeysResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/keys/_search"
@@ -3760,6 +3763,8 @@ service ManagementService {
         };
     }
 
+    // Deprecated: Use [CreateApplicationKey](/apis/resources/application_service_v2/application-service-create-application-key.api.mdx) instead to
+    // create an application key
     rpc AddAppKey(AddAppKeyRequest) returns (AddAppKeyResponse){
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/keys"
@@ -3783,9 +3788,12 @@ service ManagementService {
                     required: false;
                 };
             };
+            deprecated: true;
         };
     }
 
+    // Deprecated: Use [DeleteApplicationKey](/apis/resources/application_service_v2/application-service-delete-application-key.api.mdx) instead to
+    // delete an application key
     rpc RemoveAppKey(RemoveAppKeyRequest) returns (RemoveAppKeyResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
@@ -3808,6 +3816,7 @@ service ManagementService {
                     required: false;
                 };
             };
+            deprecated: true;
         };
     }
 
@@ -4168,6 +4177,11 @@ service ManagementService {
         };
     }
 
+    // Get User Grant By ID
+    //
+    // Deprecated: [List authorizations](apis/resources/authorization_service_v2/zitadel-authorization-v-2-beta-authorization-service-list-authorizations.api.mdx) and filter by its ID.
+    //
+    // Returns a user grant per ID. A user grant is a role a user has for a specific project and organization.
     rpc GetUserGrantByID(GetUserGrantByIDRequest) returns (GetUserGrantByIDResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/grants/{grant_id}"
@@ -4179,8 +4193,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Grants";
-            summary: "User Grant By ID";
-            description: "Returns a user grant per ID. A user grant is a role a user has for a specific project and organization."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4192,6 +4205,11 @@ service ManagementService {
         };
     }
 
+    // Search User Grants
+    //
+    // Deprecated: [List authorizations](apis/resources/authorization_service_v2/zitadel-authorization-v-2-beta-authorization-service-list-authorizations.api.mdx) and pass the user ID filter to search for a users grants on owned or granted projects.
+    //
+    // Returns a list of user grants that match the search queries. User grants are the roles users have for a specific project and organization.
     rpc ListUserGrants(ListUserGrantRequest) returns (ListUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/grants/_search"
@@ -4204,8 +4222,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Grants";
-            summary: "Search User Grants";
-            description: "Returns a list of user grants that match the search queries. User grants are the roles users have for a specific project and organization."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4217,6 +4234,12 @@ service ManagementService {
         };
     }
 
+
+    // Add User Grant
+    //
+    // Deprecated: [Add an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-beta-authorization-service-create-authorization.api.mdx) to grant a user access to an owned or granted project.
+    //
+    // Add a user grant for a specific user. User grants are the roles users have for a specific project and organization.
     rpc AddUserGrant(AddUserGrantRequest) returns (AddUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/grants"
@@ -4229,8 +4252,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Grants";
-            summary: "Add User Grant";
-            description: "Add a user grant for a specific user. User grants are the roles users have for a specific project and organization."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4242,6 +4264,11 @@ service ManagementService {
         };
     }
 
+    // Update User Grant
+    //
+    // Deprecated: [Update an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-beta-authorization-service-update-authorization.api.mdx) to update a user's roles on an owned or granted project.
+    //
+    // Update the roles of a user grant. User grants are the roles users have for a specific project and organization.
     rpc UpdateUserGrant(UpdateUserGrantRequest) returns (UpdateUserGrantResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/grants/{grant_id}"
@@ -4254,8 +4281,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Grants";
-            summary: "Update User Grants";
-            description: "Update the roles of a user grant. User grants are the roles users have for a specific project and organization."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4267,6 +4293,11 @@ service ManagementService {
         };
     }
 
+    // Deactivate User Grant
+    //
+    // Deprecated: [Deactivate an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-beta-authorization-service-deactivate-authorization.api.mdx) to disable a user's access to an owned or granted project.
+    //
+    // Deactivate the user grant. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested. An error will be returned if the user grant is already deactivated.
     rpc DeactivateUserGrant(DeactivateUserGrantRequest) returns (DeactivateUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/grants/{grant_id}/_deactivate"
@@ -4279,8 +4310,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Grants";
-            summary: "Deactivate User Grant";
-            description: "Deactivate the user grant. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested. An error will be returned if the user grant is already deactivated."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4292,6 +4322,11 @@ service ManagementService {
         };
     }
 
+    // Reactivate User Grant
+    //
+    // Deprecated: [Activate an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-beta-authorization-service-activate-authorization.api.mdx) to enable a user's access to an owned or granted project.
+    //
+    // Reactivate a deactivated user grant. The user will be able to use the granted project again. An error will be returned if the user grant is not deactivated.
     rpc ReactivateUserGrant(ReactivateUserGrantRequest) returns (ReactivateUserGrantResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/grants/{grant_id}/_reactivate"
@@ -4304,8 +4339,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Grants";
-            summary: "Reactivate User Grant";
-            description: "Reactivate a deactivated user grant. The user will be able to use the granted project again. An error will be returned if the user grant is not deactivated."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4317,6 +4351,11 @@ service ManagementService {
         };
     }
 
+    // Remove User Grant
+    //
+    // Deprecated: [Delete an authorization](apis/resources/authorization_service_v2/zitadel-authorization-v-2-beta-authorization-service-delete-authorization.api.mdx) to remove a users access to an owned or granted project.
+    //
+    // Removes the user grant from the user. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested.
     rpc RemoveUserGrant(RemoveUserGrantRequest) returns (RemoveUserGrantResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/grants/{grant_id}"
@@ -4328,8 +4367,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Grants";
-            summary: "Remove User Grant";
-            description: "Removes the user grant from the user. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4341,6 +4379,11 @@ service ManagementService {
         };
     }
 
+    // Bulk Remove User Grants
+    //
+    // Deprecated: [Delete authorizations one after the other](apis/resources/authorization_service_v2/zitadel-authorization-v-2-beta-authorization-service-delete-authorization.api.mdx) to remove access for multiple users on multiple owned or granted projects.
+    //
+    // Remove a list of user grants. The users will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested.
     rpc BulkRemoveUserGrant(BulkRemoveUserGrantRequest) returns (BulkRemoveUserGrantResponse) {
         option (google.api.http) = {
             delete: "/user_grants/_bulk"
@@ -4353,8 +4396,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Grants";
-            summary: "Bulk Remove User Grants";
-            description: "Remove a list of user grants. The users will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";

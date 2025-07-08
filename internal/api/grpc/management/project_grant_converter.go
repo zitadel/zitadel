@@ -7,7 +7,6 @@ import (
 	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -146,24 +145,21 @@ func ListProjectGrantMembersRequestToModel(ctx context.Context, req *mgmt_pb.Lis
 	}, nil
 }
 
-func AddProjectGrantMemberRequestToDomain(req *mgmt_pb.AddProjectGrantMemberRequest) *domain.ProjectGrantMember {
-	return &domain.ProjectGrantMember{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.ProjectId,
-		},
-		GrantID: req.GrantId,
-		UserID:  req.UserId,
-		Roles:   req.Roles,
+func AddProjectGrantMemberRequestToCommand(req *mgmt_pb.AddProjectGrantMemberRequest, orgID string) *command.AddProjectGrantMember {
+	return &command.AddProjectGrantMember{
+		ResourceOwner: orgID,
+		ProjectID:     req.ProjectId,
+		GrantID:       req.GrantId,
+		UserID:        req.UserId,
+		Roles:         req.Roles,
 	}
 }
 
-func UpdateProjectGrantMemberRequestToDomain(req *mgmt_pb.UpdateProjectGrantMemberRequest) *domain.ProjectGrantMember {
-	return &domain.ProjectGrantMember{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.ProjectId,
-		},
-		GrantID: req.GrantId,
-		UserID:  req.UserId,
-		Roles:   req.Roles,
+func UpdateProjectGrantMemberRequestToCommand(req *mgmt_pb.UpdateProjectGrantMemberRequest) *command.ChangeProjectGrantMember {
+	return &command.ChangeProjectGrantMember{
+		ProjectID: req.ProjectId,
+		GrantID:   req.GrantId,
+		UserID:    req.UserId,
+		Roles:     req.Roles,
 	}
 }

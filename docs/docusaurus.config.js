@@ -218,9 +218,6 @@ module.exports = {
           showLastUpdateTime: true,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
-
-          docItemComponent: "@theme/ApiItem",
-
           docItemComponent: "@theme/ApiItem",
         },
         theme: {
@@ -297,8 +294,6 @@ module.exports = {
           user_v2: {
             specPath:
               ".artifacts/openapi/zitadel/user/v2/user_service.swagger.json",
-            specPath:
-              ".artifacts/openapi/zitadel/user/v2/user_service.swagger.json",
             outputDir: "docs/apis/resources/user_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -306,8 +301,6 @@ module.exports = {
             },
           },
           session_v2: {
-            specPath:
-              ".artifacts/openapi/zitadel/session/v2/session_service.swagger.json",
             specPath:
               ".artifacts/openapi/zitadel/session/v2/session_service.swagger.json",
             outputDir: "docs/apis/resources/session_service_v2",
@@ -319,8 +312,6 @@ module.exports = {
           oidc_v2: {
             specPath:
               ".artifacts/openapi/zitadel/oidc/v2/oidc_service.swagger.json",
-            specPath:
-              ".artifacts/openapi/zitadel/oidc/v2/oidc_service.swagger.json",
             outputDir: "docs/apis/resources/oidc_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -328,8 +319,6 @@ module.exports = {
             },
           },
           saml_v2: {
-            specPath:
-              ".artifacts/openapi/zitadel/saml/v2/saml_service.swagger.json",
             specPath:
               ".artifacts/openapi/zitadel/saml/v2/saml_service.swagger.json",
             outputDir: "docs/apis/resources/saml_service_v2",
@@ -341,8 +330,6 @@ module.exports = {
           settings_v2: {
             specPath:
               ".artifacts/openapi/zitadel/settings/v2/settings_service.swagger.json",
-            specPath:
-              ".artifacts/openapi/zitadel/settings/v2/settings_service.swagger.json",
             outputDir: "docs/apis/resources/settings_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -350,8 +337,6 @@ module.exports = {
             },
           },
           action_v2: {
-            specPath:
-              ".artifacts/openapi/zitadel/action/v2beta/action_service.swagger.json",
             specPath:
               ".artifacts/openapi/zitadel/action/v2beta/action_service.swagger.json",
             outputDir: "docs/apis/resources/action_service_v2",
@@ -364,9 +349,7 @@ module.exports = {
           },
           webkey_v2: {
             specPath:
-              ".artifacts/openapi/zitadel/webkey/v2beta/webkey_service.swagger.json",
-            specPath:
-              ".artifacts/openapi/zitadel/webkey/v2beta/webkey_service.swagger.json",
+              ".artifacts/openapi3/zitadel/webkey/v2/webkey_service.openapi.yaml",
             outputDir: "docs/apis/resources/webkey_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -376,8 +359,6 @@ module.exports = {
             },
           },
           feature_v2: {
-            specPath:
-              ".artifacts/openapi/zitadel/feature/v2/feature_service.swagger.json",
             specPath:
               ".artifacts/openapi/zitadel/feature/v2/feature_service.swagger.json",
             outputDir: "docs/apis/resources/feature_service_v2",
@@ -391,8 +372,6 @@ module.exports = {
           org_v2: {
             specPath:
               ".artifacts/openapi/zitadel/org/v2/org_service.swagger.json",
-            specPath:
-              ".artifacts/openapi/zitadel/org/v2/org_service.swagger.json",
             outputDir: "docs/apis/resources/org_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -400,8 +379,6 @@ module.exports = {
             },
           },
           idp_v2: {
-            specPath:
-              ".artifacts/openapi/zitadel/idp/v2/idp_service.swagger.json",
             specPath:
               ".artifacts/openapi/zitadel/idp/v2/idp_service.swagger.json",
             outputDir: "docs/apis/resources/idp_service_v2",
@@ -413,8 +390,6 @@ module.exports = {
           org_v2beta: {
             specPath:
               ".artifacts/openapi/zitadel/org/v2beta/org_service.swagger.json",
-            specPath:
-              ".artifacts/openapi/zitadel/org/v2beta/org_service.swagger.json",
             outputDir: "docs/apis/resources/org_service_v2beta",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -424,9 +399,15 @@ module.exports = {
           project_v2beta: {
             specPath:
               ".artifacts/openapi/zitadel/project/v2beta/project_service.swagger.json",
-            specPath:
-              ".artifacts/openapi/zitadel/project/v2beta/project_service.swagger.json",
             outputDir: "docs/apis/resources/project_service_v2",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
+            },
+          },
+          application_v2: {
+            specPath: ".artifacts/openapi3/zitadel/app/v2beta/app_service.openapi.yaml",
+            outputDir: "docs/apis/resources/application_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: "auto",
@@ -435,9 +416,25 @@ module.exports = {
           instance_v2: {
             specPath:
               ".artifacts/openapi/zitadel/instance/v2beta/instance_service.swagger.json",
-            specPath:
-              ".artifacts/openapi/zitadel/instance/v2beta/instance_service.swagger.json",
             outputDir: "docs/apis/resources/instance_service_v2",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
+            },
+          },
+          authorization_v2: {
+            specPath:
+              ".artifacts/openapi3/zitadel/authorization/v2beta/authorization_service.openapi.yaml",
+            outputDir: "docs/apis/resources/authorization_service_v2",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
+            },
+          },
+          internal_permission_v2: {
+            specPath:
+              ".artifacts/openapi3/zitadel/internal_permission/v2beta/internal_permission_service.openapi.yaml",
+            outputDir: "docs/apis/resources/internal_permission_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: "auto",

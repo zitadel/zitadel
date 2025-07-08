@@ -3,6 +3,7 @@ package action
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -13,8 +14,8 @@ import (
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 )
 
-func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetRequest) (*action.CreateTargetResponse, error) {
-	add := createTargetToCommand(req)
+func (s *Server) CreateTarget(ctx context.Context, req *connect.Request[action.CreateTargetRequest]) (*connect.Response[action.CreateTargetResponse], error) {
+	add := createTargetToCommand(req.Msg)
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	createdAt, err := s.command.AddTarget(ctx, add, instanceID)
 	if err != nil {
@@ -24,16 +25,16 @@ func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetReque
 	if !createdAt.IsZero() {
 		creationDate = timestamppb.New(createdAt)
 	}
-	return &action.CreateTargetResponse{
+	return connect.NewResponse(&action.CreateTargetResponse{
 		Id:           add.AggregateID,
 		CreationDate: creationDate,
 		SigningKey:   add.SigningKey,
-	}, nil
+	}), nil
 }
 
-func (s *Server) UpdateTarget(ctx context.Context, req *action.UpdateTargetRequest) (*action.UpdateTargetResponse, error) {
+func (s *Server) UpdateTarget(ctx context.Context, req *connect.Request[action.UpdateTargetRequest]) (*connect.Response[action.UpdateTargetResponse], error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	update := updateTargetToCommand(req)
+	update := updateTargetToCommand(req.Msg)
 	changedAt, err := s.command.ChangeTarget(ctx, update, instanceID)
 	if err != nil {
 		return nil, err
@@ -42,15 +43,15 @@ func (s *Server) UpdateTarget(ctx context.Context, req *action.UpdateTargetReque
 	if !changedAt.IsZero() {
 		changeDate = timestamppb.New(changedAt)
 	}
-	return &action.UpdateTargetResponse{
+	return connect.NewResponse(&action.UpdateTargetResponse{
 		ChangeDate: changeDate,
 		SigningKey: update.SigningKey,
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetRequest) (*action.DeleteTargetResponse, error) {
+func (s *Server) DeleteTarget(ctx context.Context, req *connect.Request[action.DeleteTargetRequest]) (*connect.Response[action.DeleteTargetResponse], error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	deletedAt, err := s.command.DeleteTarget(ctx, req.GetId(), instanceID)
+	deletedAt, err := s.command.DeleteTarget(ctx, req.Msg.GetId(), instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -58,9 +59,9 @@ func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetReque
 	if !deletedAt.IsZero() {
 		deletionDate = timestamppb.New(deletedAt)
 	}
-	return &action.DeleteTargetResponse{
+	return connect.NewResponse(&action.DeleteTargetResponse{
 		DeletionDate: deletionDate,
-	}, nil
+	}), nil
 }
 
 func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {

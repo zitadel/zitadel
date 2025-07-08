@@ -1,6 +1,6 @@
 //go:build integration
 
-package instance_test
+package app_test
 
 import (
 	"context"
@@ -165,9 +165,9 @@ func TestListApplications(t *testing.T) {
 
 	t.Parallel()
 
-	createdApiApp, apiAppName := createAPIAppWithName(t, p.GetId())
+	createdApiApp, apiAppName := createAPIAppWithName(t, IAMOwnerCtx, instance, p.GetId())
 
-	createdDeactivatedApiApp, deactivatedApiAppName := createAPIAppWithName(t, p.GetId())
+	createdDeactivatedApiApp, deactivatedApiAppName := createAPIAppWithName(t, IAMOwnerCtx, instance, p.GetId())
 	deactivateApp(t, createdDeactivatedApiApp, p.GetId())
 
 	_, createdSAMLApp, samlAppName := createSAMLAppWithName(t, gofakeit.URL(), p.GetId())
@@ -568,6 +568,251 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 					}
 
 					assert.ElementsMatch(ttt, tc.expectedAppIDs, resAppIDs)
+				}
+			}, retryDuration, tick)
+		})
+	}
+}
+
+func TestGetApplicationKey(t *testing.T) {
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
+	createdApiApp := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+	createdAppKey := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp.GetAppId(), time.Now().AddDate(0, 0, 1))
+
+	t.Parallel()
+
+	tt := []struct {
+		testName     string
+		inputRequest *app.GetApplicationKeyRequest
+		inputCtx     context.Context
+
+		expectedErrorType codes.Code
+		expectedAppKeyID  string
+	}{
+		{
+			testName: "when unknown app ID should return not found error",
+			inputCtx: IAMOwnerCtx,
+			inputRequest: &app.GetApplicationKeyRequest{
+				Id: gofakeit.Sentence(2),
+			},
+
+			expectedErrorType: codes.NotFound,
+		},
+		{
+			testName: "when user has no permission should return membership not found error",
+			inputCtx: NoPermissionCtx,
+			inputRequest: &app.GetApplicationKeyRequest{
+				Id: createdAppKey.GetId(),
+			},
+
+			expectedErrorType: codes.NotFound,
+		},
+		{
+			testName: "when providing API app ID should return valid API app result",
+			inputCtx: projectOwnerCtx,
+			inputRequest: &app.GetApplicationKeyRequest{
+				Id: createdAppKey.GetId(),
+			},
+
+			expectedAppKeyID: createdAppKey.GetId(),
+		},
+		{
+			testName: "when user is OrgOwner should return request key",
+			inputCtx: OrgOwnerCtx,
+			inputRequest: &app.GetApplicationKeyRequest{
+				Id:        createdAppKey.GetId(),
+				ProjectId: p.GetId(),
+			},
+
+			expectedAppKeyID: createdAppKey.GetId(),
+		},
+		{
+			testName: "when user is IAMOwner should return request key",
+			inputCtx: OrgOwnerCtx,
+			inputRequest: &app.GetApplicationKeyRequest{
+				Id:             createdAppKey.GetId(),
+				OrganizationId: instance.DefaultOrg.GetId(),
+			},
+
+			expectedAppKeyID: createdAppKey.GetId(),
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 30*time.Second)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				// When
+				res, err := instance.Client.AppV2Beta.GetApplicationKey(tc.inputCtx, tc.inputRequest)
+
+				// Then
+				require.Equal(t, tc.expectedErrorType, status.Code(err))
+				if tc.expectedErrorType == codes.OK {
+
+					assert.Equal(t, tc.expectedAppKeyID, res.GetId())
+					assert.NotEmpty(t, res.GetCreationDate())
+					assert.NotEmpty(t, res.GetExpirationDate())
+				}
+			}, retryDuration, tick)
+		})
+	}
+}
+
+func TestListApplicationKeys(t *testing.T) {
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
+
+	createdApiApp1 := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+	createdApiApp2 := createAPIApp(t, IAMOwnerCtx, instance, p.GetId())
+
+	tomorrow := time.Now().AddDate(0, 0, 1)
+	in2Days := tomorrow.AddDate(0, 0, 1)
+	in3Days := in2Days.AddDate(0, 0, 1)
+
+	appKey1 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetAppId(), in2Days)
+	appKey2 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetAppId(), in3Days)
+	appKey3 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp1.GetAppId(), tomorrow)
+	appKey4 := createAppKey(t, IAMOwnerCtx, instance, p.GetId(), createdApiApp2.GetAppId(), tomorrow)
+
+	t.Parallel()
+
+	tt := []struct {
+		testName     string
+		inputRequest *app.ListApplicationKeysRequest
+		deps         func() (projectID, applicationID, organizationID string)
+		inputCtx     context.Context
+
+		expectedErrorType  codes.Code
+		expectedAppKeysIDs []string
+	}{
+		{
+			testName: "when sorting by expiration date should return keys sorted by expiration date ascending",
+			inputCtx: LoginUserCtx,
+			inputRequest: &app.ListApplicationKeysRequest{
+				ResourceId:    &app.ListApplicationKeysRequest_ProjectId{ProjectId: p.GetId()},
+				Pagination:    &filter.PaginationRequest{Asc: true},
+				SortingColumn: app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_EXPIRATION,
+			},
+			expectedAppKeysIDs: []string{appKey3.GetId(), appKey4.GetId(), appKey1.GetId(), appKey2.GetId()},
+		},
+		{
+			testName: "when sorting by creation date should return keys sorted by creation date descending",
+			inputCtx: IAMOwnerCtx,
+			inputRequest: &app.ListApplicationKeysRequest{
+				ResourceId:    &app.ListApplicationKeysRequest_ProjectId{ProjectId: p.GetId()},
+				SortingColumn: app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_CREATION_DATE,
+			},
+			expectedAppKeysIDs: []string{appKey4.GetId(), appKey3.GetId(), appKey2.GetId(), appKey1.GetId()},
+		},
+		{
+			testName: "when filtering by app ID should return keys matching app ID sorted by ID",
+			inputCtx: projectOwnerCtx,
+			inputRequest: &app.ListApplicationKeysRequest{
+				Pagination: &filter.PaginationRequest{Asc: true},
+				ResourceId: &app.ListApplicationKeysRequest_ApplicationId{ApplicationId: createdApiApp1.GetAppId()},
+			},
+			expectedAppKeysIDs: []string{appKey1.GetId(), appKey2.GetId(), appKey3.GetId()},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 5*time.Second)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				// When
+				res, err := instance.Client.AppV2Beta.ListApplicationKeys(tc.inputCtx, tc.inputRequest)
+
+				// Then
+				require.Equal(ttt, tc.expectedErrorType, status.Code(err))
+				if tc.expectedErrorType == codes.OK {
+					require.Len(ttt, res.GetKeys(), len(tc.expectedAppKeysIDs))
+
+					for i, k := range res.GetKeys() {
+						assert.Equal(ttt, tc.expectedAppKeysIDs[i], k.GetId())
+					}
+				}
+			}, retryDuration, tick)
+		})
+	}
+}
+
+func TestListApplicationKeys_WithPermissionV2(t *testing.T) {
+	ensureFeaturePermissionV2Enabled(t, instancePermissionV2)
+	iamOwnerCtx := instancePermissionV2.WithAuthorization(context.Background(), integration.UserTypeIAMOwner)
+	loginUserCtx := instancePermissionV2.WithAuthorization(context.Background(), integration.UserTypeLogin)
+	p, projectOwnerCtx := getProjectAndProjectContext(t, instancePermissionV2, iamOwnerCtx)
+
+	createdApiApp1 := createAPIApp(t, iamOwnerCtx, instancePermissionV2, p.GetId())
+	createdApiApp2 := createAPIApp(t, iamOwnerCtx, instancePermissionV2, p.GetId())
+
+	tomorrow := time.Now().AddDate(0, 0, 1)
+	in2Days := tomorrow.AddDate(0, 0, 1)
+	in3Days := in2Days.AddDate(0, 0, 1)
+
+	appKey1 := createAppKey(t, iamOwnerCtx, instancePermissionV2, p.GetId(), createdApiApp1.GetAppId(), in2Days)
+	appKey2 := createAppKey(t, iamOwnerCtx, instancePermissionV2, p.GetId(), createdApiApp1.GetAppId(), in3Days)
+	appKey3 := createAppKey(t, iamOwnerCtx, instancePermissionV2, p.GetId(), createdApiApp1.GetAppId(), tomorrow)
+	appKey4 := createAppKey(t, iamOwnerCtx, instancePermissionV2, p.GetId(), createdApiApp2.GetAppId(), tomorrow)
+
+	t.Parallel()
+
+	tt := []struct {
+		testName     string
+		inputRequest *app.ListApplicationKeysRequest
+		deps         func() (projectID, applicationID, organizationID string)
+		inputCtx     context.Context
+
+		expectedErrorType  codes.Code
+		expectedAppKeysIDs []string
+	}{
+		{
+			testName: "when sorting by expiration date should return keys sorted by expiration date ascending",
+			inputCtx: loginUserCtx,
+			inputRequest: &app.ListApplicationKeysRequest{
+				Pagination:    &filter.PaginationRequest{Asc: true},
+				SortingColumn: app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_EXPIRATION,
+			},
+			expectedAppKeysIDs: []string{appKey3.GetId(), appKey4.GetId(), appKey1.GetId(), appKey2.GetId()},
+		},
+		{
+			testName: "when sorting by creation date should return keys sorted by creation date descending",
+			inputCtx: iamOwnerCtx,
+			inputRequest: &app.ListApplicationKeysRequest{
+				SortingColumn: app.ApplicationKeysSorting_APPLICATION_KEYS_SORT_BY_CREATION_DATE,
+			},
+			expectedAppKeysIDs: []string{appKey4.GetId(), appKey3.GetId(), appKey2.GetId(), appKey1.GetId()},
+		},
+		{
+			testName: "when filtering by app ID should return keys matching app ID sorted by ID",
+			inputCtx: projectOwnerCtx,
+			inputRequest: &app.ListApplicationKeysRequest{
+				Pagination: &filter.PaginationRequest{Asc: true},
+				ResourceId: &app.ListApplicationKeysRequest_ApplicationId{ApplicationId: createdApiApp1.GetAppId()},
+			},
+			expectedAppKeysIDs: []string{appKey1.GetId(), appKey2.GetId(), appKey3.GetId()},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			// t.Parallel()
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputCtx, 5*time.Second)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				// When
+				res, err := instancePermissionV2.Client.AppV2Beta.ListApplicationKeys(tc.inputCtx, tc.inputRequest)
+
+				// Then
+				require.Equal(ttt, tc.expectedErrorType, status.Code(err))
+				if tc.expectedErrorType == codes.OK {
+					require.Len(ttt, res.GetKeys(), len(tc.expectedAppKeysIDs))
+
+					for i, k := range res.GetKeys() {
+						assert.Equal(ttt, tc.expectedAppKeysIDs[i], k.GetId())
+					}
 				}
 			}, retryDuration, tick)
 		})

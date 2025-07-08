@@ -1,6 +1,6 @@
 //go:build integration
 
-package instance_test
+package app_test
 
 import (
 	"context"
@@ -13,6 +13,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
@@ -150,14 +151,14 @@ func createOIDCApp(t *testing.T, baseURI, projctID string) *app.CreateApplicatio
 	return app
 }
 
-func createAPIAppWithName(t *testing.T, projectID string) (*app.CreateApplicationResponse, string) {
+func createAPIAppWithName(t *testing.T, ctx context.Context, inst *integration.Instance, projectID string) (*app.CreateApplicationResponse, string) {
 	appName := gofakeit.AppName()
 
 	reqForAPIAppCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
 
-	appForAPIConfigChange, appAPIConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
+	appForAPIConfigChange, appAPIConfigChangeErr := inst.Client.AppV2Beta.CreateApplication(ctx, &app.CreateApplicationRequest{
 		ProjectId:           projectID,
 		Name:                appName,
 		CreationRequestType: reqForAPIAppCreation,
@@ -167,8 +168,8 @@ func createAPIAppWithName(t *testing.T, projectID string) (*app.CreateApplicatio
 	return appForAPIConfigChange, appName
 }
 
-func createAPIApp(t *testing.T, projectID string) *app.CreateApplicationResponse {
-	res, _ := createAPIAppWithName(t, projectID)
+func createAPIApp(t *testing.T, ctx context.Context, inst *integration.Instance, projectID string) *app.CreateApplicationResponse {
+	res, _ := createAPIAppWithName(t, ctx, inst, projectID)
 	return res
 }
 
@@ -202,4 +203,18 @@ func ensureFeaturePermissionV2Enabled(t *testing.T, instance *integration.Instan
 		require.NoError(tt, err)
 		assert.True(tt, f.PermissionCheckV2.GetEnabled())
 	}, retryDuration, tick, "timed out waiting for ensuring instance feature")
+}
+
+func createAppKey(t *testing.T, ctx context.Context, inst *integration.Instance, projectID, appID string, expirationDate time.Time) *app.CreateApplicationKeyResponse {
+	res, err := inst.Client.AppV2Beta.CreateApplicationKey(ctx,
+		&app.CreateApplicationKeyRequest{
+			AppId:          appID,
+			ProjectId:      projectID,
+			ExpirationDate: timestamppb.New(expirationDate.UTC()),
+		},
+	)
+
+	require.Nil(t, err)
+
+	return res
 }

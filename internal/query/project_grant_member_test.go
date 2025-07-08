@@ -46,6 +46,7 @@ var (
 		"LEFT JOIN projections.project_grants4 " +
 		"ON members.grant_id = projections.project_grants4.grant_id " +
 		"AND members.instance_id = projections.project_grants4.instance_id " +
+		"AND members.project_id = projections.project_grants4.project_id " +
 		"WHERE projections.login_names3.is_primary = $1")
 	projectGrantMembersColumns = []string{
 		"creation_date",

@@ -52,7 +52,8 @@ console/src/app/proto/generated/
 !pkg/grpc/protoc/v2/options.pb.go
 **.proto.mock.go
 **.pb.*.go
-**.gen.go 
+pkg/**/**.connect.go
+**.gen.go
 openapi/**/*.json
 /internal/api/assets/authz.go
 /internal/api/assets/router.go
