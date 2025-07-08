@@ -1050,3 +1050,77 @@ func TestWorker_Work(t *testing.T) {
 		})
 	}
 }
+
+func Test_parseAndValidateSchedule(t *testing.T) {
+	type args struct {
+		interval string
+	}
+	tests := []struct {
+		name          string
+		args          args
+		wantNextStart time.Time
+		wantNextEnd   time.Time
+		wantErr       error
+	}{
+		{
+			name: "@daily, returns randomized daily schedule",
+			args: args{
+				interval: "@daily",
+			},
+			wantNextStart: time.Now(),
+			wantNextEnd:   time.Now().Add(24 * time.Hour),
+		},
+		{
+			name: "invalid cron expression, returns error",
+			args: args{
+				interval: "invalid cron",
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "SERV-NJqiof", "invalid interval"),
+		},
+		{
+			name: "valid cron expression, returns schedule",
+			args: args{
+				interval: "0 0 * * *",
+			},
+			wantNextStart: nextMidnight(),
+			wantNextEnd:   nextMidnight(),
+		},
+		{
+			name: "valid cron expression (extended syntax), returns schedule",
+			args: args{
+				interval: "@midnight",
+			},
+			wantNextStart: nextMidnight(),
+			wantNextEnd:   nextMidnight(),
+		},
+		{
+			name: "less than minInterval, returns error",
+			args: args{
+				interval: "0/15 * * * *",
+			},
+			wantErr: zerrors.ThrowInvalidArgumentf(nil, "SERV-FJ12", "interval must be at least %s", minInterval),
+		},
+		{
+			name: "less than minInterval (extended syntax), returns error",
+			args: args{
+				interval: "@every 15m",
+			},
+			wantErr: zerrors.ThrowInvalidArgumentf(nil, "SERV-FJ12", "interval must be at least %s", minInterval),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := parseAndValidateSchedule(tt.args.interval)
+			assert.ErrorIs(t, err, tt.wantErr)
+			if tt.wantErr == nil {
+				now := time.Now()
+				assert.WithinRange(t, got.Next(now), tt.wantNextStart, tt.wantNextEnd)
+			}
+		})
+	}
+}
+
+func nextMidnight() time.Time {
+	year, month, day := time.Now().Date()
+	return time.Date(year, month, day+1, 0, 0, 0, 0, time.Local)
+}

@@ -435,8 +435,6 @@ Errors:
     Invalid: A concessão de usuário é inválida
     NotChanged: A concessão de usuário não foi alterada
     IDMissing: ID faltando
-    NotActive: A concessão de usuário não está ativa
-    NotInactive: A concessão de usuário não está desativada
     NoPermissionForProject: O usuário não possui permissões neste projeto
     RoleKeyNotFound: Função não encontrada
   Member:

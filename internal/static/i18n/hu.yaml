@@ -436,8 +436,6 @@ Errors:
     Invalid: A felhasználói jogosultság érvénytelen
     NotChanged: A felhasználói jogosultság nem lett módosítva
     IDMissing: Hiányzó azonosító
-    NotActive: A felhasználói jogosultság nem aktív
-    NotInactive: A felhasználói jogosultság nincs kikapcsolva
     NoPermissionForProject: A felhasználónak nincs jogosultsága ebben a projektben
     RoleKeyNotFound: Szerepkör nem található
   Member:

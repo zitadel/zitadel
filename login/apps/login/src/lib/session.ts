@@ -13,7 +13,6 @@ import {
 
 type LoadMostRecentSessionParams = {
   serviceUrl: string;
-
   sessionParams: {
     loginName?: string;
     organization?: string;

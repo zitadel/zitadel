@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+import "zitadel/filter/v2/filter.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+package zitadel.metadata.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/metadata/v2";
+
+message Metadata {
+  google.protobuf.Timestamp creation_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+  google.protobuf.Timestamp change_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+  string key = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "metadata key",
+      example: "\"key1\"";
+    }
+  ];
+  bytes value = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "metadata value is base64 encoded, make sure to decode to get the value",
+      example: "\"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"";
+    }
+  ];
+}
+
+message MetadataSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+    MetadataKeyFilter key_filter = 1;
+  }
+}
+
+message MetadataKeyFilter {
+  string key = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"key\""
+    }
+  ];
+  zitadel.filter.v2.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which text equality method is used";
+    }
+  ];
+}
