@@ -8,7 +8,12 @@ import (
 )
 
 func CheckPermission(ctx context.Context, resolver MembershipsResolver, systemUserRoleMapping []RoleMapping, roleMappings []RoleMapping, permission, orgID, resourceID string) (err error) {
-	requestedPermissions, _, err := getUserPermissions(ctx, resolver, permission, systemUserRoleMapping, roleMappings, GetCtxData(ctx), orgID)
+	ctxData := GetCtxData(ctx)
+	if orgID != "" {
+		ctxData.OrgID = orgID
+	}
+
+	requestedPermissions, _, err := getUserPermissions(ctx, resolver, permission, systemUserRoleMapping, roleMappings, ctxData)
 	if err != nil {
 		return err
 	}
@@ -22,7 +27,7 @@ func CheckPermission(ctx context.Context, resolver MembershipsResolver, systemUs
 
 // getUserPermissions retrieves the memberships of the authenticated user (on instance and provided organisation level),
 // and maps them to permissions. It will return the requested permission(s) and all other granted permissions separately.
-func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requiredPerm string, systemUserRoleMappings []RoleMapping, roleMappings []RoleMapping, ctxData CtxData, orgID string) (requestedPermissions, allPermissions []string, err error) {
+func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requiredPerm string, systemUserRoleMappings []RoleMapping, roleMappings []RoleMapping, ctxData CtxData) (requestedPermissions, allPermissions []string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -36,12 +41,12 @@ func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requi
 	}
 
 	ctx = context.WithValue(ctx, dataKey, ctxData)
-	memberships, err := resolver.SearchMyMemberships(ctx, orgID, false)
+	memberships, err := resolver.SearchMyMemberships(ctx, ctxData.OrgID, false)
 	if err != nil {
 		return nil, nil, err
 	}
 	if len(memberships) == 0 {
-		memberships, err = resolver.SearchMyMemberships(ctx, orgID, true)
+		memberships, err = resolver.SearchMyMemberships(ctx, ctxData.OrgID, true)
 		if len(memberships) == 0 {
 			return nil, nil, zerrors.ThrowNotFound(nil, "AUTHZ-cdgFk", "membership not found")
 		}

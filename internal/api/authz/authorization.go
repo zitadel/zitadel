@@ -35,7 +35,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 		}, nil
 	}
 
-	requestedPermissions, allPermissions, err := getUserPermissions(ctx, verifier, requiredAuthOption.Permission, systemRolePermissionMapping, rolePermissionMapping, ctxData, ctxData.OrgID)
+	requestedPermissions, allPermissions, err := getUserPermissions(ctx, verifier, requiredAuthOption.Permission, systemRolePermissionMapping, rolePermissionMapping, ctxData)
 	if err != nil {
 		return nil, err
 	}

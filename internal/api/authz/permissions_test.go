@@ -33,11 +33,12 @@ func Test_GetUserPermissions(t *testing.T) {
 		authConfig          Config
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-		errFunc func(err error) bool
-		result  []string
+		name      string
+		args      args
+		wantErr   bool
+		errFunc   func(err error) bool
+		requested []string
+		result    []string
 	}{
 		{
 			name: "Empty Context",
@@ -65,9 +66,59 @@ func Test_GetUserPermissions(t *testing.T) {
 			result:  []string{"project.read"},
 		},
 		{
+			name: "Context missing UserID",
+			args: args{
+				ctxData: CtxData{UserID: "", OrgID: "orgID"},
+				membershipsResolver: membershipsResolverFunc(func(ctx context.Context, orgID string, shouldTriggerBulk bool) ([]*Membership, error) {
+					return []*Membership{{Roles: []string{"ORG_OWNER"}}}, nil
+				}),
+				requiredPerm: "project.read",
+				authConfig: Config{
+					RolePermissionMappings: []RoleMapping{
+						{
+							Role:        "IAM_OWNER",
+							Permissions: []string{"project.read"},
+						},
+						{
+							Role:        "ORG_OWNER",
+							Permissions: []string{"org.read", "project.read"},
+						},
+					},
+				},
+			},
+			wantErr: true,
+			errFunc: zerrors.IsUnauthenticated,
+			result:  []string{"project.read"},
+		},
+		{
+			name: "Context missing OrgID",
+			args: args{
+				ctxData: CtxData{UserID: "userID", OrgID: ""},
+				membershipsResolver: membershipsResolverFunc(func(ctx context.Context, orgID string, shouldTriggerBulk bool) ([]*Membership, error) {
+					return []*Membership{{Roles: []string{"ORG_OWNER"}}}, nil
+				}),
+				requiredPerm: "project.read",
+				authConfig: Config{
+					RolePermissionMappings: []RoleMapping{
+						{
+							Role:        "IAM_OWNER",
+							Permissions: []string{"project.read"},
+						},
+						{
+							Role:        "ORG_OWNER",
+							Permissions: []string{"org.read", "project.read"},
+						},
+					},
+				},
+			},
+			wantErr: true,
+			errFunc: zerrors.IsUnauthenticated,
+			result:  []string{"project.read"},
+		},
+		{
 			name: "No Grants",
 			args: args{
-				ctxData: CtxData{},
+				ctxData: CtxData{UserID: "userID", OrgID: "orgID"},
 				membershipsResolver: membershipsResolverFunc(func(ctx context.Context, orgID string, shouldTriggerBulk bool) ([]*Membership, error) {
 					return []*Membership{}, nil
 				}),
@@ -85,7 +136,49 @@ func Test_GetUserPermissions(t *testing.T) {
 					},
 				},
 			},
-			result: make([]string, 0),
+			wantErr:   true,
+			errFunc:   zerrors.IsNotFound,
+			requested: []string{"project.read"},
+			result:    make([]string, 0),
+		},
+		{
+			name: "Get Permissions, system memberships",
+			args: args{
+				ctxData: CtxData{
+					UserID: "userID",
+					OrgID:  "",
+					SystemMemberships: Memberships{{
+						AggregateID: "IAM",
+						ObjectID:    "IAM",
+						MemberType:  MemberTypeIAM,
+						Roles:       []string{"IAM_OWNER"},
+					}}},
+				membershipsResolver: membershipsResolverFunc(func(ctx context.Context, orgID string, shouldTriggerBulk bool) ([]*Membership, error) {
+					return []*Membership{
+						{
+							AggregateID: "IAM",
+							ObjectID:    "IAM",
+							MemberType:  MemberTypeIAM,
+							Roles:       []string{"IAM_OWNER"},
+						},
+					}, nil
+				}),
+				requiredPerm: "project.read",
+				authConfig: Config{
+					RolePermissionMappings: []RoleMapping{
+						{
+							Role:        "IAM_OWNER",
+							Permissions: []string{"project.read"},
+						},
+						{
+							Role:        "ORG_OWNER",
+							Permissions: []string{"org.read", "project.read"},
+						},
+					},
+				},
+			},
+			requested: []string{"project.read"},
+			result:    []string{"project.read"},
 		},
 		{
 			name: "Get Permissions",
@@ -115,12 +208,70 @@ func Test_GetUserPermissions(t *testing.T) {
 					},
 				},
 			},
-			result: []string{"project.read"},
+			requested: []string{"project.read"},
+			result:    []string{"project.read"},
+		},
+		{
+			name: "Get Permissions, multiple",
+			args: args{
+				ctxData: CtxData{UserID: "userID", OrgID: "orgID"},
+				membershipsResolver: membershipsResolverFunc(func(ctx context.Context, orgID string, shouldTriggerBulk bool) ([]*Membership, error) {
+					return []*Membership{
+						{
+							AggregateID: "IAM",
+							ObjectID:    "IAM",
+							MemberType:  MemberTypeIAM,
+							Roles:       []string{"IAM_OWNER"},
+						},
+						{
+							AggregateID: "ORG",
+							ObjectID:    "ORG",
+							MemberType:  MemberTypeOrganization,
+							Roles:       []string{"ORG_OWNER"},
+						},
+						{
+							AggregateID: "PROJECT",
+							ObjectID:    "PROJECT",
+							MemberType:  MemberTypeProject,
+							Roles:       []string{"PROJECT_OWNER"},
+						},
+						{
+							AggregateID: "PROJECTGRANT",
+							ObjectID:    "PROJECTGRANT",
+							MemberType:  MemberTypeProjectGrant,
+							Roles:       []string{"PROJECT_GRANT_OWNER"},
+						},
+					}, nil
+				}),
+				requiredPerm: "project.read",
+				authConfig: Config{
+					RolePermissionMappings: []RoleMapping{
+						{
+							Role:        "IAM_OWNER",
+							Permissions: []string{"project.read"},
+						},
+						{
+							Role:        "ORG_OWNER",
+							Permissions: []string{"org.read", "project.read"},
+						},
+						{
+							Role:        "PROJECT_OWNER",
+							Permissions: []string{"project.read"},
+						},
+						{
+							Role:        "PROJECT_GRANT_OWNER",
+							Permissions: []string{"project.grant.read"},
+						},
+					},
+				},
+			},
+			requested: []string{"project.read", "project.read:PROJECT"},
+			result:    []string{"project.read", "org.read", "project.read:PROJECT", "project.grant.read:PROJECTGRANT"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, perms, err := getUserPermissions(context.Background(), tt.args.membershipsResolver, tt.args.requiredPerm, nil, tt.args.authConfig.RolePermissionMappings, tt.args.ctxData, tt.args.ctxData.OrgID)
+			requested, perms, err := getUserPermissions(context.Background(), tt.args.membershipsResolver, tt.args.requiredPerm, tt.args.authConfig.RolePermissionMappings, tt.args.authConfig.RolePermissionMappings, tt.args.ctxData)
 
 			if tt.wantErr && err == nil {
 				t.Errorf("got wrong result, should get err: actual: %v ", err)
@@ -130,6 +281,9 @@ func Test_GetUserPermissions(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 
+			if !tt.wantErr && !equalStringArray(requested, tt.requested) {
+				t.Errorf("got wrong requeste, expecting: %v, actual: %v ", tt.requested, requested)
+			}
 			if !tt.wantErr && !equalStringArray(perms, tt.result) {
 				t.Errorf("got wrong result, expecting: %v, actual: %v ", tt.result, perms)
 			}

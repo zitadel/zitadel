@@ -88,7 +88,7 @@ type Org struct {
 func orgsCheckPermission(ctx context.Context, orgs *Orgs, permissionCheck domain_pkg.PermissionCheck) {
 	orgs.Orgs = slices.DeleteFunc(orgs.Orgs,
 		func(org *Org) bool {
-			if err := permissionCheck(ctx, domain_pkg.PermissionOrgRead, org.ID, org.ID); err != nil {
+			if err := permissionCheck(ctx, domain_pkg.PermissionOrgRead, org.ResourceOwner, org.ID); err != nil {
 				return true
 			}
 			return false
