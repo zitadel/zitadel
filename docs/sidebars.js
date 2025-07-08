@@ -893,7 +893,7 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "APIs V1 (GA)",
-            slug: "/apis/services/",
+            slug: "/apis/v1/",
             description:
               "APIs V1 organize access by context (authenticated user, organisation, instance, system), unlike resource-specific V2 APIs.",
           },
