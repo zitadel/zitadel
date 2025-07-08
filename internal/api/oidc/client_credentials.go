@@ -14,27 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type clientCredentialsRequest struct {
-	sub      string
-	audience []string
-	scopes   []string
-}
-
-// GetSubject returns the subject for token to be created because of the client credentials request
-// the subject will be the id of the service user
-func (c *clientCredentialsRequest) GetSubject() string {
-	return c.sub
-}
-
-// GetAudience returns the audience for token to be created because of the client credentials request
-func (c *clientCredentialsRequest) GetAudience() []string {
-	return c.audience
-}
-
-func (c *clientCredentialsRequest) GetScopes() []string {
-	return c.scopes
-}
-
 func (s *Server) clientCredentialsAuth(ctx context.Context, clientID, clientSecret string) (op.Client, error) {
 	user, err := s.query.GetUserByLoginName(ctx, false, clientID)
 	if zerrors.IsNotFound(err) {

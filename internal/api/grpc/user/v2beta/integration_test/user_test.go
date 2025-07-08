@@ -1773,7 +1773,7 @@ func TestServer_DeleteUser(t *testing.T) {
 					request.UserId = resp.GetUserId()
 					Instance.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
-					Instance.CreateOrgMembership(t, CTX, request.UserId)
+					Instance.CreateOrgMembership(t, CTX, Instance.DefaultOrg.Id, request.UserId)
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -2058,7 +2058,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
 				},
-				url:                "http://" + Instance.Domain + ":8000/sso",
+				url:                "http://localhost:8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
 			},
 			wantErr: false,
@@ -2082,7 +2082,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
 				},
-				url:                "http://" + Instance.Domain + ":8000/sso",
+				url:                "http://localhost:8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
 			},
 			wantErr: false,
@@ -2106,7 +2106,9 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
 				},
-				postForm: true,
+				url:                "http://localhost:8000/sso",
+				parametersExisting: []string{"RelayState", "SAMLRequest"},
+				postForm:           true,
 			},
 			wantErr: false,
 		},
@@ -2120,9 +2122,11 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			if tt.want.url != "" {
+			if tt.want.url != "" && !tt.want.postForm {
 				authUrl, err := url.Parse(got.GetAuthUrl())
 				require.NoError(t, err)
+
+				assert.Equal(t, tt.want.url, authUrl.Scheme+"://"+authUrl.Host+authUrl.Path)
 				require.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
 
 				for _, existing := range tt.want.parametersExisting {
@@ -2133,7 +2137,15 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				}
 			}
 			if tt.want.postForm {
-				assert.NotEmpty(t, got.GetPostForm())
+				assert.Equal(t, tt.want.url, got.GetFormData().GetUrl())
+
+				require.Len(t, got.GetFormData().GetFields(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
+				for _, existing := range tt.want.parametersExisting {
+					assert.Contains(t, got.GetFormData().GetFields(), existing)
+				}
+				for key, equal := range tt.want.parametersEqual {
+					assert.Equal(t, got.GetFormData().GetFields()[key], equal)
+				}
 			}
 			integration.AssertDetails(t, &user.StartIdentityProviderIntentResponse{
 				Details: tt.want.details,

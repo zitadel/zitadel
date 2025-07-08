@@ -56,7 +56,7 @@ func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOw
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Ek9s", "Errors.User.ExternalIDP.MinimumExternalIDPNeeded")
 	}
 
-	if err := c.checkUserExists(ctx, userID, resourceOwner); err != nil {
+	if _, err := c.checkUserExists(ctx, userID, resourceOwner); err != nil {
 		return err
 	}
 
