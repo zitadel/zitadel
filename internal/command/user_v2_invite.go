@@ -50,7 +50,7 @@ func (c *Commands) sendInviteCode(ctx context.Context, invite *CreateUserInvite,
 	if err != nil {
 		return nil, nil, err
 	}
-	if err := c.checkPermission(ctx, domain.PermissionUserWrite, wm.ResourceOwner, wm.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, resourceOwner, invite.UserID); err != nil {
 		return nil, nil, err
 	}
 	if !wm.UserState.Exists() {
