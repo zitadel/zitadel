@@ -52,6 +52,7 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getUserAgent } from "./fingerprint";
+import { setSAMLFormCookie } from "./saml";
 import { createServiceForHost } from "./service";
 
 const useCache = process.env.DEBUG !== "true";
@@ -981,18 +982,15 @@ export async function startIdentityProviderFlow({
         value: urls,
       },
     })
-    .then((resp) => {
+    .then(async (resp) => {
       if (resp.nextStep.case === "authUrl" && resp.nextStep.value) {
         return resp.nextStep.value;
       } else if (resp.nextStep.case === "formData" && resp.nextStep.value) {
         const formData: FormData = resp.nextStep.value;
         const redirectUrl = "/saml-post";
 
-        const params = new URLSearchParams({ url: formData.url });
-
-        Object.entries(formData.fields).forEach(([k, v]) => {
-          params.append(k, v);
-        });
+        const dataId = await setSAMLFormCookie(JSON.stringify(formData.fields));
+        const params = new URLSearchParams({ url: formData.url, id: dataId });
 
         return `${redirectUrl}?${params.toString()}`;
       } else {
