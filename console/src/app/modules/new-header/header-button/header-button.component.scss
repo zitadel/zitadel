@@ -1,5 +1,4 @@
-.header-button {
-  width: unset;
+:host {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -8,4 +7,23 @@
   padding-right: 0;
   height: 32px;
   max-height: 32px;
+  cursor: pointer;
+}
+
+.header-text {
+  font-size: 1.1rem;
+}
+
+@mixin header-button-theme($theme) {
+  $foreground: map-get($theme, foreground);
+
+  .header-button {
+    border: 0;
+    background: transparent;
+    border-radius: 4px;
+    padding: 0;
+    height: 100%;
+    cursor: pointer;
+    color: map-get($foreground, text);
+  }
 }

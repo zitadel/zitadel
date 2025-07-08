@@ -1,7 +1,7 @@
 <ng-container *ngIf="['iam.read$', 'iam.write$'] | hasRole as iamuser$">
   <div class="nav-col" [ngClass]="{ 'is-admin': (iamuser$ | async) }">
     <ng-container
-      *ngIf="breadcrumbService.breadcrumbsExtended$ && (breadcrumbService.breadcrumbsExtended$ | async) as breadc"
+      *ngIf="breadcrumbService.breadcrumbsExtended$ | async as breadc"
     >
       <ng-container
         *ngIf="
@@ -96,12 +96,7 @@
                     [routerLinkActive]="['active']"
                     [routerLinkActiveOptions]="{ exact: false }"
                     [routerLink]="['/org-settings']"
-                    *ngIf="
-                      (['policy.read'] | hasRole | async) &&
-                      ((['iam.read$', 'iam.write$'] | hasRole | async) === false ||
-                        (((authService.cachedOrgs | async)?.length ?? 1) > 1 &&
-                          (['iam.read$', 'iam.write$'] | hasRole | async)))
-                    "
+                    *ngIf="['policy.read'] | hasRole | async"
                   >
                     <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
                   </a>

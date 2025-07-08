@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, effect, Signal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, Signal, signal } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { NewOrganizationService } from '../../services/new-organization.service';
 import { ToastService } from '../../services/toast.service';
-import { AsyncPipe, NgIf, NgTemplateOutlet } from '@angular/common';
+import { AsyncPipe, NgForOf, NgIf, NgTemplateOutlet } from '@angular/common';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { OrganizationSelectorComponent } from './organization-selector/organization-selector.component';
 import { CdkOverlayOrigin } from '@angular/cdk/overlay';
@@ -18,6 +18,8 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { NewAdminService } from '../../services/new-admin.service';
 import { NewAuthService } from '../../services/new-auth.service';
 import { RouterLink } from '@angular/router';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from '../../services/breadcrumb.service';
+import { MatRippleModule } from '@angular/material/core';
 
 @Component({
   selector: 'cnsl-new-header',
@@ -39,6 +41,8 @@ import { RouterLink } from '@angular/router';
     AsyncPipe,
     HasRolePipeModule,
     RouterLink,
+    NgForOf,
+    MatRippleModule,
   ],
 })
 export class NewHeaderComponent {
@@ -53,6 +57,7 @@ export class NewHeaderComponent {
   protected readonly instanceSelectorSecondStep = signal(false);
   protected readonly activeOrganizationQuery = this.newOrganizationService.activeOrganizationQuery();
   protected readonly isHandset: Signal<boolean>;
+  protected readonly breadcrumbs: Signal<Breadcrumb[]>;
 
   constructor(
     private readonly newOrganizationService: NewOrganizationService,
@@ -60,8 +65,10 @@ export class NewHeaderComponent {
     private readonly breakpointObserver: BreakpointObserver,
     private readonly adminService: NewAdminService,
     private readonly newAuthService: NewAuthService,
+    private readonly breadcrumbService: BreadcrumbService,
   ) {
     this.isHandset = this.getIsHandset();
+    this.breadcrumbs = this.getBreadcrumbs();
 
     effect(() => {
       if (this.listMyZitadelPermissionsQuery.isError()) {
@@ -86,5 +93,14 @@ export class NewHeaderComponent {
     const mediaQuery = '(max-width: 599px)';
     const isHandset$ = this.breakpointObserver.observe(mediaQuery).pipe(map(({ matches }) => matches));
     return toSignal(isHandset$, { initialValue: this.breakpointObserver.isMatched(mediaQuery) });
+  }
+
+  private getBreadcrumbs() {
+    const breadcrumbs = toSignal(this.breadcrumbService.breadcrumbs$, { initialValue: [] });
+    return computed(() =>
+      breadcrumbs().filter(
+        (breadcrumb) => breadcrumb.type === BreadcrumbType.PROJECT || breadcrumb.type === BreadcrumbType.APP,
+      ),
+    );
   }
 }

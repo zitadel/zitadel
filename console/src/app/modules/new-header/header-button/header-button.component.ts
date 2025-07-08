@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { heroChevronUpDown } from '@ng-icons/heroicons/outline';
+import { MatRippleModule } from '@angular/material/core';
 
 @Component({
   selector: 'cnsl-header-button',
@@ -8,7 +9,7 @@ import { heroChevronUpDown } from '@ng-icons/heroicons/outline';
   styleUrls: ['./header-button.component.scss'],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgIconComponent],
+  imports: [NgIconComponent, MatRippleModule],
   providers: [provideIcons({ heroChevronUpDown })],
 })
 export class HeaderButtonComponent {}

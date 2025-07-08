@@ -1,4 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, effect, EventEmitter, Input, Output, Signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  signal,
+  Signal,
+  ViewChild,
+} from '@angular/core';
 import { injectInfiniteQuery, injectMutation, keepPreviousData } from '@tanstack/angular-query-experimental';
 import { NewOrganizationService } from 'src/app/services/new-organization.service';
 import { NgForOf, NgIf } from '@angular/common';
@@ -20,13 +33,14 @@ import { Router } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { heroCheck, heroMagnifyingGlass } from '@ng-icons/heroicons/outline';
 import { heroArrowLeftCircleSolid } from '@ng-icons/heroicons/solid';
+import { UserService } from '../../../services/user.service';
 
 type NameQuery = Extract<
   NonNullable<MessageInitShape<typeof ListOrganizationsRequestSchema>['queries']>[number]['query'],
   { case: 'nameQuery' }
 >;
 
-const QUERY_LIMIT = 5;
+const QUERY_LIMIT = 20;
 
 @Component({
   selector: 'cnsl-organization-selector',
@@ -58,6 +72,13 @@ export class OrganizationSelectorComponent {
   @Output()
   public orgChanged = new EventEmitter<Organization>();
 
+  @ViewChild('moreButton', { static: false, read: ElementRef })
+  public set moreButton(button: ElementRef<HTMLButtonElement>) {
+    this.moreButtonSignal.set(button);
+  }
+
+  private moreButtonSignal = signal<ElementRef<HTMLButtonElement> | undefined>(undefined);
+
   protected setOrgId = injectMutation(() => ({
     mutationFn: (orgId: string) => this.newOrganizationService.setOrgId(orgId),
   }));
@@ -65,7 +86,6 @@ export class OrganizationSelectorComponent {
   protected readonly form: ReturnType<typeof this.buildForm>;
   private readonly nameQuery: Signal<NameQuery | undefined>;
   protected readonly organizationsQuery: ReturnType<typeof this.getOrganizationsQuery>;
-  protected loadedOrgsCount: Signal<bigint>;
   protected activeOrg = this.newOrganizationService.activeOrganizationQuery();
   protected activeOrgIfSearchMatches: Signal<Organization | undefined>;
 
@@ -73,12 +93,13 @@ export class OrganizationSelectorComponent {
     private readonly newOrganizationService: NewOrganizationService,
     private readonly formBuilder: FormBuilder,
     private readonly router: Router,
+    private readonly destroyRef: DestroyRef,
+    private readonly userService: UserService,
     toast: ToastService,
   ) {
     this.form = this.buildForm();
     this.nameQuery = this.getNameQuery(this.form);
     this.organizationsQuery = this.getOrganizationsQuery(this.nameQuery);
-    this.loadedOrgsCount = this.getLoadedOrgsCount(this.organizationsQuery);
     this.activeOrgIfSearchMatches = this.getActiveOrgIfSearchMatches(this.nameQuery);
 
     effect(() => {
@@ -99,11 +120,37 @@ export class OrganizationSelectorComponent {
 
     effect(() => {
       const orgId = newOrganizationService.orgId();
-      const orgs = this.organizationsQuery.data()?.pages[0]?.result;
+      const orgs = this.organizationsQuery.data()?.orgs;
       if (orgId || !orgs || orgs.length === 0) {
         return;
       }
       const _ = newOrganizationService.setOrgId(orgs[0].id);
+    });
+
+    this.infiniteScrollLoading();
+  }
+
+  private infiniteScrollLoading() {
+    const intersection = new IntersectionObserver(async (entries) => {
+      if (!entries[0]?.isIntersecting) {
+        return;
+      }
+      await this.organizationsQuery.fetchNextPage();
+    });
+    this.destroyRef.onDestroy(() => {
+      intersection.disconnect();
+    });
+
+    effect((onCleanup) => {
+      const moreButton = this.moreButtonSignal()?.nativeElement;
+      if (!moreButton) {
+        return;
+      }
+
+      intersection.observe(moreButton);
+      onCleanup(() => {
+        intersection.unobserve(moreButton);
+      });
     });
   }
 
@@ -136,9 +183,12 @@ export class OrganizationSelectorComponent {
   private getOrganizationsQuery(nameQuery: Signal<NameQuery | undefined>) {
     return injectInfiniteQuery(() => {
       const query = nameQuery();
+      const exp = this.userService.exp();
+      const isExpired = exp ? exp <= new Date() : true;
       return {
         queryKey: ['organization', 'listOrganizationsInfinite', query],
         queryFn: ({ pageParam, signal }) => this.newOrganizationService.listOrganizations(pageParam, signal),
+        enabled: !isExpired,
         initialPageParam: {
           query: {
             limit: QUERY_LIMIT,
@@ -157,12 +207,12 @@ export class OrganizationSelectorComponent {
                 },
               }
             : undefined,
+        select: (data) => ({
+          orgs: data.pages.flatMap((page) => page.result),
+          totalResult: Number(data.pages[data.pages.length - 1]?.details?.totalResult ?? 0),
+        }),
       };
     });
-  }
-
-  private getLoadedOrgsCount(organizationsQuery: ReturnType<typeof this.getOrganizationsQuery>) {
-    return computed(() => this.countLoadedOrgs(organizationsQuery.data()?.pages));
   }
 
   private countLoadedOrgs(pages?: ListOrganizationsResponse[]) {
@@ -189,7 +239,7 @@ export class OrganizationSelectorComponent {
     await this.router.navigate(['/org']);
   }
 
-  protected trackOrg(_: number, { id }: Organization): string {
+  protected trackOrgResponse(_: number, { id }: Organization): string {
     return id;
   }
 

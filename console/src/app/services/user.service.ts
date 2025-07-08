@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, Signal, signal } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import {
   AddHumanUserRequestSchema,
@@ -48,8 +48,7 @@ import {
 import type { MessageInitShape } from '@bufbuild/protobuf';
 import { create } from '@bufbuild/protobuf';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { EMPTY, of, switchMap } from 'rxjs';
-import { filter, map, startWith } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { injectQuery, queryOptions, skipToken } from '@tanstack/angular-query-experimental';
 
@@ -57,7 +56,9 @@ import { injectQuery, queryOptions, skipToken } from '@tanstack/angular-query-ex
   providedIn: 'root',
 })
 export class UserService {
-  private userId = this.getUserId();
+  private readonly payload: Signal<unknown | undefined>;
+  private readonly userId: Signal<string | undefined>;
+  public readonly exp: Signal<Date | undefined>;
 
   public userQuery() {
     return injectQuery(() => this.userQueryOptions());
@@ -74,35 +75,51 @@ export class UserService {
   constructor(
     private readonly grpcService: GrpcService,
     private readonly oauthService: OAuthService,
-  ) {}
+  ) {
+    this.payload = this.getPayload();
+    this.userId = this.getUserId(this.payload);
+    this.exp = this.getExp(this.payload);
+  }
 
-  private getUserId() {
-    const userId$ = this.oauthService.events.pipe(
+  private getPayload() {
+    const idToken$ = this.oauthService.events.pipe(
       filter((event) => event.type === 'token_received'),
       // can actually return null
       // https://github.com/manfredsteyer/angular-oauth2-oidc/blob/c724ad73eadbb28338b084e3afa5ed49a0ea058c/projects/lib/src/oauth-service.ts#L2365
       map(() => this.oauthService.getIdToken() as string | null),
-      startWith(this.oauthService.getIdToken() as string | null),
-      filter(Boolean),
-      switchMap((token) => {
-        // we do this in a try catch so the observable will retry this logic if it fails
-        try {
-          // split jwt and get base64 encoded payload
-          const unparsedPayload = atob(token.split('.')[1]);
-          // parse payload
-          const payload: unknown = JSON.parse(unparsedPayload);
-          // check if sub is in payload and is a string
-          if (payload && typeof payload === 'object' && 'sub' in payload && typeof payload.sub === 'string') {
-            return of(payload.sub);
-          }
-          return EMPTY;
-        } catch {
-          return EMPTY;
-        }
-      }),
     );
+    const idToken = toSignal(idToken$, { initialValue: this.oauthService.getIdToken() as string | null });
 
-    return toSignal(userId$, { initialValue: undefined });
+    return computed(() => {
+      try {
+        // split jwt and get base64 encoded payload
+        const unparsedPayload = atob((idToken() ?? '').split('.')[1]);
+        // parse payload
+        return JSON.parse(unparsedPayload) as unknown;
+      } catch {
+        return undefined;
+      }
+    });
+  }
+
+  private getUserId(payloadSignal: Signal<unknown | undefined>) {
+    return computed(() => {
+      const payload = payloadSignal();
+      if (payload && typeof payload === 'object' && 'sub' in payload && typeof payload.sub === 'string') {
+        return payload.sub;
+      }
+      return undefined;
+    });
+  }
+
+  private getExp(payloadSignal: Signal<unknown | undefined>) {
+    return computed(() => {
+      const payload = payloadSignal();
+      if (payload && typeof payload === 'object' && 'exp' in payload && typeof payload.exp === 'number') {
+        return new Date(payload.exp * 1000);
+      }
+      return undefined;
+    });
   }
 
   public addHumanUser(req: MessageInitShape<typeof AddHumanUserRequestSchema>): Promise<AddHumanUserResponse> {

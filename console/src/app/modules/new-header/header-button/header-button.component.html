@@ -1,6 +1,6 @@
-<button class="header-button" cnslInput>
+<span class="header-text">
   <ng-content></ng-content>
-  <div class="cnsl-action-button">
-    <ng-icon size="1.2rem" name="heroChevronUpDown"></ng-icon>
-  </div>
+</span>
+<button class="header-button" matRipple [matRippleUnbounded]="false">
+  <ng-icon size="1.2rem" name="heroChevronUpDown"></ng-icon>
 </button>

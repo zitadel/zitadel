@@ -1,12 +1,12 @@
 <div class="new-header-wrapper">
-  <span routerLink="/" class="new-header-title">CONSOLE</span>
+  <span *ngIf="!isHandset()" routerLink="/" class="new-header-title">CONSOLE</span>
   <ng-container *ngIf="myInstanceQuery.data()?.instance as instance">
     <ng-container *ngTemplateOutlet="slash"></ng-container>
     <cnsl-header-button
       cdkOverlayOrigin
       #instanceTrigger="cdkOverlayOrigin"
       (click)="isInstanceDropdownOpen.set(!isInstanceDropdownOpen())"
-      >Instance</cnsl-header-button
+      >{{ instance.name }}</cnsl-header-button
     >
     <cnsl-header-dropdown
       [trigger]="instanceTrigger"
@@ -39,6 +39,14 @@
     <cnsl-header-dropdown [trigger]="orgTrigger" [isOpen]="isOrgDropdownOpen()" (closed)="isOrgDropdownOpen.set(false)">
       <cnsl-organization-selector (orgChanged)="isOrgDropdownOpen.set(false)"></cnsl-organization-selector>
     </cnsl-header-dropdown>
+  </ng-container>
+  <ng-container *ngIf="!isHandset()">
+    <ng-container *ngFor="let bread of breadcrumbs(); index as i; let last = last">
+      <ng-container *ngTemplateOutlet="slash"></ng-container>
+      <a matRipple [matRippleUnbounded]="false" [routerLink]="bread.routerLink">
+        {{ bread.name }}
+      </a>
+    </ng-container>
   </ng-container>
 </div>
 

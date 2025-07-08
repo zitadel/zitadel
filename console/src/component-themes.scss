@@ -81,6 +81,7 @@
 @import 'src/app/modules/new-header/organization-selector/organization-selector.component.scss';
 @import 'src/app/modules/new-header/instance-selector/instance-selector.component.scss';
 @import 'src/app/modules/new-header/header-dropdown/header-dropdown.component.scss';
+@import 'src/app/modules/new-header/header-button/header-button.component.scss';
 
 @mixin component-themes($theme) {
   @include cnsl-color-theme($theme);
@@ -165,4 +166,5 @@
   @include organization-selector-theme($theme);
   @include instance-selector-theme($theme);
   @include header-dropdown-theme($theme);
+  @include header-button-theme($theme);
 }

@@ -24,21 +24,22 @@
       {{ org.name }}
       <ng-icon name="heroCheck"></ng-icon>
     </a>
-    <ng-container *ngFor="let page of organizationsQuery.data()?.pages; last as lastPage">
-      <ng-container *ngFor="let org of page.result; trackBy: trackOrg">
+    <ng-container *ngIf="organizationsQuery.data() as data">
+      <ng-container *ngFor="let org of data.orgs; trackBy: trackOrgResponse">
         <a *ngIf="org.id !== activeOrg.data()?.id" class="dropdown-button" mat-button (click)="changeOrg(org.id)">
           {{ org.name }}
         </a>
       </ng-container>
-      <ng-container *ngIf="lastPage && page.details?.totalResult as totalResult">
+      <ng-container *ngIf="data?.totalResult as totalResult">
         <button
+          #moreButton
           class="dropdown-button"
           mat-stroked-button
           *ngIf="totalResult > QUERY_LIMIT"
           (click)="organizationsQuery.fetchNextPage()"
           [disabled]="!organizationsQuery.hasNextPage() || organizationsQuery.isFetchingNextPage()"
         >
-          ...{{ totalResult - loadedOrgsCount() }} {{ 'PAGINATOR.MORE' | translate }}
+          ...{{ totalResult - data.orgs.length }} {{ 'PAGINATOR.MORE' | translate }}
         </button>
       </ng-container>
     </ng-container>

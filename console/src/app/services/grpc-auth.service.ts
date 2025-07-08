@@ -121,7 +121,6 @@ export class GrpcAuthService {
     PrivacyPolicy.AsObject | undefined
   >(undefined);
 
-  public cachedOrgs: BehaviorSubject<Org.AsObject[]> = new BehaviorSubject<Org.AsObject[]>([]);
   private cachedLabelPolicies: { [orgId: string]: LabelPolicy.AsObject } = {};
   private cachedPrivacyPolicies: { [orgId: string]: PrivacyPolicy.AsObject } = {};
 
@@ -270,11 +269,6 @@ export class GrpcAuthService {
 
   public getMyUser(): Promise<GetMyUserResponse.AsObject> {
     return this.grpcService.auth.getMyUser(new GetMyUserRequest(), null).then((resp) => resp.toObject());
-  }
-
-  public async revalidateOrgs() {
-    const orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
-    this.cachedOrgs.next(orgs);
   }
 
   public listMyProjectOrgs(
