@@ -266,6 +266,7 @@ RegistrationUser:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
   GenderLabel: 性别
   Female: 女性
   Male: 男性
@@ -310,6 +311,7 @@ ExternalRegistrationUserOverview:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
@@ -388,6 +390,7 @@ ExternalNotFound:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
 DeviceAuth:
   Title: 设备授权
   UserCode:
