@@ -343,8 +343,6 @@ module.exports = {
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: "auto",
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
             },
           },
           webkey_v2: {
@@ -354,8 +352,6 @@ module.exports = {
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: "auto",
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
             },
           },
           feature_v2: {
@@ -363,8 +359,6 @@ module.exports = {
               ".artifacts/openapi/zitadel/feature/v2/feature_service.swagger.json",
             outputDir: "docs/apis/resources/feature_service_v2",
             sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
               groupPathsBy: "tag",
               categoryLinkSource: "auto",
             },
