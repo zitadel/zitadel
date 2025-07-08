@@ -1,8 +1,6 @@
 <ng-container *ngIf="['iam.read$', 'iam.write$'] | hasRole as iamuser$">
   <div class="nav-col" [ngClass]="{ 'is-admin': (iamuser$ | async) }">
-    <ng-container
-      *ngIf="breadcrumbService.breadcrumbsExtended$ | async as breadc"
-    >
+    <ng-container *ngIf="breadcrumbService.breadcrumbsExtended$ | async as breadc">
       <ng-container
         *ngIf="
           breadc[breadc.length - 1] &&

@@ -216,21 +216,6 @@ export class AppComponent {
       )
       .subscribe((orgId) => this.newOrganizationService.setOrgId(orgId));
 
-    // todo: think about this one
-    // this.authenticationService.authenticationChanged
-    //   .pipe(
-    //     filter(Boolean),
-    //     switchMap(() => this.authService.getActiveOrg()),
-    //     takeUntilDestroyed(this.destroyRef),
-    //   )
-    //   .subscribe({
-    //     next: (org) => (this.org = org),
-    //     error: async (err) => {
-    //       console.error(err);
-    //       return this.router.navigate(['/users/me']);
-    //     },
-    //   });
-    //
     this.isDarkTheme = this.themeService.isDarkTheme;
     this.isDarkTheme.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((dark) => {
       const theme = dark ? 'dark-theme' : 'light-theme';

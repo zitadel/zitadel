@@ -43,7 +43,7 @@
   <ng-container *ngIf="!isHandset()">
     <ng-container *ngFor="let bread of breadcrumbs(); index as i; let last = last">
       <ng-container *ngTemplateOutlet="slash"></ng-container>
-      <a matRipple [matRippleUnbounded]="false" [routerLink]="bread.routerLink">
+      <a class="new-header-breadcrumb" matRipple [matRippleUnbounded]="false" [routerLink]="bread.routerLink">
         {{ bread.name }}
       </a>
     </ng-container>
