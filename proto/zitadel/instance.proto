@@ -180,9 +180,3 @@ message TrustedDomainSearchQuery {
         DomainQuery domain_query = 1;
     }
 }
-
-enum TrustedDomainFieldName {
-    TRUSTED_DOMAIN_FIELD_NAME_UNSPECIFIED = 0;
-    TRUSTED_DOMAIN_FIELD_NAME_DOMAIN = 1;
-    TRUSTED_DOMAIN_FIELD_NAME_CREATION_DATE = 2;
-}
