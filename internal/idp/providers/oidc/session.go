@@ -33,7 +33,7 @@ func NewSession(provider *Provider, code string, idpArguments map[string]any) *S
 }
 
 // GetAuth implements the [idp.Session] interface.
-func (s *Session) GetAuth(ctx context.Context) (string, bool) {
+func (s *Session) GetAuth(ctx context.Context) (idp.Auth, error) {
 	return idp.Redirect(s.AuthURL)
 }
 
@@ -94,6 +94,10 @@ func (s *Session) Authorize(ctx context.Context) (err error) {
 
 func NewUser(info *oidc.UserInfo) *User {
 	return &User{UserInfo: info}
+}
+
+func InitUser() *User {
+	return &User{UserInfo: &oidc.UserInfo{}}
 }
 
 type User struct {

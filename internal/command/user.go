@@ -194,7 +194,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain))
 
 	for _, grantID := range cascadingGrantIDs {
-		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true)
+		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true, false, nil)
 		if err != nil {
 			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
@@ -327,18 +327,18 @@ func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID stri
 	return err
 }
 
-func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner string) (err error) {
+func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner string) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-uXHNj", "Errors.User.NotFound")
+		return "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-uXHNj", "Errors.User.NotFound")
 	}
-	return nil
+	return existingUser.ResourceOwner, nil
 }
 
 func (c *Commands) userWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *UserWriteModel, err error) {
@@ -353,21 +353,27 @@ func (c *Commands) userWriteModelByID(ctx context.Context, userID, resourceOwner
 	return writeModel, nil
 }
 
-func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id, resourceOwner string) (exists bool, err error) {
+func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id, resourceOwner string, machineOnly bool) (exists bool, err error) {
+	eventTypes := []eventstore.EventType{
+		user.MachineAddedEventType,
+		user.UserRemovedType,
+	}
+	if !machineOnly {
+		eventTypes = append(eventTypes,
+			user.HumanRegisteredType,
+			user.UserV1RegisteredType,
+			user.HumanAddedType,
+			user.UserV1AddedType,
+		)
+	}
 	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(resourceOwner).
 		OrderAsc().
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(id).
-		EventTypes(
-			user.HumanRegisteredType,
-			user.UserV1RegisteredType,
-			user.HumanAddedType,
-			user.UserV1AddedType,
-			user.MachineAddedEventType,
-			user.UserRemovedType,
-		).Builder())
+		EventTypes(eventTypes...).
+		Builder())
 	if err != nil {
 		return false, err
 	}

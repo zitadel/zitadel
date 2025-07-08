@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/shopspring/decimal"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database/mock"
@@ -166,7 +167,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 				updatedState: &state{
 					instanceID:     "instance",
 					eventTimestamp: time.Now(),
-					position:       42,
+					position:       decimal.NewFromInt(42),
 				},
 			},
 			isErr: func(t *testing.T, err error) {
@@ -192,7 +193,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 				updatedState: &state{
 					instanceID:     "instance",
 					eventTimestamp: time.Now(),
-					position:       42,
+					position:       decimal.NewFromInt(42),
 				},
 			},
 			isErr: func(t *testing.T, err error) {
@@ -217,7 +218,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 							eventstore.AggregateType("aggregate type"),
 							uint64(42),
 							mock.AnyType[time.Time]{},
-							float64(42),
+							decimal.NewFromInt(42),
 							uint32(0),
 						),
 						mock.WithExecRowsAffected(1),
@@ -228,7 +229,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 				updatedState: &state{
 					instanceID:     "instance",
 					eventTimestamp: time.Now(),
-					position:       42,
+					position:       decimal.NewFromInt(42),
 					aggregateType:  "aggregate type",
 					aggregateID:    "aggregate id",
 					sequence:       42,
@@ -397,7 +398,7 @@ func TestHandler_currentState(t *testing.T) {
 									"aggregate type",
 									int64(42),
 									testTime,
-									float64(42),
+									decimal.NewFromInt(42).String(),
 									uint16(10),
 								},
 							},
@@ -412,7 +413,7 @@ func TestHandler_currentState(t *testing.T) {
 				currentState: &state{
 					instanceID:     "instance",
 					eventTimestamp: testTime,
-					position:       42,
+					position:       decimal.NewFromInt(42),
 					aggregateType:  "aggregate type",
 					aggregateID:    "aggregate id",
 					sequence:       42,

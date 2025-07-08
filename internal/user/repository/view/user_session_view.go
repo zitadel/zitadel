@@ -12,6 +12,9 @@ import (
 )
 
 //go:embed user_session_by_id.sql
+var userSessionByIDsQuery string
+
+//go:embed user_session.sql
 var userSessionByIDQuery string
 
 //go:embed user_sessions_by_user_agent.sql
@@ -30,9 +33,23 @@ func UserSessionByIDs(ctx context.Context, db *database.DB, agentID, userID, ins
 			userSession, err = scanUserSession(row)
 			return err
 		},
-		userSessionByIDQuery,
+		userSessionByIDsQuery,
 		agentID,
 		userID,
+		instanceID,
+	)
+	return userSession, err
+}
+
+func UserSessionByID(ctx context.Context, db *database.DB, userSessionID, instanceID string) (userSession *model.UserSessionView, err error) {
+	err = db.QueryRowContext(
+		ctx,
+		func(row *sql.Row) error {
+			userSession, err = scanUserSession(row)
+			return err
+		},
+		userSessionByIDQuery,
+		userSessionID,
 		instanceID,
 	)
 	return userSession, err

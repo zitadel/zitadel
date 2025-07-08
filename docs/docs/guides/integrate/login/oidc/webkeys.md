@@ -20,13 +20,6 @@ JWT access tokens, instead of [introspection](/docs/apis/openidoauth/endpoints#i
 ZITADEL uses public key verification when API calls are made or when the userInfo or introspection
 endpoints are called with a JWT access token.
 
-:::info
-Web keys are an [experimental](/docs/support/software-release-cycles-support#beta) feature. Be sure to enable the `web_key` [feature](/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) before using it.
-
-The documentation describes the state of the feature in ZITADEL V3.
-Test the feature and add improvement or bug reports directly to the [github repository](https://github.com/zitadel/zitadel) or let us know your general feedback in the [discord thread](https://discord.com/channels/927474939156643850/1329100936127320175/threads/1332344892629717075)!
-:::
-
 ### JSON Web Key
 
 ZITADEL implements the [RFC7517 - JSON Web Key (JWK)](https://www.rfc-editor.org/rfc/rfc7517) format for storage and distribution of public keys.
@@ -85,7 +78,7 @@ The same counts for [zitadel/oidc](https://github.com/zitadel/oidc) Go library.
 
 ## Web Key management
 
-ZITADEL provides a resource based [web keys API](/docs/apis/resources/webkey_service_v3).
+ZITADEL provides a resource based [web keys API](/docs/apis/resources/webkey_service_v2).
 The API allows the creation, activation, deletion and listing of web keys.
 All public keys that are stored for an instance are served on the [JWKS endpoint](#json-web-key-set).
 Applications need public keys for token verification and not all applications are capable of on-demand

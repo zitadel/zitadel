@@ -260,6 +260,12 @@ func TestServer_ImportData(t *testing.T) {
 					DataOrgs: &admin.ImportDataOrg{
 						Orgs: []*admin.DataOrg{
 							{
+								OrgId: orgIDs[4],
+								Org: &management.AddOrgRequest{
+									Name: gofakeit.ProductName(),
+								},
+							},
+							{
 								OrgId: orgIDs[3],
 								Org: &management.AddOrgRequest{
 									Name: gofakeit.ProductName(),
@@ -337,6 +343,9 @@ func TestServer_ImportData(t *testing.T) {
 				Success: &admin.ImportDataSuccess{
 					Orgs: []*admin.ImportDataSuccessOrg{
 						{
+							OrgId: orgIDs[4],
+						},
+						{
 							OrgId:      orgIDs[3],
 							ProjectIds: projectIDs[2:4],
 							ProjectRoles: []string{
@@ -364,6 +373,12 @@ func TestServer_ImportData(t *testing.T) {
 					DataOrgs: &admin.ImportDataOrg{
 						Orgs: []*admin.DataOrg{
 							{
+								OrgId: orgIDs[6],
+								Org: &management.AddOrgRequest{
+									Name: gofakeit.ProductName(),
+								},
+							},
+							{
 								OrgId: orgIDs[5],
 								Org: &management.AddOrgRequest{
 									Name: gofakeit.ProductName(),
@@ -382,6 +397,11 @@ func TestServer_ImportData(t *testing.T) {
 										ProjectId:   projectIDs[4],
 										RoleKey:     "role1",
 										DisplayName: "role1",
+									},
+									{
+										ProjectId:   projectIDs[4],
+										RoleKey:     "role2",
+										DisplayName: "role2",
 									},
 								},
 								HumanUsers: []*v1.DataHumanUser{
@@ -437,16 +457,20 @@ func TestServer_ImportData(t *testing.T) {
 					{
 						Type:    "project_grant_member",
 						Id:      orgIDs[5] + "_" + projectIDs[4] + "_" + grantIDs[5] + "_" + userIDs[2],
-						Message: "ID=V3-DKcYh Message=Errors.Project.Member.AlreadyExists Parent=(ERROR: duplicate key value violates unique constraint \"unique_constraints_pkey\" (SQLSTATE 23505))",
+						Message: "ID=PROJECT-37fug Message=Errors.AlreadyExists",
 					},
 				},
 				Success: &admin.ImportDataSuccess{
 					Orgs: []*admin.ImportDataSuccessOrg{
 						{
+							OrgId: orgIDs[6],
+						},
+						{
 							OrgId:      orgIDs[5],
 							ProjectIds: projectIDs[4:5],
 							ProjectRoles: []string{
 								projectIDs[4] + "_role1",
+								projectIDs[4] + "_role2",
 							},
 							HumanUserIds: userIDs[2:3],
 							ProjectGrants: []*admin.ImportDataSuccessProjectGrant{

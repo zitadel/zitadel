@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefoon is al geverifieerd
       Empty: Telefoon is leeg
       NotChanged: Telefoon niet veranderd
+      VerifyingRemovalIsNotSupported: Verwijderen van verificatie is niet ondersteund
     Address:
       NotFound: Adres niet gevonden
       NotChanged: Adres niet veranderd
@@ -435,8 +436,6 @@ Errors:
     Invalid: Gebruikerstoekenning is ongeldig
     NotChanged: Gebruikerstoekenning is niet veranderd
     IDMissing: ID ontbreekt
-    NotActive: Gebruikerstoekenning is niet actief
-    NotInactive: Gebruikerstoekenning is niet gedeactiveerd
     NoPermissionForProject: Gebruiker heeft geen rechten op dit project
     RoleKeyNotFound: Rol niet gevonden
   Member:

@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Mobilnr redan verifierad
       Empty: Mobilnr är tom
       NotChanged: Mobilnr ändrades inte
+      VerifyingRemovalIsNotSupported: Verifiering av borttagning stöds inte
     Address:
       NotFound: Adress hittades inte
       NotChanged: Adress ändrades inte
@@ -435,8 +436,6 @@ Errors:
     Invalid: Användarbeviljandet är ogiltigt
     NotChanged: Användarbeviljandet har inte ändrats
     IDMissing: Id saknas
-    NotActive: Användarbeviljandet är inte aktivt
-    NotInactive: Användarbeviljandet är inte inaktivt
     NoPermissionForProject: Användaren har inga behörigheter i detta projekt
     RoleKeyNotFound: Rollen hittades inte
   Member:

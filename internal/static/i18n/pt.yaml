@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: O telefone já foi verificado
       Empty: O telefone está vazio
       NotChanged: Telefone não alterado
+      VerifyingRemovalIsNotSupported: Remoção de verificação não suportada
     Address:
       NotFound: Endereço não encontrado
       NotChanged: Endereço não alterado
@@ -434,8 +435,6 @@ Errors:
     Invalid: A concessão de usuário é inválida
     NotChanged: A concessão de usuário não foi alterada
     IDMissing: ID faltando
-    NotActive: A concessão de usuário não está ativa
-    NotInactive: A concessão de usuário não está desativada
     NoPermissionForProject: O usuário não possui permissões neste projeto
     RoleKeyNotFound: Função não encontrada
   Member:

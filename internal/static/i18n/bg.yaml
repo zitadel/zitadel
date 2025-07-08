@@ -117,6 +117,7 @@ Errors:
       AlreadyVerified: Телефонът вече е потвърден
       Empty: Телефонът е празен
       NotChanged: Телефонът не е сменен
+      VerifyingRemovalIsNotSupported: Премахването на проверката не се поддържа
     Address:
       NotFound: Адресът не е намерен
       NotChanged: Адресът не е променен
@@ -447,8 +448,6 @@ Errors:
     Invalid: Потребителското разрешение е невалидно
     NotChanged: Потребителското разрешение не е променено
     IDMissing: ID липсва
-    NotActive: Потребителското разрешение не е активно
-    NotInactive: Предоставянето на потребител не е деактивирано
     NoPermissionForProject: Потребителят няма разрешения за този проект
     RoleKeyNotFound: Ролята не е намерена
   Member:

@@ -3,6 +3,7 @@ package idp
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -15,12 +16,12 @@ import (
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 )
 
-func (s *Server) GetIDPByID(ctx context.Context, req *idp_pb.GetIDPByIDRequest) (*idp_pb.GetIDPByIDResponse, error) {
-	idp, err := s.query.IDPTemplateByID(ctx, true, req.Id, false, s.checkPermission)
+func (s *Server) GetIDPByID(ctx context.Context, req *connect.Request[idp_pb.GetIDPByIDRequest]) (*connect.Response[idp_pb.GetIDPByIDResponse], error) {
+	idp, err := s.query.IDPTemplateByID(ctx, true, req.Msg.GetId(), false, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	return &idp_pb.GetIDPByIDResponse{Idp: idpToPb(idp)}, nil
+	return connect.NewResponse(&idp_pb.GetIDPByIDResponse{Idp: idpToPb(idp)}), nil
 }
 
 func idpToPb(idp *query.IDPTemplate) *idp_pb.IDP {
@@ -336,6 +337,7 @@ func samlConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.SAMLIDPTemplate
 			WithSignedRequest:             template.WithSignedRequest,
 			NameIdFormat:                  nameIDFormat,
 			TransientMappingAttributeName: gu.Ptr(template.TransientMappingAttributeName),
+			FederatedLogoutEnabled:        gu.Ptr(template.FederatedLogoutEnabled),
 		},
 	}
 }

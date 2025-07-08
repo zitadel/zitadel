@@ -10,12 +10,12 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
-func WithOrigin(fallBackToHttps bool, http1Header, http2Header string, instanceHostHeaders, publicDomainHeaders []string) mux.MiddlewareFunc {
+func WithOrigin(enforceHttps bool, http1Header, http2Header string, instanceHostHeaders, publicDomainHeaders []string) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			origin := composeDomainContext(
 				r,
-				fallBackToHttps,
+				enforceHttps,
 				// to make sure we don't break existing configurations we append the existing checked headers as well
 				slices.Compact(append(instanceHostHeaders, http1Header, http2Header, http_util.Forwarded, http_util.ZitadelForwarded, http_util.ForwardedFor, http_util.ForwardedHost, http_util.ForwardedProto)),
 				publicDomainHeaders,
@@ -25,26 +25,30 @@ func WithOrigin(fallBackToHttps bool, http1Header, http2Header string, instanceH
 	}
 }
 
-func composeDomainContext(r *http.Request, fallBackToHttps bool, instanceDomainHeaders, publicDomainHeaders []string) *http_util.DomainCtx {
+func composeDomainContext(r *http.Request, enforceHttps bool, instanceDomainHeaders, publicDomainHeaders []string) *http_util.DomainCtx {
 	instanceHost, instanceProto := hostFromRequest(r, instanceDomainHeaders)
 	publicHost, publicProto := hostFromRequest(r, publicDomainHeaders)
-	if publicProto == "" {
-		publicProto = instanceProto
-	}
-	if publicProto == "" {
-		publicProto = "http"
-		if fallBackToHttps {
-			publicProto = "https"
-		}
-	}
 	if instanceHost == "" {
 		instanceHost = r.Host
 	}
 	return &http_util.DomainCtx{
 		InstanceHost: instanceHost,
-		Protocol:     publicProto,
+		Protocol:     protocolFromRequest(instanceProto, publicProto, enforceHttps),
 		PublicHost:   publicHost,
 	}
+}
+
+func protocolFromRequest(instanceProto, publicProto string, enforceHttps bool) string {
+	if enforceHttps {
+		return "https"
+	}
+	if publicProto != "" {
+		return publicProto
+	}
+	if instanceProto != "" {
+		return instanceProto
+	}
+	return "http"
 }
 
 func hostFromRequest(r *http.Request, headers []string) (host, proto string) {
@@ -65,7 +69,7 @@ func hostFromRequest(r *http.Request, headers []string) (host, proto string) {
 		if host == "" {
 			host = hostFromHeader
 		}
-		if proto == "" {
+		if proto == "" && (protoFromHeader == "http" || protoFromHeader == "https") {
 			proto = protoFromHeader
 		}
 	}

@@ -312,6 +312,16 @@ Caches:
       AddSource: true
       Formatter:
         Format: text
+  # Federated logouts store the information needed to handle federated logout and their state transfer
+  FederatedLogouts:
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUseAge: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
 
 Machine:
   # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
@@ -387,7 +397,8 @@ Projections:
     org_domain_verified_fields:
       TransactionDuration: 0s
       BulkLimit: 2000
-
+    execution_handler:
+      BulkLimit: 10
     # The Notifications projection is used for preparing the messages (emails and SMS) to be sent to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
@@ -515,13 +526,13 @@ OIDC:
       CharSet: "BCDFGHJKLMNPQRSTVWXZ" # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARSET
       CharAmount: 8 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARARMOUNT
       DashInterval: 4 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_DASHINTERVAL
-  DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
-  DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
+  DefaultLoginURLV2: "/ui/v2/login/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
+  DefaultLogoutURLV2: "/ui/v2/login/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
   PublicKeyCacheMaxAge: 24h # ZITADEL_OIDC_PUBLICKEYCACHEMAXAGE
   DefaultBackChannelLogoutLifetime: 15m # ZITADEL_OIDC_DEFAULTBACKCHANNELLOGOUTLIFETIME
 
 SAML:
-  DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
+  DefaultLoginURLV2: "/ui/v2/login/login?samlRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
   ProviderConfig:
     MetadataConfig:
       Path: "/metadata" # ZITADEL_SAML_PROVIDERCONFIG_METADATACONFIG_PATH
@@ -652,7 +663,7 @@ SystemDefaults:
     # or cost are automatically re-hashed using this config,
     # upon password validation or update.
     Hasher:
-      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
+      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2", "sha2"
       # Depending on the algorithm, different configuration options take effect.
       Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
       # Cost takes effect for the algorithms bcrypt and scrypt
@@ -663,10 +674,11 @@ SystemDefaults:
       Memory: 32768 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_MEMORY
       # Threads takes effect for the algorithms argon2i and argon2id
       Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
-      # Rounds takes effect for the algorithm pbkdf2
+      # Rounds takes effect for the algorithm pbkdf2 and sha2
       Rounds: 290000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ROUNDS
-      # Hash takes effect for the algorithm pbkdf2
-      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+      # Hash takes effect for the algorithm pbkdf2 and sha2
+      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512" for pbkdf2
+      # Can be "sha256" or "sha512" for sha2
       Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_HASH
 
     # Verifiers enable the possibility of verifying
@@ -688,6 +700,8 @@ SystemDefaults:
     #   - "md5"      # md5Crypt with salt and password shuffling.
     #   - "md5plain" # md5 digest of a password without salt
     #   - "md5salted" # md5 digest of a salted password
+    #   - "phpass"
+    #   - "sha2" # crypt(3) SHA-256 and SHA-512
     #   - "scrypt"
     #   - "pbkdf2"   # verifier for all pbkdf2 hash modes.
   SecretHasher:
@@ -825,6 +839,13 @@ DefaultInstance:
       Pat:
         # date format: 2023-01-01T00:00:00Z
         ExpirationDate: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE
+    LoginClient:
+      Machine:
+        Username: # ZITADEL_DEFAULTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME
+        Name: # ZITADEL_DEFAULTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME
+      Pat:
+        # date format: 2023-01-01T00:00:00Z
+        ExpirationDate: # ZITADEL_DEFAULTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE
   SecretGenerators:
     ClientSecret:
       Length: 64 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_CLIENTSECRET_LENGTH
@@ -1117,8 +1138,8 @@ DefaultInstance:
     # OIDCSingleV1SessionTermination: false # ZITADEL_DEFAULTINSTANCE_FEATURES_OIDCSINGLEV1SESSIONTERMINATION
     # DisableUserTokenEvent: false # ZITADEL_DEFAULTINSTANCE_FEATURES_DISABLEUSERTOKENEVENT
     # EnableBackChannelLogout: false # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLEBACKCHANNELLOGOUT
-    # LoginV2:
-    #  Required: false # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED
+    LoginV2:
+      Required: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED
     #  BaseURI: "" # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI
     # PermissionCheckV2: false # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
     # ConsoleUseV2UserApi: false # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
@@ -1181,6 +1202,40 @@ DefaultInstance:
 # A value of "0s" means that all events are available.
 # If an audit log retention is set using an instance limit, it will overwrite the system default.
 AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
+
+# The ServicePing are periodic reports of analytics data and the usage of ZITADEL.
+# It is sent to a central endpoint to help us improve ZITADEL.
+# It's enabled by default, but you can opt out either completely or by disabling specific telemetry data.
+ServicePing:
+  # By setting Enabled to false, the service ping is disabled completely.
+  Enabled: true # ZITADEL_SERVICEPING_ENABLED
+  # The endpoint to which the reports are sent. The endpoint is used as a base path. Individual reports are sent to the endpoint with a specific path.
+  Endpoint: "https://zitadel.com/api/ping" # ZITADEL_SERVICEPING_ENDPOINT
+  # Interval at which the service ping is sent to the endpoint.
+  # The interval is in the format of a cron expression.
+  # By default, it is set to every daily.
+  # Note that if the interval is set to `@daily`, we randomize the time to prevent all systems from sending their reports at the same time.
+  # If you want to send the service ping at a specific time, you can set the interval to a cron expression like "@midnight" or "15 4 * * *".
+  Interval: "@daily" # ZITADEL_SERVICEPING_INTERVAL
+  # Maximum number of attempts for each individual report to be sent.
+  # If one report fails, it will be retried up to this number of times.
+  # Other reports will still be handled in parallel and have their own retry count.
+  # This means if the base information only succeeded after 3 attempts,
+  # the resource count still has 5 attempts to be sent.
+  MaxAttempts: 5 # ZITADEL_SERVICEPING_MAXATTEMPTS
+  # The following features can be enabled or disabled individually.
+  # By default, all features are enabled.
+  # Note that if the service ping is enabled, base information about the system is always sent.
+  # This includes the version and the id, creation date and domains of all instances.
+  # If you disable a feature, it will not be sent in the service ping.
+  # Some features provide additional configuration options, if enabled.
+  Telemetry:
+    # ResourceCount is a periodic report of the number of resources in ZITADEL.
+    # This includes the number of users, organizations, projects, and other resources.
+    ResourceCount:
+      Enabled: true # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_ENABLED
+      # The number of counts that are sent in one batch.
+      BulkSize: 10000 # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_BULKSIZE
 
 InternalAuthZ:
   # Configure the RolePermissionMappings by environment variable using JSON notation:

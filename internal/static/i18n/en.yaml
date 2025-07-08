@@ -116,6 +116,7 @@ Errors:
       AlreadyVerified: Phone already verified
       Empty: Phone is empty
       NotChanged: Phone not changed
+      VerifyingRemovalIsNotSupported: Verifying phone removal is not supported
     Address:
       NotFound: Address not found
       NotChanged: Address not changed
@@ -436,8 +437,6 @@ Errors:
     Invalid: User grant is invalid
     NotChanged: User grant has not been changed
     IDMissing: Id missing
-    NotActive: User grant is not active
-    NotInactive: User grant is not deactivated
     NoPermissionForProject: User has no permissions on this project
     RoleKeyNotFound: Role not found
   Member:

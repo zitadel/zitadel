@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefon již ověřen
       Empty: Telefon je prázdný
       NotChanged: Telefon nezměněn
+      VerifyingRemovalIsNotSupported: Ověření odstranění telefonu není podporováno
     Address:
       NotFound: Adresa nenalezena
       NotChanged: Adresa nezměněna
@@ -435,8 +436,6 @@ Errors:
     Invalid: Uživatelský grant je neplatný
     NotChanged: Uživatelský grant nebyl změněn
     IDMissing: Chybí Id
-    NotActive: Uživatelský grant není aktivní
-    NotInactive: Uživatelský grant není deaktivován
     NoPermissionForProject: Uživatel nemá na tomto projektu žádná oprávnění
     RoleKeyNotFound: Role nenalezena
   Member:

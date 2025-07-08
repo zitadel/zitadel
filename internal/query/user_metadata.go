@@ -4,12 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -34,6 +36,28 @@ type UserMetadata struct {
 type UserMetadataSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
+}
+
+func userMetadataCheckPermission(ctx context.Context, userMetadataList *UserMetadataList, permissionCheck domain.PermissionCheck) {
+	userMetadataList.Metadata = slices.DeleteFunc(userMetadataList.Metadata,
+		func(userMetadata *UserMetadata) bool {
+			return userCheckPermission(ctx, userMetadata.ResourceOwner, userMetadata.UserID, permissionCheck) != nil
+		},
+	)
+}
+
+func userMetadataPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *UserMetadataSearchQueries) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		UserMetadataResourceOwnerCol,
+		domain.PermissionUserRead,
+		SingleOrgPermissionOption(queries.Queries),
+		OwnedRowsPermissionOption(UserMetadataUserIDCol),
+	)
+	return query.JoinClause(join, args...)
 }
 
 var (
@@ -97,7 +121,7 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-aDGG2", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-aDGG2", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -125,7 +149,7 @@ func (q *Queries) SearchUserMetadataForUsers(ctx context.Context, shouldTriggerB
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Egbgd", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Egbgd", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -139,7 +163,19 @@ func (q *Queries) SearchUserMetadataForUsers(ctx context.Context, shouldTriggerB
 	return metadata, err
 }
 
-func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool, userID string, queries *UserMetadataSearchQueries, withOwnerRemoved bool) (metadata *UserMetadataList, err error) {
+func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool, userID string, queries *UserMetadataSearchQueries, permissionCheck domain.PermissionCheck) (metadata *UserMetadataList, err error) {
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	users, err := q.searchUserMetadata(ctx, shouldTriggerBulk, userID, queries, permissionCheckV2)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+		userMetadataCheckPermission(ctx, users, permissionCheck)
+	}
+	return users, nil
+}
+
+func (q *Queries) searchUserMetadata(ctx context.Context, shouldTriggerBulk bool, userID string, queries *UserMetadataSearchQueries, permissionCheckV2 bool) (metadata *UserMetadataList, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -151,13 +187,14 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 	}
 
 	query, scan := prepareUserMetadataListQuery()
+	query = userMetadataPermissionCheckV2(ctx, query, permissionCheckV2, queries)
 	eq := sq.Eq{
 		UserMetadataUserIDCol.identifier():     userID,
 		UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-Egbgd", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Egbgd", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {

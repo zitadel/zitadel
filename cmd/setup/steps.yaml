@@ -6,6 +6,7 @@ FirstInstance:
   MachineKeyPath: # ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH
   # The personal access token from the section FirstInstance.Org.Machine.Pat is written to the PatPath.
   PatPath: # ZITADEL_FIRSTINSTANCE_PATPATH
+  LoginClientPatPath: # ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH
   InstanceName: ZITADEL # ZITADEL_FIRSTINSTANCE_INSTANCENAME
   DefaultLanguage: en # ZITADEL_FIRSTINSTANCE_DEFAULTLANGUAGE
   Org:
@@ -48,6 +49,13 @@ FirstInstance:
       Pat:
         # date format: 2023-01-01T00:00:00Z
         ExpirationDate: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE
+    LoginClient:
+      Machine:
+        Username: # ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME
+        Name: # ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME
+      Pat:
+        # date format: 2023-01-01T00:00:00Z
+        ExpirationDate: # ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE
 
 CorrectCreationDate:
   FailAfter: 5m # ZITADEL_CORRECTCREATIONDATE_FAILAFTER

@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Numer telefonu już zweryfikowany
       Empty: Numer telefonu jest pusty
       NotChanged: Numer telefonu nie zmieniony
+      VerifyingRemovalIsNotSupported: Usunięcie weryfikacji nie jest obsługiwane
     Address:
       NotFound: Adres nie znaleziony
       NotChanged: Adres nie zmieniony
@@ -435,8 +436,6 @@ Errors:
     Invalid: Uprawnienie użytkownika jest nieprawidłowe
     NotChanged: Uprawnienie użytkownika nie zostało zmienione
     IDMissing: Brak ID
-    NotActive: Uprawnienie użytkownika nie jest aktywne
-    NotInactive: Uprawnienie użytkownika nie jest dezaktywowane
     NoPermissionForProject: Użytkownik nie ma uprawnień do tego projektu
     RoleKeyNotFound: Rola nie znaleziona
   Member:

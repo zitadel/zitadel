@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telepon sudah diverifikasi
       Empty: Telepon kosong
       NotChanged: Telepon tidak berubah
+      VerifyingRemovalIsNotSupported: Verifikasi penghapusan tidak didukung
     Address:
       NotFound: Alamat tidak ditemukan
       NotChanged: Alamat tidak berubah
@@ -435,8 +436,6 @@ Errors:
     Invalid: Hibah pengguna tidak valid
     NotChanged: Hibah pengguna belum diubah
     IDMissing: Aku hilang
-    NotActive: Hibah pengguna tidak aktif
-    NotInactive: Hibah pengguna tidak dinonaktifkan
     NoPermissionForProject: Pengguna tidak memiliki izin pada proyek ini
     RoleKeyNotFound: Peran tidak ditemukan
   Member:

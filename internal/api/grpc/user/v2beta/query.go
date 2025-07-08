@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -13,23 +14,23 @@ import (
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
-func (s *Server) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) (_ *user.GetUserByIDResponse, err error) {
-	resp, err := s.query.GetUserByIDWithPermission(ctx, true, req.GetUserId(), s.checkPermission)
+func (s *Server) GetUserByID(ctx context.Context, req *connect.Request[user.GetUserByIDRequest]) (_ *connect.Response[user.GetUserByIDResponse], err error) {
+	resp, err := s.query.GetUserByIDWithPermission(ctx, true, req.Msg.GetUserId(), s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	return &user.GetUserByIDResponse{
+	return connect.NewResponse(&user.GetUserByIDResponse{
 		Details: object.DomainToDetailsPb(&domain.ObjectDetails{
 			Sequence:      resp.Sequence,
 			EventDate:     resp.ChangeDate,
 			ResourceOwner: resp.ResourceOwner,
 		}),
 		User: userToPb(resp, s.assetAPIPrefix(ctx)),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListUsers(ctx context.Context, req *user.ListUsersRequest) (*user.ListUsersResponse, error) {
-	queries, err := listUsersRequestToModel(req)
+func (s *Server) ListUsers(ctx context.Context, req *connect.Request[user.ListUsersRequest]) (*connect.Response[user.ListUsersResponse], error) {
+	queries, err := listUsersRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -37,10 +38,10 @@ func (s *Server) ListUsers(ctx context.Context, req *user.ListUsersRequest) (*us
 	if err != nil {
 		return nil, err
 	}
-	return &user.ListUsersResponse{
+	return connect.NewResponse(&user.ListUsersResponse{
 		Result:  UsersToPb(res.Users, s.assetAPIPrefix(ctx)),
 		Details: object.ToListDetails(res.SearchResponse),
-	}, nil
+	}), nil
 }
 
 func UsersToPb(users []*query.User, assetPrefix string) []*user.User {
@@ -292,11 +293,11 @@ func phoneQueryToQuery(q *user.PhoneQuery) (query.SearchQuery, error) {
 }
 
 func stateQueryToQuery(q *user.StateQuery) (query.SearchQuery, error) {
-	return query.NewUserStateSearchQuery(int32(q.State))
+	return query.NewUserStateSearchQuery(q.State.ToDomain())
 }
 
 func typeQueryToQuery(q *user.TypeQuery) (query.SearchQuery, error) {
-	return query.NewUserTypeSearchQuery(int32(q.Type))
+	return query.NewUserTypeSearchQuery(q.Type.ToDomain())
 }
 
 func loginNameQueryToQuery(q *user.LoginNameQuery) (query.SearchQuery, error) {

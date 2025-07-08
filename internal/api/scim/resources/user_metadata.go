@@ -45,7 +45,7 @@ func (h *UsersHandler) queryMetadataForUsers(ctx context.Context, userIds []stri
 func (h *UsersHandler) queryMetadataForUser(ctx context.Context, id string) (map[metadata.ScopedKey][]byte, error) {
 	queries := h.buildMetadataQueries(ctx)
 
-	md, err := h.query.SearchUserMetadata(ctx, false, id, queries, false)
+	md, err := h.query.SearchUserMetadata(ctx, false, id, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,8 @@ func getValueForMetadataKey(user *ScimUser, key metadata.Key) ([]byte, error) {
 		metadata.KeyAddresses,
 		metadata.KeyEntitlements,
 		metadata.KeyIms,
-		metadata.KeyPhotos:
+		metadata.KeyPhotos,
+		metadata.KeyEmails:
 		val, err := json.Marshal(value)
 		if err != nil {
 			return nil, err
@@ -223,6 +224,8 @@ func getRawValueForMetadataKey(user *ScimUser, key metadata.Key) interface{} {
 		return user.Locale
 	case metadata.KeyTimezone:
 		return user.Timezone
+	case metadata.KeyEmails:
+		return user.Emails
 	case metadata.KeyProvisioningDomain:
 		break
 	}
