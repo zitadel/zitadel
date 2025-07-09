@@ -28,6 +28,7 @@ var (
 	ActionProjection                    *handler.Handler
 	FlowProjection                      *handler.Handler
 	ProjectProjection                   *handler.Handler
+	ProjectMetadataProjection           *handler.Handler
 	PasswordComplexityProjection        *handler.Handler
 	PasswordAgeProjection               *handler.Handler
 	LockoutPolicyProjection             *handler.Handler
@@ -125,6 +126,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	ActionProjection = newActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
 	FlowProjection = newFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
 	ProjectProjection = newProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
+	ProjectMetadataProjection = newProjectMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_metadata"]))
 	PasswordComplexityProjection = newPasswordComplexityProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["password_complexities"]))
 	PasswordAgeProjection = newPasswordAgeProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["password_age_policy"]))
 	LockoutPolicyProjection = newLockoutPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["lockout_policy"]))
@@ -304,6 +306,7 @@ func newProjectionsList() {
 		ActionProjection,
 		FlowProjection,
 		ProjectProjection,
+		ProjectMetadataProjection,
 		PasswordComplexityProjection,
 		PasswordAgeProjection,
 		LockoutPolicyProjection,
