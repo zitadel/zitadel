@@ -8,8 +8,8 @@ COMMIT_SHA ?= $(shell git rev-parse HEAD)
 ZITADEL_IMAGE ?= zitadel:local
 
 GOCOVERDIR = tmp/coverage/integration
-GOCOVERDIR_INTEGRATION = "$(shell pwd)/${GOCOVERDIR}"
-GOCOVERDIR_UNIT = "$(shell pwd)/tmp/coverage/unit"
+GOCOVERDIR_INTEGRATION = $(shell pwd)/${GOCOVERDIR}
+GOCOVERDIR_UNIT = $(shell pwd)/tmp/coverage/unit
 ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
 export GOCOVERDIR GOCOVERDIR_INTEGRATION GOCOVERDIR_UNIT ZITADEL_MASTERKEY
