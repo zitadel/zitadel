@@ -7,8 +7,8 @@ VERSION ?= development-$(now)
 COMMIT_SHA ?= $(shell git rev-parse HEAD)
 ZITADEL_IMAGE ?= zitadel:local
 
-GOCOVERDIR_INTEGRATION = tmp/coverage/integration
-GOCOVERDIR_UNIT = tmp/coverage/unit
+GOCOVERDIR_INTEGRATION = "$(shell pwd)/tmp/coverage/integration"
+GOCOVERDIR_UNIT = "$(shell pwd)/tmp/coverage/unit"
 ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
 export GOCOVERDIR_INTEGRATION GOCOVERDIR_UNIT ZITADEL_MASTERKEY
@@ -120,8 +120,8 @@ clean:
 
 .PHONY: core_unit_test
 core_unit_test:
-	mkdir -p $${GOCOVERDIR_UNIT}
-	go test -cover -race -coverprofile=profile.cov -coverpkg=./internal/... ./... -args -test.gocoverdir="${GOCOVERDIR_UNIT}"
+	mkdir -p ${GOCOVERDIR_UNIT}
+	go test -cover -race -coverprofile=profile.cov -coverpkg=./internal/... ./... -args -test.gocoverdir=${GOCOVERDIR_UNIT}
 
 .PHONY: core_unit_reports
 core_unit_reports:
