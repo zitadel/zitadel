@@ -427,6 +427,34 @@ service SettingsService {
       }
     };
   }
+
+  // Set Hosted Login Translation
+  //
+  // Sets the input translations at the specified level (instance or organization) for the input language.
+  //
+  // Required permissions:
+  //   - `iam.policy.write`
+  rpc SetOrganizationSettings(SetOrganizationSettingsRequest) returns (SetOrganizationSettingsResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The translations was successfully set.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      put: "/v2/settings/organization";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
 }
 
 message GetLoginSettingsRequest {
