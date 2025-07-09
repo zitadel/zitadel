@@ -58,14 +58,6 @@ wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosti
 # Download and adjust the example configuration file containing database initialization configuration.
 wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/loadbalancing-example/example-zitadel-init-steps.yaml
 
-# A single ZITADEL instance always needs the same 32 bytes long masterkey
-# Generate one to a file if you haven't done so already and pass it as environment variable
-LC_ALL=C tr -dc '[:alpha:]' </dev/urandom | head -c 32 > ./zitadel-masterkey
-export ZITADEL_MASTERKEY="$(cat ./zitadel-masterkey)"
-
-# Create the env-file directory with the correct ownership before the docker engine creates it with root ownership
-mkdir ./.env-file
-
 # Make sure you have the latest version of the images
 docker compose pull
 
@@ -73,8 +65,8 @@ docker compose pull
 docker compose up --detach --wait
 ```
 
-Open your favorite internet browser at https://127.0.0.1.sslip.io/ui/console?login_hint=zitadel-admin@zitadel.127.0.0.1.sslip.io.
-Your browser warns you about the insecure self-signed TLS certificate. As 127.0.0.1.sslip.io resolves to your localhost, you can safely proceed.
+Open your favorite internet browser at https://localhost/ui/console?login_hint=zitadel-admin@zitadel.localhost.
+Your browser warns you about the insecure self-signed TLS certificate. As localhost resolves to your local machine, you can safely proceed.
 Use the password *Password1!* to log in.
 
 Read more about [the login process](/guides/integrate/login/oidc/login-users).

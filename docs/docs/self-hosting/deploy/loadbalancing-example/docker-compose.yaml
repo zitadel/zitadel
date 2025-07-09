@@ -23,8 +23,12 @@ services:
     restart: 'no'
     networks:
       - 'storage'
-    image: 'ghcr.io/zitadel/zitadel:latest'
-    command: 'init --config /example-zitadel-config.yaml --config /example-zitadel-secrets.yaml'
+    image: 'ghcr.io/zitadel/zitadel:v4.0.0-rc.1'
+    command: [
+      init,
+      --config, /example-zitadel-config.yaml,
+      --config,  /example-zitadel-secrets.yaml
+    ]
     depends_on:
       db:
         condition: 'service_healthy'
@@ -36,35 +40,20 @@ services:
     restart: 'no'
     networks:
       - 'storage'
-    # We use the debug image so we have the environment to
-    # - create the .env file for the login to authenticate at Zitadel
-    # - set the correct permissions for the .env-file folder
-    image: 'ghcr.io/zitadel/zitadel:latest-debug'
-    user: root
-    entrypoint: '/bin/sh'
-    command:
-      - -c
-      - >
-        /app/zitadel setup
-        --config /example-zitadel-config.yaml
-        --config /example-zitadel-secrets.yaml
-        --steps /example-zitadel-init-steps.yaml
-        --masterkey ${ZITADEL_MASTERKEY} &&
-        mv /pat /.env-file/pat || exit 0 &&
-        echo ZITADEL_SERVICE_USER_TOKEN=$(cat /.env-file/pat) > /.env-file/.env &&
-        chown -R 1001:${GID} /.env-file &&
-        chmod -R 770 /.env-file
-    environment:
-      - GID
+    image: 'ghcr.io/zitadel/zitadel:v4.0.0-rc.1'
+    command: [
+      setup,
+      --config, /current-dir/example-zitadel-config.yaml,
+      --config, /current-dir/example-zitadel-secrets.yaml,
+      --steps, /current-dir/example-zitadel-init-steps.yaml,
+      --masterkey, MasterkeyNeedsToHave32Characters
+    ]
     depends_on:
       zitadel-init:
         condition: 'service_completed_successfully'
         restart: false
     volumes:
-      - './.env-file:/.env-file:rw'
-      - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
-      - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
-      - './example-zitadel-init-steps.yaml:/example-zitadel-init-steps.yaml:ro'
+      - '.:/current-dir:rw'
 
   zitadel:
     restart: 'unless-stopped'
@@ -77,11 +66,13 @@ services:
       - "traefik.http.services.zitadel.loadbalancer.passhostheader=true"
       - "traefik.http.services.zitadel.loadbalancer.server.scheme=h2c"
       - "traefik.http.services.zitadel.loadbalancer.server.port=8080"
-    image: 'ghcr.io/zitadel/zitadel:latest'
-    command: >
-      start --config /example-zitadel-config.yaml
-      --config /example-zitadel-secrets.yaml
-      --masterkey ${ZITADEL_MASTERKEY}
+    image: 'ghcr.io/zitadel/zitadel:v4.0.0-rc.1'
+    command: [
+      start,
+      --config, /example-zitadel-config.yaml,
+      --config, /example-zitadel-secrets.yaml,
+      --masterkey, MasterkeyNeedsToHave32Characters
+    ]
     depends_on:
       zitadel-setup:
         condition: 'service_completed_successfully'
@@ -109,17 +100,18 @@ services:
       - "traefik.http.routers.login.tls=true" # Traefik uses a self-signed certificate
       - "traefik.http.services.login.loadbalancer.passhostheader=true"
       - "traefik.http.services.login.loadbalancer.server.port=3000"
-    image: 'ghcr.io/zitadel/login:main'
+    image: 'ghcr.io/zitadel/zitadel-login:v4.0.0-rc.1'
     environment:
       - ZITADEL_API_URL=http://zitadel:8080
       - CUSTOM_REQUEST_HEADERS=Host:localhost
-      - NEXT_PUBLIC_BASE_PATH="/ui/v2/login"
+      - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
+      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client-pat
     user: "${UID:-1000}"
     volumes:
-      - './.env-file:/.env-file:ro'
+      - '.:/current-dir:ro'
     depends_on:
-      zitadel:
-        condition: 'service_healthy'
+      zitadel-setup:
+        condition: 'service_completed_successfully'
         restart: false
 
   traefik:

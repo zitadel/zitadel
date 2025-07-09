@@ -15,12 +15,6 @@ Database:
     User.SSL.Mode: 'disable'
     Admin.SSL.Mode: 'disable'
 
-# By default, ZITADEL should redirect to /ui/v2/login
-OIDC:
-  DefaultLoginURLV2: "/ui/v2/login/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
-  DefaultLogoutURLV2: "/ui/v2/login/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
-SAML.DefaultLoginURLV2: "/ui/v2/login/login?authRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
-
 # Access logs allow us to debug Network issues
 LogStore.Access.Stdout.Enabled: true
 
