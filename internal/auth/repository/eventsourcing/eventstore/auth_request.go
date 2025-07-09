@@ -1055,6 +1055,10 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	if err != nil {
 		return nil, err
 	}
+	// in case the user was set automatically, we might not have the org set
+	if request.UserOrgID == "" {
+		request.UserOrgID = user.ResourceOwner
+	}
 	userSession, err := userSessionByIDs(ctx, repo.UserSessionViewProvider, repo.UserEventProvider, request.AgentID, user)
 	if err != nil {
 		return nil, err
