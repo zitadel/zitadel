@@ -7,7 +7,7 @@ VERSION ?= development-$(now)
 COMMIT_SHA ?= $(shell git rev-parse HEAD)
 ZITADEL_IMAGE ?= zitadel:local
 
-GOCOVERDIR_INTEGRATION = "$(shell pwd)/tmp/coverage/integration"
+GOCOVERDIR_INTEGRATION = "tmp/coverage/integration"
 GOCOVERDIR_UNIT = "$(shell pwd)/tmp/coverage/unit"
 ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
@@ -137,6 +137,7 @@ core_integration_db_down:
 
 .PHONY: core_integration_setup
 core_integration_setup:
+	mkdir -p ${GOCOVERDIR_INTEGRATION}
 	go build -cover -race -tags integration -o zitadel.test main.go
 	GORACE="halt_on_error=1" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml
 	GORACE="halt_on_error=1" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml --steps internal/integration/config/steps.yaml
@@ -150,7 +151,6 @@ core_integration_server_start: core_integration_setup
 
 .PHONY: core_integration_test_packages
 core_integration_test_packages:
-	mkdir -p $${GOCOVERDIR_INTEGRATION}
 	GOCOVERDIR=${GOCOVERDIR_INTEGRATION} go test -race -count 1 -tags integration -timeout 30m $$(go list -tags integration ./... | grep "integration_test")
 
 .PHONY: core_integration_server_stop
