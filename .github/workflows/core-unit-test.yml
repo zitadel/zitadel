@@ -19,7 +19,7 @@ on:
 jobs:
   test:
     outputs:
-      unit_test_report: ${{ steps.cache.outputs.cache-hit != 'true' }}
+      unit_test_report: true
     runs-on: ubuntu-latest
     steps:
       - 
@@ -54,11 +54,9 @@ jobs:
           path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
       - 
         name: test
-        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         run: make core_unit_test
       -
         uses: actions/upload-artifact@v4
-        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         with:
           name: unit-coverage
           path: tmp/coverage/unit
