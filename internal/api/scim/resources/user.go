@@ -262,7 +262,7 @@ func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string)
 
 	grants, err := h.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{userGrantUserQuery},
-	}, true)
+	}, true, nil)
 	if err != nil {
 		return nil, nil, err
 	}

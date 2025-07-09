@@ -92,11 +92,11 @@ func Test_u2fRegistrationDetailsToPb(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := u2fRegistrationDetailsToPb(tt.args.details, tt.args.err)
 			require.ErrorIs(t, err, tt.wantErr)
-			if !proto.Equal(tt.want, got) {
+			if tt.want != nil && !proto.Equal(tt.want, got.Msg) {
 				t.Errorf("Not equal:\nExpected\n%s\nActual:%s", tt.want, got)
 			}
 			if tt.want != nil {
-				grpc.AllFieldsSet(t, got.ProtoReflect())
+				grpc.AllFieldsSet(t, got.Msg.ProtoReflect())
 			}
 		})
 	}

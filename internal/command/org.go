@@ -123,7 +123,7 @@ func (c *Commands) newOrgSetupCommands(ctx context.Context, orgID string, orgSet
 
 func (c *orgSetupCommands) setupOrgAdmin(admin *OrgSetupAdmin, allowInitialMail bool) error {
 	if admin.ID != "" {
-		c.validations = append(c.validations, c.commands.AddOrgMemberCommand(c.aggregate, admin.ID, orgAdminRoles(admin.Roles)...))
+		c.validations = append(c.validations, c.commands.AddOrgMemberCommand(&AddOrgMember{OrgID: c.aggregate.ID, UserID: admin.ID, Roles: orgAdminRoles(admin.Roles)}))
 		return nil
 	}
 
@@ -147,7 +147,7 @@ func (c *orgSetupCommands) setupOrgAdmin(admin *OrgSetupAdmin, allowInitialMail 
 			return err
 		}
 	}
-	c.validations = append(c.validations, c.commands.AddOrgMemberCommand(c.aggregate, userID, orgAdminRoles(admin.Roles)...))
+	c.validations = append(c.validations, c.commands.AddOrgMemberCommand(&AddOrgMember{OrgID: c.aggregate.ID, UserID: userID, Roles: orgAdminRoles(admin.Roles)}))
 	return nil
 }
 
@@ -359,16 +359,15 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 	if err != nil {
 		return nil, err
 	}
-	err = c.checkUserExists(ctx, userID, resourceOwner)
+	_, err = c.checkUserExists(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	addedMember := NewOrgMemberWriteModel(addedOrg.AggregateID, userID)
-	orgMemberEvent, err := c.addOrgMember(ctx, orgAgg, addedMember, domain.NewMember(orgAgg.ID, userID, domain.RoleOrgOwner))
-	if err != nil {
+	addMember := &AddOrgMember{OrgID: orgAgg.ID, UserID: userID, Roles: []string{domain.RoleOrgOwner}}
+	if err := addMember.IsValid(c.zitadelRoles); err != nil {
 		return nil, err
 	}
-	events = append(events, orgMemberEvent)
+	events = append(events, org.NewMemberAddedEvent(ctx, orgAgg, addMember.UserID, addMember.Roles...))
 	if setOrgInactive {
 		deactivateOrgEvent := org.NewOrgDeactivatedEvent(ctx, orgAgg)
 		events = append(events, deactivateOrgEvent)
