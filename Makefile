@@ -7,7 +7,7 @@ VERSION ?= development-$(now)
 COMMIT_SHA ?= $(shell git rev-parse HEAD)
 ZITADEL_IMAGE ?= zitadel:local
 
-GOCOVERDIR = "tmp/coverage/integration"
+GOCOVERDIR = "$(shell pwd)/tmp/coverage/integration"
 GOCOVERDIR_UNIT = "$(shell pwd)/tmp/coverage/unit"
 ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
