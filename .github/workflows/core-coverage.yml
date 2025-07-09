@@ -5,10 +5,10 @@ on:
     inputs:
       unit_test_report:
         required: true
-        type: boolean
+        type: string
       integration_test_report:
         required: true
-        type: boolean
+        type: string
     secrets:
       CODECOV_TOKEN:
         required: true

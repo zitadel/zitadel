@@ -16,7 +16,7 @@ on:
 jobs:
   postgres:
     outputs:
-      integration_test_report: true
+      integration_test_report: "true"
     runs-on:
       group: zitadel-public
     services:

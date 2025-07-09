@@ -19,7 +19,7 @@ on:
 jobs:
   test:
     outputs:
-      unit_test_report: true
+      unit_test_report: "true"
     runs-on: ubuntu-latest
     steps:
       - 
