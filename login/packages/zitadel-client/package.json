@@ -65,6 +65,8 @@
   "devDependencies": {
     "@bufbuild/protocompile": "^0.0.1",
     "@bufbuild/buf": "^1.53.0",
-    "@zitadel/tsconfig": "workspace:*"
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0",
+    "eslint": "^8.57.0"
   }
 }
