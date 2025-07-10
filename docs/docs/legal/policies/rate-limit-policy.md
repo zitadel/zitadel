@@ -70,7 +70,7 @@ This statement describes a longer-term limit that can lead to a ban.
 
 - The "50 requests per second over a 3 minutes" is a stricter limit that targets sustained, abusive traffic patterns and results in a temporary ban (typically a minute, as stated).
 
-It's crucial to implement exponential backoff in your application when you receive a 429 status code to avoid being banned. This means waiting progressively longer before retrying a failed request. If you anticipate high volumes, contacting ZITADEL support to discuss raising your limits is also recommended.
+It's crucial to implement exponential backoff in your application when you receive a 429 status code to avoid being banned. This means waiting progressively longer before retrying a failed request.
 
 ## Load Testing
 
