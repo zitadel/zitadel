@@ -13,21 +13,6 @@ const CONFIG_FILES = [
         source: 'tsconfig.standalone.json',
         target: 'tsconfig.json',
         required: true
-    },
-    {
-        source: '.eslintrc.standalone.cjs',
-        target: '.eslintrc.cjs',
-        required: false
-    },
-    {
-        source: 'prettier.config.standalone.mjs',
-        target: 'prettier.config.mjs',
-        required: false
-    },
-    {
-        source: 'tailwind.config.standalone.mjs',
-        target: 'tailwind.config.mjs',
-        required: false
     }
 ];
 
@@ -54,8 +39,8 @@ async function prepareStandalone() {
             throw new Error('package.standalone.json not found!');
         }
 
-        // Step 2: Copy configuration files
-        console.log('\n⚙️  Setting up configuration files...');
+        // Step 2: Copy TypeScript configuration
+        console.log('\n⚙️  Setting up TypeScript configuration...');
         for (const config of CONFIG_FILES) {
             try {
                 const sourceExists = await fs.access(config.source).then(() => true).catch(() => false);
@@ -93,6 +78,9 @@ async function prepareStandalone() {
         }
         console.log('   2. Run: npm run dev');
         console.log('   3. Start developing!\n');
+
+        console.log('ℹ️  Note: ESLint, Prettier, and Tailwind configs are now unified');
+        console.log('   - No separate standalone config files needed!');
 
     } catch (error) {
         console.error('\n❌ Failed to prepare standalone version:', error.message);

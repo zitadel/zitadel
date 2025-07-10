@@ -33,8 +33,6 @@
   "devDependencies": {
     "@changesets/cli": "^2.29.2",
     "@vitejs/plugin-react": "^4.4.1",
-    "@zitadel/eslint-config": "workspace:*",
-    "@zitadel/prettier-config": "workspace:*",
     "axios": "^1.8.4",
     "dotenv": "^16.5.0",
     "dotenv-cli": "^8.0.0",

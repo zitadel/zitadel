@@ -1,8 +1,11 @@
 export default {
-  semi: true,
-  trailingComma: "all",
-  singleQuote: false,
   printWidth: 80,
   tabWidth: 2,
-  plugins: ["prettier-plugin-tailwindcss"],
+  useTabs: false,
+  semi: true,
+  singleQuote: false,
+  trailingComma: 'all',
+  bracketSpacing: true,
+  arrowParens: 'always',
+  plugins: ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"]
 };
