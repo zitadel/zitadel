@@ -405,6 +405,27 @@ func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userI
 	return resp
 }
 
+func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, orgID string, userUniqueness bool) *settings.SetOrganizationSettingsResponse {
+	resp, err := i.Client.SettingsV2.SetOrganizationSettings(ctx,
+		&settings.SetOrganizationSettingsRequest{
+			OrganizationId: orgID,
+			UserUniqueness: gu.Ptr(userUniqueness),
+		},
+	)
+	require.NoError(t, err)
+	return resp
+}
+
+func (i *Instance) DeleteOrganizationSettings(ctx context.Context, t *testing.T, orgID string) *settings.DeleteOrganizationSettingsResponse {
+	resp, err := i.Client.SettingsV2.DeleteOrganizationSettings(ctx,
+		&settings.DeleteOrganizationSettingsRequest{
+			OrganizationId: orgID,
+		},
+	)
+	require.NoError(t, err)
+	return resp
+}
+
 func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email, phone string) *user_v2.AddHumanUserResponse {
 	resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{

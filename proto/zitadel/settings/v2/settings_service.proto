@@ -17,6 +17,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "google/protobuf/struct.proto";
 import "zitadel/settings/v2/settings.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
 
@@ -415,7 +416,7 @@ service SettingsService {
         }
       };
     };
-    
+
     option (google.api.http) = {
       put: "/v2/settings/hosted_login_translation";
       body: "*"
@@ -428,9 +429,9 @@ service SettingsService {
     };
   }
 
-  // Set Hosted Login Translation
+  // Set Organization Settings
   //
-  // Sets the input translations at the specified level (instance or organization) for the input language.
+  // Sets the settings specific to an organization.
   //
   // Required permissions:
   //   - `iam.policy.write`
@@ -445,7 +446,35 @@ service SettingsService {
     };
 
     option (google.api.http) = {
-      put: "/v2/settings/organization";
+      post: "/v2/settings/organization";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+  }
+
+  // Delete Organization Settings
+  //
+  // Delete the settings specific to an organization.
+  //
+  // Required permissions:
+  //   - `iam.policy.delete`
+  rpc DeleteOrganizationSettings(DeleteOrganizationSettingsRequest) returns (DeleteOrganizationSettingsResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "The translations was successfully set.";
+        }
+      };
+    };
+
+    option (google.api.http) = {
+      delete: "/v2/settings/organization";
       body: "*"
     };
 
@@ -607,8 +636,8 @@ message GetHostedLoginTranslationResponse {
 
   google.protobuf.Struct translations = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        example: "{\"common\":{\"back\":\"Indietro\"},\"accounts\":{\"title\":\"Account\",\"description\":\"Seleziona l'account che desideri utilizzare.\",\"addAnother\":\"Aggiungi un altro account\",\"noResults\":\"Nessun account trovato\"}}";
-        description: "Translations contains the translations in the request language.";
+      example: "{\"common\":{\"back\":\"Indietro\"},\"accounts\":{\"title\":\"Account\",\"description\":\"Seleziona l'account che desideri utilizzare.\",\"addAnother\":\"Aggiungi un altro account\",\"noResults\":\"Nessun account trovato\"}}";
+      description: "Translations contains the translations in the request language.";
     }
   ];
 }
@@ -618,7 +647,7 @@ message SetHostedLoginTranslationRequest {
     bool instance = 1 [(validate.rules).bool = {const: true}];
     string organization_id = 2;
   }
- 
+
   string locale = 3 [
     (validate.rules).string = {min_len: 2},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -629,8 +658,8 @@ message SetHostedLoginTranslationRequest {
 
   google.protobuf.Struct translations = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        example: "{\"common\":{\"back\":\"Indietro\"},\"accounts\":{\"title\":\"Account\",\"description\":\"Seleziona l'account che desideri utilizzare.\",\"addAnother\":\"Aggiungi un altro account\",\"noResults\":\"Nessun account trovato\"}}";
-        description: "Translations should contain the translations in the specified locale.";
+      example: "{\"common\":{\"back\":\"Indietro\"},\"accounts\":{\"title\":\"Account\",\"description\":\"Seleziona l'account che desideri utilizzare.\",\"addAnother\":\"Aggiungi un altro account\",\"noResults\":\"Nessun account trovato\"}}";
+      description: "Translations should contain the translations in the specified locale.";
     }
   ];
 }
@@ -643,6 +672,36 @@ message SetHostedLoginTranslationResponse {
       min_length: 32;
       max_length: 32;
       example: "\"42a1ba123e6ea6f0c93e286ed97c7018\"";
+    }
+  ];
+}
+
+message SetOrganizationSettingsRequest {
+  // Organization ID in which this settings are set.
+  string organization_id = 1;
+  // Force the usernames in the organization to be unique, only possible to set if the existing users already have unique usernames in the organization context.
+  optional bool user_uniqueness = 2;
+}
+
+message SetOrganizationSettingsResponse {
+  // The timestamp of the set of the organization settings.
+  google.protobuf.Timestamp set_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message DeleteOrganizationSettingsRequest {
+  // Organization ID in which this settings are set.
+  string organization_id = 1;
+}
+
+message DeleteOrganizationSettingsResponse {
+  // The timestamp of the deletion of the organization settings.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
     }
   ];
 }

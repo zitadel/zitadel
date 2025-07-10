@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/settings"
 )
 
@@ -13,6 +14,9 @@ type SettingsOrganizationWriteModel struct {
 
 	UserUniqueness bool
 
+	OrganizationState domain.OrgState
+
+	State                domain.OrganizationSettingsState
 	writePermissionCheck bool
 	checkPermission      domain.PermissionCheck
 }
@@ -59,8 +63,14 @@ func (wm *SettingsOrganizationWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *settings.SettingOrganizationSetEvent:
 			wm.UserUniqueness = e.UserUniqueness
+			wm.State = domain.OrganizationSettingsStateActive
 		case *settings.SettingOrganizationRemovedEvent:
 			wm.UserUniqueness = false
+			wm.State = domain.OrganizationSettingsStateRemoved
+		case *org.OrgAddedEvent:
+			wm.OrganizationState = domain.OrgStateActive
+		case *org.OrgRemovedEvent:
+			wm.OrganizationState = domain.OrgStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -74,6 +84,11 @@ func (wm *SettingsOrganizationWriteModel) Query() *eventstore.SearchQueryBuilder
 		AggregateIDs(wm.AggregateID).
 		EventTypes(settings.SettingOrganizationSetEventType,
 			settings.SettingOrganizationRemovedEventType).
+		Or().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(org.OrgAddedEventType,
+			org.OrgRemovedEventType).
 		Builder()
 }
 
@@ -90,7 +105,7 @@ func (wm *SettingsOrganizationWriteModel) NewSet(
 	}
 	events := []eventstore.Command{
 		settings.NewSettingOrganizationAddedEvent(ctx,
-			UserV3AggregateFromWriteModel(&wm.WriteModel),
+			SettingsAggregateFromWriteModel(&wm.WriteModel),
 			*userUniqueness,
 		),
 	}
@@ -105,7 +120,7 @@ func (wm *SettingsOrganizationWriteModel) NewRemoved(
 	}
 	events := []eventstore.Command{
 		settings.NewSettingOrganizationRemovedEvent(ctx,
-			UserV3AggregateFromWriteModel(&wm.WriteModel),
+			SettingsAggregateFromWriteModel(&wm.WriteModel),
 		),
 	}
 	return events, nil
