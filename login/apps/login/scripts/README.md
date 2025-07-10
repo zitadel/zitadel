@@ -8,7 +8,6 @@ This directory contains the simplified scripts needed for managing the ZITADEL L
 
 - `package.json` - Main package file (monorepo mode with `workspace:*`)
 - `package.standalone.json` - Pre-configured standalone version (uses `latest`)
-- `tsconfig.standalone.json` - TypeScript configuration for standalone mode
 - `scripts/prepare-standalone.js` - Conversion script
 
 ### Generated/Temporary Files
@@ -30,7 +29,7 @@ node scripts/prepare-standalone.js [--install]
 **What it does:**
 
 - Copies `package.standalone.json` → `package.json`
-- Copies `tsconfig.standalone.json` → `tsconfig.json`
+- Confirms all configurations are unified and ready for standalone use
 - Optionally runs `npm install`
 
 ## 🚀 **Simplified Approach**

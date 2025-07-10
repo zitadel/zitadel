@@ -9,11 +9,7 @@ import fs from 'fs/promises';
 import { execSync } from 'child_process';
 
 const CONFIG_FILES = [
-    {
-        source: 'tsconfig.standalone.json',
-        target: 'tsconfig.json',
-        required: true
-    }
+    // TypeScript config is now unified - no separate standalone version needed
 ];
 
 async function prepareStandalone() {
@@ -39,28 +35,7 @@ async function prepareStandalone() {
             throw new Error('package.standalone.json not found!');
         }
 
-        // Step 2: Copy TypeScript configuration
-        console.log('\n⚙️  Setting up TypeScript configuration...');
-        for (const config of CONFIG_FILES) {
-            try {
-                const sourceExists = await fs.access(config.source).then(() => true).catch(() => false);
-                if (sourceExists) {
-                    await fs.copyFile(config.source, config.target);
-                    console.log(`   ✅ ${config.source} → ${config.target}`);
-                } else if (config.required) {
-                    throw new Error(`Required file ${config.source} not found!`);
-                } else {
-                    console.log(`   ⚠️  ${config.source} not found, skipping`);
-                }
-            } catch (error) {
-                if (config.required) {
-                    throw error;
-                }
-                console.warn(`   ❌ Failed to copy ${config.source}: ${error.message}`);
-            }
-        }
-
-        // Step 3: Install dependencies if requested
+        // Step 2: Install dependencies if requested
         if (shouldInstall) {
             console.log('\n📥 Installing dependencies...');
             try {
