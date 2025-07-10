@@ -1,0 +1,23 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "generate": {
+      "dependsOn": ["@zitadel/proto#generate"],
+      "outputs": ["src/app/proto/generated/**"]
+    },
+    "build": {
+      "dependsOn": ["generate"],
+      "outputs": ["dist/**"]
+    },
+    "start": {
+      "dependsOn": ["generate"],
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["generate"],
+      "outputs": []
+    }
+  }
+}

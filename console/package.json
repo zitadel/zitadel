@@ -4,11 +4,12 @@
   "scripts": {
     "ng": "ng",
     "start": "node prebuild.development.js && ng serve",
+    "prebuild": "pnpm run generate",
     "build": "ng build --configuration production --base-href=/ui/console/",
     "prelint": "pnpm run generate",
     "lint": "ng lint && prettier --check src",
     "lint:fix": "prettier --write src",
-    "generate": "buf generate ../proto --include-imports --include-wkt"
+    "generate": "pnpm exec buf generate ../proto --include-imports --include-wkt"
   },
   "private": true,
   "dependencies": {
