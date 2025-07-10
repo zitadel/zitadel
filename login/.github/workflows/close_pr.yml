@@ -15,7 +15,7 @@ jobs:
         with:
           script: |
             const message = `
-            👋 **Thanks for your contribution!**
+            👋 **Thanks for your contribution @${{ github.event.pull_request.user.login }}!**
             
             This repository \`${{ github.repository }}\` is a read-only mirror of the git subtree at [\`zitadel/zitadel/login`](https://github.com/zitadel/zitadel).
             Therefore, we close this pull request automatically.
