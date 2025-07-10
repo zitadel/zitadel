@@ -35,10 +35,42 @@ For ZITADEL Cloud, we have dedicated rate limits for the user interfaces (login,
 
 Rate limits are implemented with the following rules:
 
-| Path                 | Description                            | Rate Limiting                        | One Minute Banning                    |
-|----------------------|----------------------------------------|--------------------------------------|---------------------------------------|
-| /ui/\*               | Global Login, Register and Reset Limit | 10 requests per second over a minute | 15 requests per second over 3 minutes |
-| All other paths      | All gRPC-, REST and OAuth APIs         | 50 requests per second over a minute | 50 requests per second over 3 minutes |
+| Path            | Description                            | Rate Limiting                        | One Minute Banning                    |
+| --------------- | -------------------------------------- | ------------------------------------ | ------------------------------------- |
+| /ui/\*          | Global Login, Register and Reset Limit | 10 requests per second over a minute | 15 requests per second over 3 minutes |
+| All other paths | All gRPC-, REST and OAuth APIs         | 50 requests per second over a minute | 50 requests per second over 3 minutes |
+
+## Understanding Rate Limits with Examples
+
+### Rate Limiting - "50 requests per second over a minute"
+
+This statement means you are allowed an average of 50 requests per second over the course of a minute. It does **not** mean you can do 3000 requests in one second and then no more for 59 seconds.
+
+Here's how it generally works for these types of "rolling window" rate limits:
+
+- **It's a moving average**: The system continuously calculates your average request rate over the past 60 seconds.
+
+- **Sustained rate is key**: If you consistently send more than 50 requests in a given second, even if you slow down later, your 60-second average will exceed the limit, and you'll likely hit a 429 (Too Many Requests) error.
+
+- **Bursts are usually tolerated to a degree**: You might be able to briefly exceed 50 requests in one specific second if your overall rate over the minute remains at or below 50 requests per second. However, consistent bursts will quickly lead to hitting the limit.
+
+Therefore, you are only allowed to do 50 requests every second (on average, over a minute), not 3000 requests in one second.
+
+### One Minute Banning - "50 requests per second over 3 minutes"
+
+This statement describes a longer-term limit that can lead to a ban.
+
+- **Sustained high volume**: If your average request rate over a three-minute window consistently exceeds 50 requests per second, your IP will be flagged for a ban.
+
+- **Yes, you can be banned quickly**: If you do 9000 requests in 10 seconds, that's an average of 900 requests per second. This is significantly higher than 50 requests per second over any timeframe, including a 3-minute window. So, yes, you would almost certainly be banned for one minute right away (or possibly longer, depending on their internal ban logic once a threshold is crossed).
+
+**In essence:**
+
+- The "50 requests per second over a minute" is a softer limit designed to prevent temporary spikes from overwhelming the system. You'll likely receive 429 errors if you exceed this.
+
+- The "50 requests per second over a 3 minutes" is a stricter limit that targets sustained, abusive traffic patterns and results in a temporary ban (typically a minute, as stated).
+
+It's crucial to implement exponential backoff in your application when you receive a 429 status code to avoid being banned. This means waiting progressively longer before retrying a failed request. If you anticipate high volumes, contacting ZITADEL support to discuss raising your limits is also recommended.
 
 ## Load Testing
 
