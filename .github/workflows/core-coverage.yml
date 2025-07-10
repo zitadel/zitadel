@@ -18,6 +18,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - uses: actions/download-artifact@v4
         with:
           path: tmp/coverage/unit
@@ -33,6 +34,6 @@ jobs:
         if: ${{ inputs.unit_test_report == 'true' && inputs.integration_test_report == 'true' }}
         uses: codecov/codecov-action@v5.4.0
         with:
-          file: full-profile.cov
-          name: core-integration-tests-postgres
+          files: full-profile.cov
+          name: core-tests-postgres
           token: ${{ secrets.CODECOV_TOKEN }}
