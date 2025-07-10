@@ -14,7 +14,8 @@
     "build:login:standalone": "NEXT_PUBLIC_BASE_PATH=/ui/v2/login NEXT_OUTPUT_MODE=standalone pnpm build",
     "start": "pnpm build && pnpm exec next start",
     "start:built": "pnpm exec next start",
-    "clean": "pnpm mock:stop && rm -rf .turbo && rm -rf node_modules && rm -rf .next"
+    "clean": "pnpm mock:stop && rm -rf .turbo && rm -rf node_modules && rm -rf .next",
+    "standalone:prepare": "node scripts/prepare-standalone.js"
   },
   "git": {
     "pre-commit": "lint-staged"
