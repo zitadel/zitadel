@@ -9,7 +9,7 @@ plugins:
       - allow_delete_body
       - remove_internal_comments=true
       - preserve_rpc_order=true
-  - local: ./protoc-gen-connect-openapi
+  - local: ./protoc-gen-connect-openapi/protoc-gen-connect-openapi
     out: .artifacts/openapi3
     strategy: all
     opt:
