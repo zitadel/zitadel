@@ -18,10 +18,11 @@ jobs:
             
             This repository \`${{ github.repository }}\` is a read-only mirror of our internal development in [\`zitadel/zitadel\`](https://github.com/zitadel/zitadel).
             Therefore, we close this pull request automatically, but submitting your changes to the main repository is easy:
-            1. Fork and clone zitadel/zitadel
-            2. Create a new branch for your changes
-            3. Pull your changes into the new fork by running `make login_pull LOGIN_REMOTE_URL=<your-typescript-fork-org>/typescript LOGIN_REMOTE_BRANCH=<your-typescript-fork-branch>`.
-            4. Push your changes and open a pull request to zitadel/zitadel
+            1. [Fork zitadel/zitadel](https://github.com/zitadel/zitadel/fork)
+            2. Clone your Zitadel fork \`git clone https://github.com/<your-owner>/zitadel.git\`
+            3. Change directory to your Zitadel forks root.
+            4. Pull your changes into the Zitadel fork by running \`make login_pull LOGIN_REMOTE_URL=<your-typescript-fork-url> LOGIN_REMOTE_BRANCH=<your-typescript-fork-branch>\`.
+            5. Push your changes and open a pull request to zitadel/zitadel
             `.trim();
             await github.rest.issues.createComment({
                 ...context.repo,
