@@ -22,7 +22,7 @@ jobs:
             2. Clone your Zitadel fork \`git clone https://github.com/<your-owner>/zitadel.git\`
             3. Change directory to your Zitadel forks root.
             4. Pull your changes into the Zitadel fork by running \`make login_pull LOGIN_REMOTE_URL=<your-typescript-fork-url> LOGIN_REMOTE_BRANCH=<your-typescript-fork-branch>\`.
-            5. Push your changes and open a pull request to zitadel/zitadel
+            5. Push your changes and [open a pull request to zitadel/zitadel](https://github.com/zitadel/zitadel/compare)
             `.trim();
             await github.rest.issues.createComment({
                 ...context.repo,
