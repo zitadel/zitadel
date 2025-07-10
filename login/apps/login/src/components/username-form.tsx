@@ -11,6 +11,7 @@ import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { useTranslations } from "next-intl";
 
 type Inputs = {
   loginName: string;
@@ -43,6 +44,8 @@ export function UsernameForm({
       loginName: loginName ? loginName : "",
     },
   });
+
+  const t = useTranslations("loginname");
 
   const router = useRouter();
 
@@ -85,16 +88,16 @@ export function UsernameForm({
     }
   }, []);
 
-  let inputLabel = "Loginname";
+  let inputLabel = t("loginname");
   if (
     loginSettings?.disableLoginWithEmail &&
     loginSettings?.disableLoginWithPhone
   ) {
-    inputLabel = "Username";
+    inputLabel = t("username");
   } else if (loginSettings?.disableLoginWithEmail) {
-    inputLabel = "Username or phone number";
+    inputLabel = t("usernameOrPhoneNumber");
   } else if (loginSettings?.disableLoginWithPhone) {
-    inputLabel = "Username or email";
+    inputLabel = t("usernameOrEmail");
   }
 
   return (
