@@ -30,7 +30,7 @@ node scripts/prepare-standalone.js [--install]
 
 - Copies `package.standalone.json` → `package.json`
 - Confirms all configurations are unified and ready for standalone use
-- Optionally runs `npm install`
+- Optionally runs `pnpm install`
 
 ## 🚀 **Simplified Approach**
 
@@ -51,7 +51,7 @@ git clone <standalone-repo>
 node scripts/prepare-standalone.js --install
 
 # 3. Start developing
-npm run dev
+pnpm run dev
 ```
 
 ## 🔧 **Usage for Maintainers**

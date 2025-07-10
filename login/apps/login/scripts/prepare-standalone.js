@@ -39,23 +39,20 @@ async function prepareStandalone() {
         if (shouldInstall) {
             console.log('\n📥 Installing dependencies...');
             try {
-                execSync('npm install', { stdio: 'inherit' });
+                execSync('pnpm install', { stdio: 'inherit' });
                 console.log('   ✅ Dependencies installed successfully');
             } catch (error) {
-                console.warn('   ⚠️  npm install failed, you may need to run it manually');
+                console.warn('   ⚠️  pnpm install failed, you may need to run it manually');
             }
         }
 
         console.log('\n🎉 Standalone preparation complete!');
         console.log('\n📋 Next steps:');
         if (!shouldInstall) {
-            console.log('   1. Run: npm install');
+            console.log('   1. Run: pnpm install');
         }
-        console.log('   2. Run: npm run dev');
+        console.log('   2. Run: pnpm run dev');
         console.log('   3. Start developing!\n');
-
-        console.log('ℹ️  Note: ESLint, Prettier, and Tailwind configs are now unified');
-        console.log('   - No separate standalone config files needed!');
 
     } catch (error) {
         console.error('\n❌ Failed to prepare standalone version:', error.message);
