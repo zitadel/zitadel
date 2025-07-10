@@ -23,14 +23,19 @@
     "title": "Bentornato!",
     "description": "Inserisci i tuoi dati di accesso.",
     "register": "Registrati come nuovo utente",
-    "submit": "Continua"
+    "submit": "Continua",
+    "loginname": "Nome di accesso",
+    "username": "Nome utente",
+    "usernameOrPhoneNumber": "Nome utente o numero di telefono",
+    "usernameOrEmail": "Nome utente o e-mail"
   },
   "password": {
     "verify": {
       "title": "Password",
       "description": "Inserisci la tua password.",
       "resetPassword": "Reimposta Password",
-      "submit": "Continua"
+      "submit": "Continua",
+      "password": "Password"
     },
     "set": {
       "title": "Imposta Password",
@@ -38,12 +43,17 @@
       "codeSent": "Un codice è stato inviato al tuo indirizzo email.",
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resend": "Invia di nuovo",
-      "submit": "Continua"
+      "submit": "Continua",
+      "code": "Codice",
+      "newPassword": "Nuova password",
+      "confirmPassword": "Conferma password"
     },
     "change": {
       "title": "Cambia Password",
       "description": "Imposta la password per il tuo account",
-      "submit": "Continua"
+      "submit": "Continua",
+      "newPassword": "Nuova password",
+      "confirmPassword": "Conferma password"
     }
   },
   "idp": {
@@ -107,7 +117,8 @@
       "emailDescription": "Inserisci il codice ricevuto via email.",
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resendCode": "Invia di nuovo il codice",
-      "submit": "Continua"
+      "submit": "Continua",
+      "code": "Codice"
     },
     "set": {
       "title": "Configura l'autenticazione a 2 fattori",
@@ -115,7 +126,8 @@
       "smsDescription": "Inserisci il tuo numero di telefono per ricevere un codice via SMS.",
       "emailDescription": "Inserisci il tuo indirizzo email per ricevere un codice via email.",
       "totpRegisterDescription": "Scansiona il codice QR o naviga manualmente all'URL.",
-      "submit": "Continua"
+      "submit": "Continua",
+      "code": "Codice"
     }
   },
   "passkey": {
@@ -172,8 +184,13 @@
     "password": {
       "title": "Imposta Password",
       "description": "Imposta la password per il tuo account",
-      "submit": "Continua"
-    }
+      "submit": "Continua",
+      "password": "Password",
+      "confirmPassword": "Conferma password"
+    },
+    "firstname": "Nome",
+    "lastname": "Cognome",
+    "email": "E-mail"
   },
   "invite": {
     "title": "Invita Utente",
@@ -209,7 +226,8 @@
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resendCode": "Invia di nuovo il codice",
       "codeSent": "Un codice è stato appena inviato al tuo indirizzo email.",
-      "submit": "Continua"
+      "submit": "Continua",
+      "code": "Codice"
     }
   },
   "authenticator": {
@@ -223,7 +241,8 @@
     "usercode": {
       "title": "Codice dispositivo",
       "description": "Inserisci il codice.",
-      "submit": "Continua"
+      "submit": "Continua",
+      "code": "Codice"
     },
     "request": {
       "title": "{appName} desidera connettersi:",

@@ -23,14 +23,19 @@
     "title": "Willkommen zurück!",
     "description": "Geben Sie Ihre Anmeldedaten ein.",
     "register": "Neuen Benutzer registrieren",
-    "submit": "Weiter"
+    "submit": "Weiter",
+    "loginname": "Loginname",
+    "username": "Benutzername",
+    "usernameOrPhoneNumber": "Benutzername oder Telefonnummer",
+    "usernameOrEmail": "Benutzername oder E-Mail"
   },
   "password": {
     "verify": {
       "title": "Passwort",
       "description": "Geben Sie Ihr Passwort ein.",
       "resetPassword": "Passwort zurücksetzen",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "password": "Passwort"
     },
     "set": {
       "title": "Passwort festlegen",
@@ -38,12 +43,17 @@
       "codeSent": "Ein Code wurde an Ihre E-Mail-Adresse gesendet.",
       "noCodeReceived": "Keinen Code erhalten?",
       "resend": "Erneut senden",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "code": "Code",
+      "newPassword": "Neues Passwort",
+      "confirmPassword": "Neues Passwort wiederholen"
     },
     "change": {
       "title": "Passwort ändern",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "newPassword": "Neues Passwort",
+      "confirmPassword": "Neues Passwort wiederholen"
     }
   },
   "idp": {
@@ -107,7 +117,8 @@
       "emailDescription": "Geben Sie den Code ein, den Sie per E-Mail erhalten haben.",
       "noCodeReceived": "Keinen Code erhalten?",
       "resendCode": "Code erneut senden",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "code": "Code"
     },
     "set": {
       "title": "2-Faktor einrichten",
@@ -115,7 +126,8 @@
       "smsDescription": "Geben Sie Ihre Telefonnummer ein, um einen Code per SMS zu erhalten.",
       "emailDescription": "Geben Sie Ihre E-Mail-Adresse ein, um einen Code per E-Mail zu erhalten.",
       "totpRegisterDescription": "Scannen Sie den QR-Code oder navigieren Sie manuell zur URL.",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "code": "Code"
     }
   },
   "passkey": {
@@ -150,7 +162,7 @@
   "register": {
     "methods": {
       "passkey": "Passkey",
-      "password": "Password"
+      "password": "Passwort"
     },
     "disabled": {
       "title": "Registrierung deaktiviert",
@@ -172,8 +184,13 @@
     "password": {
       "title": "Passwort festlegen",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
-      "submit": "Weiter"
-    }
+      "submit": "Weiter",
+      "password": "Passwort",
+      "confirmPassword": "Neues Passwort wiederholen"
+    },
+    "firstname": "Vorname",
+    "lastname": "Nachname",
+    "email": "E-Mail"
   },
   "invite": {
     "title": "Benutzer einladen",
@@ -209,7 +226,8 @@
       "noCodeReceived": "Keinen Code erhalten?",
       "resendCode": "Code erneut senden",
       "codeSent": "Ein Code wurde gerade an Ihre E-Mail-Adresse gesendet.",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "code": "Code"
     }
   },
   "authenticator": {
@@ -223,7 +241,8 @@
     "usercode": {
       "title": "Gerätecode",
       "description": "Geben Sie den Code ein.",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "code": "Code"
     },
     "request": {
       "title": "{appName} möchte eine Verbindung herstellen:",

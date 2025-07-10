@@ -15,6 +15,7 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import { BackButton } from "./back-button";
@@ -55,6 +56,8 @@ export function ChangePasswordForm({
       comfirmPassword: "",
     },
   });
+
+  const t = useTranslations("password");
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -158,7 +161,7 @@ export function ChangePasswordForm({
             {...register("password", {
               required: "You have to provide a new password!",
             })}
-            label="New Password"
+            label={t("change.newPassword")}
             error={errors.password?.message as string}
             data-testid="password-change-text-input"
           />
@@ -171,7 +174,7 @@ export function ChangePasswordForm({
             {...register("confirmPassword", {
               required: "This field is required",
             })}
-            label="Confirm Password"
+            label={t("change.confirmPassword")}
             error={errors.confirmPassword?.message as string}
             data-testid="password-change-confirm-text-input"
           />
