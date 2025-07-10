@@ -17,8 +17,10 @@ jobs:
             const message = `
             👋 **Thanks for your contribution!**
             
-            This repository \`${{ github.repository }}\` is a read-only mirror of our internal development in [\`zitadel/zitadel\`](https://github.com/zitadel/zitadel).
-            Therefore, we close this pull request automatically, but submitting your changes to the main repository is easy:
+            This repository \`${{ github.repository }}\` is a read-only mirror of the git subtree at [\`zitadel/zitadel/login`](https://github.com/zitadel/zitadel).
+            Therefore, we close this pull request automatically.
+
+            Your changes are not lost. Submitting them to the main repository is easy:
             1. [Fork zitadel/zitadel](https://github.com/zitadel/zitadel/fork)
             2. Clone your Zitadel fork \`git clone https://github.com/<your-owner>/zitadel.git\`
             3. Change directory to your Zitadel forks root.
