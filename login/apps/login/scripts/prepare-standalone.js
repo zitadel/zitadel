@@ -8,8 +8,9 @@
 import fs from 'fs/promises';
 import { execSync } from 'child_process';
 
-const CONFIG_FILES = [
-    // TypeScript config is now unified - no separate standalone version needed
+const FILES_TO_REMOVE = [
+    // Turbo is not needed for standalone builds since there are no workspace dependencies
+    { file: 'turbo.json', backup: 'turbo.monorepo.backup.json' }
 ];
 
 async function prepareStandalone() {
@@ -35,7 +36,25 @@ async function prepareStandalone() {
             throw new Error('package.standalone.json not found!');
         }
 
-        // Step 2: Install dependencies if requested
+        // Step 2: Remove unnecessary files for standalone
+        console.log('🗑️  Removing monorepo-specific files...');
+        for (const item of FILES_TO_REMOVE) {
+            const fileExists = await fs.access(item.file).then(() => true).catch(() => false);
+
+            if (fileExists) {
+                // Backup current file
+                await fs.copyFile(item.file, item.backup);
+                console.log(`   💾 Backed up ${item.file} → ${item.backup}`);
+
+                // Remove the file
+                await fs.unlink(item.file);
+                console.log(`   🗑️  Removed ${item.file} (not needed in standalone)`);
+            } else {
+                console.log(`   ℹ️  ${item.file} not found, skipping`);
+            }
+        }
+
+        // Step 3: Install dependencies if requested
         if (shouldInstall) {
             console.log('\n📥 Installing dependencies...');
             try {
@@ -47,6 +66,7 @@ async function prepareStandalone() {
         }
 
         console.log('\n🎉 Standalone preparation complete!');
+        console.log('   ✨ Turbo removed - using standard npm scripts');
         console.log('\n📋 Next steps:');
         if (!shouldInstall) {
             console.log('   1. Run: pnpm install');
