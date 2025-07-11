@@ -42,7 +42,6 @@ jobs:
           mv zitadel-linux-amd64/zitadel ./zitadel
       - run: make login_quality
         env:
-          # latest if branch is main, otherwise image version which is the pull request number
           DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
           LOGIN_BAKE_CLI: depot bake
           DEPOT_PROJECT_ID: w47wkxzdtw
