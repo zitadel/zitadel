@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
+import { useTranslations } from "next-intl";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
@@ -42,6 +43,8 @@ export function LoginOTP({
   code,
   loginSettings,
 }: Props) {
+  const t = useTranslations("otp");
+
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -250,7 +253,7 @@ export function LoginOTP({
         <TextInput
           type="text"
           {...register("code", { required: "This field is required" })}
-          label="Code"
+          label={t("verify.code")}
           autoComplete="one-time-code"
           data-testid="code-text-input"
         />
