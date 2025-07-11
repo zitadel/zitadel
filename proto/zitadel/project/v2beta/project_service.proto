@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package zitadel.project.v2beta;
 
+import "zitadel/metadata/v2beta/metadata.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
@@ -666,6 +667,85 @@ service ProjectService {
       };
     };
   }
+
+  // Set Project Metadata
+  //
+  // Adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
+  //
+  // Required permission:
+  //  - `org.write`
+  rpc SetProjectMetadata(SetProjectMetadataRequest) returns (SetProjectMetadataResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/projects/{project_id}/metadata"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        responses: {
+          key: "200";
+        };
+        responses: {
+          key: "404"
+          value: {
+            description: "Project's not found";
+          }
+        };
+      };
+  }
+
+  // List Project Metadata
+  //
+  // List metadata of an project filtered by query.
+  //
+  // Required permission:
+  //  - `org.read`
+  rpc ListProjectMetadata(ListProjectMetadataRequest) returns (ListProjectMetadataResponse) {
+    option (google.api.http) = {
+        post: "/v2beta/projects/{project_id}/metadata/search"
+        body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = { auth_option: {
+        permission: "org.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        responses: {
+          key: "200";
+        };
+      };
+  }
+
+  // Delete Project Metadata
+  //
+  // Delete metadata objects from an project with a specific key.
+  //
+  // Required permission:
+  //  - `org.write`
+  rpc DeleteProjectMetadata(DeleteProjectMetadataRequest) returns (DeleteProjectMetadataResponse) {
+      option (google.api.http) = {
+          delete: "/v2beta/projects/{project_id}/metadata"
+      };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+        responses: {
+          key: "200";
+        };
+      };
+  }
 }
 
 message CreateProjectRequest {
@@ -1234,4 +1314,91 @@ message ListProjectGrantsRequest {
 message ListProjectGrantsResponse {
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
   repeated ProjectGrant project_grants = 2;
+}
+
+message Metadata {
+  // Key in the metadata key/value pair.
+  string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Value in the metadata key/value pair.
+  bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message SetProjectMetadataRequest{
+  // Project ID of Project to set metadata.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // Metadata to set.
+  repeated Metadata metadata = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      title: "Medata (Key/Value)"
+      description: "The values have to be base64 encoded.";
+      example: "[{\"key\": \"test1\", \"value\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"key\": \"test2\", \"value\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
+    }
+  ];
+}
+
+message SetProjectMetadataResponse{
+  // The timestamp of the update of the project metadata.
+  google.protobuf.Timestamp set_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListProjectMetadataRequest {
+  // Project ID of Project which metadata is to be listed.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // List limitations and ordering.
+  optional zitadel.filter.v2beta.PaginationRequest pagination = 2;
+  // Define the criteria to query for.
+  repeated zitadel.metadata.v2beta.MetadataQuery filter = 3;
+}
+
+message ListProjectMetadataResponse {
+  // Pagination of the Projects metadata results.
+  zitadel.filter.v2beta.PaginationResponse pagination = 1;
+  // The Project metadata requested.
+  repeated zitadel.metadata.v2beta.Metadata metadata = 2;
+}
+
+message DeleteProjectMetadataRequest {
+  // Project ID of Project which metadata is to be deleted is stored on.
+  string project_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+
+  // The keys for the Project metadata to be deleted.
+  repeated string keys = 2 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
+}
+
+message DeleteProjectMetadataResponse{
+  // The timestamp of the deletiion of the project metadata.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }
