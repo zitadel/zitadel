@@ -165,8 +165,7 @@ core_integration_test: core_integration_server_start core_integration_test_packa
 
 .PHONY: console_lint
 console_lint:
-	cd console && \
-	pnpm lint
+	pnpm turbo lint --filter=./console
 
 .PHONY: core_lint
 core_lint:

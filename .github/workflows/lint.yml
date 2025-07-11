@@ -53,12 +53,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node_version }}
           cache: "pnpm"
           cache-dependency-path: pnpm-lock.yaml
-      - run: corepack enable pnpm && pnpm install --filter=console
+      - run: pnpm install --filter=console
       - name: lint
         run: make console_lint
 
