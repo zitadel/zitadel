@@ -25,6 +25,7 @@
     "@angular/platform-browser-dynamic": "^16.2.12",
     "@angular/router": "^16.2.12",
     "@angular/service-worker": "^16.2.12",
+    "@bufbuild/protobuf": "^2.2.2",
     "@connectrpc/connect": "^2.0.0",
     "@connectrpc/connect-web": "^2.0.0",
     "@ctrl/ngx-codemirror": "^6.1.0",

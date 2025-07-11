@@ -95,6 +95,9 @@ importers:
       '@angular/service-worker':
         specifier: ^16.2.12
         version: 16.2.12(@angular/common@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2))(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))
+      '@bufbuild/protobuf':
+        specifier: ^2.2.2
+        version: 2.6.0
       '@connectrpc/connect':
         specifier: ^2.0.0
         version: 2.0.2(@bufbuild/protobuf@2.6.0)
