@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
+import { Component, computed, DestroyRef, OnInit } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import {
@@ -17,7 +17,7 @@ import { passwordConfirmValidator, requiredValidator } from 'src/app/modules/for
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { catchError, filter } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { UserService } from 'src/app/services/user.service';
 import { User } from '@zitadel/proto/zitadel/user/v2/user_pb';
 import { NewAuthService } from 'src/app/services/new-auth.service';
@@ -62,12 +62,16 @@ export class PasswordComponent implements OnInit {
   }
 
   private getUser() {
-    return this.userService.user$.pipe(
-      catchError((err) => {
-        this.toast.showError(err);
-        return EMPTY;
-      }),
-    );
+    const userQuery = this.userService.userQuery();
+    const userSignal = computed(() => {
+      if (userQuery.isError()) {
+        this.toast.showError(userQuery.error());
+      }
+
+      return userQuery.data();
+    });
+
+    return toObservable(userSignal).pipe(filter(Boolean));
   }
 
   private getUsername(user$: Observable<User>) {

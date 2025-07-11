@@ -73,6 +73,10 @@ import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 import { LanguagesService } from './services/languages.service';
 import { PosthogService } from './services/posthog.service';
+import { NewHeaderComponent } from './modules/new-header/new-header.component';
+import { provideTanStackQuery, QueryClient, withDevtools } from '@tanstack/angular-query-experimental';
+import { CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { provideNgIconsConfig } from '@ng-icons/core';
 
 registerLocaleData(localeDe);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
@@ -168,6 +172,8 @@ const authConfig: AuthConfig = {
     MatDialogModule,
     KeyboardShortcutsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
+    NewHeaderComponent,
+    CdkOverlayOrigin,
   ],
   providers: [
     ThemeService,
@@ -242,8 +248,16 @@ const authConfig: AuthConfig = {
     LanguagesService,
     PosthogService,
     { provide: 'windowObject', useValue: window },
+    provideTanStackQuery(
+      new QueryClient(),
+      withDevtools(() => ({ loadDevtools: 'auto' })),
+    ),
+    provideNgIconsConfig({
+      size: '1rem',
+    }),
   ],
   bootstrap: [AppComponent],
+  exports: [],
 })
 export class AppModule {
   constructor() {}

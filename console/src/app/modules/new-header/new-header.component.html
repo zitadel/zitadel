@@ -1,0 +1,67 @@
+<div class="new-header-wrapper">
+  <span *ngIf="!isHandset()" routerLink="/" class="new-header-title">CONSOLE</span>
+  <ng-container *ngIf="myInstanceQuery.data()?.instance as instance">
+    <ng-container *ngTemplateOutlet="slash"></ng-container>
+    <cnsl-header-button
+      cdkOverlayOrigin
+      #instanceTrigger="cdkOverlayOrigin"
+      (click)="isInstanceDropdownOpen.set(!isInstanceDropdownOpen())"
+      >{{ instance.name }}</cnsl-header-button
+    >
+    <cnsl-header-dropdown
+      [trigger]="instanceTrigger"
+      [isOpen]="isInstanceDropdownOpen()"
+      (closed)="isInstanceDropdownOpen.set(false); instanceSelectorSecondStep.set(false)"
+    >
+      <cnsl-instance-selector
+        *ngIf="!isHandset() || !instanceSelectorSecondStep()"
+        [instance]="instance"
+        (instanceChanged)="instanceSelectorSecondStep.set(true)"
+        (settingsClicked)="isInstanceDropdownOpen.set(false)"
+      ></cnsl-instance-selector>
+      <cnsl-organization-selector
+        *ngIf="instanceSelectorSecondStep()"
+        [backButton]="isHandset() ? instance.name : ''"
+        (backButtonPressed)="instanceSelectorSecondStep.set(false)"
+        (orgChanged)="isInstanceDropdownOpen.set(false); instanceSelectorSecondStep.set(false)"
+      ></cnsl-organization-selector>
+    </cnsl-header-dropdown>
+  </ng-container>
+  <ng-container *ngIf="['org.read'] | hasRole | async">
+    <ng-container *ngTemplateOutlet="slash"></ng-container>
+    <cnsl-header-button
+      cdkOverlayOrigin
+      #orgTrigger="cdkOverlayOrigin"
+      (click)="isOrgDropdownOpen.set(!isOrgDropdownOpen())"
+    >
+      <ng-container *ngIf="activeOrganizationQuery.data() as org">{{ org.name }}</ng-container>
+    </cnsl-header-button>
+    <cnsl-header-dropdown [trigger]="orgTrigger" [isOpen]="isOrgDropdownOpen()" (closed)="isOrgDropdownOpen.set(false)">
+      <cnsl-organization-selector (orgChanged)="isOrgDropdownOpen.set(false)"></cnsl-organization-selector>
+    </cnsl-header-dropdown>
+  </ng-container>
+  <ng-container *ngIf="!isHandset()">
+    <ng-container *ngFor="let bread of breadcrumbs(); index as i; let last = last">
+      <ng-container *ngTemplateOutlet="slash"></ng-container>
+      <a class="new-header-breadcrumb" matRipple [matRippleUnbounded]="false" [routerLink]="bread.routerLink">
+        {{ bread.name }}
+      </a>
+    </ng-container>
+  </ng-container>
+</div>
+
+<ng-template #slash>
+  <svg
+    class="slash"
+    viewBox="0 0 24 24"
+    width="32"
+    height="32"
+    stroke="currentColor"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    shape-rendering="geometricPrecision"
+  >
+    <path d="M16.88 3.549L7.12 20.451"></path>
+  </svg>
+</ng-template>
