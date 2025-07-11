@@ -44,6 +44,16 @@
       "title": "Passwort ändern",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
       "submit": "Weiter"
+    },
+    "complexity": {
+      "length": "Muss mindestens {minLength} Zeichen lang sein.",
+      "hasSymbol": "Muss ein Symbol enthalten.",
+      "hasNumber": "Muss eine Zahl enthalten.",
+      "hasUppercase": "Muss einen Großbuchstaben enthalten.",
+      "hasLowercase": "Muss einen Kleinbuchstaben enthalten.",
+      "equals": "Passwortbestätigung stimmt überein.",
+      "matches": "Stimmt überein",
+      "doesNotMatch": "Stimmt nicht überein"
     }
   },
   "idp": {

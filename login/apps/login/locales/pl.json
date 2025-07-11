@@ -44,6 +44,16 @@
       "title": "Zmień hasło",
       "description": "Ustaw nowe hasło dla swojego konta",
       "submit": "Kontynuuj"
+    },
+    "complexity": {
+      "length": "Musi zawierać co najmniej {minLength} znaków.",
+      "hasSymbol": "Musi zawierać symbol.",
+      "hasNumber": "Musi zawierać numer.",
+      "hasUppercase": "Musi zawierać dużą literę.",
+      "hasLowercase": "Musi zawierać małą literę.",
+      "equals": "Potwierdzenie hasła pasuje.",
+      "matches": "Pasuje",
+      "doesNotMatch": "Nie pasuje"
     }
   },
   "idp": {

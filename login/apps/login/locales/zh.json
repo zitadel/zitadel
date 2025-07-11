@@ -42,8 +42,18 @@
     },
     "change": {
       "title": "更改密码",
-      "description": "为您的账户设置密码",
+      "description": "为您的帐户设置密码",
       "submit": "继续"
+    },
+    "complexity": {
+      "length": "必须至少有 {minLength} 个字符。",
+      "hasSymbol": "必须包含一个符号。",
+      "hasNumber": "必须包含一个数字。",
+      "hasUppercase": "必须包含一个大写字母。",
+      "hasLowercase": "必须包含一个小写字母。",
+      "equals": "密码确认匹配。",
+      "matches": "匹配",
+      "doesNotMatch": "不匹配"
     }
   },
   "idp": {

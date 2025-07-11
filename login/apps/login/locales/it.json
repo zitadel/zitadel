@@ -44,6 +44,16 @@
       "title": "Cambia Password",
       "description": "Imposta la password per il tuo account",
       "submit": "Continua"
+    },
+    "complexity": {
+      "length": "Deve contenere almeno {minLength} caratteri.",
+      "hasSymbol": "Deve includere un simbolo.",
+      "hasNumber": "Deve includere un numero.",
+      "hasUppercase": "Deve includere una lettera maiuscola.",
+      "hasLowercase": "Deve includere una lettera minuscola.",
+      "equals": "La conferma della password corrisponde.",
+      "matches": "Corrisponde",
+      "doesNotMatch": "Non corrisponde"
     }
   },
   "idp": {

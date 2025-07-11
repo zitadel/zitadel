@@ -44,6 +44,16 @@
       "title": "Cambiar Contraseña",
       "description": "Establece la contraseña para tu cuenta",
       "submit": "Continuar"
+    },
+    "complexity": {
+      "length": "Debe tener al menos {minLength} caracteres de longitud.",
+      "hasSymbol": "Debe incluir un símbolo.",
+      "hasNumber": "Debe incluir un número.",
+      "hasUppercase": "Debe incluir una letra mayúscula.",
+      "hasLowercase": "Debe incluir una letra minúscula.",
+      "equals": "La confirmación de la contraseña coincide.",
+      "matches": "Coincide",
+      "doesNotMatch": "No coincide"
     }
   },
   "idp": {

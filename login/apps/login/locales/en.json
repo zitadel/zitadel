@@ -44,6 +44,16 @@
       "title": "Change Password",
       "description": "Set the password for your account",
       "submit": "Continue"
+    },
+    "complexity": {
+      "length": "Must be at least {minLength} characters long.",
+      "hasSymbol": "Must include a symbol.",
+      "hasNumber": "Must include a number.",
+      "hasUppercase": "Must include an uppercase letter.",
+      "hasLowercase": "Must include a lowercase letter.",
+      "equals": "Password confirmation matched.",
+      "matches": "Matches",
+      "doesNotMatch": "Doesn't match"
     }
   },
   "idp": {
