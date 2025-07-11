@@ -1,4 +1,4 @@
-name: Build console
+name: Build docs
 
 on:
   workflow_call:
@@ -16,7 +16,7 @@ on:
         value: ${{ jobs.build.outputs.cache_path }}
 
 env:
-  cache_path: console/dist/console
+  cache_path: docs/build
 
 jobs:
   build:
@@ -31,9 +31,9 @@ jobs:
         continue-on-error: true
         id: cache
         with:
-          key: console-${{ hashFiles('console', 'proto', '!console/dist') }}
+          key: docs-${{ hashFiles('docs', 'proto', '!docs/build', '!docs/node_modules') }}
           restore-keys: |
-            console-
+            docs-
           path: ${{ env.cache_path }}
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         uses: bufbuild/buf-setup-action@v1
@@ -52,8 +52,8 @@ jobs:
         name: Install dependencies
         run: pnpm install
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        name: Build console with Turbo
-        run: pnpm turbo build --filter=./console
+        name: Build docs with Turbo
+        run: pnpm turbo build --filter=./docs
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:

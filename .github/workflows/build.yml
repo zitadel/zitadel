@@ -34,6 +34,12 @@ jobs:
       node_version: "20"
       buf_version: "latest"
 
+  docs:
+    uses: ./.github/workflows/docs.yml
+    with:
+      node_version: "20"
+      buf_version: "latest"
+
   version:
     uses: ./.github/workflows/version.yml
     with:
@@ -86,7 +92,7 @@ jobs:
       actions: write
       id-token: write
     with:
-      ignore-run-cache:  ${{ github.event_name == 'workflow_dispatch' || fromJSON(github.run_attempt) > 1 }}
+      ignore-run-cache: ${{ github.event_name == 'workflow_dispatch' || fromJSON(github.run_attempt) > 1 }}
       node_version: "20"
 
   container:
@@ -121,7 +127,16 @@ jobs:
       issues: write
       pull-requests: write
     needs:
-      [version, core-unit-test, core-integration-test, lint, container, login-container, login-quality, e2e]
+      [
+        version,
+        core-unit-test,
+        core-integration-test,
+        lint,
+        container,
+        login-container,
+        login-quality,
+        e2e,
+      ]
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
