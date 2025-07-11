@@ -17,7 +17,7 @@ jobs:
             const message = `
             👋 **Thanks for your contribution @${{ github.event.pull_request.user.login }}!**
             
-            This repository \`${{ github.repository }}\` is a read-only mirror of the git subtree at [\`zitadel/zitadel/login`](https://github.com/zitadel/zitadel).
+            This repository \`${{ github.repository }}\` is a read-only mirror of the git subtree at [\`zitadel/zitadel/login\`](https://github.com/zitadel/zitadel).
             Therefore, we close this pull request automatically.
 
             Your changes are not lost. Submitting them to the main repository is easy:
