@@ -33,8 +33,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: depot/setup-action@v1
-        env:
-          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
       - name: Login meta
         id: login-meta
         uses: docker/metadata-action@v5
@@ -54,6 +52,7 @@ jobs:
       - name: Bake login multi-arch
         uses: depot/bake-action@v1
         env:
+          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
           NODE_VERSION: ${{ inputs.node_version }}
         with:
           push: true

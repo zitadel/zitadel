@@ -83,16 +83,13 @@ jobs:
       uses: actions/checkout@v4
     -
       uses: depot/setup-action@v1
-      env:
-        DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
     -
       run: make login_standalone_out
       env:
-        # latest if branch is main, otherwise image version which is the pull request number
+        DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
         LOGIN_BAKE_CLI: depot bake
         DEPOT_PROJECT_ID: w47wkxzdtw
         NODE_VERSION: ${{ inputs.node_version }}
-        DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
     -
       name: move files
       run: |

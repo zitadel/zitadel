@@ -22,8 +22,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: depot/setup-action@v1
-        env:
-          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
       - name: Restore Run Caches
         uses: actions/cache/restore@v4
         id: run-caches-restore
@@ -45,6 +43,7 @@ jobs:
       - run: make login_quality
         env:
           # latest if branch is main, otherwise image version which is the pull request number
+          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
           LOGIN_BAKE_CLI: depot bake
           DEPOT_PROJECT_ID: w47wkxzdtw
           IGNORE_RUN_CACHE: ${{ github.event.inputs.ignore-run-cache }}
