@@ -83,8 +83,8 @@ jobs:
       uses: actions/checkout@v4
     -
       uses: depot/setup-action@v1
-      with:
-        oidc: true
+      env:
+        DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
     -
       run: make login_standalone_out
       env:

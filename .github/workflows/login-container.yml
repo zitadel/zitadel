@@ -29,13 +29,12 @@ jobs:
     name: Build Login Container
     runs-on: depot-ubuntu-22.04-8
     permissions:
-      id-token: write
       packages: write
     steps:
       - uses: actions/checkout@v4
       - uses: depot/setup-action@v1
-        with:
-          oidc: true
+        env:
+          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
       - name: Login meta
         id: login-meta
         uses: docker/metadata-action@v5
