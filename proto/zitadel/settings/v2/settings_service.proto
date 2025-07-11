@@ -11,6 +11,7 @@ import "zitadel/settings/v2/lockout_settings.proto";
 import "zitadel/settings/v2/login_settings.proto";
 import "zitadel/settings/v2/password_settings.proto";
 import "zitadel/settings/v2/security_settings.proto";
+import "zitadel/settings/v2/organization_settings.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -18,6 +19,7 @@ import "validate/validate.proto";
 import "google/protobuf/struct.proto";
 import "zitadel/settings/v2/settings.proto";
 import "google/protobuf/timestamp.proto";
+import "zitadel/filter/v2/filter.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
 
@@ -484,6 +486,41 @@ service SettingsService {
       }
     };
   }
+
+  // List Organization Settings
+  //
+  // Returns a list of organization settings.
+  //
+  // Required permission:
+  //   - `iam.policy.read`
+  //   - `org.policy.read`
+  rpc ListOrganizationSettings(ListOrganizationSettingsRequest) returns (ListOrganizationSettingsResponse) {
+    option (google.api.http) = {
+      post: "/v2/settings/organization/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all project grants matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+        };
+      };
+    };
+  }
 }
 
 message GetLoginSettingsRequest {
@@ -705,3 +742,39 @@ message DeleteOrganizationSettingsResponse {
     }
   ];
 }
+
+message ListOrganizationSettingsRequest{
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional OrganizationSettingsFieldName sorting_column = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"ORGANIZATION_SETTINGS_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+  repeated OrganizationSettingsSearchFilter filters = 4;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"sortingColumn\":\"ORGANIZATION_SETTINGS_FIELD_NAME_CREATION_DATE\",\"filters\":[{\"inOrganizationIdsFilter\":{\"ids\":[\"28746028909593987\"]}}]}";
+  };
+}
+
+message ListOrganizationSettingsResponse {
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+  repeated OrganizationSettings organization_settings = 2;
+}
+
+enum OrganizationSettingsFieldName {
+  ORGANIZATION_SETTINGS_FIELD_NAME_UNSPECIFIED = 0;
+  ORGANIZATION_SETTINGS_FIELD_NAME_ORGANIZATION_ID = 1;
+  ORGANIZATION_SETTINGS_FIELD_NAME_CREATION_DATE = 2;
+  ORGANIZATION_SETTINGS_FIELD_NAME_CHANGE_DATE = 3;
+}
+
+message OrganizationSettingsSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    zitadel.filter.v2.InIDsFilter in_organization_ids_filter = 2;
+  }
+}
+
