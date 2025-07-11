@@ -2,6 +2,26 @@
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
   "tasks": {
+    "generate": {
+      "outputs": ["zitadel/**"],
+      "cache": false
+    },
+    "build": {
+      "outputs": ["dist/**"],
+      "dependsOn": ["@zitadel/proto#generate"]
+    },
+    "build:client:standalone": {
+      "outputs": ["dist/**"],
+      "dependsOn": ["@zitadel/proto#generate"]
+    },
+    "@zitadel/client#build": {
+      "outputs": ["dist/**"],
+      "dependsOn": ["@zitadel/proto#generate"]
+    },
+    "@zitadel/proto#generate": {
+      "outputs": ["zitadel/**"],
+      "cache": false
+    },
     "test:integration:setup": {
       "with": ["dev"]
     },
