@@ -57,8 +57,6 @@ jobs:
     with:
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   core-integration-test:
     needs: core
@@ -66,6 +64,13 @@ jobs:
     with:
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
+
+  core-coverage:
+    needs: [ core-unit-test, core-integration-test ]
+    uses: ./.github/workflows/core-coverage.yml
+    with:
+      unit_test_report: ${{ needs.core-unit-test.outputs.unit_test_report }}
+      integration_test_report: ${{ needs.core-integration-test.outputs.integration_test_report }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
