@@ -7,12 +7,12 @@
     "test:acceptance:setup:dev": "cd ../.. && make login_test_acceptance_setup_dev"
   },
   "devDependencies": {
-    "@faker-js/faker": "^9.7.0",
+    "@faker-js/faker": "^9.9.0",
     "@otplib/core": "^12.0.0",
     "@otplib/plugin-crypto": "^12.0.0",
     "@otplib/plugin-thirty-two": "^12.0.0",
-    "@playwright/test": "^1.52.0",
-    "gaxios": "^7.1.0",
+    "@playwright/test": "^1.54.1",
+    "gaxios": "^7.1.1",
     "typescript": "^5.8.3"
   }
 }
