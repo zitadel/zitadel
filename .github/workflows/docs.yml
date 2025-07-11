@@ -52,9 +52,6 @@ jobs:
         name: Install dependencies
         run: pnpm install
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        name: Ensure protoc plugins are available
-        run: cd docs && if [ ! -f "protoc-gen-connect-openapi/protoc-gen-connect-openapi" ]; then sh ./plugin-download.sh; fi
-      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         name: Build docs with Turbo
         run: pnpm turbo build --filter=./docs
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
