@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
@@ -58,6 +57,9 @@ func (o *org) List(ctx context.Context, opts ...database.Condition) ([]*domain.O
 	// return only non deleted organizations
 	opts = append(opts, database.IsNull(o.DeletedAtColumn()))
 	writeCondition(&builder, database.And(opts...))
+
+	orderBy := database.OrderBY(o.CreatedAtColumn())
+	orderBy.Write(&builder)
 
 	return scanOrganizations(ctx, o.client, &builder)
 }
