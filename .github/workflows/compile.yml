@@ -92,6 +92,7 @@ jobs:
         LOGIN_BAKE_CLI: depot bake
         DEPOT_PROJECT_ID: w47wkxzdtw
         NODE_VERSION: ${{ inputs.node_version }}
+        DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
     -
       name: move files
       run: |
