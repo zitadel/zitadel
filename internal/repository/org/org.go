@@ -12,6 +12,7 @@ import (
 
 const (
 	uniqueOrgname           = "org_name"
+	uniqueOrgID             = "org_id"
 	OrgAddedEventType       = orgEventTypePrefix + "added"
 	OrgChangedEventType     = orgEventTypePrefix + "changed"
 	OrgDeactivatedEventType = orgEventTypePrefix + "deactivated"
@@ -22,6 +23,19 @@ const (
 	OrgNameSearchField  = "name"
 	OrgStateSearchField = "state"
 )
+
+func NewAddOrgIDUniqueConstraint(orgID string) *eventstore.UniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		uniqueOrgID,
+		orgID,
+		"Errors.Org.AlreadyExists")
+}
+
+func NewRemoveOrgIDUniqueConstraint(orgID string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
+		uniqueOrgID,
+		orgID)
+}
 
 func NewAddOrgNameUniqueConstraint(orgName string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
@@ -47,7 +61,7 @@ func (e *OrgAddedEvent) Payload() interface{} {
 }
 
 func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name)}
+	return []*eventstore.UniqueConstraint{NewAddOrgIDUniqueConstraint(e.Aggregate().ID), NewAddOrgNameUniqueConstraint(e.Name)}
 }
 
 func (e *OrgAddedEvent) Fields() []*eventstore.FieldOperation {
@@ -290,6 +304,7 @@ func (e *OrgRemovedEvent) Payload() interface{} {
 
 func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	constraints := []*eventstore.UniqueConstraint{
+		NewRemoveOrgIDUniqueConstraint(e.Aggregate().ID),
 		NewRemoveOrgNameUniqueConstraint(e.name),
 	}
 	for _, name := range e.usernames {

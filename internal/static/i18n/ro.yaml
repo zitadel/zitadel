@@ -195,7 +195,7 @@ Errors:
     AlreadyExists: Instanța există deja
     NotChanged: Instanța nu a fost schimbată
   Org:
-    AlreadyExists: Numele organizației este deja luat
+    AlreadyExists: Numele sau ID-ul organizației este deja utilizat
     Invalid: Organizația este invalidă
     AlreadyDeactivated: Organizația este deja dezactivată
     AlreadyActive: Organizația este deja activă
