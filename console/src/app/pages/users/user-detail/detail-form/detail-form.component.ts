@@ -117,6 +117,7 @@ export class DetailFormComponent implements OnInit {
     };
 
     const dialogRef = this.dialog.open<ProfilePictureComponent, typeof data, boolean>(ProfilePictureComponent, {
+      data: data,
       width: '400px',
     });
 
