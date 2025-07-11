@@ -356,7 +356,6 @@ func TestGetInstance(t *testing.T) {
 			// check instance values
 			returnedInstance, err := instanceRepo.Get(ctx,
 				instance.ID,
-				// tt.conditionClauses...,
 			)
 			require.NoError(t, err)
 			if instance.ID == "get non existent instance" {

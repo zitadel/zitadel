@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
@@ -43,7 +44,7 @@ func (o *org) Get(ctx context.Context, id domain.OrgIdentifierCondition, instanc
 	nonDeletedOrgs := database.IsNull(o.DeletedAtColumn())
 
 	conditions = append(conditions, id, instanceIDCondition, nonDeletedOrgs)
-	o.writeCondition(&builder, database.And(conditions...))
+	writeCondition(&builder, database.And(conditions...))
 
 	return scanOrganization(ctx, o.client, &builder)
 }
@@ -56,7 +57,7 @@ func (o *org) List(ctx context.Context, opts ...database.Condition) ([]*domain.O
 
 	// return only non deleted organizations
 	opts = append(opts, database.IsNull(o.DeletedAtColumn()))
-	o.writeCondition(&builder, database.And(opts...))
+	writeCondition(&builder, database.And(opts...))
 
 	return scanOrganizations(ctx, o.client, &builder)
 }
@@ -72,45 +73,42 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 	builder.WriteString(createOrganizationStmt)
 
 	err := o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
-	return checkCreateOrgErr(err)
-}
-
-//nolint:gocognit
-func checkCreateOrgErr(err error) error {
 	if err != nil {
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			// constraint violation
-			if pgErr.Code == "23514" {
-				if pgErr.ConstraintName == "organizations_name_check" {
-					return errors.New("organization name not provided")
-				}
-				if pgErr.ConstraintName == "organizations_id_check" {
-					return errors.New("organization id not provided")
-				}
-				if pgErr.ConstraintName == "organizations_instance_id_check" {
-					return errors.New("instance id not provided")
-				}
-			}
-			// duplicate
-			if pgErr.Code == "23505" {
-				if pgErr.ConstraintName == "organizations_pkey" {
-					return errors.New("organization id already exists")
-				}
-				if pgErr.ConstraintName == "organizations_instance_id_name_key" {
-					return errors.New("organization name already exists for instance")
-				}
-			}
-			// invalid instance id
-			if pgErr.Code == "23503" {
-				if pgErr.ConstraintName == "organizations_instance_id_fkey" {
-					return errors.New("invalid instance id")
-				}
-			}
-		}
-		return err
+		return checkCreateOrgErr(err)
 	}
 	return nil
+}
+
+func checkCreateOrgErr(err error) error {
+	var pgErr *pgconn.PgError
+	if !errors.As(err, &pgErr) {
+		return err
+	}
+	// constraint violation
+	if pgErr.Code == "23514" {
+		if pgErr.ConstraintName == "organizations_name_check" {
+			return errors.New("organization name not provided")
+		}
+		if pgErr.ConstraintName == "organizations_id_check" {
+			return errors.New("organization id not provided")
+		}
+	}
+	// duplicate
+	if pgErr.Code == "23505" {
+		if pgErr.ConstraintName == "organizations_pkey" {
+			return errors.New("organization id already exists")
+		}
+		if pgErr.ConstraintName == "org_unique_instance_id_name_idx" {
+			return errors.New("organization name already exists for instance")
+		}
+	}
+	// invalid instance id
+	if pgErr.Code == "23503" {
+		if pgErr.ConstraintName == "organizations_instance_id_fkey" {
+			return errors.New("invalid instance id")
+		}
+	}
+	return err
 }
 
 // Update implements [domain.OrganizationRepository].
@@ -127,7 +125,7 @@ func (o org) Update(ctx context.Context, id domain.OrgIdentifierCondition, insta
 
 	conditions := []database.Condition{id, instanceIDCondition, nonDeletedOrgs}
 	database.Changes(changes).Write(&builder)
-	o.writeCondition(&builder, database.And(conditions...))
+	writeCondition(&builder, database.And(conditions...))
 
 	stmt := builder.String()
 
@@ -147,7 +145,7 @@ func (o org) Delete(ctx context.Context, id domain.OrgIdentifierCondition, insta
 	nonDeletedOrgs := database.IsNull(o.DeletedAtColumn())
 
 	conditions := []database.Condition{id, instanceIDCondition, nonDeletedOrgs}
-	o.writeCondition(&builder, database.And(conditions...))
+	writeCondition(&builder, database.And(conditions...))
 
 	return o.client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -162,8 +160,8 @@ func (o org) SetName(name string) database.Change {
 }
 
 // SetState implements [domain.organizationChanges].
-func (i org) SetState(state domain.OrgState) database.Change {
-	return database.NewChange(i.StateColumn(), state)
+func (o org) SetState(state domain.OrgState) database.Change {
+	return database.NewChange(o.StateColumn(), state)
 }
 
 // -------------------------------------------------------------
@@ -228,17 +226,6 @@ func (org) UpdatedAtColumn() database.Column {
 // DeletedAtColumn implements [domain.organizationColumns].
 func (org) DeletedAtColumn() database.Column {
 	return database.NewColumn("deleted_at")
-}
-
-func (o *org) writeCondition(
-	builder *database.StatementBuilder,
-	condition database.Condition,
-) {
-	if condition == nil {
-		return
-	}
-	builder.WriteString(" WHERE ")
-	condition.Write(builder)
 }
 
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {

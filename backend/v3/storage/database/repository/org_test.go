@@ -195,7 +195,7 @@ func TestCreateOrganization(t *testing.T) {
 				}
 				return organization
 			}(),
-			err: errors.New("instance id not provided"),
+			err: errors.New("invalid instance id"),
 		},
 		{
 			name: "adding organization with non existent instance id",
