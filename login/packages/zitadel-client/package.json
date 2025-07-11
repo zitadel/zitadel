@@ -55,11 +55,11 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^2.2.2",
-    "@connectrpc/connect": "^2.0.0",
-    "@connectrpc/connect-node": "^2.0.0",
-    "@connectrpc/connect-web": "^2.0.0",
-    "jose": "^5.3.0",
+    "@bufbuild/protobuf": "^2.6.0",
+    "@connectrpc/connect": "^2.0.2",
+    "@connectrpc/connect-node": "^2.0.2",
+    "@connectrpc/connect-web": "^2.0.2",
+    "jose": "^6.0.11",
     "@zitadel/proto": "workspace:*"
   },
   "devDependencies": {
