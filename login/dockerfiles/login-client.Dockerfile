@@ -3,4 +3,4 @@ COPY packages/zitadel-client/package.json ./packages/zitadel-client/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile --workspace-root --filter ./packages/zitadel-client
 COPY packages/zitadel-client ./packages/zitadel-client
-RUN pnpm build:client:standalone
+RUN cd packages/zitadel-client && pnpm build
