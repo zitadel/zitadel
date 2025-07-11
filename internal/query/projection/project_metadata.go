@@ -126,10 +126,10 @@ func (p *projectMetadataProjection) reduceMetadataRemoved(event eventstore.Event
 	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
-			handler.NewCond(ProjectMetadataColumnProjectID, e.Aggregate().ID),
-			handler.NewCond(ProjectMetadataColumnResourceOwner, e.Aggregate().ResourceOwner),
-			handler.NewCond(ProjectMetadataColumnKey, e.Key),
 			handler.NewCond(ProjectMetadataColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(ProjectMetadataColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectMetadataColumnKey, e.Key),
+			handler.NewCond(ProjectMetadataColumnResourceOwner, e.Aggregate().ResourceOwner),
 		},
 	), nil
 }
