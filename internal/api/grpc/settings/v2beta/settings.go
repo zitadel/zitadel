@@ -3,6 +3,7 @@ package settings
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -14,12 +15,12 @@ import (
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 )
 
-func (s *Server) GetLoginSettings(ctx context.Context, req *settings.GetLoginSettingsRequest) (*settings.GetLoginSettingsResponse, error) {
-	current, err := s.query.LoginPolicyByID(ctx, true, object.ResourceOwnerFromReq(ctx, req.GetCtx()), false)
+func (s *Server) GetLoginSettings(ctx context.Context, req *connect.Request[settings.GetLoginSettingsRequest]) (*connect.Response[settings.GetLoginSettingsResponse], error) {
+	current, err := s.query.LoginPolicyByID(ctx, true, object.ResourceOwnerFromReq(ctx, req.Msg.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}
-	return &settings.GetLoginSettingsResponse{
+	return connect.NewResponse(&settings.GetLoginSettingsResponse{
 		Settings: loginSettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
@@ -27,15 +28,15 @@ func (s *Server) GetLoginSettings(ctx context.Context, req *settings.GetLoginSet
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.OrgID,
 		},
-	}, nil
+	}), nil
 }
 
-func (s *Server) GetPasswordComplexitySettings(ctx context.Context, req *settings.GetPasswordComplexitySettingsRequest) (*settings.GetPasswordComplexitySettingsResponse, error) {
-	current, err := s.query.PasswordComplexityPolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.GetCtx()), false)
+func (s *Server) GetPasswordComplexitySettings(ctx context.Context, req *connect.Request[settings.GetPasswordComplexitySettingsRequest]) (*connect.Response[settings.GetPasswordComplexitySettingsResponse], error) {
+	current, err := s.query.PasswordComplexityPolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.Msg.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}
-	return &settings.GetPasswordComplexitySettingsResponse{
+	return connect.NewResponse(&settings.GetPasswordComplexitySettingsResponse{
 		Settings: passwordComplexitySettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
@@ -43,15 +44,15 @@ func (s *Server) GetPasswordComplexitySettings(ctx context.Context, req *setting
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
-	}, nil
+	}), nil
 }
 
-func (s *Server) GetPasswordExpirySettings(ctx context.Context, req *settings.GetPasswordExpirySettingsRequest) (*settings.GetPasswordExpirySettingsResponse, error) {
-	current, err := s.query.PasswordAgePolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.GetCtx()), false)
+func (s *Server) GetPasswordExpirySettings(ctx context.Context, req *connect.Request[settings.GetPasswordExpirySettingsRequest]) (*connect.Response[settings.GetPasswordExpirySettingsResponse], error) {
+	current, err := s.query.PasswordAgePolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.Msg.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}
-	return &settings.GetPasswordExpirySettingsResponse{
+	return connect.NewResponse(&settings.GetPasswordExpirySettingsResponse{
 		Settings: passwordExpirySettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
@@ -59,15 +60,15 @@ func (s *Server) GetPasswordExpirySettings(ctx context.Context, req *settings.Ge
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
-	}, nil
+	}), nil
 }
 
-func (s *Server) GetBrandingSettings(ctx context.Context, req *settings.GetBrandingSettingsRequest) (*settings.GetBrandingSettingsResponse, error) {
-	current, err := s.query.ActiveLabelPolicyByOrg(ctx, object.ResourceOwnerFromReq(ctx, req.GetCtx()), false)
+func (s *Server) GetBrandingSettings(ctx context.Context, req *connect.Request[settings.GetBrandingSettingsRequest]) (*connect.Response[settings.GetBrandingSettingsResponse], error) {
+	current, err := s.query.ActiveLabelPolicyByOrg(ctx, object.ResourceOwnerFromReq(ctx, req.Msg.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}
-	return &settings.GetBrandingSettingsResponse{
+	return connect.NewResponse(&settings.GetBrandingSettingsResponse{
 		Settings: brandingSettingsToPb(current, s.assetsAPIDomain(ctx)),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
@@ -75,15 +76,15 @@ func (s *Server) GetBrandingSettings(ctx context.Context, req *settings.GetBrand
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
-	}, nil
+	}), nil
 }
 
-func (s *Server) GetDomainSettings(ctx context.Context, req *settings.GetDomainSettingsRequest) (*settings.GetDomainSettingsResponse, error) {
-	current, err := s.query.DomainPolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.GetCtx()), false)
+func (s *Server) GetDomainSettings(ctx context.Context, req *connect.Request[settings.GetDomainSettingsRequest]) (*connect.Response[settings.GetDomainSettingsResponse], error) {
+	current, err := s.query.DomainPolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.Msg.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}
-	return &settings.GetDomainSettingsResponse{
+	return connect.NewResponse(&settings.GetDomainSettingsResponse{
 		Settings: domainSettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
@@ -91,15 +92,15 @@ func (s *Server) GetDomainSettings(ctx context.Context, req *settings.GetDomainS
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
-	}, nil
+	}), nil
 }
 
-func (s *Server) GetLegalAndSupportSettings(ctx context.Context, req *settings.GetLegalAndSupportSettingsRequest) (*settings.GetLegalAndSupportSettingsResponse, error) {
-	current, err := s.query.PrivacyPolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.GetCtx()), false)
+func (s *Server) GetLegalAndSupportSettings(ctx context.Context, req *connect.Request[settings.GetLegalAndSupportSettingsRequest]) (*connect.Response[settings.GetLegalAndSupportSettingsResponse], error) {
+	current, err := s.query.PrivacyPolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.Msg.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}
-	return &settings.GetLegalAndSupportSettingsResponse{
+	return connect.NewResponse(&settings.GetLegalAndSupportSettingsResponse{
 		Settings: legalAndSupportSettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
@@ -107,15 +108,15 @@ func (s *Server) GetLegalAndSupportSettings(ctx context.Context, req *settings.G
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
-	}, nil
+	}), nil
 }
 
-func (s *Server) GetLockoutSettings(ctx context.Context, req *settings.GetLockoutSettingsRequest) (*settings.GetLockoutSettingsResponse, error) {
-	current, err := s.query.LockoutPolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.GetCtx()))
+func (s *Server) GetLockoutSettings(ctx context.Context, req *connect.Request[settings.GetLockoutSettingsRequest]) (*connect.Response[settings.GetLockoutSettingsResponse], error) {
+	current, err := s.query.LockoutPolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.Msg.GetCtx()))
 	if err != nil {
 		return nil, err
 	}
-	return &settings.GetLockoutSettingsResponse{
+	return connect.NewResponse(&settings.GetLockoutSettingsResponse{
 		Settings: lockoutSettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
@@ -123,46 +124,46 @@ func (s *Server) GetLockoutSettings(ctx context.Context, req *settings.GetLockou
 			ChangeDate:    timestamppb.New(current.ChangeDate),
 			ResourceOwner: current.ResourceOwner,
 		},
-	}, nil
+	}), nil
 }
 
-func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *settings.GetActiveIdentityProvidersRequest) (*settings.GetActiveIdentityProvidersResponse, error) {
-	links, err := s.query.IDPLoginPolicyLinks(ctx, object.ResourceOwnerFromReq(ctx, req.GetCtx()), &query.IDPLoginPolicyLinksSearchQuery{}, false)
+func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *connect.Request[settings.GetActiveIdentityProvidersRequest]) (*connect.Response[settings.GetActiveIdentityProvidersResponse], error) {
+	links, err := s.query.IDPLoginPolicyLinks(ctx, object.ResourceOwnerFromReq(ctx, req.Msg.GetCtx()), &query.IDPLoginPolicyLinksSearchQuery{}, false)
 	if err != nil {
 		return nil, err
 	}
 
-	return &settings.GetActiveIdentityProvidersResponse{
+	return connect.NewResponse(&settings.GetActiveIdentityProvidersResponse{
 		Details:           object.ToListDetails(links.SearchResponse),
 		IdentityProviders: identityProvidersToPb(links.Links),
-	}, nil
+	}), nil
 }
 
-func (s *Server) GetGeneralSettings(ctx context.Context, _ *settings.GetGeneralSettingsRequest) (*settings.GetGeneralSettingsResponse, error) {
+func (s *Server) GetGeneralSettings(ctx context.Context, _ *connect.Request[settings.GetGeneralSettingsRequest]) (*connect.Response[settings.GetGeneralSettingsResponse], error) {
 	instance := authz.GetInstance(ctx)
-	return &settings.GetGeneralSettingsResponse{
+	return connect.NewResponse(&settings.GetGeneralSettingsResponse{
 		SupportedLanguages: domain.LanguagesToStrings(i18n.SupportedLanguages()),
 		DefaultOrgId:       instance.DefaultOrganisationID(),
 		DefaultLanguage:    instance.DefaultLanguage().String(),
-	}, nil
+	}), nil
 }
 
-func (s *Server) GetSecuritySettings(ctx context.Context, req *settings.GetSecuritySettingsRequest) (*settings.GetSecuritySettingsResponse, error) {
+func (s *Server) GetSecuritySettings(ctx context.Context, req *connect.Request[settings.GetSecuritySettingsRequest]) (*connect.Response[settings.GetSecuritySettingsResponse], error) {
 	policy, err := s.query.SecurityPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &settings.GetSecuritySettingsResponse{
+	return connect.NewResponse(&settings.GetSecuritySettingsResponse{
 		Settings: securityPolicyToSettingsPb(policy),
-	}, nil
+	}), nil
 }
 
-func (s *Server) SetSecuritySettings(ctx context.Context, req *settings.SetSecuritySettingsRequest) (*settings.SetSecuritySettingsResponse, error) {
-	details, err := s.command.SetSecurityPolicy(ctx, securitySettingsToCommand(req))
+func (s *Server) SetSecuritySettings(ctx context.Context, req *connect.Request[settings.SetSecuritySettingsRequest]) (*connect.Response[settings.SetSecuritySettingsResponse], error) {
+	details, err := s.command.SetSecurityPolicy(ctx, securitySettingsToCommand(req.Msg))
 	if err != nil {
 		return nil, err
 	}
-	return &settings.SetSecuritySettingsResponse{
+	return connect.NewResponse(&settings.SetSecuritySettingsResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }

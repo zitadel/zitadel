@@ -98,6 +98,7 @@ type AuthNKey struct {
 	ChangeDate    time.Time
 	ResourceOwner string
 	Sequence      uint64
+	ApplicationID string
 
 	Expiration time.Time
 	Type       domain.AuthNKeyType
@@ -222,6 +223,19 @@ func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySear
 	return authNKeys, err
 }
 
+func (q *Queries) GetAuthNKeyByIDWithPermission(ctx context.Context, shouldTriggerBulk bool, id string, permissionCheck domain.PermissionCheck, queries ...SearchQuery) (*AuthNKey, error) {
+	key, err := q.GetAuthNKeyByID(ctx, shouldTriggerBulk, id, queries...)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := appCheckPermission(ctx, key.ResourceOwner, key.AggregateID, permissionCheck); err != nil {
+		return nil, err
+	}
+
+	return key, nil
+}
+
 func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, id string, queries ...SearchQuery) (key *AuthNKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -251,62 +265,6 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, i
 		key, err = scan(row)
 		return err
 	}, stmt, args...)
-	return key, err
-}
-
-
-func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id string, identifier string) (key []byte, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	if q.caches != nil && q.caches.authnKeys != nil {
-		if cached, ok := q.caches.authnKeys.Get(ctx, AuthnKeyIndexKeyIDAndIdentifier, authz.GetInstance(ctx).InstanceID() + ":" + id + ":" + identifier); ok && cached != nil {
-			if time.Now().Unix() < cached.Expiry {
-				return cached.Key, nil
-			}
-		logging.WithFields(
-			"logger", "query.authnkey",
-			"key_id", id,
-			"identifier", identifier,
-		).Debug("cached authn key expired")
-
-		}
-	}
-
-	stmt, scan := prepareAuthNKeyPublicKeyQuery()
-	eq := sq.And{
-		sq.Eq{
-			AuthNKeyColumnID.identifier():         id,
-			AuthNKeyColumnIdentifier.identifier(): identifier,
-			AuthNKeyColumnEnabled.identifier():    true,
-			AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		},
-		sq.Gt{
-			AuthNKeyColumnExpiration.identifier(): time.Now(),
-		},
-	}
-	query, args, err := stmt.Where(eq).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-DAb32", "Errors.Query.SQLStatement")
-	}
-
-    var expiry time.Time
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		key, expiry, err = scan(row)
-		return err
-	}, query, args...)
-
-	if err == nil && q.caches != nil && q.caches.authnKeys != nil && key != nil {
-		q.caches.authnKeys.Set(ctx, &CachedPublicKey{
-		KeyID:      id,
-		InstanceID: authz.GetInstance(ctx).InstanceID(),
-		Identifier: identifier,
-		Key:        key,
-		Expiry:     expiry.Unix(),
-})
-
-
-}
 	return key, err
 }
 
@@ -386,6 +344,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 		AuthNKeyColumnSequence.identifier(),
 		AuthNKeyColumnExpiration.identifier(),
 		AuthNKeyColumnType.identifier(),
+		AuthNKeyColumnObjectID.identifier(),
 		countColumn.identifier(),
 	).From(authNKeyTable.identifier()).
 		PlaceholderFormat(sq.Dollar)
@@ -404,6 +363,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 				&authNKey.Sequence,
 				&authNKey.Expiration,
 				&authNKey.Type,
+				&authNKey.ApplicationID,
 				&count,
 			)
 			if err != nil {
@@ -454,29 +414,6 @@ func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, er
 				return nil, zerrors.ThrowInternal(err, "QUERY-BGnbr", "Errors.Internal")
 			}
 			return authNKey, nil
-		}
-}
-
-func prepareAuthNKeyPublicKeyQuery() (sq.SelectBuilder, func(row *sql.Row) ([]byte, time.Time, error)) {
-	return sq.Select(
-			AuthNKeyColumnPublicKey.identifier(),
-			AuthNKeyColumnExpiration.identifier(),
-		).From(authNKeyTable.identifier()).
-			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) ([]byte, time.Time, error) {
-			var publicKey []byte
-			var expiration time.Time
-			err := row.Scan(
-				&publicKey,
-				&expiration,
-			)
-			if err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return nil, time.Time{}, zerrors.ThrowNotFound(err, "QUERY-SDf32", "Errors.AuthNKey.NotFound")
-				}
-				return nil, time.Time{}, zerrors.ThrowInternal(err, "QUERY-Bfs2a", "Errors.Internal")
-			}
-			return publicKey, expiration, nil
 		}
 }
 

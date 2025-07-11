@@ -451,7 +451,7 @@ service ProjectService {
   //   - `project.role.read`
   rpc ListProjectRoles (ListProjectRolesRequest) returns (ListProjectRolesResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/projects/{project_id}/roles/search"
+      post: "/v2beta/projects/{project_id}/roles/search"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {

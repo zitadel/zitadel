@@ -2,14 +2,14 @@
   "schemas": [
     "urn:ietf:params:scim:schemas:core:2.0:User"
   ],
-  "userName": "acmeUser1",
+  "userName": "acmeUser1-inactive",
   "name": {
     "familyName": "Ross",
     "givenName": "Bethany"
   },
   "emails": [
     {
-      "value": "user1@example.com",
+      "value": "user1-inactive@example.com",
       "primary": true
     }
   ],

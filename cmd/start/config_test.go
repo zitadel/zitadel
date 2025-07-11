@@ -73,8 +73,6 @@ Log:
 DefaultInstance:
   Features:
     LoginDefaultOrg: true
-    LegacyIntrospection: true
-    TriggerIntrospectionProjections: true
     UserSchema: true
 Log:
   Level: info
@@ -84,10 +82,8 @@ Actions:
 `},
 		want: func(t *testing.T, config *Config) {
 			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceFeatures{
-				LoginDefaultOrg:                 gu.Ptr(true),
-				LegacyIntrospection:             gu.Ptr(true),
-				TriggerIntrospectionProjections: gu.Ptr(true),
-				UserSchema:                      gu.Ptr(true),
+				LoginDefaultOrg: gu.Ptr(true),
+				UserSchema:      gu.Ptr(true),
 			})
 		},
 	}, {

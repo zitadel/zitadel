@@ -4,6 +4,7 @@ package user_test
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/url"
 	"os"
@@ -1818,7 +1819,7 @@ func TestServer_DeleteUser(t *testing.T) {
 					request.UserId = resp.GetUserId()
 					Instance.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
-					Instance.CreateOrgMembership(t, CTX, request.UserId)
+					Instance.CreateOrgMembership(t, CTX, Instance.DefaultOrg.Id, request.UserId)
 					return CTX
 				},
 			},
@@ -2057,7 +2058,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
 				},
-				url:                "http://" + Instance.Domain + ":8000/sso",
+				url:                "http://localhost:8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
 			},
 			wantErr: false,
@@ -2081,7 +2082,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
 				},
-				url:                "http://" + Instance.Domain + ":8000/sso",
+				url:                "http://localhost:8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
 			},
 			wantErr: false,
@@ -2105,7 +2106,9 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
 				},
-				postForm: true,
+				url:                "http://localhost:8000/sso",
+				parametersExisting: []string{"RelayState", "SAMLRequest"},
+				postForm:           true,
 			},
 			wantErr: false,
 		},
@@ -2143,9 +2146,11 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			if tt.want.url != "" {
+			if tt.want.url != "" && !tt.want.postForm {
 				authUrl, err := url.Parse(got.GetAuthUrl())
 				require.NoError(t, err)
+
+				assert.Equal(t, tt.want.url, authUrl.Scheme+"://"+authUrl.Host+authUrl.Path)
 				require.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
 
 				for _, existing := range tt.want.parametersExisting {
@@ -2156,7 +2161,15 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				}
 			}
 			if tt.want.postForm {
-				assert.NotEmpty(t, got.GetPostForm())
+				assert.Equal(t, tt.want.url, got.GetFormData().GetUrl())
+
+				require.Len(t, got.GetFormData().GetFields(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
+				for _, existing := range tt.want.parametersExisting {
+					assert.Contains(t, got.GetFormData().GetFields(), existing)
+				}
+				for key, equal := range tt.want.parametersEqual {
+					assert.Equal(t, got.GetFormData().GetFields()[key], equal)
+				}
 			}
 			integration.AssertDetails(t, &user.StartIdentityProviderIntentResponse{
 				Details: tt.want.details,
@@ -3934,6 +3947,44 @@ func TestServer_CreateUser(t *testing.T) {
 			},
 		},
 		{
+			name: "with metadata",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+									Metadata: []*user.Metadata{
+										{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+										{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
+										{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))},
+									},
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+				}
+			},
+		},
+		{
 			name: "with idp",
 			testCase: func(runId string) testCase {
 				username := fmt.Sprintf("donald.duck+%s", runId)
@@ -4878,7 +4929,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			now := time.Now()
 			runId := fmt.Sprint(now.UnixNano() + int64(i))
-			userId := Instance.CreateUserTypeHuman(CTX).GetId()
+			userId := Instance.CreateUserTypeHuman(CTX, gofakeit.Email()).GetId()
 			test := tt.testCase(runId, userId)
 			got, err := Client.UpdateUser(test.args.ctx, test.args.req)
 			if test.wantErr {
@@ -4960,7 +5011,7 @@ func TestServer_UpdateUserTypeMachine(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			now := time.Now()
 			runId := fmt.Sprint(now.UnixNano() + int64(i))
-			userId := Instance.CreateUserTypeMachine(CTX).GetId()
+			userId := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id).GetId()
 			test := tt.testCase(runId, userId)
 			got, err := Client.UpdateUser(test.args.ctx, test.args.req)
 			if test.wantErr {
