@@ -179,9 +179,10 @@ core_lint:
 
 .PHONY: login_pull
 login_pull: login_ensure_remote
-	@echo "Pulling changes from the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
+	@echo "Merging changes from the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
 	git fetch $(LOGIN_REMOTE_NAME)
-	git subtree pull --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+	git merge -s ours --no-commit --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/$(LOGIN_REMOTE_BRANCH)
+	git commit -m "Subtree merged in login"
 
 .PHONY: login_push
 login_push: login_ensure_remote
@@ -191,7 +192,7 @@ login_push: login_ensure_remote
 login_ensure_remote:
 	@if ! git remote get-url $(LOGIN_REMOTE_NAME) > /dev/null 2>&1; then \
 		echo "Adding remote $(LOGIN_REMOTE_NAME)"; \
-		git remote add --fetch $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
+		git remote add $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
 	else \
 		echo "Remote $(LOGIN_REMOTE_NAME) already exists."; \
 	fi
