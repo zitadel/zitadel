@@ -236,6 +236,7 @@ RegistrationUser:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
   GenderLabel: Nem
   Female: Nő
   Male: Férfi
@@ -279,6 +280,7 @@ ExternalRegistrationUserOverview:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
   TosAndPrivacyLabel: Felhasználási feltételek
   TosConfirm: Elfogadom a
   TosLinkText: TOS
@@ -351,6 +353,7 @@ ExternalNotFound:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
 DeviceAuth:
   Title: Eszköz engedélyezése
   UserCode:
