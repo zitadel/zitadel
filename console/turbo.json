@@ -7,11 +7,11 @@
       "outputs": ["src/app/proto/generated/**"]
     },
     "build": {
-      "dependsOn": ["generate"],
+      "dependsOn": ["generate", "@zitadel/client#build"],
       "outputs": ["dist/**"]
     },
     "start": {
-      "dependsOn": ["generate"],
+      "dependsOn": ["generate", "@zitadel/client#build"],
       "cache": false,
       "persistent": true
     },

@@ -95,6 +95,17 @@ pnpm run lint:fix
 
 The Console app uses **dual proto generation** managed by Turbo dependencies:
 
+### Dependency Chain
+
+The Console app has the following build dependencies managed by Turbo:
+
+1. `@zitadel/proto#generate` - Generates modern protobuf files
+2. `@zitadel/client#build` - Builds the TypeScript gRPC client library
+3. `console#generate` - Generates Console-specific protobuf files
+4. `console#build` - Builds the Angular application
+
+This ensures that the Console always has access to the latest client library and protobuf definitions.
+
 ### Legacy v1 API (Traditional Protobuf)
 
 - Uses local `buf.gen.yaml` configuration
