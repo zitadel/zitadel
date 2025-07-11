@@ -51,7 +51,7 @@ func (c *Commands) sendInviteCode(ctx context.Context, invite *CreateUserInvite,
 	if err != nil {
 		return nil, nil, err
 	}
-	if wm.AggregateID != "" && wm.AggregateID != authz.GetCtxData(ctx).UserID {
+	if wm.AggregateID != authz.GetCtxData(ctx).UserID {
 		if err := c.checkPermission(ctx, domain.PermissionUserWrite, wm.ResourceOwner, wm.AggregateID); err != nil {
 			return nil, nil, err
 		}
