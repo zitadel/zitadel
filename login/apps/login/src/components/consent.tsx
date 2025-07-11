@@ -56,7 +56,7 @@ export function ConsentScreen({
         )}
         {scopes?.map((s) => {
           const translationKey = `device.scope.${s}`;
-          const description = t(translationKey, null);
+          const description = t(translationKey);
 
           // Check if the key itself is returned and provide a fallback
           const resolvedDescription =

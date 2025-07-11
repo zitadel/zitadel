@@ -1,64 +1,223 @@
 {
-    "github": {
-        "enabled": true
-      },
-    "cleanUrls": true,
-    "rewrites": [
-        {
-            "source": "/docs/proxy/js/script.js",
-            "destination": "https://plausible.io/js/script.tagged-events.pageview-props.outbound-links.js"
-        },
-        {
-            "source": "/docs/proxy/api/event",
-            "destination": "https://plausible.io/api/event"
-        },
-        { 
-            "source": "/docs/:match*",
-            "destination": "/:match*"
-        }
-    ],
-    "redirects": [
-        { "source": "/", "destination": "/docs" },
-        { "source": "/docs/category/apis/:slug*", "destination": "/docs/apis/:slug*", "permanent": true },
-        { "source": "/docs/apis/mgmt/:slug*", "destination": "/docs/apis/resources/mgmt/:slug*", "permanent": true },
-        { "source": "/docs/apis/auth/:slug*", "destination": "/docs/apis/resources/auth/:slug*", "permanent": true },
-        { "source": "/docs/apis/system/:slug*", "destination": "/docs/apis/resources/system/:slug*", "permanent": true },
-        { "source": "/docs/apis/admin/:slug*", "destination": "/docs/apis/resources/admin/:slug*", "permanent": true },
-        { "source": "/docs/apis/actionsv2/introduction", "destination": "/docs/apis/actions/v2/usage", "permanent": true },
-        { "source": "/docs/apis/actionsv2/execution-local", "destination": "/docs/apis/actions/v2/testing-locally", "permanent": true },
-        { "source": "/docs/guides/integrate/human-users", "destination": "/docs/guides/integrate/login", "permanent": true },
-        { "source": "/docs/guides/solution-scenarios/device-authorization", "destination": "/docs/guides/integrate/login/oidc/device-authorization", "permanent": true },
-        { "source": "/docs/guides/integrate/oauth-recommended-flows", "destination": "/docs/guides/integrate/login/oidc/oauth-recommended-flows", "permanent": true },
-        { "source": "/docs/guides/integrate/login-users", "destination": "/docs/guides/integrate/login/oidc/login-users", "permanent": true },
-        { "source": "/docs/guides/integrate/logout", "destination": "/docs/guides/integrate/login/oidc/logout", "permanent": true },
-        { "source": "/docs/guides/solution-scenarios/onboarding", "destination": "/docs/guides/integrate/onboarding", "permanent": true },
-        { "source": "/docs/guides/solution-scenarios/onboarding/b2b", "destination": "/docs/guides/integrate/onboarding/b2b", "permanent": true },
-        { "source": "/docs/guides/solution-scenarios/onboarding/end-users", "destination": "/docs/guides/integrate/onboarding/end-users", "permanent": true },
-        { "source": "/docs/concepts/structure/jwt_idp", "destination": "/docs/guides/integrate/identity-providers/jwt-idp", "permanent": true },
-        { "source": "/docs/guides/solution-scenarios/onboarding/end-users", "destination": "/docs/guides/integrate/onboarding/end-users", "permanent": true },
-        { "source": "/docs/guides/integrate/serviceusers", "destination": "/docs/guides/integrate/service-users/authenticate-service-users", "permanent": true },
-        { "source": "/docs/guides/integrate/private-key-jwt", "destination": "/docs/guides/integrate/service-users/private-key-jwt", "permanent": true },
-        { "source": "/docs/guides/integrate/client-credentials", "destination": "/docs/guides/integrate/service-users/client-credentials", "permanent": true },
-        { "source": "/docs/guides/integrate/pat", "destination": "/docs/guides/integrate/service-users/private-access-token", "permanent": true },
-        { "source": "/docs/guides/integrate/access-zitadel-apis", "destination": "/docs/guides/integrate/zitadel-apis/access-zitadel-apis", "permanent": true },
-        { "source": "/docs/guides/integrate/access-zitadel-system-api", "destination": "/docs/guides/integrate/zitadel-apis/access-zitadel-system-api", "permanent": true },
-        { "source": "/docs/guides/integrate/event-api", "destination": "/docs/guides/integrate/zitadel-apis/event-api", "permanent": true },
-        { "source": "/docs/examples/call-zitadel-api/go", "destination": "/docs/guides/integrate/zitadel-apis/example-zitadel-api-with-go", "permanent": true },
-        { "source": "/docs/examples/call-zitadel-api/dot-net", "destination": "/docs/guides/integrate/zitadel-apis/example-zitadel-api-with-dot-net", "permanent": true },
-        { "source": "/docs/guides/manage/terraform/basics", "destination": "/docs/guides/manage/terraform-provider", "permanent": true },
-        { "source": "/docs/guides/integrate/identity-providers", "destination": "/docs/guides/integrate/identity-providers/introduction", "permanent": true },
-        { "source": "/docs/guides/integrate/login/login-users#centralized-authentication-endpoint", "destination": "/docs/guides/integrate/login/hosted-login#centralized-authentication-endpoint", "permanent": true },
-        { "source": "/docs/guides/integrate/login/login-users#security-and-compliance", "destination": "/docs/guides/integrate/login/hosted-login#security-and-compliance", "permanent": true },
-        { "source": "/docs/guides/integrate/login/login-users#developer-friendly-integration", "destination": "/docs/guides/integrate/login/hosted-login#developer-friendly-integration", "permanent": true },
-        { "source": "/docs/guides/integrate/login/login-users#key-features-of-the-hosted-login", "destination": "/docs/guides/integrate/login/hosted-login#key-features-of-the-hosted-login", "permanent": true },
-        { "source": "/docs/guides/integrate/login/login-users#flexible-usernames", "destination": "/docs/guides/integrate/login/hosted-login#flexible-usernames", "permanent": true },
-        { "source": "/docs/guides/integrate/login/login-users#support-for-multiple-authentication-methods", "destination": "/docs/guides/integrate/login/hosted-login#support-for-multiple-authentication-methods", "permanent": true },
-        { "source": "/docs/guides/integrate/login/login-users#enterprise-single-sign-on", "destination": "/docs/guides/integrate/login/hosted-login#enterprise-single-sign-on", "permanent": true },
-        { "source": "/docs/guides/integrate/login/login-users#multi-tenancy-authentication", "destination": "/docs/guides/integrate/login/hosted-login#multi-tenancy-authentication", "permanent": true },
-        { "source": "/docs/guides/integrate/login/login-users#customization-options", "destination": "/docs/guides/integrate/login/hosted-login#customization-options", "permanent": true },
-        { "source": "/docs/guides/integrate/login/login-users#fast-account-switching", "destination": "/docs/guides/integrate/login/hosted-login#fast-account-switching", "permanent": true },
-        { "source": "/docs/guides/integrate/login/login-users#self-service-for-users", "destination": "/docs/guides/integrate/login/hosted-login#self-service-for-users", "permanent": true },
-        { "source": "/docs/guides/integrate/login/login-users#password-reset", "destination": "/docs/guides/integrate/login/hosted-login#password-reset", "permanent": true }
-    ]
+  "github": {
+    "enabled": true
+  },
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/docs/proxy/js/script.js",
+      "destination": "https://plausible.io/js/script.tagged-events.pageview-props.outbound-links.js"
+    },
+    {
+      "source": "/docs/proxy/api/event",
+      "destination": "https://plausible.io/api/event"
+    },
+    {
+      "source": "/docs/:match*",
+      "destination": "/:match*"
+    }
+  ],
+  "redirects": [
+    { "source": "/", "destination": "/docs" },
+    {
+      "source": "/docs/category/apis/:slug*",
+      "destination": "/docs/apis/:slug*",
+      "permanent": true
+    },
+    {
+      "source": "/docs/apis/mgmt/:slug*",
+      "destination": "/docs/apis/resources/mgmt/:slug*",
+      "permanent": true
+    },
+    {
+      "source": "/docs/apis/auth/:slug*",
+      "destination": "/docs/apis/resources/auth/:slug*",
+      "permanent": true
+    },
+    {
+      "source": "/docs/apis/system/:slug*",
+      "destination": "/docs/apis/resources/system/:slug*",
+      "permanent": true
+    },
+    {
+      "source": "/docs/apis/admin/:slug*",
+      "destination": "/docs/apis/resources/admin/:slug*",
+      "permanent": true
+    },
+    {
+      "source": "/docs/apis/actionsv2/introduction",
+      "destination": "/docs/apis/actions/v2/usage",
+      "permanent": true
+    },
+    {
+      "source": "/docs/apis/actionsv2/execution-local",
+      "destination": "/docs/apis/actions/v2/testing-locally",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/human-users",
+      "destination": "/docs/guides/integrate/login",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/solution-scenarios/device-authorization",
+      "destination": "/docs/guides/integrate/login/oidc/device-authorization",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/oauth-recommended-flows",
+      "destination": "/docs/guides/integrate/login/oidc/oauth-recommended-flows",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login-users",
+      "destination": "/docs/guides/integrate/login/oidc/login-users",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/logout",
+      "destination": "/docs/guides/integrate/login/oidc/logout",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/solution-scenarios/onboarding",
+      "destination": "/docs/guides/integrate/onboarding",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/solution-scenarios/onboarding/b2b",
+      "destination": "/docs/guides/integrate/onboarding/b2b",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/solution-scenarios/onboarding/end-users",
+      "destination": "/docs/guides/integrate/onboarding/end-users",
+      "permanent": true
+    },
+    {
+      "source": "/docs/concepts/structure/jwt_idp",
+      "destination": "/docs/guides/integrate/identity-providers/jwt-idp",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/solution-scenarios/onboarding/end-users",
+      "destination": "/docs/guides/integrate/onboarding/end-users",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/serviceusers",
+      "destination": "/docs/guides/integrate/service-users/authenticate-service-users",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/private-key-jwt",
+      "destination": "/docs/guides/integrate/service-users/private-key-jwt",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/client-credentials",
+      "destination": "/docs/guides/integrate/service-users/client-credentials",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/pat",
+      "destination": "/docs/guides/integrate/service-users/private-access-token",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/access-zitadel-apis",
+      "destination": "/docs/guides/integrate/zitadel-apis/access-zitadel-apis",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/access-zitadel-system-api",
+      "destination": "/docs/guides/integrate/zitadel-apis/access-zitadel-system-api",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/event-api",
+      "destination": "/docs/guides/integrate/zitadel-apis/event-api",
+      "permanent": true
+    },
+    {
+      "source": "/docs/examples/call-zitadel-api/go",
+      "destination": "/docs/guides/integrate/zitadel-apis/example-zitadel-api-with-go",
+      "permanent": true
+    },
+    {
+      "source": "/docs/examples/call-zitadel-api/dot-net",
+      "destination": "/docs/guides/integrate/zitadel-apis/example-zitadel-api-with-dot-net",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/manage/terraform/basics",
+      "destination": "/docs/guides/manage/terraform-provider",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/identity-providers",
+      "destination": "/docs/guides/integrate/identity-providers/introduction",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login/login-users#centralized-authentication-endpoint",
+      "destination": "/docs/guides/integrate/login/hosted-login#centralized-authentication-endpoint",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login/login-users#security-and-compliance",
+      "destination": "/docs/guides/integrate/login/hosted-login#security-and-compliance",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login/login-users#developer-friendly-integration",
+      "destination": "/docs/guides/integrate/login/hosted-login#developer-friendly-integration",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login/login-users#key-features-of-the-hosted-login",
+      "destination": "/docs/guides/integrate/login/hosted-login#key-features-of-the-hosted-login",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login/login-users#flexible-usernames",
+      "destination": "/docs/guides/integrate/login/hosted-login#flexible-usernames",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login/login-users#support-for-multiple-authentication-methods",
+      "destination": "/docs/guides/integrate/login/hosted-login#support-for-multiple-authentication-methods",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login/login-users#enterprise-single-sign-on",
+      "destination": "/docs/guides/integrate/login/hosted-login#enterprise-single-sign-on",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login/login-users#multi-tenancy-authentication",
+      "destination": "/docs/guides/integrate/login/hosted-login#multi-tenancy-authentication",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login/login-users#customization-options",
+      "destination": "/docs/guides/integrate/login/hosted-login#customization-options",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login/login-users#fast-account-switching",
+      "destination": "/docs/guides/integrate/login/hosted-login#fast-account-switching",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login/login-users#self-service-for-users",
+      "destination": "/docs/guides/integrate/login/hosted-login#self-service-for-users",
+      "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login/login-users#password-reset",
+      "destination": "/docs/guides/integrate/login/hosted-login#password-reset",
+      "permanent": true
+    }
+  ]
 }
-

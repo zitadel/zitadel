@@ -304,7 +304,7 @@ Using [Docker Compose](https://docs.docker.com/compose/), you run [PostgreSQL](h
 You use the ZITADEL container as backend for your console.
 The console is run in your [Node](https://nodejs.org/en/about/) environment using [a local development server for Angular](https://angular.io/cli/serve#ng-serve), so you have fast feedback about your changes.
 
-We use angular-eslint/Prettier for linting/formatting, so please run `yarn lint:fix` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
+We use angular-eslint/Prettier for linting/formatting, so please run `pnpm lint:fix` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
 
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
@@ -352,16 +352,16 @@ You can run the local console development server now.
 
 ```bash
 # Install npm dependencies
-yarn install
+pnpm install
 
 # Generate source files from Protos
-yarn generate
+pnpm generate
 
 # Start the server
-yarn start
+pnpm start
 
 # If you don't want to develop against http://localhost:8080, you can use another environment
-ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.zitadel.cloud/ui/console/assets/environment.json yarn start
+ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.zitadel.cloud/ui/console/assets/environment.json pnpm start
 ```
 
 Navigate to http://localhost:4200/.
@@ -371,7 +371,7 @@ Open another shell.
 
 ```bash
 # Reformat your console code
-yarn lint:fix
+pnpm lint:fix
 
 # Change to the e2e directory
 cd .. && cd e2e/
@@ -449,7 +449,8 @@ You may edit the texts in these files or create a new file for additional langua
 Please make sure that the languages within the files remain in their own language, e.g. German must always be `Deutsch.
 If you have added support for a new language, please also ensure that it is added in the list of languages in all the other language files.
 
-You also have to add some changes to the following files: 
+You also have to add some changes to the following files:
+
 - [Register Local File](./console/src/app/app.module.ts)
 - [Add Supported Language](./console/src/app/utils/language.ts)
 - [Customized Text Docs](./docs/docs/guides/manage/customize/texts.md)

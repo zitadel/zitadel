@@ -54,6 +54,10 @@ export default getRequestConfig(async () => {
 
   return {
     locale,
-    messages: deepmerge.all([fallbackMessages, localeMessages, customMessages]),
+    messages: deepmerge.all([
+      fallbackMessages,
+      localeMessages,
+      customMessages,
+    ]) as Record<string, string>,
   };
 });

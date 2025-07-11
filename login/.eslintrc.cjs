@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
-  // This tells ESLint to load the config from the package `@zitadel/eslint-config`
-  extends: ["@zitadel/eslint-config"],
+  // Use basic ESLint config since the login app has its own detailed config
+  extends: ["eslint:recommended"],
   settings: {
     next: {
       rootDir: ["apps/*/"],

@@ -1,3 +1,10 @@
 custom-config.js
 .env*.local
 standalone
+
+# Generated standalone files (temporary)
+*.generated.*
+package.monorepo.backup.json
+
+# TypeScript build info
+tsconfig.tsbuildinfo
