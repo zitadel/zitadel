@@ -227,7 +227,7 @@ func (s *Server) RemoveProject(ctx context.Context, req *mgmt_pb.RemoveProjectRe
 	}
 	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{projectQuery},
-	}, true)
+	}, true, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -312,7 +312,7 @@ func (s *Server) RemoveProjectRole(ctx context.Context, req *mgmt_pb.RemoveProje
 	}
 	userGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{projectQuery, rolesQuery},
-	}, false)
+	}, false, nil)
 
 	if err != nil {
 		return nil, err
@@ -354,24 +354,28 @@ func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjec
 }
 
 func (s *Server) AddProjectMember(ctx context.Context, req *mgmt_pb.AddProjectMemberRequest) (*mgmt_pb.AddProjectMemberResponse, error) {
-	member, err := s.command.AddProjectMember(ctx, AddProjectMemberRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	member, err := s.command.AddProjectMember(ctx, AddProjectMemberRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectMemberResponse{
-		Details: object_grpc.AddToDetailsPb(member.Sequence, member.ChangeDate, member.ResourceOwner),
+		Details: object_grpc.AddToDetailsPb(
+			member.Sequence,
+			member.EventDate,
+			member.ResourceOwner,
+		),
 	}, nil
 }
 
 func (s *Server) UpdateProjectMember(ctx context.Context, req *mgmt_pb.UpdateProjectMemberRequest) (*mgmt_pb.UpdateProjectMemberResponse, error) {
-	member, err := s.command.ChangeProjectMember(ctx, UpdateProjectMemberRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	member, err := s.command.ChangeProjectMember(ctx, UpdateProjectMemberRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateProjectMemberResponse{
 		Details: object_grpc.ChangeToDetailsPb(
 			member.Sequence,
-			member.ChangeDate,
+			member.EventDate,
 			member.ResourceOwner,
 		),
 	}, nil

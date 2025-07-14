@@ -12,11 +12,21 @@ ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
 export GOCOVERDIR ZITADEL_MASTERKEY
 
+LOGIN_REMOTE_NAME := login
+LOGIN_REMOTE_URL ?= https://github.com/zitadel/typescript.git
+LOGIN_REMOTE_BRANCH ?= main
+
 .PHONY: compile
 compile: core_build console_build compile_pipeline
 
 .PHONY: docker_image
-docker_image: compile
+docker_image:
+	@if [ ! -f ./zitadel ]; then \
+		echo "Compiling zitadel binary"; \
+		$(MAKE) compile; \
+	else \
+		echo "Reusing precompiled zitadel binary"; \
+	fi
 	DOCKER_BUILDKIT=1 docker build -f build/Dockerfile -t $(ZITADEL_IMAGE) .
 
 .PHONY: compile_pipeline
@@ -68,12 +78,13 @@ core_grpc_dependencies:
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.22.0 		# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2?tab=versions
 	go install github.com/envoyproxy/protoc-gen-validate@v1.1.0								# https://pkg.go.dev/github.com/envoyproxy/protoc-gen-validate?tab=versions
 	go install github.com/bufbuild/buf/cmd/buf@v1.45.0										# https://pkg.go.dev/github.com/bufbuild/buf/cmd/buf?tab=versions
+	go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1						# https://pkg.go.dev/connectrpc.com/connect/cmd/protoc-gen-connect-go?tab=versions
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
 	buf generate
 	mkdir -p pkg/grpc
-	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/
+	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/
 	mkdir -p openapi/v2/zitadel
 	cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel
 
@@ -165,3 +176,35 @@ core_lint:
 		--config ./.golangci.yaml \
 		--out-format=github-actions \
 		--concurrency=$$(getconf _NPROCESSORS_ONLN)
+
+.PHONY: login_pull
+login_pull: login_ensure_remote
+	@echo "Pulling changes from the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
+	git fetch $(LOGIN_REMOTE_NAME)
+	git subtree pull --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+
+.PHONY: login_push
+login_push: login_ensure_remote
+	@echo "Pushing changes to the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
+	git subtree push --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+
+login_ensure_remote:
+	@if ! git remote get-url $(LOGIN_REMOTE_NAME) > /dev/null 2>&1; then \
+		echo "Adding remote $(LOGIN_REMOTE_NAME)"; \
+		git remote add --fetch $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
+	else \
+		echo "Remote $(LOGIN_REMOTE_NAME) already exists."; \
+	fi
+
+export LOGIN_DIR := ./login/
+export LOGIN_BAKE_CLI_ADDITIONAL_ARGS := --set login-*.context=./login/ --file ./docker-bake.hcl
+export ZITADEL_TAG ?= $(ZITADEL_IMAGE)
+include login/Makefile
+
+# Intentional override of login_test_acceptance_build
+login_test_acceptance_build: docker_image
+	@echo "Building login test acceptance environment with the local zitadel image"
+	$(MAKE) login_test_acceptance_build_compose login_test_acceptance_build_bake
+
+login_dev: docker_image typescript_generate login_test_acceptance_build_compose login_test_acceptance_cleanup login_test_acceptance_setup_dev
+	@echo "Starting login test environment with the local zitadel image"

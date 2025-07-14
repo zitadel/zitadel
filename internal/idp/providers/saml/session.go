@@ -1,13 +1,14 @@
 package saml
 
 import (
-	"bytes"
 	"context"
+	"encoding/base64"
 	"errors"
 	"net/http"
 	"net/url"
 	"time"
 
+	"github.com/beevik/etree"
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 
@@ -43,22 +44,15 @@ func NewSession(provider *Provider, requestID string, request *http.Request) (*S
 }
 
 // GetAuth implements the [idp.Session] interface.
-func (s *Session) GetAuth(ctx context.Context) (string, bool) {
-	url, _ := url.Parse(s.state)
-	resp := NewTempResponseWriter()
-
+func (s *Session) GetAuth(ctx context.Context) (idp.Auth, error) {
+	url, err := url.Parse(s.state)
+	if err != nil {
+		return nil, err
+	}
 	request := &http.Request{
 		URL: url,
 	}
-	s.ServiceProvider.HandleStartAuthFlow(
-		resp,
-		request.WithContext(ctx),
-	)
-
-	if location := resp.Header().Get("Location"); location != "" {
-		return idp.Redirect(location)
-	}
-	return idp.Form(resp.content.String())
+	return s.auth(request.WithContext(ctx))
 }
 
 // PersistentParameters implements the [idp.Session] interface.
@@ -130,24 +124,57 @@ func (s *Session) transientMappingID() (string, error) {
 	return "", zerrors.ThrowInvalidArgument(nil, "SAML-swwg2", "Errors.Intent.MissingSingleMappingAttribute")
 }
 
-type TempResponseWriter struct {
-	header  http.Header
-	content *bytes.Buffer
-}
-
-func (w *TempResponseWriter) Header() http.Header {
-	return w.header
-}
-
-func (w *TempResponseWriter) Write(content []byte) (int, error) {
-	return w.content.Write(content)
-}
-
-func (w *TempResponseWriter) WriteHeader(statusCode int) {}
-
-func NewTempResponseWriter() *TempResponseWriter {
-	return &TempResponseWriter{
-		header:  map[string][]string{},
-		content: bytes.NewBuffer([]byte{}),
+// auth is a modified copy of the [samlsp.Middleware.HandleStartAuthFlow] method.
+// Instead of writing the response to the http.ResponseWriter, it returns the auth request as an [idp.Auth].
+// In case of an error, it returns the error directly and does not write to the response.
+func (s *Session) auth(r *http.Request) (idp.Auth, error) {
+	if r.URL.Path == s.ServiceProvider.ServiceProvider.AcsURL.Path {
+		// should never occur, but was handled in the original method, so we keep it here
+		return nil, zerrors.ThrowInvalidArgument(nil, "SAML-Eoi24", "don't wrap Middleware with RequireAccount")
 	}
+
+	var binding, bindingLocation string
+	if s.ServiceProvider.Binding != "" {
+		binding = s.ServiceProvider.Binding
+		bindingLocation = s.ServiceProvider.ServiceProvider.GetSSOBindingLocation(binding)
+	} else {
+		binding = saml.HTTPRedirectBinding
+		bindingLocation = s.ServiceProvider.ServiceProvider.GetSSOBindingLocation(binding)
+		if bindingLocation == "" {
+			binding = saml.HTTPPostBinding
+			bindingLocation = s.ServiceProvider.ServiceProvider.GetSSOBindingLocation(binding)
+		}
+	}
+
+	authReq, err := s.ServiceProvider.ServiceProvider.MakeAuthenticationRequest(bindingLocation, binding, s.ServiceProvider.ResponseBinding)
+	if err != nil {
+		return nil, err
+	}
+	relayState, err := s.ServiceProvider.RequestTracker.TrackRequest(nil, r, authReq.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if binding == saml.HTTPRedirectBinding {
+		redirectURL, err := authReq.Redirect(relayState, &s.ServiceProvider.ServiceProvider)
+		if err != nil {
+			return nil, err
+		}
+		return idp.Redirect(redirectURL.String())
+	}
+	if binding == saml.HTTPPostBinding {
+		doc := etree.NewDocument()
+		doc.SetRoot(authReq.Element())
+		reqBuf, err := doc.WriteToBytes()
+		if err != nil {
+			return nil, err
+		}
+		encodedReqBuf := base64.StdEncoding.EncodeToString(reqBuf)
+		return idp.Form(authReq.Destination,
+			map[string]string{
+				"SAMLRequest": encodedReqBuf,
+				"RelayState":  relayState,
+			})
+	}
+	return nil, zerrors.ThrowInvalidArgument(nil, "SAML-Eoi24", "Errors.Intent.Invalid")
 }

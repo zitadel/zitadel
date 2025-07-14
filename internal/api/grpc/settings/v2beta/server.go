@@ -2,8 +2,10 @@ package settings
 
 import (
 	"context"
+	"net/http"
 
-	"google.golang.org/grpc"
+	"connectrpc.com/connect"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/zitadel/zitadel/internal/api/assets"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -11,12 +13,12 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2beta/settingsconnect"
 )
 
-var _ settings.SettingsServiceServer = (*Server)(nil)
+var _ settingsconnect.SettingsServiceHandler = (*Server)(nil)
 
 type Server struct {
-	settings.UnimplementedSettingsServiceServer
 	command         *command.Commands
 	query           *query.Queries
 	assetsAPIDomain func(context.Context) string
@@ -35,8 +37,12 @@ func CreateServer(
 	}
 }
 
-func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	settings.RegisterSettingsServiceServer(grpcServer, s)
+func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler) {
+	return settingsconnect.NewSettingsServiceHandler(s, connect.WithInterceptors(interceptors...))
+}
+
+func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
+	return settings.File_zitadel_settings_v2beta_settings_service_proto
 }
 
 func (s *Server) AppName() string {
