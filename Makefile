@@ -180,7 +180,7 @@ core_lint:
 .PHONY: login_pull
 login_pull: login_ensure_remote
 	@echo "Pulling changes from the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
-	git fetch $(LOGIN_REMOTE_NAME)
+	git fetch $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
 	git merge -s ours --no-commit --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/$(LOGIN_REMOTE_BRANCH)
 	git read-tree --prefix=login/ -u $(LOGIN_REMOTE_NAME)/$(LOGIN_REMOTE_BRANCH)
 	git commit -m "Subtree merged in login"
