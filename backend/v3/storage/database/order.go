@@ -6,16 +6,16 @@ type Order interface {
 	Write(builder *StatementBuilder)
 }
 
-type orderBY struct {
+type orderBy struct {
 	column Column
 }
 
-func OrderBY(column Column) Order {
-	return &orderBY{column: column}
+func OrderBy(column Column) Order {
+	return &orderBy{column: column}
 }
 
 // Write implements [Order].
-func (o *orderBY) Write(builder *StatementBuilder) {
+func (o *orderBy) Write(builder *StatementBuilder) {
 	builder.WriteString(" ORDER BY ")
 	o.column.Write(builder)
 }

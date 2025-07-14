@@ -58,7 +58,7 @@ func (o *org) List(ctx context.Context, opts ...database.Condition) ([]*domain.O
 	opts = append(opts, database.IsNull(o.DeletedAtColumn()))
 	writeCondition(&builder, database.And(opts...))
 
-	orderBy := database.OrderBY(o.CreatedAtColumn())
+	orderBy := database.OrderBy(o.CreatedAtColumn())
 	orderBy.Write(&builder)
 
 	return scanOrganizations(ctx, o.client, &builder)
@@ -177,7 +177,6 @@ func (o org) IDCondition(id string) domain.OrgIdentifierCondition {
 
 // NameCondition implements [domain.organizationConditions].
 func (o org) NameCondition(name string) domain.OrgIdentifierCondition {
-	// return database.NewTextCondition(o.NameColumn(), database.TextOperationEqualIgnoreCase, name)
 	return database.NewTextCondition(o.NameColumn(), database.TextOperationEqual, name)
 }
 
