@@ -23,7 +23,29 @@
     "title": "Welcome back!",
     "description": "Enter your login data.",
     "register": "Register new user",
-    "submit": "Continue"
+    "submit": "Continue",
+    "errors": {
+      "internalError": "An internal error occurred",
+      "couldNotGetLoginSettings": "Could not get login settings",
+      "couldNotSearchUsers": "Could not search users",
+      "couldNotGetDomain": "Could not get domain",
+      "couldNotGetHost": "Could not get host",
+      "couldNotStartIDPFlow": "Could not start IDP flow",
+      "moreThanOneUserFound": "More than one user found. Provide a unique identifier.",
+      "userNotFound": "User not found in the system",
+      "couldNotCreateSession": "Could not create session for user",
+      "initialUserNotSupported": "Initial User not supported",
+      "usernamePasswordNotAllowed": "Username Password not allowed! Contact your administrator for more information.",
+      "passkeysNotAllowed": "Passkeys not allowed! Contact your administrator for more information.",
+      "couldNotFindIdentityProvider": "Could not find identity provider."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "An error occurred",
+      "multipleUsersFound": "Multiple users found",
+      "userNotFound": "User not found in the system"
+    }
   },
   "password": {
     "verify": {

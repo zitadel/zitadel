@@ -23,7 +23,29 @@
     "title": "Bentornato!",
     "description": "Inserisci i tuoi dati di accesso.",
     "register": "Registrati come nuovo utente",
-    "submit": "Continua"
+    "submit": "Continua",
+    "errors": {
+      "internalError": "Si è verificato un errore interno",
+      "couldNotGetLoginSettings": "Impossibile ottenere le impostazioni di accesso",
+      "couldNotSearchUsers": "Impossibile cercare gli utenti",
+      "couldNotGetDomain": "Impossibile ottenere il dominio",
+      "couldNotGetHost": "Impossibile ottenere l'host",
+      "couldNotStartIDPFlow": "Impossibile avviare il flusso IDP",
+      "moreThanOneUserFound": "È stato trovato più di un utente. Fornisci un identificatore univoco.",
+      "userNotFound": "Utente non trovato nel sistema",
+      "couldNotCreateSession": "Impossibile creare la sessione per l'utente",
+      "initialUserNotSupported": "Utente iniziale non supportato",
+      "usernamePasswordNotAllowed": "Nome utente e password non consentiti! Contatta l'amministratore per maggiori informazioni.",
+      "passkeysNotAllowed": "Passkey non consentite! Contatta l'amministratore per maggiori informazioni.",
+      "couldNotFindIdentityProvider": "Impossibile trovare il provider di identità."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Si è verificato un errore",
+      "multipleUsersFound": "Trovati più utenti",
+      "userNotFound": "Utente non trovato nel sistema"
+    }
   },
   "password": {
     "verify": {

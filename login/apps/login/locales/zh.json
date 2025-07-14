@@ -23,7 +23,29 @@
     "title": "欢迎回来！",
     "description": "请输入您的登录信息。",
     "register": "注册新用户",
-    "submit": "继续"
+    "submit": "继续",
+    "errors": {
+      "internalError": "发生内部错误",
+      "couldNotGetLoginSettings": "无法获取登录设置",
+      "couldNotSearchUsers": "无法搜索用户",
+      "couldNotGetDomain": "无法获取域名",
+      "couldNotGetHost": "无法获取主机",
+      "couldNotStartIDPFlow": "无法启动身份提供者流程",
+      "moreThanOneUserFound": "找到多个用户。请提供唯一标识符。",
+      "userNotFound": "系统中未找到用户",
+      "couldNotCreateSession": "无法为用户创建会话",
+      "initialUserNotSupported": "不支持初始用户",
+      "usernamePasswordNotAllowed": "不允许使用用户名和密码！请联系管理员了解更多信息。",
+      "passkeysNotAllowed": "不允许使用 Passkey！请联系管理员了解更多信息。",
+      "couldNotFindIdentityProvider": "找不到身份提供者。"
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "发生错误",
+      "multipleUsersFound": "找到多个用户",
+      "userNotFound": "系统中未找到用户"
+    }
   },
   "password": {
     "verify": {

@@ -3,6 +3,7 @@
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 
@@ -36,8 +37,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
+  const t = await getTranslations("loginname");
+
   if (!host) {
-    throw new Error("Could not get domain");
+    throw new Error(t("errors.couldNotGetDomain"));
   }
 
   const loginSettingsByContext = await getLoginSettings({
@@ -46,7 +49,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   });
 
   if (!loginSettingsByContext) {
-    return { error: "Could not get login settings" };
+    return { error: t("errors.couldNotGetLoginSettings") };
   }
 
   let searchUsersRequest: SearchUsersCommand = {
@@ -64,7 +67,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   }
 
   if (!("result" in searchResult)) {
-    return { error: "Could not search users" };
+    return { error: t("errors.couldNotSearchUsers") };
   }
 
   const { result: potentialUsers } = searchResult;
@@ -83,7 +86,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const host = _headers.get("host");
 
       if (!host) {
-        return { error: "Could not get host" };
+        return { error: t("errors.couldNotGetHost") };
       }
 
       const identityProviderType = identityProviders[0].type;
@@ -116,7 +119,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       });
 
       if (!url) {
-        return { error: "Could not start IDP flow" };
+        return { error: t("errors.couldNotStartIDPFlow") };
       }
 
       return { redirect: url };
@@ -137,7 +140,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const host = _headers.get("host");
 
       if (!host) {
-        return { error: "Could not get host" };
+        return { error: t("errors.couldNotGetHost") };
       }
 
       const identityProviderId = identityProviders[0].idpId;
@@ -150,7 +153,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const idpType = idp?.type;
 
       if (!idp || !idpType) {
-        throw new Error("Could not find identity provider");
+        throw new Error(t("errors.couldNotFindIdentityProvider"));
       }
 
       const identityProviderType = idpTypeToIdentityProviderType(idpType);
@@ -182,7 +185,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       });
 
       if (!url) {
-        return { error: "Could not start IDP flow" };
+        return { error: t("errors.couldNotStartIDPFlow") };
       }
 
       return { redirect: url };
@@ -190,7 +193,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   };
 
   if (potentialUsers.length > 1) {
-    return { error: "More than one user found. Provide a unique identifier." };
+    return { error: t("errors.moreThanOneUserFound") };
   } else if (potentialUsers.length == 1 && potentialUsers[0].userId) {
     const user = potentialUsers[0];
     const userId = potentialUsers[0].userId;
@@ -216,21 +219,21 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       userLoginSettings?.disableLoginWithPhone
     ) {
       if (user.preferredLoginName !== concatLoginname) {
-        return { error: "User not found in the system!" };
+        return { error: t("errors.userNotFound") };
       }
     } else if (userLoginSettings?.disableLoginWithEmail) {
       if (
         user.preferredLoginName !== concatLoginname ||
         humanUser?.phone?.phone !== command.loginName
       ) {
-        return { error: "User not found in the system!" };
+        return { error: t("errors.userNotFound") };
       }
     } else if (userLoginSettings?.disableLoginWithPhone) {
       if (
         user.preferredLoginName !== concatLoginname ||
         humanUser?.email?.email !== command.loginName
       ) {
-        return { error: "User not found in the system!" };
+        return { error: t("errors.userNotFound") };
       }
     }
 
@@ -244,12 +247,12 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     });
 
     if (!session.factors?.user?.id) {
-      return { error: "Could not create session for user" };
+      return { error: t("errors.couldNotCreateSession") };
     }
 
     // TODO: check if handling of userstate INITIAL is needed
     if (user.state === UserState.INITIAL) {
-      return { error: "Initial User not supported" };
+      return { error: t("errors.initialUserNotSupported") };
     }
 
     const methods = await listAuthenticationMethodTypes({
@@ -286,8 +289,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         case AuthenticationMethodType.PASSWORD: // user has only password as auth method
           if (!userLoginSettings?.allowUsernamePassword) {
             return {
-              error:
-                "Username Password not allowed! Contact your administrator for more information.",
+              error: t("errors.usernamePasswordNotAllowed"),
             };
           }
 
@@ -315,8 +317,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
           if (userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED) {
             return {
-              error:
-                "Passkeys not allowed! Contact your administrator for more information.",
+              error: t("errors.passkeysNotAllowed"),
             };
           }
 
@@ -395,7 +396,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (resp) {
       return resp;
     }
-    return { error: "User not found in the system" };
+    return { error: t("errors.userNotFound") };
   } else if (
     loginSettingsByContext?.allowRegister &&
     loginSettingsByContext?.allowUsernamePassword
@@ -462,5 +463,5 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   // fallbackToPassword
 
-  return { error: "User not found in the system" };
+  return { error: t("errors.userNotFound") };
 }

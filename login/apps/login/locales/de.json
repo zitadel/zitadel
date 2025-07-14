@@ -23,7 +23,29 @@
     "title": "Willkommen zurück!",
     "description": "Geben Sie Ihre Anmeldedaten ein.",
     "register": "Neuen Benutzer registrieren",
-    "submit": "Weiter"
+    "submit": "Weiter",
+    "errors": {
+      "internalError": "Ein interner Fehler ist aufgetreten",
+      "couldNotGetLoginSettings": "Anmeldeeinstellungen konnten nicht abgerufen werden",
+      "couldNotSearchUsers": "Benutzer konnten nicht durchsucht werden",
+      "couldNotGetDomain": "Domain konnte nicht abgerufen werden",
+      "couldNotGetHost": "Host konnte nicht abgerufen werden",
+      "couldNotStartIDPFlow": "IDP-Ablauf konnte nicht gestartet werden",
+      "moreThanOneUserFound": "Mehr als ein Benutzer gefunden. Bitte geben Sie einen eindeutigen Identifikator an.",
+      "userNotFound": "Benutzer im System nicht gefunden",
+      "couldNotCreateSession": "Sitzung für Benutzer konnte nicht erstellt werden",
+      "initialUserNotSupported": "Initialer Benutzer wird nicht unterstützt",
+      "usernamePasswordNotAllowed": "Benutzername und Passwort nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "passkeysNotAllowed": "Passkeys nicht zulässig! Wenden Sie sich für weitere Informationen an Ihren Administrator.",
+      "couldNotFindIdentityProvider": "Identitätsanbieter konnte nicht gefunden werden."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Ein Fehler ist aufgetreten",
+      "multipleUsersFound": "Mehrere Benutzer gefunden",
+      "userNotFound": "Benutzer im System nicht gefunden"
+    }
   },
   "password": {
     "verify": {

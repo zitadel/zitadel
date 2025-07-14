@@ -11,6 +11,7 @@ import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { useTranslations } from "next-intl";
 
 type Inputs = {
   loginName: string;
@@ -42,6 +43,8 @@ export function UsernameForm({
     },
   });
 
+  const t = useTranslations("loginname");
+
   const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -57,7 +60,7 @@ export function UsernameForm({
       suffix,
     })
       .catch(() => {
-        setError("An internal error occurred");
+        setError(t("errors.internalError"));
         return;
       })
       .finally(() => {

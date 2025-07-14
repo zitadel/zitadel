@@ -23,7 +23,29 @@
     "title": "Witamy ponownie!",
     "description": "Wprowadź dane logowania.",
     "register": "Zarejestruj nowego użytkownika",
-    "submit": "Kontynuuj"
+    "submit": "Kontynuuj",
+    "errors": {
+      "internalError": "Wystąpił błąd wewnętrzny",
+      "couldNotGetLoginSettings": "Nie udało się pobrać ustawień logowania",
+      "couldNotSearchUsers": "Nie udało się wyszukać użytkowników",
+      "couldNotGetDomain": "Nie udało się pobrać domeny",
+      "couldNotGetHost": "Nie udało się pobrać hosta",
+      "couldNotStartIDPFlow": "Nie udało się rozpocząć procesu IDP",
+      "moreThanOneUserFound": "Znaleziono więcej niż jednego użytkownika. Podaj unikalny identyfikator.",
+      "userNotFound": "Użytkownik nie został znaleziony w systemie",
+      "couldNotCreateSession": "Nie udało się utworzyć sesji dla użytkownika",
+      "initialUserNotSupported": "Użytkownik inicjalny nie jest obsługiwany",
+      "usernamePasswordNotAllowed": "Logowanie przy użyciu nazwy użytkownika i hasła jest niedozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "passkeysNotAllowed": "Klucze dostępu są niedozwolone! Skontaktuj się z administratorem, aby uzyskać więcej informacji.",
+      "couldNotFindIdentityProvider": "Nie udało się znaleźć dostawcy tożsamości."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Wystąpił błąd",
+      "multipleUsersFound": "Znaleziono wielu użytkowników",
+      "userNotFound": "Użytkownik nie został znaleziony w systemie"
+    }
   },
   "password": {
     "verify": {
