@@ -179,19 +179,23 @@ core_lint:
 
 .PHONY: login_pull
 login_pull: login_ensure_remote
-	@echo "Merging changes from the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
+	@echo "Pulling changes from the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
 	git fetch $(LOGIN_REMOTE_NAME)
 	git merge -s ours --no-commit --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/$(LOGIN_REMOTE_BRANCH)
+	git read-tree --prefix=login/ -u $(LOGIN_REMOTE_NAME)/$(LOGIN_REMOTE_BRANCH)
 	git commit -m "Subtree merged in login"
 	git push
 
 .PHONY: login_push
 login_push: login_ensure_remote
 	@echo "Pushing changes to the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
-	git checkout -b $(LOGIN_REMOTE_BRANCH)-local
-	git merge -s ours --no-commit --allow-unrelated-histories origin/main
-	git commit -m "Subtree merged in login"
-	git push $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)-local:$(LOGIN_REMOTE_BRANCH)
+	git subtree split --prefix=login -b login-sync-tmp
+	git checkout login-sync-tmp
+	git fetch $(LOGIN_REMOTE_NAME) main
+	git merge -s ours --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/main -m "Synthetic merge to align histories"
+	git push $(LOGIN_REMOTE_NAME) login-sync-tmp:$(LOGIN_REMOTE_BRANCH)
+	git checkout -
+	git branch -D login-sync-tmp
 
 login_ensure_remote:
 	@if ! git remote get-url $(LOGIN_REMOTE_NAME) > /dev/null 2>&1; then \
