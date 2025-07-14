@@ -1,0 +1,47 @@
+---
+title: PHP Client
+sidebar_label: 'PHP Client'
+---
+
+<table>
+	<tr>
+		<td width="100px">
+			<img width="100px" src="/docs/img/tech/php.svg" alt="php logo"/>
+		</td>
+		<td>
+			This guide covers the official Zitadel Management API Client for PHP, which allows you to programmatically manage resources in your Zitadel instance.
+		</td>
+	</tr>
+</table>
+
+:::info
+**This is a Management API Client, not an Authentication SDK.**
+
+This library is designed for server-to-server communication to manage your Zitadel instance (e.g., creating users, managing projects, and updating settings). It is **not** intended for handling end-user login flows in your web application. For user authentication, you should use a standard OIDC library with your PHP framework of choice.
+:::
+
+The Zitadel PHP Client provides an idiomatic way to access the full gamut of
+Zitadel's v2 Management APIs from your PHP backend.
+
+### Status: Incubating
+
+> Please be aware that this client library is currently in an **incubating stage**.
+While it is available for use, the API and its functionality may evolve, potentially introducing
+breaking changes in future updates. We advise caution when considering it for production environments.
+
+### Installation
+
+You can add the client library to your project using Composer:
+
+```bash
+composer require zitadel/client
+```
+
+### Versioning
+
+The client library's versioning is aligned with the Zitadel core project. The major version of the client corresponds to the major version of Zitadel it is designed to work with. For example, v2.x.x of the client is built for and tested against Zitadel v2, ensuring a predictable and stable integration.
+
+### Resources
+
+- (https://github.com/zitadel/client-php): For source code, examples, and to report issues.
+- Packagist Package: The official package artifact for Composer.

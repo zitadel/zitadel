@@ -1,0 +1,48 @@
+---
+title: Ruby Client
+sidebar_label: 'Ruby Client'
+---
+
+<table>
+	<tr>
+		<td width="100px">
+			<img width="100px" src="/docs/img/tech/ruby.svg" alt="ruby logo"/>
+		</td>
+		<td>
+			This guide covers the official Zitadel Management API Client for Ruby (3.1+), which allows you to programmatically manage resources in your Zitadel instance.
+		</td>
+	</tr>
+</table>
+
+:::info
+**This is a Management API Client, not an Authentication SDK.**
+
+This library is designed for server-to-server communication to manage your Zitadel instance (e.g., creating users, managing projects, and updating settings). It is **not** intended for handling end-user login flows in your web application. For user authentication, you should use a standard OIDC library with your Ruby framework of choice.
+:::
+
+The Zitadel Ruby Client provides an idiomatic way to access the full gamut of Zitadel's v2 Management APIs from your Ruby backend.[1]
+
+### Status
+
+We have recently released this client library and are actively collecting feedback for improvements.
+While we are committed to preserving the public API, we do advise a degree of caution when using it
+in production environments.
+
+### Installation
+
+You can add the client library to your project using RubyGems. Add this line to your application's Gemfile [3]:
+
+```ruby
+gem 'zitadel-client'
+```
+
+### Versioning
+
+The client library's versioning is aligned with the Zitadel core project.
+The major version of the client corresponds to the major version of Zitadel it is
+designed to work with. For example, v2.x.x of the client is built for and tested against
+Zitadel v2, ensuring a predictable and stable integration.
+
+### Resources
+- (https://github.com/zitadel/client-ruby): For source code, examples, and to report issues.[1]
+- (https://rubygems.org/gems/zitadel-client): The official package artifact for RubyGems.[4]
