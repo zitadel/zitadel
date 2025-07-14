@@ -1505,6 +1505,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			name: "no human added, custom org ID",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // org already exists check
 					expectPush(
 						eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
 							&org.NewAggregate("custom-org-ID").Aggregate,
