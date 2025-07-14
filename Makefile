@@ -189,15 +189,9 @@ login_push: login_ensure_remote
 login_ensure_remote:
 	@if ! git remote get-url $(LOGIN_REMOTE_NAME) > /dev/null 2>&1; then \
 		echo "Adding remote $(LOGIN_REMOTE_NAME)"; \
-		git remote add $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
+		git remote add --fetch $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
 	else \
 		echo "Remote $(LOGIN_REMOTE_NAME) already exists."; \
-	fi
-	@if [ ! -d login ]; then \
-		echo "Adding subtree for 'login' from branch $(LOGIN_REMOTE_BRANCH)"; \
-		git subtree add --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH); \
-	else \
-		echo "Subtree 'login' already exists."; \
 	fi
 
 export LOGIN_DIR := ./login/
