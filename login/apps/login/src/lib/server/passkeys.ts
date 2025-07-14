@@ -108,7 +108,7 @@ export async function registerPasskeyLink(
     }
   }
 
-  const [hostname, port] = host.split(":");
+  const [hostname] = host.split(":");
 
   if (!hostname) {
     throw new Error("Could not get hostname");

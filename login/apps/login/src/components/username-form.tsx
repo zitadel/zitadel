@@ -3,7 +3,7 @@
 import { sendLoginname } from "@/lib/server/loginname";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import { BackButton } from "./back-button";
@@ -24,7 +24,6 @@ type Props = {
   suffix?: string;
   submit: boolean;
   allowRegister: boolean;
-  children?: ReactNode;
 };
 
 export function UsernameForm({
@@ -35,7 +34,6 @@ export function UsernameForm({
   loginSettings,
   submit,
   allowRegister,
-  children,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",

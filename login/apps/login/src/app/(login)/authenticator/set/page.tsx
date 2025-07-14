@@ -26,7 +26,6 @@ export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
   const searchParams = await props.searchParams;
-  // const locale = getLocale();
 
   const { loginName, requestId, organization, sessionId } = searchParams;
 

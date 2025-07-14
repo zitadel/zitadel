@@ -13,7 +13,7 @@ export default async function Page(props: {
 }) {
   const searchParams = await props.searchParams;
 
-  const { loginName, prompt, organization, requestId, userId } = searchParams;
+  const { loginName, prompt, organization, requestId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
