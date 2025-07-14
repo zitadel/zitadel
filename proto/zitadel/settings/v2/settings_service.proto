@@ -762,19 +762,3 @@ message ListOrganizationSettingsResponse {
   zitadel.filter.v2.PaginationResponse pagination = 1;
   repeated OrganizationSettings organization_settings = 2;
 }
-
-enum OrganizationSettingsFieldName {
-  ORGANIZATION_SETTINGS_FIELD_NAME_UNSPECIFIED = 0;
-  ORGANIZATION_SETTINGS_FIELD_NAME_ORGANIZATION_ID = 1;
-  ORGANIZATION_SETTINGS_FIELD_NAME_CREATION_DATE = 2;
-  ORGANIZATION_SETTINGS_FIELD_NAME_CHANGE_DATE = 3;
-}
-
-message OrganizationSettingsSearchFilter {
-  oneof filter {
-    option (validate.required) = true;
-
-    zitadel.filter.v2.InIDsFilter in_organization_ids_filter = 2;
-  }
-}
-
