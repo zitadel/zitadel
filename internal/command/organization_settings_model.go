@@ -33,7 +33,7 @@ func (wm *OrganizationSettingsWriteModel) checkPermissionWrite(
 	if wm.writePermissionCheck {
 		return nil
 	}
-	if err := wm.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, aggregateID); err != nil {
+	if err := wm.checkPermission(ctx, domain.PermissionIAMPolicyWrite, resourceOwner, aggregateID); err != nil {
 		return err
 	}
 	wm.writePermissionCheck = true
@@ -45,7 +45,7 @@ func (wm *OrganizationSettingsWriteModel) checkPermissionDelete(
 	resourceOwner string,
 	aggregateID string,
 ) error {
-	return wm.checkPermission(ctx, domain.PermissionUserDelete, resourceOwner, aggregateID)
+	return wm.checkPermission(ctx, domain.PermissionIAMPolicyDelete, resourceOwner, aggregateID)
 }
 
 func NewOrganizationSettingsWriteModel(id string, checkPermission domain.PermissionCheck) *OrganizationSettingsWriteModel {
