@@ -439,6 +439,7 @@ func TestGetOrganization(t *testing.T) {
 		name                   string
 		testFunc               func(ctx context.Context, t *testing.T) *domain.Organization
 		orgIdentifierCondition domain.OrgIdentifierCondition
+		err                    error
 	}
 
 	tests := []test{
@@ -498,6 +499,7 @@ func TestGetOrganization(t *testing.T) {
 				return &org
 			},
 			orgIdentifierCondition: orgRepo.NameCondition("non-existent-instance-name"),
+			err:                    repository.ErrResourceDoesNotExist,
 		},
 	}
 	for _, tt := range tests {
@@ -515,7 +517,10 @@ func TestGetOrganization(t *testing.T) {
 				tt.orgIdentifierCondition,
 				org.InstanceID,
 			)
-			require.NoError(t, err)
+			if tt.err != nil {
+				require.Equal(t, tt.err, err)
+				return
+			}
 
 			if org.Name == "non existent org" {
 				assert.Nil(t, returnedOrg)
@@ -930,7 +935,7 @@ func TestDeleteOrganization(t *testing.T) {
 				tt.orgIdentifierCondition,
 				instanceId,
 			)
-			require.NoError(t, err)
+			require.Equal(t, err, repository.ErrResourceDoesNotExist)
 			assert.Nil(t, organization)
 		})
 	}

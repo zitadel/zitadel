@@ -195,6 +195,7 @@ func TestUpdateInstance(t *testing.T) {
 		name         string
 		testFunc     func(ctx context.Context, t *testing.T) *domain.Instance
 		rowsAffected int64
+		getErr       error
 	}{
 		{
 			name: "happy path",
@@ -263,6 +264,7 @@ func TestUpdateInstance(t *testing.T) {
 				return &inst
 			},
 			rowsAffected: 0,
+			getErr:       repository.ErrResourceDoesNotExist,
 		},
 	}
 	for _, tt := range tests {
@@ -292,7 +294,7 @@ func TestUpdateInstance(t *testing.T) {
 			instance, err = instanceRepo.Get(ctx,
 				instance.ID,
 			)
-			require.NoError(t, err)
+			require.Equal(t, tt.getErr, err)
 
 			assert.Equal(t, newName, instance.Name)
 			assert.WithinRange(t, instance.UpdatedAt, beforeUpdate, afterUpdate)
@@ -306,6 +308,7 @@ func TestGetInstance(t *testing.T) {
 	type test struct {
 		name     string
 		testFunc func(ctx context.Context, t *testing.T) *domain.Instance
+		err      error
 	}
 
 	tests := []test{
@@ -341,6 +344,7 @@ func TestGetInstance(t *testing.T) {
 				}
 				return &inst
 			},
+			err: repository.ErrResourceDoesNotExist,
 		},
 	}
 	for _, tt := range tests {
@@ -357,7 +361,11 @@ func TestGetInstance(t *testing.T) {
 			returnedInstance, err := instanceRepo.Get(ctx,
 				instance.ID,
 			)
-			require.NoError(t, err)
+			if tt.err != nil {
+				require.Equal(t, tt.err, err)
+				return
+			}
+
 			if instance.ID == "get non existent instance" {
 				assert.Nil(t, returnedInstance)
 				return
@@ -649,7 +657,7 @@ func TestDeleteInstance(t *testing.T) {
 			instance, err := instanceRepo.Get(ctx,
 				tt.instanceID,
 			)
-			require.NoError(t, err)
+			require.Equal(t, err, repository.ErrResourceDoesNotExist)
 			assert.Nil(t, instance)
 		})
 	}

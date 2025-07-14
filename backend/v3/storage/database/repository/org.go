@@ -238,11 +238,8 @@ func scanOrganization(ctx context.Context, querier database.Querier, builder *da
 
 	organization := &domain.Organization{}
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(organization); err != nil {
-		// if no results returned, this is not a error
-		// it just means the organization was not found
-		// the caller should check if the returned organization is nil
 		if err.Error() == "no rows in result set" {
-			return nil, nil
+			return nil, ErrResourceDoesNotExist
 		}
 		return nil, err
 	}

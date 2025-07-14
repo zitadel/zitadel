@@ -217,11 +217,8 @@ func scanInstance(ctx context.Context, querier database.Querier, builder *databa
 
 	instance := new(domain.Instance)
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(instance); err != nil {
-		// if no results returned, this is not a error
-		// it just means the instance was not found
-		// the caller should check if the returned instance is nil
 		if err.Error() == "no rows in result set" {
-			return nil, nil
+			return nil, ErrResourceDoesNotExist
 		}
 		return nil, err
 	}
