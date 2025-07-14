@@ -157,7 +157,6 @@ type Steps struct {
 	s58ReplaceLoginNames3View               *ReplaceLoginNames3View
 	s59SetupWebkeys                         *SetupWebkeys
 	s60GenerateSystemID                     *GenerateSystemID
-	s61AddUIDniqueConstraintsForOrgs        *AddIDUniqueConstraintsForOrgs
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

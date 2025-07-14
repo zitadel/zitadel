@@ -218,13 +218,11 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s57CreateResourceCounts = &CreateResourceCounts{dbClient: dbClient}
 	steps.s58ReplaceLoginNames3View = &ReplaceLoginNames3View{dbClient: dbClient}
 	steps.s60GenerateSystemID = &GenerateSystemID{eventstore: eventstoreClient}
-	steps.s61AddUIDniqueConstraintsForOrgs = &AddIDUniqueConstraintsForOrgs{eventstore: eventstoreClient, dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
 
 	for _, step := range []migration.Migration{
-		steps.s61AddUIDniqueConstraintsForOrgs,
 		steps.s14NewEventsTable,
 		steps.s40InitPushFunc,
 		steps.s1ProjectionTable,
