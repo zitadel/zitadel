@@ -1,6 +1,7 @@
 packages:
   - "console"
   - "docs"
+  - "e2e"
   - "login"
   - "login/apps/*"
   - "login/packages/*"
