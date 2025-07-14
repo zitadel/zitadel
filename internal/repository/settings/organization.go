@@ -7,60 +7,60 @@ import (
 )
 
 const (
-	settingOrganizationPrefix           = "setting.organization."
-	SettingOrganizationSetEventType     = settingOrganizationPrefix + "set"
-	SettingOrganizationRemovedEventType = settingOrganizationPrefix + "removed"
+	organizationSettingsPrefix           = "settings.organization."
+	OrganizationSettingsSetEventType     = organizationSettingsPrefix + "set"
+	OrganizationSettingsRemovedEventType = organizationSettingsPrefix + "removed"
 )
 
-type SettingOrganizationSetEvent struct {
+type OrganizationSettingsSetEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
 	UserUniqueness bool `json:"userUniqueness,omitempty"`
 }
 
-func (e *SettingOrganizationSetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+func (e *OrganizationSettingsSetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *SettingOrganizationSetEvent) Payload() any {
+func (e *OrganizationSettingsSetEvent) Payload() any {
 	return e
 }
 
-func (e *SettingOrganizationSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+func (e *OrganizationSettingsSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewSettingOrganizationAddedEvent(
+func NewOrganizationSettingsAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userUniqueness bool,
-) *SettingOrganizationSetEvent {
-	return &SettingOrganizationSetEvent{
+) *OrganizationSettingsSetEvent {
+	return &OrganizationSettingsSetEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
-			ctx, aggregate, SettingOrganizationSetEventType,
+			ctx, aggregate, OrganizationSettingsSetEventType,
 		),
 		UserUniqueness: userUniqueness,
 	}
 }
 
-type SettingOrganizationRemovedEvent struct {
+type OrganizationSettingsRemovedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 }
 
-func (e *SettingOrganizationRemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+func (e *OrganizationSettingsRemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *SettingOrganizationRemovedEvent) Payload() any {
+func (e *OrganizationSettingsRemovedEvent) Payload() any {
 	return e
 }
 
-func (e *SettingOrganizationRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+func (e *OrganizationSettingsRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewSettingOrganizationRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *SettingOrganizationRemovedEvent {
-	return &SettingOrganizationRemovedEvent{
-		eventstore.NewBaseEventForPush(ctx, aggregate, SettingOrganizationRemovedEventType),
+func NewOrganizationSettingsRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *OrganizationSettingsRemovedEvent {
+	return &OrganizationSettingsRemovedEvent{
+		eventstore.NewBaseEventForPush(ctx, aggregate, OrganizationSettingsRemovedEventType),
 	}
 }

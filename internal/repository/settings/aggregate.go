@@ -3,7 +3,7 @@ package settings
 import "github.com/zitadel/zitadel/internal/eventstore"
 
 const (
-	AggregateType    = "setting"
+	AggregateType    = "settings"
 	AggregateVersion = "v1"
 )
 

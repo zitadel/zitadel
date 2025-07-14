@@ -30,7 +30,7 @@ func (s *Server) SetHostedLoginTranslation(ctx context.Context, req *connect.Req
 }
 
 func (s *Server) SetOrganizationSettings(ctx context.Context, req *connect.Request[settings.SetOrganizationSettingsRequest]) (*connect.Response[settings.SetOrganizationSettingsResponse], error) {
-	details, err := s.command.SetSettingsOrganization(ctx, organizationSettingsToCommand(req.Msg))
+	details, err := s.command.SetOrganizationSettings(ctx, organizationSettingsToCommand(req.Msg))
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (s *Server) SetOrganizationSettings(ctx context.Context, req *connect.Reque
 }
 
 func (s *Server) DeleteOrganizationSettings(ctx context.Context, req *connect.Request[settings.DeleteOrganizationSettingsRequest]) (*connect.Response[settings.DeleteOrganizationSettingsResponse], error) {
-	details, err := s.command.DeleteSettingsOrganization(ctx, req.Msg.GetOrganizationId())
+	details, err := s.command.DeleteOrganizationSettings(ctx, req.Msg.GetOrganizationId())
 	if err != nil {
 		return nil, err
 	}

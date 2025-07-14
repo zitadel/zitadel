@@ -7,24 +7,24 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type SetSettingsOrganization struct {
+type SetOrganizationSettings struct {
 	OrganizationID string
 
 	UserUniqueness *bool
 }
 
-func (e *SetSettingsOrganization) IsValid() error {
+func (e *SetOrganizationSettings) IsValid() error {
 	if e.OrganizationID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-TODO", "Errors.Org.Settings.Invalid")
 	}
 	return nil
 }
 
-func (c *Commands) SetSettingsOrganization(ctx context.Context, set *SetSettingsOrganization) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) SetOrganizationSettings(ctx context.Context, set *SetOrganizationSettings) (_ *domain.ObjectDetails, err error) {
 	if err := set.IsValid(); err != nil {
 		return nil, err
 	}
-	wm, err := c.getSettingsOrganizationWriteModelByID(ctx, set.OrganizationID)
+	wm, err := c.getOrganizationSettingsWriteModelByID(ctx, set.OrganizationID)
 	if err != nil {
 		return nil, err
 	}
@@ -42,11 +42,11 @@ func (c *Commands) SetSettingsOrganization(ctx context.Context, set *SetSettings
 	return c.pushAppendAndReduceDetails(ctx, wm, events...)
 }
 
-func (c *Commands) DeleteSettingsOrganization(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) DeleteOrganizationSettings(ctx context.Context, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-TODO", "Errors.IDMissing")
 	}
-	wm, err := c.getSettingsOrganizationWriteModelByID(ctx, id)
+	wm, err := c.getOrganizationSettingsWriteModelByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +62,8 @@ func (c *Commands) DeleteSettingsOrganization(ctx context.Context, id string) (*
 	return c.pushAppendAndReduceDetails(ctx, wm, events...)
 }
 
-func (c *Commands) getSettingsOrganizationWriteModelByID(ctx context.Context, id string) (*SettingsOrganizationWriteModel, error) {
-	wm := NewSettingsOrganizationWriteModel(id, c.checkPermission)
+func (c *Commands) getOrganizationSettingsWriteModelByID(ctx context.Context, id string) (*OrganizationSettingsWriteModel, error) {
+	wm := NewOrganizationSettingsWriteModel(id, c.checkPermission)
 	err := c.eventstore.FilterToQueryReducer(ctx, wm)
 	if err != nil {
 		return nil, err

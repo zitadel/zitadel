@@ -26,10 +26,10 @@ func TestOrganizationSettingsProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						settings.SettingOrganizationSetEventType,
+						settings.OrganizationSettingsSetEventType,
 						settings.AggregateType,
 						[]byte(`{"userUniqueness": true}`),
-					), eventstore.GenericEventMapper[settings.SettingOrganizationSetEvent],
+					), eventstore.GenericEventMapper[settings.OrganizationSettingsSetEvent],
 				),
 			},
 			reduce: (&organizationSettingsProjection{}).reduceOrganizationSettingsSet,
@@ -59,10 +59,10 @@ func TestOrganizationSettingsProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						settings.SettingOrganizationRemovedEventType,
+						settings.OrganizationSettingsRemovedEventType,
 						settings.AggregateType,
 						[]byte(`{}`),
-					), eventstore.GenericEventMapper[settings.SettingOrganizationRemovedEvent],
+					), eventstore.GenericEventMapper[settings.OrganizationSettingsRemovedEvent],
 				),
 			},
 			reduce: (&organizationSettingsProjection{}).reduceOrganizationSettingsRemoved,

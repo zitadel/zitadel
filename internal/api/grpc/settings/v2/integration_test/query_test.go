@@ -487,7 +487,7 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			},
 			want: &settings.ListOrganizationSettingsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  0,
+					TotalResult:  1,
 					AppliedLimit: 100,
 				},
 				OrganizationSettings: []*settings.OrganizationSettings{},
@@ -513,7 +513,7 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			},
 			want: &settings.ListOrganizationSettingsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  0,
+					TotalResult:  1,
 					AppliedLimit: 100,
 				},
 				OrganizationSettings: []*settings.OrganizationSettings{},

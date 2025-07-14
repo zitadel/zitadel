@@ -20,7 +20,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 	}
 	type args struct {
 		ctx      context.Context
-		settings *SetSettingsOrganization
+		settings *SetOrganizationSettings
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -40,7 +40,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				settings: &SetSettingsOrganization{
+				settings: &SetOrganizationSettings{
 					OrganizationID: "",
 					UserUniqueness: boolPtr(true),
 				},
@@ -59,7 +59,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				settings: &SetSettingsOrganization{
+				settings: &SetOrganizationSettings{
 					OrganizationID: "org1",
 					UserUniqueness: boolPtr(true),
 				},
@@ -80,7 +80,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							settings.NewSettingOrganizationAddedEvent(context.Background(),
+							settings.NewOrganizationSettingsAddedEvent(context.Background(),
 								&settings.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -91,7 +91,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				settings: &SetSettingsOrganization{
+				settings: &SetOrganizationSettings{
 					OrganizationID: "org1",
 					UserUniqueness: boolPtr(true),
 				},
@@ -116,7 +116,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 						),
 					),
 					expectPush(
-						settings.NewSettingOrganizationAddedEvent(context.Background(),
+						settings.NewOrganizationSettingsAddedEvent(context.Background(),
 							&settings.NewAggregate("org1", "org1").Aggregate,
 							true,
 						),
@@ -126,7 +126,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				settings: &SetSettingsOrganization{
+				settings: &SetOrganizationSettings{
 					OrganizationID: "org1",
 					UserUniqueness: boolPtr(true),
 				},
@@ -155,7 +155,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				settings: &SetSettingsOrganization{
+				settings: &SetOrganizationSettings{
 					OrganizationID: "org1",
 					UserUniqueness: boolPtr(true),
 				},
@@ -176,14 +176,14 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							settings.NewSettingOrganizationAddedEvent(context.Background(),
+							settings.NewOrganizationSettingsAddedEvent(context.Background(),
 								&settings.NewAggregate("org1", "org1").Aggregate,
 								false,
 							),
 						),
 					),
 					expectPush(
-						settings.NewSettingOrganizationAddedEvent(context.Background(),
+						settings.NewOrganizationSettingsAddedEvent(context.Background(),
 							&settings.NewAggregate("org1", "org1").Aggregate,
 							true,
 						),
@@ -193,7 +193,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				settings: &SetSettingsOrganization{
+				settings: &SetOrganizationSettings{
 					OrganizationID: "org1",
 					UserUniqueness: boolPtr(true),
 				},
@@ -222,7 +222,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				settings: &SetSettingsOrganization{
+				settings: &SetOrganizationSettings{
 					OrganizationID: "org1",
 					UserUniqueness: boolPtr(false),
 				},
@@ -241,7 +241,7 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.SetSettingsOrganization(tt.args.ctx, tt.args.settings)
+			got, err := r.SetOrganizationSettings(tt.args.ctx, tt.args.settings)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -313,14 +313,14 @@ func TestCommandSide_DeleteSettingsOrganization(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							settings.NewSettingOrganizationAddedEvent(context.Background(),
+							settings.NewOrganizationSettingsAddedEvent(context.Background(),
 								&settings.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
 						),
 					),
 					expectPush(
-						settings.NewSettingOrganizationRemovedEvent(context.Background(),
+						settings.NewOrganizationSettingsRemovedEvent(context.Background(),
 							&settings.NewAggregate("org1", "org1").Aggregate,
 						),
 					),
@@ -344,7 +344,7 @@ func TestCommandSide_DeleteSettingsOrganization(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							settings.NewSettingOrganizationAddedEvent(context.Background(),
+							settings.NewOrganizationSettingsAddedEvent(context.Background(),
 								&settings.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -368,7 +368,7 @@ func TestCommandSide_DeleteSettingsOrganization(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.DeleteSettingsOrganization(tt.args.ctx, tt.args.orgID)
+			got, err := r.DeleteOrganizationSettings(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

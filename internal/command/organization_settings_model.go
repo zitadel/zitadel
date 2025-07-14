@@ -9,7 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/settings"
 )
 
-type SettingsOrganizationWriteModel struct {
+type OrganizationSettingsWriteModel struct {
 	eventstore.WriteModel
 
 	UserUniqueness bool
@@ -21,11 +21,11 @@ type SettingsOrganizationWriteModel struct {
 	checkPermission      domain.PermissionCheck
 }
 
-func (wm *SettingsOrganizationWriteModel) GetWriteModel() *eventstore.WriteModel {
+func (wm *OrganizationSettingsWriteModel) GetWriteModel() *eventstore.WriteModel {
 	return &wm.WriteModel
 }
 
-func (wm *SettingsOrganizationWriteModel) checkPermissionWrite(
+func (wm *OrganizationSettingsWriteModel) checkPermissionWrite(
 	ctx context.Context,
 	resourceOwner string,
 	aggregateID string,
@@ -40,7 +40,7 @@ func (wm *SettingsOrganizationWriteModel) checkPermissionWrite(
 	return nil
 }
 
-func (wm *SettingsOrganizationWriteModel) checkPermissionDelete(
+func (wm *OrganizationSettingsWriteModel) checkPermissionDelete(
 	ctx context.Context,
 	resourceOwner string,
 	aggregateID string,
@@ -48,8 +48,8 @@ func (wm *SettingsOrganizationWriteModel) checkPermissionDelete(
 	return wm.checkPermission(ctx, domain.PermissionUserDelete, resourceOwner, aggregateID)
 }
 
-func NewSettingsOrganizationWriteModel(id string, checkPermission domain.PermissionCheck) *SettingsOrganizationWriteModel {
-	return &SettingsOrganizationWriteModel{
+func NewOrganizationSettingsWriteModel(id string, checkPermission domain.PermissionCheck) *OrganizationSettingsWriteModel {
+	return &OrganizationSettingsWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   id,
 			ResourceOwner: id,
@@ -58,13 +58,13 @@ func NewSettingsOrganizationWriteModel(id string, checkPermission domain.Permiss
 	}
 }
 
-func (wm *SettingsOrganizationWriteModel) Reduce() error {
+func (wm *OrganizationSettingsWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *settings.SettingOrganizationSetEvent:
+		case *settings.OrganizationSettingsSetEvent:
 			wm.UserUniqueness = e.UserUniqueness
 			wm.State = domain.OrganizationSettingsStateActive
-		case *settings.SettingOrganizationRemovedEvent:
+		case *settings.OrganizationSettingsRemovedEvent:
 			wm.UserUniqueness = false
 			wm.State = domain.OrganizationSettingsStateRemoved
 		case *org.OrgAddedEvent:
@@ -76,14 +76,14 @@ func (wm *SettingsOrganizationWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *SettingsOrganizationWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *OrganizationSettingsWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(settings.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(settings.SettingOrganizationSetEventType,
-			settings.SettingOrganizationRemovedEventType).
+		EventTypes(settings.OrganizationSettingsSetEventType,
+			settings.OrganizationSettingsRemovedEventType).
 		Or().
 		AggregateTypes(org.AggregateType).
 		AggregateIDs(wm.AggregateID).
@@ -92,7 +92,7 @@ func (wm *SettingsOrganizationWriteModel) Query() *eventstore.SearchQueryBuilder
 		Builder()
 }
 
-func (wm *SettingsOrganizationWriteModel) NewSet(
+func (wm *OrganizationSettingsWriteModel) NewSet(
 	ctx context.Context,
 	userUniqueness *bool,
 ) (_ []eventstore.Command, err error) {
@@ -104,7 +104,7 @@ func (wm *SettingsOrganizationWriteModel) NewSet(
 		return nil, nil
 	}
 	events := []eventstore.Command{
-		settings.NewSettingOrganizationAddedEvent(ctx,
+		settings.NewOrganizationSettingsAddedEvent(ctx,
 			SettingsAggregateFromWriteModel(&wm.WriteModel),
 			*userUniqueness,
 		),
@@ -112,14 +112,14 @@ func (wm *SettingsOrganizationWriteModel) NewSet(
 	return events, nil
 }
 
-func (wm *SettingsOrganizationWriteModel) NewRemoved(
+func (wm *OrganizationSettingsWriteModel) NewRemoved(
 	ctx context.Context,
 ) (_ []eventstore.Command, err error) {
 	if err := wm.checkPermissionDelete(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
 		return nil, err
 	}
 	events := []eventstore.Command{
-		settings.NewSettingOrganizationRemovedEvent(ctx,
+		settings.NewOrganizationSettingsRemovedEvent(ctx,
 			SettingsAggregateFromWriteModel(&wm.WriteModel),
 		),
 	}

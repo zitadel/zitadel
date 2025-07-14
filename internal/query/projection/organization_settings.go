@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	exec "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/settings"
@@ -44,7 +43,7 @@ func (*organizationSettingsProjection) Init() *old_handler.Check {
 			handler.NewColumn(OrganizationSettingsSequenceCol, handler.ColumnTypeInt64),
 			handler.NewColumn(OrganizationSettingsUserUniquenessCol, handler.ColumnTypeBool),
 		},
-			handler.NewPrimaryKey(OrganizationSettingsInstanceIDCol, OrganizationSettingsIDCol),
+			handler.NewPrimaryKey(OrganizationSettingsInstanceIDCol, OrganizationSettingsResourceOwnerCol, OrganizationSettingsIDCol),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{OrganizationSettingsResourceOwnerCol})),
 		),
 	)
@@ -53,18 +52,19 @@ func (*organizationSettingsProjection) Init() *old_handler.Check {
 func (p *organizationSettingsProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
-			Aggregate: exec.AggregateType,
+			Aggregate: settings.AggregateType,
 			EventReducers: []handler.EventReducer{
 				{
-					Event:  settings.SettingOrganizationSetEventType,
+					Event:  settings.OrganizationSettingsSetEventType,
 					Reduce: p.reduceOrganizationSettingsSet,
 				},
 				{
-					Event:  settings.SettingOrganizationRemovedEventType,
+					Event:  settings.OrganizationSettingsRemovedEventType,
 					Reduce: p.reduceOrganizationSettingsRemoved,
 				},
 			},
-		}, {
+		},
+		{
 			Aggregate: org.AggregateType,
 			EventReducers: []handler.EventReducer{
 				{
@@ -86,7 +86,7 @@ func (p *organizationSettingsProjection) Reducers() []handler.AggregateReducer {
 }
 
 func (p *organizationSettingsProjection) reduceOrganizationSettingsSet(event eventstore.Event) (*handler.Statement, error) {
-	e, err := assertEvent[*settings.SettingOrganizationSetEvent](event)
+	e, err := assertEvent[*settings.OrganizationSettingsSetEvent](event)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (p *organizationSettingsProjection) reduceOrganizationSettingsSet(event eve
 }
 
 func (p *organizationSettingsProjection) reduceOrganizationSettingsRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, err := assertEvent[*settings.SettingOrganizationRemovedEvent](event)
+	e, err := assertEvent[*settings.OrganizationSettingsRemovedEvent](event)
 	if err != nil {
 		return nil, err
 	}
