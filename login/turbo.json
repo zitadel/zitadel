@@ -15,6 +15,15 @@
       "persistent": true,
       "dependsOn": ["@zitadel/proto#generate"]
     },
+    "lint": {
+      "outputs": [],
+      "cache": true
+    },
+    "test:unit": {
+      "outputs": [],
+      "cache": true,
+      "dependsOn": ["@zitadel/client#build"]
+    },
     "build:client:standalone": {
       "outputs": ["dist/**"],
       "dependsOn": ["@zitadel/proto#generate"]
