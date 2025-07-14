@@ -76,10 +76,11 @@ jobs:
       - uses: depot/setup-action@v1
         with:
           oidc: true
-      - run: cd login && make login_standalone_out
+      - run: make -C login login_standalone_out
         env:
           # latest if branch is main, otherwise image version which is the pull request number
           LOGIN_BAKE_CLI: depot bake --set login-*.context=./login/
+          LOGIN_DIR: ./
           DEPOT_PROJECT_ID: w47wkxzdtw
           NODE_VERSION: ${{ inputs.node_version }}
       - name: move files
