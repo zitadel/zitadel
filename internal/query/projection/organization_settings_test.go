@@ -34,7 +34,7 @@ func TestOrganizationSettingsProjection_reduces(t *testing.T) {
 			},
 			reduce: (&organizationSettingsProjection{}).reduceOrganizationSettingsSet,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("setting"),
+				aggregateType: eventstore.AggregateType("settings"),
 				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
@@ -67,7 +67,7 @@ func TestOrganizationSettingsProjection_reduces(t *testing.T) {
 			},
 			reduce: (&organizationSettingsProjection{}).reduceOrganizationSettingsRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("setting"),
+				aggregateType: eventstore.AggregateType("settings"),
 				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
