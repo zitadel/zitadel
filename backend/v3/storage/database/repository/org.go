@@ -2,7 +2,10 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -12,11 +15,13 @@ import (
 // repository
 // -------------------------------------------------------------
 
+var _ domain.OrganizationRepository = (*org)(nil)
+
 type org struct {
 	repository
 }
 
-func OrgRepository(client database.QueryExecutor) domain.OrgRepository {
+func OrganizationRepository(client database.QueryExecutor) domain.OrganizationRepository {
 	return &org{
 		repository: repository{
 			client: client,
@@ -24,52 +29,140 @@ func OrgRepository(client database.QueryExecutor) domain.OrgRepository {
 	}
 }
 
-// Create implements [domain.OrgRepository].
-func (o *org) Create(ctx context.Context, org *domain.Org) error {
-	org.CreatedAt = time.Now()
-	org.UpdatedAt = org.CreatedAt
+const queryOrganizationStmt = `SELECT id, name, instance_id, state, created_at, updated_at, deleted_at` +
+	` FROM zitadel.organizations`
+
+// Get implements [domain.OrganizationRepository].
+func (o *org) Get(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, conditions ...database.Condition) (*domain.Organization, error) {
+	builder := database.StatementBuilder{}
+
+	builder.WriteString(queryOrganizationStmt)
+
+	instanceIDCondition := o.InstanceIDCondition(instanceID)
+	// don't update deleted organizations
+	nonDeletedOrgs := database.IsNull(o.DeletedAtColumn())
+
+	conditions = append(conditions, id, instanceIDCondition, nonDeletedOrgs)
+	writeCondition(&builder, database.And(conditions...))
+
+	return scanOrganization(ctx, o.client, &builder)
+}
+
+// List implements [domain.OrganizationRepository].
+func (o *org) List(ctx context.Context, opts ...database.Condition) ([]*domain.Organization, error) {
+	builder := database.StatementBuilder{}
+
+	builder.WriteString(queryOrganizationStmt)
+
+	// return only non deleted organizations
+	opts = append(opts, database.IsNull(o.DeletedAtColumn()))
+	writeCondition(&builder, database.And(opts...))
+
+	orderBy := database.OrderBy(o.CreatedAtColumn())
+	orderBy.Write(&builder)
+
+	return scanOrganizations(ctx, o.client, &builder)
+}
+
+const createOrganizationStmt = `INSERT INTO zitadel.organizations (id, name, instance_id, state)` +
+	` VALUES ($1, $2, $3, $4)` +
+	` RETURNING created_at, updated_at`
+
+// Create implements [domain.OrganizationRepository].
+func (o *org) Create(ctx context.Context, organization *domain.Organization) error {
+	builder := database.StatementBuilder{}
+	builder.AppendArgs(organization.ID, organization.Name, organization.InstanceID, organization.State)
+	builder.WriteString(createOrganizationStmt)
+
+	err := o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
+	if err != nil {
+		return checkCreateOrgErr(err)
+	}
 	return nil
 }
 
-// Delete implements [domain.OrgRepository].
-func (o *org) Delete(ctx context.Context, condition database.Condition) error {
-	return nil
+func checkCreateOrgErr(err error) error {
+	var pgErr *pgconn.PgError
+	if !errors.As(err, &pgErr) {
+		return err
+	}
+	// constraint violation
+	if pgErr.Code == "23514" {
+		if pgErr.ConstraintName == "organizations_name_check" {
+			return errors.New("organization name not provided")
+		}
+		if pgErr.ConstraintName == "organizations_id_check" {
+			return errors.New("organization id not provided")
+		}
+	}
+	// duplicate
+	if pgErr.Code == "23505" {
+		if pgErr.ConstraintName == "organizations_pkey" {
+			return errors.New("organization id already exists")
+		}
+		if pgErr.ConstraintName == "org_unique_instance_id_name_idx" {
+			return errors.New("organization name already exists for instance")
+		}
+	}
+	// invalid instance id
+	if pgErr.Code == "23503" {
+		if pgErr.ConstraintName == "organizations_instance_id_fkey" {
+			return errors.New("invalid instance id")
+		}
+	}
+	return err
 }
 
-// Get implements [domain.OrgRepository].
-func (o *org) Get(ctx context.Context, opts ...database.QueryOption) (*domain.Org, error) {
-	panic("unimplemented")
+// Update implements [domain.OrganizationRepository].
+func (o org) Update(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, changes ...database.Change) (int64, error) {
+	if changes == nil {
+		return 0, errors.New("Update must contain a condition") // (otherwise ALL organizations will be updated)
+	}
+	builder := database.StatementBuilder{}
+	builder.WriteString(`UPDATE zitadel.organizations SET `)
+
+	instanceIDCondition := o.InstanceIDCondition(instanceID)
+	// don't update deleted organizations
+	nonDeletedOrgs := database.IsNull(o.DeletedAtColumn())
+
+	conditions := []database.Condition{id, instanceIDCondition, nonDeletedOrgs}
+	database.Changes(changes).Write(&builder)
+	writeCondition(&builder, database.And(conditions...))
+
+	stmt := builder.String()
+
+	rowsAffected, err := o.client.Exec(ctx, stmt, builder.Args()...)
+	return rowsAffected, err
 }
 
-// List implements [domain.OrgRepository].
-func (o *org) List(ctx context.Context, opts ...database.QueryOption) ([]*domain.Org, error) {
-	panic("unimplemented")
-}
+// Delete implements [domain.OrganizationRepository].
+func (o org) Delete(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string) (int64, error) {
+	builder := database.StatementBuilder{}
 
-// Update implements [domain.OrgRepository].
-func (o *org) Update(ctx context.Context, condition database.Condition, changes ...database.Change) error {
-	panic("unimplemented")
-}
+	builder.WriteString(`UPDATE zitadel.organizations SET deleted_at = $1`)
+	builder.AppendArgs(time.Now())
 
-func (o *org) Member() domain.MemberRepository {
-	return &orgMember{o}
-}
+	instanceIDCondition := o.InstanceIDCondition(instanceID)
+	// don't update deleted organizations
+	nonDeletedOrgs := database.IsNull(o.DeletedAtColumn())
 
-func (o *org) Domain() domain.DomainRepository {
-	return &orgDomain{o}
+	conditions := []database.Condition{id, instanceIDCondition, nonDeletedOrgs}
+	writeCondition(&builder, database.And(conditions...))
+
+	return o.client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 // -------------------------------------------------------------
 // changes
 // -------------------------------------------------------------
 
-// SetName implements [domain.orgChanges].
-func (o *org) SetName(name string) database.Change {
+// SetName implements [domain.organizationChanges].
+func (o org) SetName(name string) database.Change {
 	return database.NewChange(o.NameColumn(), name)
 }
 
-// SetState implements [domain.orgChanges].
-func (o *org) SetState(state domain.OrgState) database.Change {
+// SetState implements [domain.organizationChanges].
+func (o org) SetState(state domain.OrgState) database.Change {
 	return database.NewChange(o.StateColumn(), state)
 }
 
@@ -77,63 +170,97 @@ func (o *org) SetState(state domain.OrgState) database.Change {
 // conditions
 // -------------------------------------------------------------
 
-// IDCondition implements [domain.orgConditions].
-func (o *org) IDCondition(orgID string) database.Condition {
-	return database.NewTextCondition(o.IDColumn(), database.TextOperationEqual, orgID)
+// IDCondition implements [domain.organizationConditions].
+func (o org) IDCondition(id string) domain.OrgIdentifierCondition {
+	return database.NewTextCondition(o.IDColumn(), database.TextOperationEqual, id)
 }
 
-// InstanceIDCondition implements [domain.orgConditions].
-func (o *org) InstanceIDCondition(instanceID string) database.Condition {
+// NameCondition implements [domain.organizationConditions].
+func (o org) NameCondition(name string) domain.OrgIdentifierCondition {
+	return database.NewTextCondition(o.NameColumn(), database.TextOperationEqual, name)
+}
+
+// InstanceIDCondition implements [domain.organizationConditions].
+func (o org) InstanceIDCondition(instanceID string) database.Condition {
 	return database.NewTextCondition(o.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
-// NameCondition implements [domain.orgConditions].
-func (o *org) NameCondition(op database.TextOperation, name string) database.Condition {
-	return database.NewTextCondition(o.NameColumn(), op, name)
-}
-
-// StateCondition implements [domain.orgConditions].
-func (o *org) StateCondition(op database.NumberOperation, state domain.OrgState) database.Condition {
-	return database.NewNumberCondition(o.StateColumn(), op, state)
+// StateCondition implements [domain.organizationConditions].
+func (o org) StateCondition(state domain.OrgState) database.Condition {
+	return database.NewTextCondition(o.StateColumn(), database.TextOperationEqual, state.String())
 }
 
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
 
-// CreatedAtColumn implements [domain.orgColumns].
-func (o *org) CreatedAtColumn() database.Column {
-	return database.NewColumn("created_at")
-}
-
-// DeletedAtColumn implements [domain.orgColumns].
-func (o *org) DeletedAtColumn() database.Column {
-	return database.NewColumn("deleted_at")
-}
-
-// IDColumn implements [domain.orgColumns].
-func (o *org) IDColumn() database.Column {
+// IDColumn implements [domain.organizationColumns].
+func (org) IDColumn() database.Column {
 	return database.NewColumn("id")
 }
 
-// InstanceIDColumn implements [domain.orgColumns].
-func (o *org) InstanceIDColumn() database.Column {
-	return database.NewColumn("instance_id")
-}
-
-// NameColumn implements [domain.orgColumns].
-func (o *org) NameColumn() database.Column {
+// NameColumn implements [domain.organizationColumns].
+func (org) NameColumn() database.Column {
 	return database.NewColumn("name")
 }
 
-// StateColumn implements [domain.orgColumns].
-func (o *org) StateColumn() database.Column {
+// InstanceIDColumn implements [domain.organizationColumns].
+func (org) InstanceIDColumn() database.Column {
+	return database.NewColumn("instance_id")
+}
+
+// StateColumn implements [domain.organizationColumns].
+func (org) StateColumn() database.Column {
 	return database.NewColumn("state")
 }
 
-// UpdatedAtColumn implements [domain.orgColumns].
-func (o *org) UpdatedAtColumn() database.Column {
+// CreatedAtColumn implements [domain.organizationColumns].
+func (org) CreatedAtColumn() database.Column {
+	return database.NewColumn("created_at")
+}
+
+// UpdatedAtColumn implements [domain.organizationColumns].
+func (org) UpdatedAtColumn() database.Column {
 	return database.NewColumn("updated_at")
 }
 
-var _ domain.OrgRepository = (*org)(nil)
+// DeletedAtColumn implements [domain.organizationColumns].
+func (org) DeletedAtColumn() database.Column {
+	return database.NewColumn("deleted_at")
+}
+
+func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	organization := &domain.Organization{}
+	if err := rows.(database.CollectableRows).CollectExactlyOneRow(organization); err != nil {
+		if err.Error() == "no rows in result set" {
+			return nil, ErrResourceDoesNotExist
+		}
+		return nil, err
+	}
+
+	return organization, nil
+}
+
+func scanOrganizations(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Organization, error) {
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	organizations := []*domain.Organization{}
+	if err := rows.(database.CollectableRows).Collect(&organizations); err != nil {
+		// if no results returned, this is not a error
+		// it just means the organization was not found
+		// the caller should check if the returned organization is nil
+		if err.Error() == "no rows in result set" {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return organizations, nil
+}

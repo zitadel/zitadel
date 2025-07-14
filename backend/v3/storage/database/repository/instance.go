@@ -33,16 +33,17 @@ const queryInstanceStmt = `SELECT id, name, default_org_id, iam_project_id, cons
 	` FROM zitadel.instances`
 
 // Get implements [domain.InstanceRepository].
-func (i *instance) Get(ctx context.Context, opts ...database.Condition) (*domain.Instance, error) {
+func (i *instance) Get(ctx context.Context, id string) (*domain.Instance, error) {
 	var builder database.StatementBuilder
 
 	builder.WriteString(queryInstanceStmt)
 
+	idCondition := i.IDCondition(id)
 	// return only non deleted instances
-	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
-	i.writeCondition(&builder, database.And(opts...))
+	conditions := []database.Condition{idCondition, database.IsNull(i.DeletedAtColumn())}
+	writeCondition(&builder, database.And(conditions...))
 
-	return scanInstance(i.client.QueryRow(ctx, builder.String(), builder.Args()...))
+	return scanInstance(ctx, i.client, &builder)
 }
 
 // List implements [domain.InstanceRepository].
@@ -54,15 +55,9 @@ func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]*dom
 	// return only non deleted instances
 	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
 	notDeletedCondition := database.And(opts...)
-	i.writeCondition(&builder, notDeletedCondition)
+	writeCondition(&builder, notDeletedCondition)
 
-	rows, err := i.client.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	return scanInstances(rows)
+	return scanInstances(ctx, i.client, &builder)
 }
 
 const createInstanceStmt = `INSERT INTO zitadel.instances (id, name, default_org_id, iam_project_id, console_client_id, console_app_id, default_language)` +
@@ -101,15 +96,20 @@ func (i *instance) Create(ctx context.Context, instance *domain.Instance) error 
 }
 
 // Update implements [domain.InstanceRepository].
-func (i instance) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
+func (i instance) Update(ctx context.Context, id string, changes ...database.Change) (int64, error) {
+	if changes == nil {
+		return 0, errors.New("Update must contain a change")
+	}
 	var builder database.StatementBuilder
 
 	builder.WriteString(`UPDATE zitadel.instances SET `)
 
-	// don't update deleted instances
-	conditions := []database.Condition{condition, database.IsNull(i.DeletedAtColumn())}
 	database.Changes(changes).Write(&builder)
-	i.writeCondition(&builder, database.And(conditions...))
+
+	idCondition := i.IDCondition(id)
+	// don't update deleted instances
+	conditions := []database.Condition{idCondition, database.IsNull(i.DeletedAtColumn())}
+	writeCondition(&builder, database.And(conditions...))
 
 	stmt := builder.String()
 
@@ -118,18 +118,18 @@ func (i instance) Update(ctx context.Context, condition database.Condition, chan
 }
 
 // Delete implements [domain.InstanceRepository].
-func (i instance) Delete(ctx context.Context, condition database.Condition) error {
-	if condition == nil {
-		return errors.New("Delete must contain a condition") // (otherwise ALL instances will be deleted)
-	}
+func (i instance) Delete(ctx context.Context, id string) (int64, error) {
 	var builder database.StatementBuilder
 
 	builder.WriteString(`UPDATE zitadel.instances SET deleted_at = $1`)
 	builder.AppendArgs(time.Now())
 
-	i.writeCondition(&builder, condition)
-	_, err := i.client.Exec(ctx, builder.String(), builder.Args()...)
-	return err
+	// don't delete already deleted instance
+	idCondition := i.IDCondition(id)
+	conditions := []database.Condition{idCondition, database.IsNull(i.DeletedAtColumn())}
+	writeCondition(&builder, database.And(conditions...))
+
+	return i.client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
 // -------------------------------------------------------------
@@ -209,32 +209,30 @@ func (instance) DeletedAtColumn() database.Column {
 	return database.NewColumn("deleted_at")
 }
 
-func (i *instance) writeCondition(
-	builder *database.StatementBuilder,
-	condition database.Condition,
-) {
-	if condition == nil {
-		return
+func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
 	}
-	builder.WriteString(" WHERE ")
-	condition.Write(builder)
+
+	instance := new(domain.Instance)
+	if err := rows.(database.CollectableRows).CollectExactlyOneRow(instance); err != nil {
+		if err.Error() == "no rows in result set" {
+			return nil, ErrResourceDoesNotExist
+		}
+		return nil, err
+	}
+
+	return instance, nil
 }
 
-func scanInstance(scanner database.Scanner) (*domain.Instance, error) {
-	var instance domain.Instance
-	err := scanner.Scan(
-		&instance.ID,
-		&instance.Name,
-		&instance.DefaultOrgID,
-		&instance.IAMProjectID,
-		&instance.ConsoleClientID,
-		&instance.ConsoleAppID,
-		&instance.DefaultLanguage,
-		&instance.CreatedAt,
-		&instance.UpdatedAt,
-		&instance.DeletedAt,
-	)
+func scanInstances(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (instances []*domain.Instance, err error) {
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := rows.(database.CollectableRows).Collect(&instances); err != nil {
 		// if no results returned, this is not a error
 		// it just means the instance was not found
 		// the caller should check if the returned instance is nil
@@ -244,32 +242,5 @@ func scanInstance(scanner database.Scanner) (*domain.Instance, error) {
 		return nil, err
 	}
 
-	return &instance, nil
-}
-
-func scanInstances(rows database.Rows) ([]*domain.Instance, error) {
-	instances := make([]*domain.Instance, 0)
-	for rows.Next() {
-
-		var instance domain.Instance
-		err := rows.Scan(
-			&instance.ID,
-			&instance.Name,
-			&instance.DefaultOrgID,
-			&instance.IAMProjectID,
-			&instance.ConsoleClientID,
-			&instance.ConsoleAppID,
-			&instance.DefaultLanguage,
-			&instance.CreatedAt,
-			&instance.UpdatedAt,
-			&instance.DeletedAt,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		instances = append(instances, &instance)
-
-	}
 	return instances, nil
 }

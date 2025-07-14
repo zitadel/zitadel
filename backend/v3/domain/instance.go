@@ -86,12 +86,12 @@ type InstanceRepository interface {
 	// Member returns the member repository which is a sub repository of the instance repository.
 	// Member() MemberRepository
 
-	Get(ctx context.Context, opts ...database.Condition) (*Instance, error)
+	Get(ctx context.Context, id string) (*Instance, error)
 	List(ctx context.Context, opts ...database.Condition) ([]*Instance, error)
 
 	Create(ctx context.Context, instance *Instance) error
-	Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error)
-	Delete(ctx context.Context, condition database.Condition) error
+	Update(ctx context.Context, id string, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, id string) (int64, error)
 }
 
 type CreateInstance struct {
