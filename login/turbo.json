@@ -14,11 +14,11 @@
       "outputs": ["dist/**"],
       "dependsOn": ["@zitadel/proto#generate"]
     },
-    "@zitadel/client#build": {
+    "client:build": {
       "outputs": ["dist/**"],
       "dependsOn": ["@zitadel/proto#generate"]
     },
-    "@zitadel/proto#generate": {
+    "proto:generate": {
       "outputs": ["zitadel/**"],
       "cache": false
     },

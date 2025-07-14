@@ -12,44 +12,45 @@ jobs:
         browser: [firefox, chrome]
     runs-on: ubuntu-latest
     steps:
-      - 
-        name: Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
-      -
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           path: .artifacts
           name: zitadel-linux-amd64
-      -
-        name: Unpack executable
+      - name: Unpack executable
         run: |
           tar -xvf .artifacts/zitadel-linux-amd64.tar.gz
           mv zitadel-linux-amd64/zitadel ./zitadel
-      -
-        name: Set up QEMU
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-      -
-        name: Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      -
-        name: Start DB and ZITADEL
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install
+      - name: Start DB and ZITADEL
         run: |
           cd ./e2e
           ZITADEL_IMAGE=zitadel:local docker compose up --detach --wait
-      - 
-        name: Cypress run
+      - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
           CYPRESS_BASE_URL: http://localhost:8080/ui/console
           CYPRESS_WEBHOOK_HANDLER_HOST: host.docker.internal
-          CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://root@localhost:26257/zitadel'
+          CYPRESS_DATABASE_CONNECTION_URL: "postgresql://root@localhost:26257/zitadel"
           CYPRESS_BACKEND_URL: http://localhost:8080
         with:
           working-directory: e2e
           browser: ${{ matrix.browser }}
           config-file: cypress.config.ts
-      - 
-        uses: actions/upload-artifact@v4
+          install: false
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: production-tests-${{ matrix.browser }}
