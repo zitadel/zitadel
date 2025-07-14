@@ -67,7 +67,7 @@ const (
 	PermissionUserGrantDelete          = "user.grant.delete"
 	PermissionIAMPolicyWrite           = "iam.policy.write"
 	PermissionIAMPolicyDelete          = "iam.policy.delete"
-	PermissionIAMPolicyRead            = "iam.policy.read"
+	PermissionPolicyRead               = "policy.read"
 )
 
 // ProjectPermissionCheck is used as a check for preconditions dependent on application, project, user resourceowner and usergrants.

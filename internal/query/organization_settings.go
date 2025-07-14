@@ -64,7 +64,7 @@ func organizationSettingsListCheckPermission(ctx context.Context, organizationSe
 }
 
 func organizationSettingsCheckPermission(ctx context.Context, resourceOwner string, id string, permissionCheck domain.PermissionCheck) error {
-	return permissionCheck(ctx, domain.PermissionIAMPolicyRead, resourceOwner, id)
+	return permissionCheck(ctx, domain.PermissionPolicyRead, resourceOwner, id)
 }
 
 type OrganizationSettings struct {
@@ -97,7 +97,7 @@ func organizationSettingsPermissionCheckV2(ctx context.Context, query sq.SelectB
 	join, args := PermissionClause(
 		ctx,
 		OrganizationSettingsColumnID,
-		domain.PermissionIAMPolicyRead,
+		domain.PermissionPolicyRead,
 		SingleOrgPermissionOption(queries.Queries),
 	)
 	return query.JoinClause(join, args...)
