@@ -30,7 +30,14 @@
       "title": "Passwort",
       "description": "Geben Sie Ihr Passwort ein.",
       "resetPassword": "Passwort zurücksetzen",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "errors": {
+        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+        "couldNotResetPassword": "Passwort konnte nicht zurückgesetzt werden"
+      },
+      "info": {
+        "passwordResetSent": "Passwort wurde zurückgesetzt. Bitte prüfen Sie Ihre E-Mails"
+      }
     },
     "set": {
       "title": "Passwort festlegen",
@@ -38,12 +45,22 @@
       "codeSent": "Ein Code wurde an Ihre E-Mail-Adresse gesendet.",
       "noCodeReceived": "Keinen Code erhalten?",
       "resend": "Erneut senden",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "errors": {
+        "couldNotSetPassword": "Passwort konnte nicht gesetzt werden",
+        "couldNotResetPassword": "Passwort konnte nicht zurückgesetzt werden",
+        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden"
+      }
     },
     "change": {
       "title": "Passwort ändern",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "errors": {
+        "couldNotChangePassword": "Passwort konnte nicht geändert werden",
+        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+        "unknownError": "Unbekannter Fehler"
+      }
     },
     "complexity": {
       "length": "Muss mindestens {minLength} Zeichen lang sein.",
@@ -54,6 +71,22 @@
       "equals": "Passwortbestätigung stimmt überein.",
       "matches": "Stimmt überein",
       "doesNotMatch": "Stimmt nicht überein"
+    },
+    "errors": {
+      "noHostFound": "Kein Host gefunden",
+      "couldNotSendResetLink": "Passwort-Zurücksetzungslink konnte nicht gesendet werden",
+      "couldNotCreateSessionForUser": "Sitzung für Benutzer konnte nicht erstellt werden",
+      "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+      "failedToAuthenticate": "Authentifizierung fehlgeschlagen. Sie haben {failedAttempts} von {maxPasswordAttempts} Passwortversuchen.{lockoutMessage}",
+      "accountLockedContactAdmin": " Kontaktieren Sie Ihren Administrator, um Ihr Konto zu entsperren",
+      "initialUserNotSupported": "Initialbenutzer wird nicht unterstützt",
+      "userInitialStateNotSupported": "Anfangszustand des Benutzers wird nicht unterstützt",
+      "codeOrVerificationRequired": "Sie müssen einen Code angeben oder eine gültige Benutzerverifizierung durchführen",
+      "verificationRequired": "Die Benutzerverifizierung muss durchgeführt werden",
+      "couldNotLoadSession": "Sitzung konnte nicht geladen werden",
+      "couldNotLoadAuthMethods": "Authentifizierungsmethoden konnten nicht geladen werden",
+      "failedPrecondition": "Vorbedingung fehlgeschlagen",
+      "sessionNotValid": "Sitzung ist nicht gültig"
     }
   },
   "idp": {

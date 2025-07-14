@@ -30,7 +30,14 @@
       "title": "Contraseña",
       "description": "Introduce tu contraseña.",
       "resetPassword": "Restablecer contraseña",
-      "submit": "Continuar"
+      "submit": "Continuar",
+      "errors": {
+        "couldNotVerifyPassword": "No se pudo verificar la contraseña",
+        "couldNotResetPassword": "No se pudo restablecer la contraseña"
+      },
+      "info": {
+        "passwordResetSent": "Se restableció la contraseña. Por favor, revise su correo electrónico"
+      }
     },
     "set": {
       "title": "Establecer Contraseña",
@@ -38,12 +45,22 @@
       "codeSent": "Se ha enviado un código a su correo electrónico.",
       "noCodeReceived": "¿No recibiste un código?",
       "resend": "Reenviar código",
-      "submit": "Continuar"
+      "submit": "Continuar",
+      "errors": {
+        "couldNotSetPassword": "No se pudo establecer la contraseña",
+        "couldNotResetPassword": "No se pudo restablecer la contraseña",
+        "couldNotVerifyPassword": "No se pudo verificar la contraseña"
+      }
     },
     "change": {
       "title": "Cambiar Contraseña",
       "description": "Establece la contraseña para tu cuenta",
-      "submit": "Continuar"
+      "submit": "Continuar",
+      "errors": {
+        "couldNotChangePassword": "No se pudo cambiar la contraseña",
+        "couldNotVerifyPassword": "No se pudo verificar la contraseña",
+        "unknownError": "Error desconocido"
+      }
     },
     "complexity": {
       "length": "Debe tener al menos {minLength} caracteres de longitud.",
@@ -54,6 +71,22 @@
       "equals": "La confirmación de la contraseña coincide.",
       "matches": "Coincide",
       "doesNotMatch": "No coincide"
+    },
+    "errors": {
+      "noHostFound": "No se encontró el host",
+      "couldNotSendResetLink": "No se pudo enviar el enlace de restablecimiento de contraseña",
+      "couldNotCreateSessionForUser": "No se pudo crear la sesión para el usuario",
+      "couldNotVerifyPassword": "No se pudo verificar la contraseña",
+      "failedToAuthenticate": "Error al autenticar. Tuvo {failedAttempts} de {maxPasswordAttempts} intentos de contraseña.{lockoutMessage}",
+      "accountLockedContactAdmin": " Comuníquese con su administrador para desbloquear su cuenta",
+      "initialUserNotSupported": "Usuario inicial no compatible",
+      "userInitialStateNotSupported": "El estado inicial del usuario no es compatible",
+      "codeOrVerificationRequired": "Debe proporcionar un código o tener una verificación de usuario válida",
+      "verificationRequired": "Se debe realizar la verificación de usuario",
+      "couldNotLoadSession": "No se pudo cargar la sesión",
+      "couldNotLoadAuthMethods": "No se pudieron cargar los métodos de autenticación",
+      "failedPrecondition": "Precondición fallida",
+      "sessionNotValid": "La sesión no es válida"
     }
   },
   "idp": {

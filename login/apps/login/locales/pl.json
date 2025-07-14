@@ -30,7 +30,14 @@
       "title": "Hasło",
       "description": "Wprowadź swoje hasło.",
       "resetPassword": "Zresetuj hasło",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "errors": {
+        "couldNotVerifyPassword": "Nie można zweryfikować hasła",
+        "couldNotResetPassword": "Nie można zresetować hasła"
+      },
+      "info": {
+        "passwordResetSent": "Hasło zostało zresetowane. Sprawdź swoją pocztę e-mail"
+      }
     },
     "set": {
       "title": "Ustaw hasło",
@@ -38,12 +45,22 @@
       "codeSent": "Kod został wysłany na twój adres e-mail.",
       "noCodeReceived": "Nie otrzymałeś kodu?",
       "resend": "Wyślij kod ponownie",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "errors": {
+        "couldNotSetPassword": "Nie można ustawić hasła",
+        "couldNotResetPassword": "Nie można zresetować hasła",
+        "couldNotVerifyPassword": "Nie można zweryfikować hasła"
+      }
     },
     "change": {
       "title": "Zmień hasło",
       "description": "Ustaw nowe hasło dla swojego konta",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "errors": {
+        "couldNotChangePassword": "Nie można zmienić hasła",
+        "couldNotVerifyPassword": "Nie można zweryfikować hasła",
+        "unknownError": "Nieznany błąd"
+      }
     },
     "complexity": {
       "length": "Musi zawierać co najmniej {minLength} znaków.",
@@ -54,6 +71,22 @@
       "equals": "Potwierdzenie hasła pasuje.",
       "matches": "Pasuje",
       "doesNotMatch": "Nie pasuje"
+    },
+    "errors": {
+      "noHostFound": "Nie znaleziono hosta",
+      "couldNotSendResetLink": "Nie można wysłać linku do resetowania hasła",
+      "couldNotCreateSessionForUser": "Nie można utworzyć sesji dla użytkownika",
+      "couldNotVerifyPassword": "Nie można zweryfikować hasła",
+      "failedToAuthenticate": "Uwierzytelnianie nie powiodło się. Wykorzystałeś {failedAttempts} z {maxPasswordAttempts} prób wprowadzenia hasła.{lockoutMessage}",
+      "accountLockedContactAdmin": " Skontaktuj się z administratorem, aby odblokować konto",
+      "initialUserNotSupported": "Użytkownik początkowy nie jest obsługiwany",
+      "userInitialStateNotSupported": "Początkowy stan użytkownika nie jest obsługiwany",
+      "codeOrVerificationRequired": "Musisz podać kod lub mieć ważną weryfikację użytkownika",
+      "verificationRequired": "Wymagana jest weryfikacja użytkownika",
+      "couldNotLoadSession": "Nie można załadować sesji",
+      "couldNotLoadAuthMethods": "Nie można załadować metod uwierzytelniania",
+      "failedPrecondition": "Nie spełniono warunków wstępnych",
+      "sessionNotValid": "Sesja jest nieważna"
     }
   },
   "idp": {

@@ -30,7 +30,14 @@
       "title": "Password",
       "description": "Inserisci la tua password.",
       "resetPassword": "Reimposta Password",
-      "submit": "Continua"
+      "submit": "Continua",
+      "errors": {
+        "couldNotVerifyPassword": "Impossibile verificare la password",
+        "couldNotResetPassword": "Impossibile reimpostare la password"
+      },
+      "info": {
+        "passwordResetSent": "La password è stata reimpostata. Controlla la tua e-mail"
+      }
     },
     "set": {
       "title": "Imposta Password",
@@ -38,12 +45,22 @@
       "codeSent": "Un codice è stato inviato al tuo indirizzo email.",
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resend": "Invia di nuovo",
-      "submit": "Continua"
+      "submit": "Continua",
+      "errors": {
+        "couldNotSetPassword": "Impossibile impostare la password",
+        "couldNotResetPassword": "Impossibile reimpostare la password",
+        "couldNotVerifyPassword": "Impossibile verificare la password"
+      }
     },
     "change": {
       "title": "Cambia Password",
       "description": "Imposta la password per il tuo account",
-      "submit": "Continua"
+      "submit": "Continua",
+      "errors": {
+        "couldNotChangePassword": "Impossibile modificare la password",
+        "couldNotVerifyPassword": "Impossibile verificare la password",
+        "unknownError": "Errore sconosciuto"
+      }
     },
     "complexity": {
       "length": "Deve contenere almeno {minLength} caratteri.",
@@ -54,6 +71,22 @@
       "equals": "La conferma della password corrisponde.",
       "matches": "Corrisponde",
       "doesNotMatch": "Non corrisponde"
+    },
+    "errors": {
+      "noHostFound": "Nessun host trovato",
+      "couldNotSendResetLink": "Impossibile inviare il link per il ripristino della password",
+      "couldNotCreateSessionForUser": "Impossibile creare una sessione per l'utente",
+      "couldNotVerifyPassword": "Impossibile verificare la password",
+      "failedToAuthenticate": "Autenticazione non riuscita. Hai effettuato {failedAttempts} di {maxPasswordAttempts} tentativi di password.{lockoutMessage}",
+      "accountLockedContactAdmin": " Contatta l'amministratore per sbloccare il tuo account",
+      "initialUserNotSupported": "Utente iniziale non supportato",
+      "userInitialStateNotSupported": "Lo stato iniziale dell'utente non è supportato",
+      "codeOrVerificationRequired": "Devi fornire un codice o avere una verifica utente valida",
+      "verificationRequired": "È necessario effettuare la verifica utente",
+      "couldNotLoadSession": "Impossibile caricare la sessione",
+      "couldNotLoadAuthMethods": "Impossibile caricare i metodi di autenticazione",
+      "failedPrecondition": "Precondizione non soddisfatta",
+      "sessionNotValid": "La sessione non è valida"
     }
   },
   "idp": {

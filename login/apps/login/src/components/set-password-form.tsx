@@ -16,6 +16,7 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
@@ -59,6 +60,8 @@ export function SetPasswordForm({
     },
   });
 
+  const t = useTranslations("password");
+
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
@@ -74,7 +77,7 @@ export function SetPasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not reset password");
+        setError(t("set.errors.couldNotResetPassword"));
         return;
       })
       .finally(() => {
@@ -101,7 +104,7 @@ export function SetPasswordForm({
 
     const changeResponse = await changePassword(payload)
       .catch(() => {
-        setError("Could not set password");
+        setError(t("set.errors.couldNotSetPassword"));
         return;
       })
       .finally(() => {
@@ -114,7 +117,7 @@ export function SetPasswordForm({
     }
 
     if (!changeResponse) {
-      setError("Could not set password");
+      setError(t("set.errors.couldNotSetPassword"));
       return;
     }
 
@@ -138,7 +141,7 @@ export function SetPasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not verify password");
+        setError(t("set.errors.couldNotVerifyPassword"));
         return;
       })
       .finally(() => {

@@ -30,7 +30,14 @@
       "title": "Password",
       "description": "Enter your password.",
       "resetPassword": "Reset Password",
-      "submit": "Continue"
+      "submit": "Continue",
+      "errors": {
+        "couldNotVerifyPassword": "Could not verify password",
+        "couldNotResetPassword": "Could not reset password"
+      },
+      "info": {
+        "passwordResetSent": "Password was reset. Please check your email"
+      }
     },
     "set": {
       "title": "Set Password",
@@ -38,12 +45,22 @@
       "codeSent": "A code has been sent to your email address.",
       "noCodeReceived": "Didn't receive a code?",
       "resend": "Resend code",
-      "submit": "Continue"
+      "submit": "Continue",
+      "errors": {
+        "couldNotSetPassword": "Could not set password",
+        "couldNotResetPassword": "Could not reset password",
+        "couldNotVerifyPassword": "Could not verify password"
+      }
     },
     "change": {
       "title": "Change Password",
       "description": "Set the password for your account",
-      "submit": "Continue"
+      "submit": "Continue",
+      "errors": {
+        "couldNotChangePassword": "Could not change password",
+        "couldNotVerifyPassword": "Could not verify password",
+        "unknownError": "Unknown error"
+      }
     },
     "complexity": {
       "length": "Must be at least {minLength} characters long.",
@@ -54,6 +71,22 @@
       "equals": "Password confirmation matched.",
       "matches": "Matches",
       "doesNotMatch": "Doesn't match"
+    },
+    "errors": {
+      "noHostFound": "No host found",
+      "couldNotSendResetLink": "Could not send Password Reset Link",
+      "couldNotCreateSessionForUser": "Could not create session for user",
+      "couldNotVerifyPassword": "Could not verify password",
+      "failedToAuthenticate": "Failed to authenticate. You had {failedAttempts} of {maxPasswordAttempts} password attempts.{lockoutMessage}",
+      "accountLockedContactAdmin": " Contact your administrator to unlock your account",
+      "initialUserNotSupported": "Initial User not supported",
+      "userInitialStateNotSupported": "User Initial State is not supported",
+      "codeOrVerificationRequired": "You have to provide a code or have a valid User Verification Check",
+      "verificationRequired": "User Verification Check has to be done",
+      "couldNotLoadSession": "Could not load session",
+      "couldNotLoadAuthMethods": "Could not load auth methods",
+      "failedPrecondition": "Failed precondition",
+      "sessionNotValid": "Session is not valid"
     }
   },
   "idp": {

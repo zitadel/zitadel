@@ -30,7 +30,14 @@
       "title": "Пароль",
       "description": "Введите ваш пароль.",
       "resetPassword": "Сбросить пароль",
-      "submit": "Продолжить"
+      "submit": "Продолжить",
+      "errors": {
+        "couldNotVerifyPassword": "Не удалось проверить пароль",
+        "couldNotResetPassword": "Не удалось сбросить пароль"
+      },
+      "info": {
+        "passwordResetSent": "Пароль был сброшен. Пожалуйста, проверьте свою электронную почту"
+      }
     },
     "set": {
       "title": "Установить пароль",
@@ -38,12 +45,22 @@
       "codeSent": "Код отправлен на ваш адрес электронной почты.",
       "noCodeReceived": "Не получили код?",
       "resend": "Отправить код повторно",
-      "submit": "Продолжить"
+      "submit": "Продолжить",
+      "errors": {
+        "couldNotSetPassword": "Не удалось установить пароль",
+        "couldNotResetPassword": "Не удалось сбросить пароль",
+        "couldNotVerifyPassword": "Не удалось проверить пароль"
+      }
     },
     "change": {
       "title": "Изменить пароль",
       "description": "Установите пароль для вашего аккаунта",
-      "submit": "Продолжить"
+      "submit": "Продолжить",
+      "errors": {
+        "couldNotChangePassword": "Не удалось изменить пароль",
+        "couldNotVerifyPassword": "Не удалось проверить пароль",
+        "unknownError": "Неизвестная ошибка"
+      }
     },
     "complexity": {
       "length": "Минимум {minLength} символов.",
@@ -54,6 +71,22 @@
       "equals": "Пароли должны совпадать.",
       "matches": "Совпадает",
       "doesNotMatch": "Не совпадает"
+    },
+    "errors": {
+      "noHostFound": "Хост не найден",
+      "couldNotSendResetLink": "Не удалось отправить ссылку для сброса пароля",
+      "couldNotCreateSessionForUser": "Не удалось создать сессию для пользователя",
+      "couldNotVerifyPassword": "Не удалось проверить пароль",
+      "failedToAuthenticate": "Не удалось пройти аутентификацию. У вас было {failedAttempts} из {maxPasswordAttempts} попыток ввода пароля.{lockoutMessage}",
+      "accountLockedContactAdmin": " Свяжитесь с администратором, чтобы разблокировать вашу учетную запись",
+      "initialUserNotSupported": "Первичный пользователь не поддерживается",
+      "userInitialStateNotSupported": "Начальное состояние пользователя не поддерживается",
+      "codeOrVerificationRequired": "Вы должны предоставить код или иметь действительную проверку пользователя",
+      "verificationRequired": "Необходимо выполнить проверку пользователя",
+      "couldNotLoadSession": "Не удалось загрузить сессию",
+      "couldNotLoadAuthMethods": "Не удалось загрузить методы аутентификации",
+      "failedPrecondition": "Нарушено предварительное условие",
+      "sessionNotValid": "Сессия недействительна"
     }
   },
   "idp": {

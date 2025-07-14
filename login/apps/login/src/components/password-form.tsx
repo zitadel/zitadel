@@ -6,6 +6,7 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
@@ -35,6 +36,8 @@ export function PasswordForm({
     mode: "onBlur",
   });
 
+  const t = useTranslations("password");
+
   const [info, setInfo] = useState<string>("");
   const [error, setError] = useState<string>("");
 
@@ -55,7 +58,7 @@ export function PasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not verify password");
+        setError(t("verify.errors.couldNotVerifyPassword"));
         return;
       })
       .finally(() => {
@@ -83,7 +86,7 @@ export function PasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not reset password");
+        setError(t("verify.errors.couldNotResetPassword"));
         return;
       })
       .finally(() => {
@@ -95,7 +98,7 @@ export function PasswordForm({
       return;
     }
 
-    setInfo("Password was reset. Please check your email.");
+    setInfo(t("verify.info.passwordResetSent"));
 
     const params = new URLSearchParams({
       loginName: loginName,
