@@ -10,6 +10,11 @@
       "dependsOn": ["generate", "@zitadel/client#build"],
       "outputs": ["dist/**"]
     },
+    "dev": {
+      "dependsOn": ["generate", "@zitadel/client#build"],
+      "cache": false,
+      "persistent": true
+    },
     "start": {
       "dependsOn": ["generate", "@zitadel/client#build"],
       "cache": false,

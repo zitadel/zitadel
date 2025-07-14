@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "dev": "node prebuild.development.js && ng serve",
     "start": "node prebuild.development.js && ng serve",
     "prebuild": "pnpm run generate",
     "build": "ng build --configuration production --base-href=/ui/console/",

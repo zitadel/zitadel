@@ -26,6 +26,11 @@
       "outputs": ["build/**"],
       "cache": true
     },
+    "dev": {
+      "dependsOn": ["generate"],
+      "cache": false,
+      "persistent": true
+    },
     "start": {
       "dependsOn": ["generate"],
       "cache": false,

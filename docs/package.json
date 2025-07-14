@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
+    "dev": "docusaurus start",
     "start": "docusaurus start",
     "start:api": "pnpm run generate && docusaurus start",
     "build": "pnpm run ensure-plugins && pnpm run generate && docusaurus build",
