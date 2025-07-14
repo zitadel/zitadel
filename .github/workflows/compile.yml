@@ -76,11 +76,12 @@ jobs:
       - uses: depot/setup-action@v1
         with:
           oidc: true
-      - run: make -C login login_standalone_out
+      - run: |
+          cp pnpm-lock.yaml pnpm-workspace.yaml turbo.json .npmrc package.json login/
+          cd login && make login_standalone_out
         env:
           # latest if branch is main, otherwise image version which is the pull request number
-          LOGIN_BAKE_CLI: depot bake
-          LOGIN_DIR: ../
+          LOGIN_BAKE_CLI: depot bake --file docker-bake.hcl --file apps/login-test-acceptance/docker-compose.yaml
           DEPOT_PROJECT_ID: w47wkxzdtw
           NODE_VERSION: ${{ inputs.node_version }}
       - name: move files
