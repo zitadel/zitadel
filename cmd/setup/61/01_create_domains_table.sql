@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS zitadel.domains(
-  instance_id TEXT NOT NULL
+  id TEXT NOT NULL PRIMARY KEY DEFAULT generate_ulid()
+  , instance_id TEXT NOT NULL
   , org_id TEXT
   , domain TEXT NOT NULL CHECK (LENGTH(domain) BETWEEN 1 AND 255)
   , is_verified BOOLEAN NOT NULL DEFAULT FALSE

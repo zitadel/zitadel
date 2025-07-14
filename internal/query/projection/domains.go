@@ -15,6 +15,7 @@ import (
 const (
 	DomainsTable = "zitadel.domains"
 
+	DomainsIDCol             = "id"
 	DomainsInstanceIDCol     = "instance_id"
 	DomainsOrgIDCol          = "org_id"
 	DomainsDomainCol         = "domain"
@@ -40,6 +41,7 @@ func (*domainsProjection) Init() *old_handler.Check {
 	// The table is created by migration, so we just need to check it exists
 	return handler.NewTableCheck(
 		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(DomainsIDCol, handler.ColumnTypeText),
 			handler.NewColumn(DomainsInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(DomainsOrgIDCol, handler.ColumnTypeText),
 			handler.NewColumn(DomainsDomainCol, handler.ColumnTypeText),
@@ -50,7 +52,7 @@ func (*domainsProjection) Init() *old_handler.Check {
 			handler.NewColumn(DomainsUpdatedAtCol, handler.ColumnTypeTimestamp),
 			handler.NewColumn(DomainsDeletedAtCol, handler.ColumnTypeTimestamp),
 		},
-			// Note: We don't define primary key here since the table is created by migration
+			handler.NewPrimaryKey(DomainsIDCol),
 		),
 	)
 }

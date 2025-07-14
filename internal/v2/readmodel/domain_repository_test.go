@@ -25,14 +25,16 @@ func TestDomainRepository_AddInstanceDomain(t *testing.T) {
 
 	instanceID := "test-instance-id"
 	domainName := "test.example.com"
+	expectedID := "domain-id-123"
 
-	mock.ExpectExec(`INSERT INTO zitadel\.domains`).
+	mock.ExpectQuery(`INSERT INTO zitadel\.domains`).
 		WithArgs(instanceID, domainName, true, false, sqlmock.AnyArg(), sqlmock.AnyArg()).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(expectedID))
 
 	result, err := repo.AddInstanceDomain(context.Background(), instanceID, domainName)
 
 	require.NoError(t, err)
+	assert.Equal(t, expectedID, result.ID)
 	assert.Equal(t, instanceID, result.InstanceID)
 	assert.Nil(t, result.OrganizationID)
 	assert.Equal(t, domainName, result.Domain)
@@ -54,14 +56,16 @@ func TestDomainRepository_AddOrganizationDomain(t *testing.T) {
 	orgID := "test-org-id"
 	domainName := "test.example.com"
 	validationType := domain.OrgDomainValidationTypeHTTP
+	expectedID := "domain-id-456"
 
-	mock.ExpectExec(`INSERT INTO zitadel\.domains`).
+	mock.ExpectQuery(`INSERT INTO zitadel\.domains`).
 		WithArgs(instanceID, orgID, domainName, false, false, int(validationType), sqlmock.AnyArg(), sqlmock.AnyArg()).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(expectedID))
 
 	result, err := repo.AddOrganizationDomain(context.Background(), instanceID, orgID, domainName, validationType)
 
 	require.NoError(t, err)
+	assert.Equal(t, expectedID, result.ID)
 	assert.Equal(t, instanceID, result.InstanceID)
 	assert.Equal(t, orgID, *result.OrganizationID)
 	assert.Equal(t, domainName, result.Domain)
@@ -120,8 +124,8 @@ func TestDomainRepository_Get(t *testing.T) {
 	}
 
 	rows := sqlmock.NewRows([]string{
-		"instance_id", "org_id", "domain", "is_verified", "is_primary", "validation_type", "created_at", "updated_at", "deleted_at",
-	}).AddRow(instanceID, nil, domainName, true, false, nil, now, now, nil)
+		"id", "instance_id", "org_id", "domain", "is_verified", "is_primary", "validation_type", "created_at", "updated_at", "deleted_at",
+	}).AddRow("domain-123", instanceID, nil, domainName, true, false, nil, now, now, nil)
 
 	mock.ExpectQuery(`SELECT .* FROM zitadel\.domains`).
 		WithArgs(domainName, instanceID).
@@ -130,6 +134,7 @@ func TestDomainRepository_Get(t *testing.T) {
 	result, err := repo.Get(context.Background(), criteria)
 
 	require.NoError(t, err)
+	assert.Equal(t, "domain-123", result.ID)
 	assert.Equal(t, instanceID, result.InstanceID)
 	assert.Nil(t, result.OrganizationID)
 	assert.Equal(t, domainName, result.Domain)
@@ -168,10 +173,10 @@ func TestDomainRepository_List(t *testing.T) {
 
 	// Mock data query
 	rows := sqlmock.NewRows([]string{
-		"instance_id", "org_id", "domain", "is_verified", "is_primary", "validation_type", "created_at", "updated_at", "deleted_at",
+		"id", "instance_id", "org_id", "domain", "is_verified", "is_primary", "validation_type", "created_at", "updated_at", "deleted_at",
 	}).
-		AddRow(instanceID, nil, "instance.example.com", true, true, nil, now, now, nil).
-		AddRow(instanceID, "org-id", "org.example.com", false, false, int(domain.OrgDomainValidationTypeHTTP), now, now, nil)
+		AddRow("domain-instance", instanceID, nil, "instance.example.com", true, true, nil, now, now, nil).
+		AddRow("domain-org", instanceID, "org-id", "org.example.com", false, false, int(domain.OrgDomainValidationTypeHTTP), now, now, nil)
 
 	mock.ExpectQuery(`SELECT .* FROM zitadel\.domains.*ORDER BY domain ASC.*LIMIT 10`).
 		WithArgs(instanceID).
@@ -184,6 +189,7 @@ func TestDomainRepository_List(t *testing.T) {
 	assert.Len(t, result.Domains, 2)
 
 	// Check first domain (instance domain)
+	assert.Equal(t, "domain-instance", result.Domains[0].ID)
 	assert.Equal(t, instanceID, result.Domains[0].InstanceID)
 	assert.Nil(t, result.Domains[0].OrganizationID)
 	assert.Equal(t, "instance.example.com", result.Domains[0].Domain)
@@ -191,6 +197,7 @@ func TestDomainRepository_List(t *testing.T) {
 	assert.True(t, result.Domains[0].IsPrimary)
 
 	// Check second domain (org domain)
+	assert.Equal(t, "domain-org", result.Domains[1].ID)
 	assert.Equal(t, instanceID, result.Domains[1].InstanceID)
 	assert.Equal(t, "org-id", *result.Domains[1].OrganizationID)
 	assert.Equal(t, "org.example.com", result.Domains[1].Domain)
