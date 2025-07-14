@@ -520,16 +520,24 @@ export async function GET(request: NextRequest) {
       if (url && binding.case === "redirect") {
         return NextResponse.redirect(url);
       } else if (url && binding.case === "post") {
-        const redirectUrl = constructUrl(request, "/saml-post");
+        // Create HTML form that auto-submits via POST and escape the SAML cookie
+        const html = `
+          <html>
+            <body onload="document.forms[0].submit()">
+              <form action="${url}" method="post">
+                <input type="hidden" name="RelayState" value="${binding.value.relayState}" />
+                <input type="hidden" name="SAMLResponse" value="${binding.value.samlResponse}" />
+                <noscript>
+                  <button type="submit">Continue</button>
+                </noscript>
+              </form>
+            </body>
+          </html>
+        `;
 
-        redirectUrl.searchParams.set("url", url);
-        redirectUrl.searchParams.set("RelayState", binding.value.relayState);
-        redirectUrl.searchParams.set(
-          "SAMLResponse",
-          binding.value.samlResponse,
-        );
-
-        return NextResponse.redirect(redirectUrl.toString());
+        return new NextResponse(html, {
+          headers: { "Content-Type": "text/html" },
+        });
       } else {
         console.log(
           "could not create response, redirect user to choose other account",

@@ -436,8 +436,6 @@ Errors:
     Invalid: User Grant non è valido
     NotChanged: User Grant non è stata cambiato
     IDMissing: ID mancante
-    NotActive: User Grant non è attivo
-    NotInactive: User Grant non è disattivato
     NoPermissionForProject: L'utente non ha permessi su questo progetto
     RoleKeyNotFound: Ruolo non trovato
   Member:

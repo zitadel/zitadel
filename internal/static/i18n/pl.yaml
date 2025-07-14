@@ -436,8 +436,6 @@ Errors:
     Invalid: Uprawnienie użytkownika jest nieprawidłowe
     NotChanged: Uprawnienie użytkownika nie zostało zmienione
     IDMissing: Brak ID
-    NotActive: Uprawnienie użytkownika nie jest aktywne
-    NotInactive: Uprawnienie użytkownika nie jest dezaktywowane
     NoPermissionForProject: Użytkownik nie ma uprawnień do tego projektu
     RoleKeyNotFound: Rola nie znaleziona
   Member:

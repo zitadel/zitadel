@@ -78,12 +78,13 @@ core_grpc_dependencies:
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.22.0 		# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2?tab=versions
 	go install github.com/envoyproxy/protoc-gen-validate@v1.1.0								# https://pkg.go.dev/github.com/envoyproxy/protoc-gen-validate?tab=versions
 	go install github.com/bufbuild/buf/cmd/buf@v1.45.0										# https://pkg.go.dev/github.com/bufbuild/buf/cmd/buf?tab=versions
+	go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1						# https://pkg.go.dev/connectrpc.com/connect/cmd/protoc-gen-connect-go?tab=versions
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
 	buf generate
 	mkdir -p pkg/grpc
-	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/
+	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/
 	mkdir -p openapi/v2/zitadel
 	cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel
 
@@ -190,15 +191,9 @@ login_push: login_ensure_remote
 login_ensure_remote:
 	@if ! git remote get-url $(LOGIN_REMOTE_NAME) > /dev/null 2>&1; then \
 		echo "Adding remote $(LOGIN_REMOTE_NAME)"; \
-		git remote add $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
+		git remote add --fetch $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
 	else \
 		echo "Remote $(LOGIN_REMOTE_NAME) already exists."; \
-	fi
-	@if [ ! -d login ]; then \
-		echo "Adding subtree for 'login' from branch $(LOGIN_REMOTE_BRANCH)"; \
-		git subtree add --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH); \
-	else \
-		echo "Subtree 'login' already exists."; \
 	fi
 
 export LOGIN_DIR := ./login/

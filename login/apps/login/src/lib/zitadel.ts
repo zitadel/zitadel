@@ -52,6 +52,7 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { unstable_cacheLife as cacheLife } from "next/cache";
 import { getUserAgent } from "./fingerprint";
+import { setSAMLFormCookie } from "./saml";
 import { createServiceForHost } from "./service";
 
 const useCache = process.env.DEBUG !== "true";
@@ -854,15 +855,15 @@ export async function searchUsers({
     const emailQuery = EmailQuery(searchValue);
     emailAndPhoneQueries.push(emailQuery);
   } else {
-    const emailAndPhoneOrQueries: SearchQuery[] = [];
+    const orQuery: SearchQuery[] = [];
 
     const emailQuery = EmailQuery(searchValue);
-    emailAndPhoneOrQueries.push(emailQuery);
+    orQuery.push(emailQuery);
 
     let phoneQuery;
     if (searchValue.length <= 20) {
       phoneQuery = PhoneQuery(searchValue);
-      emailAndPhoneOrQueries.push(phoneQuery);
+      orQuery.push(phoneQuery);
     }
 
     emailAndPhoneQueries.push(
@@ -870,7 +871,7 @@ export async function searchUsers({
         query: {
           case: "orQuery",
           value: {
-            queries: emailAndPhoneOrQueries,
+            queries: orQuery,
           },
         },
       }),
@@ -903,7 +904,7 @@ export async function searchUsers({
   }
 
   if (emailOrPhoneResult.result.length == 1) {
-    return loginNameResult;
+    return emailOrPhoneResult;
   }
 
   return { error: "User not found in the system" };
@@ -981,18 +982,15 @@ export async function startIdentityProviderFlow({
         value: urls,
       },
     })
-    .then((resp) => {
+    .then(async (resp) => {
       if (resp.nextStep.case === "authUrl" && resp.nextStep.value) {
         return resp.nextStep.value;
       } else if (resp.nextStep.case === "formData" && resp.nextStep.value) {
         const formData: FormData = resp.nextStep.value;
         const redirectUrl = "/saml-post";
 
-        const params = new URLSearchParams({ url: formData.url });
-
-        Object.entries(formData.fields).forEach(([k, v]) => {
-          params.append(k, v);
-        });
+        const dataId = await setSAMLFormCookie(JSON.stringify(formData.fields));
+        const params = new URLSearchParams({ url: formData.url, id: dataId });
 
         return `${redirectUrl}?${params.toString()}`;
       } else {

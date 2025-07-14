@@ -436,8 +436,6 @@ Errors:
     Invalid: Benutzer Berechtigung ist ungültig
     NotChanged: Benutzer Berechtigung wurde nicht verändert
     IDMissing: ID fehlt
-    NotActive: Benutzer Berechtigung ist nicht aktiv
-    NotInactive: Benutzer Berechtigung ist nicht deaktiviert
     NoPermissionForProject: Benutzer hat keine Rechte auf diesem Projekt
     RoleKeyNotFound: Rolle konnte nicht gefunden werden
   Member:

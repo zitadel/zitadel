@@ -437,8 +437,6 @@ Errors:
     Invalid: 사용자 권한이 유효하지 않습니다
     NotChanged: 사용자 권한이 변경되지 않았습니다
     IDMissing: ID가 누락되었습니다
-    NotActive: 사용자 권한이 활성 상태가 아닙니다
-    NotInactive: 사용자 권한이 비활성 상태가 아닙니다
     NoPermissionForProject: 사용자가 이 프로젝트에 대한 권한이 없습니다
     RoleKeyNotFound: 역할을 찾을 수 없습니다
   Member:
