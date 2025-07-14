@@ -44,6 +44,8 @@ func (wm *OrgMemberWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.MemberWriteModel.AppendEvents(&e.MemberCascadeRemovedEvent)
+		case *org.OrgRemovedEvent:
+			wm.MemberWriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -62,6 +64,7 @@ func (wm *OrgMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 			org.MemberAddedEventType,
 			org.MemberChangedEventType,
 			org.MemberRemovedEventType,
-			org.MemberCascadeRemovedEventType).
+			org.MemberCascadeRemovedEventType,
+			org.OrgRemovedEventType).
 		Builder()
 }
