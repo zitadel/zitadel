@@ -183,11 +183,15 @@ login_pull: login_ensure_remote
 	git fetch $(LOGIN_REMOTE_NAME)
 	git merge -s ours --no-commit --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/$(LOGIN_REMOTE_BRANCH)
 	git commit -m "Subtree merged in login"
+	git push
 
 .PHONY: login_push
 login_push: login_ensure_remote
 	@echo "Pushing changes to the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
-	git subtree push --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+	git checkout -b $(LOGIN_REMOTE_BRANCH)-local
+	git merge -s ours --no-commit --allow-unrelated-histories origin/main
+	git commit -m "Subtree merged in login"
+	git push $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)-local:$(LOGIN_REMOTE_BRANCH)
 
 login_ensure_remote:
 	@if ! git remote get-url $(LOGIN_REMOTE_NAME) > /dev/null 2>&1; then \
