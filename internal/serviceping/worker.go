@@ -3,7 +3,10 @@ package serviceping
 import (
 	"context"
 	"errors"
+	"fmt"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/muhlemmer/gu"
 	"github.com/riverqueue/river"
@@ -15,11 +18,13 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/queue"
 	"github.com/zitadel/zitadel/internal/v2/system"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	analytics "github.com/zitadel/zitadel/pkg/grpc/analytics/v2beta"
 )
 
 const (
-	QueueName = "service_ping_report"
+	QueueName   = "service_ping_report"
+	minInterval = 30 * time.Minute
 )
 
 var (
@@ -238,7 +243,7 @@ func Start(config *Config, q *queue.Queue) error {
 	if !config.Enabled {
 		return nil
 	}
-	schedule, err := cron.ParseStandard(config.Interval)
+	schedule, err := parseAndValidateSchedule(config.Interval)
 	if err != nil {
 		return err
 	}
@@ -249,4 +254,40 @@ func Start(config *Config, q *queue.Queue) error {
 		queue.WithMaxAttempts(config.MaxAttempts),
 	)
 	return nil
+}
+
+func parseAndValidateSchedule(interval string) (cron.Schedule, error) {
+	if interval == "@daily" {
+		interval = randomizeDaily()
+	}
+	schedule, err := cron.ParseStandard(interval)
+	if err != nil {
+		return nil, zerrors.ThrowInvalidArgument(err, "SERV-NJqiof", "invalid interval")
+	}
+	var intervalDuration time.Duration
+	switch s := schedule.(type) {
+	case *cron.SpecSchedule:
+		// For cron.SpecSchedule, we need to calculate the interval duration
+		// by getting the next time and subtracting it from the time after that.
+		// This is because the schedule could be a specific time, that is less than 30 minutes away,
+		// but still run only once a day and therefore is valid.
+		next := s.Next(time.Now())
+		nextAfter := s.Next(next)
+		intervalDuration = nextAfter.Sub(next)
+	case cron.ConstantDelaySchedule:
+		intervalDuration = s.Delay
+	}
+	if intervalDuration < minInterval {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "SERV-FJ12", "interval must be at least %s", minInterval)
+	}
+	logging.WithFields("interval", interval).Info("scheduling service ping")
+	return schedule, nil
+}
+
+// randomizeDaily generates a random time for the daily cron job
+// to prevent all systems from sending the report at the same time.
+func randomizeDaily() string {
+	minute := rand.Intn(60)
+	hour := rand.Intn(24)
+	return fmt.Sprintf("%d %d * * *", minute, hour)
 }
