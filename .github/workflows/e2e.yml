@@ -34,6 +34,8 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: pnpm install
+      - name: Install Cypress binary
+        run: cd ./e2e && pnpm exec cypress install
       - name: Start DB and ZITADEL
         run: |
           cd ./e2e
