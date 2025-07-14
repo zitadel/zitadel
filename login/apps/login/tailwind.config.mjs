@@ -9,14 +9,26 @@ let themeColors = {
   link: { light: { contrast: {} }, dark: { contrast: {} } },
 };
 
-const shades = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"];
+const shades = [
+  "50",
+  "100",
+  "200",
+  "300",
+  "400",
+  "500",
+  "600",
+  "700",
+  "800",
+  "900",
+];
 const themes = ["light", "dark"];
 const types = ["background", "primary", "warn", "text", "link"];
 
 types.forEach((type) => {
   themes.forEach((theme) => {
     shades.forEach((shade) => {
-      themeColors[type][theme][shade] = `var(--theme-${theme}-${type}-${shade})`;
+      themeColors[type][theme][shade] =
+        `var(--theme-${theme}-${type}-${shade})`;
       themeColors[type][theme][`contrast-${shade}`] =
         `var(--theme-${theme}-${type}-contrast-${shade})`;
       themeColors[type][theme][`secondary-${shade}`] =

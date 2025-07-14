@@ -67,7 +67,7 @@ export async function verifyU2F(command: VerifyU2FCommand) {
   }
 
   let passkeyName = command.passkeyName;
-  if (!!!passkeyName) {
+  if (!passkeyName) {
     const headersList = await headers();
     const userAgentStructure = { headers: headersList };
     const { browser, device, os } = userAgent(userAgentStructure);

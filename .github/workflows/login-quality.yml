@@ -52,7 +52,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Run login quality checks with Turbo
-        run: pnpm turbo lint test:unit --filter=./login
+        run: pnpm turbo test:unit --filter=@zitadel/login
         env:
           # latest if branch is main, otherwise image version which is the pull request number
           LOGIN_BAKE_CLI: depot bake

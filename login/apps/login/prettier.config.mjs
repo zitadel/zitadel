@@ -4,8 +4,8 @@ export default {
   useTabs: false,
   semi: true,
   singleQuote: false,
-  trailingComma: 'all',
+  trailingComma: "all",
   bracketSpacing: true,
-  arrowParens: 'always',
-  plugins: ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"]
+  arrowParens: "always",
+  plugins: ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"],
 };

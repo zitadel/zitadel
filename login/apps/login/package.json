@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbopack",
-    "test:unit": "pnpm vitest",
+    "test:unit": "pnpm vitest --run",
     "test:unit:standalone": "pnpm test:unit",
     "test:unit:watch": "pnpm test:unit --watch",
     "lint": "pnpm exec next lint && pnpm exec prettier --check .",

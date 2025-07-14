@@ -8,11 +8,11 @@
 @layer base {
   h1,
   .ztdl-h1 {
-    @apply text-2xl text-center;
+    @apply text-center text-2xl;
   }
 
   .ztdl-p {
-    @apply text-sm text-center text-text-light-secondary-500 dark:text-text-dark-secondary-500 text-center;
+    @apply text-center text-sm text-text-light-secondary-500 dark:text-text-dark-secondary-500;
   }
 }
 

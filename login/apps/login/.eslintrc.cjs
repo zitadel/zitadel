@@ -7,8 +7,8 @@ module.exports = {
     "@next/next/no-img-element": "off",
     "react/no-unescaped-entities": "off",
     "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-    "no-undef": "off"
+    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    "no-undef": "off",
   },
   parserOptions: {
     ecmaVersion: "latest",

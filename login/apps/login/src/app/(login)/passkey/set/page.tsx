@@ -54,7 +54,7 @@ export default async function Page(props: {
           <span>
             <Translated i18nKey="set.info.description" namespace="passkey" />
             <a
-              className="text-primary-light-500 dark:text-primary-dark-500 hover:text-primary-light-300 hover:dark:text-primary-dark-300"
+              className="text-primary-light-500 hover:text-primary-light-300 dark:text-primary-dark-500 hover:dark:text-primary-dark-300"
               target="_blank"
               href="https://zitadel.com/docs/guides/manage/user/reg-create-user#with-passwordless"
             >

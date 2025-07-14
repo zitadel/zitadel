@@ -145,7 +145,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
 
   // if no name is provided, try to generate one from the user agent
   let passkeyName = command.passkeyName;
-  if (!!!passkeyName) {
+  if (!passkeyName) {
     const headersList = await headers();
     const userAgentStructure = { headers: headersList };
     const { browser, device, os } = userAgent(userAgentStructure);
