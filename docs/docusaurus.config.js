@@ -218,7 +218,6 @@ module.exports = {
           showLastUpdateTime: true,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
-
           docItemComponent: "@theme/ApiItem",
         },
         theme: {
@@ -240,6 +239,17 @@ module.exports = {
         },
         SearchSettings: {
           tabs: ["All", "Docs", "GitHub", "Forums", "Discord"],
+        },
+      },
+    ],
+    [
+      "@signalwire/docusaurus-plugin-llms-txt",
+      {
+        depth: 3,
+        logLevel: 1,
+        content: {
+          excludeRoutes: ["/search"],
+          enableMarkdownFiles: true,
         },
       },
     ],

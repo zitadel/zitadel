@@ -1,5 +1,6 @@
 echo $(uname -m)
-
+mkdir protoc-gen-connect-openapi
+cd ./protoc-gen-connect-openapi/
 if [ "$(uname)" = "Darwin" ]; then
   curl -L -o protoc-gen-connect-openapi.tar.gz https://github.com/sudorandom/protoc-gen-connect-openapi/releases/download/v0.18.0/protoc-gen-connect-openapi_0.18.0_darwin_all.tar.gz
 else
