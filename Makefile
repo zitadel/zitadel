@@ -181,8 +181,7 @@ core_lint:
 login_pull: login_ensure_remote
 	@echo "Pulling changes from the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
 	git fetch $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
-	git merge -s ours --no-commit --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/$(LOGIN_REMOTE_BRANCH)
-	git commit -m "Subtree merged in login"
+	git merge -s ours --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/$(LOGIN_REMOTE_BRANCH) -m "Synthetic merge to align histories"
 	git push
 
 .PHONY: login_push
