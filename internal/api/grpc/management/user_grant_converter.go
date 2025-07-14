@@ -49,19 +49,23 @@ func shouldAppendUserGrantOwnerQuery(queries []*user.UserGrantQuery) bool {
 	return true
 }
 
-func AddUserGrantRequestToDomain(req *mgmt_pb.AddUserGrantRequest) *domain.UserGrant {
+func AddUserGrantRequestToDomain(req *mgmt_pb.AddUserGrantRequest, resourceowner string) *domain.UserGrant {
 	return &domain.UserGrant{
 		UserID:         req.UserId,
 		ProjectID:      req.ProjectId,
 		ProjectGrantID: req.ProjectGrantId,
 		RoleKeys:       req.RoleKeys,
+		ObjectRoot: models.ObjectRoot{
+			ResourceOwner: resourceowner,
+		},
 	}
 }
 
-func UpdateUserGrantRequestToDomain(req *mgmt_pb.UpdateUserGrantRequest) *domain.UserGrant {
+func UpdateUserGrantRequestToDomain(req *mgmt_pb.UpdateUserGrantRequest, resourceowner string) *domain.UserGrant {
 	return &domain.UserGrant{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.GrantId,
+			AggregateID:   req.GrantId,
+			ResourceOwner: resourceowner,
 		},
 		UserID:   req.UserId,
 		RoleKeys: req.RoleKeys,

@@ -18,7 +18,8 @@
     "generate:apidocs": "docusaurus gen-api-docs all",
     "generate:configdocs": "cp -r ../cmd/defaults.yaml ./docs/self-hosting/manage/configure/ && cp -r ../cmd/setup/steps.yaml ./docs/self-hosting/manage/configure/",
     "generate:re-gen": "yarn generate:clean-all && yarn generate",
-    "generate:clean-all": "docusaurus clean-api-docs all"
+    "generate:clean-all": "docusaurus clean-api-docs all",
+    "postinstall": "sh ./plugin-download.sh"
   },
   "dependencies": {
     "@bufbuild/buf": "^1.14.0",
@@ -29,6 +30,7 @@
     "@docusaurus/theme-search-algolia": "^3.8.1",
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
+    "@signalwire/docusaurus-plugin-llms-txt": "^1.2.0",
     "@inkeep/cxkit-docusaurus": "^0.5.89",
     "autoprefixer": "^10.4.13",
     "clsx": "^1.2.1",

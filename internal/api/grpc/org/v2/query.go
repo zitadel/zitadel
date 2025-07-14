@@ -3,6 +3,8 @@ package org
 import (
 	"context"
 
+	"connectrpc.com/connect"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -11,36 +13,36 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 )
 
-func (s *Server) ListOrganizations(ctx context.Context, req *org.ListOrganizationsRequest) (*org.ListOrganizationsResponse, error) {
+func (s *Server) ListOrganizations(ctx context.Context, req *connect.Request[org.ListOrganizationsRequest]) (*connect.Response[org.ListOrganizationsResponse], error) {
 	queries, err := listOrgRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	orgs, err := s.query.SearchOrgs(ctx, queries, s.checkPermission)
+	orgs, err := s.query.SearchOrgs(ctx, queries.Msg, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	return &org.ListOrganizationsResponse{
+	return connect.NewResponse(&org.ListOrganizationsResponse{
 		Result:  organizationsToPb(orgs.Orgs),
 		Details: object.ToListDetails(orgs.SearchResponse),
-	}, nil
+	}), nil
 }
 
-func listOrgRequestToModel(ctx context.Context, req *org.ListOrganizationsRequest) (*query.OrgSearchQueries, error) {
-	offset, limit, asc := object.ListQueryToQuery(req.Query)
-	queries, err := orgQueriesToQuery(ctx, req.Queries)
+func listOrgRequestToModel(ctx context.Context, req *connect.Request[org.ListOrganizationsRequest]) (*connect.Response[query.OrgSearchQueries], error) {
+	offset, limit, asc := object.ListQueryToQuery(req.Msg.Query)
+	queries, err := orgQueriesToQuery(ctx, req.Msg.Queries)
 	if err != nil {
 		return nil, err
 	}
-	return &query.OrgSearchQueries{
+	return connect.NewResponse(&query.OrgSearchQueries{
 		SearchRequest: query.SearchRequest{
 			Offset:        offset,
 			Limit:         limit,
-			SortingColumn: fieldNameToOrganizationColumn(req.SortingColumn),
+			SortingColumn: fieldNameToOrganizationColumn(req.Msg.SortingColumn),
 			Asc:           asc,
 		},
 		Queries: queries,
-	}, nil
+	}), nil
 }
 
 func orgQueriesToQuery(ctx context.Context, queries []*org.SearchQuery) (_ []query.SearchQuery, err error) {

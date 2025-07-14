@@ -43,7 +43,7 @@ func TestServer_AddSecret(t *testing.T) {
 				CTX,
 				&user.AddSecretRequest{},
 				func(request *user.AddSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX)
+					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
 					return nil
 				},
@@ -55,7 +55,7 @@ func TestServer_AddSecret(t *testing.T) {
 				CTX,
 				&user.AddSecretRequest{},
 				func(request *user.AddSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX)
+					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
 					return nil
 				},
@@ -67,7 +67,7 @@ func TestServer_AddSecret(t *testing.T) {
 				CTX,
 				&user.AddSecretRequest{},
 				func(request *user.AddSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX)
+					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
 					_, err := Client.AddSecret(CTX, &user.AddSecretRequest{
 						UserId: resp.GetId(),
@@ -202,7 +202,7 @@ func TestServer_RemoveSecret(t *testing.T) {
 				CTX,
 				&user.RemoveSecretRequest{},
 				func(request *user.RemoveSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX)
+					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
 					return nil
 				},
@@ -215,7 +215,7 @@ func TestServer_RemoveSecret(t *testing.T) {
 				CTX,
 				&user.RemoveSecretRequest{},
 				func(request *user.RemoveSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX)
+					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
 					_, err := Instance.Client.UserV2.AddSecret(CTX, &user.AddSecretRequest{
 						UserId: resp.GetId(),

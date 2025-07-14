@@ -4,7 +4,9 @@ import { createResponse, getLoginSettings } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { v4 as uuidv4 } from "uuid";
 import { constructUrl } from "./service-url";
 import { isSessionValid } from "./session";
 
@@ -16,6 +18,37 @@ type LoginWithSAMLAndSession = {
   sessionCookies: Cookie[];
   request: NextRequest;
 };
+
+export async function getSAMLFormUID() {
+  return uuidv4();
+}
+
+export async function setSAMLFormCookie(value: string): Promise<string> {
+  const cookiesList = await cookies();
+
+  const uid = await getSAMLFormUID();
+
+  await cookiesList.set({
+    name: uid,
+    value: value,
+    httpOnly: true,
+    path: "/",
+    maxAge: 5 * 60, // 5 minutes
+  });
+
+  return uid;
+}
+
+export async function getSAMLFormCookie(uid: string): Promise<string | null> {
+  const cookiesList = await cookies();
+
+  const cookie = cookiesList.get(uid);
+  if (!cookie || !cookie.value) {
+    return null;
+  }
+
+  return cookie.value;
+}
 
 export async function loginWithSAMLAndSession({
   serviceUrl,
