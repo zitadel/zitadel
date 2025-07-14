@@ -201,7 +201,7 @@ func (a *API) registerConnectServer(service server.ConnectServer) {
 		methodNames[i] = string(methods.Get(i).Name())
 	}
 	a.connectServices[prefix] = methodNames
-	a.RegisterHandlerPrefixes(handler, prefix)
+	a.RegisterHandlerPrefixes(http_mw.CORSInterceptor(handler), prefix)
 }
 
 // HandleFunc allows registering a [http.HandlerFunc] on an exact
