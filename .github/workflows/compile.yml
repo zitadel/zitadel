@@ -69,34 +69,9 @@ jobs:
           name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
           path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
 
-  login:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: depot/setup-action@v1
-        with:
-          oidc: true
-      - run: |
-          cp pnpm-lock.yaml pnpm-workspace.yaml turbo.json .npmrc package.json login/
-          cd login && make login_standalone_out
-        env:
-          # latest if branch is main, otherwise image version which is the pull request number
-          LOGIN_BAKE_CLI: depot bake --file docker-bake.hcl --file apps/login-test-acceptance/docker-compose.yaml
-          DEPOT_PROJECT_ID: w47wkxzdtw
-          NODE_VERSION: ${{ inputs.node_version }}
-      - name: move files
-        run: |
-          cp login/LICENSE login/apps/login/standalone/
-          cp login/README.md login/apps/login/standalone/
-          tar -czvf login.tar.gz -C login/apps/login/standalone .
-      - uses: actions/upload-artifact@v4
-        with:
-          name: login
-          path: login.tar.gz
-
   checksums:
     runs-on: ubuntu-latest
-    needs: [executable, login]
+    needs: [executable]
     steps:
       - uses: actions/download-artifact@v4
         with:
