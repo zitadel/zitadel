@@ -3,4 +3,4 @@ packages:
   - "docs"
   - "e2e"
   - "login/apps/*"
-  - "login/packages/*"
+  - "clients/typescript/*"

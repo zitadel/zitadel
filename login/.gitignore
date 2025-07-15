@@ -16,3 +16,11 @@ public/dist
 /blob-report/
 /out
 /docker
+
+custom-config.js
+.env*.local
+standalone
+
+
+# TypeScript build info
+tsconfig.tsbuildinfo

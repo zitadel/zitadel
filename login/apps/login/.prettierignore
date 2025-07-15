@@ -1,2 +1,4 @@
 .next
-/external
+external
+dist
+standalone
