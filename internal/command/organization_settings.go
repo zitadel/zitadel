@@ -10,7 +10,7 @@ import (
 type SetOrganizationSettings struct {
 	OrganizationID string
 
-	UserUniqueness *bool
+	OrganizationScopedUsernames *bool
 }
 
 func (e *SetOrganizationSettings) IsValid() error {
@@ -33,7 +33,7 @@ func (c *Commands) SetOrganizationSettings(ctx context.Context, set *SetOrganiza
 	}
 
 	events, err := wm.NewSet(ctx,
-		set.UserUniqueness,
+		set.OrganizationScopedUsernames,
 	)
 	if err != nil {
 		return nil, err

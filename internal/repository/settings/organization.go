@@ -15,7 +15,7 @@ const (
 type OrganizationSettingsSetEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	UserUniqueness bool `json:"userUniqueness,omitempty"`
+	OrganizationScopedUsernames bool `json:"organizationScopedUsernames,omitempty"`
 }
 
 func (e *OrganizationSettingsSetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -33,13 +33,13 @@ func (e *OrganizationSettingsSetEvent) UniqueConstraints() []*eventstore.UniqueC
 func NewOrganizationSettingsAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	userUniqueness bool,
+	organizationScopedUsernames bool,
 ) *OrganizationSettingsSetEvent {
 	return &OrganizationSettingsSetEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx, aggregate, OrganizationSettingsSetEventType,
 		),
-		UserUniqueness: userUniqueness,
+		OrganizationScopedUsernames: organizationScopedUsernames,
 	}
 }
 

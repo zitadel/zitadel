@@ -556,10 +556,10 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 						},
 					}
 					response.OrganizationSettings[0] = &settings.OrganizationSettings{
-						OrganizationId: orgResp.GetOrganizationId(),
-						CreationDate:   settingsResp.GetSetDate(),
-						ChangeDate:     settingsResp.GetSetDate(),
-						UserUniqueness: true,
+						OrganizationId:              orgResp.GetOrganizationId(),
+						CreationDate:                settingsResp.GetSetDate(),
+						ChangeDate:                  settingsResp.GetSetDate(),
+						OrganizationScopedUsernames: true,
 					}
 				},
 				req: &settings.ListOrganizationSettingsRequest{
@@ -592,22 +592,22 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 						},
 					}
 					response.OrganizationSettings[2] = &settings.OrganizationSettings{
-						OrganizationId: orgResp1.GetOrganizationId(),
-						CreationDate:   settingsResp1.GetSetDate(),
-						ChangeDate:     settingsResp1.GetSetDate(),
-						UserUniqueness: true,
+						OrganizationId:              orgResp1.GetOrganizationId(),
+						CreationDate:                settingsResp1.GetSetDate(),
+						ChangeDate:                  settingsResp1.GetSetDate(),
+						OrganizationScopedUsernames: true,
 					}
 					response.OrganizationSettings[1] = &settings.OrganizationSettings{
-						OrganizationId: orgResp2.GetOrganizationId(),
-						CreationDate:   settingsResp2.GetSetDate(),
-						ChangeDate:     settingsResp2.GetSetDate(),
-						UserUniqueness: true,
+						OrganizationId:              orgResp2.GetOrganizationId(),
+						CreationDate:                settingsResp2.GetSetDate(),
+						ChangeDate:                  settingsResp2.GetSetDate(),
+						OrganizationScopedUsernames: true,
 					}
 					response.OrganizationSettings[0] = &settings.OrganizationSettings{
-						OrganizationId: orgResp3.GetOrganizationId(),
-						CreationDate:   settingsResp3.GetSetDate(),
-						ChangeDate:     settingsResp3.GetSetDate(),
-						UserUniqueness: true,
+						OrganizationId:              orgResp3.GetOrganizationId(),
+						CreationDate:                settingsResp3.GetSetDate(),
+						ChangeDate:                  settingsResp3.GetSetDate(),
+						OrganizationScopedUsernames: true,
 					}
 				},
 				req: &settings.ListOrganizationSettingsRequest{

@@ -717,7 +717,7 @@ message SetOrganizationSettingsRequest {
   // Organization ID in which this settings are set.
   string organization_id = 1;
   // Force the usernames in the organization to be unique, only possible to set if the existing users already have unique usernames in the organization context.
-  optional bool user_uniqueness = 2;
+  optional bool organization_scoped_usernames = 2;
 }
 
 message SetOrganizationSettingsResponse {

@@ -217,8 +217,8 @@ func TestServer_SetOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				req: &settings.SetOrganizationSettingsRequest{
-					OrganizationId: Instance.DefaultOrg.GetId(),
-					UserUniqueness: gu.Ptr(true),
+					OrganizationId:              Instance.DefaultOrg.GetId(),
+					OrganizationScopedUsernames: gu.Ptr(true),
 				},
 			},
 			wantErr: true,
@@ -228,8 +228,8 @@ func TestServer_SetOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCTX,
 				req: &settings.SetOrganizationSettingsRequest{
-					OrganizationId: "",
-					UserUniqueness: gu.Ptr(true),
+					OrganizationId:              "",
+					OrganizationScopedUsernames: gu.Ptr(true),
 				},
 			},
 			wantErr: true,
@@ -239,8 +239,8 @@ func TestServer_SetOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCTX,
 				req: &settings.SetOrganizationSettingsRequest{
-					OrganizationId: "notexisting",
-					UserUniqueness: gu.Ptr(true),
+					OrganizationId:              "notexisting",
+					OrganizationScopedUsernames: gu.Ptr(true),
 				},
 			},
 			wantErr: true,
@@ -269,7 +269,7 @@ func TestServer_SetOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCTX,
 				req: &settings.SetOrganizationSettingsRequest{
-					UserUniqueness: gu.Ptr(true),
+					OrganizationScopedUsernames: gu.Ptr(true),
 				},
 			},
 			want: want{
@@ -286,7 +286,7 @@ func TestServer_SetOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCTX,
 				req: &settings.SetOrganizationSettingsRequest{
-					UserUniqueness: gu.Ptr(false),
+					OrganizationScopedUsernames: gu.Ptr(false),
 				},
 			},
 			want: want{

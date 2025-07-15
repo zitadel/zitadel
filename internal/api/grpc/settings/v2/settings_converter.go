@@ -254,7 +254,7 @@ func securitySettingsToCommand(req *settings.SetSecuritySettingsRequest) *comman
 
 func organizationSettingsToCommand(req *settings.SetOrganizationSettingsRequest) *command.SetOrganizationSettings {
 	return &command.SetOrganizationSettings{
-		OrganizationID: req.OrganizationId,
-		UserUniqueness: req.UserUniqueness,
+		OrganizationID:              req.OrganizationId,
+		OrganizationScopedUsernames: req.OrganizationScopedUsernames,
 	}
 }

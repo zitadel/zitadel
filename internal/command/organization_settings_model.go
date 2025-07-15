@@ -16,9 +16,8 @@ type OrganizationSettingsWriteModel struct {
 
 	OrganizationState domain.OrgState
 
-	State                domain.OrganizationSettingsState
-	writePermissionCheck bool
-	checkPermission      domain.PermissionCheck
+	State           domain.OrganizationSettingsState
+	checkPermission domain.PermissionCheck
 }
 
 func (wm *OrganizationSettingsWriteModel) GetWriteModel() *eventstore.WriteModel {
@@ -30,14 +29,7 @@ func (wm *OrganizationSettingsWriteModel) checkPermissionWrite(
 	resourceOwner string,
 	aggregateID string,
 ) error {
-	if wm.writePermissionCheck {
-		return nil
-	}
-	if err := wm.checkPermission(ctx, domain.PermissionIAMPolicyWrite, resourceOwner, aggregateID); err != nil {
-		return err
-	}
-	wm.writePermissionCheck = true
-	return nil
+	return wm.checkPermission(ctx, domain.PermissionIAMPolicyWrite, resourceOwner, aggregateID)
 }
 
 func (wm *OrganizationSettingsWriteModel) checkPermissionDelete(
@@ -62,15 +54,17 @@ func (wm *OrganizationSettingsWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *settings.OrganizationSettingsSetEvent:
-			wm.UserUniqueness = e.UserUniqueness
+			wm.UserUniqueness = e.OrganizationScopedUsernames
 			wm.State = domain.OrganizationSettingsStateActive
 		case *settings.OrganizationSettingsRemovedEvent:
 			wm.UserUniqueness = false
 			wm.State = domain.OrganizationSettingsStateRemoved
 		case *org.OrgAddedEvent:
 			wm.OrganizationState = domain.OrgStateActive
+			wm.UserUniqueness = false
 		case *org.OrgRemovedEvent:
 			wm.OrganizationState = domain.OrgStateRemoved
+			wm.UserUniqueness = false
 		}
 	}
 	return wm.WriteModel.Reduce()

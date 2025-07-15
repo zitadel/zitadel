@@ -41,8 +41,8 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				settings: &SetOrganizationSettings{
-					OrganizationID: "",
-					UserUniqueness: boolPtr(true),
+					OrganizationID:              "",
+					OrganizationScopedUsernames: boolPtr(true),
 				},
 			},
 			res: res{
@@ -60,8 +60,8 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				settings: &SetOrganizationSettings{
-					OrganizationID: "org1",
-					UserUniqueness: boolPtr(true),
+					OrganizationID:              "org1",
+					OrganizationScopedUsernames: boolPtr(true),
 				},
 			},
 			res: res{
@@ -92,8 +92,8 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				settings: &SetOrganizationSettings{
-					OrganizationID: "org1",
-					UserUniqueness: boolPtr(true),
+					OrganizationID:              "org1",
+					OrganizationScopedUsernames: boolPtr(true),
 				},
 			},
 			res: res{
@@ -127,8 +127,8 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				settings: &SetOrganizationSettings{
-					OrganizationID: "org1",
-					UserUniqueness: boolPtr(true),
+					OrganizationID:              "org1",
+					OrganizationScopedUsernames: boolPtr(true),
 				},
 			},
 			res: res{
@@ -156,8 +156,8 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				settings: &SetOrganizationSettings{
-					OrganizationID: "org1",
-					UserUniqueness: boolPtr(true),
+					OrganizationID:              "org1",
+					OrganizationScopedUsernames: boolPtr(true),
 				},
 			},
 			res: res{
@@ -194,8 +194,8 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				settings: &SetOrganizationSettings{
-					OrganizationID: "org1",
-					UserUniqueness: boolPtr(true),
+					OrganizationID:              "org1",
+					OrganizationScopedUsernames: boolPtr(true),
 				},
 			},
 			res: res{
@@ -223,8 +223,8 @@ func TestCommandSide_SetSettingsOrganization(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				settings: &SetOrganizationSettings{
-					OrganizationID: "org1",
-					UserUniqueness: boolPtr(false),
+					OrganizationID:              "org1",
+					OrganizationScopedUsernames: boolPtr(false),
 				},
 			},
 			res: res{

@@ -44,8 +44,8 @@ var (
 		name:  projection.OrganizationSettingsSequenceCol,
 		table: organizationSettingsTable,
 	}
-	OrganizationSettingsColumnUserUniqueness = Column{
-		name:  projection.OrganizationSettingsUserUniquenessCol,
+	OrganizationSettingsColumnOrganizationScopedUsernames = Column{
+		name:  projection.OrganizationSettingsOrganizationScopedUsernamesCol,
 		table: organizationSettingsTable,
 	}
 )
@@ -74,7 +74,7 @@ type OrganizationSettings struct {
 	ResourceOwner string
 	Sequence      uint64
 
-	UserUniqueness bool
+	OrganizationScopedUsernames bool
 }
 
 type OrganizationSettingsSearchQueries struct {
@@ -152,7 +152,7 @@ func prepareOrganizationSettingsListQuery() (sq.SelectBuilder, func(*sql.Rows) (
 			OrganizationSettingsColumnChangeDate.identifier(),
 			OrganizationSettingsColumnResourceOwner.identifier(),
 			OrganizationSettingsColumnSequence.identifier(),
-			OrganizationSettingsColumnUserUniqueness.identifier(),
+			OrganizationSettingsColumnOrganizationScopedUsernames.identifier(),
 			countColumn.identifier(),
 		).From(organizationSettingsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
@@ -169,7 +169,7 @@ func prepareOrganizationSettingsListQuery() (sq.SelectBuilder, func(*sql.Rows) (
 					&settings.ChangeDate,
 					&settings.ResourceOwner,
 					&settings.Sequence,
-					&settings.UserUniqueness,
+					&settings.OrganizationScopedUsernames,
 					&count,
 				)
 				if err != nil {

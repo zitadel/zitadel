@@ -12,25 +12,25 @@ import "zitadel/filter/v2/filter.proto";
 
 message OrganizationSettings {
   // The unique identifier of the organization the settings belong to.
-  string organization_id = 2 [
+  string organization_id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629012906488334\"";
     }
   ];
   // The timestamp of the organization settings creation.
-  google.protobuf.Timestamp creation_date = 3 [
+  google.protobuf.Timestamp creation_date = 2[
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2024-12-18T07:50:47.492Z\"";
     }
   ];
   // The timestamp of the last change to the organization settings.
-  google.protobuf.Timestamp change_date = 4 [
+  google.protobuf.Timestamp change_date = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2025-01-23T10:34:18.051Z\"";
     }
   ];
   // Defines if the usernames have to be unique in the organization context.
-  bool user_uniqueness = 1;
+  bool organization_scoped_usernames = 4;
 }
 
 enum OrganizationSettingsFieldName {
@@ -44,6 +44,12 @@ message OrganizationSettingsSearchFilter {
   oneof filter {
     option (validate.required) = true;
 
-    zitadel.filter.v2.InIDsFilter in_organization_ids_filter = 2;
+    zitadel.filter.v2.InIDsFilter in_organization_ids_filter = 1;
+    OrganizationScopedUsernamesFilter organization_scoped_usernames_filter = 2;
   }
+}
+
+// Query for organization settings with specific scopes usernames.
+message OrganizationScopedUsernamesFilter {
+  bool organization_scoped_usernames = 1;
 }

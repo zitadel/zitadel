@@ -12,14 +12,14 @@ import (
 )
 
 const (
-	OrganizationSettingsTable             = "projections.organization_settings"
-	OrganizationSettingsIDCol             = "id"
-	OrganizationSettingsCreationDateCol   = "creation_date"
-	OrganizationSettingsChangeDateCol     = "change_date"
-	OrganizationSettingsResourceOwnerCol  = "resource_owner"
-	OrganizationSettingsInstanceIDCol     = "instance_id"
-	OrganizationSettingsSequenceCol       = "sequence"
-	OrganizationSettingsUserUniquenessCol = "user_uniqueness"
+	OrganizationSettingsTable                          = "projections.organization_settings"
+	OrganizationSettingsIDCol                          = "id"
+	OrganizationSettingsCreationDateCol                = "creation_date"
+	OrganizationSettingsChangeDateCol                  = "change_date"
+	OrganizationSettingsResourceOwnerCol               = "resource_owner"
+	OrganizationSettingsInstanceIDCol                  = "instance_id"
+	OrganizationSettingsSequenceCol                    = "sequence"
+	OrganizationSettingsOrganizationScopedUsernamesCol = "organization_scoped_usernames"
 )
 
 type organizationSettingsProjection struct{}
@@ -41,7 +41,7 @@ func (*organizationSettingsProjection) Init() *old_handler.Check {
 			handler.NewColumn(OrganizationSettingsResourceOwnerCol, handler.ColumnTypeText),
 			handler.NewColumn(OrganizationSettingsInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(OrganizationSettingsSequenceCol, handler.ColumnTypeInt64),
-			handler.NewColumn(OrganizationSettingsUserUniquenessCol, handler.ColumnTypeBool),
+			handler.NewColumn(OrganizationSettingsOrganizationScopedUsernamesCol, handler.ColumnTypeBool),
 		},
 			handler.NewPrimaryKey(OrganizationSettingsInstanceIDCol, OrganizationSettingsResourceOwnerCol, OrganizationSettingsIDCol),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{OrganizationSettingsResourceOwnerCol})),
@@ -104,7 +104,7 @@ func (p *organizationSettingsProjection) reduceOrganizationSettingsSet(event eve
 			handler.NewCol(OrganizationSettingsCreationDateCol, handler.OnlySetValueOnInsert(OrganizationSettingsTable, e.CreationDate())),
 			handler.NewCol(OrganizationSettingsChangeDateCol, e.CreationDate()),
 			handler.NewCol(OrganizationSettingsSequenceCol, e.Sequence()),
-			handler.NewCol(OrganizationSettingsUserUniquenessCol, e.UserUniqueness),
+			handler.NewCol(OrganizationSettingsOrganizationScopedUsernamesCol, e.OrganizationScopedUsernames),
 		},
 	), nil
 }

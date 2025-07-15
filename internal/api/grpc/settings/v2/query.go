@@ -299,9 +299,9 @@ func organizationSettingsListToPb(settingsList []*query.OrganizationSettings) []
 
 func organizationSettingsToPb(organizationSettings *query.OrganizationSettings) *settings.OrganizationSettings {
 	return &settings.OrganizationSettings{
-		OrganizationId: organizationSettings.ID,
-		CreationDate:   timestamppb.New(organizationSettings.CreationDate),
-		ChangeDate:     timestamppb.New(organizationSettings.ChangeDate),
-		UserUniqueness: organizationSettings.UserUniqueness,
+		OrganizationId:              organizationSettings.ID,
+		CreationDate:                timestamppb.New(organizationSettings.CreationDate),
+		ChangeDate:                  timestamppb.New(organizationSettings.ChangeDate),
+		OrganizationScopedUsernames: organizationSettings.OrganizationScopedUsernames,
 	}
 }
