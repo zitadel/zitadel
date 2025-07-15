@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       login_build_image_name:
-        description: 'The image repository name of the standalone login image'
+        description: "The image repository name of the standalone login image"
         type: string
         required: true
       node_version:
@@ -12,8 +12,8 @@ on:
         type: string
     outputs:
       login_build_image:
-          description: 'The full image tag of the standalone login image'
-          value: '${{ inputs.login_build_image_name }}:${{ github.sha }}'
+        description: "The full image tag of the standalone login image"
+        value: "${{ inputs.login_build_image_name }}:${{ github.sha }}"
 
 permissions:
   packages: write
@@ -52,6 +52,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Copy pnpm-lock.yaml to login directory
+        run: cp pnpm-lock.yaml login/
       - name: Bake login multi-arch
         uses: depot/bake-action@v1
         env:
