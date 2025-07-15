@@ -491,6 +491,10 @@ func (e *UsernameChangedEvent) Payload() interface{} {
 }
 
 func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	if e.oldUserName == e.UserName &&
+		e.oldUserLoginMustBeDomain == e.userLoginMustBeDomain {
+		return []*eventstore.UniqueConstraint{}
+	}
 	return []*eventstore.UniqueConstraint{
 		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.oldUserLoginMustBeDomain),
 		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
@@ -503,6 +507,7 @@ func NewUsernameChangedEvent(
 	oldUserName,
 	newUserName string,
 	userLoginMustBeDomain bool,
+	oldUserLoginMustBeDomain bool,
 	opts ...UsernameChangedEventOption,
 ) *UsernameChangedEvent {
 	event := &UsernameChangedEvent{

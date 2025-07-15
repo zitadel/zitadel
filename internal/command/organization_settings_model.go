@@ -88,19 +88,27 @@ func (wm *OrganizationSettingsWriteModel) Query() *eventstore.SearchQueryBuilder
 
 func (wm *OrganizationSettingsWriteModel) NewSet(
 	ctx context.Context,
-	userUniqueness *bool,
+	organizationScopedUsernames *bool,
+	userLoginMustBeDomain bool,
 ) (_ []eventstore.Command, err error) {
 	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
 		return nil, err
 	}
 	// no changes
-	if userUniqueness == nil || *userUniqueness == wm.OrganizationScopedUsernames {
+	if organizationScopedUsernames == nil || *organizationScopedUsernames == wm.OrganizationScopedUsernames {
 		return nil, nil
+	}
+	//TODO: if uniqueconstraints have to be changed query usernames and add it to the event
+	var usernames []*settings.UsernameChange
+	if (wm.OrganizationScopedUsernames || userLoginMustBeDomain) == (*organizationScopedUsernames || userLoginMustBeDomain) {
+		usernames = make([]*settings.UsernameChange, 0)
 	}
 	events := []eventstore.Command{
 		settings.NewOrganizationSettingsAddedEvent(ctx,
 			SettingsAggregateFromWriteModel(&wm.WriteModel),
-			*userUniqueness,
+			usernames,
+			*organizationScopedUsernames || userLoginMustBeDomain,
+			wm.OrganizationScopedUsernames || userLoginMustBeDomain,
 		),
 	}
 	return events, nil
@@ -108,13 +116,22 @@ func (wm *OrganizationSettingsWriteModel) NewSet(
 
 func (wm *OrganizationSettingsWriteModel) NewRemoved(
 	ctx context.Context,
+	userLoginMustBeDomain bool,
 ) (_ []eventstore.Command, err error) {
 	if err := wm.checkPermissionDelete(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
 		return nil, err
 	}
+	//TODO: if uniqueconstraints have to be changed query usernames and add it to the event
+	var usernames []*settings.UsernameChange
+	if userLoginMustBeDomain != wm.OrganizationScopedUsernames {
+		usernames = make([]*settings.UsernameChange, 0)
+	}
 	events := []eventstore.Command{
 		settings.NewOrganizationSettingsRemovedEvent(ctx,
 			SettingsAggregateFromWriteModel(&wm.WriteModel),
+			usernames,
+			userLoginMustBeDomain,
+			wm.OrganizationScopedUsernames || userLoginMustBeDomain,
 		),
 	}
 	return events, nil

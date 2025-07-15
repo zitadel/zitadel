@@ -15,7 +15,9 @@ const (
 type OrganizationSettingsSetEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	OrganizationScopedUsernames bool `json:"organizationScopedUsernames,omitempty"`
+	OrganizationScopedUsernames    bool `json:"organizationScopedUsernames,omitempty"`
+	oldOrganizationScopedUsernames bool
+	usernameChanges                []*UsernameChange
 }
 
 func (e *OrganizationSettingsSetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -27,24 +29,44 @@ func (e *OrganizationSettingsSetEvent) Payload() any {
 }
 
 func (e *OrganizationSettingsSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
+	if len(e.usernameChanges) == 0 {
+		return []*eventstore.UniqueConstraint{}
+	}
+	changes := make([]*eventstore.UniqueConstraint, len(e.usernameChanges))
+	for i, change := range e.usernameChanges {
+		//TODO: constraint changes
+	}
+	return changes
 }
 
 func NewOrganizationSettingsAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	usernameChanges []*UsernameChange,
 	organizationScopedUsernames bool,
+	oldOrganizationScopedUsernames bool,
 ) *OrganizationSettingsSetEvent {
 	return &OrganizationSettingsSetEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx, aggregate, OrganizationSettingsSetEventType,
 		),
-		OrganizationScopedUsernames: organizationScopedUsernames,
+		OrganizationScopedUsernames:    organizationScopedUsernames,
+		oldOrganizationScopedUsernames: oldOrganizationScopedUsernames,
+		usernameChanges:                usernameChanges,
 	}
+}
+
+type UsernameChange struct {
+	Username      string
+	ResourceOwner string
 }
 
 type OrganizationSettingsRemovedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
+
+	organizationScopedUsernames    bool
+	oldOrganizationScopedUsernames bool
+	usernameChanges                []*UsernameChange
 }
 
 func (e *OrganizationSettingsRemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -56,11 +78,29 @@ func (e *OrganizationSettingsRemovedEvent) Payload() any {
 }
 
 func (e *OrganizationSettingsRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
+	if len(e.usernameChanges) == 0 {
+		return []*eventstore.UniqueConstraint{}
+	}
+	changes := make([]*eventstore.UniqueConstraint, len(e.usernameChanges))
+	for i, change := range e.usernameChanges {
+		//TODO: constraint changes
+	}
+	return changes
 }
 
-func NewOrganizationSettingsRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *OrganizationSettingsRemovedEvent {
+func NewOrganizationSettingsRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	usernameChanges []*UsernameChange,
+	organizationScopedUsernames bool,
+	oldOrganizationScopedUsernames bool,
+) *OrganizationSettingsRemovedEvent {
 	return &OrganizationSettingsRemovedEvent{
-		eventstore.NewBaseEventForPush(ctx, aggregate, OrganizationSettingsRemovedEventType),
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx, aggregate, OrganizationSettingsRemovedEventType,
+		),
+		organizationScopedUsernames:    organizationScopedUsernames,
+		oldOrganizationScopedUsernames: oldOrganizationScopedUsernames,
+		usernameChanges:                usernameChanges,
 	}
 }
