@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/repository/settings"
+	settings "github.com/zitadel/zitadel/internal/repository/organization_settings"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -34,7 +34,7 @@ func TestOrganizationSettingsProjection_reduces(t *testing.T) {
 			},
 			reduce: (&organizationSettingsProjection{}).reduceOrganizationSettingsSet,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("settings"),
+				aggregateType: eventstore.AggregateType("organization_settings"),
 				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
@@ -67,7 +67,7 @@ func TestOrganizationSettingsProjection_reduces(t *testing.T) {
 			},
 			reduce: (&organizationSettingsProjection{}).reduceOrganizationSettingsRemoved,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("settings"),
+				aggregateType: eventstore.AggregateType("organization_settings"),
 				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{

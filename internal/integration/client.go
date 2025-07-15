@@ -405,9 +405,9 @@ func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userI
 	return resp
 }
 
-func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, orgID string, organizationScopedUsernames bool) *settings.SetOrganizationSettingsResponse {
-	resp, err := i.Client.SettingsV2.SetOrganizationSettings(ctx,
-		&settings.SetOrganizationSettingsRequest{
+func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, orgID string, organizationScopedUsernames bool) *settings_v2beta.SetOrganizationSettingsResponse {
+	resp, err := i.Client.SettingsV2beta.SetOrganizationSettings(ctx,
+		&settings_v2beta.SetOrganizationSettingsRequest{
 			OrganizationId:              orgID,
 			OrganizationScopedUsernames: gu.Ptr(organizationScopedUsernames),
 		},
@@ -416,9 +416,9 @@ func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, or
 	return resp
 }
 
-func (i *Instance) DeleteOrganizationSettings(ctx context.Context, t *testing.T, orgID string) *settings.DeleteOrganizationSettingsResponse {
-	resp, err := i.Client.SettingsV2.DeleteOrganizationSettings(ctx,
-		&settings.DeleteOrganizationSettingsRequest{
+func (i *Instance) DeleteOrganizationSettings(ctx context.Context, t *testing.T, orgID string) *settings_v2beta.DeleteOrganizationSettingsResponse {
+	resp, err := i.Client.SettingsV2beta.DeleteOrganizationSettings(ctx,
+		&settings_v2beta.DeleteOrganizationSettingsRequest{
 			OrganizationId: orgID,
 		},
 	)

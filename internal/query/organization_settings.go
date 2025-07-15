@@ -145,6 +145,10 @@ func NewOrganizationSettingsOrganizationIDSearchQuery(ids []string) (SearchQuery
 	return NewListQuery(OrganizationSettingsColumnID, list, ListIn)
 }
 
+func NewOrganizationSettingsOrganizationScopedUsernamesSearchQuery(organizationScopedUsernames bool) (SearchQuery, error) {
+	return NewBoolQuery(OrganizationSettingsColumnOrganizationScopedUsernames, organizationScopedUsernames)
+}
+
 func prepareOrganizationSettingsListQuery() (sq.SelectBuilder, func(*sql.Rows) (*OrganizationSettingsList, error)) {
 	return sq.Select(
 			OrganizationSettingsColumnID.identifier(),

@@ -1,4 +1,4 @@
-package settings
+package organization_settings
 
 import "github.com/zitadel/zitadel/internal/eventstore"
 

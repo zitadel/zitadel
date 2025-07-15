@@ -1,14 +1,14 @@
 syntax = "proto3";
 
-package zitadel.settings.v2;
+package zitadel.settings.v2beta;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta;settings";
 
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "google/protobuf/timestamp.proto";
-import "zitadel/filter/v2/filter.proto";
+import "zitadel/filter/v2beta/filter.proto";
 
 message OrganizationSettings {
   // The unique identifier of the organization the settings belong to.
@@ -44,7 +44,7 @@ message OrganizationSettingsSearchFilter {
   oneof filter {
     option (validate.required) = true;
 
-    zitadel.filter.v2.InIDsFilter in_organization_ids_filter = 1;
+    zitadel.filter.v2beta.InIDsFilter in_organization_ids_filter = 1;
     OrganizationScopedUsernamesFilter organization_scoped_usernames_filter = 2;
   }
 }

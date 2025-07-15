@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/repository/settings"
+	settings "github.com/zitadel/zitadel/internal/repository/organization_settings"
 )
 
 type OrganizationSettingsWriteModel struct {

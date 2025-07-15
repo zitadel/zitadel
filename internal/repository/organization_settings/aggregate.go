@@ -1,9 +1,9 @@
-package settings
+package organization_settings
 
 import "github.com/zitadel/zitadel/internal/eventstore"
 
 const (
-	AggregateType    = "settings"
+	AggregateType    = "organization_settings"
 	AggregateVersion = "v1"
 )
 

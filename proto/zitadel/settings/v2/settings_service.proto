@@ -11,7 +11,6 @@ import "zitadel/settings/v2/lockout_settings.proto";
 import "zitadel/settings/v2/login_settings.proto";
 import "zitadel/settings/v2/password_settings.proto";
 import "zitadel/settings/v2/security_settings.proto";
-import "zitadel/settings/v2/organization_settings.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -430,97 +429,6 @@ service SettingsService {
       }
     };
   }
-
-  // Set Organization Settings
-  //
-  // Sets the settings specific to an organization.
-  //
-  // Required permissions:
-  //   - `iam.policy.write`
-  rpc SetOrganizationSettings(SetOrganizationSettingsRequest) returns (SetOrganizationSettingsResponse) {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
-        key: "200";
-        value: {
-          description: "The translations was successfully set.";
-        }
-      };
-    };
-
-    option (google.api.http) = {
-      post: "/v2/settings/organization";
-      body: "*"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "authenticated"
-      }
-    };
-  }
-
-  // Delete Organization Settings
-  //
-  // Delete the settings specific to an organization.
-  //
-  // Required permissions:
-  //   - `iam.policy.delete`
-  rpc DeleteOrganizationSettings(DeleteOrganizationSettingsRequest) returns (DeleteOrganizationSettingsResponse) {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
-        key: "200";
-        value: {
-          description: "The translations was successfully set.";
-        }
-      };
-    };
-
-    option (google.api.http) = {
-      delete: "/v2/settings/organization";
-      body: "*"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "authenticated"
-      }
-    };
-  }
-
-  // List Organization Settings
-  //
-  // Returns a list of organization settings.
-  //
-  // Required permission:
-  //   - `iam.policy.read`
-  //   - `org.policy.read`
-  rpc ListOrganizationSettings(ListOrganizationSettingsRequest) returns (ListOrganizationSettingsResponse) {
-    option (google.api.http) = {
-      post: "/v2/settings/organization/search"
-      body: "*"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "authenticated"
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
-        key: "200";
-        value: {
-          description: "A list of all project grants matching the query";
-        };
-      };
-      responses: {
-        key: "400";
-        value: {
-          description: "invalid list query";
-        };
-      };
-    };
-  }
 }
 
 message GetLoginSettingsRequest {
@@ -711,54 +619,4 @@ message SetHostedLoginTranslationResponse {
       example: "\"42a1ba123e6ea6f0c93e286ed97c7018\"";
     }
   ];
-}
-
-message SetOrganizationSettingsRequest {
-  // Organization ID in which this settings are set.
-  string organization_id = 1;
-  // Force the usernames in the organization to be unique, only possible to set if the existing users already have unique usernames in the organization context.
-  optional bool organization_scoped_usernames = 2;
-}
-
-message SetOrganizationSettingsResponse {
-  // The timestamp of the set of the organization settings.
-  google.protobuf.Timestamp set_date = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"2025-01-23T10:34:18.051Z\"";
-    }
-  ];
-}
-
-message DeleteOrganizationSettingsRequest {
-  // Organization ID in which this settings are set.
-  string organization_id = 1;
-}
-
-message DeleteOrganizationSettingsResponse {
-  // The timestamp of the deletion of the organization settings.
-  google.protobuf.Timestamp deletion_date = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"2025-01-23T10:34:18.051Z\"";
-    }
-  ];
-}
-
-message ListOrganizationSettingsRequest{
-  // List limitations and ordering.
-  optional zitadel.filter.v2.PaginationRequest pagination = 1;
-  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
-  optional OrganizationSettingsFieldName sorting_column = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      default: "\"ORGANIZATION_SETTINGS_FIELD_NAME_CREATION_DATE\""
-    }
-  ];
-  repeated OrganizationSettingsSearchFilter filters = 4;
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"sortingColumn\":\"ORGANIZATION_SETTINGS_FIELD_NAME_CREATION_DATE\",\"filters\":[{\"inOrganizationIdsFilter\":{\"ids\":[\"28746028909593987\"]}}]}";
-  };
-}
-
-message ListOrganizationSettingsResponse {
-  zitadel.filter.v2.PaginationResponse pagination = 1;
-  repeated OrganizationSettings organization_settings = 2;
 }
