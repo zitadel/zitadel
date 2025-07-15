@@ -14,6 +14,9 @@ on:
       login_build_image:
           description: 'The full image tag of the standalone login image'
           value: '${{ inputs.login_build_image_name }}:${{ github.sha }}'
+    secrets:
+      DEPOT_TOKEN:
+        required: true
 
 permissions:
   packages: write
