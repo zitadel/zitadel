@@ -23,7 +23,7 @@ you have [more contact options on our Website](https://zitadel.com/contact).
 The repository zitadel/typescript is a read-only mirror of the git subtree at zitadel/zitadel/login.
 To submit changes, please open a Pull Request [in the zitadel/zitadel repository](https://github.com/zitadel/zitadel/compare).
 
-If you alread made changes based on the zitadel/typescript repository, these changes are not lost.
+If you already made changes based on the zitadel/typescript repository, these changes are not lost.
 Submitting them to the main repository is easy:
 
 1. [Fork zitadel/zitadel](https://github.com/zitadel/zitadel/fork)
