@@ -10,21 +10,22 @@ on:
       node_version:
         required: true
         type: string
+    secrets:
+      DEPOT_TOKEN:
+        required: true
+
 jobs:
   quality:
     name: Ensure Quality
     runs-on: depot-ubuntu-22.04-8
     timeout-minutes: 30
     permissions:
-      id-token: write
       actions: write
     env:
       CACHE_DIR: /tmp/login-run-caches
     steps:
       - uses: actions/checkout@v4
       - uses: depot/setup-action@v1
-        with:
-          oidc: true
       - name: Restore Run Caches
         uses: actions/cache/restore@v4
         id: run-caches-restore
@@ -54,7 +55,7 @@ jobs:
       - name: Run login quality checks with Turbo
         run: pnpm turbo test:unit --filter=@zitadel/login
         env:
-          # latest if branch is main, otherwise image version which is the pull request number
+          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
           LOGIN_BAKE_CLI: depot bake
           DEPOT_PROJECT_ID: w47wkxzdtw
           IGNORE_RUN_CACHE: ${{ github.event.inputs.ignore-run-cache }}

@@ -21,6 +21,10 @@ on:
       node_version:
         required: true
         type: string
+    secrets:
+      DEPOT_TOKEN:
+        required: true
+
 jobs:
   executable:
     runs-on: ubuntu-latest

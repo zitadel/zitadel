@@ -23,6 +23,7 @@ a [GitHub issue](https://github.com/zitadel/typescript/issues).
 We think the easiest path of getting up and running, is the following:
 
 1. Fork and clone this repository
+1. Rename the file .github/dependabot.example.yml to .github/dependabot.yml so you don't miss version and security updates.
 1. [Run the ZITADEL Cloud login UI locally](#run-login-ui)
 1. Make changes to the code and see the effects live on your local machine
 1. Study the rest of this README.md and get familiar and comfortable with how everything works.

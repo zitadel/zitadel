@@ -19,7 +19,6 @@ permissions:
   issues: write
   pull-requests: write
   actions: write
-  id-token: write
 
 jobs:
   core:
@@ -56,6 +55,8 @@ jobs:
       console_cache_path: ${{ needs.console.outputs.cache_path }}
       version: ${{ needs.version.outputs.version }}
       node_version: "20"
+    secrets:
+      DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
 
   core-unit-test:
     needs: core
@@ -94,6 +95,8 @@ jobs:
     with:
       ignore-run-cache: ${{ github.event_name == 'workflow_dispatch' || fromJSON(github.run_attempt) > 1 }}
       node_version: "20"
+    secrets:
+      DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
 
   container:
     needs: [compile]
@@ -114,6 +117,8 @@ jobs:
     with:
       login_build_image_name: "ghcr.io/zitadel/zitadel-login-build"
       node_version: "20"
+    secrets:
+      DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
 
   e2e:
     uses: ./.github/workflows/e2e.yml
