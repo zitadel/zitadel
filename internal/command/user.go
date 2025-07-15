@@ -194,7 +194,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain))
 
 	for _, grantID := range cascadingGrantIDs {
-		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true)
+		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true, false, nil)
 		if err != nil {
 			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue
@@ -327,18 +327,18 @@ func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID stri
 	return err
 }
 
-func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner string) (err error) {
+func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner string) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-uXHNj", "Errors.User.NotFound")
+		return "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-uXHNj", "Errors.User.NotFound")
 	}
-	return nil
+	return existingUser.ResourceOwner, nil
 }
 
 func (c *Commands) userWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *UserWriteModel, err error) {

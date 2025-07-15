@@ -78,12 +78,13 @@ core_grpc_dependencies:
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.22.0 		# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2?tab=versions
 	go install github.com/envoyproxy/protoc-gen-validate@v1.1.0								# https://pkg.go.dev/github.com/envoyproxy/protoc-gen-validate?tab=versions
 	go install github.com/bufbuild/buf/cmd/buf@v1.45.0										# https://pkg.go.dev/github.com/bufbuild/buf/cmd/buf?tab=versions
+	go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1						# https://pkg.go.dev/connectrpc.com/connect/cmd/protoc-gen-connect-go?tab=versions
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
 	buf generate
 	mkdir -p pkg/grpc
-	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/
+	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/
 	mkdir -p openapi/v2/zitadel
 	cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel
 
@@ -179,13 +180,20 @@ core_lint:
 .PHONY: login_pull
 login_pull: login_ensure_remote
 	@echo "Pulling changes from the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
-	git fetch $(LOGIN_REMOTE_NAME)
-	git subtree pull --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+	git fetch $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+	git merge -s ours --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/$(LOGIN_REMOTE_BRANCH) -m "Synthetic merge to align histories"
+	git push
 
 .PHONY: login_push
 login_push: login_ensure_remote
 	@echo "Pushing changes to the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
-	git subtree push --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+	git subtree split --prefix=login -b login-sync-tmp
+	git checkout login-sync-tmp
+	git fetch $(LOGIN_REMOTE_NAME) main
+	git merge -s ours --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/main -m "Synthetic merge to align histories"
+	git push $(LOGIN_REMOTE_NAME) login-sync-tmp:$(LOGIN_REMOTE_BRANCH)
+	git checkout -
+	git branch -D login-sync-tmp
 
 login_ensure_remote:
 	@if ! git remote get-url $(LOGIN_REMOTE_NAME) > /dev/null 2>&1; then \
@@ -193,12 +201,6 @@ login_ensure_remote:
 		git remote add $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
 	else \
 		echo "Remote $(LOGIN_REMOTE_NAME) already exists."; \
-	fi
-	@if [ ! -d login ]; then \
-		echo "Adding subtree for 'login' from branch $(LOGIN_REMOTE_BRANCH)"; \
-		git subtree add --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH); \
-	else \
-		echo "Subtree 'login' already exists."; \
 	fi
 
 export LOGIN_DIR := ./login/

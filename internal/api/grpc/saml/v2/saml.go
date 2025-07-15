@@ -3,6 +3,7 @@ package saml
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/saml/pkg/provider"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -16,15 +17,15 @@ import (
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 )
 
-func (s *Server) GetSAMLRequest(ctx context.Context, req *saml_pb.GetSAMLRequestRequest) (*saml_pb.GetSAMLRequestResponse, error) {
-	authRequest, err := s.query.SamlRequestByID(ctx, true, req.GetSamlRequestId(), true)
+func (s *Server) GetSAMLRequest(ctx context.Context, req *connect.Request[saml_pb.GetSAMLRequestRequest]) (*connect.Response[saml_pb.GetSAMLRequestResponse], error) {
+	authRequest, err := s.query.SamlRequestByID(ctx, true, req.Msg.GetSamlRequestId(), true)
 	if err != nil {
 		logging.WithError(err).Error("query samlRequest by ID")
 		return nil, err
 	}
-	return &saml_pb.GetSAMLRequestResponse{
+	return connect.NewResponse(&saml_pb.GetSAMLRequestResponse{
 		SamlRequest: samlRequestToPb(authRequest),
-	}, nil
+	}), nil
 }
 
 func samlRequestToPb(a *query.SamlRequest) *saml_pb.SAMLRequest {
@@ -34,18 +35,18 @@ func samlRequestToPb(a *query.SamlRequest) *saml_pb.SAMLRequest {
 	}
 }
 
-func (s *Server) CreateResponse(ctx context.Context, req *saml_pb.CreateResponseRequest) (*saml_pb.CreateResponseResponse, error) {
-	switch v := req.GetResponseKind().(type) {
+func (s *Server) CreateResponse(ctx context.Context, req *connect.Request[saml_pb.CreateResponseRequest]) (*connect.Response[saml_pb.CreateResponseResponse], error) {
+	switch v := req.Msg.GetResponseKind().(type) {
 	case *saml_pb.CreateResponseRequest_Error:
-		return s.failSAMLRequest(ctx, req.GetSamlRequestId(), v.Error)
+		return s.failSAMLRequest(ctx, req.Msg.GetSamlRequestId(), v.Error)
 	case *saml_pb.CreateResponseRequest_Session:
-		return s.linkSessionToSAMLRequest(ctx, req.GetSamlRequestId(), v.Session)
+		return s.linkSessionToSAMLRequest(ctx, req.Msg.GetSamlRequestId(), v.Session)
 	default:
 		return nil, zerrors.ThrowUnimplementedf(nil, "SAMLv2-0Tfak3fBS0", "verification oneOf %T in method CreateResponse not implemented", v)
 	}
 }
 
-func (s *Server) failSAMLRequest(ctx context.Context, samlRequestID string, ae *saml_pb.AuthorizationError) (*saml_pb.CreateResponseResponse, error) {
+func (s *Server) failSAMLRequest(ctx context.Context, samlRequestID string, ae *saml_pb.AuthorizationError) (*connect.Response[saml_pb.CreateResponseResponse], error) {
 	details, aar, err := s.command.FailSAMLRequest(ctx, samlRequestID, errorReasonToDomain(ae.GetError()))
 	if err != nil {
 		return nil, err
@@ -55,7 +56,7 @@ func (s *Server) failSAMLRequest(ctx context.Context, samlRequestID string, ae *
 	if err != nil {
 		return nil, err
 	}
-	return createCallbackResponseFromBinding(details, url, body, authReq.RelayState), nil
+	return connect.NewResponse(createCallbackResponseFromBinding(details, url, body, authReq.RelayState)), nil
 }
 
 func (s *Server) checkPermission(ctx context.Context, issuer string, userID string) error {
@@ -72,7 +73,7 @@ func (s *Server) checkPermission(ctx context.Context, issuer string, userID stri
 	return nil
 }
 
-func (s *Server) linkSessionToSAMLRequest(ctx context.Context, samlRequestID string, session *saml_pb.Session) (*saml_pb.CreateResponseResponse, error) {
+func (s *Server) linkSessionToSAMLRequest(ctx context.Context, samlRequestID string, session *saml_pb.Session) (*connect.Response[saml_pb.CreateResponseResponse], error) {
 	details, aar, err := s.command.LinkSessionToSAMLRequest(ctx, samlRequestID, session.GetSessionId(), session.GetSessionToken(), true, s.checkPermission)
 	if err != nil {
 		return nil, err
@@ -87,7 +88,7 @@ func (s *Server) linkSessionToSAMLRequest(ctx context.Context, samlRequestID str
 	if err != nil {
 		return nil, err
 	}
-	return createCallbackResponseFromBinding(details, url, body, authReq.RelayState), nil
+	return connect.NewResponse(createCallbackResponseFromBinding(details, url, body, authReq.RelayState)), nil
 }
 
 func createCallbackResponseFromBinding(details *domain.ObjectDetails, url string, body string, relayState string) *saml_pb.CreateResponseResponse {

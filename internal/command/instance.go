@@ -690,7 +690,7 @@ func setupLoginClient(commands *Commands, validations *[]preparation.Validation,
 
 func setupAdminMembers(commands *Commands, validations *[]preparation.Validation, instanceAgg *instance.Aggregate, orgAgg *org.Aggregate, userID string) {
 	*validations = append(*validations,
-		commands.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
+		commands.AddOrgMemberCommand(&AddOrgMember{orgAgg.ID, userID, []string{domain.RoleOrgOwner}}),
 		commands.AddInstanceMemberCommand(instanceAgg, userID, domain.RoleIAMOwner),
 	)
 }

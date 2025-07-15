@@ -4,6 +4,7 @@ package user_test
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/url"
 	"os"
@@ -33,6 +34,7 @@ import (
 var (
 	CTX                            context.Context
 	IamCTX                         context.Context
+	LoginCTX                       context.Context
 	UserCTX                        context.Context
 	SystemCTX                      context.Context
 	SystemUserWithNoPermissionsCTX context.Context
@@ -50,6 +52,7 @@ func TestMain(m *testing.M) {
 		SystemUserWithNoPermissionsCTX = integration.WithSystemUserWithNoPermissionsAuthorization(ctx)
 		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
 		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		LoginCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
 		SystemCTX = integration.WithSystemAuthorization(ctx)
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 		Client = Instance.Client.UserV2
@@ -1818,7 +1821,7 @@ func TestServer_DeleteUser(t *testing.T) {
 					request.UserId = resp.GetUserId()
 					Instance.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
-					Instance.CreateOrgMembership(t, CTX, request.UserId)
+					Instance.CreateOrgMembership(t, CTX, Instance.DefaultOrg.Id, request.UserId)
 					return CTX
 				},
 			},
@@ -1852,7 +1855,7 @@ func TestServer_DeleteUser(t *testing.T) {
 					require.NoError(t, err)
 					request.UserId = removeUser.Id
 					Instance.RegisterUserPasskey(CTX, removeUser.Id)
-					_, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, removeUser.Id)
+					_, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, removeUser.Id)
 					return integration.WithAuthorizationToken(UserCTX, token)
 				},
 			},
@@ -2744,7 +2747,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 func ctxFromNewUserWithRegisteredPasswordlessLegacy(t *testing.T) (context.Context, string, *auth.AddMyPasswordlessResponse) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
 	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
 	pkr, err := Instance.Client.Auth.AddMyPasswordless(ctx, &auth.AddMyPasswordlessRequest{})
@@ -3946,6 +3949,44 @@ func TestServer_CreateUser(t *testing.T) {
 			},
 		},
 		{
+			name: "with metadata",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+									Metadata: []*user.Metadata{
+										{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+										{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
+										{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))},
+									},
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+				}
+			},
+		},
+		{
 			name: "with idp",
 			testCase: func(runId string) testCase {
 				username := fmt.Sprintf("donald.duck+%s", runId)
@@ -4890,7 +4931,7 @@ func TestServer_UpdateUserTypeHuman(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			now := time.Now()
 			runId := fmt.Sprint(now.UnixNano() + int64(i))
-			userId := Instance.CreateUserTypeHuman(CTX).GetId()
+			userId := Instance.CreateUserTypeHuman(CTX, gofakeit.Email()).GetId()
 			test := tt.testCase(runId, userId)
 			got, err := Client.UpdateUser(test.args.ctx, test.args.req)
 			if test.wantErr {
@@ -4972,7 +5013,7 @@ func TestServer_UpdateUserTypeMachine(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			now := time.Now()
 			runId := fmt.Sprint(now.UnixNano() + int64(i))
-			userId := Instance.CreateUserTypeMachine(CTX).GetId()
+			userId := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id).GetId()
 			test := tt.testCase(runId, userId)
 			got, err := Client.UpdateUser(test.args.ctx, test.args.req)
 			if test.wantErr {

@@ -31,6 +31,7 @@ import (
 var (
 	CTX       context.Context
 	IamCTX    context.Context
+	LoginCTX  context.Context
 	UserCTX   context.Context
 	SystemCTX context.Context
 	Instance  *integration.Instance
@@ -46,6 +47,7 @@ func TestMain(m *testing.M) {
 
 		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
 		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		LoginCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
 		SystemCTX = integration.WithSystemAuthorization(ctx)
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 		Client = Instance.Client.UserV2beta
@@ -1773,7 +1775,7 @@ func TestServer_DeleteUser(t *testing.T) {
 					request.UserId = resp.GetUserId()
 					Instance.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
-					Instance.CreateOrgMembership(t, CTX, request.UserId)
+					Instance.CreateOrgMembership(t, CTX, Instance.DefaultOrg.Id, request.UserId)
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -2125,7 +2127,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			if tt.want.url != "" && !tt.want.postForm {
 				authUrl, err := url.Parse(got.GetAuthUrl())
 				require.NoError(t, err)
-				
+
 				assert.Equal(t, tt.want.url, authUrl.Scheme+"://"+authUrl.Host+authUrl.Path)
 				require.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
 
