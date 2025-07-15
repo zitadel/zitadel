@@ -5,9 +5,7 @@
     "ng": "ng",
     "dev": "node prebuild.development.js && ng serve",
     "start": "node prebuild.development.js && ng serve",
-    "prebuild": "pnpm run generate",
     "build": "ng build --configuration production --base-href=/ui/console/",
-    "prelint": "pnpm run generate",
     "lint": "ng lint && prettier --check src",
     "lint:fix": "prettier --write src",
     "generate": "pnpm exec buf generate ../proto --include-imports --include-wkt"
