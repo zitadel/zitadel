@@ -6,5 +6,8 @@ RUN corepack enable && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack prepare pnpm@9
     apt-get update && apt-get install -y --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 WORKDIR /build
-COPY turbo.json .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Copy package manager configuration files first for better caching
+COPY .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# turbo.json is needed for workspace structure but not for turbo commands
+COPY turbo.json ./
 ENTRYPOINT ["pnpm"]

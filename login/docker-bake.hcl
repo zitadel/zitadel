@@ -62,6 +62,14 @@ target "login-pnpm" {
   }
 }
 
+target "login-build-base" {
+  inherits   = ["release"]
+  dockerfile = "${DOCKERFILES_DIR}login-build-base.Dockerfile"
+  contexts = {
+    login-pnpm = "target:login-pnpm"
+  }
+}
+
 target "login-dev-base" {
   dockerfile = "${DOCKERFILES_DIR}login-dev-base.Dockerfile"
   contexts = {
