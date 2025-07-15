@@ -48,13 +48,13 @@ func TestServer_GetSAMLRequest(t *testing.T) {
 		{
 			name: "success, redirect binding",
 			dep: func() (time.Time, string, error) {
-				return Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
+				return Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
 			},
 		},
 		{
 			name: "success, post binding",
 			dep: func() (time.Time, string, error) {
-				return Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+				return Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
 			},
 		},
 	}
@@ -63,9 +63,9 @@ func TestServer_GetSAMLRequest(t *testing.T) {
 			creationTime, authRequestID, err := tt.dep()
 			require.NoError(t, err)
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(LoginCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := Client.GetSAMLRequest(CTX, &saml_pb.GetSAMLRequestRequest{
+				got, err := Client.GetSAMLRequest(LoginCTX, &saml_pb.GetSAMLRequestRequest{
 					SamlRequestId: authRequestID,
 				})
 				if tt.wantErr {
@@ -90,10 +90,11 @@ func TestServer_CreateResponse(t *testing.T) {
 
 	_, rootURLPost, spMiddlewarePost := createSAMLApplication(CTX, t, idpMetadata, saml.HTTPPostBinding, false, false)
 	_, rootURLRedirect, spMiddlewareRedirect := createSAMLApplication(CTX, t, idpMetadata, saml.HTTPRedirectBinding, false, false)
-	sessionResp := createSession(CTX, t, Instance.Users[integration.UserTypeOrgOwner].ID)
+	sessionResp := createSession(LoginCTX, t, Instance.Users[integration.UserTypeLogin].ID)
 
 	tests := []struct {
 		name      string
+		ctx       context.Context
 		req       *saml_pb.CreateResponseRequest
 		AuthError string
 		want      *saml_pb.CreateResponseResponse
@@ -102,6 +103,7 @@ func TestServer_CreateResponse(t *testing.T) {
 	}{
 		{
 			name: "Not found",
+			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: "123",
 				ResponseKind: &saml_pb.CreateResponseRequest_Session{
@@ -115,9 +117,10 @@ func TestServer_CreateResponse(t *testing.T) {
 		},
 		{
 			name: "session not found",
+			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -132,9 +135,10 @@ func TestServer_CreateResponse(t *testing.T) {
 		},
 		{
 			name: "session token invalid",
+			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -149,9 +153,10 @@ func TestServer_CreateResponse(t *testing.T) {
 		},
 		{
 			name: "fail callback, post",
+			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -177,11 +182,12 @@ func TestServer_CreateResponse(t *testing.T) {
 		},
 		{
 			name: "fail callback, post, already failed",
+			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
 					require.NoError(t, err)
-					Instance.FailSAMLAuthRequest(CTX, authRequestID, saml_pb.ErrorReason_ERROR_REASON_AUTH_N_FAILED)
+					Instance.FailSAMLAuthRequest(LoginCTX, authRequestID, saml_pb.ErrorReason_ERROR_REASON_AUTH_N_FAILED)
 					return authRequestID
 				}(),
 				ResponseKind: &saml_pb.CreateResponseRequest_Error{
@@ -195,9 +201,10 @@ func TestServer_CreateResponse(t *testing.T) {
 		},
 		{
 			name: "fail callback, redirect",
+			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -219,10 +226,29 @@ func TestServer_CreateResponse(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "callback, redirect",
+			name: "fail callback, no permission, error",
+			ctx:  CTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+				ResponseKind: &saml_pb.CreateResponseRequest_Error{
+					Error: &saml_pb.AuthorizationError{
+						Error:            saml_pb.ErrorReason_ERROR_REASON_REQUEST_DENIED,
+						ErrorDescription: gu.Ptr("nope"),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "callback, redirect",
+			ctx:  LoginCTX,
+			req: &saml_pb.CreateResponseRequest{
+				SamlRequestId: func() string {
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -245,9 +271,10 @@ func TestServer_CreateResponse(t *testing.T) {
 		},
 		{
 			name: "callback, post",
+			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -273,11 +300,30 @@ func TestServer_CreateResponse(t *testing.T) {
 		},
 		{
 			name: "callback, post",
+			ctx:  LoginCTX,
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
 					require.NoError(t, err)
-					Instance.SuccessfulSAMLAuthRequest(CTX, Instance.Users[integration.UserTypeOrgOwner].ID, authRequestID)
+					Instance.SuccessfulSAMLAuthRequest(LoginCTX, Instance.Users[integration.UserTypeLogin].ID, authRequestID)
+					return authRequestID
+				}(),
+				ResponseKind: &saml_pb.CreateResponseRequest_Session{
+					Session: &saml_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "callback, no permission, error",
+			ctx:  CTX,
+			req: &saml_pb.CreateResponseRequest{
+				SamlRequestId: func() string {
+					_, authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeLogin].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					require.NoError(t, err)
 					return authRequestID
 				}(),
 				ResponseKind: &saml_pb.CreateResponseRequest_Session{
@@ -292,7 +338,7 @@ func TestServer_CreateResponse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.CreateResponse(CTX, tt.req)
+			got, err := Client.CreateResponse(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -336,7 +382,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			wantErr: true,
 		},
@@ -350,7 +396,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			want: &saml_pb.CreateResponseResponse{
 				Url:     `https:\/\/(.*)\/saml\/acs\?RelayState=(.*)&SAMLResponse=(.*)&SigAlg=(.*)&Signature=(.*)`,
@@ -372,7 +418,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			want: &saml_pb.CreateResponseResponse{
 				Url:     `https:\/\/(.*)\/saml\/acs\?RelayState=(.*)&SAMLResponse=(.*)&SigAlg=(.*)&Signature=(.*)`,
@@ -391,7 +437,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 
 				orgResp := Instance.CreateOrganization(ctx, "saml-permisison-"+gofakeit.AppName(), gofakeit.Email())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			wantErr: true,
 		},
@@ -401,7 +447,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				_, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, true)
 				user := Instance.CreateHumanUser(ctx)
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			wantErr: true,
 		},
@@ -414,7 +460,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			wantErr: true,
 		},
@@ -426,7 +472,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				user := Instance.CreateHumanUser(ctx)
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			want: &saml_pb.CreateResponseResponse{
 				Url:     `https:\/\/(.*)\/saml\/acs\?RelayState=(.*)&SAMLResponse=(.*)&SigAlg=(.*)&Signature=(.*)`,
@@ -445,7 +491,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				user := Instance.CreateHumanUser(ctx)
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			want: &saml_pb.CreateResponseResponse{
 				Url:     `https:\/\/(.*)\/saml\/acs\?RelayState=(.*)&SAMLResponse=(.*)&SigAlg=(.*)&Signature=(.*)`,
@@ -462,7 +508,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				_, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, true, false)
 				user := Instance.CreateHumanUser(ctx)
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			wantErr: true,
 		},
@@ -474,7 +520,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			want: &saml_pb.CreateResponseResponse{
 				Url:     `https:\/\/(.*)\/saml\/acs\?RelayState=(.*)&SAMLResponse=(.*)&SigAlg=(.*)&Signature=(.*)`,
@@ -492,7 +538,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				orgResp := Instance.CreateOrganization(ctx, "saml-permisison-"+gofakeit.AppName(), gofakeit.Email())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			wantErr: true,
 		},
@@ -506,7 +552,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			want: &saml_pb.CreateResponseResponse{
 				Url:     `https:\/\/(.*)\/saml\/acs\?RelayState=(.*)&SAMLResponse=(.*)&SigAlg=(.*)&Signature=(.*)`,
@@ -526,7 +572,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			wantErr: true,
 		},
@@ -536,7 +582,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				_, _, sp := createSAMLApplication(ctx, t, idpMetadata, saml.HTTPRedirectBinding, false, true)
 				user := Instance.CreateHumanUser(ctx)
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			want: &saml_pb.CreateResponseResponse{
 				Url:     `https:\/\/(.*)\/saml\/acs\?RelayState=(.*)&SAMLResponse=(.*)&SigAlg=(.*)&Signature=(.*)`,
@@ -554,7 +600,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				orgResp := Instance.CreateOrganization(ctx, "saml-permisison-"+gofakeit.AppName(), gofakeit.Email())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			wantErr: true,
 		},
@@ -566,7 +612,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
-				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
+				return createSessionAndSmlRequestForCallback(ctx, t, sp, Instance.Users[integration.UserTypeLogin].ID, acsRedirect, user.GetUserId(), saml.HTTPRedirectBinding)
 			},
 			want: &saml_pb.CreateResponseResponse{
 				Url:     `https:\/\/(.*)\/saml\/acs\?RelayState=(.*)&SAMLResponse=(.*)&SigAlg=(.*)&Signature=(.*)`,
@@ -582,7 +628,7 @@ func TestServer_CreateResponse_Permission(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			req := tt.dep(IAMCTX, t)
 
-			got, err := Client.CreateResponse(CTX, req)
+			got, err := Client.CreateResponse(LoginCTX, req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
