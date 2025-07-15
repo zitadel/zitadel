@@ -101,7 +101,7 @@ func TestServer_CreateCallback(t *testing.T) {
 	require.NoError(t, err)
 	clientV2, err := Instance.CreateOIDCClientLoginVersion(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, loginV2)
 	require.NoError(t, err)
-	sessionResp := createSession(t, CTX, Instance.Users[integration.UserTypeOrgOwner].ID)
+	sessionResp := createSession(t, CTXLoginClient, Instance.Users[integration.UserTypeLogin].ID)
 
 	tests := []struct {
 		name      string
@@ -114,7 +114,7 @@ func TestServer_CreateCallback(t *testing.T) {
 	}{
 		{
 			name: "Not found",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: "123",
 				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -128,10 +128,10 @@ func TestServer_CreateCallback(t *testing.T) {
 		},
 		{
 			name: "session not found",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users[integration.UserTypeOrgOwner].ID, redirectURI)
+					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTXLoginClient, client.GetClientId(), Instance.Users[integration.UserTypeLogin].ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -146,10 +146,10 @@ func TestServer_CreateCallback(t *testing.T) {
 		},
 		{
 			name: "session token invalid",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
+					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTXLoginClient, client.GetClientId(), Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -164,10 +164,10 @@ func TestServer_CreateCallback(t *testing.T) {
 		},
 		{
 			name: "fail callback",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
+					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTXLoginClient, client.GetClientId(), Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -193,7 +193,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			ctx:  CTXLoginClient,
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					_, authRequestID, err := Instance.CreateOIDCAuthRequestWithoutLoginClientHeader(CTX, clientV2.GetClientId(), redirectURI, "")
+					_, authRequestID, err := Instance.CreateOIDCAuthRequestWithoutLoginClientHeader(CTXLoginClient, clientV2.GetClientId(), redirectURI, "")
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -215,11 +215,30 @@ func TestServer_CreateCallback(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "code callback",
+			name: "fail callback, no permission, error",
 			ctx:  CTX,
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
+					_, authRequestID, err := Instance.CreateOIDCAuthRequestWithoutLoginClientHeader(CTXLoginClient, clientV2.GetClientId(), redirectURI, "")
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+				CallbackKind: &oidc_pb.CreateCallbackRequest_Error{
+					Error: &oidc_pb.AuthorizationError{
+						Error:            oidc_pb.ErrorReason_ERROR_REASON_ACCESS_DENIED,
+						ErrorDescription: gu.Ptr("nope"),
+						ErrorUri:         gu.Ptr("https://example.com/docs"),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "code callback",
+			ctx:  CTXLoginClient,
+			req: &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: func() string {
+					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTXLoginClient, client.GetClientId(), Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -244,7 +263,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			ctx:  CTX,
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					_, authRequestID, err := Instance.CreateOIDCAuthRequestWithoutLoginClientHeader(CTX, clientV2.GetClientId(), redirectURI, "")
+					_, authRequestID, err := Instance.CreateOIDCAuthRequestWithoutLoginClientHeader(CTXLoginClient, clientV2.GetClientId(), redirectURI, "")
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -262,7 +281,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			ctx:  CTXLoginClient,
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					_, authRequestID, err := Instance.CreateOIDCAuthRequestWithoutLoginClientHeader(CTX, clientV2.GetClientId(), redirectURI, "")
+					_, authRequestID, err := Instance.CreateOIDCAuthRequestWithoutLoginClientHeader(CTXLoginClient, clientV2.GetClientId(), redirectURI, "")
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -284,12 +303,12 @@ func TestServer_CreateCallback(t *testing.T) {
 		},
 		{
 			name: "implicit",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
 					client, err := Instance.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit, nil)
 					require.NoError(t, err)
-					authRequestID, err := Instance.CreateOIDCAuthRequestImplicit(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURIImplicit)
+					authRequestID, err := Instance.CreateOIDCAuthRequestImplicit(CTXLoginClient, client.GetClientId(), Instance.Users.Get(integration.UserTypeLogin).ID, redirectURIImplicit)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -316,7 +335,7 @@ func TestServer_CreateCallback(t *testing.T) {
 				AuthRequestId: func() string {
 					clientV2, err := Instance.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit, loginV2)
 					require.NoError(t, err)
-					authRequestID, err := Instance.CreateOIDCAuthRequestImplicitWithoutLoginClientHeader(CTX, clientV2.GetClientId(), redirectURIImplicit)
+					authRequestID, err := Instance.CreateOIDCAuthRequestImplicitWithoutLoginClientHeader(CTXLoginClient, clientV2.GetClientId(), redirectURIImplicit)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -364,7 +383,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 	}{
 		{
 			name: "usergrant to project and different resourceowner with different project grant",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, true)
 				projectID2, _ := createOIDCApplication(ctx, t, true, true)
@@ -374,13 +393,13 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
 		{
 			name: "usergrant to project and different resourceowner with project grant",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, true)
 
@@ -389,7 +408,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -401,7 +420,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 		},
 		{
 			name: "usergrant to project grant and different resourceowner with project grant",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, true)
 
@@ -410,7 +429,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, projectGrantResp.GetGrantId(), user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -422,31 +441,31 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 		},
 		{
 			name: "no usergrant and different resourceowner",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				_, clientID := createOIDCApplication(ctx, t, true, true)
 
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
 		{
 			name: "no usergrant and same resourceowner",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				_, clientID := createOIDCApplication(ctx, t, true, true)
 				user := Instance.CreateHumanUser(ctx)
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
 		{
 			name: "usergrant and different resourceowner",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, true)
 
@@ -454,19 +473,19 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
 		{
 			name: "usergrant and same resourceowner",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, true)
 				user := Instance.CreateHumanUser(ctx)
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -478,13 +497,13 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 		},
 		{
 			name: "projectRoleCheck, usergrant and same resourceowner",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, false)
 				user := Instance.CreateHumanUser(ctx)
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -496,25 +515,25 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 		},
 		{
 			name: "projectRoleCheck, no usergrant and same resourceowner",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				_, clientID := createOIDCApplication(ctx, t, true, false)
 				user := Instance.CreateHumanUser(ctx)
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
 		{
 			name: "projectRoleCheck, usergrant and different resourceowner",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, false)
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -526,19 +545,19 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 		},
 		{
 			name: "projectRoleCheck, no usergrant and different resourceowner",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				_, clientID := createOIDCApplication(ctx, t, true, false)
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
 		{
 			name: "projectRoleCheck, usergrant on project grant and different resourceowner",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, false)
 
@@ -546,7 +565,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				projectGrantResp := Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, projectGrantResp.GetGrantId(), user.GetUserId())
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -558,25 +577,25 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 		},
 		{
 			name: "projectRoleCheck, no usergrant on project grant and different resourceowner",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, false)
 
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
 				Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
 		{
 			name: "hasProjectCheck, same resourceowner",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				user := Instance.CreateHumanUser(ctx)
 				_, clientID := createOIDCApplication(ctx, t, false, true)
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -588,19 +607,19 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 		},
 		{
 			name: "hasProjectCheck, different resourceowner",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				_, clientID := createOIDCApplication(ctx, t, false, true)
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
 		{
 			name: "hasProjectCheck, different resourceowner with project grant",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, false, true)
 
@@ -608,7 +627,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
-				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -657,15 +676,15 @@ func TestServer_GetDeviceAuthorizationRequest(t *testing.T) {
 					UserCode: "notFound",
 				}, nil
 			},
-			ctx:     CTX,
+			ctx:     CTXLoginClient,
 			wantErr: true,
 		},
 		{
 			name: "success",
 			dep: func() (*oidc.DeviceAuthorizationResponse, error) {
-				return Instance.CreateDeviceAuthorizationRequest(CTX, client.GetClientId(), "openid")
+				return Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
 			},
-			ctx: CTX,
+			ctx: CTXLoginClient,
 		},
 	}
 	for _, tt := range tests {
@@ -697,7 +716,7 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 	require.NoError(t, err)
 	client, err := Instance.CreateOIDCClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, app.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE)
 	require.NoError(t, err)
-	sessionResp := createSession(t, CTX, Instance.Users[integration.UserTypeOrgOwner].ID)
+	sessionResp := createSession(t, CTXLoginClient, Instance.Users[integration.UserTypeLogin].ID)
 
 	tests := []struct {
 		name      string
@@ -710,7 +729,7 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 	}{
 		{
 			name: "Not found",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 				DeviceAuthorizationId: "123",
 				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Session{
@@ -724,14 +743,14 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 		},
 		{
 			name: "session not found",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 				DeviceAuthorizationId: func() string {
-					req, err := Instance.CreateDeviceAuthorizationRequest(CTX, client.GetClientId(), "openid")
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
 					require.NoError(t, err)
 					var id string
 					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
-						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
 							UserCode: req.UserCode,
 						})
 						assert.NoError(t, err)
@@ -750,14 +769,14 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 		},
 		{
 			name: "session token invalid",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 				DeviceAuthorizationId: func() string {
-					req, err := Instance.CreateDeviceAuthorizationRequest(CTX, client.GetClientId(), "openid")
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
 					require.NoError(t, err)
 					var id string
 					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
-						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
 							UserCode: req.UserCode,
 						})
 						assert.NoError(collectT, err)
@@ -776,14 +795,14 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 		},
 		{
 			name: "deny device authorization",
-			ctx:  CTX,
+			ctx:  CTXLoginClient,
 			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 				DeviceAuthorizationId: func() string {
-					req, err := Instance.CreateDeviceAuthorizationRequest(CTX, client.GetClientId(), "openid")
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
 					require.NoError(t, err)
 					var id string
 					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
-						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
 							UserCode: req.UserCode,
 						})
 						assert.NoError(collectT, err)
@@ -797,15 +816,37 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "deny device authorization, no permission, error",
+			ctx:  CTX,
+			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
+				DeviceAuthorizationId: func() string {
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
+					require.NoError(t, err)
+					var id string
+					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
+						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+							UserCode: req.UserCode,
+						})
+						assert.NoError(collectT, err)
+						id = resp.GetDeviceAuthorizationRequest().GetId()
+					}, 5*time.Second, 100*time.Millisecond)
+					return id
+				}(),
+				Decision: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest_Deny{},
+			},
+			want:    &oidc_pb.AuthorizeOrDenyDeviceAuthorizationResponse{},
+			wantErr: true,
+		},
+		{
 			name: "authorize, no permission, error",
 			ctx:  CTX,
 			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 				DeviceAuthorizationId: func() string {
-					req, err := Instance.CreateDeviceAuthorizationRequest(CTX, client.GetClientId(), "openid")
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
 					require.NoError(t, err)
 					var id string
 					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
-						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
 							UserCode: req.UserCode,
 						})
 						assert.NoError(collectT, err)
@@ -827,11 +868,11 @@ func TestServer_AuthorizeOrDenyDeviceAuthorization(t *testing.T) {
 			ctx:  CTXLoginClient,
 			req: &oidc_pb.AuthorizeOrDenyDeviceAuthorizationRequest{
 				DeviceAuthorizationId: func() string {
-					req, err := Instance.CreateDeviceAuthorizationRequest(CTX, client.GetClientId(), "openid")
+					req, err := Instance.CreateDeviceAuthorizationRequest(CTXLoginClient, client.GetClientId(), "openid")
 					require.NoError(t, err)
 					var id string
 					assert.EventuallyWithT(t, func(collectT *assert.CollectT) {
-						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTX, &oidc_pb.GetDeviceAuthorizationRequestRequest{
+						resp, err := Instance.Client.OIDCv2.GetDeviceAuthorizationRequest(CTXLoginClient, &oidc_pb.GetDeviceAuthorizationRequestRequest{
 							UserCode: req.UserCode,
 						})
 						assert.NoError(collectT, err)

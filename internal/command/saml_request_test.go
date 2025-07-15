@@ -768,7 +768,8 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 func TestCommands_FailSAMLRequest(t *testing.T) {
 	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient")
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx         context.Context
@@ -802,7 +803,39 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 			res{
 				wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-32lGj1Fhjt", "Errors.SAMLRequest.AlreadyHandled"),
 			},
-		}, {
+		},
+		{
+			"missing permission",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"login",
+								"application",
+								"acs",
+								"relaystate",
+								"request",
+								"binding",
+								"issuer",
+								"destination",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx:         mockCtx,
+				id:          "V2_id",
+				reason:      domain.SAMLErrorReasonAuthNFailed,
+				description: "desc",
+			},
+			res{
+				wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
 			"already failed",
 			fields{
 				eventstore: expectEventstore(
@@ -824,6 +857,7 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx:         mockCtx,
@@ -859,6 +893,7 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx:         mockCtx,
@@ -887,7 +922,8 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			details, got, err := c.FailSAMLRequest(tt.args.ctx, tt.args.id, tt.args.reason)
 			require.ErrorIs(t, err, tt.res.wantErr)

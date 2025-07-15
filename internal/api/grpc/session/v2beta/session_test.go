@@ -339,9 +339,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 					Limit:  0,
 					Asc:    false,
 				},
-				Queries: []query.SearchQuery{
-					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
-				},
+				Queries: []query.SearchQuery{},
 			},
 		},
 		{
@@ -359,9 +357,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 					SortingColumn: query.SessionColumnCreationDate,
 					Asc:           false,
 				},
-				Queries: []query.SearchQuery{
-					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
-				},
+				Queries: []query.SearchQuery{},
 			},
 		},
 		{
@@ -410,7 +406,6 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 					mustNewListQuery(t, query.SessionColumnID, []interface{}{"4", "5", "6"}, query.ListIn),
 					mustNewTextQuery(t, query.SessionColumnUserID, "10", query.TextEquals),
 					mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampGreater),
-					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
 				},
 			},
 		},
@@ -462,9 +457,7 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 			args: args{
 				ctx: authz.NewMockContext("123", "456", "789"),
 			},
-			want: []query.SearchQuery{
-				mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
-			},
+			want: []query.SearchQuery{},
 		},
 		{
 			name: "invalid argument",
@@ -496,7 +489,6 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 			want: []query.SearchQuery{
 				mustNewListQuery(t, query.SessionColumnID, []interface{}{"1", "2", "3"}, query.ListIn),
 				mustNewListQuery(t, query.SessionColumnID, []interface{}{"4", "5", "6"}, query.ListIn),
-				mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
 			},
 		},
 	}

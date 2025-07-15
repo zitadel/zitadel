@@ -31,6 +31,7 @@ import (
 var (
 	CTX       context.Context
 	IamCTX    context.Context
+	LoginCTX  context.Context
 	UserCTX   context.Context
 	SystemCTX context.Context
 	Instance  *integration.Instance
@@ -46,6 +47,7 @@ func TestMain(m *testing.M) {
 
 		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
 		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		LoginCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
 		SystemCTX = integration.WithSystemAuthorization(ctx)
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 		Client = Instance.Client.UserV2beta
