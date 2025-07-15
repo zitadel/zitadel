@@ -59,6 +59,30 @@ importers:
         specifier: ^3.1.2
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.16.4)(jiti@1.21.7)(jsdom@26.1.0)(less@4.1.3)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0)
 
+  acceptance:
+    devDependencies:
+      '@faker-js/faker':
+        specifier: ^9.7.0
+        version: 9.9.0
+      '@otplib/core':
+        specifier: ^12.0.0
+        version: 12.0.1
+      '@otplib/plugin-crypto':
+        specifier: ^12.0.0
+        version: 12.0.1
+      '@otplib/plugin-thirty-two':
+        specifier: ^12.0.0
+        version: 12.0.1
+      '@playwright/test':
+        specifier: ^1.52.0
+        version: 1.54.1
+      gaxios:
+        specifier: ^7.1.0
+        version: 7.1.1
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+
   clients/typescript/zitadel-client:
     dependencies:
       '@bufbuild/protobuf':
@@ -463,7 +487,7 @@ importers:
         specifier: ^13.13.3
         version: 13.17.0
 
-  login/apps/login:
+  login:
     dependencies:
       '@headlessui/react':
         specifier: ^2.1.9
@@ -479,10 +503,10 @@ importers:
         version: 1.5.0(next@15.4.0-canary.86(@babel/core@7.28.0)(@playwright/test@1.54.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.89.2))(react@19.1.0)
       '@zitadel/client':
         specifier: workspace:*
-        version: link:../../../clients/typescript/zitadel-client
+        version: link:../clients/typescript/zitadel-client
       '@zitadel/proto':
         specifier: workspace:*
-        version: link:../../../clients/typescript/zitadel-proto
+        version: link:../clients/typescript/zitadel-proto
       clsx:
         specifier: 1.2.1
         version: 1.2.1
@@ -620,31 +644,7 @@ importers:
         specifier: ^2.0.0
         version: 2.1.9(@types/node@22.16.4)(jsdom@26.1.0)(less@4.1.3)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)
 
-  login/apps/login-test-acceptance:
-    devDependencies:
-      '@faker-js/faker':
-        specifier: ^9.7.0
-        version: 9.9.0
-      '@otplib/core':
-        specifier: ^12.0.0
-        version: 12.0.1
-      '@otplib/plugin-crypto':
-        specifier: ^12.0.0
-        version: 12.0.1
-      '@otplib/plugin-thirty-two':
-        specifier: ^12.0.0
-        version: 12.0.1
-      '@playwright/test':
-        specifier: ^1.52.0
-        version: 1.54.1
-      gaxios:
-        specifier: ^7.1.0
-        version: 7.1.1
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
-
-  login/apps/login-test-integration:
+  login/integration:
     devDependencies:
       '@types/node':
         specifier: ^22.14.1
@@ -19239,7 +19239,7 @@ snapshots:
       proc-log: 3.0.0
       promise-inflight: 1.0.1
       promise-retry: 2.0.1
-      semver: 7.5.4
+      semver: 7.7.2
       which: 3.0.1
     transitivePeerDependencies:
       - bluebird
@@ -24926,7 +24926,7 @@ snapshots:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 3.0.5
+      minimatch: 3.1.2
       once: 1.4.0
       path-is-absolute: 1.0.1
 
@@ -28060,7 +28060,7 @@ snapshots:
 
   npm-install-checks@6.3.0:
     dependencies:
-      semver: 7.5.4
+      semver: 7.7.2
 
   npm-normalize-package-bin@3.0.1: {}
 
