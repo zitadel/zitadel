@@ -36,8 +36,6 @@ We think the easiest path of getting up and running, is the following:
 - `login`: The login UI used by ZITADEL Cloud, powered by Next.js
 - `@zitadel/client`: shared client utilities for node and browser environments
 - `@zitadel/proto`: Protocol Buffers (proto) definitions used by ZITADEL projects
-- `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
-- `@zitadel/eslint-config`: ESLint preset
 
 Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
 

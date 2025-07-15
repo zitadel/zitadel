@@ -1,0 +1,25 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "e2e": {
+      "cache": false,
+      "persistent": false
+    },
+    "e2e:golang": {
+      "cache": false,
+      "persistent": false
+    },
+    "e2e:golangangular": {
+      "cache": false,
+      "persistent": false
+    },
+    "e2e:angular": {
+      "cache": false,
+      "persistent": false
+    },
+    "lint": {
+      "outputs": []
+    }
+  }
+}

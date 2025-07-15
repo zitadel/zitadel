@@ -204,7 +204,7 @@ export class UserCreateV2Component implements OnInit {
 
     if (authenticationFactor.factor === 'initialPassword') {
       const { password } = authenticationFactor.form.getRawValue();
-      humanReq.passwordType = {
+      humanReq['passwordType'] = {
         case: 'password',
         value: {
           password,

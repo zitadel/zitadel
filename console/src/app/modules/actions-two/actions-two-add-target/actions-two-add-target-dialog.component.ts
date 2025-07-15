@@ -89,7 +89,7 @@ export class ActionTwoAddTargetDialogComponent {
       nanos: 0,
     };
 
-    const targetType: Extract<MessageInitShape<typeof CreateTargetRequestSchema>['targetType'], { case: TargetTypes }> =
+    const targetType: MessageInitShape<typeof CreateTargetRequestSchema>['targetType'] =
       type === 'restWebhook'
         ? { case: type, value: { interruptOnError } }
         : type === 'restCall'

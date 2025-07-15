@@ -107,10 +107,11 @@ FROM node:20-buster AS console-deps
 
 WORKDIR /zitadel/console
 
-COPY console/package.json .
-COPY console/yarn.lock .
+COPY pnpm-lock.yaml .
+COPY pnpm-workspace.yaml .
+COPY console/package.json console/
 
-RUN yarn install --frozen-lockfile
+RUN corepack enable pnpm && pnpm install --frozen-lockfile --filter=console
 
 # #######################################
 # generate console client
@@ -127,7 +128,7 @@ COPY console/package.json .
 COPY console/buf.*.yaml .
 COPY proto ../proto
 
-RUN yarn generate
+RUN pnpm generate
 
 # #######################################
 # Gather all console files
@@ -145,7 +146,7 @@ COPY console/tsconfig* .
 # Build console
 # #######################################
 FROM console-gathered AS console
-RUN yarn build
+RUN pnpm build
 
 # ##############################################################################
 # build the executable
@@ -264,7 +265,7 @@ FROM console-gathered AS lint-console
 
 COPY console/.eslintrc.js .
 COPY console/.prettier* .
-RUN yarn lint
+RUN pnpm lint
 
 # #######################################
 # core

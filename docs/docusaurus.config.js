@@ -264,7 +264,7 @@ module.exports = {
             outputDir: "docs/apis/resources/auth",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           mgmt: {
@@ -272,7 +272,7 @@ module.exports = {
             outputDir: "docs/apis/resources/mgmt",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           admin: {
@@ -280,7 +280,7 @@ module.exports = {
             outputDir: "docs/apis/resources/admin",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           system: {
@@ -288,7 +288,7 @@ module.exports = {
             outputDir: "docs/apis/resources/system",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           user_v2: {
