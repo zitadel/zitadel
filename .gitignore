@@ -88,3 +88,5 @@ load-test/yarn-error.log
 load-test/dist
 load-test/output/*
 .vercel
+go1.24.1.linux-arm64.tar.gz
+build.log
