@@ -12,7 +12,7 @@ import (
 type OrganizationSettingsWriteModel struct {
 	eventstore.WriteModel
 
-	UserUniqueness bool
+	OrganizationScopedUsernames bool
 
 	OrganizationState domain.OrgState
 
@@ -54,17 +54,17 @@ func (wm *OrganizationSettingsWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *settings.OrganizationSettingsSetEvent:
-			wm.UserUniqueness = e.OrganizationScopedUsernames
+			wm.OrganizationScopedUsernames = e.OrganizationScopedUsernames
 			wm.State = domain.OrganizationSettingsStateActive
 		case *settings.OrganizationSettingsRemovedEvent:
-			wm.UserUniqueness = false
+			wm.OrganizationScopedUsernames = false
 			wm.State = domain.OrganizationSettingsStateRemoved
 		case *org.OrgAddedEvent:
 			wm.OrganizationState = domain.OrgStateActive
-			wm.UserUniqueness = false
+			wm.OrganizationScopedUsernames = false
 		case *org.OrgRemovedEvent:
 			wm.OrganizationState = domain.OrgStateRemoved
-			wm.UserUniqueness = false
+			wm.OrganizationScopedUsernames = false
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -94,7 +94,7 @@ func (wm *OrganizationSettingsWriteModel) NewSet(
 		return nil, err
 	}
 	// no changes
-	if userUniqueness == nil || *userUniqueness == wm.UserUniqueness {
+	if userUniqueness == nil || *userUniqueness == wm.OrganizationScopedUsernames {
 		return nil, nil
 	}
 	events := []eventstore.Command{
