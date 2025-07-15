@@ -285,7 +285,13 @@ func (s *SessionCommands) commands(ctx context.Context) (string, []eventstore.Co
 	return token, s.eventCommands, nil
 }
 
-func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, metadata map[string][]byte, userAgent *domain.UserAgent, lifetime time.Duration) (set *SessionChanged, err error) {
+func (c *Commands) CreateSession(
+	ctx context.Context,
+	cmds []SessionCommand,
+	metadata map[string][]byte,
+	userAgent *domain.UserAgent,
+	lifetime time.Duration,
+) (set *SessionChanged, err error) {
 	sessionID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -295,15 +301,27 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, met
 	if err != nil {
 		return nil, err
 	}
+	if err = c.checkSessionWritePermission(ctx, sessionWriteModel, ""); err != nil {
+		return nil, err
+	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
 	cmd.Start(ctx, userAgent)
 	return c.updateSession(ctx, cmd, metadata, lifetime)
 }
 
-func (c *Commands) UpdateSession(ctx context.Context, sessionID string, cmds []SessionCommand, metadata map[string][]byte, lifetime time.Duration) (set *SessionChanged, err error) {
+func (c *Commands) UpdateSession(
+	ctx context.Context,
+	sessionID, sessionToken string,
+	cmds []SessionCommand,
+	metadata map[string][]byte,
+	lifetime time.Duration,
+) (set *SessionChanged, err error) {
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
+		return nil, err
+	}
+	if err = c.checkSessionWritePermission(ctx, sessionWriteModel, sessionToken); err != nil {
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
@@ -378,6 +396,21 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 	changed := sessionWriteModelToSessionChanged(checks.sessionWriteModel)
 	changed.NewToken = sessionToken
 	return changed, nil
+}
+
+// checkSessionWritePermission will check that the provided sessionToken is correct or
+// if empty, check that the caller is granted the "session.write" permission on the resource owner of the authenticated user.
+// In case the user is not set and the userResourceOwner is not set (also the case for the session creation),
+// it will check permission on the instance.
+func (c *Commands) checkSessionWritePermission(ctx context.Context, model *SessionWriteModel, sessionToken string) error {
+	if sessionToken != "" {
+		return c.sessionTokenVerifier(ctx, sessionToken, model.AggregateID, model.TokenID)
+	}
+	userResourceOwner, err := c.sessionUserResourceOwner(ctx, model)
+	if err != nil {
+		return err
+	}
+	return c.checkPermission(ctx, domain.PermissionSessionWrite, userResourceOwner, model.UserID)
 }
 
 // checkSessionTerminationPermission will check that the provided sessionToken is correct or
