@@ -238,6 +238,13 @@
       "title": "Imposta Password",
       "description": "Imposta la password per il tuo account",
       "submit": "Continua"
+    },
+    "errors": {
+      "couldNotCreateUser": "Impossibile creare l'utente",
+      "couldNotCreateSession": "Impossibile creare la sessione",
+      "userNotFound": "Utente non trovato nel sistema",
+      "couldNotLinkIDP": "Impossibile collegare l'IDP all'utente",
+      "couldNotRegisterUser": "Impossibile registrare l'utente"
     }
   },
   "invite": {

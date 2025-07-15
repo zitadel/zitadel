@@ -238,6 +238,13 @@
       "title": "设置密码",
       "description": "为您的账户设置密码",
       "submit": "继续"
+    },
+    "errors": {
+      "couldNotCreateUser": "无法创建用户",
+      "couldNotCreateSession": "无法创建会话",
+      "userNotFound": "系统中未找到用户",
+      "couldNotLinkIDP": "无法将 IDP 关联到用户",
+      "couldNotRegisterUser": "无法注册用户"
     }
   },
   "invite": {

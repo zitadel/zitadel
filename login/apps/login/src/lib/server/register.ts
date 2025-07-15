@@ -17,6 +17,7 @@ import {
   ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { getNextUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification } from "../verify-helper";
@@ -36,6 +37,7 @@ export type RegisterUserResponse = {
   factors: Factors | undefined;
 };
 export async function registerUser(command: RegisterUserCommand) {
+  const t = await getTranslations("register");
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
@@ -54,7 +56,7 @@ export async function registerUser(command: RegisterUserCommand) {
   });
 
   if (!addResponse) {
-    return { error: "Could not create user" };
+    return { error: t("errors.couldNotCreateUser") };
   }
 
   const loginSettings = await getLoginSettings({
@@ -84,7 +86,7 @@ export async function registerUser(command: RegisterUserCommand) {
   });
 
   if (!session || !session.factors?.user) {
-    return { error: "Could not create session" };
+    return { error: t("errors.couldNotCreateSession") };
   }
 
   if (!command.password) {
@@ -105,7 +107,7 @@ export async function registerUser(command: RegisterUserCommand) {
     });
 
     if (!userResponse.user) {
-      return { error: "User not found in the system" };
+      return { error: t("errors.userNotFound") };
     }
 
     const humanUser =
@@ -165,6 +167,7 @@ export type registerUserAndLinkToIDPResponse = {
 export async function registerUserAndLinkToIDP(
   command: RegisterUserAndLinkToIDPommand,
 ) {
+  const t = await getTranslations("register");
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
@@ -182,7 +185,7 @@ export async function registerUserAndLinkToIDP(
   });
 
   if (!addResponse) {
-    return { error: "Could not create user" };
+    return { error: t("errors.couldNotCreateUser") };
   }
 
   const loginSettings = await getLoginSettings({
@@ -201,7 +204,7 @@ export async function registerUserAndLinkToIDP(
   });
 
   if (!idpLink) {
-    return { error: "Could not link IDP to user" };
+    return { error: t("errors.couldNotLinkIDP") };
   }
 
   const session = await createSessionForIdpAndUpdateCookie({
@@ -212,7 +215,7 @@ export async function registerUserAndLinkToIDP(
   });
 
   if (!session || !session.factors?.user) {
-    return { error: "Could not create session" };
+    return { error: t("errors.couldNotCreateSession") };
   }
 
   const url = await getNextUrl(

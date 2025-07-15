@@ -8,6 +8,7 @@ import {
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import {
@@ -60,6 +61,8 @@ export function RegisterForm({
     },
   });
 
+  const t = useTranslations("register");
+
   const [loading, setLoading] = useState<boolean>(false);
   const [selected, setSelected] = useState<AuthenticationMethod>(methods[0]);
   const [error, setError] = useState<string>("");
@@ -76,7 +79,7 @@ export function RegisterForm({
       requestId: requestId,
     })
       .catch(() => {
-        setError("Could not register user");
+        setError(t("errors.couldNotRegisterUser"));
         return;
       })
       .finally(() => {

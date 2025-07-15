@@ -238,6 +238,13 @@
       "title": "Ustaw hasło",
       "description": "Ustaw hasło dla swojego konta",
       "submit": "Kontynuuj"
+    },
+    "errors": {
+      "couldNotCreateUser": "Nie udało się utworzyć użytkownika",
+      "couldNotCreateSession": "Nie udało się utworzyć sesji",
+      "userNotFound": "Nie znaleziono użytkownika w systemie",
+      "couldNotLinkIDP": "Nie udało się powiązać IDP z użytkownikiem",
+      "couldNotRegisterUser": "Nie udało się zarejestrować użytkownika"
     }
   },
   "invite": {

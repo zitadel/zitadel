@@ -238,6 +238,13 @@
       "title": "Set Password",
       "description": "Set the password for your account",
       "submit": "Continue"
+    },
+    "errors": {
+      "couldNotCreateUser": "Could not create user",
+      "couldNotCreateSession": "Could not create session",
+      "userNotFound": "User not found in the system",
+      "couldNotLinkIDP": "Could not link IDP to user",
+      "couldNotRegisterUser": "Could not register user"
     }
   },
   "invite": {

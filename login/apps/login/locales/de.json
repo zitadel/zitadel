@@ -238,6 +238,13 @@
       "title": "Passwort festlegen",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
       "submit": "Weiter"
+    },
+    "errors": {
+      "couldNotCreateUser": "Benutzer konnte nicht erstellt werden",
+      "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
+      "userNotFound": "Benutzer nicht im System gefunden",
+      "couldNotLinkIDP": "IDP konnte nicht mit dem Benutzer verknüpft werden",
+      "couldNotRegisterUser": "Benutzer konnte nicht registriert werden"
     }
   },
   "invite": {

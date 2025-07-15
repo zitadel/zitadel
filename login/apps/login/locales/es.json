@@ -238,6 +238,13 @@
       "title": "Establecer Contraseña",
       "description": "Establece la contraseña para tu cuenta",
       "submit": "Continuar"
+    },
+    "errors": {
+      "couldNotCreateUser": "No se pudo crear el usuario",
+      "couldNotCreateSession": "No se pudo crear la sesión",
+      "userNotFound": "Usuario no encontrado en el sistema",
+      "couldNotLinkIDP": "No se pudo vincular el IdP al usuario",
+      "couldNotRegisterUser": "No se pudo registrar el usuario"
     }
   },
   "invite": {
