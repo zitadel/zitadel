@@ -33,6 +33,7 @@ import (
 var (
 	CTX       context.Context
 	IamCTX    context.Context
+	LoginCTX  context.Context
 	UserCTX   context.Context
 	SystemCTX context.Context
 	Instance  *integration.Instance
@@ -48,6 +49,7 @@ func TestMain(m *testing.M) {
 
 		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
 		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		LoginCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
 		SystemCTX = integration.WithSystemAuthorization(ctx)
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 		Client = Instance.Client.UserV2
@@ -2545,7 +2547,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 func ctxFromNewUserWithRegisteredPasswordlessLegacy(t *testing.T) (context.Context, string, *auth.AddMyPasswordlessResponse) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
 	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
 	pkr, err := Instance.Client.Auth.AddMyPasswordless(ctx, &auth.AddMyPasswordlessRequest{})

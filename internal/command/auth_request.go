@@ -135,6 +135,11 @@ func (c *Commands) FailAuthRequest(ctx context.Context, id string, reason domain
 	if writeModel.AuthRequestState != domain.AuthRequestStateAdded {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx202nt", "Errors.AuthRequest.AlreadyHandled")
 	}
+	if authz.GetCtxData(ctx).UserID != writeModel.LoginClient {
+		if err := c.checkPermission(ctx, domain.PermissionSessionLink, writeModel.ResourceOwner, ""); err != nil {
+			return nil, nil, err
+		}
+	}
 	err = c.pushAppendAndReduce(ctx, writeModel, authrequest.NewFailedEvent(
 		ctx,
 		&authrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,

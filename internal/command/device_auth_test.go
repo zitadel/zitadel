@@ -273,7 +273,8 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 	pushErr := errors.New("pushErr")
 
 	type fields struct {
-		eventstore func(*testing.T) *eventstore.Eventstore
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx    context.Context
@@ -298,6 +299,26 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound"),
 		},
 		{
+			name: "missing permission, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(eventFromEventPusherWithInstanceID(
+						"instance1",
+						deviceauth.NewAddedEvent(
+							ctx,
+							deviceauth.NewAggregate("123", "instance1"),
+							"client_id", "123", "456", now,
+							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"}, true,
+						),
+					)),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args:    args{ctx, "123", domain.DeviceAuthCanceledDenied},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+		},
+		{
 			name: "push error",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -318,6 +339,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args:    args{ctx, "123", domain.DeviceAuthCanceledDenied},
 			wantErr: pushErr,
@@ -343,6 +365,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{ctx, "123", domain.DeviceAuthCanceledDenied},
 			wantDetails: &domain.ObjectDetails{
@@ -370,6 +393,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{ctx, "123", domain.DeviceAuthCanceledExpired},
 			wantDetails: &domain.ObjectDetails{
@@ -380,7 +404,8 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			gotDetails, err := c.CancelDeviceAuth(tt.args.ctx, tt.args.id, tt.args.reason)
 			require.ErrorIs(t, err, tt.wantErr)
