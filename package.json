@@ -33,7 +33,9 @@
   },
   "pnpm": {
     "overrides": {
-      "@typescript-eslint/parser": "^8.35.1"
+      "@typescript-eslint/parser": "^8.35.1",
+      "@zitadel/client": "workspace:*",
+      "@zitadel/proto": "workspace:*"
     }
   },
   "devDependencies": {
