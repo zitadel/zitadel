@@ -11,25 +11,25 @@ variable "DOCKERFILES_DIR" {
 # By default the platforms property is empty, so images are only built for the current bake runtime platform.
 target "release" {}
 
-# typescript-proto-client is used to generate the client code for the login service.
-# It is not login-prefixed, so it is easily extendable.
+# login-zitadel-proto generates the @zitadel/proto package from protobuf files.
+# It generates TypeScript definitions from protobuf files.
 # To extend this bake-file.hcl, set the context of all login-prefixed targets to a different directory.
 # For example docker bake --file login/docker-bake.hcl --file docker-bake.hcl --set login-*.context=./login/
 # The zitadel repository uses this to generate the client and the mock server from local proto files.
-target "typescript-proto-client" {
+target "login-zitadel-proto" {
   inherits   = ["release"]
-  dockerfile = "${DOCKERFILES_DIR}typescript-proto-client.Dockerfile"
+  dockerfile = "${DOCKERFILES_DIR}login-zitadel-proto.Dockerfile"
   contexts = {
     # We directly generate and download the client server-side with buf, so we don't need the proto files
     login-pnpm = "target:login-pnpm"
   }
 }
 
-# We prefix the target with login- so we can reuse the writing of protos if we overwrite the typescript-proto-client target.
-target "login-typescript-proto-client-out" {
-  dockerfile = "${DOCKERFILES_DIR}login-typescript-proto-client-out.Dockerfile"
+# We prefix the target with login- so we can reuse the writing of protos if we overwrite the login-zitadel-proto target.
+target "login-zitadel-proto-out" {
+  dockerfile = "${DOCKERFILES_DIR}login-zitadel-proto-out.Dockerfile"
   contexts = {
-    typescript-proto-client = "target:typescript-proto-client"
+    login-zitadel-proto = "target:login-zitadel-proto"
   }
   output = [
     "type=local,dest=${LOGIN_DIR}packages/zitadel-proto"
@@ -87,16 +87,16 @@ target "login-lint" {
 target "login-test-unit" {
   dockerfile = "${DOCKERFILES_DIR}login-test-unit.Dockerfile"
   contexts = {
-    login-client = "target:login-client"
+    login-zitadel-client = "target:login-zitadel-client"
   }
 }
 
-target "login-client" {
+target "login-zitadel-client" {
   inherits   = ["release"]
-  dockerfile = "${DOCKERFILES_DIR}login-client.Dockerfile"
+  dockerfile = "${DOCKERFILES_DIR}login-zitadel-client.Dockerfile"
   contexts = {
-    login-pnpm              = "target:login-pnpm"
-    typescript-proto-client = "target:typescript-proto-client"
+    login-build-base    = "target:login-build-base"
+    login-zitadel-proto = "target:login-zitadel-proto"
   }
 }
 
@@ -154,7 +154,7 @@ target "login-standalone" {
   ]
   dockerfile = "${DOCKERFILES_DIR}login-standalone.Dockerfile"
   contexts = {
-    login-client = "target:login-client"
+    login-zitadel-client = "target:login-zitadel-client"
   }
 }
 

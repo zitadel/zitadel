@@ -1,4 +1,4 @@
-FROM login-client AS login-standalone-builder
+FROM login-zitadel-client AS login-standalone-builder
 # Copy package.json files first for better dependency caching
 COPY apps/login/package.json ./apps/login/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \

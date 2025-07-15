@@ -1,5 +1,23 @@
+# .dockerignore for login-test-acceptance
 *
 !/apps/login-test-acceptance/*.json
 !/apps/login-test-acceptance/*.ts
 !/apps/login-test-acceptance/zitadel.yaml
 !/apps/login-test-acceptance/tests
+
+# Exclude turbo cache and other build artifacts
+**/.turbo
+**/.next
+**/node_modules
+**/dist
+**/build
+**/*.log
+**/.git
+**/coverage
+**/.nyc_output
+**/cypress/videos
+**/cypress/screenshots
+**/playwright-report
+**/test-results
+**/.env.local
+**/.env.*.local

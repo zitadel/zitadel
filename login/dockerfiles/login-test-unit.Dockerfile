@@ -1,4 +1,4 @@
-FROM login-client AS login-test-unit
+FROM login-zitadel-client AS login-test-unit
 # Copy package.json first for better dependency caching
 COPY apps/login/package.json ./apps/login/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
