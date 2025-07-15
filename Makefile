@@ -180,13 +180,20 @@ core_lint:
 .PHONY: login_pull
 login_pull: login_ensure_remote
 	@echo "Pulling changes from the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
-	git fetch $(LOGIN_REMOTE_NAME)
-	git subtree pull --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+	git fetch $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+	git merge -s ours --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/$(LOGIN_REMOTE_BRANCH) -m "Synthetic merge to align histories"
+	git push
 
 .PHONY: login_push
 login_push: login_ensure_remote
 	@echo "Pushing changes to the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
-	git subtree push --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+	git subtree split --prefix=login -b login-sync-tmp
+	git checkout login-sync-tmp
+	git fetch $(LOGIN_REMOTE_NAME) main
+	git merge -s ours --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/main -m "Synthetic merge to align histories"
+	git push $(LOGIN_REMOTE_NAME) login-sync-tmp:$(LOGIN_REMOTE_BRANCH)
+	git checkout -
+	git branch -D login-sync-tmp
 
 login_ensure_remote:
 	@if ! git remote get-url $(LOGIN_REMOTE_NAME) > /dev/null 2>&1; then \
@@ -194,12 +201,6 @@ login_ensure_remote:
 		git remote add $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
 	else \
 		echo "Remote $(LOGIN_REMOTE_NAME) already exists."; \
-	fi
-	@if [ ! -d login ]; then \
-		echo "Adding subtree for 'login' from branch $(LOGIN_REMOTE_BRANCH)"; \
-		git subtree add --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH); \
-	else \
-		echo "Subtree 'login' already exists."; \
 	fi
 
 export LOGIN_DIR := ./login/

@@ -989,10 +989,72 @@ export async function startIdentityProviderFlow({
         const formData: FormData = resp.nextStep.value;
         const redirectUrl = "/saml-post";
 
-        const dataId = await setSAMLFormCookie(JSON.stringify(formData.fields));
-        const params = new URLSearchParams({ url: formData.url, id: dataId });
+        try {
+          // Log the attempt with structure inspection
+          console.log("Attempting to stringify formData.fields:", {
+            fields: formData.fields,
+            fieldsType: typeof formData.fields,
+            fieldsKeys: Object.keys(formData.fields || {}),
+            fieldsEntries: Object.entries(formData.fields || {}),
+          });
 
-        return `${redirectUrl}?${params.toString()}`;
+          const stringifiedFields = JSON.stringify(formData.fields);
+          console.log(
+            "Successfully stringified formData.fields, length:",
+            stringifiedFields.length,
+          );
+
+          // Check cookie size limits (typical limit is 4KB)
+          if (stringifiedFields.length > 4000) {
+            console.warn(
+              `SAML form cookie value is large (${stringifiedFields.length} characters), may exceed browser limits`,
+            );
+          }
+
+          const dataId = await setSAMLFormCookie(stringifiedFields);
+          const params = new URLSearchParams({ url: formData.url, id: dataId });
+
+          return `${redirectUrl}?${params.toString()}`;
+        } catch (stringifyError) {
+          console.error("Failed to stringify formData.fields:", {
+            error: stringifyError,
+            formDataFields: formData.fields,
+            formDataUrl: formData.url,
+            fieldsType: typeof formData.fields,
+            fieldsConstructor: formData.fields?.constructor?.name,
+          });
+
+          // Try to create a safe serialization by converting to plain object
+          try {
+            const safeFields: Record<string, string> = {};
+            const fieldsObj = formData.fields || {};
+
+            // Convert each field to a string if it's not already
+            for (const [key, value] of Object.entries(fieldsObj)) {
+              safeFields[key] =
+                typeof value === "string" ? value : String(value);
+            }
+
+            console.log(
+              "Using safe serialization for formData.fields:",
+              safeFields,
+            );
+
+            const safeStringified = JSON.stringify(safeFields);
+            const dataId = await setSAMLFormCookie(safeStringified);
+            const params = new URLSearchParams({
+              url: formData.url,
+              id: dataId,
+            });
+
+            return `${redirectUrl}?${params.toString()}`;
+          } catch (fallbackError) {
+            console.error("Safe serialization also failed:", fallbackError);
+            throw new Error(
+              `Failed to serialize SAML form data: ${stringifyError instanceof Error ? stringifyError.message : String(stringifyError)}`,
+            );
+          }
+        }
       } else {
         return null;
       }
