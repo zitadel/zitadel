@@ -54,7 +54,6 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			assert.WithinRange(t, instance.CreatedAt, beforeCreate, afterCreate)
 			// event instance.added
 			assert.WithinRange(t, instance.UpdatedAt, beforeCreate, afterCreate)
-			assert.Nil(t, instance.DeletedAt)
 		}, retryDuration, tick)
 	})
 
@@ -132,7 +131,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			)
 			// event instance.removed
 			assert.Nil(t, instance)
-			require.NoError(t, err)
+			require.Equal(t, repository.ErrResourceDoesNotExist, err)
 		}, retryDuration, tick)
 	})
 }

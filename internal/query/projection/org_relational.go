@@ -171,12 +171,8 @@ func (p *orgRelationalProjection) reduceOrgRelationalRemoved(event eventstore.Ev
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-DGm9g", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
-	return handler.NewUpdateStatement(
+	return handler.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(UpdatedAt, e.CreationDate()),
-			handler.NewCol(DeletedAt, e.CreationDate()),
-		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
 			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
