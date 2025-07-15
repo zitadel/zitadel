@@ -405,11 +405,11 @@ func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userI
 	return resp
 }
 
-func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, orgID string, userUniqueness bool) *settings.SetOrganizationSettingsResponse {
+func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, orgID string, organizationScopedUsernames bool) *settings.SetOrganizationSettingsResponse {
 	resp, err := i.Client.SettingsV2.SetOrganizationSettings(ctx,
 		&settings.SetOrganizationSettingsRequest{
-			OrganizationId: orgID,
-			UserUniqueness: gu.Ptr(userUniqueness),
+			OrganizationId:              orgID,
+			OrganizationScopedUsernames: gu.Ptr(organizationScopedUsernames),
 		},
 	)
 	require.NoError(t, err)
