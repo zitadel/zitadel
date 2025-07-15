@@ -274,14 +274,14 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail b
 		if err != nil {
 			return nil, err
 		}
-	} else {
-		existingOrg, err := c.getOrgWriteModelByID(ctx, o.OrgID)
-		if err != nil {
-			return nil, err
-		}
-		if existingOrg.State != domain.OrgStateUnspecified && existingOrg.State != domain.OrgStateRemoved {
-			return nil, zerrors.ThrowNotFound(nil, "ORG-lapo2n", "Errors.Org.AlreadyExisting")
-		}
+	}
+
+	existingOrg, err := c.getOrgWriteModelByID(ctx, o.OrgID)
+	if err != nil {
+		return nil, err
+	}
+	if existingOrg.State != domain.OrgStateUnspecified && existingOrg.State != domain.OrgStateRemoved {
+		return nil, zerrors.ThrowNotFound(nil, "ORG-lapo2n", "Errors.Org.AlreadyExisting")
 	}
 
 	return c.setUpOrgWithIDs(ctx, o, o.OrgID, allowInitialMail, userIDs...)
