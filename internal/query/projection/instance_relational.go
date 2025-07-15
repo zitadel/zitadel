@@ -97,11 +97,8 @@ func (p *instanceRelationalProjection) reduceInstanceDelete(event eventstore.Eve
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-so2am1", "reduce.wrong.event.type %s", instance.InstanceChangedEventType)
 	}
-	return handler.NewUpdateStatement(
+	return handler.NewDeleteStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(DeletedAt, e.CreationDate()),
-		},
 		[]handler.Condition{
 			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
 		},
