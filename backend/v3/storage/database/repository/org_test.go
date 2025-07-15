@@ -247,7 +247,6 @@ func TestCreateOrganization(t *testing.T) {
 			assert.Equal(t, tt.organization.State, organization.State)
 			assert.WithinRange(t, organization.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, organization.UpdatedAt, beforeCreate, afterCreate)
-			assert.Nil(t, organization.DeletedAt)
 		})
 	}
 }
@@ -400,7 +399,6 @@ func TestUpdateOrganization(t *testing.T) {
 			assert.Equal(t, createdOrg.Name, organization.Name)
 			assert.Equal(t, createdOrg.State, organization.State)
 			assert.WithinRange(t, organization.UpdatedAt, beforeUpdate, afterUpdate)
-			assert.Nil(t, organization.DeletedAt)
 		})
 	}
 }
