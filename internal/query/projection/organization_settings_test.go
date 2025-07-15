@@ -28,7 +28,7 @@ func TestOrganizationSettingsProjection_reduces(t *testing.T) {
 					testEvent(
 						settings.OrganizationSettingsSetEventType,
 						settings.AggregateType,
-						[]byte(`{"userUniqueness": true}`),
+						[]byte(`{"organizationScopedUsernames": true}`),
 					), eventstore.GenericEventMapper[settings.OrganizationSettingsSetEvent],
 				),
 			},
@@ -39,7 +39,7 @@ func TestOrganizationSettingsProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.organization_settings (instance_id, resource_owner, id, creation_date, change_date, sequence, user_uniqueness) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, resource_owner, id) DO UPDATE SET (creation_date, change_date, sequence, user_uniqueness) = (projections.organization_settings.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.user_uniqueness)",
+							expectedStmt: "INSERT INTO projections.organization_settings (instance_id, resource_owner, id, creation_date, change_date, sequence, organization_scoped_usernames) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, resource_owner, id) DO UPDATE SET (creation_date, change_date, sequence, organization_scoped_usernames) = (projections.organization_settings.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.organization_scoped_usernames)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"ro-id",

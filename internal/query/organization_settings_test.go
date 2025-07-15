@@ -15,7 +15,7 @@ var (
 		` projections.organization_settings.change_date,` +
 		` projections.organization_settings.resource_owner,` +
 		` projections.organization_settings.sequence,` +
-		` projections.organization_settings.user_uniqueness,` +
+		` projections.organization_settings.organization_scoped_usernames,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.organization_settings`
 	prepareOrganizationSettingsListCols = []string{
@@ -24,7 +24,7 @@ var (
 		"change_date",
 		"resource_owner",
 		"sequence",
-		"user_uniqueness",
+		"organization_scoped_usernames",
 		"count",
 	}
 )
