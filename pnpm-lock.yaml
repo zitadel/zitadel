@@ -468,11 +468,11 @@ importers:
         specifier: ^1.2.2
         version: 1.5.0(next@15.4.0-canary.86(@babel/core@7.28.0)(@playwright/test@1.53.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.89.2))(react@19.1.0)
       '@zitadel/client':
-        specifier: workspace:*
-        version: link:../../packages/zitadel-client
+        specifier: latest
+        version: 1.2.1-sha-220f335
       '@zitadel/proto':
-        specifier: workspace:*
-        version: link:../../packages/zitadel-proto
+        specifier: latest
+        version: 1.2.1-sha-220f335
       clsx:
         specifier: 1.2.1
         version: 1.2.1
@@ -5868,6 +5868,12 @@ packages:
 
   '@zag-js/utils@1.18.1':
     resolution: {integrity: sha512-KocaggqVZ/gAwON1a9szCLNTSrgg4MHNg3pJImBeex8RGMXo4vK0G4DTm7WS8ccxoIaeP+gqeTS+vuof22+SMg==}
+
+  '@zitadel/client@1.2.1-sha-220f335':
+    resolution: {integrity: sha512-1rO+nh3IMVp+8oVmXJlYxeBUPnNPF4vNz/LPwdmZ6k41oxn6LbyDjdgK8cYnyN7paW2wUZJtXXn6gedoHyuuxw==}
+
+  '@zitadel/proto@1.2.1-sha-220f335':
+    resolution: {integrity: sha512-IdVEIqOi+R8J+e815ut2XmjUU5yIca8J/OMAq8IdzW8f8TFnCv70uGqhdpa5vEMqEHrv3wihNUG4EhylZtogmA==}
 
   '@zkochan/js-yaml@0.0.6':
     resolution: {integrity: sha512-nzvgl3VfhcELQ8LyVrYOru+UtAy1nrygk2+AGbTm8a5YcO6o8lSjAT+pfg3vJWxIoZKOUhrK6UU7xW/+00kQrg==}
@@ -21912,6 +21918,19 @@ snapshots:
       csstype: 3.1.3
 
   '@zag-js/utils@1.18.1': {}
+
+  '@zitadel/client@1.2.1-sha-220f335':
+    dependencies:
+      '@bufbuild/protobuf': 2.6.0
+      '@connectrpc/connect': 2.0.2(@bufbuild/protobuf@2.6.0)
+      '@connectrpc/connect-node': 2.0.2(@bufbuild/protobuf@2.6.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0))
+      '@connectrpc/connect-web': 2.0.2(@bufbuild/protobuf@2.6.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0))
+      '@zitadel/proto': link:login/packages/zitadel-proto
+      jose: 5.10.0
+
+  '@zitadel/proto@1.2.1-sha-220f335':
+    dependencies:
+      '@bufbuild/protobuf': 2.6.0
 
   '@zkochan/js-yaml@0.0.6':
     dependencies:

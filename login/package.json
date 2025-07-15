@@ -18,7 +18,6 @@
     "test:integration:setup": "NODE_ENV=test pnpm exec turbo run test:integration:setup",
     "test:acceptance": "cd apps/login-test-acceptance && pnpm test:acceptance",
     "test:acceptance:setup": "cd apps/login-test-acceptance && pnpm test:acceptance:setup",
-    "test:watch": "pnpm exec turbo run test:watch",
     "dev": "pnpm exec turbo run dev --no-cache --continue",
     "dev:local": "pnpm test:acceptance:setup",
     "lint": "pnpm exec turbo run lint",
