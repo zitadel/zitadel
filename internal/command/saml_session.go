@@ -80,7 +80,12 @@ func (c *Commands) CreateSAMLSessionFromSAMLRequest(ctx context.Context, samlReq
 		return err
 	}
 	cmd.SetSAMLRequestSuccessful(ctx, samlReqModel.aggregate)
+	postCommit, err := cmd.SetMilestones(ctx)
+	if err != nil {
+		return err
+	}
 	_, err = cmd.PushEvents(ctx)
+	postCommit(ctx)
 	return err
 }
 
