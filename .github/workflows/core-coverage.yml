@@ -1,0 +1,39 @@
+name: Upload coverage
+
+on:
+  workflow_call:
+    inputs:
+      unit_test_report:
+        required: true
+        type: string
+      integration_test_report:
+        required: true
+        type: string
+    secrets:
+      CODECOV_TOKEN:
+        required: true
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v4
+        with:
+          path: tmp/coverage/unit
+          name: unit-coverage
+      - uses: actions/download-artifact@v4
+        with:
+          path: tmp/coverage/integration
+          name: integration-coverage
+      - name: merge coverages
+        if: ${{ inputs.unit_test_report == 'true' && inputs.integration_test_report == 'true' }}
+        run: make core_coverage_reports
+      - name: publish coverage
+        if: ${{ inputs.unit_test_report == 'true' && inputs.integration_test_report == 'true' }}
+        uses: codecov/codecov-action@v5.4.0
+        with:
+          files: full-profile.cov
+          name: core-tests-postgres
+          token: ${{ secrets.CODECOV_TOKEN }}

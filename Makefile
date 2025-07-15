@@ -7,10 +7,12 @@ VERSION ?= development-$(now)
 COMMIT_SHA ?= $(shell git rev-parse HEAD)
 ZITADEL_IMAGE ?= zitadel:local
 
-GOCOVERDIR = tmp/coverage
+GOCOVERDIR = tmp/coverage/integration
+GOCOVERDIR_INTEGRATION = $(shell pwd)/${GOCOVERDIR}
+GOCOVERDIR_UNIT = $(shell pwd)/tmp/coverage/unit
 ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
-export GOCOVERDIR ZITADEL_MASTERKEY
+export GOCOVERDIR GOCOVERDIR_INTEGRATION GOCOVERDIR_UNIT ZITADEL_MASTERKEY
 
 LOGIN_REMOTE_NAME := login
 LOGIN_REMOTE_URL ?= https://github.com/zitadel/typescript.git
@@ -119,7 +121,12 @@ clean:
 
 .PHONY: core_unit_test
 core_unit_test:
-	go test -race -coverprofile=profile.cov -coverpkg=./internal/...  ./...
+	mkdir -p ${GOCOVERDIR_UNIT}
+	go test -cover -race -coverprofile=profile.cov -coverpkg=./internal/... ./... -args -test.gocoverdir=${GOCOVERDIR_UNIT}
+
+.PHONY: core_unit_reports
+core_unit_reports:
+	go tool covdata textfmt -i=${GOCOVERDIR_UNIT} -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/... -o unit-profile.cov
 
 .PHONY: core_integration_db_up
 core_integration_db_up:
@@ -131,8 +138,8 @@ core_integration_db_down:
 
 .PHONY: core_integration_setup
 core_integration_setup:
+	mkdir -p ${GOCOVERDIR_INTEGRATION}
 	go build -cover -race -tags integration -o zitadel.test main.go
-	mkdir -p $${GOCOVERDIR}
 	GORACE="halt_on_error=1" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml
 	GORACE="halt_on_error=1" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml --steps internal/integration/config/steps.yaml
 
@@ -159,10 +166,14 @@ core_integration_server_stop:
 
 .PHONY: core_integration_reports
 core_integration_reports:
-	go tool covdata textfmt -i=tmp/coverage -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/... -o profile.cov
+	go tool covdata textfmt -i=${GOCOVERDIR_INTEGRATION} -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/... -o integration-profile.cov
 
 .PHONY: core_integration_test
-core_integration_test: core_integration_server_start core_integration_test_packages core_integration_server_stop core_integration_reports
+core_integration_test: core_integration_server_start core_integration_test_packages core_integration_server_stop
+
+.PHONY: core_coverage_reports
+core_coverage_reports:
+	go tool covdata textfmt -i=${GOCOVERDIR_INTEGRATION},${GOCOVERDIR_UNIT} -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/... -o full-profile.cov
 
 .PHONY: console_lint
 console_lint:

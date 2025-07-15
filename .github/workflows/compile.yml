@@ -113,6 +113,7 @@ jobs:
     - 
       uses: actions/download-artifact@v4
       with:
+        pattern: zitadel-*
         path: executables
     - 
       name: move files one folder up
