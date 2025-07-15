@@ -21,6 +21,10 @@ on:
       node_version:
         required: true
         type: string
+    secrets:
+      DEPOT_TOKEN:
+        required: true
+
 jobs:
   executable:
     runs-on: ubuntu-latest
@@ -83,12 +87,10 @@ jobs:
       uses: actions/checkout@v4
     -
       uses: depot/setup-action@v1
-      with:
-        oidc: true
     -
       run: make login_standalone_out
       env:
-        # latest if branch is main, otherwise image version which is the pull request number
+        DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
         LOGIN_BAKE_CLI: depot bake
         DEPOT_PROJECT_ID: w47wkxzdtw
         NODE_VERSION: ${{ inputs.node_version }}
