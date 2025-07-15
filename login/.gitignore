@@ -1,26 +1,4 @@
-.DS_Store
-node_modules
-.turbo
-*.log
-.next
-dist
-dist-ssr
-*.local
-.env
-server/dist
-public/dist
-.vscode
-.idea
-.vercel
-.env*.local
-/blob-report/
-/out
-/docker
-
 custom-config.js
 .env*.local
 standalone
-
-
-# TypeScript build info
 tsconfig.tsbuildinfo

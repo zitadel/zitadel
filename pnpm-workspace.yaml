@@ -2,5 +2,7 @@ packages:
   - "console"
   - "docs"
   - "e2e"
-  - "login/apps/*"
+  - "acceptance"
+  - "login"
+  - "login/integration"
   - "clients/typescript/*"
