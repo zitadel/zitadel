@@ -280,7 +280,7 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail b
 	if err != nil {
 		return nil, err
 	}
-	if existingOrg.State != domain.OrgStateUnspecified && existingOrg.State != domain.OrgStateRemoved {
+	if existingOrg.State == domain.OrgStateRemoved || existingOrg.State != domain.OrgStateUnspecified {
 		return nil, zerrors.ThrowNotFound(nil, "ORG-lapo2n", "Errors.Org.AlreadyExisting")
 	}
 
@@ -339,7 +339,7 @@ func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
-	if existingOrg.State != domain.OrgStateUnspecified && existingOrg.State != domain.OrgStateRemoved {
+	if existingOrg.State == domain.OrgStateRemoved || existingOrg.State != domain.OrgStateUnspecified {
 		return nil, zerrors.ThrowNotFound(nil, "ORG-lapo2m", "Errors.Org.AlreadyExisting")
 	}
 
