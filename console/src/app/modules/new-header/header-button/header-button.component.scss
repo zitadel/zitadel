@@ -3,27 +3,52 @@
   flex-direction: row;
   align-items: center;
   justify-content: stretch;
-  gap: 0.5rem;
+  gap: 0rem;
   padding-right: 0;
   height: 32px;
   max-height: 32px;
   cursor: pointer;
 }
 
-.header-text {
-  font-size: 1.1rem;
-}
-
 @mixin header-button-theme($theme) {
   $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
 
   .header-button {
+    height: 36px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
     border: 0;
     background: transparent;
-    border-radius: 4px;
-    padding: 0;
-    height: 100%;
+    border-radius: 6px;
+    padding: 0 0.5rem;
     cursor: pointer;
     color: map-get($foreground, text);
+
+    &:hover {
+      background-color: if($is-dark-theme, #ffffff10, #00000010);
+    }
+  }
+
+  .header-text {
+    height: 36px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    border: none;
+    color: map-get($foreground, text);
+    border-radius: 6px;
+    position: relative;
+    font-size: 14px;
+    padding: 0 0.75rem;
+    text-align: left;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all ease 0.2s;
+
+    &:hover {
+      background-color: if($is-dark-theme, #ffffff10, #00000010);
+    }
   }
 }
