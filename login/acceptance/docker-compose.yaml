@@ -1,8 +1,16 @@
 services:
+
   zitadel:
-    user: "${ZITADEL_DEV_UID}"
-    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:02617cf17fdde849378c1a6b5254bbfb2745b164}"
-    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
+    user: "${UID:-1000}:${GID:-1000}"
+    image: "${ZITADEL_TAG:-ghcr.io/zitadel/zitadel:latest}"
+    container_name: acceptance-zitadel
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.zitadel.rule=!PathPrefix(`/ui/v2/login`)"
+      #      - "traefik.http.middlewares.zitadel.headers.customrequestheaders.Host=localhost"
+#      - "traefik.http.routers.zitadel.middlewares=zitadel@docker"
+      - "traefik.http.services.zitadel-service.loadbalancer.server.scheme=h2c"
     ports:
       - "8080:8080"
     volumes:
@@ -11,12 +19,11 @@ services:
     depends_on:
       db:
         condition: "service_healthy"
-    extra_hosts:
-      - "localhost:host-gateway"
 
   db:
     restart: "always"
-    image: postgres:17.0-alpine3.19
+    image: ${LOGIN_TEST_ACCEPTANCE_POSTGES_TAG:-postgres:17.0-alpine3.19}
+    container_name: acceptance-db
     environment:
       - POSTGRES_USER=zitadel
       - PGUSER=zitadel
@@ -30,42 +37,201 @@ services:
       retries: 5
       start_period: "20s"
     ports:
-      - 5432:5432
+      - "5432:5432"
 
-  wait_for_zitadel:
+  wait-for-zitadel:
     image: curlimages/curl:8.00.1
+    container_name: acceptance-wait-for-zitadel
     command: /bin/sh -c "until curl -s -o /dev/null -i -f http://zitadel:8080/debug/ready; do echo 'waiting' && sleep 1; done; echo 'ready' && sleep 5;" || false
     depends_on:
       - zitadel
 
+  traefik:
+    image: "traefik:v3.4"
+    container_name: "acceptance-traefik"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.login.rule=PathPrefix(`/ui/v2/login`)"
+      - "traefik.http.services.login-service.loadbalancer.server.url=http://host.docker.internal:3000"
+    command:
+#      - "--log.level=DEBUG"
+      - "--ping"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.http.tls=true"
+      - "--entryPoints.websecure.address=:443"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: "10s"
+      timeout: "30s"
+      retries: 5
+      start_period: "20s"
+    ports:
+      - "443:443"
+      - "8090:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
   setup:
-    user: "${ZITADEL_DEV_UID}"
-    container_name: setup
-    image: acceptance-setup:latest
+    user: "${UID:-1000}:${GID:-1000}"
+    image: ${LOGIN_TEST_ACCEPTANCE_SETUP_TAG:-login-test-acceptance-setup:local}
+    container_name: acceptance-setup
+    restart: no
+    build:
+      context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/setup"
+      dockerfile: ../go-command.Dockerfile
+    entrypoint: "./setup.sh"
     environment:
       PAT_FILE: /pat/zitadel-admin-sa.pat
       ZITADEL_API_INTERNAL_URL: http://zitadel:8080
-      WRITE_ENVIRONMENT_FILE: /apps/login/.env.local
-      WRITE_TEST_ENVIRONMENT_FILE: /acceptance/tests/.env.local
+      WRITE_ENVIRONMENT_FILE: /login-env/.env.test.local
       SINK_EMAIL_INTERNAL_URL: http://sink:3333/email
       SINK_SMS_INTERNAL_URL: http://sink:3333/sms
       SINK_NOTIFICATION_URL: http://localhost:3333/notification
+      LOGIN_BASE_URL: https://127.0.0.1.sslip.io/ui/v2/login/
+      ZITADEL_API_URL: https://127.0.0.1.sslip.io
+      ZITADEL_API_DOMAIN: 127.0.0.1.sslip.io
+      ZITADEL_ADMIN_USER: zitadel-admin@zitadel.127.0.0.1.sslip.io
     volumes:
-      - "./pat:/pat"
-      - "../apps/login:/apps/login"
-      - "../acceptance/tests:/acceptance/tests"
+      - ./pat:/pat # Read the PAT file from zitadels setup
+      - ../login:/login-env # Write the environment variables file for the login
     depends_on:
-      wait_for_zitadel:
+      traefik:
+        condition: "service_healthy"
+      wait-for-zitadel:
         condition: "service_completed_successfully"
 
   sink:
-    image: golang:1.24-alpine
-    container_name: sink
-    command: go run /sink/main.go -port '3333' -email '/email' -sms '/sms' -notification '/notification'
+    image: ${LOGIN_TEST_ACCEPTANCE_SINK_TAG:-login-test-acceptance-sink:local}
+    container_name: acceptance-sink
+    build:
+      context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/sink"
+      dockerfile: ../go-command.Dockerfile
+      args:
+        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    environment:
+      PORT: '3333'
+    command:
+      - -port
+      - '3333'
+      - -email
+      - '/email'
+      - -sms
+      - '/sms'
+      - -notification
+      - '/notification'
     ports:
-      - 3333:3333
-    volumes:
-      - "./sink:/sink"
+      - "3333:3333"
     depends_on:
+      setup:
+        condition: "service_completed_successfully"
+
+  oidcrp:
+    user: "${UID:-1000}:${GID:-1000}"
+    image: ${LOGIN_TEST_ACCEPTANCE_OIDCRP_TAG:-login-test-acceptance-oidcrp:local}
+    container_name: acceptance-oidcrp
+    build:
+      context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/oidcrp"
+      dockerfile: ../go-command.Dockerfile
+      args:
+        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    environment:
+      API_URL: 'http://traefik'
+      API_DOMAIN: 'traefik'
+      PAT_FILE: '/pat/zitadel-admin-sa.pat'
+      LOGIN_URL: 'https://traefik/ui/v2/login'
+      ISSUER: 'https://traefik'
+      HOST: 'traefik'
+      PORT: '8000'
+      SCOPES: 'openid profile email'
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./pat:/pat"
+    depends_on:
+      traefik:
+        condition: "service_healthy"
+      setup:
+        condition: "service_completed_successfully"
+
+  oidcop:
+    user: "${UID:-1000}:${GID:-1000}"
+    image: ${LOGIN_TEST_ACCEPTANCE_OIDCOP_TAG:-login-test-acceptance-oidcop:local}
+    container_name: acceptance-oidcop
+    build:
+      context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/idp/oidc"
+      dockerfile: ../../go-command.Dockerfile
+      args:
+        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    environment:
+      API_URL: 'http://traefik'
+      API_DOMAIN: 'traefik'
+      PAT_FILE: '/pat/zitadel-admin-sa.pat'
+      SCHEMA: 'https'
+      HOST: 'traefik'
+      PORT: "8004"
+    ports:
+      - 8004:8004
+    volumes:
+      - "./pat:/pat"
+    depends_on:
+      traefik:
+        condition: "service_healthy"
+      setup:
+        condition: "service_completed_successfully"
+
+  samlsp:
+    user: "${UID:-1000}:${GID:-1000}"
+    image: "${LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG:-login-test-acceptance-samlsp:local}"
+    container_name: acceptance-samlsp
+    build:
+      context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/samlsp"
+      dockerfile: ../go-command.Dockerfile
+      args:
+        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    environment:
+      API_URL: 'http://traefik'
+      API_DOMAIN: 'traefik'
+      PAT_FILE: '/pat/zitadel-admin-sa.pat'
+      LOGIN_URL: 'https://traefik/ui/v2/login'
+      IDP_URL: 'http://zitadel:8080/saml/v2/metadata'
+      HOST: 'https://traefik'
+      PORT: '8001'
+    ports:
+      - 8001:8001
+    volumes:
+      - "./pat:/pat"
+    depends_on:
+      traefik:
+        condition: "service_healthy"
+      setup:
+        condition: "service_completed_successfully"
+
+  samlidp:
+    user: "${UID:-1000}:${GID:-1000}"
+    image: "${LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG:-login-test-acceptance-samlidp:local}"
+    container_name: acceptance-samlidp
+    build:
+      context: "${LOGIN_TEST_ACCEPTANCE_BUILD_CONTEXT:-.}/idp/saml"
+      dockerfile: ../../go-command.Dockerfile
+      args:
+        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    environment:
+      API_URL: 'http://traefik:8080'
+      API_DOMAIN: 'traefik'
+      PAT_FILE: '/pat/zitadel-admin-sa.pat'
+      SCHEMA: 'https'
+      HOST: 'traefik'
+      PORT: "8003"
+    ports:
+      - 8003:8003
+    volumes:
+      - "./pat:/pat"
+    depends_on:
+      traefik:
+        condition: "service_healthy"
       setup:
         condition: "service_completed_successfully"

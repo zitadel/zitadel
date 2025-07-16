@@ -1,3 +1,8 @@
+custom-config.js
+.env*.local
+standalone
+tsconfig.tsbuildinfo
+
 .DS_Store
 node_modules
 .turbo
@@ -7,12 +12,6 @@ dist
 dist-ssr
 *.local
 .env
-server/dist
-public/dist
 .vscode
 .idea
-.vercel
-.env*.local
 /blob-report/
-/out
-/docker

@@ -59,6 +59,56 @@ importers:
         specifier: ^3.1.2
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.16.4)(jiti@1.21.7)(jsdom@26.1.0)(less@4.1.3)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0)
 
+  clients/typescript/zitadel-client:
+    dependencies:
+      '@bufbuild/protobuf':
+        specifier: ^2.2.2
+        version: 2.6.0
+      '@connectrpc/connect':
+        specifier: ^2.0.0
+        version: 2.0.2(@bufbuild/protobuf@2.6.0)
+      '@connectrpc/connect-node':
+        specifier: ^2.0.0
+        version: 2.0.2(@bufbuild/protobuf@2.6.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0))
+      '@connectrpc/connect-web':
+        specifier: ^2.0.0
+        version: 2.0.2(@bufbuild/protobuf@2.6.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0))
+      '@zitadel/proto':
+        specifier: workspace:*
+        version: link:../zitadel-proto
+      jose:
+        specifier: ^5.3.0
+        version: 5.10.0
+    devDependencies:
+      '@bufbuild/buf':
+        specifier: ^1.53.0
+        version: 1.55.1
+      '@bufbuild/protocompile':
+        specifier: ^0.0.1
+        version: 0.0.1(@bufbuild/buf@1.55.1)
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.15.0
+        version: 8.37.0(@typescript-eslint/parser@8.37.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.35.1
+        version: 8.37.0(eslint@8.57.1)(typescript@5.8.3)
+      eslint:
+        specifier: ^8.57.0
+        version: 8.57.1
+      tsup:
+        specifier: ^8.4.0
+        version: 8.5.0(@swc/core@1.12.14)(jiti@1.21.7)(postcss@8.5.6)(typescript@5.8.3)(yaml@2.8.0)
+
+  clients/typescript/zitadel-proto:
+    dependencies:
+      '@bufbuild/protobuf':
+        specifier: ^2.2.2
+        version: 2.6.0
+    devDependencies:
+      '@bufbuild/buf':
+        specifier: ^1.53.0
+        version: 1.55.1
+
   console:
     dependencies:
       '@angular/animations':
@@ -123,10 +173,10 @@ importers:
         version: 15.0.0(@angular/common@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2))(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2)
       '@zitadel/client':
         specifier: workspace:*
-        version: link:../login/packages/zitadel-client
+        version: link:../clients/typescript/zitadel-client
       '@zitadel/proto':
         specifier: workspace:*
-        version: link:../login/packages/zitadel-proto
+        version: link:../clients/typescript/zitadel-proto
       angular-oauth2-oidc:
         specifier: ^15.0.1
         version: 15.0.1(@angular/common@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2))(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))
@@ -413,7 +463,7 @@ importers:
         specifier: ^13.13.3
         version: 13.17.0
 
-  login/apps/login:
+  login:
     dependencies:
       '@headlessui/react':
         specifier: ^2.1.9
@@ -429,10 +479,10 @@ importers:
         version: 1.5.0(next@15.4.0-canary.86(@babel/core@7.28.0)(@playwright/test@1.54.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.89.2))(react@19.1.0)
       '@zitadel/client':
         specifier: workspace:*
-        version: link:../../packages/zitadel-client
+        version: link:../clients/typescript/zitadel-client
       '@zitadel/proto':
         specifier: workspace:*
-        version: link:../../packages/zitadel-proto
+        version: link:../clients/typescript/zitadel-proto
       clsx:
         specifier: 1.2.1
         version: 1.2.1
@@ -570,7 +620,7 @@ importers:
         specifier: ^2.0.0
         version: 2.1.9(@types/node@22.16.4)(jsdom@26.1.0)(less@4.1.3)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)
 
-  login/apps/login-test-acceptance:
+  login/acceptance:
     devDependencies:
       '@faker-js/faker':
         specifier: ^9.7.0
@@ -594,7 +644,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  login/apps/login-test-integration:
+  login/integration:
     devDependencies:
       '@types/node':
         specifier: ^22.14.1
@@ -617,56 +667,6 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
-
-  login/packages/zitadel-client:
-    dependencies:
-      '@bufbuild/protobuf':
-        specifier: ^2.2.2
-        version: 2.6.0
-      '@connectrpc/connect':
-        specifier: ^2.0.0
-        version: 2.0.2(@bufbuild/protobuf@2.6.0)
-      '@connectrpc/connect-node':
-        specifier: ^2.0.0
-        version: 2.0.2(@bufbuild/protobuf@2.6.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0))
-      '@connectrpc/connect-web':
-        specifier: ^2.0.0
-        version: 2.0.2(@bufbuild/protobuf@2.6.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0))
-      '@zitadel/proto':
-        specifier: workspace:*
-        version: link:../zitadel-proto
-      jose:
-        specifier: ^5.3.0
-        version: 5.10.0
-    devDependencies:
-      '@bufbuild/buf':
-        specifier: ^1.53.0
-        version: 1.55.1
-      '@bufbuild/protocompile':
-        specifier: ^0.0.1
-        version: 0.0.1(@bufbuild/buf@1.55.1)
-      '@typescript-eslint/eslint-plugin':
-        specifier: ^8.15.0
-        version: 8.37.0(@typescript-eslint/parser@8.37.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
-      '@typescript-eslint/parser':
-        specifier: ^8.35.1
-        version: 8.37.0(eslint@8.57.1)(typescript@5.8.3)
-      eslint:
-        specifier: ^8.57.0
-        version: 8.57.1
-      tsup:
-        specifier: ^8.4.0
-        version: 8.5.0(@swc/core@1.12.14)(jiti@1.21.7)(postcss@8.5.6)(typescript@5.8.3)(yaml@2.8.0)
-
-  login/packages/zitadel-proto:
-    dependencies:
-      '@bufbuild/protobuf':
-        specifier: ^2.2.2
-        version: 2.6.0
-    devDependencies:
-      '@bufbuild/buf':
-        specifier: ^1.53.0
-        version: 1.55.1
 
 packages:
 
@@ -19225,11 +19225,11 @@ snapshots:
   '@npmcli/fs@2.1.2':
     dependencies:
       '@gar/promisify': 1.1.3
-      semver: 7.5.4
+      semver: 7.7.2
 
   '@npmcli/fs@3.1.1':
     dependencies:
-      semver: 7.5.4
+      semver: 7.7.2
 
   '@npmcli/git@4.1.0':
     dependencies:
@@ -19239,7 +19239,7 @@ snapshots:
       proc-log: 3.0.0
       promise-inflight: 1.0.1
       promise-retry: 2.0.1
-      semver: 7.5.4
+      semver: 7.7.2
       which: 3.0.1
     transitivePeerDependencies:
       - bluebird
@@ -24042,7 +24042,7 @@ snapshots:
     dependencies:
       '@next/eslint-plugin-next': 15.4.0-canary.86
       '@rushstack/eslint-patch': 1.12.0
-      '@typescript-eslint/eslint-plugin': 7.18.0(@typescript-eslint/parser@8.37.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/eslint-plugin': 8.37.0(@typescript-eslint/parser@8.37.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
       '@typescript-eslint/parser': 8.37.0(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
@@ -24926,7 +24926,7 @@ snapshots:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 3.0.5
+      minimatch: 3.1.2
       once: 1.4.0
       path-is-absolute: 1.0.1
 
@@ -24976,7 +24976,7 @@ snapshots:
   globby@13.2.2:
     dependencies:
       dir-glob: 3.0.1
-      fast-glob: 3.3.1
+      fast-glob: 3.3.3
       ignore: 5.3.2
       merge2: 1.4.1
       slash: 4.0.0
@@ -28000,7 +28000,7 @@ snapshots:
       nopt: 6.0.0
       npmlog: 6.0.2
       rimraf: 3.0.2
-      semver: 7.5.4
+      semver: 7.7.2
       tar: 6.2.1
       which: 2.0.2
     transitivePeerDependencies:
@@ -28045,7 +28045,7 @@ snapshots:
     dependencies:
       hosted-git-info: 6.1.3
       is-core-module: 2.16.1
-      semver: 7.5.4
+      semver: 7.7.2
       validate-npm-package-license: 3.0.4
 
   normalize-path@3.0.0: {}
@@ -28060,7 +28060,7 @@ snapshots:
 
   npm-install-checks@6.3.0:
     dependencies:
-      semver: 7.5.4
+      semver: 7.7.2
 
   npm-normalize-package-bin@3.0.1: {}
 
