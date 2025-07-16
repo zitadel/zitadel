@@ -276,6 +276,7 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail b
 		}
 	}
 
+	// because users can choose their own IDs, we must check that an org with the same ID does not already exist
 	existingOrg, err := c.getOrgWriteModelByID(ctx, o.OrgID)
 	if err != nil {
 		return nil, err
@@ -339,6 +340,8 @@ func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
+
+	// because users can choose their own IDs, we must check that an org with the same ID does not already exist
 	if existingOrg.State != domain.OrgStateRemoved && existingOrg.State != domain.OrgStateUnspecified {
 		return nil, zerrors.ThrowAlreadyExists(nil, "ORG-lapo2n", "Errors.Org.AlreadyExisting")
 	}
