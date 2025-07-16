@@ -43,7 +43,7 @@ func (c *pgxConn) Query(ctx context.Context, sql string, args ...any) (database.
 // QueryRow implements sql.Client.
 // Subtle: this method shadows the method (*Conn).QueryRow of pgxConn.Conn.
 func (c *pgxConn) QueryRow(ctx context.Context, sql string, args ...any) database.Row {
-	return c.Conn.QueryRow(ctx, sql, args...)
+	return &Row{c.Conn.QueryRow(ctx, sql, args...)}
 }
 
 // Exec implements [database.Pool].
