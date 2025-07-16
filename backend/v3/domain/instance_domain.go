@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
@@ -23,6 +24,13 @@ type AddInstanceDomain struct {
 	IsVerified       bool                   `json:"isVerified,omitempty" db:"is_verified"`
 	IsPrimary        bool                   `json:"isPrimary,omitempty" db:"is_primary"`
 	VerificationType DomainVerificationType `json:"verificationType,omitempty" db:"verification_type"`
+
+	// CreatedAt is the time when the domain was added.
+	// It is set by the repository and should not be set by the caller.
+	CreatedAt time.Time `json:"createdAt,omitzero" db:"created_at"`
+	// UpdatedAt is the time when the domain was last updated.
+	// It is set by the repository and should not be set by the caller.
+	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
 type instanceDomainColumns interface {
@@ -47,7 +55,7 @@ type InstanceDomainRepository interface {
 	// Add adds a new domain to the instance.
 	Add(ctx context.Context, domain *AddInstanceDomain) error
 	// Update updates an existing domain in the instance.
-	Update(ctx context.Context, condition database.Condition, changes ...database.Change) error
+	Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error)
 	// Remove removes a domain from the instance.
-	Remove(ctx context.Context, condition database.Condition) error
+	Remove(ctx context.Context, condition database.Condition) (int64, error)
 }

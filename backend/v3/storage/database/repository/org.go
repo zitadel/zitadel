@@ -113,7 +113,7 @@ func checkCreateOrgErr(err error) error {
 }
 
 // Update implements [domain.OrganizationRepository].
-func (o org) Update(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, changes ...database.Change) (int64, error) {
+func (o *org) Update(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, changes ...database.Change) (int64, error) {
 	if changes == nil {
 		return 0, errors.New("Update must contain a condition") // (otherwise ALL organizations will be updated)
 	}
@@ -133,7 +133,7 @@ func (o org) Update(ctx context.Context, id domain.OrgIdentifierCondition, insta
 }
 
 // Delete implements [domain.OrganizationRepository].
-func (o org) Delete(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string) (int64, error) {
+func (o *org) Delete(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string) (int64, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(`DELETE FROM zitadel.organizations`)
@@ -230,9 +230,6 @@ func scanOrganization(ctx context.Context, querier database.Querier, builder *da
 
 	organization := &domain.Organization{}
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(organization); err != nil {
-		if err.Error() == "no rows in result set" {
-			return nil, ErrResourceDoesNotExist
-		}
 		return nil, err
 	}
 
