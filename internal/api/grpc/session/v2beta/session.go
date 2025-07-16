@@ -12,7 +12,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -90,7 +89,7 @@ func (s *Server) SetSession(ctx context.Context, req *connect.Request[session.Se
 		return nil, err
 	}
 
-	set, err := s.command.UpdateSession(ctx, req.Msg.GetSessionId(), cmds, req.Msg.GetMetadata(), req.Msg.GetLifetime().AsDuration())
+	set, err := s.command.UpdateSession(ctx, req.Msg.GetSessionId(), req.Msg.GetSessionToken(), cmds, req.Msg.GetMetadata(), req.Msg.GetLifetime().AsDuration())
 	if err != nil {
 		return nil, err
 	}
@@ -256,18 +255,13 @@ func listSessionsRequestToQuery(ctx context.Context, req *session.ListSessionsRe
 }
 
 func sessionQueriesToQuery(ctx context.Context, queries []*session.SearchQuery) (_ []query.SearchQuery, err error) {
-	q := make([]query.SearchQuery, len(queries)+1)
+	q := make([]query.SearchQuery, len(queries))
 	for i, v := range queries {
 		q[i], err = sessionQueryToQuery(v)
 		if err != nil {
 			return nil, err
 		}
 	}
-	creatorQuery, err := query.NewSessionCreatorSearchQuery(authz.GetCtxData(ctx).UserID)
-	if err != nil {
-		return nil, err
-	}
-	q[len(queries)] = creatorQuery
 	return q, nil
 }
 

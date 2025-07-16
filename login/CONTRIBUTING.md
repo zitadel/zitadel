@@ -20,6 +20,18 @@ you have [more contact options on our Website](https://zitadel.com/contact).
 
 ## Pull Requests
 
+The repository zitadel/typescript is a read-only mirror of the git subtree at zitadel/zitadel/login.
+To submit changes, please open a Pull Request [in the zitadel/zitadel repository](https://github.com/zitadel/zitadel/compare).
+
+If you already made changes based on the zitadel/typescript repository, these changes are not lost.
+Submitting them to the main repository is easy:
+
+1. [Fork zitadel/zitadel](https://github.com/zitadel/zitadel/fork)
+1. Clone your Zitadel fork git clone https://github.com/<your-owner>/zitadel.git
+1. Change directory to your Zitadel forks root.
+1. Pull your changes into the Zitadel fork by running make login_pull LOGIN_REMOTE_URL=https://github.com/<your-owner>/typescript.git LOGIN_REMOTE_BRANCH=<your-typescript-fork-branch>.
+1. Push your changes and [open a pull request to zitadel/zitadel](https://github.com/zitadel/zitadel/compare)
+
 Please consider the following guidelines when creating a pull request.
 
 - The latest changes are always in `main`, so please make your pull request against that branch.

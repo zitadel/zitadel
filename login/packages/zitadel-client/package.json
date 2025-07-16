@@ -46,11 +46,8 @@
     "build": "pnpm exec tsup",
     "build:client:standalone": "pnpm build",
     "test": "pnpm test:unit",
-    "test:watch": "pnpm test:unit:watch",
     "test:unit": "pnpm exec vitest",
     "test:unit:standalone": "pnpm test:unit",
-    "test:unit:watch": "pnpm exec vitest --watch",
-    "dev": "pnpm exec tsup --watch --dts",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
@@ -67,6 +64,7 @@
     "@bufbuild/buf": "^1.53.0",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
-    "eslint": "^8.57.0"
+    "eslint": "^8.57.0",
+    "tsup": "^8.4.0"
   }
 }
