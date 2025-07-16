@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       ignore-run-cache:
-        description: 'Ignore run caches'
+        description: "Ignore run caches"
         type: boolean
         required: true
       node_version:
@@ -44,7 +44,16 @@ jobs:
         run: |
           tar -xvf .artifacts/zitadel-linux-amd64.tar.gz
           mv zitadel-linux-amd64/zitadel ./zitadel
-      - run: make login_quality
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run login quality checks with Turbo
+        run: pnpm turbo test:unit --filter=@zitadel/login
         env:
           DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
           LOGIN_BAKE_CLI: depot bake

@@ -10,7 +10,7 @@ import {
 } from "@/lib/zitadel";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { getLocale } from "next-intl/server";
+// import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
 
@@ -33,7 +33,6 @@ export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
   const searchParams = await props.searchParams;
-  const locale = getLocale();
 
   const requestId = searchParams?.requestId;
   const organization = searchParams?.organization;
@@ -78,11 +77,11 @@ export default async function Page(props: {
           <Translated i18nKey="description" namespace="accounts" />
         </p>
 
-        <div className="flex flex-col w-full space-y-2">
+        <div className="flex w-full flex-col space-y-2">
           <SessionsList sessions={sessions} requestId={requestId} />
           <Link href={`/loginname?` + params}>
-            <div className="flex flex-row items-center py-3 px-4 hover:bg-black/10 dark:hover:bg-white/10 rounded-md transition-all">
-              <div className="w-8 h-8 mr-4 flex flex-row justify-center items-center rounded-full bg-black/5 dark:bg-white/5">
+            <div className="flex flex-row items-center rounded-md px-4 py-3 transition-all hover:bg-black/10 dark:hover:bg-white/10">
+              <div className="mr-4 flex h-8 w-8 flex-row items-center justify-center rounded-full bg-black/5 dark:bg-white/5">
                 <UserPlusIcon className="h-5 w-5" />
               </div>
               <span className="text-sm">

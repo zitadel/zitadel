@@ -4,7 +4,7 @@ export const Spinner: FC<{ className?: string }> = ({ className = "" }) => {
   return (
     <svg
       role="status"
-      className={`${className} inline-block animate-spin fill-primary-light-500 dark:fill-primary-dark-500 text-black/10 dark:text-white/10`}
+      className={`${className} inline-block animate-spin fill-primary-light-500 text-black/10 dark:fill-primary-dark-500 dark:text-white/10`}
       viewBox="0 0 100 101"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

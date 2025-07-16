@@ -194,7 +194,7 @@ Errors:
     AlreadyExists: Instanz exisitiert bereits
     NotChanged: Instanz wurde nicht verändert
   Org:
-    AlreadyExists: Organisationsname existiert bereits
+    AlreadyExists: Der Name oder die ID der Organisation ist bereits vorhanden
     Invalid: Organisation ist ungültig
     AlreadyDeactivated: Organisation ist bereits deaktiviert
     AlreadyActive: Organisation ist bereits aktiv

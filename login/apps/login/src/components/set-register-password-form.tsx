@@ -108,7 +108,7 @@ export function SetRegisterPasswordForm({
 
   return (
     <form className="w-full">
-      <div className="pt-4 grid grid-cols-1 gap-4 mb-4">
+      <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
         <div className="">
           <TextInput
             type="password"
@@ -161,7 +161,7 @@ export function SetRegisterPasswordForm({
           onClick={handleSubmit(submitRegister)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
           <Translated i18nKey="password.submit" namespace="register" />
         </Button>
       </div>

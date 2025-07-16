@@ -11,7 +11,7 @@ function GitHubLogo() {
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 1024 1024"
-        className="h-8 w-8 hidden dark:block"
+        className="hidden h-8 w-8 dark:block"
       >
         <path
           fill="#fafafa"
@@ -24,7 +24,7 @@ function GitHubLogo() {
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 1024 1024"
-        className="h-8 w-8 block dark:hidden"
+        className="block h-8 w-8 dark:hidden"
       >
         <path
           fill="#1B1F23"
