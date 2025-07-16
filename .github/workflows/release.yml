@@ -192,7 +192,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           version: ${{ needs.version.outputs.version }}
-          cwd: login
+          cwd: clients/typescript
+          createGithubReleases: false
 
   typescript-repo:
     runs-on: ubuntu-latest
