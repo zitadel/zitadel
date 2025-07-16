@@ -20,14 +20,14 @@ type Organization struct {
 	Name       string     `json:"name,omitempty" db:"name"`
 	InstanceID string     `json:"instanceId,omitempty" db:"instance_id"`
 	State      string     `json:"state,omitempty" db:"state"`
-	CreatedAt  time.Time  `json:"createdAt,omitempty" db:"created_at"`
-	UpdatedAt  time.Time  `json:"updatedAt,omitempty" db:"updated_at"`
+	CreatedAt  time.Time  `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt  time.Time  `json:"updatedAt,omitzero" db:"updated_at"`
 	DeletedAt  *time.Time `json:"deletedAt,omitempty" db:"deleted_at"`
 }
 
 // OrgIdentifierCondition is used to help specify a single Organization,
 // it will either be used as the organization ID or organization name,
-// as organizations can be identified either using (instnaceID + ID) OR (instanceID + name)
+// as organizations can be identified either using (instanceID + ID) OR (instanceID + name)
 type OrgIdentifierCondition interface {
 	database.Condition
 }
@@ -82,6 +82,9 @@ type OrganizationRepository interface {
 	Create(ctx context.Context, instance *Organization) error
 	Update(ctx context.Context, id OrgIdentifierCondition, instance_id string, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, id OrgIdentifierCondition, instance_id string) (int64, error)
+
+	// Domains returns the domain sub repository for the organization.
+	Domains() OrganizationDomainRepository
 }
 
 type CreateOrganization struct {

@@ -15,6 +15,8 @@ var _ domain.InstanceRepository = (*instance)(nil)
 
 type instance struct {
 	repository
+	shouldJoinDomains bool
+	domainRepo        domain.InstanceDomainRepository
 }
 
 func InstanceRepository(client database.QueryExecutor) domain.InstanceRepository {
@@ -243,4 +245,23 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 	}
 
 	return instances, nil
+}
+
+// -------------------------------------------------------------
+// sub repositories
+// -------------------------------------------------------------
+
+// Domains implements [domain.InstanceRepository].
+func (i *instance) Domains() domain.InstanceDomainRepository {
+	i.shouldJoinDomains = true
+
+	if i.domainRepo != nil {
+		return i.domainRepo
+	}
+
+	i.domainRepo = &instanceDomain{
+		repository: i.repository,
+		instance:   i,
+	}
+	return i.domainRepo
 }

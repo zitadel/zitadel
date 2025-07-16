@@ -18,7 +18,9 @@ import (
 var _ domain.OrganizationRepository = (*org)(nil)
 
 type org struct {
+	shouldJoinDomains bool
 	repository
+	domainRepo domain.OrganizationDomainRepository
 }
 
 func OrganizationRepository(client database.QueryExecutor) domain.OrganizationRepository {
@@ -229,6 +231,10 @@ func (org) DeletedAtColumn() database.Column {
 	return database.NewColumn("deleted_at")
 }
 
+// -------------------------------------------------------------
+// scanners
+// -------------------------------------------------------------
+
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
@@ -263,4 +269,23 @@ func scanOrganizations(ctx context.Context, querier database.Querier, builder *d
 		return nil, err
 	}
 	return organizations, nil
+}
+
+// -------------------------------------------------------------
+// sub repositories
+// -------------------------------------------------------------
+
+func (o *org) Domains() domain.OrganizationDomainRepository {
+	o.shouldJoinDomains = true
+
+	if o.domainRepo != nil {
+		return o.domainRepo
+	}
+
+	o.domainRepo = &orgDomain{
+		repository: o.repository,
+		org:        o,
+	}
+
+	return o.domainRepo
 }
