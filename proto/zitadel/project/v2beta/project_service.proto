@@ -673,7 +673,7 @@ service ProjectService {
   // Adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
   //
   // Required permission:
-  //  - `org.write`
+  //  - `project.write`
   rpc SetProjectMetadata(SetProjectMetadataRequest) returns (SetProjectMetadataResponse) {
     option (google.api.http) = {
       post: "/v2beta/projects/{project_id}/metadata"
@@ -682,7 +682,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "project.write"
       }
     };
 
@@ -728,7 +728,7 @@ service ProjectService {
   // Delete metadata objects from an project with a specific key.
   //
   // Required permission:
-  //  - `org.write`
+  //  - `project.write`
   rpc DeleteProjectMetadata(DeleteProjectMetadataRequest) returns (DeleteProjectMetadataResponse) {
       option (google.api.http) = {
           delete: "/v2beta/projects/{project_id}/metadata"
@@ -736,7 +736,7 @@ service ProjectService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "org.write"
+        permission: "project.write"
       }
     };
 
