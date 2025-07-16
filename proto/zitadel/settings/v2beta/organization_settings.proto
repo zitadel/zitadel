@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package zitadel.settings.v2beta;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta;settings";
+
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "zitadel/filter/v2beta/filter.proto";
+
+message OrganizationSettings {
+  // The unique identifier of the organization the settings belong to.
+  string organization_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The timestamp of the organization settings creation.
+  google.protobuf.Timestamp creation_date = 2[
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The timestamp of the last change to the organization settings.
+  google.protobuf.Timestamp change_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+  // Defines if the usernames have to be unique in the organization context.
+  bool organization_scoped_usernames = 4;
+}
+
+enum OrganizationSettingsFieldName {
+  ORGANIZATION_SETTINGS_FIELD_NAME_UNSPECIFIED = 0;
+  ORGANIZATION_SETTINGS_FIELD_NAME_ORGANIZATION_ID = 1;
+  ORGANIZATION_SETTINGS_FIELD_NAME_CREATION_DATE = 2;
+  ORGANIZATION_SETTINGS_FIELD_NAME_CHANGE_DATE = 3;
+}
+
+message OrganizationSettingsSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    zitadel.filter.v2beta.InIDsFilter in_organization_ids_filter = 1;
+    OrganizationScopedUsernamesFilter organization_scoped_usernames_filter = 2;
+  }
+}
+
+// Query for organization settings with specific scopes usernames.
+message OrganizationScopedUsernamesFilter {
+  bool organization_scoped_usernames = 1;
+}
