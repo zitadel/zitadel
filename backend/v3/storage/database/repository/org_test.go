@@ -2,7 +2,6 @@ package repository_test
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"time"
 
@@ -29,7 +28,7 @@ func TestCreateOrganization(t *testing.T) {
 	}
 	instanceRepo := repository.InstanceRepository(pool)
 	err := instanceRepo.Create(t.Context(), &instance)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	tests := []struct {
 		name         string
@@ -64,7 +63,7 @@ func TestCreateOrganization(t *testing.T) {
 				}
 				return organization
 			}(),
-			err: errors.New("organization name not provided"),
+			err: new(database.CheckErr),
 		},
 		{
 			name: "adding org with same id twice",
@@ -86,7 +85,7 @@ func TestCreateOrganization(t *testing.T) {
 				org.Name = gofakeit.Name()
 				return &org
 			},
-			err: errors.New("organization id already exists"),
+			err: new(database.UniqueErr),
 		},
 		{
 			name: "adding org with same name twice",
@@ -108,7 +107,7 @@ func TestCreateOrganization(t *testing.T) {
 				org.ID = gofakeit.Name()
 				return &org
 			},
-			err: errors.New("organization name already exists for instance"),
+			err: new(database.UniqueErr),
 		},
 		func() struct {
 			name         string
@@ -181,7 +180,7 @@ func TestCreateOrganization(t *testing.T) {
 				}
 				return organization
 			}(),
-			err: errors.New("organization id not provided"),
+			err: new(database.CheckErr),
 		},
 		{
 			name: "adding organization with no instance id",
@@ -195,7 +194,7 @@ func TestCreateOrganization(t *testing.T) {
 				}
 				return organization
 			}(),
-			err: errors.New("invalid instance id"),
+			err: new(database.ForeignKeyErr),
 		},
 		{
 			name: "adding organization with non existent instance id",
@@ -210,7 +209,7 @@ func TestCreateOrganization(t *testing.T) {
 				}
 				return organization
 			}(),
-			err: errors.New("invalid instance id"),
+			err: new(database.ForeignKeyErr),
 		},
 	}
 	for _, tt := range tests {
@@ -228,7 +227,7 @@ func TestCreateOrganization(t *testing.T) {
 			// create organization
 			beforeCreate := time.Now()
 			err = organizationRepo.Create(ctx, organization)
-			assert.Equal(t, tt.err, err)
+			assert.ErrorIs(t, err, tt.err)
 			if err != nil {
 				return
 			}
@@ -265,7 +264,7 @@ func TestUpdateOrganization(t *testing.T) {
 	}
 	instanceRepo := repository.InstanceRepository(pool)
 	err := instanceRepo.Create(t.Context(), &instance)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	organizationRepo := repository.OrganizationRepository(pool)
 
 	tests := []struct {
@@ -417,7 +416,7 @@ func TestGetOrganization(t *testing.T) {
 	}
 	instanceRepo := repository.InstanceRepository(pool)
 	err := instanceRepo.Create(t.Context(), &instance)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	orgRepo := repository.OrganizationRepository(pool)
 
@@ -497,7 +496,7 @@ func TestGetOrganization(t *testing.T) {
 				return &org
 			},
 			orgIdentifierCondition: orgRepo.NameCondition("non-existent-instance-name"),
-			err:                    repository.ErrResourceDoesNotExist,
+			err:                    new(database.ErrNoRowFound),
 		},
 	}
 	for _, tt := range tests {
@@ -516,7 +515,7 @@ func TestGetOrganization(t *testing.T) {
 				org.InstanceID,
 			)
 			if tt.err != nil {
-				require.Equal(t, tt.err, err)
+				require.ErrorIs(t, tt.err, err)
 				return
 			}
 
@@ -553,7 +552,7 @@ func TestListOrganization(t *testing.T) {
 	}
 	instanceRepo := repository.InstanceRepository(pool)
 	err = instanceRepo.Create(ctx, &instance)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	type test struct {
 		name                   string
@@ -800,7 +799,7 @@ func TestDeleteOrganization(t *testing.T) {
 	}
 	instanceRepo := repository.InstanceRepository(pool)
 	err := instanceRepo.Create(t.Context(), &instance)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	type test struct {
 		name                   string
@@ -933,7 +932,7 @@ func TestDeleteOrganization(t *testing.T) {
 				tt.orgIdentifierCondition,
 				instanceId,
 			)
-			require.Equal(t, err, repository.ErrResourceDoesNotExist)
+			require.ErrorIs(t, err, new(database.ErrNoRowFound))
 			assert.Nil(t, organization)
 		})
 	}
