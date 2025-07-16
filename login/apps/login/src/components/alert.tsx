@@ -26,7 +26,7 @@ export function Alert({ children, type = AlertType.ALERT }: Props) {
   return (
     <div
       className={clsx(
-        "flex flex-row items-center justify-center border rounded-md py-2 pr-2 scroll-px-40",
+        "flex scroll-px-40 flex-row items-center justify-center rounded-md border py-2 pr-2",
         {
           [yellow]: type === AlertType.ALERT,
           [neutral]: type === AlertType.INFO,
@@ -34,12 +34,12 @@ export function Alert({ children, type = AlertType.ALERT }: Props) {
       )}
     >
       {type === AlertType.ALERT && (
-        <ExclamationTriangleIcon className="flex-shrink-0 h-5 w-5 mr-2 ml-2" />
+        <ExclamationTriangleIcon className="ml-2 mr-2 h-5 w-5 flex-shrink-0" />
       )}
       {type === AlertType.INFO && (
-        <InformationCircleIcon className="flex-shrink-0 h-5 w-5 mr-2 ml-2" />
+        <InformationCircleIcon className="ml-2 mr-2 h-5 w-5 flex-shrink-0" />
       )}
-      <span className="text-sm w-full ">{children}</span>
+      <span className="w-full text-sm">{children}</span>
     </div>
   );
 }

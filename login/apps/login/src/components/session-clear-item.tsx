@@ -52,7 +52,7 @@ export function SessionClearItem({
           reload();
         });
       }}
-      className="group flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
+      className="group flex flex-row items-center rounded-md border border-divider-light bg-background-light-400 px-4 py-2 transition-all hover:shadow-lg dark:bg-background-dark-400 dark:hover:bg-white/10"
     >
       <div className="pr-4">
         <Avatar
@@ -64,11 +64,11 @@ export function SessionClearItem({
 
       <div className="flex flex-col items-start overflow-hidden">
         <span className="">{session.factors?.user?.displayName}</span>
-        <span className="text-xs opacity-80 text-ellipsis">
+        <span className="text-ellipsis text-xs opacity-80">
           {session.factors?.user?.loginName}
         </span>
         {valid ? (
-          <span className="text-xs opacity-80 text-ellipsis">
+          <span className="text-ellipsis text-xs opacity-80">
             {verifiedAt && (
               <Translated
                 i18nKey="verfiedAt"
@@ -79,7 +79,7 @@ export function SessionClearItem({
           </span>
         ) : (
           verifiedAt && (
-            <span className="text-xs opacity-80 text-ellipsis">
+            <span className="text-ellipsis text-xs opacity-80">
               expired{" "}
               {session.expirationDate &&
                 moment(timestampDate(session.expirationDate)).fromNow()}
@@ -90,14 +90,14 @@ export function SessionClearItem({
 
       <span className="flex-grow"></span>
       <div className="relative flex flex-row items-center">
-        <div className="mr-6 px-2 py-[2px] text-xs hidden group-hover:block transition-all text-warn-light-500 dark:text-warn-dark-500 bg-[#ff0000]/10 dark:bg-[#ff0000]/10 rounded-full flex items-center justify-center">
+        <div className="mr-6 flex hidden items-center justify-center rounded-full bg-[#ff0000]/10 px-2 py-[2px] text-xs text-warn-light-500 transition-all group-hover:block dark:bg-[#ff0000]/10 dark:text-warn-dark-500">
           <Translated i18nKey="clear" namespace="logout" />
         </div>
 
         {valid ? (
-          <div className="absolute h-2 w-2 bg-green-500 rounded-full mx-2 transform right-0 transition-all"></div>
+          <div className="absolute right-0 mx-2 h-2 w-2 transform rounded-full bg-green-500 transition-all"></div>
         ) : (
-          <div className="absolute h-2 w-2 bg-red-500 rounded-full mx-2 transform right-0 transition-all"></div>
+          <div className="absolute right-0 mx-2 h-2 w-2 transform rounded-full bg-red-500 transition-all"></div>
         )}
       </div>
     </button>

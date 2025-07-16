@@ -79,7 +79,7 @@ export default async function Page(props: {
         ></UsernameForm>
 
         {identityProviders && loginSettings?.allowExternalIdp && (
-          <div className="w-full pt-6 pb-4">
+          <div className="w-full pb-4 pt-6">
             <SignInWithIdp
               identityProviders={identityProviders}
               requestId={requestId}

@@ -72,7 +72,7 @@ export default async function Page(props: {
           <Translated i18nKey="description" namespace="logout" />
         </p>
 
-        <div className="flex flex-col w-full space-y-2">
+        <div className="flex w-full flex-col space-y-2">
           <SessionsClearList
             sessions={sessions}
             logoutHint={logoutHint}
