@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "dev": "node prebuild.development.js && ng serve",
     "start": "node prebuild.development.js && ng serve",
     "build": "ng build --configuration production --base-href=/ui/console/",
-    "prelint": "npm run generate",
     "lint": "ng lint && prettier --check src",
     "lint:fix": "prettier --write src",
-    "generate": "buf generate ../proto --include-imports --include-wkt"
+    "generate": "pnpm exec buf generate ../proto --include-imports --include-wkt"
   },
   "private": true,
   "dependencies": {
@@ -24,6 +24,7 @@
     "@angular/platform-browser-dynamic": "^16.2.12",
     "@angular/router": "^16.2.12",
     "@angular/service-worker": "^16.2.12",
+    "@bufbuild/protobuf": "^2.2.2",
     "@connectrpc/connect": "^2.0.0",
     "@connectrpc/connect-web": "^2.0.0",
     "@ctrl/ngx-codemirror": "^6.1.0",
@@ -34,8 +35,8 @@
     "@ng-icons/heroicons": "^25.0.0",
     "@ngx-translate/core": "^15.0.0",
     "@tanstack/angular-query-experimental": "^5.75.4",
-    "@zitadel/client": "1.2.0",
-    "@zitadel/proto": "1.2.0",
+    "@zitadel/client": "workspace:*",
+    "@zitadel/proto": "workspace:*",
     "angular-oauth2-oidc": "^15.0.1",
     "angularx-qrcode": "^16.0.2",
     "buffer": "^6.0.3",

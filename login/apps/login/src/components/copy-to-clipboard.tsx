@@ -27,7 +27,7 @@ export function CopyToClipboard({ value }: Props) {
       <button
         id="tooltip-ctc"
         type="button"
-        className=" text-primary-light-500 dark:text-primary-dark-500"
+        className="text-primary-light-500 dark:text-primary-dark-500"
         onClick={() => setCopied(true)}
       >
         {!copied ? (

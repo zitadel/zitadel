@@ -2,8 +2,7 @@
   "extends": ["//"],
   "tasks": {
     "generate": {
-      "outputs": ["zitadel/**"],
-      "cache": false
+      "outputs": ["zitadel/**"]
     }
   }
 }

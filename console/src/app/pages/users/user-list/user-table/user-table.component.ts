@@ -44,10 +44,10 @@ import { ListUsersRequestSchema, ListUsersResponse } from '@zitadel/proto/zitade
 import { UserState as UserStateV1 } from 'src/app/proto/generated/zitadel/user_pb';
 import { NewOrganizationService } from 'src/app/services/new-organization.service';
 
-type Query = Exclude<
-  Exclude<MessageInitShape<typeof ListUsersRequestSchema>['queries'], undefined>[number]['query'],
-  undefined
->;
+type ListUsersRequest = MessageInitShape<typeof ListUsersRequestSchema>;
+type QueriesArray = NonNullable<ListUsersRequest['queries']>;
+type QueryWrapper = QueriesArray extends readonly (infer T)[] ? T : never;
+type Query = NonNullable<QueryWrapper extends { query?: infer Q } ? Q : never>;
 
 @Component({
   selector: 'cnsl-user-table',

@@ -143,7 +143,7 @@ export class FeaturesComponent {
     }, {});
 
     // to save special flags they have to be handled here
-    req.loginV2 = {
+    req['loginV2'] = {
       required: newToggleStates.loginV2.enabled,
       baseUri: newToggleStates.loginV2.baseUri,
     };
