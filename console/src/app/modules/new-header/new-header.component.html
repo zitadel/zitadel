@@ -5,8 +5,11 @@
       cdkOverlayOrigin
       #instanceTrigger="cdkOverlayOrigin"
       (click)="isInstanceDropdownOpen.set(!isInstanceDropdownOpen())"
-      >{{ instance.name }}</cnsl-header-button
     >
+      <a class="new-header-breadcrumb" matRipple [matRippleUnbounded]="false" [routerLink]="bread.routerLink">
+        {{ instance.name }}
+      </a>
+    </cnsl-header-button>
     <cnsl-header-dropdown
       [trigger]="instanceTrigger"
       [isOpen]="isInstanceDropdownOpen()"
