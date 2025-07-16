@@ -152,3 +152,68 @@ func (q *Queries) GetWebKeySet(ctx context.Context) (_ *jose.JSONWebKeySet, err 
 	}
 	return &jose.JSONWebKeySet{Keys: keys}, nil
 }
+// GetActiveWebKey gets the current active signing key with caching.
+func (q *Queries) GetActiveWebKey(ctx context.Context) (webKey *jose.JSONWebKey, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	instanceID := authz.GetInstance(ctx).InstanceID()
+
+	// Try cache first
+	if q.caches != nil && q.caches.webkeyActiveSigningKey != nil {
+		cacheEntry, ok := q.caches.webkeyActiveSigningKey.Get(ctx, webkeyActiveSigningKeyCacheInstanceIndex, instanceID)
+		if ok {
+			return cacheEntry.webKey, nil
+		}
+	}
+
+	// Cache miss - fetch from database using existing method
+	webKey, err = q.GetActiveSigningWebKey(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set cache
+	if q.caches != nil && q.caches.webkeyActiveSigningKey != nil {
+		entry := &webkeyActiveSigningKeyCacheEntry{
+			instanceID: instanceID,
+			webKey:     webKey,
+		}
+		q.caches.webkeyActiveSigningKey.Set(ctx, entry)
+	}
+
+	return webKey, nil
+}
+
+// GetAllPublicWebKeys gets all public web keys with caching.
+func (q *Queries) GetAllPublicWebKeys(ctx context.Context) (_ *jose.JSONWebKeySet, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	instanceID := authz.GetInstance(ctx).InstanceID()
+
+	// Try cache first
+	if q.caches != nil && q.caches.webkeyPublicKeys != nil {
+		cacheEntry, ok := q.caches.webkeyPublicKeys.Get(ctx, webkeyPublicKeysCacheInstanceIndex, instanceID)
+		if ok {
+			return cacheEntry.keySet, nil
+		}
+	}
+
+	// Cache miss - fetch from database using existing method
+	keySet, err := q.GetWebKeySet(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set cache
+	if q.caches != nil && q.caches.webkeyPublicKeys != nil {
+		entry := &webkeyPublicKeysCacheEntry{
+			instanceID: instanceID,
+			keySet:     keySet,
+		}
+		q.caches.webkeyPublicKeys.Set(ctx, entry)
+	}
+
+	return keySet, nil
+}
