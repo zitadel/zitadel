@@ -282,6 +282,19 @@
       "resendCode": "重发验证码",
       "codeSent": "刚刚发送了一封包含验证码的电子邮件。",
       "submit": "继续"
+    },
+    "errors": {
+      "couldNotResendEmail": "无法重新发送邮件",
+      "couldNotVerifyUser": "无法验证用户",
+      "couldNotVerifyInvite": "无法验证邀请",
+      "couldNotVerifyEmail": "无法验证邮箱",
+      "couldNotVerify": "无法验证",
+      "couldNotLoadUser": "无法加载用户",
+      "couldNotLoadAuthenticators": "无法加载可用的身份验证器",
+      "couldNotCreateSession": "无法创建会话",
+      "noHostFound": "未找到主机",
+      "userAlreadyVerified": "用户已验证！",
+      "couldNotResendInvite": "无法重新发送邀请"
     }
   },
   "authenticator": {

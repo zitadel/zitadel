@@ -282,6 +282,19 @@
       "resendCode": "Code erneut senden",
       "codeSent": "Ein Code wurde gerade an Ihre E-Mail-Adresse gesendet.",
       "submit": "Weiter"
+    },
+    "errors": {
+      "couldNotResendEmail": "E-Mail konnte nicht erneut gesendet werden",
+      "couldNotVerifyUser": "Benutzer konnte nicht verifiziert werden",
+      "couldNotVerifyInvite": "Einladung konnte nicht verifiziert werden",
+      "couldNotVerifyEmail": "E-Mail konnte nicht verifiziert werden",
+      "couldNotVerify": "Konnte nicht verifizieren",
+      "couldNotLoadUser": "Benutzer konnte nicht geladen werden",
+      "couldNotLoadAuthenticators": "Mögliche Authentifikatoren konnten nicht geladen werden",
+      "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
+      "noHostFound": "Kein Host gefunden",
+      "userAlreadyVerified": "Benutzer ist bereits verifiziert!",
+      "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden"
     }
   },
   "authenticator": {

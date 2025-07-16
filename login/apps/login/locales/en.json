@@ -282,6 +282,19 @@
       "resendCode": "Resend code",
       "codeSent": "A code has just been sent to your email address.",
       "submit": "Continue"
+    },
+    "errors": {
+      "couldNotResendEmail": "Could not resend email",
+      "couldNotVerifyUser": "Could not verify user",
+      "couldNotVerifyInvite": "Could not verify invite",
+      "couldNotVerifyEmail": "Could not verify email",
+      "couldNotVerify": "Could not verify",
+      "couldNotLoadUser": "Could not load user",
+      "couldNotLoadAuthenticators": "Could not load possible authenticators",
+      "couldNotCreateSession": "Could not create session",
+      "noHostFound": "No host found",
+      "userAlreadyVerified": "User is already verified!",
+      "couldNotResendInvite": "Could not resend invite"
     }
   },
   "authenticator": {

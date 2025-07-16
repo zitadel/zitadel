@@ -282,6 +282,19 @@
       "resendCode": "Wyślij kod ponownie",
       "codeSent": "Kod został właśnie wysłany na twój adres e-mail.",
       "submit": "Kontynuuj"
+    },
+    "errors": {
+      "couldNotResendEmail": "Nie udało się ponownie wysłać wiadomości e-mail",
+      "couldNotVerifyUser": "Nie udało się zweryfikować użytkownika",
+      "couldNotVerifyInvite": "Nie udało się zweryfikować zaproszenia",
+      "couldNotVerifyEmail": "Nie udało się zweryfikować adresu e-mail",
+      "couldNotVerify": "Nie udało się zweryfikować",
+      "couldNotLoadUser": "Nie udało się załadować użytkownika",
+      "couldNotLoadAuthenticators": "Nie udało się wczytać dostępnych metod uwierzytelniania",
+      "couldNotCreateSession": "Nie udało się utworzyć sesji",
+      "noHostFound": "Nie znaleziono hosta",
+      "userAlreadyVerified": "Użytkownik jest już zweryfikowany!",
+      "couldNotResendInvite": "Nie udało się ponownie wysłać zaproszenia"
     }
   },
   "authenticator": {

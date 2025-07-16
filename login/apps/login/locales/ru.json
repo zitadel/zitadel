@@ -282,6 +282,19 @@
       "resendCode": "Отправить код повторно",
       "codeSent": "Код отправлен на ваш email.",
       "submit": "Продолжить"
+    },
+    "errors": {
+      "couldNotResendEmail": "Не удалось повторно отправить электронное письмо",
+      "couldNotVerifyUser": "Не удалось подтвердить пользователя",
+      "couldNotVerifyInvite": "Не удалось подтвердить приглашение",
+      "couldNotVerifyEmail": "Не удалось подтвердить электронную почту",
+      "couldNotVerify": "Не удалось подтвердить",
+      "couldNotLoadUser": "Не удалось загрузить пользователя",
+      "couldNotLoadAuthenticators": "Не удалось загрузить доступные средства аутентификации",
+      "couldNotCreateSession": "Не удалось создать сеанс",
+      "noHostFound": "Хост не найден",
+      "userAlreadyVerified": "Пользователь уже подтверждён!",
+      "couldNotResendInvite": "Не удалось повторно отправить приглашение"
     }
   },
   "authenticator": {

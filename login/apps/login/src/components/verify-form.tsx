@@ -4,6 +4,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
@@ -41,6 +42,8 @@ export function VerifyForm({
     },
   });
 
+  const t = useTranslations("verify");
+
   const [error, setError] = useState<string>("");
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -54,7 +57,7 @@ export function VerifyForm({
       isInvite: isInvite,
     })
       .catch(() => {
-        setError("Could not resend email");
+        setError(t("errors.couldNotResendEmail"));
         return;
       })
       .finally(() => {
@@ -84,7 +87,7 @@ export function VerifyForm({
         requestId: requestId,
       })
         .catch(() => {
-          setError("Could not verify user");
+          setError(t("errors.couldNotVerifyUser"));
           return;
         })
         .finally(() => {

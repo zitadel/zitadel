@@ -282,6 +282,19 @@
       "resendCode": "Invia di nuovo il codice",
       "codeSent": "Un codice è stato appena inviato al tuo indirizzo email.",
       "submit": "Continua"
+    },
+    "errors": {
+      "couldNotResendEmail": "Impossibile reinviare l'email",
+      "couldNotVerifyUser": "Impossibile verificare l'utente",
+      "couldNotVerifyInvite": "Impossibile verificare l'invito",
+      "couldNotVerifyEmail": "Impossibile verificare l'email",
+      "couldNotVerify": "Impossibile verificare",
+      "couldNotLoadUser": "Impossibile caricare l'utente",
+      "couldNotLoadAuthenticators": "Impossibile caricare gli autenticatori possibili",
+      "couldNotCreateSession": "Impossibile creare la sessione",
+      "noHostFound": "Nessun host trovato",
+      "userAlreadyVerified": "L'utente è già verificato!",
+      "couldNotResendInvite": "Impossibile reinviare l'invito"
     }
   },
   "authenticator": {
