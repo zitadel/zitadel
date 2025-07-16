@@ -18,7 +18,7 @@ import {
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { getLocale } from "next-intl/server";
+// import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -26,7 +26,6 @@ export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
   const searchParams = await props.searchParams;
-  const locale = getLocale();
 
   const { loginName, requestId, organization, sessionId } = searchParams;
 
@@ -193,7 +192,7 @@ export default async function Page(props: {
 
         {loginSettings?.allowExternalIdp && !!identityProviders.length && (
           <>
-            <div className="py-3 flex flex-col">
+            <div className="flex flex-col py-3">
               <p className="ztdl-p text-center">
                 <Translated i18nKey="linkWithIDP" namespace="authenticator" />
               </p>

@@ -64,16 +64,16 @@ export function Avatar({
 
   return (
     <div
-      className={`w-full h-full flex-shrink-0 flex justify-center items-center cursor-default pointer-events-none group-focus:outline-none group-focus:ring-2 transition-colors duration-200 dark:group-focus:ring-offset-blue bg-primary-light-500 text-primary-light-contrast-500 hover:bg-primary-light-400 hover:dark:bg-primary-dark-500 group-focus:ring-primary-light-200 dark:group-focus:ring-primary-dark-400 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 dark:text-blue rounded-full ${
+      className={`dark:group-focus:ring-offset-blue dark:text-blue pointer-events-none flex h-full w-full flex-shrink-0 cursor-default items-center justify-center rounded-full bg-primary-light-500 text-primary-light-contrast-500 transition-colors duration-200 hover:bg-primary-light-400 group-focus:outline-none group-focus:ring-2 group-focus:ring-primary-light-200 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 hover:dark:bg-primary-dark-500 dark:group-focus:ring-primary-dark-400 ${
         shadow ? "shadow" : ""
       } ${
         size === "large"
           ? "h-20 w-20 font-normal"
           : size === "base"
-            ? "w-[38px] h-[38px] font-bold"
+            ? "h-[38px] w-[38px] font-bold"
             : size === "small"
-              ? "!w-[32px] !h-[32px] font-bold text-[13px]"
-              : "w-12 h-12"
+              ? "!h-[32px] !w-[32px] text-[13px] font-bold"
+              : "h-12 w-12"
       }`}
       style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
     >
@@ -82,7 +82,7 @@ export function Avatar({
           height={48}
           width={48}
           alt="avatar"
-          className="w-full h-full border border-divider-light dark:border-divider-dark rounded-full"
+          className="h-full w-full rounded-full border border-divider-light dark:border-divider-dark"
           src={imageUrl}
         />
       ) : (

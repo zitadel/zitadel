@@ -42,14 +42,14 @@ export function UserAvatar({
           loginName={loginName ?? ""}
         />
       </div>
-      <span className="ml-4 pr-4 text-14px max-w-[250px] text-ellipsis overflow-hidden">
+      <span className="ml-4 max-w-[250px] overflow-hidden text-ellipsis pr-4 text-14px">
         {loginName}
       </span>
       <span className="flex-grow"></span>
       {showDropdown && (
         <Link
           href={"/accounts?" + params}
-          className="ml-4 flex items-center justify-center p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded-full mr-1 transition-all"
+          className="ml-4 mr-1 flex items-center justify-center rounded-full p-1 transition-all hover:bg-black/10 dark:hover:bg-white/10"
         >
           <ChevronDownIcon className="h-4 w-4" />
         </Link>

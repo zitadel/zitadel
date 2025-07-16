@@ -28,7 +28,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
     const host = headers.get("host");
 
     if (host) {
-      const [hostname, port] = host.split(":");
+      const [hostname] = host.split(":");
       if (hostname !== "localhost") {
         instanceUrl = host.startsWith("http") ? host : `https://${host}`;
       }

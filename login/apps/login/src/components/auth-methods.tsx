@@ -35,12 +35,12 @@ export const TOTP = (alreadyAdded: boolean, link: string) => {
     <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
-          "font-medium flex items-center",
+          "flex items-center font-medium",
           alreadyAdded ? "opacity-50" : "",
         )}
       >
         <svg
-          className="h-8 w-8 transform -translate-x-[2px] mr-4 fill-current text-black dark:text-white"
+          className="mr-4 h-8 w-8 -translate-x-[2px] transform fill-current text-black dark:text-white"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
         >
@@ -63,7 +63,7 @@ export const U2F = (alreadyAdded: boolean, link: string) => {
     <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
-          "font-medium flex items-center",
+          "flex items-center font-medium",
           alreadyAdded ? "" : "",
         )}
       >
@@ -73,7 +73,7 @@ export const U2F = (alreadyAdded: boolean, link: string) => {
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="currentColor"
-          className="w-8 h-8 mr-4"
+          className="mr-4 h-8 w-8"
         >
           <path
             strokeLinecap="round"
@@ -97,12 +97,12 @@ export const EMAIL = (alreadyAdded: boolean, link: string) => {
     <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
-          "font-medium flex items-center",
+          "flex items-center font-medium",
           alreadyAdded ? "" : "",
         )}
       >
         <svg
-          className="w-8 h-8 mr-4"
+          className="mr-4 h-8 w-8"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -132,12 +132,12 @@ export const SMS = (alreadyAdded: boolean, link: string) => {
     <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
-          "font-medium flex items-center",
+          "flex items-center font-medium",
           alreadyAdded ? "" : "",
         )}
       >
         <svg
-          className="w-8 h-8 mr-4"
+          className="mr-4 h-8 w-8"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -166,7 +166,7 @@ export const PASSKEYS = (alreadyAdded: boolean, link: string) => {
     <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
-          "font-medium flex items-center",
+          "flex items-center font-medium",
           alreadyAdded ? "" : "",
         )}
       >
@@ -176,7 +176,7 @@ export const PASSKEYS = (alreadyAdded: boolean, link: string) => {
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="currentColor"
-          className="w-8 h-8 mr-4"
+          className="mr-4 h-8 w-8"
         >
           <path
             strokeLinecap="round"
@@ -200,12 +200,12 @@ export const PASSWORD = (alreadyAdded: boolean, link: string) => {
     <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
-          "font-medium flex items-center",
+          "flex items-center font-medium",
           alreadyAdded ? "" : "",
         )}
       >
         <svg
-          className="w-8 h-7 mr-4 fill-current"
+          className="mr-4 h-7 w-8 fill-current"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
         >
@@ -225,9 +225,9 @@ export const PASSWORD = (alreadyAdded: boolean, link: string) => {
 
 function Setup() {
   return (
-    <div className="transform  absolute right-2 top-0">
+    <div className="absolute right-2 top-0 transform">
       <StateBadge evenPadding={true} state={BadgeState.Success}>
-        <CheckIcon className="w-4 h-4" />
+        <CheckIcon className="h-4 w-4" />
       </StateBadge>
     </div>
   );
