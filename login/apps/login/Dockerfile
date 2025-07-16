@@ -1,28 +1,32 @@
 # Dockerfile for standalone ZITADEL Login UI
 FROM node:18-alpine AS base
 
+# Install pnpm
+RUN npm install -g pnpm@9.1.2
+
 # Install dependencies only when needed
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Prepare standalone and install dependencies
-COPY prepare-standalone.sh package*.json ./
-COPY *.standalone.* ./
-RUN ./prepare-standalone.sh
+# Install dependencies using pnpm
+COPY package*.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --prod
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
 
-# Prepare standalone configs
-RUN ./prepare-standalone.sh --no-install
+# Copy package files and install all dependencies (including dev dependencies)
+COPY package*.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY . .
 
 # Build application
 ENV NEXT_TELEMETRY_DISABLED 1
-RUN npm run build:standalone
+RUN pnpm run build:login:standalone
 
 # Production image, copy all the files and run next
 FROM base AS runner
