@@ -230,7 +230,9 @@ func TestServer_CreateOrganization(t *testing.T) {
 				Name: gofakeit.AppName(),
 				Id:   gu.Ptr("custom_id"),
 			},
-			want: &v2beta_org.CreateOrganizationResponse{},
+			want: &v2beta_org.CreateOrganizationResponse{
+				Id: "custom_id",
+			},
 		},
 		func() test {
 			orgID := gofakeit.Name()

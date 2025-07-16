@@ -96,7 +96,7 @@ export function RegisterFormIDPIncomplete({
 
   return (
     <form className="w-full">
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="mb-4 grid grid-cols-2 gap-4">
         <div className="">
           <TextInput
             type="firstname"
@@ -147,7 +147,7 @@ export function RegisterFormIDPIncomplete({
           onClick={handleSubmit(submitAndRegister)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
           <Translated i18nKey="submit" namespace="register" />
         </Button>
       </div>

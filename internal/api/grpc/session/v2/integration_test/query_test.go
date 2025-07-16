@@ -72,7 +72,7 @@ func TestServer_GetSession(t *testing.T) {
 		{
 			name: "get session, permission, ok",
 			args: args{
-				CTX,
+				IAMOwnerCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
 					resp, err := Client.CreateSession(ctx, &session.CreateSessionRequest{})
@@ -213,7 +213,7 @@ func TestServer_GetSession(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var sequence uint64
 			if tt.args.dep != nil {
-				sequence = tt.args.dep(CTX, t, tt.args.req)
+				sequence = tt.args.dep(LoginCTX, t, tt.args.req)
 			}
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
@@ -360,7 +360,7 @@ func TestServer_ListSessions(t *testing.T) {
 		{
 			name: "list sessions, permission, ok",
 			args: args{
-				CTX,
+				IAMOwnerCTX,
 				&session.ListSessionsRequest{},
 				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
 					info := createSession(ctx, t, "", "", nil, nil)
@@ -501,7 +501,7 @@ func TestServer_ListSessions(t *testing.T) {
 		{
 			name: "list sessions, own creator, ok",
 			args: args{
-				CTX,
+				LoginCTX,
 				&session.ListSessionsRequest{},
 				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
 					info := createSession(ctx, t, User.GetUserId(), "agent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
@@ -542,7 +542,7 @@ func TestServer_ListSessions(t *testing.T) {
 					info := createSession(ctx, t, User.GetUserId(), "agent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
 					request.Queries = append(request.Queries,
 						&session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}},
-						&session.SearchQuery{Query: &session.SearchQuery_CreatorQuery{CreatorQuery: &session.CreatorQuery{Id: gu.Ptr(Instance.Users.Get(integration.UserTypeOrgOwner).ID)}}})
+						&session.SearchQuery{Query: &session.SearchQuery_CreatorQuery{CreatorQuery: &session.CreatorQuery{Id: gu.Ptr(Instance.Users.Get(integration.UserTypeLogin).ID)}}})
 					return []*sessionAttr{info}
 				},
 			},
@@ -682,7 +682,7 @@ func TestServer_ListSessions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			infos := tt.args.dep(CTX, t, tt.args.req)
+			infos := tt.args.dep(LoginCTX, t, tt.args.req)
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {

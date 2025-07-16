@@ -8,7 +8,7 @@ on:
 jobs:
   auto-close:
     runs-on: ubuntu-latest
-    if: github.repository_id == '622995060'
+    if: github.repository_id == '622995060' && github.ref_name != 'mirror-zitadel-repo'
     steps:
       - name: Comment and close PR
         uses: actions/github-script@v7

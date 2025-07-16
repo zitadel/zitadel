@@ -27,7 +27,7 @@ export function AppAvatar({ appName, imageUrl, shadow }: AvatarProps) {
 
   return (
     <div
-      className={`w-[100px] h-[100px] flex justify-center items-center cursor-default pointer-events-none group-focus:outline-none group-focus:ring-2 transition-colors duration-200 dark:group-focus:ring-offset-blue bg-primary-light-500 text-primary-light-contrast-500 hover:bg-primary-light-400 hover:dark:bg-primary-dark-500 group-focus:ring-primary-light-200 dark:group-focus:ring-primary-dark-400 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 dark:text-blue rounded-full ${
+      className={`dark:group-focus:ring-offset-blue dark:text-blue pointer-events-none flex h-[100px] w-[100px] cursor-default items-center justify-center rounded-full bg-primary-light-500 text-primary-light-contrast-500 transition-colors duration-200 hover:bg-primary-light-400 group-focus:outline-none group-focus:ring-2 group-focus:ring-primary-light-200 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 hover:dark:bg-primary-dark-500 dark:group-focus:ring-primary-dark-400 ${
         shadow ? "shadow" : ""
       }`}
       style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
@@ -37,11 +37,11 @@ export function AppAvatar({ appName, imageUrl, shadow }: AvatarProps) {
           height={48}
           width={48}
           alt="avatar"
-          className="w-full h-full border border-divider-light dark:border-divider-dark rounded-full"
+          className="h-full w-full rounded-full border border-divider-light dark:border-divider-dark"
           src={imageUrl}
         />
       ) : (
-        <span className={`uppercase text-3xl`}>{credentials}</span>
+        <span className={`text-3xl uppercase`}>{credentials}</span>
       )}
     </div>
   );

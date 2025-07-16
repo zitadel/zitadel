@@ -108,7 +108,7 @@ export async function registerPasskeyLink(
     }
   }
 
-  const [hostname, port] = host.split(":");
+  const [hostname] = host.split(":");
 
   if (!hostname) {
     throw new Error("Could not get hostname");
@@ -145,7 +145,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
 
   // if no name is provided, try to generate one from the user agent
   let passkeyName = command.passkeyName;
-  if (!!!passkeyName) {
+  if (!passkeyName) {
     const headersList = await headers();
     const userAgentStructure = { headers: headersList };
     const { browser, device, os } = userAgent(userAgentStructure);

@@ -97,18 +97,17 @@ console_move:
 
 .PHONY: console_dependencies
 console_dependencies:
-	cd console && \
-	yarn install --immutable
+	pnpm install
 
 .PHONY: console_client
 console_client:
 	cd console && \
-	yarn generate
+	pnpm generate
 
 .PHONY: console_build
 console_build: console_dependencies console_client
 	cd console && \
-	yarn build
+	pnpm build
 
 .PHONY: clean
 clean:
@@ -166,8 +165,7 @@ core_integration_test: core_integration_server_start core_integration_test_packa
 
 .PHONY: console_lint
 console_lint:
-	cd console && \
-	yarn lint
+	pnpm turbo lint --filter=./console
 
 .PHONY: core_lint
 core_lint:
@@ -180,18 +178,25 @@ core_lint:
 .PHONY: login_pull
 login_pull: login_ensure_remote
 	@echo "Pulling changes from the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
-	git fetch $(LOGIN_REMOTE_NAME)
-	git subtree pull --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+	git fetch $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+	git merge -s ours --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/$(LOGIN_REMOTE_BRANCH) -m "Synthetic merge to align histories"
+	git push
 
 .PHONY: login_push
 login_push: login_ensure_remote
 	@echo "Pushing changes to the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
-	git subtree push --prefix=login $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+	git subtree split --prefix=login -b login-sync-tmp
+	git checkout login-sync-tmp
+	git fetch $(LOGIN_REMOTE_NAME) main
+	git merge -s ours --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/main -m "Synthetic merge to align histories"
+	git push $(LOGIN_REMOTE_NAME) login-sync-tmp:$(LOGIN_REMOTE_BRANCH)
+	git checkout -
+	git branch -D login-sync-tmp
 
 login_ensure_remote:
 	@if ! git remote get-url $(LOGIN_REMOTE_NAME) > /dev/null 2>&1; then \
 		echo "Adding remote $(LOGIN_REMOTE_NAME)"; \
-		git remote add --fetch $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
+		git remote add $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
 	else \
 		echo "Remote $(LOGIN_REMOTE_NAME) already exists."; \
 	fi
