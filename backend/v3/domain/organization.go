@@ -7,22 +7,20 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-//go:generate enumer -type OrgState -transform lower -trimprefix OrgState
-type OrgState uint8
+type OrgState string
 
 const (
-	OrgStateActive OrgState = iota
-	OrgStateInactive
+	OrgStateActive   OrgState = "active"
+	OrgStateInactive OrgState = "inactive"
 )
 
 type Organization struct {
-	ID         string     `json:"id,omitempty" db:"id"`
-	Name       string     `json:"name,omitempty" db:"name"`
-	InstanceID string     `json:"instanceId,omitempty" db:"instance_id"`
-	State      string     `json:"state,omitempty" db:"state"`
-	CreatedAt  time.Time  `json:"createdAt,omitzero" db:"created_at"`
-	UpdatedAt  time.Time  `json:"updatedAt,omitzero" db:"updated_at"`
-	DeletedAt  *time.Time `json:"deletedAt,omitempty" db:"deleted_at"`
+	ID         string    `json:"id,omitempty" db:"id"`
+	Name       string    `json:"name,omitempty" db:"name"`
+	InstanceID string    `json:"instanceId,omitempty" db:"instance_id"`
+	State      OrgState  `json:"state,omitempty" db:"state"`
+	CreatedAt  time.Time `json:"createdAt,omitempty" db:"created_at"`
+	UpdatedAt  time.Time `json:"updatedAt,omitempty" db:"updated_at"`
 }
 
 // OrgIdentifierCondition is used to help specify a single Organization,
@@ -46,8 +44,6 @@ type organizationColumns interface {
 	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
 	UpdatedAtColumn() database.Column
-	// DeletedAtColumn returns the column for the deleted at field.
-	DeletedAtColumn() database.Column
 }
 
 // organizationConditions define all the conditions for the instance table.
@@ -77,7 +73,7 @@ type OrganizationRepository interface {
 	organizationChanges
 
 	Get(ctx context.Context, id OrgIdentifierCondition, instance_id string, opts ...database.Condition) (*Organization, error)
-	List(ctx context.Context, opts ...database.Condition) ([]*Organization, error)
+	List(ctx context.Context, conditions ...database.Condition) ([]*Organization, error)
 
 	Create(ctx context.Context, instance *Organization) error
 	Update(ctx context.Context, id OrgIdentifierCondition, instance_id string, changes ...database.Change) (int64, error)

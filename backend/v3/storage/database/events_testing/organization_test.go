@@ -46,7 +46,6 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 			assert.Equal(t, domain.OrgStateActive.String(), organization.State)
 			assert.WithinRange(t, organization.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, organization.UpdatedAt, beforeCreate, afterCreate)
-			assert.Nil(t, organization.DeletedAt)
 		}, retryDuration, tick)
 	})
 
@@ -209,7 +208,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 				orgRepo.NameCondition(orgName),
 				instanceID,
 			)
-			require.NoError(t, err)
+			require.Equal(t, repository.ErrResourceDoesNotExist, err)
 
 			// event org.remove
 			assert.Nil(t, organization)

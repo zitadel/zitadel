@@ -185,7 +185,6 @@ func TestCreateInstance(t *testing.T) {
 			assert.Equal(t, tt.instance.DefaultLanguage, instance.DefaultLanguage)
 			assert.WithinRange(t, instance.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, instance.UpdatedAt, beforeCreate, afterCreate)
-			assert.Nil(t, instance.DeletedAt)
 		})
 	}
 }
@@ -298,7 +297,6 @@ func TestUpdateInstance(t *testing.T) {
 
 			assert.Equal(t, newName, instance.Name)
 			assert.WithinRange(t, instance.UpdatedAt, beforeUpdate, afterUpdate)
-			assert.Nil(t, instance.DeletedAt)
 		})
 	}
 }

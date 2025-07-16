@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
 
@@ -31,7 +30,7 @@ func OrganizationRepository(client database.QueryExecutor) domain.OrganizationRe
 	}
 }
 
-const queryOrganizationStmt = `SELECT id, name, instance_id, state, created_at, updated_at, deleted_at` +
+const queryOrganizationStmt = `SELECT id, name, instance_id, state, created_at, updated_at` +
 	` FROM zitadel.organizations`
 
 // Get implements [domain.OrganizationRepository].
@@ -41,24 +40,22 @@ func (o *org) Get(ctx context.Context, id domain.OrgIdentifierCondition, instanc
 	builder.WriteString(queryOrganizationStmt)
 
 	instanceIDCondition := o.InstanceIDCondition(instanceID)
-	// don't update deleted organizations
-	nonDeletedOrgs := database.IsNull(o.DeletedAtColumn())
 
-	conditions = append(conditions, id, instanceIDCondition, nonDeletedOrgs)
+	conditions = append(conditions, id, instanceIDCondition)
 	writeCondition(&builder, database.And(conditions...))
 
 	return scanOrganization(ctx, o.client, &builder)
 }
 
 // List implements [domain.OrganizationRepository].
-func (o *org) List(ctx context.Context, opts ...database.Condition) ([]*domain.Organization, error) {
+func (o *org) List(ctx context.Context, conditions ...database.Condition) ([]*domain.Organization, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(queryOrganizationStmt)
 
-	// return only non deleted organizations
-	opts = append(opts, database.IsNull(o.DeletedAtColumn()))
-	writeCondition(&builder, database.And(opts...))
+	if conditions != nil {
+		writeCondition(&builder, database.And(conditions...))
+	}
 
 	orderBy := database.OrderBy(o.CreatedAtColumn())
 	orderBy.Write(&builder)
@@ -124,10 +121,8 @@ func (o org) Update(ctx context.Context, id domain.OrgIdentifierCondition, insta
 	builder.WriteString(`UPDATE zitadel.organizations SET `)
 
 	instanceIDCondition := o.InstanceIDCondition(instanceID)
-	// don't update deleted organizations
-	nonDeletedOrgs := database.IsNull(o.DeletedAtColumn())
 
-	conditions := []database.Condition{id, instanceIDCondition, nonDeletedOrgs}
+	conditions := []database.Condition{id, instanceIDCondition}
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, database.And(conditions...))
 
@@ -141,14 +136,11 @@ func (o org) Update(ctx context.Context, id domain.OrgIdentifierCondition, insta
 func (o org) Delete(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string) (int64, error) {
 	builder := database.StatementBuilder{}
 
-	builder.WriteString(`UPDATE zitadel.organizations SET deleted_at = $1`)
-	builder.AppendArgs(time.Now())
+	builder.WriteString(`DELETE FROM zitadel.organizations`)
 
 	instanceIDCondition := o.InstanceIDCondition(instanceID)
-	// don't update deleted organizations
-	nonDeletedOrgs := database.IsNull(o.DeletedAtColumn())
 
-	conditions := []database.Condition{id, instanceIDCondition, nonDeletedOrgs}
+	conditions := []database.Condition{id, instanceIDCondition}
 	writeCondition(&builder, database.And(conditions...))
 
 	return o.client.Exec(ctx, builder.String(), builder.Args()...)
@@ -189,7 +181,7 @@ func (o org) InstanceIDCondition(instanceID string) database.Condition {
 
 // StateCondition implements [domain.organizationConditions].
 func (o org) StateCondition(state domain.OrgState) database.Condition {
-	return database.NewTextCondition(o.StateColumn(), database.TextOperationEqual, state.String())
+	return database.NewTextCondition(o.StateColumn(), database.TextOperationEqual, state)
 }
 
 // -------------------------------------------------------------
@@ -224,11 +216,6 @@ func (org) CreatedAtColumn() database.Column {
 // UpdatedAtColumn implements [domain.organizationColumns].
 func (org) UpdatedAtColumn() database.Column {
 	return database.NewColumn("updated_at")
-}
-
-// DeletedAtColumn implements [domain.organizationColumns].
-func (org) DeletedAtColumn() database.Column {
-	return database.NewColumn("deleted_at")
 }
 
 // -------------------------------------------------------------

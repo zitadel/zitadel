@@ -9,16 +9,15 @@ import (
 )
 
 type Instance struct {
-	ID              string     `json:"id,omitempty" db:"id"`
-	Name            string     `json:"name,omitempty" db:"name"`
-	DefaultOrgID    string     `json:"defaultOrgId,omitempty" db:"default_org_id"`
-	IAMProjectID    string     `json:"iamProjectId,omitempty" db:"iam_project_id"`
-	ConsoleClientID string     `json:"consoleClientId,omitempty" db:"console_client_id"`
-	ConsoleAppID    string     `json:"consoleAppId,omitempty" db:"console_app_id"`
-	DefaultLanguage string     `json:"defaultLanguage,omitempty" db:"default_language"`
-	CreatedAt       time.Time  `json:"createdAt" db:"created_at"`
-	UpdatedAt       time.Time  `json:"updatedAt" db:"updated_at"`
-	DeletedAt       *time.Time `json:"deletedAt" db:"deleted_at"`
+	ID              string    `json:"id,omitempty" db:"id"`
+	Name            string    `json:"name,omitempty" db:"name"`
+	DefaultOrgID    string    `json:"defaultOrgId,omitempty" db:"default_org_id"`
+	IAMProjectID    string    `json:"iamProjectId,omitempty" db:"iam_project_id"`
+	ConsoleClientID string    `json:"consoleClientId,omitempty" db:"console_client_id"`
+	ConsoleAppID    string    `json:"consoleAppId,omitempty" db:"console_app_id"`
+	DefaultLanguage string    `json:"defaultLanguage,omitempty" db:"default_language"`
+	CreatedAt       time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt       time.Time `json:"updatedAt" db:"updated_at"`
 }
 
 type instanceCacheIndex uint8
@@ -58,8 +57,6 @@ type instanceColumns interface {
 	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
 	UpdatedAtColumn() database.Column
-	// DeletedAtColumn returns the column for the deleted at field.
-	DeletedAtColumn() database.Column
 }
 
 // instanceConditions define all the conditions for the instance table.

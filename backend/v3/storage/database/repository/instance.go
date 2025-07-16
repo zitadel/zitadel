@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
 
@@ -31,7 +30,7 @@ func InstanceRepository(client database.QueryExecutor) domain.InstanceRepository
 // repository
 // -------------------------------------------------------------
 
-const queryInstanceStmt = `SELECT id, name, default_org_id, iam_project_id, console_client_id, console_app_id, default_language, created_at, updated_at, deleted_at` +
+const queryInstanceStmt = `SELECT id, name, default_org_id, iam_project_id, console_client_id, console_app_id, default_language, created_at, updated_at` +
 	` FROM zitadel.instances`
 
 // Get implements [domain.InstanceRepository].
@@ -41,23 +40,20 @@ func (i *instance) Get(ctx context.Context, id string) (*domain.Instance, error)
 	builder.WriteString(queryInstanceStmt)
 
 	idCondition := i.IDCondition(id)
-	// return only non deleted instances
-	conditions := []database.Condition{idCondition, database.IsNull(i.DeletedAtColumn())}
-	writeCondition(&builder, database.And(conditions...))
+	writeCondition(&builder, idCondition)
 
 	return scanInstance(ctx, i.client, &builder)
 }
 
 // List implements [domain.InstanceRepository].
-func (i *instance) List(ctx context.Context, opts ...database.Condition) ([]*domain.Instance, error) {
+func (i *instance) List(ctx context.Context, conditions ...database.Condition) ([]*domain.Instance, error) {
 	var builder database.StatementBuilder
 
 	builder.WriteString(queryInstanceStmt)
 
-	// return only non deleted instances
-	opts = append(opts, database.IsNull(i.DeletedAtColumn()))
-	notDeletedCondition := database.And(opts...)
-	writeCondition(&builder, notDeletedCondition)
+	if conditions != nil {
+		writeCondition(&builder, database.And(conditions...))
+	}
 
 	return scanInstances(ctx, i.client, &builder)
 }
@@ -109,9 +105,7 @@ func (i instance) Update(ctx context.Context, id string, changes ...database.Cha
 	database.Changes(changes).Write(&builder)
 
 	idCondition := i.IDCondition(id)
-	// don't update deleted instances
-	conditions := []database.Condition{idCondition, database.IsNull(i.DeletedAtColumn())}
-	writeCondition(&builder, database.And(conditions...))
+	writeCondition(&builder, idCondition)
 
 	stmt := builder.String()
 
@@ -123,13 +117,10 @@ func (i instance) Update(ctx context.Context, id string, changes ...database.Cha
 func (i instance) Delete(ctx context.Context, id string) (int64, error) {
 	var builder database.StatementBuilder
 
-	builder.WriteString(`UPDATE zitadel.instances SET deleted_at = $1`)
-	builder.AppendArgs(time.Now())
+	builder.WriteString(`DELETE FROM zitadel.instances`)
 
-	// don't delete already deleted instance
 	idCondition := i.IDCondition(id)
-	conditions := []database.Condition{idCondition, database.IsNull(i.DeletedAtColumn())}
-	writeCondition(&builder, database.And(conditions...))
+	writeCondition(&builder, idCondition)
 
 	return i.client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -204,11 +195,6 @@ func (instance) DefaultLanguageColumn() database.Column {
 // UpdatedAtColumn implements [domain.instanceColumns].
 func (instance) UpdatedAtColumn() database.Column {
 	return database.NewColumn("updated_at")
-}
-
-// DeletedAtColumn implements [domain.instanceColumns].
-func (instance) DeletedAtColumn() database.Column {
-	return database.NewColumn("deleted_at")
 }
 
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {

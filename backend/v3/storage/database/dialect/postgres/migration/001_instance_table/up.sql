@@ -7,8 +7,7 @@ CREATE TABLE IF NOT EXISTS zitadel.instances(
   console_app_id TEXT, -- NOT NULL,
   default_language TEXT, -- NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-  deleted_at TIMESTAMPTZ DEFAULT NULL
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
 CREATE OR REPLACE FUNCTION zitadel.set_updated_at()
