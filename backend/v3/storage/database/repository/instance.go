@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jackc/pgx/v5/pgconn"
-
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
@@ -67,28 +65,7 @@ func (i *instance) Create(ctx context.Context, instance *domain.Instance) error 
 	builder.AppendArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleAppID, instance.DefaultLanguage)
 	builder.WriteString(createInstanceStmt)
 
-	err := i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&instance.CreatedAt, &instance.UpdatedAt)
-	if err != nil {
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			// constraint violation
-			if pgErr.Code == "23514" {
-				if pgErr.ConstraintName == "instances_name_check" {
-					return errors.New("instance name not provided")
-				}
-				if pgErr.ConstraintName == "instances_id_check" {
-					return errors.New("instance id not provided")
-				}
-			}
-			// duplicate
-			if pgErr.Code == "23505" {
-				if pgErr.ConstraintName == "instances_pkey" {
-					return errors.New("instance id already exists")
-				}
-			}
-		}
-	}
-	return err
+	return i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&instance.CreatedAt, &instance.UpdatedAt)
 }
 
 // Update implements [domain.InstanceRepository].
@@ -107,8 +84,7 @@ func (i instance) Update(ctx context.Context, id string, changes ...database.Cha
 
 	stmt := builder.String()
 
-	rowsAffected, err := i.client.Exec(ctx, stmt, builder.Args()...)
-	return rowsAffected, err
+	return i.client.Exec(ctx, stmt, builder.Args()...)
 }
 
 // Delete implements [domain.InstanceRepository].
@@ -203,9 +179,6 @@ func scanInstance(ctx context.Context, querier database.Querier, builder *databa
 
 	instance := new(domain.Instance)
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(instance); err != nil {
-		if err.Error() == "no rows in result set" {
-			return nil, ErrResourceDoesNotExist
-		}
 		return nil, err
 	}
 
@@ -219,12 +192,6 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 	}
 
 	if err := rows.(database.CollectableRows).Collect(&instances); err != nil {
-		// if no results returned, this is not a error
-		// it just means the instance was not found
-		// the caller should check if the returned instance is nil
-		if err.Error() == "no rows in result set" {
-			return nil, nil
-		}
 		return nil, err
 	}
 

@@ -41,10 +41,10 @@ type Config struct {
 func (c *Config) Connect(ctx context.Context) (database.Pool, error) {
 	pool, err := c.getPool(ctx)
 	if err != nil {
-		return nil, err
+		return nil, wrapError(err)
 	}
 	if err = pool.Ping(ctx); err != nil {
-		return nil, err
+		return nil, wrapError(err)
 	}
 	return &pgxPool{Pool: pool}, nil
 }

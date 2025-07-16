@@ -2,7 +2,6 @@ package repository_test
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"time"
 
@@ -55,7 +54,7 @@ func TestCreateInstance(t *testing.T) {
 				}
 				return instance
 			}(),
-			err: errors.New("instance name not provided"),
+			err: new(database.CheckErr),
 		},
 		{
 			name: "adding same instance twice",
@@ -80,7 +79,7 @@ func TestCreateInstance(t *testing.T) {
 				require.NoError(t, err)
 				return &inst
 			},
-			err: errors.New("instance id already exists"),
+			err: new(database.UniqueErr),
 		},
 		func() struct {
 			name     string
@@ -146,7 +145,7 @@ func TestCreateInstance(t *testing.T) {
 				}
 				return instance
 			}(),
-			err: errors.New("instance id not provided"),
+			err: new(database.CheckErr),
 		},
 	}
 	for _, tt := range tests {
@@ -164,7 +163,7 @@ func TestCreateInstance(t *testing.T) {
 			// create instance
 			beforeCreate := time.Now()
 			err := instanceRepo.Create(ctx, instance)
-			assert.Equal(t, tt.err, err)
+			assert.ErrorIs(t, err, tt.err)
 			if err != nil {
 				return
 			}
@@ -263,7 +262,7 @@ func TestUpdateInstance(t *testing.T) {
 				return &inst
 			},
 			rowsAffected: 0,
-			getErr:       repository.ErrResourceDoesNotExist,
+			getErr:       new(database.ErrNoRowFound),
 		},
 	}
 	for _, tt := range tests {
@@ -342,7 +341,7 @@ func TestGetInstance(t *testing.T) {
 				}
 				return &inst
 			},
-			err: repository.ErrResourceDoesNotExist,
+			err: new(database.ErrNoRowFound),
 		},
 	}
 	for _, tt := range tests {
@@ -360,7 +359,7 @@ func TestGetInstance(t *testing.T) {
 				instance.ID,
 			)
 			if tt.err != nil {
-				require.Equal(t, tt.err, err)
+				require.ErrorIs(t, err, tt.err)
 				return
 			}
 
@@ -655,7 +654,7 @@ func TestDeleteInstance(t *testing.T) {
 			instance, err := instanceRepo.Get(ctx,
 				tt.instanceID,
 			)
-			require.Equal(t, err, repository.ErrResourceDoesNotExist)
+			require.ErrorIs(t, err, new(database.ErrNoRowFound))
 			assert.Nil(t, instance)
 		})
 	}
