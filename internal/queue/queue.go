@@ -9,6 +9,7 @@ import (
 	"github.com/riverqueue/river/riverdriver/riverpgxv5"
 	"github.com/riverqueue/river/rivertype"
 	"github.com/riverqueue/rivercontrib/otelriver"
+	"github.com/robfig/cron/v3"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -73,6 +74,26 @@ func (q *Queue) AddWorkers(w ...Worker) {
 	for _, worker := range w {
 		worker.Register(q.config.Workers, q.config.Queues)
 	}
+}
+
+func (q *Queue) AddPeriodicJob(schedule cron.Schedule, jobArgs river.JobArgs, opts ...InsertOpt) (handle rivertype.PeriodicJobHandle) {
+	if q == nil {
+		logging.Info("skip adding periodic job because queue is not set")
+		return
+	}
+	options := new(river.InsertOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+	return q.client.PeriodicJobs().Add(
+		river.NewPeriodicJob(
+			schedule,
+			func() (river.JobArgs, *river.InsertOpts) {
+				return jobArgs, options
+			},
+			nil,
+		),
+	)
 }
 
 type InsertOpt func(*river.InsertOpts)

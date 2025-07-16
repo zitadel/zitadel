@@ -1,0 +1,61 @@
+name: Build docs
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      buf_version:
+        required: true
+        type: string
+    outputs:
+      cache_key:
+        value: ${{ jobs.build.outputs.cache_key }}
+      cache_path:
+        value: ${{ jobs.build.outputs.cache_path }}
+
+env:
+  cache_path: docs/build
+
+jobs:
+  build:
+    outputs:
+      cache_key: ${{ steps.cache.outputs.cache-primary-key }}
+      cache_path: ${{ env.cache_path }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        timeout-minutes: 1
+        continue-on-error: true
+        id: cache
+        with:
+          key: docs-${{ hashFiles('docs', 'proto', '!docs/build', '!docs/node_modules', '!docs/protoc-gen-connect-openapi') }}
+          restore-keys: |
+            docs-
+          path: ${{ env.cache_path }}
+      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ github.token }}
+          version: ${{ inputs.buf_version }}
+      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        uses: pnpm/action-setup@v4
+      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
+      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        name: Install dependencies
+        run: pnpm install
+      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        name: Build docs with Turbo
+        run: pnpm turbo build --filter=./docs
+      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.cache_path }}
+          key: ${{ steps.cache.outputs.cache-primary-key }}
