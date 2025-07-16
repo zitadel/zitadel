@@ -23,6 +23,11 @@
   "lint-staged": {
     "*": "prettier --write --ignore-unknown"
   },
+  "pnpm": {
+    "overrides": {
+      "@zitadel/proto": "latest"
+    }
+  },
   "dependencies": {
     "@headlessui/react": "^2.1.9",
     "@heroicons/react": "2.1.3",
