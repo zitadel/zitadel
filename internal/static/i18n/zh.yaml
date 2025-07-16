@@ -436,8 +436,6 @@ Errors:
     Invalid: 用户授权无效
     NotChanged: 用户授权未更改
     IDMissing: 没有 ID
-    NotActive: 用户授权不是启用状态
-    NotInactive: 用户授权不是停用状态
     NoPermissionForProject: 用户对此项目没有权限
     RoleKeyNotFound: 角色不存在
   Member:

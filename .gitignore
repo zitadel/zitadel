@@ -52,7 +52,8 @@ console/src/app/proto/generated/
 !pkg/grpc/protoc/v2/options.pb.go
 **.proto.mock.go
 **.pb.*.go
-**.gen.go 
+pkg/**/**.connect.go
+**.gen.go
 openapi/**/*.json
 /internal/api/assets/authz.go
 /internal/api/assets/router.go
@@ -83,7 +84,11 @@ go.work.sum
 .netlify
 
 load-test/node_modules
-load-test/yarn-error.log
+load-test/pnpm-debug.log
 load-test/dist
 load-test/output/*
 .vercel
+
+# Turbo
+.turbo/
+**/.turbo/

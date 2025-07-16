@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
@@ -12,13 +13,13 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) ListKeys(ctx context.Context, req *user.ListKeysRequest) (*user.ListKeysResponse, error) {
-	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
+func (s *Server) ListKeys(ctx context.Context, req *connect.Request[user.ListKeysRequest]) (*connect.Response[user.ListKeysResponse], error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Msg.GetPagination())
 	if err != nil {
 		return nil, err
 	}
 
-	filters, err := keyFiltersToQueries(req.Filters)
+	filters, err := keyFiltersToQueries(req.Msg.GetFilters())
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +28,7 @@ func (s *Server) ListKeys(ctx context.Context, req *user.ListKeysRequest) (*user
 			Offset:        offset,
 			Limit:         limit,
 			Asc:           asc,
-			SortingColumn: authnKeyFieldNameToSortingColumn(req.SortingColumn),
+			SortingColumn: authnKeyFieldNameToSortingColumn(req.Msg.SortingColumn),
 		},
 		Queries: filters,
 	}
@@ -49,7 +50,7 @@ func (s *Server) ListKeys(ctx context.Context, req *user.ListKeysRequest) (*user
 			ExpirationDate: timestamppb.New(key.Expiration),
 		}
 	}
-	return resp, nil
+	return connect.NewResponse(resp), nil
 }
 
 func keyFiltersToQueries(filters []*user.KeysSearchFilter) (_ []query.SearchQuery, err error) {

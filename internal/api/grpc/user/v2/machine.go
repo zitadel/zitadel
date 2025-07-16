@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/command"
@@ -11,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) createUserTypeMachine(ctx context.Context, machinePb *user.CreateUserRequest_Machine, orgId, userName, userId string) (*user.CreateUserResponse, error) {
+func (s *Server) createUserTypeMachine(ctx context.Context, machinePb *user.CreateUserRequest_Machine, orgId, userName, userId string) (*connect.Response[user.CreateUserResponse], error) {
 	cmd := &command.Machine{
 		Username:        userName,
 		Name:            machinePb.Name,
@@ -32,21 +33,21 @@ func (s *Server) createUserTypeMachine(ctx context.Context, machinePb *user.Crea
 	if err != nil {
 		return nil, err
 	}
-	return &user.CreateUserResponse{
+	return connect.NewResponse(&user.CreateUserResponse{
 		Id:           cmd.AggregateID,
 		CreationDate: timestamppb.New(details.EventDate),
-	}, nil
+	}), nil
 }
 
-func (s *Server) updateUserTypeMachine(ctx context.Context, machinePb *user.UpdateUserRequest_Machine, userId string, userName *string) (*user.UpdateUserResponse, error) {
+func (s *Server) updateUserTypeMachine(ctx context.Context, machinePb *user.UpdateUserRequest_Machine, userId string, userName *string) (*connect.Response[user.UpdateUserResponse], error) {
 	cmd := updateMachineUserToCommand(userId, userName, machinePb)
 	err := s.command.ChangeUserMachine(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
-	return &user.UpdateUserResponse{
+	return connect.NewResponse(&user.UpdateUserResponse{
 		ChangeDate: timestamppb.New(cmd.Details.EventDate),
-	}, nil
+	}), nil
 }
 
 func updateMachineUserToCommand(userId string, userName *string, machine *user.UpdateUserRequest_Machine) *command.ChangeMachine {
