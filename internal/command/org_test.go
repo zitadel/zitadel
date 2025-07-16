@@ -1527,7 +1527,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zerrors.ThrowNotFound(nil, "ORG-lapo2n", "Errors.Org.AlreadyExisting"),
+				err: zerrors.ThrowAlreadyExists(nil, "ORG-laho2n", "Errors.Org.AlreadyExisting"),
 			},
 		},
 		{
@@ -1543,6 +1543,23 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 							context.Background(), &org.NewAggregate("custom-org-ID").Aggregate,
 							"Org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}),
 					),
+					expectPush(
+						eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"Org",
+						)),
+						eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate, "org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainPrimarySetEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"org.iam-domain",
+						)),
+					),
 				),
 			},
 			args: args{
@@ -1553,7 +1570,12 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zerrors.ThrowNotFound(nil, "ORG-lapo2n", "Errors.Org.AlreadyExisting"),
+				createdOrg: &CreatedOrg{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "custom-org-ID",
+					},
+					OrgAdmins: []OrgAdmin{},
+				},
 			},
 		},
 		{

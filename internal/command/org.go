@@ -280,8 +280,8 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail b
 	if err != nil {
 		return nil, err
 	}
-	if existingOrg.State == domain.OrgStateRemoved || existingOrg.State != domain.OrgStateUnspecified {
-		return nil, zerrors.ThrowNotFound(nil, "ORG-lapo2n", "Errors.Org.AlreadyExisting")
+	if existingOrg.State != domain.OrgStateRemoved && existingOrg.State != domain.OrgStateUnspecified {
+		return nil, zerrors.ThrowAlreadyExists(nil, "ORG-laho2n", "Errors.Org.AlreadyExisting")
 	}
 
 	return c.setUpOrgWithIDs(ctx, o, o.OrgID, allowInitialMail, userIDs...)
@@ -339,8 +339,8 @@ func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
-	if existingOrg.State == domain.OrgStateRemoved || existingOrg.State != domain.OrgStateUnspecified {
-		return nil, zerrors.ThrowNotFound(nil, "ORG-lapo2m", "Errors.Org.AlreadyExisting")
+	if existingOrg.State != domain.OrgStateRemoved && existingOrg.State != domain.OrgStateUnspecified {
+		return nil, zerrors.ThrowAlreadyExists(nil, "ORG-lapo2n", "Errors.Org.AlreadyExisting")
 	}
 
 	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, setOrgInactive, claimedUserIDs)
