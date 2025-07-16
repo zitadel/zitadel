@@ -215,7 +215,7 @@ func NewUnknownError(original error) error {
 }
 
 func (e *UnknownErr) Error() string {
-	return "unknown database error"
+	return fmt.Sprintf("unknown database error: %v", e.original)
 }
 
 func (e *UnknownErr) Is(target error) bool {
