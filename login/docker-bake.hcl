@@ -1,9 +1,9 @@
 variable "LOGIN_DIR" {
-  default = "./"
+  default = "./login/"
 }
 
 variable "DOCKERFILES_DIR" {
-  default = "dockerfiles/"
+  default = "./login/dockerfiles/"
 }
 
 # The release target is overwritten in docker-bake-release.hcl
