@@ -7,11 +7,11 @@ import { cookies, headers } from "next/headers";
 import { userAgent } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 
-async function getFingerprintId() {
+export async function getFingerprintId() {
   return uuidv4();
 }
 
-async function setFingerprintIdCookie(fingerprintId: string) {
+export async function setFingerprintIdCookie(fingerprintId: string) {
   const cookiesList = await cookies();
 
   return cookiesList.set({

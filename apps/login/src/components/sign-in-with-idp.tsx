@@ -17,7 +17,7 @@ import { SignInWithGitlab } from "./idps/sign-in-with-gitlab";
 import { SignInWithGoogle } from "./idps/sign-in-with-google";
 import { Translated } from "./translated";
 
-interface SignInWithIDPProps {
+export interface SignInWithIDPProps {
   children?: ReactNode;
   identityProviders: IdentityProvider[];
   requestId?: string;

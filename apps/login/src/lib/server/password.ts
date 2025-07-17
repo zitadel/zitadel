@@ -81,7 +81,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
   });
 }
 
-type UpdateSessionCommand = {
+export type UpdateSessionCommand = {
   loginName: string;
   organization?: string;
   checks: Checks;

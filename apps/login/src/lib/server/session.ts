@@ -105,7 +105,7 @@ export async function continueWithSession({
   }
 }
 
-type UpdateSessionCommand = {
+export type UpdateSessionCommand = {
   loginName?: string;
   sessionId?: string;
   organization?: string;

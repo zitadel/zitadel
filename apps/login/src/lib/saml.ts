@@ -19,7 +19,7 @@ type LoginWithSAMLAndSession = {
   request: NextRequest;
 };
 
-async function getSAMLFormUID() {
+export async function getSAMLFormUID() {
   return uuidv4();
 }
 

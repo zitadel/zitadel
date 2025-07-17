@@ -1,30 +1,57 @@
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import tinycolor from "tinycolor2";
 
-interface Color {
+export interface Color {
   name: string;
   hex: string;
   rgb: string;
   contrastColor: string;
 }
 
-type MapName = "background" | "primary" | "warn" | "text" | "link";
+export type MapName = "background" | "primary" | "warn" | "text" | "link";
 
-type ColorMap = {
-  [_key in MapName]: Color[];
+export type ColorName =
+  | "50"
+  | "100"
+  | "200"
+  | "300"
+  | "400"
+  | "500"
+  | "600"
+  | "700"
+  | "800"
+  | "C900"
+  | "A100"
+  | "A200"
+  | "A400"
+  | "A700";
+
+export type ColorMap = {
+  [key in MapName]: Color[];
 };
 
-const DARK_PRIMARY = "#2073c4";
-const PRIMARY = "#5469d4";
+export const DARK_PRIMARY = "#2073c4";
+export const PRIMARY = "#5469d4";
 
-const DARK_WARN = "#ff3b5b";
-const WARN = "#cd3d56";
+export const DARK_WARN = "#ff3b5b";
+export const WARN = "#cd3d56";
 
-const DARK_BACKGROUND = "#111827";
-const BACKGROUND = "#fafafa";
+export const DARK_BACKGROUND = "#111827";
+export const BACKGROUND = "#fafafa";
 
-const DARK_TEXT = "#ffffff";
-const TEXT = "#000000";
+export const DARK_TEXT = "#ffffff";
+export const TEXT = "#000000";
+
+export type LabelPolicyColors = {
+  backgroundColor: string;
+  backgroundColorDark: string;
+  fontColor: string;
+  fontColorDark: string;
+  warnColor: string;
+  warnColorDark: string;
+  primaryColor: string;
+  primaryColorDark: string;
+};
 
 type BrandingColors = {
   lightTheme: {
@@ -155,7 +182,7 @@ function getContrast(color: string): string {
   }
 }
 
-function computeMap(branding: BrandingColors, dark: boolean): ColorMap {
+export function computeMap(branding: BrandingColors, dark: boolean): ColorMap {
   return {
     background: computeColors(
       dark
@@ -186,7 +213,7 @@ export interface ColorShade {
   900: string;
 }
 
-const COLORS = [
+export const COLORS = [
   {
     500: "#ef4444",
     200: "#fecaca",
@@ -336,7 +363,7 @@ export function getColorHash(value: string): ColorShade {
   return COLORS[hash % COLORS.length];
 }
 
-function hashCode(str: string, seed = 0): number {
+export function hashCode(str: string, seed = 0): number {
   let h1 = 0xdeadbeef ^ seed,
     h2 = 0x41c6ce57 ^ seed;
   for (let i = 0, ch; i < str.length; i++) {
@@ -351,4 +378,62 @@ function hashCode(str: string, seed = 0): number {
     Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
     Math.imul(h1 ^ (h1 >>> 13), 3266489909);
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
+
+export function getMembershipColor(role: string): ColorShade {
+  const hash = hashCode(role);
+  let color = COLORS[hash % COLORS.length];
+
+  switch (role) {
+    case "IAM_OWNER":
+      color = COLORS[0];
+      break;
+    case "IAM_OWNER_VIEWER":
+      color = COLORS[14];
+      break;
+    case "IAM_ORG_MANAGER":
+      color = COLORS[11];
+      break;
+    case "IAM_USER_MANAGER":
+      color = COLORS[8];
+      break;
+
+    case "ORG_OWNER":
+      color = COLORS[16];
+      break;
+    case "ORG_USER_MANAGER":
+      color = COLORS[8];
+      break;
+    case "ORG_OWNER_VIEWER":
+      color = COLORS[14];
+      break;
+    case "ORG_USER_PERMISSION_EDITOR":
+      color = COLORS[7];
+      break;
+    case "ORG_PROJECT_PERMISSION_EDITOR":
+      color = COLORS[11];
+      break;
+    case "ORG_PROJECT_CREATOR":
+      color = COLORS[12];
+      break;
+
+    case "PROJECT_OWNER":
+      color = COLORS[9];
+      break;
+    case "PROJECT_OWNER_VIEWER":
+      color = COLORS[10];
+      break;
+    case "PROJECT_OWNER_GLOBAL":
+      color = COLORS[11];
+      break;
+    case "PROJECT_OWNER_VIEWER_GLOBAL":
+      color = COLORS[12];
+      break;
+
+    default:
+      color = COLORS[hash % COLORS.length];
+      break;
+  }
+
+  return color;
 }

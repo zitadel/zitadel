@@ -15,6 +15,7 @@ import {
   ErrorDetail,
 } from "@zitadel/proto/zitadel/message_pb";
 import {
+  Challenges,
   RequestChallenges,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -184,6 +185,10 @@ export async function createSessionForIdpAndUpdateCookie({
     return session as Session;
   });
 }
+
+export type SessionWithChallenges = Session & {
+  challenges: Challenges | undefined;
+};
 
 export async function setSessionAndUpdateCookie(
   recentCookie: CustomCookieData,

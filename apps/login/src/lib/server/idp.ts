@@ -13,7 +13,7 @@ import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 
-type RedirectToIdpState = { error?: string | null } | undefined;
+export type RedirectToIdpState = { error?: string | null } | undefined;
 
 export async function redirectToIdp(
   prevState: RedirectToIdpState,
@@ -63,7 +63,7 @@ export async function redirectToIdp(
   return { error: "Unexpected response from IDP flow" };
 }
 
-type StartIDPFlowCommand = {
+export type StartIDPFlowCommand = {
   serviceUrl: string;
   host: string;
   idpId: string;

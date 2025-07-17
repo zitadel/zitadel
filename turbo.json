@@ -21,16 +21,14 @@
       "cache": true
     },
     "build": {},
-    "build:login:standalone": {},
-    "build:client:standalone": {},
-    "test": {},
-    "start": {},
-    "start:built": {},
-    "test:unit": {},
-    "test:unit:standalone": {},
-    "test:watch": {
-      "persistent": true
+    "quality": {
+      "with": [
+        "lint",
+        "test:unit"
+      ]
     },
+    "start": {},
+    "test:unit": {},
     "lint": {},
     "lint:fix": {},
     "dev": {
