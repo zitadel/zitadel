@@ -70,16 +70,18 @@ export default async function Page(props: {
       await addOTPSMS({
         serviceUrl,
         userId: session.factors.user.id,
-      }).catch((error) => {
-        error = new Error("Could not add OTP via SMS");
+      }).catch((_error) => {
+        // TODO: Throw this error?
+        new Error("Could not add OTP via SMS");
       });
     } else if (method === "email") {
       // works
       await addOTPEmail({
         serviceUrl,
         userId: session.factors.user.id,
-      }).catch((error) => {
-        error = new Error("Could not add OTP via Email");
+      }).catch((_error) => {
+        // TODO: Throw this error?
+        new Error("Could not add OTP via Email");
       });
     } else {
       throw new Error("Invalid method");

@@ -22,8 +22,6 @@
     "dev": "pnpm exec turbo run dev --no-cache --continue",
     "dev:local": "pnpm test:acceptance:setup",
     "dev:console": "pnpm exec turbo run start --filter=console",
-    "lint": "pnpm exec turbo run lint",
-    "lint:fix": "pnpm exec turbo run lint:fix",
     "clean": "pnpm exec turbo run clean && rm -rf node_modules",
     "format:fix": "pnpm exec prettier --write \"**/*.{ts,tsx,md}\"",
     "format": "pnpm exec prettier --check \"**/*.{ts,tsx,md}\"",

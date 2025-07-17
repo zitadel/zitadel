@@ -43,7 +43,7 @@ export function AuthenticationMethodRadio({
                   } boder-divider-light relative flex h-full flex-1 cursor-pointer rounded-lg border px-5 py-4 hover:shadow-lg focus:outline-none dark:border-divider-dark dark:hover:bg-white/10`
                 }
               >
-                {({ active, checked }) => (
+                {({ checked }) => (
                   <>
                     <div className="flex w-full flex-col items-center text-sm">
                       {method === "passkey" && (

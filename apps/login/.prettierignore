@@ -1,5 +1,5 @@
-.next
-/external
-.github/
-dist/
-standalone/
+*
+!constants
+!src
+!locales
+!scripts/healthcheck.js

@@ -13,7 +13,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const { loginName, requestId, organization, userId } = searchParams;
+  const { loginName, organization, userId } = searchParams;
 
   const branding = await getBrandingSettings({
     serviceUrl,

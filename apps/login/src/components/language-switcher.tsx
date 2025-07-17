@@ -55,7 +55,7 @@ export function LanguageSwitcher() {
             "transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0",
           )}
         >
-          {LANGS.map((lang, index) => (
+          {LANGS.map((lang) => (
             <ListboxOption
               key={lang.code}
               value={lang}

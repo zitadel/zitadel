@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-export const ZitadelLogoDark: FC = (props) => (
+export const ZitadelLogoDark: FC = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fillRule="evenodd"

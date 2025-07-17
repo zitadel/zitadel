@@ -34,7 +34,8 @@ export default async function Page(props: {
   const organization = searchParams?.organization;
   const postLogoutRedirectUri = searchParams?.post_logout_redirect_uri;
   const logoutHint = searchParams?.logout_hint;
-  const UILocales = searchParams?.ui_locales; // TODO implement with new translation service
+  // TODO implement with new translation service
+  // const UILocales = searchParams?.ui_locales;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);

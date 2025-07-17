@@ -30,12 +30,10 @@ export default async function Page(props: {
 
   const {
     loginName, // send from password page
-    userId, // send from email link
     requestId,
     sessionId,
     organization,
     code,
-    submit,
   } = searchParams;
 
   const { method } = params;

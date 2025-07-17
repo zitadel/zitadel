@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export function SelfServiceMenu({ sessionId }: { sessionId: string }) {
+export function SelfServiceMenu() {
   const list: any[] = [];
 
   // if (!!config.selfservice.change_password.enabled) {

@@ -41,7 +41,7 @@ export function SessionItem({
   const currentLocale = useLocale();
   moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const [_loading, setLoading] = useState<boolean>(false);
 
   async function clearSessionId(id: string) {
     setLoading(true);
@@ -61,7 +61,7 @@ export function SessionItem({
 
   const { valid, verifiedAt } = isSessionValid(session);
 
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
 
   const router = useRouter();
 

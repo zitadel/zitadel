@@ -31,7 +31,6 @@ type Props = {
 };
 export function TotpRegister({
   uri,
-  secret,
   loginName,
   sessionId,
   requestId,

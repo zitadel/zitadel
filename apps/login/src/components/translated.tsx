@@ -2,7 +2,6 @@ import { useTranslations } from "next-intl";
 
 export function Translated({
   i18nKey,
-  children,
   namespace,
   data,
   ...props
