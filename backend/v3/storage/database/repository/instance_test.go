@@ -54,7 +54,7 @@ func TestCreateInstance(t *testing.T) {
 				}
 				return instance
 			}(),
-			err: new(database.CheckErr),
+			err: new(database.CheckError),
 		},
 		{
 			name: "adding same instance twice",
@@ -79,7 +79,7 @@ func TestCreateInstance(t *testing.T) {
 				require.NoError(t, err)
 				return &inst
 			},
-			err: new(database.UniqueErr),
+			err: new(database.UniqueError),
 		},
 		func() struct {
 			name     string
@@ -145,7 +145,7 @@ func TestCreateInstance(t *testing.T) {
 				}
 				return instance
 			}(),
-			err: new(database.CheckErr),
+			err: new(database.CheckError),
 		},
 	}
 	for _, tt := range tests {
@@ -262,7 +262,7 @@ func TestUpdateInstance(t *testing.T) {
 				return &inst
 			},
 			rowsAffected: 0,
-			getErr:       new(database.ErrNoRowFound),
+			getErr:       new(database.NoRowFoundError),
 		},
 	}
 	for _, tt := range tests {
@@ -341,7 +341,7 @@ func TestGetInstance(t *testing.T) {
 				}
 				return &inst
 			},
-			err: new(database.ErrNoRowFound),
+			err: new(database.NoRowFoundError),
 		},
 	}
 	for _, tt := range tests {
@@ -654,7 +654,7 @@ func TestDeleteInstance(t *testing.T) {
 			instance, err := instanceRepo.Get(ctx,
 				tt.instanceID,
 			)
-			require.ErrorIs(t, err, new(database.ErrNoRowFound))
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
 			assert.Nil(t, instance)
 		})
 	}

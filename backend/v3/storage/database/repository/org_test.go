@@ -63,7 +63,7 @@ func TestCreateOrganization(t *testing.T) {
 				}
 				return organization
 			}(),
-			err: new(database.CheckErr),
+			err: new(database.CheckError),
 		},
 		{
 			name: "adding org with same id twice",
@@ -85,7 +85,7 @@ func TestCreateOrganization(t *testing.T) {
 				org.Name = gofakeit.Name()
 				return &org
 			},
-			err: new(database.UniqueErr),
+			err: new(database.UniqueError),
 		},
 		{
 			name: "adding org with same name twice",
@@ -107,7 +107,7 @@ func TestCreateOrganization(t *testing.T) {
 				org.ID = gofakeit.Name()
 				return &org
 			},
-			err: new(database.UniqueErr),
+			err: new(database.UniqueError),
 		},
 		func() struct {
 			name         string
@@ -180,7 +180,7 @@ func TestCreateOrganization(t *testing.T) {
 				}
 				return organization
 			}(),
-			err: new(database.CheckErr),
+			err: new(database.CheckError),
 		},
 		{
 			name: "adding organization with no instance id",
@@ -194,7 +194,7 @@ func TestCreateOrganization(t *testing.T) {
 				}
 				return organization
 			}(),
-			err: new(database.ForeignKeyErr),
+			err: new(database.ForeignKeyError),
 		},
 		{
 			name: "adding organization with non existent instance id",
@@ -209,7 +209,7 @@ func TestCreateOrganization(t *testing.T) {
 				}
 				return organization
 			}(),
-			err: new(database.ForeignKeyErr),
+			err: new(database.ForeignKeyError),
 		},
 	}
 	for _, tt := range tests {
@@ -496,7 +496,7 @@ func TestGetOrganization(t *testing.T) {
 				return &org
 			},
 			orgIdentifierCondition: orgRepo.NameCondition("non-existent-instance-name"),
-			err:                    new(database.ErrNoRowFound),
+			err:                    new(database.NoRowFoundError),
 		},
 	}
 	for _, tt := range tests {
@@ -932,7 +932,7 @@ func TestDeleteOrganization(t *testing.T) {
 				tt.orgIdentifierCondition,
 				instanceId,
 			)
-			require.ErrorIs(t, err, new(database.ErrNoRowFound))
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
 			assert.Nil(t, organization)
 		})
 	}

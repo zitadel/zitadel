@@ -4,55 +4,55 @@ import (
 	"fmt"
 )
 
-// ErrNoRowFound is returned when QueryRow does not find any row.
+// NoRowFoundError is returned when QueryRow does not find any row.
 // It wraps the dialect specific original error to provide more context.
-type ErrNoRowFound struct {
+type NoRowFoundError struct {
 	original error
 }
 
 func NewNoRowFoundError(original error) error {
-	return &ErrNoRowFound{
+	return &NoRowFoundError{
 		original: original,
 	}
 }
 
-func (e *ErrNoRowFound) Error() string {
+func (e *NoRowFoundError) Error() string {
 	return "no row found"
 }
 
-func (e *ErrNoRowFound) Is(target error) bool {
-	_, ok := target.(*ErrNoRowFound)
+func (e *NoRowFoundError) Is(target error) bool {
+	_, ok := target.(*NoRowFoundError)
 	return ok
 }
 
-func (e *ErrNoRowFound) Unwrap() error {
+func (e *NoRowFoundError) Unwrap() error {
 	return e.original
 }
 
-// ErrMultipleRowsFound is returned when QueryRow finds multiple rows.
+// MultipleRowsFoundError is returned when QueryRow finds multiple rows.
 // It wraps the dialect specific original error to provide more context.
-type ErrMultipleRowsFound struct {
+type MultipleRowsFoundError struct {
 	original error
 	count    int
 }
 
 func NewMultipleRowsFoundError(original error, count int) error {
-	return &ErrMultipleRowsFound{
+	return &MultipleRowsFoundError{
 		original: original,
 		count:    count,
 	}
 }
 
-func (e *ErrMultipleRowsFound) Error() string {
+func (e *MultipleRowsFoundError) Error() string {
 	return fmt.Sprintf("multiple rows found: %d", e.count)
 }
 
-func (e *ErrMultipleRowsFound) Is(target error) bool {
-	_, ok := target.(*ErrMultipleRowsFound)
+func (e *MultipleRowsFoundError) Is(target error) bool {
+	_, ok := target.(*MultipleRowsFoundError)
 	return ok
 }
 
-func (e *ErrMultipleRowsFound) Unwrap() error {
+func (e *MultipleRowsFoundError) Unwrap() error {
 	return e.original
 }
 
@@ -93,15 +93,15 @@ func (e *IntegrityViolation) Is(target error) bool {
 	return ok
 }
 
-// CheckErr is returned when a check constraint fails.
+// CheckError is returned when a check constraint fails.
 // It wraps the [IntegrityViolation] to provide more context.
 // It is used to indicate that a check constraint was violated during an insert or update operation.
-type CheckErr struct {
+type CheckError struct {
 	IntegrityViolation
 }
 
 func NewCheckError(table, constraint string, original error) error {
-	return &CheckErr{
+	return &CheckError{
 		IntegrityViolation: IntegrityViolation{
 			integrityType: IntegrityTypeCheck,
 			table:         table,
@@ -111,24 +111,24 @@ func NewCheckError(table, constraint string, original error) error {
 	}
 }
 
-func (e *CheckErr) Is(target error) bool {
-	_, ok := target.(*CheckErr)
+func (e *CheckError) Is(target error) bool {
+	_, ok := target.(*CheckError)
 	return ok
 }
 
-func (e *CheckErr) Unwrap() error {
+func (e *CheckError) Unwrap() error {
 	return &e.IntegrityViolation
 }
 
-// UniqueErr is returned when a unique constraint fails.
+// UniqueError is returned when a unique constraint fails.
 // It wraps the [IntegrityViolation] to provide more context.
 // It is used to indicate that a unique constraint was violated during an insert or update operation.
-type UniqueErr struct {
+type UniqueError struct {
 	IntegrityViolation
 }
 
 func NewUniqueError(table, constraint string, original error) error {
-	return &UniqueErr{
+	return &UniqueError{
 		IntegrityViolation: IntegrityViolation{
 			integrityType: IntegrityTypeUnique,
 			table:         table,
@@ -138,24 +138,24 @@ func NewUniqueError(table, constraint string, original error) error {
 	}
 }
 
-func (e *UniqueErr) Is(target error) bool {
-	_, ok := target.(*UniqueErr)
+func (e *UniqueError) Is(target error) bool {
+	_, ok := target.(*UniqueError)
 	return ok
 }
 
-func (e *UniqueErr) Unwrap() error {
+func (e *UniqueError) Unwrap() error {
 	return &e.IntegrityViolation
 }
 
-// ForeignKeyErr is returned when a foreign key constraint fails.
+// ForeignKeyError is returned when a foreign key constraint fails.
 // It wraps the [IntegrityViolation] to provide more context.
 // It is used to indicate that a foreign key constraint was violated during an insert or update operation
-type ForeignKeyErr struct {
+type ForeignKeyError struct {
 	IntegrityViolation
 }
 
 func NewForeignKeyError(table, constraint string, original error) error {
-	return &ForeignKeyErr{
+	return &ForeignKeyError{
 		IntegrityViolation: IntegrityViolation{
 			integrityType: IntegrityTypeForeign,
 			table:         table,
@@ -165,24 +165,24 @@ func NewForeignKeyError(table, constraint string, original error) error {
 	}
 }
 
-func (e *ForeignKeyErr) Is(target error) bool {
-	_, ok := target.(*ForeignKeyErr)
+func (e *ForeignKeyError) Is(target error) bool {
+	_, ok := target.(*ForeignKeyError)
 	return ok
 }
 
-func (e *ForeignKeyErr) Unwrap() error {
+func (e *ForeignKeyError) Unwrap() error {
 	return &e.IntegrityViolation
 }
 
-// NotNullErr is returned when a not null constraint fails.
+// NotNullError is returned when a not null constraint fails.
 // It wraps the [IntegrityViolation] to provide more context.
 // It is used to indicate that a not null constraint was violated during an insert or update operation.
-type NotNullErr struct {
+type NotNullError struct {
 	IntegrityViolation
 }
 
 func NewNotNullError(table, constraint string, original error) error {
-	return &NotNullErr{
+	return &NotNullError{
 		IntegrityViolation: IntegrityViolation{
 			integrityType: IntegrityTypeNotNull,
 			table:         table,
@@ -192,37 +192,37 @@ func NewNotNullError(table, constraint string, original error) error {
 	}
 }
 
-func (e *NotNullErr) Is(target error) bool {
-	_, ok := target.(*NotNullErr)
+func (e *NotNullError) Is(target error) bool {
+	_, ok := target.(*NotNullError)
 	return ok
 }
 
-func (e *NotNullErr) Unwrap() error {
+func (e *NotNullError) Unwrap() error {
 	return &e.IntegrityViolation
 }
 
-// UnknownErr is returned when an unknown error occurs.
+// UnknownError is returned when an unknown error occurs.
 // It wraps the dialect specific original error to provide more context.
 // It is used to indicate that an error occurred that does not fit into any of the other categories.
-type UnknownErr struct {
+type UnknownError struct {
 	original error
 }
 
 func NewUnknownError(original error) error {
-	return &UnknownErr{
+	return &UnknownError{
 		original: original,
 	}
 }
 
-func (e *UnknownErr) Error() string {
+func (e *UnknownError) Error() string {
 	return fmt.Sprintf("unknown database error: %v", e.original)
 }
 
-func (e *UnknownErr) Is(target error) bool {
-	_, ok := target.(*UnknownErr)
+func (e *UnknownError) Is(target error) bool {
+	_, ok := target.(*UnknownError)
 	return ok
 }
 
-func (e *UnknownErr) Unwrap() error {
+func (e *UnknownError) Unwrap() error {
 	return e.original
 }
