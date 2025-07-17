@@ -2,8 +2,7 @@
   $foreground: map-get($theme, foreground);
   $background: map-get($theme, background);
   $is-dark-theme: map-get($theme, is-dark);
-
-  $border-radius: 1rem;
+  $border-radius: 0.5rem;
 
   .dropdown-content {
     max-height: 50vh;

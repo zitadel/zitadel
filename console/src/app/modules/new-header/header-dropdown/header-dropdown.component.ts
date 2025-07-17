@@ -91,7 +91,18 @@ export class HeaderDropdownComponent implements OnInit {
                 overlayY: 'bottom',
               },
             ])
-        : undefined!,
+        : this.overlay
+            .position()
+            .flexibleConnectedTo(this.trigger.elementRef)
+            .withPositions([
+              {
+                originX: 'start',
+                originY: 'bottom',
+                overlayX: 'start',
+                overlayY: 'top',
+                offsetY: 8, // 8px gap between trigger and overlay
+              },
+            ]),
     );
   }
 }

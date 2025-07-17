@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { heroChevronUpDown } from '@ng-icons/heroicons/outline';
 import { MatRippleModule } from '@angular/material/core';
@@ -12,4 +12,6 @@ import { MatRippleModule } from '@angular/material/core';
   imports: [NgIconComponent, MatRippleModule],
   providers: [provideIcons({ heroChevronUpDown })],
 })
-export class HeaderButtonComponent {}
+export class HeaderButtonComponent {
+  @Input() ariaLabel: string = '';
+}

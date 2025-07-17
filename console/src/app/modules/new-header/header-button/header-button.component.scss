@@ -10,6 +10,18 @@
   cursor: pointer;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 @mixin header-button-theme($theme) {
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
@@ -22,30 +34,9 @@
     border: 0;
     background: transparent;
     border-radius: 6px;
-    padding: 0 0.5rem;
+    padding: 0 0.25rem;
     cursor: pointer;
     color: map-get($foreground, text);
-
-    &:hover {
-      background-color: if($is-dark-theme, #ffffff10, #00000010);
-    }
-  }
-
-  .header-text {
-    height: 36px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    border: none;
-    color: map-get($foreground, text);
-    border-radius: 6px;
-    position: relative;
-    font-size: 14px;
-    padding: 0 0.75rem;
-    text-align: left;
-    background-color: transparent;
-    cursor: pointer;
-    transition: all ease 0.2s;
 
     &:hover {
       background-color: if($is-dark-theme, #ffffff10, #00000010);

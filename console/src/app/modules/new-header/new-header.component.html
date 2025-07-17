@@ -1,14 +1,15 @@
 <div class="new-header-wrapper">
   <ng-container *ngIf="myInstanceQuery.data()?.instance as instance">
     <ng-container *ngTemplateOutlet="slash"></ng-container>
+    <a class="new-header-breadcrumb" matRipple [matRippleUnbounded]="false" [routerLink]="['/instance']">
+      {{ instance.name }}
+    </a>
     <cnsl-header-button
       cdkOverlayOrigin
       #instanceTrigger="cdkOverlayOrigin"
       (click)="isInstanceDropdownOpen.set(!isInstanceDropdownOpen())"
+      ariaLabel="{{ instance.name }}"
     >
-      <a class="new-header-breadcrumb" matRipple [matRippleUnbounded]="false" [routerLink]="bread.routerLink">
-        {{ instance.name }}
-      </a>
     </cnsl-header-button>
     <cnsl-header-dropdown
       [trigger]="instanceTrigger"
@@ -31,12 +32,21 @@
   </ng-container>
   <ng-container *ngIf="['org.read'] | hasRole | async">
     <ng-container *ngTemplateOutlet="slash"></ng-container>
+    <a
+      *ngIf="activeOrganizationQuery.data() as org"
+      class="new-header-breadcrumb"
+      matRipple
+      [matRippleUnbounded]="false"
+      [routerLink]="['/']"
+    >
+      {{ org.name }}
+    </a>
     <cnsl-header-button
       cdkOverlayOrigin
       #orgTrigger="cdkOverlayOrigin"
       (click)="isOrgDropdownOpen.set(!isOrgDropdownOpen())"
+      ariaLabel="{{ activeOrganizationQuery.data()?.name }}"
     >
-      <ng-container *ngIf="activeOrganizationQuery.data() as org">{{ org.name }}</ng-container>
     </cnsl-header-button>
     <cnsl-header-dropdown [trigger]="orgTrigger" [isOpen]="isOrgDropdownOpen()" (closed)="isOrgDropdownOpen.set(false)">
       <cnsl-organization-selector (orgChanged)="isOrgDropdownOpen.set(false)"></cnsl-organization-selector>
