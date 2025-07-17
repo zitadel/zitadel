@@ -4,9 +4,6 @@
     "build": {
       "outputs": ["dist/**"],
       "dependsOn": ["@zitadel/proto#generate"]
-    },
-    "build:client:standalone": {
-      "outputs": ["dist/**"]
     }
   }
 }

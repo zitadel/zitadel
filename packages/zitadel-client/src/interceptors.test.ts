@@ -24,7 +24,7 @@ describe("NewAuthorizationBearerInterceptor", () => {
   };
 
   test("injects the authorization token", async () => {
-    const handler = vitest.fn((request: Int32Value, context: HandlerContext) => {
+    const handler = vitest.fn((request: Int32Value, _context: HandlerContext) => {
       return { value: request.value.toString() };
     });
 
@@ -42,7 +42,7 @@ describe("NewAuthorizationBearerInterceptor", () => {
   });
 
   test("do not overwrite the previous authorization token", async () => {
-    const handler = vitest.fn((request: Int32Value, context: HandlerContext) => {
+    const handler = vitest.fn((request: Int32Value, _context: HandlerContext) => {
       return { value: request.value.toString() };
     });
 
