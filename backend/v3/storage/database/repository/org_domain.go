@@ -14,9 +14,44 @@ type orgDomain struct {
 	*org
 }
 
+
+
 // -------------------------------------------------------------
 // repository
 // -------------------------------------------------------------
+
+const queryOrganizationDomainStmt = `SELECT instance_id, org_id, domain, is_verified, is_primary, verification_type, created_at, updated_at ` +
+	`FROM zitadel.organization_domains`
+
+// Get implements [domain.OrganizationDomainRepository].
+// Subtle: this method shadows the method ([domain.OrganizationRepository]).Get of orgDomain.org.
+func (o *orgDomain) Get(ctx context.Context, opts ...database.QueryOption) (*domain.OrganizationDomain, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(queryOrganizationDomainStmt)
+	options.Write(&builder)
+
+	return scanOrganizationDomain(ctx, o.client, &builder)
+}
+
+// List implements [domain.OrganizationDomainRepository].
+// Subtle: this method shadows the method ([domain.OrganizationRepository]).List of orgDomain.org.
+func (o *orgDomain) List(ctx context.Context, opts ...database.QueryOption) ([]*domain.OrganizationDomain, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(queryOrganizationDomainStmt)
+	options.Write(&builder)
+
+	return scanOrganizationDomains(ctx, o.client, &builder)
+}
 
 // Add implements [domain.OrganizationDomainRepository].
 func (o *orgDomain) Add(ctx context.Context, domain *domain.AddOrganizationDomain) error {
@@ -32,7 +67,7 @@ func (o *orgDomain) Add(ctx context.Context, domain *domain.AddOrganizationDomai
 }
 
 // Update implements [domain.OrganizationDomainRepository].
-// Subtle: this method shadows the method (*org).Update of orgDomain.org.
+// Subtle: this method shadows the method ([domain.OrganizationRepository]).Update of orgDomain.org.
 func (o *orgDomain) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
 	var builder database.StatementBuilder
 
@@ -83,7 +118,7 @@ func (o orgDomain) DomainCondition(op database.TextOperation, domain string) dat
 }
 
 // InstanceIDCondition implements [domain.OrganizationDomainRepository].
-// Subtle: this method shadows the method (*org).InstanceIDCondition of orgDomain.org.
+// Subtle: this method shadows the method ([domain.OrganizationRepository]).InstanceIDCondition of orgDomain.org.
 func (o orgDomain) InstanceIDCondition(instanceID string) database.Condition {
 	return database.NewTextCondition(o.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
@@ -108,7 +143,7 @@ func (o orgDomain) OrgIDCondition(orgID string) database.Condition {
 // -------------------------------------------------------------
 
 // CreatedAtColumn implements [domain.OrganizationDomainRepository].
-// Subtle: this method shadows the method (*org).CreatedAtColumn of orgDomain.org.
+// Subtle: this method shadows the method ([domain.OrganizationRepository]).CreatedAtColumn of orgDomain.org.
 func (orgDomain) CreatedAtColumn() database.Column {
 	return database.NewColumn("created_at")
 }
@@ -119,7 +154,7 @@ func (orgDomain) DomainColumn() database.Column {
 }
 
 // InstanceIDColumn implements [domain.OrganizationDomainRepository].
-// Subtle: this method shadows the method (*org).InstanceIDColumn of orgDomain.org.
+// Subtle: this method shadows the method ([domain.OrganizationRepository]).InstanceIDColumn of orgDomain.org.
 func (orgDomain) InstanceIDColumn() database.Column {
 	return database.NewColumn("instance_id")
 }
@@ -140,7 +175,7 @@ func (orgDomain) OrgIDColumn() database.Column {
 }
 
 // UpdatedAtColumn implements [domain.OrganizationDomainRepository].
-// Subtle: this method shadows the method (*org).UpdatedAtColumn of orgDomain.org.
+// Subtle: this method shadows the method ([domain.OrganizationRepository]).UpdatedAtColumn of orgDomain.org.
 func (orgDomain) UpdatedAtColumn() database.Column {
 	return database.NewColumn("updated_at")
 }
@@ -153,3 +188,29 @@ func (orgDomain) VerificationTypeColumn() database.Column {
 // -------------------------------------------------------------
 // scanners
 // -------------------------------------------------------------
+
+func scanOrganizationDomain(ctx context.Context, client database.Querier, builder *database.StatementBuilder) (*domain.OrganizationDomain, error) {
+	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+	
+	organizationDomain := &domain.OrganizationDomain{}
+	if err := rows.(database.CollectableRows).CollectExactlyOneRow(organizationDomain); err != nil {
+		return nil, err
+	}
+	return organizationDomain, nil
+}
+
+func scanOrganizationDomains(ctx context.Context, client database.Querier, builder *database.StatementBuilder) ([]*domain.OrganizationDomain, error) {
+	rows, err := client.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	var organizationDomains []*domain.OrganizationDomain
+	if err := rows.(database.CollectableRows).Collect(&organizationDomains); err != nil {
+		return nil, err
+	}
+	return organizationDomains, nil
+}

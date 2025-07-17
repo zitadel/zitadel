@@ -94,9 +94,3 @@ type MemberRepository interface {
 	RemoveMember(ctx context.Context, orgID, userID string) error
 }
 
-// DomainRepository is a sub repository of the org repository and maybe the instance repository.
-type DomainRepository interface {
-	AddDomain(ctx context.Context, domain string) error
-	SetDomainVerified(ctx context.Context, domain string) error
-	RemoveDomain(ctx context.Context, domain string) error
-}

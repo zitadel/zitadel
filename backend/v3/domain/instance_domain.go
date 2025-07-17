@@ -52,6 +52,14 @@ type InstanceDomainRepository interface {
 	instanceDomainConditions
 	instanceDomainChanges
 
+	// Get returns a single domain based on the criteria.
+	// If no domain is found, it returns an error of type [database.ErrNotFound].
+	// If multiple domains are found, it returns an error of type [database.ErrMultipleRows].
+	Get(ctx context.Context, opts ...database.QueryOption) (*InstanceDomain, error)
+	// List returns a list of domains based on the criteria.
+	// If no domains are found, it returns an empty slice.
+	List(ctx context.Context, opts ...database.QueryOption) ([]*InstanceDomain, error)
+
 	// Add adds a new domain to the instance.
 	Add(ctx context.Context, domain *AddInstanceDomain) error
 	// Update updates an existing domain in the instance.

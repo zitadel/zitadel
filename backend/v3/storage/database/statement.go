@@ -24,7 +24,7 @@ func (b *StatementBuilder) WriteArg(arg any) {
 	b.WriteString(b.AppendArg(arg))
 }
 
-// AppebdArg adds the argument to the statement and returns the placeholder.
+// AppendArg adds the argument to the statement and returns the placeholder.
 func (b *StatementBuilder) AppendArg(arg any) (placeholder string) {
 	if b.existingArgs == nil {
 		b.existingArgs = make(map[any]string)

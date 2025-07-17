@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jackc/pgx/v5/pgconn"
-
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
@@ -73,44 +71,9 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 	builder.AppendArgs(organization.ID, organization.Name, organization.InstanceID, organization.State)
 	builder.WriteString(createOrganizationStmt)
 
-	err := o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
-	if err != nil {
-		return checkCreateOrgErr(err)
-	}
-	return nil
+	return o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
 }
 
-func checkCreateOrgErr(err error) error {
-	var pgErr *pgconn.PgError
-	if !errors.As(err, &pgErr) {
-		return err
-	}
-	// constraint violation
-	if pgErr.Code == "23514" {
-		if pgErr.ConstraintName == "organizations_name_check" {
-			return errors.New("organization name not provided")
-		}
-		if pgErr.ConstraintName == "organizations_id_check" {
-			return errors.New("organization id not provided")
-		}
-	}
-	// duplicate
-	if pgErr.Code == "23505" {
-		if pgErr.ConstraintName == "organizations_pkey" {
-			return errors.New("organization id already exists")
-		}
-		if pgErr.ConstraintName == "org_unique_instance_id_name_idx" {
-			return errors.New("organization name already exists for instance")
-		}
-	}
-	// invalid instance id
-	if pgErr.Code == "23503" {
-		if pgErr.ConstraintName == "organizations_instance_id_fkey" {
-			return errors.New("invalid instance id")
-		}
-	}
-	return err
-}
 
 // Update implements [domain.OrganizationRepository].
 func (o *org) Update(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, changes ...database.Change) (int64, error) {

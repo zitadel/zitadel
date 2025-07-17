@@ -18,6 +18,39 @@ type instanceDomain struct {
 // repository
 // -------------------------------------------------------------
 
+const queryInstanceDomainStmt = `SELECT instance_id, domain, is_verified, is_primary, verification_type, created_at, updated_at ` +
+	`FROM zitadel.instance_domains`
+
+// Get implements [domain.InstanceDomainRepository].
+// Subtle: this method shadows the method ([domain.InstanceRepository]).Get of instanceDomain.instance.
+func (i *instanceDomain) Get(ctx context.Context, opts ...database.QueryOption) (*domain.InstanceDomain, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(queryInstanceDomainStmt)
+	options.Write(&builder)
+
+	return scanInstanceDomain(ctx, i.client, &builder)
+}
+
+// List implements [domain.InstanceDomainRepository].
+// Subtle: this method shadows the method ([domain.InstanceRepository]).List of instanceDomain.instance.
+func (i *instanceDomain) List(ctx context.Context, opts ...database.QueryOption) ([]*domain.InstanceDomain, error) {
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	var builder database.StatementBuilder
+	builder.WriteString(queryInstanceDomainStmt)
+	options.Write(&builder)
+
+	return scanInstanceDomains(ctx, i.client, &builder)
+}
+
 // Add implements [domain.InstanceDomainRepository].
 func (i *instanceDomain) Add(ctx context.Context, domain *domain.AddInstanceDomain) error {
 	var builder database.StatementBuilder
@@ -42,7 +75,7 @@ func (i *instanceDomain) Remove(ctx context.Context, condition database.Conditio
 }
 
 // Update implements [domain.InstanceDomainRepository].
-// Subtle: this method shadows the method (instance).Update of instanceDomain.instance.
+// Subtle: this method shadows the method ([domain.InstanceRepository]).Update of instanceDomain.instance.
 func (i *instanceDomain) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
 	var builder database.StatementBuilder
 
@@ -102,7 +135,7 @@ func (i instanceDomain) IsVerifiedCondition(isVerified bool) database.Condition 
 // -------------------------------------------------------------
 
 // CreatedAtColumn implements [domain.InstanceDomainRepository].
-// Subtle: this method shadows the method (instance).CreatedAtColumn of instanceDomain.instance.
+// Subtle: this method shadows the method ([domain.InstanceRepository]).CreatedAtColumn of instanceDomain.instance.
 func (instanceDomain) CreatedAtColumn() database.Column {
 	return database.NewColumn("created_at")
 }
@@ -128,7 +161,7 @@ func (instanceDomain) IsVerifiedColumn() database.Column {
 }
 
 // UpdatedAtColumn implements [domain.InstanceDomainRepository].
-// Subtle: this method shadows the method (instance).UpdatedAtColumn of instanceDomain.instance.
+// Subtle: this method shadows the method ([domain.InstanceRepository]).UpdatedAtColumn of instanceDomain.instance.
 func (instanceDomain) UpdatedAtColumn() database.Column {
 	return database.NewColumn("updated_at")
 }
@@ -146,3 +179,30 @@ func (instanceDomain) IsGeneratedColumn() database.Column {
 // -------------------------------------------------------------
 // scanners
 // -------------------------------------------------------------
+
+func scanInstanceDomains(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.InstanceDomain, error) {
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+
+	var instanceDomains []*domain.InstanceDomain
+	if err := rows.(database.CollectableRows).Collect(&instanceDomains); err != nil {
+		return nil, err
+	}
+
+	return instanceDomains, nil
+}
+
+func scanInstanceDomain(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.InstanceDomain, error) {
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return nil, err
+	}
+	instanceDomain := &domain.InstanceDomain{}
+	if err := rows.(database.CollectableRows).CollectExactlyOneRow(instanceDomain); err != nil {
+		return nil, err
+	}
+
+	return instanceDomain, nil
+}
