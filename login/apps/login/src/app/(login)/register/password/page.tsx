@@ -4,12 +4,11 @@ import { Translated } from "@/components/translated";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   getBrandingSettings,
-  getDefaultOrg,
   getLegalAndSupportSettings,
   getLoginSettings,
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
-import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { getEffectiveOrganizationId } from "@/lib/organization";
 import { headers } from "next/headers";
 
 export default async function Page(props: {
@@ -22,14 +21,10 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
-    if (org) {
-      organization = org.id;
-    }
-  }
+  organization = await getEffectiveOrganizationId({
+    serviceUrl,
+    organization,
+  });
 
   const missingData = !firstname || !lastname || !email || !organization;
 
