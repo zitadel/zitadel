@@ -8,14 +8,13 @@
     "build": "next build",
     "build:standalone": "NEXT_PUBLIC_BASE_PATH=/ui/v2/login NEXT_OUTPUT_MODE=standalone next build",
     "start": "next start",
-    "lint": "pnpm run '/^(lint:next|prettier|knip)$/'",
+    "lint": "pnpm run '/^lint:check:.*$/'",
+    "lint:check:next": "next lint",
+    "lint:check:knip": "knip",
+    "lint:check:prettier": "prettier --check .",
     "lint:fix": "prettier --write .",
-    "lint:next": "next lint",
-    "prettier:fix": "prettier --check .",
-    "knip:fix": "knip --fix",
     "test:unit": "vitest --run",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next",
-    "knip": "knip"
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next"
   },
   "pnpm": {
     "overrides": {
