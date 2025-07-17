@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { enterAnimations } from 'src/app/animations';
+import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 
-const ACTIONS: SidenavSetting = { id: 'general', i18nKey: 'MENU.ACTIONS' };
-const TARGETS: SidenavSetting = { id: 'roles', i18nKey: 'MENU.TARGETS' };
+const ACTIONS: SidenavSetting = { id: 'actions', i18nKey: 'MENU.ACTIONS' };
+const TARGETS: SidenavSetting = { id: 'targets', i18nKey: 'MENU.TARGETS' };
 
 @Component({
   selector: 'cnsl-actions',
@@ -14,7 +15,8 @@ const TARGETS: SidenavSetting = { id: 'roles', i18nKey: 'MENU.TARGETS' };
 })
 export class ActionsComponent {
   public settingsList: SidenavSetting[] = [ACTIONS, TARGETS];
-  public currentSetting = this.settingsList[0];
+  protected readonly currentSetting$ = signal<SidenavSetting>(this.settingsList[0]);
+  protected readonly InfoSectionType = InfoSectionType;
 
   constructor(breadcrumbService: BreadcrumbService) {
     const iamBread = new Breadcrumb({

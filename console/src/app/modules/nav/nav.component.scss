@@ -72,7 +72,6 @@
           color: map-get($foreground, text);
           opacity: 0.8;
 
-          // Active indicator line
           &::after {
             content: '';
             position: absolute;
@@ -80,9 +79,9 @@
             left: 0;
             right: 0;
             width: 0;
-            height: 1px;
+            height: 2px;
             background-color: map-get($foreground, text);
-            transition: width 0.2s ease;
+            // transition: width 0.2s ease;
             border-radius: 2px;
             z-index: 999;
           }
@@ -130,7 +129,7 @@
             color: map-get($primary, default-contrast);
 
             &::after {
-              width: 100%; // Full width for testing
+              width: 100%;
             }
 
             .c_label {

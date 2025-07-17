@@ -1,14 +1,23 @@
 <div class="max-width-container">
   <div class="enlarged-container">
-    <h1>{{ 'ORG.PAGES.LIST' | translate }}</h1>
-    <p class="org-desc cnsl-secondary-text">{{ 'ORG.PAGES.LISTDESCRIPTION' | translate }}</p>
+    <h1>{{ 'ACTIONSTWO.EXECUTION.TITLE' | translate }}</h1>
+    <cnsl-info-section [type]="InfoSectionType.ALERT">
+      {{ 'ACTIONSTWO.BETA_NOTE' | translate }}
+    </cnsl-info-section>
 
-    <cnsl-meta-layout>
-      <cnsl-sidenav [(setting)]="currentSetting" [settingsList]="settingsList">
-        <ng-container *ngIf="currentSetting.id === 'actions'"> actions </ng-container>
+    <cnsl-sidenav
+      [indented]="true"
+      [setting]="currentSetting$()"
+      (settingChange)="currentSetting$.set($event)"
+      [settingsList]="settingsList"
+    >
+      <ng-container *ngIf="currentSetting$().id === 'actions'">
+        <cnsl-actions-two-actions></cnsl-actions-two-actions>
+      </ng-container>
 
-        <ng-container *ngIf="currentSetting.id === 'targets'"> targets </ng-container>
-      </cnsl-sidenav>
-    </cnsl-meta-layout>
+      <ng-container *ngIf="currentSetting$().id === 'targets'">
+        <cnsl-actions-two-targets></cnsl-actions-two-targets>
+      </ng-container>
+    </cnsl-sidenav>
   </div>
 </div>
