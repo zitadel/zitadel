@@ -29,5 +29,10 @@ declare namespace NodeJS {
      * Split by comma, key value pairs separated by colon
      */
     CUSTOM_REQUEST_HEADERS?: string;
+
+    /**
+     * Optional: the site title
+     */
+    SITE_TITLE?: string;
   }
 }
