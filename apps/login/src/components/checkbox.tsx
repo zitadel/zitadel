@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-export type CheckboxProps = DetailedHTMLProps<
+type CheckboxProps = DetailedHTMLProps<
   InputHTMLAttributes<HTMLInputElement>,
   HTMLInputElement
 > & {

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    ".": {
+      "ignore": [
+        "acceptance/**",
+        "integration/**"
+      ]
+    }
+  },
+  "ignoreDependencies": [
+    "@zitadel/client",
+    "@zitadel/proto"
+  ],
+  "rules": {
+    "optionalPeerDependencies": "error",
+    "dependencies": "error",
+    "devDependencies": "error",
+    "exports": "warn",
+    "files": "warn",
+    "binaries": "warn",
+    "classMembers": "warn",
+    "duplicates": "warn",
+    "enumMembers": "warn",
+    "nsExports": "warn",
+    "nsTypes": "warn",
+    "types": "warn",
+    "unlisted": "warn",
+    "unresolved": "warn"
+  }
+}

@@ -8,7 +8,7 @@ export enum BadgeState {
   Alert = "alert",
 }
 
-export type StateBadgeProps = {
+type StateBadgeProps = {
   state: BadgeState;
   children: ReactNode;
   evenPadding?: boolean;

@@ -47,34 +47,6 @@ export function checkPasswordChangeRequired(
   }
 }
 
-export function checkEmailVerified(
-  session: Session,
-  humanUser?: HumanUser,
-  organization?: string,
-  requestId?: string,
-) {
-  if (!humanUser?.email?.isVerified) {
-    const paramsVerify = new URLSearchParams({
-      loginName: session.factors?.user?.loginName as string,
-      userId: session.factors?.user?.id as string, // verify needs user id
-      send: "true", // we request a new email code once the page is loaded
-    });
-
-    if (organization || session.factors?.user?.organizationId) {
-      paramsVerify.append(
-        "organization",
-        organization ?? (session.factors?.user?.organizationId as string),
-      );
-    }
-
-    if (requestId) {
-      paramsVerify.append("requestId", requestId);
-    }
-
-    return { redirect: "/verify?" + paramsVerify };
-  }
-}
-
 export function checkEmailVerification(
   session: Session,
   humanUser?: HumanUser,

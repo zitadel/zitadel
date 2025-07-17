@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from "react";
 
-export enum ButtonSizes {
+enum ButtonSizes {
   Small = "Small",
   Large = "Large",
 }
@@ -9,16 +9,15 @@ export enum ButtonSizes {
 export enum ButtonVariants {
   Primary = "Primary",
   Secondary = "Secondary",
-  Destructive = "Destructive",
-}
+  }
 
-export enum ButtonColors {
+enum ButtonColors {
   Neutral = "Neutral",
   Primary = "Primary",
   Warn = "Warn",
 }
 
-export type ButtonProps = DetailedHTMLProps<
+type ButtonProps = DetailedHTMLProps<
   ButtonHTMLAttributes<HTMLButtonElement>,
   HTMLButtonElement
 > & {
@@ -27,7 +26,7 @@ export type ButtonProps = DetailedHTMLProps<
   color?: ButtonColors;
 };
 
-export const getButtonClasses = (
+const getButtonClasses = (
   size: ButtonSizes,
   variant: ButtonVariants,
   color: ButtonColors,

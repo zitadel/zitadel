@@ -40,8 +40,6 @@ import { SendInviteCodeSchema } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
   AddHumanUserRequest,
   AddHumanUserRequestSchema,
-  ResendEmailCodeRequest,
-  ResendEmailCodeRequestSchema,
   SendEmailCodeRequestSchema,
   SetPasswordRequest,
   SetPasswordRequestSchema,
@@ -62,41 +60,6 @@ async function cacheWrapper<T>(callback: Promise<T>) {
   cacheLife("hours");
 
   return callback;
-}
-
-export async function getHostedLoginTranslation({
-  serviceUrl,
-  organization,
-  locale,
-}: {
-  serviceUrl: string;
-  organization?: string;
-  locale?: string;
-}) {
-  const settingsService: Client<typeof SettingsService> =
-    await createServiceForHost(SettingsService, serviceUrl);
-
-  const callback = settingsService
-    .getHostedLoginTranslation(
-      {
-        level: organization
-          ? {
-              case: "organizationId",
-              value: organization,
-            }
-          : {
-              case: "instance",
-              value: true,
-            },
-        locale: locale,
-      },
-      {},
-    )
-    .then((resp) => {
-      return resp.translations ? resp.translations : undefined;
-    });
-
-  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getBrandingSettings({
@@ -240,21 +203,6 @@ export async function registerTOTP({
   );
 
   return userService.registerTOTP({ userId }, {});
-}
-
-export async function getGeneralSettings({
-  serviceUrl,
-}: {
-  serviceUrl: string;
-}) {
-  const settingsService: Client<typeof SettingsService> =
-    await createServiceForHost(SettingsService, serviceUrl);
-
-  const callback = settingsService
-    .getGeneralSettings({}, {})
-    .then((resp) => resp.supportedLanguages);
-
-  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getLegalAndSupportSettings({
@@ -427,7 +375,7 @@ export async function listSessions({ serviceUrl, ids }: ListSessionsCommand) {
   );
 }
 
-export type AddHumanUserData = {
+type AddHumanUserData = {
   serviceUrl: string;
   firstName: string;
   lastName: string;
@@ -639,7 +587,7 @@ export async function createInviteCode({
   );
 }
 
-export type ListUsersCommand = {
+type ListUsersCommand = {
   serviceUrl: string;
   loginName?: string;
   userName?: string;
@@ -1201,33 +1149,6 @@ export async function verifyEmail({
     },
     {},
   );
-}
-
-export async function resendEmailCode({
-  serviceUrl,
-  userId,
-  urlTemplate,
-}: {
-  serviceUrl: string;
-  userId: string;
-  urlTemplate: string;
-}) {
-  let request: ResendEmailCodeRequest = create(ResendEmailCodeRequestSchema, {
-    userId,
-  });
-
-  const medium = create(SendEmailVerificationCodeSchema, {
-    urlTemplate,
-  });
-
-  request = { ...request, verification: { case: "sendCode", value: medium } };
-
-  const userService: Client<typeof UserService> = await createServiceForHost(
-    UserService,
-    serviceUrl,
-  );
-
-  return userService.resendEmailCode(request, {});
 }
 
 export async function retrieveIDPIntent({

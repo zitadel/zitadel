@@ -43,9 +43,11 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "pnpm exec tsup",
-    "test:unit": "pnpm exec vitest --run",
-    "lint": "eslint \"src/**/*.ts*\"",
+    "build": "tsup",
+    "lint": "pnpm run '/eslint|knip/'",
+    "eslint": "eslint 'src/**/*.ts*'",
+    "knip": "knip",
+    "test:unit": "vitest --run",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
@@ -58,10 +60,13 @@
   },
   "devDependencies": {
     "@bufbuild/protocompile": "^0.0.1",
+    "@types/node": "^24.0.14",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
     "eslint": "^8.57.0",
+    "knip": "^5.61.3",
     "tsup": "^8.4.0",
+    "typescript": "^5.8.3",
     "vitest": "^2.0.0"
   }
 }

@@ -11,7 +11,6 @@ import {
   getUserByID,
 } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
-import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import {
   ChecksJson,
   ChecksSchema,
@@ -30,11 +29,6 @@ type RegisterUserCommand = {
   requestId?: string;
 };
 
-export type RegisterUserResponse = {
-  userId: string;
-  sessionId: string;
-  factors: Factors | undefined;
-};
 export async function registerUser(command: RegisterUserCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -157,11 +151,6 @@ type RegisterUserAndLinkToIDPommand = {
   idpUserName: string;
 };
 
-export type registerUserAndLinkToIDPResponse = {
-  userId: string;
-  sessionId: string;
-  factors: Factors | undefined;
-};
 export async function registerUserAndLinkToIDP(
   command: RegisterUserAndLinkToIDPommand,
 ) {

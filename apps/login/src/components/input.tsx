@@ -10,7 +10,7 @@ import {
   ReactNode,
 } from "react";
 
-export type TextInputProps = DetailedHTMLProps<
+type TextInputProps = DetailedHTMLProps<
   InputHTMLAttributes<HTMLInputElement>,
   HTMLInputElement
 > & {
