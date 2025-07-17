@@ -63,7 +63,6 @@ const (
 	IntegrityTypeUnique  IntegrityType = "unique"
 	IntegrityTypeForeign IntegrityType = "foreign"
 	IntegrityTypeNotNull IntegrityType = "not null"
-	IntegrityTypeUnknown IntegrityType = "unknown"
 )
 
 // IntegrityViolationError represents a generic integrity violation error.
