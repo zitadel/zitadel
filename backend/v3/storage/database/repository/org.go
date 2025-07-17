@@ -217,27 +217,18 @@ func (org) UpdatedAtColumn() database.Column {
 }
 
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
-	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	organization := &domain.Organization{}
+	err := scan(ctx, querier, builder, organization)
 	if err != nil {
 		return nil, err
 	}
-
-	organization := &domain.Organization{}
-	if err := rows.(database.CollectableRows).CollectExactlyOneRow(organization); err != nil {
-		return nil, err
-	}
-
 	return organization, nil
 }
 
 func scanOrganizations(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Organization, error) {
-	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return nil, err
-	}
-
 	organizations := []*domain.Organization{}
-	if err := rows.(database.CollectableRows).Collect(&organizations); err != nil {
+	err := scanMultiple(ctx, querier, builder, &organizations)
+	if err != nil {
 		return nil, err
 	}
 	return organizations, nil

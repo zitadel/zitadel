@@ -30,7 +30,6 @@ CREATE TABLE identity_providers (
     
     , created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     , updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    , deleted_at TIMESTAMPTZ
     
     , PRIMARY KEY (instance_id, id)
     , CONSTRAINT identity_providers_unique UNIQUE NULLS NOT DISTINCT (instance_id, org_id, id)

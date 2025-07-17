@@ -84,7 +84,7 @@ type InstanceRepository interface {
 	// Member() MemberRepository
 
 	Get(ctx context.Context, id string) (*Instance, error)
-	List(ctx context.Context, opts ...database.Condition) ([]*Instance, error)
+	List(ctx context.Context, conditions ...database.Condition) ([]*Instance, error)
 
 	Create(ctx context.Context, instance *Instance) error
 	Update(ctx context.Context, id string, changes ...database.Change) (int64, error)
