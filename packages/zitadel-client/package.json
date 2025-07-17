@@ -44,9 +44,9 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
-    "lint": "pnpm run '/eslint|knip/'",
-    "eslint": "eslint 'src/**/*.ts*'",
-    "knip": "knip",
+    "lint": "pnpm run '/^lint:check:.*$/'",
+    "lint:check:eslint": "eslint 'src/**/*.ts*'",
+    "lint:check:knip": "knip",
     "test:unit": "vitest --run",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },

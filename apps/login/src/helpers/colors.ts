@@ -27,7 +27,7 @@ export type ColorName =
   | "A700";
 
 export type ColorMap = {
-  [key in MapName]: Color[];
+  [_key in MapName]: Color[];
 };
 
 export const DARK_PRIMARY = "#2073c4";
