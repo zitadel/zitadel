@@ -11,6 +11,7 @@
       ariaLabel="{{ instance.name }}"
     >
     </cnsl-header-button>
+
     <cnsl-header-dropdown
       [trigger]="instanceTrigger"
       [isOpen]="isInstanceDropdownOpen()"
@@ -30,7 +31,7 @@
       ></cnsl-organization-selector>
     </cnsl-header-dropdown>
   </ng-container>
-  <ng-container *ngIf="['org.read'] | hasRole | async">
+  <ng-container *ngIf="!onInstanceLevel() && (['org.read'] | hasRole | async) === true">
     <ng-container *ngTemplateOutlet="slash"></ng-container>
     <a
       *ngIf="activeOrganizationQuery.data() as org"
@@ -53,7 +54,7 @@
     </cnsl-header-dropdown>
   </ng-container>
   <ng-container *ngIf="!isHandset()">
-    <ng-container *ngFor="let bread of breadcrumbs(); index as i; let last = last">
+    <ng-container *ngFor="let bread of nestedBreadcrumbs(); index as i; let last = last">
       <ng-container *ngTemplateOutlet="slash"></ng-container>
       <a class="new-header-breadcrumb" matRipple [matRippleUnbounded]="false" [routerLink]="bread.routerLink">
         {{ bread.name }}

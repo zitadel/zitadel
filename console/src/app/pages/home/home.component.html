@@ -11,10 +11,12 @@
       <cnsl-shortcuts />
     </ng-template>
 
-    <p class="disclaimer cnsl-secondary-text">{{ 'HOME.DISCLAIMER' | translate }}</p>
+    <ng-container *ngIf="['policy.read'] | hasRole | async">
+      <cnsl-settings-grid [type]="PolicyComponentServiceType.ADMIN"></cnsl-settings-grid>
+    </ng-container>
 
     <span class="fill-space"></span>
-    <h2 class="desc">{{ 'ONBOARDING.MOREDESCRIPTION' | translate }}</h2>
+    <h2 class="home-desc">{{ 'ONBOARDING.MOREDESCRIPTION' | translate }}</h2>
 
     <div class="home-grid-container">
       <a href="https://zitadel.com/docs/guides/start/quickstart" target="_blank" rel="noreferrer" class="grid-item">

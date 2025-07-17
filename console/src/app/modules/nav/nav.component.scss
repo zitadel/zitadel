@@ -33,7 +33,7 @@
         display: flex;
         align-items: center;
         overflow-x: auto;
-        overflow-y: visible; // Allow the indicator line to show
+        overflow-y: hidden; // Allow the indicator line to show
         align-self: stretch;
         position: absolute;
         top: 0;

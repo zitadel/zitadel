@@ -57,7 +57,9 @@ export class NewHeaderComponent {
   protected readonly instanceSelectorSecondStep = signal(false);
   protected readonly activeOrganizationQuery = this.newOrganizationService.activeOrganizationQuery();
   protected readonly isHandset: Signal<boolean>;
-  protected readonly breadcrumbs: Signal<Breadcrumb[]>;
+  protected readonly breadcrumbs: Signal<Breadcrumb[]> = toSignal(this.breadcrumbService.breadcrumbs$, { initialValue: [] });
+  protected readonly nestedBreadcrumbs: Signal<Breadcrumb[]>;
+  protected readonly onInstanceLevel: Signal<boolean>;
 
   constructor(
     private readonly newOrganizationService: NewOrganizationService,
@@ -68,7 +70,8 @@ export class NewHeaderComponent {
     private readonly breadcrumbService: BreadcrumbService,
   ) {
     this.isHandset = this.getIsHandset();
-    this.breadcrumbs = this.getBreadcrumbs();
+    this.nestedBreadcrumbs = this.getBreadcrumbs();
+    this.onInstanceLevel = this.isOnInstanceLevel();
 
     effect(() => {
       if (this.listMyZitadelPermissionsQuery.isError()) {
@@ -96,11 +99,17 @@ export class NewHeaderComponent {
   }
 
   private getBreadcrumbs() {
-    const breadcrumbs = toSignal(this.breadcrumbService.breadcrumbs$, { initialValue: [] });
     return computed(() =>
-      breadcrumbs().filter(
+      this.breadcrumbs().filter(
         (breadcrumb) => breadcrumb.type === BreadcrumbType.PROJECT || breadcrumb.type === BreadcrumbType.APP,
       ),
     );
+  }
+
+  private isOnInstanceLevel() {
+    return computed(() => {
+      console.log(this.breadcrumbs());
+      return this.breadcrumbs().length === 1 && this.breadcrumbs()[0].type === BreadcrumbType.INSTANCE;
+    });
   }
 }
