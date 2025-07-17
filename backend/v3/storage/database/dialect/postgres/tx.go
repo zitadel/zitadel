@@ -15,12 +15,14 @@ var _ database.Transaction = (*pgxTx)(nil)
 
 // Commit implements [database.Transaction].
 func (tx *pgxTx) Commit(ctx context.Context) error {
-	return tx.Tx.Commit(ctx)
+	err := tx.Tx.Commit(ctx)
+	return wrapError(err)
 }
 
 // Rollback implements [database.Transaction].
 func (tx *pgxTx) Rollback(ctx context.Context) error {
-	return tx.Tx.Rollback(ctx)
+	err := tx.Tx.Rollback(ctx)
+	return wrapError(err)
 }
 
 // End implements [database.Transaction].
@@ -39,20 +41,26 @@ func (tx *pgxTx) End(ctx context.Context, err error) error {
 // Subtle: this method shadows the method (Tx).Query of pgxTx.Tx.
 func (tx *pgxTx) Query(ctx context.Context, sql string, args ...any) (database.Rows, error) {
 	rows, err := tx.Tx.Query(ctx, sql, args...)
-	return &Rows{rows}, err
+	if err != nil {
+		return nil, wrapError(err)
+	}
+	return &Rows{rows}, nil
 }
 
 // QueryRow implements [database.Transaction].
 // Subtle: this method shadows the method (Tx).QueryRow of pgxTx.Tx.
 func (tx *pgxTx) QueryRow(ctx context.Context, sql string, args ...any) database.Row {
-	return tx.Tx.QueryRow(ctx, sql, args...)
+	return &Row{tx.Tx.QueryRow(ctx, sql, args...)}
 }
 
 // Exec implements [database.Transaction].
 // Subtle: this method shadows the method (Pool).Exec of pgxPool.Pool.
 func (tx *pgxTx) Exec(ctx context.Context, sql string, args ...any) (int64, error) {
 	res, err := tx.Tx.Exec(ctx, sql, args...)
-	return res.RowsAffected(), err
+	if err != nil {
+		return 0, wrapError(err)
+	}
+	return res.RowsAffected(), nil
 }
 
 // Begin implements [database.Transaction].
@@ -60,7 +68,7 @@ func (tx *pgxTx) Exec(ctx context.Context, sql string, args ...any) (int64, erro
 func (tx *pgxTx) Begin(ctx context.Context) (database.Transaction, error) {
 	savepoint, err := tx.Tx.Begin(ctx)
 	if err != nil {
-		return nil, err
+		return nil, wrapError(err)
 	}
 	return &pgxTx{savepoint}, nil
 }

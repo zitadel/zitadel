@@ -25,7 +25,7 @@ func (c *pgxConn) Release(_ context.Context) error {
 func (c *pgxConn) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
 	tx, err := c.Conn.BeginTx(ctx, transactionOptionsToPgx(opts))
 	if err != nil {
-		return nil, err
+		return nil, wrapError(err)
 	}
 	return &pgxTx{tx}, nil
 }
@@ -34,20 +34,26 @@ func (c *pgxConn) Begin(ctx context.Context, opts *database.TransactionOptions) 
 // Subtle: this method shadows the method (*Conn).Query of pgxConn.Conn.
 func (c *pgxConn) Query(ctx context.Context, sql string, args ...any) (database.Rows, error) {
 	rows, err := c.Conn.Query(ctx, sql, args...)
-	return &Rows{rows}, err
+	if err != nil {
+		return nil, wrapError(err)
+	}
+	return &Rows{rows}, nil
 }
 
 // QueryRow implements sql.Client.
 // Subtle: this method shadows the method (*Conn).QueryRow of pgxConn.Conn.
 func (c *pgxConn) QueryRow(ctx context.Context, sql string, args ...any) database.Row {
-	return c.Conn.QueryRow(ctx, sql, args...)
+	return &Row{c.Conn.QueryRow(ctx, sql, args...)}
 }
 
 // Exec implements [database.Pool].
 // Subtle: this method shadows the method (Pool).Exec of pgxPool.Pool.
 func (c *pgxConn) Exec(ctx context.Context, sql string, args ...any) (int64, error) {
 	res, err := c.Conn.Exec(ctx, sql, args...)
-	return res.RowsAffected(), err
+	if err != nil {
+		return 0, wrapError(err)
+	}
+	return res.RowsAffected(), nil
 }
 
 // Migrate implements [database.Migrator].
@@ -57,5 +63,5 @@ func (c *pgxConn) Migrate(ctx context.Context) error {
 	}
 	err := migration.Migrate(ctx, c.Conn.Conn())
 	isMigrated = err == nil
-	return err
+	return wrapError(err)
 }

@@ -1,12 +1,8 @@
 package repository
 
 import (
-	"errors"
-
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
-
-var ErrResourceDoesNotExist = errors.New("resource does not exist")
 
 type repository struct {
 	client database.QueryExecutor
