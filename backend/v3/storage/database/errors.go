@@ -66,9 +66,9 @@ const (
 	IntegrityTypeUnknown IntegrityType = "unknown"
 )
 
-// IntegrityViolation represents a generic integrity violation error.
+// IntegrityViolationError represents a generic integrity violation error.
 // It wraps the dialect specific original error to provide more context.
-type IntegrityViolation struct {
+type IntegrityViolationError struct {
 	integrityType IntegrityType
 	table         string
 	constraint    string
@@ -76,7 +76,7 @@ type IntegrityViolation struct {
 }
 
 func NewIntegrityViolationError(typ IntegrityType, table, constraint string, original error) error {
-	return &IntegrityViolation{
+	return &IntegrityViolationError{
 		integrityType: typ,
 		table:         table,
 		constraint:    constraint,
@@ -84,25 +84,25 @@ func NewIntegrityViolationError(typ IntegrityType, table, constraint string, ori
 	}
 }
 
-func (e *IntegrityViolation) Error() string {
+func (e *IntegrityViolationError) Error() string {
 	return fmt.Sprintf("integrity violation of type %q on %q (constraint: %q): %v", e.integrityType, e.table, e.constraint, e.original)
 }
 
-func (e *IntegrityViolation) Is(target error) bool {
-	_, ok := target.(*IntegrityViolation)
+func (e *IntegrityViolationError) Is(target error) bool {
+	_, ok := target.(*IntegrityViolationError)
 	return ok
 }
 
 // CheckError is returned when a check constraint fails.
-// It wraps the [IntegrityViolation] to provide more context.
+// It wraps the [IntegrityViolationError] to provide more context.
 // It is used to indicate that a check constraint was violated during an insert or update operation.
 type CheckError struct {
-	IntegrityViolation
+	IntegrityViolationError
 }
 
 func NewCheckError(table, constraint string, original error) error {
 	return &CheckError{
-		IntegrityViolation: IntegrityViolation{
+		IntegrityViolationError: IntegrityViolationError{
 			integrityType: IntegrityTypeCheck,
 			table:         table,
 			constraint:    constraint,
@@ -117,19 +117,19 @@ func (e *CheckError) Is(target error) bool {
 }
 
 func (e *CheckError) Unwrap() error {
-	return &e.IntegrityViolation
+	return &e.IntegrityViolationError
 }
 
 // UniqueError is returned when a unique constraint fails.
-// It wraps the [IntegrityViolation] to provide more context.
+// It wraps the [IntegrityViolationError] to provide more context.
 // It is used to indicate that a unique constraint was violated during an insert or update operation.
 type UniqueError struct {
-	IntegrityViolation
+	IntegrityViolationError
 }
 
 func NewUniqueError(table, constraint string, original error) error {
 	return &UniqueError{
-		IntegrityViolation: IntegrityViolation{
+		IntegrityViolationError: IntegrityViolationError{
 			integrityType: IntegrityTypeUnique,
 			table:         table,
 			constraint:    constraint,
@@ -144,19 +144,19 @@ func (e *UniqueError) Is(target error) bool {
 }
 
 func (e *UniqueError) Unwrap() error {
-	return &e.IntegrityViolation
+	return &e.IntegrityViolationError
 }
 
 // ForeignKeyError is returned when a foreign key constraint fails.
-// It wraps the [IntegrityViolation] to provide more context.
+// It wraps the [IntegrityViolationError] to provide more context.
 // It is used to indicate that a foreign key constraint was violated during an insert or update operation
 type ForeignKeyError struct {
-	IntegrityViolation
+	IntegrityViolationError
 }
 
 func NewForeignKeyError(table, constraint string, original error) error {
 	return &ForeignKeyError{
-		IntegrityViolation: IntegrityViolation{
+		IntegrityViolationError: IntegrityViolationError{
 			integrityType: IntegrityTypeForeign,
 			table:         table,
 			constraint:    constraint,
@@ -171,19 +171,19 @@ func (e *ForeignKeyError) Is(target error) bool {
 }
 
 func (e *ForeignKeyError) Unwrap() error {
-	return &e.IntegrityViolation
+	return &e.IntegrityViolationError
 }
 
 // NotNullError is returned when a not null constraint fails.
-// It wraps the [IntegrityViolation] to provide more context.
+// It wraps the [IntegrityViolationError] to provide more context.
 // It is used to indicate that a not null constraint was violated during an insert or update operation.
 type NotNullError struct {
-	IntegrityViolation
+	IntegrityViolationError
 }
 
 func NewNotNullError(table, constraint string, original error) error {
 	return &NotNullError{
-		IntegrityViolation: IntegrityViolation{
+		IntegrityViolationError: IntegrityViolationError{
 			integrityType: IntegrityTypeNotNull,
 			table:         table,
 			constraint:    constraint,
@@ -198,7 +198,7 @@ func (e *NotNullError) Is(target error) bool {
 }
 
 func (e *NotNullError) Unwrap() error {
-	return &e.IntegrityViolation
+	return &e.IntegrityViolationError
 }
 
 // UnknownError is returned when an unknown error occurs.
