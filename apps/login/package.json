@@ -5,23 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "dev:turbo": "next dev --turbopack",
-    "test:unit": "pnpm vitest --run",
-    "test:unit:standalone": "pnpm test:unit",
+    "build": "pnpm exec next build",
+    "build:standalone": "NEXT_PUBLIC_BASE_PATH=/ui/v2/login NEXT_OUTPUT_MODE=standalone pnpm build",
+    "start": "pnpm exec next start",
     "lint": "pnpm exec next lint && pnpm exec prettier --check .",
     "lint:fix": "pnpm exec prettier --write .",
-    "lint-staged": "lint-staged",
-    "build": "pnpm exec next build",
-    "build:login:standalone": "NEXT_PUBLIC_BASE_PATH=/ui/v2/login NEXT_OUTPUT_MODE=standalone pnpm build",
-    "start": "pnpm build && pnpm exec next start",
-    "start:built": "pnpm exec next start",
+    "test:unit": "pnpm vitest --run",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next"
-  },
-  "git": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*": "prettier --write --ignore-unknown"
   },
   "pnpm": {
     "overrides": {
@@ -52,11 +42,8 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.23.0",
-    "@bufbuild/buf": "^1.53.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
-    "@types/ms": "2.1.0",
     "@types/node": "^22.14.1",
     "@types/react": "19.1.2",
     "@types/react-dom": "19.1.2",
@@ -64,23 +51,17 @@
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "@vercel/git-hooks": "1.0.0",
-    "autoprefixer": "10.4.21",
+    "@vitejs/plugin-react": "^4.4.1",
     "eslint": "^8.57.0",
     "eslint-config-next": "15.4.0-canary.86",
     "eslint-config-prettier": "^9.1.0",
-    "grpc-tools": "1.13.0",
     "jsdom": "^26.1.0",
     "lint-staged": "15.5.1",
-    "make-dir-cli": "4.0.0",
-    "postcss": "8.5.3",
     "prettier": "^3.2.5",
-    "prettier-plugin-organize-imports": "^3.2.0",
-    "prettier-plugin-tailwindcss": "0.6.11",
     "sass": "^1.87.0",
     "tailwindcss": "3.4.14",
-    "ts-proto": "^2.7.0",
     "typescript": "^5.8.3",
-    "vitest": "^2.0.0"
+    "vitest": "^2.0.0",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }

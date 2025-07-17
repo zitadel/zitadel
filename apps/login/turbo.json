@@ -3,9 +3,9 @@
   "tasks": {
     "build": {
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
-      "dependsOn": ["@zitadel/client#build", "@zitadel/proto#generate"]
+      "dependsOn": ["@zitadel/client#build"]
     },
-    "build:login:standalone": {
+    "build:standalone": {
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "dev": {
