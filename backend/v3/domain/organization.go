@@ -7,26 +7,25 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-//go:generate enumer -type OrgState -transform lower -trimprefix OrgState
-type OrgState uint8
+type OrgState string
 
 const (
-	OrgStateActive OrgState = iota
-	OrgStateInactive
+	OrgStateActive   OrgState = "active"
+	OrgStateInactive OrgState = "inactive"
 )
 
 type Organization struct {
 	ID         string    `json:"id,omitempty" db:"id"`
 	Name       string    `json:"name,omitempty" db:"name"`
 	InstanceID string    `json:"instanceId,omitempty" db:"instance_id"`
-	State      string    `json:"state,omitempty" db:"state"`
+	State      OrgState  `json:"state,omitempty" db:"state"`
 	CreatedAt  time.Time `json:"createdAt,omitempty" db:"created_at"`
 	UpdatedAt  time.Time `json:"updatedAt,omitempty" db:"updated_at"`
 }
 
 // OrgIdentifierCondition is used to help specify a single Organization,
 // it will either be used as the organization ID or organization name,
-// as organizations can be identified either using (instnaceID + ID) OR (instanceID + name)
+// as organizations can be identified either using (instanceID + ID) OR (instanceID + name)
 type OrgIdentifierCondition interface {
 	database.Condition
 }
@@ -79,6 +78,9 @@ type OrganizationRepository interface {
 	Create(ctx context.Context, instance *Organization) error
 	Update(ctx context.Context, id OrgIdentifierCondition, instance_id string, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, id OrgIdentifierCondition, instance_id string) (int64, error)
+
+	// Domains returns the domain sub repository for the organization.
+	Domains() OrganizationDomainRepository
 }
 
 type CreateOrganization struct {
@@ -92,9 +94,3 @@ type MemberRepository interface {
 	RemoveMember(ctx context.Context, orgID, userID string) error
 }
 
-// DomainRepository is a sub repository of the org repository and maybe the instance repository.
-type DomainRepository interface {
-	AddDomain(ctx context.Context, domain string) error
-	SetDomainVerified(ctx context.Context, domain string) error
-	RemoveDomain(ctx context.Context, domain string) error
-}

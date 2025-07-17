@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jackc/pgx/v5/pgconn"
-
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
@@ -17,7 +15,9 @@ import (
 var _ domain.OrganizationRepository = (*org)(nil)
 
 type org struct {
+	shouldJoinDomains bool
 	repository
+	domainRepo domain.OrganizationDomainRepository
 }
 
 func OrganizationRepository(client database.QueryExecutor) domain.OrganizationRepository {
@@ -71,47 +71,12 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 	builder.AppendArgs(organization.ID, organization.Name, organization.InstanceID, organization.State)
 	builder.WriteString(createOrganizationStmt)
 
-	err := o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
-	if err != nil {
-		return checkCreateOrgErr(err)
-	}
-	return nil
+	return o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
 }
 
-func checkCreateOrgErr(err error) error {
-	var pgErr *pgconn.PgError
-	if !errors.As(err, &pgErr) {
-		return err
-	}
-	// constraint violation
-	if pgErr.Code == "23514" {
-		if pgErr.ConstraintName == "organizations_name_check" {
-			return errors.New("organization name not provided")
-		}
-		if pgErr.ConstraintName == "organizations_id_check" {
-			return errors.New("organization id not provided")
-		}
-	}
-	// duplicate
-	if pgErr.Code == "23505" {
-		if pgErr.ConstraintName == "organizations_pkey" {
-			return errors.New("organization id already exists")
-		}
-		if pgErr.ConstraintName == "org_unique_instance_id_name_idx" {
-			return errors.New("organization name already exists for instance")
-		}
-	}
-	// invalid instance id
-	if pgErr.Code == "23503" {
-		if pgErr.ConstraintName == "organizations_instance_id_fkey" {
-			return errors.New("invalid instance id")
-		}
-	}
-	return err
-}
 
 // Update implements [domain.OrganizationRepository].
-func (o org) Update(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, changes ...database.Change) (int64, error) {
+func (o *org) Update(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, changes ...database.Change) (int64, error) {
 	if changes == nil {
 		return 0, errors.New("Update must contain a condition") // (otherwise ALL organizations will be updated)
 	}
@@ -131,7 +96,7 @@ func (o org) Update(ctx context.Context, id domain.OrgIdentifierCondition, insta
 }
 
 // Delete implements [domain.OrganizationRepository].
-func (o org) Delete(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string) (int64, error) {
+func (o *org) Delete(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string) (int64, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(`DELETE FROM zitadel.organizations`)
@@ -179,7 +144,7 @@ func (o org) InstanceIDCondition(instanceID string) database.Condition {
 
 // StateCondition implements [domain.organizationConditions].
 func (o org) StateCondition(state domain.OrgState) database.Condition {
-	return database.NewTextCondition(o.StateColumn(), database.TextOperationEqual, state.String())
+	return database.NewTextCondition(o.StateColumn(), database.TextOperationEqual, state)
 }
 
 // -------------------------------------------------------------
@@ -216,6 +181,10 @@ func (org) UpdatedAtColumn() database.Column {
 	return database.NewColumn("updated_at")
 }
 
+// -------------------------------------------------------------
+// scanners
+// -------------------------------------------------------------
+
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
@@ -224,9 +193,6 @@ func scanOrganization(ctx context.Context, querier database.Querier, builder *da
 
 	organization := &domain.Organization{}
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(organization); err != nil {
-		if err.Error() == "no rows in result set" {
-			return nil, ErrResourceDoesNotExist
-		}
 		return nil, err
 	}
 
@@ -241,13 +207,26 @@ func scanOrganizations(ctx context.Context, querier database.Querier, builder *d
 
 	organizations := []*domain.Organization{}
 	if err := rows.(database.CollectableRows).Collect(&organizations); err != nil {
-		// if no results returned, this is not a error
-		// it just means the organization was not found
-		// the caller should check if the returned organization is nil
-		if err.Error() == "no rows in result set" {
-			return nil, nil
-		}
 		return nil, err
 	}
 	return organizations, nil
+}
+
+// -------------------------------------------------------------
+// sub repositories
+// -------------------------------------------------------------
+
+func (o *org) Domains() domain.OrganizationDomainRepository {
+	o.shouldJoinDomains = true
+
+	if o.domainRepo != nil {
+		return o.domainRepo
+	}
+
+	o.domainRepo = &orgDomain{
+		repository: o.repository,
+		org:        o,
+	}
+
+	return o.domainRepo
 }
