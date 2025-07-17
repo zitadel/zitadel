@@ -1,5 +1,6 @@
 # Contributing to ZITADEL
 
+
 ## Introduction
 
 Thank you for your interest about how to contribute! As you might know there is more than code to contribute. You can find all information needed to start contributing here.
@@ -12,9 +13,12 @@ If you want to give an answer or be part of discussions please be kind. Treat ot
 
 ## What can I contribute?
 
-For people who are new to ZITADEL: We flag issues which are a good starting point to start contributing. You find them [here](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+For people who are new to ZITADEL: We flag issues which are a good starting point to start contributing.
+You find them [here](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+We add the label "good first issue" for problems we think are a good starting point to contribute to ZITADEL.
 
-Make ZITADEL more popular and give it a ⭐
+- [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+- [All issues](https://github.com/zitadel/zitadel/issues)
 
 Help shaping the future of ZITADEL:
 
@@ -22,74 +26,15 @@ Help shaping the future of ZITADEL:
 - Ask or answer questions in the [issues section](https://github.com/zitadel/zitadel/issues)
 - Share your thoughts and ideas in the [discussions section](https://github.com/zitadel/zitadel/discussions)
 
-[Contribute](#how-to-contribute)
-
-- [Contribute code](#contribute)
-- If you found a mistake on our [docs page](https://zitadel.com/docs) or something is missing please read [the docs section](#contribute-docs)
-- [Translate](#contribute-internationalization) and improve texts
+Make ZITADEL more popular and give it a ⭐
 
 Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
-## Quick Start for Contributors
+[Contribute](#how-to-contribute)
 
-ZITADEL uses **pnpm** as package manager and **Turbo** for build orchestration across the monorepo. Here are the most common commands you'll need:
-
-### Prerequisites
-
-- [Node version v20.x](https://nodejs.org/en/download/)
-- [pnpm version 9.x](https://pnpm.io/installation)
-- [Docker](https://docs.docker.com/engine/install/) for running databases and services
-
-### Common Development Commands
-
-```bash
-# Install all dependencies across the monorepo
-pnpm install
-
-# Start the backend database and ZITADEL server
-docker compose --file ./e2e/docker-compose.yaml up --detach zitadel
-
-# Develop the Console (Angular app)
-pnpm dev --filter=console
-
-# Develop the Login UI (Next.js app)
-pnpm dev --filter=@zitadel/login
-
-# Develop the Documentation (Docusaurus)
-pnpm dev --filter=zitadel-docs
-
-# Build everything
-pnpm build
-
-# Lint and fix code across all packages
-pnpm lint
-
-# Run tests
-pnpm test
-
-# Clean up
-docker compose --file ./e2e/docker-compose.yaml down
-```
-
-### Monorepo Structure
-
-The repository is organized as follows:
-
-| Package           | Description                 | Technology          | Development Command                           |
-| ----------------- | --------------------------- | ------------------- | --------------------------------------------- |
-| `console`         | Management UI (post-login)  | Angular, TypeScript | `pnpm turbo dev --filter=console`             |
-| `@zitadel/login`  | Authentication UI           | Next.js, React      | `pnpm turbo dev --filter=@zitadel/login`      |
-| `zitadel-docs`    | Documentation site          | Docusaurus          | `pnpm turbo dev --filter=zitadel-docs`        |
-| `@zitadel/client` | TypeScript client library   | TypeScript          | `pnpm turbo build --filter=@zitadel/client`   |
-| `@zitadel/proto`  | Protocol buffer definitions | Protobuf            | `pnpm turbo generate --filter=@zitadel/proto` |
-
-### Development Workflow
-
-1. **Start the backend**: `docker compose --file ./e2e/docker-compose.yaml up --detach zitadel`
-2. **Choose your focus**: Run one of the development commands above
-3. **Make changes**: Edit code with live reload feedback
-4. **Test your changes**: Use the appropriate test commands
-5. **Cleanup**: `docker compose --file ./e2e/docker-compose.yaml down`
+- [Contribute code](#contribute)
+- If you found a mistake on our [docs page](https://zitadel.com/docs) or something is missing please read [the docs section](contribute-docs)
+- [Translate](#contribute-internationalization) and improve texts
 
 ## How to contribute
 
@@ -100,6 +45,21 @@ You need a github account for that.
 If you are unfamiliar with git have a look at Github's documentation on [creating forks](https://help.github.com/articles/fork-a-repo) and [creating pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork).
 Please draft the pull request as soon as possible.
 Go through the following checklist before you submit the final pull request:
+
+### Components
+
+The code consists of the following parts:
+
+| name            | description                                        | language                                                                                                  | where to find                                       | Development Guide                                  |
+|-----------------|----------------------------------------------------|-----------------------------------------------------------------------------------------------------------|-----------------------------------------------------|----------------------------------------------------|
+| backend         | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to Backend](contribute-backend)        |
+| API definitions | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to Backend](contribute-backend)        |
+| console         | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](contribute-frontend)      |
+| login           | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./login](./login)                                  | [Contribute to Frontend](contribute-frontend)      |
+| docs            | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](contribute-frontend)      |
+| translations    | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](contribute-translations) |
+
+Please follow the guides to validate and test the code before you contribute.
 
 ### Submit a pull request (PR)
 
@@ -165,27 +125,6 @@ Please make sure you cover your changes with tests before marking a Pull Request
 - [ ] Integration tests ensure that certain commands emit expected events that trigger notifications.
 - [ ] Integration tests ensure that certain events trigger expected notifications.
 
-## Contribute
-
-The code consists of the following parts:
-
-| name            | description                                        | language                                                                                                  | where to find                             |
-| --------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| backend         | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc) |
-| console         | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                    |
-| login           | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./login](./login)                        |
-| API definitions | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)        |
-| docs            | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                          |
-
-**Important**: This repository uses **pnpm** as package manager and **Turbo** for build orchestration. All frontend packages (console, login, docs) are managed as a monorepo with shared dependencies and optimized builds.
-
-Please validate and test the code before you contribute.
-
-We add the label "good first issue" for problems we think are a good starting point to contribute to ZITADEL.
-
-- [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-- [All issues](https://github.com/zitadel/zitadel/issues)
-
 ### General Guidelines
 
 #### Gender Neutrality and Inclusive Language
@@ -225,7 +164,7 @@ ZITADEL serves traffic as soon as you can see the following log line:
 
 `INFO[0001] server is listening on [::]:8080`
 
-### Backend/login
+## <a name="backend"></a>Contribute Backend Code
 
 By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.
 Using [Docker Compose](https://docs.docker.com/compose/), you run a [PostgreSQL](https://www.postgresql.org/download/) on your local machine.
@@ -265,7 +204,7 @@ You can now run and debug the binary in .artifacts/zitadel/zitadel using your fa
 You can test if ZITADEL does what you expect by using the UI at http://localhost:8080/ui/console.
 Also, you can verify the data by running `psql "host=localhost dbname=zitadel sslmode=disable"` and running SQL queries.
 
-#### Run Local Unit Tests
+### Run Local Unit Tests
 
 To test the code without dependencies, run the unit tests:
 
@@ -273,7 +212,7 @@ To test the code without dependencies, run the unit tests:
 make core_unit_test
 ```
 
-#### Run Local Integration Tests
+### Run Local Integration Tests
 
 Integration tests are run as gRPC clients against a running ZITADEL server binary.
 The server binary is typically [build with coverage enabled](https://go.dev/doc/build-cover).
@@ -314,7 +253,7 @@ make core_integration_server_stop core_integration_db_down
 
 The test binary has the race detector enabled. `core_core_integration_server_stop` checks for any race logs reported by Go and will print them along a `66` exit code when found. Note that the actual race condition may have happened anywhere during the server lifetime, including start, stop or serving gRPC requests during tests.
 
-#### Run Local End-to-End Tests
+### Run Local End-to-End Tests
 
 To test the whole system, including the console UI and the login UI, run the E2E tests.
 
@@ -324,7 +263,7 @@ export ZITADEL_IMAGE=zitadel:local GOOS=linux
 make docker_image
 
 # If you made changes in the e2e directory, make sure you reformat the files
-pnpm turbo lint --filter=e2e
+pnpm lint --filter=e2e
 
 # Run the tests
 docker compose --file ./e2e/docker-compose.yaml run --service-ports e2e
@@ -337,7 +276,7 @@ When you are happy with your changes, you can cleanup your environment.
 docker compose --file ./e2e/docker-compose.yaml down
 ```
 
-#### Run Local End-to-End Tests Against Your Dev Server Console
+### Run Local End-to-End Tests Against Your Dev Server Console
 
 If you also make [changes to the console](#console), you can run the test suite against your locally built backend code and frontend server.
 
@@ -346,10 +285,10 @@ If you also make [changes to the console](#console), you can run the test suite 
 pnpm install
 
 # Run the tests interactively
-cd ./e2e && pnpm run open:golangangular
+pnpm run open:golangangular
 
 # Run the tests non-interactively
-cd ./e2e && pnpm run e2e:golangangular
+pnpm run e2e:golangangular
 ```
 
 When you are happy with your changes, you can cleanup your environment.
@@ -359,23 +298,33 @@ When you are happy with your changes, you can cleanup your environment.
 docker compose --file ./e2e/docker-compose.yaml down
 ```
 
-### Console
+## Contribute Frontend Code
 
-By executing the commands from this section, you run everything you need to develop the console locally.
-Using [Docker Compose](https://docs.docker.com/compose/), you run [PostgreSQL](https://www.postgresql.org/download/) and the [latest release of ZITADEL](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
-You use the ZITADEL container as backend for your console.
-The console is run in your [Node](https://nodejs.org/en/about/) environment using [a local development server for Angular](https://angular.io/cli/serve#ng-serve), so you have fast feedback about your changes.
+This repository uses **pnpm** as package manager and **Turbo** for build orchestration.
+All frontend packages are managed as a monorepo with shared dependencies and optimized builds:
 
-We use **pnpm** as package manager and **Turbo** for build orchestration. Use angular-eslint/Prettier for linting/formatting, so please run `pnpm turbo lint --filter=console` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
+- [apps/login](contribute-login) (depends on packages/zitadel-client and packages/zitadel-proto)
+- apps/login/integration
+- apps/login/acceptance
+- [console](contribute-console) (depends on packages/zitadel-client)
+- packages/zitadel-client
+- packages/zitadel-proto
+- [docs](contribute-docs)
 
-Once you are happy with your changes, you run end-to-end tests and tear everything down.
+### <a name="frontend-dev-requirements"></a>Frontend Development Requirements
+
+The frontend components are run in your [Node](https://nodejs.org/en/about/) environment with live-reloading develpment servers, so you have fast feedback about your changes.
+
+We use **pnpm** as package manager and **Turbo** for build orchestration. Use angular-eslint/Prettier for linting/formatting.
+VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues during development.
 
 The commands in this section are tested against the following software versions:
 
 - [Docker version 20.10.17](https://docs.docker.com/engine/install/)
 - [Node version v20.x](https://nodejs.org/en/download/)
 - [pnpm version 9.x](https://pnpm.io/installation)
-- [Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)
+
+To run tests with Cypress, ensure you have installed the required [Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)
 
 <details>
   <summary>Note for WSL2 on Windows 10</summary>
@@ -387,131 +336,19 @@ The commands in this section are tested against the following software versions:
 4. When starting XLaunch, make sure to disable access control
 </details>
 
-Run the database and the latest backend locally.
+### <a name="contribute-login"></a>Contribute to Login
 
-```bash
-# Start from the root of the repository
-# You just need the db and the zitadel services to develop the console against.
-docker compose --file ./e2e/docker-compose.yaml up --detach zitadel
-```
+The Login UI is a Next.js application that provides the user interface for authentication flows.
+It's located in the `apps/login` directory and uses pnpm and Turbo for development.
 
-When the backend is ready, you have the latest zitadel exposed at http://localhost:8080.
-You can now run a local development server with live code reloading at http://localhost:4200.
-To allow console access via http://localhost:4200, you have to configure the ZITADEL backend.
-
-1. Navigate to <http://localhost:8080/ui/console/projects>.
-2. When prompted, login with _zitadel-admin@<span because="breaks the mailto"></span>zitadel.localhost_ and _Password1!_
-3. Select the _ZITADEL_ project.
-4. Select the _Console_ application.
-5. Select _Redirect Settings_
-6. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
-7. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
-8. Select the _Save_ button
-
-You can run the local console development server now.
-
-```bash
-# Install dependencies (from repository root)
-pnpm install
-
-# Option 1: Run console development server with Turbo (recommended)
-pnpm turbo dev --filter=console
-
-# Option 2: Run console development server directly
-cd ./console && pnpm start
-
-# Option 3: Build and serve console (production build)
-pnpm turbo build --filter=console
-cd ./console && pnpm serve
-
-# If you don't want to develop against http://localhost:8080, you can use another environment
-ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.zitadel.cloud/ui/console/assets/environment.json pnpm turbo dev --filter=console
-```
-
-Navigate to http://localhost:4200/.
-Make some changes to the source code and see how the browser is automatically updated.
-
-#### Console Development Scripts
-
-Here are the most useful scripts for console development:
-
-```bash
-# Generate protobuf files (happens automatically with Turbo dependencies)
-pnpm turbo generate --filter=console
-
-# Run development server with live reload
-pnpm turbo dev --filter=console
-
-# Build for production
-pnpm turbo build --filter=console
-
-# Lint and fix code
-pnpm turbo lint --filter=console
-
-# Run unit tests
-pnpm turbo test --filter=console
-
-# Run all console-related tasks
-pnpm turbo dev lint test --filter=console
-```
-
-After making changes to the code, you should run the end-to-end-tests.
-Open another shell.
-
-```bash
-# Reformat your console code using Turbo
-pnpm turbo lint --filter=console
-
-# Change to the e2e directory
-cd ./e2e
-
-# If you made changes in the e2e directory, make sure you reformat the files here too
-pnpm run lint:fix
-
-# Install pnpm dependencies
-pnpm install
-
-# Run all e2e tests
-pnpm run e2e:angular -- --headed
-```
-
-You can also open the test suite interactively for fast feedback on specific tests.
-
-```bash
-# Run tests interactively
-pnpm run open:angular
-```
-
-If you also make [changes to the backend code](#backend--login), you can run the test against your locally built backend code and frontend server
-
-```bash
-pnpm run open:golangangular
-pnpm run e2e:golangangular
-```
-
-When you are happy with your changes, you can format your code and cleanup your environment
-
-```bash
-# Stop and remove the docker containers for zitadel and the database
-docker compose --file ./e2e/docker-compose.yaml down
-```
-
-### Login UI
-
-The Login UI is a Next.js application that provides the user interface for authentication flows. It's located in the `./login` directory and uses pnpm and Turbo for development.
-
-#### Prerequisites
-
-- [Node version v20.x](https://nodejs.org/en/download/)
-- [pnpm version 9.x](https://pnpm.io/installation)
-- [Docker](https://docs.docker.com/engine/install/) for running the backend
+To start developing the login, make sure your system has the [required system dependencies](frontend-dev-requirements) installed.
 
 #### Development Setup
 
 ```bash
 # Start from the root of the repository
 # Start the database and ZITADEL backend
-docker compose --file ./e2e/docker-compose.yaml up --detach zitadel
+docker compose --file ./apps/login/acceptance/docker-compose.yaml up --detach zitadel
 
 # Install dependencies
 pnpm install
@@ -519,45 +356,12 @@ pnpm install
 # Option 1: Run login development server with Turbo (recommended)
 pnpm turbo dev --filter=@zitadel/login
 
-# Option 2: Run login development server directly
-cd ./login && pnpm dev
-
-# Option 3: Build and serve login (production build)
+# Option 2: Build and serve login (production build)
 pnpm turbo build --filter=@zitadel/login
 cd ./login && pnpm start
 ```
 
-The login UI will be available at http://localhost:3000.
-
-#### Login Development Scripts
-
-Here are the most useful scripts for login development:
-
-```bash
-# Generate protobuf files (happens automatically with Turbo dependencies)
-pnpm turbo generate --filter=@zitadel/login
-
-# Run development server with live reload
-pnpm turbo dev --filter=@zitadel/login
-
-# Build for production
-pnpm turbo build --filter=@zitadel/login
-
-# Lint and fix code
-pnpm turbo lint --filter=@zitadel/login
-
-# Run unit tests
-pnpm turbo test:unit --filter=@zitadel/login
-
-# Run integration tests
-pnpm turbo test:integration --filter=@zitadel/login
-
-# Run acceptance tests
-pnpm turbo test:acceptance --filter=@zitadel/login
-
-# Run all login-related tasks
-pnpm turbo dev lint test:unit --filter=@zitadel/login
-```
+The login UI is available at http://localhost:3000.
 
 #### Login Architecture
 
@@ -573,34 +377,98 @@ The build process uses Turbo to orchestrate dependencies:
 2. Client library build (`@zitadel/client#build`)
 3. Login application build (`@zitadel/login#build`)
 
-#### Testing the Login UI
+#### Pass Quality Checks
+
+Reproduce the pipelines linting and testing for the login.
 
 ```bash
-# Run unit tests
-pnpm turbo test:unit --filter=@zitadel/login
-
-# Run integration tests (requires running backend)
-pnpm turbo test:integration --filter=@zitadel/login
-
-# Run acceptance tests
-pnpm turbo test:acceptance --filter=@zitadel/login
-
-# Run all tests
-pnpm turbo test:unit test:integration test:acceptance --filter=@zitadel/login
+pnpm turbo quality --filter=./apps/login/* --filter=./packages/*
 ```
 
-When you are happy with your changes, cleanup your environment:
+Fix the [quality checks](troubleshoot-frontend), add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
+
+### <a name="contribute-console"></a>Contribute to Console
+
+To start developing the console, make sure your system has the [required system dependencies](frontend-dev-requirements) installed.
+Then, you need to decide which Zitadel instance you would like to target.
+- The easiest starting point is to [configure your environment](console-dev-existing-zitadel) to use a [Zitadel cloud](https://zitadel.com) instance.
+- Alternatively, you can [start a local Zitadel instance from scratch and develop against it](console-dev-local-zitadel).
+
+#### <a name="console-dev-existing-zitadel"></a>Develop against an already running Zitadel instance
+
+By default, `pnpm dev --filter=console` targets a Zitadel API running at http://localhost:8080.
+To change this, export the link to your environment.json in your environment variables.
 
 ```bash
-# Stop and remove the docker containers
-docker compose --file ./e2e/docker-compose.yaml down
+export ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.us1.zitadel.cloud/ui/console/assets/environment.json
 ```
 
-## Contribute docs
+Proceed [with configuring your console redirect URIs](console-redirect).
+
+#### <a name="console-dev-local-zitadel"></a>Develop against a local Zitadel instance from scratch
+
+By executing the commands from this section, you run everything you need to develop the console locally.
+Using [Docker Compose](https://docs.docker.com/compose/), you run [PostgreSQL](https://www.postgresql.org/download/) and the [latest release of ZITADEL](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
+You use the Zitadel container as backend for your console.
+
+Run the database and the latest backend locally.
+
+```bash
+# Start from the root of the repository
+# You just need the db and the zitadel services to develop the console against.
+docker compose --file ./e2e/docker-compose.yaml up --detach zitadel
+```
+
+When Zitadel accepts traffic, navigate to http://localhost:8080/ui/console/projects?login_hint=zitadel-admin@zitadel.localhost and log in with  _Password1!_.
+
+Proceed [with configuring your console redirect URIs](console-redirect).
+
+#### <a name="console-redirect"></a> Configure Console redirect URI
+
+To allow console access via http://localhost:4200, you have to configure the ZITADEL backend.
+
+1. Navigate to /ui/console/projects in your target Zitadel instance.
+3. Select the _ZITADEL_ project.
+4. Select the _Console_ application.
+5. Select _Redirect Settings_
+6. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
+7. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
+8. Select the _Save_ button
+
+#### Develop
+
+Run the local console development server.
+
+```bash
+# Install dependencies (from repository root)
+pnpm install
+
+# Option 1: Run console development server with live reloading and dependency rebuilds
+pnpm turbo dev --filter=console
+
+# Option 2: Build and serve console (production build)
+pnpm turbo build --filter=console
+pnpm turbo serve --filter=console
+```
+
+Navigate to http://localhost:4200/.
+Make some changes to the source code and see how the browser is automatically updated.
+
+#### Pass Quality Checks
+
+Reproduce the pipelines linting and testing for the console.
+
+```bash
+pnpm turbo quality --filter=console --filter=e2e
+```
+
+Fix the [quality checks](troubleshoot-frontend), add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
+
+### <a name="contribute-docs"></a>Contribute to Docs
 
 Project documentation is made with Docusaurus and is located under [./docs](./docs). The documentation uses **pnpm** and **Turbo** for development and build processes.
 
-### Local Development
+#### Local Development
 
 ```bash
 # Install dependencies (from repository root)
@@ -609,33 +477,9 @@ pnpm install
 # Option 1: Run docs development server with Turbo (recommended)
 pnpm turbo dev --filter=zitadel-docs
 
-# Option 2: Run docs development server directly
-cd ./docs && pnpm start
-
-# Option 3: Build and serve docs (production build)
+# Option 2: Build and serve docs (production build)
 pnpm turbo build --filter=zitadel-docs
 cd ./docs && pnpm serve
-```
-
-#### Docs Development Scripts
-
-Here are the most useful scripts for docs development:
-
-```bash
-# Generate API documentation and configuration docs
-pnpm turbo generate --filter=zitadel-docs
-
-# Run development server with live reload
-pnpm turbo dev --filter=zitadel-docs
-
-# Build for production
-pnpm turbo build --filter=zitadel-docs
-
-# Lint and fix code
-pnpm turbo lint --filter=zitadel-docs
-
-# Run all docs-related tasks
-pnpm turbo dev lint build --filter=zitadel-docs
 ```
 
 The docs build process automatically:
@@ -646,11 +490,11 @@ The docs build process automatically:
 4. Copies configuration files
 5. Builds the Docusaurus site
 
-### Local testing
+#### Local testing
 
 The documentation server will be available at http://localhost:3000 with live reload for fast development feedback.
 
-### Style guide
+#### Style guide
 
 - **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
 - **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "\_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
@@ -666,12 +510,50 @@ The style guide covers a lot of material, so their [highlights](https://develope
 - Use active voice: make clear who's performing the action.
 - Use descriptive link text.
 
-### Docs pull request
+#### Docs pull request
 
 When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
 Scope can be left empty (omit the brackets) or refer to the top navigation sections.
 
-## Contribute internationalization
+#### Pass Quality Checks
+
+Reproduce the pipelines linting checks for the docs.
+
+```bash
+pnpm turbo quality --filter=docs
+```
+
+Fix the [quality checks](troubleshoot-frontend), add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
+
+### <a name="troubleshoot-frontend"></a>Troubleshoot Frontend Quality Checks
+
+To debug and fix failing tasks, execute them individually using the `--filter` flag.
+
+```bash
+# to reproduce linting error in the console:
+pnpm lint --filter=console
+# To fix them:
+pnpm lint:fix --filter=console
+```
+
+More tasks that are runnable on-demand.
+Some tasks have variants like `pnpm test:e2e:angulargolang`,
+others support arguments and flags like `pnpm test:integration run --spec apps/login/integration/integration/login.cy.ts`.
+
+| Command                  | Description                                        | Example                                                                                                               |
+|--------------------------|----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| `pnpm turbo generate`    | Generate stubs from Proto files                    | Generate API docs: `pnpm turbo generate --filter docs`                                                                |
+| `pnpm turbo build`       | Build runnable JavaScript code                     | Regenerate the proto stubs and build the @zitadel/client package: `pnpm turbo build --filter @zitadel/client`         |
+| `pnpm turbo quality`     | Reproduce the pipeline quality checks              | Run login-related quality checks `pnpm turbo quality --filter ./apps/login/* --filter ./packages/*`                   |
+| `pnpm turbo lint:fix`    | Fix linting issues                                 | Fix console-relevant linting issues `pnpm turbo lint:fix --filter console --filter ./packages/* --filter e2e`         |
+| `pnpm turbo format:fix`  | Fix formatting issues                              | Fix login-related formatting issues `pnpm turbo format:fix --filter ./apps/login/* --filter ./packages/*`             |
+| `pnpm turbo test:unit`   | Run unit tests. Rerun on file changes              | Without any filters, all packages are unit tested `pnpm turbo test:unit`                                              |
+| `pnpm test:integration`  | Run Cypress CLI for login integration tests        | Run the tests non-interactively `pnpm test:integration run`                                                           |
+| `pnpm test:acceptance`   | Run the Playwright CLI for login acceptance tests  | Run the tests non-interactively `pnpm test:acceptance test`                                                           |
+| `pnpm test:e2e`          | Run the Cypress CLI for console e2e tests          | Test interactively against the console in a local dev server and Zitadel in a container: `pnpm test:e2e:angular open` |
+| `pnpm down`              | Remove containers and volumes                      | Shut down containers from the integration test setup `pnpm down --filter login-test-integration`                      |
+
+## <a name="contribute-translations"></a>Contribute Translations
 
 ZITADEL loads translations from four files:
 
@@ -729,6 +611,7 @@ The state should reflect the progress of the issue and what is going on right no
 - **🔖 Ready**: The issue is ready to take into a sprint. Difference to "prioritized..." is that the complexity is defined by the team.
 - **📋 Sprint backlog**: The issue is scheduled for the current sprint.
 - **🏗 In progress**: Someone is working on this issue right now. The issue will get an assignee as soon as it is in progress.
+- **❌ Blocked**: The issue is blocked until another issue is resolved/done.
 - **👀 In review**: The issue is in review. Please add someone to review your issue or let us know that it is ready to review with a comment on your pull request.
 - **✅ Done**: The issue is implemented and merged to main.
 
