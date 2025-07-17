@@ -27,13 +27,11 @@ export class InstanceSelectorComponent {
   @Input({ required: true })
   public instance!: InstanceDetail;
 
-  constructor(
-    private readonly router: Router,
-    private envService: EnvironmentService,
-  ) {}
+  constructor(private envService: EnvironmentService) {}
 
   protected async setInstance({ id }: InstanceDetail) {
     this.instanceChanged.emit(id);
-    await this.router.navigate(['/']);
+    // skip this for now
+    // await this.router.navigate(['/']);
   }
 }
