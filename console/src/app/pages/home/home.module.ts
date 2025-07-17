@@ -14,7 +14,6 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './home.component';
 import { QuickstartComponent } from 'src/app/components/quickstart/quickstart.component';
-import { SettingsGridModule } from 'src/app/modules/settings-grid/settings-grid.module';
 
 @NgModule({
   declarations: [HomeComponent],
@@ -32,7 +31,6 @@ import { SettingsGridModule } from 'src/app/modules/settings-grid/settings-grid.
     ShortcutsModule,
     OnboardingModule,
     MatRippleModule,
-    SettingsGridModule,
   ],
 })
 export default class HomeModule {}

@@ -126,7 +126,6 @@
 
           &.active {
             opacity: 1;
-            color: map-get($primary, default-contrast);
 
             &::after {
               width: 100%;

@@ -11,10 +11,6 @@
       <cnsl-shortcuts />
     </ng-template>
 
-    <ng-container *ngIf="['policy.read'] | hasRole | async">
-      <cnsl-settings-grid [type]="PolicyComponentServiceType.ADMIN"></cnsl-settings-grid>
-    </ng-container>
-
     <span class="fill-space"></span>
     <h2 class="home-desc">{{ 'ONBOARDING.MOREDESCRIPTION' | translate }}</h2>
 

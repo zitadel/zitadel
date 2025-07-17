@@ -1,14 +1,26 @@
-<div class="upper-content">
-  <span class="dropdown-label">{{ 'MENU.INSTANCEOVERVIEW' | translate }}</span>
-  <a (click)="setInstance(instance)" mat-button class="dropdown-button"
-    >{{ instance.name }}
-    <ng-icon name="heroChevronRight"></ng-icon>
-  </a>
-</div>
+<div class="instance-selector-container">
+  <div class="upper-content">
+    <span class="dropdown-label">{{ 'MENU.INSTANCEOVERVIEW' | translate }}</span>
+    <a (click)="setInstance(instance)" mat-button class="dropdown-button"
+      >{{ instance.name }}
+      <ng-icon name="heroChevronRight"></ng-icon>
+    </a>
+  </div>
 
-<div class="footer">
-  <a [routerLink]="['/instance']" (click)="settingsClicked.emit()" mat-button class="dropdown-button settings-button">
-    <h3>{{ 'MENU.SETTINGS' | translate }}</h3>
-    <ng-icon name="heroCog8ToothSolid"></ng-icon>
-  </a>
+  <div class="footer">
+    <a
+      mat-raised-button
+      color="primary"
+      *ngIf="customerPortalLink$ | async as customerPortalLink"
+      class="portal-link external-link"
+      [href]="customerPortalLink"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <div class="cnsl-action-button">
+        <span class="portal-span">{{ 'MENU.CUSTOMERPORTAL' | translate }}</span>
+        <i class="las la-external-link-alt"></i>
+      </div>
+    </a>
+  </div>
 </div>

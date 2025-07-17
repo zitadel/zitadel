@@ -86,7 +86,6 @@ export class InstanceComponent {
   ];
 
   protected readonly settingsList$: Observable<SidenavSetting[]>;
-  protected readonly customerPortalLink$ = this.envService.env.pipe(map((env) => env.customer_portal));
 
   constructor(
     protected readonly adminService: AdminService,
@@ -95,7 +94,6 @@ export class InstanceComponent {
     breadcrumbService: BreadcrumbService,
     private readonly router: Router,
     private readonly authService: GrpcAuthService,
-    private readonly envService: EnvironmentService,
     activatedRoute: ActivatedRoute,
     private readonly destroyRef: DestroyRef,
   ) {
