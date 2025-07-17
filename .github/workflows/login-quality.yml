@@ -53,7 +53,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Run login quality checks with Turbo
-        run: pnpm turbo test:unit --filter=@zitadel/login
+        run: pnpm turbo test:unit
         env:
           DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
           LOGIN_BAKE_CLI: depot bake

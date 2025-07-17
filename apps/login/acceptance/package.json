@@ -12,6 +12,7 @@
     "@otplib/plugin-crypto": "^12.0.0",
     "@otplib/plugin-thirty-two": "^12.0.0",
     "@playwright/test": "^1.52.0",
+    "dotenv-cli": "^8.0.0",
     "gaxios": "^7.1.0",
     "typescript": "^5.8.3"
   }

@@ -50,22 +50,22 @@ pnpm install
 docker compose --file ./e2e/docker-compose.yaml up --detach zitadel
 
 # Develop the Console (Angular app)
-pnpm turbo dev --filter=console
+pnpm dev --filter=console
 
 # Develop the Login UI (Next.js app)
-pnpm turbo dev --filter=@zitadel/login
+pnpm dev --filter=@zitadel/login
 
 # Develop the Documentation (Docusaurus)
-pnpm turbo dev --filter=zitadel-docs
+pnpm dev --filter=zitadel-docs
 
 # Build everything
-pnpm turbo build
+pnpm build
 
 # Lint and fix code across all packages
-pnpm turbo lint
+pnpm lint
 
 # Run tests
-pnpm turbo test
+pnpm test
 
 # Clean up
 docker compose --file ./e2e/docker-compose.yaml down
