@@ -1,7 +1,7 @@
 <div class="new-header-wrapper">
   <ng-container *ngIf="myInstanceQuery.data()?.instance as instance">
     <ng-container *ngTemplateOutlet="slash"></ng-container>
-    <a class="new-header-breadcrumb" matRipple [matRippleUnbounded]="false" [routerLink]="['/instance']">
+    <a class="new-header-breadcrumb" matRipple [matRippleUnbounded]="false" [routerLink]="['/']">
       {{ instance.name }}
     </a>
     <cnsl-header-button
@@ -37,7 +37,7 @@
       class="new-header-breadcrumb"
       matRipple
       [matRippleUnbounded]="false"
-      [routerLink]="['/']"
+      [routerLink]="['/org']"
     >
       {{ org.name }}
     </a>

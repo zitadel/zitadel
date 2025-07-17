@@ -33,10 +33,7 @@ import {
   VIEWS,
   FAILEDEVENTS,
   EVENTS,
-  ORGANIZATIONS,
   FEATURESETTINGS,
-  ACTIONS,
-  ACTIONS_TARGETS,
 } from 'src/app/modules/settings-list/settings';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -58,10 +55,7 @@ export class InstanceComponent {
 
   protected id: string = '';
   protected readonly defaultSettingsList: SidenavSetting[] = [
-    ORGANIZATIONS,
     FEATURESETTINGS,
-    ACTIONS,
-    ACTIONS_TARGETS,
     // notifications
     // { showWarn: true, ...NOTIFICATIONS },
     NOTIFICATIONS,

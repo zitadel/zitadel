@@ -27,8 +27,8 @@ export class HomeComponent {
     public themeService: ThemeService,
   ) {
     const bread: Breadcrumb = {
-      type: BreadcrumbType.ORG,
-      routerLink: ['/org'],
+      type: BreadcrumbType.INSTANCE,
+      routerLink: ['/'],
     };
 
     breadcrumbService.setBreadcrumb([bread]);
