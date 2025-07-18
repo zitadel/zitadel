@@ -1,0 +1,21 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "dependsOn": ["@zitadel/client#build"]
+    },
+    "build:standalone": {
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "dependsOn": ["@zitadel/client#build"]
+    },
+    "test": {
+      "dependsOn": ["@zitadel/client#build"]
+    },
+    "test:unit": {
+      "dependsOn": ["@zitadel/client#build"]
+    }
+  }
+}

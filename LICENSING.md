@@ -23,6 +23,7 @@ The following files and directories, including their subdirectories, are license
 
 ```
 login/
+clients/
 ```
 
 ## Community Contributions

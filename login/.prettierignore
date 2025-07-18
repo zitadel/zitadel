@@ -1,9 +1,0 @@
-.next/
-.changeset/
-.github/
-dist/
-standalone/
-packages/zitadel-proto/google
-packages/zitadel-proto/protoc-gen-openapiv2
-packages/zitadel-proto/validate
-packages/zitadel-proto/zitadel
