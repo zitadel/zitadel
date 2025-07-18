@@ -2,21 +2,14 @@ version: '3.8'
 services:
   devcontainer:
     image: mcr.microsoft.com/devcontainers/base:ubuntu
+    user: "1000:1000"
     volumes:
-      - ../..:/workspaces:cached
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ..:/workspaces
+      - ${HOME}:/home/${USER}
     network_mode: service:db
     command: sleep infinity
     environment:
       ZITADEL_DATABASE_POSTGRES_HOST: db
-      ZITADEL_DATABASE_POSTGRES_PORT: 5432
-      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
       ZITADEL_EXTERNALSECURE: false
   db:
     image: postgres:latest
