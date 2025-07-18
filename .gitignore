@@ -7,7 +7,7 @@
 
 # Test binary, build with `go test -c`
 *.test
-!apps/login/.env.test
+!/**/.env.test
 
 # Coverage
 coverage.txt

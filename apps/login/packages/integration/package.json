@@ -2,14 +2,13 @@
   "name": "login-test-integration",
   "private": true,
   "scripts": {
-    "test:integration": "dotenv -e ../login/.env.test pnpm exec cypress run --browser chrome --headless",
-    "test:integration:open": "dotenv -e ../login/.env.test pnpm exec cypress open --browser chrome",
+    "test:integration": "DISPLAY='' dotenv -e ../../apps/login/.env.test cypress",
     "test:integration:setup": "cd .. && make login_test_integration_dev"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",
     "concurrently": "^9.1.2",
-    "cypress": "^14.3.2",
+    "cypress": "^14.5.2",
     "dotenv-cli": "^8.0.0",
     "env-cmd": "^10.0.0",
     "nodemon": "^3.1.9",

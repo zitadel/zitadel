@@ -14,7 +14,9 @@
     "NEXT_PUBLIC_BASE_PATH",
     "CUSTOM_REQUEST_HEADERS",
     "NODE_ENV",
-    "INKEEP_API_KEY"
+    "INKEEP_API_KEY",
+    "DISPLAY",
+    "CYPRESS_DISPLAY"
   ],
   "tasks": {
     "generate": {
@@ -24,11 +26,17 @@
     "quality": {
       "with": [
         "lint",
-        "test:unit"
+        "test:unit",
+        "test:integration",
+        "test:acceptance",
+        "test:e2e"
       ]
     },
     "start": {},
     "test:unit": {},
+    "test:integration": {},
+    "test:acceptance": {},
+    "test:e2e": {},
     "lint": {},
     "lint:fix": {},
     "dev": {
