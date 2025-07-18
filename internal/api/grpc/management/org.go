@@ -278,28 +278,28 @@ func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembers
 }
 
 func (s *Server) AddOrgMember(ctx context.Context, req *mgmt_pb.AddOrgMemberRequest) (*mgmt_pb.AddOrgMemberResponse, error) {
-	addedMember, err := s.command.AddOrgMember(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Roles...)
+	addedMember, err := s.command.AddOrgMember(ctx, AddOrgMemberRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddOrgMemberResponse{
 		Details: object.AddToDetailsPb(
 			addedMember.Sequence,
-			addedMember.ChangeDate,
+			addedMember.EventDate,
 			addedMember.ResourceOwner,
 		),
 	}, nil
 }
 
 func (s *Server) UpdateOrgMember(ctx context.Context, req *mgmt_pb.UpdateOrgMemberRequest) (*mgmt_pb.UpdateOrgMemberResponse, error) {
-	changedMember, err := s.command.ChangeOrgMember(ctx, UpdateOrgMemberRequestToDomain(ctx, req))
+	changedMember, err := s.command.ChangeOrgMember(ctx, UpdateOrgMemberRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateOrgMemberResponse{
 		Details: object.ChangeToDetailsPb(
 			changedMember.Sequence,
-			changedMember.ChangeDate,
+			changedMember.EventDate,
 			changedMember.ResourceOwner,
 		),
 	}, nil
@@ -316,28 +316,7 @@ func (s *Server) RemoveOrgMember(ctx context.Context, req *mgmt_pb.RemoveOrgMemb
 }
 
 func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, orgID string) ([]string, error) {
-	queries := make([]query.SearchQuery, 0, 2)
-	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
-	if err != nil {
-		return nil, err
-	}
-	queries = append(queries, loginName)
-	if orgID != "" {
-		owner, err := query.NewUserResourceOwnerSearchQuery(orgID, query.TextNotEquals)
-		if err != nil {
-			return nil, err
-		}
-		queries = append(queries, owner)
-	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: queries}, nil)
-	if err != nil {
-		return nil, err
-	}
-	userIDs := make([]string, len(users.Users))
-	for i, user := range users.Users {
-		userIDs[i] = user.ID
-	}
-	return userIDs, nil
+	return s.query.SearchClaimedUserIDsOfOrgDomain(ctx, orgDomain, orgID)
 }
 
 func (s *Server) ListOrgMetadata(ctx context.Context, req *mgmt_pb.ListOrgMetadataRequest) (*mgmt_pb.ListOrgMetadataResponse, error) {

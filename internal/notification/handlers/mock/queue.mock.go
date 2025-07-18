@@ -22,6 +22,7 @@ import (
 type MockQueue struct {
 	ctrl     *gomock.Controller
 	recorder *MockQueueMockRecorder
+	isgomock struct{}
 }
 
 // MockQueueMockRecorder is the mock recorder for MockQueue.
@@ -42,10 +43,10 @@ func (m *MockQueue) EXPECT() *MockQueueMockRecorder {
 }
 
 // Insert mocks base method.
-func (m *MockQueue) Insert(arg0 context.Context, arg1 river.JobArgs, arg2 ...queue.InsertOpt) error {
+func (m *MockQueue) Insert(ctx context.Context, args river.JobArgs, opts ...queue.InsertOpt) error {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{ctx, args}
+	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Insert", varargs...)
@@ -54,8 +55,8 @@ func (m *MockQueue) Insert(arg0 context.Context, arg1 river.JobArgs, arg2 ...que
 }
 
 // Insert indicates an expected call of Insert.
-func (mr *MockQueueMockRecorder) Insert(arg0, arg1 any, arg2 ...any) *gomock.Call {
+func (mr *MockQueueMockRecorder) Insert(ctx, args any, opts ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, args}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockQueue)(nil).Insert), varargs...)
 }
