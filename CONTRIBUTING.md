@@ -539,19 +539,20 @@ pnpm lint:fix --filter=console
 More tasks that are runnable on-demand.
 Some tasks have variants like `pnpm test:e2e:angulargolang`,
 others support arguments and flags like `pnpm test:integration run --spec apps/login/integration/integration/login.cy.ts`.
+For the turbo commands, check your options with `pnpm turbo --help`
 
-| Command                  | Description                                        | Example                                                                                                               |
-|--------------------------|----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
-| `pnpm turbo generate`    | Generate stubs from Proto files                    | Generate API docs: `pnpm turbo generate --filter docs`                                                                |
-| `pnpm turbo build`       | Build runnable JavaScript code                     | Regenerate the proto stubs and build the @zitadel/client package: `pnpm turbo build --filter @zitadel/client`         |
-| `pnpm turbo quality`     | Reproduce the pipeline quality checks              | Run login-related quality checks `pnpm turbo quality --filter ./apps/login/* --filter ./packages/*`                   |
-| `pnpm turbo lint:fix`    | Fix linting issues                                 | Fix console-relevant linting issues `pnpm turbo lint:fix --filter console --filter ./packages/* --filter e2e`         |
-| `pnpm turbo format:fix`  | Fix formatting issues                              | Fix login-related formatting issues `pnpm turbo format:fix --filter ./apps/login/* --filter ./packages/*`             |
-| `pnpm turbo test:unit`   | Run unit tests. Rerun on file changes              | Without any filters, all packages are unit tested `pnpm turbo test:unit`                                              |
-| `pnpm test:integration`  | Run Cypress CLI for login integration tests        | Run the tests non-interactively `pnpm test:integration run`                                                           |
-| `pnpm test:acceptance`   | Run the Playwright CLI for login acceptance tests  | Run the tests non-interactively `pnpm test:acceptance test`                                                           |
-| `pnpm test:e2e`          | Run the Cypress CLI for console e2e tests          | Test interactively against the console in a local dev server and Zitadel in a container: `pnpm test:e2e:angular open` |
-| `pnpm down`              | Remove containers and volumes                      | Shut down containers from the integration test setup `pnpm down --filter login-test-integration`                      |
+| Command                   | Description                                        | Example                                                                                                               |
+|---------------------------|----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| `pnpm turbo run generate` | Generate stubs from Proto files                    | Generate API docs: `pnpm turbo generate --filter docs`                                                                |
+| `pnpm turbo build`        | Build runnable JavaScript code                     | Regenerate the proto stubs and build the @zitadel/client package: `pnpm turbo build --filter @zitadel/client`         |
+| `pnpm turbo quality`      | Reproduce the pipeline quality checks              | Run login-related quality checks `pnpm turbo quality --filter ./apps/login/* --filter ./packages/*`                   |
+| `pnpm turbo lint:fix`     | Fix linting issues                                 | Fix console-relevant linting issues `pnpm turbo lint:fix --filter console --filter ./packages/* --filter e2e`         |
+| `pnpm turbo format:fix`   | Fix formatting issues                              | Fix login-related formatting issues `pnpm turbo format:fix --filter ./apps/login/* --filter ./packages/*`             |
+| `pnpm turbo test:unit`    | Run unit tests. Rerun on file changes              | Run unit tests in all packages in and watch for file changes `pnpm turbo watch test:unit`                             |
+| `pnpm test:integration`   | Run Cypress CLI for login integration tests        | Run the tests non-interactively `pnpm test:integration run`                                                           |
+| `pnpm test:acceptance`    | Run the Playwright CLI for login acceptance tests  | Run the tests non-interactively `pnpm test:acceptance test`                                                           |
+| `pnpm test:e2e`           | Run the Cypress CLI for console e2e tests          | Test interactively against the console in a local dev server and Zitadel in a container: `pnpm test:e2e:angular open` |
+| `pnpm down`               | Remove containers and volumes                      | Shut down containers from the integration test setup `pnpm down --filter login-test-integration`                      |
 
 ## <a name="contribute-translations"></a>Contribute Translations
 
