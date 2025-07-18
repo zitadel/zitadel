@@ -1,0 +1,35 @@
+@mixin new-header-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .new-header-wrapper {
+    padding-left: 5px;
+    padding-right: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+  }
+
+  .new-header-breadcrumb {
+    height: 36px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    padding: 0 0.5rem;
+    border: none;
+    color: map-get($foreground, text);
+    position: relative;
+    font-size: 14px;
+    text-align: left;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    text-decoration: none;
+
+    &:hover {
+      background-color: if($is-dark-theme, #ffffff10, #00000010);
+    }
+  }
+}

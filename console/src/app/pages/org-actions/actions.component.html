@@ -1,0 +1,107 @@
+<div class="max-width-container">
+  <div class="enlarged-container actions-enlarged-container">
+    <div class="actions-title-row">
+      <h1>{{ 'DESCRIPTIONS.ACTIONS.TITLE' | translate }}</h1>
+      <a mat-icon-button href="https://zitadel.com/docs/concepts/features/actions" rel="noreferrer" target="_blank">
+        <mat-icon class="icon">info_outline</mat-icon>
+      </a>
+    </div>
+    <cnsl-info-section [type]="InfoSectionType.ALERT">
+      {{ 'DESCRIPTIONS.ACTIONS.ACTIONSTWO_NOTE' | translate }}
+    </cnsl-info-section>
+    <p class="desc cnsl-secondary-text">{{ 'DESCRIPTIONS.ACTIONS.DESCRIPTION' | translate }}</p>
+
+    <cnsl-info-section class="max-actions" *ngIf="maxActions"
+      >{{ 'FLOWS.ACTIONSMAX' | translate: { value: maxActions } }}
+    </cnsl-info-section>
+
+    <ng-template cnslHasRole [hasRole]="['org.action.read']">
+      <cnsl-card
+        title="{{ 'DESCRIPTIONS.ACTIONS.SCRIPTS.TITLE' | translate }}"
+        description="{{ 'DESCRIPTIONS.ACTIONS.SCRIPTS.DESCRIPTION' | translate }}"
+      >
+        <cnsl-action-table (changedSelection)="selection = $event"></cnsl-action-table>
+      </cnsl-card>
+    </ng-template>
+
+    <div class="title-section">
+      <h2>{{ 'DESCRIPTIONS.ACTIONS.FLOWS.TITLE' | translate }}</h2>
+      <i class="las la-exchange-alt"></i>
+    </div>
+
+    <p class="desc cnsl-secondary-text">{{ 'DESCRIPTIONS.ACTIONS.FLOWS.DESCRIPTION' | translate }}</p>
+
+    <ng-template cnslHasRole [hasRole]="['org.flow.read']">
+      <div class="actions-flow">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'FLOWS.FLOWTYPE' | translate }}</cnsl-label>
+          <mat-select [formControl]="typeControl">
+            <mat-option *ngFor="let type of typesForSelection" [value]="type">
+              {{ type.name?.localizedMessage }}
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
+
+        <div *ngIf="flow" class="trigger-wrapper">
+          <div class="actions-topbottomline"></div>
+
+          <div class="flow-type">
+            <i class="type-icon las la-dot-circle"></i>
+            <span>{{ flow.type?.name?.localizedMessage }}</span>
+            <button
+              *ngIf="flow.type && (flow.triggerActionsList?.length ?? 0) > 0"
+              matTooltip="{{ 'ACTIONS.CLEAR' | translate }}"
+              mat-icon-button
+              color="warn"
+              (click)="clearFlow(flow.type.id)"
+            >
+              <i class="type-button-icon las la-trash"></i>
+            </button>
+          </div>
+
+          <cnsl-card *ngFor="let trigger of flow.triggerActionsList; index as i" class="trigger">
+            <div class="trigger-top">
+              <mat-icon svgIcon="mdi_arrow_right_bottom" class="icon"></mat-icon>
+              <span>{{ trigger.triggerType?.name?.localizedMessage }}</span>
+              <span class="fill-space"></span>
+              <button color="warn" mat-icon-button (click)="removeTriggerActionsList(i)">
+                <i class="las la-trash"></i>
+              </button>
+            </div>
+            <span class="fill-space"></span>
+            <div class="flow-action-wrapper" cdkDropList (cdkDropListDropped)="drop(i, trigger.actionsList, $event)">
+              <div
+                cdkDrag
+                cdkDragLockAxis="y"
+                cdkDragBoundary=".action-wrapper"
+                class="flow-action"
+                *ngFor="let action of trigger.actionsList"
+              >
+                <i class="las la-code"></i>
+                <span class="flow-action-name">{{ action.name }}</span>
+                <span class="fill-space"></span>
+                <span
+                  class="state"
+                  [ngClass]="{
+                    active: action.state === ActionState.ACTION_STATE_ACTIVE,
+                    inactive: action.state === ActionState.ACTION_STATE_INACTIVE,
+                  }"
+                >
+                  {{ 'FLOWS.STATES.' + action.state | translate }}</span
+                >
+              </div>
+            </div>
+          </cnsl-card>
+
+          <button *ngIf="flow.type" class="add-btn" mat-raised-button color="primary" (click)="openAddTrigger(flow.type)">
+            <div class="cnsl-action-button">
+              <mat-icon>add</mat-icon>
+              <span>{{ 'FLOWS.ADDTRIGGER' | translate }}</span>
+              <span *ngIf="selection && selection.length">&nbsp;({{ selection.length }})</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>

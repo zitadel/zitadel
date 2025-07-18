@@ -75,7 +75,15 @@ const routes: Routes = [
     loadChildren: () => import('./pages/actions/actions.module'),
     canActivate: [authGuard, roleGuard],
     data: {
-      roles: ['org.action.read', 'org.flow.read'],
+      roles: ['iam.read', 'iam.read'],
+    },
+  },
+  {
+    path: 'actions-v1',
+    loadChildren: () => import('./pages/org-actions/actions.module'),
+    canActivate: [authGuard, roleGuard],
+    data: {
+      roles: ['iam.read', 'iam.read'],
     },
   },
   {
