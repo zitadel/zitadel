@@ -286,18 +286,17 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 	// we'll redirect to the UI (V2) and let it decide which session to terminate
 	//
 	// If there's no id_token_hint and for v1 logins, we handle them separately
-	if endSessionRequest.IDTokenHintClaims == nil &&
-		(authz.GetFeatures(ctx).LoginV2.Required || headers.Get(LoginClientHeader) != "") {
+	if endSessionRequest.IDTokenHintClaims == nil && (authz.GetFeatures(ctx).LoginV2.Required || headers.Get(LoginClientHeader) != "") {
+		baseURI := authz.GetFeatures(ctx).LoginV2.BaseURI
 		redirectURI := v2PostLogoutRedirectURI(endSessionRequest.RedirectURI)
 		// if no base uri is set, fallback to the default configured in the runtime config
-		if authz.GetFeatures(ctx).LoginV2.BaseURI == nil || authz.GetFeatures(ctx).LoginV2.BaseURI.String() == "" {
-			defaultURI, err := url.Parse(o.defaultLogoutURLV2)
+		if baseURI == nil || baseURI.String() == "" {
+			baseURI, err = url.Parse(o.defaultLogoutURLV2)
 			if err != nil {
 				return "", err
 			}
-			return buildLoginV2LogoutURL(defaultURI, redirectURI, endSessionRequest.LogoutHint, endSessionRequest.UILocales), nil
 		}
-		return buildLoginV2LogoutURL(authz.GetFeatures(ctx).LoginV2.BaseURI, redirectURI, endSessionRequest.LogoutHint, endSessionRequest.UILocales), nil
+		return buildLoginV2LogoutURL(baseURI, redirectURI, endSessionRequest.LogoutHint, endSessionRequest.UILocales), nil
 	}
 
 	// V1:
