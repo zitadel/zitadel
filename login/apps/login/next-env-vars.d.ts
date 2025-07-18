@@ -29,5 +29,12 @@ declare namespace NodeJS {
      * Split by comma, key value pairs separated by colon
      */
     CUSTOM_REQUEST_HEADERS?: string;
+
+    /**
+     * Optional: the default organization Id to use, when no organization is specified in the url
+     * When no organization is specified and url does not contain an organization id,
+     * the default organization is obtained from the api
+     */
+    DEFAULT_ORGANIZATION_ID?: string;
   }
 }

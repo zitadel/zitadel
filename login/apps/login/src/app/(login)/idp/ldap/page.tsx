@@ -2,8 +2,8 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { LDAPUsernamePasswordForm } from "@/components/ldap-username-password-form";
 import { Translated } from "@/components/translated";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
-import { getBrandingSettings, getDefaultOrg } from "@/lib/zitadel";
-import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { getBrandingSettings } from "@/lib/zitadel";
+import { getEffectiveOrganizationId } from "@/lib/organization";
 import { headers } from "next/headers";
 
 export default async function Page(props: {
@@ -20,19 +20,14 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  let defaultOrganization;
-  if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
-    if (org) {
-      defaultOrganization = org.id;
-    }
-  }
+  const effectiveOrganization = await getEffectiveOrganizationId({
+    serviceUrl,
+    organization,
+  });
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    organization: organization ?? defaultOrganization,
+    organization: effectiveOrganization,
   });
 
   // return login failed if no linking or creation is allowed and no user was found

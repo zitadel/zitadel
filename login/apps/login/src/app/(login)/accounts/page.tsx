@@ -5,11 +5,10 @@ import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   getBrandingSettings,
-  getDefaultOrg,
   listSessions,
 } from "@/lib/zitadel";
+import { getEffectiveOrganizationId } from "@/lib/organization";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
-import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 // import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -40,21 +39,16 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  let defaultOrganization;
-  if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
-    if (org) {
-      defaultOrganization = org.id;
-    }
-  }
+  const effectiveOrganization = await getEffectiveOrganizationId({
+    serviceUrl,
+    organization,
+  });
 
   let sessions = await loadSessions({ serviceUrl });
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    organization: organization ?? defaultOrganization,
+    organization: effectiveOrganization,
   });
 
   const params = new URLSearchParams();

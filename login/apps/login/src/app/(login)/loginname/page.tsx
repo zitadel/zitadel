@@ -6,10 +6,9 @@ import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   getActiveIdentityProviders,
   getBrandingSettings,
-  getDefaultOrg,
   getLoginSettings,
 } from "@/lib/zitadel";
-import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { getEffectiveOrganizationId } from "@/lib/organization";
 import { headers } from "next/headers";
 
 export default async function Page(props: {
@@ -26,19 +25,14 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  let defaultOrganization;
-  if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
-    if (org) {
-      defaultOrganization = org.id;
-    }
-  }
+  const effectiveOrganization = await getEffectiveOrganizationId({
+    serviceUrl,
+    organization,
+  });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    organization: organization ?? defaultOrganization,
+    organization: effectiveOrganization,
   });
 
   const contextLoginSettings = await getLoginSettings({
@@ -48,14 +42,14 @@ export default async function Page(props: {
 
   const identityProviders = await getActiveIdentityProviders({
     serviceUrl,
-    orgId: organization ?? defaultOrganization,
+    orgId: effectiveOrganization,
   }).then((resp) => {
     return resp.identityProviders;
   });
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    organization: organization ?? defaultOrganization,
+    organization: effectiveOrganization,
   });
 
   return (

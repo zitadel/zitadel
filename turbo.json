@@ -14,7 +14,8 @@
     "NEXT_PUBLIC_BASE_PATH",
     "CUSTOM_REQUEST_HEADERS",
     "NODE_ENV",
-    "INKEEP_API_KEY"
+    "INKEEP_API_KEY",
+    "DEFAULT_ORGANIZATION_ID"
   ],
   "tasks": {
     "generate": {

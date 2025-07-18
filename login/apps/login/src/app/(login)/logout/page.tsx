@@ -5,10 +5,9 @@ import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   getBrandingSettings,
-  getDefaultOrg,
   listSessions,
 } from "@/lib/zitadel";
-import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { getEffectiveOrganizationId } from "@/lib/organization";
 import { headers } from "next/headers";
 
 async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
@@ -39,21 +38,16 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  let defaultOrganization;
-  if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
-    if (org) {
-      defaultOrganization = org.id;
-    }
-  }
+  const effectiveOrganization = await getEffectiveOrganizationId({
+    serviceUrl,
+    organization,
+  });
 
   let sessions = await loadSessions({ serviceUrl });
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    organization: organization ?? defaultOrganization,
+    organization: effectiveOrganization,
   });
 
   const params = new URLSearchParams();
@@ -77,7 +71,7 @@ export default async function Page(props: {
             sessions={sessions}
             logoutHint={logoutHint}
             postLogoutRedirectUri={postLogoutRedirectUri}
-            organization={organization ?? defaultOrganization}
+            organization={effectiveOrganization}
           />
         </div>
       </div>

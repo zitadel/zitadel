@@ -11,7 +11,6 @@ import {
   addHuman,
   addIDPLink,
   getBrandingSettings,
-  getDefaultOrg,
   getIDPByID,
   getLoginSettings,
   getOrgsByDomain,
@@ -19,10 +18,10 @@ import {
   retrieveIDPIntent,
   updateHuman,
 } from "@/lib/zitadel";
+import { getEffectiveOrganizationId } from "@/lib/organization";
 import { ConnectError, create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import {
   AddHumanUserRequest,
   AddHumanUserRequestSchema,
@@ -79,19 +78,17 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  let branding = await getBrandingSettings({
+
+  organization = await getEffectiveOrganizationId({
     serviceUrl,
     organization,
   });
 
-  if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
-    if (org) {
-      organization = org.id;
-    }
-  }
+
+  let branding = await getBrandingSettings({
+    serviceUrl,
+    organization,
+  });
 
   if (!provider || !id || !token) {
     return loginFailed(branding, "IDP context missing");
