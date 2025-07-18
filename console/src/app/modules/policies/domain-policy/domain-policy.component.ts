@@ -7,15 +7,15 @@ import {
   UpdateDomainPolicyRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { GetOrgIAMPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { DomainPolicy, OrgIAMPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageLocation, StorageService } from 'src/app/services/storage.service';
+import { StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
+import { NewOrganizationService } from '../../../services/new-organization.service';
 
 @Component({
   selector: 'cnsl-domain-policy',
@@ -30,7 +30,7 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
 
   public loading: boolean = false;
   private sub: Subscription = new Subscription();
-  private org!: Org.AsObject;
+  private orgId = this.newOrganizationService.getOrgId();
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
@@ -39,7 +39,7 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private injector: Injector,
     private adminService: AdminService,
-    private storageService: StorageService,
+    private readonly newOrganizationService: NewOrganizationService,
   ) {}
 
   ngOnInit(): void {
@@ -69,12 +69,6 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
   }
 
   private async getData(): Promise<GetCustomOrgIAMPolicyResponse.AsObject | GetOrgIAMPolicyResponse.AsObject | any> {
-    const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-
-    if (org?.id) {
-      this.org = org;
-    }
-
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         return this.managementService.getDomainPolicy();
@@ -90,7 +84,7 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
       case PolicyComponentServiceType.MGMT:
         if ((this.domainData as OrgIAMPolicy.AsObject).isDefault) {
           const req = new AddCustomDomainPolicyRequest();
-          req.setOrgId(this.org.id);
+          req.setOrgId(this.orgId());
           req.setUserLoginMustBeDomain(this.domainData.userLoginMustBeDomain);
           req.setValidateOrgDomains(this.domainData.validateOrgDomains);
           req.setSmtpSenderAddressMatchesInstanceDomain(this.domainData.smtpSenderAddressMatchesInstanceDomain);
@@ -106,7 +100,7 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
           break;
         } else {
           const req = new AddCustomDomainPolicyRequest();
-          req.setOrgId(this.org.id);
+          req.setOrgId(this.orgId());
           req.setUserLoginMustBeDomain(this.domainData.userLoginMustBeDomain);
           req.setValidateOrgDomains(this.domainData.validateOrgDomains);
           req.setSmtpSenderAddressMatchesInstanceDomain(this.domainData.smtpSenderAddressMatchesInstanceDomain);
@@ -154,7 +148,7 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
       dialogRef.afterClosed().subscribe((resp) => {
         if (resp) {
           this.adminService
-            .resetCustomDomainPolicyToDefault(this.org.id)
+            .resetCustomDomainPolicyToDefault(this.orgId())
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
               setTimeout(() => {
