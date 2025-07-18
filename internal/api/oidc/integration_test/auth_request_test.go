@@ -565,7 +565,7 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 				return clientID
 			}(),
 			authRequestID: createAuthRequest,
-			logoutURL:     http_utils.BuildOrigin(Instance.Host(), Instance.Config.Secure) + Instance.Config.LogoutURLV2 + logoutRedirectURI + "?state=state",
+			logoutURL:     http_utils.BuildOrigin(Instance.Host(), Instance.Config.Secure) + Instance.Config.LogoutURLV2 + url.QueryEscape(logoutRedirectURI+"?state=state"),
 		},
 		{
 			name: "login v2 config",
@@ -574,7 +574,7 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 				return clientID
 			}(),
 			authRequestID: createAuthRequestNoLoginClientHeader,
-			logoutURL:     http_utils.BuildOrigin(Instance.Host(), Instance.Config.Secure) + Instance.Config.LogoutURLV2 + logoutRedirectURI + "?state=state",
+			logoutURL:     http_utils.BuildOrigin(Instance.Host(), Instance.Config.Secure) + Instance.Config.LogoutURLV2 + url.QueryEscape(logoutRedirectURI+"?state=state"),
 		},
 	}
 	for _, tt := range tests {
