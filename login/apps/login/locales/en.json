@@ -23,14 +23,19 @@
     "title": "Welcome back!",
     "description": "Enter your login data.",
     "register": "Register new user",
-    "submit": "Continue"
+    "submit": "Continue",
+    "loginname": "Loginname",
+    "username": "Username",
+    "usernameOrPhoneNumber": "Username or phone number",
+    "usernameOrEmail": "Username or email"
   },
   "password": {
     "verify": {
       "title": "Password",
       "description": "Enter your password.",
       "resetPassword": "Reset Password",
-      "submit": "Continue"
+      "submit": "Continue",
+      "password": "Password"
     },
     "set": {
       "title": "Set Password",
@@ -38,12 +43,17 @@
       "codeSent": "A code has been sent to your email address.",
       "noCodeReceived": "Didn't receive a code?",
       "resend": "Resend code",
-      "submit": "Continue"
+      "submit": "Continue",
+      "code": "Code",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password"
     },
     "change": {
       "title": "Change Password",
       "description": "Set the password for your account",
-      "submit": "Continue"
+      "submit": "Continue",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password"
     }
   },
   "idp": {
@@ -107,7 +117,8 @@
       "emailDescription": "Enter the code you received via email.",
       "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
-      "submit": "Continue"
+      "submit": "Continue",
+      "code": "Code"
     },
     "set": {
       "title": "Set up 2-Factor",
@@ -115,7 +126,8 @@
       "smsDescription": "Enter your phone number to receive a code via SMS.",
       "emailDescription": "Enter your email address to receive a code via email.",
       "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
-      "submit": "Continue"
+      "submit": "Continue",
+      "code": "Code"
     }
   },
   "passkey": {
@@ -172,8 +184,13 @@
     "password": {
       "title": "Set Password",
       "description": "Set the password for your account",
-      "submit": "Continue"
-    }
+      "submit": "Continue",
+      "password": "Password",
+      "confirmPassword": "Confirm Password"
+    },
+    "firstname": "First name",
+    "lastname": "Last name",
+    "email": "E-mail"
   },
   "invite": {
     "title": "Invite User",
@@ -209,7 +226,8 @@
       "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
       "codeSent": "A code has just been sent to your email address.",
-      "submit": "Continue"
+      "submit": "Continue",
+      "code": "Code"
     }
   },
   "authenticator": {
@@ -223,7 +241,8 @@
     "usercode": {
       "title": "Device code",
       "description": "Enter the code displayed on your app or device.",
-      "submit": "Continue"
+      "submit": "Continue",
+      "code": "Code"
     },
     "request": {
       "title": "{appName} would like to connect",

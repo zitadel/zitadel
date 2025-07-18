@@ -10,6 +10,7 @@ import { registerUser } from "@/lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import { BackButton } from "./back-button";
@@ -51,6 +52,8 @@ export function SetRegisterPasswordForm({
       lastname: lastname ?? "",
     },
   });
+
+  const t = useTranslations("register");
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -117,7 +120,7 @@ export function SetRegisterPasswordForm({
             {...register("password", {
               required: "You have to provide a password!",
             })}
-            label="Password"
+            label={t("password.password")}
             error={errors.password?.message as string}
             data-testid="password-text-input"
           />
@@ -130,7 +133,7 @@ export function SetRegisterPasswordForm({
             {...register("confirmPassword", {
               required: "This field is required",
             })}
-            label="Confirm Password"
+            label={t("password.confirmPassword")}
             error={errors.confirmPassword?.message as string}
             data-testid="password-confirm-text-input"
           />

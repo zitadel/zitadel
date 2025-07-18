@@ -23,14 +23,19 @@
     "title": "欢迎回来！",
     "description": "请输入您的登录信息。",
     "register": "注册新用户",
-    "submit": "继续"
+    "submit": "继续",
+    "loginname": "登录名",
+    "username": "用户名",
+    "usernameOrPhoneNumber": "用户名或电话号码",
+    "usernameOrEmail": "用户名或电子邮箱"
   },
   "password": {
     "verify": {
       "title": "密码",
       "description": "请输入您的密码。",
       "resetPassword": "重置密码",
-      "submit": "继续"
+      "submit": "继续",
+      "password": "密码"
     },
     "set": {
       "title": "设置密码",
@@ -38,12 +43,17 @@
       "codeSent": "验证码已发送到您的邮箱。",
       "noCodeReceived": "没有收到验证码？",
       "resend": "重发验证码",
-      "submit": "继续"
+      "submit": "继续",
+      "code": "验证码",
+      "newPassword": "新密码",
+      "confirmPassword": "确认密码"
     },
     "change": {
       "title": "更改密码",
       "description": "为您的账户设置密码",
-      "submit": "继续"
+      "submit": "继续",
+      "newPassword": "新密码",
+      "confirmPassword": "确认密码"
     }
   },
   "idp": {
@@ -107,7 +117,8 @@
       "emailDescription": "输入通过电子邮件收到的验证码。",
       "noCodeReceived": "没有收到验证码？",
       "resendCode": "重发验证码",
-      "submit": "继续"
+      "submit": "继续",
+      "code": "验证码"
     },
     "set": {
       "title": "设置双因素认证",
@@ -115,7 +126,8 @@
       "smsDescription": "输入您的电话号码以接收短信验证码。",
       "emailDescription": "输入您的电子邮箱地址以接收电子邮件验证码。",
       "totpRegisterDescription": "扫描二维码或手动导航到URL。",
-      "submit": "继续"
+      "submit": "继续",
+      "code": "验证码"
     }
   },
   "passkey": {
@@ -172,8 +184,13 @@
     "password": {
       "title": "设置密码",
       "description": "为您的账户设置密码",
-      "submit": "继续"
-    }
+      "submit": "继续",
+      "password": "密码",
+      "confirmPassword": "确认密码"
+    },
+    "firstname": "名字",
+    "lastname": "姓氏",
+    "email": "电子邮箱"
   },
   "invite": {
     "title": "邀请用户",
@@ -209,7 +226,8 @@
       "noCodeReceived": "没有收到验证码？",
       "resendCode": "重发验证码",
       "codeSent": "刚刚发送了一封包含验证码的电子邮件。",
-      "submit": "继续"
+      "submit": "继续",
+      "code": "验证码"
     }
   },
   "authenticator": {
@@ -223,7 +241,8 @@
     "usercode": {
       "title": "设备代码",
       "description": "输入代码。",
-      "submit": "继续"
+      "submit": "继续",
+      "code": "验证码"
     },
     "request": {
       "title": "{appName} 想要连接：",
