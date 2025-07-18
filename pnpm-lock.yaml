@@ -635,6 +635,10 @@ importers:
         version: 2.1.9(@types/node@24.0.14)(jsdom@26.1.0)(less@4.1.3)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)
 
   packages/zitadel-proto:
+    dependencies:
+      '@bufbuild/protobuf':
+        specifier: ^2.2.2
+        version: 2.6.1
     devDependencies:
       '@bufbuild/buf':
         specifier: ^1.53.0
