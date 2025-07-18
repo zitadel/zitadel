@@ -22,18 +22,18 @@ func IDProviderRepository(client database.QueryExecutor) domain.IDProviderReposi
 	}
 }
 
-const queryIDProviderStmt = `instance_id, org_id, id, state, name, type, allow_creation, allow_auto_creation,` +
+const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, allow_creation, allow_auto_creation,` +
 	` allow_auto_update, allow_linking, styling_type, payload, created_at, updated_at` +
 	` FROM zitadel.identity_providers`
 
-func (i *idProvider) Get(ctx context.Context, id string) (*domain.IdentityProvider, error) {
+func (i *idProvider) Get(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID string) (*domain.IdentityProvider, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(queryIDProviderStmt)
 
-	idCondition := i.IDCondition(id)
+	conditions := []database.Condition{id, i.InstanceIDCondition(instnaceID), i.OrgIDCondition(orgID)}
 
-	writeCondition(&builder, idCondition)
+	writeCondition(&builder, database.And(conditions...))
 
 	return scanIDProvider(ctx, i.client, &builder)
 }
@@ -56,13 +56,13 @@ func (i *idProvider) List(ctx context.Context, conditions ...database.Condition)
 const createIDProviderStmt = `INSERT INTO zitadel.identity_providers` +
 	` (instance_id, org_id, id, state, name, type, allow_creation, allow_auto_creation,` +
 	` allow_auto_update, allow_linking, styling_type, payload)` +
-	` VALUES ($1, $2, $3, $4, $5, $6, $,7, $8, $9, $10, $11, $12)` +
+	` VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)` +
 	` RETURNING created_at, updated_at`
 
 func (i *idProvider) Create(ctx context.Context, idp *domain.IdentityProvider) error {
 	builder := database.StatementBuilder{}
 	builder.AppendArgs(idp.InstanceID, idp.OrgID, idp.ID, idp.State, idp.Name, idp.Type, idp.AllowCreation,
-		idp.AllowAutoCreation, idp.AllowLinking, idp.StylingType, idp.Payload)
+		idp.AllowAutoCreation, idp.AllowAutoUpdate, idp.AllowLinking, idp.StylingType, idp.Payload)
 	builder.WriteString(createIDProviderStmt)
 
 	err := i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&idp.CreatedAt, &idp.UpdatedAt)
@@ -72,14 +72,15 @@ func (i *idProvider) Create(ctx context.Context, idp *domain.IdentityProvider) e
 	return nil
 }
 
-func (i *idProvider) Update(ctx context.Context, id string, changes ...database.Change) (int64, error) {
+func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierCondition, changes ...database.Change) (int64, error) {
 	if changes == nil {
 		return 0, errors.New("Update must contain a condition") // (otherwise ALL identity_providers will be updated)
 	}
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.identity_provider SET `)
 
-	conditions := []database.Condition{i.IDCondition(id)}
+	// conditions := []database.Condition{i.IDCondition(id)}
+	conditions := []database.Condition{id}
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, database.And(conditions...))
 
@@ -89,13 +90,13 @@ func (i *idProvider) Update(ctx context.Context, id string, changes ...database.
 	return rowsAffected, err
 }
 
-func (i *idProvider) Delete(ctx context.Context, id string) (int64, error) {
+func (i *idProvider) Delete(ctx context.Context, id domain.IDPIdentifierCondition) (int64, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(`DELETE FROM zitadel.identity_providers`)
 
-	conditions := []database.Condition{i.IDCondition(id)}
-	writeCondition(&builder, database.And(conditions...))
+	// conditions := []database.Condition{i.IDCondition(id)}
+	// writeCondition(&builder, database.And(conditions...))
 
 	return i.client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -172,7 +173,7 @@ func (i idProvider) OrgIDCondition(id string) database.Condition {
 	return database.NewTextCondition(i.OrgIDColumn(), database.TextOperationEqual, id)
 }
 
-func (i idProvider) IDCondition(id string) database.Condition {
+func (i idProvider) IDCondition(id string) domain.IDPIdentifierCondition {
 	return database.NewTextCondition(i.IDColumn(), database.TextOperationEqual, id)
 }
 
@@ -180,7 +181,7 @@ func (i idProvider) StateCondition(state domain.IDPState) database.Condition {
 	return database.NewTextCondition(i.OrgIDColumn(), database.TextOperationEqual, state.String())
 }
 
-func (i idProvider) NameCondition(name string) database.Condition {
+func (i idProvider) NameCondition(name string) domain.IDPIdentifierCondition {
 	return database.NewTextCondition(i.NameColumn(), database.TextOperationEqual, name)
 }
 

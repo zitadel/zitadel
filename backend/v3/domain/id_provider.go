@@ -31,19 +31,26 @@ const (
 
 type IdentityProvider struct {
 	InstanceID        string    `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID             string    `json:"org_id,omitempty" db:"org_id"`
+	OrgID             string    `json:"orgId,omitempty" db:"org_id"`
 	ID                string    `json:"id,omitempty" db:"id"`
 	State             string    `json:"state,omitempty" db:"state"`
 	Name              string    `json:"name,omitempty" db:"name"`
 	Type              string    `json:"type,omitempty" db:"type"`
-	AllowCreation     bool      `json:"allow_creation,omitempty" db:"allow_creation"`
-	AllowAutoCreation bool      `json:"allow_auto_creation,omitempty" db:"allow_auto_creation"`
-	AllowAutoUpdate   bool      `json:"allow_auto_update,omitempty" db:"allow_auto_update"`
-	AllowLinking      bool      `json:"allow_linking,omitempty" db:"allow_linking"`
-	StylingType       int16     `json:"styling_type,omitempty" db:"styling_type"`
+	AllowCreation     bool      `json:"allowCreation,omitempty" db:"allow_creation"`
+	AllowAutoCreation bool      `json:"allowAutoCreation,omitempty" db:"allow_auto_creation"`
+	AllowAutoUpdate   bool      `json:"allowAutoUpdate,omitempty" db:"allow_auto_update"`
+	AllowLinking      bool      `json:"allowLinking,omitempty" db:"allow_linking"`
+	StylingType       int16     `json:"stylingType,omitempty" db:"styling_type"`
 	Payload           string    `json:"payload,omitempty" db:"payload"`
 	CreatedAt         time.Time `json:"createdAt,omitempty" db:"created_at"`
 	UpdatedAt         time.Time `json:"updatedAt,omitempty" db:"updated_at"`
+}
+
+// IDPIdentifierCondition is used to help specify a single identity_provider,
+// it will either be used as the  identity_provider ID or identity_provider name,
+// as identity_provider can be identified either using (instnaceID + OrgID + ID) OR (instanceID + OrgID + name)
+type IDPIdentifierCondition interface {
+	database.Condition
 }
 
 type idProviderColumns interface {
@@ -66,9 +73,9 @@ type idProviderColumns interface {
 type idProviderConditions interface {
 	InstanceIDCondition(id string) database.Condition
 	OrgIDCondition(id string) database.Condition
-	IDCondition(id string) database.Condition
+	IDCondition(id string) IDPIdentifierCondition
 	StateCondition(state IDPState) database.Condition
-	NameCondition(name string) database.Condition
+	NameCondition(name string) IDPIdentifierCondition
 	TypeCondition(typee IDPType) database.Condition
 	AllowCreationCondition(allow bool) database.Condition
 	AllowAutoCreationCondition(allow bool) database.Condition
@@ -94,10 +101,10 @@ type IDProviderRepository interface {
 	idProviderConditions
 	idProviderChanges
 
-	Get(ctx context.Context, id string) (*IdentityProvider, error)
+	Get(ctx context.Context, id IDPIdentifierCondition, instnaceID string, orgID string) (*IdentityProvider, error)
 	List(ctx context.Context, conditions ...database.Condition) ([]*IdentityProvider, error)
 
 	Create(ctx context.Context, idp *IdentityProvider) error
-	Update(ctx context.Context, id string, changes ...database.Change) (int64, error)
-	Delete(ctx context.Context, id string) (int64, error)
+	Update(ctx context.Context, id IDPIdentifierCondition, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, id IDPIdentifierCondition) (int64, error)
 }
