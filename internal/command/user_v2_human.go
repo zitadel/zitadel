@@ -165,6 +165,11 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		return err
 	}
 
+	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, resourceOwner)
+	if err != nil {
+		return err
+	}
+
 	var createCmd humanCreationCommand
 	if human.Register {
 		createCmd = user.NewHumanRegisteredEvent(
@@ -178,7 +183,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			human.PreferredLanguage,
 			human.Gender,
 			human.Email.Address,
-			domainPolicy.UserLoginMustBeDomain,
+			domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
 			human.UserAgentID,
 		)
 	} else {
@@ -193,7 +198,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			human.PreferredLanguage,
 			human.Gender,
 			human.Email.Address,
-			domainPolicy.UserLoginMustBeDomain,
+			domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
 		)
 	}
 

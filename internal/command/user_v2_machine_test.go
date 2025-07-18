@@ -32,6 +32,8 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 	}
 
 	userAgg := user.NewAggregate("user1", "org1")
+	orgAgg := org.NewAggregate("org1")
+
 	userAddedEvent := user.NewMachineAddedEvent(context.Background(),
 		&userAgg.Aggregate,
 		"username",
@@ -101,19 +103,21 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewUsernameChangedEvent(context.Background(),
 							&userAgg.Aggregate,
 							"username",
 							"changed",
 							true,
+							false,
 						),
 					),
 				),

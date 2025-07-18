@@ -516,6 +516,12 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			if err != nil {
 				return nil, err
 			}
+
+			organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, a.ID)
+			if err != nil {
+				return nil, err
+			}
+
 			usernames, err := OrgUsers(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
@@ -532,7 +538,7 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			if err != nil {
 				return nil, err
 			}
-			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain, domains, links, entityIds)}, nil
+			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername, domains, links, entityIds)}, nil
 		}, nil
 	}
 }

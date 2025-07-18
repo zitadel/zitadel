@@ -1101,6 +1101,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
@@ -1143,6 +1144,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
@@ -1183,6 +1185,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
