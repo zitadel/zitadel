@@ -16,11 +16,6 @@
     "lint-staged": "lint-staged",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next"
   },
-  "pnpm": {
-    "overrides": {
-      "@zitadel/proto": "latest"
-    }
-  },
   "git": {
     "pre-commit": "lint-staged"
   },
