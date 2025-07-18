@@ -8,7 +8,7 @@
     "test:unit": "pnpm vitest --run",
     "test:unit:standalone": "pnpm test:unit",
     "lint": "pnpm exec next lint && pnpm exec prettier --check .",
-    "lint:fix": "pnpm exec prettier --write .",
+    "lint:fix": "pnpm exec eslint . --fix && pnpm exec prettier --write .",
     "lint-staged": "lint-staged",
     "build": "pnpm exec next build",
     "build:login:standalone": "NEXT_PUBLIC_BASE_PATH=/ui/v2/login NEXT_OUTPUT_MODE=standalone pnpm build",
