@@ -8,6 +8,12 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
 import { Lato } from "next/font/google";
 import { ReactNode, Suspense } from "react";
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const siteTitle = process.env.SITE_TITLE;
+  return siteTitle ? { title: siteTitle } : {};
+}
 
 const lato = Lato({
   weight: ["400", "700", "900"],
