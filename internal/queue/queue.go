@@ -41,6 +41,7 @@ func NewQueue(config *Config) (_ *Queue, err error) {
 			Queues:     make(map[string]river.QueueConfig),
 			JobTimeout: -1,
 			Middleware: middleware,
+			Schema:     schema,
 		},
 	}, nil
 }
@@ -56,7 +57,6 @@ func (q *Queue) Start(ctx context.Context) (err error) {
 	if q == nil || !q.shouldStart {
 		return nil
 	}
-	ctx = WithQueue(ctx)
 
 	q.client, err = river.NewClient(q.driver, q.config)
 	if err != nil {
@@ -112,7 +112,6 @@ func WithQueueName(name string) InsertOpt {
 
 func (q *Queue) Insert(ctx context.Context, args river.JobArgs, opts ...InsertOpt) error {
 	options := new(river.InsertOpts)
-	ctx = WithQueue(ctx)
 	for _, opt := range opts {
 		opt(options)
 	}
