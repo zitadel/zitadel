@@ -11,6 +11,7 @@ import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
 import { Translated } from "./translated";
+import { useTranslations } from "next-intl";
 
 type Inputs = {
   loginName: string;
@@ -41,6 +42,8 @@ export function UsernameForm({
       loginName: loginName ? loginName : "",
     },
   });
+
+  const t = useTranslations("loginname");
 
   const router = useRouter();
 
@@ -101,7 +104,7 @@ export function UsernameForm({
         <TextInput
           type="text"
           autoComplete="username"
-          {...register("loginName", { required: "This field is required" })}
+          {...register("loginName", { required: t("required.loginName") })}
           label={inputLabel}
           data-testid="username-text-input"
           suffix={suffix}

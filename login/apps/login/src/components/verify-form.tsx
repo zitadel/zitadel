@@ -4,6 +4,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
@@ -40,6 +41,8 @@ export function VerifyForm({
       code: code ?? "",
     },
   });
+
+  const t = useTranslations("verify");
 
   const [error, setError] = useState<string>("");
 
@@ -135,7 +138,7 @@ export function VerifyForm({
           <TextInput
             type="text"
             autoComplete="one-time-code"
-            {...register("code", { required: "This field is required" })}
+            {...register("code", { required: t("verify.required.code") })}
             label="Code"
             data-testid="code-text-input"
           />

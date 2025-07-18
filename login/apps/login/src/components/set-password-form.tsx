@@ -16,6 +16,7 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
@@ -58,6 +59,8 @@ export function SetPasswordForm({
       code: code ?? "",
     },
   });
+
+  const t = useTranslations("password");
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -216,7 +219,7 @@ export function SetPasswordForm({
               type="text"
               required
               {...register("code", {
-                required: "This field is required",
+                required: t("set.required.code"),
               })}
               label="Code"
               autoComplete="one-time-code"
@@ -231,7 +234,7 @@ export function SetPasswordForm({
             autoComplete="new-password"
             required
             {...register("password", {
-              required: "You have to provide a password!",
+              required: t("set.required.newPassword"),
             })}
             label="New Password"
             error={errors.password?.message as string}
@@ -244,7 +247,7 @@ export function SetPasswordForm({
             required
             autoComplete="new-password"
             {...register("confirmPassword", {
-              required: "This field is required",
+              required: t("set.required.confirmPassword"),
             })}
             label="Confirm Password"
             error={errors.confirmPassword?.message as string}
