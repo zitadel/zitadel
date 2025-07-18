@@ -48,6 +48,18 @@ func NewRemoveUsernameUniqueConstraint(userName, resourceOwner string, userLogin
 		uniqueUserName)
 }
 
+func NewUsernameUniqueConstraints(usernameChanges []string, resourceOwner string, userLoginMustBeDomain, oldUserLoginMustBeDomain bool) []*eventstore.UniqueConstraint {
+	if len(usernameChanges) == 0 || oldUserLoginMustBeDomain == userLoginMustBeDomain {
+		return []*eventstore.UniqueConstraint{}
+	}
+	changes := make([]*eventstore.UniqueConstraint, len(usernameChanges)*2)
+	for i, username := range usernameChanges {
+		changes[i*2] = NewRemoveUsernameUniqueConstraint(username, resourceOwner, oldUserLoginMustBeDomain)
+		changes[i*2+1] = NewAddUsernameUniqueConstraint(username, resourceOwner, userLoginMustBeDomain)
+	}
+	return changes
+}
+
 type UserLockedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
@@ -480,10 +492,11 @@ func DomainClaimedSentEventMapper(event eventstore.Event) (eventstore.Event, err
 type UsernameChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName                 string `json:"userName"`
-	oldUserName              string
-	userLoginMustBeDomain    bool
-	oldUserLoginMustBeDomain bool
+	UserName                    string `json:"userName"`
+	oldUserName                 string
+	userLoginMustBeDomain       bool
+	oldUserLoginMustBeDomain    bool
+	organizationScopedUsernames bool
 }
 
 func (e *UsernameChangedEvent) Payload() interface{} {
@@ -491,13 +504,20 @@ func (e *UsernameChangedEvent) Payload() interface{} {
 }
 
 func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	newSetting := e.userLoginMustBeDomain || e.organizationScopedUsernames
+	oldSetting := e.oldUserLoginMustBeDomain || e.organizationScopedUsernames
+
+	// changes only necessary if username changed or setting for usernames changed
+	// if user login must be domain is set, there is a possibility that the username changes
+	// organization scoped usernames are included here so that the unique constraint only gets changed if necessary
 	if e.oldUserName == e.UserName &&
-		e.oldUserLoginMustBeDomain == e.userLoginMustBeDomain {
+		newSetting == oldSetting {
 		return []*eventstore.UniqueConstraint{}
 	}
+
 	return []*eventstore.UniqueConstraint{
-		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.oldUserLoginMustBeDomain),
-		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
+		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, oldSetting),
+		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, newSetting),
 	}
 }
 
@@ -507,7 +527,7 @@ func NewUsernameChangedEvent(
 	oldUserName,
 	newUserName string,
 	userLoginMustBeDomain bool,
-	oldUserLoginMustBeDomain bool,
+	organizationScopedUsernames bool,
 	opts ...UsernameChangedEventOption,
 ) *UsernameChangedEvent {
 	event := &UsernameChangedEvent{
@@ -516,10 +536,11 @@ func NewUsernameChangedEvent(
 			aggregate,
 			UserUserNameChangedType,
 		),
-		UserName:                 newUserName,
-		oldUserName:              oldUserName,
-		userLoginMustBeDomain:    userLoginMustBeDomain,
-		oldUserLoginMustBeDomain: userLoginMustBeDomain,
+		UserName:                    newUserName,
+		oldUserName:                 oldUserName,
+		userLoginMustBeDomain:       userLoginMustBeDomain,
+		oldUserLoginMustBeDomain:    userLoginMustBeDomain,
+		organizationScopedUsernames: organizationScopedUsernames,
 	}
 	for _, opt := range opts {
 		opt(event)
@@ -531,9 +552,9 @@ type UsernameChangedEventOption func(*UsernameChangedEvent)
 
 // UsernameChangedEventWithPolicyChange signals that the change occurs because of / during a domain policy change
 // (will ensure the unique constraint change is handled correctly)
-func UsernameChangedEventWithPolicyChange() UsernameChangedEventOption {
+func UsernameChangedEventWithPolicyChange(oldUserLoginMustBeDomain bool) UsernameChangedEventOption {
 	return func(e *UsernameChangedEvent) {
-		e.oldUserLoginMustBeDomain = !e.userLoginMustBeDomain
+		e.oldUserLoginMustBeDomain = oldUserLoginMustBeDomain
 	}
 }
 

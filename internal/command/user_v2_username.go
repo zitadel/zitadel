@@ -28,6 +28,11 @@ func (c *Commands) changeUsername(ctx context.Context, cmds []eventstore.Command
 		return cmds, err
 	}
 	return append(cmds,
-		user.NewUsernameChangedEvent(ctx, &wm.Aggregate().Aggregate, wm.UserName, userName, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername),
+		user.NewUsernameChangedEvent(ctx, &wm.Aggregate().Aggregate,
+			wm.UserName,
+			userName,
+			domainPolicy.UserLoginMustBeDomain,
+			organizationScopedUsername,
+		),
 	), nil
 }

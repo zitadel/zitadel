@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	settings "github.com/zitadel/zitadel/internal/repository/organization_settings"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type OrganizationSettingsWriteModel struct {
@@ -90,6 +91,7 @@ func (wm *OrganizationSettingsWriteModel) NewSet(
 	ctx context.Context,
 	organizationScopedUsernames *bool,
 	userLoginMustBeDomain bool,
+	usernamesF func(ctx context.Context, orgID string) ([]string, error),
 ) (_ []eventstore.Command, err error) {
 	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
 		return nil, err
@@ -98,10 +100,13 @@ func (wm *OrganizationSettingsWriteModel) NewSet(
 	if organizationScopedUsernames == nil || *organizationScopedUsernames == wm.OrganizationScopedUsernames {
 		return nil, nil
 	}
-	//TODO: if uniqueconstraints have to be changed query usernames and add it to the event
-	var usernames []*settings.UsernameChange
-	if (wm.OrganizationScopedUsernames || userLoginMustBeDomain) == (*organizationScopedUsernames || userLoginMustBeDomain) {
-		usernames = make([]*settings.UsernameChange, 0)
+
+	var usernames []string
+	if (wm.OrganizationScopedUsernames || userLoginMustBeDomain) != (*organizationScopedUsernames || userLoginMustBeDomain) {
+		usernames, err = usernamesF(ctx, wm.AggregateID)
+		if err != nil {
+			return nil, err
+		}
 	}
 	events := []eventstore.Command{
 		settings.NewOrganizationSettingsAddedEvent(ctx,
@@ -117,14 +122,18 @@ func (wm *OrganizationSettingsWriteModel) NewSet(
 func (wm *OrganizationSettingsWriteModel) NewRemoved(
 	ctx context.Context,
 	userLoginMustBeDomain bool,
+	usernamesF func(ctx context.Context, orgID string) ([]string, error),
 ) (_ []eventstore.Command, err error) {
 	if err := wm.checkPermissionDelete(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
 		return nil, err
 	}
-	//TODO: if uniqueconstraints have to be changed query usernames and add it to the event
-	var usernames []*settings.UsernameChange
+
+	var usernames []string
 	if userLoginMustBeDomain != wm.OrganizationScopedUsernames {
-		usernames = make([]*settings.UsernameChange, 0)
+		usernames, err = usernamesF(ctx, wm.AggregateID)
+		if err != nil {
+			return nil, err
+		}
 	}
 	events := []eventstore.Command{
 		settings.NewOrganizationSettingsRemovedEvent(ctx,
@@ -145,4 +154,85 @@ func SettingsAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggr
 		InstanceID:    wm.InstanceID,
 		Version:       settings.AggregateVersion,
 	}
+}
+
+type OrganizationScopedUsernamesWriteModel struct {
+	eventstore.WriteModel
+
+	Users []*organizationScopedUser
+}
+
+type organizationScopedUser struct {
+	id       string
+	username string
+}
+
+func NewOrganizationScopedUsernamesWriteModel(orgID string) *OrganizationScopedUsernamesWriteModel {
+	return &OrganizationScopedUsernamesWriteModel{
+		WriteModel: eventstore.WriteModel{
+			ResourceOwner: orgID,
+		},
+		Users: make([]*organizationScopedUser, 0),
+	}
+}
+
+func (wm *OrganizationScopedUsernamesWriteModel) AppendEvents(events ...eventstore.Event) {
+	wm.WriteModel.AppendEvents(events...)
+}
+
+func (wm *OrganizationScopedUsernamesWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *user.HumanAddedEvent:
+			wm.Users = append(wm.Users, &organizationScopedUser{id: e.Aggregate().ID, username: e.UserName})
+		case *user.HumanRegisteredEvent:
+			wm.Users = append(wm.Users, &organizationScopedUser{id: e.Aggregate().ID, username: e.UserName})
+		case *user.MachineAddedEvent:
+			wm.Users = append(wm.Users, &organizationScopedUser{id: e.Aggregate().ID, username: e.UserName})
+		case *user.UsernameChangedEvent:
+			for _, user := range wm.Users {
+				if user.id == e.Aggregate().ID {
+					user.username = e.UserName
+					break
+				}
+			}
+		case *user.DomainClaimedEvent:
+			for _, user := range wm.Users {
+				if user.id == e.Aggregate().ID {
+					user.username = e.UserName
+					break
+				}
+			}
+		case *user.UserRemovedEvent:
+			wm.removeUser(e.Aggregate().ID)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *OrganizationScopedUsernamesWriteModel) removeUser(userID string) {
+	for i, user := range wm.Users {
+		if user.id == userID {
+			wm.Users[i] = wm.Users[len(wm.Users)-1]
+			wm.Users[len(wm.Users)-1] = nil
+			wm.Users = wm.Users[:len(wm.Users)-1]
+			return
+		}
+	}
+}
+
+func (wm *OrganizationScopedUsernamesWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		EventTypes(
+			user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.MachineAddedEventType,
+			user.UserUserNameChangedType,
+			user.UserDomainClaimedType,
+			user.UserRemovedType,
+		).
+		Builder()
 }

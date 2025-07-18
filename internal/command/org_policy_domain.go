@@ -118,16 +118,18 @@ func prepareAddOrgDomainPolicy(
 			if err != nil {
 				return nil, err
 			}
+			// regardless if the UserLoginMustBeDomain setting is true or false,
+			// if it will be the same value as currently on the instance,
+			// then there no further changes are needed
+			if instancePolicy.UserLoginMustBeDomain == userLoginMustBeDomain {
+				return cmds, nil
+			}
+
 			organizationScopedUsernames, err := checkOrganizationScopedUsernames(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
 			}
-			// regardless if the UserLoginMustBeDomain setting is true or false,
-			// if it will be the same value as currently on the instance,
-			// then there no further changes are needed
-			if (instancePolicy.UserLoginMustBeDomain || organizationScopedUsernames) == (userLoginMustBeDomain || organizationScopedUsernames) {
-				return cmds, nil
-			}
+
 			// the UserLoginMustBeDomain setting will be different from the instance
 			// therefore get all usernames and the current primary domain
 			usersWriteModel, err := domainPolicyUsernames(ctx, filter, a.ID)
@@ -135,8 +137,9 @@ func prepareAddOrgDomainPolicy(
 				return nil, err
 			}
 			return append(cmds, usersWriteModel.NewUsernameChangedEvents(ctx,
-				userLoginMustBeDomain || organizationScopedUsernames,
-				instancePolicy.UserLoginMustBeDomain || organizationScopedUsernames,
+				userLoginMustBeDomain,
+				organizationScopedUsernames,
+				instancePolicy.UserLoginMustBeDomain,
 			)...), nil
 		}, nil
 	}
@@ -182,8 +185,9 @@ func prepareChangeOrgDomainPolicy(
 			}
 			// to compute the username changed events
 			return append(cmds, usersWriteModel.NewUsernameChangedEvents(ctx,
-				userLoginMustBeDomain || organizationScopedUsernames,
-				!userLoginMustBeDomain || organizationScopedUsernames,
+				userLoginMustBeDomain,
+				organizationScopedUsernames,
+				writeModel.UserLoginMustBeDomain,
 			)...), nil
 		}, nil
 	}
@@ -205,8 +209,9 @@ func prepareRemoveOrgDomainPolicy(
 			if err != nil {
 				return nil, err
 			}
+			policyChange := org.NewDomainPolicyRemovedEvent(ctx, &a.Aggregate)
 			cmds := []eventstore.Command{
-				org.NewDomainPolicyRemovedEvent(ctx, &a.Aggregate),
+				policyChange,
 			}
 
 			organizationScopedUsernames, err := checkOrganizationScopedUsernames(ctx, filter, a.ID)
@@ -217,7 +222,7 @@ func prepareRemoveOrgDomainPolicy(
 			// regardless if the UserLoginMustBeDomain setting is true or false,
 			// if it will be the same value as currently on the instance,
 			// then there no further changes are needed
-			if (instancePolicy.UserLoginMustBeDomain || organizationScopedUsernames) == (writeModel.UserLoginMustBeDomain || organizationScopedUsernames) {
+			if writeModel.UserLoginMustBeDomain == instancePolicy.UserLoginMustBeDomain {
 				return cmds, nil
 			}
 			// get all usernames and the primary domain
@@ -227,9 +232,22 @@ func prepareRemoveOrgDomainPolicy(
 			}
 			// to compute the username changed events
 			return append(cmds, usersWriteModel.NewUsernameChangedEvents(ctx,
-				instancePolicy.UserLoginMustBeDomain || organizationScopedUsernames,
-				writeModel.UserLoginMustBeDomain || organizationScopedUsernames,
+				instancePolicy.UserLoginMustBeDomain,
+				organizationScopedUsernames,
+				writeModel.UserLoginMustBeDomain,
 			)...), nil
 		}, nil
 	}
+}
+
+func userLoginMustBeDomainChangeNecessary(oldUserLoginMustBeDomain, newUserLoginMustBeDomain, organizationScopedUsernames bool) bool {
+	// either the username has to change due to a change in the userLoginMustBeDomain config or the uniqueconstraints have to change due to
+	if newUserLoginMustBeDomain == oldUserLoginMustBeDomain && newUserLoginMustBeDomain == organizationScopedUsernames {
+		return false
+	}
+	return true
+}
+
+func userLoginMustBeDomainChange(userLoginMustBeDomain, organizationScopedUsernames bool) bool {
+	return userLoginMustBeDomain || organizationScopedUsernames
 }

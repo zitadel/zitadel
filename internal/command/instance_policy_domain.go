@@ -130,11 +130,20 @@ func prepareChangeDefaultDomainPolicy(
 			// loop over all found organisations to get their usernames
 			// and to compute the username changed events
 			for _, orgID := range orgsWriteModel.OrgIDs {
+				organizationScopedUsernames, err := checkOrganizationScopedUsernames(ctx, filter, a.ID)
+				if err != nil {
+					return nil, err
+				}
+
 				usersWriteModel, err := domainPolicyUsernames(ctx, filter, orgID)
 				if err != nil {
 					return nil, err
 				}
-				cmds = append(cmds, usersWriteModel.NewUsernameChangedEvents(ctx, userLoginMustBeDomain)...)
+				cmds = append(cmds, usersWriteModel.NewUsernameChangedEvents(ctx,
+					userLoginMustBeDomain,
+					organizationScopedUsernames,
+					writeModel.UserLoginMustBeDomain,
+				)...)
 			}
 			return cmds, nil
 		}, nil

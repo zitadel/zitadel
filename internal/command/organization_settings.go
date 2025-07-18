@@ -42,6 +42,7 @@ func (c *Commands) SetOrganizationSettings(ctx context.Context, set *SetOrganiza
 	events, err := wm.NewSet(ctx,
 		set.OrganizationScopedUsernames,
 		domainPolicy.UserLoginMustBeDomain,
+		c.getOrganizationScopedUsernames,
 	)
 	if err != nil {
 		return nil, err
@@ -62,7 +63,15 @@ func (c *Commands) DeleteOrganizationSettings(ctx context.Context, id string) (*
 		return writeModelToObjectDetails(wm.GetWriteModel()), nil
 	}
 
-	events, err := wm.NewRemoved(ctx)
+	domainPolicy, err := c.domainPolicyWriteModel(ctx, wm.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
+	events, err := wm.NewRemoved(ctx,
+		domainPolicy.UserLoginMustBeDomain,
+		c.getOrganizationScopedUsernames,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -110,4 +119,25 @@ func (c *Commands) checkOrganizationScopedUsernames(ctx context.Context, orgID s
 		return true, nil
 	}
 	return false, nil
+}
+
+func (c *Commands) getOrganizationScopedUsernamesWriteModelByID(ctx context.Context, id string) (*OrganizationScopedUsernamesWriteModel, error) {
+	wm := NewOrganizationScopedUsernamesWriteModel(id)
+	err := c.eventstore.FilterToQueryReducer(ctx, wm)
+	if err != nil {
+		return nil, err
+	}
+	return wm, nil
+}
+
+func (c *Commands) getOrganizationScopedUsernames(ctx context.Context, id string) ([]string, error) {
+	wm, err := c.getOrganizationScopedUsernamesWriteModelByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	usernames := make([]string, len(wm.Users))
+	for i, user := range wm.Users {
+		usernames[i] = user.username
+	}
+	return usernames, nil
 }

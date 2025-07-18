@@ -295,12 +295,14 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewUsernameChangedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"username",
 							"test@test.ch",
 							true,
+							false,
 						),
 					),
 				),
@@ -348,6 +350,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(context.Background(),
@@ -361,6 +364,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"username",
 							"test@test.ch",
+							false,
 							false,
 						),
 					),
@@ -409,12 +413,14 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewUsernameChangedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"username",
 							"username1",
 							true,
+							false,
 						),
 					),
 				),
@@ -462,11 +468,13 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewUsernameChangedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"username",
 							"username1",
+							false,
 							true,
 						),
 					),
@@ -506,7 +514,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 
 func TestCommandSide_DeactivateUser(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
@@ -528,9 +536,7 @@ func TestCommandSide_DeactivateUser(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -544,8 +550,7 @@ func TestCommandSide_DeactivateUser(t *testing.T) {
 		{
 			name: "user not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -561,8 +566,7 @@ func TestCommandSide_DeactivateUser(t *testing.T) {
 		{
 			name: "user already inactive, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -598,8 +602,7 @@ func TestCommandSide_DeactivateUser(t *testing.T) {
 		{
 			name: "deactivate user, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -638,7 +641,7 @@ func TestCommandSide_DeactivateUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.DeactivateUser(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
@@ -656,7 +659,7 @@ func TestCommandSide_DeactivateUser(t *testing.T) {
 
 func TestCommandSide_ReactivateUser(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
@@ -678,9 +681,7 @@ func TestCommandSide_ReactivateUser(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -694,8 +695,7 @@ func TestCommandSide_ReactivateUser(t *testing.T) {
 		{
 			name: "user not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -711,8 +711,7 @@ func TestCommandSide_ReactivateUser(t *testing.T) {
 		{
 			name: "user already active, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -743,8 +742,7 @@ func TestCommandSide_ReactivateUser(t *testing.T) {
 		{
 			name: "reactivate user, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -787,7 +785,7 @@ func TestCommandSide_ReactivateUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.ReactivateUser(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
@@ -805,7 +803,7 @@ func TestCommandSide_ReactivateUser(t *testing.T) {
 
 func TestCommandSide_LockUser(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
@@ -827,9 +825,7 @@ func TestCommandSide_LockUser(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -843,8 +839,7 @@ func TestCommandSide_LockUser(t *testing.T) {
 		{
 			name: "user not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -860,8 +855,7 @@ func TestCommandSide_LockUser(t *testing.T) {
 		{
 			name: "user already locked, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -897,8 +891,7 @@ func TestCommandSide_LockUser(t *testing.T) {
 		{
 			name: "lock user, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -937,7 +930,7 @@ func TestCommandSide_LockUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.LockUser(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
@@ -955,7 +948,7 @@ func TestCommandSide_LockUser(t *testing.T) {
 
 func TestCommandSide_UnlockUser(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
@@ -977,9 +970,7 @@ func TestCommandSide_UnlockUser(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -993,8 +984,7 @@ func TestCommandSide_UnlockUser(t *testing.T) {
 		{
 			name: "user not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -1010,8 +1000,7 @@ func TestCommandSide_UnlockUser(t *testing.T) {
 		{
 			name: "user already active, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1042,8 +1031,7 @@ func TestCommandSide_UnlockUser(t *testing.T) {
 		{
 			name: "unlock user, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1086,7 +1074,7 @@ func TestCommandSide_UnlockUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.UnlockUser(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
@@ -1104,7 +1092,7 @@ func TestCommandSide_UnlockUser(t *testing.T) {
 
 func TestCommandSide_RemoveUser(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
@@ -1129,9 +1117,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -1145,8 +1131,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 		{
 			name: "user not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -1162,8 +1147,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 		{
 			name: "org iam policy not found, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1196,8 +1180,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 		{
 			name: "remove user, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1249,8 +1232,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 		{
 			name: "remove user with erxternal idp, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1315,8 +1297,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 		{
 			name: "remove user with user memberships, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1418,7 +1399,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.RemoveUser(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.cascadeUserMemberships, tt.args.cascadeUserGrants...)
 			if tt.res.err == nil {
@@ -1434,7 +1415,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 
 func TestCommands_RevokeAccessToken(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx     context.Context
@@ -1455,7 +1436,7 @@ func TestCommands_RevokeAccessToken(t *testing.T) {
 		{
 			"id missing error",
 			fields{
-				eventstoreExpect(t),
+				expectEventstore(),
 			},
 			args{
 				context.Background(),
@@ -1471,7 +1452,7 @@ func TestCommands_RevokeAccessToken(t *testing.T) {
 		{
 			"not active error",
 			fields{
-				eventstoreExpect(t,
+				expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewUserTokenAddedEvent(context.Background(),
@@ -1507,7 +1488,7 @@ func TestCommands_RevokeAccessToken(t *testing.T) {
 		{
 			"active ok",
 			fields{
-				eventstoreExpect(t,
+				expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewUserTokenAddedEvent(context.Background(),
@@ -1552,7 +1533,7 @@ func TestCommands_RevokeAccessToken(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := c.RevokeAccessToken(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.tokenID)
 			if tt.res.err == nil {
@@ -1570,7 +1551,7 @@ func TestCommands_RevokeAccessToken(t *testing.T) {
 
 func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -1589,9 +1570,7 @@ func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1604,8 +1583,7 @@ func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -1621,8 +1599,7 @@ func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 		{
 			name: "code sent, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1657,7 +1634,7 @@ func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			err := r.UserDomainClaimedSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID)
 			if tt.res.err == nil {

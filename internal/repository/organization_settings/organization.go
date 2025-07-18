@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
@@ -17,7 +18,7 @@ type OrganizationSettingsSetEvent struct {
 
 	OrganizationScopedUsernames    bool `json:"organizationScopedUsernames,omitempty"`
 	oldOrganizationScopedUsernames bool
-	usernameChanges                []*UsernameChange
+	usernameChanges                []string
 }
 
 func (e *OrganizationSettingsSetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -29,12 +30,13 @@ func (e *OrganizationSettingsSetEvent) Payload() any {
 }
 
 func (e *OrganizationSettingsSetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	if len(e.usernameChanges) == 0 {
+	if len(e.usernameChanges) == 0 || e.oldOrganizationScopedUsernames == e.OrganizationScopedUsernames {
 		return []*eventstore.UniqueConstraint{}
 	}
-	changes := make([]*eventstore.UniqueConstraint, len(e.usernameChanges))
-	for i, change := range e.usernameChanges {
-		//TODO: constraint changes
+	changes := make([]*eventstore.UniqueConstraint, len(e.usernameChanges)*2)
+	for i, username := range e.usernameChanges {
+		changes[i*2] = user.NewRemoveUsernameUniqueConstraint(username, e.Aggregate().ResourceOwner, e.oldOrganizationScopedUsernames)
+		changes[i*2+1] = user.NewAddUsernameUniqueConstraint(username, e.Aggregate().ResourceOwner, e.OrganizationScopedUsernames)
 	}
 	return changes
 }
@@ -42,7 +44,7 @@ func (e *OrganizationSettingsSetEvent) UniqueConstraints() []*eventstore.UniqueC
 func NewOrganizationSettingsAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	usernameChanges []*UsernameChange,
+	usernameChanges []string,
 	organizationScopedUsernames bool,
 	oldOrganizationScopedUsernames bool,
 ) *OrganizationSettingsSetEvent {
@@ -56,17 +58,12 @@ func NewOrganizationSettingsAddedEvent(
 	}
 }
 
-type UsernameChange struct {
-	Username      string
-	ResourceOwner string
-}
-
 type OrganizationSettingsRemovedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
 	organizationScopedUsernames    bool
 	oldOrganizationScopedUsernames bool
-	usernameChanges                []*UsernameChange
+	usernameChanges                []string
 }
 
 func (e *OrganizationSettingsRemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -78,20 +75,13 @@ func (e *OrganizationSettingsRemovedEvent) Payload() any {
 }
 
 func (e *OrganizationSettingsRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	if len(e.usernameChanges) == 0 {
-		return []*eventstore.UniqueConstraint{}
-	}
-	changes := make([]*eventstore.UniqueConstraint, len(e.usernameChanges))
-	for i, change := range e.usernameChanges {
-		//TODO: constraint changes
-	}
-	return changes
+	return user.NewUsernameUniqueConstraints(e.usernameChanges, e.Aggregate().ResourceOwner, e.organizationScopedUsernames, e.oldOrganizationScopedUsernames)
 }
 
 func NewOrganizationSettingsRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	usernameChanges []*UsernameChange,
+	usernameChanges []string,
 	organizationScopedUsernames bool,
 	oldOrganizationScopedUsernames bool,
 ) *OrganizationSettingsRemovedEvent {

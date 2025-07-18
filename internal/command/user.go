@@ -43,10 +43,15 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 	if err = c.userValidateDomain(ctx, orgID, userName, domainPolicy.UserLoginMustBeDomain); err != nil {
 		return nil, err
 	}
+	orgScopedUsernames, err := c.checkOrganizationScopedUsernames(ctx, orgID)
+	if err != nil {
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-TODO", "Errors.Org.DomainPolicy.NotExisting")
+	}
+
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 
 	pushedEvents, err := c.eventstore.Push(ctx,
-		user.NewUsernameChangedEvent(ctx, userAgg, existingUser.UserName, userName, domainPolicy.UserLoginMustBeDomain))
+		user.NewUsernameChangedEvent(ctx, userAgg, existingUser.UserName, userName, domainPolicy.UserLoginMustBeDomain, orgScopedUsernames))
 	if err != nil {
 		return nil, err
 	}
