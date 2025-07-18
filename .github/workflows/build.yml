@@ -110,7 +110,6 @@ jobs:
 
   login-container:
     uses: ./.github/workflows/login-container.yml
-    if: ${{ github.event_name == 'workflow_dispatch' }}
     permissions:
       packages: write
       id-token: write
