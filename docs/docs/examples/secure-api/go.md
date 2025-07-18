@@ -6,13 +6,17 @@ sidebar_label: Go
 This integration guide shows you how to integrate **ZITADEL** into your Go API. It demonstrates how to secure your API using
 OAuth 2 Token Introspection.
 
+> ℹ️ These examples and guides are based on our official [Go SDK](https://github.com/zitadel/zitadel-go).
+>
+> The SDK is a convenient wrapper around our low-level [OIDC library](https://github.com/zitadel/oidc). For most use cases, using the helpers provided in our [Go SDK](https://github.com/zitadel/zitadel-go) is the recommended approach for implementing authentication.
+
 At the end of the guide you should have an API with a protected endpoint.
 
 > This documentation references our HTTP example. There's also one for GRPC. Check them out on [GitHub](https://github.com/zitadel/zitadel-go/blob/next/example/api/http/main.go).
 
 ## Prerequisites
 
-This will handle the OAuth 2.0 introspection request including authentication using JWT with Private Key using our [OIDC client library](https://github.com/zitadel/oidc).
+This will handle the OAuth 2.0 introspection request including authentication using JWT with Private Key using our [Go SDK](https://github.com/zitadel/zitadel-go).
 All that is required, is to create your API, create a private key and a personal access token for a service user.
 
 ### Set up application and obtain keys
@@ -125,7 +129,7 @@ Now you can call the API by browser or curl. Try the healthz endpoint first:
 curl -i http://localhost:8089/api/healthz
 ```
 
-it should return something like: 
+it should return something like:
 
 ```
 HTTP/1.1 200 OK

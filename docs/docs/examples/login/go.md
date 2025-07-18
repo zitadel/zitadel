@@ -3,12 +3,16 @@ title: ZITADEL with Go
 sidebar_label: Go
 ---
 
-This integration guide demonstrates the recommended way to incorporate ZITADEL into your Go web application. 
+This integration guide demonstrates the recommended way to incorporate ZITADEL into your Go web application.
 It explains how to enable user login in your application and how to fetch data from the user info endpoint.
+
+> ℹ️ These examples and guides are based on our official [Go SDK](https://github.com/zitadel/zitadel-go).
+>
+> The SDK is a convenient wrapper around our low-level [OIDC library](https://github.com/zitadel/oidc). For most use cases, using the helpers provided in our [Go SDK](https://github.com/zitadel/zitadel-go) is the recommended approach for implementing authentication.
 
 By the end of this guide, your application will have login functionality and will be able to access the current user's profile.
 
-> This documentation references our [example](https://github.com/zitadel/zitadel-go) on GitHub. 
+> This documentation references our [example](https://github.com/zitadel/zitadel-go) on GitHub.
 > You can either create your own application or directly run the example by providing the necessary arguments.
 
 ## Set up application
@@ -86,7 +90,7 @@ To ensure the user is authenticated before they are able to use your application
     ```go
     mw.CheckAuthentication()(handler)
     ```
-  
+
 ***Authentication context***
 
 If you used either of the authentication checks above, you can then access context information in your handler:
@@ -119,7 +123,7 @@ https://github.com/zitadel/zitadel-go/blob/next/example/app/templates/profile.ht
 
 You will need to provide some values for the program to run:
 - `domain`: Your ZITADEL instance domain, e.g. my-domain.zitadel.cloud
-- `key`: Random secret string. Used for symmetric encryption of state parameters, cookies and PCKE. 
+- `key`: Random secret string. Used for symmetric encryption of state parameters, cookies and PCKE.
 - `clientID`: The clientID provided by ZITADEL
 - `redirectURI`: The redirectURI registered at ZITADEL
 - `port`: The port on which the API will be accessible, default it 8089
@@ -146,7 +150,7 @@ By clicking on `Login` you will be redirected to your ZITADEL instance. After lo
 
 Congratulations! You have successfully integrated your Go application with ZITADEL!
 
-If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-go) application. 
-This application includes all the functionalities mentioned in this quickstart. 
+If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-go) application.
+This application includes all the functionalities mentioned in this quickstart.
 You can directly start it with your own configuration. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel-go/issues).
 
