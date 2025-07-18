@@ -1,6 +1,5 @@
 FROM login-client AS login-standalone-builder
 COPY apps/login ./apps/login
-COPY packages/zitadel-tailwind-config packages/zitadel-tailwind-config
 RUN pnpm exec turbo prune @zitadel/login --docker
 WORKDIR /build/docker
 RUN cp -r ../out/json/* .

@@ -124,7 +124,7 @@ export function RegisterForm({
   const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
   return (
     <form className="w-full">
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="mb-4 grid grid-cols-2 gap-4">
         <div className="">
           <TextInput
             type="firstname"
@@ -170,7 +170,7 @@ export function RegisterForm({
         loginSettings.allowUsernamePassword &&
         loginSettings.passkeysType == PasskeysType.ALLOWED && (
           <>
-            <p className="mt-4 ztdl-p mb-6 block text-left">
+            <p className="ztdl-p mb-6 mt-4 block text-left">
               <Translated i18nKey="selectMethod" namespace="register" />
             </p>
 
@@ -211,14 +211,14 @@ export function RegisterForm({
             const usePasswordToContinue: boolean =
               loginSettings?.allowUsernamePassword &&
               loginSettings?.passkeysType == PasskeysType.ALLOWED
-                ? !!!(selected === methods[0]) // choose selection if both available
+                ? !(selected === methods[0]) // choose selection if both available
                 : !!loginSettings?.allowUsernamePassword; // if password is chosen
             // set password as default if only password is allowed
             return submitAndContinue(values, usePasswordToContinue);
           })}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}
+          {loading && <Spinner className="mr-2 h-5 w-5" />}
           <Translated i18nKey="submit" namespace="register" />
         </Button>
       </div>

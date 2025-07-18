@@ -76,8 +76,8 @@ export function SignInWithIdp({
   };
 
   return (
-    <div className="flex flex-col w-full space-y-2 text-sm">
-      <p className="text-center ztdl-p">
+    <div className="flex w-full flex-col space-y-2 text-sm">
+      <p className="ztdl-p text-center">
         <Translated i18nKey="orSignInWith" namespace="idp" />
       </p>
       {!!identityProviders.length && identityProviders?.map(renderIDPButton)}

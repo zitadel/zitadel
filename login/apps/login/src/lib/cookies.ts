@@ -314,7 +314,7 @@ export async function getMostRecentCookieWithLoginname<T>({
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
     let filtered = sessions.filter((cookie) => {
-      return !!loginName ? cookie.loginName === loginName : true;
+      return loginName ? cookie.loginName === loginName : true;
     });
 
     if (organization) {
