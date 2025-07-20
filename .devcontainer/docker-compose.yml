@@ -4,11 +4,17 @@ services:
     image: mcr.microsoft.com/devcontainers/base:ubuntu
     volumes:
       - ..:/workspaces:cached
-    network_mode: service:db
     command: sleep infinity
     environment:
       ZITADEL_DATABASE_POSTGRES_HOST: db
       ZITADEL_EXTERNALSECURE: false
+    ports:
+      - 8080:8080
+      - 3000:3000
+      - 8000:8000
+      - 8001:8001
+      - 8003:8003
+      - 8004:8004
 
   db:
     image: postgres:17.0-alpine3.19
@@ -39,16 +45,10 @@ services:
     image: "${ZITADEL_TAG:-ghcr.io/zitadel/zitadel:v4.0.0-rc.2}"
     container_name: zitadel
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
-    ports:
-      - 8080:8080
-      - 3000:3000
-      - 8000:8000
-      - 8001:8001
-      - 8003:8003
-      - 8004:8004
     volumes:
       - ../apps/login/packages/acceptance/pat:/pat:delegated
       - ../apps/login/packages/acceptance/zitadel.yaml:/zitadel.yaml:cached
+    network_mode: service:devcontainer
     healthcheck:
       test:
         - CMD
@@ -67,7 +67,7 @@ services:
       context: ../apps/login/packages/acceptance/setup
       dockerfile: ../go-command.Dockerfile
     entrypoint: "./setup.sh"
-    network_mode: service:zitadel
+    network_mode: service:devcontainer
     environment:
       PAT_FILE: /pat/zitadel-admin-sa.pat
       ZITADEL_API_URL: http://localhost:8080
@@ -84,6 +84,14 @@ services:
     depends_on:
       zitadel:
         condition: "service_healthy"
+
+  login:
+    image: "${LOGIN_TAG:-zitadel-login:local}"
+    container_name: login
+    network_mode: service:devcontainer
+    depends_on:
+      configure-login:
+        condition: service_completed_successfully
 
   mock-notifications:
     container_name: mock-notifications
@@ -116,7 +124,7 @@ services:
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
-    network_mode: service:zitadel
+    network_mode: service:devcontainer
     environment:
       API_URL: 'http://localhost:8080'
       API_DOMAIN: 'localhost'
@@ -132,26 +140,26 @@ services:
       configure-login:
         condition: "service_completed_successfully"
 
-  mock-oidcop:
-    container_name: mock-oidcop
-    build:
-      context: ../apps/login/packages/acceptance/idp/oidc
-      dockerfile: ../../go-command.Dockerfile
-      args:
-        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
-    network_mode: service:zitadel
-    environment:
-      API_URL: 'http://localhost:8080'
-      API_DOMAIN: 'localhost'
-      PAT_FILE: '/pat/zitadel-admin-sa.pat'
-      SCHEMA: 'http'
-      HOST: 'localhost'
-      PORT: "8004"
-    volumes:
-      - "../apps/login/packages/acceptance/pat:/pat:cached"
-    depends_on:
-      configure-login:
-        condition: "service_completed_successfully"
+#  mock-oidcop:
+#    container_name: mock-oidcop
+#    build:
+#      context: ../apps/login/packages/acceptance/idp/oidc
+#      dockerfile: ../../go-command.Dockerfile
+#      args:
+#        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+#    network_mode: service:devcontainer
+#    environment:
+#      API_URL: 'http://localhost:8080'
+#      API_DOMAIN: 'localhost'
+#      PAT_FILE: '/pat/zitadel-admin-sa.pat'
+#      SCHEMA: 'http'
+#      HOST: 'localhost'
+#      PORT: "8004"
+#    volumes:
+#      - "../apps/login/packages/acceptance/pat:/pat:cached"
+#    depends_on:
+#      configure-login:
+#        condition: "service_completed_successfully"
 
   mock-samlsp:
     container_name: mock-samlsp
@@ -160,7 +168,7 @@ services:
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
-    network_mode: service:zitadel
+    network_mode: service:devcontainer
     environment:
       API_URL: 'http://localhost:8080'
       API_DOMAIN: 'localhost'
@@ -175,26 +183,26 @@ services:
       configure-login:
         condition: "service_completed_successfully"
 
-  mock-samlidp:
-    container_name: mock-samlidp
-    build:
-      context: ../apps/login/packages/acceptance/idp/saml
-      dockerfile: ../../go-command.Dockerfile
-      args:
-        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
-    network_mode: service:zitadel
-    environment:
-      API_URL: 'http://localhost:8080'
-      API_DOMAIN: 'localhost'
-      PAT_FILE: '/pat/zitadel-admin-sa.pat'
-      SCHEMA: 'http'
-      HOST: 'localhost'
-      PORT: "8003"
-    volumes:
-      - "../apps/login/packages/acceptance/pat:/pat"
-    depends_on:
-      configure-login:
-        condition: "service_completed_successfully"
+#  mock-samlidp:
+#    container_name: mock-samlidp
+#    build:
+#      context: ../apps/login/packages/acceptance/idp/saml
+#      dockerfile: ../../go-command.Dockerfile
+#      args:
+#        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+#    network_mode: service:devcontainer
+#    environment:
+#      API_URL: 'http://localhost:8080'
+#      API_DOMAIN: 'localhost'
+#      PAT_FILE: '/pat/zitadel-admin-sa.pat'
+#      SCHEMA: 'http'
+#      HOST: 'localhost'
+#      PORT: "8003"
+#    volumes:
+#      - "../apps/login/packages/acceptance/pat:/pat"
+#    depends_on:
+#      configure-login:
+#        condition: "service_completed_successfully"
 
 volumes:
   postgres-data:
