@@ -1,16 +1,16 @@
 version: '3.8'
 services:
+
   devcontainer:
     image: mcr.microsoft.com/devcontainers/base:ubuntu
-    user: "1000:1000"
     volumes:
-      - ..:/workspaces
-      - ${HOME}:/home/${USER}
+      - ..:/workspaces:cached
     network_mode: service:db
     command: sleep infinity
     environment:
       ZITADEL_DATABASE_POSTGRES_HOST: db
       ZITADEL_EXTERNALSECURE: false
+
   db:
     image: postgres:latest
     restart: unless-stopped
@@ -19,6 +19,161 @@ services:
     environment:
       PGUSER: postgres
       POSTGRES_PASSWORD: postgres
+
+  mock-zitadel:
+    build:
+      context: apps/login/packages/integration/core-mock
+    container_name: mock-zitadel
+    ports:
+      - 22220:22220
+      - 22222:22222
+
+  configure-login:
+    container_name: configure-login
+    restart: no
+    build:
+      context: apps/login/packages/acceptance/setup"
+      dockerfile: apps/login/packages/acceptance/go-command.Dockerfile
+    entrypoint: "./setup.sh"
+    environment:
+      PAT_FILE: /pat/zitadel-admin-sa.pat
+      ZITADEL_API_INTERNAL_URL: http://zitadel:8080
+      WRITE_ENVIRONMENT_FILE: /login-env/.env.test.local
+      SINK_EMAIL_INTERNAL_URL: http://sink:3333/email
+      SINK_SMS_INTERNAL_URL: http://sink:3333/sms
+      SINK_NOTIFICATION_URL: http://localhost:3333/notification
+      LOGIN_BASE_URL: https://127.0.0.1.sslip.io/ui/v2/login/
+      ZITADEL_API_URL: https://127.0.0.1.sslip.io
+      ZITADEL_API_DOMAIN: 127.0.0.1.sslip.io
+      ZITADEL_ADMIN_USER: zitadel-admin@zitadel.127.0.0.1.sslip.io
+    volumes:
+      - ./pat:/pat # Read the PAT file from zitadels setup
+      - ../login:/login-env # Write the environment variables file for the login
+    depends_on:
+      traefik:
+        condition: "service_healthy"
+      wait-for-zitadel:
+        condition: "service_completed_successfully"
+
+  mock-notifications:
+    container_name: mock-notifications
+    build:
+      context: apps/login/packages/acceptance/sink"
+      dockerfile: apps/login/packages/acceptance/go-command.Dockerfile
+      args:
+        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    environment:
+      PORT: '3333'
+    command:
+      - -port
+      - '3333'
+      - -email
+      - '/email'
+      - -sms
+      - '/sms'
+      - -notification
+      - '/notification'
+    ports:
+      - "3333:3333"
+    depends_on:
+      configure-login:
+        condition: "service_completed_successfully"
+
+  mock-oidcrp:
+    container_name: mock-oidcrp
+    build:
+      context: apps/login/packages/acceptance/oidcrp"
+      dockerfile: apps/login/packages/acceptance/go-command.Dockerfile
+      args:
+        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    environment:
+      API_URL: 'http://traefik'
+      API_DOMAIN: 'traefik'
+      PAT_FILE: '/pat/zitadel-admin-sa.pat'
+      LOGIN_URL: 'https://traefik/ui/v2/login'
+      ISSUER: 'https://traefik'
+      HOST: 'traefik'
+      PORT: '8000'
+      SCOPES: 'openid profile email'
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./pat:/pat"
+    depends_on:
+      configure-login:
+        condition: "service_completed_successfully"
+
+  mock-oidcop:
+    image: ${LOGIN_TEST_ACCEPTANCE_OIDCOP_TAG:-login-test-acceptance-oidcop:local}
+    container_name: mock-oidcop
+    build:
+      context: apps/login/packages/acceptance/idp/oidc"
+      dockerfile: apps/login/packages/acceptance/go-command.Dockerfile
+      args:
+        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    environment:
+      API_URL: 'http://traefik'
+      API_DOMAIN: 'traefik'
+      PAT_FILE: '/pat/zitadel-admin-sa.pat'
+      SCHEMA: 'https'
+      HOST: 'traefik'
+      PORT: "8004"
+    ports:
+      - 8004:8004
+    volumes:
+      - "./pat:/pat"
+    depends_on:
+      configure-login:
+        condition: "service_completed_successfully"
+
+  mock-samlsp:
+    user: "${UID:-1000}:${GID:-1000}"
+    image: "${LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG:-login-test-acceptance-samlsp:local}"
+    container_name: acceptance-samlsp
+    build:
+      context: apps/login/packages/acceptance/samlsp"
+      dockerfile: apps/login/packages/acceptance/go-command.Dockerfile
+      args:
+        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    environment:
+      API_URL: 'http://traefik'
+      API_DOMAIN: 'traefik'
+      PAT_FILE: '/pat/zitadel-admin-sa.pat'
+      LOGIN_URL: 'https://traefik/ui/v2/login'
+      IDP_URL: 'http://zitadel:8080/saml/v2/metadata'
+      HOST: 'https://traefik'
+      PORT: '8001'
+    ports:
+      - 8001:8001
+    volumes:
+      - "./pat:/pat"
+    depends_on:
+      configure-login:
+        condition: "service_completed_successfully"
+
+  mock-samlidp:
+    user: "${UID:-1000}:${GID:-1000}"
+    image: "${LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG:-login-test-acceptance-samlidp:local}"
+    container_name: acceptance-samlidp
+    build:
+      context: apps/login/packages/acceptance/idp/saml"
+      dockerfile: apps/login/packages/acceptance/go-command.Dockerfile
+      args:
+        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    environment:
+      API_URL: 'http://traefik:8080'
+      API_DOMAIN: 'traefik'
+      PAT_FILE: '/pat/zitadel-admin-sa.pat'
+      SCHEMA: 'https'
+      HOST: 'traefik'
+      PORT: "8003"
+    ports:
+      - 8003:8003
+    volumes:
+      - "./pat:/pat"
+    depends_on:
+      configure-login:
+        condition: "service_completed_successfully"
 
 volumes:
   postgres-data:
