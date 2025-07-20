@@ -8,15 +8,9 @@ services:
     environment:
       ZITADEL_DATABASE_POSTGRES_HOST: db
       ZITADEL_EXTERNALSECURE: false
-    ports:
-      - 8080:8080
-      - 3000:3000
-      - 8000:8000
-      - 8001:8001
-      - 8003:8003
-      - 8004:8004
 
   db:
+    container_name: db
     image: postgres:17.0-alpine3.19
     restart: unless-stopped
     volumes:
@@ -34,9 +28,9 @@ services:
       - "5432:5432"
 
   mock-zitadel:
+    container_name: mock-zitadel
     build:
       context: ../apps/login/packages/integration/core-mock
-    container_name: mock-zitadel
     ports:
       - 22220:22220
       - 22222:22222
@@ -86,8 +80,8 @@ services:
         condition: "service_healthy"
 
   login:
-    image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2}"
     container_name: login
+    image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2}"
     network_mode: service:devcontainer
     volumes:
       - ../apps/login/apps/login/.env.test.local:/env-files/.env:cached
