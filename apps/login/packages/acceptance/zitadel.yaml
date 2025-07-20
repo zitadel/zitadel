@@ -1,6 +1,4 @@
-ExternalDomain: 127.0.0.1.sslip.io
-ExternalSecure: true
-ExternalPort: 443
+ExternalSecure: false
 TLS.Enabled: false
 
 FirstInstance:
@@ -17,8 +15,12 @@ FirstInstance:
       Machine:
         Username: zitadel-admin-sa
         Name: Admin
-      Pat:
-        ExpirationDate: 2099-01-01T00:00:00Z
+      Pat.ExpirationDate: 2099-01-01T00:00:00Z
+    LoginClient:
+      Machine:
+        Username: login-client-sa
+        Name: Login Client
+      Pat.ExpirationDate: 2099-01-01T00:00:00Z
 
 DefaultInstance:
   LoginPolicy:
@@ -47,37 +49,16 @@ DefaultInstance:
     HelpLink: "https://zitadel.com/docs"
     SupportEmail: "support@zitadel.com"
     DocsLink: "https://zitadel.com/docs"
-  Features:
-    LoginV2:
-      Required: true
-
-OIDC:
-  DefaultLoginURLV2: "/ui/v2/login/login?authRequest="
-
-SAML:
-  DefaultLoginURLV2: "/ui/v2/login/login?authRequest="
 
 Database:
   EventPushConnRatio: 0.2 # 4
   ProjectionSpoolerConnRatio: 0.3 # 6
   postgres:
     Host: db
-    Port: 5432
-    Database: zitadel
     MaxOpenConns: 20
     MaxIdleConns: 20
     MaxConnLifetime: 1h
     MaxConnIdleTime: 5m
-    User:
-      Username: zitadel
-      SSL:
-        Mode: disable
-    Admin:
-      Username: zitadel
-      SSL:
-        Mode: disable
+    User.Password: zitadel
 
-Logstore:
-  Access:
-    Stdout:
-      Enabled: true
+Logstore.Access.Stdout.Enabled: true

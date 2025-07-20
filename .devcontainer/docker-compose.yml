@@ -1,4 +1,3 @@
-version: '3.8'
 services:
 
   devcontainer:
@@ -12,54 +11,85 @@ services:
       ZITADEL_EXTERNALSECURE: false
 
   db:
-    image: postgres:latest
+    image: postgres:17.0-alpine3.19
     restart: unless-stopped
     volumes:
       - postgres-data:/var/lib/postgresql/data
     environment:
       PGUSER: postgres
       POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: "10s"
+      timeout: "30s"
+      retries: 5
+      start_period: "20s"
+    ports:
+      - "5432:5432"
 
   mock-zitadel:
     build:
-      context: apps/login/packages/integration/core-mock
+      context: ../apps/login/packages/integration/core-mock
     container_name: mock-zitadel
     ports:
       - 22220:22220
       - 22222:22222
 
+  zitadel:
+    image: "${ZITADEL_TAG:-ghcr.io/zitadel/zitadel:v4.0.0-rc.2}"
+    container_name: zitadel
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    ports:
+      - 8080:8080
+      - 3000:3000
+      - 8000:8000
+      - 8001:8001
+      - 8003:8003
+      - 8004:8004
+    volumes:
+      - ../apps/login/packages/acceptance/pat:/pat:delegated
+      - ../apps/login/packages/acceptance/zitadel.yaml:/zitadel.yaml:cached
+    healthcheck:
+      test:
+        - CMD
+        - /app/zitadel
+        - ready
+        - --config
+        - /zitadel.yaml
+    depends_on:
+      db:
+        condition: "service_healthy"
+
   configure-login:
     container_name: configure-login
     restart: no
     build:
-      context: apps/login/packages/acceptance/setup"
-      dockerfile: apps/login/packages/acceptance/go-command.Dockerfile
+      context: ../apps/login/packages/acceptance/setup
+      dockerfile: ../go-command.Dockerfile
     entrypoint: "./setup.sh"
+    network_mode: service:zitadel
     environment:
       PAT_FILE: /pat/zitadel-admin-sa.pat
-      ZITADEL_API_INTERNAL_URL: http://zitadel:8080
+      ZITADEL_API_URL: http://localhost:8080
       WRITE_ENVIRONMENT_FILE: /login-env/.env.test.local
       SINK_EMAIL_INTERNAL_URL: http://sink:3333/email
       SINK_SMS_INTERNAL_URL: http://sink:3333/sms
       SINK_NOTIFICATION_URL: http://localhost:3333/notification
-      LOGIN_BASE_URL: https://127.0.0.1.sslip.io/ui/v2/login/
-      ZITADEL_API_URL: https://127.0.0.1.sslip.io
-      ZITADEL_API_DOMAIN: 127.0.0.1.sslip.io
-      ZITADEL_ADMIN_USER: zitadel-admin@zitadel.127.0.0.1.sslip.io
+      LOGIN_BASE_URL: http://localhost:3000/ui/v2/login/
+      ZITADEL_API_DOMAIN: localhost
+      ZITADEL_ADMIN_USER: zitadel-admin@zitadel.localhost
     volumes:
-      - ./pat:/pat # Read the PAT file from zitadels setup
-      - ../login:/login-env # Write the environment variables file for the login
+      - ../apps/login/packages/acceptance/pat:/pat:cached # Read the PAT file from zitadels setup
+      - ../apps/login/apps/login:/login-env:delegated # Write the environment variables file for the login
     depends_on:
-      traefik:
+      zitadel:
         condition: "service_healthy"
-      wait-for-zitadel:
-        condition: "service_completed_successfully"
 
   mock-notifications:
     container_name: mock-notifications
     build:
-      context: apps/login/packages/acceptance/sink"
-      dockerfile: apps/login/packages/acceptance/go-command.Dockerfile
+      context: ../apps/login/packages/acceptance/sink
+      dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
     environment:
@@ -82,95 +112,86 @@ services:
   mock-oidcrp:
     container_name: mock-oidcrp
     build:
-      context: apps/login/packages/acceptance/oidcrp"
-      dockerfile: apps/login/packages/acceptance/go-command.Dockerfile
+      context: ../apps/login/packages/acceptance/oidcrp
+      dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    network_mode: service:zitadel
     environment:
-      API_URL: 'http://traefik'
-      API_DOMAIN: 'traefik'
+      API_URL: 'http://localhost:8080'
+      API_DOMAIN: 'localhost'
       PAT_FILE: '/pat/zitadel-admin-sa.pat'
-      LOGIN_URL: 'https://traefik/ui/v2/login'
-      ISSUER: 'https://traefik'
-      HOST: 'traefik'
+      LOGIN_URL: 'http://localhost:3000/ui/v2/login'
+      ISSUER: 'http://localhost:8000'
+      HOST: 'localhost'
       PORT: '8000'
       SCOPES: 'openid profile email'
-    ports:
-      - "8000:8000"
     volumes:
-      - "./pat:/pat"
+      - ../apps/login/packages/acceptance/pat:/pat:cached
     depends_on:
       configure-login:
         condition: "service_completed_successfully"
 
   mock-oidcop:
-    image: ${LOGIN_TEST_ACCEPTANCE_OIDCOP_TAG:-login-test-acceptance-oidcop:local}
     container_name: mock-oidcop
     build:
-      context: apps/login/packages/acceptance/idp/oidc"
-      dockerfile: apps/login/packages/acceptance/go-command.Dockerfile
+      context: ../apps/login/packages/acceptance/idp/oidc
+      dockerfile: ../../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    network_mode: service:zitadel
     environment:
-      API_URL: 'http://traefik'
-      API_DOMAIN: 'traefik'
+      API_URL: 'http://localhost:8080'
+      API_DOMAIN: 'localhost'
       PAT_FILE: '/pat/zitadel-admin-sa.pat'
-      SCHEMA: 'https'
-      HOST: 'traefik'
+      SCHEMA: 'http'
+      HOST: 'localhost'
       PORT: "8004"
-    ports:
-      - 8004:8004
     volumes:
-      - "./pat:/pat"
+      - "../apps/login/packages/acceptance/pat:/pat:cached"
     depends_on:
       configure-login:
         condition: "service_completed_successfully"
 
   mock-samlsp:
-    user: "${UID:-1000}:${GID:-1000}"
-    image: "${LOGIN_TEST_ACCEPTANCE_SAMLSP_TAG:-login-test-acceptance-samlsp:local}"
-    container_name: acceptance-samlsp
+    container_name: mock-samlsp
     build:
-      context: apps/login/packages/acceptance/samlsp"
-      dockerfile: apps/login/packages/acceptance/go-command.Dockerfile
+      context: ../apps/login/packages/acceptance/samlsp
+      dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    network_mode: service:zitadel
     environment:
-      API_URL: 'http://traefik'
-      API_DOMAIN: 'traefik'
+      API_URL: 'http://localhost:8080'
+      API_DOMAIN: 'localhost'
       PAT_FILE: '/pat/zitadel-admin-sa.pat'
-      LOGIN_URL: 'https://traefik/ui/v2/login'
-      IDP_URL: 'http://zitadel:8080/saml/v2/metadata'
-      HOST: 'https://traefik'
+      LOGIN_URL: 'http://localhost:3000/ui/v2/login'
+      IDP_URL: 'http://localhost:8080/saml/v2/metadata'
+      HOST: 'http://localhost:8001'
       PORT: '8001'
-    ports:
-      - 8001:8001
     volumes:
-      - "./pat:/pat"
+      - "../apps/login/packages/acceptance/pat:/pat:cached"
     depends_on:
       configure-login:
         condition: "service_completed_successfully"
 
   mock-samlidp:
-    user: "${UID:-1000}:${GID:-1000}"
-    image: "${LOGIN_TEST_ACCEPTANCE_SAMLIDP_TAG:-login-test-acceptance-samlidp:local}"
-    container_name: acceptance-samlidp
+    container_name: mock-samlidp
     build:
-      context: apps/login/packages/acceptance/idp/saml"
-      dockerfile: apps/login/packages/acceptance/go-command.Dockerfile
+      context: ../apps/login/packages/acceptance/idp/saml
+      dockerfile: ../../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+    network_mode: service:zitadel
     environment:
-      API_URL: 'http://traefik:8080'
-      API_DOMAIN: 'traefik'
+      API_URL: 'http://localhost:8080'
+      API_DOMAIN: 'localhost'
       PAT_FILE: '/pat/zitadel-admin-sa.pat'
-      SCHEMA: 'https'
-      HOST: 'traefik'
+      SCHEMA: 'http'
+      HOST: 'localhost'
       PORT: "8003"
-    ports:
-      - 8003:8003
     volumes:
-      - "./pat:/pat"
+      - "../apps/login/packages/acceptance/pat:/pat"
     depends_on:
       configure-login:
         condition: "service_completed_successfully"
