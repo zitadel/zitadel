@@ -86,9 +86,11 @@ services:
         condition: "service_healthy"
 
   login:
-    image: "${LOGIN_TAG:-zitadel-login:local}"
+    image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2}"
     container_name: login
     network_mode: service:devcontainer
+    volumes:
+      - ../apps/login/apps/login/.env.test.local:/env-files/.env:cached
     depends_on:
       configure-login:
         condition: service_completed_successfully
