@@ -55,5 +55,12 @@
         }
       }
     }
+  },
+  {
+    "service": "zitadel.settings.v2.SettingsService",
+    "method": "GetHostedLoginTranslations",
+    "out": {
+      "data": {}
+    }
   }
 ]

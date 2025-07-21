@@ -12,8 +12,6 @@ services:
     environment:
       ZITADEL_DATABASE_POSTGRES_HOST: db
       ZITADEL_EXTERNALSECURE: false
-    ports:
-    - 3001:3001
 
   db:
     container_name: db
@@ -44,6 +42,8 @@ services:
   login-integration:
     container_name: login-integration
     image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2}"
+    env_file:
+      - fileName: ../apps/login/apps/login/.env.test
     volumes:
       - ../apps/login/apps/login/.env.test:/env-files/.env:cached
     network_mode: service:devcontainer

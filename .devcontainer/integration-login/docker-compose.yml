@@ -1,0 +1,14 @@
+services:
+  login-integration:
+    extends:
+      file: ../docker-compose.yml
+      service: devcontainer  
+    container_name: login-integration
+    command: pnpm turbo @zitadel/login#dev
+    network_mode: service:devcontainer
+    environment:
+      NODE_ENV: 'test'
+      PORT: 3001
+    depends_on:
+      mock-zitadel:
+        condition: service_started
