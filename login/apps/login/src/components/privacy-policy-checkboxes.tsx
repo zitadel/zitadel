@@ -23,7 +23,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
 
   return (
     <>
-      <p className="flex flex-row items-center text-text-light-secondary-500 dark:text-text-dark-secondary-500 mt-4 text-sm">
+      <p className="mt-4 flex flex-row items-center text-sm text-text-light-secondary-500 dark:text-text-dark-secondary-500">
         <Translated i18nKey="agreeTo" namespace="register" />
         {legal?.helpLink && (
           <span>
@@ -34,7 +34,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="ml-1 w-5 h-5"
+                className="ml-1 h-5 w-5"
               >
                 <path
                   strokeLinecap="round"

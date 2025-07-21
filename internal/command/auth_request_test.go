@@ -911,7 +911,8 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 func TestCommands_FailAuthRequest(t *testing.T) {
 	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient")
 	type fields struct {
-		eventstore func(*testing.T) *eventstore.Eventstore
+		eventstore      func(*testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx    context.Context
@@ -946,6 +947,45 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 			},
 		},
 		{
+			"missing permission",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"login",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								nil,
+								true,
+								"issuer",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx:    mockCtx,
+				id:     "V2_id",
+				reason: domain.OIDCErrorReasonLoginRequired,
+			},
+			res{
+				wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
 			"failed",
 			fields{
 				eventstore: expectEventstore(
@@ -977,6 +1017,7 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 							domain.OIDCErrorReasonLoginRequired),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx:    mockCtx,
@@ -1006,7 +1047,8 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			details, got, err := c.FailAuthRequest(tt.args.ctx, tt.args.id, tt.args.reason)
 			require.ErrorIs(t, err, tt.res.wantErr)
