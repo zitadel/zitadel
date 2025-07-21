@@ -90,7 +90,7 @@ func Test_ZITADEL_API_missing_audience_scope(t *testing.T) {
 func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 	clientID, _ := createClient(t, Instance)
 	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, zitadelAudienceScope)
-	createResp, err := Instance.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
+	createResp, err := Instance.Client.SessionV2.CreateSession(CTXLOGIN, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
 				Search: &session.CheckUser_UserId{UserId: User.GetUserId()},

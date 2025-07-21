@@ -21,23 +21,23 @@ export function Theme() {
 
   return (
     <div
-      className={`h-fit relative grid grid-cols-2 rounded-full border border-divider-light dark:border-divider-dark p-1`}
+      className={`relative grid h-fit grid-cols-2 rounded-full border border-divider-light p-1 dark:border-divider-dark`}
     >
       <button
-        className={`h-8 w-8 rounded-full flex flex-row items-center justify-center hover:opacity-100 transition-all ${
+        className={`flex h-8 w-8 flex-row items-center justify-center rounded-full transition-all hover:opacity-100 ${
           isDark ? "bg-black/10 dark:bg-white/10" : "opacity-60"
         }`}
         onClick={() => setTheme("dark")}
       >
-        <MoonIcon className="h-4 w-4 flex-shrink-0 text-xl rounded-full" />
+        <MoonIcon className="h-4 w-4 flex-shrink-0 rounded-full text-xl" />
       </button>
       <button
-        className={`h-8 w-8 rounded-full flex flex-row items-center justify-center hover:opacity-100 transition-all ${
+        className={`flex h-8 w-8 flex-row items-center justify-center rounded-full transition-all hover:opacity-100 ${
           !isDark ? "bg-black/10 dark:bg-white/10" : "opacity-60"
         }`}
         onClick={() => setTheme("light")}
       >
-        <SunIcon className="h-6 w-6 flex-shrink-0 text-xl rounded-full" />
+        <SunIcon className="h-6 w-6 flex-shrink-0 rounded-full text-xl" />
       </button>
     </div>
   );

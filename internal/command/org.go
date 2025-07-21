@@ -276,6 +276,15 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail b
 		}
 	}
 
+	// because users can choose their own ID, we must check that an org with the same ID does not already exist
+	existingOrg, err := c.getOrgWriteModelByID(ctx, o.OrgID)
+	if err != nil {
+		return nil, err
+	}
+	if existingOrg.State.Exists() {
+		return nil, zerrors.ThrowAlreadyExists(nil, "ORG-laho2n", "Errors.Org.AlreadyExisting")
+	}
+
 	return c.setUpOrgWithIDs(ctx, o, o.OrgID, allowInitialMail, userIDs...)
 }
 
@@ -327,12 +336,13 @@ func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	// because users can choose their own ID, we must check that an org with the same ID does not already exist
 	existingOrg, err := c.getOrgWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
-	if existingOrg.State != domain.OrgStateUnspecified {
-		return nil, zerrors.ThrowNotFound(nil, "ORG-lapo2m", "Errors.Org.AlreadyExisting")
+	if existingOrg.State.Exists() {
+		return nil, zerrors.ThrowAlreadyExists(nil, "ORG-lapo2n", "Errors.Org.AlreadyExisting")
 	}
 
 	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, setOrgInactive, claimedUserIDs)
