@@ -8,12 +8,10 @@ import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
-  const locale = getLocale();
 
   const { userId, loginName, code, organization, requestId, invite, send } =
     searchParams;
@@ -136,7 +134,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         )}
 
         {id && send && (
-          <div className="py-4 w-full">
+          <div className="w-full py-4">
             <Alert type={AlertType.INFO}>
               <Translated i18nKey="verify.codeSent" namespace="verify" />
             </Alert>

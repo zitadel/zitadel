@@ -3,11 +3,7 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import {
-  getBrandingSettings,
-  getLoginSettings,
-  getUserByID,
-} from "@/lib/zitadel";
+import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { headers } from "next/headers";
 
@@ -30,14 +26,6 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   }).catch((error) => {
     console.warn("Error loading session:", error);
   });
-
-  let loginSettings;
-  if (!requestId) {
-    loginSettings = await getLoginSettings({
-      serviceUrl,
-      organization,
-    });
-  }
 
   const id = userId ?? sessionFactors?.factors?.user?.id;
 

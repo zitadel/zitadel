@@ -144,7 +144,7 @@ export async function updateSession(options: UpdateSessionCommand) {
     challenges.webAuthN &&
     !challenges.webAuthN.domain
   ) {
-    const [hostname, port] = host.split(":");
+    const [hostname] = host.split(":");
 
     challenges.webAuthN.domain = hostname;
   }

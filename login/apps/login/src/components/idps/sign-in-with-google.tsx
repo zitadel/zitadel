@@ -12,7 +12,7 @@ export const SignInWithGoogle = forwardRef<
 
   return (
     <BaseButton {...restProps} ref={ref}>
-      <div className="h-12 w-12 flex items-center justify-center">
+      <div className="flex h-12 w-12 items-center justify-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           xmlSpace="preserve"

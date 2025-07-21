@@ -42,7 +42,7 @@ export async function addU2F(command: RegisterU2FCommand) {
     sessionToken: sessionCookie.token,
   });
 
-  const [hostname, port] = host.split(":");
+  const [hostname] = host.split(":");
 
   if (!hostname) {
     throw new Error("Could not get hostname");
@@ -67,7 +67,7 @@ export async function verifyU2F(command: VerifyU2FCommand) {
   }
 
   let passkeyName = command.passkeyName;
-  if (!!!passkeyName) {
+  if (!passkeyName) {
     const headersList = await headers();
     const userAgentStructure = { headers: headersList };
     const { browser, device, os } = userAgent(userAgentStructure);

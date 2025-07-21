@@ -85,7 +85,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
             onClick={handleSubmit(submitCodeAndContinue)}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+            {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
             <Translated i18nKey="verify.submit" namespace="verify" />
           </Button>
         </div>

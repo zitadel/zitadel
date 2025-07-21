@@ -124,7 +124,7 @@ export function PasswordForm({
         />
         {!loginSettings?.hidePasswordReset && (
           <button
-            className="transition-all text-sm hover:text-primary-light-500 dark:hover:text-primary-dark-500"
+            className="text-sm transition-all hover:text-primary-light-500 dark:hover:text-primary-dark-500"
             onClick={() => resetPasswordAndContinue()}
             type="button"
             disabled={loading}
@@ -167,7 +167,7 @@ export function PasswordForm({
           onClick={handleSubmit(submitPassword)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
           <Translated i18nKey="verify.submit" namespace="password" />
         </Button>
       </div>

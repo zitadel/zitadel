@@ -194,7 +194,7 @@ Errors:
     AlreadyExists: Instantie bestaat al
     NotChanged: Instantie is niet veranderd
   Org:
-    AlreadyExists: Organisatienaam is al in gebruik
+    AlreadyExists: Organisatienaam of -id is al in gebruik
     Invalid: Organisatie is ongeldig
     AlreadyDeactivated: Organisatie is al gedeactiveerd
     AlreadyActive: Organisatie is al actief

@@ -13,7 +13,8 @@
     "ZITADEL_SERVICE_USER_TOKEN",
     "NEXT_PUBLIC_BASE_PATH",
     "CUSTOM_REQUEST_HEADERS",
-    "NODE_ENV"
+    "NODE_ENV",
+    "INKEEP_API_KEY"
   ],
   "tasks": {
     "generate": {
