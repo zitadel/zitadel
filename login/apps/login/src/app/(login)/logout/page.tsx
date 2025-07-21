@@ -1,7 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsClearList } from "@/components/sessions-clear-list";
 import { Translated } from "@/components/translated";
-import { getAllSessionCookieIds } from "@/lib/cookies";
+import { getAllSessionCookieIdsWithExpiration } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   getBrandingSettings,
@@ -12,12 +12,13 @@ import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { headers } from "next/headers";
 
 async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
-  const ids: (string | undefined)[] = await getAllSessionCookieIds();
+  const cookies = await getAllSessionCookieIdsWithExpiration();
 
-  if (ids && ids.length) {
+  const cookieIds = cookies.map((cookie) => cookie?.id).filter(Boolean);
+  if (cookieIds && cookieIds.length) {
     const response = await listSessions({
       serviceUrl,
-      ids: ids.filter((id) => !!id) as string[],
+      ids: cookieIds.filter((id) => !!id) as string[],
     });
     return response?.sessions ?? [];
   } else {

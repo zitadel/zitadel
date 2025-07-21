@@ -1,7 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsList } from "@/components/sessions-list";
 import { Translated } from "@/components/translated";
-import { getAllSessionCookieIds } from "@/lib/cookies";
+import { getAllSessionCookieIdsWithExpiration } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   getBrandingSettings,
@@ -15,12 +15,13 @@ import { headers } from "next/headers";
 import Link from "next/link";
 
 async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
-  const ids: (string | undefined)[] = await getAllSessionCookieIds();
+  const cookies = await getAllSessionCookieIdsWithExpiration();
+  const cookieIds = cookies.map((cookie) => cookie?.id).filter(Boolean);
 
-  if (ids && ids.length) {
+  if (cookieIds && cookieIds.length) {
     const response = await listSessions({
       serviceUrl,
-      ids: ids.filter((id) => !!id) as string[],
+      ids: cookieIds.filter((id) => !!id) as string[],
     });
     return response?.sessions ?? [];
   } else {

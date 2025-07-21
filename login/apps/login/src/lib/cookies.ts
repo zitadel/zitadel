@@ -240,9 +240,9 @@ export async function getSessionCookieByLoginName<T>({
  * @param cleanup when true, removes all expired sessions, default true
  * @returns Session Cookies
  */
-export async function getAllSessionCookieIds<T>(
+export async function getAllSessionCookieIdsWithExpiration<T>(
   cleanup: boolean = false,
-): Promise<any> {
+): Promise<{ id: string; expirationTs?: string }[]> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -257,9 +257,13 @@ export async function getAllSessionCookieIds<T>(
             ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
             : true,
         )
-        .map((session) => session.id);
+        .map((session) => {
+          return { id: session.id, expirationTs: session.expirationTs };
+        });
     } else {
-      return sessions.map((session) => session.id);
+      return sessions.map((session) => {
+        return { id: session.id, expirationTs: session.expirationTs };
+      });
     }
   } else {
     return [];
