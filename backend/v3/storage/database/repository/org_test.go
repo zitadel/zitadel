@@ -519,11 +519,6 @@ func TestGetOrganization(t *testing.T) {
 				return
 			}
 
-			if org.Name == "non existent org" {
-				assert.Nil(t, returnedOrg)
-				return
-			}
-
 			assert.Equal(t, returnedOrg.ID, org.ID)
 			assert.Equal(t, returnedOrg.Name, org.Name)
 			assert.Equal(t, returnedOrg.InstanceID, org.InstanceID)

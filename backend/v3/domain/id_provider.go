@@ -105,6 +105,6 @@ type IDProviderRepository interface {
 	List(ctx context.Context, conditions ...database.Condition) ([]*IdentityProvider, error)
 
 	Create(ctx context.Context, idp *IdentityProvider) error
-	Update(ctx context.Context, id IDPIdentifierCondition, changes ...database.Change) (int64, error)
+	Update(ctx context.Context, id IDPIdentifierCondition, instnaceID string, orgID string, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, id IDPIdentifierCondition) (int64, error)
 }

@@ -61,8 +61,19 @@ const createIDProviderStmt = `INSERT INTO zitadel.identity_providers` +
 
 func (i *idProvider) Create(ctx context.Context, idp *domain.IdentityProvider) error {
 	builder := database.StatementBuilder{}
-	builder.AppendArgs(idp.InstanceID, idp.OrgID, idp.ID, idp.State, idp.Name, idp.Type, idp.AllowCreation,
-		idp.AllowAutoCreation, idp.AllowAutoUpdate, idp.AllowLinking, idp.StylingType, idp.Payload)
+	builder.AppendArgs(
+		idp.InstanceID,
+		idp.OrgID,
+		idp.ID,
+		idp.State,
+		idp.Name,
+		idp.Type,
+		idp.AllowCreation,
+		idp.AllowAutoCreation,
+		idp.AllowAutoUpdate,
+		idp.AllowLinking,
+		idp.StylingType,
+		idp.Payload)
 	builder.WriteString(createIDProviderStmt)
 
 	err := i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&idp.CreatedAt, &idp.UpdatedAt)
@@ -72,22 +83,24 @@ func (i *idProvider) Create(ctx context.Context, idp *domain.IdentityProvider) e
 	return nil
 }
 
-func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierCondition, changes ...database.Change) (int64, error) {
+func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID string, changes ...database.Change) (int64, error) {
 	if changes == nil {
-		return 0, errors.New("Update must contain a condition") // (otherwise ALL identity_providers will be updated)
+		return 0, errors.New("Update must contain at least one change")
 	}
 	builder := database.StatementBuilder{}
-	builder.WriteString(`UPDATE zitadel.identity_provider SET `)
+	builder.WriteString(`UPDATE zitadel.identity_providers SET `)
 
-	// conditions := []database.Condition{i.IDCondition(id)}
-	conditions := []database.Condition{id}
+	conditions := []database.Condition{
+		id,
+		i.InstanceIDCondition(instnaceID),
+		i.OrgIDCondition(orgID),
+	}
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, database.And(conditions...))
 
 	stmt := builder.String()
 
-	rowsAffected, err := i.client.Exec(ctx, stmt, builder.Args()...)
-	return rowsAffected, err
+	return i.client.Exec(ctx, stmt, builder.Args()...)
 }
 
 func (i *idProvider) Delete(ctx context.Context, id domain.IDPIdentifierCondition) (int64, error) {
@@ -230,7 +243,7 @@ func (i idProvider) SetAllowCreation(allow bool) database.Change {
 }
 
 func (i idProvider) SetAllowAutoCreation(allow bool) database.Change {
-	return database.NewChange(i.AllowAutoUpdateColumn(), allow)
+	return database.NewChange(i.AllowAutoCreationColumn(), allow)
 }
 
 func (i idProvider) SetAllowAutoUpdate(allow bool) database.Change {
@@ -246,7 +259,7 @@ func (i idProvider) SetStylingType(stylingType int16) database.Change {
 }
 
 func (i idProvider) SetPayload(payload string) database.Change {
-	return database.NewChange(i.StylingTypeColumn(), payload)
+	return database.NewChange(i.PayloadColumn(), payload)
 }
 
 func scanIDProvider(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.IdentityProvider, error) {
