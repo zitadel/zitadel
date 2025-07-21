@@ -23,14 +23,43 @@
     "title": "Welcome back!",
     "description": "Enter your login data.",
     "register": "Register new user",
-    "submit": "Continue"
+    "submit": "Continue",
+    "errors": {
+      "internalError": "An internal error occurred",
+      "couldNotGetLoginSettings": "Could not get login settings",
+      "couldNotSearchUsers": "Could not search users",
+      "couldNotGetDomain": "Could not get domain",
+      "couldNotGetHost": "Could not get host",
+      "couldNotStartIDPFlow": "Could not start IDP flow",
+      "moreThanOneUserFound": "More than one user found. Provide a unique identifier.",
+      "userNotFound": "User not found in the system",
+      "couldNotCreateSession": "Could not create session for user",
+      "initialUserNotSupported": "Initial User not supported",
+      "usernamePasswordNotAllowed": "Username Password not allowed! Contact your administrator for more information.",
+      "passkeysNotAllowed": "Passkeys not allowed! Contact your administrator for more information.",
+      "couldNotFindIdentityProvider": "Could not find identity provider."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "An error occurred",
+      "multipleUsersFound": "Multiple users found",
+      "userNotFound": "User not found in the system"
+    }
   },
   "password": {
     "verify": {
       "title": "Password",
       "description": "Enter your password.",
       "resetPassword": "Reset Password",
-      "submit": "Continue"
+      "submit": "Continue",
+      "errors": {
+        "couldNotVerifyPassword": "Could not verify password",
+        "couldNotResetPassword": "Could not reset password"
+      },
+      "info": {
+        "passwordResetSent": "Password was reset. Please check your email"
+      }
     },
     "set": {
       "title": "Set Password",
@@ -38,12 +67,48 @@
       "codeSent": "A code has been sent to your email address.",
       "noCodeReceived": "Didn't receive a code?",
       "resend": "Resend code",
-      "submit": "Continue"
+      "submit": "Continue",
+      "errors": {
+        "couldNotSetPassword": "Could not set password",
+        "couldNotResetPassword": "Could not reset password",
+        "couldNotVerifyPassword": "Could not verify password"
+      }
     },
     "change": {
       "title": "Change Password",
       "description": "Set the password for your account",
-      "submit": "Continue"
+      "submit": "Continue",
+      "errors": {
+        "couldNotChangePassword": "Could not change password",
+        "couldNotVerifyPassword": "Could not verify password",
+        "unknownError": "Unknown error"
+      }
+    },
+    "complexity": {
+      "length": "Must be at least {minLength} characters long.",
+      "hasSymbol": "Must include a symbol.",
+      "hasNumber": "Must include a number.",
+      "hasUppercase": "Must include an uppercase letter.",
+      "hasLowercase": "Must include a lowercase letter.",
+      "equals": "Password confirmation matched.",
+      "matches": "Matches",
+      "doesNotMatch": "Doesn't match"
+    },
+    "errors": {
+      "noHostFound": "No host found",
+      "couldNotSendResetLink": "Could not send Password Reset Link",
+      "couldNotCreateSessionForUser": "Could not create session for user",
+      "couldNotVerifyPassword": "Could not verify password",
+      "failedToAuthenticate": "Failed to authenticate. You had {failedAttempts} of {maxPasswordAttempts} password attempts.{lockoutMessage}",
+      "accountLockedContactAdmin": " Contact your administrator to unlock your account",
+      "initialUserNotSupported": "Initial User not supported",
+      "userInitialStateNotSupported": "User Initial State is not supported",
+      "codeOrVerificationRequired": "You have to provide a code or have a valid User Verification Check",
+      "verificationRequired": "User Verification Check has to be done",
+      "couldNotLoadSession": "Could not load session",
+      "couldNotLoadAuthMethods": "Could not load auth methods",
+      "failedPrecondition": "Failed precondition",
+      "sessionNotValid": "Session is not valid"
     }
   },
   "idp": {
@@ -173,6 +238,13 @@
       "title": "Set Password",
       "description": "Set the password for your account",
       "submit": "Continue"
+    },
+    "errors": {
+      "couldNotCreateUser": "Could not create user",
+      "couldNotCreateSession": "Could not create session",
+      "userNotFound": "User not found in the system",
+      "couldNotLinkIDP": "Could not link IDP to user",
+      "couldNotRegisterUser": "Could not register user"
     }
   },
   "invite": {
@@ -210,6 +282,19 @@
       "resendCode": "Resend code",
       "codeSent": "A code has just been sent to your email address.",
       "submit": "Continue"
+    },
+    "errors": {
+      "couldNotResendEmail": "Could not resend email",
+      "couldNotVerifyUser": "Could not verify user",
+      "couldNotVerifyInvite": "Could not verify invite",
+      "couldNotVerifyEmail": "Could not verify email",
+      "couldNotVerify": "Could not verify",
+      "couldNotLoadUser": "Could not load user",
+      "couldNotLoadAuthenticators": "Could not load possible authenticators",
+      "couldNotCreateSession": "Could not create session",
+      "noHostFound": "No host found",
+      "userAlreadyVerified": "User is already verified!",
+      "couldNotResendInvite": "Could not resend invite"
     }
   },
   "authenticator": {

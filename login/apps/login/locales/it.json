@@ -23,14 +23,43 @@
     "title": "Bentornato!",
     "description": "Inserisci i tuoi dati di accesso.",
     "register": "Registrati come nuovo utente",
-    "submit": "Continua"
+    "submit": "Continua",
+    "errors": {
+      "internalError": "Si è verificato un errore interno",
+      "couldNotGetLoginSettings": "Impossibile ottenere le impostazioni di accesso",
+      "couldNotSearchUsers": "Impossibile cercare gli utenti",
+      "couldNotGetDomain": "Impossibile ottenere il dominio",
+      "couldNotGetHost": "Impossibile ottenere l'host",
+      "couldNotStartIDPFlow": "Impossibile avviare il flusso IDP",
+      "moreThanOneUserFound": "È stato trovato più di un utente. Fornisci un identificatore univoco.",
+      "userNotFound": "Utente non trovato nel sistema",
+      "couldNotCreateSession": "Impossibile creare la sessione per l'utente",
+      "initialUserNotSupported": "Utente iniziale non supportato",
+      "usernamePasswordNotAllowed": "Nome utente e password non consentiti! Contatta l'amministratore per maggiori informazioni.",
+      "passkeysNotAllowed": "Passkey non consentite! Contatta l'amministratore per maggiori informazioni.",
+      "couldNotFindIdentityProvider": "Impossibile trovare il provider di identità."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Si è verificato un errore",
+      "multipleUsersFound": "Trovati più utenti",
+      "userNotFound": "Utente non trovato nel sistema"
+    }
   },
   "password": {
     "verify": {
       "title": "Password",
       "description": "Inserisci la tua password.",
       "resetPassword": "Reimposta Password",
-      "submit": "Continua"
+      "submit": "Continua",
+      "errors": {
+        "couldNotVerifyPassword": "Impossibile verificare la password",
+        "couldNotResetPassword": "Impossibile reimpostare la password"
+      },
+      "info": {
+        "passwordResetSent": "La password è stata reimpostata. Controlla la tua e-mail"
+      }
     },
     "set": {
       "title": "Imposta Password",
@@ -38,12 +67,48 @@
       "codeSent": "Un codice è stato inviato al tuo indirizzo email.",
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resend": "Invia di nuovo",
-      "submit": "Continua"
+      "submit": "Continua",
+      "errors": {
+        "couldNotSetPassword": "Impossibile impostare la password",
+        "couldNotResetPassword": "Impossibile reimpostare la password",
+        "couldNotVerifyPassword": "Impossibile verificare la password"
+      }
     },
     "change": {
       "title": "Cambia Password",
       "description": "Imposta la password per il tuo account",
-      "submit": "Continua"
+      "submit": "Continua",
+      "errors": {
+        "couldNotChangePassword": "Impossibile modificare la password",
+        "couldNotVerifyPassword": "Impossibile verificare la password",
+        "unknownError": "Errore sconosciuto"
+      }
+    },
+    "complexity": {
+      "length": "Deve contenere almeno {minLength} caratteri.",
+      "hasSymbol": "Deve includere un simbolo.",
+      "hasNumber": "Deve includere un numero.",
+      "hasUppercase": "Deve includere una lettera maiuscola.",
+      "hasLowercase": "Deve includere una lettera minuscola.",
+      "equals": "La conferma della password corrisponde.",
+      "matches": "Corrisponde",
+      "doesNotMatch": "Non corrisponde"
+    },
+    "errors": {
+      "noHostFound": "Nessun host trovato",
+      "couldNotSendResetLink": "Impossibile inviare il link per il ripristino della password",
+      "couldNotCreateSessionForUser": "Impossibile creare una sessione per l'utente",
+      "couldNotVerifyPassword": "Impossibile verificare la password",
+      "failedToAuthenticate": "Autenticazione non riuscita. Hai effettuato {failedAttempts} di {maxPasswordAttempts} tentativi di password.{lockoutMessage}",
+      "accountLockedContactAdmin": " Contatta l'amministratore per sbloccare il tuo account",
+      "initialUserNotSupported": "Utente iniziale non supportato",
+      "userInitialStateNotSupported": "Lo stato iniziale dell'utente non è supportato",
+      "codeOrVerificationRequired": "Devi fornire un codice o avere una verifica utente valida",
+      "verificationRequired": "È necessario effettuare la verifica utente",
+      "couldNotLoadSession": "Impossibile caricare la sessione",
+      "couldNotLoadAuthMethods": "Impossibile caricare i metodi di autenticazione",
+      "failedPrecondition": "Precondizione non soddisfatta",
+      "sessionNotValid": "La sessione non è valida"
     }
   },
   "idp": {
@@ -173,6 +238,13 @@
       "title": "Imposta Password",
       "description": "Imposta la password per il tuo account",
       "submit": "Continua"
+    },
+    "errors": {
+      "couldNotCreateUser": "Impossibile creare l'utente",
+      "couldNotCreateSession": "Impossibile creare la sessione",
+      "userNotFound": "Utente non trovato nel sistema",
+      "couldNotLinkIDP": "Impossibile collegare l'IDP all'utente",
+      "couldNotRegisterUser": "Impossibile registrare l'utente"
     }
   },
   "invite": {
@@ -210,6 +282,19 @@
       "resendCode": "Invia di nuovo il codice",
       "codeSent": "Un codice è stato appena inviato al tuo indirizzo email.",
       "submit": "Continua"
+    },
+    "errors": {
+      "couldNotResendEmail": "Impossibile reinviare l'email",
+      "couldNotVerifyUser": "Impossibile verificare l'utente",
+      "couldNotVerifyInvite": "Impossibile verificare l'invito",
+      "couldNotVerifyEmail": "Impossibile verificare l'email",
+      "couldNotVerify": "Impossibile verificare",
+      "couldNotLoadUser": "Impossibile caricare l'utente",
+      "couldNotLoadAuthenticators": "Impossibile caricare gli autenticatori possibili",
+      "couldNotCreateSession": "Impossibile creare la sessione",
+      "noHostFound": "Nessun host trovato",
+      "userAlreadyVerified": "L'utente è già verificato!",
+      "couldNotResendInvite": "Impossibile reinviare l'invito"
     }
   },
   "authenticator": {

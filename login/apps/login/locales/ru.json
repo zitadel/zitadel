@@ -23,14 +23,43 @@
     "title": "С возвращением!",
     "description": "Введите свои данные для входа.",
     "register": "Зарегистрировать нового пользователя",
-    "submit": "Продолжить"
+    "submit": "Продолжить",
+    "errors": {
+      "internalError": "Произошла внутренняя ошибка",
+      "couldNotGetLoginSettings": "Не удалось получить настройки входа",
+      "couldNotSearchUsers": "Не удалось выполнить поиск пользователей",
+      "couldNotGetDomain": "Не удалось получить домен",
+      "couldNotGetHost": "Не удалось получить хост",
+      "couldNotStartIDPFlow": "Не удалось запустить поток IDP",
+      "moreThanOneUserFound": "Найдено более одного пользователя. Укажите уникальный идентификатор.",
+      "userNotFound": "Пользователь не найден в системе",
+      "couldNotCreateSession": "Не удалось создать сессию для пользователя",
+      "initialUserNotSupported": "Начальный пользователь не поддерживается",
+      "usernamePasswordNotAllowed": "Использование имени пользователя и пароля не разрешено! Обратитесь к администратору за дополнительной информацией.",
+      "passkeysNotAllowed": "Ключи доступа не разрешены! Обратитесь к администратору за дополнительной информацией.",
+      "couldNotFindIdentityProvider": "Не удалось найти поставщика удостоверений."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Произошла ошибка",
+      "multipleUsersFound": "Найдено несколько пользователей",
+      "userNotFound": "Пользователь не найден в системе"
+    }
   },
   "password": {
     "verify": {
       "title": "Пароль",
       "description": "Введите ваш пароль.",
       "resetPassword": "Сбросить пароль",
-      "submit": "Продолжить"
+      "submit": "Продолжить",
+      "errors": {
+        "couldNotVerifyPassword": "Не удалось проверить пароль",
+        "couldNotResetPassword": "Не удалось сбросить пароль"
+      },
+      "info": {
+        "passwordResetSent": "Пароль был сброшен. Пожалуйста, проверьте свою электронную почту"
+      }
     },
     "set": {
       "title": "Установить пароль",
@@ -38,12 +67,48 @@
       "codeSent": "Код отправлен на ваш адрес электронной почты.",
       "noCodeReceived": "Не получили код?",
       "resend": "Отправить код повторно",
-      "submit": "Продолжить"
+      "submit": "Продолжить",
+      "errors": {
+        "couldNotSetPassword": "Не удалось установить пароль",
+        "couldNotResetPassword": "Не удалось сбросить пароль",
+        "couldNotVerifyPassword": "Не удалось проверить пароль"
+      }
     },
     "change": {
       "title": "Изменить пароль",
       "description": "Установите пароль для вашего аккаунта",
-      "submit": "Продолжить"
+      "submit": "Продолжить",
+      "errors": {
+        "couldNotChangePassword": "Не удалось изменить пароль",
+        "couldNotVerifyPassword": "Не удалось проверить пароль",
+        "unknownError": "Неизвестная ошибка"
+      }
+    },
+    "complexity": {
+      "length": "Минимум {minLength} символов.",
+      "hasSymbol": "Должен содержать специальный символ.",
+      "hasNumber": "Должен содержать цифру.",
+      "hasUppercase": "Должен содержать заглавную букву.",
+      "hasLowercase": "Должен содержать строчную букву.",
+      "equals": "Пароли должны совпадать.",
+      "matches": "Совпадает",
+      "doesNotMatch": "Не совпадает"
+    },
+    "errors": {
+      "noHostFound": "Хост не найден",
+      "couldNotSendResetLink": "Не удалось отправить ссылку для сброса пароля",
+      "couldNotCreateSessionForUser": "Не удалось создать сессию для пользователя",
+      "couldNotVerifyPassword": "Не удалось проверить пароль",
+      "failedToAuthenticate": "Не удалось пройти аутентификацию. У вас было {failedAttempts} из {maxPasswordAttempts} попыток ввода пароля.{lockoutMessage}",
+      "accountLockedContactAdmin": " Свяжитесь с администратором, чтобы разблокировать вашу учетную запись",
+      "initialUserNotSupported": "Первичный пользователь не поддерживается",
+      "userInitialStateNotSupported": "Начальное состояние пользователя не поддерживается",
+      "codeOrVerificationRequired": "Вы должны предоставить код или иметь действительную проверку пользователя",
+      "verificationRequired": "Необходимо выполнить проверку пользователя",
+      "couldNotLoadSession": "Не удалось загрузить сессию",
+      "couldNotLoadAuthMethods": "Не удалось загрузить методы аутентификации",
+      "failedPrecondition": "Нарушено предварительное условие",
+      "sessionNotValid": "Сессия недействительна"
     }
   },
   "idp": {
@@ -173,7 +238,14 @@
       "title": "Установить пароль",
       "description": "Установите пароль для вашего аккаунта",
       "submit": "Продолжить"
-    }
+    },
+    "errors": {
+      "couldNotCreateUser": "Не удалось создать пользователя",
+      "couldNotCreateSession": "Не удалось создать сессию",
+      "userNotFound": "Пользователь не найден в системе",
+      "couldNotLinkIDP": "Не удалось привязать IDP к пользователю",
+      "couldNotRegisterUser": "Не удалось зарегистрировать пользователя"
+    }  
   },
   "invite": {
     "title": "Пригласить пользователя",
@@ -210,6 +282,19 @@
       "resendCode": "Отправить код повторно",
       "codeSent": "Код отправлен на ваш email.",
       "submit": "Продолжить"
+    },
+    "errors": {
+      "couldNotResendEmail": "Не удалось повторно отправить электронное письмо",
+      "couldNotVerifyUser": "Не удалось подтвердить пользователя",
+      "couldNotVerifyInvite": "Не удалось подтвердить приглашение",
+      "couldNotVerifyEmail": "Не удалось подтвердить электронную почту",
+      "couldNotVerify": "Не удалось подтвердить",
+      "couldNotLoadUser": "Не удалось загрузить пользователя",
+      "couldNotLoadAuthenticators": "Не удалось загрузить доступные средства аутентификации",
+      "couldNotCreateSession": "Не удалось создать сеанс",
+      "noHostFound": "Хост не найден",
+      "userAlreadyVerified": "Пользователь уже подтверждён!",
+      "couldNotResendInvite": "Не удалось повторно отправить приглашение"
     }
   },
   "authenticator": {
