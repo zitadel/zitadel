@@ -55,15 +55,22 @@ export async function createSessionAndUpdateCookie(command: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
+  const sessionLifetime =
+    command.lifetime ||
+    ({
+      seconds: BigInt(24 * 60 * 60), // 24 hours
+      nanos: 0,
+    } as Duration); // set this to a default of 24 hours if not provided, for usecases where the lifetime is not specified (user discovery)
+  console.log(
+    "set session lifetime to ",
+    sessionLifetime,
+    sessionLifetime?.seconds,
+  );
+
   const createdSession = await createSessionFromChecks({
     serviceUrl,
     checks: command.checks,
-    lifetime:
-      command.lifetime ||
-      ({
-        seconds: BigInt(24 * 60 * 60), // 24 hours
-        nanos: 0,
-      } as Duration), // set this to a default of 24 hours if not provided, for usecases where the lifetime is not specified (user discovery)
+    lifetime: sessionLifetime,
   });
 
   if (createdSession) {
@@ -195,41 +202,41 @@ export type SessionWithChallenges = Session & {
   challenges: Challenges | undefined;
 };
 
-export async function setSessionAndUpdateCookie(
-  recentCookie: CustomCookieData,
-  checks?: Checks,
-  challenges?: RequestChallenges,
-  requestId?: string,
-  lifetime?: Duration,
-) {
+export async function setSessionAndUpdateCookie(command: {
+  recentCookie: CustomCookieData;
+  checks?: Checks;
+  challenges?: RequestChallenges;
+  requestId?: string;
+  lifetime: Duration;
+}) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   return setSession({
     serviceUrl,
-    sessionId: recentCookie.id,
-    sessionToken: recentCookie.token,
-    challenges,
-    checks,
-    lifetime,
+    sessionId: command.recentCookie.id,
+    sessionToken: command.recentCookie.token,
+    challenges: command.challenges,
+    checks: command.checks,
+    lifetime: command.lifetime,
   })
     .then((updatedSession) => {
       if (updatedSession) {
         const sessionCookie: CustomCookieData = {
-          id: recentCookie.id,
+          id: command.recentCookie.id,
           token: updatedSession.sessionToken,
-          creationTs: recentCookie.creationTs,
-          expirationTs: recentCookie.expirationTs,
+          creationTs: command.recentCookie.creationTs,
+          expirationTs: command.recentCookie.expirationTs,
           // just overwrite the changeDate with the new one
           changeTs: updatedSession.details?.changeDate
             ? `${timestampMs(updatedSession.details.changeDate)}`
             : "",
-          loginName: recentCookie.loginName,
-          organization: recentCookie.organization,
+          loginName: command.recentCookie.loginName,
+          organization: command.recentCookie.organization,
         };
 
-        if (requestId) {
-          sessionCookie.requestId = requestId;
+        if (command.requestId) {
+          sessionCookie.requestId = command.requestId;
         }
 
         return getSession({
