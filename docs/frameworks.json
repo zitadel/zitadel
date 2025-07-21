@@ -3,21 +3,21 @@
 		"id": "client-php",
 		"title": "PHP",
 		"imgSrcDark": "/docs/img/tech/php.svg",
-		"docsLink": "/docs/sdk-examples/java",
+		"docsLink": "/docs/sdk-examples/client-libraries/php",
 		"client": true
 	},
 	{
 		"id": "client-java",
 		"title": "Java",
 		"imgSrcDark": "/docs/img/tech/java.svg",
-		"docsLink": "/docs/sdk-examples/java",
+		"docsLink": "/docs/sdk-examples/client-libraries/java",
 		"client": true
 	},
 	{
 		"id": "client-go",
 		"title": "Go",
 		"imgSrcDark": "/docs/img/tech/golang.svg",
-		"docsLink": "/docs/sdk-examples/java",
+		"docsLink": "/docs/sdk-examples/go",
 		"client": true,
 		"sdk": true
 	},
@@ -25,14 +25,14 @@
 		"id": "client-ruby",
 		"title": "Ruby",
 		"imgSrcDark": "/docs/img/tech/ruby.svg",
-		"docsLink": "/docs/sdk-examples/java",
+		"docsLink": "/docs/sdk-examples/client-libraries/ruby",
 		"client": true
 	},
 	{
 		"id": "client-python",
 		"title": "Python",
 		"imgSrcDark": "/docs/img/tech/python.svg",
-		"docsLink": "/docs/sdk-examples/java",
+		"docsLink": "/docs/sdk-examples/client-libraries/python",
 		"client": true
 	},
 
