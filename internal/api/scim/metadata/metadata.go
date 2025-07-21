@@ -13,7 +13,7 @@ type ScopedKey string
 const (
 	externalIdProvisioningDomainPlaceholder = "{provisioningDomain}"
 
-	KeyPrefix                 = "urn:zitadel:scim:"
+	KeyPrefix                     = "urn:zitadel:scim:"
 	KeyProvisioningDomain     Key = KeyPrefix + "provisioningDomain"
 	KeyIgnorePasswordOnCreate Key = KeyPrefix + "ignorePasswordOnCreate"
 

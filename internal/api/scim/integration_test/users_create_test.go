@@ -435,17 +435,26 @@ func TestCreateUser_scopedExternalID(t *testing.T) {
 
 func TestCreateUser_ignorePasswordOnCreate(t *testing.T) {
 	tests := []struct {
-		name           string
-		ignorePassword string
-		scimError      string
-		wantUser       *resources.ScimUser
-		wantErr        bool
+		name            string
+		ignorePassword  string
+		scimErrorType   string
+		scimErrorDetail string
+		wantUser        *resources.ScimUser
+		wantErr         bool
 	}{
 		{
-			name:           "ignorePasswordOnCreate set to false",
-			ignorePassword: "false",
-			wantErr:        true,
-			scimError:      "invalidValue",
+			name:            "ignorePasswordOnCreate set to false",
+			ignorePassword:  "false",
+			wantErr:         true,
+			scimErrorType:   "invalidValue",
+			scimErrorDetail: "Password is too short",
+		},
+		{
+			name:            "ignorePasswordOnCreate set to an invalid value - defaults to false",
+			ignorePassword:  "random",
+			wantErr:         true,
+			scimErrorType:   "invalidValue",
+			scimErrorDetail: "Password is too short",
 		},
 		{
 			name:           "ignorePasswordOnCreate set to true",
@@ -467,34 +476,37 @@ func TestCreateUser_ignorePasswordOnCreate(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// create a machine user
+			callingUserId, callingUserPat, err := Instance.CreateMachineUserPATWithMembership(CTX, "ORG_OWNER")
+			require.NoError(t, err)
+			ctx := integration.WithAuthorizationToken(CTX, callingUserPat)
 
-		// create a machine user
-		callingUserId, callingUserPat, err := Instance.CreateMachineUserPATWithMembership(CTX, "ORG_OWNER")
-		require.NoError(t, err)
-		ctx := integration.WithAuthorizationToken(CTX, callingUserPat)
+			// set urn:zitadel:scim:ignorePasswordOnCreate metadata for the machine user
+			setAndEnsureMetadata(t, callingUserId, "urn:zitadel:scim:ignorePasswordOnCreate", tt.ignorePassword)
 
-		// set urn:zitadel:scim:ignorePasswordOnCreate metadata for the machine user
-		setAndEnsureMetadata(t, callingUserId, "urn:zitadel:scim:ignorePasswordOnCreate", tt.ignorePassword)
-
-		createdUser, err := Instance.Client.SCIM.Users.Create(ctx, Instance.DefaultOrg.Id, withUsername(invalidPasswordUserJson, "acmeUser1"))
-		if (err != nil) != tt.wantErr {
-			t.Errorf("CreateUser() error = %v, wantErr %v", err, tt.wantErr)
-			return
-		}
-		if err != nil {
-			scimErr := scim.RequireScimError(t, http.StatusBadRequest, err)
-			assert.Equal(t, tt.scimError, scimErr.Error.ScimType)
-			return
-		}
-
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-			// ensure the user is really stored and not just returned to the caller
-			fetchedUser, err := Instance.Client.SCIM.Users.Get(CTX, Instance.DefaultOrg.Id, createdUser.ID)
-			require.NoError(ttt, err)
-			if !test.PartiallyDeepEqual(tt.wantUser, fetchedUser) {
-				ttt.Errorf("GetUser() got = %v, want %v", fetchedUser, tt.wantUser)
+			// create a user with an invalid password
+			createdUser, err := Instance.Client.SCIM.Users.Create(ctx, Instance.DefaultOrg.Id, withUsername(invalidPasswordUserJson, "acmeUser1"))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CreateUser() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
-		}, retryDuration, tick)
+			if err != nil {
+				scimErr := scim.RequireScimError(t, http.StatusBadRequest, err)
+				assert.Equal(t, tt.scimErrorType, scimErr.Error.ScimType)
+				assert.Equal(t, tt.scimErrorDetail, scimErr.Error.Detail)
+				return
+			}
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				// ensure the user is really stored and not just returned to the caller
+				fetchedUser, err := Instance.Client.SCIM.Users.Get(CTX, Instance.DefaultOrg.Id, createdUser.ID)
+				require.NoError(ttt, err)
+				if !test.PartiallyDeepEqual(tt.wantUser, fetchedUser) {
+					ttt.Errorf("GetUser() got = %v, want %v", fetchedUser, tt.wantUser)
+				}
+			}, retryDuration, tick)
+		})
 	}
 }
