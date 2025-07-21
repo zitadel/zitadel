@@ -2,7 +2,7 @@
 	"name": "zitadel",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "devcontainer",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"workspaceFolder": "/workspaces",
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {
 			"version": "1.24"
@@ -11,12 +11,21 @@
 			"version": "lts/iron"
 		},
 		"ghcr.io/guiyomh/features/golangci-lint:0": {},
-		"ghcr.io/jungaretti/features/make:1": {}
+		"ghcr.io/jungaretti/features/make:1": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
 	},
 	"forwardPorts": [
 		3000,
+		3001,
 		4200,
 		8080
 	],
-	"onCreateCommand": "npm install -g sass@1.64.1"
+	"onCreateCommand": "npm install -g sass@1.64.1",
+	"customizations": {
+		"jetbrains": {
+			"settings": {
+				"com.intellij:app:HttpConfigurable.use_proxy_pac": true
+			}
+		}
+	}
 }

@@ -94,3 +94,6 @@ load-test/output/*
 # Turbo
 .turbo/
 **/.turbo/
+
+# PNPM
+.pnpm-store

@@ -1,13 +1,19 @@
 services:
 
   devcontainer:
-    image: mcr.microsoft.com/devcontainers/base:ubuntu
+    build:
+      context: .
     volumes:
       - ..:/workspaces:cached
+      - /tmp/.X11-unix:/tmp/.X11-unix:cached
+      - ~/.cache:/home/vscode/.cache:delegated
     command: sleep infinity
+    working_dir: /workspaces
     environment:
       ZITADEL_DATABASE_POSTGRES_HOST: db
       ZITADEL_EXTERNALSECURE: false
+    ports:
+    - 3001:3001
 
   db:
     container_name: db
@@ -34,6 +40,18 @@ services:
     ports:
       - 22220:22220
       - 22222:22222
+
+  login-integration:
+    container_name: login-integration
+    image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2}"
+    volumes:
+      - ../apps/login/apps/login/.env.test:/env-files/.env:cached
+    network_mode: service:devcontainer
+    environment:
+      PORT: 3001
+    depends_on:
+      mock-zitadel:
+        condition: service_started
 
   zitadel:
     image: "${ZITADEL_TAG:-ghcr.io/zitadel/zitadel:v4.0.0-rc.2}"
@@ -68,7 +86,7 @@ services:
       WRITE_ENVIRONMENT_FILE: /login-env/.env.test.local
       SINK_EMAIL_INTERNAL_URL: http://sink:3333/email
       SINK_SMS_INTERNAL_URL: http://sink:3333/sms
-      SINK_NOTIFICATION_URL: http://localhost:3333/notification
+      SINK_NOTIFICATION_URL: http://sink:3333/notification
       LOGIN_BASE_URL: http://localhost:3000/ui/v2/login/
       ZITADEL_API_DOMAIN: localhost
       ZITADEL_ADMIN_USER: zitadel-admin@zitadel.localhost

@@ -1,6 +1,7 @@
 {
   "name": "login-test-integration",
   "private": true,
+  "type": "module",
   "scripts": {
     "test:integration": "DISPLAY='' dotenv -e ../../apps/login/.env.test cypress",
     "test:integration:setup": "cd .. && make login_test_integration_dev"

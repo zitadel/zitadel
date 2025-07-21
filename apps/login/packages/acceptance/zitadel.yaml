@@ -62,3 +62,4 @@ Database:
     User.Password: zitadel
 
 Logstore.Access.Stdout.Enabled: true
+Log.Formatter.Format: json
