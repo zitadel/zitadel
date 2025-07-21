@@ -12,7 +12,7 @@ export const SignInWithApple = forwardRef<
 
   return (
     <BaseButton {...restProps} ref={ref}>
-      <div className="h-12 w-12 flex items-center justify-center">
+      <div className="flex h-12 w-12 items-center justify-center">
         <div className="h-6 w-6">
           <svg viewBox="0 0 170 170" fill="currentColor">
             <title>Apple Logo</title>

@@ -27,13 +27,13 @@ export default async function RootLayout({
           <Suspense
             fallback={
               <div
-                className={`relative min-h-screen bg-background-light-600 dark:bg-background-dark-600 flex flex-col justify-center`}
+                className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
               >
-                <div className="relative mx-auto max-w-[440px] py-8 w-full">
+                <div className="relative mx-auto w-full max-w-[440px] py-8">
                   <Skeleton>
                     <div className="h-40"></div>
                   </Skeleton>
-                  <div className="flex flex-row justify-end py-4 items-center space-x-4">
+                  <div className="flex flex-row items-center justify-end space-x-4 py-4">
                     <Theme />
                   </div>
                 </div>
@@ -42,11 +42,11 @@ export default async function RootLayout({
           >
             <LanguageProvider>
               <div
-                className={`relative min-h-screen bg-background-light-600 dark:bg-background-dark-600 flex flex-col justify-center`}
+                className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
               >
-                <div className="relative mx-auto max-w-[440px] py-8 w-full ">
+                <div className="relative mx-auto w-full max-w-[440px] py-8">
                   {children}
-                  <div className="flex flex-row justify-end py-4 items-center space-x-4">
+                  <div className="flex flex-row items-center justify-end space-x-4 py-4">
                     <LanguageSwitcher />
                     <Theme />
                   </div>
