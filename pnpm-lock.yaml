@@ -16,6 +16,9 @@ importers:
       '@changesets/cli':
         specifier: ^2.29.5
         version: 2.29.5
+      devcontainer:
+        specifier: ^0.3.0
+        version: 0.3.0
       turbo:
         specifier: 2.5.5
         version: 2.5.5
@@ -7359,6 +7362,9 @@ packages:
     resolution: {integrity: sha512-CmnVc+Hek2egPx1PeTFVta2W78xy2K/9Rkf6cC4T59S50tVnzKj+tnx5mmx5lwvCkujZ4uRrpRSuV+IVs3f90Q==}
     engines: {node: '>= 4.0.0'}
     hasBin: true
+
+  devcontainer@0.3.0:
+    resolution: {integrity: sha512-RAZPW5YLy7bgX3rYRjAzxedQPccJPgRPgfXOUGC3uIJSmcw5x4GEigNPswk/IH4N3f2BIeCAlNKeG6l1xYbXzg==}
 
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
@@ -23374,6 +23380,8 @@ snapshots:
       debug: 4.4.1(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
+
+  devcontainer@0.3.0: {}
 
   devlop@1.1.0:
     dependencies:
