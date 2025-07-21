@@ -298,7 +298,7 @@ export async function createSessionFromChecks({
 }: {
   serviceUrl: string;
   checks: Checks;
-  lifetime?: Duration;
+  lifetime: Duration;
 }) {
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, serviceUrl);
@@ -337,7 +337,12 @@ export async function createSessionForUserIdAndIdpIntent({
       },
       idpIntent,
     },
-    lifetime,
+    lifetime:
+      lifetime ||
+      ({
+        seconds: BigInt(24 * 60 * 60), // 24 hours
+        nanos: 0,
+      } as Duration), // set this to a default of 24 hours
     userAgent,
   });
 }

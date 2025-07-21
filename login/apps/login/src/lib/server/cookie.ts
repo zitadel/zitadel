@@ -58,7 +58,12 @@ export async function createSessionAndUpdateCookie(command: {
   const createdSession = await createSessionFromChecks({
     serviceUrl,
     checks: command.checks,
-    lifetime: command.lifetime,
+    lifetime:
+      command.lifetime ||
+      ({
+        seconds: BigInt(24 * 60 * 60), // 24 hours
+        nanos: 0,
+      } as Duration), // set this to a default of 24 hours if not provided, for usecases where the lifetime is not specified (user discovery)
   });
 
   if (createdSession) {
