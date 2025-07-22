@@ -1,13 +1,14 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { Component, OnDestroy } from '@angular/core';
+import { Component, effect, OnDestroy } from '@angular/core';
 import { merge, Subject, takeUntil } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageLocation, StorageService } from 'src/app/services/storage.service';
+import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 
 import { SETTINGLINKS } from '../settings-grid/settinglinks';
+import { NewOrganizationService } from '../../services/new-organization.service';
 
 export interface ShortcutItem {
   id: string;
@@ -80,7 +81,7 @@ const CREATE_USER: ShortcutItem = {
   styleUrls: ['./shortcuts.component.scss'],
 })
 export class ShortcutsComponent implements OnDestroy {
-  public org!: Org.AsObject;
+  public orgId!: string;
 
   public main: ShortcutItem[] = [];
   public secondary: ShortcutItem[] = [];
@@ -96,22 +97,15 @@ export class ShortcutsComponent implements OnDestroy {
     private storageService: StorageService,
     private auth: GrpcAuthService,
     private mgmtService: ManagementService,
+    private newOrganizationService: NewOrganizationService,
   ) {
-    const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-    if (org && org.id) {
-      this.org = org;
-      this.loadProjectShortcuts();
-    }
-
-    merge(this.auth.activeOrgChanged, this.mgmtService.ownedProjects)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-        if (org && org.id) {
-          this.org = org;
-          this.loadProjectShortcuts();
-        }
-      });
+    effect(() => {
+      const orgId = this.newOrganizationService.orgId();
+      if (orgId) {
+        this.orgId = orgId;
+        this.loadProjectShortcuts();
+      }
+    });
   }
 
   public loadProjectShortcuts(): void {
@@ -151,14 +145,14 @@ export class ShortcutsComponent implements OnDestroy {
         });
 
         this.ALL_SHORTCUTS = [...routesShortcuts, ...settingsShortcuts, ...mapped];
-        this.loadShortcuts(this.org);
+        this.loadShortcuts(this.orgId);
       }
     });
   }
 
-  public loadShortcuts(org: Org.AsObject): void {
+  public loadShortcuts(orgId: string): void {
     ['main', 'secondary', 'third'].map((listName) => {
-      const joinedShortcuts = this.storageService.getItem(`shortcuts:${listName}:${org.id}`, StorageLocation.local);
+      const joinedShortcuts = this.storageService.getItem(`shortcuts:${listName}:${orgId}`, StorageLocation.local);
       if (joinedShortcuts) {
         const parsedIds: string[] = joinedShortcuts.split(',');
         if (parsedIds && parsedIds.length) {
@@ -244,26 +238,26 @@ export class ShortcutsComponent implements OnDestroy {
   }
 
   public saveStateToStorage(): void {
-    const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-    if (org && org.id) {
-      this.storageService.setItem(`shortcuts:main:${org.id}`, this.main.map((p) => p.id).join(','), StorageLocation.local);
+    const orgId = this.newOrganizationService.orgId();
+    if (orgId) {
+      this.storageService.setItem(`shortcuts:main:${orgId}`, this.main.map((p) => p.id).join(','), StorageLocation.local);
       this.storageService.setItem(
-        `shortcuts:secondary:${org.id}`,
+        `shortcuts:secondary:${orgId}`,
         this.secondary.map((p) => p.id).join(','),
         StorageLocation.local,
       );
-      this.storageService.setItem(`shortcuts:third:${org.id}`, this.third.map((p) => p.id).join(','), StorageLocation.local);
+      this.storageService.setItem(`shortcuts:third:${orgId}`, this.third.map((p) => p.id).join(','), StorageLocation.local);
     }
   }
 
   public reset(): void {
-    const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-    if (org && org.id) {
+    const orgId = this.newOrganizationService.orgId();
+    if (orgId) {
       ['main', 'secondary', 'third'].map((listName) => {
-        this.storageService.removeItem(`shortcuts:${listName}:${org.id}`, StorageLocation.local);
+        this.storageService.removeItem(`shortcuts:${listName}:${orgId}`, StorageLocation.local);
       });
 
-      this.loadShortcuts(org);
+      this.loadShortcuts(orgId);
     }
   }
 

@@ -1,17 +1,17 @@
 <div class="main-container">
   <ng-container *ngIf="authService.user | async as user">
     <cnsl-header
-      [org]="org"
+      [org]="activeOrganizationQuery.data()"
       [user]="user"
       [isDarkTheme]="componentCssClass === 'dark-theme'"
-      (changedActiveOrg)="changedOrg($event)"
-    ></cnsl-header>
+      (changedActiveOrg)="changedOrg()"
+    />
 
     <cnsl-nav
       id="mainnav"
       class="nav"
       [ngClass]="{ shadow: yoffset > 60 }"
-      [org]="org"
+      [org]="activeOrganizationQuery.data()"
       [user]="user"
       [isDarkTheme]="componentCssClass === 'dark-theme'"
     ></cnsl-nav>
