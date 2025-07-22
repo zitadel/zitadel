@@ -1,6 +1,6 @@
 services:
-  debug-turbo-lint-unit:
+  turbo-lint-unit-debug:
     extends:
       file: ../base/docker-compose.yml
       service: devcontainer
-    container_name: debug-turbo-lint-unit
+    container_name: turbo-lint-unit-debug

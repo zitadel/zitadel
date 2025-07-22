@@ -17,8 +17,7 @@
 		4200,
 		8080
 	],
-	"remoteUser": "node",
-	"onCreateCommand": "pnpm install -g sass@1.64.1 && pnpm install --frozen-lockfile --recursive",
+	"onCreateCommand": "pnpm install -g sass@1.64.1",
 	"customizations": {
 		"jetbrains": {
 			"settings": {

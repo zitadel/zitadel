@@ -2,7 +2,8 @@
   "name": "login-test-integration",
   "private": true, 
   "scripts": {
-    "test:integration": "DISPLAY='' dotenv -e ../../apps/login/.env.test cypress"
+    "test:integration:login": "cypress run",
+    "test:integration:login:debug": "cypress open"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",

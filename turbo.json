@@ -14,6 +14,7 @@
     "NEXT_PUBLIC_BASE_PATH",
     "CUSTOM_REQUEST_HEADERS",
     "NODE_ENV",
+    "PORT",
     "INKEEP_API_KEY",
     "DISPLAY",
     "CYPRESS_DISPLAY"
@@ -27,14 +28,15 @@
       "with": [
         "lint",
         "test:unit",
-        "test:integration",
+        "test:integration:login",
         "test:acceptance",
         "test:e2e"
       ]
     },
     "start": {},
     "test:unit": {},
-    "test:integration": {},
+    "test:integration:login": {},
+    "test:integration:login:debug": {},
     "test:acceptance": {},
     "test:e2e": {},
     "lint": {},

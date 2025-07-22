@@ -1,0 +1,18 @@
+{
+	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
+	"name": "turbo-lint-unit",
+	"dockerComposeFile": [
+		"../base/docker-compose.yml"
+	],
+	"service": "devcontainer",
+	"runServices": ["devcontainer"],
+	"workspaceFolder": "/workspaces",
+	"onCreateCommand": "pnpm install --frozen-lockfile --recursive && pnpm turbo lint test:unit",
+	"customizations": {
+		"jetbrains": {
+			"settings": {
+				"com.intellij:app:HttpConfigurable.use_proxy_pac": true
+			}
+		}
+	}
+}

@@ -1,17 +1,16 @@
 {
 	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
-	"name": "debug-login-integration",
+	"name": "turbo-lint-unit-debug",
 	"dockerComposeFile": [
 		"../base/docker-compose.yml",
 		"docker-compose.yml"
 	],
-	"service": "debug-login-integration",
-	"runServices": ["debug-login-integration"],
+	"service": "turbo-lint-unit-debug",
+	"runServices": ["turbo-lint-unit-debug"],
 	"workspaceFolder": "/workspaces",
 	"forwardPorts": [3001],
-	"remoteUser": "node",
 	"onCreateCommand": "pnpm install --frozen-lockfile --recursive",
-	"postAttachCommand": "pnpm turbo daemon clean || pnpm turbo @zitadel/login#dev",
+	"postAttachCommand": "pnpm turbo daemon clean; pnpm turbo watch lint test:unit",
 	"customizations": {
 		"jetbrains": {
 			"settings": {

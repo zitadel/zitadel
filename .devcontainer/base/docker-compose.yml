@@ -2,13 +2,12 @@ services:
 
   devcontainer:
     container_name: devcontainer
-    user: node
     build:
       context: .
     volumes:
       - ../../:/workspaces:cached
       - /tmp/.X11-unix:/tmp/.X11-unix:cached
-      - ~/.cache:/home/vscode/.cache:delegated
+      - home-dot-cache:/home/node/.cache:delegated
     command: sleep infinity
     working_dir: /workspaces
     environment:
@@ -47,6 +46,7 @@ services:
     env_file: ../../apps/login/apps/login/.env.test
     network_mode: service:devcontainer
     environment:
+      NODE_ENV: test
       PORT: 3001
     depends_on:
       mock-zitadel:
@@ -219,3 +219,4 @@ services:
 
 volumes:
   postgres-data:
+  home-dot-cache:

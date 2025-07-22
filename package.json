@@ -4,9 +4,7 @@
   "name": "zitadel-monorepo",
   "scripts": {
     "changeset": "changeset",
-    "devcontainer": "devcontainer",
-    "test:integration": "cd apps/login/packages/integration && pnpm test:integration",
-    "test:acceptance": "cd apps/login/packages/acceptance && pnpm test:acceptance"
+    "devcontainer": "devcontainer"
   },
   "pnpm": {
     "overrides": {
