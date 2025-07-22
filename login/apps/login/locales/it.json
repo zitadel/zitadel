@@ -4,9 +4,11 @@
   },
   "accounts": {
     "title": "Account",
-    "description": "Seleziona l'account che desideri utilizzare.",
+    "description": "Seleziona l'account che vuoi utilizzare.",
     "addAnother": "Aggiungi un altro account",
-    "noResults": "Nessun account trovato"
+    "noResults": "Nessun account trovato",
+    "verified": "verificato",
+    "expired": "scaduto"
   },
   "logout": {
     "title": "Esci",

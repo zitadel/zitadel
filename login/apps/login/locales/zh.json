@@ -4,9 +4,11 @@
   },
   "accounts": {
     "title": "账户",
-    "description": "选择您想使用的账户。",
+    "description": "选择您要使用的账户。",
     "addAnother": "添加另一个账户",
-    "noResults": "未找到账户"
+    "noResults": "未找到账户",
+    "verified": "已验证",
+    "expired": "已过期"
   },
   "logout": {
     "title": "注销",
