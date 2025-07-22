@@ -7,7 +7,7 @@ services:
     volumes:
       - ../../:/workspaces:cached
       - /tmp/.X11-unix:/tmp/.X11-unix:cached
-      - home-dot-cache:/home/node/.cache:delegated
+      - home-dir:/home/node:delegated
     command: sleep infinity
     working_dir: /workspaces
     environment:
@@ -219,4 +219,4 @@ services:
 
 volumes:
   postgres-data:
-  home-dot-cache:
+  home-dir:

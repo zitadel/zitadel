@@ -9,7 +9,7 @@
 	"runServices": ["login-integration-debug"],
 	"workspaceFolder": "/workspaces",
 	"forwardPorts": [3001],
-	"onCreateCommand": "pnpm install --frozen-lockfile --recursive",
+	"onCreateCommand": "pnpm install --recursive",
 	"postAttachCommand": "pnpm turbo daemon clean; pnpm turbo @zitadel/login#dev test:integration:login:debug",
 	"customizations": {
 		"jetbrains": {

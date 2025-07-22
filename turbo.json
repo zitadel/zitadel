@@ -35,8 +35,6 @@
     },
     "start": {},
     "test:unit": {},
-    "test:integration:login": {},
-    "test:integration:login:debug": {},
     "test:acceptance": {},
     "test:e2e": {},
     "lint": {},

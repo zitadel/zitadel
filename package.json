@@ -4,7 +4,9 @@
   "name": "zitadel-monorepo",
   "scripts": {
     "changeset": "changeset",
-    "devcontainer": "devcontainer"
+    "devcontainer": "devcontainer",
+    "devcontainer:lint-unit": "pnpm devcontainer up --config .devcontainer/turbo-lint-unit/devcontainer.json --workspace-folder . --remove-existing-container",
+    "devcontainer:integration:login": "pnpm devcontainer up --config .devcontainer/login-integration/devcontainer.json --workspace-folder . --remove-existing-container"
   },
   "pnpm": {
     "overrides": {
