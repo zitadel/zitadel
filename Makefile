@@ -202,9 +202,9 @@ login_ensure_remote:
 	fi
 
 export LOGIN_DIR := ./login/
-export LOGIN_BAKE_CLI_ADDITIONAL_ARGS := --set login-*.context=./login/ --file ./docker-bake.hcl
+export LOGIN_BAKE_CLI_ADDITIONAL_ARGS := --set login-*.context=./apps/login/ --file ./docker-bake.hcl
 export ZITADEL_TAG ?= $(ZITADEL_IMAGE)
-include login/Makefile
+include apps/login/Makefile
 
 # Intentional override of login_test_acceptance_build
 login_test_acceptance_build: docker_image
