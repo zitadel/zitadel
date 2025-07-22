@@ -16,7 +16,7 @@ import {
   setPassword,
   setUserPassword,
 } from "@/lib/zitadel";
-import { ConnectError, create } from "@zitadel/client";
+import { ConnectError, create, Duration } from "@zitadel/client";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import {
   Checks,
@@ -152,14 +152,32 @@ export async function sendPassword(command: UpdateSessionCommand) {
     // this is a fake error message to hide that the user does not even exist
     return { error: "Could not verify password" };
   } else {
+    loginSettings = await getLoginSettings({
+      serviceUrl,
+      organization: sessionCookie.organization,
+    });
+
+    if (!loginSettings) {
+      return { error: "Could not load login settings" };
+    }
+
+    let lifetime = loginSettings.passwordCheckLifetime;
+
+    if (!lifetime) {
+      console.warn("No password lifetime provided, defaulting to 24 hours");
+      lifetime = {
+        seconds: BigInt(60 * 60 * 24), // default to 24 hours
+        nanos: 0,
+      } as Duration;
+    }
+
     try {
-      session = await setSessionAndUpdateCookie(
-        sessionCookie,
-        command.checks,
-        undefined,
-        command.requestId,
-        loginSettings?.passwordCheckLifetime,
-      );
+      session = await setSessionAndUpdateCookie({
+        recentCookie: sessionCookie,
+        checks: command.checks,
+        requestId: command.requestId,
+        lifetime,
+      });
     } catch (error: any) {
       if ("failedAttempts" in error && error.failedAttempts) {
         const lockoutSettings = await getLockoutSettings({

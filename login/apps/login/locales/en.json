@@ -6,7 +6,9 @@
     "title": "Accounts",
     "description": "Select the account you want to use.",
     "addAnother": "Add another account",
-    "noResults": "No accounts found"
+    "noResults": "No accounts found",
+    "verified": "verified",
+    "expired": "expired"
   },
   "logout": {
     "title": "Logout",
@@ -23,14 +25,20 @@
     "title": "Welcome back!",
     "description": "Enter your login data.",
     "register": "Register new user",
-    "submit": "Continue"
+    "submit": "Continue",
+    "required": {
+      "loginName": "This field is required"
+    }
   },
   "password": {
     "verify": {
       "title": "Password",
       "description": "Enter your password.",
       "resetPassword": "Reset Password",
-      "submit": "Continue"
+      "submit": "Continue",
+      "required": {
+        "password": "This field is required"
+      }
     },
     "set": {
       "title": "Set Password",
@@ -38,12 +46,21 @@
       "codeSent": "A code has been sent to your email address.",
       "noCodeReceived": "Didn't receive a code?",
       "resend": "Resend code",
-      "submit": "Continue"
+      "submit": "Continue",
+      "required": {
+        "code": "This field is required",
+        "newPassword": "You have to provide a password!",
+        "confirmPassword": "This field is required"
+      }
     },
     "change": {
       "title": "Change Password",
       "description": "Set the password for your account",
-      "submit": "Continue"
+      "submit": "Continue",
+      "required": {
+        "newPassword": "You have to provide a new password!",
+        "confirmPassword": "This field is required"
+      }
     }
   },
   "idp": {
@@ -85,7 +102,11 @@
     "description": "Enter your LDAP credentials.",
     "username": "Username",
     "password": "Password",
-    "submit": "Continue"
+    "submit": "Continue",
+    "required": {
+      "username": "This field is required",
+      "password": "This field is required"
+    }
   },
   "mfa": {
     "verify": {
@@ -107,7 +128,10 @@
       "emailDescription": "Enter the code you received via email.",
       "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
-      "submit": "Continue"
+      "submit": "Continue",
+      "required": {
+        "code": "This field is required"
+      }
     },
     "set": {
       "title": "Set up 2-Factor",
@@ -115,7 +139,10 @@
       "smsDescription": "Enter your phone number to receive a code via SMS.",
       "emailDescription": "Enter your email address to receive a code via email.",
       "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
-      "submit": "Continue"
+      "submit": "Continue",
+      "required": {
+        "code": "This field is required"
+      }
     }
   },
   "passkey": {
@@ -172,7 +199,16 @@
     "password": {
       "title": "Set Password",
       "description": "Set the password for your account",
-      "submit": "Continue"
+      "submit": "Continue",
+      "required": {
+        "password": "You have to provide a password!",
+        "confirmPassword": "This field is required"
+      }
+    },
+    "required": {
+      "firstname": "This field is required",
+      "lastname": "This field is required",
+      "email": "This field is required"
     }
   },
   "invite": {
@@ -209,7 +245,10 @@
       "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
       "codeSent": "A code has just been sent to your email address.",
-      "submit": "Continue"
+      "submit": "Continue",
+      "required": {
+        "code": "This field is required"
+      }
     }
   },
   "authenticator": {
@@ -223,7 +262,10 @@
     "usercode": {
       "title": "Device code",
       "description": "Enter the code displayed on your app or device.",
-      "submit": "Continue"
+      "submit": "Continue",
+      "required": {
+        "code": "This field is required"
+      }
     },
     "request": {
       "title": "{appName} would like to connect",

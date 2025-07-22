@@ -8,6 +8,7 @@ import {
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import {
@@ -59,6 +60,8 @@ export function RegisterForm({
       lastname: lastname ?? "",
     },
   });
+
+  const t = useTranslations("register");
 
   const [loading, setLoading] = useState<boolean>(false);
   const [selected, setSelected] = useState<AuthenticationMethod>(methods[0]);
@@ -130,7 +133,7 @@ export function RegisterForm({
             type="firstname"
             autoComplete="firstname"
             required
-            {...register("firstname", { required: "This field is required" })}
+            {...register("firstname", { required: t("required.firstname") })}
             label="First name"
             error={errors.firstname?.message as string}
             data-testid="firstname-text-input"
@@ -141,7 +144,7 @@ export function RegisterForm({
             type="lastname"
             autoComplete="lastname"
             required
-            {...register("lastname", { required: "This field is required" })}
+            {...register("lastname", { required: t("required.lastname") })}
             label="Last name"
             error={errors.lastname?.message as string}
             data-testid="lastname-text-input"
@@ -152,7 +155,7 @@ export function RegisterForm({
             type="email"
             autoComplete="email"
             required
-            {...register("email", { required: "This field is required" })}
+            {...register("email", { required: t("required.email") })}
             label="E-mail"
             error={errors.email?.message as string}
             data-testid="email-text-input"
