@@ -134,7 +134,7 @@ curl --request POST \
   --data @importBody.json
 ```
 
-Successful response:
+Successful Response:
 ```bash
 {
   "success": {
@@ -192,11 +192,53 @@ The import API returns a detailed response with any errors encountered during th
 
 #### Where to check logs and get help
 
-You can also verify that a user was imported by calling the **events endpoint** and checking for the following event type:
+You can verify that users were imported successfully by querying the **events API** and looking for the `user.human.added` event type.
 
-```json
-"user.human.added"
+Use the following request:
+
+```bash
+curl --location 'https://<instance-domain>/admin/v1/events/_search' \
+--header 'Authorization: Bearer <token>' \
+--header 'Content-Type: application/json' \
+--data '{
+  "asc": true,
+  "limit": 1000,
+  "event_types": [
+    "user.human.added"
+  ]
+}'
 ```
+
+This will return a list of user creation events including details such as email, username, and hashed password to help you confirm the imported data.
+
+Successful Response
+```bash
+{
+  "events": [
+    {
+      "type": {
+        "type": "user.human.added",
+        "localized": {
+          "key": "EventTypes.user.human.added",
+          "localizedMessage": "Person added"
+        }
+      },
+      "payload": {
+        "displayName": "test user",
+        "email": "testuser@gmail.com",
+        "userName": "testuser"
+      },
+      "aggregate": {
+        "id": "da72ac13-6994-4498-8b27-3ff9555661b2",
+        "resourceOwner": "318900732864567390"
+      },
+      "creationDate": "2025-07-22T15:16:06.364302Z"
+    }
+  ]
+}
+```
+
+ℹ️ Note: If you see entries with "type": "user.human.added" and correct payload data, the import was successful.
 
 ---
 
