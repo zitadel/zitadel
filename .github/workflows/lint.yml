@@ -57,7 +57,7 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           push: never
-          config: .devcontainer/turbo-lint-unit/devcontainer.json
+          configFile: .devcontainer/turbo-lint-unit/devcontainer.json
 
   core:
     name: core
