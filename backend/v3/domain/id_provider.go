@@ -31,7 +31,7 @@ const (
 
 type IdentityProvider struct {
 	InstanceID        string    `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID             string    `json:"orgId,omitempty" db:"org_id"`
+	OrgID             *string   `json:"orgId,omitempty" db:"org_id"`
 	ID                string    `json:"id,omitempty" db:"id"`
 	State             string    `json:"state,omitempty" db:"state"`
 	Name              string    `json:"name,omitempty" db:"name"`
@@ -41,7 +41,7 @@ type IdentityProvider struct {
 	AllowAutoUpdate   bool      `json:"allowAutoUpdate,omitempty" db:"allow_auto_update"`
 	AllowLinking      bool      `json:"allowLinking,omitempty" db:"allow_linking"`
 	StylingType       int16     `json:"stylingType,omitempty" db:"styling_type"`
-	Payload           string    `json:"payload,omitempty" db:"payload"`
+	Payload           *string   `json:"payload,omitempty" db:"payload"`
 	CreatedAt         time.Time `json:"createdAt,omitempty" db:"created_at"`
 	UpdatedAt         time.Time `json:"updatedAt,omitempty" db:"updated_at"`
 }
@@ -72,7 +72,7 @@ type idProviderColumns interface {
 
 type idProviderConditions interface {
 	InstanceIDCondition(id string) database.Condition
-	OrgIDCondition(id string) database.Condition
+	OrgIDCondition(id *string) database.Condition
 	IDCondition(id string) IDPIdentifierCondition
 	StateCondition(state IDPState) database.Condition
 	NameCondition(name string) IDPIdentifierCondition

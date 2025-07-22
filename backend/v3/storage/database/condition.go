@@ -16,11 +16,16 @@ func (a *and) Write(builder *StatementBuilder) {
 		builder.WriteString("(")
 		defer builder.WriteString(")")
 	}
-	for i, condition := range a.conditions {
-		if i > 0 {
+	firstCondition := true
+	for _, condition := range a.conditions {
+		if condition == nil {
+			continue
+		}
+		if !firstCondition {
 			builder.WriteString(" AND ")
 		}
 		condition.Write(builder)
+		firstCondition = false
 	}
 }
 
