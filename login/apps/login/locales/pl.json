@@ -6,7 +6,9 @@
     "title": "Konta",
     "description": "Wybierz konto, którego chcesz użyć.",
     "addAnother": "Dodaj kolejne konto",
-    "noResults": "Nie znaleziono kont"
+    "noResults": "Nie znaleziono kont",
+    "verified": "zweryfikowany",
+    "expired": "wygasł"
   },
   "logout": {
     "title": "Wyloguj się",

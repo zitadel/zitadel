@@ -298,7 +298,7 @@ export async function createSessionFromChecks({
 }: {
   serviceUrl: string;
   checks: Checks;
-  lifetime?: Duration;
+  lifetime: Duration;
 }) {
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, serviceUrl);
@@ -320,7 +320,7 @@ export async function createSessionForUserIdAndIdpIntent({
     idpIntentId?: string | undefined;
     idpIntentToken?: string | undefined;
   };
-  lifetime?: Duration;
+  lifetime: Duration;
 }) {
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, serviceUrl);
@@ -355,7 +355,7 @@ export async function setSession({
   sessionToken: string;
   challenges: RequestChallenges | undefined;
   checks?: Checks;
-  lifetime?: Duration;
+  lifetime: Duration;
 }) {
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, serviceUrl);
@@ -1016,44 +1016,10 @@ export async function startIdentityProviderFlow({
 
           return `${redirectUrl}?${params.toString()}`;
         } catch (stringifyError) {
-          console.error("Failed to stringify formData.fields:", {
-            error: stringifyError,
-            formDataFields: formData.fields,
-            formDataUrl: formData.url,
-            fieldsType: typeof formData.fields,
-            fieldsConstructor: formData.fields?.constructor?.name,
-          });
-
-          // Try to create a safe serialization by converting to plain object
-          try {
-            const safeFields: Record<string, string> = {};
-            const fieldsObj = formData.fields || {};
-
-            // Convert each field to a string if it's not already
-            for (const [key, value] of Object.entries(fieldsObj)) {
-              safeFields[key] =
-                typeof value === "string" ? value : String(value);
-            }
-
-            console.log(
-              "Using safe serialization for formData.fields:",
-              safeFields,
-            );
-
-            const safeStringified = JSON.stringify(safeFields);
-            const dataId = await setSAMLFormCookie(safeStringified);
-            const params = new URLSearchParams({
-              url: formData.url,
-              id: dataId,
-            });
-
-            return `${redirectUrl}?${params.toString()}`;
-          } catch (fallbackError) {
-            console.error("Safe serialization also failed:", fallbackError);
-            throw new Error(
-              `Failed to serialize SAML form data: ${stringifyError instanceof Error ? stringifyError.message : String(stringifyError)}`,
-            );
-          }
+          console.error("JSON serialization failed:", stringifyError);
+          throw new Error(
+            `Failed to serialize SAML form data: ${stringifyError instanceof Error ? stringifyError.message : String(stringifyError)}`,
+          );
         }
       } else {
         return null;

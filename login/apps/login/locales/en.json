@@ -6,7 +6,9 @@
     "title": "Accounts",
     "description": "Select the account you want to use.",
     "addAnother": "Add another account",
-    "noResults": "No accounts found"
+    "noResults": "No accounts found",
+    "verified": "verified",
+    "expired": "expired"
   },
   "logout": {
     "title": "Logout",
