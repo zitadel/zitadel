@@ -139,13 +139,13 @@ export function SessionItem({
           <span className="flex-grow"></span>
           <div className="relative flex flex-row items-center">
             {valid ? (
-              <div className="absolute right-0 mx-2 h-2 w-2 transform rounded-full bg-green-500 transition-all group-hover:right-6"></div>
+              <div className="absolute right-6 mx-2 h-2 w-2 transform rounded-full bg-green-500 transition-all group-hover:right-6 sm:right-0"></div>
             ) : (
-              <div className="absolute right-0 mx-2 h-2 w-2 transform rounded-full bg-red-500 transition-all group-hover:right-6"></div>
+              <div className="absolute right-6 mx-2 h-2 w-2 transform rounded-full bg-red-500 transition-all group-hover:right-6 sm:right-0"></div>
             )}
 
             <XCircleIcon
-              className="hidden h-5 w-5 opacity-50 transition-all hover:opacity-100 group-hover:block"
+              className="h-5 w-5 opacity-50 transition-all hover:opacity-100 group-hover:block sm:hidden"
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
@@ -160,11 +160,11 @@ export function SessionItem({
       {valid && session.expirationDate && (
         <Tooltip.Portal>
           <Tooltip.Content
-            className="z-50 select-none rounded border bg-white px-3 py-2 text-sm text-gray-900 shadow-xl dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            className="z-50 select-none rounded-md border bg-background-light-500 px-3 py-2 text-xs text-black shadow-xl dark:border-white/20 dark:bg-background-dark-500 dark:text-white"
             sideOffset={5}
           >
             Expires {moment(timestampDate(session.expirationDate)).fromNow()}
-            <Tooltip.Arrow className="fill-white dark:fill-gray-800" />
+            <Tooltip.Arrow className="fill-white dark:fill-white/20" />
           </Tooltip.Content>
         </Tooltip.Portal>
       )}
