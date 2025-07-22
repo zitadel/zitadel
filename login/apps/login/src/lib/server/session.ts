@@ -154,19 +154,27 @@ export async function updateSession(options: UpdateSessionCommand) {
     organization,
   });
 
-  const lifetime = checks?.webAuthN
+  let lifetime = checks?.webAuthN
     ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
     : checks?.otpEmail || checks?.otpSms
       ? loginSettings?.secondFactorCheckLifetime
       : undefined;
 
-  const session = await setSessionAndUpdateCookie(
-    recentSession,
+  if (!lifetime) {
+    console.warn("No lifetime provided for session, defaulting to 24 hours");
+    lifetime = {
+      seconds: BigInt(60 * 60 * 24), // default to 24 hours
+      nanos: 0,
+    } as Duration;
+  }
+
+  const session = await setSessionAndUpdateCookie({
+    recentCookie: recentSession,
     checks,
     challenges,
     requestId,
     lifetime,
-  );
+  });
 
   if (!session) {
     return { error: "Could not update session" };

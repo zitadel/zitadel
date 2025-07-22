@@ -298,7 +298,7 @@ export async function createSessionFromChecks({
 }: {
   serviceUrl: string;
   checks: Checks;
-  lifetime?: Duration;
+  lifetime: Duration;
 }) {
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, serviceUrl);
@@ -320,7 +320,7 @@ export async function createSessionForUserIdAndIdpIntent({
     idpIntentId?: string | undefined;
     idpIntentToken?: string | undefined;
   };
-  lifetime?: Duration;
+  lifetime: Duration;
 }) {
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, serviceUrl);
@@ -355,7 +355,7 @@ export async function setSession({
   sessionToken: string;
   challenges: RequestChallenges | undefined;
   checks?: Checks;
-  lifetime?: Duration;
+  lifetime: Duration;
 }) {
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, serviceUrl);
