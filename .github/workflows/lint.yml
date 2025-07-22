@@ -58,6 +58,7 @@ jobs:
         with:
           push: never
           configFile: .devcontainer/turbo-lint-unit/devcontainer.json
+          runCmd: echo "Successfully ran lint and unit tests in dev container postStartCommand"
 
   core:
     name: core
