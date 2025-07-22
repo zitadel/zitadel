@@ -32,7 +32,7 @@ func initScimContext(ctx context.Context, q *query.Queries) (context.Context, er
 
 	userID := authz.GetCtxData(ctx).UserID
 
-	// get the provisioningDomain and ignorePassword metadata keys associated with the service user
+	// get the provisioningDomain and ignorePasswordOnCreate metadata keys associated with the service user
 	metadataKeys := []smetadata.Key{
 		smetadata.KeyProvisioningDomain,
 		smetadata.KeyIgnorePasswordOnCreate,
