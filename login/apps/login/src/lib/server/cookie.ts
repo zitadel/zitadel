@@ -55,17 +55,16 @@ export async function createSessionAndUpdateCookie(command: {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const sessionLifetime =
-    command.lifetime ||
-    ({
+  let sessionLifetime = command.lifetime;
+
+  if (!sessionLifetime) {
+    console.warn("No session lifetime provided, using default of 24 hours.");
+
+    sessionLifetime = {
       seconds: BigInt(24 * 60 * 60), // 24 hours
       nanos: 0,
-    } as Duration); // set this to a default of 24 hours if not provided, for usecases where the lifetime is not specified (user discovery)
-  console.log(
-    "set session lifetime to ",
-    sessionLifetime,
-    sessionLifetime?.seconds,
-  );
+    } as Duration; // for usecases where the lifetime is not specified (user discovery)
+  }
 
   const createdSession = await createSessionFromChecks({
     serviceUrl,
@@ -138,11 +137,24 @@ export async function createSessionForIdpAndUpdateCookie({
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
+  let sessionLifetime = lifetime;
+
+  if (!sessionLifetime) {
+    console.warn(
+      "No IDP session lifetime provided, using default of 24 hours.",
+    );
+
+    sessionLifetime = {
+      seconds: BigInt(24 * 60 * 60), // 24 hours
+      nanos: 0,
+    } as Duration;
+  }
+
   const createdSession = await createSessionForUserIdAndIdpIntent({
     serviceUrl,
     userId,
     idpIntent,
-    lifetime,
+    lifetime: sessionLifetime,
   }).catch((error: ErrorDetail | CredentialsCheckError) => {
     console.error("Could not set session", error);
     if ("failedAttempts" in error && error.failedAttempts) {

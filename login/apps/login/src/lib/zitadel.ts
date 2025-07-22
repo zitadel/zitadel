@@ -320,7 +320,7 @@ export async function createSessionForUserIdAndIdpIntent({
     idpIntentId?: string | undefined;
     idpIntentToken?: string | undefined;
   };
-  lifetime?: Duration;
+  lifetime: Duration;
 }) {
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, serviceUrl);
@@ -337,12 +337,7 @@ export async function createSessionForUserIdAndIdpIntent({
       },
       idpIntent,
     },
-    lifetime:
-      lifetime ||
-      ({
-        seconds: BigInt(24 * 60 * 60), // 24 hours
-        nanos: 0,
-      } as Duration), // set this to a default of 24 hours
+    lifetime,
     userAgent,
   });
 }
@@ -360,7 +355,7 @@ export async function setSession({
   sessionToken: string;
   challenges: RequestChallenges | undefined;
   checks?: Checks;
-  lifetime?: Duration;
+  lifetime: Duration;
 }) {
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, serviceUrl);

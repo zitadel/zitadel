@@ -218,7 +218,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
       : undefined;
 
   if (!lifetime) {
-    console.warn("No lifetime provided for passkey, defaulting to 24 hours");
+    console.warn("No passkey lifetime provided, defaulting to 24 hours");
 
     lifetime = {
       seconds: BigInt(60 * 60 * 24), // default to 24 hours

@@ -164,7 +164,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     let lifetime = loginSettings.passwordCheckLifetime;
 
     if (!lifetime) {
-      console.warn("No lifetime provided for password, defaulting to 24 hours");
+      console.warn("No password lifetime provided, defaulting to 24 hours");
       lifetime = {
         seconds: BigInt(60 * 60 * 24), // default to 24 hours
         nanos: 0,
