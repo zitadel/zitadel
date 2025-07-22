@@ -1,10 +1,12 @@
 services:
 
   devcontainer:
+    container_name: devcontainer
+    user: node
     build:
       context: .
     volumes:
-      - ..:/workspaces:cached
+      - ../../:/workspaces:cached
       - /tmp/.X11-unix:/tmp/.X11-unix:cached
       - ~/.cache:/home/vscode/.cache:delegated
     command: sleep infinity
@@ -34,7 +36,7 @@ services:
   mock-zitadel:
     container_name: mock-zitadel
     build:
-      context: ../apps/login/packages/integration/core-mock
+      context: ../../apps/login/packages/integration/core-mock
     ports:
       - 22220:22220
       - 22222:22222
@@ -42,10 +44,7 @@ services:
   login-integration:
     container_name: login-integration
     image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2}"
-    env_file:
-      - fileName: ../apps/login/apps/login/.env.test
-    volumes:
-      - ../apps/login/apps/login/.env.test:/env-files/.env:cached
+    env_file: ../../apps/login/apps/login/.env.test
     network_mode: service:devcontainer
     environment:
       PORT: 3001
@@ -58,8 +57,8 @@ services:
     container_name: zitadel
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
     volumes:
-      - ../apps/login/packages/acceptance/pat:/pat:delegated
-      - ../apps/login/packages/acceptance/zitadel.yaml:/zitadel.yaml:cached
+      - ../../apps/login/packages/acceptance/pat:/pat:delegated
+      - ../../apps/login/packages/acceptance/zitadel.yaml:/zitadel.yaml:cached
     network_mode: service:devcontainer
     healthcheck:
       test:
@@ -76,7 +75,7 @@ services:
     container_name: configure-login
     restart: no
     build:
-      context: ../apps/login/packages/acceptance/setup
+      context: ../../apps/login/packages/acceptance/setup
       dockerfile: ../go-command.Dockerfile
     entrypoint: "./setup.sh"
     network_mode: service:devcontainer
@@ -91,18 +90,18 @@ services:
       ZITADEL_API_DOMAIN: localhost
       ZITADEL_ADMIN_USER: zitadel-admin@zitadel.localhost
     volumes:
-      - ../apps/login/packages/acceptance/pat:/pat:cached # Read the PAT file from zitadels setup
-      - ../apps/login/apps/login:/login-env:delegated # Write the environment variables file for the login
+      - ../../apps/login/packages/acceptance/pat:/pat:cached # Read the PAT file from zitadels setup
+      - ../../apps/login/apps/login:/login-env:delegated # Write the environment variables file for the login
     depends_on:
       zitadel:
         condition: "service_healthy"
 
-  login:
+  login-acceptance:
     container_name: login
     image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2}"
     network_mode: service:devcontainer
     volumes:
-      - ../apps/login/apps/login/.env.test.local:/env-files/.env:cached
+      - ../../apps/login/apps/login/.env.test.local:/env-files/.env:cached
     depends_on:
       configure-login:
         condition: service_completed_successfully
@@ -110,7 +109,7 @@ services:
   mock-notifications:
     container_name: mock-notifications
     build:
-      context: ../apps/login/packages/acceptance/sink
+      context: ../../apps/login/packages/acceptance/sink
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
@@ -134,7 +133,7 @@ services:
   mock-oidcrp:
     container_name: mock-oidcrp
     build:
-      context: ../apps/login/packages/acceptance/oidcrp
+      context: ../../apps/login/packages/acceptance/oidcrp
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
@@ -149,7 +148,7 @@ services:
       PORT: '8000'
       SCOPES: 'openid profile email'
     volumes:
-      - ../apps/login/packages/acceptance/pat:/pat:cached
+      - ../../apps/login/packages/acceptance/pat:/pat:cached
     depends_on:
       configure-login:
         condition: "service_completed_successfully"
@@ -157,7 +156,7 @@ services:
 #  mock-oidcop:
 #    container_name: mock-oidcop
 #    build:
-#      context: ../apps/login/packages/acceptance/idp/oidc
+#      context: ../../apps/login/packages/acceptance/idp/oidc
 #      dockerfile: ../../go-command.Dockerfile
 #      args:
 #        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
@@ -178,7 +177,7 @@ services:
   mock-samlsp:
     container_name: mock-samlsp
     build:
-      context: ../apps/login/packages/acceptance/samlsp
+      context: ../../apps/login/packages/acceptance/samlsp
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
@@ -200,7 +199,7 @@ services:
 #  mock-samlidp:
 #    container_name: mock-samlidp
 #    build:
-#      context: ../apps/login/packages/acceptance/idp/saml
+#      context: ../../apps/login/packages/acceptance/idp/saml
 #      dockerfile: ../../go-command.Dockerfile
 #      args:
 #        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}

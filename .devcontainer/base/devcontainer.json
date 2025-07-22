@@ -8,11 +8,8 @@
 		"ghcr.io/devcontainers/features/go:1": {
 			"version": "1.24"
 		},
-		"ghcr.io/devcontainers/features/node:1": {
-			"version": "lts/iron"
-		},
 		"ghcr.io/guiyomh/features/golangci-lint:0": {},
-		"ghcr.io/jungaretti/features/make:1": {},
+		"ghcr.io/jungaretti/features/make:1": {}
 	},
 	"forwardPorts": [
 		3000,
@@ -20,7 +17,8 @@
 		4200,
 		8080
 	],
-	"onCreateCommand": "npm install -g sass@1.64.1",
+	"remoteUser": "node",
+	"onCreateCommand": "pnpm install -g sass@1.64.1 && pnpm install --frozen-lockfile --recursive",
 	"customizations": {
 		"jetbrains": {
 			"settings": {

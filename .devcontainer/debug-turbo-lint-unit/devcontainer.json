@@ -1,18 +1,17 @@
 {
 	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
-	"name": "login",
+	"name": "debug-turbo-lint-unit",
 	"dockerComposeFile": [
-		"../docker-compose.yml",
+		"../base/docker-compose.yml",
 		"docker-compose.yml"
 	],
-	"service": "devcontainer",
+	"service": "debug-turbo-lint-unit",
+	"runServices": ["debug-turbo-lint-unit"],
 	"workspaceFolder": "/workspaces",
-	"features": {
-		"ghcr.io/devcontainers/features/node:1": {
-			"version": "lts/iron"
-		}
-	},
 	"forwardPorts": [3001],
+	"remoteUser": "node",
+	"onCreateCommand": "pnpm install --frozen-lockfile --recursive",
+	"postAttachCommand": "pnpm turbo daemon clean && pnpm turbo watch lint test:unit",
 	"customizations": {
 		"jetbrains": {
 			"settings": {

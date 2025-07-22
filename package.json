@@ -5,10 +5,8 @@
   "scripts": {
     "changeset": "changeset",
     "devcontainer": "devcontainer",
-    "test:integration": "cd login/integration && pnpm test:integration",
-    "test:integration:setup": "cd login/integration && NODE_ENV=test pnpm exec turbo run test:integration:setup",
-    "test:acceptance": "cd login/acceptance && pnpm test:acceptance",
-    "test:acceptance:setup": "cd login/apps/login-test-acceptance && pnpm test:acceptance:setup"
+    "test:integration": "cd apps/login/packages/integration && pnpm test:integration",
+    "test:acceptance": "cd apps/login/packages/acceptance && pnpm test:acceptance"
   },
   "pnpm": {
     "overrides": {
@@ -19,7 +17,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
-    "devcontainer": "^0.3.0",
+    "@devcontainers/cli": "^0.80.0",
     "turbo": "2.5.5"
   }
 }

@@ -1,0 +1,12 @@
+services:
+  debug-login-integration:
+    extends:
+      file: ../base/docker-compose.yml
+      service: devcontainer
+    container_name: debug-login-integration
+    environment:
+      NODE_ENV: 'test'
+      PORT: 3001
+    depends_on:
+      mock-zitadel:
+        condition: service_started
