@@ -26,12 +26,12 @@ const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, 
 	` allow_auto_update, allow_linking, styling_type, payload, created_at, updated_at` +
 	` FROM zitadel.identity_providers`
 
-func (i *idProvider) Get(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID string) (*domain.IdentityProvider, error) {
+func (i *idProvider) Get(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IdentityProvider, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(queryIDProviderStmt)
 
-	conditions := []database.Condition{id, i.InstanceIDCondition(instnaceID), i.OrgIDCondition(orgID)}
+	conditions := []database.Condition{id, i.InstanceIDCondition(instnaceID), i.OrgIDCondition(*orgID)}
 
 	writeCondition(&builder, database.And(conditions...))
 
@@ -83,7 +83,7 @@ func (i *idProvider) Create(ctx context.Context, idp *domain.IdentityProvider) e
 	return nil
 }
 
-func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID string, changes ...database.Change) (int64, error) {
+func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string, changes ...database.Change) (int64, error) {
 	if changes == nil {
 		return 0, errors.New("Update must contain at least one change")
 	}
@@ -93,7 +93,7 @@ func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierConditio
 	conditions := []database.Condition{
 		id,
 		i.InstanceIDCondition(instnaceID),
-		i.OrgIDCondition(orgID),
+		i.OrgIDCondition(*orgID),
 	}
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, database.And(conditions...))
@@ -103,7 +103,7 @@ func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierConditio
 	return i.client.Exec(ctx, stmt, builder.Args()...)
 }
 
-func (i *idProvider) Delete(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID string) (int64, error) {
+func (i *idProvider) Delete(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (int64, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(`DELETE FROM zitadel.identity_providers`)
@@ -111,7 +111,7 @@ func (i *idProvider) Delete(ctx context.Context, id domain.IDPIdentifierConditio
 	conditions := []database.Condition{
 		id,
 		i.InstanceIDCondition(instnaceID),
-		i.OrgIDCondition(orgID),
+		i.OrgIDCondition(*orgID),
 	}
 	writeCondition(&builder, database.And(conditions...))
 

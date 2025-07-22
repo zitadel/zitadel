@@ -330,7 +330,7 @@ func TestCreateIDProvider(t *testing.T) {
 			idp, err = idpRepo.Get(ctx,
 				idpRepo.IDCondition(idp.ID),
 				idp.InstanceID,
-				idp.OrgID,
+				&idp.OrgID,
 			)
 			require.NoError(t, err)
 
@@ -585,7 +585,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			rowsAffected, err := idpRepo.Update(ctx,
 				idpRepo.IDCondition(createdIDP.ID),
 				createdIDP.InstanceID,
-				createdIDP.OrgID,
+				&createdIDP.OrgID,
 				tt.update...,
 			)
 			afterUpdate := time.Now()
@@ -601,7 +601,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			idp, err := idpRepo.Get(ctx,
 				organizationRepo.IDCondition(createdIDP.ID),
 				createdIDP.InstanceID,
-				createdIDP.OrgID,
+				&createdIDP.OrgID,
 			)
 			require.NoError(t, err)
 
@@ -848,7 +848,7 @@ func TestGetIDProvider(t *testing.T) {
 			returnedIDP, err := idpRepo.Get(ctx,
 				tt.idpIdentifierCondition,
 				idp.InstanceID,
-				idp.OrgID,
+				&idp.OrgID,
 			)
 			if err != nil {
 				require.ErrorIs(t, tt.err, err)
@@ -1830,7 +1830,7 @@ func TestDeleteIDProvider(t *testing.T) {
 					affectedRows, err := idpRepo.Delete(ctx,
 						idpRepo.NameCondition(name),
 						instanceId,
-						orgId,
+						&orgId,
 					)
 					assert.Equal(t, int64(1), affectedRows)
 					require.NoError(t, err)
@@ -1853,7 +1853,7 @@ func TestDeleteIDProvider(t *testing.T) {
 			noOfDeletedRows, err := idpRepo.Delete(ctx,
 				tt.idpIdentifierCondition,
 				instanceId,
-				orgId,
+				&orgId,
 			)
 			require.NoError(t, err)
 			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
@@ -1862,7 +1862,7 @@ func TestDeleteIDProvider(t *testing.T) {
 			organization, err := idpRepo.Get(ctx,
 				tt.idpIdentifierCondition,
 				instanceId,
-				orgId,
+				&orgId,
 			)
 			require.ErrorIs(t, err, new(database.NoRowFoundError))
 			assert.Nil(t, organization)
