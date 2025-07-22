@@ -15,12 +15,12 @@ import { headers } from "next/headers";
 import Link from "next/link";
 
 async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
-  const ids: (string | undefined)[] = await getAllSessionCookieIds();
+  const cookieIds = await getAllSessionCookieIds();
 
-  if (ids && ids.length) {
+  if (cookieIds && cookieIds.length) {
     const response = await listSessions({
       serviceUrl,
-      ids: ids.filter((id) => !!id) as string[],
+      ids: cookieIds.filter((id) => !!id) as string[],
     });
     return response?.sessions ?? [];
   } else {

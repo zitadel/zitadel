@@ -66,7 +66,6 @@ export default async function Page(props: {
           error = err;
         });
     } else if (method === "sms") {
-      // does not work
       await addOTPSMS({
         serviceUrl,
         userId: session.factors.user.id,
@@ -75,7 +74,6 @@ export default async function Page(props: {
         new Error("Could not add OTP via SMS");
       });
     } else if (method === "email") {
-      // works
       await addOTPEmail({
         serviceUrl,
         userId: session.factors.user.id,
@@ -108,6 +106,7 @@ export default async function Page(props: {
       paramsToContinue.append("requestId", requestId);
     }
     urlToContinue = `/otp/${method}?` + paramsToContinue;
+
     // immediately check the OTP on the next page if sms or email was set up
     if (["email", "sms"].includes(method)) {
       return redirect(urlToContinue);
