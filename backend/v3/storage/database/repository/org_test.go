@@ -810,8 +810,7 @@ func TestDeleteOrganization(t *testing.T) {
 			return test{
 				name: "happy path delete organization filter id",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					organizations := make([]*domain.Organization, noOfOrganizations)
-					for i := range noOfOrganizations {
+					for range noOfOrganizations {
 
 						org := domain.Organization{
 							ID:         organizationId,
@@ -824,7 +823,6 @@ func TestDeleteOrganization(t *testing.T) {
 						err := organizationRepo.Create(ctx, &org)
 						require.NoError(t, err)
 
-						organizations[i] = &org
 					}
 				},
 				orgIdentifierCondition: organizationRepo.IDCondition(organizationId),
@@ -838,8 +836,7 @@ func TestDeleteOrganization(t *testing.T) {
 			return test{
 				name: "happy path delete organization filter name",
 				testFunc: func(ctx context.Context, t *testing.T) {
-					organizations := make([]*domain.Organization, noOfOrganizations)
-					for i := range noOfOrganizations {
+					for range noOfOrganizations {
 
 						org := domain.Organization{
 							ID:         gofakeit.Name(),
@@ -852,7 +849,6 @@ func TestDeleteOrganization(t *testing.T) {
 						err := organizationRepo.Create(ctx, &org)
 						require.NoError(t, err)
 
-						organizations[i] = &org
 					}
 				},
 				orgIdentifierCondition: organizationRepo.NameCondition(organizationName),
@@ -874,8 +870,7 @@ func TestDeleteOrganization(t *testing.T) {
 				name: "deleted already deleted organization",
 				testFunc: func(ctx context.Context, t *testing.T) {
 					noOfOrganizations := 1
-					organizations := make([]*domain.Organization, noOfOrganizations)
-					for i := range noOfOrganizations {
+					for range noOfOrganizations {
 
 						org := domain.Organization{
 							ID:         gofakeit.Name(),
@@ -888,13 +883,12 @@ func TestDeleteOrganization(t *testing.T) {
 						err := organizationRepo.Create(ctx, &org)
 						require.NoError(t, err)
 
-						organizations[i] = &org
 					}
 
 					// delete organization
 					affectedRows, err := organizationRepo.Delete(ctx,
 						organizationRepo.NameCondition(organizationName),
-						organizations[0].InstanceID,
+						instanceId,
 					)
 					assert.Equal(t, int64(1), affectedRows)
 					require.NoError(t, err)

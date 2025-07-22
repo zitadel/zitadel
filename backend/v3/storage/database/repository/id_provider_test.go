@@ -381,6 +381,7 @@ func TestUpdateIDProvider(t *testing.T) {
 	require.NoError(t, err)
 
 	idpRepo := repository.IDProviderRepository(pool)
+
 	tests := []struct {
 		name         string
 		testFunc     func(ctx context.Context, t *testing.T) *domain.IdentityProvider
@@ -579,7 +580,7 @@ func TestUpdateIDProvider(t *testing.T) {
 
 			createdIDP := tt.testFunc(ctx, t)
 
-			// update org
+			// update idp
 			beforeUpdate := time.Now()
 			rowsAffected, err := idpRepo.Update(ctx,
 				idpRepo.IDCondition(createdIDP.ID),
@@ -596,7 +597,7 @@ func TestUpdateIDProvider(t *testing.T) {
 				return
 			}
 
-			// check organization values
+			// check idp values
 			idp, err := idpRepo.Get(ctx,
 				organizationRepo.IDCondition(createdIDP.ID),
 				createdIDP.InstanceID,
@@ -854,10 +855,18 @@ func TestGetIDProvider(t *testing.T) {
 				return
 			}
 
+			assert.Equal(t, returnedIDP.InstanceID, idp.InstanceID)
+			assert.Equal(t, returnedIDP.OrgID, idp.OrgID)
+			assert.Equal(t, returnedIDP.State, idp.State)
 			assert.Equal(t, returnedIDP.ID, idp.ID)
 			assert.Equal(t, returnedIDP.Name, idp.Name)
-			assert.Equal(t, returnedIDP.InstanceID, idp.InstanceID)
-			assert.Equal(t, returnedIDP.State, idp.State)
+			assert.Equal(t, returnedIDP.Type, idp.Type)
+			assert.Equal(t, returnedIDP.AllowCreation, idp.AllowCreation)
+			assert.Equal(t, returnedIDP.AllowAutoCreation, idp.AllowAutoCreation)
+			assert.Equal(t, returnedIDP.AllowAutoUpdate, idp.AllowAutoUpdate)
+			assert.Equal(t, returnedIDP.AllowLinking, idp.AllowLinking)
+			assert.Equal(t, returnedIDP.StylingType, idp.StylingType)
+			assert.Equal(t, returnedIDP.Payload, idp.Payload)
 		})
 	}
 }
@@ -867,7 +876,6 @@ func TestListIDProvider(t *testing.T) {
 	pool, stop, err := newEmbeddedDB(ctx)
 	require.NoError(t, err)
 	defer stop()
-	organizationRepo := repository.OrganizationRepository(pool)
 
 	// create instance
 	instanceId := gofakeit.Name()
@@ -884,233 +892,980 @@ func TestListIDProvider(t *testing.T) {
 	err = instanceRepo.Create(ctx, &instance)
 	require.NoError(t, err)
 
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive.String(),
+	}
+	organizationRepo := repository.OrganizationRepository(pool)
+	err = organizationRepo.Create(t.Context(), &org)
+	require.NoError(t, err)
+
+	idpRepo := repository.IDProviderRepository(pool)
+
 	type test struct {
-		name                   string
-		testFunc               func(ctx context.Context, t *testing.T) []*domain.Organization
-		conditionClauses       []database.Condition
-		noOrganizationReturned bool
+		name             string
+		testFunc         func(ctx context.Context, t *testing.T) []*domain.IdentityProvider
+		conditionClauses []database.Condition
+		noIDPsReturned   bool
 	}
 	tests := []test{
 		{
-			name: "happy path single organization no filter",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
-				noOfOrganizations := 1
-				organizations := make([]*domain.Organization, noOfOrganizations)
-				for i := range noOfOrganizations {
-
-					org := domain.Organization{
-						ID:         gofakeit.Name(),
-						Name:       gofakeit.Name(),
-						InstanceID: instanceId,
-						State:      domain.OrgStateActive.String(),
-					}
-
-					// create organization
-					err := organizationRepo.Create(ctx, &org)
-					require.NoError(t, err)
-
-					organizations[i] = &org
+			name: "multiple idps filter on instance",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				// create instance
+				newInstanceId := gofakeit.Name()
+				instance := domain.Instance{
+					ID:              newInstanceId,
+					Name:            gofakeit.Name(),
+					DefaultOrgID:    "defaultOrgId",
+					IAMProjectID:    "iamProject",
+					ConsoleClientID: "consoleCLient",
+					ConsoleAppID:    "consoleApp",
+					DefaultLanguage: "defaultLanguage",
 				}
+				err = instanceRepo.Create(ctx, &instance)
+				require.NoError(t, err)
 
-				return organizations
-			},
-		},
-		{
-			name: "happy path multiple organization no filter",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
-				noOfOrganizations := 5
-				organizations := make([]*domain.Organization, noOfOrganizations)
-				for i := range noOfOrganizations {
-
-					org := domain.Organization{
-						ID:         gofakeit.Name(),
-						Name:       gofakeit.Name(),
-						InstanceID: instanceId,
-						State:      domain.OrgStateActive.String(),
-					}
-
-					// create organization
-					err := organizationRepo.Create(ctx, &org)
-					require.NoError(t, err)
-
-					organizations[i] = &org
-				}
-
-				return organizations
-			},
-		},
-		func() test {
-			organizationId := gofakeit.Name()
-			return test{
-				name: "organization filter on id",
-				testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
-					// create organization
-					// this org is created as an additional org which should NOT
-					// be returned in the results of this test case
-					org := domain.Organization{
-						ID:         gofakeit.Name(),
-						Name:       gofakeit.Name(),
-						InstanceID: instanceId,
-						State:      domain.OrgStateActive.String(),
-					}
-					err = organizationRepo.Create(ctx, &org)
-					require.NoError(t, err)
-
-					noOfOrganizations := 1
-					organizations := make([]*domain.Organization, noOfOrganizations)
-					for i := range noOfOrganizations {
-
-						org := domain.Organization{
-							ID:         organizationId,
-							Name:       gofakeit.Name(),
-							InstanceID: instanceId,
-							State:      domain.OrgStateActive.String(),
-						}
-
-						// create organization
-						err := organizationRepo.Create(ctx, &org)
-						require.NoError(t, err)
-
-						organizations[i] = &org
-					}
-
-					return organizations
-				},
-				conditionClauses: []database.Condition{organizationRepo.IDCondition(organizationId)},
-			}
-		}(),
-		{
-			name: "multiple organization filter on state",
-			testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
-				// create organization
-				// this org is created as an additional org which should NOT
-				// be returned in the results of this test case
+				// create org
+				newOrgId := gofakeit.Name()
 				org := domain.Organization{
-					ID:         gofakeit.Name(),
+					ID:         newOrgId,
+					Name:       gofakeit.Name(),
+					InstanceID: newInstanceId,
+					State:      domain.OrgStateActive.String(),
+				}
+				organizationRepo := repository.OrganizationRepository(pool)
+				err = organizationRepo.Create(t.Context(), &org)
+				require.NoError(t, err)
+
+				// create idp
+				// this idp is created as an additional idp which should NOT
+				// be returned in the results of this test case
+				idp := domain.IdentityProvider{
+					InstanceID:        newInstanceId,
+					OrgID:             newOrgId,
+					ID:                gofakeit.Name(),
+					State:             domain.IDPStateActive.String(),
+					Name:              gofakeit.Name(),
+					Type:              domain.IDPTypeOIDC.String(),
+					AllowCreation:     true,
+					AllowAutoCreation: true,
+					AllowAutoUpdate:   true,
+					AllowLinking:      true,
+					StylingType:       1,
+					Payload:           "{}",
+				}
+				err := idpRepo.Create(ctx, &idp)
+				require.NoError(t, err)
+
+				noOfIDPs := 5
+				idps := make([]*domain.IdentityProvider, noOfIDPs)
+				for i := range noOfIDPs {
+
+					idp := domain.IdentityProvider{
+						InstanceID:        instanceId,
+						OrgID:             orgId,
+						ID:                gofakeit.Name(),
+						State:             domain.IDPStateActive.String(),
+						Name:              gofakeit.Name(),
+						Type:              domain.IDPTypeOIDC.String(),
+						AllowCreation:     true,
+						AllowAutoCreation: true,
+						AllowAutoUpdate:   true,
+						AllowLinking:      true,
+						StylingType:       1,
+						Payload:           "{}",
+					}
+
+					err := idpRepo.Create(ctx, &idp)
+					require.NoError(t, err)
+
+					idps[i] = &idp
+				}
+
+				return idps
+			},
+			conditionClauses: []database.Condition{idpRepo.InstanceIDCondition(instanceId)},
+		},
+		{
+			name: "multiple idps filter on org",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				// create org
+				newOrgId := gofakeit.Name()
+				org := domain.Organization{
+					ID:         newOrgId,
 					Name:       gofakeit.Name(),
 					InstanceID: instanceId,
 					State:      domain.OrgStateActive.String(),
 				}
-				err = organizationRepo.Create(ctx, &org)
+				organizationRepo := repository.OrganizationRepository(pool)
+				err = organizationRepo.Create(t.Context(), &org)
 				require.NoError(t, err)
 
-				noOfOrganizations := 5
-				organizations := make([]*domain.Organization, noOfOrganizations)
-				for i := range noOfOrganizations {
+				// create idp
+				// this idp is created as an additional idp which should NOT
+				// be returned in the results of this test case
+				idp := domain.IdentityProvider{
+					InstanceID:        instanceId,
+					OrgID:             newOrgId,
+					ID:                gofakeit.Name(),
+					State:             domain.IDPStateActive.String(),
+					Name:              gofakeit.Name(),
+					Type:              domain.IDPTypeOIDC.String(),
+					AllowCreation:     true,
+					AllowAutoCreation: true,
+					AllowAutoUpdate:   true,
+					AllowLinking:      true,
+					StylingType:       1,
+					Payload:           "{}",
+				}
+				err := idpRepo.Create(ctx, &idp)
+				require.NoError(t, err)
 
-					org := domain.Organization{
-						ID:         gofakeit.Name(),
-						Name:       gofakeit.Name(),
-						InstanceID: instanceId,
-						State:      domain.OrgStateInactive.String(),
+				noOfIDPs := 5
+				idps := make([]*domain.IdentityProvider, noOfIDPs)
+				for i := range noOfIDPs {
+
+					idp := domain.IdentityProvider{
+						InstanceID:        instanceId,
+						OrgID:             orgId,
+						ID:                gofakeit.Name(),
+						State:             domain.IDPStateActive.String(),
+						Name:              gofakeit.Name(),
+						Type:              domain.IDPTypeOIDC.String(),
+						AllowCreation:     true,
+						AllowAutoCreation: true,
+						AllowAutoUpdate:   true,
+						AllowLinking:      true,
+						StylingType:       1,
+						Payload:           "{}",
 					}
 
-					// create organization
-					err := organizationRepo.Create(ctx, &org)
+					err := idpRepo.Create(ctx, &idp)
 					require.NoError(t, err)
 
-					organizations[i] = &org
+					idps[i] = &idp
 				}
 
-				return organizations
+				return idps
 			},
-			conditionClauses: []database.Condition{organizationRepo.StateCondition(domain.OrgStateInactive)},
+			conditionClauses: []database.Condition{idpRepo.OrgIDCondition(orgId)},
 		},
-		func() test {
-			instanceId_2 := gofakeit.Name()
-			return test{
-				name: "multiple organization filter on instance",
-				testFunc: func(ctx context.Context, t *testing.T) []*domain.Organization {
-					// create instance 1
-					instanceId_1 := gofakeit.Name()
-					instance := domain.Instance{
-						ID:              instanceId_1,
-						Name:            gofakeit.Name(),
-						DefaultOrgID:    "defaultOrgId",
-						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
-						DefaultLanguage: "defaultLanguage",
-					}
-					instanceRepo := repository.InstanceRepository(pool)
-					err = instanceRepo.Create(ctx, &instance)
-					assert.Nil(t, err)
+		{
+			name: "happy path single idp no filter",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				noOfIDPs := 1
+				idps := make([]*domain.IdentityProvider, noOfIDPs)
+				for i := range noOfIDPs {
 
-					// create organization
-					// this org is created as an additional org which should NOT
-					// be returned in the results of this test case
-					org := domain.Organization{
-						ID:         gofakeit.Name(),
-						Name:       gofakeit.Name(),
-						InstanceID: instanceId_1,
-						State:      domain.OrgStateActive.String(),
+					idp := domain.IdentityProvider{
+						InstanceID:        instanceId,
+						OrgID:             orgId,
+						ID:                gofakeit.Name(),
+						State:             domain.IDPStateActive.String(),
+						Name:              gofakeit.Name(),
+						Type:              domain.IDPTypeOIDC.String(),
+						AllowCreation:     true,
+						AllowAutoCreation: true,
+						AllowAutoUpdate:   true,
+						AllowLinking:      true,
+						StylingType:       1,
+						Payload:           "{}",
 					}
-					err = organizationRepo.Create(ctx, &org)
+
+					err := idpRepo.Create(ctx, &idp)
 					require.NoError(t, err)
 
-					// create instance 2
-					instance_2 := domain.Instance{
-						ID:              instanceId_2,
-						Name:            gofakeit.Name(),
-						DefaultOrgID:    "defaultOrgId",
-						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
-						DefaultLanguage: "defaultLanguage",
+					idps[i] = &idp
+				}
+
+				return idps
+			},
+		},
+		{
+			name: "happy path multiple idps no filter",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				noOfIDPs := 5
+				idps := make([]*domain.IdentityProvider, noOfIDPs)
+				for i := range noOfIDPs {
+
+					idp := domain.IdentityProvider{
+						InstanceID:        instanceId,
+						OrgID:             orgId,
+						ID:                gofakeit.Name(),
+						State:             domain.IDPStateActive.String(),
+						Name:              gofakeit.Name(),
+						Type:              domain.IDPTypeOIDC.String(),
+						AllowCreation:     true,
+						AllowAutoCreation: true,
+						AllowAutoUpdate:   true,
+						AllowLinking:      true,
+						StylingType:       1,
+						Payload:           "{}",
 					}
-					err = instanceRepo.Create(ctx, &instance_2)
-					assert.Nil(t, err)
 
-					noOfOrganizations := 5
-					organizations := make([]*domain.Organization, noOfOrganizations)
-					for i := range noOfOrganizations {
+					err := idpRepo.Create(ctx, &idp)
+					require.NoError(t, err)
 
-						org := domain.Organization{
-							ID:         gofakeit.Name(),
-							Name:       gofakeit.Name(),
-							InstanceID: instanceId_2,
-							State:      domain.OrgStateActive.String(),
+					idps[i] = &idp
+				}
+
+				return idps
+			},
+		},
+		func() test {
+			id := gofakeit.Name()
+			return test{
+				name: "idp filter on id",
+				testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+					// create idp
+					// this idp is created as an additional idp which should NOT
+					// be returned in the results of this test case
+					idp := domain.IdentityProvider{
+						InstanceID:        instanceId,
+						OrgID:             orgId,
+						ID:                gofakeit.Name(),
+						State:             domain.IDPStateActive.String(),
+						Name:              gofakeit.Name(),
+						Type:              domain.IDPTypeOIDC.String(),
+						AllowCreation:     true,
+						AllowAutoCreation: true,
+						AllowAutoUpdate:   true,
+						AllowLinking:      true,
+						StylingType:       1,
+						Payload:           "{}",
+					}
+					err := idpRepo.Create(ctx, &idp)
+					require.NoError(t, err)
+
+					noOfIDPs := 1
+					idps := make([]*domain.IdentityProvider, noOfIDPs)
+					for i := range noOfIDPs {
+
+						idp := domain.IdentityProvider{
+							InstanceID:        instanceId,
+							OrgID:             orgId,
+							ID:                id,
+							State:             domain.IDPStateActive.String(),
+							Name:              gofakeit.Name(),
+							Type:              domain.IDPTypeOIDC.String(),
+							AllowCreation:     true,
+							AllowAutoCreation: true,
+							AllowAutoUpdate:   true,
+							AllowLinking:      true,
+							StylingType:       1,
+							Payload:           "{}",
 						}
 
-						// create organization
-						err := organizationRepo.Create(ctx, &org)
+						err := idpRepo.Create(ctx, &idp)
 						require.NoError(t, err)
 
-						organizations[i] = &org
+						idps[i] = &idp
 					}
 
-					return organizations
+					return idps
 				},
-				conditionClauses: []database.Condition{organizationRepo.InstanceIDCondition(instanceId_2)},
+				conditionClauses: []database.Condition{idpRepo.IDCondition(id)},
+			}
+		}(),
+		{
+			name: "multiple idps filter on state",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				// create idp
+				// this idp is created as an additional idp which should NOT
+				// be returned in the results of this test case
+				idp := domain.IdentityProvider{
+					InstanceID: instanceId,
+					OrgID:      orgId,
+					ID:         gofakeit.Name(),
+					// state inactive
+					State:             domain.IDPStateInactive.String(),
+					Name:              gofakeit.Name(),
+					Type:              domain.IDPTypeOIDC.String(),
+					AllowCreation:     true,
+					AllowAutoCreation: true,
+					AllowAutoUpdate:   true,
+					AllowLinking:      true,
+					StylingType:       1,
+					Payload:           "{}",
+				}
+				err := idpRepo.Create(ctx, &idp)
+				require.NoError(t, err)
+
+				noOfIDPs := 5
+				idps := make([]*domain.IdentityProvider, noOfIDPs)
+				for i := range noOfIDPs {
+
+					idp := domain.IdentityProvider{
+						InstanceID: instanceId,
+						OrgID:      orgId,
+						ID:         gofakeit.Name(),
+						// state active
+						State:             domain.IDPStateActive.String(),
+						Name:              gofakeit.Name(),
+						Type:              domain.IDPTypeOIDC.String(),
+						AllowCreation:     true,
+						AllowAutoCreation: true,
+						AllowAutoUpdate:   true,
+						AllowLinking:      true,
+						StylingType:       1,
+						Payload:           "{}",
+					}
+
+					err := idpRepo.Create(ctx, &idp)
+					require.NoError(t, err)
+
+					idps[i] = &idp
+				}
+
+				return idps
+			},
+			conditionClauses: []database.Condition{idpRepo.StateCondition(domain.IDPStateActive)},
+		},
+		func() test {
+			name := gofakeit.Name()
+			return test{
+				name: "multiple idps filter on name",
+				testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+					// create idp
+					// this idp is created as an additional idp which should NOT
+					// be returned in the results of this test case
+					idp := domain.IdentityProvider{
+						InstanceID:        instanceId,
+						OrgID:             orgId,
+						ID:                gofakeit.Name(),
+						State:             domain.IDPStateActive.String(),
+						Name:              gofakeit.Name(),
+						Type:              domain.IDPTypeOIDC.String(),
+						AllowCreation:     true,
+						AllowAutoCreation: true,
+						AllowAutoUpdate:   true,
+						AllowLinking:      true,
+						StylingType:       1,
+						Payload:           "{}",
+					}
+					err := idpRepo.Create(ctx, &idp)
+					require.NoError(t, err)
+
+					noOfIDPs := 1
+					idps := make([]*domain.IdentityProvider, noOfIDPs)
+					for i := range noOfIDPs {
+
+						idp := domain.IdentityProvider{
+							InstanceID:        instanceId,
+							OrgID:             orgId,
+							ID:                gofakeit.Name(),
+							State:             domain.IDPStateActive.String(),
+							Name:              name,
+							Type:              domain.IDPTypeOIDC.String(),
+							AllowCreation:     true,
+							AllowAutoCreation: true,
+							AllowAutoUpdate:   true,
+							AllowLinking:      true,
+							StylingType:       1,
+							Payload:           "{}",
+						}
+
+						err := idpRepo.Create(ctx, &idp)
+						require.NoError(t, err)
+
+						idps[i] = &idp
+					}
+
+					return idps
+				},
+				conditionClauses: []database.Condition{idpRepo.NameCondition(name)},
+			}
+		}(),
+		{
+			name: "multiple idps filter on type",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				// create idp
+				// this idp is created as an additional idp which should NOT
+				// be returned in the results of this test case
+				idp := domain.IdentityProvider{
+					InstanceID:        instanceId,
+					OrgID:             orgId,
+					ID:                gofakeit.Name(),
+					State:             domain.IDPStateInactive.String(),
+					Name:              gofakeit.Name(),
+					Type:              domain.IDPTypeOIDC.String(),
+					AllowCreation:     true,
+					AllowAutoCreation: true,
+					AllowAutoUpdate:   true,
+					AllowLinking:      true,
+					StylingType:       1,
+					Payload:           "{}",
+				}
+				err := idpRepo.Create(ctx, &idp)
+				require.NoError(t, err)
+
+				noOfIDPs := 5
+				idps := make([]*domain.IdentityProvider, noOfIDPs)
+				for i := range noOfIDPs {
+
+					idp := domain.IdentityProvider{
+						InstanceID: instanceId,
+						OrgID:      orgId,
+						ID:         gofakeit.Name(),
+						State:      domain.IDPStateActive.String(),
+						Name:       gofakeit.Name(),
+						// type LDAP
+						Type:              domain.IDPTypeLDAP.String(),
+						AllowCreation:     true,
+						AllowAutoCreation: true,
+						AllowAutoUpdate:   true,
+						AllowLinking:      true,
+						StylingType:       1,
+						Payload:           "{}",
+					}
+
+					err := idpRepo.Create(ctx, &idp)
+					require.NoError(t, err)
+
+					idps[i] = &idp
+				}
+
+				return idps
+			},
+			conditionClauses: []database.Condition{idpRepo.TypeCondition(domain.IDPTypeLDAP)},
+		},
+		{
+			name: "multiple idps filter on AllowCreation",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				// create idp
+				// this idp is created as an additional idp which should NOT
+				// be returned in the results of this test case
+				idp := domain.IdentityProvider{
+					InstanceID:        instanceId,
+					OrgID:             orgId,
+					ID:                gofakeit.Name(),
+					State:             domain.IDPStateInactive.String(),
+					Name:              gofakeit.Name(),
+					Type:              domain.IDPTypeOIDC.String(),
+					AllowCreation:     true,
+					AllowAutoCreation: true,
+					AllowAutoUpdate:   true,
+					AllowLinking:      true,
+					StylingType:       1,
+					Payload:           "{}",
+				}
+				err := idpRepo.Create(ctx, &idp)
+				require.NoError(t, err)
+
+				noOfIDPs := 5
+				idps := make([]*domain.IdentityProvider, noOfIDPs)
+				for i := range noOfIDPs {
+
+					idp := domain.IdentityProvider{
+						InstanceID: instanceId,
+						OrgID:      orgId,
+						ID:         gofakeit.Name(),
+						State:      domain.IDPStateActive.String(),
+						Name:       gofakeit.Name(),
+						Type:       domain.IDPTypeLDAP.String(),
+						// AllowCreation set to false
+						AllowCreation:     false,
+						AllowAutoCreation: true,
+						AllowAutoUpdate:   true,
+						AllowLinking:      true,
+						StylingType:       1,
+						Payload:           "{}",
+					}
+
+					err := idpRepo.Create(ctx, &idp)
+					require.NoError(t, err)
+
+					idps[i] = &idp
+				}
+
+				return idps
+			},
+			conditionClauses: []database.Condition{idpRepo.AllowCreationCondition(false)},
+		},
+		{
+			name: "multiple idps filter on AllowAutoCreation",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				// create idp
+				// this idp is created as an additional idp which should NOT
+				// be returned in the results of this test case
+				idp := domain.IdentityProvider{
+					InstanceID:        instanceId,
+					OrgID:             orgId,
+					ID:                gofakeit.Name(),
+					State:             domain.IDPStateInactive.String(),
+					Name:              gofakeit.Name(),
+					Type:              domain.IDPTypeOIDC.String(),
+					AllowCreation:     true,
+					AllowAutoCreation: true,
+					AllowAutoUpdate:   true,
+					AllowLinking:      true,
+					StylingType:       1,
+					Payload:           "{}",
+				}
+				err := idpRepo.Create(ctx, &idp)
+				require.NoError(t, err)
+
+				noOfIDPs := 5
+				idps := make([]*domain.IdentityProvider, noOfIDPs)
+				for i := range noOfIDPs {
+
+					idp := domain.IdentityProvider{
+						InstanceID:    instanceId,
+						OrgID:         orgId,
+						ID:            gofakeit.Name(),
+						State:         domain.IDPStateActive.String(),
+						Name:          gofakeit.Name(),
+						Type:          domain.IDPTypeLDAP.String(),
+						AllowCreation: true,
+						// AllowAutoCreation set to false
+						AllowAutoCreation: false,
+						AllowAutoUpdate:   true,
+						AllowLinking:      true,
+						StylingType:       1,
+						Payload:           "{}",
+					}
+
+					err := idpRepo.Create(ctx, &idp)
+					require.NoError(t, err)
+
+					idps[i] = &idp
+				}
+
+				return idps
+			},
+			conditionClauses: []database.Condition{idpRepo.AllowAutoCreationCondition(false)},
+		},
+		{
+			name: "multiple idps filter on AllowAutoUpdate",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				// create idp
+				// this idp is created as an additional idp which should NOT
+				// be returned in the results of this test case
+				idp := domain.IdentityProvider{
+					InstanceID: instanceId,
+					OrgID:      orgId,
+					ID:         gofakeit.Name(),
+					// state inactive
+					State:             domain.IDPStateInactive.String(),
+					Name:              gofakeit.Name(),
+					Type:              domain.IDPTypeOIDC.String(),
+					AllowCreation:     true,
+					AllowAutoCreation: true,
+					AllowAutoUpdate:   true,
+					AllowLinking:      true,
+					StylingType:       1,
+					Payload:           "{}",
+				}
+				err := idpRepo.Create(ctx, &idp)
+				require.NoError(t, err)
+
+				noOfIDPs := 5
+				idps := make([]*domain.IdentityProvider, noOfIDPs)
+				for i := range noOfIDPs {
+
+					idp := domain.IdentityProvider{
+						InstanceID:        instanceId,
+						OrgID:             orgId,
+						ID:                gofakeit.Name(),
+						State:             domain.IDPStateActive.String(),
+						Name:              gofakeit.Name(),
+						Type:              domain.IDPTypeLDAP.String(),
+						AllowCreation:     true,
+						AllowAutoCreation: true,
+						// AllowAutoUpdate set to false
+						AllowAutoUpdate: false,
+						AllowLinking:    true,
+						StylingType:     1,
+						Payload:         "{}",
+					}
+
+					err := idpRepo.Create(ctx, &idp)
+					require.NoError(t, err)
+
+					idps[i] = &idp
+				}
+
+				return idps
+			},
+			conditionClauses: []database.Condition{idpRepo.AllowAutoUpdateCondition(false)},
+		},
+		{
+			name: "multiple idps filter on AllowLinking",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				// create idp
+				// this idp is created as an additional idp which should NOT
+				// be returned in the results of this test case
+				idp := domain.IdentityProvider{
+					InstanceID: instanceId,
+					OrgID:      orgId,
+					ID:         gofakeit.Name(),
+					// state inactive
+					State:             domain.IDPStateInactive.String(),
+					Name:              gofakeit.Name(),
+					Type:              domain.IDPTypeOIDC.String(),
+					AllowCreation:     true,
+					AllowAutoCreation: true,
+					AllowAutoUpdate:   true,
+					AllowLinking:      true,
+					StylingType:       1,
+					Payload:           "{}",
+				}
+				err := idpRepo.Create(ctx, &idp)
+				require.NoError(t, err)
+
+				noOfIDPs := 5
+				idps := make([]*domain.IdentityProvider, noOfIDPs)
+				for i := range noOfIDPs {
+
+					idp := domain.IdentityProvider{
+						InstanceID:        instanceId,
+						OrgID:             orgId,
+						ID:                gofakeit.Name(),
+						State:             domain.IDPStateActive.String(),
+						Name:              gofakeit.Name(),
+						Type:              domain.IDPTypeLDAP.String(),
+						AllowCreation:     true,
+						AllowAutoCreation: true,
+						AllowAutoUpdate:   true,
+						// AllowLinking set to false
+						AllowLinking: false,
+						StylingType:  1,
+						Payload:      "{}",
+					}
+
+					err := idpRepo.Create(ctx, &idp)
+					require.NoError(t, err)
+
+					idps[i] = &idp
+				}
+
+				return idps
+			},
+			conditionClauses: []database.Condition{idpRepo.AllowLinkingCondition(false)},
+		},
+		{
+			name: "multiple idps filter on StylingType",
+			testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+				// create idp
+				// this idp is created as an additional idp which should NOT
+				// be returned in the results of this test case
+				idp := domain.IdentityProvider{
+					InstanceID:        instanceId,
+					OrgID:             orgId,
+					ID:                gofakeit.Name(),
+					State:             domain.IDPStateActive.String(),
+					Name:              gofakeit.Name(),
+					Type:              domain.IDPTypeOIDC.String(),
+					AllowCreation:     true,
+					AllowAutoCreation: true,
+					AllowAutoUpdate:   true,
+					AllowLinking:      true,
+					StylingType:       1,
+					Payload:           "{}",
+				}
+				err := idpRepo.Create(ctx, &idp)
+				require.NoError(t, err)
+
+				noOfIDPs := 1
+				idps := make([]*domain.IdentityProvider, noOfIDPs)
+				for i := range noOfIDPs {
+
+					idp := domain.IdentityProvider{
+						InstanceID:        instanceId,
+						OrgID:             orgId,
+						ID:                gofakeit.Name(),
+						State:             domain.IDPStateActive.String(),
+						Name:              gofakeit.Name(),
+						Type:              domain.IDPTypeOIDC.String(),
+						AllowCreation:     true,
+						AllowAutoCreation: true,
+						AllowAutoUpdate:   true,
+						AllowLinking:      true,
+						// StylingType set to 4
+						StylingType: 4,
+						Payload:     "{}",
+					}
+
+					err := idpRepo.Create(ctx, &idp)
+					require.NoError(t, err)
+
+					idps[i] = &idp
+				}
+
+				return idps
+			},
+			conditionClauses: []database.Condition{idpRepo.StylingTypeCondition(4)},
+		},
+		func() test {
+			payload := `{"json": {}}`
+			return test{
+				name: "multiple idps filter on Payload",
+				testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
+					// create idp
+					// this idp is created as an additional idp which should NOT
+					// be returned in the results of this test case
+					idp := domain.IdentityProvider{
+						InstanceID:        instanceId,
+						OrgID:             orgId,
+						ID:                gofakeit.Name(),
+						State:             domain.IDPStateActive.String(),
+						Name:              gofakeit.Name(),
+						Type:              domain.IDPTypeOIDC.String(),
+						AllowCreation:     true,
+						AllowAutoCreation: true,
+						AllowAutoUpdate:   true,
+						AllowLinking:      true,
+						StylingType:       1,
+						Payload:           "{}",
+					}
+					err := idpRepo.Create(ctx, &idp)
+					require.NoError(t, err)
+
+					noOfIDPs := 1
+					idps := make([]*domain.IdentityProvider, noOfIDPs)
+					for i := range noOfIDPs {
+
+						idp := domain.IdentityProvider{
+							InstanceID:        instanceId,
+							OrgID:             orgId,
+							ID:                gofakeit.Name(),
+							State:             domain.IDPStateActive.String(),
+							Name:              gofakeit.Name(),
+							Type:              domain.IDPTypeOIDC.String(),
+							AllowCreation:     true,
+							AllowAutoCreation: true,
+							AllowAutoUpdate:   true,
+							AllowLinking:      true,
+							StylingType:       1,
+							Payload:           payload,
+						}
+
+						err := idpRepo.Create(ctx, &idp)
+						require.NoError(t, err)
+
+						idps[i] = &idp
+					}
+
+					return idps
+				},
+				conditionClauses: []database.Condition{idpRepo.PayloadCondition(payload)},
 			}
 		}(),
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Cleanup(func() {
-				_, err := pool.Exec(ctx, "DELETE FROM zitadel.organizations")
+				_, err := pool.Exec(ctx, "DELETE FROM zitadel.identity_providers")
 				require.NoError(t, err)
 			})
 
-			organizations := tt.testFunc(ctx, t)
+			ctx := t.Context()
 
-			// check organization values
-			returnedOrgs, err := organizationRepo.List(ctx,
+			idps := tt.testFunc(ctx, t)
+
+			// check idp values
+			returnedIDPs, err := idpRepo.List(ctx,
 				tt.conditionClauses...,
 			)
 			require.NoError(t, err)
-			if tt.noOrganizationReturned {
-				assert.Nil(t, returnedOrgs)
+			if tt.noIDPsReturned {
+				assert.Nil(t, returnedIDPs)
 				return
 			}
 
-			assert.Equal(t, len(organizations), len(returnedOrgs))
-			for i, org := range organizations {
-				assert.Equal(t, returnedOrgs[i].ID, org.ID)
-				assert.Equal(t, returnedOrgs[i].Name, org.Name)
-				assert.Equal(t, returnedOrgs[i].InstanceID, org.InstanceID)
-				assert.Equal(t, returnedOrgs[i].State, org.State)
+			assert.Equal(t, len(idps), len(returnedIDPs))
+			for i, idp := range idps {
+
+				assert.Equal(t, returnedIDPs[i].InstanceID, idp.InstanceID)
+				assert.Equal(t, returnedIDPs[i].OrgID, idp.OrgID)
+				assert.Equal(t, returnedIDPs[i].State, idp.State)
+				assert.Equal(t, returnedIDPs[i].ID, idp.ID)
+				assert.Equal(t, returnedIDPs[i].Name, idp.Name)
+				assert.Equal(t, returnedIDPs[i].Type, idp.Type)
+				assert.Equal(t, returnedIDPs[i].AllowCreation, idp.AllowCreation)
+				assert.Equal(t, returnedIDPs[i].AllowAutoCreation, idp.AllowAutoCreation)
+				assert.Equal(t, returnedIDPs[i].AllowAutoUpdate, idp.AllowAutoUpdate)
+				assert.Equal(t, returnedIDPs[i].AllowLinking, idp.AllowLinking)
+				assert.Equal(t, returnedIDPs[i].StylingType, idp.StylingType)
+				assert.Equal(t, returnedIDPs[i].Payload, idp.Payload)
 			}
+		})
+	}
+}
+
+func TestDeleteIDProvider(t *testing.T) {
+	// create instance
+	instanceId := gofakeit.Name()
+	instance := domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	}
+	instanceRepo := repository.InstanceRepository(pool)
+	err := instanceRepo.Create(t.Context(), &instance)
+	require.NoError(t, err)
+
+	// create org
+	orgId := gofakeit.Name()
+	org := domain.Organization{
+		ID:         orgId,
+		Name:       gofakeit.Name(),
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive.String(),
+	}
+	organizationRepo := repository.OrganizationRepository(pool)
+	err = organizationRepo.Create(t.Context(), &org)
+	require.NoError(t, err)
+
+	idpRepo := repository.IDProviderRepository(pool)
+
+	type test struct {
+		name                   string
+		testFunc               func(ctx context.Context, t *testing.T)
+		idpIdentifierCondition domain.IDPIdentifierCondition
+		noOfDeletedRows        int64
+	}
+	tests := []test{
+		func() test {
+			id := gofakeit.Name()
+			var noOfIDPs int64 = 1
+			return test{
+				name: "happy path delete idp filter id",
+				testFunc: func(ctx context.Context, t *testing.T) {
+					for range noOfIDPs {
+						idp := domain.IdentityProvider{
+							InstanceID:        instanceId,
+							OrgID:             orgId,
+							ID:                id,
+							State:             domain.IDPStateActive.String(),
+							Name:              gofakeit.Name(),
+							Type:              domain.IDPTypeOIDC.String(),
+							AllowCreation:     true,
+							AllowAutoCreation: true,
+							AllowAutoUpdate:   true,
+							AllowLinking:      true,
+							StylingType:       1,
+							Payload:           "{}",
+						}
+
+						err := idpRepo.Create(ctx, &idp)
+						require.NoError(t, err)
+					}
+				},
+				idpIdentifierCondition: idpRepo.IDCondition(id),
+				noOfDeletedRows:        noOfIDPs,
+			}
+		}(),
+		func() test {
+			name := gofakeit.Name()
+			var noOfIDPs int64 = 1
+			return test{
+				name: "happy path delete idp filter name",
+				testFunc: func(ctx context.Context, t *testing.T) {
+					for range noOfIDPs {
+						idp := domain.IdentityProvider{
+							InstanceID:        instanceId,
+							OrgID:             orgId,
+							ID:                gofakeit.Name(),
+							State:             domain.IDPStateActive.String(),
+							Name:              name,
+							Type:              domain.IDPTypeOIDC.String(),
+							AllowCreation:     true,
+							AllowAutoCreation: true,
+							AllowAutoUpdate:   true,
+							AllowLinking:      true,
+							StylingType:       1,
+							Payload:           "{}",
+						}
+
+						err := idpRepo.Create(ctx, &idp)
+						require.NoError(t, err)
+
+					}
+				},
+				idpIdentifierCondition: idpRepo.NameCondition(name),
+				noOfDeletedRows:        noOfIDPs,
+			}
+		}(),
+		{
+			name:                   "delete non existent idp",
+			idpIdentifierCondition: idpRepo.NameCondition(gofakeit.Name()),
+		},
+		func() test {
+			name := gofakeit.Name()
+			return test{
+				name: "deleted already deleted idp",
+				testFunc: func(ctx context.Context, t *testing.T) {
+					noOfIDPs := 1
+					for range noOfIDPs {
+						idp := domain.IdentityProvider{
+							InstanceID:        instanceId,
+							OrgID:             orgId,
+							ID:                gofakeit.Name(),
+							State:             domain.IDPStateActive.String(),
+							Name:              name,
+							Type:              domain.IDPTypeOIDC.String(),
+							AllowCreation:     true,
+							AllowAutoCreation: true,
+							AllowAutoUpdate:   true,
+							AllowLinking:      true,
+							StylingType:       1,
+							Payload:           "{}",
+						}
+
+						err := idpRepo.Create(ctx, &idp)
+						require.NoError(t, err)
+					}
+
+					// delete organization
+					affectedRows, err := idpRepo.Delete(ctx,
+						idpRepo.NameCondition(name),
+						instanceId,
+						orgId,
+					)
+					assert.Equal(t, int64(1), affectedRows)
+					require.NoError(t, err)
+				},
+				idpIdentifierCondition: idpRepo.NameCondition(name),
+				// this test should return 0 affected rows as the idp was already deleted
+				noOfDeletedRows: 0,
+			}
+		}(),
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := t.Context()
+
+			if tt.testFunc != nil {
+				tt.testFunc(ctx, t)
+			}
+
+			// delete idp
+			noOfDeletedRows, err := idpRepo.Delete(ctx,
+				tt.idpIdentifierCondition,
+				instanceId,
+				orgId,
+			)
+			require.NoError(t, err)
+			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
+
+			// check idp was deleted
+			organization, err := idpRepo.Get(ctx,
+				tt.idpIdentifierCondition,
+				instanceId,
+				orgId,
+			)
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
+			assert.Nil(t, organization)
 		})
 	}
 }

@@ -103,13 +103,17 @@ func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierConditio
 	return i.client.Exec(ctx, stmt, builder.Args()...)
 }
 
-func (i *idProvider) Delete(ctx context.Context, id domain.IDPIdentifierCondition) (int64, error) {
+func (i *idProvider) Delete(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID string) (int64, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(`DELETE FROM zitadel.identity_providers`)
 
-	// conditions := []database.Condition{i.IDCondition(id)}
-	// writeCondition(&builder, database.And(conditions...))
+	conditions := []database.Condition{
+		id,
+		i.InstanceIDCondition(instnaceID),
+		i.OrgIDCondition(orgID),
+	}
+	writeCondition(&builder, database.And(conditions...))
 
 	return i.client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -191,7 +195,7 @@ func (i idProvider) IDCondition(id string) domain.IDPIdentifierCondition {
 }
 
 func (i idProvider) StateCondition(state domain.IDPState) database.Condition {
-	return database.NewTextCondition(i.OrgIDColumn(), database.TextOperationEqual, state.String())
+	return database.NewTextCondition(i.StateColumn(), database.TextOperationEqual, state.String())
 }
 
 func (i idProvider) NameCondition(name string) domain.IDPIdentifierCondition {
