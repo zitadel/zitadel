@@ -6,7 +6,9 @@
     "title": "Konten",
     "description": "Wählen Sie das Konto aus, das Sie verwenden möchten.",
     "addAnother": "Ein weiteres Konto hinzufügen",
-    "noResults": "Keine Konten gefunden"
+    "noResults": "Keine Konten gefunden",
+    "verified": "verifiziert",
+    "expired": "abgelaufen"
   },
   "logout": {
     "title": "Logout",
@@ -23,14 +25,20 @@
     "title": "Willkommen zurück!",
     "description": "Geben Sie Ihre Anmeldedaten ein.",
     "register": "Neuen Benutzer registrieren",
-    "submit": "Weiter"
+    "submit": "Weiter",
+    "required": {
+      "loginName": "Dieses Feld ist erforderlich"
+    }
   },
   "password": {
     "verify": {
       "title": "Passwort",
       "description": "Geben Sie Ihr Passwort ein.",
       "resetPassword": "Passwort zurücksetzen",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "required": {
+        "password": "Dieses Feld ist erforderlich"
+      }
     },
     "set": {
       "title": "Passwort festlegen",
@@ -38,12 +46,21 @@
       "codeSent": "Ein Code wurde an Ihre E-Mail-Adresse gesendet.",
       "noCodeReceived": "Keinen Code erhalten?",
       "resend": "Erneut senden",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "required": {
+        "code": "Dieses Feld ist erforderlich",
+        "newPassword": "Bitte geben Sie ein Passwort ein!",
+        "confirmPassword": "Dieses Feld ist erforderlich"
+      }
     },
     "change": {
       "title": "Passwort ändern",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "required": {
+        "newPassword": "Bitte geben Sie ein neues Passwort ein!",
+        "confirmPassword": "Dieses Feld ist erforderlich"
+      }
     }
   },
   "idp": {
@@ -85,7 +102,11 @@
     "description": "Geben Sie Ihre LDAP-Anmeldedaten ein.",
     "username": "Benutzername",
     "password": "Passwort",
-    "submit": "Weiter"
+    "submit": "Weiter",
+    "required": {
+      "username": "Dieses Feld ist erforderlich",
+      "password": "Dieses Feld ist erforderlich"
+    }
   },
   "mfa": {
     "verify": {
@@ -107,7 +128,10 @@
       "emailDescription": "Geben Sie den Code ein, den Sie per E-Mail erhalten haben.",
       "noCodeReceived": "Keinen Code erhalten?",
       "resendCode": "Code erneut senden",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "required": {
+        "code": "Dieses Feld ist erforderlich"
+      }
     },
     "set": {
       "title": "2-Faktor einrichten",
@@ -115,7 +139,10 @@
       "smsDescription": "Geben Sie Ihre Telefonnummer ein, um einen Code per SMS zu erhalten.",
       "emailDescription": "Geben Sie Ihre E-Mail-Adresse ein, um einen Code per E-Mail zu erhalten.",
       "totpRegisterDescription": "Scannen Sie den QR-Code oder navigieren Sie manuell zur URL.",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "required": {
+        "code": "Dieses Feld ist erforderlich"
+      }
     }
   },
   "passkey": {
@@ -172,7 +199,16 @@
     "password": {
       "title": "Passwort festlegen",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "required": {
+        "password": "Bitte geben Sie ein Passwort ein!",
+        "confirmPassword": "Dieses Feld ist erforderlich"
+      }
+    },
+    "required": {
+      "firstname": "Dieses Feld ist erforderlich",
+      "lastname": "Dieses Feld ist erforderlich",
+      "email": "Dieses Feld ist erforderlich"
     }
   },
   "invite": {
@@ -209,7 +245,10 @@
       "noCodeReceived": "Keinen Code erhalten?",
       "resendCode": "Code erneut senden",
       "codeSent": "Ein Code wurde gerade an Ihre E-Mail-Adresse gesendet.",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "required": {
+        "code": "Dieses Feld ist erforderlich"
+      }
     }
   },
   "authenticator": {
@@ -223,7 +262,10 @@
     "usercode": {
       "title": "Gerätecode",
       "description": "Geben Sie den Code ein.",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "required": {
+        "code": "Dieses Feld ist erforderlich"
+      }
     },
     "request": {
       "title": "{appName} möchte eine Verbindung herstellen:",
