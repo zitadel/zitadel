@@ -11,6 +11,7 @@ import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar } from "./avatar";
+import { Translated } from "./translated";
 
 export function isSessionValid(session: Partial<Session>): {
   valid: boolean;
@@ -122,13 +123,13 @@ export function SessionItem({
             </span>
             {valid ? (
               <span className="text-ellipsis text-xs opacity-80">
-                verified{" "}
+                <Translated i18nKey="verified" namespace="accounts" />{" "}
                 {verifiedAt && moment(timestampDate(verifiedAt)).fromNow()}
               </span>
             ) : (
               verifiedAt && (
                 <span className="text-ellipsis text-xs opacity-80">
-                  expired{" "}
+                  <Translated i18nKey="expired" namespace="accounts" />{" "}
                   {session.expirationDate &&
                     moment(timestampDate(session.expirationDate)).fromNow()}
                 </span>

@@ -4,9 +4,11 @@
   },
   "accounts": {
     "title": "Cuentas",
-    "description": "Selecciona la cuenta que deseas usar.",
+    "description": "Seleccione la cuenta que desea utilizar.",
     "addAnother": "Agregar otra cuenta",
-    "noResults": "No se encontraron cuentas"
+    "noResults": "No se encontraron cuentas",
+    "verified": "verificado",
+    "expired": "expirado"
   },
   "logout": {
     "title": "Cerrar sesión",
