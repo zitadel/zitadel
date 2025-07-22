@@ -235,8 +235,12 @@ func TestCreateOrganization(t *testing.T) {
 
 			// check organization values
 			organization, err = organizationRepo.Get(ctx,
-				organizationRepo.IDCondition(organization.ID),
-				organization.InstanceID,
+				database.WithCondition(
+					database.And(
+						organizationRepo.IDCondition(organization.ID),
+						organizationRepo.InstanceIDCondition(organization.InstanceID),
+					),
+				),
 			)
 			require.NoError(t, err)
 
@@ -389,8 +393,12 @@ func TestUpdateOrganization(t *testing.T) {
 
 			// check organization values
 			organization, err := organizationRepo.Get(ctx,
-				organizationRepo.IDCondition(createdOrg.ID),
-				createdOrg.InstanceID,
+				database.WithCondition(
+					database.And(
+						organizationRepo.IDCondition(createdOrg.ID),
+						organizationRepo.InstanceIDCondition(createdOrg.InstanceID),
+					),
+				),
 			)
 			require.NoError(t, err)
 
@@ -511,13 +519,18 @@ func TestGetOrganization(t *testing.T) {
 
 			// get org values
 			returnedOrg, err := orgRepo.Get(ctx,
-				tt.orgIdentifierCondition,
-				org.InstanceID,
+				database.WithCondition(
+					database.And(
+						tt.orgIdentifierCondition,
+						orgRepo.InstanceIDCondition(org.InstanceID),
+					),
+				),
 			)
 			if tt.err != nil {
 				require.ErrorIs(t, tt.err, err)
 				return
 			}
+			require.NoError(t, err)
 
 			if org.Name == "non existent org" {
 				assert.Nil(t, returnedOrg)
@@ -764,9 +777,15 @@ func TestListOrganization(t *testing.T) {
 
 			organizations := tt.testFunc(ctx, t)
 
+			var condition database.Condition
+			if len(tt.conditionClauses) > 0 {
+				condition = database.And(tt.conditionClauses...)
+			}
+
 			// check organization values
 			returnedOrgs, err := organizationRepo.List(ctx,
-				tt.conditionClauses...,
+				database.WithCondition(condition),
+				database.WithOrderBy(organizationRepo.CreatedAtColumn(true)),
 			)
 			require.NoError(t, err)
 			if tt.noOrganizationReturned {
@@ -929,8 +948,12 @@ func TestDeleteOrganization(t *testing.T) {
 
 			// check organization was deleted
 			organization, err := organizationRepo.Get(ctx,
-				tt.orgIdentifierCondition,
-				instanceId,
+				database.WithCondition(
+					database.And(
+						tt.orgIdentifierCondition,
+						organizationRepo.InstanceIDCondition(instanceId),
+					),
+				),
 			)
 			require.ErrorIs(t, err, new(database.NoRowFoundError))
 			assert.Nil(t, organization)

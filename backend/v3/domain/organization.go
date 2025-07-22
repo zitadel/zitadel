@@ -19,8 +19,10 @@ type Organization struct {
 	Name       string    `json:"name,omitempty" db:"name"`
 	InstanceID string    `json:"instanceId,omitempty" db:"instance_id"`
 	State      OrgState  `json:"state,omitempty" db:"state"`
-	CreatedAt  time.Time `json:"createdAt,omitempty" db:"created_at"`
-	UpdatedAt  time.Time `json:"updatedAt,omitempty" db:"updated_at"`
+	CreatedAt  time.Time `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt  time.Time `json:"updatedAt,omitzero" db:"updated_at"`
+
+	Domains []*OrganizationDomain `json:"domains,omitempty" db:"-"`
 }
 
 // OrgIdentifierCondition is used to help specify a single Organization,
@@ -33,17 +35,23 @@ type OrgIdentifierCondition interface {
 // organizationColumns define all the columns of the instance table.
 type organizationColumns interface {
 	// IDColumn returns the column for the id field.
-	IDColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	IDColumn(qualified bool) database.Column
 	// NameColumn returns the column for the name field.
-	NameColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	NameColumn(qualified bool) database.Column
 	// InstanceIDColumn returns the column for the default org id field
-	InstanceIDColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	InstanceIDColumn(qualified bool) database.Column
 	// StateColumn returns the column for the name field.
-	StateColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	StateColumn(qualified bool) database.Column
 	// CreatedAtColumn returns the column for the created at field.
-	CreatedAtColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	CreatedAtColumn(qualified bool) database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
-	UpdatedAtColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	UpdatedAtColumn(qualified bool) database.Column
 }
 
 // organizationConditions define all the conditions for the instance table.
@@ -72,15 +80,17 @@ type OrganizationRepository interface {
 	organizationConditions
 	organizationChanges
 
-	Get(ctx context.Context, id OrgIdentifierCondition, instance_id string, opts ...database.Condition) (*Organization, error)
-	List(ctx context.Context, conditions ...database.Condition) ([]*Organization, error)
+	Get(ctx context.Context, opts ...database.QueryOption) (*Organization, error)
+	List(ctx context.Context, opts ...database.QueryOption) ([]*Organization, error)
 
 	Create(ctx context.Context, instance *Organization) error
 	Update(ctx context.Context, id OrgIdentifierCondition, instance_id string, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, id OrgIdentifierCondition, instance_id string) (int64, error)
 
 	// Domains returns the domain sub repository for the organization.
-	Domains() OrganizationDomainRepository
+	// If shouldLoad is true, the domains will be loaded from the database and written to the [Instance].Domains field.
+	// If shouldLoad is set to true once, the Domains field will be set event if shouldLoad is false in the future.
+	Domains(shouldLoad bool) OrganizationDomainRepository
 }
 
 type CreateOrganization struct {

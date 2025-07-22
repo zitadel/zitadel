@@ -2,17 +2,23 @@ package domain
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
+
+type InstanceDomains struct {
+	domains []*InstanceDomain
+	Raw     json.RawMessage
+}
 
 type InstanceDomain struct {
 	InstanceID       string                 `json:"instanceId,omitempty" db:"instance_id"`
 	Domain           string                 `json:"domain,omitempty" db:"domain"`
 	IsVerified       bool                   `json:"isVerified,omitempty" db:"is_verified"`
 	IsPrimary        bool                   `json:"isPrimary,omitempty" db:"is_primary"`
-	VerificationType DomainVerificationType `json:"verificationType,omitempty" db:"verification_type"`
+	ValidationType DomainValidationType `json:"validationType,omitempty" db:"validation_type"`
 
 	CreatedAt string `json:"createdAt,omitempty" db:"created_at"`
 	UpdatedAt string `json:"updatedAt,omitempty" db:"updated_at"`
@@ -23,7 +29,7 @@ type AddInstanceDomain struct {
 	Domain           string                 `json:"domain,omitempty" db:"domain"`
 	IsVerified       bool                   `json:"isVerified,omitempty" db:"is_verified"`
 	IsPrimary        bool                   `json:"isPrimary,omitempty" db:"is_primary"`
-	VerificationType DomainVerificationType `json:"verificationType,omitempty" db:"verification_type"`
+	VerificationType DomainValidationType `json:"validationType,omitempty" db:"validation_type"`
 
 	// CreatedAt is the time when the domain was added.
 	// It is set by the repository and should not be set by the caller.
@@ -36,7 +42,8 @@ type AddInstanceDomain struct {
 type instanceDomainColumns interface {
 	domainColumns
 	// IsGeneratedColumn returns the column for the is generated field.
-	IsGeneratedColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	IsGeneratedColumn(qualified bool) database.Column
 }
 
 type instanceDomainConditions interface {

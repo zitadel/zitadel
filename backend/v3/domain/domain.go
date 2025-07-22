@@ -2,28 +2,35 @@ package domain
 
 import "github.com/zitadel/zitadel/backend/v3/storage/database"
 
-type DomainVerificationType string
+type DomainValidationType string
 
 const (
-	DomainVerificationTypeDNS  DomainVerificationType = "dns"
-	DomainVerificationTypeHTTP DomainVerificationType = "http"
+	DomainValidationTypeDNS  DomainValidationType = "dns"
+	DomainValidationTypeHTTP DomainValidationType = "http"
 )
 
 type domainColumns interface {
 	// InstanceIDColumn returns the column for the instance id field.
-	InstanceIDColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	InstanceIDColumn(qualified bool) database.Column
 	// DomainColumn returns the column for the domain field.
-	DomainColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	DomainColumn(qualified bool) database.Column
 	// IsVerifiedColumn returns the column for the is verified field.
-	IsVerifiedColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	IsVerifiedColumn(qualified bool) database.Column
 	// IsPrimaryColumn returns the column for the is primary field.
-	IsPrimaryColumn() database.Column
-	// VerificationTypeColumn returns the column for the verification type field.
-	VerificationTypeColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	IsPrimaryColumn(qualified bool) database.Column
+	// ValidationTypeColumn returns the column for the verification type field.
+	// `qualified` indicates if the column should be qualified with the table name.
+	ValidationTypeColumn(qualified bool) database.Column
 	// CreatedAtColumn returns the column for the created at field.
-	CreatedAtColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	CreatedAtColumn(qualified bool) database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
-	UpdatedAtColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	UpdatedAtColumn(qualified bool) database.Column
 }
 
 type domainConditions interface {
@@ -51,9 +58,9 @@ type domainChanges interface {
 	// - The domain is already primary.
 	// - No domain matches the condition.
 	SetPrimary() database.Change
-	// SetVerificationType sets the verification type column.
+	// SetValidationType sets the verification type column.
 	// If the domain is already verified, this is a no-op.
-	SetVerificationType(verificationType DomainVerificationType) database.Change
+	SetValidationType(verificationType DomainValidationType) database.Change
 }
 
 // import (

@@ -30,6 +30,36 @@ func WithOffset(offset uint32) QueryOption {
 	}
 }
 
+// WithGroupBy sets the columns to group the results by.
+func WithGroupBy(groupBy ...Column) QueryOption {
+	return func(opts *QueryOpts) {
+		opts.GroupBy = groupBy
+	}
+}
+
+// WithLeftJoin adds a LEFT JOIN to the query.
+func WithLeftJoin(table string, columns Condition) QueryOption {
+	return func(opts *QueryOpts) {
+		opts.Joins = append(opts.Joins, join{
+			table:   table,
+			typ:     JoinTypeLeft,
+			columns: columns,
+		})
+	}
+}
+
+type joinType string
+
+const (
+	JoinTypeLeft  joinType = "LEFT"
+)
+
+type join struct {
+	table   string
+	typ     joinType
+	columns Condition
+}
+
 // QueryOpts holds the options for a query.
 // It is used to build the SQL SELECT statement.
 type QueryOpts struct {
@@ -45,10 +75,19 @@ type QueryOpts struct {
 	// Offset is the number of results to skip before returning the results.
 	// It is used to build the OFFSET clause of the SQL statement.
 	Offset    uint32
+	// GroupBy is the columns to group the results by.
+	// It is used to build the GROUP BY clause of the SQL statement.
+	GroupBy Columns
+	// Joins is a list of joins to be applied to the query.
+	// It is used to build the JOIN clauses of the SQL statement.
+	Joins []join
 }
 
+
 func (opts *QueryOpts) Write(builder *StatementBuilder) {
+	opts.WriteLeftJoins(builder)
 	opts.WriteCondition(builder)
+	opts.WriteGroupBy(builder)
 	opts.WriteOrderBy(builder)
 	opts.WriteLimit(builder)
 	opts.WriteOffset(builder)
@@ -84,4 +123,26 @@ func (opts *QueryOpts) WriteOffset(builder *StatementBuilder) {
 	}
 	builder.WriteString(" OFFSET ")
 	builder.WriteArg(opts.Offset)
+}
+
+func (opts *QueryOpts) WriteGroupBy(builder *StatementBuilder) {
+	if len(opts.GroupBy) == 0 {
+		return
+	}
+	builder.WriteString(" GROUP BY ")
+	opts.GroupBy.Write(builder)
+}
+
+func (opts *QueryOpts) WriteLeftJoins(builder *StatementBuilder) {
+	if len(opts.Joins) == 0 {
+		return
+	}
+	for _, join := range opts.Joins {
+		builder.WriteString(" ")
+		builder.WriteString(string(join.typ))
+		builder.WriteString(" JOIN ")
+		builder.WriteString(join.table)
+		builder.WriteString(" ON ")
+		join.columns.Write(builder)
+	}
 }

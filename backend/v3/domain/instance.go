@@ -18,6 +18,8 @@ type Instance struct {
 	DefaultLanguage string    `json:"defaultLanguage,omitempty" db:"default_language"`
 	CreatedAt       time.Time `json:"createdAt" db:"created_at"`
 	UpdatedAt       time.Time `json:"updatedAt" db:"updated_at"`
+
+	Domains []*InstanceDomain `json:"domains,omitempty" db:"-"`
 }
 
 type instanceCacheIndex uint8
@@ -40,23 +42,32 @@ var _ cache.Entry[instanceCacheIndex, string] = (*Instance)(nil)
 // instanceColumns define all the columns of the instance table.
 type instanceColumns interface {
 	// IDColumn returns the column for the id field.
-	IDColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	IDColumn(qualified bool) database.Column
 	// NameColumn returns the column for the name field.
-	NameColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	NameColumn(qualified bool) database.Column
 	// DefaultOrgIDColumn returns the column for the default org id field
-	DefaultOrgIDColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	DefaultOrgIDColumn(qualified bool) database.Column
 	// IAMProjectIDColumn returns the column for the default IAM org id field
-	IAMProjectIDColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	IAMProjectIDColumn(qualified bool) database.Column
 	// ConsoleClientIDColumn returns the column for the default IAM org id field
-	ConsoleClientIDColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	ConsoleClientIDColumn(qualified bool) database.Column
 	// ConsoleAppIDColumn returns the column for the console client id field
-	ConsoleAppIDColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	ConsoleAppIDColumn(qualified bool) database.Column
 	// DefaultLanguageColumn returns the column for the default language field
-	DefaultLanguageColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	DefaultLanguageColumn(qualified bool) database.Column
 	// CreatedAtColumn returns the column for the created at field.
-	CreatedAtColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	CreatedAtColumn(qualified bool) database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
-	UpdatedAtColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	UpdatedAtColumn(qualified bool) database.Column
 }
 
 // instanceConditions define all the conditions for the instance table.
@@ -83,16 +94,27 @@ type InstanceRepository interface {
 	// Member returns the member repository which is a sub repository of the instance repository.
 	// Member() MemberRepository
 
-	Get(ctx context.Context, id string) (*Instance, error)
-	List(ctx context.Context, opts ...database.Condition) ([]*Instance, error)
+	Get(ctx context.Context, opts ...database.QueryOption) (*Instance, error)
+	List(ctx context.Context, opts ...database.QueryOption) ([]*Instance, error)
 
 	Create(ctx context.Context, instance *Instance) error
 	Update(ctx context.Context, id string, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, id string) (int64, error)
 
-	Domains() InstanceDomainRepository
+	// Domains returns the domain sub repository for the instance.
+	// If shouldLoad is true, the domains will be loaded from the database and written to the [Instance].Domains field.
+	// If shouldLoad is set to true once, the Domains field will be set event if shouldLoad is false in the future.
+	Domains(shouldLoad bool) InstanceDomainRepository
 }
 
 type CreateInstance struct {
 	Name string `json:"name"`
+}
+
+type InstanceQueryOption func(*InstanceQueryOpts)
+
+type InstanceQueryOpts struct {
+	database.QueryOpts
+
+	JoinDomains bool
 }

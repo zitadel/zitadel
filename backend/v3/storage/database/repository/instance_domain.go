@@ -18,8 +18,8 @@ type instanceDomain struct {
 // repository
 // -------------------------------------------------------------
 
-const queryInstanceDomainStmt = `SELECT instance_id, domain, is_verified, is_primary, verification_type, created_at, updated_at ` +
-	`FROM zitadel.instance_domains`
+const queryInstanceDomainStmt = `SELECT instance_domains.instance_id, instance_domains.domain, instance_domains.is_verified, instance_domains.is_primary, instance_domains.validation_type, instance_domains.created_at, instance_domains.updated_at ` +
+	`FROM zitadel.instance_domains id`
 
 // Get implements [domain.InstanceDomainRepository].
 // Subtle: this method shadows the method ([domain.InstanceRepository]).Get of instanceDomain.instance.
@@ -55,7 +55,7 @@ func (i *instanceDomain) List(ctx context.Context, opts ...database.QueryOption)
 func (i *instanceDomain) Add(ctx context.Context, domain *domain.AddInstanceDomain) error {
 	var builder database.StatementBuilder
 
-	builder.WriteString(`INSERT INTO zitadel.instance_domains (instance_id, domain, is_verified, is_primary, verification_type) ` +
+	builder.WriteString(`INSERT INTO zitadel.instance_domains (instance_id, domain, is_verified, is_primary, validation_type) ` +
 		`VALUES ($1, $2, $3, $4, $5)` +
 		` RETURNING created_at, updated_at`)
 
@@ -91,19 +91,19 @@ func (i *instanceDomain) Update(ctx context.Context, condition database.Conditio
 // changes
 // -------------------------------------------------------------
 
-// SetVerificationType implements [domain.InstanceDomainRepository].
-func (i instanceDomain) SetVerificationType(verificationType domain.DomainVerificationType) database.Change {
-	return database.NewChange(i.VerificationTypeColumn(), verificationType)
+// SetValidationType implements [domain.InstanceDomainRepository].
+func (i instanceDomain) SetValidationType(verificationType domain.DomainValidationType) database.Change {
+	return database.NewChange(i.ValidationTypeColumn(false), verificationType)
 }
 
 // SetPrimary implements [domain.InstanceDomainRepository].
 func (i instanceDomain) SetPrimary() database.Change {
-	return database.NewChange(i.IsPrimaryColumn(), true)
+	return database.NewChange(i.IsPrimaryColumn(false), true)
 }
 
 // SetVerified implements [domain.InstanceDomainRepository].
 func (i instanceDomain) SetVerified() database.Change {
-	return database.NewChange(i.IsVerifiedColumn(), true)
+	return database.NewChange(i.IsVerifiedColumn(false), true)
 }
 
 // -------------------------------------------------------------
@@ -112,22 +112,22 @@ func (i instanceDomain) SetVerified() database.Change {
 
 // DomainCondition implements [domain.InstanceDomainRepository].
 func (i instanceDomain) DomainCondition(op database.TextOperation, domain string) database.Condition {
-	return database.NewTextCondition(i.DomainColumn(), op, domain)
+	return database.NewTextCondition(i.DomainColumn(true), op, domain)
 }
 
 // InstanceIDCondition implements [domain.InstanceDomainRepository].
 func (i instanceDomain) InstanceIDCondition(instanceID string) database.Condition {
-	return database.NewTextCondition(i.InstanceIDColumn(), database.TextOperationEqual, instanceID)
+	return database.NewTextCondition(i.InstanceIDColumn(true), database.TextOperationEqual, instanceID)
 }
 
 // IsPrimaryCondition implements [domain.InstanceDomainRepository].
 func (i instanceDomain) IsPrimaryCondition(isPrimary bool) database.Condition {
-	return database.NewBooleanCondition(i.IsPrimaryColumn(), isPrimary)
+	return database.NewBooleanCondition(i.IsPrimaryColumn(true), isPrimary)
 }
 
 // IsVerifiedCondition implements [domain.InstanceDomainRepository].
 func (i instanceDomain) IsVerifiedCondition(isVerified bool) database.Condition {
-	return database.NewBooleanCondition(i.IsVerifiedColumn(), isVerified)
+	return database.NewBooleanCondition(i.IsVerifiedColumn(true), isVerified)
 }
 
 // -------------------------------------------------------------
@@ -136,43 +136,67 @@ func (i instanceDomain) IsVerifiedCondition(isVerified bool) database.Condition 
 
 // CreatedAtColumn implements [domain.InstanceDomainRepository].
 // Subtle: this method shadows the method ([domain.InstanceRepository]).CreatedAtColumn of instanceDomain.instance.
-func (instanceDomain) CreatedAtColumn() database.Column {
+func (instanceDomain) CreatedAtColumn(qualified bool) database.Column {
+	if qualified {
+		return database.NewColumn("instance_domains.created_at")
+	}
 	return database.NewColumn("created_at")
 }
 
 // DomainColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) DomainColumn() database.Column {
+func (instanceDomain) DomainColumn(qualified bool) database.Column {
+	if qualified {
+		return database.NewColumn("instance_domains.domain")
+	}
 	return database.NewColumn("domain")
 }
 
 // InstanceIDColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) InstanceIDColumn() database.Column {
+func (instanceDomain) InstanceIDColumn(qualified bool) database.Column {
+	if qualified {
+		return database.NewColumn("instance_domains.instance_id")
+	}
 	return database.NewColumn("instance_id")
 }
 
 // IsPrimaryColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) IsPrimaryColumn() database.Column {
+func (instanceDomain) IsPrimaryColumn(qualified bool) database.Column {
+	if qualified {
+		return database.NewColumn("instance_domains.is_primary")
+	}
 	return database.NewColumn("is_primary")
 }
 
 // IsVerifiedColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) IsVerifiedColumn() database.Column {
+func (instanceDomain) IsVerifiedColumn(qualified bool) database.Column {
+	if qualified {
+		return database.NewColumn("instance_domains.is_verified")
+	}
 	return database.NewColumn("is_verified")
 }
 
 // UpdatedAtColumn implements [domain.InstanceDomainRepository].
 // Subtle: this method shadows the method ([domain.InstanceRepository]).UpdatedAtColumn of instanceDomain.instance.
-func (instanceDomain) UpdatedAtColumn() database.Column {
+func (instanceDomain) UpdatedAtColumn(qualified bool) database.Column {
+	if qualified {
+		return database.NewColumn("instance_domains.updated_at")
+	}
 	return database.NewColumn("updated_at")
 }
 
-// VerificationTypeColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) VerificationTypeColumn() database.Column {
-	return database.NewColumn("verification_type")
+// ValidationTypeColumn implements [domain.InstanceDomainRepository].
+func (instanceDomain) ValidationTypeColumn(qualified bool) database.Column {
+	if qualified {
+		return database.NewColumn("instance_domains.validation_type")
+	}
+	return database.NewColumn("validation_type")
 }
 
 // IsGeneratedColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) IsGeneratedColumn() database.Column {
+func (instanceDomain) IsGeneratedColumn(qualified bool) database.Column {
+	if qualified {
+		return database.NewColumn("instance_domains.is_generated")
+	}
 	return database.NewColumn("is_generated")
 }
 
