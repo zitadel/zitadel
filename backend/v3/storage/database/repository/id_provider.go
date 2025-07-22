@@ -31,7 +31,7 @@ func (i *idProvider) Get(ctx context.Context, id domain.IDPIdentifierCondition, 
 
 	builder.WriteString(queryIDProviderStmt)
 
-	conditions := []database.Condition{id, i.InstanceIDCondition(instnaceID), i.OrgIDCondition(*orgID)}
+	conditions := []database.Condition{id, i.InstanceIDCondition(instnaceID), i.OrgIDCondition(orgID)}
 
 	writeCondition(&builder, database.And(conditions...))
 
@@ -93,7 +93,7 @@ func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierConditio
 	conditions := []database.Condition{
 		id,
 		i.InstanceIDCondition(instnaceID),
-		i.OrgIDCondition(*orgID),
+		i.OrgIDCondition(orgID),
 	}
 	database.Changes(changes).Write(&builder)
 	writeCondition(&builder, database.And(conditions...))
@@ -111,7 +111,7 @@ func (i *idProvider) Delete(ctx context.Context, id domain.IDPIdentifierConditio
 	conditions := []database.Condition{
 		id,
 		i.InstanceIDCondition(instnaceID),
-		i.OrgIDCondition(*orgID),
+		i.OrgIDCondition(orgID),
 	}
 	writeCondition(&builder, database.And(conditions...))
 
@@ -186,8 +186,11 @@ func (i idProvider) InstanceIDCondition(id string) database.Condition {
 	return database.NewTextCondition(i.InstanceIDColumn(), database.TextOperationEqual, id)
 }
 
-func (i idProvider) OrgIDCondition(id string) database.Condition {
-	return database.NewTextCondition(i.OrgIDColumn(), database.TextOperationEqual, id)
+func (i idProvider) OrgIDCondition(id *string) database.Condition {
+	if id == nil {
+		return nil
+	}
+	return database.NewTextCondition(i.OrgIDColumn(), database.TextOperationEqual, *id)
 }
 
 func (i idProvider) IDCondition(id string) domain.IDPIdentifierCondition {

@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -54,7 +56,7 @@ func TestCreateIDProvider(t *testing.T) {
 			name: "happy path",
 			idp: domain.IdentityProvider{
 				InstanceID:        instanceId,
-				OrgID:             orgId,
+				OrgID:             &orgId,
 				ID:                gofakeit.Name(),
 				State:             domain.IDPStateActive.String(),
 				Name:              gofakeit.Name(),
@@ -64,14 +66,14 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           "{}",
+				Payload:           gu.Ptr("{}"),
 			},
 		},
 		{
 			name: "create organization without name",
 			idp: domain.IdentityProvider{
 				InstanceID: instanceId,
-				OrgID:      orgId,
+				OrgID:      &orgId,
 				ID:         gofakeit.Name(),
 				State:      domain.IDPStateActive.String(),
 				// Name:              gofakeit.Name(),
@@ -81,7 +83,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           "{}",
+				Payload:           gu.Ptr("{}"),
 			},
 			err: new(database.CheckError),
 		},
@@ -92,7 +94,7 @@ func TestCreateIDProvider(t *testing.T) {
 
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -102,7 +104,7 @@ func TestCreateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -120,7 +122,7 @@ func TestCreateIDProvider(t *testing.T) {
 
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -130,7 +132,7 @@ func TestCreateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -177,7 +179,7 @@ func TestCreateIDProvider(t *testing.T) {
 					idpRepo := repository.IDProviderRepository(pool)
 					idp := domain.IdentityProvider{
 						InstanceID:        newInstId,
-						OrgID:             newOrgId,
+						OrgID:             &newOrgId,
 						ID:                id,
 						State:             domain.IDPStateActive.String(),
 						Name:              name,
@@ -187,7 +189,7 @@ func TestCreateIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 
 					err = idpRepo.Create(ctx, &idp)
@@ -196,12 +198,12 @@ func TestCreateIDProvider(t *testing.T) {
 					// change the instanceID to a different instance
 					idp.InstanceID = instanceId
 					// change the OrgId to a different organization
-					idp.OrgID = orgId
+					idp.OrgID = &orgId
 					return &idp
 				},
 				idp: domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                id,
 					State:             domain.IDPStateActive.String(),
 					Name:              name,
@@ -211,7 +213,7 @@ func TestCreateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				},
 			}
 		}(),
@@ -219,7 +221,7 @@ func TestCreateIDProvider(t *testing.T) {
 			name: "adding idp with no id",
 			idp: domain.IdentityProvider{
 				InstanceID: instanceId,
-				OrgID:      orgId,
+				OrgID:      &orgId,
 				// ID:                gofakeit.Name(),
 				State:             domain.IDPStateActive.String(),
 				Name:              gofakeit.Name(),
@@ -229,7 +231,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           "{}",
+				Payload:           gu.Ptr("{}"),
 			},
 			err: new(database.CheckError),
 		},
@@ -237,7 +239,7 @@ func TestCreateIDProvider(t *testing.T) {
 			name: "adding idp with no name",
 			idp: domain.IdentityProvider{
 				InstanceID: instanceId,
-				OrgID:      orgId,
+				OrgID:      &orgId,
 				ID:         gofakeit.Name(),
 				State:      domain.IDPStateActive.String(),
 				// Name:              gofakeit.Name(),
@@ -247,7 +249,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           "{}",
+				Payload:           gu.Ptr("{}"),
 			},
 			err: new(database.CheckError),
 		},
@@ -255,7 +257,7 @@ func TestCreateIDProvider(t *testing.T) {
 			name: "adding idp with no instance id",
 			idp: domain.IdentityProvider{
 				// InstanceID:        instanceId,
-				OrgID:             orgId,
+				OrgID:             &orgId,
 				State:             domain.IDPStateActive.String(),
 				Name:              gofakeit.Name(),
 				Type:              domain.IDPTypeOIDC.String(),
@@ -264,7 +266,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           "{}",
+				Payload:           gu.Ptr("{}"),
 			},
 			err: new(database.IntegrityViolationError),
 		},
@@ -272,7 +274,7 @@ func TestCreateIDProvider(t *testing.T) {
 			name: "adding organization with non existent instance id",
 			idp: domain.IdentityProvider{
 				InstanceID:        gofakeit.Name(),
-				OrgID:             orgId,
+				OrgID:             &orgId,
 				State:             domain.IDPStateActive.String(),
 				ID:                gofakeit.Name(),
 				Name:              gofakeit.Name(),
@@ -282,7 +284,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           "{}",
+				Payload:           gu.Ptr("{}"),
 			},
 			err: new(database.ForeignKeyError),
 		},
@@ -290,7 +292,7 @@ func TestCreateIDProvider(t *testing.T) {
 			name: "adding organization with non existent org id",
 			idp: domain.IdentityProvider{
 				InstanceID:        instanceId,
-				OrgID:             gofakeit.Name(),
+				OrgID:             gu.Ptr(gofakeit.Name()),
 				State:             domain.IDPStateActive.String(),
 				ID:                gofakeit.Name(),
 				Name:              gofakeit.Name(),
@@ -300,7 +302,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           "{}",
+				Payload:           gu.Ptr("{}"),
 			},
 			err: new(database.ForeignKeyError),
 		},
@@ -330,7 +332,7 @@ func TestCreateIDProvider(t *testing.T) {
 			idp, err = idpRepo.Get(ctx,
 				idpRepo.IDCondition(idp.ID),
 				idp.InstanceID,
-				&idp.OrgID,
+				idp.OrgID,
 			)
 			require.NoError(t, err)
 
@@ -393,7 +395,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -403,7 +405,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -419,7 +421,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -429,7 +431,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -445,7 +447,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -455,7 +457,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -471,7 +473,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -481,7 +483,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -497,7 +499,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -507,7 +509,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -523,7 +525,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -533,7 +535,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -549,7 +551,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -559,12 +561,12 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
-				idp.Payload = `{"json": {}}`
+				idp.Payload = gu.Ptr(`{"json": {}}`)
 				return &idp
 			},
 			// update:       []database.Change{idpRepo.SetPayload("{{}}")},
@@ -585,7 +587,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			rowsAffected, err := idpRepo.Update(ctx,
 				idpRepo.IDCondition(createdIDP.ID),
 				createdIDP.InstanceID,
-				&createdIDP.OrgID,
+				createdIDP.OrgID,
 				tt.update...,
 			)
 			afterUpdate := time.Now()
@@ -601,7 +603,7 @@ func TestUpdateIDProvider(t *testing.T) {
 			idp, err := idpRepo.Get(ctx,
 				organizationRepo.IDCondition(createdIDP.ID),
 				createdIDP.InstanceID,
-				&createdIDP.OrgID,
+				createdIDP.OrgID,
 			)
 			require.NoError(t, err)
 
@@ -678,7 +680,7 @@ func TestGetIDProvider(t *testing.T) {
 				testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                id,
 						State:             domain.IDPStateActive.String(),
 						Name:              gofakeit.Name(),
@@ -688,7 +690,7 @@ func TestGetIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -705,7 +707,7 @@ func TestGetIDProvider(t *testing.T) {
 				testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive.String(),
 						Name:              name,
@@ -715,7 +717,7 @@ func TestGetIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -730,7 +732,7 @@ func TestGetIDProvider(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -740,7 +742,7 @@ func TestGetIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -755,7 +757,7 @@ func TestGetIDProvider(t *testing.T) {
 			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -765,7 +767,7 @@ func TestGetIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -783,7 +785,7 @@ func TestGetIDProvider(t *testing.T) {
 				testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                id,
 						State:             domain.IDPStateActive.String(),
 						Name:              gofakeit.Name(),
@@ -793,12 +795,12 @@ func TestGetIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
 					require.NoError(t, err)
-					idp.OrgID = "non-existent-orgID"
+					idp.OrgID = gu.Ptr("non-existent-orgID")
 					return &idp
 				},
 				idpIdentifierCondition: idpRepo.IDCondition(id),
@@ -812,7 +814,7 @@ func TestGetIDProvider(t *testing.T) {
 				testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive.String(),
 						Name:              name,
@@ -822,7 +824,7 @@ func TestGetIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -848,7 +850,7 @@ func TestGetIDProvider(t *testing.T) {
 			returnedIDP, err := idpRepo.Get(ctx,
 				tt.idpIdentifierCondition,
 				idp.InstanceID,
-				&idp.OrgID,
+				idp.OrgID,
 			)
 			if err != nil {
 				require.ErrorIs(t, tt.err, err)
@@ -947,7 +949,7 @@ func TestListIDProvider(t *testing.T) {
 				// be returned in the results of this test case
 				idp := domain.IdentityProvider{
 					InstanceID:        newInstanceId,
-					OrgID:             newOrgId,
+					OrgID:             &newOrgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -957,7 +959,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -968,7 +970,7 @@ func TestListIDProvider(t *testing.T) {
 
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive.String(),
 						Name:              gofakeit.Name(),
@@ -978,7 +980,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1011,7 +1013,7 @@ func TestListIDProvider(t *testing.T) {
 				// be returned in the results of this test case
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             newOrgId,
+					OrgID:             &newOrgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -1021,7 +1023,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1032,7 +1034,7 @@ func TestListIDProvider(t *testing.T) {
 
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive.String(),
 						Name:              gofakeit.Name(),
@@ -1042,7 +1044,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1053,7 +1055,7 @@ func TestListIDProvider(t *testing.T) {
 
 				return idps
 			},
-			conditionClauses: []database.Condition{idpRepo.OrgIDCondition(orgId)},
+			conditionClauses: []database.Condition{idpRepo.OrgIDCondition(&orgId)},
 		},
 		{
 			name: "happy path single idp no filter",
@@ -1064,7 +1066,7 @@ func TestListIDProvider(t *testing.T) {
 
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive.String(),
 						Name:              gofakeit.Name(),
@@ -1074,7 +1076,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1095,7 +1097,7 @@ func TestListIDProvider(t *testing.T) {
 
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive.String(),
 						Name:              gofakeit.Name(),
@@ -1105,7 +1107,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1127,7 +1129,7 @@ func TestListIDProvider(t *testing.T) {
 					// be returned in the results of this test case
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive.String(),
 						Name:              gofakeit.Name(),
@@ -1137,7 +1139,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 					err := idpRepo.Create(ctx, &idp)
 					require.NoError(t, err)
@@ -1148,7 +1150,7 @@ func TestListIDProvider(t *testing.T) {
 
 						idp := domain.IdentityProvider{
 							InstanceID:        instanceId,
-							OrgID:             orgId,
+							OrgID:             &orgId,
 							ID:                id,
 							State:             domain.IDPStateActive.String(),
 							Name:              gofakeit.Name(),
@@ -1158,7 +1160,7 @@ func TestListIDProvider(t *testing.T) {
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
 							StylingType:       1,
-							Payload:           "{}",
+							Payload:           gu.Ptr("{}"),
 						}
 
 						err := idpRepo.Create(ctx, &idp)
@@ -1180,7 +1182,7 @@ func TestListIDProvider(t *testing.T) {
 				// be returned in the results of this test case
 				idp := domain.IdentityProvider{
 					InstanceID: instanceId,
-					OrgID:      orgId,
+					OrgID:      &orgId,
 					ID:         gofakeit.Name(),
 					// state inactive
 					State:             domain.IDPStateInactive.String(),
@@ -1191,7 +1193,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1202,7 +1204,7 @@ func TestListIDProvider(t *testing.T) {
 
 					idp := domain.IdentityProvider{
 						InstanceID: instanceId,
-						OrgID:      orgId,
+						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
 						// state active
 						State:             domain.IDPStateActive.String(),
@@ -1213,7 +1215,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1236,7 +1238,7 @@ func TestListIDProvider(t *testing.T) {
 					// be returned in the results of this test case
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive.String(),
 						Name:              gofakeit.Name(),
@@ -1246,7 +1248,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 					err := idpRepo.Create(ctx, &idp)
 					require.NoError(t, err)
@@ -1257,7 +1259,7 @@ func TestListIDProvider(t *testing.T) {
 
 						idp := domain.IdentityProvider{
 							InstanceID:        instanceId,
-							OrgID:             orgId,
+							OrgID:             &orgId,
 							ID:                gofakeit.Name(),
 							State:             domain.IDPStateActive.String(),
 							Name:              name,
@@ -1267,7 +1269,7 @@ func TestListIDProvider(t *testing.T) {
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
 							StylingType:       1,
-							Payload:           "{}",
+							Payload:           gu.Ptr("{}"),
 						}
 
 						err := idpRepo.Create(ctx, &idp)
@@ -1289,7 +1291,7 @@ func TestListIDProvider(t *testing.T) {
 				// be returned in the results of this test case
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateInactive.String(),
 					Name:              gofakeit.Name(),
@@ -1299,7 +1301,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1310,7 +1312,7 @@ func TestListIDProvider(t *testing.T) {
 
 					idp := domain.IdentityProvider{
 						InstanceID: instanceId,
-						OrgID:      orgId,
+						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
 						State:      domain.IDPStateActive.String(),
 						Name:       gofakeit.Name(),
@@ -1321,7 +1323,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1342,7 +1344,7 @@ func TestListIDProvider(t *testing.T) {
 				// be returned in the results of this test case
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateInactive.String(),
 					Name:              gofakeit.Name(),
@@ -1352,7 +1354,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1363,7 +1365,7 @@ func TestListIDProvider(t *testing.T) {
 
 					idp := domain.IdentityProvider{
 						InstanceID: instanceId,
-						OrgID:      orgId,
+						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
 						State:      domain.IDPStateActive.String(),
 						Name:       gofakeit.Name(),
@@ -1374,7 +1376,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1395,7 +1397,7 @@ func TestListIDProvider(t *testing.T) {
 				// be returned in the results of this test case
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateInactive.String(),
 					Name:              gofakeit.Name(),
@@ -1405,7 +1407,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1416,7 +1418,7 @@ func TestListIDProvider(t *testing.T) {
 
 					idp := domain.IdentityProvider{
 						InstanceID:    instanceId,
-						OrgID:         orgId,
+						OrgID:         &orgId,
 						ID:            gofakeit.Name(),
 						State:         domain.IDPStateActive.String(),
 						Name:          gofakeit.Name(),
@@ -1427,7 +1429,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1448,7 +1450,7 @@ func TestListIDProvider(t *testing.T) {
 				// be returned in the results of this test case
 				idp := domain.IdentityProvider{
 					InstanceID: instanceId,
-					OrgID:      orgId,
+					OrgID:      &orgId,
 					ID:         gofakeit.Name(),
 					// state inactive
 					State:             domain.IDPStateInactive.String(),
@@ -1459,7 +1461,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1470,7 +1472,7 @@ func TestListIDProvider(t *testing.T) {
 
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive.String(),
 						Name:              gofakeit.Name(),
@@ -1481,7 +1483,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate: false,
 						AllowLinking:    true,
 						StylingType:     1,
-						Payload:         "{}",
+						Payload:         gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1502,7 +1504,7 @@ func TestListIDProvider(t *testing.T) {
 				// be returned in the results of this test case
 				idp := domain.IdentityProvider{
 					InstanceID: instanceId,
-					OrgID:      orgId,
+					OrgID:      &orgId,
 					ID:         gofakeit.Name(),
 					// state inactive
 					State:             domain.IDPStateInactive.String(),
@@ -1513,7 +1515,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1524,7 +1526,7 @@ func TestListIDProvider(t *testing.T) {
 
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive.String(),
 						Name:              gofakeit.Name(),
@@ -1535,7 +1537,7 @@ func TestListIDProvider(t *testing.T) {
 						// AllowLinking set to false
 						AllowLinking: false,
 						StylingType:  1,
-						Payload:      "{}",
+						Payload:      gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1556,7 +1558,7 @@ func TestListIDProvider(t *testing.T) {
 				// be returned in the results of this test case
 				idp := domain.IdentityProvider{
 					InstanceID:        instanceId,
-					OrgID:             orgId,
+					OrgID:             &orgId,
 					ID:                gofakeit.Name(),
 					State:             domain.IDPStateActive.String(),
 					Name:              gofakeit.Name(),
@@ -1566,7 +1568,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           "{}",
+					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1577,7 +1579,7 @@ func TestListIDProvider(t *testing.T) {
 
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive.String(),
 						Name:              gofakeit.Name(),
@@ -1588,7 +1590,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowLinking:      true,
 						// StylingType set to 4
 						StylingType: 4,
-						Payload:     "{}",
+						Payload:     gu.Ptr("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1611,7 +1613,7 @@ func TestListIDProvider(t *testing.T) {
 					// be returned in the results of this test case
 					idp := domain.IdentityProvider{
 						InstanceID:        instanceId,
-						OrgID:             orgId,
+						OrgID:             &orgId,
 						ID:                gofakeit.Name(),
 						State:             domain.IDPStateActive.String(),
 						Name:              gofakeit.Name(),
@@ -1621,7 +1623,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           "{}",
+						Payload:           gu.Ptr("{}"),
 					}
 					err := idpRepo.Create(ctx, &idp)
 					require.NoError(t, err)
@@ -1632,7 +1634,7 @@ func TestListIDProvider(t *testing.T) {
 
 						idp := domain.IdentityProvider{
 							InstanceID:        instanceId,
-							OrgID:             orgId,
+							OrgID:             &orgId,
 							ID:                gofakeit.Name(),
 							State:             domain.IDPStateActive.String(),
 							Name:              gofakeit.Name(),
@@ -1642,7 +1644,7 @@ func TestListIDProvider(t *testing.T) {
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
 							StylingType:       1,
-							Payload:           payload,
+							Payload:           &payload,
 						}
 
 						err := idpRepo.Create(ctx, &idp)
@@ -1744,7 +1746,7 @@ func TestDeleteIDProvider(t *testing.T) {
 					for range noOfIDPs {
 						idp := domain.IdentityProvider{
 							InstanceID:        instanceId,
-							OrgID:             orgId,
+							OrgID:             &orgId,
 							ID:                id,
 							State:             domain.IDPStateActive.String(),
 							Name:              gofakeit.Name(),
@@ -1754,7 +1756,7 @@ func TestDeleteIDProvider(t *testing.T) {
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
 							StylingType:       1,
-							Payload:           "{}",
+							Payload:           gu.Ptr("{}"),
 						}
 
 						err := idpRepo.Create(ctx, &idp)
@@ -1774,7 +1776,7 @@ func TestDeleteIDProvider(t *testing.T) {
 					for range noOfIDPs {
 						idp := domain.IdentityProvider{
 							InstanceID:        instanceId,
-							OrgID:             orgId,
+							OrgID:             &orgId,
 							ID:                gofakeit.Name(),
 							State:             domain.IDPStateActive.String(),
 							Name:              name,
@@ -1784,7 +1786,7 @@ func TestDeleteIDProvider(t *testing.T) {
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
 							StylingType:       1,
-							Payload:           "{}",
+							Payload:           gu.Ptr("{}"),
 						}
 
 						err := idpRepo.Create(ctx, &idp)
@@ -1809,7 +1811,7 @@ func TestDeleteIDProvider(t *testing.T) {
 					for range noOfIDPs {
 						idp := domain.IdentityProvider{
 							InstanceID:        instanceId,
-							OrgID:             orgId,
+							OrgID:             &orgId,
 							ID:                gofakeit.Name(),
 							State:             domain.IDPStateActive.String(),
 							Name:              name,
@@ -1819,7 +1821,7 @@ func TestDeleteIDProvider(t *testing.T) {
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
 							StylingType:       1,
-							Payload:           "{}",
+							Payload:           gu.Ptr("{}"),
 						}
 
 						err := idpRepo.Create(ctx, &idp)
