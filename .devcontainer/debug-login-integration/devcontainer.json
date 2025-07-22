@@ -11,7 +11,7 @@
 	"forwardPorts": [3001],
 	"remoteUser": "node",
 	"onCreateCommand": "pnpm install --frozen-lockfile --recursive",
-	"postAttachCommand": "pnpm turbo daemon clean && pnpm turbo @zitadel/login#dev",
+	"postAttachCommand": "pnpm turbo daemon clean || pnpm turbo @zitadel/login#dev",
 	"customizations": {
 		"jetbrains": {
 			"settings": {
