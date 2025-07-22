@@ -434,6 +434,7 @@ func TestCreateUser_scopedExternalID(t *testing.T) {
 }
 
 func TestCreateUser_ignorePasswordOnCreate(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name            string
 		ignorePassword  string
@@ -450,11 +451,11 @@ func TestCreateUser_ignorePasswordOnCreate(t *testing.T) {
 			scimErrorDetail: "Password is too short",
 		},
 		{
-			name:            "ignorePasswordOnCreate set to an invalid value - defaults to false",
+			name:            "ignorePasswordOnCreate set to an invalid value",
 			ignorePassword:  "random",
 			wantErr:         true,
 			scimErrorType:   "invalidValue",
-			scimErrorDetail: "Password is too short",
+			scimErrorDetail: "Invalid value for metadata key urn:zitadel:scim:ignorePasswordOnCreate: random",
 		},
 		{
 			name:           "ignorePasswordOnCreate set to true",
@@ -477,6 +478,7 @@ func TestCreateUser_ignorePasswordOnCreate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// create a machine user
 			callingUserId, callingUserPat, err := Instance.CreateMachineUserPATWithMembership(CTX, "ORG_OWNER")
 			require.NoError(t, err)
@@ -487,10 +489,7 @@ func TestCreateUser_ignorePasswordOnCreate(t *testing.T) {
 
 			// create a user with an invalid password
 			createdUser, err := Instance.Client.SCIM.Users.Create(ctx, Instance.DefaultOrg.Id, withUsername(invalidPasswordUserJson, "acmeUser1"))
-			if (err != nil) != tt.wantErr {
-				t.Errorf("CreateUser() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			require.Equal(t, tt.wantErr, err != nil)
 			if err != nil {
 				scimErr := scim.RequireScimError(t, http.StatusBadRequest, err)
 				assert.Equal(t, tt.scimErrorType, scimErr.Error.ScimType)
@@ -503,9 +502,7 @@ func TestCreateUser_ignorePasswordOnCreate(t *testing.T) {
 				// ensure the user is really stored and not just returned to the caller
 				fetchedUser, err := Instance.Client.SCIM.Users.Get(CTX, Instance.DefaultOrg.Id, createdUser.ID)
 				require.NoError(ttt, err)
-				if !test.PartiallyDeepEqual(tt.wantUser, fetchedUser) {
-					ttt.Errorf("GetUser() got = %v, want %v", fetchedUser, tt.wantUser)
-				}
+				assert.True(ttt, test.PartiallyDeepEqual(tt.wantUser, fetchedUser))
 			}, retryDuration, tick)
 		})
 	}

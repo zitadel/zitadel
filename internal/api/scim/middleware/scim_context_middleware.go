@@ -4,6 +4,9 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"strings"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	zhttp "github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -59,10 +62,14 @@ func initScimContext(ctx context.Context, q *query.Queries) (context.Context, er
 				data.ExternalIDScopedMetadataKey = smetadata.ScopeExternalIdKey(data.ProvisioningDomain)
 			}
 		case string(smetadata.KeyIgnorePasswordOnCreate):
-			ignorePasswordOnCreate, err := strconv.ParseBool(string(metadata.Value))
-			if err == nil {
-				data.IgnorePasswordOnCreate = ignorePasswordOnCreate
+			ignorePasswordOnCreate, parseErr := strconv.ParseBool(strings.TrimSpace(string(metadata.Value)))
+			if parseErr != nil {
+				return ctx,
+					zerrors.ThrowInvalidArgumentf(nil, "SMCM-yvw2rt", "Invalid value for metadata key %s: %s", smetadata.KeyIgnorePasswordOnCreate, metadata.Value)
 			}
+			data.IgnorePasswordOnCreate = ignorePasswordOnCreate
+		default:
+			logging.WithFields("user_metadata_key", metadata.Key).Warn("unexpected metadata key")
 		}
 	}
 	return smetadata.SetScimContextData(ctx, data), nil
