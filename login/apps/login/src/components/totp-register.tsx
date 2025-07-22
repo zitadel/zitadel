@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import { Button, ButtonVariants } from "./button";
@@ -49,6 +50,8 @@ export function TotpRegister({
       code: "",
     },
   });
+
+  const t = useTranslations("otp");
 
   async function continueWithCode(values: Inputs) {
     setLoading(true);
@@ -123,7 +126,7 @@ export function TotpRegister({
             <div className="">
               <TextInput
                 type="text"
-                {...register("code", { required: "This field is required" })}
+                {...register("code", { required: t("set.required.code") })}
                 label="Code"
                 data-testid="code-text-input"
               />

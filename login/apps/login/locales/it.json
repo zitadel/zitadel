@@ -25,14 +25,20 @@
     "title": "Bentornato!",
     "description": "Inserisci i tuoi dati di accesso.",
     "register": "Registrati come nuovo utente",
-    "submit": "Continua"
+    "submit": "Continua",
+    "required": {
+      "loginName": "Questo campo è obbligatorio"
+    }
   },
   "password": {
     "verify": {
       "title": "Password",
       "description": "Inserisci la tua password.",
       "resetPassword": "Reimposta Password",
-      "submit": "Continua"
+      "submit": "Continua",
+      "required": {
+        "password": "Questo campo è obbligatorio"
+      }
     },
     "set": {
       "title": "Imposta Password",
@@ -40,12 +46,21 @@
       "codeSent": "Un codice è stato inviato al tuo indirizzo email.",
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resend": "Invia di nuovo",
-      "submit": "Continua"
+      "submit": "Continua",
+      "required": {
+        "code": "Questo campo è obbligatorio",
+        "newPassword": "Devi fornire una password!",
+        "confirmPassword": "Questo campo è obbligatorio"
+      }
     },
     "change": {
       "title": "Cambia Password",
       "description": "Imposta la password per il tuo account",
-      "submit": "Continua"
+      "submit": "Continua",
+      "required": {
+        "newPassword": "Devi fornire una nuova password!",
+        "confirmPassword": "Questo campo è obbligatorio"
+      }
     }
   },
   "idp": {
@@ -87,7 +102,11 @@
     "description": "Inserisci le tue credenziali LDAP.",
     "username": "Nome utente",
     "password": "Password",
-    "submit": "Continua"
+    "submit": "Continua",
+    "required": {
+      "username": "Questo campo è obbligatorio",
+      "password": "Questo campo è obbligatorio"
+    }
   },
   "mfa": {
     "verify": {
@@ -109,7 +128,10 @@
       "emailDescription": "Inserisci il codice ricevuto via email.",
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resendCode": "Invia di nuovo il codice",
-      "submit": "Continua"
+      "submit": "Continua",
+      "required": {
+        "code": "Questo campo è obbligatorio"
+      }
     },
     "set": {
       "title": "Configura l'autenticazione a 2 fattori",
@@ -117,7 +139,10 @@
       "smsDescription": "Inserisci il tuo numero di telefono per ricevere un codice via SMS.",
       "emailDescription": "Inserisci il tuo indirizzo email per ricevere un codice via email.",
       "totpRegisterDescription": "Scansiona il codice QR o naviga manualmente all'URL.",
-      "submit": "Continua"
+      "submit": "Continua",
+      "required": {
+        "code": "Questo campo è obbligatorio"
+      }
     }
   },
   "passkey": {
@@ -174,7 +199,16 @@
     "password": {
       "title": "Imposta Password",
       "description": "Imposta la password per il tuo account",
-      "submit": "Continua"
+      "submit": "Continua",
+      "required": {
+        "password": "Devi fornire una password!",
+        "confirmPassword": "Questo campo è obbligatorio"
+      }
+    },
+    "required": {
+      "firstname": "Questo campo è obbligatorio",
+      "lastname": "Questo campo è obbligatorio",
+      "email": "Questo campo è obbligatorio"
     }
   },
   "invite": {
@@ -211,7 +245,10 @@
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resendCode": "Invia di nuovo il codice",
       "codeSent": "Un codice è stato appena inviato al tuo indirizzo email.",
-      "submit": "Continua"
+      "submit": "Continua",
+      "required": {
+        "code": "Questo campo è obbligatorio"
+      }
     }
   },
   "authenticator": {
@@ -225,7 +262,10 @@
     "usercode": {
       "title": "Codice dispositivo",
       "description": "Inserisci il codice.",
-      "submit": "Continua"
+      "submit": "Continua",
+      "required": {
+        "code": "Questo campo è obbligatorio"
+      }
     },
     "request": {
       "title": "{appName} desidera connettersi:",
