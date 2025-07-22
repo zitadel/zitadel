@@ -17,10 +17,10 @@
     "generate": "buf generate ../../proto --path ../../proto/zitadel",
     "clean": "rm -rf zitadel .turbo node_modules google protoc-gen-openapiv2 validate"
   },
-  "devDependencies": {
-    "@bufbuild/buf": "^1.53.0"
-  },
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.2"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.53.0"
   }
 }
