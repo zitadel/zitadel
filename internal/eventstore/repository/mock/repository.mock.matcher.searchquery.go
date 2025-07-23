@@ -10,7 +10,7 @@ import (
 type filterQueryMatcher repository.SearchQuery
 
 func (f *filterQueryMatcher) String() string {
-	var filterLists []string
+	var filterLists = make([]string, 0, len(f.SubQueries))
 	for _, filterSlice := range f.SubQueries {
 		var str string
 		for _, filter := range filterSlice {

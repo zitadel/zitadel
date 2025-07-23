@@ -39,6 +39,8 @@ linters:
     - nolintlint
     # Checks for misuse of Sprintf to construct a host with port in a URL.
     - nosprintfhostport
+    # Finds slice declarations that could potentially be preallocated [fast: true, auto-fix: false]
+    - prealloc
     # checks whether Err of rows is checked successfully in `sql.Rows` [fast: false, auto-fix: false]
     - rowserrcheck
     # Checks that sql.Rows and sql.Stmt are closed. [fast: false, auto-fix: false]
@@ -171,9 +173,6 @@ linters:
     # paralleltest detects missing usage of t.Parallel() method in your Go test [fast: true, auto-fix: false]
     # FUTURE: will break all of our tests
     - paralleltest
-    # Finds slice declarations that could potentially be preallocated [fast: true, auto-fix: false]
-    # FUTURE: would improve performance
-    - prealloc
     # find code that shadows one of Go's predeclared identifiers [fast: true, auto-fix: false]
     # FUTURE: checks for overwrites
     - predeclared

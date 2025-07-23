@@ -92,7 +92,7 @@ func (c *Commands) BulkAddProjectRole(ctx context.Context, projectID, resourceOw
 }
 
 func (c *Commands) addProjectRoles(ctx context.Context, projectAgg *eventstore.Aggregate, projectRoles ...*AddProjectRole) ([]eventstore.Command, error) {
-	var events []eventstore.Command
+	var events = make([]eventstore.Command, 0, len(projectRoles))
 	for _, projectRole := range projectRoles {
 		if projectRole.ResourceOwner != projectAgg.ResourceOwner {
 			return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-4Q2WjlbHvc", "Errors.Project.Role.Invalid")

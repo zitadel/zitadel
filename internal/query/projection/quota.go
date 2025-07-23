@@ -156,7 +156,15 @@ func (q *quotaProjection) reduceQuotaSet(event eventstore.Event) (*handler.State
 	if err != nil {
 		return nil, err
 	}
-	var statements []func(e eventstore.Event) handler.Exec
+
+	// UpsertStatement.
+	statementsAmount := 1
+	if e.Notifications != nil {
+		// DeleteStatement + Notifications.
+		statementsAmount += 1 + len(*e.Notifications)
+	}
+
+	var statements = make([]func(e eventstore.Event) handler.Exec, 0, statementsAmount)
 
 	// 1. Insert or update quota if the event has not only notification changes
 	quotaConflictColumns := []handler.Column{
