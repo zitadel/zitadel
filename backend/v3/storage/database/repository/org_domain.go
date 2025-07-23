@@ -18,8 +18,8 @@ type orgDomain struct {
 // repository
 // -------------------------------------------------------------
 
-const queryOrganizationDomainStmt = `SELECT instance_id, org_id, domain, is_verified, is_primary, verification_type, created_at, updated_at ` +
-	`FROM zitadel.organization_domains`
+const queryOrganizationDomainStmt = `SELECT instance_id, org_id, domain, is_verified, is_primary, validation_type, created_at, updated_at ` +
+	`FROM zitadel.org_domains`
 
 // Get implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).Get of orgDomain.org.
@@ -55,11 +55,9 @@ func (o *orgDomain) List(ctx context.Context, opts ...database.QueryOption) ([]*
 func (o *orgDomain) Add(ctx context.Context, domain *domain.AddOrganizationDomain) error {
 	var builder database.StatementBuilder
 
-	builder.WriteString(`INSERT INTO zitadel.organization_domains (instance_id, org_id, domain, is_verified, is_primary, verification_type) ` +
-		`VALUES ($1, $2, $3, $4, $5, $6)` +
-		` RETURNING created_at, updated_at`)
-
-	builder.AppendArgs(domain.InstanceID, domain.OrgID, domain.Domain, domain.IsVerified, domain.IsPrimary, domain.ValidationType)
+	builder.WriteString(`INSERT INTO zitadel.org_domains (instance_id, org_id, domain, is_verified, is_primary, validation_type) VALUES (`)
+	builder.WriteArgs(domain.InstanceID, domain.OrgID, domain.Domain, domain.IsVerified, domain.IsPrimary, domain.ValidationType)
+	builder.WriteString(`) RETURNING created_at, updated_at`)
 
 	return o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)
 }
@@ -67,11 +65,14 @@ func (o *orgDomain) Add(ctx context.Context, domain *domain.AddOrganizationDomai
 // Update implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).Update of orgDomain.org.
 func (o *orgDomain) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
+	if len(changes) == 0 {
+		return 0, database.NoChangesError
+	}
+
 	var builder database.StatementBuilder
 
-	builder.WriteString(`UPDATE zitadel.organization_domains SET `)
+	builder.WriteString(`UPDATE zitadel.org_domains SET `)
 	database.Changes(changes).Write(&builder)
-
 	writeCondition(&builder, condition)
 
 	return o.client.Exec(ctx, builder.String(), builder.Args()...)
@@ -81,7 +82,7 @@ func (o *orgDomain) Update(ctx context.Context, condition database.Condition, ch
 func (o *orgDomain) Remove(ctx context.Context, condition database.Condition) (int64, error) {
 	var builder database.StatementBuilder
 
-	builder.WriteString(`DELETE FROM zitadel.organization_domains `)
+	builder.WriteString(`DELETE FROM zitadel.org_domains `)
 	writeCondition(&builder, condition)
 
 	return o.client.Exec(ctx, builder.String(), builder.Args()...)
