@@ -314,7 +314,7 @@ func WithAuthorizationToken(ctx context.Context, token string) context.Context {
 	if !ok {
 		md = make(metadata.MD)
 	}
-	md.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	md.Set("Authorization", "Bearer "+token)
 	return metadata.NewOutgoingContext(ctx, md)
 }
 
@@ -327,7 +327,7 @@ func (i *Instance) BearerToken(ctx context.Context) string {
 }
 
 func (i *Instance) WithSystemAuthorizationHTTP(u UserType) map[string]string {
-	return map[string]string{"Authorization": fmt.Sprintf("Bearer %s", i.Users.Get(u).Token)}
+	return map[string]string{"Authorization": "Bearer " + i.Users.Get(u).Token}
 }
 
 func await(af func() error) error {

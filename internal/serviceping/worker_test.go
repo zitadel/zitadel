@@ -2,7 +2,7 @@ package serviceping
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"net/http"
 	"reflect"
 	"testing"
@@ -26,7 +26,7 @@ import (
 
 var (
 	testNow   = time.Now()
-	errInsert = fmt.Errorf("insert error")
+	errInsert = errors.New("insert error")
 )
 
 func TestWorker_reportBaseInformation(t *testing.T) {

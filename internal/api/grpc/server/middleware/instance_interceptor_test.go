@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"reflect"
 	"testing"
 	"time"
@@ -232,20 +232,20 @@ type mockInstanceVerifier struct {
 
 func (m *mockInstanceVerifier) InstanceByHost(_ context.Context, instanceHost, publicHost string) (authz.Instance, error) {
 	if instanceHost != m.instanceHost {
-		return nil, fmt.Errorf("invalid host")
+		return nil, errors.New("invalid host")
 	}
 	if publicHost == "" {
 		return &mockInstance{}, nil
 	}
 	if publicHost != instanceHost && publicHost != m.publicHost {
-		return nil, fmt.Errorf("invalid host")
+		return nil, errors.New("invalid host")
 	}
 	return &mockInstance{}, nil
 }
 
 func (m *mockInstanceVerifier) InstanceByID(_ context.Context, id string) (authz.Instance, error) {
 	if id != m.id {
-		return nil, fmt.Errorf("not found")
+		return nil, errors.New("not found")
 	}
 	return &mockInstance{}, nil
 }

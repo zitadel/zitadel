@@ -3,7 +3,7 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"reflect"
 	"testing"
 	"time"
@@ -356,7 +356,7 @@ func (repo *testPusher) Push(_ context.Context, _ database.ContextQueryExecuter,
 
 	if len(repo.events) != len(commands) {
 		repo.t.Errorf("length of events unequal want: %d got %d", len(repo.events), len(commands))
-		return nil, fmt.Errorf("")
+		return nil, errors.New("")
 	}
 
 	events = make([]Event, len(commands))

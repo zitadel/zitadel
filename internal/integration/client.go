@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -1119,7 +1120,7 @@ func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.
 }
 
 func (i *Instance) CreateUserSchemaEmpty(ctx context.Context) *userschema_v3alpha.CreateUserSchemaResponse {
-	return i.CreateUserSchemaEmptyWithType(ctx, fmt.Sprint(time.Now().UnixNano()+1))
+	return i.CreateUserSchemaEmptyWithType(ctx, strconv.FormatInt(time.Now().UnixNano()+1, 10))
 }
 
 func (i *Instance) CreateUserSchema(ctx context.Context, schemaData []byte) *userschema_v3alpha.CreateUserSchemaResponse {
@@ -1128,7 +1129,7 @@ func (i *Instance) CreateUserSchema(ctx context.Context, schemaData []byte) *use
 	logging.OnError(err).Fatal("create userschema unmarshal")
 	schema, err := i.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
 		UserSchema: &userschema_v3alpha.UserSchema{
-			Type: fmt.Sprint(time.Now().UnixNano() + 1),
+			Type: strconv.FormatInt(time.Now().UnixNano()+1, 10),
 			DataType: &userschema_v3alpha.UserSchema_Schema{
 				Schema: userSchema,
 			},

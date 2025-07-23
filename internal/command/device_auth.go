@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"golang.org/x/text/language"
@@ -163,7 +162,7 @@ func (c *Commands) getDeviceAuthWriteModelByDeviceCode(ctx context.Context, devi
 type DeviceAuthStateError domain.DeviceAuthState
 
 func (e DeviceAuthStateError) Error() string {
-	return fmt.Sprintf("device auth state not approved: %s", domain.DeviceAuthState(e).String())
+	return "device auth state not approved: " + domain.DeviceAuthState(e).String()
 }
 
 // CreateOIDCSessionFromDeviceAuth creates a new OIDC session if the device authorization

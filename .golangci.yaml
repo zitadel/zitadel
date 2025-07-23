@@ -41,6 +41,8 @@ linters:
     - nolintlint
     # Checks for misuse of Sprintf to construct a host with port in a URL.
     - nosprintfhostport
+    # Checks that fmt.Sprintf can be replaced with a faster alternative.
+    - perfsprint
     # Finds slice declarations that could potentially be preallocated [fast: true, auto-fix: false]
     - prealloc
     # checks whether Err of rows is checked successfully in `sql.Rows` [fast: false, auto-fix: false]

@@ -1,6 +1,7 @@
 package file
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -31,7 +32,7 @@ func (d *Storage) ReadKey(id string) (*crypto.Key, error) {
 	}
 	key, ok := keys[id]
 	if !ok {
-		return nil, fmt.Errorf("key no found")
+		return nil, errors.New("key no found")
 	}
 	return &crypto.Key{
 		ID:    id,
@@ -40,5 +41,5 @@ func (d *Storage) ReadKey(id string) (*crypto.Key, error) {
 }
 
 func (d *Storage) CreateKeys(keys ...*crypto.Key) error {
-	return fmt.Errorf("this provider is not able to store new keys")
+	return errors.New("this provider is not able to store new keys")
 }

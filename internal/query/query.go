@@ -2,7 +2,6 @@ package query
 
 import (
 	"context"
-	"fmt"
 	"regexp"
 	"sync"
 	"time"
@@ -137,7 +136,7 @@ func triggerBatch(ctx context.Context, handlers ...*handler.Handler) {
 	for _, h := range handlers {
 		go func(ctx context.Context, h *handler.Handler) {
 			name := h.ProjectionName()
-			_, traceSpan := tracing.NewNamedSpan(ctx, fmt.Sprintf("Trigger%s", name))
+			_, traceSpan := tracing.NewNamedSpan(ctx, "Trigger"+name)
 			_, err := h.Trigger(ctx, handler.WithAwaitRunning())
 			logging.OnError(err).WithField("projection", name).Debug("trigger failed")
 			traceSpan.EndWithError(err)

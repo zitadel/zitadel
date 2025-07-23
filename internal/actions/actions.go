@@ -26,7 +26,7 @@ const (
 )
 
 func actionFailedMessage(err error) string {
-	return fmt.Sprintf("action run failed: %s", err.Error())
+	return "action run failed: " + err.Error()
 }
 
 func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script, name string, opts ...Option) (err error) {

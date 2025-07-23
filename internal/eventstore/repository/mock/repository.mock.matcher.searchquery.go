@@ -19,7 +19,7 @@ func (f *filterQueryMatcher) String() string {
 		filterLists = append(filterLists, fmt.Sprintf("[%s]", strings.TrimPrefix(str, ",")))
 
 	}
-	return fmt.Sprintf("Filters: %s", strings.Join(filterLists, " "))
+	return "Filters: " + strings.Join(filterLists, " ")
 }
 
 func (f *filterQueryMatcher) Matches(x interface{}) bool {

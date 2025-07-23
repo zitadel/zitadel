@@ -2,6 +2,7 @@ package saml
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -135,7 +136,7 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage cr
 			return fmt.Errorf("error while reading ca certificate: %w", err)
 		}
 		if certAndKey.Key == nil || certAndKey.Certificate == nil {
-			return fmt.Errorf("has no ca certificate")
+			return errors.New("has no ca certificate")
 		}
 
 		switch usage {
@@ -144,12 +145,12 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage cr
 		case crypto.KeyUsageSAMLResponseSinging:
 			return p.command.GenerateSAMLResponseCertificate(setSAMLCtx(ctx), p.certificateAlgorithm, certAndKey.Key, certAndKey.Certificate)
 		default:
-			return fmt.Errorf("unknown usage")
+			return errors.New("unknown usage")
 		}
 	case crypto.KeyUsageSAMLCA:
 		return p.command.GenerateSAMLCACertificate(setSAMLCtx(ctx), p.certificateAlgorithm)
 	default:
-		return fmt.Errorf("unknown certificate usage")
+		return errors.New("unknown certificate usage")
 	}
 }
 

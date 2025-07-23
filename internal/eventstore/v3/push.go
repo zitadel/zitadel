@@ -57,7 +57,7 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 		}()
 	}
 
-	_, err = tx.ExecContext(ctx, fmt.Sprintf("SET LOCAL application_name = '%s'", fmt.Sprintf("zitadel_es_pusher_%s", authz.GetInstance(ctx).InstanceID())))
+	_, err = tx.ExecContext(ctx, fmt.Sprintf("SET LOCAL application_name = '%s'", "zitadel_es_pusher_"+authz.GetInstance(ctx).InstanceID()))
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -173,7 +174,7 @@ func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, prefixes []string, 
 	case HashNameSha2:
 		return c.sha2()
 	case "":
-		return nil, nil, fmt.Errorf("missing hasher algorithm")
+		return nil, nil, errors.New("missing hasher algorithm")
 	case HashNameArgon2, HashNameMd5, HashNameMd5Plain, HashNameMd5Salted, HashNamePHPass:
 		fallthrough
 	default:
