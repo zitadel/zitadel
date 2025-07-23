@@ -1,3 +1,16 @@
+output:
+  formats:
+    - format: colored-line-number
+
+  print-issued-lines: true
+  print-linter-name: true
+  sort-results: true
+  sort-order:
+    - linter
+    - severity
+    - file # filepath, line, and column.
+  show-stats: true
+
 issues:
   new-from-rev: main
   # Set to 0 to disable.
@@ -84,9 +97,6 @@ linters:
     # checks function and package cyclomatic complexity [fast: false, auto-fix: false]
     # not use because gocognit is used
     - cyclop
-    # The owner seems to have abandoned the linter. Replaced by unused.
-    # deprecated, replaced by unused
-    - deadcode
     # check declaration order and count of types, constants, variables and functions [fast: true, auto-fix: false]
     # FUTURE: IMO it sometimes makes sense to declare consts or types after a func
     - decorder
@@ -108,23 +118,14 @@ linters:
     # Checks types passed to the json encoding functions. Reports unsupported types and optionally reports occations, where the check for the returned error can be omitted. [fast: false, auto-fix: false]
     # FUTURE: use asap, because we use json alot. nice feature is possiblity to check if err check is required
     - errchkjson
-    # execinquery is a linter about query string checker in Query function which reads your Go src files and warning it finds
-    # FUTURE: might find some errors in sql queries
-    - execinquery
-    # Checks if all struct's fields are initialized [fast: false, auto-fix: false]
-    # deprecated
-    - exhaustivestruct
     # Checks if all structure fields are initialized
     # Not all fields have to be initialized
     - exhaustruct
-    # checks for pointers to enclosing loop variables [fast: false, auto-fix: false]
-    # FUTURE: finds bugs hard to find, could occur much later
-    - exportloopref
     # Forbids identifiers [fast: true, auto-fix: false]
     # see no reason. allows to define regexp which are not allowed to use
     - forbidigo
     # finds forced type assertions [fast: true, auto-fix: false]
-    # not used because we mostly use `_, _ = a.(int)` 
+    # not used because we mostly use `_, _ = a.(int)`
     - forcetypeassert
     # Tool for detection of long functions [fast: true, auto-fix: false]
     # not used because it ignores complexity
@@ -149,7 +150,7 @@ linters:
     - godox
     # Golang linter to check the errors handling expressions [fast: false, auto-fix: false]
     # Not used in favore of errorlint
-    - goerr113
+    - err113
     # Gofmt checks whether code was gofmt-ed. By default this tool runs with -s option to check for code simplification [fast: true, auto-fix: true]
     # ignored in favor of goimports
     - gofmt
@@ -162,12 +163,6 @@ linters:
     # In addition to fixing imports, goimports also formats your code in the same style as gofmt. [fast: true, auto-fix: true]
     # ignored in favor of gci
     - goimports
-    #deprecated]: Golint differs from gofmt. Gofmt reformats Go source code, whereas golint prints out style mistakes [fast: false, auto-fix: false]
-    # ignored in favor of goimports
-    - golint
-    # An analyzer to detect magic numbers. [fast: true, auto-fix: false]
-    # FUTURE: not that critical at the moment
-    - gomnd
     # Manage the use of 'replace', 'retract', and 'excludes' directives in go.mod. [fast: true, auto-fix: false]
     # FUTURE: not a problem at the moment
     - gomoddirectives
@@ -183,18 +178,12 @@ linters:
     # An analyzer to analyze expression groups. [fast: true, auto-fix: false]
     # I think the groups (vars, consts, imports, ...) we have atm are ok
     - grouper
-    # Checks that your code uses short syntax for if-statements whenever possible [fast: true, auto-fix: false]
-    # Dont't use its deprecated
-    - ifshort
     # Enforces consistent import aliases [fast: false, auto-fix: false]
     # FUTURE: aliasing of imports is more or less consistent
     - importas
     # A linter that checks the number of methods inside an interface.
     # No need at the moment, repository abstraction was removed
     - interfacebloat
-    # A linter that suggests interface types
-    # Don't use it's archived
-    - interfacer
     # Accept Interfaces, Return Concrete Types [fast: false, auto-fix: false]
     # FUTURE: check if no interface is returned
     - ireturn
@@ -228,9 +217,6 @@ linters:
     # Reports all names returns
     # Named returns are not allowed which IMO reduces readability of code
     - nonamedreturns
-    # detects snake case of variable naming and function name.
-    # has not been a problem in our code and deprecated
-    - nosnakecase
     # paralleltest detects missing usage of t.Parallel() method in your Go test [fast: true, auto-fix: false]
     # FUTURE: will break all of our tests
     - paralleltest
@@ -249,12 +235,6 @@ linters:
     # Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint. [fast: false, auto-fix: false]
     # Linter aggregator, would allow to use less other linters
     - revive
-    # checks for unpinned variables in go programs
-    # deprecated
-    - scopelint
-    # Finds unused struct fields [fast: false, auto-fix: false]
-    # deprecated, replaced by unused
-    - structcheck
     # Stylecheck is a replacement for golint [fast: false, auto-fix: false]
     # we use goimports
     - stylecheck
@@ -282,9 +262,6 @@ linters:
     # A linter that detect the possibility to use variables/constants from the Go standard library.
     # FUTURE: improves code quality
     - usestdlibvars
-    # Finds unused global variables and constants [fast: false, auto-fix: false]
-    # deprecated, replaced by unused
-    - varcheck
     # checks that the length of a variable's name matches its scope [fast: false, auto-fix: false]
     # I would not use it because it more or less checks if var lenght matches
     - varnamelen
@@ -300,6 +277,7 @@ linters:
     # Whitespace Linter - Forces you to use empty lines! [fast: true, auto-fix: false]
     # FUTURE: improves code quality by allowing and blocking line breaks
     - wsl
+
 linters-settings:
   gci:
     sections:

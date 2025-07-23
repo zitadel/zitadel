@@ -172,10 +172,8 @@ console_lint:
 .PHONY: core_lint
 core_lint:
 	golangci-lint run \
-		--timeout 10m \
 		--config ./.golangci.yaml \
-		--out-format=github-actions \
-		--concurrency=$$(getconf _NPROCESSORS_ONLN)
+ 		--concurrency=$$(getconf _NPROCESSORS_ONLN)
 
 .PHONY: login_pull
 login_pull: login_ensure_remote
