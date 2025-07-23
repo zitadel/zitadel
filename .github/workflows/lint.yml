@@ -36,17 +36,17 @@ jobs:
     continue-on-error: true
     if: ${{ github.event_name == 'pull_request' }}
     steps:
-    - 
+    -
       uses: actions/checkout@v4
-    - 
+    -
       uses: bufbuild/buf-setup-action@v1
       with:
         version: ${{ inputs.buf_version }}
         github_token: ${{ secrets.GITHUB_TOKEN }}
-    - 
+    -
       name: lint
       uses: bufbuild/buf-lint-action@v1
-    - 
+    -
       uses: bufbuild/buf-breaking-action@v1
       with:
         against: "https://github.com/${{ github.repository }}.git#branch=${{ github.base_ref }}"
@@ -79,11 +79,11 @@ jobs:
     -
       name: Checkout
       uses: actions/checkout@v4
-    - 
+    -
       uses: actions/setup-go@v5
       with:
         go-version-file: 'go.mod'
-    - 
+    -
       uses: actions/cache/restore@v4
       timeout-minutes: 1
       name: restore core
@@ -91,8 +91,8 @@ jobs:
         path: ${{ inputs.core_cache_path }}
         key: ${{ inputs.core_cache_key }}
         fail-on-cache-miss: true
-    - 
-      uses: golangci/golangci-lint-action@v6
+    -
+      uses: golangci/golangci-lint-action@v8
       with:
         version: ${{ inputs.go_lint_version }}
         github-token: ${{ github.token }}
