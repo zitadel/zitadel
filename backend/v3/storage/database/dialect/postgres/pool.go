@@ -58,7 +58,7 @@ func (c *pgxPool) Exec(ctx context.Context, sql string, args ...any) (int64, err
 
 // Begin implements [database.Pool].
 func (c *pgxPool) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
-	tx, err := c.Pool.BeginTx(ctx, transactionOptionsToPgx(opts))
+	tx, err := c.BeginTx(ctx, transactionOptionsToPgx(opts))
 	if err != nil {
 		return nil, wrapError(err)
 	}

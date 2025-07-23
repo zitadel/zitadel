@@ -2,22 +2,16 @@ package domain
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-type InstanceDomains struct {
-	domains []*InstanceDomain
-	Raw     json.RawMessage
-}
-
 type InstanceDomain struct {
-	InstanceID       string                 `json:"instanceId,omitempty" db:"instance_id"`
-	Domain           string                 `json:"domain,omitempty" db:"domain"`
-	IsVerified       bool                   `json:"isVerified,omitempty" db:"is_verified"`
-	IsPrimary        bool                   `json:"isPrimary,omitempty" db:"is_primary"`
+	InstanceID     string               `json:"instanceId,omitempty" db:"instance_id"`
+	Domain         string               `json:"domain,omitempty" db:"domain"`
+	IsVerified     bool                 `json:"isVerified,omitempty" db:"is_verified"`
+	IsPrimary      bool                 `json:"isPrimary,omitempty" db:"is_primary"`
 	ValidationType DomainValidationType `json:"validationType,omitempty" db:"validation_type"`
 
 	CreatedAt string `json:"createdAt,omitempty" db:"created_at"`
@@ -25,10 +19,10 @@ type InstanceDomain struct {
 }
 
 type AddInstanceDomain struct {
-	InstanceID       string                 `json:"instanceId,omitempty" db:"instance_id"`
-	Domain           string                 `json:"domain,omitempty" db:"domain"`
-	IsVerified       bool                   `json:"isVerified,omitempty" db:"is_verified"`
-	IsPrimary        bool                   `json:"isPrimary,omitempty" db:"is_primary"`
+	InstanceID       string               `json:"instanceId,omitempty" db:"instance_id"`
+	Domain           string               `json:"domain,omitempty" db:"domain"`
+	IsVerified       bool                 `json:"isVerified,omitempty" db:"is_verified"`
+	IsPrimary        bool                 `json:"isPrimary,omitempty" db:"is_primary"`
 	VerificationType DomainValidationType `json:"validationType,omitempty" db:"validation_type"`
 
 	// CreatedAt is the time when the domain was added.

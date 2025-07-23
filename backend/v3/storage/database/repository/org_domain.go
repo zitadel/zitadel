@@ -14,8 +14,6 @@ type orgDomain struct {
 	*org
 }
 
-
-
 // -------------------------------------------------------------
 // repository
 // -------------------------------------------------------------
@@ -146,7 +144,7 @@ func (o orgDomain) OrgIDCondition(orgID string) database.Condition {
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).CreatedAtColumn of orgDomain.org.
 func (orgDomain) CreatedAtColumn(qualified bool) database.Column {
 	if qualified {
-		return database.NewColumn("org_domains.created_at")	
+		return database.NewColumn("org_domains.created_at")
 	}
 	return database.NewColumn("created_at")
 }
@@ -154,7 +152,7 @@ func (orgDomain) CreatedAtColumn(qualified bool) database.Column {
 // DomainColumn implements [domain.OrganizationDomainRepository].
 func (orgDomain) DomainColumn(qualified bool) database.Column {
 	if qualified {
-		return database.NewColumn("org_domains.domain")	
+		return database.NewColumn("org_domains.domain")
 	}
 	return database.NewColumn("domain")
 }
@@ -163,7 +161,7 @@ func (orgDomain) DomainColumn(qualified bool) database.Column {
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).InstanceIDColumn of orgDomain.org.
 func (orgDomain) InstanceIDColumn(qualified bool) database.Column {
 	if qualified {
-		return database.NewColumn("org_domains.instance_id")	
+		return database.NewColumn("org_domains.instance_id")
 	}
 	return database.NewColumn("instance_id")
 }
@@ -171,7 +169,7 @@ func (orgDomain) InstanceIDColumn(qualified bool) database.Column {
 // IsPrimaryColumn implements [domain.OrganizationDomainRepository].
 func (orgDomain) IsPrimaryColumn(qualified bool) database.Column {
 	if qualified {
-		return database.NewColumn("org_domains.is_primary")	
+		return database.NewColumn("org_domains.is_primary")
 	}
 	return database.NewColumn("is_primary")
 }
@@ -179,7 +177,7 @@ func (orgDomain) IsPrimaryColumn(qualified bool) database.Column {
 // IsVerifiedColumn implements [domain.OrganizationDomainRepository].
 func (orgDomain) IsVerifiedColumn(qualified bool) database.Column {
 	if qualified {
-		return database.NewColumn("org_domains.is_verified")	
+		return database.NewColumn("org_domains.is_verified")
 	}
 	return database.NewColumn("is_verified")
 }
@@ -187,7 +185,7 @@ func (orgDomain) IsVerifiedColumn(qualified bool) database.Column {
 // OrgIDColumn implements [domain.OrganizationDomainRepository].
 func (orgDomain) OrgIDColumn(qualified bool) database.Column {
 	if qualified {
-		return database.NewColumn("org_domains.org_id")	
+		return database.NewColumn("org_domains.org_id")
 	}
 	return database.NewColumn("org_id")
 }
@@ -196,7 +194,7 @@ func (orgDomain) OrgIDColumn(qualified bool) database.Column {
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).UpdatedAtColumn of orgDomain.org.
 func (orgDomain) UpdatedAtColumn(qualified bool) database.Column {
 	if qualified {
-		return database.NewColumn("org_domains.updated_at")	
+		return database.NewColumn("org_domains.updated_at")
 	}
 	return database.NewColumn("updated_at")
 }
@@ -204,7 +202,7 @@ func (orgDomain) UpdatedAtColumn(qualified bool) database.Column {
 // ValidationTypeColumn implements [domain.OrganizationDomainRepository].
 func (orgDomain) ValidationTypeColumn(qualified bool) database.Column {
 	if qualified {
-		return database.NewColumn("org_domains.validation_type")	
+		return database.NewColumn("org_domains.validation_type")
 	}
 	return database.NewColumn("validation_type")
 }
@@ -218,7 +216,7 @@ func scanOrganizationDomain(ctx context.Context, client database.Querier, builde
 	if err != nil {
 		return nil, err
 	}
-	
+
 	organizationDomain := &domain.OrganizationDomain{}
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(organizationDomain); err != nil {
 		return nil, err

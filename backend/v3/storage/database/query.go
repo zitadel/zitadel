@@ -51,7 +51,7 @@ func WithLeftJoin(table string, columns Condition) QueryOption {
 type joinType string
 
 const (
-	JoinTypeLeft  joinType = "LEFT"
+	JoinTypeLeft joinType = "LEFT"
 )
 
 type join struct {
@@ -68,13 +68,13 @@ type QueryOpts struct {
 	Condition Condition
 	// OrderBy is the columns to order the results by.
 	// It is used to build the ORDER BY clause of the SQL statement.
-	OrderBy   Columns
+	OrderBy Columns
 	// Limit is the maximum number of results to return.
 	// It is used to build the LIMIT clause of the SQL statement.
-	Limit     uint32
+	Limit uint32
 	// Offset is the number of results to skip before returning the results.
 	// It is used to build the OFFSET clause of the SQL statement.
-	Offset    uint32
+	Offset uint32
 	// GroupBy is the columns to group the results by.
 	// It is used to build the GROUP BY clause of the SQL statement.
 	GroupBy Columns
@@ -82,7 +82,6 @@ type QueryOpts struct {
 	// It is used to build the JOIN clauses of the SQL statement.
 	Joins []join
 }
-
 
 func (opts *QueryOpts) Write(builder *StatementBuilder) {
 	opts.WriteLeftJoins(builder)

@@ -110,11 +110,3 @@ type InstanceRepository interface {
 type CreateInstance struct {
 	Name string `json:"name"`
 }
-
-type InstanceQueryOption func(*InstanceQueryOpts)
-
-type InstanceQueryOpts struct {
-	database.QueryOpts
-
-	JoinDomains bool
-}

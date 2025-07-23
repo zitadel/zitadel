@@ -103,4 +103,3 @@ type MemberRepository interface {
 	SetMemberRoles(ctx context.Context, orgID, userID string, roles []string) error
 	RemoveMember(ctx context.Context, orgID, userID string) error
 }
-

@@ -8,11 +8,11 @@ import (
 )
 
 type OrganizationDomain struct {
-	InstanceID       string                 `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID            string                 `json:"orgId,omitempty" db:"org_id"`
-	Domain           string                 `json:"domain,omitempty" db:"domain"`
-	IsVerified       bool                   `json:"isVerified,omitempty" db:"is_verified"`
-	IsPrimary        bool                   `json:"isPrimary,omitempty" db:"is_primary"`
+	InstanceID     string               `json:"instanceId,omitempty" db:"instance_id"`
+	OrgID          string               `json:"orgId,omitempty" db:"org_id"`
+	Domain         string               `json:"domain,omitempty" db:"domain"`
+	IsVerified     bool                 `json:"isVerified,omitempty" db:"is_verified"`
+	IsPrimary      bool                 `json:"isPrimary,omitempty" db:"is_primary"`
 	ValidationType DomainValidationType `json:"validationType,omitempty" db:"validation_type"`
 
 	CreatedAt string `json:"createdAt,omitempty" db:"created_at"`
@@ -20,11 +20,11 @@ type OrganizationDomain struct {
 }
 
 type AddOrganizationDomain struct {
-	InstanceID       string                 `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID            string                 `json:"orgId,omitempty" db:"org_id"`
-	Domain           string                 `json:"domain,omitempty" db:"domain"`
-	IsVerified       bool                   `json:"isVerified,omitempty" db:"is_verified"`
-	IsPrimary        bool                   `json:"isPrimary,omitempty" db:"is_primary"`
+	InstanceID     string               `json:"instanceId,omitempty" db:"instance_id"`
+	OrgID          string               `json:"orgId,omitempty" db:"org_id"`
+	Domain         string               `json:"domain,omitempty" db:"domain"`
+	IsVerified     bool                 `json:"isVerified,omitempty" db:"is_verified"`
+	IsPrimary      bool                 `json:"isPrimary,omitempty" db:"is_primary"`
 	ValidationType DomainValidationType `json:"validationType,omitempty" db:"validation_type"`
 
 	// CreatedAt is the time when the domain was added.

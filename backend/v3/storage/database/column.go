@@ -53,6 +53,6 @@ type ignoreCaseCol struct {
 
 // WriteIgnoreCase implements [ignoreCaseColumn].
 func (c ignoreCaseCol) WriteIgnoreCase(builder *StatementBuilder) {
-	c.column.Write(builder)
+	c.Write(builder)
 	builder.WriteString(c.suffix)
 }

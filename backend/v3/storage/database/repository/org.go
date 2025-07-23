@@ -58,12 +58,12 @@ func (o *org) List(ctx context.Context, opts ...database.QueryOption) ([]*domain
 		database.WithGroupBy(o.InstanceIDColumn(true), o.IDColumn(true)),
 	)
 
-	options := new(database.QueryOpts)	
+	options := new(database.QueryOpts)
 	for _, opt := range opts {
 		opt(options)
 	}
-	
-	var builder  database.StatementBuilder
+
+	var builder database.StatementBuilder
 	builder.WriteString(queryOrganizationStmt)
 	options.Write(&builder)
 
@@ -72,7 +72,7 @@ func (o *org) List(ctx context.Context, opts ...database.QueryOption) ([]*domain
 
 func (o *org) joinDomains() database.QueryOption {
 	columns := make([]database.Condition, 0, 3)
-	columns = append(columns, 
+	columns = append(columns,
 		database.NewColumnCondition(o.InstanceIDColumn(true), o.Domains(false).InstanceIDColumn(true)),
 		database.NewColumnCondition(o.IDColumn(true), o.Domains(false).OrgIDColumn(true)),
 	)
@@ -89,7 +89,6 @@ func (o *org) joinDomains() database.QueryOption {
 	)
 }
 
-
 const createOrganizationStmt = `INSERT INTO zitadel.organizations (id, name, instance_id, state)` +
 	` VALUES ($1, $2, $3, $4)` +
 	` RETURNING created_at, updated_at`
@@ -102,7 +101,6 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 
 	return o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
 }
-
 
 // Update implements [domain.OrganizationRepository].
 func (o *org) Update(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, changes ...database.Change) (int64, error) {
@@ -266,7 +264,7 @@ func scanOrganizations(ctx context.Context, querier database.Querier, builder *d
 	if err := rows.(database.CollectableRows).Collect(&rawOrgs); err != nil {
 		return nil, err
 	}
-	
+
 	organizations := make([]*domain.Organization, len(rawOrgs))
 	for i, org := range rawOrgs {
 		if len(org.RawDomains) > 0 {
