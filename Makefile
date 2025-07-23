@@ -27,7 +27,7 @@ docker_image:
 	else \
 		echo "Reusing precompiled zitadel binary"; \
 	fi
-	DOCKER_BUILDKIT=1 docker build -f build/Dockerfile -t $(ZITADEL_IMAGE) .
+	DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile -t $(ZITADEL_IMAGE) .
 
 .PHONY: compile_pipeline
 compile_pipeline: console_move
@@ -97,17 +97,11 @@ console_move:
 
 .PHONY: console_dependencies
 console_dependencies:
-	pnpm install --frozen-lockfile
-
-.PHONY: console_client
-console_client:
-	cd console && \
-	pnpm generate
+	npx pnpm install --frozen-lockfile --filter=./console
 
 .PHONY: console_build
-console_build: console_dependencies console_client
-	cd console && \
-	pnpm build
+console_build: console_dependencies
+	npx pnpm turbo build --filter=./console
 
 .PHONY: clean
 clean:
@@ -165,7 +159,7 @@ core_integration_test: core_integration_server_start core_integration_test_packa
 
 .PHONY: console_lint
 console_lint:
-	pnpm turbo lint --filter=./console
+	npx pnpm turbo lint --filter=./console
 
 .PHONY: core_lint
 core_lint:

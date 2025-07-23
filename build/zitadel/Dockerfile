@@ -4,7 +4,7 @@ ARG TARGETPLATFORM
 
 RUN apt-get update && apt-get install ca-certificates -y
 
-COPY build/entrypoint.sh /app/entrypoint.sh
+COPY build/zitadel/entrypoint.sh /app/entrypoint.sh
 COPY zitadel /app/zitadel
 
 RUN useradd -s "" --home / zitadel && \
