@@ -120,7 +120,7 @@ Use your **access token** or **PAT** to authenticate, then call the [Management 
 
 **Import Endpoint:**
 
-* `POST /management/v1/users/human/_import`
+* `POST /admin/v1/import`
 * `Authorization: Bearer <token>`
 * **Body:** Generated in step 4.2
 
@@ -128,7 +128,7 @@ Use your **access token** or **PAT** to authenticate, then call the [Management 
 
 ```bash
 curl --request POST \
-  --url https://<instance-domain>/management/v1/users/human/_import \
+  --url https://<instance-domain>/admin/v1/import \
   --header 'Content-Type: application/json' \
   --header 'Authorization: Bearer <token>' \
   --data @importBody.json
@@ -210,7 +210,7 @@ curl --location 'https://<instance-domain>/admin/v1/events/_search' \
 ```
 
 This will return a list of user creation events including details such as email, username, and hashed password to help you confirm the imported data.
-
+ 
 Successful Response
 ```bash
 {
