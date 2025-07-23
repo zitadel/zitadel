@@ -11,7 +11,6 @@ import {
   getLoginSettings,
   getSession,
 } from "@/lib/zitadel";
-import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 
 export default async function Page(props: {
@@ -20,7 +19,6 @@ export default async function Page(props: {
 }) {
   const params = await props.params;
   const searchParams = await props.searchParams;
-  const locale = getLocale();
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -43,17 +41,13 @@ export default async function Page(props: {
   const { method } = params;
 
   const session = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
+    ? await loadSessionById(sessionId, organization)
     : await loadMostRecentSession({
         serviceUrl,
         sessionParams: { loginName, organization },
       });
 
-  async function loadSessionById(
-    host: string,
-    sessionId: string,
-    organization?: string,
-  ) {
+  async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,

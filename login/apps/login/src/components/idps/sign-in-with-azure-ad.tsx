@@ -12,13 +12,13 @@ export const SignInWithAzureAd = forwardRef<
 
   return (
     <BaseButton {...restProps} ref={ref}>
-      <div className="h-12 p-[10px] w-12 flex items-center justify-center">
+      <div className="flex h-12 w-12 items-center justify-center p-[10px]">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="21"
           height="21"
           viewBox="0 0 21 21"
-          className="w-full h-full"
+          className="h-full w-full"
         >
           <path fill="#f25022" d="M1 1H10V10H1z"></path>
           <path fill="#00a4ef" d="M1 11H10V20H1z"></path>

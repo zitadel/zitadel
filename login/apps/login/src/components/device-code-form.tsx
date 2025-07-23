@@ -4,6 +4,7 @@ import { Alert } from "@/components/alert";
 import { getDeviceAuthorizationRequest } from "@/lib/server/oidc";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
@@ -24,6 +25,8 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
       userCode: userCode || "",
     },
   });
+
+  const t = useTranslations("device");
 
   const [error, setError] = useState<string>("");
 
@@ -62,7 +65,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
           <TextInput
             type="text"
             autoComplete="one-time-code"
-            {...register("userCode", { required: "This field is required" })}
+            {...register("userCode", { required: t("usercode.required.code") })}
             label="Code"
             data-testid="code-text-input"
           />
@@ -85,7 +88,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
             onClick={handleSubmit(submitCodeAndContinue)}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+            {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
             <Translated i18nKey="verify.submit" namespace="verify" />
           </Button>
         </div>

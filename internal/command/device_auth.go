@@ -135,6 +135,9 @@ func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domai
 	if !model.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound")
 	}
+	if err := c.checkPermission(ctx, domain.PermissionSessionLink, model.ResourceOwner, ""); err != nil {
+		return nil, err
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewCanceledEvent(ctx, model.aggregate, reason))
 	if err != nil {
 		return nil, err

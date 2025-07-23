@@ -25,29 +25,72 @@ export async function getSAMLFormUID() {
 
 export async function setSAMLFormCookie(value: string): Promise<string> {
   const cookiesList = await cookies();
-
   const uid = await getSAMLFormUID();
 
-  await cookiesList.set({
-    name: uid,
-    value: value,
-    httpOnly: true,
-    path: "/",
-    maxAge: 5 * 60, // 5 minutes
-  });
+  try {
+    // Check cookie size limits (typical limit is 4KB)
+    if (value.length > 4000) {
+      console.warn(
+        `SAML form cookie value is large (${value.length} characters), may exceed browser limits`,
+      );
+    }
 
-  return uid;
+    // Log the attempt
+    console.log(
+      `Setting SAML form cookie with uid: ${uid}, value length: ${value.length}`,
+    );
+
+    await cookiesList.set({
+      name: uid,
+      value: value,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Required for HTTPS in production
+      sameSite: "lax", // Allows cookies with top-level navigation (needed for SAML redirects)
+      path: "/",
+      maxAge: 5 * 60, // 5 minutes
+    });
+
+    // Note: We can't reliably verify immediately due to Next.js cookies API behavior
+    // Instead, we'll rely on the getSAMLFormCookie function to detect failures
+    console.log(`Successfully set SAML form cookie with uid: ${uid}`);
+
+    return uid;
+  } catch (error) {
+    console.error(`Failed to set SAML form cookie with uid: ${uid}`, {
+      error,
+      valueLength: value.length,
+      uid,
+    });
+    throw new Error(
+      `Failed to set SAML form cookie: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
 }
 
 export async function getSAMLFormCookie(uid: string): Promise<string | null> {
   const cookiesList = await cookies();
 
-  const cookie = cookiesList.get(uid);
-  if (!cookie || !cookie.value) {
+  try {
+    const cookie = cookiesList.get(uid);
+
+    if (!cookie) {
+      console.warn(`SAML form cookie not found for uid: ${uid}`);
+      return null;
+    }
+
+    if (!cookie.value) {
+      console.warn(`SAML form cookie found but empty value for uid: ${uid}`);
+      return null;
+    }
+
+    console.log(
+      `Successfully retrieved SAML form cookie for uid: ${uid}, value length: ${cookie.value.length}`,
+    );
+    return cookie.value;
+  } catch (error) {
+    console.error(`Error retrieving SAML form cookie for uid: ${uid}`, error);
     return null;
   }
-
-  return cookie.value;
 }
 
 export async function loginWithSAMLAndSession({

@@ -4,9 +4,11 @@
   },
   "accounts": {
     "title": "账户",
-    "description": "选择您想使用的账户。",
+    "description": "选择您要使用的账户。",
     "addAnother": "添加另一个账户",
-    "noResults": "未找到账户"
+    "noResults": "未找到账户",
+    "verified": "已验证",
+    "expired": "已过期"
   },
   "logout": {
     "title": "注销",
@@ -23,14 +25,20 @@
     "title": "欢迎回来！",
     "description": "请输入您的登录信息。",
     "register": "注册新用户",
-    "submit": "继续"
+    "submit": "继续",
+    "required": {
+      "loginName": "此字段为必填项"
+    }
   },
   "password": {
     "verify": {
       "title": "密码",
       "description": "请输入您的密码。",
       "resetPassword": "重置密码",
-      "submit": "继续"
+      "submit": "继续",
+      "required": {
+        "password": "此字段为必填项"
+      }
     },
     "set": {
       "title": "设置密码",
@@ -38,12 +46,21 @@
       "codeSent": "验证码已发送到您的邮箱。",
       "noCodeReceived": "没有收到验证码？",
       "resend": "重发验证码",
-      "submit": "继续"
+      "submit": "继续",
+      "required": {
+        "code": "此字段为必填项",
+        "newPassword": "必须提供密码！",
+        "confirmPassword": "此字段为必填项"
+      }
     },
     "change": {
       "title": "更改密码",
       "description": "为您的账户设置密码",
-      "submit": "继续"
+      "submit": "继续",
+      "required": {
+        "newPassword": "必须提供新密码！",
+        "confirmPassword": "此字段为必填项"
+      }
     }
   },
   "idp": {
@@ -85,7 +102,11 @@
     "description": "请输入您的 LDAP 凭据。",
     "username": "用户名",
     "password": "密码",
-    "submit": "继续"
+    "submit": "继续",
+    "required": {
+      "username": "此字段为必填项",
+      "password": "此字段为必填项"
+    }
   },
   "mfa": {
     "verify": {
@@ -107,7 +128,10 @@
       "emailDescription": "输入通过电子邮件收到的验证码。",
       "noCodeReceived": "没有收到验证码？",
       "resendCode": "重发验证码",
-      "submit": "继续"
+      "submit": "继续",
+      "required": {
+        "code": "此字段为必填项"
+      }
     },
     "set": {
       "title": "设置双因素认证",
@@ -115,7 +139,10 @@
       "smsDescription": "输入您的电话号码以接收短信验证码。",
       "emailDescription": "输入您的电子邮箱地址以接收电子邮件验证码。",
       "totpRegisterDescription": "扫描二维码或手动导航到URL。",
-      "submit": "继续"
+      "submit": "继续",
+      "required": {
+        "code": "此字段为必填项"
+      }
     }
   },
   "passkey": {
@@ -172,7 +199,16 @@
     "password": {
       "title": "设置密码",
       "description": "为您的账户设置密码",
-      "submit": "继续"
+      "submit": "继续",
+      "required": {
+        "password": "必须提供密码！",
+        "confirmPassword": "此字段为必填项"
+      }
+    },
+    "required": {
+      "firstname": "此字段为必填项",
+      "lastname": "此字段为必填项",
+      "email": "此字段为必填项"
     }
   },
   "invite": {
@@ -209,7 +245,10 @@
       "noCodeReceived": "没有收到验证码？",
       "resendCode": "重发验证码",
       "codeSent": "刚刚发送了一封包含验证码的电子邮件。",
-      "submit": "继续"
+      "submit": "继续",
+      "required": {
+        "code": "此字段为必填项"
+      }
     }
   },
   "authenticator": {
@@ -223,7 +262,10 @@
     "usercode": {
       "title": "设备代码",
       "description": "输入代码。",
-      "submit": "继续"
+      "submit": "继续",
+      "required": {
+        "code": "此字段为必填项"
+      }
     },
     "request": {
       "title": "{appName} 想要连接：",

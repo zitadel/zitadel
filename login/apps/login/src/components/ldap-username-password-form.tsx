@@ -68,7 +68,7 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
       <TextInput
         type="text"
         autoComplete="username"
-        {...register("loginName", { required: "This field is required" })}
+        {...register("loginName", { required: t("required.username") })}
         label={t("username")}
         data-testid="username-text-input"
       />
@@ -77,7 +77,7 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
         <TextInput
           type="password"
           autoComplete="password"
-          {...register("password", { required: "This field is required" })}
+          {...register("password", { required: t("required.password") })}
           label={t("password")}
           data-testid="password-text-input"
         />
@@ -100,7 +100,7 @@ export function LDAPUsernamePasswordForm({ idpId, link }: Props) {
           onClick={handleSubmit(submitUsernamePassword)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}
+          {loading && <Spinner className="mr-2 h-5 w-5" />}
           <Translated i18nKey="submit" namespace="ldap" />
         </Button>
       </div>

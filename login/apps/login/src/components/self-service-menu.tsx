@@ -15,7 +15,7 @@ export function SelfServiceMenu({ sessionId }: { sessionId: string }) {
   // }
 
   return (
-    <div className="w-full flex flex-col space-y-2">
+    <div className="flex w-full flex-col space-y-2">
       {list.map((menuitem, index) => {
         return (
           <SelfServiceItem
@@ -34,7 +34,7 @@ const SelfServiceItem = ({ name, link }: { name: string; link: string }) => {
     <Link
       prefetch={false}
       href={link}
-      className="w-full group flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
+      className="group flex w-full flex-row items-center rounded-md border border-divider-light bg-background-light-400 px-4 py-2 transition-all hover:shadow-lg dark:bg-background-dark-400 dark:hover:bg-white/10"
     >
       {name}
     </Link>

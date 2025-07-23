@@ -12,12 +12,12 @@ import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { headers } from "next/headers";
 
 async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
-  const ids: (string | undefined)[] = await getAllSessionCookieIds();
+  const cookieIds = await getAllSessionCookieIds();
 
-  if (ids && ids.length) {
+  if (cookieIds && cookieIds.length) {
     const response = await listSessions({
       serviceUrl,
-      ids: ids.filter((id) => !!id) as string[],
+      ids: cookieIds.filter((id) => !!id) as string[],
     });
     return response?.sessions ?? [];
   } else {
@@ -72,7 +72,7 @@ export default async function Page(props: {
           <Translated i18nKey="description" namespace="logout" />
         </p>
 
-        <div className="flex flex-col w-full space-y-2">
+        <div className="flex w-full flex-col space-y-2">
           <SessionsClearList
             sessions={sessions}
             logoutHint={logoutHint}

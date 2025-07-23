@@ -108,7 +108,7 @@ export async function registerPasskeyLink(
     }
   }
 
-  const [hostname, port] = host.split(":");
+  const [hostname] = host.split(":");
 
   if (!hostname) {
     throw new Error("Could not get hostname");
@@ -145,7 +145,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
 
   // if no name is provided, try to generate one from the user agent
   let passkeyName = command.passkeyName;
-  if (!!!passkeyName) {
+  if (!passkeyName) {
     const headersList = await headers();
     const userAgentStructure = { headers: headersList };
     const { browser, device, os } = userAgent(userAgentStructure);
@@ -211,19 +211,27 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     organization,
   });
 
-  const lifetime = checks?.webAuthN
+  let lifetime = checks?.webAuthN
     ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
     : checks?.otpEmail || checks?.otpSms
       ? loginSettings?.secondFactorCheckLifetime
       : undefined;
 
-  const session = await setSessionAndUpdateCookie(
-    recentSession,
+  if (!lifetime) {
+    console.warn("No passkey lifetime provided, defaulting to 24 hours");
+
+    lifetime = {
+      seconds: BigInt(60 * 60 * 24), // default to 24 hours
+      nanos: 0,
+    } as Duration;
+  }
+
+  const session = await setSessionAndUpdateCookie({
+    recentCookie: recentSession,
     checks,
-    undefined,
     requestId,
     lifetime,
-  );
+  });
 
   if (!session || !session?.factors?.user?.id) {
     return { error: "Could not update session" };

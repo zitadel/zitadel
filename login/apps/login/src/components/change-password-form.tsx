@@ -15,6 +15,7 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import { BackButton } from "./back-button";
@@ -55,6 +56,8 @@ export function ChangePasswordForm({
       comfirmPassword: "",
     },
   });
+
+  const t = useTranslations("password");
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -149,14 +152,14 @@ export function ChangePasswordForm({
 
   return (
     <form className="w-full">
-      <div className="pt-4 grid grid-cols-1 gap-4 mb-4">
+      <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
         <div className="">
           <TextInput
             type="password"
             autoComplete="new-password"
             required
             {...register("password", {
-              required: "You have to provide a new password!",
+              required: t("change.required.newPassword"),
             })}
             label="New Password"
             error={errors.password?.message as string}
@@ -169,7 +172,7 @@ export function ChangePasswordForm({
             required
             autoComplete="new-password"
             {...register("confirmPassword", {
-              required: "This field is required",
+              required: t("change.required.confirmPassword"),
             })}
             label="Confirm Password"
             error={errors.confirmPassword?.message as string}
@@ -202,7 +205,7 @@ export function ChangePasswordForm({
           onClick={handleSubmit(submitChange)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
           <Translated i18nKey="change.submit" namespace="password" />
         </Button>
       </div>

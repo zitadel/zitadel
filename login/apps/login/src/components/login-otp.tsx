@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
+import { useTranslations } from "next-intl";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
@@ -42,6 +43,8 @@ export function LoginOTP({
   code,
   loginSettings,
 }: Props) {
+  const t = useTranslations("otp");
+
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -220,14 +223,14 @@ export function LoginOTP({
       {["email", "sms"].includes(method) && (
         <Alert type={AlertType.INFO}>
           <div className="flex flex-row">
-            <span className="flex-1 mr-auto text-left">
+            <span className="mr-auto flex-1 text-left">
               <Translated i18nKey="verify.noCodeReceived" namespace="otp" />
             </span>
             <button
               aria-label="Resend OTP Code"
               disabled={loading}
               type="button"
-              className="ml-4 text-primary-light-500 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 hover:text-primary-light-400 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
+              className="ml-4 cursor-pointer text-primary-light-500 hover:text-primary-light-400 disabled:cursor-default disabled:text-gray-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 dark:disabled:text-gray-700"
               onClick={() => {
                 setLoading(true);
                 updateSessionForOTPChallenge()
@@ -249,7 +252,7 @@ export function LoginOTP({
       <div className="mt-4">
         <TextInput
           type="text"
-          {...register("code", { required: "This field is required" })}
+          {...register("code", { required: t("verify.required.code") })}
           label="Code"
           autoComplete="one-time-code"
           data-testid="code-text-input"
@@ -275,7 +278,7 @@ export function LoginOTP({
           })}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
           <Translated i18nKey="verify.submit" namespace="otp" />
         </Button>
       </div>

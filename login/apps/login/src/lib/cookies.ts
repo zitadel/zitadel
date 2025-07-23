@@ -242,7 +242,7 @@ export async function getSessionCookieByLoginName<T>({
  */
 export async function getAllSessionCookieIds<T>(
   cleanup: boolean = false,
-): Promise<any> {
+): Promise<string[]> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -314,7 +314,7 @@ export async function getMostRecentCookieWithLoginname<T>({
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
     let filtered = sessions.filter((cookie) => {
-      return !!loginName ? cookie.loginName === loginName : true;
+      return loginName ? cookie.loginName === loginName : true;
     });
 
     if (organization) {

@@ -34,7 +34,7 @@ export function ChooseSecondFactor({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-5 w-full pt-4">
+    <div className="grid w-full grid-cols-1 gap-5 pt-4">
       {userMethods.map((method, i) => {
         return (
           <div key={"method-" + i}>

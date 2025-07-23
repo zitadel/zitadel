@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import { Button, ButtonVariants } from "./button";
@@ -49,6 +50,8 @@ export function TotpRegister({
       code: "",
     },
   });
+
+  const t = useTranslations("otp");
 
   async function continueWithCode(values: Inputs) {
     setLoading(true);
@@ -105,14 +108,14 @@ export function TotpRegister({
   }
 
   return (
-    <div className="flex flex-col items-center ">
+    <div className="flex flex-col items-center">
       {uri && (
         <>
           <QRCodeSVG
-            className="rounded-md w-40 h-40 p-2 bg-white my-4"
+            className="my-4 h-40 w-40 rounded-md bg-white p-2"
             value={uri}
           />
-          <div className="mb-4 w-96 flex text-sm my-2 border rounded-lg px-4 py-2 pr-2 border-divider-light dark:border-divider-dark">
+          <div className="my-2 mb-4 flex w-96 rounded-lg border border-divider-light px-4 py-2 pr-2 text-sm dark:border-divider-dark">
             <Link href={uri} target="_blank" className="flex-1 overflow-x-auto">
               {uri}
             </Link>
@@ -123,7 +126,7 @@ export function TotpRegister({
             <div className="">
               <TextInput
                 type="text"
-                {...register("code", { required: "This field is required" })}
+                {...register("code", { required: t("set.required.code") })}
                 label="Code"
                 data-testid="code-text-input"
               />
@@ -145,7 +148,7 @@ export function TotpRegister({
                 onClick={handleSubmit(continueWithCode)}
                 data-testid="submit-button"
               >
-                {loading && <Spinner className="h-5 w-5 mr-2" />}
+                {loading && <Spinner className="mr-2 h-5 w-5" />}
                 <Translated i18nKey="set.submit" namespace="otp" />
               </Button>
             </div>

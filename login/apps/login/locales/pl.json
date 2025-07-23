@@ -6,7 +6,9 @@
     "title": "Konta",
     "description": "Wybierz konto, którego chcesz użyć.",
     "addAnother": "Dodaj kolejne konto",
-    "noResults": "Nie znaleziono kont"
+    "noResults": "Nie znaleziono kont",
+    "verified": "zweryfikowany",
+    "expired": "wygasł"
   },
   "logout": {
     "title": "Wyloguj się",
@@ -23,14 +25,20 @@
     "title": "Witamy ponownie!",
     "description": "Wprowadź dane logowania.",
     "register": "Zarejestruj nowego użytkownika",
-    "submit": "Kontynuuj"
+    "submit": "Kontynuuj",
+    "required": {
+      "loginName": "To pole jest wymagane"
+    }
   },
   "password": {
     "verify": {
       "title": "Hasło",
       "description": "Wprowadź swoje hasło.",
       "resetPassword": "Zresetuj hasło",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "required": {
+        "password": "To pole jest wymagane"
+      }
     },
     "set": {
       "title": "Ustaw hasło",
@@ -38,12 +46,21 @@
       "codeSent": "Kod został wysłany na twój adres e-mail.",
       "noCodeReceived": "Nie otrzymałeś kodu?",
       "resend": "Wyślij kod ponownie",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "required": {
+        "code": "To pole jest wymagane",
+        "newPassword": "Musisz podać hasło!",
+        "confirmPassword": "To pole jest wymagane"
+      }
     },
     "change": {
       "title": "Zmień hasło",
       "description": "Ustaw nowe hasło dla swojego konta",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "required": {
+        "newPassword": "Musisz podać nowe hasło!",
+        "confirmPassword": "To pole jest wymagane"
+      }
     }
   },
   "idp": {
@@ -85,7 +102,11 @@
     "description": "Wprowadź swoje dane logowania LDAP.",
     "username": "Nazwa użytkownika",
     "password": "Hasło",
-    "submit": "Kontynuuj"
+    "submit": "Kontynuuj",
+    "required": {
+      "username": "To pole jest wymagane",
+      "password": "To pole jest wymagane"
+    }
   },
   "mfa": {
     "verify": {
@@ -107,7 +128,10 @@
       "emailDescription": "Wprowadź kod otrzymany e-mailem.",
       "noCodeReceived": "Nie otrzymałeś kodu?",
       "resendCode": "Wyślij kod ponownie",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "required": {
+        "code": "To pole jest wymagane"
+      }
     },
     "set": {
       "title": "Skonfiguruj uwierzytelnianie dwuskładnikowe",
@@ -115,7 +139,10 @@
       "smsDescription": "Wprowadź swój numer telefonu, aby otrzymać kod SMS-em.",
       "emailDescription": "Wprowadź swój adres e-mail, aby otrzymać kod e-mailem.",
       "totpRegisterDescription": "Zeskanuj kod QR lub otwórz adres URL ręcznie.",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "required": {
+        "code": "To pole jest wymagane"
+      }
     }
   },
   "passkey": {
@@ -172,7 +199,16 @@
     "password": {
       "title": "Ustaw hasło",
       "description": "Ustaw hasło dla swojego konta",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "required": {
+        "password": "Musisz podać hasło!",
+        "confirmPassword": "To pole jest wymagane"
+      }
+    },
+    "required": {
+      "firstname": "To pole jest wymagane",
+      "lastname": "To pole jest wymagane",
+      "email": "To pole jest wymagane"
     }
   },
   "invite": {
@@ -209,7 +245,10 @@
       "noCodeReceived": "Nie otrzymałeś kodu?",
       "resendCode": "Wyślij kod ponownie",
       "codeSent": "Kod został właśnie wysłany na twój adres e-mail.",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "required": {
+        "code": "To pole jest wymagane"
+      }
     }
   },
   "authenticator": {
@@ -223,7 +262,10 @@
     "usercode": {
       "title": "Kod urządzenia",
       "description": "Wprowadź kod.",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "required": {
+        "code": "To pole jest wymagane"
+      }
     },
     "request": {
       "title": "{appName} chce się połączyć:",

@@ -4,6 +4,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/verify";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
@@ -40,6 +41,8 @@ export function VerifyForm({
       code: code ?? "",
     },
   });
+
+  const t = useTranslations("verify");
 
   const [error, setError] = useState<string>("");
 
@@ -114,14 +117,14 @@ export function VerifyForm({
       <form className="w-full">
         <Alert type={AlertType.INFO}>
           <div className="flex flex-row">
-            <span className="flex-1 mr-auto text-left">
+            <span className="mr-auto flex-1 text-left">
               <Translated i18nKey="verify.noCodeReceived" namespace="verify" />
             </span>
             <button
               aria-label="Resend Code"
               disabled={loading}
               type="button"
-              className="ml-4 text-primary-light-500 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 hover:text-primary-light-400 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
+              className="ml-4 cursor-pointer text-primary-light-500 hover:text-primary-light-400 disabled:cursor-default disabled:text-gray-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 dark:disabled:text-gray-700"
               onClick={() => {
                 resendCode();
               }}
@@ -135,7 +138,7 @@ export function VerifyForm({
           <TextInput
             type="text"
             autoComplete="one-time-code"
-            {...register("code", { required: "This field is required" })}
+            {...register("code", { required: t("verify.required.code") })}
             label="Code"
             data-testid="code-text-input"
           />
@@ -158,7 +161,7 @@ export function VerifyForm({
             onClick={handleSubmit(fcn)}
             data-testid="submit-button"
           >
-            {loading && <Spinner className="h-5 w-5 mr-2" />}
+            {loading && <Spinner className="mr-2 h-5 w-5" />}
             <Translated i18nKey="verify.submit" namespace="verify" />
           </Button>
         </div>

@@ -8,6 +8,7 @@ import {
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import {
@@ -59,6 +60,8 @@ export function RegisterForm({
       lastname: lastname ?? "",
     },
   });
+
+  const t = useTranslations("register");
 
   const [loading, setLoading] = useState<boolean>(false);
   const [selected, setSelected] = useState<AuthenticationMethod>(methods[0]);
@@ -124,13 +127,13 @@ export function RegisterForm({
   const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
   return (
     <form className="w-full">
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="mb-4 grid grid-cols-2 gap-4">
         <div className="">
           <TextInput
             type="firstname"
             autoComplete="firstname"
             required
-            {...register("firstname", { required: "This field is required" })}
+            {...register("firstname", { required: t("required.firstname") })}
             label="First name"
             error={errors.firstname?.message as string}
             data-testid="firstname-text-input"
@@ -141,7 +144,7 @@ export function RegisterForm({
             type="lastname"
             autoComplete="lastname"
             required
-            {...register("lastname", { required: "This field is required" })}
+            {...register("lastname", { required: t("required.lastname") })}
             label="Last name"
             error={errors.lastname?.message as string}
             data-testid="lastname-text-input"
@@ -152,7 +155,7 @@ export function RegisterForm({
             type="email"
             autoComplete="email"
             required
-            {...register("email", { required: "This field is required" })}
+            {...register("email", { required: t("required.email") })}
             label="E-mail"
             error={errors.email?.message as string}
             data-testid="email-text-input"
@@ -170,7 +173,7 @@ export function RegisterForm({
         loginSettings.allowUsernamePassword &&
         loginSettings.passkeysType == PasskeysType.ALLOWED && (
           <>
-            <p className="mt-4 ztdl-p mb-6 block text-left">
+            <p className="ztdl-p mb-6 mt-4 block text-left">
               <Translated i18nKey="selectMethod" namespace="register" />
             </p>
 
@@ -211,14 +214,14 @@ export function RegisterForm({
             const usePasswordToContinue: boolean =
               loginSettings?.allowUsernamePassword &&
               loginSettings?.passkeysType == PasskeysType.ALLOWED
-                ? !!!(selected === methods[0]) // choose selection if both available
+                ? !(selected === methods[0]) // choose selection if both available
                 : !!loginSettings?.allowUsernamePassword; // if password is chosen
             // set password as default if only password is allowed
             return submitAndContinue(values, usePasswordToContinue);
           })}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}
+          {loading && <Spinner className="mr-2 h-5 w-5" />}
           <Translated i18nKey="submit" namespace="register" />
         </Button>
       </div>

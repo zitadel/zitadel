@@ -16,6 +16,7 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
@@ -58,6 +59,8 @@ export function SetPasswordForm({
       code: code ?? "",
     },
   });
+
+  const t = useTranslations("password");
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -188,18 +191,18 @@ export function SetPasswordForm({
 
   return (
     <form className="w-full">
-      <div className="pt-4 grid grid-cols-1 gap-4 mb-4">
+      <div className="mb-4 grid grid-cols-1 gap-4 pt-4">
         {codeRequired && (
           <Alert type={AlertType.INFO}>
             <div className="flex flex-row">
-              <span className="flex-1 mr-auto text-left">
+              <span className="mr-auto flex-1 text-left">
                 <Translated i18nKey="set.noCodeReceived" namespace="password" />
               </span>
               <button
                 aria-label="Resend OTP Code"
                 disabled={loading}
                 type="button"
-                className="ml-4 text-primary-light-500 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 hover:text-primary-light-400 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
+                className="ml-4 cursor-pointer text-primary-light-500 hover:text-primary-light-400 disabled:cursor-default disabled:text-gray-400 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 dark:disabled:text-gray-700"
                 onClick={() => {
                   resendCode();
                 }}
@@ -216,7 +219,7 @@ export function SetPasswordForm({
               type="text"
               required
               {...register("code", {
-                required: "This field is required",
+                required: t("set.required.code"),
               })}
               label="Code"
               autoComplete="one-time-code"
@@ -231,7 +234,7 @@ export function SetPasswordForm({
             autoComplete="new-password"
             required
             {...register("password", {
-              required: "You have to provide a password!",
+              required: t("set.required.newPassword"),
             })}
             label="New Password"
             error={errors.password?.message as string}
@@ -244,7 +247,7 @@ export function SetPasswordForm({
             required
             autoComplete="new-password"
             {...register("confirmPassword", {
-              required: "This field is required",
+              required: t("set.required.confirmPassword"),
             })}
             label="Confirm Password"
             error={errors.confirmPassword?.message as string}
@@ -277,7 +280,7 @@ export function SetPasswordForm({
           onClick={handleSubmit(submitPassword)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}{" "}
+          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
           <Translated i18nKey="set.submit" namespace="password" />
         </Button>
       </div>

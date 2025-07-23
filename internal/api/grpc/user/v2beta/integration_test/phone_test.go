@@ -258,7 +258,7 @@ func TestServer_RemovePhone(t *testing.T) {
 	doubleRemoveUser := Instance.CreateHumanUser(CTX)
 
 	Instance.RegisterUserPasskey(CTX, otherUser)
-	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, otherUser)
 
 	tests := []struct {
 		name    string
