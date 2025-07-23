@@ -62,13 +62,13 @@ docker exec <container_name> \
 Then copy the exported file to your host machine:
 
 ```bash
-docker cp <container_name>:/tmp/export ./keycloak-export
+docker cp <container_name>:/tmp/export/<your_realm_name>-realm.json .                                                                                                                       
 ```
 
 This creates a file such as:
 
 ```
-keycloak-export/<your_realm_name>-realm.json
+<your_realm_name>-realm.json
 ```
 
 ---
@@ -86,7 +86,7 @@ Use the migration tool to convert the Keycloak realm export into a ZITADEL-compa
 ```bash
 zitadel-tools migrate keycloak \
   --org=<ORG_ID> \
-  --realm=./keycloak-export/<your_realm_name>-realm.json \
+  --realm=<your_realm_name>-realm.json \
   --output=./importBody.json \
   --timeout=5m0s \
   --multiline
