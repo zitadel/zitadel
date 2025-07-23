@@ -51,7 +51,7 @@ Go through the following checklist before you submit the final pull request:
 The code consists of the following parts:
 
 | name            | description                                        | language                                                                                                  | where to find                                       | Development Guide                                  |
-|-----------------|----------------------------------------------------|-----------------------------------------------------------------------------------------------------------|-----------------------------------------------------|----------------------------------------------------|
+| --------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------- |
 | backend         | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to Backend](contribute-backend)        |
 | API definitions | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to Backend](contribute-backend)        |
 | console         | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](contribute-frontend)      |
@@ -337,7 +337,7 @@ All frontend packages are managed as a monorepo with shared dependencies and opt
 The frontend components are run in a [Node](https://nodejs.org/en/about/) environment and are managed using the pnpm package manager and the Turborepo orchestrator.
 
 > [!INFO]
-> Some dev containers are available for remote development with docker and pipeline debugging in isolated environments.
+> Some [dev containers are available](dev-containers) for remote development with docker and pipeline debugging in isolated environments.
 > If you don't want to use one of the dev containers, you can develop the frontend components directly on your local machine.
 > To do so, proceed with installing the necessary dependencies.
 
@@ -555,6 +555,8 @@ Fix the [quality checks](troubleshoot-frontend), add new checks that cover your 
 
 To debug and fix failing tasks, execute them individually using the `--filter` flag.
 
+We recommend to use [one of the dev containers](dev-containers) to reproduce pipeline issues.
+
 ```bash
 # to reproduce linting error in the console:
 pnpm lint --filter=console
@@ -567,19 +569,17 @@ Some tasks have variants like `pnpm test:e2e:angulargolang`,
 others support arguments and flags like `pnpm test:integration run --spec apps/login/integration/integration/login.cy.ts`.
 For the turbo commands, check your options with `pnpm turbo --help`
 
-| Command                       | Description                                               | Example                                                                                                                                                    |
-|-------------------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `pnpm turbo run generate`     | Generate stubs from Proto files                           | Generate API docs: `pnpm turbo run generate --filter zitadel-docs`                                                                                         |
-| `pnpm turbo build`            | Build runnable JavaScript code                            | Regenerate the proto stubs and build the @zitadel/client package: `pnpm turbo build --filter @zitadel/client`                                              |
-| `pnpm turbo quality`          | Reproduce the pipeline quality checks                     | Run login-related quality checks `pnpm turbo quality --filter './apps/login/*' --filter './packages/*'`                                                    |
-| `pnpm turbo lint`             | Check linting issues                                      | Check login-related linting issues for differences with main `pnpm turbo lint --filter=[main...HEAD] --filter .'/apps/login/**/*' --filter './packages/*'` |
-| `pnpm turbo lint:fix`         | Fix linting issues                                        | Fix console-relevant linting issues `pnpm turbo lint:fix --filter console --filter './packages/*' --filter zitadel-e2e`                                    |
-| `pnpm turbo test:unit`        | Run unit tests. Rerun on file changes                     | Run unit tests in all packages in and watch for file changes `pnpm turbo watch test:unit`                                                                  |
-| `pnpm turbo test:integration` | Run Cypress CLI for login integration tests               | Run the tests non-interactively `pnpm turbo test:integration run`                                                                                          |
-| `pnpm turbo test:acceptance`  | Run the Playwright CLI for login acceptance tests         | Run the tests non-interactively `pnpm turbo test:acceptance -- test`                                                                                       |
-| `pnpm turbo test:e2e`         | Run the Cypress CLI for console e2e tests                 | Test interactively against the console in a local dev server and Zitadel in a container: `pnpm turbo test:e2e:angular open`                                |
-| `pnpm turbo down`             | Remove containers and volumes                             | Shut down containers from the integration test setup `pnpm turbo down --filter login-test-integration`                                                     |
-| `pnpm turbo clean`            | Remove downloaded dependencies and other generated files  | Shut down containers from the integration test setup `pnpm turbo clean --filter zitadel-docs`                                                              |
+| Command                   | Description                                              | Example                                                                                                                                                    |
+| ------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm turbo run generate` | Generate stubs from Proto files                          | Generate API docs: `pnpm turbo run generate --filter zitadel-docs`                                                                                         |
+| `pnpm turbo build`        | Build runnable JavaScript code                           | Regenerate the proto stubs and build the @zitadel/client package: `pnpm turbo build --filter @zitadel/client`                                              |
+| `pnpm turbo quality`      | Reproduce the pipeline quality checks                    | Run login-related quality checks `pnpm turbo quality --filter './apps/login/*' --filter './packages/*'`                                                    |
+| `pnpm turbo lint`         | Check linting issues                                     | Check login-related linting issues for differences with main `pnpm turbo lint --filter=[main...HEAD] --filter .'/apps/login/**/*' --filter './packages/*'` |
+| `pnpm turbo lint:fix`     | Fix linting issues                                       | Fix console-relevant linting issues `pnpm turbo lint:fix --filter console --filter './packages/*' --filter zitadel-e2e`                                    |
+| `pnpm turbo test:unit`    | Run unit tests. Rerun on file changes                    | Run unit tests in all packages in and watch for file changes `pnpm turbo watch test:unit`                                                                  |
+| `pnpm turbo test:e2e`     | Run the Cypress CLI for console e2e tests                | Test interactively against the console in a local dev server and Zitadel in a container: `pnpm turbo test:e2e:angular open`                                |
+| `pnpm turbo down`         | Remove containers and volumes                            | Shut down containers from the integration test setup `pnpm turbo down`                                                                                     |
+| `pnpm turbo clean`        | Remove downloaded dependencies and other generated files | Remove generated docs  `pnpm turbo clean --filter zitadel-docs`                                                                                            |
 
 ## <a name="contribute-translations"></a>Contribute Translations
 
