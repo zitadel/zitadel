@@ -15,8 +15,8 @@
     "test:unit": "vitest --run",
     "lint-staged": "lint-staged",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next",
-    "test:integration:login": "cypress run",
-    "test:integration:login:debug": "cypress open",
+    "test:integration:login": "DISPLAY='' cypress run",
+    "test:integration:login:debug": "DISPLAY=:0 cypress open",
     "test:acceptance": "dotenv -e ../login/.env.test.local playwright",
     "test:acceptance:setup": "cd ../.. && make login_test_acceptance_setup_env && NODE_ENV=test turbo run test:acceptance:setup:dev",
     "test:acceptance:setup:dev": "cd ../.. && make login_test_acceptance_setup_dev"

@@ -14,7 +14,7 @@
 		3001
 	],
 	"onCreateCommand": "pnpm install --recursive",
-	"postAttachCommand": "pnpm turbo daemon clean; pnpm turbo @zitadel/login#dev test:integration:login:debug",
+	"postAttachCommand": "pnpm turbo daemon clean || true; pnpm turbo test:integration:login:debug",
 	"customizations": {
 		"jetbrains": {
 			"settings": {
