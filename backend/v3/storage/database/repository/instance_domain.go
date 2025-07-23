@@ -19,7 +19,7 @@ type instanceDomain struct {
 // -------------------------------------------------------------
 
 const queryInstanceDomainStmt = `SELECT instance_domains.instance_id, instance_domains.domain, instance_domains.is_verified, instance_domains.is_primary, instance_domains.validation_type, instance_domains.created_at, instance_domains.updated_at ` +
-	`FROM zitadel.instance_domains id`
+	`FROM zitadel.instance_domains`
 
 // Get implements [domain.InstanceDomainRepository].
 // Subtle: this method shadows the method ([domain.InstanceRepository]).Get of instanceDomain.instance.
@@ -55,11 +55,9 @@ func (i *instanceDomain) List(ctx context.Context, opts ...database.QueryOption)
 func (i *instanceDomain) Add(ctx context.Context, domain *domain.AddInstanceDomain) error {
 	var builder database.StatementBuilder
 
-	builder.WriteString(`INSERT INTO zitadel.instance_domains (instance_id, domain, is_verified, is_primary, validation_type) ` +
-		`VALUES ($1, $2, $3, $4, $5)` +
-		` RETURNING created_at, updated_at`)
-
-	builder.AppendArgs(domain.InstanceID, domain.Domain, domain.IsVerified, domain.IsPrimary, domain.VerificationType)
+	builder.WriteString(`INSERT INTO zitadel.instance_domains (instance_id, domain, is_verified, is_primary, validation_type) VALUES (`)
+	builder.WriteArgs(domain.InstanceID, domain.Domain, domain.IsVerified, domain.IsPrimary, domain.ValidationType)
+	builder.WriteString(`) RETURNING created_at, updated_at`)
 
 	return i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)
 }
@@ -69,7 +67,7 @@ func (i *instanceDomain) Remove(ctx context.Context, condition database.Conditio
 	var builder database.StatementBuilder
 
 	builder.WriteString(`DELETE FROM zitadel.instance_domains WHERE `)
-	writeCondition(&builder, condition)
+	condition.Write(&builder)
 
 	return i.client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -77,6 +75,9 @@ func (i *instanceDomain) Remove(ctx context.Context, condition database.Conditio
 // Update implements [domain.InstanceDomainRepository].
 // Subtle: this method shadows the method ([domain.InstanceRepository]).Update of instanceDomain.instance.
 func (i *instanceDomain) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
+	if len(changes) == 0 {
+		return 0, database.NoChangesError
+	}
 	var builder database.StatementBuilder
 
 	builder.WriteString(`UPDATE zitadel.instance_domains SET `)
@@ -223,7 +224,7 @@ func scanInstanceDomain(ctx context.Context, querier database.Querier, builder *
 	if err != nil {
 		return nil, err
 	}
-	instanceDomain := &domain.InstanceDomain{}
+	instanceDomain := new(domain.InstanceDomain)
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(instanceDomain); err != nil {
 		return nil, err
 	}

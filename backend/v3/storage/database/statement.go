@@ -24,6 +24,17 @@ func (b *StatementBuilder) WriteArg(arg any) {
 	b.WriteString(b.AppendArg(arg))
 }
 
+// WriteArgs adds the arguments to the statement and writes the placeholders to the query.
+// The placeholders are comma separated.
+func (b *StatementBuilder) WriteArgs(args ...any) {
+	for i, arg := range args {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		b.WriteArg(arg)
+	}
+}
+
 // AppendArg adds the argument to the statement and returns the placeholder.
 func (b *StatementBuilder) AppendArg(arg any) (placeholder string) {
 	if b.existingArgs == nil {
@@ -43,6 +54,7 @@ func (b *StatementBuilder) AppendArg(arg any) (placeholder string) {
 }
 
 // AppendArgs adds the arguments to the statement and doesn't return the placeholders.
+// If an argument is already added, it will not be added again.
 func (b *StatementBuilder) AppendArgs(args ...any) {
 	for _, arg := range args {
 		b.AppendArg(arg)
