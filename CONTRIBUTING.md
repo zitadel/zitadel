@@ -1,4 +1,4 @@
-# Contributing to ZITADEL
+# Contributing to Zitadel
 
 
 ## Introduction
@@ -13,20 +13,20 @@ If you want to give an answer or be part of discussions please be kind. Treat ot
 
 ## What can I contribute?
 
-For people who are new to ZITADEL: We flag issues which are a good starting point to start contributing.
+For people who are new to Zitadel: We flag issues which are a good starting point to start contributing.
 You find them [here](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-We add the label "good first issue" for problems we think are a good starting point to contribute to ZITADEL.
+We add the label "good first issue" for problems we think are a good starting point to contribute to Zitadel.
 
 - [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 - [All issues](https://github.com/zitadel/zitadel/issues)
 
-Help shaping the future of ZITADEL:
+Help shaping the future of Zitadel:
 
 - Join our [chat](https://zitadel.com/chat) and discuss with us or others.
 - Ask or answer questions in the [issues section](https://github.com/zitadel/zitadel/issues)
 - Share your thoughts and ideas in the [discussions section](https://github.com/zitadel/zitadel/discussions)
 
-Make ZITADEL more popular and give it a ⭐
+Make Zitadel more popular and give it a ⭐
 
 Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
@@ -145,34 +145,55 @@ Choose alternative words depending on the context.
 
 ### API
 
-ZITADEL follows an API first approach. This means all features can not only be accessed via the UI but also via the API.
+Zitadel follows an API first approach. This means all features can not only be accessed via the UI but also via the API.
 The API is designed to be used by different clients, such as web applications, mobile applications, and other services.
 Therefore, the API is designed to be easy to use, consistent, and reliable.
 Please check out the dedicated [API guidelines](./API_DESIGN.md) page when contributing to the API.
 
-### Developing ZITADEL with Dev Containers
 
-Follow the instructions provided by your code editor/IDE to initiate the development container. This typically involves opening the "Command Palette" or similar functionality and searching for commands related to "Dev Containers" or "Remote Containers". The quick start guide for VS Code can found [here](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)
+#### <a name="dev-containers"></>Developing Zitadel with Dev Containers
 
-When you are connected to the container run the following commands to start ZITADEL.
+You can use dev containers if you'd like to make sure you have the same development environment like the corresponding GitHub PR checks use.
+The following dev containers are available:
+
+- **.devcontainer/base/devcontainer.json**: Contains everything you need to run whatever you want.
+- **.devcontainer/turbo-lint-unit/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests and then exits. This is useful to reproduce the corresponding GitHub PR check. 
+- **.devcontainer/turbo-lint-unit-debug/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests in watch mode. You can fix the errors right away and have immediate feedback.
+- **.devcontainer/login-integration/devcontainer.json**: Runs a dev container that executes login integration tests and then exits. This is useful to reproduce the corresponding GitHub PR check.
+- **.devcontainer/login-integration-debug/devcontainer.json**: Runs a dev container that spins up the login in a hot-reloading dev server and executes login integration tests interactively. You can fix the errors right away and have immediate feedback.
+
+You can also run the GitHub PR checks locally in dev containers without having to connect to a dev container.
+The following pnpm commands use the devcontainer CLI and exit when the checks are done.
+
+```bash
+npx pnpm devcontainer:lint-unit
+npx pnpm devcontainer:integration:login
+```
+
+To connect to a dev container with to have full IDE support, follow the instructions provided by your code editor/IDE to initiate the dev container.
+This typically involves opening the "Command Palette" or similar functionality and searching for commands related to "Dev Containers" or "Remote Containers".
+The quick start guide for VS Code can found [here](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)
+
+For example, to build and run the Zitadel binary in a dev container, connect your IDE to the dev container described in .devcontainer/base/devcontainer.json.
+Run the following commands inside the container to start Zitadel.
 
 ```bash
 make compile && ./zitadel start-from-init --masterkey MasterkeyNeedsToHave32Characters --tlsMode disabled
 ```
 
-ZITADEL serves traffic as soon as you can see the following log line:
+Zitadel serves traffic as soon as you can see the following log line:
 
 `INFO[0001] server is listening on [::]:8080`
 
 ## <a name="backend"></a>Contribute Backend Code
 
-By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.
+By executing the commands from this section, you run everything you need to develop the Zitadel backend locally.
 Using [Docker Compose](https://docs.docker.com/compose/), you run a [PostgreSQL](https://www.postgresql.org/download/) on your local machine.
-With [make](https://www.gnu.org/software/make/), you build a debuggable ZITADEL binary and run it using [delve](https://github.com/go-delve/delve).
+With [make](https://www.gnu.org/software/make/), you build a debuggable Zitadel binary and run it using [delve](https://github.com/go-delve/delve).
 Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
-ZITADEL uses [golangci-lint](https://golangci-lint.run) for code quality checks. Please use [this configuration](.golangci.yaml) when running `golangci-lint`. We recommend to set golangci-lint as linter in your IDE.
+Zitadel uses [golangci-lint](https://golangci-lint.run) for code quality checks. Please use [this configuration](.golangci.yaml) when running `golangci-lint`. We recommend to set golangci-lint as linter in your IDE.
 
 The commands in this section are tested against the following software versions:
 
@@ -201,7 +222,7 @@ make compile
 > Build the binary: `make compile`
 
 You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
-You can test if ZITADEL does what you expect by using the UI at http://localhost:8080/ui/console.
+You can test if Zitadel does what you expect by using the UI at http://localhost:8080/ui/console.
 Also, you can verify the data by running `psql "host=localhost dbname=zitadel sslmode=disable"` and running SQL queries.
 
 ### Run Local Unit Tests
@@ -214,9 +235,9 @@ make core_unit_test
 
 ### Run Local Integration Tests
 
-Integration tests are run as gRPC clients against a running ZITADEL server binary.
+Integration tests are run as gRPC clients against a running Zitadel server binary.
 The server binary is typically [build with coverage enabled](https://go.dev/doc/build-cover).
-It is also possible to run a ZITADEL sever in a debugger and run the integrations tests like that. In order to run the server, a database is required.
+It is also possible to run a Zitadel sever in a debugger and run the integrations tests like that. In order to run the server, a database is required.
 
 In order to prepare the local system, the following will bring up the database, builds a coverage binary, initializes the database and starts the sever.
 
@@ -239,7 +260,7 @@ To run all available integration tests:
 make core_integration_test_packages
 ```
 
-When you change any ZITADEL server code, be sure to rebuild and restart the server before the next test run.
+When you change any Zitadel server code, be sure to rebuild and restart the server before the next test run.
 
 ```bash
 make core_integration_server_stop core_integration_server_start
@@ -259,11 +280,11 @@ To test the whole system, including the console UI and the login UI, run the E2E
 
 ```bash
 # Build the production docker image
-export ZITADEL_IMAGE=zitadel:local GOOS=linux
+export Zitadel_IMAGE=zitadel:local GOOS=linux
 make docker_image
 
 # If you made changes in the e2e directory, make sure you reformat the files
-pnpm lint --filter=e2e
+pnpm turbo lint:fix --filter=e2e
 
 # Run the tests
 docker compose --file ./e2e/docker-compose.yaml run --service-ports e2e
@@ -313,7 +334,12 @@ All frontend packages are managed as a monorepo with shared dependencies and opt
 
 ### <a name="frontend-dev-requirements"></a>Frontend Development Requirements
 
-The frontend components are run in your [Node](https://nodejs.org/en/about/) environment with live-reloading develpment servers, so you have fast feedback about your changes.
+The frontend components are run in a [Node](https://nodejs.org/en/about/) environment and are managed using the pnpm package manager and the Turborepo orchestrator.
+
+> [!INFO]
+> Some dev containers are available for remote development with docker and pipeline debugging in isolated environments.
+> If you don't want to use one of the dev containers, you can develop the frontend components directly on your local machine.
+> To do so, proceed with installing the necessary dependencies.
 
 We use **pnpm** as package manager and **Turbo** for build orchestration. Use angular-eslint/Prettier for linting/formatting.
 VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues during development.
@@ -347,7 +373,7 @@ To start developing the login, make sure your system has the [required system de
 
 ```bash
 # Start from the root of the repository
-# Start the database and ZITADEL backend
+# Start the database and Zitadel backend
 docker compose --file ./apps/login/acceptance/docker-compose.yaml up --detach zitadel
 
 # Install dependencies
@@ -368,7 +394,7 @@ The login UI is available at http://localhost:3000.
 The login application consists of multiple packages:
 
 - `@zitadel/login` - Main Next.js application
-- `@zitadel/client` - TypeScript client library for ZITADEL APIs
+- `@zitadel/client` - TypeScript client library for Zitadel APIs
 - `@zitadel/proto` - Protocol buffer definitions and generated code
 
 The build process uses Turbo to orchestrate dependencies:
@@ -408,7 +434,7 @@ Proceed [with configuring your console redirect URIs](console-redirect).
 #### <a name="console-dev-local-zitadel"></a>Develop against a local Zitadel instance from scratch
 
 By executing the commands from this section, you run everything you need to develop the console locally.
-Using [Docker Compose](https://docs.docker.com/compose/), you run [PostgreSQL](https://www.postgresql.org/download/) and the [latest release of ZITADEL](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
+Using [Docker Compose](https://docs.docker.com/compose/), you run [PostgreSQL](https://www.postgresql.org/download/) and the [latest release of Zitadel](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
 You use the Zitadel container as backend for your console.
 
 Run the database and the latest backend locally.
@@ -425,10 +451,10 @@ Proceed [with configuring your console redirect URIs](console-redirect).
 
 #### <a name="console-redirect"></a> Configure Console redirect URI
 
-To allow console access via http://localhost:4200, you have to configure the ZITADEL backend.
+To allow console access via http://localhost:4200, you have to configure the Zitadel backend.
 
 1. Navigate to /ui/console/projects in your target Zitadel instance.
-3. Select the _ZITADEL_ project.
+3. Select the _Zitadel_ project.
 4. Select the _Console_ application.
 5. Select _Redirect Settings_
 6. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
@@ -557,7 +583,7 @@ For the turbo commands, check your options with `pnpm turbo --help`
 
 ## <a name="contribute-translations"></a>Contribute Translations
 
-ZITADEL loads translations from four files:
+Zitadel loads translations from four files:
 
 - [Console texts](./console/src/assets/i18n)
 - [Login interface](./internal/api/ui/login/static/i18n)
@@ -575,7 +601,7 @@ You also have to add some changes to the following files:
 - [Customized Text Docs](./docs/docs/guides/manage/customize/texts.md)
 - [Add language option](./internal/api/ui/login/static/templates/external_not_found_option.html)
 
-## Want to start ZITADEL?
+## Want to start Zitadel?
 
 You can find an installation guide for all the different environments here:
 [https://zitadel.com/docs/self-hosting/deploy/overview](https://zitadel.com/docs/self-hosting/deploy/overview)
@@ -586,14 +612,14 @@ You can find an installation guide for all the different environments here:
 
 ## Product management
 
-The ZITADEL Team works with an agile product management methodology.
+The Zitadel Team works with an agile product management methodology.
 You can find all the issues prioritized and ordered in the [product board](https://github.com/orgs/zitadel/projects/2/views/1).
 
 ### Sprint
 
 We want to deliver a new release every second week. So we plan everything in two-week sprints.
 Each Tuesday we estimate new issues and on Wednesday the last sprint will be reviewed and the next one will be planned.
-After a sprint ends a new version of ZITADEL will be released, and publish to [ZITADEL Cloud](https://zitadel.cloud) the following Monday.
+After a sprint ends a new version of Zitadel will be released, and publish to [Zitadel Cloud](https://zitadel.cloud) the following Monday.
 
 If there are some critical or urgent issues we will have a look at it earlier, than the two weeks.
 To show the community the needed information, each issue gets attributes and labels.
@@ -619,10 +645,10 @@ The state should reflect the progress of the issue and what is going on right no
 
 #### Priority
 
-Priority shows you the priority the ZITADEL team has given this issue. In general the higher the demand from customers and community for the feature, the higher the priority.
+Priority shows you the priority the Zitadel team has given this issue. In general the higher the demand from customers and community for the feature, the higher the priority.
 
 - **🌋 Critical**: This is a security issue or something that has to be fixed urgently, because the software is not usable or highly vulnerable.
-- **🏔 High**: These are the issues the ZITADEL team is currently focusing on and will be implemented as soon as possible.
+- **🏔 High**: These are the issues the Zitadel team is currently focusing on and will be implemented as soon as possible.
 - **🏕 Medium**: After all the high issues are done these will be next.
 - **🏝 Low**: This is low in priority and will probably not be implemented in the next time or just if someone has some time in between.
 
@@ -637,18 +663,18 @@ Everything that is higher than 8 should be split in smaller parts.
 
 There are a few general labels that don't belong to a specific category.
 
-- **good first issue**: This label shows contributors, that it is an easy entry point to start developing on ZITADEL.
-- **help wanted**: The author is seeking help on this topic, this may be from an internal ZITADEL team member or external contributors.
+- **good first issue**: This label shows contributors, that it is an easy entry point to start developing on Zitadel.
+- **help wanted**: The author is seeking help on this topic, this may be from an internal Zitadel team member or external contributors.
 
 #### Category
 
-The category shows which part of ZITADEL is affected.
+The category shows which part of Zitadel is affected.
 
 - **category: backend**: The backend includes the APIs, event store, command and query side. This is developed in golang.
 - **category: ci**: ci is all about continues integration and pipelines.
-- **category: design**: All about the ux/ui of ZITADEL
+- **category: design**: All about the ux/ui of Zitadel
 - **category: docs**: Adjustments or new documentations, this can be found in the docs folder.
-- **category: frontend**: The frontend concerns on the one hand the ZITADEL management console (Angular) and on the other hand the login (gohtml)
+- **category: frontend**: The frontend concerns on the one hand the Zitadel management console (Angular) and on the other hand the login (gohtml)
 - **category: infra**: Infrastructure does include many different parts. E.g Terraform-provider, docker, metrics, etc.
 - **category: translation**: Everything concerning translations or new languages
 
