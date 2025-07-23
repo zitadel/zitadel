@@ -1,44 +1,18 @@
+version: "2"
+run:
+  concurrency: 4
+  go: "1.22"
 output:
   formats:
-    - format: colored-line-number
-
-  print-issued-lines: true
-  print-linter-name: true
-  sort-results: true
+    text:
+      path: stdout
+      print-linter-name: true
+      print-issued-lines: true
   sort-order:
     - linter
     - severity
-    - file # filepath, line, and column.
-  show-stats: true
+    - file
 
-issues:
-  new-from-rev: main
-  # Set to 0 to disable.
-  max-issues-per-linter: 0
-  # Set to 0 to disable.
-  max-same-issues: 0
-  exclude-dirs:
-    - .artifacts
-    - .backups
-    - .codecov
-    - .github
-    - .keys
-    - .vscode
-    - build
-    - console
-    - deploy
-    - docs
-    - guides
-    - internal/api/ui/login/static
-    - openapi
-    - proto
-    - tools
-    - login
-
-run:
-  concurrency: 4
-  timeout: 10m
-  go: '1.22'
 linters:
   enable:
     # Simple linter to check that your code does not contain non-ASCII identifiers [fast: true, auto-fix: false]
@@ -47,36 +21,20 @@ linters:
     - bodyclose
     # check the function whether use a non-inherited context [fast: false, auto-fix: false]
     - contextcheck
-    # Computes and checks the cognitive complexity of functions [fast: true, auto-fix: false]
-    - gocognit
-    # Checks Go code for unused constants, variables, functions and types [fast: false, auto-fix: false]
-    - unused
-    # Errcheck is a program for checking for unchecked errors in go programs. These unchecked errors can be critical bugs in some cases [fast: false, auto-fix: false]
-    - errcheck
     # Checks that sentinel errors are prefixed with the `Err` and error types are suffixed with the `Error`. [fast: false, auto-fix: false]
     - errname
     # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13. [fast: false, auto-fix: false]
     - errorlint
     # check exhaustiveness of enum switch statements [fast: false, auto-fix: false]
     - exhaustive
-    # Gci controls golang package import order and makes it always deterministic. [fast: true, auto-fix: false]
-    - gci
+    # Computes and checks the cognitive complexity of functions [fast: true, auto-fix: false]
+    - gocognit
     # Provides diagnostics that check for bugs, performance and style issues. [fast: false, auto-fix: false]
     - gocritic
-    # Linter for Go source code that specializes in simplifying a code [fast: false, auto-fix: false]
-    - gosimple
-    # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string [fast: false, auto-fix: false]
-    - govet
-    # Detects when assignments to existing variables are not used [fast: true, auto-fix: false]
-    - ineffassign
     # Finds commonly misspelled English words in comments [fast: true, auto-fix: true]
     - misspell
-    # Finds naked returns in functions greater than a specified function length [fast: true, auto-fix: false]
+     # Finds naked returns in functions greater than a specified function length [fast: true, auto-fix: false]
     - nakedret
-    # Staticcheck is a go vet on steroids, applying a ton of static analysis checks [fast: false, auto-fix: false]
-    - staticcheck
-    # Like the front-end of a Go compiler, parses and type-checks Go code [fast: false, auto-fix: false]
-    - typecheck
     # Reports ill-formed or insufficient nolint directives [fast: true, auto-fix: false]
     - nolintlint
     # Checks for misuse of Sprintf to construct a host with port in a URL.
@@ -115,6 +73,9 @@ linters:
     # check for two durations multiplied together [fast: false, auto-fix: false]
     # FUTURE: checks for accident `1 * time.Second * time.Second`
     - durationcheck
+    # Golang linter to check the errors handling expressions [fast: false, auto-fix: false]
+    # Not used in favore of errorlint
+    - err113
     # Checks types passed to the json encoding functions. Reports unsupported types and optionally reports occations, where the check for the returned error can be omitted. [fast: false, auto-fix: false]
     # FUTURE: use asap, because we use json alot. nice feature is possiblity to check if err check is required
     - errchkjson
@@ -148,21 +109,9 @@ linters:
     # Tool for detection of FIXME, TODO and other comment keywords [fast: true, auto-fix: false]
     # FUTURE: maybe makes sense later. IMO some view todos are ok for later tasks.
     - godox
-    # Golang linter to check the errors handling expressions [fast: false, auto-fix: false]
-    # Not used in favore of errorlint
-    - err113
-    # Gofmt checks whether code was gofmt-ed. By default this tool runs with -s option to check for code simplification [fast: true, auto-fix: true]
-    # ignored in favor of goimports
-    - gofmt
-    # Gofumpt checks whether code was gofumpt-ed. [fast: true, auto-fix: true]
-    # ignored in favor of goimports
-    - gofumpt
     # Checks is file header matches to pattern [fast: true, auto-fix: false]
     # ignored because we don't write licenses as headers
     - goheader
-    # In addition to fixing imports, goimports also formats your code in the same style as gofmt. [fast: true, auto-fix: true]
-    # ignored in favor of gci
-    - goimports
     # Manage the use of 'replace', 'retract', and 'excludes' directives in go.mod. [fast: true, auto-fix: false]
     # FUTURE: not a problem at the moment
     - gomoddirectives
@@ -235,18 +184,9 @@ linters:
     # Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint. [fast: false, auto-fix: false]
     # Linter aggregator, would allow to use less other linters
     - revive
-    # Stylecheck is a replacement for golint [fast: false, auto-fix: false]
-    # we use goimports
-    - stylecheck
     # Checks the struct tags. [fast: true, auto-fix: false]
     # FUTURE: would help for new structs
     - tagliatelle
-    # tenv is analyzer that detects using os.Setenv instead of t.Setenv since Go1.17 [fast: false, auto-fix: false]
-    # FUTURE: currently are no env vars set
-    - tenv
-    # linter checks if examples are testable (have an expected output)
-    # FUTURE: as soon as examples are added
-    - testableexamples
     # linter that makes you use a separate _test package [fast: true, auto-fix: false]
     # don't use because we test some unexported functions
     - testpackage
@@ -277,11 +217,67 @@ linters:
     # Whitespace Linter - Forces you to use empty lines! [fast: true, auto-fix: false]
     # FUTURE: improves code quality by allowing and blocking line breaks
     - wsl
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - .artifacts
+      - .backups
+      - .codecov
+      - .github
+      - .keys
+      - .vscode
+      - build
+      - console
+      - deploy
+      - docs
+      - guides
+      - internal/api/ui/login/static
+      - openapi
+      - proto
+      - tools
+      - login
+      - third_party$
+      - builtin$
+      - examples$
 
-linters-settings:
-  gci:
-    sections:
-      - standard # Standard section: captures all standard packages.
-      - default # Default section: contains all imports that could not be matched to another section type.
-      - prefix(github.com/zitadel/zitadel) # Custom section: groups all imports with the specified Prefix.
-    custom-order: true
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  new-from-rev: main
+formatters:
+  enable:
+    - gci
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/zitadel/zitadel)
+      custom-order: true
+  exclusions:
+    generated: lax
+    paths:
+      - .artifacts
+      - .backups
+      - .codecov
+      - .github
+      - .keys
+      - .vscode
+      - build
+      - console
+      - deploy
+      - docs
+      - guides
+      - internal/api/ui/login/static
+      - openapi
+      - proto
+      - tools
+      - login
+      - third_party$
+      - builtin$
+      - examples$
