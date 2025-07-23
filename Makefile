@@ -97,7 +97,7 @@ console_move:
 
 .PHONY: console_dependencies
 console_dependencies:
-	pnpm install
+	pnpm install --frozen-lockfile
 
 .PHONY: console_client
 console_client:

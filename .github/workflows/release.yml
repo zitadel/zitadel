@@ -184,7 +184,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: login
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Create Release Pull Request
         uses: changesets/action@v1

@@ -62,7 +62,6 @@ jobs:
           provenance: true
           sbom: true
           targets: login-standalone
-          set: login-*.context=./apps/login/
           project: w47wkxzdtw
           files: |
             ./apps/login/docker-bake.hcl
