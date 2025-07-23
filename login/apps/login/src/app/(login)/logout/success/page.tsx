@@ -1,8 +1,8 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { Translated } from "@/components/translated";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
-import { getBrandingSettings, getDefaultOrg } from "@/lib/zitadel";
-import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { getBrandingSettings } from "@/lib/zitadel";
+import { getEffectiveOrganizationId } from "@/lib/organization";
 import { headers } from "next/headers";
 
 export default async function Page(props: { searchParams: Promise<any> }) {
@@ -13,19 +13,14 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const { login_hint, organization } = searchParams;
 
-  let defaultOrganization;
-  if (!organization) {
-    const org: Organization | null = await getDefaultOrg({
-      serviceUrl,
-    });
-    if (org) {
-      defaultOrganization = org.id;
-    }
-  }
+  const effectiveOrganization = await getEffectiveOrganizationId({
+    serviceUrl,
+    organization,
+  });
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    organization,
+    organization: effectiveOrganization,
   });
 
   return (
