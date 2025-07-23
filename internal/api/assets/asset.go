@@ -239,7 +239,7 @@ func GetAsset(w http.ResponseWriter, r *http.Request, resourceOwner, objectName 
 	if info.Hash == strings.Trim(r.Header.Get(http_util.IfNoneMatch), "\"") {
 		w.Header().Set(http_util.LastModified, info.LastModified.Format(time.RFC1123))
 		w.Header().Set(http_util.Etag, "\""+info.Hash+"\"")
-		w.WriteHeader(304)
+		w.WriteHeader(http.StatusNotModified)
 		return nil
 	}
 	w.Header().Set(http_util.ContentLength, strconv.FormatInt(info.Size, 10))

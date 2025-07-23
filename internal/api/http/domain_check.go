@@ -36,8 +36,8 @@ func ValidateDomainHTTP(domain, token, verifier string) error {
 	if err != nil {
 		return zerrors.ThrowInternal(err, "HTTP-BH42h", "Errors.Internal")
 	}
-	if resp.StatusCode != 200 {
-		if resp.StatusCode == 404 {
+	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusNotFound {
 			return zerrors.ThrowNotFound(err, "ORG-F4zhw", "Errors.Org.DomainVerificationHTTPNotFound")
 		}
 		return zerrors.ThrowInternal(err, "HTTP-G2zsw", "Errors.Internal")

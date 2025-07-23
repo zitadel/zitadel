@@ -49,6 +49,8 @@ linters:
     - thelper
     # Remove unnecessary type conversions [fast: false, auto-fix: false]
     - unconvert
+    # A linter that detect the possibility to use variables/constants from the Go standard library.
+    - usestdlibvars
   disable:
     # Checks for dangerous unicode character sequences [fast: true, auto-fix: false]
     # not needed because github does that out of the box
@@ -197,9 +199,6 @@ linters:
     # Reports unused function parameters [fast: false, auto-fix: false]
     # DISCUSS: nice idea and would improve code quality, but how to handle false positives?
     - unparam
-    # A linter that detect the possibility to use variables/constants from the Go standard library.
-    # FUTURE: improves code quality
-    - usestdlibvars
     # checks that the length of a variable's name matches its scope [fast: false, auto-fix: false]
     # I would not use it because it more or less checks if var lenght matches
     - varnamelen
