@@ -529,3 +529,6 @@ Errors:
     NotExisting: User Code doesn't exist
 
 optional: (optional)
+
+UserProfile:
+  Anonymous: "Anonymous User"
