@@ -5,10 +5,14 @@
 		"../base/docker-compose.yml",
 		"docker-compose.yml"
 	],
-	"service": "login-integration-debug",
-	"runServices": ["login-integration-debug"],
+	"service": "login-integration",
+	"runServices": [
+		"login-integration"
+	],
 	"workspaceFolder": "/workspaces",
-	"forwardPorts": [3001],
+	"forwardPorts": [
+		3001
+	],
 	"onCreateCommand": "pnpm install --recursive",
 	"postAttachCommand": "pnpm turbo daemon clean; pnpm turbo @zitadel/login#dev test:integration:login:debug",
 	"customizations": {

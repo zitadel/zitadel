@@ -5,8 +5,8 @@ export default defineConfig({
 
   e2e: {
     baseUrl: process.env.LOGIN_BASE_URL || "http://localhost:3001/ui/v2/login",
-    specPattern: "integration/**/*.cy.{js,jsx,ts,tsx}",
-    supportFile: "support/e2e.{js,jsx,ts,tsx}",
+    specPattern: "integration/integration/**/*.cy.{js,jsx,ts,tsx}",
+    supportFile: "integration/support/e2e.{js,jsx,ts,tsx}",
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },

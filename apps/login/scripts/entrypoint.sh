@@ -10,4 +10,4 @@ fi
 
 
 
-exec node /runtime/apps/login/apps/login/server.js
+exec node /runtime/apps/login/server.js
