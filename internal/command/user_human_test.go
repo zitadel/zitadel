@@ -1451,6 +1451,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "orgid missing, invalid argument error",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(),
 					},
@@ -1477,6 +1479,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "org policy not found, precondition error",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(),
@@ -1506,6 +1510,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "password policy not found, precondition error",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -1545,6 +1551,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "user invalid, invalid argument error",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -1590,6 +1598,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human (with password and initial code), ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -1676,6 +1686,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human email verified password change not required, ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -1756,6 +1768,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human email verified passwordless only, ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -1855,6 +1869,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human email verified passwordless and password change not required, ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -1958,6 +1974,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human (with phone), ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -2093,6 +2111,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human (with verified phone), ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -2188,6 +2208,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human (with undefined preferred language), ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -2273,6 +2295,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human (with unsupported preferred language), ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -2359,6 +2383,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human (with idp), ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -2504,6 +2530,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human (with idp, no creation allowed), precondition error",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -2647,6 +2675,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human (with idp, manual creation not allowed), ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -2819,6 +2849,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human (with idp, auto creation not allowed), ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -2991,6 +3023,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human (with idp, auto creation not allowed) + deactivated state, ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(
@@ -3170,6 +3204,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human (with idp, auto creation not allowed) + locked state, ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(

@@ -135,6 +135,8 @@ func (i *Instance) CreateOIDCInactivateProjectClient(ctx context.Context, redire
 }
 
 func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, t *testing.T, redirectURI string, loginVersion *app.LoginVersion) (*management.AddOIDCAppResponse, error) {
+	t.Helper()
+
 	project := i.CreateProject(ctx, t, "", gofakeit.AppName(), false, false)
 
 	resp, err := i.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
@@ -176,6 +178,8 @@ func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, t *testing.
 }
 
 func (i *Instance) CreateOIDCTokenExchangeClient(ctx context.Context, t *testing.T) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
+	t.Helper()
+
 	project := i.CreateProject(ctx, t, "", gofakeit.AppName(), false, false)
 	return i.CreateOIDCWebClientJWT(ctx, "", "", project.GetId(), app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE, app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN)
 }

@@ -296,6 +296,8 @@ func (e *mappedExpecter) Errorf(format string, args ...interface{}) {
 func (e *mappedExpecter) Helper() {}
 
 func (e *mappedExpecter) expectationsMet(t *testing.T) {
+	t.Helper()
+
 	if e.notEmptyFields != e.expectedNotEmptyFields {
 		t.Errorf("not empty fields not matched: \n expected:\n\t%s\n got:\n\t%s", e.expectedNotEmptyFields, e.notEmptyFields)
 	}

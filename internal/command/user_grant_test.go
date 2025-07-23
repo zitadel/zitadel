@@ -465,6 +465,8 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
+					t.Helper()
+
 					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
 				},
 			},
@@ -538,6 +540,8 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
+					t.Helper()
+
 					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
 				},
 			},
@@ -616,6 +620,8 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
+					t.Helper()
+
 					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
 				},
 			},
@@ -699,6 +705,8 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
+					t.Helper()
+
 					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
 				},
 			},

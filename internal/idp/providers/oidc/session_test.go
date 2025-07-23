@@ -384,6 +384,8 @@ func userinfo() *oidc.UserInfo {
 }
 
 func tokenResponse(t *testing.T, issuer string) *oidc.AccessTokenResponse {
+	t.Helper()
+
 	claims := oidc.NewIDTokenClaims(
 		issuer,
 		"sub",
@@ -454,6 +456,8 @@ HfIQgWUAW9dsjVVOXMP1jhq8U9hmH/PFWA11V/iCdk1NTxZEw87VAOeWuajpdDHG
 }
 
 func keys(t *testing.T) *jose.JSONWebKeySet {
+	t.Helper()
+
 	privateKey, err := crypto.BytesToPublicKey([]byte(`-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs38btwb3c7r0tMaQpGvB
 mY+mPwMU/LpfuPoC0k2t4RsKp0fv40SMl50CRrHgk395wch8PMPYbl3+8TtYAJuy

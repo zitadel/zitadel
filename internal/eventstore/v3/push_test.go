@@ -79,7 +79,7 @@ func Test_mapCommands(t *testing.T) {
 					uint64(1),
 					0,
 				},
-				err: func(t *testing.T, err error) {},
+				err: func(t *testing.T, err error) { t.Helper() },
 			},
 		},
 		{
@@ -141,7 +141,7 @@ func Test_mapCommands(t *testing.T) {
 					uint64(7),
 					1,
 				},
-				err: func(t *testing.T, err error) {},
+				err: func(t *testing.T, err error) { t.Helper() },
 			},
 		},
 		{
@@ -207,7 +207,7 @@ func Test_mapCommands(t *testing.T) {
 					uint64(1),
 					1,
 				},
-				err: func(t *testing.T, err error) {},
+				err: func(t *testing.T, err error) { t.Helper() },
 			},
 		},
 		{
@@ -224,7 +224,7 @@ func Test_mapCommands(t *testing.T) {
 				events:       []eventstore.Event{},
 				placeHolders: []string{},
 				args:         []any{},
-				err:          func(t *testing.T, err error) {},
+				err:          func(t *testing.T, err error) { t.Helper() },
 				shouldPanic:  true,
 			},
 		},
@@ -232,6 +232,8 @@ func Test_mapCommands(t *testing.T) {
 	for _, tt := range tests {
 		if tt.want.err == nil {
 			tt.want.err = func(t *testing.T, err error) {
+				t.Helper()
+
 				require.NoError(t, err)
 			}
 		}

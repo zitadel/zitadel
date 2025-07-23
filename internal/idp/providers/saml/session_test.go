@@ -315,6 +315,8 @@ func TestSession_FetchUser(t *testing.T) {
 }
 
 func httpPostFormRequest(t *testing.T, callbackURL, relayState, response string) *http.Request {
+	t.Helper()
+
 	body := url.Values{
 		"SAMLResponse": {response},
 		"RelayState":   {relayState},

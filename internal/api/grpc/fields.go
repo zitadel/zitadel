@@ -18,7 +18,9 @@ var CustomMappers = map[protoreflect.FullName]func(assert.TestingT, protoreflect
 
 // AllFieldsSet recusively checks if all values in a message
 // have a non-zero value.
-func AllFieldsSet(t testing.TB, msg protoreflect.Message, ignoreTypes ...protoreflect.FullName) {
+func AllFieldsSet(tb testing.TB, msg protoreflect.Message, ignoreTypes ...protoreflect.FullName) {
+	tb.Helper()
+
 	ignore := make(map[protoreflect.FullName]bool, len(ignoreTypes))
 	for _, name := range ignoreTypes {
 		ignore[name] = true
@@ -35,13 +37,13 @@ func AllFieldsSet(t testing.TB, msg protoreflect.Message, ignoreTypes ...protore
 	for i := 0; i < fields.Len(); i++ {
 		fd := fields.Get(i)
 		if !msg.Has(fd) {
-			t.Errorf("not all fields set in %q, missing %q", name, fd.Name())
+			tb.Errorf("not all fields set in %q, missing %q", name, fd.Name())
 			continue
 		}
 
 		if fd.Kind() == protoreflect.MessageKind {
 			if m, ok := msg.Get(fd).Interface().(protoreflect.Message); ok {
-				AllFieldsSet(t, m, ignoreTypes...)
+				AllFieldsSet(tb, m, ignoreTypes...)
 			}
 		}
 	}

@@ -55,6 +55,8 @@ func TestHandler_lockState(t *testing.T) {
 				instanceID: "instance",
 			},
 			isErr: func(t *testing.T, err error) {
+				t.Helper()
+
 				if !errors.Is(err, sql.ErrTxDone) {
 					t.Errorf("unexpected error, want: %v got: %v", sql.ErrTxDone, err)
 				}
@@ -82,6 +84,8 @@ func TestHandler_lockState(t *testing.T) {
 				instanceID: "instance",
 			},
 			isErr: func(t *testing.T, err error) {
+				t.Helper()
+
 				if !errors.Is(err, zerrors.ThrowInternal(nil, "V2-lpiK0", "")) {
 					t.Errorf("unexpected error: want internal (V2lpiK0), got: %v", err)
 				}
@@ -113,6 +117,8 @@ func TestHandler_lockState(t *testing.T) {
 	for _, tt := range tests {
 		if tt.isErr == nil {
 			tt.isErr = func(t *testing.T, err error) {
+				t.Helper()
+
 				if err != nil {
 					t.Error("expected no error got:", err)
 				}
@@ -171,6 +177,8 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 				},
 			},
 			isErr: func(t *testing.T, err error) {
+				t.Helper()
+
 				if !errors.Is(err, sql.ErrTxDone) {
 					t.Errorf("unexpected error, want: %v, got %v", sql.ErrTxDone, err)
 				}
@@ -197,6 +205,8 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 				},
 			},
 			isErr: func(t *testing.T, err error) {
+				t.Helper()
+
 				if !errors.Is(err, zerrors.ThrowInternal(nil, "V2-FGEKi", "")) {
 					t.Errorf("unexpected error, want: %v, got %v", sql.ErrTxDone, err)
 				}
@@ -240,6 +250,8 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 	for _, tt := range tests {
 		if tt.isErr == nil {
 			tt.isErr = func(t *testing.T, err error) {
+				t.Helper()
+
 				if err != nil {
 					t.Error("expected no error got:", err)
 				}
@@ -303,6 +315,8 @@ func TestHandler_currentState(t *testing.T) {
 			},
 			want: want{
 				isErr: func(t *testing.T, err error) {
+					t.Helper()
+
 					if !errors.Is(err, sql.ErrConnDone) {
 						t.Errorf("unexpected error, want: %v, got: %v", sql.ErrConnDone, err)
 					}
@@ -338,6 +352,8 @@ func TestHandler_currentState(t *testing.T) {
 			},
 			want: want{
 				isErr: func(t *testing.T, err error) {
+					t.Helper()
+
 					if !errors.Is(err, sql.ErrTxDone) {
 						t.Errorf("unexpected error, want: %v, got: %v", sql.ErrTxDone, err)
 					}
@@ -366,6 +382,8 @@ func TestHandler_currentState(t *testing.T) {
 			},
 			want: want{
 				isErr: func(t *testing.T, err error) {
+					t.Helper()
+
 					pgErr := new(pgconn.PgError)
 					if !errors.As(err, &pgErr) {
 						t.Errorf("error should be PgErr but was %T", err)
@@ -425,6 +443,8 @@ func TestHandler_currentState(t *testing.T) {
 	for _, tt := range tests {
 		if tt.want.isErr == nil {
 			tt.want.isErr = func(t *testing.T, err error) {
+				t.Helper()
+
 				if err != nil {
 					t.Error("expected no error got:", err)
 				}

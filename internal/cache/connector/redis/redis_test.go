@@ -68,6 +68,8 @@ func Test_redisCache_set(t *testing.T) {
 				},
 			},
 			assertions: func(t *testing.T, s *miniredis.Miniredis, objectID string) {
+				t.Helper()
+
 				s.CheckGet(t, "0:one", objectID)
 				s.CheckGet(t, "1:foo", objectID)
 				s.CheckGet(t, "1:bar", objectID)
@@ -88,6 +90,8 @@ func Test_redisCache_set(t *testing.T) {
 				},
 			},
 			assertions: func(t *testing.T, s *miniredis.Miniredis, objectID string) {
+				t.Helper()
+
 				s.CheckGet(t, "0:one", objectID)
 				s.CheckGet(t, "1:foo", objectID)
 				s.CheckGet(t, "1:bar", objectID)
@@ -115,6 +119,8 @@ func Test_redisCache_set(t *testing.T) {
 				},
 			},
 			assertions: func(t *testing.T, s *miniredis.Miniredis, objectID string) {
+				t.Helper()
+
 				s.CheckGet(t, "0:one", objectID)
 				s.CheckGet(t, "1:foo", objectID)
 				s.CheckGet(t, "1:bar", objectID)
@@ -141,6 +147,8 @@ func Test_redisCache_set(t *testing.T) {
 				},
 			},
 			assertions: func(t *testing.T, s *miniredis.Miniredis, objectID string) {
+				t.Helper()
+
 				s.CheckGet(t, "0:one", objectID)
 				s.CheckGet(t, "1:foo", objectID)
 				s.CheckGet(t, "1:bar", objectID)
@@ -198,6 +206,8 @@ func Test_redisCache_Get(t *testing.T) {
 			name:   "get by ID",
 			config: cache.Config{},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -218,6 +228,8 @@ func Test_redisCache_Get(t *testing.T) {
 			name:   "get by name",
 			config: cache.Config{},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -240,6 +252,8 @@ func Test_redisCache_Get(t *testing.T) {
 				LastUseAge: time.Minute,
 			},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -262,6 +276,8 @@ func Test_redisCache_Get(t *testing.T) {
 				MaxAge: time.Minute,
 			},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -282,6 +298,8 @@ func Test_redisCache_Get(t *testing.T) {
 			name:   "not found",
 			config: cache.Config{},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -298,6 +316,8 @@ func Test_redisCache_Get(t *testing.T) {
 			name:   "json decode error",
 			config: cache.Config{},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -358,6 +378,8 @@ func Test_redisCache_Invalidate(t *testing.T) {
 			name:   "no keys, noop",
 			config: cache.Config{},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -374,12 +396,16 @@ func Test_redisCache_Invalidate(t *testing.T) {
 			name:   "invalidate by ID",
 			config: cache.Config{},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
 				})
 			},
 			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
+				t.Helper()
+
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.False(t, ok)
 				assert.Nil(t, obj)
@@ -398,12 +424,16 @@ func Test_redisCache_Invalidate(t *testing.T) {
 			name:   "invalidate by name",
 			config: cache.Config{},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
 				})
 			},
 			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
+				t.Helper()
+
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.False(t, ok)
 				assert.Nil(t, obj)
@@ -424,6 +454,8 @@ func Test_redisCache_Invalidate(t *testing.T) {
 				LastUseAge: time.Minute,
 			},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -433,6 +465,8 @@ func Test_redisCache_Invalidate(t *testing.T) {
 				s.FastForward(2 * time.Minute)
 			},
 			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
+				t.Helper()
+
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.False(t, ok)
 				assert.Nil(t, obj)
@@ -451,12 +485,16 @@ func Test_redisCache_Invalidate(t *testing.T) {
 			name:   "not found",
 			config: cache.Config{},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
 				})
 			},
 			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
+				t.Helper()
+
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.True(t, ok)
 				assert.NotNil(t, obj)
@@ -519,6 +557,8 @@ func Test_redisCache_Delete(t *testing.T) {
 			name:   "no keys, noop",
 			config: cache.Config{},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -535,12 +575,16 @@ func Test_redisCache_Delete(t *testing.T) {
 			name:   "delete ID",
 			config: cache.Config{},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
 				})
 			},
 			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
+				t.Helper()
+
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.False(t, ok)
 				assert.Nil(t, obj)
@@ -560,12 +604,16 @@ func Test_redisCache_Delete(t *testing.T) {
 			name:   "delete name",
 			config: cache.Config{},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
 				})
 			},
 			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
+				t.Helper()
+
 				// get by ID should still work
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.True(t, ok)
@@ -585,12 +633,16 @@ func Test_redisCache_Delete(t *testing.T) {
 			name:   "not found",
 			config: cache.Config{},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
 				})
 			},
 			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
+				t.Helper()
+
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.True(t, ok)
 				assert.NotNil(t, obj)
@@ -649,6 +701,8 @@ func Test_redisCache_Truncate(t *testing.T) {
 			name:   "ok",
 			config: cache.Config{},
 			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+				t.Helper()
+
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -659,6 +713,8 @@ func Test_redisCache_Truncate(t *testing.T) {
 				})
 			},
 			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
+				t.Helper()
+
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.False(t, ok)
 				assert.Nil(t, obj)
@@ -689,6 +745,8 @@ func Test_redisCache_Truncate(t *testing.T) {
 }
 
 func prepareCache(t *testing.T, conf cache.Config, options ...func(*Config)) (cache.Cache[testIndex, string, *testObject], *miniredis.Miniredis) {
+	t.Helper()
+
 	conf.Log = &logging.Config{
 		Level:     "debug",
 		AddSource: true,

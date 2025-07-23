@@ -145,7 +145,7 @@ func TestCommands_RemoveTrustedDomain(t *testing.T) {
 		{
 			name: "domain empty string, error",
 			fields: fields{
-				eventstore: func(t *testing.T) *eventstore.Eventstore { return &eventstore.Eventstore{} },
+				eventstore: func(t *testing.T) *eventstore.Eventstore { t.Helper(); return &eventstore.Eventstore{} },
 			},
 			args: args{
 				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
@@ -158,7 +158,7 @@ func TestCommands_RemoveTrustedDomain(t *testing.T) {
 		{
 			name: "domain invalid character, error",
 			fields: fields{
-				eventstore: func(t *testing.T) *eventstore.Eventstore { return &eventstore.Eventstore{} },
+				eventstore: func(t *testing.T) *eventstore.Eventstore { t.Helper(); return &eventstore.Eventstore{} },
 			},
 			args: args{
 				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
@@ -171,7 +171,7 @@ func TestCommands_RemoveTrustedDomain(t *testing.T) {
 		{
 			name: "domain length exceeded, error",
 			fields: fields{
-				eventstore: func(t *testing.T) *eventstore.Eventstore { return &eventstore.Eventstore{} },
+				eventstore: func(t *testing.T) *eventstore.Eventstore { t.Helper(); return &eventstore.Eventstore{} },
 			},
 			args: args{
 				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),

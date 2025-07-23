@@ -1157,6 +1157,8 @@ func (r *testReducer) Reduce(events ...*eventstore.StorageEvent) error {
 }
 
 func (r *testReducer) assert(t *testing.T) {
+	t.Helper()
+
 	if r.expectedReduces == r.reduceCount {
 		return
 	}
@@ -1187,6 +1189,8 @@ func Test_executeQuery(t *testing.T) {
 			want: want{
 				eventCount: 0,
 				assertErr: func(t *testing.T, err error) bool {
+					t.Helper()
+
 					is := errors.Is(err, nil)
 					if !is {
 						t.Errorf("no error expected got: %v", err)
@@ -1221,6 +1225,8 @@ func Test_executeQuery(t *testing.T) {
 			want: want{
 				eventCount: 1,
 				assertErr: func(t *testing.T, err error) bool {
+					t.Helper()
+
 					is := errors.Is(err, nil)
 					if !is {
 						t.Errorf("no error expected got: %v", err)
@@ -1255,6 +1261,8 @@ func Test_executeQuery(t *testing.T) {
 			want: want{
 				eventCount: 1,
 				assertErr: func(t *testing.T, err error) bool {
+					t.Helper()
+
 					is := errors.Is(err, nil)
 					if !is {
 						t.Errorf("no error expected got: %v", err)
@@ -1303,6 +1311,8 @@ func Test_executeQuery(t *testing.T) {
 			want: want{
 				eventCount: 2,
 				assertErr: func(t *testing.T, err error) bool {
+					t.Helper()
+
 					is := errors.Is(err, nil)
 					if !is {
 						t.Errorf("no error expected got: %v", err)
@@ -1352,6 +1362,8 @@ func Test_executeQuery(t *testing.T) {
 			want: want{
 				eventCount: 1,
 				assertErr: func(t *testing.T, err error) bool {
+					t.Helper()
+
 					is := errors.Is(err, errReduce)
 					if !is {
 						t.Errorf("no error expected got: %v", err)

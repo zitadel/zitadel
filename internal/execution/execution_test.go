@@ -493,6 +493,8 @@ func testServers(
 	c []*callTestServer,
 	call func([]string) (interface{}, error),
 ) (interface{}, error) {
+	t.Helper()
+
 	urls := make([]string, len(c))
 	for i := range c {
 		url, close := listen(t, c[i])
@@ -507,6 +509,8 @@ func testServer(
 	c *callTestServer,
 	call func(string) ([]byte, error),
 ) ([]byte, error) {
+	t.Helper()
+
 	url, close := listen(t, c)
 	defer close()
 	return call(url)
@@ -516,6 +520,8 @@ func listen(
 	t *testing.T,
 	c *callTestServer,
 ) (url string, close func()) {
+	t.Helper()
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		checkRequest(t, r, c.method, c.expectBody, c.signingKey)
 
@@ -537,6 +543,8 @@ func listen(
 }
 
 func checkRequest(t *testing.T, sent *http.Request, method string, expectedBody []byte, signingKey string) {
+	t.Helper()
+
 	sentBody, err := io.ReadAll(sent.Body)
 	require.NoError(t, err)
 	require.Equal(t, expectedBody, sentBody)

@@ -43,6 +43,8 @@ linters:
     - rowserrcheck
     # Checks that sql.Rows and sql.Stmt are closed. [fast: false, auto-fix: false]
     - sqlclosecheck
+    # thelper detects golang test helpers without t.Helper() call and checks the consistency of test helpers [fast: false, auto-fix: false]
+    - thelper
     # Remove unnecessary type conversions [fast: false, auto-fix: false]
     - unconvert
   disable:
@@ -190,9 +192,6 @@ linters:
     # linter that makes you use a separate _test package [fast: true, auto-fix: false]
     # don't use because we test some unexported functions
     - testpackage
-    # thelper detects golang test helpers without t.Helper() call and checks the consistency of test helpers [fast: false, auto-fix: false]
-    # FUTURE: nice to improve test quality
-    - thelper
     # tparallel detects inappropriate usage of t.Parallel() method in your Go test codes [fast: false, auto-fix: false]
     # FUTURE: nice to improve test quality
     - tparallel

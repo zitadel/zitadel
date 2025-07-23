@@ -130,6 +130,8 @@ func (db *dbMock) close() {
 }
 
 func mockDB(t *testing.T) *dbMock {
+	t.Helper()
+
 	mockDB := dbMock{}
 	db, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 	if err != nil {

@@ -419,6 +419,8 @@ func Test_uniqueConstraints(t *testing.T) {
 				},
 			},
 			assertErr: func(t *testing.T, err error) bool {
+				t.Helper()
+
 				is := errors.Is(err, zerrors.ThrowAlreadyExists(execErr, "POSTG-QzjyP", "Errors.Internal"))
 				if !is {
 					t.Errorf("no error expected got: %v", err)
@@ -453,6 +455,8 @@ func Test_uniqueConstraints(t *testing.T) {
 				},
 			},
 			assertErr: func(t *testing.T, err error) bool {
+				t.Helper()
+
 				is := errors.Is(err, zerrors.ThrowAlreadyExists(execErr, "POSTG-QzjyP", "My.Error"))
 				if !is {
 					t.Errorf("no error expected got: %v", err)
@@ -735,6 +739,8 @@ func Test_lockAggregates(t *testing.T) {
 }
 
 func assertIntent(t *testing.T, got, want *intent) {
+	t.Helper()
+
 	if got.sequence != want.sequence {
 		t.Errorf("unexpected sequence %d want %d", got.sequence, want.sequence)
 	}
@@ -742,6 +748,8 @@ func assertIntent(t *testing.T, got, want *intent) {
 }
 
 func assertPushAggregate(t *testing.T, got, want *eventstore.PushAggregate) {
+	t.Helper()
+
 	if !reflect.DeepEqual(got.Type(), want.Type()) {
 		t.Errorf("unexpected Type %v, want: %v", got.Type(), want.Type())
 	}
@@ -1196,6 +1204,8 @@ func Test_push(t *testing.T) {
 			},
 			want: want{
 				assertErr: func(t *testing.T, err error) bool {
+					t.Helper()
+
 					is := errors.Is(err, errReduce)
 					if !is {
 						t.Errorf("no error expected got: %v", err)
@@ -1310,6 +1320,8 @@ func Test_push(t *testing.T) {
 }
 
 func expectNoErr(t *testing.T, err error) bool {
+	t.Helper()
+
 	is := err == nil
 	if !is {
 		t.Errorf("no error expected got: %v", err)

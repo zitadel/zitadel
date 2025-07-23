@@ -53,6 +53,8 @@ func TestWorker_reportBaseInformation(t *testing.T) {
 			name: "database error, error",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					ctrl := gomock.NewController(t)
 					queries := mock.NewMockQueries(ctrl)
 					queries.EXPECT().SearchInstances(gomock.Any(), &query.InstanceSearchQueries{}).Return(
@@ -61,6 +63,8 @@ func TestWorker_reportBaseInformation(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					return mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 				},
 			},
@@ -73,6 +77,8 @@ func TestWorker_reportBaseInformation(t *testing.T) {
 			name: "telemetry client error, error",
 			fields: fields{
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					client := mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 					client.EXPECT().ReportBaseInformation(gomock.Any(), &analytics.ReportBaseInformationRequest{
 						SystemId: "system-id",
@@ -90,6 +96,8 @@ func TestWorker_reportBaseInformation(t *testing.T) {
 					return client
 				},
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().SearchInstances(gomock.Any(), &query.InstanceSearchQueries{}).Return(
 						&query.Instances{
@@ -124,6 +132,8 @@ func TestWorker_reportBaseInformation(t *testing.T) {
 			name: "report ok, reportID returned",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().SearchInstances(gomock.Any(), &query.InstanceSearchQueries{}).Return(
 						&query.Instances{
@@ -147,6 +157,8 @@ func TestWorker_reportBaseInformation(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					client := mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 					client.EXPECT().ReportBaseInformation(gomock.Any(), &analytics.ReportBaseInformationRequest{
 						SystemId: "system-id",
@@ -208,6 +220,8 @@ func TestWorker_reportResourceCounts(t *testing.T) {
 			name: "database error, error",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().ListResourceCounts(gomock.Any(), 0, 1).Return(
 						nil, zerrors.ThrowInternal(nil, "id", "db error"),
@@ -215,6 +229,8 @@ func TestWorker_reportResourceCounts(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					return mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 				},
 				config: &Config{
@@ -236,6 +252,8 @@ func TestWorker_reportResourceCounts(t *testing.T) {
 			name: "no resource counts, no error",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().ListResourceCounts(gomock.Any(), 0, 1).Return(
 						[]query.ResourceCount{}, nil,
@@ -243,6 +261,8 @@ func TestWorker_reportResourceCounts(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					return mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 				},
 				config: &Config{
@@ -264,6 +284,8 @@ func TestWorker_reportResourceCounts(t *testing.T) {
 			name: "telemetry client error, error",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().ListResourceCounts(gomock.Any(), 0, 2).Return(
 						[]query.ResourceCount{
@@ -282,6 +304,8 @@ func TestWorker_reportResourceCounts(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					client := mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 					client.EXPECT().ReportResourceCounts(gomock.Any(), &analytics.ReportResourceCountsRequest{
 						SystemId: "system-id",
@@ -321,6 +345,8 @@ func TestWorker_reportResourceCounts(t *testing.T) {
 			name: "report ok, no additional counts, no error",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().ListResourceCounts(gomock.Any(), 0, 2).Return(
 						[]query.ResourceCount{
@@ -339,6 +365,8 @@ func TestWorker_reportResourceCounts(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					client := mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 					client.EXPECT().ReportResourceCounts(gomock.Any(), &analytics.ReportResourceCountsRequest{
 						SystemId: "system-id",
@@ -380,6 +408,8 @@ func TestWorker_reportResourceCounts(t *testing.T) {
 			name: "report ok, additional counts, no error",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().ListResourceCounts(gomock.Any(), 0, 2).Return(
 						[]query.ResourceCount{
@@ -422,6 +452,8 @@ func TestWorker_reportResourceCounts(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					client := mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 					client.EXPECT().ReportResourceCounts(gomock.Any(), &analytics.ReportResourceCountsRequest{
 						SystemId: "system-id",
@@ -526,12 +558,18 @@ func TestWorker_Work(t *testing.T) {
 			name: "unknown report type, cancel job",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					return mock.NewMockQueries(gomock.NewController(t))
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					return mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 				},
 				queue: func(t *testing.T) Queue {
+					t.Helper()
+
 					return mock.NewMockQueue(gomock.NewController(t))
 				},
 			},
@@ -549,6 +587,8 @@ func TestWorker_Work(t *testing.T) {
 			name: "report base information, database error, retry job",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().SearchInstances(gomock.Any(), &query.InstanceSearchQueries{}).Return(
 						nil, zerrors.ThrowInternal(nil, "id", "db error"),
@@ -556,9 +596,13 @@ func TestWorker_Work(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					return mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 				},
 				queue: func(t *testing.T) Queue {
+					t.Helper()
+
 					return mock.NewMockQueue(gomock.NewController(t))
 				},
 			},
@@ -576,6 +620,8 @@ func TestWorker_Work(t *testing.T) {
 			name: "report base information, config error, cancel job",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().SearchInstances(gomock.Any(), &query.InstanceSearchQueries{}).Return(
 						&query.Instances{
@@ -595,6 +641,8 @@ func TestWorker_Work(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					client := mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 					client.EXPECT().ReportBaseInformation(gomock.Any(), &analytics.ReportBaseInformationRequest{
 						SystemId: "system-id",
@@ -612,6 +660,8 @@ func TestWorker_Work(t *testing.T) {
 					return client
 				},
 				queue: func(t *testing.T) Queue {
+					t.Helper()
+
 					return mock.NewMockQueue(gomock.NewController(t))
 				},
 				systemID: "system-id",
@@ -631,6 +681,8 @@ func TestWorker_Work(t *testing.T) {
 			name: "report base information, no reports enabled, no error",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().SearchInstances(gomock.Any(), &query.InstanceSearchQueries{}).Return(
 						&query.Instances{
@@ -650,6 +702,8 @@ func TestWorker_Work(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					client := mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 					client.EXPECT().ReportBaseInformation(gomock.Any(), &analytics.ReportBaseInformationRequest{
 						SystemId: "system-id",
@@ -669,6 +723,8 @@ func TestWorker_Work(t *testing.T) {
 					return client
 				},
 				queue: func(t *testing.T) Queue {
+					t.Helper()
+
 					return mock.NewMockQueue(gomock.NewController(t))
 				},
 				config: &Config{
@@ -694,6 +750,8 @@ func TestWorker_Work(t *testing.T) {
 			name: "report base information, job creation error, cancel job",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().SearchInstances(gomock.Any(), &query.InstanceSearchQueries{}).Return(
 						&query.Instances{
@@ -713,6 +771,8 @@ func TestWorker_Work(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					client := mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 					client.EXPECT().ReportBaseInformation(gomock.Any(), &analytics.ReportBaseInformationRequest{
 						SystemId: "system-id",
@@ -732,6 +792,8 @@ func TestWorker_Work(t *testing.T) {
 					return client
 				},
 				queue: func(t *testing.T) Queue {
+					t.Helper()
+
 					q := mock.NewMockQueue(gomock.NewController(t))
 					q.EXPECT().Insert(gomock.Any(),
 						&ServicePingReport{
@@ -768,6 +830,8 @@ func TestWorker_Work(t *testing.T) {
 			name: "report base information, success, no error",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().SearchInstances(gomock.Any(), &query.InstanceSearchQueries{}).Return(
 						&query.Instances{
@@ -787,6 +851,8 @@ func TestWorker_Work(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					client := mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 					client.EXPECT().ReportBaseInformation(gomock.Any(), &analytics.ReportBaseInformationRequest{
 						SystemId: "system-id",
@@ -806,6 +872,8 @@ func TestWorker_Work(t *testing.T) {
 					return client
 				},
 				queue: func(t *testing.T) Queue {
+					t.Helper()
+
 					q := mock.NewMockQueue(gomock.NewController(t))
 					q.EXPECT().Insert(gomock.Any(),
 						&ServicePingReport{
@@ -841,6 +909,8 @@ func TestWorker_Work(t *testing.T) {
 			name: "report resource counts, service unavailable, retry job",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().ListResourceCounts(gomock.Any(), 0, 2).Return(
 						[]query.ResourceCount{
@@ -859,6 +929,8 @@ func TestWorker_Work(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					client := mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 					client.EXPECT().ReportResourceCounts(gomock.Any(), &analytics.ReportResourceCountsRequest{
 						SystemId: "system-id",
@@ -880,6 +952,8 @@ func TestWorker_Work(t *testing.T) {
 					return client
 				},
 				queue: func(t *testing.T) Queue {
+					t.Helper()
+
 					return mock.NewMockQueue(gomock.NewController(t))
 				},
 				config: &Config{
@@ -906,6 +980,8 @@ func TestWorker_Work(t *testing.T) {
 			name: "report resource counts, precondition error, cancel job",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().ListResourceCounts(gomock.Any(), 0, 2).Return(
 						[]query.ResourceCount{
@@ -924,6 +1000,8 @@ func TestWorker_Work(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					client := mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 					client.EXPECT().ReportResourceCounts(gomock.Any(), &analytics.ReportResourceCountsRequest{
 						SystemId: "system-id",
@@ -945,6 +1023,8 @@ func TestWorker_Work(t *testing.T) {
 					return client
 				},
 				queue: func(t *testing.T) Queue {
+					t.Helper()
+
 					return mock.NewMockQueue(gomock.NewController(t))
 				},
 				config: &Config{
@@ -971,6 +1051,8 @@ func TestWorker_Work(t *testing.T) {
 			name: "report resource counts, success, no error",
 			fields: fields{
 				db: func(t *testing.T) Queries {
+					t.Helper()
+
 					queries := mock.NewMockQueries(gomock.NewController(t))
 					queries.EXPECT().ListResourceCounts(gomock.Any(), 0, 2).Return(
 						[]query.ResourceCount{
@@ -989,6 +1071,8 @@ func TestWorker_Work(t *testing.T) {
 					return queries
 				},
 				reportClient: func(t *testing.T) analytics.TelemetryServiceClient {
+					t.Helper()
+
 					client := mock.NewMockTelemetryServiceClient(gomock.NewController(t))
 					client.EXPECT().ReportResourceCounts(gomock.Any(), &analytics.ReportResourceCountsRequest{
 						SystemId: "system-id",
@@ -1012,6 +1096,8 @@ func TestWorker_Work(t *testing.T) {
 					return client
 				},
 				queue: func(t *testing.T) Queue {
+					t.Helper()
+
 					return mock.NewMockQueue(gomock.NewController(t))
 				},
 				config: &Config{

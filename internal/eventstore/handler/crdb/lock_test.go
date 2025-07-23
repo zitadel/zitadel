@@ -321,6 +321,8 @@ type errsMock struct {
 }
 
 func (m *errsMock) handleErrs(t *testing.T, cancel func()) {
+	t.Helper()
+
 	for i := 0; i < m.successfulIters; i++ {
 		if err := <-m.errs; err != nil {
 			t.Errorf("unexpected err in iteration %d: %v", i, err)

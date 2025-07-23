@@ -506,6 +506,8 @@ for values in ('authz_instance');
 )
 
 func prepareCache(t *testing.T, conf cache.Config) (cache.PrunerCache[testIndex, string, *testObject], pgxmock.PgxPoolIface) {
+	t.Helper()
+
 	conf.Log = &logging.Config{
 		Level:     "debug",
 		AddSource: true,

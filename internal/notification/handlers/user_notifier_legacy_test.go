@@ -1943,6 +1943,8 @@ type wantLegacySMS struct {
 }
 
 func newUserNotifierLegacy(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fields, a args, w wantLegacy) *userNotifierLegacy {
+	t.Helper()
+
 	queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
 	channel := channel_mock.NewMockNotificationChannel(ctrl)

@@ -267,6 +267,8 @@ func TestCommands_CheckPermissionUserDelete(t *testing.T) {
 
 func mockDomainPermissionCheck(expectCtx context.Context, expectPermission, expectResourceOwner, expectResourceID string) func(t *testing.T) domain.PermissionCheck {
 	return func(t *testing.T) domain.PermissionCheck {
+		t.Helper()
+
 		return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 			assert.Equal(t, expectCtx, ctx)
 			assert.Equal(t, expectPermission, permission)

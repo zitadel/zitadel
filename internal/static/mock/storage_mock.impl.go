@@ -13,6 +13,8 @@ import (
 )
 
 func NewStorage(t *testing.T) *MockStorage {
+	t.Helper()
+
 	return NewMockStorage(gomock.NewController(t))
 }
 

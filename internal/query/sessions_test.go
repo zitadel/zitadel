@@ -581,6 +581,8 @@ func Test_SessionPrepare(t *testing.T) {
 }
 
 func prepareSessionQueryTesting(t *testing.T, token string) func() (sq.SelectBuilder, func(*sql.Row) (*Session, error)) {
+	t.Helper()
+
 	return func() (sq.SelectBuilder, func(*sql.Row) (*Session, error)) {
 		builder, scan := prepareSessionQuery()
 		return builder, func(row *sql.Row) (*Session, error) {

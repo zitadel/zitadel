@@ -17,6 +17,8 @@ type SQLMock struct {
 type Expectation func(m sqlmock.Sqlmock)
 
 func NewSQLMock(t *testing.T, expectations ...Expectation) *SQLMock {
+	t.Helper()
+
 	db, mock, err := sqlmock.New(
 		sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual),
 		sqlmock.ValueConverterOption(new(TypeConverter)),

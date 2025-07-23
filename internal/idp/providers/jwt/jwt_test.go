@@ -44,6 +44,8 @@ func TestProvider_BeginAuth(t *testing.T) {
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					t.Helper()
+
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
 			},
@@ -65,6 +67,8 @@ func TestProvider_BeginAuth(t *testing.T) {
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					t.Helper()
+
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
 			},
@@ -84,6 +88,8 @@ func TestProvider_BeginAuth(t *testing.T) {
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					t.Helper()
+
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
 			},
@@ -160,6 +166,8 @@ func TestProvider_Options(t *testing.T) {
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					t.Helper()
+
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
 				opts: nil,
@@ -182,6 +190,8 @@ func TestProvider_Options(t *testing.T) {
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					t.Helper()
+
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
 				opts: []ProviderOpts{

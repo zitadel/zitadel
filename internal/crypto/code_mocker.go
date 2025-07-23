@@ -61,12 +61,16 @@ func createMockEncryptionAlgorithm(ctrl *gomock.Controller, encryptFunction func
 }
 
 func createMockCrypto(t *testing.T) EncryptionAlgorithm {
+	t.Helper()
+
 	mCrypto := NewMockEncryptionAlgorithm(gomock.NewController(t))
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("crypto")
 	return mCrypto
 }
 
 func createMockGenerator(t *testing.T, crypto EncryptionAlgorithm) Generator {
+	t.Helper()
+
 	mGenerator := NewMockGenerator(gomock.NewController(t))
 	mGenerator.EXPECT().Alg().AnyTimes().Return(crypto)
 	return mGenerator

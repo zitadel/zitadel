@@ -61,6 +61,8 @@ func TestSession_FetchUser(t *testing.T) {
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					t.Helper()
+
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
 				httpMock: func(issuer string) {
@@ -84,6 +86,8 @@ func TestSession_FetchUser(t *testing.T) {
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					t.Helper()
+
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
 				httpMock: func(issuer string) {
@@ -112,6 +116,8 @@ func TestSession_FetchUser(t *testing.T) {
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
 				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					t.Helper()
+
 					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 				},
 				httpMock: func(issuer string) {
@@ -213,6 +219,8 @@ func TestSession_FetchUser(t *testing.T) {
 }
 
 func idToken(t *testing.T, issuer string) string {
+	t.Helper()
+
 	claims := oidc.NewIDTokenClaims(
 		issuer,
 		"sub",
@@ -295,6 +303,8 @@ HfIQgWUAW9dsjVVOXMP1jhq8U9hmH/PFWA11V/iCdk1NTxZEw87VAOeWuajpdDHG
 }
 
 func keys(t *testing.T) *jose.JSONWebKeySet {
+	t.Helper()
+
 	privateKey, err := crypto.BytesToPublicKey([]byte(`-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs38btwb3c7r0tMaQpGvB
 mY+mPwMU/LpfuPoC0k2t4RsKp0fv40SMl50CRrHgk395wch8PMPYbl3+8TtYAJuy
