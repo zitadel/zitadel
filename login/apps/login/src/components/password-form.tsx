@@ -6,6 +6,7 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
@@ -34,6 +35,8 @@ export function PasswordForm({
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
+  
+  const t = useTranslations("password");
 
   const [info, setInfo] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -118,7 +121,7 @@ export function PasswordForm({
         <TextInput
           type="password"
           autoComplete="password"
-          {...register("password", { required: "This field is required" })}
+          {...register("password", { required: t("verify.required.password") })}
           label="Password"
           data-testid="password-text-input"
         />
