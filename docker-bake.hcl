@@ -1,7 +1,6 @@
-# login-standalone can extend the login-standalone target in apps/login/docker-bake.hcl
+# login-standalone should be extended by the login-standalone target in apps/login/docker-bake.hcl
 target "login-standalone" {
-  context = .
-  dockerfile = dockerfiles/login.Dockerfile
+  dockerfile = "dockerfiles/login.Dockerfile"
 }
 
 target "login-standalone-out" {
@@ -11,3 +10,4 @@ target "login-standalone-out" {
     "type=local,dest=.artifacts/login"
   ]
 }
+ 
