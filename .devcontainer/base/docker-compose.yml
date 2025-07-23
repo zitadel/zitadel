@@ -24,7 +24,7 @@ services:
       PGUSER: postgres
       POSTGRES_PASSWORD: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: [ "CMD-SHELL", "pg_isready" ]
       interval: "10s"
       timeout: "30s"
       retries: 5
@@ -42,9 +42,9 @@ services:
 
   login-integration:
     container_name: login-integration
-    build: 
+    build:
       context: ../..
-      dockerfile: dockerfiles/login.Dockerfile
+      dockerfile: build/login/Dockerfile
     image: "${LOGIN_TAG:-zitadel-login:local}"
     env_file: ../../apps/login/.env.test
     network_mode: service:devcontainer
@@ -156,26 +156,26 @@ services:
       configure-login:
         condition: "service_completed_successfully"
 
-#  mock-oidcop:
-#    container_name: mock-oidcop
-#    build:
-#      context: ../../apps/login/acceptance/idp/oidc
-#      dockerfile: ../../go-command.Dockerfile
-#      args:
-#        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
-#    network_mode: service:devcontainer
-#    environment:
-#      API_URL: 'http://localhost:8080'
-#      API_DOMAIN: 'localhost'
-#      PAT_FILE: '/pat/zitadel-admin-sa.pat'
-#      SCHEMA: 'http'
-#      HOST: 'localhost'
-#      PORT: "8004"
-#    volumes:
-#      - "../apps/login/packages/acceptance/pat:/pat:cached"
-#    depends_on:
-#      configure-login:
-#        condition: "service_completed_successfully"
+  #  mock-oidcop:
+  #    container_name: mock-oidcop
+  #    build:
+  #      context: ../../apps/login/acceptance/idp/oidc
+  #      dockerfile: ../../go-command.Dockerfile
+  #      args:
+  #        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+  #    network_mode: service:devcontainer
+  #    environment:
+  #      API_URL: 'http://localhost:8080'
+  #      API_DOMAIN: 'localhost'
+  #      PAT_FILE: '/pat/zitadel-admin-sa.pat'
+  #      SCHEMA: 'http'
+  #      HOST: 'localhost'
+  #      PORT: "8004"
+  #    volumes:
+  #      - "../apps/login/packages/acceptance/pat:/pat:cached"
+  #    depends_on:
+  #      configure-login:
+  #        condition: "service_completed_successfully"
 
   mock-samlsp:
     container_name: mock-samlsp

@@ -1,6 +1,6 @@
 # login-standalone should be extended by the login-standalone target in apps/login/docker-bake.hcl
 target "login-standalone" {
-  dockerfile = "dockerfiles/login.Dockerfile"
+  dockerfile = "build/login/Dockerfile"
 }
 
 target "login-standalone-out" {
