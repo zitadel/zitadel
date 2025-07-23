@@ -58,7 +58,7 @@
   },
   {
     "service": "zitadel.settings.v2.SettingsService",
-    "method": "GetHostedLoginTranslations",
+    "method": "GetHostedLoginTranslation",
     "out": {
       "data": {}
     }

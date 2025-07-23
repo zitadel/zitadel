@@ -42,6 +42,9 @@ services:
 
   login-integration:
     container_name: login-integration
+    build: 
+      context: ../..
+      dockerfile: dockerfiles/login.Dockerfile
     image: "${LOGIN_TAG:-zitadel-login:local}"
     env_file: ../../apps/login/apps/login/.env.test
     network_mode: service:devcontainer
