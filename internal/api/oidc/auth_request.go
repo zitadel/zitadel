@@ -287,16 +287,18 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 	//
 	// If there's no id_token_hint and for v1 logins, we handle them separately
 	if endSessionRequest.IDTokenHintClaims == nil && (authz.GetFeatures(ctx).LoginV2.Required || headers.Get(LoginClientHeader) != "") {
-		baseURI := authz.GetFeatures(ctx).LoginV2.BaseURI
 		redirectURI := v2PostLogoutRedirectURI(endSessionRequest.RedirectURI)
-		// if no base uri is set, fallback to the default configured in the runtime config
-		if baseURI == nil || baseURI.String() == "" {
-			baseURI, err = url.Parse(o.defaultLogoutURLV2)
+		logoutURI := authz.GetFeatures(ctx).LoginV2.BaseURI
+		// if no logout uri is set, fallback to the default configured in the runtime config
+		if logoutURI == nil || logoutURI.String() == "" {
+			logoutURI, err = url.Parse(o.defaultLogoutURLV2)
 			if err != nil {
 				return "", err
 			}
+		} else {
+			logoutURI = logoutURI.JoinPath(LogoutPath)
 		}
-		return buildLoginV2LogoutURL(baseURI, redirectURI, endSessionRequest.LogoutHint, endSessionRequest.UILocales), nil
+		return buildLoginV2LogoutURL(logoutURI, redirectURI, endSessionRequest.LogoutHint, endSessionRequest.UILocales), nil
 	}
 
 	// V1:
@@ -373,9 +375,12 @@ func (o *OPStorage) federatedLogout(ctx context.Context, sessionID string, postL
 	return login.ExternalLogoutPath(sessionID)
 }
 
-func buildLoginV2LogoutURL(baseURI *url.URL, redirectURI, logoutHint string, uiLocales []language.Tag) string {
-	baseURI.JoinPath(LogoutPath)
-	q := baseURI.Query()
+func buildLoginV2LogoutURL(logoutURI *url.URL, redirectURI, logoutHint string, uiLocales []language.Tag) string {
+	if strings.HasSuffix(logoutURI.Path, "/") && len(logoutURI.Path) > 1 {
+		logoutURI.Path = strings.TrimSuffix(logoutURI.Path, "/")
+	}
+
+	q := logoutURI.Query()
 	q.Set(LoginPostLogoutRedirectParam, redirectURI)
 	if logoutHint != "" {
 		q.Set(LoginLogoutHintParam, logoutHint)
@@ -387,8 +392,8 @@ func buildLoginV2LogoutURL(baseURI *url.URL, redirectURI, logoutHint string, uiL
 		}
 		q.Set(LoginUILocalesParam, strings.Join(locales, " "))
 	}
-	baseURI.RawQuery = q.Encode()
-	return baseURI.String()
+	logoutURI.RawQuery = q.Encode()
+	return logoutURI.String()
 }
 
 // v2PostLogoutRedirectURI will take care that the post_logout_redirect_uri is correctly set for v2 logins.
