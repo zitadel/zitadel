@@ -2841,7 +2841,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 			},
 		},
 		{
-			name: "no permissions, permisison denied error",
+			name: "no permissions, permission denied error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,

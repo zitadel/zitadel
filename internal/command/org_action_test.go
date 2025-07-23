@@ -623,7 +623,7 @@ func TestCommands_DeleteAction(t *testing.T) {
 		res    res
 	}{
 		{
-			"id or resourceOwner emtpy, error",
+			"id or resourceOwner empty, error",
 			fields{
 				eventstore: eventstoreExpect(t),
 			},

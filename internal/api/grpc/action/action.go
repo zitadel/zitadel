@@ -10,7 +10,7 @@ import (
 	message_pb "github.com/zitadel/zitadel/pkg/grpc/message"
 )
 
-// for backward compatability: old enum identifiers are mapped as well
+// for backward compatibility: old enum identifiers are mapped as well
 func FlowTypeToDomain(flowType string) domain.FlowType {
 	switch flowType {
 	case "FLOW_TYPE_EXTERNAL_AUTHENTICATION", domain.FlowTypeExternalAuthentication.ID():
@@ -36,7 +36,7 @@ func FlowTypeToPb(typ domain.FlowType) *action_pb.FlowType {
 }
 
 // TriggerTypeToDomain maps the pb type to domain
-// for backward compatability: old enum identifiers are mapped as well
+// for backward compatibility: old enum identifiers are mapped as well
 func TriggerTypeToDomain(triggerType string) domain.TriggerType {
 	switch triggerType {
 	case "TRIGGER_TYPE_POST_AUTHENTICATION", domain.TriggerTypePostAuthentication.ID():

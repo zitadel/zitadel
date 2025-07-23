@@ -16,10 +16,10 @@ type TLS struct {
 	//either directly or by a path to the corresponding file
 	Enabled bool
 	//Path to the private key of the TLS certificate, it will be loaded into the Key
-	//and overwrite any exising value
+	//and overwrite any existing value
 	KeyPath string
 	//Path to the certificate for the TLS connection, it will be loaded into the Cert
-	//and overwrite any exising value
+	//and overwrite any existing value
 	CertPath string
 	//Private key of the TLS certificate (KeyPath will this overwrite, if specified)
 	Key []byte

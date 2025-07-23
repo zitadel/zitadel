@@ -118,7 +118,7 @@ func (c *HTTP) fetch(ctx context.Context) func(call goja.FunctionCall) goja.Valu
 }
 
 // the first argument has to be a string and is required
-// the second agrument is optional and an object with the following fields possible:
+// the second argument is optional and an object with the following fields possible:
 // - `Headers`: map with string key and value of type string or string array
 // - `Body`: json body of the request
 // - `Method`: http method type
