@@ -6,7 +6,9 @@
     "changeset": "changeset",
     "devcontainer": "devcontainer",
     "devcontainer:lint-unit": "pnpm devcontainer up --config .devcontainer/turbo-lint-unit/devcontainer.json --workspace-folder . --remove-existing-container",
-    "devcontainer:integration:login": "pnpm devcontainer up --config .devcontainer/login-integration/devcontainer.json --workspace-folder . --remove-existing-container"
+    "devcontainer:integration:login": "pnpm devcontainer up --config .devcontainer/login-integration/devcontainer.json --workspace-folder . --remove-existing-container",
+    "devcontainer:integration:login:build": "pnpm docker:build:login && devcontainer:integration:login",
+    "docker:build:login": "docker build --tag zitadel-login:local --file dockerfiles/login.Dockerfile ."
   },
   "pnpm": {
     "overrides": {

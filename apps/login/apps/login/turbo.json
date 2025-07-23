@@ -5,8 +5,9 @@
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
       "dependsOn": ["@zitadel/client#build"]
     },
-    "build:standalone": {
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    "build:login:standalone": {
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "dependsOn": ["@zitadel/client#build"]
     },
     "dev": {
       "dependsOn": ["@zitadel/client#build"]

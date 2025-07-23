@@ -24,6 +24,7 @@
       "cache": true
     },
     "build": {},
+    "build:login:standalone": {},
     "quality": {
       "with": [
         "lint",

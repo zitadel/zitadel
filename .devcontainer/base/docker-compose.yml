@@ -42,7 +42,7 @@ services:
 
   login-integration:
     container_name: login-integration
-    image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2}"
+    image: "${LOGIN_TAG:-zitadel-login:local}"
     env_file: ../../apps/login/apps/login/.env.test
     network_mode: service:devcontainer
     environment:
