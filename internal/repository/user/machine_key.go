@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -62,8 +63,8 @@ func MachineKeyAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 	if err != nil {
 		// first events had wrong payload.
 		// the keys were removed later, that's why we ignore them here.
-		//nolint:errorlint
-		if unwrapErr, ok := err.(*json.UnmarshalTypeError); ok && unwrapErr.Field == "publicKey" {
+		var unwrapErr *json.UnmarshalTypeError
+		if errors.As(err, &unwrapErr) && unwrapErr.Field == "publicKey" {
 			return machineKeyAdded, nil
 		}
 		return nil, zerrors.ThrowInternal(err, "USER-p0ovS", "unable to unmarshal machine key added")

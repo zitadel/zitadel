@@ -1,6 +1,7 @@
 package zerrors
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -29,8 +30,8 @@ func ThrowInternalf(parent error, id, format string, a ...interface{}) error {
 func (err *InternalError) IsInternal() {}
 
 func IsInternal(err error) bool {
-	_, ok := err.(Internal)
-	return ok
+	var tmp Internal
+	return errors.As(err, &tmp)
 }
 
 func (err *InternalError) Is(target error) bool {

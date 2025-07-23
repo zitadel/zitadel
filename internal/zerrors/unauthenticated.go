@@ -1,6 +1,7 @@
 package zerrors
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -29,8 +30,8 @@ func ThrowUnauthenticatedf(parent error, id, format string, a ...interface{}) er
 func (err *UnauthenticatedError) IsUnauthenticated() {}
 
 func IsUnauthenticated(err error) bool {
-	_, ok := err.(Unauthenticated)
-	return ok
+	var tmp Unauthenticated
+	return errors.As(err, &tmp)
 }
 
 func (err *UnauthenticatedError) Is(target error) bool {

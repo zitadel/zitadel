@@ -1,6 +1,7 @@
 package zerrors
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -29,8 +30,8 @@ func ThrowInvalidArgumentf(parent error, id, format string, a ...interface{}) er
 func (err *InvalidArgumentError) IsInvalidArgument() {}
 
 func IsErrorInvalidArgument(err error) bool {
-	_, ok := err.(InvalidArgument)
-	return ok
+	var tmp InvalidArgument
+	return errors.As(err, &tmp)
 }
 
 func (err *InvalidArgumentError) Is(target error) bool {

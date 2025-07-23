@@ -1,6 +1,9 @@
 package zerrors
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type NotFound interface {
 	error
@@ -22,8 +25,8 @@ func ThrowNotFoundf(parent error, id, format string, a ...interface{}) error {
 func (err *NotFoundError) IsNotFound() {}
 
 func IsNotFound(err error) bool {
-	_, ok := err.(NotFound)
-	return ok
+	var tmp NotFound
+	return errors.As(err, &tmp)
 }
 
 func (err *NotFoundError) Is(target error) bool {

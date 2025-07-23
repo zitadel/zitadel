@@ -1,6 +1,7 @@
 package zerrors
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -29,8 +30,8 @@ func ThrowPermissionDeniedf(parent error, id, format string, a ...interface{}) e
 func (err *PermissionDeniedError) IsPermissionDenied() {}
 
 func IsPermissionDenied(err error) bool {
-	_, ok := err.(PermissionDenied)
-	return ok
+	var tmp PermissionDenied
+	return errors.As(err, &tmp)
 }
 
 func (err *PermissionDeniedError) Is(target error) bool {

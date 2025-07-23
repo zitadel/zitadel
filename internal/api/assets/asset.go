@@ -177,7 +177,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 		resourceOwner := uploader.ResourceOwner(authz.GetInstance(ctx), ctxData)
 		objectName, err := uploader.ObjectName(ctxData)
 		if err != nil {
-			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
+			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %w", err), http.StatusInternalServerError)
 			return
 		}
 		uploadInfo := &command.AssetUpload{
@@ -210,7 +210,7 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 		}
 		objectName, err := downloader.ObjectName(ctx, path)
 		if err != nil {
-			s.ErrorHandler()(w, r, fmt.Errorf("download failed: %v", err), http.StatusInternalServerError)
+			s.ErrorHandler()(w, r, fmt.Errorf("download failed: %w", err), http.StatusInternalServerError)
 			return
 		}
 		if objectName == "" {

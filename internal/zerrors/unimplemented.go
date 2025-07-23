@@ -1,6 +1,7 @@
 package zerrors
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -29,8 +30,8 @@ func ThrowUnimplementedf(parent error, id, format string, a ...interface{}) erro
 func (err *UnimplementedError) IsUnimplemented() {}
 
 func IsUnimplemented(err error) bool {
-	_, ok := err.(Unimplemented)
-	return ok
+	var tmp Unimplemented
+	return errors.As(err, &tmp)
 }
 
 func (err *UnimplementedError) Is(target error) bool {
