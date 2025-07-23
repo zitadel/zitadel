@@ -1131,6 +1131,16 @@ module.exports = {
         },
       ],
     },
+    {
+      type: "category",
+      label: "Stream",
+      collapsed: false,
+      link: {type: "doc", id: "self-hosting/stream/index"},
+      items: [
+        "self-hosting/stream/reference",
+        "self-hosting/stream/config",
+      ],
+    },
   ],
   legal: [
     {
