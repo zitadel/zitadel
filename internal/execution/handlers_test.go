@@ -337,7 +337,7 @@ func TestActionProjection_reduces(t *testing.T) {
 						EventType:   action.AddedEventType,
 						UserID:      userID,
 						EventData:   []byte(eventData),
-						TargetsData: mockTargetsToBytes(targets),
+						TargetsData: mockTargetsToBytes(t, targets),
 					},
 					gomock.Any(),
 				).Return(nil)
@@ -388,7 +388,7 @@ func TestActionProjection_reduces(t *testing.T) {
 						EventType:   action.AddedEventType,
 						UserID:      userID,
 						EventData:   []byte(eventData),
-						TargetsData: mockTargetsToBytes(targets),
+						TargetsData: mockTargetsToBytes(t, targets),
 					},
 					gomock.Any(),
 				).Return(nil)
@@ -474,8 +474,14 @@ func mockTargets(count int) []*query.ExecutionTarget {
 	return targets
 }
 
-func mockTargetsToBytes(targets []*query.ExecutionTarget) []byte {
-	data, _ := json.Marshal(targets)
+func mockTargetsToBytes(t *testing.T, targets []*query.ExecutionTarget) []byte {
+	t.Helper()
+
+	data, err := json.Marshal(targets)
+	if err != nil {
+		t.Fatalf("json.Marshal: %v", err)
+	}
+
 	return data
 }
 

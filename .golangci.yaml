@@ -21,6 +21,8 @@ linters:
     - bodyclose
     # check the function whether use a non-inherited context [fast: false, auto-fix: false]
     - contextcheck
+    # Checks types passed to the json encoding functions. Reports unsupported types and optionally reports occations, where the check for the returned error can be omitted. [fast: false, auto-fix: false]
+    - errchkjson
     # Checks that sentinel errors are prefixed with the `Err` and error types are suffixed with the `Error`. [fast: false, auto-fix: false]
     - errname
     # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13. [fast: false, auto-fix: false]
@@ -82,9 +84,6 @@ linters:
     # Golang linter to check the errors handling expressions [fast: false, auto-fix: false]
     # Not used in favore of errorlint
     - err113
-    # Checks types passed to the json encoding functions. Reports unsupported types and optionally reports occations, where the check for the returned error can be omitted. [fast: false, auto-fix: false]
-    # FUTURE: use asap, because we use json alot. nice feature is possiblity to check if err check is required
-    - errchkjson
     # Checks if all structure fields are initialized
     # Not all fields have to be initialized
     - exhaustruct

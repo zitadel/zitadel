@@ -2881,7 +2881,11 @@ func Test_userSessionByIDs(t *testing.T) {
 							Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
 							CreationDate:  testNow,
 							Data: func() []byte {
-								data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
+								data, err := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
+								if err != nil {
+									t.Fatalf("json.Marshal: %v", err)
+								}
+
 								return data
 							}(),
 						},
@@ -2910,7 +2914,11 @@ func Test_userSessionByIDs(t *testing.T) {
 							Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
 							CreationDate:  testNow,
 							Data: func() []byte {
-								data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
+								data, err := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
+								if err != nil {
+									t.Fatalf("json.Marshal: %v", err)
+								}
+
 								return data
 							}(),
 						},
@@ -2971,7 +2979,11 @@ func Test_userSessionByIDs(t *testing.T) {
 							Typ:           user_repo.HumanPasswordCheckSucceededType,
 							CreationDate:  testNow,
 							Data: func() []byte {
-								data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
+								data, err := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
+								if err != nil {
+									t.Fatalf("json.Marshal: %v", err)
+								}
+
 								return data
 							}(),
 						},
@@ -3071,7 +3083,11 @@ func Test_userByID(t *testing.T) {
 							Typ:           user_repo.UserV1PasswordChangedType,
 							CreationDate:  testNow,
 							Data: func() []byte {
-								data, _ := json.Marshal(user_es_model.Password{ChangeRequired: false, Secret: &crypto.CryptoValue{}})
+								data, err := json.Marshal(user_es_model.Password{ChangeRequired: false, Secret: &crypto.CryptoValue{}})
+								if err != nil {
+									t.Fatalf("json.Marshal: %v", err)
+								}
+
 								return data
 							}(),
 						},

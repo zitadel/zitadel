@@ -597,9 +597,15 @@ type request struct {
 	Request string `json:"request"`
 }
 
-func testErrorBody(code int, message string) []byte {
+func testErrorBody(t *testing.T, code int, message string) []byte {
+	t.Helper()
+
 	body := &execution.ErrorBody{ForwardedStatusCode: code, ForwardedErrorMessage: message}
-	data, _ := json.Marshal(body)
+	data, err := json.Marshal(body)
+	if err != nil {
+		t.Fatalf("json.Marshal: %v", err)
+	}
+
 	return data
 }
 
@@ -688,7 +694,7 @@ func Test_handleResponse(t *testing.T) {
 			args{
 				resp: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       io.NopCloser(bytes.NewReader(testErrorBody(http.StatusForbidden, "forbidden"))),
+					Body:       io.NopCloser(bytes.NewReader(testErrorBody(t, http.StatusForbidden, "forbidden"))),
 				},
 			},
 			res{
@@ -702,7 +708,7 @@ func Test_handleResponse(t *testing.T) {
 			args{
 				resp: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       io.NopCloser(bytes.NewReader(testErrorBody(http.StatusInternalServerError, "internal"))),
+					Body:       io.NopCloser(bytes.NewReader(testErrorBody(t, http.StatusInternalServerError, "internal"))),
 				},
 			},
 			res{
@@ -716,7 +722,7 @@ func Test_handleResponse(t *testing.T) {
 			args{
 				resp: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       io.NopCloser(bytes.NewReader(testErrorBody(http.StatusPermanentRedirect, "redirect"))),
+					Body:       io.NopCloser(bytes.NewReader(testErrorBody(t, http.StatusPermanentRedirect, "redirect"))),
 				},
 			},
 			res{
