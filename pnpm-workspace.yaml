@@ -3,5 +3,4 @@ packages:
   - "docs"
   - "e2e"
   - "packages/*"
-  - "apps/login/apps/*"
-  - "apps/login/packages/*"
+  - "apps/*"

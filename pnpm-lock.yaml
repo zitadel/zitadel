@@ -23,7 +23,7 @@ importers:
         specifier: 2.5.5
         version: 2.5.5
 
-  apps/login/apps/login:
+  apps/login:
     dependencies:
       '@headlessui/react':
         specifier: ^2.1.9
@@ -42,10 +42,10 @@ importers:
         version: 1.5.0(next@15.4.0-canary.86(@babel/core@7.28.0)(@playwright/test@1.54.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.89.2))(react@19.1.0)
       '@zitadel/client':
         specifier: workspace:*
-        version: link:../../../../packages/zitadel-client
+        version: link:../../packages/zitadel-client
       '@zitadel/proto':
         specifier: workspace:*
-        version: link:../../../../packages/zitadel-proto
+        version: link:../../packages/zitadel-proto
       clsx:
         specifier: 1.2.1
         version: 1.2.1
@@ -98,6 +98,21 @@ importers:
       '@bufbuild/buf':
         specifier: ^1.53.0
         version: 1.55.1
+      '@faker-js/faker':
+        specifier: ^9.7.0
+        version: 9.9.0
+      '@otplib/core':
+        specifier: ^12.0.0
+        version: 12.0.1
+      '@otplib/plugin-crypto':
+        specifier: ^12.0.0
+        version: 12.0.1
+      '@otplib/plugin-thirty-two':
+        specifier: ^12.0.0
+        version: 12.0.1
+      '@playwright/test':
+        specifier: ^1.52.0
+        version: 1.54.1
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.6.3
@@ -137,6 +152,18 @@ importers:
       autoprefixer:
         specifier: 10.4.21
         version: 10.4.21(postcss@8.5.3)
+      concurrently:
+        specifier: ^9.1.2
+        version: 9.2.0
+      cypress:
+        specifier: ^14.5.2
+        version: 14.5.2
+      dotenv-cli:
+        specifier: ^8.0.0
+        version: 8.0.0
+      env-cmd:
+        specifier: ^10.0.0
+        version: 10.1.0
       eslint:
         specifier: ^8.57.0
         version: 8.57.1
@@ -146,6 +173,9 @@ importers:
       eslint-config-prettier:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
+      gaxios:
+        specifier: ^7.1.0
+        version: 7.1.1
       grpc-tools:
         specifier: 1.13.0
         version: 1.13.0(encoding@0.1.13)
@@ -158,6 +188,9 @@ importers:
       make-dir-cli:
         specifier: 4.0.0
         version: 4.0.0
+      nodemon:
+        specifier: ^3.1.9
+        version: 3.1.10
       postcss:
         specifier: 8.5.3
         version: 8.5.3
@@ -173,6 +206,9 @@ importers:
       sass:
         specifier: ^1.87.0
         version: 1.89.2
+      start-server-and-test:
+        specifier: ^2.0.11
+        version: 2.0.12
       tailwindcss:
         specifier: 3.4.14
         version: 3.4.14
@@ -188,60 +224,6 @@ importers:
       vitest:
         specifier: ^2.0.0
         version: 2.1.9(@types/node@22.16.5)(jsdom@26.1.0)(less@4.1.3)(lightningcss@1.30.1)(sass@1.89.2)(terser@5.43.1)
-
-  apps/login/packages/acceptance:
-    devDependencies:
-      '@faker-js/faker':
-        specifier: ^9.7.0
-        version: 9.9.0
-      '@otplib/core':
-        specifier: ^12.0.0
-        version: 12.0.1
-      '@otplib/plugin-crypto':
-        specifier: ^12.0.0
-        version: 12.0.1
-      '@otplib/plugin-thirty-two':
-        specifier: ^12.0.0
-        version: 12.0.1
-      '@playwright/test':
-        specifier: ^1.52.0
-        version: 1.54.1
-      dotenv-cli:
-        specifier: ^8.0.0
-        version: 8.0.0
-      gaxios:
-        specifier: ^7.1.0
-        version: 7.1.1
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
-
-  apps/login/packages/integration:
-    devDependencies:
-      '@types/node':
-        specifier: ^22.14.1
-        version: 22.16.5
-      concurrently:
-        specifier: ^9.1.2
-        version: 9.2.0
-      cypress:
-        specifier: ^14.5.2
-        version: 14.5.2
-      dotenv-cli:
-        specifier: ^8.0.0
-        version: 8.0.0
-      env-cmd:
-        specifier: ^10.0.0
-        version: 10.1.0
-      nodemon:
-        specifier: ^3.1.9
-        version: 3.1.10
-      start-server-and-test:
-        specifier: ^2.0.11
-        version: 2.0.12
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
 
   console:
     dependencies:
@@ -19145,11 +19127,11 @@ snapshots:
   '@npmcli/fs@2.1.2':
     dependencies:
       '@gar/promisify': 1.1.3
-      semver: 7.5.4
+      semver: 7.7.2
 
   '@npmcli/fs@3.1.1':
     dependencies:
-      semver: 7.5.4
+      semver: 7.7.2
 
   '@npmcli/git@4.1.0':
     dependencies:
@@ -19159,7 +19141,7 @@ snapshots:
       proc-log: 3.0.0
       promise-inflight: 1.0.1
       promise-retry: 2.0.1
-      semver: 7.5.4
+      semver: 7.7.2
       which: 3.0.1
     transitivePeerDependencies:
       - bluebird
@@ -22973,7 +22955,7 @@ snapshots:
       postcss-modules-scope: 3.2.1(postcss@8.5.3)
       postcss-modules-values: 4.0.0(postcss@8.5.3)
       postcss-value-parser: 4.2.0
-      semver: 7.5.4
+      semver: 7.7.2
       webpack: 5.94.0(@swc/core@1.13.1)(esbuild@0.18.17)
 
   css-minimizer-webpack-plugin@5.0.1(clean-css@5.3.3)(webpack@5.100.2(@swc/core@1.13.1(@swc/helpers@0.5.17))):
@@ -24155,7 +24137,7 @@ snapshots:
     dependencies:
       '@next/eslint-plugin-next': 15.4.0-canary.86
       '@rushstack/eslint-patch': 1.12.0
-      '@typescript-eslint/eslint-plugin': 7.18.0(@typescript-eslint/parser@8.38.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
+      '@typescript-eslint/eslint-plugin': 8.38.0(@typescript-eslint/parser@8.38.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
       '@typescript-eslint/parser': 8.38.0(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
@@ -24991,7 +24973,7 @@ snapshots:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 3.0.5
+      minimatch: 3.1.2
       once: 1.4.0
       path-is-absolute: 1.0.1
 
@@ -28083,7 +28065,7 @@ snapshots:
       nopt: 6.0.0
       npmlog: 6.0.2
       rimraf: 3.0.2
-      semver: 7.5.4
+      semver: 7.7.2
       tar: 6.2.1
       which: 2.0.2
     transitivePeerDependencies:
@@ -28128,7 +28110,7 @@ snapshots:
     dependencies:
       hosted-git-info: 6.1.3
       is-core-module: 2.16.1
-      semver: 7.5.4
+      semver: 7.7.2
       validate-npm-package-license: 3.0.4
 
   normalize-path@3.0.0: {}
@@ -28143,7 +28125,7 @@ snapshots:
 
   npm-install-checks@6.3.0:
     dependencies:
-      semver: 7.5.4
+      semver: 7.7.2
 
   npm-normalize-package-bin@3.0.1: {}
 
@@ -28151,7 +28133,7 @@ snapshots:
     dependencies:
       hosted-git-info: 6.1.3
       proc-log: 3.0.0
-      semver: 7.5.4
+      semver: 7.7.2
       validate-npm-package-name: 5.0.1
 
   npm-packlist@7.0.4:
@@ -28163,7 +28145,7 @@ snapshots:
       npm-install-checks: 6.3.0
       npm-normalize-package-bin: 3.0.1
       npm-package-arg: 10.1.0
-      semver: 7.5.4
+      semver: 7.7.2
 
   npm-registry-fetch@14.0.5:
     dependencies:
@@ -29027,7 +29009,7 @@ snapshots:
       cosmiconfig: 8.3.6(typescript@5.1.6)
       jiti: 1.21.7
       postcss: 8.4.31
-      semver: 7.5.4
+      semver: 7.7.2
       webpack: 5.94.0(@swc/core@1.13.1)(esbuild@0.18.17)
     transitivePeerDependencies:
       - typescript
