@@ -163,14 +163,21 @@ The following dev containers are available:
 - **.devcontainer/login-integration-debug/devcontainer.json**: Runs a dev container that spins up the login in a hot-reloading dev server and executes login integration tests interactively. You can fix the errors right away and have immediate feedback.
 
 You can also run the GitHub PR checks locally in dev containers without having to connect to a dev container.
-The following pnpm commands use the devcontainer CLI and exit when the checks are done.
+ 
+
+The following pnpm commands use the [devcontainer CLI](https://github.com/devcontainers/cli/) and exit when the checks are done.
+The minimal system requirements are having Docker and the devcontainers CLI installed.
+If you don't have the node_modules installed already, you need to install the devcontainers CLI manually. Run `npm i -g @devcontainers/cli`. Alternatively, the [official Microsoft VS Code extension for Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) offers a command `Dev Containers: Install devcontainer CLI`
+
 
 ```bash
-npx pnpm devcontainer:lint-unit
-npx pnpm devcontainer:integration:login
+npm run devcontainer:lint-unit
+npm run devcontainer:integration:login
 ```
 
-To connect to a dev container with to have full IDE support, follow the instructions provided by your code editor/IDE to initiate the dev container.
+If you don't have NPM installed, copy and execute the scripts from the package.json directly.
+
+To connect to a dev container to have full IDE support, follow the instructions provided by your code editor/IDE to initiate the dev container.
 This typically involves opening the "Command Palette" or similar functionality and searching for commands related to "Dev Containers" or "Remote Containers".
 The quick start guide for VS Code can found [here](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)
 
