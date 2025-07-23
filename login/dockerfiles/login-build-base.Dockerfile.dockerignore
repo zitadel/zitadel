@@ -1,0 +1,14 @@
+# .dockerignore for login-build-base
+**/.turbo
+**/.next
+**/node_modules
+**/dist
+**/build
+**/*.log
+**/.git
+**/coverage
+**/.nyc_output
+**/cypress/videos
+**/cypress/screenshots
+**/.env.local
+**/.env.*.local

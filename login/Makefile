@@ -123,7 +123,7 @@ login_standalone_out:
 
 typescript_generate:
 	@echo "Generating TypeScript client and writing to local $(LOGIN_DIR)packages/zitadel-proto"
-	$(LOGIN_BAKE_CLI_WITH_ARGS) login-typescript-proto-client-out
+	$(LOGIN_BAKE_CLI_WITH_ARGS) login-zitadel-proto-out
 
 clean_run_caches:
 	@echo "Removing cache directory: $(CACHE_DIR)"
