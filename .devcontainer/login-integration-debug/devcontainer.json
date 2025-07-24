@@ -13,7 +13,7 @@
 	"forwardPorts": [
 		3001
 	],
-	"onCreateCommand": "pnpm install --recursive",
+	"onCreateCommand": "pnpm install --recursive && cd apps/login/integration && pnpm cypress install",
 	"postAttachCommand": "pnpm turbo daemon clean || true; pnpm turbo test:integration:login:debug",
 	"customizations": {
 		"jetbrains": {
