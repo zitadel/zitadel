@@ -3,6 +3,10 @@
 	"name": "devcontainer",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "devcontainer",
+	"runServices": [
+		"devContainer",
+		"db"
+	],
 	"workspaceFolder": "/workspaces",
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {

@@ -1,6 +1,5 @@
 # Contributing to Zitadel
 
-
 ## Introduction
 
 Thank you for your interest about how to contribute! As you might know there is more than code to contribute. You can find all information needed to start contributing here.
@@ -150,51 +149,19 @@ The API is designed to be used by different clients, such as web applications, m
 Therefore, the API is designed to be easy to use, consistent, and reliable.
 Please check out the dedicated [API guidelines](./API_DESIGN.md) page when contributing to the API.
 
-
-#### <a name="dev-containers"></>Developing Zitadel with Dev Containers
-
-You can use dev containers if you'd like to make sure you have the same development environment like the corresponding GitHub PR checks use.
-The following dev containers are available:
-
-- **.devcontainer/base/devcontainer.json**: Contains everything you need to run whatever you want.
-- **.devcontainer/turbo-lint-unit/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests and then exits. This is useful to reproduce the corresponding GitHub PR check. 
-- **.devcontainer/turbo-lint-unit-debug/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests in watch mode. You can fix the errors right away and have immediate feedback.
-- **.devcontainer/login-integration/devcontainer.json**: Runs a dev container that executes login integration tests and then exits. This is useful to reproduce the corresponding GitHub PR check.
-- **.devcontainer/login-integration-debug/devcontainer.json**: Runs a dev container that spins up the login in a hot-reloading dev server and executes login integration tests interactively. You can fix the errors right away and have immediate feedback.
-
-You can also run the GitHub PR checks locally in dev containers without having to connect to a dev container.
- 
-
-The following pnpm commands use the [devcontainer CLI](https://github.com/devcontainers/cli/) and exit when the checks are done.
-The minimal system requirements are having Docker and the devcontainers CLI installed.
-If you don't have the node_modules installed already, you need to install the devcontainers CLI manually. Run `npm i -g @devcontainers/cli`. Alternatively, the [official Microsoft VS Code extension for Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) offers a command `Dev Containers: Install devcontainer CLI`
-
-
-```bash
-npm run devcontainer:lint-unit
-npm run devcontainer:integration:login
-```
-
-If you don't have NPM installed, copy and execute the scripts from the package.json directly.
-
-To connect to a dev container to have full IDE support, follow the instructions provided by your code editor/IDE to initiate the dev container.
-This typically involves opening the "Command Palette" or similar functionality and searching for commands related to "Dev Containers" or "Remote Containers".
-The quick start guide for VS Code can found [here](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)
-
-For example, to build and run the Zitadel binary in a dev container, connect your IDE to the dev container described in .devcontainer/base/devcontainer.json.
-Run the following commands inside the container to start Zitadel.
-
-```bash
-make compile && ./zitadel start-from-init --masterkey MasterkeyNeedsToHave32Characters --tlsMode disabled
-```
-
-Zitadel serves traffic as soon as you can see the following log line:
-
-`INFO[0001] server is listening on [::]:8080`
-
 ## <a name="backend"></a>Contribute Backend Code
 
+
+
+### <a name="backend-requirements"></a> Backend Requirements
+
 By executing the commands from this section, you run everything you need to develop the Zitadel backend locally.
+
+> [!INFO]
+> Some [dev containers are available](dev-containers) for remote development with docker and pipeline debugging in isolated environments.
+> If you don't want to use one of the dev containers, you can develop the backend components directly on your local machine.
+> To do so, proceed with installing the necessary dependencies.
+
 Using [Docker Compose](https://docs.docker.com/compose/), you run a [PostgreSQL](https://www.postgresql.org/download/) on your local machine.
 With [make](https://www.gnu.org/software/make/), you build a debuggable Zitadel binary and run it using [delve](https://github.com/go-delve/delve).
 Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
@@ -207,6 +174,8 @@ The commands in this section are tested against the following software versions:
 - [Docker version 20.10.17](https://docs.docker.com/engine/install/)
 - [Go version 1.22](https://go.dev/doc/install)
 - [Delve 1.9.1](https://github.com/go-delve/delve/tree/v1.9.1/Documentation/installation)
+
+### <a name="build-and-run-zitadel"></a>Build and Run Zitadel
 
 Make some changes to the source code, then run the database locally.
 
@@ -588,6 +557,48 @@ For the turbo commands, check your options with `pnpm turbo --help`
 | `pnpm turbo down`         | Remove containers and volumes                            | Shut down containers from the integration test setup `pnpm turbo down`                                                                                     |
 | `pnpm turbo clean`        | Remove downloaded dependencies and other generated files | Remove generated docs  `pnpm turbo clean --filter zitadel-docs`                                                                                            |
 
+## <a name="dev-containers"></>Developing Zitadel with Dev Containers
+
+You can use dev containers if you'd like to make sure you have the same development environment like the corresponding GitHub PR checks use.
+The following dev containers are available:
+
+- **.devcontainer/base/devcontainer.json**: Contains everything you need to run whatever you want.
+- **.devcontainer/turbo-lint-unit/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests and then exits. This is useful to reproduce the corresponding GitHub PR check. 
+- **.devcontainer/turbo-lint-unit-debug/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests in watch mode. You can fix the errors right away and have immediate feedback.
+- **.devcontainer/login-integration/devcontainer.json**: Runs a dev container that executes login integration tests and then exits. This is useful to reproduce the corresponding GitHub PR check.
+- **.devcontainer/login-integration-debug/devcontainer.json**: Runs a dev container that spins up the login in a hot-reloading dev server and executes login integration tests interactively. You can fix the errors right away and have immediate feedback.
+
+You can also run the GitHub PR checks locally in dev containers without having to connect to a dev container.
+ 
+
+The following pnpm commands use the [devcontainer CLI](https://github.com/devcontainers/cli/) and exit when the checks are done.
+The minimal system requirements are having Docker and the devcontainers CLI installed.
+If you don't have the node_modules installed already, you need to install the devcontainers CLI manually. Run `npm i -g @devcontainers/cli`. Alternatively, the [official Microsoft VS Code extension for Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) offers a command `Dev Containers: Install devcontainer CLI`
+
+
+```bash
+npm run devcontainer:lint-unit
+npm run devcontainer:integration:login
+```
+
+If you don't have NPM installed, copy and execute the scripts from the package.json directly.
+
+To connect to a dev container to have full IDE support, follow the instructions provided by your code editor/IDE to initiate the dev container.
+This typically involves opening the "Command Palette" or similar functionality and searching for commands related to "Dev Containers" or "Remote Containers".
+The quick start guide for VS Code can found [here](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)
+
+For example, to build and run the Zitadel binary in a dev container, connect your IDE to the dev container described in .devcontainer/base/devcontainer.json.
+Run the following commands inside the container to start Zitadel.
+
+```bash
+make compile && ./zitadel start-from-init --masterkey MasterkeyNeedsToHave32Characters --tlsMode disabled
+```
+
+Zitadel serves traffic as soon as you can see the following log line:
+
+`INFO[0001] server is listening on [::]:8080`
+
+
 ## <a name="contribute-translations"></a>Contribute Translations
 
 Zitadel loads translations from four files:
@@ -607,11 +618,6 @@ You also have to add some changes to the following files:
 - [Add Supported Language](./console/src/app/utils/language.ts)
 - [Customized Text Docs](./docs/docs/guides/manage/customize/texts.md)
 - [Add language option](./internal/api/ui/login/static/templates/external_not_found_option.html)
-
-## Want to start Zitadel?
-
-You can find an installation guide for all the different environments here:
-[https://zitadel.com/docs/self-hosting/deploy/overview](https://zitadel.com/docs/self-hosting/deploy/overview)
 
 ## **Did you find a security flaw?**
 

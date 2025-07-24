@@ -10,7 +10,7 @@
 	"workspaceFolder": "/workspaces",
 	"forwardPorts": [3001],
 	"onCreateCommand": "pnpm install --recursive",
-	"postAttachCommand": "pnpm turbo daemon clean; pnpm turbo watch lint test:unit",
+	"postAttachCommand": "pnpm turbo daemon clean || true; pnpm turbo watch lint test:unit",
 	"customizations": {
 		"jetbrains": {
 			"settings": {

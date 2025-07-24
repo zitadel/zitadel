@@ -5,9 +5,13 @@
 		"../base/docker-compose.yml"
 	],
 	"service": "devcontainer",
-	"runServices": ["login-integration"],
+	"runServices": [
+		"login-integration"
+	],
 	"workspaceFolder": "/workspaces",
-	"forwardPorts": [3001],
+	"forwardPorts": [
+		3001
+	],
 	"onCreateCommand": "pnpm install --frozen-lockfile --recursive && cd apps/login/packages/integration && pnpm cypress install && pnpm test:integration:login",
 	"customizations": {
 		"jetbrains": {

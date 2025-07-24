@@ -40,9 +40,16 @@
         "@zitadel/client#build"
       ]
     },
-    "test:integration:login:debug": {
-      "persistent": true,
-      "cache": false,
+    "test:integration:login": {
+      "inputs": [
+        ".next/trace",
+        "integration/integration/**",
+        "integration/support/**"
+      ],
+      "outputs": [
+        "cypress/videos/**",
+        "cypress/screenshots/**"
+      ],
       "with": [
         "dev"
       ]
