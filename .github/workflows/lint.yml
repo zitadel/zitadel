@@ -53,18 +53,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          version: 9.1.2+sha256.19c17528f9ca20bd442e4ca42f00f1b9808a9cb419383cd04ba32ef19322aba7
-
-          # The devcontainer runs install after we set up caching in the following step
-          run_install: false        
-      - name: Set up pnpm caching
-        uses: actions/setup-node@v4
-        with:
-          # We don't care about the node version or anything else, we just want to set up pnpm caching
-          cache: 'pnpm'
       - name: Install Dev Container CLI
         run: npm install -g @devcontainers/cli@0.80.0
       - name: Lint and Unit Test All JavaScript Code
