@@ -13,6 +13,7 @@ services:
     environment:
       ZITADEL_DATABASE_POSTGRES_HOST: db
       ZITADEL_EXTERNALSECURE: false
+      PNPM_HOME: $PNPM_HOME
 
   db:
     container_name: db
