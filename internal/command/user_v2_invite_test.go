@@ -21,6 +21,7 @@ import (
 )
 
 func TestCommands_CreateInviteCode(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		checkPermission             domain.PermissionCheck
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
@@ -664,6 +665,7 @@ func TestCommands_CreateInviteCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := &Commands{
 				checkPermission:             tt.fields.checkPermission,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
@@ -680,6 +682,7 @@ func TestCommands_CreateInviteCode(t *testing.T) {
 }
 
 func TestCommands_ResendInviteCode(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		checkPermission             domain.PermissionCheck
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
@@ -1051,6 +1054,7 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := &Commands{
 				checkPermission:             tt.fields.checkPermission,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
@@ -1065,6 +1069,7 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 }
 
 func TestCommands_InviteCodeSent(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
@@ -1183,6 +1188,7 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
@@ -1193,6 +1199,7 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 }
 
 func TestCommands_VerifyInviteCode(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		eventstore     func(*testing.T) *eventstore.Eventstore
 		userEncryption crypto.EncryptionAlgorithm
@@ -1278,6 +1285,7 @@ func TestCommands_VerifyInviteCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := &Commands{
 				eventstore:     tt.fields.eventstore(t),
 				userEncryption: tt.fields.userEncryption,
@@ -1290,6 +1298,7 @@ func TestCommands_VerifyInviteCode(t *testing.T) {
 }
 
 func TestCommands_VerifyInviteCodeSetPassword(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		eventstore         func(*testing.T) *eventstore.Eventstore
 		userEncryption     crypto.EncryptionAlgorithm
@@ -1606,6 +1615,7 @@ func TestCommands_VerifyInviteCodeSetPassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := &Commands{
 				eventstore:         tt.fields.eventstore(t),
 				userEncryption:     tt.fields.userEncryption,
