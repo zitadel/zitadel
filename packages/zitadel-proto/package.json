@@ -6,7 +6,14 @@
     "access": "public"
   },
   "type": "module",
+  "main": "./zitadel/policy_pb.js",
+  "types": "./types/zitadel/policy_pb.d.ts",
   "exports": {
+    ".": {
+      "types": "./types/zitadel/policy_pb.d.ts",
+      "import": "./es/zitadel/policy_pb.js",
+      "require": "./cjs/zitadel/policy_pb.cjs"
+    },
     "./zitadel/*": {
       "types": "./types/zitadel/*.d.ts",
       "import": "./es/zitadel/*.js",
@@ -50,13 +57,16 @@
   },
   "sideEffects": false,
   "scripts": {
-    "generate": "pnpm exec buf generate ../../proto",
+    "generate": "pnpm exec buf generate ../../proto && node scripts/generate-exports.mjs",
+    "generate:exports": "node scripts/generate-exports.mjs",
+    "postinstall": "node scripts/generate-exports.mjs",
     "clean": "rm -rf zitadel .turbo node_modules google protoc-gen-openapiv2 validate cjs types es"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.2"
   },
   "devDependencies": {
-    "@bufbuild/buf": "^1.53.0"
+    "@bufbuild/buf": "^1.53.0",
+    "glob": "^11.0.0"
   }
 }
