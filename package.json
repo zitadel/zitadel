@@ -3,6 +3,7 @@
   "private": true,
   "name": "zitadel-monorepo",
   "scripts": {
+    "generate": "turbo run generate",
     "changeset": "changeset",
     "devcontainer": "devcontainer",
     "devcontainer:lint-unit": "pnpm devcontainer up --config .devcontainer/turbo-lint-unit/devcontainer.json --workspace-folder . --remove-existing-container",
