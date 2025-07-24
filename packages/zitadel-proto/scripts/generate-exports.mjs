@@ -9,6 +9,11 @@ const PACKAGE_JSON_PATH = './package.json';
 /**
  * Generate clean, minimal exports using wildcards for better maintainability
  * This approach is compatible with older moduleResolution: "node" strategies
+ * 
+ * Note: This script is kept for manual maintenance but is no longer run automatically
+ * on postinstall since the wildcard exports are stable and checked into version control.
+ * 
+ * Run manually with: npm run generate:exports
  */
 async function generateExports() {
     console.log('🔍 Scanning for generated proto files...');
