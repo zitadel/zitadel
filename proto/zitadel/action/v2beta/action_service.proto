@@ -664,6 +664,7 @@ message ListTargetsRequest {
 }
 
 message ListTargetsResponse {
+  reserved 'result';
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
   repeated Target targets = 2;
 }
@@ -704,6 +705,7 @@ message ListExecutionsRequest {
 }
 
 message ListExecutionsResponse {
+  reserved 'result';
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
   repeated Execution executions = 2;
 }
