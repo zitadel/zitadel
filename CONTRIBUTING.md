@@ -573,7 +573,7 @@ You can also run the GitHub PR checks locally in dev containers without having t
 
 The following pnpm commands use the [devcontainer CLI](https://github.com/devcontainers/cli/) and exit when the checks are done.
 The minimal system requirements are having Docker and the devcontainers CLI installed.
-If you don't have the node_modules installed already, you need to install the devcontainers CLI manually. Run `npm i -g @devcontainers/cli`. Alternatively, the [official Microsoft VS Code extension for Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) offers a command `Dev Containers: Install devcontainer CLI`
+If you don't have the node_modules installed already, you need to install the devcontainers CLI manually. Run `npm i -g @devcontainers/cli@0.80.0`. Alternatively, the [official Microsoft VS Code extension for Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) offers a command `Dev Containers: Install devcontainer CLI`
 
 
 ```bash

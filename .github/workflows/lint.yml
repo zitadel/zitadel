@@ -66,9 +66,9 @@ jobs:
           # We don't care about the node version or anything else, we just want to set up pnpm caching
           cache: 'pnpm'
       - name: Install Dev Container CLI
-        run: pnpm install -g @devcontainers/cli@0.3.0
+        run: npm install -g @devcontainers/cli@0.80.0
       - name: Lint and Unit Test All JavaScript Code
-        run: pnpm devcontainer:lint-unit
+        run: npm devcontainer:lint-unit
 
   core:
     name: core
