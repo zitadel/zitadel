@@ -26,12 +26,7 @@ jobs:
         with:
           # We don't care about the node version or anything else, we just want to set up pnpm caching
           cache: 'pnpm'
+      - name: Install Dev Container CLI
+        run: pnpm install -g @devcontainers/cli@0.3.0
       - name: Run Integration Tests against the Login and a Mocked Zitadel API
-        uses: devcontainers/ci@v0.3
-        environment:
-          LOGIN_TAG: ${{ inputs.login_build_image }}
-        with:
-          push: never
-          configFile: .devcontainer/login-integration/devcontainer.json
-          runCmd: echo "Successfully ran postStartCommand"
-          
+        run: pnpm devcontainer:integration:login

@@ -57,6 +57,7 @@ jobs:
         name: Install pnpm
         with:
           version: 9.1.2+sha256.19c17528f9ca20bd442e4ca42f00f1b9808a9cb419383cd04ba32ef19322aba7
+
           # The devcontainer runs install after we set up caching in the following step
           run_install: false        
       - name: Set up pnpm caching
@@ -64,12 +65,10 @@ jobs:
         with:
           # We don't care about the node version or anything else, we just want to set up pnpm caching
           cache: 'pnpm'
+      - name: Install Dev Container CLI
+        run: pnpm install -g @devcontainers/cli@0.3.0
       - name: Lint and Unit Test All JavaScript Code
-        uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          configFile: .devcontainer/turbo-lint-unit/devcontainer.json
-          runCmd: echo "Successfully ran postStartCommand"
+        run: pnpm devcontainer:lint-unit
 
   core:
     name: core
