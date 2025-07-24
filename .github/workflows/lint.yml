@@ -53,12 +53,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Run lint and unit tests in dev container
+      - name: Set up pnpm caching
+        uses: actions/setup-node@v4
+        with:
+          cache: 'pnpm'
+      - name: Lint and Unit Test All JavaScript Code
         uses: devcontainers/ci@v0.3
         with:
           push: never
           configFile: .devcontainer/turbo-lint-unit/devcontainer.json
-          runCmd: echo "Successfully ran lint and unit tests in dev container postStartCommand"
+          runCmd: echo "Successfully ran postStartCommand"
 
   core:
     name: core

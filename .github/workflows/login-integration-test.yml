@@ -1,0 +1,31 @@
+name: Integration test core
+
+on: 
+  workflow_call: 
+    inputs:
+      login_build_image:
+        required: true
+        type: string
+
+jobs:
+
+  login-integration-test:
+    if: ${{ github.event_name == 'pull_request' }}
+    name: login-integration-test
+    runs-on: depot-ubuntu-22.04-8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up pnpm caching
+        uses: actions/setup-node@v4
+        with:
+          cache: 'pnpm'
+      - name: Run Integration Tests against the Login and a Mocked Zitadel API
+        uses: devcontainers/ci@v0.3
+        environment:
+          LOGIN_TAG: ${{ inputs.login_build_image }}
+        with:
+          push: never
+          configFile: .devcontainer/login-integration/devcontainer.json
+          runCmd: echo "Successfully ran postStartCommand"
+          
