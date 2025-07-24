@@ -31,59 +31,59 @@ async function generateExports() {
     // Read current package.json
     const packageJson = JSON.parse(fs.readFileSync(PACKAGE_JSON_PATH, 'utf8'));
 
-    // Create minimal, clean exports using wildcards
-    // This is much more maintainable and works great with older module resolution
-    const exports = {
-        '.': {
-            types: './types/zitadel/policy_pb.d.ts',
-            import: './es/zitadel/policy_pb.js',
-            require: './cjs/zitadel/policy_pb.cjs'
-        },
-        // Wildcard patterns for all proto directories
-        './zitadel/*': {
-            types: './types/zitadel/*.d.ts',
-            import: './es/zitadel/*.js',
-            require: './cjs/zitadel/*.cjs'
-        },
-        './zitadel/*.js': {
-            types: './types/zitadel/*.d.ts',
-            import: './es/zitadel/*.js',
-            require: './cjs/zitadel/*.js'
-        },
-        './validate/*': {
-            types: './types/validate/*.d.ts',
-            import: './es/validate/*.js',
-            require: './cjs/validate/*.cjs'
-        },
-        './validate/*.js': {
-            types: './types/validate/*.d.ts',
-            import: './es/validate/*.js',
-            require: './cjs/validate/*.js'
-        },
-        './google/*': {
-            types: './types/google/*.d.ts',
-            import: './es/google/*.js',
-            require: './cjs/google/*.cjs'
-        },
-        './google/*.js': {
-            types: './types/google/*.d.ts',
-            import: './es/google/*.js',
-            require: './cjs/google/*.js'
-        },
-        './protoc-gen-openapiv2/*': {
-            types: './types/protoc-gen-openapiv2/*.d.ts',
-            import: './es/protoc-gen-openapiv2/*.js',
-            require: './cjs/protoc-gen-openapiv2/*.cjs'
-        },
-        './protoc-gen-openapiv2/*.js': {
-            types: './types/protoc-gen-openapiv2/*.d.ts',
-            import: './es/protoc-gen-openapiv2/*.js',
-            require: './cjs/protoc-gen-openapiv2/*.js'
-        }
-    };
+  // Create minimal, clean exports using wildcards
+  // This is much more maintainable and works great with older module resolution
+  // Note: No main "." entry since this package is designed for subpath imports
+  const exports = {
+    // Wildcard patterns for all proto directories
+    './zitadel/*': {
+      types: './types/zitadel/*.d.ts',
+      import: './es/zitadel/*.js',
+      require: './cjs/zitadel/*.cjs'
+    },
+    './zitadel/*.js': {
+      types: './types/zitadel/*.d.ts',
+      import: './es/zitadel/*.js',
+      require: './cjs/zitadel/*.js'
+    },
+    './validate/*': {
+      types: './types/validate/*.d.ts',
+      import: './es/validate/*.js',
+      require: './cjs/validate/*.cjs'
+    },
+    './validate/*.js': {
+      types: './types/validate/*.d.ts',
+      import: './es/validate/*.js',
+      require: './cjs/validate/*.js'
+    },
+    './google/*': {
+      types: './types/google/*.d.ts',
+      import: './es/google/*.js',
+      require: './cjs/google/*.cjs'
+    },
+    './google/*.js': {
+      types: './types/google/*.d.ts',
+      import: './es/google/*.js',
+      require: './cjs/google/*.js'
+    },
+    './protoc-gen-openapiv2/*': {
+      types: './types/protoc-gen-openapiv2/*.d.ts',
+      import: './es/protoc-gen-openapiv2/*.js',
+      require: './cjs/protoc-gen-openapiv2/*.cjs'
+    },
+    './protoc-gen-openapiv2/*.js': {
+      types: './types/protoc-gen-openapiv2/*.d.ts',
+      import: './es/protoc-gen-openapiv2/*.js',
+      require: './cjs/protoc-gen-openapiv2/*.js'
+    }
+  };
 
-    // Update package.json with clean exports
-    packageJson.exports = exports;
+  // Update package.json with clean exports
+  packageJson.exports = exports;
+  
+  // Remove misleading main/types fields since this package uses subpath imports only
+  delete packageJson.main;
+  delete packageJson.types;
 
     // Write back to package.json
     fs.writeFileSync(PACKAGE_JSON_PATH, JSON.stringify(packageJson, null, 2) + '\n');

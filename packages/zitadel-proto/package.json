@@ -6,14 +6,7 @@
     "access": "public"
   },
   "type": "module",
-  "main": "./zitadel/policy_pb.js",
-  "types": "./types/zitadel/policy_pb.d.ts",
   "exports": {
-    ".": {
-      "types": "./types/zitadel/policy_pb.d.ts",
-      "import": "./es/zitadel/policy_pb.js",
-      "require": "./cjs/zitadel/policy_pb.cjs"
-    },
     "./zitadel/*": {
       "types": "./types/zitadel/*.d.ts",
       "import": "./es/zitadel/*.js",
