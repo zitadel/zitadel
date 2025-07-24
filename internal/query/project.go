@@ -282,12 +282,13 @@ func projectPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabl
 }
 
 func (q *Queries) SearchGrantedProjects(ctx context.Context, queries *ProjectAndGrantedProjectSearchQueries, permissionCheck domain.PermissionCheck) (*GrantedProjects, error) {
-	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
-	projects, err := q.searchGrantedProjects(ctx, queries, permissionCheckV2)
+	// removed as permission v2 is not implemented yet for project grant level permissions
+	// permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	projects, err := q.searchGrantedProjects(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+	if permissionCheck != nil { // && !authz.GetFeatures(ctx).PermissionCheckV2 {
 		grantedProjectsCheckPermission(ctx, projects, permissionCheck)
 	}
 	return projects, nil

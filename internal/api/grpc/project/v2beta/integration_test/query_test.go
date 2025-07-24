@@ -576,7 +576,8 @@ func TestServer_ListProjects(t *testing.T) {
 }
 
 func TestServer_ListProjects_PermissionV2(t *testing.T) {
-	ensureFeaturePermissionV2Enabled(t, instancePermissionV2)
+	// removed as permission v2 is not implemented yet for project grant level permissions
+	// ensureFeaturePermissionV2Enabled(t, instancePermissionV2)
 	iamOwnerCtx := instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	orgID := instancePermissionV2.DefaultOrg.GetId()
 
@@ -646,7 +647,7 @@ func TestServer_ListProjects_PermissionV2(t *testing.T) {
 			},
 			want: &project.ListProjectsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  0,
+					TotalResult:  1,
 					AppliedLimit: 100,
 				},
 				Projects: []*project.Project{},
@@ -868,7 +869,7 @@ func TestServer_ListProjects_PermissionV2(t *testing.T) {
 			},
 			want: &project.ListProjectsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  1,
+					TotalResult:  3,
 					AppliedLimit: 100,
 				},
 				Projects: []*project.Project{
@@ -876,7 +877,6 @@ func TestServer_ListProjects_PermissionV2(t *testing.T) {
 				},
 			},
 		},
-		// TODO: correct when permission check is added for project grants https://github.com/zitadel/zitadel/issues/9972
 		{
 			name: "list granted project, project id",
 			args: args{
@@ -888,28 +888,26 @@ func TestServer_ListProjects_PermissionV2(t *testing.T) {
 					projectName := gofakeit.AppName()
 					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, orgName, gofakeit.Email())
 					projectResp := instancePermissionV2.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), projectName, true, true)
-					// projectGrantResp :=
-					instancePermissionV2.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgID)
+					projectGrantResp := instancePermissionV2.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgID)
 					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
 						InProjectIdsFilter: &filter.InIDsFilter{Ids: []string{projectResp.GetId()}},
 					}
-					/*
-						response.Projects[0] = &project.Project{
-							Id:                      projectResp.GetId(),
-							Name:                    projectName,
-							OrganizationId:          orgResp.GetOrganizationId(),
-							CreationDate:            projectGrantResp.GetCreationDate(),
-							ChangeDate:              projectGrantResp.GetCreationDate(),
-							State:                   1,
-							ProjectRoleAssertion:    false,
-							ProjectAccessRequired:   true,
-							AuthorizationRequired:   true,
-							PrivateLabelingSetting:  project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
-							GrantedOrganizationId:   gu.Ptr(orgID),
-							GrantedOrganizationName: gu.Ptr(instancePermissionV2.DefaultOrg.GetName()),
-							GrantedState:            1,
-						}
-					*/
+
+					response.Projects[0] = &project.Project{
+						Id:                      projectResp.GetId(),
+						Name:                    projectName,
+						OrganizationId:          orgResp.GetOrganizationId(),
+						CreationDate:            projectGrantResp.GetCreationDate(),
+						ChangeDate:              projectGrantResp.GetCreationDate(),
+						State:                   1,
+						ProjectRoleAssertion:    false,
+						ProjectAccessRequired:   true,
+						AuthorizationRequired:   true,
+						PrivateLabelingSetting:  project.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED,
+						GrantedOrganizationId:   gu.Ptr(orgID),
+						GrantedOrganizationName: gu.Ptr(instancePermissionV2.DefaultOrg.GetName()),
+						GrantedState:            1,
+					}
 				},
 				req: &project.ListProjectsRequest{
 					Filters: []*project.ProjectSearchFilter{{}},
@@ -917,10 +915,10 @@ func TestServer_ListProjects_PermissionV2(t *testing.T) {
 			},
 			want: &project.ListProjectsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  0,
+					TotalResult:  2,
 					AppliedLimit: 100,
 				},
-				Projects: []*project.Project{},
+				Projects: []*project.Project{{}},
 			},
 		},
 	}
