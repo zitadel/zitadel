@@ -3,7 +3,8 @@ services:
   devcontainer:
     container_name: devcontainer
     build:
-      context: .
+      context: ../..
+      dockerfile: .devcontainer/base/Dockerfile
     volumes:
       - ../../:/workspaces:cached
     command: sleep infinity
