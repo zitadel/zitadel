@@ -44,7 +44,7 @@ async function generateExports() {
         './zitadel/*': {
             types: './types/zitadel/*.d.ts',
             import: './es/zitadel/*.js',
-            require: './cjs/zitadel/*.cjs'
+            require: './cjs/zitadel/*.js'
         },
         './zitadel/*.js': {
             types: './types/zitadel/*.d.ts',
@@ -54,7 +54,7 @@ async function generateExports() {
         './validate/*': {
             types: './types/validate/*.d.ts',
             import: './es/validate/*.js',
-            require: './cjs/validate/*.cjs'
+            require: './cjs/validate/*.js'
         },
         './validate/*.js': {
             types: './types/validate/*.d.ts',
@@ -64,7 +64,7 @@ async function generateExports() {
         './google/*': {
             types: './types/google/*.d.ts',
             import: './es/google/*.js',
-            require: './cjs/google/*.cjs'
+            require: './cjs/google/*.js'
         },
         './google/*.js': {
             types: './types/google/*.d.ts',
@@ -74,7 +74,7 @@ async function generateExports() {
         './protoc-gen-openapiv2/*': {
             types: './types/protoc-gen-openapiv2/*.d.ts',
             import: './es/protoc-gen-openapiv2/*.js',
-            require: './cjs/protoc-gen-openapiv2/*.cjs'
+            require: './cjs/protoc-gen-openapiv2/*.js'
         },
         './protoc-gen-openapiv2/*.js': {
             types: './types/protoc-gen-openapiv2/*.d.ts',

@@ -64,12 +64,9 @@ export class NewMgmtService {
   }
 
   public sendHumanResetPasswordNotification(
-    userId: string,
-    type: SendHumanResetPasswordNotificationRequest_Type,
+    req: MessageInitShape<typeof SendHumanResetPasswordNotificationRequestSchema>,
   ): Promise<SendHumanResetPasswordNotificationResponse> {
-    return this.grpcService.mgmtNew.sendHumanResetPasswordNotification(
-      create(SendHumanResetPasswordNotificationRequestSchema, { userId, type }),
-    );
+    return this.grpcService.mgmtNew.sendHumanResetPasswordNotification(create(SendHumanResetPasswordNotificationRequestSchema, req));
   }
 
   public resendHumanInitialization(userId: string, email: string = ''): Promise<ResendHumanInitializationResponse> {
