@@ -82,7 +82,7 @@ require (
 	github.com/twilio/twilio-go v1.26.1
 	github.com/zitadel/exifremove v0.1.0
 	github.com/zitadel/logging v0.6.2
-	github.com/zitadel/oidc/v3 v3.41.1-0.20250718152526-16ebef905b40
+	github.com/zitadel/oidc/v3 v3.42.0
 	github.com/zitadel/passwap v0.9.0
 	github.com/zitadel/saml v0.3.5
 	github.com/zitadel/schema v1.3.1
