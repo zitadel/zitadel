@@ -15,5 +15,4 @@ RUN apt-get update && \
     corepack enable && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack prepare pnpm@9.1.2 --activate
 
 COPY pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile --recursive
+RUN pnpm install --frozen-lockfile --recursive
