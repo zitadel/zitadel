@@ -66,7 +66,10 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 		case *user.HumanInviteCheckFailedEvent:
 			wm.InviteCheckFailureCount++
 			if wm.InviteCheckFailureCount >= 3 { //TODO: config?
-				wm.UserState = domain.UserStateDeleted
+				// invalidate the invite code after 3 failures (wrong code or expiration)
+				// so that a new invite code can be created for this user
+				wm.EmptyInviteCode()
+				wm.CodeReturned = false
 			}
 		case *user.HumanEmailVerifiedEvent:
 			wm.EmailVerified = true
