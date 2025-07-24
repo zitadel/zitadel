@@ -65,8 +65,8 @@ func (wm *UserV2InviteWriteModel) Reduce() error {
 			wm.EmptyInviteCode()
 		case *user.HumanInviteCheckFailedEvent:
 			wm.InviteCheckFailureCount++
-			if wm.InviteCheckFailureCount >= 3 { //TODO: config?
-				// invalidate the invite code after 3 failures (wrong code or expiration)
+			if wm.InviteCheckFailureCount >= 3 || crypto.IsCodeExpired(wm.InviteCodeCreationDate, wm.InviteCodeExpiry) { //TODO: config?
+				// invalidate the invite code after attempting to verify an expired code, or a wrong code three or more times
 				// so that a new invite code can be created for this user
 				wm.EmptyInviteCode()
 				wm.CodeReturned = false
