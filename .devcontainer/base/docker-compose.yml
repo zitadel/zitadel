@@ -6,14 +6,11 @@ services:
       context: .
     volumes:
       - ../../:/workspaces:cached
-      - /tmp/.X11-unix:/tmp/.X11-unix:cached
-      - home-dir:/home/node:delegated
     command: sleep infinity
     working_dir: /workspaces
     environment:
       ZITADEL_DATABASE_POSTGRES_HOST: db
       ZITADEL_EXTERNALSECURE: false
-      PNPM_HOME: $PNPM_HOME
 
   db:
     container_name: db

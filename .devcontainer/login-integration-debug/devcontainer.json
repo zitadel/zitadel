@@ -9,11 +9,11 @@
 	"runServices": [
 		"login-integration"
 	],
-	"workspaceFolder": "/workspaces",
+	"workspaceFolder": "/workspaces/apps/login",
 	"forwardPorts": [
 		3001
 	],
-	"onCreateCommand": "pnpm install --recursive && cd apps/login/integration && pnpm cypress install",
+	"onCreateCommand": "pnpm cypress install",
 	"postAttachCommand": "pnpm turbo daemon clean || true; pnpm turbo test:integration:login",
 	"customizations": {
 		"jetbrains": {

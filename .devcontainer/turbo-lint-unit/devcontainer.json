@@ -5,9 +5,11 @@
 		"../base/docker-compose.yml"
 	],
 	"service": "devcontainer",
-	"runServices": ["devcontainer"],
+	"runServices": [
+		"devcontainer"
+	],
 	"workspaceFolder": "/workspaces",
-	"postStartCommand": "pnpm install --frozen-lockfile --recursive && pnpm turbo lint test:unit",
+	"postStartCommand": "pnpm turbo lint test:unit",
 	"customizations": {
 		"jetbrains": {
 			"settings": {
