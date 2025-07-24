@@ -1,12 +1,104 @@
-# ZITADEL Login UI
+# ZITADEL TypeScript with Turborepo
 
-This is going to be our next UI for the hosted login. It's based on Next.js 13 and its introduced `app/` directory.
+This repository contains all TypeScript and JavaScript packages and applications you need to create your own ZITADEL
+Login UI.
 
-## Flow Diagram
+<img src="./apps/login/screenshots/collage.png" alt="collage of login screens" width="1600px" />
 
-This diagram shows the available pages and flows.
+[![npm package](https://img.shields.io/npm/v/@zitadel/proto.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/proto)
+[![npm package](https://img.shields.io/npm/v/@zitadel/client.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/client)
 
-> Note that back navigation or retries are not displayed.
+**⚠️ This repo and packages are in beta state and subject to change ⚠️**
+
+The scope of functionality of this repo and packages is under active development.
+
+The `@zitadel/client` package is using [@connectrpc/connect](https://github.com/connectrpc/connect-es#readme).
+
+You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute.
+Questions can be raised in our [Discord channel](https://discord.gg/erh5Brh7jE) or as
+a [GitHub issue](https://github.com/zitadel/typescript/issues).
+
+## Developing Your Own ZITADEL Login UI
+
+We think the easiest path of getting up and running, is the following:
+
+1. Fork and clone this repository
+1. Rename the file .github/dependabot.example.yml to .github/dependabot.yml so you don't miss version and security updates.
+1. [Run the ZITADEL Cloud login UI locally](#run-login-ui)
+1. Make changes to the code and see the effects live on your local machine
+1. Study the rest of this README.md and get familiar and comfortable with how everything works.
+1. Decide on a way of how you want to build and run your login UI.
+   You can reuse ZITADEL Clouds way.
+   But if you need more freedom, you can also import the packages you need into your self built application.
+
+## Included Apps And Packages
+
+- `login`: The login UI used by ZITADEL Cloud, powered by Next.js
+- `@zitadel/client`: shared client utilities for node and browser environments
+- `@zitadel/proto`: Protocol Buffers (proto) definitions used by ZITADEL projects
+
+Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
+
+### Login
+
+The login is currently in a work in progress state.
+The goal is to implement a login UI, using the session API of ZITADEL, which also implements the OIDC Standard and is
+ready to use for everyone.
+
+In the first phase we want to have a MVP login ready with the OIDC Standard and a basic feature set. In a second step
+the features will be extended.
+
+This list should show the current implementation state, and also what is missing.
+You can already use the current state, and extend it with your needs.
+
+#### Features list
+
+- [x] Local User Registration (with Password)
+- [x] User Registration and Login with external Provider
+  - [x] Google
+  - [x] GitHub
+  - [x] GitHub Enterprise
+  - [x] GitLab
+  - [x] GitLab Enterprise
+  - [x] Azure
+  - [x] Apple
+  - [x] Generic OIDC
+  - [x] Generic OAuth
+  - [x] Generic JWT
+  - [x] LDAP
+  - [x] SAML SP
+- Multifactor Registration an Login
+  - [x] Passkeys
+  - [x] TOTP
+  - [x] OTP: Email Code
+  - [x] OTP: SMS Code
+- [x] Password Change/Reset
+- [x] Domain Discovery
+- [x] Branding
+- OIDC Standard
+
+  - [x] Authorization Code Flow with PKCE
+  - [x] AuthRequest `hintUserId`
+  - [x] AuthRequest `loginHint`
+  - [x] AuthRequest `prompt`
+    - [x] Login
+    - [x] Select Account
+    - [ ] Consent
+    - [x] Create
+  - Scopes
+    - [x] `openid email profile address``
+    - [x] `offline access`
+    - [x] `urn:zitadel:iam:org:idp:id:{idp_id}`
+    - [x] `urn:zitadel:iam:org:project:id:zitadel:aud`
+    - [x] `urn:zitadel:iam:org:id:{orgid}`
+    - [x] `urn:zitadel:iam:org:domain:primary:{domain}`
+  - [ ] AuthRequest UI locales
+
+  #### Flow diagram
+
+  This diagram shows the available pages and flows.
+
+  > Note that back navigation or retries are not displayed.
 
 ```mermaid
     flowchart TD
@@ -48,347 +140,124 @@ This diagram shows the available pages and flows.
     verify --> B[signedin]
 ```
 
-### /loginname
+You can find a more detailed documentation of the different pages [here](./apps/login/readme.md).
 
-This page shows a loginname field and Identity Providers to login or register.
-If `loginSettings(org?).allowRegister` is `true`, it also shows a link to jump to /register
+#### Custom translations
 
-<img src="./screenshots/loginname.png" alt="/loginame" width="400px" />
+The new login uses the [SettingsApi](https://zitadel.com/docs/apis/resources/settings_service_v2/settings-service-get-hosted-login-translation) to load custom translations.
+Translations can be overriden at both the instance and organization levels.
+To find the keys more easily, you can inspect the HTML and search for a `data-i18n-key` attribute, or look at the defaults in `/apps/login/locales/[locale].ts`.
+![Custom Translations](.github/custom-i18n.png)
 
-Requests to the APIs made:
+## Tooling
 
-- `getLoginSettings(org?)`
-- `getLegalAndSupportSettings(org?)`
-- `getIdentityProviders(org?)`
-- `getBrandingSettings(org?)`
-- `getActiveIdentityProviders(org?)`
-- `startIdentityProviderFlow`
-- `listUsers(org?)`
-- `listAuthenticationMethodTypes`
-- `getOrgsByDomain`
-- `createSession()`
-- `getSession()`
+- [TypeScript](https://www.typescriptlang.org/) for static type checking
+- [ESLint](https://eslint.org/) for code linting
+- [Prettier](https://prettier.io) for code formatting
 
-After a loginname is entered, a `listUsers` request is made using the loginName query to identify already registered users.
+## Useful Commands
 
-**USER FOUND:** If only one user is found, we query `listAuthenticationMethodTypes` to identify future steps.
-If no authentication methods are found, we render an error stating: _User has no available authentication methods._ (exception see below.)
-Now if only one method is found, we continue with the corresponding step (/password, /passkey).
-If multiple methods are set, we prefer passkeys over any other method, so we redirect to /passkey, second option is IDP, and third is password.
-If password is the next step, we check `loginSettings.passkeysType` for PasskeysType.ALLOWED, and prompt the user to setup passkeys afterwards.
+- `make login-quality` - Check the quality of your code against a production build without installing any dependencies besides Docker
+- `pnpm generate` - Build proto stubs for the client package
+- `pnpm dev` - Develop all packages and the login app
+- `pnpm build` - Build all packages and the login app
+- `pnpm clean` - Clean up all `node_modules` and `dist` folders (runs each package's clean script)
 
-**NO USER FOUND:** If no user is found, we check whether registering is allowed using `loginSettings.allowRegister`.
-If `loginSettings?.allowUsernamePassword` is not allowed we continue to check for available IDPs. If a single IDP is available, we directly redirect the user to signup.
+Learn more about developing the login UI in the [contribution guide](/CONTRIBUTING.md).
 
-If no single IDP is set, we check for `loginSettings.allowUsernamePassword` and if no organization is set as context, we check whether we can discover a organization from the loginname of the user (using: `getOrgsByDomain`). Then if an organization is found, we check whether domainDiscovery is allowed on it and redirect the user to /register page including the discovered domain or without.
+## Versioning And Publishing Packages
 
-If no previous condition is met we throw an error stating the user was not found.
+Package publishing has been configured using [Changesets](https://github.com/changesets/changesets).
+Here is their [documentation](https://github.com/changesets/changesets#documentation) for more information about the
+workflow.
 
-**EXCEPTIONS:** If the outcome after this order produces a no authentication methods found, or user not found, we check whether `loginSettings?.ignoreUnknownUsernames` is set to `true` as in this case we redirect to the /password page regardless (to prevent username guessing).
+The [GitHub Action](https://github.com/changesets/action) needs an `NPM_TOKEN` and `GITHUB_TOKEN` in the repository
+settings. The [Changesets bot](https://github.com/apps/changeset-bot) should also be installed on the GitHub repository.
 
-> NOTE: This page at this stage beeing ignores local sessions and executes a reauthentication. This is a feature which is not implemented yet.
+Read the [changesets documentation](https://github.com/changesets/changesets/blob/main/docs/automating-changesets.md)
+for more information about this automation
 
-> NOTE: We ignore `loginSettings.allowExternalIdp` as the information whether IDPs are available comes as response from `getActiveIdentityProviders(org?)`. If a user has a cookie for the same loginname, a new session is created regardless and overwrites the old session. The old session is not deleted from the login as for now.
+### Run Login UI
 
-> NOTE: `listAuthenticationMethodTypes()` does not consider different domains for u2f methods or passkeys. The check whether a user should be redirected to one of the pages `/passkey` or `/u2f`, should be extended to use a domain filter (https://github.com/zitadel/zitadel/issues/8615)
+To run the application make sure to install the dependencies with
 
-### /password
+```sh
+pnpm install
+```
 
-This page shows a password field to hydrate the current session with password as a factor.
-Below the password field, a reset password link is shown which allows to send a reset email.
+then generate the GRPC stubs with
 
-<img src="./screenshots/password.png" alt="/password" width="400px" />
+```sh
+pnpm generate
+```
 
-Requests to the APIs made:
+To run the application against a local ZITADEL instance, run the following command:
 
-- `getLoginSettings(org?)`
-- `getBrandingSettings(org?)`
-- `listAuthenticationMethodTypes`
-- `getSession()`
-- `updateSession()`
-- `listUsers()`
-- `getUserById()`
+```sh
+pnpm run-zitadel
+```
 
-**MFA AVAILABLE:** After the password has been submitted, additional authentication methods are loaded.
-If the user has set up an additional **single** second factor, it is redirected to add the next factor. Depending on the available method he is redirected to `/otp/time-based`,`/otp/sms?`, `/otp/email?` or `/u2f?`. If the user has multiple second factors, he is redirected to `/mfa` to select his preferred method to continue.
+This sets up ZITADEL using docker compose and writes the configuration to the file `apps/login/.env.local`.
 
-**NO MFA, USER STATE INITIAL** If the user has no MFA methods and is in an initial state, we redirect to `/password/change` where a new password can be set.
+<details>
+<summary>Alternatively, use another environment</summary>
+You can develop against any ZITADEL instance in which you have sufficient rights to execute the following steps.
+Just create or overwrite the file `apps/login/.env.local` yourself.
+Add your instances base URL to the file at the key `ZITADEL_API_URL`.
+Go to your instance and create a service user for the login application.
+The login application creates users on your primary organization and reads policy data.
+For the sake of simplicity, just make the service user an instance member with the role `IAM_OWNER`.
+Create a PAT and copy it to the file `apps/login/.env.local` using the key `ZITADEL_SERVICE_USER_TOKEN`.
 
-**NO MFA, FORCE MFA:** If no MFA method is available, and the settings force MFA, the user is sent to `/mfa/set` which prompts to setup a second factor.
+The file should look similar to this:
 
-**PROMPT PASSKEY** If the settings do not enforce MFA, we check if passkeys are allowed with `loginSettings?.passkeysType == PasskeysType.ALLOWED` and redirect the user to `/passkey/set` if no passkeys are setup. This step can be skipped.
+```
+ZITADEL_API_URL=https://zitadel-tlx3du.us1.zitadel.cloud
+ZITADEL_SERVICE_USER_TOKEN=1S6w48thfWFI2klgfwkCnhXJLf9FQ457E-_3H74ePQxfO3Af0Tm4V5Xi-ji7urIl_xbn-Rk
+```
 
-If none of the previous conditions apply, we continue to sign in.
+</details>
 
-> NOTE: `listAuthenticationMethodTypes()` does not consider different domains for u2f methods or passkeys. The check whether a user should be redirected to one of the pages `/passkey` or `/u2f`, should be extended to use a domain filter (https://github.com/zitadel/zitadel/issues/8615)
+Start the login application in dev mode:
 
-### /password/change
+```sh
+pnpm dev
+```
 
-This page allows to change the password. It is used after a user is in an initial state and is required to change the password, or it can be directly invoked with an active session.
+Open the login application with your favorite browser at `localhost:3000`.
+Change the source code and see the changes live in your browser.
 
-<img src="./screenshots/password_change.png" alt="/password/change" width="400px" />
+Make sure the application still behaves as expected by running all tests
 
-Requests to the APIs made:
+```sh
+pnpm test
+```
 
-- `getLoginSettings(org?)`
-- `getPasswordComplexitySettings(user?)`
-- `getBrandingSettings(org?)`
-- `getSession()`
-- `setPassword()`
+To satisfy your unique workflow requirements, check out the package.json in the root directory for more detailed scripts.
 
-> NOTE: The request to change the password is using the session of the user itself not the service user, therefore no code is required.
+### Run Login UI Acceptance tests
 
-### /password/set
+To run the acceptance tests you need a running ZITADEL environment and a component which receives HTTP requests for the emails and sms's.
+This component should also be able to return the content of these notifications, as the codes and links are used in the login flows.
+There is a basic implementation in Golang available under [the sink package](./acceptance/sink).
 
-This page allows to set a password. It is used after a user has requested to reset the password on the `/password` page.
+To setup ZITADEL with the additional Sink container for handling the notifications:
 
-<img src="./screenshots/password_set.png" alt="/password/set" width="400px" />
+```sh
+pnpm run-sink
+```
 
-Requests to the APIs made:
+Then you can start the acceptance tests with:
 
-- `getLoginSettings(org?)`
-- `getPasswordComplexitySettings(user?)`
-- `getBrandingSettings(org?)`
-- `getUserByID()`
-- `setPassword()`
+```sh
+pnpm test:acceptance
+```
 
-The page allows to enter a code or be invoked directly from a email link which prefills the code. The user can enter a new password and submit.
+### Deploy to Vercel
 
-### /otp/[method]
+To deploy your own version on Vercel, navigate to your instance and create a service user.
+Then create a personal access token (PAT), copy and set it as ZITADEL_SERVICE_USER_TOKEN, then navigate to your instance
+settings and make sure it gets IAM_OWNER permissions.
+Finally set your instance url as ZITADEL_API_URL. Make sure to set it without trailing slash.
 
-This page shows a code field to check an otp method. The session of the user is then hydrated with the respective factor. Supported methods are `time-based`, `sms` and `email`.
-
-<img src="./screenshots/otp.png" alt="/otp/[method]" width="400px" />
-
-Requests to the APIs made:
-
-- `getBrandingSettings(org?)`
-- `getSession()`
-- `updateSession()`
-
-If `email` or `sms` is requested as method, the current session of the user is updated to request the challenge. This will trigger an email or sms which can be entered in the code field.
-The `time-based` (TOTP) method does not require a trigger, therefore no `updateSession()` is performed and no resendLink under the code field is shown.
-
-The submission of the code updates the session and continues to sign in the user.
-
-### /u2f
-
-This page requests a webAuthN challenge for the user and updates the session afterwards.
-
-<img src="./screenshots/u2f.png" alt="/u2f" width="400px" />
-
-Requests to the APIs made:
-
-- `getBrandingSettings(org?)`
-- `getSession()`
-- `updateSession()`
-
-When updating the session for the webAuthN challenge, we set `userVerificationRequirement` to `UserVerificationRequirement.DISCOURAGED` as this will request the webAuthN method as second factor and not as primary method.
-After updating the session, the user is **always** signed in. :warning: required as this page is a follow up for setting up a u2f method.
-
-### /passkey
-
-This page requests a webAuthN challenge for the user and updates the session afterwards.
-It is invoked directly after setting up a passkey `/passkey/set` or when loggin in a user after `/loginname`.
-
-<img src="./screenshots/passkey.png" alt="/passkey" width="400px" />
-
-Requests to the APIs made:
-
-- `getBrandingSettings(org?)`
-- `getSession()`
-- `updateSession()`
-
-When updating the session for the webAuthN challenge, we set `userVerificationRequirement` to `UserVerificationRequirement.REQUIRED` as this will request the webAuthN method as primary method to login.
-After updating the session, the user is **always** signed in. :warning: required as this page is a follow up for setting up a passkey
-
-> NOTE: This page currently does not check whether a user contains passkeys. If this method is not available, this page should not be used.
-
-### /mfa/set
-
-This page loads login settings and the authentication methods for a user and shows setup options.
-
-<img src="./screenshots/mfaset.png" alt="/mfa/set" width="400px" />
-
-Requests to the APIs made:
-
-- `getBrandingSettings(org?)`
-- `getLoginSettings(user.org)` :warning: context taken from session
-- `getSession()`
-- `listAuthenticationMethodTypes()`
-- `getUserByID()`
-
-If a user has already setup a certain method, a checkbox is shown alongside the button and the button is disabled.
-OTP Email and OTP SMS only show up if the user has verified email or phone.
-If the user chooses a method he is redirected to one of `/otp/time-based/set`, `/u2f/set`, `/otp/email/set`, or `/otp/sms/set`.
-At the moment, U2F methods are hidden if a method is already added on the users resource. Reasoning is that the page should only be invoked for prompts. A self service page which shows up multiple u2f factors is implemented at a later stage.
-
-> NOTE: The session and therefore the user factor defines which login settings are checked for available options.
-
-> NOTE: `listAuthenticationMethodTypes()` does not consider different domains for u2f or passkeys. The check whether a user should be redirected to one of the pages `/passkey/set` or `/u2f/set`, should be extended to use a domain filter (https://github.com/zitadel/zitadel/issues/8615)
-
-### /passkey/set
-
-This page sets a passkey method for a user. This page can be either enforced, or optional depending on the Login Settings.
-
-<!-- screen is the same -->
-<img src="./screenshots/u2fset.png" alt="/passkey/set" width="400px" />
-
-Requests to the APIs made:
-
-- `getBrandingSettings(org?)`
-- `getSession()`
-- `createPasskeyRegistrationLink()` TODO: check if this can be used with the session token (mfa required (AUTHZ-Kl3p0))
-- `registerPasskey()`
-- `verifyPasskey()`
-
-If the loginname decides to redirect the user to this page, a button to skip appears which will sign the user in afterwards.
-After a passkey is registered, we redirect the user to `/passkey` to verify it again and sign in with the new method. The `createPasskeyRegistrationLink()` uses the token of the session which is determined by the flow.
-
-> NOTE: this page allows passkeys to be created only if the current session is valid (self service), or no authentication method is set (register). TODO: to be implemented.
-
-> NOTE: Redirecting the user to `/passkey` will not be required in future and the currently used session will be hydrated directly after registering. (https://github.com/zitadel/zitadel/issues/8611)
-
-### /otp/time-based/set
-
-This page registers a time based OTP method for a user.
-
-<img src="./screenshots/otpset.png" alt="/otp/time-based/set" width="400px" />
-
-Requests to the APIs made:
-
-- `getBrandingSettings(org?)`
-- `getSession()`
-- `registerTOTP()`
-- `verifyTOTP()`
-
-After the setup is done, the user is redirected to verify the TOTP method on `/otp/time-based`.
-
-> NOTE: Redirecting the user to `/otp/time-based` will not be required in future and the currently used session will be hydrated directly. (https://github.com/zitadel/zitadel/issues/8611)
-
-### /otp/email/set /otp/sms/set
-
-This page registers either an Email OTP method or SMS OTP method for a user.
-
-Requests to the APIs made:
-
-- `getBrandingSettings(org?)`
-- `getSession()`
-- `addOTPEmail()` / `addOTPSMS()`
-
-This page directly calls `addOTPEmail()` or `addOTPSMS()` when invoked and shows a success message.
-Right afterwards, redirects to verify the method.
-
-### /u2f/set
-
-This page registers a U2F method for a user.
-
-<img src="./screenshots/u2fset.png" alt="/u2f/set" width="400px" />
-
-Requests to the APIs made:
-
-- `getBrandingSettings(org?)`
-- `getSession()`
-- `registerU2F()` :warning: TODO: check if this can be used with the session token (mfa required (AUTHZ-Kl3p0))
-- `verifyU2FRegistration()`
-
-After a u2f method is registered, we redirect the user to `/passkey` to verify it again and sign in with the new method. The `createPasskeyRegistrationLink()` uses the token of the session which is determined by the flow.
-
-> NOTE: Redirecting the user to `/passkey` will not be required in future and the currently used session will be hydrated directly after registering. (https://github.com/zitadel/zitadel/issues/8611)
-
-### /register
-
-This page shows a register page, which gets firstname and lastname of a user as well as the email. It offers to setup a user, using password or passkeys.
-
-<img src="./screenshots/register.png" alt="/register" width="400px" />
-
-<img src="./screenshots/register_password.png" alt="register with password" width="400px" />
-
-Requests to the APIs made:
-
-- `listOrganizations()` :warning: TODO: determine the default organization if no context is set
-- `getLegalAndSupportSettings(org)`
-- `getPasswordComplexitySettings()`
-- `getBrandingSettings()`
-- `addHumanUser()`
-- `createSession()`
-- `getSession()`
-
-To register a user, the organization where the resource will be created is determined first. If no context is provided via url, we fall back to the default organization of the instance.
-
-**PASSWORD:** If a password is set, the user is created as a resource, then a session using the password check is created immediately. After creating the session, the user is directly logged in and eventually redirected back to the application.
-
-**PASSKEY:** If passkey is selected, the user is created as a resource first, then a session using the userId is created immediately. This session does not yet contain a check, we therefore redirect the user to setup a passkey at `/passkey/set`. As the passkey set page verifies the passkey right afterwards, the process ends with a signed in user.
-
-> NOTE: https://github.com/zitadel/zitadel/issues/8616 to determine the default organization of an instance must be implemented in order to correctly use the legal-, login-, branding- and complexitysettings.
-
-> NOTE: TODO: check which methods are allowed in the login settings, loginSettings.allowUsernamePassword / check for passkey
-
-### /idp
-
-This page doubles as /loginname but limits it to choose from IDPs
-
-<img src="./screenshots/idp.png" alt="/idp" width="400px" />
-
-Requests to the APIs made:
-
-- `getBrandingSettings(org?)`
-- `getActiveIdentityProviders(org?)`
-- `startIdentityProviderFlow()`
-
-### /idp/[method]/success /idp/[method]/failure
-
-Both /success and /failure pages are designed to intercept the responses from the IDPs and decide on how to continue with the process.
-
-### /verify
-
-This page verifies the email to be valid. It page of the login can also be invoked without an active session.
-The context of the user is taken from the url and is set in the email template.
-
-<img src="./screenshots/accounts.png" alt="/accounts" width="400px" />
-
-Requests to the APIs made:
-
-- `getBrandingSettings(org?)`
-- `getLoginSettings(org?)`
-- `verifyEmail()`
-
-If the page is invoked with an active session (right after a register with password), the user is signed in or redirected to the loginname if no context is known.
-
-> NOTE: This page will be extended to support invitations. In such case, authentication methods of the user are loaded and if none available, shown as possible next step (`/passkey/set`, `password/set`).
-
-### /accounts
-
-This page shows an overview of all current sessions.
-Sessions with invalid token show a red dot on the right side, Valid session a green dot, and its last verified date.
-
-<img src="./screenshots/accounts.png" alt="/accounts" width="400px" />
-
-This page is a starting point for self management, reauthentication, or can be used to clear local sessions.
-This page is also shown if used with OIDC and `prompt: select_account`.
-
-On all pages, where the current user is shown, you can jump to this page. This way, a session can quickly be reused if valid.
-
-<img src="./screenshots/accounts_jumpto.png" alt="jump to accounts" width="250px" />
-
-### /signedin
-
-This is a success page which shows a completed login flow for a user, which did navigate to the login without a OIDC auth requrest. From here device authorization flows are completed. It checks if the requestId param of starts with `device_` and then executes the `authorizeOrDenyDeviceAuthorization` command.
-
-<img src="./screenshots/signedin.png" alt="/signedin" width="400px" />
-
-In future, self service options to jump to are shown below, like:
-
-- change password
-- setup passkeys
-- setup mfa
-- change profile
-- logout
-
-> NOTE: This page has to be explicitly enabled or act as a fallback if no default redirect is set.
-
-## Currently NOT Supported
-
-- forceMFA on login settings is not checked for IDPs
-
-Also note that IDP logins are considered as valid MFA. An additional MFA check will be implemented in future if enforced.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Ftypescript&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_LOGIN_CLIENT%20membership%20on%20your%20instance%20and%20provide%20its%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)
