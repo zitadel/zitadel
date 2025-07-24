@@ -56,7 +56,7 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 10
+          version: 9.1.2+sha256.19c17528f9ca20bd442e4ca42f00f1b9808a9cb419383cd04ba32ef19322aba7
           # The devcontainer runs install after we set up caching in the following step
           run_install: false        
       - name: Set up pnpm caching
