@@ -6,16 +6,52 @@
     "access": "public"
   },
   "type": "module",
-  "files": [
-    "zitadel/**",
-    "validate/**",
-    "google/**",
-    "protoc-gen-openapiv2/**"
-  ],
+  "exports": {
+    "./zitadel/*": {
+      "types": "./types/zitadel/*.d.ts",
+      "import": "./es/zitadel/*.js",
+      "require": "./cjs/zitadel/*.cjs"
+    },
+    "./zitadel/*.js": {
+      "types": "./types/zitadel/*.d.ts",
+      "import": "./es/zitadel/*.js",
+      "require": "./cjs/zitadel/*.js"
+    },
+    "./validate/*": {
+      "types": "./types/validate/*.d.ts",
+      "import": "./es/validate/*.js",
+      "require": "./cjs/validate/*.cjs"
+    },
+    "./validate/*.js": {
+      "types": "./types/validate/*.d.ts",
+      "import": "./es/validate/*.js",
+      "require": "./cjs/validate/*.js"
+    },
+    "./google/*": {
+      "types": "./types/google/*.d.ts",
+      "import": "./es/google/*.js",
+      "require": "./cjs/google/*.cjs"
+    },
+    "./google/*.js": {
+      "types": "./types/google/*.d.ts",
+      "import": "./es/google/*.js",
+      "require": "./cjs/google/*.js"
+    },
+    "./protoc-gen-openapiv2/*": {
+      "types": "./types/protoc-gen-openapiv2/*.d.ts",
+      "import": "./es/protoc-gen-openapiv2/*.js",
+      "require": "./cjs/protoc-gen-openapiv2/*.cjs"
+    },
+    "./protoc-gen-openapiv2/*.js": {
+      "types": "./types/protoc-gen-openapiv2/*.d.ts",
+      "import": "./es/protoc-gen-openapiv2/*.js",
+      "require": "./cjs/protoc-gen-openapiv2/*.js"
+    }
+  },
   "sideEffects": false,
   "scripts": {
-    "generate": "buf generate ../../proto --path ../../proto/zitadel",
-    "clean": "rm -rf zitadel .turbo node_modules google protoc-gen-openapiv2 validate"
+    "generate": "pnpm exec buf generate ../../proto --path ../../proto/zitadel",
+    "clean": "rm -rf zitadel .turbo node_modules google protoc-gen-openapiv2 validate cjs types es"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.2"
