@@ -53,9 +53,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
+          # The devcontainer runs install after we set up caching in the following step
+          run_install: false        
       - name: Set up pnpm caching
         uses: actions/setup-node@v4
         with:
+          # We don't care about the node version or anything else, we just want to set up pnpm caching
           cache: 'pnpm'
       - name: Lint and Unit Test All JavaScript Code
         uses: devcontainers/ci@v0.3
