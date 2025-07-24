@@ -68,7 +68,7 @@ jobs:
       - name: Install Dev Container CLI
         run: npm install -g @devcontainers/cli@0.80.0
       - name: Lint and Unit Test All JavaScript Code
-        run: npm devcontainer:lint-unit
+        run: npm run devcontainer:lint-unit
 
   core:
     name: core
