@@ -19,6 +19,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
     "@devcontainers/cli": "^0.80.0",
-    "turbo": "2.5.5"
+    "turbo": "2.5.5",
+    "sass": "^1.64.1"
   }
 }

@@ -8,7 +8,8 @@ RUN corepack enable && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack prepare pnpm@9
     rm -rf /var/cache/apk/*
 WORKDIR /app
 COPY pnpm-lock.yaml pnpm-workspace.yaml  ./
-RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm fetch --frozen-lockfile \
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm fetch --frozen-lockfile \
     --filter @zitadel/login \
     --filter @zitadel/client \
     --filter @zitadel/proto
@@ -16,7 +17,8 @@ COPY package.json ./
 COPY apps/login/package.json ./apps/login/package.json
 COPY packages/zitadel-proto/package.json ./packages/zitadel-proto/package.json
 COPY packages/zitadel-client/package.json ./packages/zitadel-client/package.json
-RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm install --frozen-lockfile \
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile \
     --filter @zitadel/login \
     --filter @zitadel/client \
     --filter @zitadel/proto

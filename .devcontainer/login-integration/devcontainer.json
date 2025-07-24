@@ -12,12 +12,6 @@
 	"forwardPorts": [
 		3001
 	],
-	"onCreateCommand": "pnpm cypress install && pnpm test:integration:login",
-	"customizations": {
-		"jetbrains": {
-			"settings": {
-				"com.intellij:app:HttpConfigurable.use_proxy_pac": true
-			}
-		}
-	}
+	"onCreateCommand": "pnpm install --frozen-lockfile && pnpm cypress install",
+	"postAttachCommand": "pnpm test:integration:login"
 }

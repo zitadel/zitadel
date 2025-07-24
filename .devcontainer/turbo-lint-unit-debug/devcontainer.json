@@ -13,12 +13,6 @@
 	"forwardPorts": [
 		3001
 	],
-	"postAttachCommand": "pnpm turbo daemon clean || true; pnpm turbo watch lint test:unit",
-	"customizations": {
-		"jetbrains": {
-			"settings": {
-				"com.intellij:app:HttpConfigurable.use_proxy_pac": true
-			}
-		}
-	}
+	"onCreateCommand": "pnpm install --recursive",
+	"postAttachCommand": "pnpm turbo daemon clean || true; pnpm turbo watch lint test:unit"
 }

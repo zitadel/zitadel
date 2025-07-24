@@ -9,12 +9,6 @@
 		"devcontainer"
 	],
 	"workspaceFolder": "/workspaces",
-	"postStartCommand": "pnpm turbo lint test:unit",
-	"customizations": {
-		"jetbrains": {
-			"settings": {
-				"com.intellij:app:HttpConfigurable.use_proxy_pac": true
-			}
-		}
-	}
+	"onCreateCommand": "pnpm install --frozen-lockfile --recursive",
+	"postAttachCommand": "pnpm turbo lint test:unit"
 }
