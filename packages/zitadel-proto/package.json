@@ -52,7 +52,6 @@
   "scripts": {
     "generate": "pnpm exec buf generate ../../proto && node scripts/generate-exports.mjs",
     "generate:exports": "node scripts/generate-exports.mjs",
-    "postinstall": "node scripts/generate-exports.mjs",
     "clean": "rm -rf zitadel .turbo node_modules google protoc-gen-openapiv2 validate cjs types es"
   },
   "dependencies": {
