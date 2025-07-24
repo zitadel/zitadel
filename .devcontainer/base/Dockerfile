@@ -5,8 +5,8 @@ ENV SHELL=/bin/bash \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     CI=1 \
-    PNPM_HOME=/tmp/pnpm-store \
-    PATH=/tmp/pnpm-store:$PATH
+    PNPM_HOME=/home/node/.local/share/pnpm \
+    PATH=/home/node/.local/share/pnpm:$PATH
 
 RUN apt-get update && \
     apt-get --no-install-recommends install -y \
@@ -15,5 +15,5 @@ RUN apt-get update && \
     corepack enable && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack prepare pnpm@9.1.2 --activate
 
 COPY pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN --mount=type=cache,id=pnpm,target=/tmp/pnpm-store \
+RUN --mount=type=cache,id=pnpm,target=/home/node/.local/share/pnpm/store \
     pnpm install --frozen-lockfile --recursive
