@@ -115,13 +115,13 @@ export class ActionsTwoAddActionTargetComponent {
 
     this.actionService
       .listTargets({})
-      .then(({ result }) => {
-        const targets = result.reduce((acc, target) => {
+      .then(({ targets }) => {
+        const result = targets.reduce((acc, target) => {
           acc.set(target.id, target);
           return acc;
         }, new Map<string, Target>());
 
-        targetsSignal.set({ state: 'loaded', targets });
+        targetsSignal.set({ state: 'loaded', result });
       })
       .catch((error) => {
         this.toast.showError(error);
