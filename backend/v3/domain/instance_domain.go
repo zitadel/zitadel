@@ -23,6 +23,7 @@ type AddInstanceDomain struct {
 	Domain         string               `json:"domain,omitempty" db:"domain"`
 	IsVerified     bool                 `json:"isVerified,omitempty" db:"is_verified"`
 	IsPrimary      bool                 `json:"isPrimary,omitempty" db:"is_primary"`
+	IsGenerated    bool                 `json:"isGenerated,omitempty" db:"is_generated"`
 	ValidationType DomainValidationType `json:"validationType,omitempty" db:"validation_type"`
 
 	// CreatedAt is the time when the domain was added.

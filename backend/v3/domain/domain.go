@@ -1,6 +1,10 @@
 package domain
 
-import "github.com/zitadel/zitadel/backend/v3/storage/database"
+import (
+	"time"
+
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+)
 
 type DomainValidationType string
 
@@ -61,6 +65,9 @@ type domainChanges interface {
 	// SetValidationType sets the verification type column.
 	// If the domain is already verified, this is a no-op.
 	SetValidationType(verificationType DomainValidationType) database.Change
+	// SetUpdatedAt sets the updated at column.
+	// This is used for reducing events.
+	SetUpdatedAt(t time.Time) database.Change
 }
 
 // import (
