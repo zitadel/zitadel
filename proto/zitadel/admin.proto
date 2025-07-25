@@ -4011,6 +4011,11 @@ service AdminService {
         };
     }
 
+    // List IAM Members
+    //
+    // Deprecated: use [ListAdministrators](apis/resources/permission_service_v2/internal-permission-service-list-administrators.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the instance level, matching the search queries. The search queries will be AND linked.
     rpc ListIAMMembers(ListIAMMembersRequest) returns (ListIAMMembersResponse) {
         option (google.api.http) = {
             post: "/members/_search";
@@ -4024,8 +4029,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "List IAM Members";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the instance level, matching the search queries. The search queries will be AND linked."
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -4035,8 +4039,11 @@ service AdminService {
         };
     }
 
-    //Adds a user to the membership list of ZITADEL with the given roles
-    // undefined roles will be dropped
+    // Add IAM Member
+    //
+    // Deprecated: use [CreateAdministrator](apis/resources/permission_service_v2/internal-permission-service-create-administrator.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list with one or multiple roles.
     rpc AddIAMMember(AddIAMMemberRequest) returns (AddIAMMemberResponse) {
         option (google.api.http) = {
             post: "/members";
@@ -4050,8 +4057,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Add IAM Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list with one or multiple roles."
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -4072,6 +4078,11 @@ service AdminService {
         };
     }
 
+    // Update IAM Member
+    //
+    // Deprecated: use [UpdateAdministrator](apis/resources/permission_service_v2/internal-permission-service-update-administrator.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateIAMMember(UpdateIAMMemberRequest) returns (UpdateIAMMemberResponse) {
         option (google.api.http) = {
             put: "/members/{user_id}";
@@ -4085,8 +4096,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Update IAM Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -4107,6 +4117,11 @@ service AdminService {
         };
     }
 
+    // Remove IAM Member
+    //
+    // Deprecated: use [DeleteAdministrator](apis/resources/permission_service_v2/internal-permission-service-delete-administrator.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (organization, project).
     rpc RemoveIAMMember(RemoveIAMMemberRequest) returns (RemoveIAMMemberResponse) {
         option (google.api.http) = {
             delete: "/members/{user_id}";
@@ -4119,8 +4134,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Remove IAM Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (organization, project)"
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
