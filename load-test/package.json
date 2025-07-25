@@ -28,6 +28,7 @@
     "scripts": {
         "bundle": "webpack",
         "lint": "prettier --check src/**",
-        "lint:fix": "prettier --write src"
+        "lint:fix": "prettier --write src",
+        "clean": "rm -rf dist .turbo node_modules"
     }
 }
