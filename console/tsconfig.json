@@ -22,7 +22,13 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "lib": ["ES2022", "dom"]
+    "lib": ["ES2022", "dom"],
+    "paths": {
+      "@tanstack/angular-query-experimental": ["./node_modules/@tanstack/angular-query-experimental/build/index.d.ts"],
+      "@ng-icons/core": ["./node_modules/@ng-icons/core"],
+      "@ng-icons/heroicons/outline": ["./node_modules/@ng-icons/heroicons/outline"],
+      "@ng-icons/heroicons/solid": ["./node_modules/@ng-icons/heroicons/solid"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

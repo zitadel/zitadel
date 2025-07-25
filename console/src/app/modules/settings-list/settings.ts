@@ -1,15 +1,6 @@
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { SidenavSetting } from '../sidenav/sidenav.component';
 
-export const ORGANIZATIONS: SidenavSetting = {
-  id: 'organizations',
-  i18nKey: 'SETTINGS.LIST.ORGS',
-  groupI18nKey: 'SETTINGS.GROUPS.GENERAL',
-  requiredRoles: {
-    [PolicyComponentServiceType.ADMIN]: ['iam.read'],
-  },
-};
-
 export const FEATURESETTINGS: SidenavSetting = {
   id: 'features',
   i18nKey: 'SETTINGS.LIST.FEATURESETTINGS',
@@ -221,24 +212,4 @@ export const BRANDING: SidenavSetting = {
     [PolicyComponentServiceType.MGMT]: ['policy.read'],
     [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
   },
-};
-
-export const ACTIONS: SidenavSetting = {
-  id: 'actions',
-  i18nKey: 'SETTINGS.LIST.ACTIONS',
-  groupI18nKey: 'SETTINGS.GROUPS.ACTIONS',
-  requiredRoles: {
-    [PolicyComponentServiceType.ADMIN]: ['action.execution.write', 'action.target.write'],
-  },
-  beta: true,
-};
-
-export const ACTIONS_TARGETS: SidenavSetting = {
-  id: 'actions_targets',
-  i18nKey: 'SETTINGS.LIST.TARGETS',
-  groupI18nKey: 'SETTINGS.GROUPS.ACTIONS',
-  requiredRoles: {
-    [PolicyComponentServiceType.ADMIN]: ['action.execution.write', 'action.target.write'],
-  },
-  beta: true,
 };

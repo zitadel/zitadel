@@ -1,13 +1,72 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { Component, OnDestroy } from '@angular/core';
-import { merge, Subject, takeUntil } from 'rxjs';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
+import { Component, effect, OnDestroy } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 
-import { SETTINGLINKS } from '../settings-grid/settinglinks';
+import { NewOrganizationService } from '../../services/new-organization.service';
+
+export interface SettingLinks {
+  i18nTitle: string;
+  i18nDesc: string;
+  iamRouterLink: any;
+  orgRouterLink?: any;
+  queryParams: any;
+  iamWithRole?: string[];
+  orgWithRole?: string[];
+  icon?: string;
+  svgIcon?: string;
+  color: string;
+}
+
+export const LOGIN_GROUP: SettingLinks = {
+  i18nTitle: 'SETTINGS.GROUPS.LOGIN',
+  i18nDesc: 'POLICY.LOGIN_POLICY.DESCRIPTION',
+  iamRouterLink: ['/settings'],
+  orgRouterLink: ['/org-settings'],
+  queryParams: { id: 'login' },
+  iamWithRole: ['iam.policy.read'],
+  orgWithRole: ['policy.read'],
+  icon: 'las la-sign-in-alt',
+  color: 'green',
+};
+
+export const APPEARANCE_GROUP: SettingLinks = {
+  i18nTitle: 'SETTINGS.GROUPS.APPEARANCE',
+  i18nDesc: 'POLICY.PRIVATELABELING.DESCRIPTION',
+  iamRouterLink: ['/settings'],
+  orgRouterLink: ['/org-settings'],
+  queryParams: { id: 'branding' },
+  iamWithRole: ['iam.policy.read'],
+  orgWithRole: ['policy.read'],
+  icon: 'las la-swatchbook',
+  color: 'blue',
+};
+
+export const PRIVACY_POLICY: SettingLinks = {
+  i18nTitle: 'DESCRIPTIONS.SETTINGS.PRIVACY_POLICY.TITLE',
+  i18nDesc: 'POLICY.PRIVACY_POLICY.DESCRIPTION',
+  iamRouterLink: ['/settings'],
+  orgRouterLink: ['/org-settings'],
+  queryParams: { id: 'privacypolicy' },
+  iamWithRole: ['iam.policy.read'],
+  orgWithRole: ['policy.read'],
+  icon: 'las la-file-contract',
+  color: 'black',
+};
+
+export const NOTIFICATION_GROUP: SettingLinks = {
+  i18nTitle: 'SETTINGS.GROUPS.NOTIFICATIONS',
+  i18nDesc: 'SETTINGS.LIST.NOTIFICATIONS_DESC',
+  iamRouterLink: ['/settings'],
+  queryParams: { id: 'smtpprovider' },
+  iamWithRole: ['iam.policy.read'],
+  icon: 'las la-bell',
+  color: 'red',
+};
+
+export const SETTINGLINKS: SettingLinks[] = [LOGIN_GROUP, APPEARANCE_GROUP, PRIVACY_POLICY, NOTIFICATION_GROUP];
 
 export interface ShortcutItem {
   id: string;
@@ -80,7 +139,7 @@ const CREATE_USER: ShortcutItem = {
   styleUrls: ['./shortcuts.component.scss'],
 })
 export class ShortcutsComponent implements OnDestroy {
-  public org!: Org.AsObject;
+  public orgId!: string;
 
   public main: ShortcutItem[] = [];
   public secondary: ShortcutItem[] = [];
@@ -92,26 +151,19 @@ export class ShortcutsComponent implements OnDestroy {
   private destroy$: Subject<void> = new Subject();
   public editState: boolean = false;
   public ProjectState: any = ProjectState;
+
   constructor(
     private storageService: StorageService,
-    private auth: GrpcAuthService,
     private mgmtService: ManagementService,
+    private newOrganizationService: NewOrganizationService,
   ) {
-    const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-    if (org && org.id) {
-      this.org = org;
-      this.loadProjectShortcuts();
-    }
-
-    merge(this.auth.activeOrgChanged, this.mgmtService.ownedProjects)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-        if (org && org.id) {
-          this.org = org;
-          this.loadProjectShortcuts();
-        }
-      });
+    effect(() => {
+      const orgId = this.newOrganizationService.orgId();
+      if (orgId) {
+        this.orgId = orgId;
+        this.loadProjectShortcuts();
+      }
+    });
   }
 
   public loadProjectShortcuts(): void {
@@ -151,14 +203,14 @@ export class ShortcutsComponent implements OnDestroy {
         });
 
         this.ALL_SHORTCUTS = [...routesShortcuts, ...settingsShortcuts, ...mapped];
-        this.loadShortcuts(this.org);
+        this.loadShortcuts(this.orgId);
       }
     });
   }
 
-  public loadShortcuts(org: Org.AsObject): void {
+  public loadShortcuts(orgId: string): void {
     ['main', 'secondary', 'third'].map((listName) => {
-      const joinedShortcuts = this.storageService.getItem(`shortcuts:${listName}:${org.id}`, StorageLocation.local);
+      const joinedShortcuts = this.storageService.getItem(`shortcuts:${listName}:${orgId}`, StorageLocation.local);
       if (joinedShortcuts) {
         const parsedIds: string[] = joinedShortcuts.split(',');
         if (parsedIds && parsedIds.length) {
@@ -244,26 +296,26 @@ export class ShortcutsComponent implements OnDestroy {
   }
 
   public saveStateToStorage(): void {
-    const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-    if (org && org.id) {
-      this.storageService.setItem(`shortcuts:main:${org.id}`, this.main.map((p) => p.id).join(','), StorageLocation.local);
+    const orgId = this.newOrganizationService.orgId();
+    if (orgId) {
+      this.storageService.setItem(`shortcuts:main:${orgId}`, this.main.map((p) => p.id).join(','), StorageLocation.local);
       this.storageService.setItem(
-        `shortcuts:secondary:${org.id}`,
+        `shortcuts:secondary:${orgId}`,
         this.secondary.map((p) => p.id).join(','),
         StorageLocation.local,
       );
-      this.storageService.setItem(`shortcuts:third:${org.id}`, this.third.map((p) => p.id).join(','), StorageLocation.local);
+      this.storageService.setItem(`shortcuts:third:${orgId}`, this.third.map((p) => p.id).join(','), StorageLocation.local);
     }
   }
 
   public reset(): void {
-    const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
-    if (org && org.id) {
+    const orgId = this.newOrganizationService.orgId();
+    if (orgId) {
       ['main', 'secondary', 'third'].map((listName) => {
-        this.storageService.removeItem(`shortcuts:${listName}:${org.id}`, StorageLocation.local);
+        this.storageService.removeItem(`shortcuts:${listName}:${orgId}`, StorageLocation.local);
       });
 
-      this.loadShortcuts(org);
+      this.loadShortcuts(orgId);
     }
   }
 

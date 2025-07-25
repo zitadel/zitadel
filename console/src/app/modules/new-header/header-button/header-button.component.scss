@@ -1,0 +1,45 @@
+:host {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: stretch;
+  gap: 0rem;
+  padding-right: 0;
+  height: 32px;
+  max-height: 32px;
+  cursor: pointer;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@mixin header-button-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .header-button {
+    height: 36px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    border: 0;
+    background: transparent;
+    border-radius: 6px;
+    padding: 0 0.25rem;
+    cursor: pointer;
+    color: map-get($foreground, text);
+
+    &:hover {
+      background-color: if($is-dark-theme, #ffffff10, #00000010);
+    }
+  }
+}

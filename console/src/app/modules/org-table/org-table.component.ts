@@ -1,24 +1,26 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { Component, Input, ViewChild } from '@angular/core';
-import { MatSort, Sort } from '@angular/material/sort';
+import { Component, computed, effect, signal } from '@angular/core';
+import { Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, catchError, finalize, from, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
-import { Org, OrgFieldName, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
+import { OrgQuery } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { NewOrganizationService } from '../../services/new-organization.service';
+import { injectQuery, keepPreviousData } from '@tanstack/angular-query-experimental';
+import { MessageInitShape } from '@bufbuild/protobuf';
+import { ListOrganizationsRequestSchema } from '@zitadel/proto/zitadel/org/v2/org_service_pb';
+import { PageEvent } from '@angular/material/paginator';
+import { OrganizationFieldName } from '@zitadel/proto/zitadel/org/v2/query_pb';
+import { Organization, OrganizationState } from '@zitadel/proto/zitadel/org/v2/org_pb';
 import { PaginatorComponent } from '../paginator/paginator.component';
 
-enum OrgListSearchKey {
-  NAME = 'NAME',
-}
-
-type Request = { limit: number; offset: number; queries: OrgQuery[] };
+type ListQuery = NonNullable<MessageInitShape<typeof ListOrganizationsRequestSchema>['query']>;
+type SearchQuery = NonNullable<MessageInitShape<typeof ListOrganizationsRequestSchema>['queries']>[number];
 
 @Component({
   selector: 'cnsl-org-table',
@@ -26,100 +28,80 @@ type Request = { limit: number; offset: number; queries: OrgQuery[] };
   styleUrls: ['./org-table.component.scss'],
 })
 export class OrgTableComponent {
-  public orgSearchKey: OrgListSearchKey | undefined = undefined;
-
-  @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  @ViewChild('input') public filter!: Input;
-
-  public dataSource: MatTableDataSource<Org.AsObject> = new MatTableDataSource<Org.AsObject>([]);
   public displayedColumns: string[] = ['name', 'state', 'primaryDomain', 'creationDate', 'changeDate', 'actions'];
-  private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-  public activeOrg!: Org.AsObject;
-  public initialLimit: number = 20;
-  public timestamp: Timestamp.AsObject | undefined = undefined;
-  public totalResult: number = 0;
-  public filterOpen: boolean = false;
-  public OrgState: any = OrgState;
   public copied: string = '';
-  @ViewChild(MatSort) public sort!: MatSort;
 
-  private searchQueries: OrgQuery[] = [];
-  private destroy$: Subject<void> = new Subject();
-  private requestOrgs$: BehaviorSubject<Request> = new BehaviorSubject<Request>({
-    limit: this.initialLimit,
-    offset: 0,
-    queries: [],
-  });
   public defaultOrgId: string = '';
-  private requestOrgsObservable$ = this.requestOrgs$.pipe(takeUntil(this.destroy$));
+
+  protected readonly listQuery = signal<ListQuery & { limit: number }>({ limit: 20, offset: BigInt(0) });
+  private readonly searchQueries = signal<SearchQuery[]>([]);
+  private readonly sortingColumn = signal<OrganizationFieldName | undefined>(undefined);
+
+  private readonly req = computed<MessageInitShape<typeof ListOrganizationsRequestSchema>>(() => ({
+    query: this.listQuery(),
+    queries: this.searchQueries().length ? this.searchQueries() : undefined,
+    sortingColumn: this.sortingColumn(),
+  }));
+
+  protected listOrganizationsQuery = injectQuery(() => ({
+    ...this.newOrganizationService.listOrganizationsQueryOptions(this.req()),
+    placeholderData: keepPreviousData,
+  }));
+
+  protected readonly dataSource = this.getDataSource();
 
   constructor(
-    private authService: GrpcAuthService,
-    private mgmtService: ManagementService,
-    private adminService: AdminService,
-    private router: Router,
-    private toast: ToastService,
-    private _liveAnnouncer: LiveAnnouncer,
-    private translate: TranslateService,
+    private readonly authService: GrpcAuthService,
+    private readonly mgmtService: ManagementService,
+    private readonly adminService: AdminService,
+    protected readonly router: Router,
+    private readonly toast: ToastService,
+    private readonly liveAnnouncer: LiveAnnouncer,
+    private readonly translate: TranslateService,
+    private readonly newOrganizationService: NewOrganizationService,
   ) {
-    this.requestOrgs$.next({ limit: this.initialLimit, offset: 0, queries: this.searchQueries });
-    this.authService.getActiveOrg().then((org) => (this.activeOrg = org));
-
-    this.requestOrgsObservable$.pipe(switchMap((req) => this.loadOrgs(req))).subscribe((orgs) => {
-      this.dataSource = new MatTableDataSource<Org.AsObject>(orgs);
-    });
-
     this.mgmtService.getIAM().then((iam) => {
       this.defaultOrgId = iam.defaultOrgId;
     });
-  }
 
-  public loadOrgs(request: Request): Observable<Org.AsObject[]> {
-    this.loadingSubject.next(true);
-
-    let sortingField: OrgFieldName | undefined = undefined;
-    if (this.sort?.active && this.sort?.direction)
-      switch (this.sort.active) {
-        case 'name':
-          sortingField = OrgFieldName.ORG_FIELD_NAME_NAME;
-          break;
+    effect(() => {
+      if (this.listOrganizationsQuery.isError()) {
+        this.toast.showError(this.listOrganizationsQuery.error());
       }
-
-    return from(
-      this.adminService.listOrgs(request.limit, request.offset, request.queries, sortingField, this.sort?.direction),
-    ).pipe(
-      map((resp) => {
-        this.timestamp = resp.details?.viewTimestamp;
-        this.totalResult = resp.details?.totalResult ?? 0;
-        return resp.resultList;
-      }),
-      catchError((error) => {
-        this.toast.showError(error);
-        return of([]);
-      }),
-      finalize(() => this.loadingSubject.next(false)),
-    );
-  }
-
-  public refresh(): void {
-    this.requestOrgs$.next({
-      limit: this.paginator.pageSize,
-      offset: this.paginator.pageSize * this.paginator.pageIndex,
-      queries: this.searchQueries,
     });
   }
 
-  public sortChange(sortState: Sort) {
-    if (sortState.direction && sortState.active) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-      this.refresh();
+  private getDataSource() {
+    const dataSource = new MatTableDataSource<Organization>();
+    effect(() => {
+      const organizations = this.listOrganizationsQuery.data()?.result ?? [];
+      if (dataSource.data != organizations) {
+        dataSource.data = organizations;
+      }
+    });
+
+    return dataSource;
+  }
+
+  public async sortChange(sortState: Sort) {
+    this.sortingColumn.set(sortState.active === 'name' ? OrganizationFieldName.NAME : undefined);
+
+    const listQuery = { ...this.listQuery() };
+    if (sortState.direction === 'asc') {
+      this.listQuery.set({ ...listQuery, asc: true });
     } else {
-      this._liveAnnouncer.announce('Sorting cleared');
+      delete listQuery.asc;
+      this.listQuery.set(listQuery);
+    }
+
+    if (sortState.direction && sortState.active) {
+      await this.liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+    } else {
+      await this.liveAnnouncer.announce('Sorting cleared');
     }
   }
 
-  public setDefaultOrg(org: Org.AsObject) {
+  public setDefaultOrg(org: Organization) {
     this.adminService
       .setDefaultOrg(org.id)
       .then(() => {
@@ -131,34 +113,56 @@ export class OrgTableComponent {
       });
   }
 
-  public applySearchQuery(searchQueries: OrgQuery[]): void {
-    this.searchQueries = searchQueries;
-    this.requestOrgs$.next({
-      limit: this.paginator ? this.paginator.pageSize : this.initialLimit,
-      offset: this.paginator ? this.paginator.pageSize * this.paginator.pageIndex : 0,
-      queries: this.searchQueries,
-    });
-  }
-
-  public setFilter(key: OrgListSearchKey): void {
-    setTimeout(() => {
-      if (this.filter) {
-        (this.filter as any).nativeElement.focus();
-      }
-    }, 100);
-
-    if (this.orgSearchKey !== key) {
-      this.orgSearchKey = key;
-    } else {
-      this.orgSearchKey = undefined;
-      this.refresh();
+  public applySearchQuery(searchQueries: OrgQuery[], paginator: PaginatorComponent): void {
+    if (this.searchQueries().length === 0 && searchQueries.length === 0) {
+      return;
     }
+    paginator.pageIndex = 0;
+    this.searchQueries.set(searchQueries.map((q) => ({ query: this.oldQueryToNewQuery(q.toObject()) })));
   }
 
-  public setAndNavigateToOrg(org: Org.AsObject): void {
-    if (org.state !== OrgState.ORG_STATE_REMOVED) {
-      this.authService.setActiveOrg(org);
-      this.router.navigate(['/org']);
+  private oldQueryToNewQuery(query: OrgQuery.AsObject): SearchQuery['query'] {
+    if (query.idQuery) {
+      return {
+        case: 'idQuery' as const,
+        value: {
+          id: query.idQuery.id,
+        },
+      };
+    }
+    if (query.stateQuery) {
+      return {
+        case: 'stateQuery' as const,
+        value: {
+          state: query.stateQuery.state as unknown as any,
+        },
+      };
+    }
+    if (query.domainQuery) {
+      return {
+        case: 'domainQuery' as const,
+        value: {
+          domain: query.domainQuery.domain,
+          method: query.domainQuery.method as unknown as any,
+        },
+      };
+    }
+    if (query.nameQuery) {
+      return {
+        case: 'nameQuery' as const,
+        value: {
+          name: query.nameQuery.name,
+          method: query.nameQuery.method as unknown as any,
+        },
+      };
+    }
+    throw new Error('Invalid query');
+  }
+
+  public async setAndNavigateToOrg(org: Organization): Promise<void> {
+    if (org.state !== OrganizationState.REMOVED) {
+      await this.newOrganizationService.setOrgId(org.id);
+      await this.router.navigate(['/org']);
     } else {
       this.translate.get('ORG.TOAST.ORG_WAS_DELETED').subscribe((data) => {
         this.toast.showInfo(data);
@@ -166,11 +170,13 @@ export class OrgTableComponent {
     }
   }
 
-  public changePage(): void {
-    this.refresh();
+  protected pageChanged(event: PageEvent) {
+    this.listQuery.set({
+      limit: event.pageSize,
+      offset: BigInt(event.pageSize) * BigInt(event.pageIndex),
+    });
   }
 
-  public gotoRouterLink(rL: any) {
-    this.router.navigate(rL);
-  }
+  protected readonly Number = Number;
+  protected readonly OrganizationState = OrganizationState;
 }

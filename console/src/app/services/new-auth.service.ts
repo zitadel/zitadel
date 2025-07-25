@@ -6,7 +6,6 @@ import {
   GetMyLoginPolicyResponse,
   GetMyLoginPolicyRequestSchema,
   GetMyPasswordComplexityPolicyResponse,
-  GetMyUserResponse,
   ListMyAuthFactorsRequestSchema,
   ListMyAuthFactorsResponse,
   RemoveMyAuthFactorOTPEmailRequestSchema,
@@ -19,17 +18,15 @@ import {
   RemoveMyAuthFactorOTPSMSResponse,
   ListMyMetadataResponse,
   VerifyMyPhoneResponse,
+  ListMyZitadelPermissionsResponse,
 } from '@zitadel/proto/zitadel/auth_pb';
+import { injectQuery } from '@tanstack/angular-query-experimental';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NewAuthService {
   constructor(private readonly grpcService: GrpcService) {}
-
-  public getMyUser(): Promise<GetMyUserResponse> {
-    return this.grpcService.authNew.getMyUser({});
-  }
 
   public verifyMyPhone(code: string): Promise<VerifyMyPhoneResponse> {
     return this.grpcService.authNew.verifyMyPhone({ code });
@@ -69,5 +66,16 @@ export class NewAuthService {
 
   public getMyPasswordComplexityPolicy(): Promise<GetMyPasswordComplexityPolicyResponse> {
     return this.grpcService.authNew.getMyPasswordComplexityPolicy({});
+  }
+
+  public listMyZitadelPermissions(): Promise<ListMyZitadelPermissionsResponse> {
+    return this.grpcService.authNew.listMyZitadelPermissions({});
+  }
+
+  public listMyZitadelPermissionsQuery() {
+    return injectQuery(() => ({
+      queryKey: ['auth', 'listMyZitadelPermissions'],
+      queryFn: () => this.listMyZitadelPermissions().then(({ result }) => result),
+    }));
   }
 }
