@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Request, RpcError, StatusCode, UnaryInterceptor, UnaryResponse } from 'grpc-web';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 
 import { StorageKey, StorageLocation, StorageService } from '../storage.service';
 import { ConnectError, Interceptor } from '@connectrpc/connect';

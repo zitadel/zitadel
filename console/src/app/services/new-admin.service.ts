@@ -20,7 +20,7 @@ export class NewAdminService {
   ) {}
 
   public setupOrg(req: MessageInitShape<typeof SetUpOrgRequestSchema>): Promise<SetUpOrgResponse> {
-    return this.grpcService.adminNew.setupOrg(req);
+    return this.grpcService.adminNew.setUpOrg(req);
   }
 
   public getDefaultOrg(): Promise<GetDefaultOrgResponse> {

@@ -103,14 +103,11 @@ import { GrpcService } from './grpc.service';
 import { NewOrganizationService } from './new-organization.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 
-const ORG_LIMIT = 10;
-
 @Injectable({
   providedIn: 'root',
 })
 export class GrpcAuthService {
   public user: Observable<User.AsObject | undefined>;
-  private triggerPermissionsRefresh: Subject<void> = new Subject();
   public zitadelPermissions: Observable<string[]>;
 
   public labelpolicy$!: Observable<LabelPolicy.AsObject>;
@@ -196,10 +193,6 @@ export class GrpcAuthService {
       req.setQueriesList(queryList);
     }
     return this.grpcService.auth.listMyMetadata(req, null).then((resp) => resp.toObject());
-  }
-
-  private loadPermissions(): void {
-    this.triggerPermissionsRefresh.next();
   }
 
   /**
