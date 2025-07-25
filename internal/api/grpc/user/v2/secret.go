@@ -3,37 +3,38 @@ package user
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) AddSecret(ctx context.Context, req *user.AddSecretRequest) (*user.AddSecretResponse, error) {
+func (s *Server) AddSecret(ctx context.Context, req *connect.Request[user.AddSecretRequest]) (*connect.Response[user.AddSecretResponse], error) {
 	newSecret := &command.GenerateMachineSecret{
 		PermissionCheck: s.command.NewPermissionCheckUserWrite(ctx),
 	}
-	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, "", newSecret)
+	details, err := s.command.GenerateMachineSecret(ctx, req.Msg.GetUserId(), "", newSecret)
 	if err != nil {
 		return nil, err
 	}
-	return &user.AddSecretResponse{
+	return connect.NewResponse(&user.AddSecretResponse{
 		CreationDate: timestamppb.New(details.EventDate),
 		ClientSecret: newSecret.ClientSecret,
-	}, nil
+	}), nil
 }
 
-func (s *Server) RemoveSecret(ctx context.Context, req *user.RemoveSecretRequest) (*user.RemoveSecretResponse, error) {
+func (s *Server) RemoveSecret(ctx context.Context, req *connect.Request[user.RemoveSecretRequest]) (*connect.Response[user.RemoveSecretResponse], error) {
 	details, err := s.command.RemoveMachineSecret(
 		ctx,
-		req.UserId,
+		req.Msg.GetUserId(),
 		"",
 		s.command.NewPermissionCheckUserWrite(ctx),
 	)
 	if err != nil {
 		return nil, err
 	}
-	return &user.RemoveSecretResponse{
+	return connect.NewResponse(&user.RemoveSecretResponse{
 		DeletionDate: timestamppb.New(details.EventDate),
-	}, nil
+	}), nil
 }
