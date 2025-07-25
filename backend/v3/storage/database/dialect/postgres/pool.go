@@ -33,7 +33,6 @@ func (c *pgxPool) Acquire(ctx context.Context) (database.Client, error) {
 // Query implements [database.Pool].
 // Subtle: this method shadows the method (Pool).Query of pgxPool.Pool.
 func (c *pgxPool) Query(ctx context.Context, sql string, args ...any) (database.Rows, error) {
-	//nolint:sqlclosecheck // Rows.Close is called by the caller
 	rows, err := c.Pool.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, wrapError(err)
