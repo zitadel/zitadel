@@ -131,6 +131,7 @@ jobs:
         lint,
         container,
         login-container,
+        login-acceptance,
         e2e,
       ]
     if: ${{ github.event_name == 'workflow_dispatch' }}
