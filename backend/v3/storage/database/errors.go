@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-var NoChangesError = errors.New("Update must contain a change")
+var ErrNoChanges = errors.New("update must contain a change")
 
 // NoRowFoundError is returned when QueryRow does not find any row.
 // It wraps the dialect specific original error to provide more context.

@@ -77,7 +77,7 @@ func (i *instanceDomain) Remove(ctx context.Context, condition database.Conditio
 // Subtle: this method shadows the method ([domain.InstanceRepository]).Update of instanceDomain.instance.
 func (i *instanceDomain) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
-		return 0, database.NoChangesError
+		return 0, database.ErrNoChanges
 	}
 	var builder database.StatementBuilder
 

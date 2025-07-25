@@ -67,7 +67,7 @@ func (o *orgDomain) Add(ctx context.Context, domain *domain.AddOrganizationDomai
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).Update of orgDomain.org.
 func (o *orgDomain) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
-		return 0, database.NoChangesError
+		return 0, database.ErrNoChanges
 	}
 
 	var builder database.StatementBuilder

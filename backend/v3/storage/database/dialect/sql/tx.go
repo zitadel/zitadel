@@ -43,6 +43,7 @@ func (tx *sqlTx) End(ctx context.Context, err error) error {
 // Query implements [database.Transaction].
 // Subtle: this method shadows the method (Tx).Query of pgxTx.Tx.
 func (tx *sqlTx) Query(ctx context.Context, sql string, args ...any) (database.Rows, error) {
+	//nolint:sqlclosecheck // Rows.Close is called by the caller
 	rows, err := tx.QueryContext(ctx, sql, args...)
 	if err != nil {
 		return nil, wrapError(err)

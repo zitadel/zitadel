@@ -105,7 +105,7 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 // Update implements [domain.OrganizationRepository].
 func (o *org) Update(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
-		return 0, database.NoChangesError
+		return 0, database.ErrNoChanges
 	}
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.organizations SET `)

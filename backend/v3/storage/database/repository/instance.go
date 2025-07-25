@@ -105,7 +105,7 @@ func (i *instance) Create(ctx context.Context, instance *domain.Instance) error 
 // Update implements [domain.InstanceRepository].
 func (i instance) Update(ctx context.Context, id string, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
-		return 0, database.NoChangesError
+		return 0, database.ErrNoChanges
 	}
 	var builder database.StatementBuilder
 

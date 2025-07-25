@@ -475,7 +475,7 @@ func TestUpdateInstanceDomain(t *testing.T) {
 			condition: domainRepo.DomainCondition(database.TextOperationEqual, domainName),
 			changes:   []database.Change{},
 			expected:  0,
-			err:       database.NoChangesError,
+			err:       database.ErrNoChanges,
 		},
 	}
 
