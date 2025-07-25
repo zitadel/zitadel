@@ -50,7 +50,7 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         name: Build console with Turbo
         run: pnpm turbo build --filter=./console

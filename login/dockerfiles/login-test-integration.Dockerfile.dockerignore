@@ -1,9 +1,0 @@
-*
-
-!/apps/login-test-integration
-/apps/login-test-integration/core-mock
-
-**/*.md
-**/*.png
-**/node_modules
-**/.turbo
