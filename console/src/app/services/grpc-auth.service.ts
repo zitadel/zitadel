@@ -103,6 +103,8 @@ import { GrpcService } from './grpc.service';
 import { NewOrganizationService } from './new-organization.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 
+const ORG_LIMIT = 10;
+
 @Injectable({
   providedIn: 'root',
 })
