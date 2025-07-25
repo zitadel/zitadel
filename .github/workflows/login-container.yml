@@ -30,7 +30,7 @@ env:
 jobs:
   login-container:
     name: Build Login Container
-    runs-on: depot-ubuntu-22.04-8
+    runs-on: ubuntu-latest
     permissions:
       packages: write
     steps:
