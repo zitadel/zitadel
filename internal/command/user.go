@@ -189,7 +189,9 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotExisting")
 	}
-	var events []eventstore.Command
+
+	// UserRemoved + CascadingGrantIDs + CascadingUserMemberships.
+	var events = make([]eventstore.Command, 0, 1+len(cascadingGrantIDs)+len(cascadingUserMemberships))
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain))
 

@@ -117,7 +117,7 @@ func (i *Instance) CreateSAMLClientLoginVersion(ctx context.Context, projectID s
 
 	resp, err := i.Client.Mgmt.AddSAMLApp(ctx, &management.AddSAMLAppRequest{
 		ProjectId:    projectID,
-		Name:         fmt.Sprintf("app-%s", gofakeit.AppName()),
+		Name:         "app-" + gofakeit.AppName(),
 		Metadata:     &management.AddSAMLAppRequest_MetadataXml{MetadataXml: spMetadata},
 		LoginVersion: loginVersion,
 	})

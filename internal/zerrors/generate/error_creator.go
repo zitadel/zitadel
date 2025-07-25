@@ -32,7 +32,7 @@ func main() {
 
 	fmt.Print(`
 !!!!!
-  Add status mapping in internal/api/grpc/zerrors.go	
+  Add status mapping in internal/api/grpc/zerrors.go
 !!!!!`)
 }
 
@@ -43,7 +43,8 @@ type Data struct {
 func (data *Data) createFile(tmplName string) *os.File {
 	filename := strings.Replace(tmplName, "error", strings.ToLower(data.ErrorName), 1)
 	filename = filename[:len(filename)-5]
-	filePath := fmt.Sprintf("../%s", filename)
+
+	filePath := "../" + filename
 	file, err := os.Create(filePath)
 	if err != nil {
 		log.Fatalf("unable to create file (%s): %v", filePath, err)

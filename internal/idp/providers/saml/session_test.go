@@ -315,12 +315,14 @@ func TestSession_FetchUser(t *testing.T) {
 }
 
 func httpPostFormRequest(t *testing.T, callbackURL, relayState, response string) *http.Request {
+	t.Helper()
+
 	body := url.Values{
 		"SAMLResponse": {response},
 		"RelayState":   {relayState},
 	}
 
-	req, err := http.NewRequest("POST", callbackURL, strings.NewReader(body.Encode()))
+	req, err := http.NewRequest(http.MethodPost, callbackURL, strings.NewReader(body.Encode()))
 	assert.NoError(t, err)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	assert.NoError(t, req.ParseForm())

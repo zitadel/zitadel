@@ -64,6 +64,8 @@ func baseEvent(*testing.T) eventstore.Event {
 
 func getEvent(event *repository.Event, mapper func(eventstore.Event) (eventstore.Event, error)) func(t *testing.T) eventstore.Event {
 	return func(t *testing.T) eventstore.Event {
+		t.Helper()
+
 		e, err := mapper(event)
 		if err != nil {
 			t.Fatalf("mapper failed: %v", err)

@@ -79,28 +79,28 @@ func (s *Session) validateToken(ctx context.Context, token string) (*oidc.IDToke
 	claims := new(oidc.IDTokenClaims)
 	payload, err := oidc.ParseToken(token, claims)
 	if err != nil {
-		return nil, fmt.Errorf("%w: malformed jwt payload: %v", ErrInvalidToken, err)
+		return nil, fmt.Errorf("%w: malformed jwt payload: %w", ErrInvalidToken, err)
 	}
 
 	if err = oidc.CheckIssuer(claims, s.Provider.issuer); err != nil {
-		return nil, fmt.Errorf("%w: invalid issuer: %v", ErrInvalidToken, err)
+		return nil, fmt.Errorf("%w: invalid issuer: %w", ErrInvalidToken, err)
 	}
 
 	logging.Debug("begin signature validation")
 	keySet := rp.NewRemoteKeySet(http.DefaultClient, s.Provider.keysEndpoint)
 	if err = oidc.CheckSignature(ctx, token, payload, claims, nil, keySet); err != nil {
-		return nil, fmt.Errorf("%w: invalid signature: %v", ErrInvalidToken, err)
+		return nil, fmt.Errorf("%w: invalid signature: %w", ErrInvalidToken, err)
 	}
 
 	if !claims.GetExpiration().IsZero() {
 		if err = oidc.CheckExpiration(claims, offset); err != nil {
-			return nil, fmt.Errorf("%w: expired: %v", ErrInvalidToken, err)
+			return nil, fmt.Errorf("%w: expired: %w", ErrInvalidToken, err)
 		}
 	}
 
 	if !claims.GetIssuedAt().IsZero() {
 		if err = oidc.CheckIssuedAt(claims, maxAge, offset); err != nil {
-			return nil, fmt.Errorf("%w: %v", ErrInvalidToken, err)
+			return nil, fmt.Errorf("%w: %w", ErrInvalidToken, err)
 		}
 	}
 	return claims, nil

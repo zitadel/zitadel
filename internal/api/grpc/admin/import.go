@@ -267,7 +267,7 @@ func getFileFromS3(ctx context.Context, input *admin_pb.ImportDataRequest_S3Inpu
 		return nil, err
 	}
 	if !exists {
-		return nil, fmt.Errorf("bucket not existing: %v", err)
+		return nil, fmt.Errorf("bucket not existing: %w", err)
 	}
 
 	object, err := minioClient.GetObject(ctx, input.Bucket, input.Path, minio.GetObjectOptions{})

@@ -1799,7 +1799,7 @@ func TestExistsUser(t *testing.T) {
 			wantErr:    false,
 		},
 		{
-			name: "error durring filter",
+			name: "error during filter",
 			args: args{
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return nil, zerrors.ThrowInternal(nil, "USER-Drebn", "Errors.Internal")
