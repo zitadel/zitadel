@@ -5,20 +5,26 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/crypto"
 )
 
 //go:generate enumer -type IDPType -transform lower -trimprefix IDPType
 type IDPType uint8
 
 const (
-	IDPTypeOIDC IDPType = iota
-	IDPTypeOAUTH
-	IDPTypeSAML
+	IDPTypeUnspecified IDPType = iota
+	IDPTypeOIDC
+	IDPTypeJWT
+	IDPTypeOAuth
 	IDPTypeLDAP
-	IDPTypeGithub
+	IDPTypeAzureAD
+	IDPTypeGitHub
+	IDPTypeGitHubEnterprise
+	IDPTypeGitLab
+	IDPTypeGitLabSelfHosted
 	IDPTypeGoogle
-	IDPTypeMicrosoft
 	IDPTypeApple
+	IDPTypeSAML
 )
 
 //go:generate enumer -type IDPState -transform lower -trimprefix IDPState
@@ -27,6 +33,16 @@ type IDPState uint8
 const (
 	IDPStateActive IDPState = iota
 	IDPStateInactive
+)
+
+type OIDCMappingField int8
+
+const (
+	OIDCMappingFieldUnspecified OIDCMappingField = iota
+	OIDCMappingFieldPreferredLoginName
+	OIDCMappingFieldEmail
+	// count is for validation purposes
+	oidcMappingFieldCount
 )
 
 type IdentityProvider struct {
@@ -46,9 +62,39 @@ type IdentityProvider struct {
 	UpdatedAt         time.Time `json:"updatedAt,omitempty" db:"updated_at"`
 }
 
+type OIDC struct {
+	IDPConfigID           string             `json:"idpConfigId"`
+	ClientID              string             `json:"clientId,omitempty"`
+	ClientSecret          crypto.CryptoValue `json:"clientSecret,omitempty"`
+	Issuer                string             `json:"issuer,omitempty"`
+	AuthorizationEndpoint string             `json:"authorizationEndpoint,omitempty"`
+	TokenEndpoint         string             `json:"tokenEndpoint,omitempty"`
+	Scopes                []string           `json:"scopes,omitempty"`
+	IDPDisplayNameMapping OIDCMappingField   `json:"IDPDisplayNameMapping,omitempty"`
+	UserNameMapping       OIDCMappingField   `json:"usernameMapping,omitempty"`
+}
+
+type IDPOIDC struct {
+	*IdentityProvider
+	OIDC
+}
+
+type JWT struct {
+	IDPConfigID  string `json:"idpConfigId"`
+	JWTEndpoint  string `json:"jwtEndpoint,omitempty"`
+	Issuer       string `json:"issuer,omitempty"`
+	KeysEndpoint string `json:"keysEndpoint,omitempty"`
+	HeaderName   string `json:"headerName,omitempty"`
+}
+
+type IDPJWT struct {
+	*IdentityProvider
+	JWT
+}
+
 // IDPIdentifierCondition is used to help specify a single identity_provider,
 // it will either be used as the  identity_provider ID or identity_provider name,
-// as identity_provider can be identified either using (instnaceID + OrgID + ID) OR (instanceID + OrgID + name)
+// as identity_provider can be identified either using (instanceID + OrgID + ID) OR (instanceID + OrgID + name)
 type IDPIdentifierCondition interface {
 	database.Condition
 }
@@ -101,10 +147,13 @@ type IDProviderRepository interface {
 	idProviderConditions
 	idProviderChanges
 
-	Get(ctx context.Context, id IDPIdentifierCondition, instnaceID string, orgID *string) (*IdentityProvider, error)
+	Get(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IdentityProvider, error)
 	List(ctx context.Context, conditions ...database.Condition) ([]*IdentityProvider, error)
 
 	Create(ctx context.Context, idp *IdentityProvider) error
-	Update(ctx context.Context, id IDPIdentifierCondition, instnaceID string, orgID *string, changes ...database.Change) (int64, error)
-	Delete(ctx context.Context, id IDPIdentifierCondition, instnaceID string, orgID *string) (int64, error)
+	Update(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string, changes ...database.Change) (int64, error)
+	Delete(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (int64, error)
+
+	GetOIDC(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOIDC, error)
+	GetJWT(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPJWT, error)
 }

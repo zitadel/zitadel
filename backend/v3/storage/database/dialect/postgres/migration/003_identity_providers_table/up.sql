@@ -5,6 +5,7 @@ CREATE TYPE zitadel.idp_state AS ENUM (
 
 CREATE TYPE zitadel.idp_type AS ENUM (
     'oidc',
+    'jwt',
     'oauth',
     'saml',
     'ldap',
@@ -20,7 +21,7 @@ CREATE TABLE zitadel.identity_providers (
     , id TEXT NOT NULL CHECK (id <> '')
     , state zitadel.idp_state NOT NULL DEFAULT 'active'
     , name TEXT NOT NULL CHECK (name <> '')
-    , type zitadel.idp_type NOT NULL
+    , type zitadel.idp_type -- NOT NULL
     , allow_creation BOOLEAN NOT NULL DEFAULT TRUE
     , allow_auto_creation BOOLEAN NOT NULL DEFAULT TRUE
     , allow_auto_update BOOLEAN NOT NULL DEFAULT TRUE

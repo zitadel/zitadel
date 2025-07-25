@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -26,12 +27,12 @@ const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, 
 	` allow_auto_update, allow_linking, styling_type, payload, created_at, updated_at` +
 	` FROM zitadel.identity_providers`
 
-func (i *idProvider) Get(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IdentityProvider, error) {
+func (i *idProvider) Get(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IdentityProvider, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(queryIDProviderStmt)
 
-	conditions := []database.Condition{id, i.InstanceIDCondition(instnaceID), i.OrgIDCondition(orgID)}
+	conditions := []database.Condition{id, i.InstanceIDCondition(instanceID), i.OrgIDCondition(orgID)}
 
 	writeCondition(&builder, database.And(conditions...))
 
@@ -116,6 +117,50 @@ func (i *idProvider) Delete(ctx context.Context, id domain.IDPIdentifierConditio
 	writeCondition(&builder, database.And(conditions...))
 
 	return i.client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+func (i *idProvider) GetOIDC(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPOIDC, error) {
+	idpOIDC := &domain.IDPOIDC{}
+	var err error
+
+	idpOIDC.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpOIDC.Type != domain.IDPTypeOIDC.String() {
+		// TODO
+		return nil, nil
+	}
+
+	err = json.Unmarshal([]byte(*idpOIDC.Payload), idpOIDC)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpOIDC, nil
+}
+
+func (i *idProvider) GetJWT(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPJWT, error) {
+	idpJWT := &domain.IDPJWT{}
+	var err error
+
+	idpJWT.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpJWT.Type != domain.IDPTypeJWT.String() {
+		// TODO
+		return nil, nil
+	}
+
+	err = json.Unmarshal([]byte(*idpJWT.Payload), idpJWT)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpJWT, nil
 }
 
 // -------------------------------------------------------------

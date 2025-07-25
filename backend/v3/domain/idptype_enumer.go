@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _IDPTypeName = "oidcoauthsamlldapgithubgooglemicrosoftapple"
+const _IDPTypeName = "unspecifiedoidcjwtoauthldapazureadgithubgithubenterprisegitlabgitlabselfhostedgoogleapplesaml"
 
-var _IDPTypeIndex = [...]uint8{0, 4, 9, 13, 17, 23, 29, 38, 43}
+var _IDPTypeIndex = [...]uint8{0, 11, 15, 18, 23, 27, 34, 40, 56, 62, 78, 84, 89, 93}
 
-const _IDPTypeLowerName = "oidcoauthsamlldapgithubgooglemicrosoftapple"
+const _IDPTypeLowerName = "unspecifiedoidcjwtoauthldapazureadgithubgithubenterprisegitlabgitlabselfhostedgoogleapplesaml"
 
 func (i IDPType) String() string {
 	if i >= IDPType(len(_IDPTypeIndex)-1) {
@@ -24,46 +24,66 @@ func (i IDPType) String() string {
 // Re-run the stringer command to generate them again.
 func _IDPTypeNoOp() {
 	var x [1]struct{}
-	_ = x[IDPTypeOIDC-(0)]
-	_ = x[IDPTypeOAUTH-(1)]
-	_ = x[IDPTypeSAML-(2)]
-	_ = x[IDPTypeLDAP-(3)]
-	_ = x[IDPTypeGithub-(4)]
-	_ = x[IDPTypeGoogle-(5)]
-	_ = x[IDPTypeMicrosoft-(6)]
-	_ = x[IDPTypeApple-(7)]
+	_ = x[IDPTypeUnspecified-(0)]
+	_ = x[IDPTypeOIDC-(1)]
+	_ = x[IDPTypeJWT-(2)]
+	_ = x[IDPTypeOAuth-(3)]
+	_ = x[IDPTypeLDAP-(4)]
+	_ = x[IDPTypeAzureAD-(5)]
+	_ = x[IDPTypeGitHub-(6)]
+	_ = x[IDPTypeGitHubEnterprise-(7)]
+	_ = x[IDPTypeGitLab-(8)]
+	_ = x[IDPTypeGitLabSelfHosted-(9)]
+	_ = x[IDPTypeGoogle-(10)]
+	_ = x[IDPTypeApple-(11)]
+	_ = x[IDPTypeSAML-(12)]
 }
 
-var _IDPTypeValues = []IDPType{IDPTypeOIDC, IDPTypeOAUTH, IDPTypeSAML, IDPTypeLDAP, IDPTypeGithub, IDPTypeGoogle, IDPTypeMicrosoft, IDPTypeApple}
+var _IDPTypeValues = []IDPType{IDPTypeUnspecified, IDPTypeOIDC, IDPTypeJWT, IDPTypeOAuth, IDPTypeLDAP, IDPTypeAzureAD, IDPTypeGitHub, IDPTypeGitHubEnterprise, IDPTypeGitLab, IDPTypeGitLabSelfHosted, IDPTypeGoogle, IDPTypeApple, IDPTypeSAML}
 
 var _IDPTypeNameToValueMap = map[string]IDPType{
-	_IDPTypeName[0:4]:        IDPTypeOIDC,
-	_IDPTypeLowerName[0:4]:   IDPTypeOIDC,
-	_IDPTypeName[4:9]:        IDPTypeOAUTH,
-	_IDPTypeLowerName[4:9]:   IDPTypeOAUTH,
-	_IDPTypeName[9:13]:       IDPTypeSAML,
-	_IDPTypeLowerName[9:13]:  IDPTypeSAML,
-	_IDPTypeName[13:17]:      IDPTypeLDAP,
-	_IDPTypeLowerName[13:17]: IDPTypeLDAP,
-	_IDPTypeName[17:23]:      IDPTypeGithub,
-	_IDPTypeLowerName[17:23]: IDPTypeGithub,
-	_IDPTypeName[23:29]:      IDPTypeGoogle,
-	_IDPTypeLowerName[23:29]: IDPTypeGoogle,
-	_IDPTypeName[29:38]:      IDPTypeMicrosoft,
-	_IDPTypeLowerName[29:38]: IDPTypeMicrosoft,
-	_IDPTypeName[38:43]:      IDPTypeApple,
-	_IDPTypeLowerName[38:43]: IDPTypeApple,
+	_IDPTypeName[0:11]:       IDPTypeUnspecified,
+	_IDPTypeLowerName[0:11]:  IDPTypeUnspecified,
+	_IDPTypeName[11:15]:      IDPTypeOIDC,
+	_IDPTypeLowerName[11:15]: IDPTypeOIDC,
+	_IDPTypeName[15:18]:      IDPTypeJWT,
+	_IDPTypeLowerName[15:18]: IDPTypeJWT,
+	_IDPTypeName[18:23]:      IDPTypeOAuth,
+	_IDPTypeLowerName[18:23]: IDPTypeOAuth,
+	_IDPTypeName[23:27]:      IDPTypeLDAP,
+	_IDPTypeLowerName[23:27]: IDPTypeLDAP,
+	_IDPTypeName[27:34]:      IDPTypeAzureAD,
+	_IDPTypeLowerName[27:34]: IDPTypeAzureAD,
+	_IDPTypeName[34:40]:      IDPTypeGitHub,
+	_IDPTypeLowerName[34:40]: IDPTypeGitHub,
+	_IDPTypeName[40:56]:      IDPTypeGitHubEnterprise,
+	_IDPTypeLowerName[40:56]: IDPTypeGitHubEnterprise,
+	_IDPTypeName[56:62]:      IDPTypeGitLab,
+	_IDPTypeLowerName[56:62]: IDPTypeGitLab,
+	_IDPTypeName[62:78]:      IDPTypeGitLabSelfHosted,
+	_IDPTypeLowerName[62:78]: IDPTypeGitLabSelfHosted,
+	_IDPTypeName[78:84]:      IDPTypeGoogle,
+	_IDPTypeLowerName[78:84]: IDPTypeGoogle,
+	_IDPTypeName[84:89]:      IDPTypeApple,
+	_IDPTypeLowerName[84:89]: IDPTypeApple,
+	_IDPTypeName[89:93]:      IDPTypeSAML,
+	_IDPTypeLowerName[89:93]: IDPTypeSAML,
 }
 
 var _IDPTypeNames = []string{
-	_IDPTypeName[0:4],
-	_IDPTypeName[4:9],
-	_IDPTypeName[9:13],
-	_IDPTypeName[13:17],
-	_IDPTypeName[17:23],
-	_IDPTypeName[23:29],
-	_IDPTypeName[29:38],
-	_IDPTypeName[38:43],
+	_IDPTypeName[0:11],
+	_IDPTypeName[11:15],
+	_IDPTypeName[15:18],
+	_IDPTypeName[18:23],
+	_IDPTypeName[23:27],
+	_IDPTypeName[27:34],
+	_IDPTypeName[34:40],
+	_IDPTypeName[40:56],
+	_IDPTypeName[56:62],
+	_IDPTypeName[62:78],
+	_IDPTypeName[78:84],
+	_IDPTypeName[84:89],
+	_IDPTypeName[89:93],
 }
 
 // IDPTypeString retrieves an enum value from the enum constants string name.
