@@ -31,7 +31,6 @@ jobs:
     uses: ./.github/workflows/console.yml
     with:
       node_version: "20"
-      buf_version: "latest"
 
   docs:
     uses: ./.github/workflows/docs.yml
