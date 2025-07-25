@@ -121,7 +121,7 @@ export class ActionsTwoAddActionTargetComponent {
           return acc;
         }, new Map<string, Target>());
 
-        targetsSignal.set({ state: 'loaded', result });
+        targetsSignal.set({ state: 'loaded', targets: result });
       })
       .catch((error) => {
         this.toast.showError(error);
