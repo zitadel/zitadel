@@ -6,7 +6,9 @@
     "changeset": "changeset",
     "devcontainer": "devcontainer",
     "devcontainer:lint-unit": "pnpm devcontainer up --config .devcontainer/turbo-lint-unit/devcontainer.json --workspace-folder . --remove-existing-container",
-    "devcontainer:integration:login": "pnpm devcontainer up --config .devcontainer/login-integration/devcontainer.json --workspace-folder . --remove-existing-container"
+    "devcontainer:integration:login": "pnpm devcontainer up --config .devcontainer/login-integration/devcontainer.json --workspace-folder . --remove-existing-container",
+    "clean": "turbo run clean",
+    "clean:all": "pnpm run clean && rm -rf .turbo node_modules"
   },
   "pnpm": {
     "overrides": {
