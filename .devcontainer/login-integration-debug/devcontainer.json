@@ -1,0 +1,21 @@
+{
+	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
+	"name": "login-integration-debug",
+	"dockerComposeFile": [
+		"../base/docker-compose.yml",
+		"docker-compose.yml"
+	],
+	"service": "login-integration-debug",
+	"runServices": ["login-integration-debug"],
+	"workspaceFolder": "/workspaces",
+	"forwardPorts": [3001],
+	"onCreateCommand": "pnpm install --recursive",
+	"postAttachCommand": "pnpm turbo daemon clean; pnpm turbo @zitadel/login#dev test:integration:login:debug",
+	"customizations": {
+		"jetbrains": {
+			"settings": {
+				"com.intellij:app:HttpConfigurable.use_proxy_pac": true
+			}
+		}
+	}
+}
