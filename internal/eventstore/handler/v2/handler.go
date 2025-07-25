@@ -646,7 +646,7 @@ func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, statements 
 	for i, statement := range statements {
 		select {
 		case <-ctx.Done():
-			break
+			return lastProcessedIndex, nil
 		default:
 			err := h.executeStatement(ctx, tx, statement)
 			if err != nil {
@@ -669,7 +669,7 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 		return err
 	}
 
-	if err = statement.Execute(tx, h.projection.Name()); err != nil {
+	if err = statement.Execute(ctx, tx, h.projection.Name()); err != nil {
 		h.log().WithError(err).Error("statement execution failed")
 
 		_, rollbackErr := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT exec_stmt")
