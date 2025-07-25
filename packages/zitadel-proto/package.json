@@ -6,6 +6,8 @@
     "access": "public"
   },
   "type": "module",
+  "main": "./cjs/index.js",
+  "types": "./types/index.d.ts",
   "exports": {
     "./zitadel/*": {
       "types": "./types/zitadel/*.d.ts",
@@ -46,6 +48,22 @@
       "types": "./types/protoc-gen-openapiv2/*.d.ts",
       "import": "./es/protoc-gen-openapiv2/*.js",
       "require": "./cjs/protoc-gen-openapiv2/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "zitadel/*": [
+        "./types/zitadel/*"
+      ],
+      "validate/*": [
+        "./types/validate/*"
+      ],
+      "google/*": [
+        "./types/google/*"
+      ],
+      "protoc-gen-openapiv2/*": [
+        "./types/protoc-gen-openapiv2/*"
+      ]
     }
   },
   "sideEffects": false,
