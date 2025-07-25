@@ -15,10 +15,10 @@ import (
 )
 
 const (
-	IDPRelationalTable                = "zitadel.identity_providers"
-	IDPRelationalOrgIdCol             = "org_id"
-	IDPRelationalAllowAutoCreationCol = "allow_auto_creation"
-	IDPRelationalPayloadCol           = "payload"
+	IDPRelationalTable           = "zitadel.identity_providers"
+	IDPRelationalOrgIdCol        = "org_id"
+	IDPRelationalAutoRegisterCol = "auto_register"
+	IDPRelationalPayloadCol      = "payload"
 )
 
 type idpRelationalProjection struct {
@@ -103,8 +103,7 @@ func (p *idpRelationalProjection) reduceIDPRelationalAdded(event eventstore.Even
 			handler.NewCol(IDPStateCol, domain.IDPStateActive.String()),
 			handler.NewCol(IDPNameCol, e.Name),
 			handler.NewCol(IDPStylingTypeCol, e.StylingType),
-			handler.NewCol(IDPRelationalAllowAutoCreationCol, e.AutoRegister),
-			// handler.NewCol(IDPTypeCol, domain.IDPTypeOIDC.String()),
+			handler.NewCol(IDPRelationalAutoRegisterCol, e.AutoRegister),
 			handler.NewCol(CreatedAt, e.CreationDate()),
 		},
 	), nil
@@ -118,13 +117,13 @@ func (p *idpRelationalProjection) reduceIDPRelationalChanged(event eventstore.Ev
 
 	cols := make([]handler.Column, 0, 5)
 	if e.Name != nil {
-		cols = append(cols, handler.NewCol(IDPNameCol, e.Name))
+		cols = append(cols, handler.NewCol(IDPNameCol, *e.Name))
 	}
 	if e.StylingType != nil {
-		cols = append(cols, handler.NewCol(IDPStylingTypeCol, e.StylingType))
+		cols = append(cols, handler.NewCol(IDPStylingTypeCol, *e.StylingType))
 	}
 	if e.AutoRegister != nil {
-		cols = append(cols, handler.NewCol(IDPRelationalAllowAutoCreationCol, e.AutoRegister))
+		cols = append(cols, handler.NewCol(IDPRelationalAutoRegisterCol, *e.AutoRegister))
 	}
 	if len(cols) == 0 {
 		return handler.NewNoOpStatement(e), nil

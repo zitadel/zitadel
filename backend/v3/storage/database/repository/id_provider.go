@@ -191,6 +191,10 @@ func (idProvider) TypeColumn() database.Column {
 	return database.NewColumn("type")
 }
 
+func (idProvider) AutoRegisterColumn() database.Column {
+	return database.NewColumn("auto_register")
+}
+
 func (idProvider) AllowCreationColumn() database.Column {
 	return database.NewColumn("allow_creation")
 }
@@ -205,6 +209,10 @@ func (idProvider) AllowAutoUpdateColumn() database.Column {
 
 func (idProvider) AllowLinkingColumn() database.Column {
 	return database.NewColumn("allow_linking")
+}
+
+func (idProvider) AllowAutoLinkingColumn() database.Column {
+	return database.NewColumn("allow_auto_linking")
 }
 
 func (idProvider) StylingTypeColumn() database.Column {
@@ -254,6 +262,10 @@ func (i idProvider) TypeCondition(typee domain.IDPType) database.Condition {
 	return database.NewTextCondition(i.TypeColumn(), database.TextOperationEqual, typee.String())
 }
 
+func (i idProvider) AutoRegisterCondition(allow bool) database.Condition {
+	return database.NewBooleanCondition(i.AutoRegisterColumn(), allow)
+}
+
 func (i idProvider) AllowCreationCondition(allow bool) database.Condition {
 	return database.NewBooleanCondition(i.AllowCreationColumn(), allow)
 }
@@ -268,6 +280,10 @@ func (i idProvider) AllowAutoUpdateCondition(allow bool) database.Condition {
 
 func (i idProvider) AllowLinkingCondition(allow bool) database.Condition {
 	return database.NewBooleanCondition(i.AllowLinkingColumn(), allow)
+}
+
+func (i idProvider) AllowAutoLinkingCondition(allow bool) database.Condition {
+	return database.NewBooleanCondition(i.AllowAutoLinkingColumn(), allow)
 }
 
 func (i idProvider) StylingTypeCondition(style int16) database.Condition {
@@ -294,6 +310,10 @@ func (i idProvider) SetAllowCreation(allow bool) database.Change {
 	return database.NewChange(i.AllowCreationColumn(), allow)
 }
 
+func (i idProvider) SetAutoRegister(allow bool) database.Change {
+	return database.NewChange(i.AutoRegisterColumn(), allow)
+}
+
 func (i idProvider) SetAllowAutoCreation(allow bool) database.Change {
 	return database.NewChange(i.AllowAutoCreationColumn(), allow)
 }
@@ -304,6 +324,10 @@ func (i idProvider) SetAllowAutoUpdate(allow bool) database.Change {
 
 func (i idProvider) SetAllowLinking(allow bool) database.Change {
 	return database.NewChange(i.AllowLinkingColumn(), allow)
+}
+
+func (i idProvider) SetAutoAllowLinking(allow bool) database.Change {
+	return database.NewChange(i.AllowAutoLinkingColumn(), allow)
 }
 
 func (i idProvider) SetStylingType(stylingType int16) database.Change {

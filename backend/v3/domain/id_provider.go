@@ -53,9 +53,11 @@ type IdentityProvider struct {
 	Name              string    `json:"name,omitempty" db:"name"`
 	Type              string    `json:"type,omitempty" db:"type"`
 	AllowCreation     bool      `json:"allowCreation,omitempty" db:"allow_creation"`
+	AutoRegister      bool      `json:"autoRegister,omitempty" db:"auto_register"`
 	AllowAutoCreation bool      `json:"allowAutoCreation,omitempty" db:"allow_auto_creation"`
 	AllowAutoUpdate   bool      `json:"allowAutoUpdate,omitempty" db:"allow_auto_update"`
 	AllowLinking      bool      `json:"allowLinking,omitempty" db:"allow_linking"`
+	AllowAutoLinking  bool      `json:"allowAutoLinking,omitempty" db:"allow_auto_linking"`
 	StylingType       int16     `json:"stylingType,omitempty" db:"styling_type"`
 	Payload           *string   `json:"payload,omitempty" db:"payload"`
 	CreatedAt         time.Time `json:"createdAt,omitempty" db:"created_at"`
@@ -107,9 +109,11 @@ type idProviderColumns interface {
 	NameColumn() database.Column
 	TypeColumn() database.Column
 	AllowCreationColumn() database.Column
+	AutoRegisterColumn() database.Column
 	AllowAutoCreationColumn() database.Column
 	AllowAutoUpdateColumn() database.Column
 	AllowLinkingColumn() database.Column
+	AllowAutoLinkingColumn() database.Column
 	StylingTypeColumn() database.Column
 	PayloadColumn() database.Column
 	CreatedAtColumn() database.Column
@@ -123,10 +127,12 @@ type idProviderConditions interface {
 	StateCondition(state IDPState) database.Condition
 	NameCondition(name string) IDPIdentifierCondition
 	TypeCondition(typee IDPType) database.Condition
+	AutoRegisterCondition(allow bool) database.Condition
 	AllowCreationCondition(allow bool) database.Condition
 	AllowAutoCreationCondition(allow bool) database.Condition
 	AllowAutoUpdateCondition(allow bool) database.Condition
 	AllowLinkingCondition(allow bool) database.Condition
+	AllowAutoLinkingCondition(allow bool) database.Condition
 	StylingTypeCondition(style int16) database.Condition
 	PayloadCondition(payload string) database.Condition
 }
@@ -135,9 +141,11 @@ type idProviderChanges interface {
 	SetName(name string) database.Change
 	SetState(state IDPState) database.Change
 	SetAllowCreation(allow bool) database.Change
+	SetAutoRegister(allow bool) database.Change
 	SetAllowAutoCreation(allow bool) database.Change
 	SetAllowAutoUpdate(allow bool) database.Change
 	SetAllowLinking(allow bool) database.Change
+	SetAutoAllowLinking(allow bool) database.Change
 	SetStylingType(stylingType int16) database.Change
 	SetPayload(payload string) database.Change
 }

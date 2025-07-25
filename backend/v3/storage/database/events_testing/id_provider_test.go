@@ -56,7 +56,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, name, idp.Name)
 			assert.Equal(t, instanceID, idp.InstanceID)
 			assert.Equal(t, domain.IDPStateActive.String(), idp.State)
-			assert.Equal(t, true, idp.AllowAutoCreation)
+			assert.Equal(t, true, idp.AutoRegister)
 			assert.Equal(t, int16(idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE), idp.StylingType)
 			assert.WithinRange(t, idp.UpdatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, idp.CreatedAt, beforeCreate, afterCreate)
@@ -93,7 +93,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository(pool)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			idp, err := idpRepo.Get(CTX,
 				idpRepo.NameCondition(name),
@@ -105,7 +105,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			// event iam.idp.config.changed
 			assert.Equal(t, addOIDC.IdpId, idp.ID)
 			assert.Equal(t, name, idp.Name)
-			assert.Equal(t, false, idp.AllowAutoCreation)
+			assert.Equal(t, false, idp.AutoRegister)
 			assert.Equal(t, int16(idp_grpc.IDPStylingType_STYLING_TYPE_UNSPECIFIED), idp.StylingType)
 			assert.WithinRange(t, idp.UpdatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)

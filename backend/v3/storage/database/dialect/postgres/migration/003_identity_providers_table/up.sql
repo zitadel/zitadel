@@ -22,10 +22,12 @@ CREATE TABLE zitadel.identity_providers (
     , state zitadel.idp_state NOT NULL DEFAULT 'active'
     , name TEXT NOT NULL CHECK (name <> '')
     , type zitadel.idp_type -- NOT NULL
+    , auto_register BOOLEAN NOT NULL DEFAULT TRUE
     , allow_creation BOOLEAN NOT NULL DEFAULT TRUE
     , allow_auto_creation BOOLEAN NOT NULL DEFAULT TRUE
     , allow_auto_update BOOLEAN NOT NULL DEFAULT TRUE
     , allow_linking BOOLEAN NOT NULL DEFAULT TRUE
+    , allow_auto_linking BOOLEAN NOT NULL DEFAULT TRUE
     , styling_type SMALLINT
     , payload JSONB
     
