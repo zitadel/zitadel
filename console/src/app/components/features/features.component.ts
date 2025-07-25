@@ -33,13 +33,10 @@ const FEATURE_KEYS = [
   'enableBackChannelLogout',
   // 'improvedPerformance',
   'loginDefaultOrg',
-  'oidcLegacyIntrospection',
   'oidcSingleV1SessionTermination',
   'oidcTokenExchange',
-  'oidcTriggerIntrospectionProjections',
   'permissionCheckV2',
   'userSchema',
-  'webKey',
 ] as const;
 
 export type ToggleState = { source: Source; enabled: boolean };
@@ -142,7 +139,7 @@ export class FeaturesComponent {
     }, {});
 
     // to save special flags they have to be handled here
-    req.loginV2 = {
+    req['loginV2'] = {
       required: toggleStates.loginV2.enabled,
       baseUri: toggleStates.loginV2.baseUri,
     };

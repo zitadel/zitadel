@@ -782,12 +782,3 @@ func TestServer_ListExecutions(t *testing.T) {
 		})
 	}
 }
-
-func containExecution(t *assert.CollectT, executionList []*action.Execution, execution *action.Execution) bool {
-	for _, exec := range executionList {
-		if assert.EqualExportedValues(t, execution, exec) {
-			return true
-		}
-	}
-	return false
-}

@@ -26,7 +26,7 @@ func (c *Commands) ImportHumanTOTP(ctx context.Context, userID, userAgentID, res
 	if err != nil {
 		return err
 	}
-	if err = c.checkUserExists(ctx, userID, resourceOwner); err != nil {
+	if _, err = c.checkUserExists(ctx, userID, resourceOwner); err != nil {
 		return err
 	}
 
