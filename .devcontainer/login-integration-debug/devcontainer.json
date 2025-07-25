@@ -9,10 +9,10 @@
 	"runServices": [
 		"login-integration"
 	],
-	"workspaceFolder": "/workspaces/apps/login",
+	"workspaceFolder": "/workspaces",
 	"forwardPorts": [
 		3001
 	],
-	"onCreateCommand": "pnpm install && pnpm cypress install",
-	"postAttachCommand": "pnpm turbo daemon clean || true; pnpm turbo test:integration:login"
+	"onCreateCommand": "pnpm install --filter . --filter @zitadel/login; cd apps/login; pnpm cypress install",
+	"postAttachCommand": "pnpm turbo daemon clean || true; pnpm turbo watch test:integration:login"
 }

@@ -8,10 +8,10 @@
 	"runServices": [
 		"login-integration"
 	],
-	"workspaceFolder": "/workspaces/apps/login",
+	"workspaceFolder": "/workspaces",
 	"forwardPorts": [
 		3001
 	],
-	"onCreateCommand": "pnpm install --frozen-lockfile && pnpm cypress install",
-	"postAttachCommand": "pnpm test:integration:login"
+	"onCreateCommand": "pnpm install --frozen-lockfile --filter . --filter @zitadel/login; cd apps/login; pnpm cypress install",
+	"postAttachCommand": "cd apps/login; pnpm test:integration:login"
 }

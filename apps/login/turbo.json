@@ -49,9 +49,6 @@
       "outputs": [
         "cypress/videos/**",
         "cypress/screenshots/**"
-      ],
-      "with": [
-        "dev"
       ]
     }
   }

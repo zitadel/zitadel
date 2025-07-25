@@ -4,7 +4,4 @@ services:
     extends:
       file: ../base/docker-compose.yml
       service: devcontainer
-    build:
-      context: ../base
-      dockerfile: !reset ""
     network_mode: !reset ""
