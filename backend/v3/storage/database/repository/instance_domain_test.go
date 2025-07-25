@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -42,7 +43,7 @@ func TestAddInstanceDomain(t *testing.T) {
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     false,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 		},
 		{
@@ -52,7 +53,7 @@ func TestAddInstanceDomain(t *testing.T) {
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     true,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeHTTP,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 			},
 		},
 		{
@@ -62,7 +63,7 @@ func TestAddInstanceDomain(t *testing.T) {
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     true,
 				IsPrimary:      true,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 		},
 		{
@@ -72,7 +73,7 @@ func TestAddInstanceDomain(t *testing.T) {
 				Domain:         "",
 				IsVerified:     false,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 			err: new(database.CheckError),
 		},
@@ -86,7 +87,7 @@ func TestAddInstanceDomain(t *testing.T) {
 					Domain:         domainName,
 					IsVerified:     false,
 					IsPrimary:      false,
-					ValidationType: domain.DomainValidationTypeDNS,
+					ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 				}
 
 				err := domainRepo.Add(ctx, instanceDomain)
@@ -98,7 +99,7 @@ func TestAddInstanceDomain(t *testing.T) {
 					Domain:         domainName,
 					IsVerified:     true,
 					IsPrimary:      true,
-					ValidationType: domain.DomainValidationTypeHTTP,
+					ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 				}
 			},
 			err: new(database.UniqueError),
@@ -110,7 +111,7 @@ func TestAddInstanceDomain(t *testing.T) {
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     false,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 			err: new(database.ForeignKeyError),
 		},
@@ -120,7 +121,7 @@ func TestAddInstanceDomain(t *testing.T) {
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     false,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 			err: new(database.ForeignKeyError),
 		},
@@ -189,14 +190,14 @@ func TestGetInstanceDomain(t *testing.T) {
 		Domain:         domainName1,
 		IsVerified:     true,
 		IsPrimary:      true,
-		ValidationType: domain.DomainValidationTypeDNS,
+		ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 	}
 	domain2 := &domain.AddInstanceDomain{
 		InstanceID:     instanceID,
 		Domain:         domainName2,
 		IsVerified:     false,
 		IsPrimary:      false,
-		ValidationType: domain.DomainValidationTypeHTTP,
+		ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 	}
 
 	err = domainRepo.Add(t.Context(), domain1)
@@ -310,21 +311,21 @@ func TestListInstanceDomains(t *testing.T) {
 			Domain:         gofakeit.DomainName(),
 			IsVerified:     true,
 			IsPrimary:      true,
-			ValidationType: domain.DomainValidationTypeDNS,
+			ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 		},
 		{
 			InstanceID:     instanceID,
 			Domain:         gofakeit.DomainName(),
 			IsVerified:     false,
 			IsPrimary:      false,
-			ValidationType: domain.DomainValidationTypeHTTP,
+			ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 		},
 		{
 			InstanceID:     instanceID,
 			Domain:         gofakeit.DomainName(),
 			IsVerified:     true,
 			IsPrimary:      false,
-			ValidationType: domain.DomainValidationTypeDNS,
+			ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 		},
 	}
 
@@ -422,7 +423,7 @@ func TestUpdateInstanceDomain(t *testing.T) {
 		Domain:         domainName,
 		IsVerified:     false,
 		IsPrimary:      false,
-		ValidationType: domain.DomainValidationTypeDNS,
+		ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 	}
 
 	err = domainRepo.Add(t.Context(), instanceDomain)
@@ -536,14 +537,14 @@ func TestRemoveInstanceDomain(t *testing.T) {
 		Domain:         domainName1,
 		IsVerified:     true,
 		IsPrimary:      true,
-		ValidationType: domain.DomainValidationTypeDNS,
+		ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 	}
 	domain2 := &domain.AddInstanceDomain{
 		InstanceID:     instanceID,
 		Domain:         domainName2,
 		IsVerified:     false,
 		IsPrimary:      false,
-		ValidationType: domain.DomainValidationTypeHTTP,
+		ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 	}
 
 	err = domainRepo.Add(t.Context(), domain1)

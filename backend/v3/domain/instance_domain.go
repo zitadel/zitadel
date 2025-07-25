@@ -19,12 +19,12 @@ type InstanceDomain struct {
 }
 
 type AddInstanceDomain struct {
-	InstanceID     string               `json:"instanceId,omitempty" db:"instance_id"`
-	Domain         string               `json:"domain,omitempty" db:"domain"`
-	IsVerified     bool                 `json:"isVerified,omitempty" db:"is_verified"`
-	IsPrimary      bool                 `json:"isPrimary,omitempty" db:"is_primary"`
-	IsGenerated    bool                 `json:"isGenerated,omitempty" db:"is_generated"`
-	ValidationType DomainValidationType `json:"validationType,omitempty" db:"validation_type"`
+	InstanceID     string                `json:"instanceId,omitempty" db:"instance_id"`
+	Domain         string                `json:"domain,omitempty" db:"domain"`
+	IsVerified     bool                  `json:"isVerified,omitempty" db:"is_verified"`
+	IsPrimary      bool                  `json:"isPrimary,omitempty" db:"is_primary"`
+	IsGenerated    bool                  `json:"isGenerated,omitempty" db:"is_generated"`
+	ValidationType *DomainValidationType `json:"validationType,omitempty" db:"validation_type"`
 
 	// CreatedAt is the time when the domain was added.
 	// It is set by the repository and should not be set by the caller.
