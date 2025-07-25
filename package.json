@@ -6,8 +6,8 @@
     "generate": "turbo run generate",
     "changeset": "changeset",
     "devcontainer": "devcontainer",
-    "devcontainer:lint-unit": "devcontainer up --config .devcontainer/turbo-lint-unit/devcontainer.json --workspace-folder . --remove-existing-container",
-    "devcontainer:integration:login": "devcontainer up --config .devcontainer/login-integration/devcontainer.json --workspace-folder . --remove-existing-container"
+    "devcontainer:lint-unit": "devcontainer up --config .devcontainer/turbo-lint-unit/devcontainer.json --workspace-folder .",
+    "devcontainer:integration:login": "devcontainer up --config .devcontainer/login-integration/devcontainer.json --workspace-folder ."
   },
   "pnpm": {
     "overrides": {

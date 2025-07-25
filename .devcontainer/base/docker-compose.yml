@@ -46,7 +46,7 @@ services:
       dockerfile: build/login/Dockerfile
     image: "${LOGIN_TAG:-zitadel-login:local}"
     env_file: ../../apps/login/.env.test
-    network_mode: service:devcontainer
+    network_mode: service:mock-zitadel
     environment:
       NODE_ENV: test
       PORT: 3001

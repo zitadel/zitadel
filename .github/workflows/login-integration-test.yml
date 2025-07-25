@@ -10,7 +10,6 @@ on:
 jobs:
 
   login-integration-test:
-    if: ${{ github.event_name == 'pull_request' }}
     name: login-integration-test
     runs-on: depot-ubuntu-22.04-8
     steps:

@@ -4,4 +4,3 @@ services:
     extends:
       file: ../base/docker-compose.yml
       service: devcontainer
-    network_mode: service:mock-zitadel
