@@ -221,7 +221,7 @@ func TestGetInstanceDomain(t *testing.T) {
 				Domain:         domainName1,
 				IsVerified:     true,
 				IsPrimary:      true,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 		},
 		{
@@ -234,7 +234,7 @@ func TestGetInstanceDomain(t *testing.T) {
 				Domain:         domainName2,
 				IsVerified:     false,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeHTTP,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 			},
 		},
 		{
@@ -247,7 +247,7 @@ func TestGetInstanceDomain(t *testing.T) {
 				Domain:         domainName1,
 				IsVerified:     true,
 				IsPrimary:      true,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 		},
 		{

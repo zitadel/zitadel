@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -52,7 +53,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     false,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 		},
 		{
@@ -63,7 +64,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     true,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeHTTP,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 			},
 		},
 		{
@@ -74,7 +75,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     true,
 				IsPrimary:      true,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 		},
 		{
@@ -85,7 +86,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 				Domain:         "",
 				IsVerified:     false,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 			err: new(database.CheckError),
 		},
@@ -100,7 +101,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 					Domain:         domainName,
 					IsVerified:     false,
 					IsPrimary:      false,
-					ValidationType: domain.DomainValidationTypeDNS,
+					ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 				}
 
 				err := domainRepo.Add(ctx, organizationDomain)
@@ -113,7 +114,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 					Domain:         domainName,
 					IsVerified:     true,
 					IsPrimary:      true,
-					ValidationType: domain.DomainValidationTypeHTTP,
+					ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 				}
 			},
 			err: new(database.UniqueError),
@@ -126,7 +127,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     false,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 			err: new(database.ForeignKeyError),
 		},
@@ -138,7 +139,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     false,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 			err: new(database.ForeignKeyError),
 		},
@@ -149,7 +150,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     false,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 			err: new(database.ForeignKeyError),
 		},
@@ -160,7 +161,7 @@ func TestAddOrganizationDomain(t *testing.T) {
 				Domain:         gofakeit.DomainName(),
 				IsVerified:     false,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 			err: new(database.ForeignKeyError),
 		},
@@ -249,7 +250,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 		Domain:         domainName1,
 		IsVerified:     true,
 		IsPrimary:      true,
-		ValidationType: domain.DomainValidationTypeDNS,
+		ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 	}
 	domain2 := &domain.AddOrganizationDomain{
 		InstanceID:     instanceID,
@@ -257,7 +258,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 		Domain:         domainName2,
 		IsVerified:     false,
 		IsPrimary:      false,
-		ValidationType: domain.DomainValidationTypeHTTP,
+		ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 	}
 
 	err = domainRepo.Add(t.Context(), domain1)
@@ -282,7 +283,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 				Domain:         domainName1,
 				IsVerified:     true,
 				IsPrimary:      true,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 		},
 		{
@@ -296,7 +297,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 				Domain:         domainName2,
 				IsVerified:     false,
 				IsPrimary:      false,
-				ValidationType: domain.DomainValidationTypeHTTP,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 			},
 		},
 		{
@@ -311,7 +312,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 				Domain:         domainName1,
 				IsVerified:     true,
 				IsPrimary:      true,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 		},
 		{
@@ -325,7 +326,7 @@ func TestGetOrganizationDomain(t *testing.T) {
 				Domain:         domainName1,
 				IsVerified:     true,
 				IsPrimary:      true,
-				ValidationType: domain.DomainValidationTypeDNS,
+				ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 			},
 		},
 		{
@@ -405,7 +406,7 @@ func TestListOrganizationDomains(t *testing.T) {
 			Domain:         gofakeit.DomainName(),
 			IsVerified:     true,
 			IsPrimary:      true,
-			ValidationType: domain.DomainValidationTypeDNS,
+			ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 		},
 		{
 			InstanceID:     instanceID,
@@ -413,7 +414,7 @@ func TestListOrganizationDomains(t *testing.T) {
 			Domain:         gofakeit.DomainName(),
 			IsVerified:     false,
 			IsPrimary:      false,
-			ValidationType: domain.DomainValidationTypeHTTP,
+			ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 		},
 		{
 			InstanceID:     instanceID,
@@ -421,7 +422,7 @@ func TestListOrganizationDomains(t *testing.T) {
 			Domain:         gofakeit.DomainName(),
 			IsVerified:     true,
 			IsPrimary:      false,
-			ValidationType: domain.DomainValidationTypeDNS,
+			ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 		},
 	}
 
@@ -541,7 +542,7 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 		Domain:         domainName,
 		IsVerified:     false,
 		IsPrimary:      false,
-		ValidationType: domain.DomainValidationTypeDNS,
+		ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 	}
 
 	err = domainRepo.Add(t.Context(), organizationDomain)
@@ -677,7 +678,7 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 		Domain:         domainName1,
 		IsVerified:     true,
 		IsPrimary:      true,
-		ValidationType: domain.DomainValidationTypeDNS,
+		ValidationType: gu.Ptr(domain.DomainValidationTypeDNS),
 	}
 	domain2 := &domain.AddOrganizationDomain{
 		InstanceID:     instanceID,
@@ -685,7 +686,7 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 		Domain:         domainName2,
 		IsVerified:     false,
 		IsPrimary:      false,
-		ValidationType: domain.DomainValidationTypeHTTP,
+		ValidationType: gu.Ptr(domain.DomainValidationTypeHTTP),
 	}
 
 	err = domainRepo.Add(t.Context(), domain1)

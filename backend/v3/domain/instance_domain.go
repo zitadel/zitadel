@@ -8,11 +8,11 @@ import (
 )
 
 type InstanceDomain struct {
-	InstanceID     string               `json:"instanceId,omitempty" db:"instance_id"`
-	Domain         string               `json:"domain,omitempty" db:"domain"`
-	IsVerified     bool                 `json:"isVerified,omitempty" db:"is_verified"`
-	IsPrimary      bool                 `json:"isPrimary,omitempty" db:"is_primary"`
-	ValidationType DomainValidationType `json:"validationType,omitempty" db:"validation_type"`
+	InstanceID     string                `json:"instanceId,omitempty" db:"instance_id"`
+	Domain         string                `json:"domain,omitempty" db:"domain"`
+	IsVerified     bool                  `json:"isVerified,omitempty" db:"is_verified"`
+	IsPrimary      bool                  `json:"isPrimary,omitempty" db:"is_primary"`
+	ValidationType *DomainValidationType `json:"validationType,omitempty" db:"validation_type"`
 
 	CreatedAt time.Time `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"updated_at"`
