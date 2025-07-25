@@ -15,6 +15,7 @@ import (
 var (
 	CTX      context.Context
 	IAMCTX   context.Context
+	LoginCTX context.Context
 	Instance *integration.Instance
 	Client   saml_pb.SAMLServiceClient
 )
@@ -29,6 +30,7 @@ func TestMain(m *testing.M) {
 
 		IAMCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
+		LoginCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
 		return m.Run()
 	}())
 }

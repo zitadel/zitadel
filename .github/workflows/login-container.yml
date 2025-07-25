@@ -14,6 +14,9 @@ on:
       login_build_image:
           description: 'The full image tag of the standalone login image'
           value: '${{ inputs.login_build_image_name }}:${{ github.sha }}'
+    secrets:
+      DEPOT_TOKEN:
+        required: true
 
 permissions:
   packages: write
@@ -27,15 +30,12 @@ env:
 jobs:
   login-container:
     name: Build Login Container
-    runs-on: depot-ubuntu-22.04-8
+    runs-on: ubuntu-latest
     permissions:
-      id-token: write
       packages: write
     steps:
       - uses: actions/checkout@v4
       - uses: depot/setup-action@v1
-        with:
-          oidc: true
       - name: Login meta
         id: login-meta
         uses: docker/metadata-action@v5
@@ -55,16 +55,16 @@ jobs:
       - name: Bake login multi-arch
         uses: depot/bake-action@v1
         env:
+          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
           NODE_VERSION: ${{ inputs.node_version }}
         with:
           push: true
           provenance: true
           sbom: true
           targets: login-standalone
-          set: login-*.context=./login/
           project: w47wkxzdtw
           files: |
-            ./login/docker-bake.hcl
-            ./login/docker-bake-release.hcl
+            ./apps/login/docker-bake.hcl
+            ./apps/login/docker-bake-release.hcl
             ./docker-bake.hcl
             cwd://${{ steps.login-meta.outputs.bake-file }}

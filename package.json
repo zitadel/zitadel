@@ -1,0 +1,23 @@
+{
+  "packageManager": "pnpm@9.1.2+sha256.19c17528f9ca20bd442e4ca42f00f1b9808a9cb419383cd04ba32ef19322aba7",
+  "private": true,
+  "name": "zitadel-monorepo",
+  "scripts": {
+    "changeset": "changeset",
+    "devcontainer": "devcontainer",
+    "devcontainer:lint-unit": "pnpm devcontainer up --config .devcontainer/turbo-lint-unit/devcontainer.json --workspace-folder . --remove-existing-container",
+    "devcontainer:integration:login": "pnpm devcontainer up --config .devcontainer/login-integration/devcontainer.json --workspace-folder . --remove-existing-container"
+  },
+  "pnpm": {
+    "overrides": {
+      "@typescript-eslint/parser": "^8.35.1",
+      "@zitadel/client": "workspace:*",
+      "@zitadel/proto": "workspace:*"
+    }
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.5",
+    "@devcontainers/cli": "^0.80.0",
+    "turbo": "2.5.5"
+  }
+}
