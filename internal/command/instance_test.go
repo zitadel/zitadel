@@ -478,6 +478,7 @@ func humanFilters(orgID string) []expect {
 				true,
 			),
 		),
+		expectFilterOrganizationSettings("org1", false, false),
 		expectFilter(
 			org.NewPasswordComplexityPolicyAddedEvent(
 				context.Background(),
@@ -519,6 +520,7 @@ func machineFilters(orgID string, pat bool) []expect {
 				true,
 			),
 		),
+		expectFilterOrganizationSettings("org1", false, false),
 	}
 	if pat {
 		filters = append(filters,
@@ -562,6 +564,7 @@ func loginClientFilters(orgID string, pat bool) []expect {
 				true,
 			),
 		),
+		expectFilterOrganizationSettings("org1", false, false),
 	}
 	if pat {
 		filters = append(filters,

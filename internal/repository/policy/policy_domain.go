@@ -2,6 +2,7 @@ package policy
 
 import (
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -122,6 +123,10 @@ func DomainPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, e
 
 type DomainPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	usernameChanges          []string
+	userLoginMustBeDomain    bool
+	oldUserLoginMustBeDomain bool
 }
 
 func (e *DomainPolicyRemovedEvent) Payload() interface{} {
@@ -129,7 +134,7 @@ func (e *DomainPolicyRemovedEvent) Payload() interface{} {
 }
 
 func (e *DomainPolicyRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
+	return user.NewUsernameUniqueConstraints(e.usernameChanges, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain, e.oldUserLoginMustBeDomain)
 }
 
 func NewDomainPolicyRemovedEvent(base *eventstore.BaseEvent) *DomainPolicyRemovedEvent {
@@ -142,4 +147,10 @@ func DomainPolicyRemovedEventMapper(event eventstore.Event) (eventstore.Event, e
 	return &DomainPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
+}
+
+func (e *DomainPolicyRemovedEvent) AddUniqueConstraintChanges(usernameChanges []string, userLoginMustBeDomain, oldUserLoginMustBeDomain bool) {
+	e.usernameChanges = usernameChanges
+	e.userLoginMustBeDomain = userLoginMustBeDomain
+	e.oldUserLoginMustBeDomain = oldUserLoginMustBeDomain
 }

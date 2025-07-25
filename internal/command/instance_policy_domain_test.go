@@ -19,7 +19,7 @@ import (
 
 func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx                                    context.Context
@@ -40,8 +40,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 		{
 			name: "domain policy already existing, already exists error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainPolicyAddedEvent(context.Background(),
@@ -67,8 +66,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 		{
 			name: "add policy,ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						instance.NewDomainPolicyAddedEvent(context.Background(),
@@ -96,7 +94,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.AddDefaultDomainPolicy(tt.args.ctx, tt.args.userLoginMustBeDomain, tt.args.validateOrgDomains, tt.args.smtpSenderAddressMatchesInstanceDomain)
 			if tt.res.err == nil {
@@ -114,7 +112,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 
 func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx                                    context.Context
@@ -135,8 +133,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 		{
 			name: "domain policy not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -153,8 +150,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 		{
 			name: "no changes, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainPolicyAddedEvent(context.Background(),
@@ -180,8 +176,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 		{
 			name: "change, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainPolicyAddedEvent(context.Background(),
@@ -236,6 +231,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 					),
 					// domainPolicyUsernames for each org
 					// org1
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(
@@ -266,6 +262,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 						),
 					),
 					// org3
+					expectFilterOrganizationSettings("org3", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(
@@ -302,14 +299,16 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 							"user1",
 							"user1@org1.com",
 							false,
-							user.UsernameChangedEventWithPolicyChange(),
+							false,
+							user.UsernameChangedEventWithPolicyChange(true),
 						),
 						user.NewUsernameChangedEvent(context.Background(),
 							&user.NewAggregate("user1", "org3").Aggregate,
 							"user1",
 							"user1@org3.com",
 							false,
-							user.UsernameChangedEventWithPolicyChange(),
+							false,
+							user.UsernameChangedEventWithPolicyChange(true),
 						),
 					),
 				),
@@ -326,11 +325,315 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "change, organization scoped usernames, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					// domainPolicyOrgs
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org2").Aggregate,
+								"org2",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org2").Aggregate,
+								false,
+								false,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+								"org3",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+								false,
+								false,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPolicyRemovedEvent(context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+							),
+						),
+					),
+					// domainPolicyUsernames for each org
+					// org1
+					expectFilterOrganizationSettings("org1", true, true),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org1.com",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org1.com",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"user1",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.English,
+								domain.GenderUnspecified,
+								"user1@org1.com",
+								false,
+							),
+						),
+					),
+					// org3
+					expectFilterOrganizationSettings("org3", true, true),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+								"org3.com",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+								"org3.com",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org3").Aggregate,
+								"user1",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.English,
+								domain.GenderUnspecified,
+								"user1@org3.com",
+								false,
+							),
+						),
+					),
+					expectPush(
+						newDefaultDomainPolicyChangedEvent(context.Background(), false, false, false),
+						user.NewUsernameChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"user1",
+							"user1@org1.com",
+							false,
+							true,
+							user.UsernameChangedEventWithPolicyChange(true),
+						),
+						user.NewUsernameChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org3").Aggregate,
+							"user1",
+							"user1@org3.com",
+							false,
+							true,
+							user.UsernameChangedEventWithPolicyChange(true),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:                                    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				userLoginMustBeDomain:                  false,
+				validateOrgDomains:                     false,
+				smtpSenderAddressMatchesInstanceDomain: false,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "change, organization scoped usernames, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								false,
+								true,
+								true,
+							),
+						),
+					),
+					// domainPolicyOrgs
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org2").Aggregate,
+								"org2",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org2").Aggregate,
+								true,
+								false,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+								"org3",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+								true,
+								false,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPolicyRemovedEvent(context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+							),
+						),
+					),
+					// domainPolicyUsernames for each org
+					// org1
+					expectFilterOrganizationSettings("org1", true, true),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org1.com",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org1.com",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"user1@org1.com",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.English,
+								domain.GenderUnspecified,
+								"user1@org1.com",
+								false,
+							),
+						),
+					),
+					// org3
+					expectFilterOrganizationSettings("org3", true, true),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+								"org3.com",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+								"org3.com",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org3").Aggregate,
+								"user1@org3.com",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.English,
+								domain.GenderUnspecified,
+								"user1@org3.com",
+								true,
+							),
+						),
+					),
+					expectPush(
+						newDefaultDomainPolicyChangedEvent(context.Background(), true, false, false),
+						user.NewUsernameChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"user1@org1.com",
+							"user1@org1.com",
+							true,
+							true,
+							user.UsernameChangedEventWithPolicyChange(false),
+						),
+						user.NewUsernameChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org3").Aggregate,
+							"user1@org3.com",
+							"user1@org3.com",
+							true,
+							true,
+							user.UsernameChangedEventWithPolicyChange(true),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:                                    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				userLoginMustBeDomain:                  true,
+				validateOrgDomains:                     false,
+				smtpSenderAddressMatchesInstanceDomain: false,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.ChangeDefaultDomainPolicy(tt.args.ctx, tt.args.userLoginMustBeDomain, tt.args.validateOrgDomains, tt.args.smtpSenderAddressMatchesInstanceDomain)
 			if tt.res.err == nil {
