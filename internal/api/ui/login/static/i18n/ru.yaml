@@ -528,5 +528,11 @@ Errors:
       RegistrationNotAllowed: Регистрация запрещена
   DeviceAuth:
     NotExisting: Код пользователя не существует
+  Captcha:
+    InitializationFailed: Не удалось инициализировать Captcha
+    InvalidCaptcha: Ошибка проверки Captcha. Токен недействителен или истёк
+    MissingToken: Отсутствует токен Captcha
+    UnexpectedType: Неожиданный тип Captcha в конфигурации
+    ValidationFailed: Произошла ошибка при проверке Captcha токена
 
 optional: (optional)

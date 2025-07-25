@@ -42,6 +42,11 @@ func writeModelToLoginPolicy(wm *LoginPolicyWriteModel) *domain.LoginPolicy {
 		MFAInitSkipLifetime:        wm.MFAInitSkipLifetime,
 		SecondFactorCheckLifetime:  wm.SecondFactorCheckLifetime,
 		MultiFactorCheckLifetime:   wm.MultiFactorCheckLifetime,
+		EnableRegistrationCaptcha:  wm.EnableRegistrationCaptcha,
+		EnableLoginCaptcha:         wm.EnableLoginCaptcha,
+		CaptchaType:                wm.CaptchaType,
+		CaptchaSiteKey:             wm.CaptchaSiteKey,
+		CaptchaSecretKey:           wm.CaptchaSecretKey,
 	}
 }
 

@@ -85,6 +85,11 @@ type InstanceSetup struct {
 		MfaInitSkipLifetime        time.Duration
 		SecondFactorCheckLifetime  time.Duration
 		MultiFactorCheckLifetime   time.Duration
+		EnableRegistrationCaptcha  bool
+		EnableLoginCaptcha         bool
+		CaptchaType                domain.CaptchaType
+		CaptchaSiteKey             string
+		CaptchaSecretKey           string
 	}
 	NotificationPolicy struct {
 		PasswordChange bool
@@ -363,6 +368,11 @@ func setupInstanceElements(instanceAgg *instance.Aggregate, setup *InstanceSetup
 			setup.LoginPolicy.MfaInitSkipLifetime,
 			setup.LoginPolicy.SecondFactorCheckLifetime,
 			setup.LoginPolicy.MultiFactorCheckLifetime,
+			setup.LoginPolicy.EnableRegistrationCaptcha,
+			setup.LoginPolicy.EnableLoginCaptcha,
+			setup.LoginPolicy.CaptchaType,
+			setup.LoginPolicy.CaptchaSiteKey,
+			setup.LoginPolicy.CaptchaSecretKey,
 		),
 		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeTOTP),
 		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),

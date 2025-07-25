@@ -16,8 +16,9 @@ const (
 )
 
 type loginData struct {
-	LoginName string `schema:"loginName"`
-	Register  bool   `schema:"register"`
+	LoginName    string `schema:"loginName"`
+	CaptchaToken string `schema:"captchaToken"`
+	Register     bool   `schema:"register"`
 }
 
 func LoginLink(origin, orgID string) string {
