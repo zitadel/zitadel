@@ -634,11 +634,11 @@ importers:
   packages/zitadel-proto:
     dependencies:
       '@bufbuild/protobuf':
-        specifier: ^2.2.2
+        specifier: ^2.6.1
         version: 2.6.1
     devDependencies:
       '@bufbuild/buf':
-        specifier: ^1.53.0
+        specifier: ^1.55.1
         version: 1.55.1
       glob:
         specifier: ^11.0.0
@@ -22857,7 +22857,7 @@ snapshots:
 
   copy-webpack-plugin@11.0.0(webpack@5.100.2(@swc/core@1.13.1(@swc/helpers@0.5.17))):
     dependencies:
-      fast-glob: 3.3.3
+      fast-glob: 3.3.1
       glob-parent: 6.0.2
       globby: 13.2.2
       normalize-path: 3.0.0
