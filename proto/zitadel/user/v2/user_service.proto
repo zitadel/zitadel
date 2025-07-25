@@ -1671,6 +1671,7 @@ service UserService {
   // Create an invite code for a user to initialize their first authentication method (password, passkeys, IdP) depending on the organization's available methods.
   // If an invite code has been created previously, it's url template and application name will be used as defaults for the new code.
   // The new code will overwrite the previous one and make it invalid.
+  // Note: It is possible to reissue a new code only when the previous code has expired, or when the user provides a wrong code three or more times during verification.
   rpc CreateInviteCode (CreateInviteCodeRequest) returns (CreateInviteCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/invite_code"
