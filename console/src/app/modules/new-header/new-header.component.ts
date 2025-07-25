@@ -108,7 +108,6 @@ export class NewHeaderComponent {
 
   private isOnInstanceLevel() {
     return computed(() => {
-      console.log(this.breadcrumbs());
       return this.breadcrumbs().length === 1 && this.breadcrumbs()[0].type === BreadcrumbType.INSTANCE;
     });
   }

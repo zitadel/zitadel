@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { authGuard } from './guards/auth.guard';
-import { homeGuard } from './guards/home.guard';
 import { roleGuard } from './guards/role-guard';
 import { UserGrantContext } from './modules/user-grants/user-grants-datasource';
 import { OrgCreateComponent } from './pages/org-create/org-create.component';
@@ -11,7 +10,7 @@ const routes: Routes = [
   {
     path: '',
     loadChildren: () => import('./pages/home/home.module'),
-    canActivate: [authGuard, homeGuard],
+    canActivate: [authGuard],
     data: {
       roles: ['.'],
     },
