@@ -239,15 +239,3 @@ func prepareRemoveOrgDomainPolicy(
 		}, nil
 	}
 }
-
-func userLoginMustBeDomainChangeNecessary(oldUserLoginMustBeDomain, newUserLoginMustBeDomain, organizationScopedUsernames bool) bool {
-	// either the username has to change due to a change in the userLoginMustBeDomain config or the uniqueconstraints have to change due to
-	if newUserLoginMustBeDomain == oldUserLoginMustBeDomain && newUserLoginMustBeDomain == organizationScopedUsernames {
-		return false
-	}
-	return true
-}
-
-func userLoginMustBeDomainChange(userLoginMustBeDomain, organizationScopedUsernames bool) bool {
-	return userLoginMustBeDomain || organizationScopedUsernames
-}
