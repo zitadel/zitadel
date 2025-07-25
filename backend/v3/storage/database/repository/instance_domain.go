@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -105,6 +106,11 @@ func (i instanceDomain) SetPrimary() database.Change {
 // SetVerified implements [domain.InstanceDomainRepository].
 func (i instanceDomain) SetVerified() database.Change {
 	return database.NewChange(i.IsVerifiedColumn(false), true)
+}
+
+// SetUpdatedAt implements [domain.OrganizationDomainRepository].
+func (i instanceDomain) SetUpdatedAt(updatedAt time.Time) database.Change {
+	return database.NewChange(i.UpdatedAtColumn(false), updatedAt)
 }
 
 // -------------------------------------------------------------

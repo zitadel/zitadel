@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -105,6 +106,11 @@ func (o orgDomain) SetValidationType(verificationType domain.DomainValidationTyp
 // SetVerified implements [domain.OrganizationDomainRepository].
 func (o orgDomain) SetVerified() database.Change {
 	return database.NewChange(o.IsVerifiedColumn(false), true)
+}
+
+// SetUpdatedAt implements [domain.OrganizationDomainRepository].
+func (o orgDomain) SetUpdatedAt(updatedAt time.Time) database.Change {
+	return database.NewChange(o.UpdatedAtColumn(false), updatedAt)
 }
 
 // -------------------------------------------------------------
