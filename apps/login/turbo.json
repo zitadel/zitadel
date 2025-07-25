@@ -42,9 +42,11 @@
     },
     "test:integration:login": {
       "inputs": [
-        ".next/trace",
+        ".next/**",
+        "!.next/cache/**",
         "integration/integration/**",
-        "integration/support/**"
+        "integration/support/**",
+        "cypress.config.ts"
       ],
       "outputs": [
         "cypress/videos/**",

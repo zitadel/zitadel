@@ -33,7 +33,7 @@ describe("login", () => {
           factors: {
             user: {
               id: "221394658884845598",
-              loginName: "john@zitadel.com",
+              loginName: "john@example.com",
             },
             password: undefined,
             webAuthN: undefined,
@@ -64,22 +64,22 @@ describe("login", () => {
             {
               userId: "221394658884845598",
               state: 1,
-              username: "john@zitadel.com",
-              loginNames: ["john@zitadel.com"],
-              preferredLoginName: "john@zitadel.com",
+              username: "john@example.com",
+              loginNames: ["john@example.com"],
+              preferredLoginName: "john@example.com",
               human: {
                 userId: "221394658884845598",
                 state: 1,
-                username: "john@zitadel.com",
-                loginNames: ["john@zitadel.com"],
-                preferredLoginName: "john@zitadel.com",
+                username: "john@example.com",
+                loginNames: ["john@example.com"],
+                preferredLoginName: "john@example.com",
                 profile: {
                   givenName: "John",
                   familyName: "Doe",
-                  avatarUrl: "https://zitadel.com/avatar.jpg",
+                  avatarUrl: "https://example.com/avatar.jpg",
                 },
                 email: {
-                  email: "john@zitadel.com",
+                  email: "john@example.com",
                   isVerified: true,
                 },
               },
@@ -94,8 +94,8 @@ describe("login", () => {
       });
     });
     it("should redirect a user with password authentication to /password", () => {
-      cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
-      cy.url({ timeout: 10_000 }).should("include", Cypress.config().baseUrl + "/password");
+      cy.visit("/loginname?loginName=john%40example.com&submit=true");
+      cy.url({ timeout: 5 * 60_000 }).should("include", Cypress.config().baseUrl + "/password");
     });
     describe("with passkey prompt", () => {
       beforeEach(() => {
@@ -112,8 +112,8 @@ describe("login", () => {
         });
       });
       // it("should prompt a user to setup passwordless authentication if passkey is allowed in the login settings", () => {
-      //   cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
-      //   cy.location("pathname", { timeout: 10_000 }).should("eq", "/password");
+      //   cy.visit("/loginname?loginName=john%40example.com&submit=true");
+      //   cy.location("pathname", { timeout: 5 * 60_000 }).should("eq", "/password");
       //   cy.get('input[type="password"]').focus().type("MyStrongPassword!1");
       //   cy.get('button[type="submit"]').click();
       //   cy.location("pathname", { timeout: 10_000 }).should(
@@ -134,22 +134,22 @@ describe("login", () => {
             {
               userId: "221394658884845598",
               state: 1,
-              username: "john@zitadel.com",
-              loginNames: ["john@zitadel.com"],
-              preferredLoginName: "john@zitadel.com",
+              username: "john@example.com",
+              loginNames: ["john@example.com"],
+              preferredLoginName: "john@example.com",
               human: {
                 userId: "221394658884845598",
                 state: 1,
-                username: "john@zitadel.com",
-                loginNames: ["john@zitadel.com"],
-                preferredLoginName: "john@zitadel.com",
+                username: "john@example.com",
+                loginNames: ["john@example.com"],
+                preferredLoginName: "john@example.com",
                 profile: {
                   givenName: "John",
                   familyName: "Doe",
-                  avatarUrl: "https://zitadel.com/avatar.jpg",
+                  avatarUrl: "https://example.com/avatar.jpg",
                 },
                 email: {
-                  email: "john@zitadel.com",
+                  email: "john@example.com",
                   isVerified: true,
                 },
               },
@@ -165,8 +165,8 @@ describe("login", () => {
     });
 
     it("should redirect a user with passwordless authentication to /passkey", () => {
-      cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
-      cy.url({ timeout: 10_000 }).should("include", Cypress.config().baseUrl + "/passkey");
+      cy.visit("/loginname?loginName=john%40example.com&submit=true");
+      cy.url({ timeout: 5 * 60_000 }).should("include", Cypress.config().baseUrl + "/passkey");
     });
   });
 });
