@@ -15,7 +15,6 @@ const (
 
 	KeyPrefix                 = "urn:zitadel:scim:"
 	KeyProvisioningDomain Key = KeyPrefix + "provisioningDomain"
-	KeyIgnorePassword     Key = KeyPrefix + "ignorePassword"
 
 	KeyExternalId               Key = KeyPrefix + "externalId"
 	keyScopedExternalIdTemplate     = KeyPrefix + externalIdProvisioningDomainPlaceholder + ":externalId"

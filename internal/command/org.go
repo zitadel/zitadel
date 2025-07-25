@@ -512,12 +512,12 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 				return nil, zerrors.ThrowNotFound(nil, "COMMA-aps2n", "Errors.Org.NotFound")
 			}
 
-			domainPolicy, err := c.domainPolicyWriteModel(ctx, a.ID)
+			domainPolicy, err := domainPolicyWriteModel(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
 			}
 
-			organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, a.ID)
+			organizationScopedUsername, err := checkOrganizationScopedUsernames(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
 			}

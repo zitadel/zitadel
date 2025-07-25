@@ -90,11 +90,11 @@ func checkOrganizationScopedUsernames(ctx context.Context, filter preparation.Fi
 	}
 	wm.AppendEvents(events...)
 	err = wm.Reduce()
-
-	if wm.State.Exists() && wm.OrganizationScopedUsernames {
-		return true, nil
+	if err != nil {
+		return false, err
 	}
-	return false, nil
+
+	return wm.State.Exists() && wm.OrganizationScopedUsernames, nil
 }
 
 func (c *Commands) getOrganizationSettingsWriteModelByID(ctx context.Context, id string) (*OrganizationSettingsWriteModel, error) {
