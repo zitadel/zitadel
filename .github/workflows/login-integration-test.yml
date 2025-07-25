@@ -8,10 +8,9 @@ on:
         type: string
 
 jobs:
-
   login-integration-test:
     name: login-integration-test
-    runs-on: depot-ubuntu-22.04-8
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
