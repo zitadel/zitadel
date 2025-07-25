@@ -21,12 +21,9 @@ import {
   createUserServiceClient,
   createSessionServiceClient,
   createOrganizationServiceClient,
-  // @ts-ignore
 } from '@zitadel/client/v2';
-//@ts-ignore
 import { createAdminServiceClient, createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
-// @ts-ignore
 import { createClientFor } from '@zitadel/client';
 
 import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
@@ -86,30 +83,10 @@ export class GrpcService {
           ],
         };
 
-        this.auth = new AuthServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
-        this.mgmt = new ManagementServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
-        this.admin = new AdminServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
-        this.user = new UserServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
+        this.auth = new AuthServiceClient(env.api, null, interceptors);
+        this.mgmt = new ManagementServiceClient(env.api, null, interceptors);
+        this.admin = new AdminServiceClient(env.api, null, interceptors);
+        this.user = new UserServiceClient(env.api, null, interceptors);
 
         const transport = createGrpcWebTransport({
           baseUrl: env.api,
