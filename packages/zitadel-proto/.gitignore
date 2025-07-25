@@ -3,3 +3,6 @@ google
 protoc-gen-openapiv2
 validate
 node_modules
+cjs
+es
+types
