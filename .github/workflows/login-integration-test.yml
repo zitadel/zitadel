@@ -18,3 +18,5 @@ jobs:
         run: npm install -g @devcontainers/cli@0.80.0
       - name: Run Integration Tests against the Login and a Mocked Zitadel API
         run: npm run devcontainer:integration:login
+        env:
+          LOGIN_TAG: ${{ inputs.login_build_image }}
