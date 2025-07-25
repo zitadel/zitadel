@@ -51,7 +51,7 @@ func (s *Server) SetSession(ctx context.Context, req *connect.Request[session.Se
 		return nil, err
 	}
 
-	set, err := s.command.UpdateSession(ctx, req.Msg.GetSessionId(), cmds, req.Msg.GetMetadata(), req.Msg.GetLifetime().AsDuration())
+	set, err := s.command.UpdateSession(ctx, req.Msg.GetSessionId(), req.Msg.GetSessionToken(), cmds, req.Msg.GetMetadata(), req.Msg.GetLifetime().AsDuration())
 	if err != nil {
 		return nil, err
 	}
