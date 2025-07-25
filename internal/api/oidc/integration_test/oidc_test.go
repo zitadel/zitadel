@@ -311,7 +311,7 @@ func Test_ZITADEL_API_terminated_session(t *testing.T) {
 	require.Equal(t, User.GetUserId(), myUserResp.GetUser().GetId())
 
 	// end session
-	postLogoutRedirect, err := rp.EndSession(CTX, provider, tokens.IDToken, logoutRedirectURI, "state")
+	postLogoutRedirect, err := rp.EndSession(CTX, provider, tokens.IDToken, logoutRedirectURI, "state", "", nil)
 	require.NoError(t, err)
 	assert.Equal(t, logoutRedirectURI+"?state=state", postLogoutRedirect.String())
 
