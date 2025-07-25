@@ -412,9 +412,9 @@ export class UserDetailComponent implements OnInit {
 
   public sendSetPasswordNotification(user: UserV2): void {
     this.newMgmtService
-      .sendHumanResetPasswordNotification({ 
-        userId: user.userId, 
-        type: SendHumanResetPasswordNotificationRequest_Type.EMAIL 
+      .sendHumanResetPasswordNotification({
+        userId: user.userId,
+        type: SendHumanResetPasswordNotificationRequest_Type.EMAIL,
       })
       .then(() => {
         this.toast.showInfo('USER.TOAST.PASSWORDNOTIFICATIONSENT', true);
