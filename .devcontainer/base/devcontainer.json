@@ -1,20 +1,13 @@
 {
 	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
-	"name": "devcontainer",
-	"dockerComposeFile": "docker-compose.yml",
+	"name": "Base Container. Install and run Components yourself",
+	"dockerComposeFile": "docker-compose.yaml",
 	"service": "devcontainer",
 	"runServices": [
 		"devContainer",
 		"db"
 	],
 	"workspaceFolder": "/workspaces",
-	"features": {
-		"ghcr.io/devcontainers/features/go:1": {
-			"version": "1.24"
-		},
-		"ghcr.io/guiyomh/features/golangci-lint:0": {},
-		"ghcr.io/jungaretti/features/make:1": {}
-	},
 	"forwardPorts": [
 		3000,
 		3001,
@@ -22,11 +15,12 @@
 		8080
 	],
 	"onCreateCommand": "pnpm install --frozen-lockfile --recursive --prefer-offline",
-	"customizations": {
-		"jetbrains": {
-			"settings": {
-				"com.intellij:app:HttpConfigurable.use_proxy_pac": true
-			}
-		}
+	"features": {
+		"ghcr.io/devcontainers/features/go:1": {
+			"version": "1.24"
+		},
+		"ghcr.io/guiyomh/features/golangci-lint:0": {},
+		"ghcr.io/jungaretti/features/make:1": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker": {}
 	}
 }

@@ -1,8 +1,9 @@
 {
 	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
-	"name": "login-integration",
+	"name": "Login Integration One-Off Container - Reproduce Pull Request Checks",
 	"dockerComposeFile": [
-		"../base/docker-compose.yml"
+		"../base/docker-compose.yaml",
+		"./docker-compose.yaml"
 	],
 	"service": "devcontainer",
 	"runServices": [
@@ -10,8 +11,10 @@
 	],
 	"workspaceFolder": "/workspaces",
 	"forwardPorts": [
+		22220,
+		22222,
 		3001
 	],
-	"onCreateCommand": "pnpm install --frozen-lockfile --filter . --filter @zitadel/login; cd apps/login; pnpm cypress install",
-	"postAttachCommand": "cd apps/login; pnpm test:integration:login"
+	"onCreateCommand": "pnpm --filter @zitadel/login install --frozen-lockfile; pnpm --filter @zitadel/login exec cypress install",
+	"updateContentCommand": "pnpm --filter @zitadel/login test:integration:login"
 }

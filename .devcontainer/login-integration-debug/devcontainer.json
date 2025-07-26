@@ -1,9 +1,10 @@
 {
 	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
-	"name": "login-integration-debug",
+	"name": "Login Integration Hot Reload Container - Debug and Fix Pull Request Checks",
 	"dockerComposeFile": [
-		"../base/docker-compose.yml",
-		"docker-compose.yml"
+		"../base/docker-compose.yaml",
+		"../login-integration/docker-compose.yaml",
+		"docker-compose.yaml"
 	],
 	"service": "login-integration",
 	"runServices": [
@@ -11,8 +12,13 @@
 	],
 	"workspaceFolder": "/workspaces",
 	"forwardPorts": [
+		22220,
+		22222,
 		3001
 	],
 	"onCreateCommand": "pnpm install --filter . --filter @zitadel/login; cd apps/login; pnpm cypress install",
-	"postAttachCommand": "pnpm turbo daemon clean || true; pnpm turbo watch @zitadel/login#dev test:integration:login"
+	"postAttachCommand": "pnpm turbo daemon clean || true; pnpm turbo watch @zitadel/login#dev test:integration:login",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-outside-of-docker": {}
+	}
 }

@@ -31,32 +31,9 @@ services:
     ports:
       - "5432:5432"
 
-  mock-zitadel:
-    container_name: mock-zitadel
-    build:
-      context: ../../apps/login/integration/core-mock
-    ports:
-      - 22220:22220
-      - 22222:22222
-
-  login-integration:
-    container_name: login-integration
-    build:
-      context: ../..
-      dockerfile: build/login/Dockerfile
-    image: "${LOGIN_TAG:-zitadel-login:local}"
-    env_file: ../../apps/login/.env.test
-    network_mode: service:mock-zitadel
-    environment:
-      NODE_ENV: test
-      PORT: 3001
-    depends_on:
-      mock-zitadel:
-        condition: service_started
-
   zitadel:
-    image: "${ZITADEL_TAG:-ghcr.io/zitadel/zitadel:v4.0.0-rc.2}"
     container_name: zitadel
+    image: "${ZITADEL_TAG:-ghcr.io/zitadel/zitadel:v4.0.0-rc.2}"
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
     volumes:
       - ../../apps/login/acceptance/pat:/pat:delegated

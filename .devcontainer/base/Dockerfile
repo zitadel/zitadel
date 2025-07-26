@@ -12,11 +12,6 @@ RUN apt-get update && \
     apt-get --no-install-recommends install -y \
     libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libasound2 libxtst6 xauth xvfb && \
     apt-get clean && \
-    corepack enable && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack prepare pnpm@9.1.2 --activate
+    corepack enable && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack prepare pnpm@10.13.1 --activate
 
 USER node
-WORKDIR /home/node/preinstall
-COPY pnpm-lock.yaml ./
-RUN pnpm fetch
-RUN cd /home/node && pwd && ls -la && whoami
-RUN pnpm store path

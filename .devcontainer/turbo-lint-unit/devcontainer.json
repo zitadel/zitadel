@@ -1,8 +1,8 @@
 {
 	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
-	"name": "turbo-lint-unit",
+	"name": "Turbo Lint and Unit One-Off Container - Reproduce Pull Request Checks",
 	"dockerComposeFile": [
-		"../base/docker-compose.yml"
+		"../base/docker-compose.yaml"
 	],
 	"service": "devcontainer",
 	"runServices": [
@@ -10,5 +10,5 @@
 	],
 	"workspaceFolder": "/workspaces",
 	"onCreateCommand": "pnpm install --frozen-lockfile --recursive",
-	"postAttachCommand": "pnpm turbo lint test:unit"
+	"updateContentCommand": "pnpm turbo lint test:unit"
 }

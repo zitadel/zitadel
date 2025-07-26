@@ -23,6 +23,7 @@
 !packages/zitadel-proto/turbo.json
 
 !packages/zitadel-client/package.json
+!packages/zitadel-client/**/package.json
 !packages/zitadel-client/src
 !packages/zitadel-client/tsconfig.json
 !packages/zitadel-client/tsup.config.ts
@@ -30,8 +31,7 @@
 
 !proto
 
-*.md
-*.png
-node_modules
-*.test.ts
-*.test.tsx
+**/*.md
+**/node_modules
+**/*.test.ts
+**/*.test.tsx

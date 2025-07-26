@@ -2,5 +2,5 @@ services:
   login-integration:
     container_name: login-integration-debug
     extends:
-      file: ../base/docker-compose.yml
+      file: ../login-integration/docker-compose.yaml
       service: devcontainer
