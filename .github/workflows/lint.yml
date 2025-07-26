@@ -53,6 +53,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - uses: depot/setup-action@v1        
       - name: Install Dev Container CLI
         run: npm install -g @devcontainers/cli@0.80.0
       - name: Lint and Unit Test All JavaScript Code
