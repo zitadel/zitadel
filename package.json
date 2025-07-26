@@ -9,7 +9,7 @@
     "devcontainer:lint-unit": "npm run devcontainer:lint-unit:build && npm run devcontainer:lint-unit:up",
     "devcontainer:lint-unit:build": "devcontainer build --config .devcontainer/turbo-lint-unit/devcontainer.json --workspace-folder .",
     "devcontainer:lint-unit:up": "devcontainer up --prebuild --config .devcontainer/turbo-lint-unit/devcontainer.json --workspace-folder . --remove-existing-container",
-    "devcontainer:integration:login": "npm run devcontainer:integration:login:build && npm devcontainer:integration:login:up",
+    "devcontainer:integration:login": "npm run devcontainer:integration:login:build && npm run devcontainer:integration:login:up",
     "devcontainer:integration:login:build": "npm run devcontainer:integration:login:build:env && npm run devcontainer:integration:login:build:services",
     "devcontainer:integration:login:build:env": "devcontainer build --config .devcontainer/login-integration/devcontainer.json --workspace-folder .",
     "devcontainer:integration:login:build:services": "COMPOSE_BAKE=1 docker compose --file  .devcontainer/base/docker-compose.yaml --file .devcontainer/login-integration/docker-compose.yaml build login-integration",
