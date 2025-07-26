@@ -19,9 +19,6 @@ on:
         required: true
         type: string
 
-permissions:
-  id-token: write
-
 jobs:
   lint-skip:
     name: lint skip
@@ -57,12 +54,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - uses: depot/setup-action@v1
-        with:
-          oidc: true              
       - name: Install Dev Container CLI
         run: npm install -g @devcontainers/cli@0.80.0
       - name: Lint and Unit Test All JavaScript Code
         run: npm run devcontainer:lint-unit
+        env:
+          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
 
   core:
     name: core

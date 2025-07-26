@@ -20,7 +20,6 @@ on:
 
 permissions:
   packages: write
-  id-token: write
 
 env:
   default_labels: |
@@ -37,8 +36,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: depot/setup-action@v1
-        with:
-          oidc: true  
       - name: Login meta
         id: login-meta
         uses: docker/metadata-action@v5
@@ -59,6 +56,7 @@ jobs:
         uses: depot/bake-action@v1
         env:
           NODE_VERSION: ${{ inputs.node_version }}
+          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
         with:
           push: true
           provenance: true

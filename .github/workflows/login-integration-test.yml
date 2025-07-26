@@ -9,7 +9,6 @@ on:
 
 permissions:
   packages: write
-  id-token: write
 
 jobs:
   login-integration-test:
@@ -19,11 +18,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - uses: depot/setup-action@v1        
-        with:
-          oidc: true      
       - name: Install Dev Container CLI
         run: npm install -g @devcontainers/cli@0.80.0
       - name: Run Integration Tests against the Login and a Mocked Zitadel API
         run: npm run devcontainer:integration:login
         env:
           LOGIN_TAG: ${{ inputs.login_build_image }}
+          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
