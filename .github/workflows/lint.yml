@@ -20,7 +20,7 @@ on:
         type: string
 
 permissions:
-  oidc: write
+  id-token: write
 
 jobs:
   lint-skip:

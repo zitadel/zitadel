@@ -19,7 +19,7 @@ permissions:
   issues: write
   pull-requests: write
   actions: write
-  oidc: write
+  id-token: write
 
 jobs:
   core:

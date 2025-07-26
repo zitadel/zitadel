@@ -9,7 +9,7 @@ on:
 
 permissions:
   packages: write
-  oidc: write
+  id-token: write
 
 jobs:
   login-integration-test:
