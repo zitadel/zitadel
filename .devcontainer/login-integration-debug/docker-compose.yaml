@@ -1,0 +1,6 @@
+services:
+  login-integration:
+    container_name: login-integration-debug
+    extends:
+      file: ../login-integration/docker-compose.yaml
+      service: devcontainer

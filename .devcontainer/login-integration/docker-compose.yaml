@@ -1,0 +1,27 @@
+services:
+  devcontainer:
+    container_name: devcontainer-login-integration
+    env_file: ../../apps/login/.env.test
+    network_mode: service:mock-zitadel
+
+  login-integration:
+    container_name: login-integration
+    build:
+      context: ../..
+      dockerfile: build/login/Dockerfile
+    image: "${LOGIN_TAG:-zitadel-login:local}"
+    env_file: ../../apps/login/.env.test
+    network_mode: service:mock-zitadel
+    environment:
+      NODE_ENV: test
+      PORT: 3001
+      NEXT_PUBLIC_BASE_PATH: /ui/v2/login
+
+  mock-zitadel:
+    container_name: mock-zitadel
+    build:
+      context: ../../apps/login/integration/core-mock
+    ports:
+      - 22220:22220
+      - 22222:22222
+      - 3001:3001

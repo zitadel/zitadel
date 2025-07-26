@@ -1,0 +1,27 @@
+name: Integration test core
+
+on: 
+  workflow_call: 
+    inputs:
+      login_build_image:
+        required: true
+        type: string
+
+permissions:
+  packages: write
+
+jobs:
+  login-integration-test:
+    name: login-integration-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: depot/setup-action@v1        
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli@0.80.0
+      - name: Run Integration Tests against the Login and a Mocked Zitadel API
+        run: npm run devcontainer:integration:login
+        env:
+          LOGIN_TAG: ${{ inputs.login_build_image }}
+          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}

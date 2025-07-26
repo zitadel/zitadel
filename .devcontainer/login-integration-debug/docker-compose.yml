@@ -1,9 +1,0 @@
-services:
-  login-integration-debug:
-    extends:
-      file: ../base/docker-compose.yml
-      service: devcontainer
-    container_name: login-integration-debug
-    depends_on:
-      mock-zitadel:
-        condition: service_started

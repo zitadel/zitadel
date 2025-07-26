@@ -53,12 +53,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Run lint and unit tests in dev container
-        uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          configFile: .devcontainer/turbo-lint-unit/devcontainer.json
-          runCmd: echo "Successfully ran lint and unit tests in dev container postStartCommand"
+      - uses: depot/setup-action@v1
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli@0.80.0
+      - name: Lint and Unit Test All JavaScript Code
+        run: npm run devcontainer:lint-unit
+        env:
+          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
 
   core:
     name: core

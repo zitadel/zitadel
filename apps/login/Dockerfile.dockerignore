@@ -8,7 +8,8 @@
 !next.config.mjs
 !next-env-vars.d.ts
 !next-env.d.ts
-!tailwind.config.js
+!tailwind.config.mjs
+!postcss.config.cjs
 !tsconfig.json
 !package.json
 !pnpm-lock.yaml

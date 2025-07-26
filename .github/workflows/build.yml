@@ -106,6 +106,12 @@ jobs:
     secrets:
       DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
 
+  login-integration-test:
+    uses: ./.github/workflows/login-integration-test.yml
+    needs: [login-container]
+    with:
+      login_build_image: ${{ needs.login-container.outputs.login_build_image }}
+
   e2e:
     uses: ./.github/workflows/e2e.yml
     needs: [compile]
@@ -125,6 +131,7 @@ jobs:
         lint,
         container,
         login-container,
+        login-integration-test,
         e2e,
       ]
     if: ${{ github.event_name == 'workflow_dispatch' }}

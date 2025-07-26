@@ -55,8 +55,8 @@ jobs:
       - name: Bake login multi-arch
         uses: depot/bake-action@v1
         env:
-          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
           NODE_VERSION: ${{ inputs.node_version }}
+          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
         with:
           push: true
           provenance: true
