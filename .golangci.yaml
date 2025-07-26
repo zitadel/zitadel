@@ -19,6 +19,12 @@ linters:
     - rowserrcheck
     - sqlclosecheck
     - unconvert
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - nilnil
   disable:
     - bidichk
     - containedctx
