@@ -440,7 +440,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.stmtErr != nil {
 				w.stmtErr(t, err)
 				return

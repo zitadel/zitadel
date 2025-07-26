@@ -185,7 +185,7 @@ func (s *Styling) Reducers() []handler.AggregateReducer {
 }
 
 func (m *Styling) processLabelPolicy(event eventstore.Event) (_ *handler.Statement, err error) {
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		policy := new(iam_model.LabelPolicyView)
 		switch event.Type() {
 		case instance.LabelPolicyAddedEventType,

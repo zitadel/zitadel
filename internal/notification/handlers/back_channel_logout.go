@@ -95,8 +95,8 @@ func (u *backChannelLogoutNotifier) reduceUserSignedOut(event eventstore.Event) 
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Gr63h", "reduce.wrong.event.type %s", user.HumanSignedOutType)
 	}
 
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx, err := u.queries.HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx, err := u.queries.HandlerContext(ctx, event.Aggregate())
 		if err != nil {
 			return err
 		}
@@ -116,8 +116,8 @@ func (u *backChannelLogoutNotifier) reduceSessionTerminated(event eventstore.Eve
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-D6H2h", "reduce.wrong.event.type %s", session.TerminateType)
 	}
 
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx, err := u.queries.HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx, err := u.queries.HandlerContext(ctx, event.Aggregate())
 		if err != nil {
 			return err
 		}
