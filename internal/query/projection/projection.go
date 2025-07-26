@@ -37,6 +37,7 @@ var (
 	ProjectGrantProjection              *handler.Handler
 	ProjectRoleProjection               *handler.Handler
 	OrgDomainProjection                 *handler.Handler
+	DomainsProjection                   *handler.Handler // Unified domains table
 	LoginPolicyProjection               *handler.Handler
 	IDPProjection                       *handler.Handler
 	AppProjection                       *handler.Handler
@@ -134,6 +135,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	ProjectGrantProjection = newProjectGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grants"]))
 	ProjectRoleProjection = newProjectRoleProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles"]))
 	OrgDomainProjection = newOrgDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_domains"]))
+	DomainsProjection = newDomainsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["domains"]))
 	LoginPolicyProjection = newLoginPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_policies"]))
 	IDPProjection = newIDPProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idps"]))
 	AppProjection = newAppProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["apps"]))
