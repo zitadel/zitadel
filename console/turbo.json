@@ -19,10 +19,6 @@
       "dependsOn": ["generate", "@zitadel/client#build"],
       "cache": false,
       "persistent": true
-    },
-    "lint": {
-      "dependsOn": ["generate"],
-      "outputs": []
     }
   }
 }

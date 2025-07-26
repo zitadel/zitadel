@@ -30,7 +30,7 @@ env:
 jobs:
   login-container:
     name: Build Login Container
-    runs-on: depot-ubuntu-22.04-8
+    runs-on: ubuntu-latest
     permissions:
       packages: write
     steps:
@@ -62,10 +62,9 @@ jobs:
           provenance: true
           sbom: true
           targets: login-standalone
-          set: login-*.context=./login/
           project: w47wkxzdtw
           files: |
-            ./login/docker-bake.hcl
-            ./login/docker-bake-release.hcl
+            ./apps/login/docker-bake.hcl
+            ./apps/login/docker-bake-release.hcl
             ./docker-bake.hcl
             cwd://${{ steps.login-meta.outputs.bake-file }}

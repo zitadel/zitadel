@@ -31,7 +31,6 @@ jobs:
     uses: ./.github/workflows/console.yml
     with:
       node_version: "20"
-      buf_version: "latest"
 
   docs:
     uses: ./.github/workflows/docs.yml
@@ -86,18 +85,6 @@ jobs:
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
 
-  login-quality:
-    needs: [compile]
-    uses: ./.github/workflows/login-quality.yml
-    permissions:
-      actions: write
-      id-token: write
-    with:
-      ignore-run-cache: ${{ github.event_name == 'workflow_dispatch' || fromJSON(github.run_attempt) > 1 }}
-      node_version: "20"
-    secrets:
-      DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
-
   container:
     needs: [compile]
     uses: ./.github/workflows/container.yml
@@ -110,7 +97,6 @@ jobs:
 
   login-container:
     uses: ./.github/workflows/login-container.yml
-    if: ${{ github.event_name == 'workflow_dispatch' }}
     permissions:
       packages: write
       id-token: write
@@ -139,7 +125,6 @@ jobs:
         lint,
         container,
         login-container,
-        login-quality,
         e2e,
       ]
     if: ${{ github.event_name == 'workflow_dispatch' }}
