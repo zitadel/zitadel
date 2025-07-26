@@ -7,26 +7,27 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-//go:generate enumer -type OrgState -transform lower -trimprefix OrgState
-type OrgState uint8
+type OrgState string
 
 const (
-	OrgStateActive OrgState = iota
-	OrgStateInactive
+	OrgStateActive   OrgState = "active"
+	OrgStateInactive OrgState = "inactive"
 )
 
 type Organization struct {
 	ID         string    `json:"id,omitempty" db:"id"`
 	Name       string    `json:"name,omitempty" db:"name"`
 	InstanceID string    `json:"instanceId,omitempty" db:"instance_id"`
-	State      string    `json:"state,omitempty" db:"state"`
-	CreatedAt  time.Time `json:"createdAt,omitempty" db:"created_at"`
-	UpdatedAt  time.Time `json:"updatedAt,omitempty" db:"updated_at"`
+	State      OrgState  `json:"state,omitempty" db:"state"`
+	CreatedAt  time.Time `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt  time.Time `json:"updatedAt,omitzero" db:"updated_at"`
+
+	Domains []*OrganizationDomain `json:"domains,omitempty" db:"-"`
 }
 
 // OrgIdentifierCondition is used to help specify a single Organization,
 // it will either be used as the organization ID or organization name,
-// as organizations can be identified either using (instnaceID + ID) OR (instanceID + name)
+// as organizations can be identified either using (instanceID + ID) OR (instanceID + name)
 type OrgIdentifierCondition interface {
 	database.Condition
 }
@@ -34,17 +35,23 @@ type OrgIdentifierCondition interface {
 // organizationColumns define all the columns of the instance table.
 type organizationColumns interface {
 	// IDColumn returns the column for the id field.
-	IDColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	IDColumn(qualified bool) database.Column
 	// NameColumn returns the column for the name field.
-	NameColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	NameColumn(qualified bool) database.Column
 	// InstanceIDColumn returns the column for the default org id field
-	InstanceIDColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	InstanceIDColumn(qualified bool) database.Column
 	// StateColumn returns the column for the name field.
-	StateColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	StateColumn(qualified bool) database.Column
 	// CreatedAtColumn returns the column for the created at field.
-	CreatedAtColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	CreatedAtColumn(qualified bool) database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
-	UpdatedAtColumn() database.Column
+	// `qualified` indicates if the column should be qualified with the table name.
+	UpdatedAtColumn(qualified bool) database.Column
 }
 
 // organizationConditions define all the conditions for the instance table.
@@ -73,12 +80,17 @@ type OrganizationRepository interface {
 	organizationConditions
 	organizationChanges
 
-	Get(ctx context.Context, id OrgIdentifierCondition, instance_id string, opts ...database.Condition) (*Organization, error)
-	List(ctx context.Context, conditions ...database.Condition) ([]*Organization, error)
+	Get(ctx context.Context, opts ...database.QueryOption) (*Organization, error)
+	List(ctx context.Context, opts ...database.QueryOption) ([]*Organization, error)
 
 	Create(ctx context.Context, instance *Organization) error
 	Update(ctx context.Context, id OrgIdentifierCondition, instance_id string, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, id OrgIdentifierCondition, instance_id string) (int64, error)
+
+	// Domains returns the domain sub repository for the organization.
+	// If shouldLoad is true, the domains will be loaded from the database and written to the [Instance].Domains field.
+	// If shouldLoad is set to true once, the Domains field will be set event if shouldLoad is false in the future.
+	Domains(shouldLoad bool) OrganizationDomainRepository
 }
 
 type CreateOrganization struct {
@@ -90,11 +102,4 @@ type MemberRepository interface {
 	AddMember(ctx context.Context, orgID, userID string, roles []string) error
 	SetMemberRoles(ctx context.Context, orgID, userID string, roles []string) error
 	RemoveMember(ctx context.Context, orgID, userID string) error
-}
-
-// DomainRepository is a sub repository of the org repository and maybe the instance repository.
-type DomainRepository interface {
-	AddDomain(ctx context.Context, domain string) error
-	SetDomainVerified(ctx context.Context, domain string) error
-	RemoveDomain(ctx context.Context, domain string) error
 }

@@ -74,4 +74,3 @@ package repository_test
 // 		user.Human().Update(context.Background(), user.IDCondition("test"), user.SetUsername("test"))
 // 	})
 // }
-

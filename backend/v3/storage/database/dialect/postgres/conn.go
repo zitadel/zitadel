@@ -23,7 +23,7 @@ func (c *pgxConn) Release(_ context.Context) error {
 
 // Begin implements [database.Client].
 func (c *pgxConn) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
-	tx, err := c.Conn.BeginTx(ctx, transactionOptionsToPgx(opts))
+	tx, err := c.BeginTx(ctx, transactionOptionsToPgx(opts))
 	if err != nil {
 		return nil, wrapError(err)
 	}
@@ -33,6 +33,7 @@ func (c *pgxConn) Begin(ctx context.Context, opts *database.TransactionOptions) 
 // Query implements sql.Client.
 // Subtle: this method shadows the method (*Conn).Query of pgxConn.Conn.
 func (c *pgxConn) Query(ctx context.Context, sql string, args ...any) (database.Rows, error) {
+
 	rows, err := c.Conn.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, wrapError(err)

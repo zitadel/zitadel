@@ -6,7 +6,7 @@ CREATE TYPE zitadel.organization_state AS ENUM (
 CREATE TABLE zitadel.organizations(
   id TEXT NOT NULL CHECK (id <> ''),
   name TEXT NOT NULL CHECK (name <> ''),
-  instance_id TEXT NOT NULL REFERENCES zitadel.instances (id),
+  instance_id TEXT NOT NULL REFERENCES zitadel.instances (id) ON DELETE CASCADE,
   state zitadel.organization_state NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,

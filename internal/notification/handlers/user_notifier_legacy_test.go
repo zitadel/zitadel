@@ -283,7 +283,7 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -596,7 +596,7 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -949,7 +949,7 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1080,7 +1080,7 @@ func Test_userNotifierLegacy_reduceDomainClaimed(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1355,7 +1355,7 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1495,7 +1495,7 @@ func Test_userNotifierLegacy_reducePasswordChanged(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {

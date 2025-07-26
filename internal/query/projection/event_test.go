@@ -99,7 +99,7 @@ func assertReduce(t *testing.T, stmt *handler.Statement, err error, projection s
 		want.executer.Validate(t)
 		return
 	}
-	err = stmt.Execute(want.executer, projection)
+	err = stmt.Execute(t.Context(), want.executer, projection)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
