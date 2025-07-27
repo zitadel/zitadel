@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
@@ -17,4 +19,22 @@ func writeCondition(
 	}
 	builder.WriteString(" WHERE ")
 	condition.Write(builder)
+}
+
+func scanRow(ctx context.Context, querier database.Querier, builder *database.StatementBuilder, res any) error {
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return err
+	}
+
+	return rows.(database.CollectableRows).CollectExactlyOneRow(res)
+}
+
+func scanRows(ctx context.Context, querier database.Querier, builder *database.StatementBuilder, res any) error {
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	if err != nil {
+		return err
+	}
+
+	return rows.(database.CollectableRows).Collect(res)
 }

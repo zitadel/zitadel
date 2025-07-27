@@ -14,7 +14,7 @@ var _OrgStateIndex = [...]uint8{0, 6, 14}
 const _OrgStateLowerName = "activeinactive"
 
 func (i OrgState) String() string {
-	if i < 0 || i >= OrgState(len(_OrgStateIndex)-1) {
+	if i >= OrgState(len(_OrgStateIndex)-1) {
 		return fmt.Sprintf("OrgState(%d)", i)
 	}
 	return _OrgStateName[_OrgStateIndex[i]:_OrgStateIndex[i+1]]
