@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
@@ -34,8 +35,12 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(tt *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(orgName),
-				instanceID,
+				database.WithCondition(
+					database.And(
+						orgRepo.NameCondition(orgName),
+						orgRepo.InstanceIDCondition(instanceID),
+					),
+				),
 			)
 			require.NoError(tt, err)
 
@@ -43,7 +48,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 			assert.NotNil(t, organization.ID)
 			assert.Equal(t, orgName, organization.Name)
 			assert.NotNil(t, organization.InstanceID)
-			assert.Equal(t, domain.OrgStateActive.String(), organization.State)
+			assert.Equal(t, domain.OrgStateActive, organization.State)
 			assert.WithinRange(t, organization.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, organization.UpdatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)
@@ -73,8 +78,12 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(orgName),
-				instanceID,
+				database.WithCondition(
+					database.And(
+						orgRepo.NameCondition(orgName),
+						orgRepo.InstanceIDCondition(instanceID),
+					),
+				),
 			)
 			require.NoError(t, err)
 
@@ -107,14 +116,18 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(orgName),
-				instanceID,
+				database.WithCondition(
+					database.And(
+						orgRepo.NameCondition(orgName),
+						orgRepo.InstanceIDCondition(instanceID),
+					),
+				),
 			)
 			require.NoError(t, err)
 
 			// event org.deactivate
 			assert.Equal(t, orgName, organization.Name)
-			assert.Equal(t, domain.OrgStateInactive.String(), organization.State)
+			assert.Equal(t, domain.OrgStateInactive, organization.State)
 			assert.WithinRange(t, organization.UpdatedAt, beforeDeactivate, afterDeactivate)
 		}, retryDuration, tick)
 	})
@@ -139,13 +152,17 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(orgName),
-				instanceID,
+				database.WithCondition(
+					database.And(
+						orgRepo.NameCondition(orgName),
+						orgRepo.InstanceIDCondition(instanceID),
+					),
+				),
 			)
 			require.NoError(t, err)
 
 			assert.Equal(t, orgName, organization.Name)
-			assert.Equal(t, domain.OrgStateInactive.String(), organization.State)
+			assert.Equal(t, domain.OrgStateInactive, organization.State)
 		}, retryDuration, tick)
 
 		// 4. activate org name
@@ -159,14 +176,18 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(orgName),
-				instanceID,
+				database.WithCondition(
+					database.And(
+						orgRepo.NameCondition(orgName),
+						orgRepo.InstanceIDCondition(instanceID),
+					),
+				),
 			)
 			require.NoError(t, err)
 
 			// event org.reactivate
 			assert.Equal(t, orgName, organization.Name)
-			assert.Equal(t, domain.OrgStateActive.String(), organization.State)
+			assert.Equal(t, domain.OrgStateActive, organization.State)
 			assert.WithinRange(t, organization.UpdatedAt, beforeActivate, afterActivate)
 		}, retryDuration, tick)
 	})
@@ -185,8 +206,12 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(orgName),
-				instanceID,
+				database.WithCondition(
+					database.And(
+						orgRepo.NameCondition(orgName),
+						orgRepo.InstanceIDCondition(instanceID),
+					),
+				),
 			)
 			require.NoError(t, err)
 
@@ -205,10 +230,14 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			organization, err := orgRepo.Get(CTX,
-				orgRepo.NameCondition(orgName),
-				instanceID,
+				database.WithCondition(
+					database.And(
+						orgRepo.NameCondition(orgName),
+						orgRepo.InstanceIDCondition(instanceID),
+					),
+				),
 			)
-			require.Equal(t, repository.ErrResourceDoesNotExist, err)
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
 
 			// event org.remove
 			assert.Nil(t, organization)

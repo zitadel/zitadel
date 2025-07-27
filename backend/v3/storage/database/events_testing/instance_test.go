@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
@@ -37,7 +38,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
-				instance.GetInstanceId(),
+				database.WithCondition(instanceRepo.IDCondition(instance.GetInstanceId())),
 			)
 			require.NoError(ttt, err)
 			// event instance.added
@@ -84,7 +85,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
-				res.InstanceId,
+				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
 			require.NoError(ttt, err)
 			// event instance.changed
@@ -113,7 +114,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
-				res.InstanceId,
+				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
 			require.NoError(ttt, err)
 			assert.Equal(ttt, instanceName, instance.Name)
@@ -127,11 +128,11 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
-				res.InstanceId,
+				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
 			// event instance.removed
 			assert.Nil(t, instance)
-			require.Equal(t, repository.ErrResourceDoesNotExist, err)
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
 		}, retryDuration, tick)
 	})
 }
