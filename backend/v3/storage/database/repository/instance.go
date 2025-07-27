@@ -177,7 +177,7 @@ func scanInstance(ctx context.Context, querier database.Querier, builder *databa
 	if err != nil {
 		return nil, err
 	}
-	return instance, err
+	return instance, nil
 }
 
 func scanInstances(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (instances []*domain.Instance, err error) {

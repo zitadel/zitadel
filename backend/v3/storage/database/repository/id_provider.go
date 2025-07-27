@@ -299,7 +299,7 @@ func scanIDProvider(ctx context.Context, querier database.Querier, builder *data
 	if err != nil {
 		return nil, err
 	}
-	return idp, err
+	return idp, nil
 }
 
 func scanIDProviders(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.IdentityProvider, error) {

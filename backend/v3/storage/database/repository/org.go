@@ -222,7 +222,7 @@ func scanOrganization(ctx context.Context, querier database.Querier, builder *da
 	if err != nil {
 		return nil, err
 	}
-	return organization, err
+	return organization, nil
 }
 
 func scanOrganizations(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Organization, error) {
