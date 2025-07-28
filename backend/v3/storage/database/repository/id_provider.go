@@ -23,8 +23,8 @@ func IDProviderRepository(client database.QueryExecutor) domain.IDProviderReposi
 	}
 }
 
-const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, allow_creation, allow_auto_creation,` +
-	` allow_auto_update, allow_linking, styling_type, payload, created_at, updated_at` +
+const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, auto_register, allow_creation, allow_auto_creation,` +
+	` allow_auto_update, allow_linking, allow_auto_linking, styling_type, payload, created_at, updated_at` +
 	` FROM zitadel.identity_providers`
 
 func (i *idProvider) Get(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IdentityProvider, error) {
