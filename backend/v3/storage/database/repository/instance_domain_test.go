@@ -38,13 +38,21 @@ func TestAddInstanceDomain(t *testing.T) {
 		err            error
 	}{
 		{
-			name: "happy path",
+			name: "happy path custom domain",
 			instanceDomain: domain.AddInstanceDomain{
 				InstanceID:  instanceID,
 				Domain:      gofakeit.DomainName(),
 				Type:        domain.DomainTypeCustom,
 				IsPrimary:   gu.Ptr(false),
 				IsGenerated: gu.Ptr(false),
+			},
+		},
+		{
+			name: "happy path trusted domain",
+			instanceDomain: domain.AddInstanceDomain{
+				InstanceID: instanceID,
+				Domain:     gofakeit.DomainName(),
+				Type:       domain.DomainTypeTrusted,
 			},
 		},
 		{
@@ -58,7 +66,7 @@ func TestAddInstanceDomain(t *testing.T) {
 			},
 		},
 		{
-			name: "add domain without domain name",
+			name: "add custom domain without domain name",
 			instanceDomain: domain.AddInstanceDomain{
 				InstanceID:  instanceID,
 				Domain:      "",
@@ -69,7 +77,16 @@ func TestAddInstanceDomain(t *testing.T) {
 			err: new(database.CheckError),
 		},
 		{
-			name: "add domain with same domain twice",
+			name: "add trusted domain without domain name",
+			instanceDomain: domain.AddInstanceDomain{
+				InstanceID: instanceID,
+				Domain:     "",
+				Type:       domain.DomainTypeTrusted,
+			},
+			err: new(database.CheckError),
+		},
+		{
+			name: "add custom domain with same domain twice",
 			testFunc: func(ctx context.Context, t *testing.T, domainRepo domain.InstanceDomainRepository) *domain.AddInstanceDomain {
 				domainName := gofakeit.DomainName()
 
@@ -89,8 +106,31 @@ func TestAddInstanceDomain(t *testing.T) {
 					InstanceID:  instanceID,
 					Domain:      domainName,
 					Type:        domain.DomainTypeCustom,
-					IsPrimary:   gu.Ptr(true),
+					IsPrimary:   gu.Ptr(false),
 					IsGenerated: gu.Ptr(false),
+				}
+			},
+			err: new(database.UniqueError),
+		},
+		{
+			name: "add trusted domain with same domain twice",
+			testFunc: func(ctx context.Context, t *testing.T, domainRepo domain.InstanceDomainRepository) *domain.AddInstanceDomain {
+				domainName := gofakeit.DomainName()
+
+				instanceDomain := &domain.AddInstanceDomain{
+					InstanceID: instanceID,
+					Domain:     domainName,
+					Type:       domain.DomainTypeTrusted,
+				}
+
+				err := domainRepo.Add(ctx, instanceDomain)
+				require.NoError(t, err)
+
+				// return same domain again
+				return &domain.AddInstanceDomain{
+					InstanceID: instanceID,
+					Domain:     domainName,
+					Type:       domain.DomainTypeTrusted,
 				}
 			},
 			err: new(database.UniqueError),
@@ -115,6 +155,42 @@ func TestAddInstanceDomain(t *testing.T) {
 				IsGenerated: gu.Ptr(false),
 			},
 			err: new(database.ForeignKeyError),
+		},
+		{
+			name: "add custom domain without primary",
+			instanceDomain: domain.AddInstanceDomain{
+				Domain:      gofakeit.DomainName(),
+				Type:        domain.DomainTypeCustom,
+				IsGenerated: gu.Ptr(false),
+			},
+			err: new(database.CheckError),
+		},
+		{
+			name: "add custom domain without generated",
+			instanceDomain: domain.AddInstanceDomain{
+				Domain:    gofakeit.DomainName(),
+				Type:      domain.DomainTypeCustom,
+				IsPrimary: gu.Ptr(false),
+			},
+			err: new(database.CheckError),
+		},
+		{
+			name: "add trusted domain with primary",
+			instanceDomain: domain.AddInstanceDomain{
+				Domain:    gofakeit.DomainName(),
+				Type:      domain.DomainTypeTrusted,
+				IsPrimary: gu.Ptr(false),
+			},
+			err: new(database.CheckError),
+		},
+		{
+			name: "add trusted domain with generated",
+			instanceDomain: domain.AddInstanceDomain{
+				Domain:      gofakeit.DomainName(),
+				Type:        domain.DomainTypeTrusted,
+				IsGenerated: gu.Ptr(false),
+			},
+			err: new(database.CheckError),
 		},
 	}
 
