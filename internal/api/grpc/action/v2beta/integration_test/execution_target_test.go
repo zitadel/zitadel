@@ -477,10 +477,10 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 		if !assert.NoError(ttt, err) {
 			return
 		}
-		if !assert.Len(ttt, got.GetResult(), 1) {
+		if !assert.Len(ttt, got.GetExecutions(), 1) {
 			return
 		}
-		gotTargets := got.GetResult()[0].GetTargets()
+		gotTargets := got.GetExecutions()[0].GetTargets()
 		// always first check length, otherwise its failed anyway
 		if assert.Len(ttt, gotTargets, len(targets)) {
 			for i := range targets {
@@ -506,10 +506,10 @@ func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Inst
 		if !assert.NoError(ttt, err) {
 			return
 		}
-		if !assert.Len(ttt, got.GetResult(), 1) {
+		if !assert.Len(ttt, got.GetTargets(), 1) {
 			return
 		}
-		config := got.GetResult()[0]
+		config := got.GetTargets()[0]
 		assert.Equal(ttt, config.GetEndpoint(), endpoint)
 		switch ty {
 		case domain.TargetTypeWebhook:

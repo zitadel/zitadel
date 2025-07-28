@@ -52,7 +52,7 @@ func (s *Server) ListTargets(ctx context.Context, req *connect.Request[action.Li
 		return nil, err
 	}
 	return connect.NewResponse(&action.ListTargetsResponse{
-		Result:     targetsToPb(resp.Targets),
+		Targets:    targetsToPb(resp.Targets),
 		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
 	}), nil
 }
@@ -67,7 +67,7 @@ func (s *Server) ListExecutions(ctx context.Context, req *connect.Request[action
 		return nil, err
 	}
 	return connect.NewResponse(&action.ListExecutionsResponse{
-		Result:     executionsToPb(resp.Executions),
+		Executions: executionsToPb(resp.Executions),
 		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
 	}), nil
 }
