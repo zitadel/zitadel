@@ -53,14 +53,14 @@ CREATE INDEX idx_org_domain ON zitadel.org_domains(instance_id, domain);
 CREATE TRIGGER trg_set_updated_at_instance_domains
   BEFORE UPDATE ON zitadel.instance_domains
   FOR EACH ROW
-  WHEN (NEW.updated_at IS NULL)
+  WHEN (OLD.updated_at IS NOT DISTINCT FROM NEW.updated_at)
   EXECUTE FUNCTION zitadel.set_updated_at();
 
 -- Trigger to update the updated_at timestamp on org_domains
 CREATE TRIGGER trg_set_updated_at_org_domains
   BEFORE UPDATE ON zitadel.org_domains
   FOR EACH ROW
-  WHEN (NEW.updated_at IS NULL)
+  WHEN (OLD.updated_at IS NOT DISTINCT FROM NEW.updated_at)
   EXECUTE FUNCTION zitadel.set_updated_at();
 
 -- Function to check for already verified org domains

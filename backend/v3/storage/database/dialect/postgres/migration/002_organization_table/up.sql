@@ -20,5 +20,5 @@ CREATE UNIQUE INDEX org_unique_instance_id_name_idx
 CREATE TRIGGER trigger_set_updated_at
 BEFORE UPDATE ON zitadel.organizations
 FOR EACH ROW
-WHEN (NEW.updated_at IS NULL)
+WHEN (OLD.updated_at IS NOT DISTINCT FROM NEW.updated_at)
 EXECUTE FUNCTION zitadel.set_updated_at();
