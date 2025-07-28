@@ -374,11 +374,9 @@ func TestListInstanceDomains(t *testing.T) {
 			Type:        domain.DomainTypeCustom,
 		},
 		{
-			InstanceID:  instanceID,
-			Domain:      gofakeit.DomainName(),
-			IsPrimary:   gu.Ptr(false),
-			IsGenerated: gu.Ptr(false),
-			Type:        domain.DomainTypeCustom,
+			InstanceID: instanceID,
+			Domain:     gofakeit.DomainName(),
+			Type:       domain.DomainTypeTrusted,
 		},
 	}
 
