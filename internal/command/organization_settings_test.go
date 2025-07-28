@@ -458,38 +458,44 @@ func TestCommandSide_DeleteSettingsOrganization(t *testing.T) {
 
 func expectFilterPreOrganizationSettings(orgID string, orgExisting, settingExisting, orgScopedUsernames bool) expect {
 	var events []eventstore.Event
+	events = append(events,
+		expectFilterPreOrganizationSettingsEvents(context.Background(), orgID, orgExisting)...,
+	)
+	events = append(events,
+		expectFilterOrganizationSettingsEvents(context.Background(), orgID, settingExisting, orgScopedUsernames)...,
+	)
+	return expectFilter(
+		events...,
+	)
+}
+
+func expectFilterPreOrganizationSettingsEvents(ctx context.Context, orgID string, orgExisting bool) []eventstore.Event {
+	var events []eventstore.Event
 	if orgExisting {
 		events = append(events,
 			eventFromEventPusher(
-				org.NewOrgAddedEvent(context.Background(),
+				org.NewOrgAddedEvent(ctx,
 					&org.NewAggregate(orgID).Aggregate,
 					"org",
 				),
 			),
 		)
 	}
-	if settingExisting {
-		events = append(events,
-			expectFilterOrganizationSettingsEvents(orgID, settingExisting, orgScopedUsernames)...,
-		)
-	}
-	return expectFilter(
-		events...,
-	)
+	return events
 }
 
 func expectFilterOrganizationSettings(orgID string, settingExisting, orgScopedUsernames bool) expect {
 	return expectFilter(
-		expectFilterOrganizationSettingsEvents(orgID, settingExisting, orgScopedUsernames)...,
+		expectFilterOrganizationSettingsEvents(context.Background(), orgID, settingExisting, orgScopedUsernames)...,
 	)
 }
 
-func expectFilterOrganizationSettingsEvents(orgID string, settingExisting, orgScopedUsernames bool) []eventstore.Event {
+func expectFilterOrganizationSettingsEvents(ctx context.Context, orgID string, settingExisting, orgScopedUsernames bool) []eventstore.Event {
 	var events []eventstore.Event
 	if settingExisting {
 		events = append(events,
 			eventFromEventPusher(
-				settings.NewOrganizationSettingsAddedEvent(context.Background(),
+				settings.NewOrganizationSettingsAddedEvent(ctx,
 					&settings.NewAggregate(orgID, orgID).Aggregate,
 					[]string{},
 					orgScopedUsernames,
