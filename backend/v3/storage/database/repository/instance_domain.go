@@ -72,16 +72,6 @@ func (i *instanceDomain) Add(ctx context.Context, domain *domain.AddInstanceDoma
 	return i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)
 }
 
-// Remove implements [domain.InstanceDomainRepository].
-func (i *instanceDomain) Remove(ctx context.Context, condition database.Condition) (int64, error) {
-	var builder database.StatementBuilder
-
-	builder.WriteString(`DELETE FROM zitadel.instance_domains WHERE `)
-	condition.Write(&builder)
-
-	return i.client.Exec(ctx, builder.String(), builder.Args()...)
-}
-
 // Update implements [domain.InstanceDomainRepository].
 // Subtle: this method shadows the method ([domain.InstanceRepository]).Update of instanceDomain.instance.
 func (i *instanceDomain) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
@@ -94,6 +84,16 @@ func (i *instanceDomain) Update(ctx context.Context, condition database.Conditio
 	database.Changes(changes).Write(&builder)
 
 	writeCondition(&builder, condition)
+
+	return i.client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+// Remove implements [domain.InstanceDomainRepository].
+func (i *instanceDomain) Remove(ctx context.Context, condition database.Condition) (int64, error) {
+	var builder database.StatementBuilder
+
+	builder.WriteString(`DELETE FROM zitadel.instance_domains WHERE `)
+	condition.Write(&builder)
 
 	return i.client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -213,12 +213,12 @@ func scanInstanceDomains(ctx context.Context, querier database.Querier, builder 
 		return nil, err
 	}
 
-	var instanceDomains []*domain.InstanceDomain
-	if err := rows.(database.CollectableRows).Collect(&instanceDomains); err != nil {
+	var domains []*domain.InstanceDomain
+	if err := rows.(database.CollectableRows).Collect(&domains); err != nil {
 		return nil, err
 	}
 
-	return instanceDomains, nil
+	return domains, nil
 }
 
 func scanInstanceDomain(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.InstanceDomain, error) {
@@ -226,10 +226,10 @@ func scanInstanceDomain(ctx context.Context, querier database.Querier, builder *
 	if err != nil {
 		return nil, err
 	}
-	instanceDomain := new(domain.InstanceDomain)
-	if err := rows.(database.CollectableRows).CollectExactlyOneRow(instanceDomain); err != nil {
+	domain := new(domain.InstanceDomain)
+	if err := rows.(database.CollectableRows).CollectExactlyOneRow(domain); err != nil {
 		return nil, err
 	}
 
-	return instanceDomain, nil
+	return domain, nil
 }

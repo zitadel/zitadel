@@ -649,6 +649,16 @@ func TestInstanceDomainConditions(t *testing.T) {
 			condition: domainRepo.IsPrimaryCondition(false),
 			expected:  "instance_domains.is_primary = $1",
 		},
+		{
+			name:      "is type custom",
+			condition: domainRepo.TypeCondition(domain.DomainTypeCustom),
+			expected:  "instance_domains.type = $1",
+		},
+		{
+			name:      "is type trusted",
+			condition: domainRepo.TypeCondition(domain.DomainTypeTrusted),
+			expected:  "instance_domains.type = $1",
+		},
 	}
 
 	for _, test := range tests {
@@ -673,6 +683,11 @@ func TestInstanceDomainChanges(t *testing.T) {
 			name:     "set primary",
 			change:   domainRepo.SetPrimary(),
 			expected: "is_primary = $1",
+		},
+		{
+			name:     "set type",
+			change:   domainRepo.SetType(domain.DomainTypeCustom),
+			expected: "type = $1",
 		},
 	}
 

@@ -54,10 +54,19 @@ func (o *orgDomain) List(ctx context.Context, opts ...database.QueryOption) ([]*
 
 // Add implements [domain.OrganizationDomainRepository].
 func (o *orgDomain) Add(ctx context.Context, domain *domain.AddOrganizationDomain) error {
-	var builder database.StatementBuilder
+	var (
+		builder              database.StatementBuilder
+		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
+	)
+	if !domain.CreatedAt.IsZero() {
+		createdAt = domain.CreatedAt
+	}
+	if !domain.UpdatedAt.IsZero() {
+		updatedAt = domain.UpdatedAt
+	}
 
-	builder.WriteString(`INSERT INTO zitadel.org_domains (instance_id, org_id, domain, is_verified, is_primary, validation_type) VALUES (`)
-	builder.WriteArgs(domain.InstanceID, domain.OrgID, domain.Domain, domain.IsVerified, domain.IsPrimary, domain.ValidationType)
+	builder.WriteString(`INSERT INTO zitadel.org_domains (instance_id, org_id, domain, is_verified, is_primary, validation_type, created_at, updated_at) VALUES (`)
+	builder.WriteArgs(domain.InstanceID, domain.OrgID, domain.Domain, domain.IsVerified, domain.IsPrimary, domain.ValidationType, createdAt, updatedAt)
 	builder.WriteString(`) RETURNING created_at, updated_at`)
 
 	return o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)
@@ -224,11 +233,11 @@ func scanOrganizationDomain(ctx context.Context, client database.Querier, builde
 		return nil, err
 	}
 
-	organizationDomain := &domain.OrganizationDomain{}
-	if err := rows.(database.CollectableRows).CollectExactlyOneRow(organizationDomain); err != nil {
+	domain := &domain.OrganizationDomain{}
+	if err := rows.(database.CollectableRows).CollectExactlyOneRow(domain); err != nil {
 		return nil, err
 	}
-	return organizationDomain, nil
+	return domain, nil
 }
 
 func scanOrganizationDomains(ctx context.Context, client database.Querier, builder *database.StatementBuilder) ([]*domain.OrganizationDomain, error) {
@@ -237,9 +246,9 @@ func scanOrganizationDomains(ctx context.Context, client database.Querier, build
 		return nil, err
 	}
 
-	var organizationDomains []*domain.OrganizationDomain
-	if err := rows.(database.CollectableRows).Collect(&organizationDomains); err != nil {
+	var domains []*domain.OrganizationDomain
+	if err := rows.(database.CollectableRows).Collect(&domains); err != nil {
 		return nil, err
 	}
-	return organizationDomains, nil
+	return domains, nil
 }
