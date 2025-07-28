@@ -1661,12 +1661,12 @@ func TestListIDProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.WithoutCancel(t.Context())
+
 			t.Cleanup(func() {
 				_, err := pool.Exec(ctx, "DELETE FROM zitadel.identity_providers")
 				require.NoError(t, err)
 			})
-
-			ctx := context.WithoutCancel(t.Context())
 
 			idps := tt.testFunc(ctx, t)
 
