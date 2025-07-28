@@ -148,6 +148,7 @@ func (p *orgDomainRelationalProjection) reduceVerificationAdded(event eventstore
 				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
 			),
 			domainRepo.SetValidationType(validationType),
+			domainRepo.SetUpdatedAt(e.CreationDate()),
 		)
 		return err
 	}), nil
@@ -171,6 +172,7 @@ func (p *orgDomainRelationalProjection) reduceVerified(event eventstore.Event) (
 				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
 			),
 			domainRepo.SetVerified(),
+			domainRepo.SetUpdatedAt(e.CreationDate()),
 		)
 		return err
 	}), nil
