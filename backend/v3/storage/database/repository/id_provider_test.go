@@ -875,7 +875,7 @@ func TestGetIDProvider(t *testing.T) {
 
 // gocognit linting fails due to number of test cases
 // and the fact that each test case has a testFunc()
-// nolint: gocognit
+//nolint: gocognit
 func TestListIDProvider(t *testing.T) {
 	ctx := t.Context()
 	pool, stop, err := newEmbeddedDB(ctx)
