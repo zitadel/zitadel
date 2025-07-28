@@ -42,6 +42,7 @@ const (
 	OIDCMappingFieldPreferredLoginName
 	OIDCMappingFieldEmail
 	// count is for validation purposes
+	//nolint: unused
 	oidcMappingFieldCount
 )
 

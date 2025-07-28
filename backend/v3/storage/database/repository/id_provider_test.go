@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muhlemmer/gu"
-
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
@@ -173,7 +173,7 @@ func TestCreateIDProvider(t *testing.T) {
 						State:      domain.OrgStateActive.String(),
 					}
 					organizationRepo := repository.OrganizationRepository(pool)
-					err = organizationRepo.Create(t.Context(), &org)
+					err = organizationRepo.Create(ctx, &org)
 					require.NoError(t, err)
 
 					idpRepo := repository.IDProviderRepository(pool)
@@ -941,7 +941,7 @@ func TestListIDProvider(t *testing.T) {
 					State:      domain.OrgStateActive.String(),
 				}
 				organizationRepo := repository.OrganizationRepository(pool)
-				err = organizationRepo.Create(t.Context(), &org)
+				err = organizationRepo.Create(ctx, &org)
 				require.NoError(t, err)
 
 				// create idp
@@ -1005,7 +1005,7 @@ func TestListIDProvider(t *testing.T) {
 					State:      domain.OrgStateActive.String(),
 				}
 				organizationRepo := repository.OrganizationRepository(pool)
-				err = organizationRepo.Create(t.Context(), &org)
+				err = organizationRepo.Create(ctx, &org)
 				require.NoError(t, err)
 
 				// create idp
@@ -1666,7 +1666,7 @@ func TestListIDProvider(t *testing.T) {
 				require.NoError(t, err)
 			})
 
-			ctx := t.Context()
+			ctx := context.WithoutCancel(t.Context())
 
 			idps := tt.testFunc(ctx, t)
 

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
