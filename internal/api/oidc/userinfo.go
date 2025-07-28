@@ -321,6 +321,13 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 					}
 				}),
 			),
+			actions.SetFields("application",
+				actions.SetFields("getClientId", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						return c.Runtime.ToValue(clientID)
+					}
+				}),
+			),
 		),
 	)
 
