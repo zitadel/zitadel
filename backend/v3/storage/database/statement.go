@@ -8,8 +8,9 @@ import (
 type Instruction string
 
 const (
-	NowInstruction  Instruction = "NOW()"
-	NullInstruction Instruction = "NULL"
+	DefaultInstruction Instruction = "DEFAULT"
+	NowInstruction     Instruction = "NOW()"
+	NullInstruction    Instruction = "NULL"
 )
 
 // StatementBuilder is a helper to build SQL statement.

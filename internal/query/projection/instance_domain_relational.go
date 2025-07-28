@@ -69,10 +69,11 @@ func (p *instanceDomainRelationalProjection) reduceCustomDomainAdded(event event
 		return repository.InstanceRepository(v3_sql.SQLTx(tx)).Domains(false).Add(ctx, &domain.AddInstanceDomain{
 			InstanceID:  e.Aggregate().InstanceID,
 			Domain:      e.Domain,
-			IsGenerated: e.Generated,
+			IsPrimary:   gu.Ptr(false),
+			IsGenerated: &e.Generated,
 			Type:        domain.DomainTypeCustom,
-			CreatedAt:   gu.Ptr(e.CreationDate()),
-			UpdatedAt:   gu.Ptr(e.CreationDate()),
+			CreatedAt:   e.CreationDate(),
+			UpdatedAt:   e.CreationDate(),
 		})
 	}), nil
 }
@@ -136,9 +137,9 @@ func (p *instanceDomainRelationalProjection) reduceTrustedDomainAdded(event even
 		return repository.InstanceRepository(v3_sql.SQLTx(tx)).Domains(false).Add(ctx, &domain.AddInstanceDomain{
 			InstanceID: e.Aggregate().InstanceID,
 			Domain:     e.Domain,
-			Type:       domain.DomainTypeCustom,
-			CreatedAt:  gu.Ptr(e.CreationDate()),
-			UpdatedAt:  gu.Ptr(e.CreationDate()),
+			Type:       domain.DomainTypeTrusted,
+			CreatedAt:  e.CreationDate(),
+			UpdatedAt:  e.CreationDate(),
 		})
 	}), nil
 }

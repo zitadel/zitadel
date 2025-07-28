@@ -54,13 +54,22 @@ func (i *instanceDomain) List(ctx context.Context, opts ...database.QueryOption)
 
 // Add implements [domain.InstanceDomainRepository].
 func (i *instanceDomain) Add(ctx context.Context, domain *domain.AddInstanceDomain) error {
-	var builder database.StatementBuilder
+	var (
+		builder              database.StatementBuilder
+		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
+	)
+	if !domain.CreatedAt.IsZero() {
+		createdAt = domain.CreatedAt
+	}
+	if !domain.UpdatedAt.IsZero() {
+		updatedAt = domain.UpdatedAt
+	}
 
 	builder.WriteString(`INSERT INTO zitadel.instance_domains (instance_id, domain, is_primary, is_generated, type, created_at, updated_at) VALUES (`)
-	builder.WriteArgs(domain.InstanceID, domain.Domain, domain.IsPrimary, domain.IsGenerated, domain.Type, domain.CreatedAt, domain.UpdatedAt)
+	builder.WriteArgs(domain.InstanceID, domain.Domain, domain.IsPrimary, domain.IsGenerated, domain.Type, createdAt, updatedAt)
 	builder.WriteString(`) RETURNING created_at, updated_at`)
 
-	return i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(domain.CreatedAt, domain.UpdatedAt)
+	return i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&domain.CreatedAt, &domain.UpdatedAt)
 }
 
 // Remove implements [domain.InstanceDomainRepository].

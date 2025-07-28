@@ -3,7 +3,6 @@
 package events_test
 
 import (
-	"log"
 	"testing"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
@@ -42,7 +42,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 		assert.NoError(ttt, err)
 	}, retryDuration, tick)
 
-	t.Run("test instance domain add reduces", func(t *testing.T) {
+	t.Run("test instance custom domain add reduces", func(t *testing.T) {
 		// Add a domain to the instance
 		domainName := gofakeit.DomainName()
 		beforeAdd := time.Now()
@@ -71,6 +71,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
 						instanceDomainRepo.DomainCondition(database.TextOperationEqual, domainName),
+						instanceDomainRepo.TypeCondition(domain.DomainTypeCustom),
 					),
 				),
 			)
@@ -78,15 +79,13 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 			// event instance.domain.added
 			assert.Equal(ttt, domainName, domain.Domain)
 			assert.Equal(ttt, instance.Instance.Id, domain.InstanceID)
-			assert.False(ttt, domain.IsPrimary)
-			log.Printf("created at %v\n", domain.CreatedAt)
-			log.Printf("after %v\n", afterAdd)
-			log.Printf("before %v\n", beforeAdd)
+			assert.False(ttt, *domain.IsPrimary)
 			assert.WithinRange(ttt, domain.CreatedAt, beforeAdd, afterAdd)
 			assert.WithinRange(ttt, domain.UpdatedAt, beforeAdd, afterAdd)
 		}, retryDuration, tick)
 	})
-	t.Run("test instance domain set primary reduces", func(t *testing.T) {
+
+	t.Run("test instance custom domain set primary reduces", func(t *testing.T) {
 		// Add a domain to the instance
 		domainName := gofakeit.DomainName()
 		_, err := instance.Client.InstanceV2Beta.AddCustomDomain(CTX, &v2beta.AddCustomDomainRequest{
@@ -101,6 +100,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
+						instanceDomainRepo.TypeCondition(domain.DomainTypeCustom),
 						instanceDomainRepo.IsPrimaryCondition(false),
 					),
 				),
@@ -129,11 +129,13 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 				database.WithCondition(
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
-						instanceDomainRepo.DomainCondition(database.TextOperationEqual, domainName)),
+						instanceDomainRepo.DomainCondition(database.TextOperationEqual, domainName),
+						instanceDomainRepo.TypeCondition(domain.DomainTypeCustom),
+					),
 				),
 			)
 			require.NoError(ttt, err)
-			require.False(ttt, domain.IsPrimary)
+			require.False(ttt, *domain.IsPrimary)
 			assert.Equal(ttt, domainName, domain.Domain)
 		}, retryDuration, tick)
 
@@ -154,18 +156,19 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
 						instanceDomainRepo.IsPrimaryCondition(true),
+						instanceDomainRepo.TypeCondition(domain.DomainTypeCustom),
 					),
 				),
 			)
 			require.NoError(ttt, err)
 			// event instance.domain.primary.set
 			assert.Equal(ttt, domainName, domain.Domain)
-			assert.True(ttt, domain.IsPrimary)
+			assert.True(ttt, *domain.IsPrimary)
 			assert.WithinRange(ttt, domain.UpdatedAt, beforeSetPrimary, afterSetPrimary)
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance domain remove reduces", func(t *testing.T) {
+	t.Run("test instance custom domain remove reduces", func(t *testing.T) {
 		// Add a domain to the instance
 		domainName := gofakeit.DomainName()
 		_, err := instance.Client.InstanceV2Beta.AddCustomDomain(CTX, &v2beta.AddCustomDomainRequest{
@@ -173,16 +176,6 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 			Domain:     domainName,
 		})
 		require.NoError(t, err)
-
-		t.Cleanup(func() {
-			_, err := instance.Client.InstanceV2Beta.RemoveCustomDomain(CTX, &v2beta.RemoveCustomDomainRequest{
-				InstanceId: instance.Instance.Id,
-				Domain:     domainName,
-			})
-			if err != nil {
-				t.Logf("Failed to delete instance domain on cleanup: %v", err)
-			}
-		})
 
 		// Wait for domain to be created and verify it exists
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
@@ -192,6 +185,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
 						instanceDomainRepo.DomainCondition(database.TextOperationEqual, domainName),
+						instanceDomainRepo.TypeCondition(domain.DomainTypeCustom),
 					),
 				),
 			)
@@ -199,7 +193,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// Remove the domain
-		_, err = SystemClient.RemoveDomain(CTX, &system.RemoveDomainRequest{
+		_, err = instance.Client.InstanceV2Beta.RemoveCustomDomain(CTX, &v2beta.RemoveCustomDomainRequest{
 			InstanceId: instance.Instance.Id,
 			Domain:     domainName,
 		})
@@ -213,6 +207,98 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 					database.And(
 						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
 						instanceDomainRepo.DomainCondition(database.TextOperationEqual, domainName),
+						instanceDomainRepo.TypeCondition(domain.DomainTypeCustom),
+					),
+				),
+			)
+			// event instance.domain.removed
+			assert.Nil(ttt, domain)
+			require.ErrorIs(ttt, err, new(database.NoRowFoundError))
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance trusted domain add reduces", func(t *testing.T) {
+		// Add a domain to the instance
+		domainName := gofakeit.DomainName()
+		beforeAdd := time.Now()
+		_, err := instance.Client.InstanceV2Beta.AddTrustedDomain(CTX, &v2beta.AddTrustedDomainRequest{
+			InstanceId: instance.Instance.Id,
+			Domain:     domainName,
+		})
+		require.NoError(t, err)
+		afterAdd := time.Now()
+
+		t.Cleanup(func() {
+			_, err := instance.Client.InstanceV2Beta.RemoveTrustedDomain(CTX, &v2beta.RemoveTrustedDomainRequest{
+				InstanceId: instance.Instance.Id,
+				Domain:     domainName,
+			})
+			if err != nil {
+				t.Logf("Failed to delete instance domain on cleanup: %v", err)
+			}
+		})
+
+		// Test that domain add reduces
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+			domain, err := instanceDomainRepo.Get(CTX,
+				database.WithCondition(
+					database.And(
+						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
+						instanceDomainRepo.DomainCondition(database.TextOperationEqual, domainName),
+						instanceDomainRepo.TypeCondition(domain.DomainTypeTrusted),
+					),
+				),
+			)
+			require.NoError(ttt, err)
+			// event instance.domain.added
+			assert.Equal(ttt, domainName, domain.Domain)
+			assert.Equal(ttt, instance.Instance.Id, domain.InstanceID)
+			assert.WithinRange(ttt, domain.CreatedAt, beforeAdd, afterAdd)
+			assert.WithinRange(ttt, domain.UpdatedAt, beforeAdd, afterAdd)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance trusted domain remove reduces", func(t *testing.T) {
+		// Add a domain to the instance
+		domainName := gofakeit.DomainName()
+		_, err := instance.Client.InstanceV2Beta.AddTrustedDomain(CTX, &v2beta.AddTrustedDomainRequest{
+			InstanceId: instance.Instance.Id,
+			Domain:     domainName,
+		})
+		require.NoError(t, err)
+
+		// Wait for domain to be created and verify it exists
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+			_, err := instanceDomainRepo.Get(CTX,
+				database.WithCondition(
+					database.And(
+						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
+						instanceDomainRepo.DomainCondition(database.TextOperationEqual, domainName),
+						instanceDomainRepo.TypeCondition(domain.DomainTypeTrusted),
+					),
+				),
+			)
+			require.NoError(ttt, err)
+		}, retryDuration, tick)
+
+		// Remove the domain
+		_, err = instance.Client.InstanceV2Beta.RemoveTrustedDomain(CTX, &v2beta.RemoveTrustedDomainRequest{
+			InstanceId: instance.Instance.Id,
+			Domain:     domainName,
+		})
+		require.NoError(t, err)
+
+		// Test that domain remove reduces
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+			domain, err := instanceDomainRepo.Get(CTX,
+				database.WithCondition(
+					database.And(
+						instanceDomainRepo.InstanceIDCondition(instance.Instance.Id),
+						instanceDomainRepo.DomainCondition(database.TextOperationEqual, domainName),
+						instanceDomainRepo.TypeCondition(domain.DomainTypeTrusted),
 					),
 				),
 			)

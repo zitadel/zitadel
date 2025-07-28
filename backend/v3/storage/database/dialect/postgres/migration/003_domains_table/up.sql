@@ -15,8 +15,8 @@ CREATE TABLE zitadel.instance_domains(
   , is_generated BOOLEAN
   , type zitadel.domain_type NOT NULL
 
-  , created_at TIMESTAMPTZ DEFAULT NOW()
-  , updated_at TIMESTAMPTZ DEFAULT NOW()
+  , created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+  , updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 
   , PRIMARY KEY (domain)
 
@@ -24,7 +24,7 @@ CREATE TABLE zitadel.instance_domains(
 
   , CONSTRAINT primary_cannot_be_trusted CHECK (is_primary IS NULL OR type != 'trusted')
   , CONSTRAINT generated_cannot_be_trusted CHECK (is_generated IS NULL OR type != 'trusted')
-  , CONSTRAINT custom_values_set CHECK (type = 'custom' AND is_primary IS NOT NULL AND is_generated IS NOT NULL)
+  , CONSTRAINT custom_values_set CHECK ((is_primary IS NOT NULL AND is_generated IS NOT NULL) OR type != 'custom')
 );
 
 CREATE INDEX idx_instance_domain_instance ON zitadel.instance_domains(instance_id);
@@ -37,8 +37,8 @@ CREATE TABLE zitadel.org_domains(
   , is_primary BOOLEAN NOT NULL DEFAULT FALSE
   , validation_type zitadel.domain_validation_type
 
-  , created_at TIMESTAMPTZ DEFAULT NOW()
-  , updated_at TIMESTAMPTZ DEFAULT NOW()
+  , created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+  , updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 
   , PRIMARY KEY (instance_id, org_id, domain)
 

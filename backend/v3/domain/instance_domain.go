@@ -8,10 +8,15 @@ import (
 )
 
 type InstanceDomain struct {
-	InstanceID string     `json:"instanceId,omitempty" db:"instance_id"`
-	Domain     string     `json:"domain,omitempty" db:"domain"`
-	IsPrimary  bool       `json:"isPrimary,omitempty" db:"is_primary"`
-	Type       DomainType `json:"type,omitempty" db:"type"`
+	InstanceID string `json:"instanceId,omitempty" db:"instance_id"`
+	Domain     string `json:"domain,omitempty" db:"domain"`
+	// IsPrimary indicates if the domain is the primary domain of the instance.
+	// It is only set for custom domains.
+	IsPrimary *bool `json:"isPrimary,omitempty" db:"is_primary"`
+	// IsGenerated indicates if the domain is a generated domain.
+	// It is only set for custom domains.
+	IsGenerated *bool      `json:"isGenerated,omitempty" db:"is_generated"`
+	Type        DomainType `json:"type,omitempty" db:"type"`
 
 	CreatedAt time.Time `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"updated_at"`
@@ -20,16 +25,16 @@ type InstanceDomain struct {
 type AddInstanceDomain struct {
 	InstanceID  string     `json:"instanceId,omitempty" db:"instance_id"`
 	Domain      string     `json:"domain,omitempty" db:"domain"`
-	IsPrimary   bool       `json:"isPrimary,omitempty" db:"is_primary"`
-	IsGenerated bool       `json:"isGenerated,omitempty" db:"is_generated"`
+	IsPrimary   *bool      `json:"isPrimary,omitempty" db:"is_primary"`
+	IsGenerated *bool      `json:"isGenerated,omitempty" db:"is_generated"`
 	Type        DomainType `json:"type,omitempty" db:"type"`
 
 	// CreatedAt is the time when the domain was added.
 	// It is set by the repository and should not be set by the caller.
-	CreatedAt *time.Time `json:"createdAt,omitzero" db:"created_at"`
+	CreatedAt time.Time `json:"createdAt,omitzero" db:"created_at"`
 	// UpdatedAt is the time when the domain was last updated.
 	// It is set by the repository and should not be set by the caller.
-	UpdatedAt *time.Time `json:"updatedAt,omitzero" db:"updated_at"`
+	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
 type instanceDomainColumns interface {

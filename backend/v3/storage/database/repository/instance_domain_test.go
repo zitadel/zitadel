@@ -3,8 +3,10 @@ package repository_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -38,25 +40,31 @@ func TestAddInstanceDomain(t *testing.T) {
 		{
 			name: "happy path",
 			instanceDomain: domain.AddInstanceDomain{
-				InstanceID: instanceID,
-				Domain:     gofakeit.DomainName(),
-				IsPrimary:  false,
+				InstanceID:  instanceID,
+				Domain:      gofakeit.DomainName(),
+				Type:        domain.DomainTypeCustom,
+				IsPrimary:   gu.Ptr(false),
+				IsGenerated: gu.Ptr(false),
 			},
 		},
 		{
 			name: "add primary domain",
 			instanceDomain: domain.AddInstanceDomain{
-				InstanceID: instanceID,
-				Domain:     gofakeit.DomainName(),
-				IsPrimary:  true,
+				InstanceID:  instanceID,
+				Domain:      gofakeit.DomainName(),
+				Type:        domain.DomainTypeCustom,
+				IsPrimary:   gu.Ptr(true),
+				IsGenerated: gu.Ptr(false),
 			},
 		},
 		{
 			name: "add domain without domain name",
 			instanceDomain: domain.AddInstanceDomain{
-				InstanceID: instanceID,
-				Domain:     "",
-				IsPrimary:  false,
+				InstanceID:  instanceID,
+				Domain:      "",
+				Type:        domain.DomainTypeCustom,
+				IsPrimary:   gu.Ptr(false),
+				IsGenerated: gu.Ptr(false),
 			},
 			err: new(database.CheckError),
 		},
@@ -66,9 +74,11 @@ func TestAddInstanceDomain(t *testing.T) {
 				domainName := gofakeit.DomainName()
 
 				instanceDomain := &domain.AddInstanceDomain{
-					InstanceID: instanceID,
-					Domain:     domainName,
-					IsPrimary:  false,
+					InstanceID:  instanceID,
+					Domain:      domainName,
+					Type:        domain.DomainTypeCustom,
+					IsPrimary:   gu.Ptr(false),
+					IsGenerated: gu.Ptr(false),
 				}
 
 				err := domainRepo.Add(ctx, instanceDomain)
@@ -76,9 +86,11 @@ func TestAddInstanceDomain(t *testing.T) {
 
 				// return same domain again
 				return &domain.AddInstanceDomain{
-					InstanceID: instanceID,
-					Domain:     domainName,
-					IsPrimary:  true,
+					InstanceID:  instanceID,
+					Domain:      domainName,
+					Type:        domain.DomainTypeCustom,
+					IsPrimary:   gu.Ptr(true),
+					IsGenerated: gu.Ptr(false),
 				}
 			},
 			err: new(database.UniqueError),
@@ -86,17 +98,21 @@ func TestAddInstanceDomain(t *testing.T) {
 		{
 			name: "add domain with non-existent instance",
 			instanceDomain: domain.AddInstanceDomain{
-				InstanceID: "non-existent-instance",
-				Domain:     gofakeit.DomainName(),
-				IsPrimary:  false,
+				InstanceID:  "non-existent-instance",
+				Domain:      gofakeit.DomainName(),
+				Type:        domain.DomainTypeCustom,
+				IsPrimary:   gu.Ptr(false),
+				IsGenerated: gu.Ptr(false),
 			},
 			err: new(database.ForeignKeyError),
 		},
 		{
 			name: "add domain without instance id",
 			instanceDomain: domain.AddInstanceDomain{
-				Domain:    gofakeit.DomainName(),
-				IsPrimary: false,
+				Domain:      gofakeit.DomainName(),
+				Type:        domain.DomainTypeCustom,
+				IsPrimary:   gu.Ptr(false),
+				IsGenerated: gu.Ptr(false),
 			},
 			err: new(database.ForeignKeyError),
 		},
@@ -106,6 +122,8 @@ func TestAddInstanceDomain(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			ctx := t.Context()
 
+			// we take now here because the timestamp of the transaction is used to set the createdAt and updatedAt fields
+			beforeAdd := time.Now()
 			tx, err := pool.Begin(t.Context(), nil)
 			require.NoError(t, err)
 			defer func() {
@@ -122,6 +140,7 @@ func TestAddInstanceDomain(t *testing.T) {
 			}
 
 			err = domainRepo.Add(ctx, instanceDomain)
+			afterAdd := time.Now()
 			if test.err != nil {
 				assert.ErrorIs(t, err, test.err)
 				return
@@ -130,6 +149,8 @@ func TestAddInstanceDomain(t *testing.T) {
 			require.NoError(t, err)
 			assert.NotZero(t, instanceDomain.CreatedAt)
 			assert.NotZero(t, instanceDomain.UpdatedAt)
+			assert.WithinRange(t, instanceDomain.CreatedAt, beforeAdd, afterAdd)
+			assert.WithinRange(t, instanceDomain.UpdatedAt, beforeAdd, afterAdd)
 		})
 	}
 }
@@ -161,14 +182,18 @@ func TestGetInstanceDomain(t *testing.T) {
 	domainName2 := gofakeit.DomainName()
 
 	domain1 := &domain.AddInstanceDomain{
-		InstanceID: instanceID,
-		Domain:     domainName1,
-		IsPrimary:  true,
+		InstanceID:  instanceID,
+		Domain:      domainName1,
+		IsPrimary:   gu.Ptr(true),
+		IsGenerated: gu.Ptr(false),
+		Type:        domain.DomainTypeCustom,
 	}
 	domain2 := &domain.AddInstanceDomain{
-		InstanceID: instanceID,
-		Domain:     domainName2,
-		IsPrimary:  false,
+		InstanceID:  instanceID,
+		Domain:      domainName2,
+		IsPrimary:   gu.Ptr(false),
+		IsGenerated: gu.Ptr(false),
+		Type:        domain.DomainTypeCustom,
 	}
 
 	err = domainRepo.Add(t.Context(), domain1)
@@ -190,7 +215,7 @@ func TestGetInstanceDomain(t *testing.T) {
 			expected: &domain.InstanceDomain{
 				InstanceID: instanceID,
 				Domain:     domainName1,
-				IsPrimary:  true,
+				IsPrimary:  gu.Ptr(true),
 			},
 		},
 		{
@@ -201,7 +226,7 @@ func TestGetInstanceDomain(t *testing.T) {
 			expected: &domain.InstanceDomain{
 				InstanceID: instanceID,
 				Domain:     domainName2,
-				IsPrimary:  false,
+				IsPrimary:  gu.Ptr(false),
 			},
 		},
 		{
@@ -259,19 +284,25 @@ func TestListInstanceDomains(t *testing.T) {
 	domainRepo := instanceRepo.Domains(false)
 	domains := []domain.AddInstanceDomain{
 		{
-			InstanceID: instanceID,
-			Domain:     gofakeit.DomainName(),
-			IsPrimary:  true,
+			InstanceID:  instanceID,
+			Domain:      gofakeit.DomainName(),
+			IsPrimary:   gu.Ptr(true),
+			IsGenerated: gu.Ptr(false),
+			Type:        domain.DomainTypeCustom,
 		},
 		{
-			InstanceID: instanceID,
-			Domain:     gofakeit.DomainName(),
-			IsPrimary:  false,
+			InstanceID:  instanceID,
+			Domain:      gofakeit.DomainName(),
+			IsPrimary:   gu.Ptr(false),
+			IsGenerated: gu.Ptr(false),
+			Type:        domain.DomainTypeCustom,
 		},
 		{
-			InstanceID: instanceID,
-			Domain:     gofakeit.DomainName(),
-			IsPrimary:  false,
+			InstanceID:  instanceID,
+			Domain:      gofakeit.DomainName(),
+			IsPrimary:   gu.Ptr(false),
+			IsGenerated: gu.Ptr(false),
+			Type:        domain.DomainTypeCustom,
 		},
 	}
 
@@ -358,9 +389,11 @@ func TestUpdateInstanceDomain(t *testing.T) {
 	domainRepo := instanceRepo.Domains(false)
 	domainName := gofakeit.DomainName()
 	instanceDomain := &domain.AddInstanceDomain{
-		InstanceID: instanceID,
-		Domain:     domainName,
-		IsPrimary:  false,
+		InstanceID:  instanceID,
+		Domain:      domainName,
+		IsPrimary:   gu.Ptr(false),
+		IsGenerated: gu.Ptr(false),
+		Type:        domain.DomainTypeCustom,
 	}
 
 	err = domainRepo.Add(t.Context(), instanceDomain)
@@ -445,17 +478,20 @@ func TestRemoveInstanceDomain(t *testing.T) {
 	// add domains
 	domainRepo := instanceRepo.Domains(false)
 	domainName1 := gofakeit.DomainName()
-	domainName2 := gofakeit.DomainName()
 
 	domain1 := &domain.AddInstanceDomain{
-		InstanceID: instanceID,
-		Domain:     domainName1,
-		IsPrimary:  true,
+		InstanceID:  instanceID,
+		Domain:      domainName1,
+		IsPrimary:   gu.Ptr(true),
+		IsGenerated: gu.Ptr(false),
+		Type:        domain.DomainTypeCustom,
 	}
 	domain2 := &domain.AddInstanceDomain{
-		InstanceID: instanceID,
-		Domain:     domainName2,
-		IsPrimary:  false,
+		InstanceID:  instanceID,
+		Domain:      gofakeit.DomainName(),
+		IsPrimary:   gu.Ptr(false),
+		IsGenerated: gu.Ptr(false),
+		Type:        domain.DomainTypeCustom,
 	}
 
 	err = domainRepo.Add(t.Context(), domain1)
