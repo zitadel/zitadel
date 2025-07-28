@@ -2250,7 +2250,7 @@ service ManagementService {
 
     // Create Organization
     //
-    // Deprecated: use [organization service v2 CreateOrganization](apis/resources/org_service_v2beta/organization-service-create-organization.api.mdx) instead
+    // Deprecated: use [organization service v2 CreateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-create-organization.api.mdx) instead
     //
     // Create a new organization. Based on the given name a domain will be generated to be able to identify users within an organization.
     rpc AddOrg(AddOrgRequest) returns (AddOrgResponse) {
@@ -2279,7 +2279,7 @@ service ManagementService {
 
     // Update Organization
     //
-    // Deprecated: use [organization service v2 UpdateOrganization](apis/resources/org_service_v2beta/organization-service-update-organization.api.mdx) instead.
+    // Deprecated: use [organization service v2 UpdateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-update-organization.api.mdx) instead.
     //
     // Change the name of the organization.
     rpc UpdateOrg(UpdateOrgRequest) returns (UpdateOrgResponse) {
@@ -2308,7 +2308,7 @@ service ManagementService {
 
     // Deactivate Organization
     //
-    // Deprecated: use [organization service v2 DeactivateOrganization](apis/resources/org_service_v2beta/organization-service-deactivate-organization.api.mdx) instead.
+    // Deprecated: use [organization service v2 DeactivateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-deactivate-organization.api.mdx) instead.
     //
     // Sets the state of my organization to deactivated. Users of this organization will not be able to log in.
     rpc DeactivateOrg(DeactivateOrgRequest) returns (DeactivateOrgResponse) {
@@ -2337,7 +2337,7 @@ service ManagementService {
 
     // Reactivate Organization
     //
-    // Deprecated: use [organization service v2 ActivateOrganization](apis/resources/org_service_v2beta/organization-service-activate-organization.api.mdx) instead.
+    // Deprecated: use [organization service v2 ActivateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-activate-organization.api.mdx) instead.
     //
     // Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again.
     rpc ReactivateOrg(ReactivateOrgRequest) returns (ReactivateOrgResponse) {
@@ -2366,7 +2366,7 @@ service ManagementService {
 
     // Delete Organization
     //
-    // Deprecated: use [organization service v2 DeleteOrganization](apis/resources/org_service_v2beta/organization-service-delete-organization.api.mdx) instead.
+    // Deprecated: use [organization service v2 DeleteOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization.api.mdx) instead.
     //
     // Deletes my organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in.
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
@@ -2394,7 +2394,7 @@ service ManagementService {
 
     // Set Organization Metadata
     //
-    // Deprecated: use [organization service v2 SetOrganizationMetadata](apis/resources/org_service_v2beta/organization-service-set-organization-metadata.api.mdx) instead.
+    // Deprecated: use [organization service v2 SetOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-set-organization-metadata.api.mdx) instead.
     //
     // This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
     rpc SetOrgMetadata(SetOrgMetadataRequest) returns (SetOrgMetadataResponse) {
@@ -2424,7 +2424,7 @@ service ManagementService {
 
     // Bulk Set Organization Metadata
     //
-    // Deprecated: use [organization service v2 SetOrganizationMetadata](apis/resources/org_service_v2beta/organization-service-set-organization-metadata.api.mdx) instead.
+    // Deprecated: use [organization service v2 SetOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-set-organization-metadata.api.mdx) instead.
     //
     // This endpoint sets a list of metadata to the organization. Make sure the values are base64 encoded.
     rpc BulkSetOrgMetadata(BulkSetOrgMetadataRequest) returns (BulkSetOrgMetadataResponse) {
@@ -2454,7 +2454,7 @@ service ManagementService {
 
     // Search Organization Metadata
     //
-    // Deprecated: use [organization service v2 ListOrganizationMetadata](apis/resources/org_service_v2beta/organization-service-list-organization-metadata.api.mdx) instead.
+    // Deprecated: use [organization service v2 ListOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-list-organization-metadata.api.mdx) instead.
     //
     // Get the metadata of an organization filtered by your query.
     rpc ListOrgMetadata(ListOrgMetadataRequest) returns (ListOrgMetadataResponse) {
@@ -2484,7 +2484,7 @@ service ManagementService {
 
     // Get Organization Metadata By Key
     //
-    // Deprecated: use [organization service v2 ListOrganizationMetadata](apis/resources/org_service_v2beta/organization-service-list-organization-metadata.api.mdx) instead.
+    // Deprecated: use [organization service v2 ListOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-list-organization-metadata.api.mdx) instead.
     //
     // Get a metadata object from an organization by a specific key.
     rpc GetOrgMetadata(GetOrgMetadataRequest) returns (GetOrgMetadataResponse) {
@@ -2513,7 +2513,7 @@ service ManagementService {
 
     // Delete Organization Metadata By Key
     //
-    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](apis/resources/org_service_v2beta/organization-service-delete-organization-metadata.api.mdx) instead.
+    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization-metadata.api.mdx) instead.
     //
     // Remove a metadata object from an organization with a specific key.
     rpc RemoveOrgMetadata(RemoveOrgMetadataRequest) returns (RemoveOrgMetadataResponse) {
@@ -2542,7 +2542,7 @@ service ManagementService {
 
     // Bulk Delete Metadata
     //
-    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](apis/resources/org_service_v2beta/organization-service-delete-organization-metadata.api.mdx) instead.
+    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization-metadata.api.mdx) instead.
     //
     // Remove a list of metadata objects from an organization with a list of keys.
     rpc BulkRemoveOrgMetadata(BulkRemoveOrgMetadataRequest) returns (BulkRemoveOrgMetadataResponse) {
@@ -2572,7 +2572,7 @@ service ManagementService {
 
     // Add Domain
     //
-    // Deprecated: use [organization service v2 AddOrganizationDomain](apis/resources/org_service_v2beta/organization-service-add-organization-domain.api.mdx) instead.
+    // Deprecated: use [organization service v2 AddOrganizationDomain](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-add-organization-domain.api.mdx) instead.
     //
     // Add a new domain to an organization. The domains are used to identify to which organization a user belongs.
     rpc AddOrgDomain(AddOrgDomainRequest) returns (AddOrgDomainResponse) {
@@ -2601,7 +2601,7 @@ service ManagementService {
 
     // Search Domains
     //
-    // Deprecated: use [organization service v2 ListOrganizationDomains](apis/resources/org_service_v2beta/organization-service-list-organization-domains.api.mdx) instead.
+    // Deprecated: use [organization service v2 ListOrganizationDomains](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-list-organization-domains.api.mdx) instead.
     //
     // Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs.
     rpc ListOrgDomains(ListOrgDomainsRequest) returns (ListOrgDomainsResponse) {
@@ -2630,7 +2630,7 @@ service ManagementService {
 
     // Remove Domain
     //
-    // Deprecated: use [organization service v2 DeleteOrganizationDomain](apis/resources/org_service_v2beta/organization-service-delete-organization-domain.api.mdx) instead.
+    // Deprecated: use [organization service v2 DeleteOrganizationDomain](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization-domain.api.mdx) instead.
     //
     // Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead.
     rpc RemoveOrgDomain(RemoveOrgDomainRequest) returns (RemoveOrgDomainResponse) {
@@ -2658,7 +2658,7 @@ service ManagementService {
 
     // Generate Domain Verification
     //
-    // Deprecated: use [organization service v2 GenerateOrganizationDomainValidation](apis/resources/org_service_v2beta/organization-service-generate-organization-domain-validation.api.mdx) instead.
+    // Deprecated: use [organization service v2 GenerateOrganizationDomainValidation](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-generate-organization-domain-validation.api.mdx) instead.
     //
     // Generate a new file to be able to verify your domain with DNS or HTTP challenge.
     rpc GenerateOrgDomainValidation(GenerateOrgDomainValidationRequest) returns (GenerateOrgDomainValidationResponse) {
@@ -2687,7 +2687,7 @@ service ManagementService {
 
     // Verify Domain
     //
-    // Deprecated: use [organization service v2 VerifyOrganizationDomain](apis/resources/org_service_v2beta/organization-service-verify-organization-domain.api.mdx) instead.
+    // Deprecated: use [organization service v2 VerifyOrganizationDomain](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-verify-organization-domain.api.mdx) instead.
     //
     // Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique.
     rpc ValidateOrgDomain(ValidateOrgDomainRequest) returns (ValidateOrgDomainResponse) {
