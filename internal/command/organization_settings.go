@@ -17,7 +17,7 @@ type SetOrganizationSettings struct {
 
 func (e *SetOrganizationSettings) IsValid() error {
 	if e.OrganizationID == "" {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-TODO", "Errors.Org.Settings.Invalid")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-zI4z7cLLRJ", "Errors.Org.Settings.Invalid")
 	}
 	return nil
 }
@@ -31,7 +31,7 @@ func (c *Commands) SetOrganizationSettings(ctx context.Context, set *SetOrganiza
 		return nil, err
 	}
 	if !wm.OrganizationState.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-TODO", "Errors.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-oDzwP5kmdP", "Errors.NotFound")
 	}
 
 	domainPolicy, err := c.domainPolicyWriteModel(ctx, wm.AggregateID)
@@ -53,7 +53,7 @@ func (c *Commands) SetOrganizationSettings(ctx context.Context, set *SetOrganiza
 
 func (c *Commands) DeleteOrganizationSettings(ctx context.Context, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-TODO", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-eU5hkMy3Pf", "Errors.IDMissing")
 	}
 	wm, err := c.getOrganizationSettingsWriteModelByID(ctx, id)
 	if err != nil {
@@ -79,8 +79,8 @@ func (c *Commands) DeleteOrganizationSettings(ctx context.Context, id string) (*
 	return c.pushAppendAndReduceDetails(ctx, wm, events...)
 }
 
-func checkOrganizationScopedUsernames(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (_ bool, err error) {
-	wm := NewOrganizationSettingsWriteModel(id, nil)
+func checkOrganizationScopedUsernames(ctx context.Context, filter preparation.FilterToQueryReducer, id string, checkPermission domain.PermissionCheck) (_ bool, err error) {
+	wm := NewOrganizationSettingsWriteModel(id, checkPermission)
 	events, err := filter(ctx, wm.Query())
 	if err != nil {
 		return false, err
@@ -115,10 +115,7 @@ func (c *Commands) checkOrganizationScopedUsernames(ctx context.Context, orgID s
 		return false, err
 	}
 
-	if wm.State.Exists() && wm.OrganizationScopedUsernames {
-		return true, nil
-	}
-	return false, nil
+	return wm.State.Exists() && wm.OrganizationScopedUsernames, nil
 }
 
 func (c *Commands) getOrganizationScopedUsernamesWriteModelByID(ctx context.Context, id string) (*OrganizationScopedUsernamesWriteModel, error) {

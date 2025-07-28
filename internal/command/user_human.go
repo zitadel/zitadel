@@ -199,7 +199,7 @@ func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto
 				return nil, err
 			}
 
-			organizationScopedUsername, err := checkOrganizationScopedUsernames(ctx, filter, a.ResourceOwner)
+			organizationScopedUsername, err := checkOrganizationScopedUsernames(ctx, filter, a.ResourceOwner, nil)
 			if err != nil {
 				return nil, err
 			}

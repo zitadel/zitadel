@@ -125,7 +125,7 @@ func prepareAddOrgDomainPolicy(
 				return cmds, nil
 			}
 
-			organizationScopedUsernames, err := checkOrganizationScopedUsernames(ctx, filter, a.ID)
+			organizationScopedUsernames, err := checkOrganizationScopedUsernames(ctx, filter, a.ID, nil)
 			if err != nil {
 				return nil, err
 			}
@@ -174,7 +174,7 @@ func prepareChangeOrgDomainPolicy(
 				return cmds, err
 			}
 
-			organizationScopedUsernames, err := checkOrganizationScopedUsernames(ctx, filter, a.ID)
+			organizationScopedUsernames, err := checkOrganizationScopedUsernames(ctx, filter, a.ID, nil)
 			if err != nil {
 				return nil, err
 			}
@@ -214,7 +214,7 @@ func prepareRemoveOrgDomainPolicy(
 				policyChange,
 			}
 
-			organizationScopedUsernames, err := checkOrganizationScopedUsernames(ctx, filter, a.ID)
+			organizationScopedUsernames, err := checkOrganizationScopedUsernames(ctx, filter, a.ID, nil)
 			if err != nil {
 				return nil, err
 			}

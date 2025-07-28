@@ -517,7 +517,7 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 				return nil, err
 			}
 
-			organizationScopedUsername, err := checkOrganizationScopedUsernames(ctx, filter, a.ID)
+			organizationScopedUsername, err := checkOrganizationScopedUsernames(ctx, filter, a.ID, nil)
 			if err != nil {
 				return nil, err
 			}

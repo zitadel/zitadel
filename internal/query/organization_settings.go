@@ -124,7 +124,7 @@ func (q *Queries) searchOrganizationSettings(ctx context.Context, queries *Organ
 	eq := sq.Eq{OrganizationSettingsColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-TODO", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-qNPeOXlMwj", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -183,7 +183,7 @@ func prepareOrganizationSettingsListQuery() (sq.SelectBuilder, func(*sql.Rows) (
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, zerrors.ThrowInternal(err, "QUERY-TODO", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-mmC1K0t5Fq", "Errors.Query.CloseRows")
 			}
 
 			return &OrganizationSettingsList{

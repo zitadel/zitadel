@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	settings "github.com/zitadel/zitadel/internal/repository/organization_settings"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OrganizationSettingsWriteModel struct {
@@ -30,6 +31,9 @@ func (wm *OrganizationSettingsWriteModel) checkPermissionWrite(
 	resourceOwner string,
 	aggregateID string,
 ) error {
+	if wm.checkPermission == nil {
+		return zerrors.ThrowPermissionDenied(nil, "COMMAND-8Dttuyj0B4", "Permission check not defined")
+	}
 	return wm.checkPermission(ctx, domain.PermissionIAMPolicyWrite, resourceOwner, aggregateID)
 }
 
@@ -38,6 +42,9 @@ func (wm *OrganizationSettingsWriteModel) checkPermissionDelete(
 	resourceOwner string,
 	aggregateID string,
 ) error {
+	if wm.checkPermission == nil {
+		return zerrors.ThrowPermissionDenied(nil, "COMMAND-6R54f4vWqv", "Permission check not defined")
+	}
 	return wm.checkPermission(ctx, domain.PermissionIAMPolicyDelete, resourceOwner, aggregateID)
 }
 

@@ -130,7 +130,7 @@ func prepareChangeDefaultDomainPolicy(
 			// loop over all found organisations to get their usernames
 			// and to compute the username changed events
 			for _, orgID := range orgsWriteModel.OrgIDs {
-				organizationScopedUsernames, err := checkOrganizationScopedUsernames(ctx, filter, a.ID)
+				organizationScopedUsernames, err := checkOrganizationScopedUsernames(ctx, filter, a.ID, nil)
 				if err != nil {
 					return nil, err
 				}

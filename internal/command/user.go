@@ -45,7 +45,7 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 	}
 	orgScopedUsernames, err := c.checkOrganizationScopedUsernames(ctx, orgID)
 	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-TODO", "Errors.Org.DomainPolicy.NotExisting")
+		return nil, err
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
@@ -311,7 +311,7 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 		return nil, err
 	}
 
-	organizationScopedUsername, err := checkOrganizationScopedUsernames(ctx, filter, userWriteModel.ResourceOwner)
+	organizationScopedUsername, err := checkOrganizationScopedUsernames(ctx, filter, userWriteModel.ResourceOwner, nil)
 	if err != nil {
 		return nil, err
 	}
