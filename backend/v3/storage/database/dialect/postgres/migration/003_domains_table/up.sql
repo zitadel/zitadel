@@ -3,20 +3,28 @@ CREATE TYPE zitadel.domain_validation_type AS ENUM (
     , 'dns'
 );
 
+CREATE TYPE zitadel.domain_type AS ENUM (
+    'custom'
+    , 'trusted'
+);
+
 CREATE TABLE zitadel.instance_domains(
   instance_id TEXT NOT NULL
   , domain TEXT NOT NULL CHECK (LENGTH(domain) BETWEEN 1 AND 255)
-  , is_verified BOOLEAN NOT NULL DEFAULT FALSE
-  , is_primary BOOLEAN NOT NULL DEFAULT FALSE
-  , is_generated BOOLEAN NOT NULL DEFAULT FALSE
-  , validation_type zitadel.domain_validation_type
+  , is_primary BOOLEAN
+  , is_generated BOOLEAN
+  , type zitadel.domain_type NOT NULL
 
-  , created_at TIMESTAMP DEFAULT NOW()
-  , updated_at TIMESTAMP DEFAULT NOW()
+  , created_at TIMESTAMPTZ DEFAULT NOW()
+  , updated_at TIMESTAMPTZ DEFAULT NOW()
 
   , PRIMARY KEY (domain)
 
   , FOREIGN KEY (instance_id) REFERENCES zitadel.instances(id) ON DELETE CASCADE
+
+  , CONSTRAINT primary_cannot_be_trusted CHECK (is_primary IS NULL OR type != 'trusted')
+  , CONSTRAINT generated_cannot_be_trusted CHECK (is_generated IS NULL OR type != 'trusted')
+  , CONSTRAINT custom_values_set CHECK (type = 'custom' AND is_primary IS NOT NULL AND is_generated IS NOT NULL)
 );
 
 CREATE INDEX idx_instance_domain_instance ON zitadel.instance_domains(instance_id);
@@ -29,8 +37,8 @@ CREATE TABLE zitadel.org_domains(
   , is_primary BOOLEAN NOT NULL DEFAULT FALSE
   , validation_type zitadel.domain_validation_type
 
-  , created_at TIMESTAMP DEFAULT NOW()
-  , updated_at TIMESTAMP DEFAULT NOW()
+  , created_at TIMESTAMPTZ DEFAULT NOW()
+  , updated_at TIMESTAMPTZ DEFAULT NOW()
 
   , PRIMARY KEY (instance_id, org_id, domain)
 
@@ -91,7 +99,8 @@ BEGIN
   SET is_primary = FALSE, updated_at = NOW()
   WHERE instance_id = NEW.instance_id 
     AND domain != NEW.domain 
-    AND is_primary = TRUE;
+    AND is_primary = TRUE
+    AND type = 'custom';
   
   RETURN NEW;
 END;

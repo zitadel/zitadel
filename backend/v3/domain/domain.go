@@ -13,6 +13,13 @@ const (
 	DomainValidationTypeHTTP DomainValidationType = "http"
 )
 
+type DomainType string
+
+const (
+	DomainTypeCustom  DomainType = "custom"
+	DomainTypeTrusted DomainType = "trusted"
+)
+
 type domainColumns interface {
 	// InstanceIDColumn returns the column for the instance id field.
 	// `qualified` indicates if the column should be qualified with the table name.
@@ -20,15 +27,9 @@ type domainColumns interface {
 	// DomainColumn returns the column for the domain field.
 	// `qualified` indicates if the column should be qualified with the table name.
 	DomainColumn(qualified bool) database.Column
-	// IsVerifiedColumn returns the column for the is verified field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	IsVerifiedColumn(qualified bool) database.Column
 	// IsPrimaryColumn returns the column for the is primary field.
 	// `qualified` indicates if the column should be qualified with the table name.
 	IsPrimaryColumn(qualified bool) database.Column
-	// ValidationTypeColumn returns the column for the verification type field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	ValidationTypeColumn(qualified bool) database.Column
 	// CreatedAtColumn returns the column for the created at field.
 	// `qualified` indicates if the column should be qualified with the table name.
 	CreatedAtColumn(qualified bool) database.Column
@@ -44,13 +45,9 @@ type domainConditions interface {
 	DomainCondition(op database.TextOperation, domain string) database.Condition
 	// IsPrimaryCondition returns a filter on the is primary field.
 	IsPrimaryCondition(isPrimary bool) database.Condition
-	// IsVerifiedCondition returns a filter on the is verified field.
-	IsVerifiedCondition(isVerified bool) database.Condition
 }
 
 type domainChanges interface {
-	// SetVerified sets the is verified column to true.
-	SetVerified() database.Change
 	// SetPrimary sets a domain as primary based on the condition.
 	// All other domains will be set to non-primary.
 	//
@@ -62,9 +59,6 @@ type domainChanges interface {
 	// - The domain is already primary.
 	// - No domain matches the condition.
 	SetPrimary() database.Change
-	// SetValidationType sets the verification type column.
-	// If the domain is already verified, this is a no-op.
-	SetValidationType(verificationType DomainValidationType) database.Change
 	// SetUpdatedAt sets the updated at column.
 	// This is used for reducing events.
 	SetUpdatedAt(t time.Time) database.Change

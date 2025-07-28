@@ -38,17 +38,31 @@ type AddOrganizationDomain struct {
 type organizationDomainColumns interface {
 	domainColumns
 	// OrgIDColumn returns the column for the org id field.
+	// `qualified` indicates if the column should be qualified with the table name.
 	OrgIDColumn(qualified bool) database.Column
+	// IsVerifiedColumn returns the column for the is verified field.
+	// `qualified` indicates if the column should be qualified with the table name.
+	IsVerifiedColumn(qualified bool) database.Column
+	// ValidationTypeColumn returns the column for the verification type field.
+	// `qualified` indicates if the column should be qualified with the table name.
+	ValidationTypeColumn(qualified bool) database.Column
 }
 
 type organizationDomainConditions interface {
 	domainConditions
 	// OrgIDCondition returns a filter on the org id field.
 	OrgIDCondition(orgID string) database.Condition
+	// IsVerifiedCondition returns a filter on the is verified field.
+	IsVerifiedCondition(isVerified bool) database.Condition
 }
 
 type organizationDomainChanges interface {
 	domainChanges
+	// SetVerified sets the is verified column to true.
+	SetVerified() database.Change
+	// SetValidationType sets the verification type column.
+	// If the domain is already verified, this is a no-op.
+	SetValidationType(verificationType DomainValidationType) database.Change
 }
 
 type OrganizationDomainRepository interface {

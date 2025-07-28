@@ -9,6 +9,7 @@ Database:
       SSL:
         Mode: disable
     Admin:
-      Username: zitadel
+      Username: adlerhurst
+      Password: password
       SSL:
         Mode: disable

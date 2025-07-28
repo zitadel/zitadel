@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	old_domain "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -31,22 +32,30 @@ func (p *orgDomainRelationalProjection) Reducers() []handler.AggregateReducer {
 			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgDomainAddedEventType,
-					Reduce: p.reduceDomainAdded,
+					Reduce: p.reduceAdded,
 				},
 				{
 					Event:  org.OrgDomainPrimarySetEventType,
-					Reduce: p.reduceDomainPrimarySet,
+					Reduce: p.reducePrimarySet,
 				},
 				{
 					Event:  org.OrgDomainRemovedEventType,
-					Reduce: p.reduceDomainRemoved,
+					Reduce: p.reduceRemoved,
+				},
+				{
+					Event:  org.OrgDomainVerificationAddedEventType,
+					Reduce: p.reduceVerificationAdded,
+				},
+				{
+					Event:  org.OrgDomainVerifiedEventType,
+					Reduce: p.reduceVerified,
 				},
 			},
 		},
 	}
 }
 
-func (p *orgDomainRelationalProjection) reduceDomainAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgDomainRelationalProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ZX9Fw", "reduce.wrong.event.type %s", org.OrgDomainAddedEventType)
@@ -66,7 +75,7 @@ func (p *orgDomainRelationalProjection) reduceDomainAdded(event eventstore.Event
 	}), nil
 }
 
-func (p *orgDomainRelationalProjection) reduceDomainPrimarySet(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgDomainRelationalProjection) reducePrimarySet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPrimarySetEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-dmFdb", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
@@ -90,7 +99,7 @@ func (p *orgDomainRelationalProjection) reduceDomainPrimarySet(event eventstore.
 	}), nil
 }
 
-func (p *orgDomainRelationalProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *orgDomainRelationalProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-MzC0n", "reduce.wrong.event.type %s", org.OrgDomainRemovedEventType)
@@ -107,6 +116,61 @@ func (p *orgDomainRelationalProjection) reduceDomainRemoved(event eventstore.Eve
 				domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),
 				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
 			),
+		)
+		return err
+	}), nil
+}
+
+func (p *orgDomainRelationalProjection) reduceVerificationAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.DomainVerificationAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-oGzip", "reduce.wrong.event.type %s", org.OrgDomainVerificationAddedEventType)
+	}
+	var validationType domain.DomainValidationType
+	switch e.ValidationType {
+	case old_domain.OrgDomainValidationTypeDNS:
+		validationType = domain.DomainValidationTypeDNS
+	case old_domain.OrgDomainValidationTypeHTTP:
+		validationType = domain.DomainValidationTypeHTTP
+	case old_domain.OrgDomainValidationTypeUnspecified:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-FJfKB", "reduce.unsupported.validation.type %v", e.ValidationType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-yF03i", "reduce.wrong.db.pool %T", ex)
+		}
+		domainRepo := repository.OrganizationRepository(v3_sql.SQLTx(tx)).Domains(false)
+		_, err := domainRepo.Update(ctx,
+			database.And(
+				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
+				domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),
+				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
+			),
+			domainRepo.SetValidationType(validationType),
+		)
+		return err
+	}), nil
+}
+
+func (p *orgDomainRelationalProjection) reduceVerified(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.DomainVerifiedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-7WrI2", "reduce.wrong.event.type %s", org.OrgDomainVerifiedEventType)
+	}
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-0ZGqC", "reduce.wrong.db.pool %T", ex)
+		}
+		domainRepo := repository.OrganizationRepository(v3_sql.SQLTx(tx)).Domains(false)
+		_, err := domainRepo.Update(ctx,
+			database.And(
+				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
+				domainRepo.OrgIDCondition(e.Aggregate().ResourceOwner),
+				domainRepo.DomainCondition(database.TextOperationEqual, e.Domain),
+			),
+			domainRepo.SetVerified(),
 		)
 		return err
 	}), nil

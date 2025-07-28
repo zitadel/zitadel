@@ -30,7 +30,7 @@ func InstanceRepository(client database.QueryExecutor) domain.InstanceRepository
 
 const (
 	queryInstanceStmt = `SELECT instances.id, instances.name, instances.default_org_id, instances.iam_project_id, instances.console_client_id, instances.console_app_id, instances.default_language, instances.created_at, instances.updated_at` +
-		` , CASE WHEN count(instance_domains.domain) > 0 THEN jsonb_agg(json_build_object('domain', instance_domains.domain, 'isVerified', instance_domains.is_verified, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'validationType', instance_domains.validation_type, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at)) ELSE NULL::JSONB END domains` +
+		` , CASE WHEN count(instance_domains.domain) > 0 THEN jsonb_agg(json_build_object('domain', instance_domains.domain, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at)) ELSE NULL::JSONB END domains` +
 		` FROM zitadel.instances`
 )
 

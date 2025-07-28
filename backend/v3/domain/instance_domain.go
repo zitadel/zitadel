@@ -8,30 +8,28 @@ import (
 )
 
 type InstanceDomain struct {
-	InstanceID     string                `json:"instanceId,omitempty" db:"instance_id"`
-	Domain         string                `json:"domain,omitempty" db:"domain"`
-	IsVerified     bool                  `json:"isVerified,omitempty" db:"is_verified"`
-	IsPrimary      bool                  `json:"isPrimary,omitempty" db:"is_primary"`
-	ValidationType *DomainValidationType `json:"validationType,omitempty" db:"validation_type"`
+	InstanceID string     `json:"instanceId,omitempty" db:"instance_id"`
+	Domain     string     `json:"domain,omitempty" db:"domain"`
+	IsPrimary  bool       `json:"isPrimary,omitempty" db:"is_primary"`
+	Type       DomainType `json:"type,omitempty" db:"type"`
 
 	CreatedAt time.Time `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
 type AddInstanceDomain struct {
-	InstanceID     string                `json:"instanceId,omitempty" db:"instance_id"`
-	Domain         string                `json:"domain,omitempty" db:"domain"`
-	IsVerified     bool                  `json:"isVerified,omitempty" db:"is_verified"`
-	IsPrimary      bool                  `json:"isPrimary,omitempty" db:"is_primary"`
-	IsGenerated    bool                  `json:"isGenerated,omitempty" db:"is_generated"`
-	ValidationType *DomainValidationType `json:"validationType,omitempty" db:"validation_type"`
+	InstanceID  string     `json:"instanceId,omitempty" db:"instance_id"`
+	Domain      string     `json:"domain,omitempty" db:"domain"`
+	IsPrimary   bool       `json:"isPrimary,omitempty" db:"is_primary"`
+	IsGenerated bool       `json:"isGenerated,omitempty" db:"is_generated"`
+	Type        DomainType `json:"type,omitempty" db:"type"`
 
 	// CreatedAt is the time when the domain was added.
 	// It is set by the repository and should not be set by the caller.
-	CreatedAt time.Time `json:"createdAt,omitzero" db:"created_at"`
+	CreatedAt *time.Time `json:"createdAt,omitzero" db:"created_at"`
 	// UpdatedAt is the time when the domain was last updated.
 	// It is set by the repository and should not be set by the caller.
-	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"updated_at"`
+	UpdatedAt *time.Time `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
 type instanceDomainColumns interface {
@@ -39,14 +37,21 @@ type instanceDomainColumns interface {
 	// IsGeneratedColumn returns the column for the is generated field.
 	// `qualified` indicates if the column should be qualified with the table name.
 	IsGeneratedColumn(qualified bool) database.Column
+	// TypeColumn returns the column for the type field.
+	// `qualified` indicates if the column should be qualified with the table name.
+	TypeColumn(qualified bool) database.Column
 }
 
 type instanceDomainConditions interface {
 	domainConditions
+	// TypeCondition returns a filter for the type field.
+	TypeCondition(typ DomainType) database.Condition
 }
 
 type instanceDomainChanges interface {
 	domainChanges
+	// SetType sets the type column.
+	SetType(typ DomainType) database.Change
 }
 
 type InstanceDomainRepository interface {

@@ -17,6 +17,8 @@ import (
 )
 
 func TestServer_TestInstanceReduces(t *testing.T) {
+	instanceRepo := repository.InstanceRepository(pool)
+
 	t.Run("test instance add reduces", func(t *testing.T) {
 		instanceName := gofakeit.Name()
 		beforeCreate := time.Now()
@@ -33,8 +35,15 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		afterCreate := time.Now()
 
 		require.NoError(t, err)
+		t.Cleanup(func() {
+			_, err = SystemClient.RemoveInstance(CTX, &system.RemoveInstanceRequest{
+				InstanceId: instance.GetInstanceId(),
+			})
+			if err != nil {
+				t.Logf("Failed to delete instance on cleanup: %v", err)
+			}
+		})
 
-		instanceRepo := repository.InstanceRepository(pool)
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
@@ -71,6 +80,14 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
+		t.Cleanup(func() {
+			_, err = SystemClient.RemoveInstance(CTX, &system.RemoveInstanceRequest{
+				InstanceId: res.GetInstanceId(),
+			})
+			if err != nil {
+				t.Logf("Failed to delete instance on cleanup: %v", err)
+			}
+		})
 
 		instanceName += "new"
 		beforeUpdate := time.Now()
@@ -78,10 +95,9 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			InstanceId:   res.InstanceId,
 			InstanceName: instanceName,
 		})
-		require.NoError(t, err)
 		afterUpdate := time.Now()
+		require.NoError(t, err)
 
-		instanceRepo := repository.InstanceRepository(pool)
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
@@ -107,8 +123,6 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-
-		instanceRepo := repository.InstanceRepository(pool)
 
 		// check instance exists
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
