@@ -21,5 +21,5 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trigger_set_updated_at
 BEFORE UPDATE ON zitadel.instances
 FOR EACH ROW
-WHEN (OLD.updated_at IS NOT DISTINCT FROM NEW.updated_at)
+WHEN (NEW.updated_at IS NULL)
 EXECUTE FUNCTION zitadel.set_updated_at();

@@ -43,6 +43,7 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 		assert.NoError(ttt, err)
 	}, retryDuration, tick)
 
+	// The API call also sets the domain as primary, so we don't do a separate test for that.
 	t.Run("test organization domain add reduces", func(t *testing.T) {
 		// Add a domain to the organization
 		domainName := gofakeit.DomainName()
