@@ -33,7 +33,6 @@ func (c *pgxConn) Begin(ctx context.Context, opts *database.TransactionOptions) 
 // Query implements sql.Client.
 // Subtle: this method shadows the method (*Conn).Query of pgxConn.Conn.
 func (c *pgxConn) Query(ctx context.Context, sql string, args ...any) (database.Rows, error) {
-
 	rows, err := c.Conn.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, wrapError(err)
