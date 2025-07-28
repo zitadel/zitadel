@@ -441,7 +441,9 @@ service UserService {
     };
   }
 
-  // Resend code to verify user phone
+  // Resend code to verify user phone number
+  //
+  // Resend code to verify user phone number.
   rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone/resend"
@@ -470,9 +472,9 @@ service UserService {
     };
   }
 
-  // Verify the phone
+  // Verify the phone number
   //
-  // Verify the phone with the generated code..
+  // Verify the phone number with the generated code.
   rpc VerifyPhone (VerifyPhoneRequest) returns (VerifyPhoneResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone/verify"
