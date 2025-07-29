@@ -1,4 +1,12 @@
-package orgv2
+package org
+
+import (
+	"context"
+
+	"connectrpc.com/connect"
+
+	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+)
 
 // import (
 // 	"context"
@@ -31,3 +39,33 @@ package orgv2
 // 	}
 // 	return cmds
 // }
+
+// ActivateOrganization implements [orgconnect.OrganizationServiceHandler].
+func (s *Server) ActivateOrganization(ctx context.Context, req *connect.Request[org.ActivateOrganizationRequest]) (*connect.Response[org.ActivateOrganizationResponse], error) {
+	return s.UnimplementedOrganizationServiceHandler.ActivateOrganization(ctx, req)
+}
+
+// CreateOrganization implements [orgconnect.OrganizationServiceHandler].
+func (s *Server) CreateOrganization(ctx context.Context, req *connect.Request[org.CreateOrganizationRequest]) (*connect.Response[org.CreateOrganizationResponse], error) {
+	return s.UnimplementedOrganizationServiceHandler.CreateOrganization(ctx, req)
+}
+
+// DeactivateOrganization implements [orgconnect.OrganizationServiceHandler].
+func (s *Server) DeactivateOrganization(ctx context.Context, req *connect.Request[org.DeactivateOrganizationRequest]) (*connect.Response[org.DeactivateOrganizationResponse], error) {
+	return s.UnimplementedOrganizationServiceHandler.DeactivateOrganization(ctx, req)
+}
+
+// DeleteOrganization implements [orgconnect.OrganizationServiceHandler].
+func (s *Server) DeleteOrganization(ctx context.Context, req *connect.Request[org.DeleteOrganizationRequest]) (*connect.Response[org.DeleteOrganizationResponse], error) {
+	return s.UnimplementedOrganizationServiceHandler.DeleteOrganization(ctx, req)
+}
+
+// ListOrganizations implements [orgconnect.OrganizationServiceHandler].
+func (s *Server) ListOrganizations(ctx context.Context, req *connect.Request[org.ListOrganizationsRequest]) (*connect.Response[org.ListOrganizationsResponse], error) {
+	return s.UnimplementedOrganizationServiceHandler.ListOrganizations(ctx, req)
+}
+
+// UpdateOrganization implements [orgconnect.OrganizationServiceHandler].
+func (s *Server) UpdateOrganization(ctx context.Context, req *connect.Request[org.UpdateOrganizationRequest]) (*connect.Response[org.UpdateOrganizationResponse], error) {
+	return s.UnimplementedOrganizationServiceHandler.UpdateOrganization(ctx, req)
+}
