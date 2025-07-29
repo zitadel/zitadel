@@ -185,7 +185,7 @@ func (q *Queries) searchAdministrators(ctx context.Context, queries *MembershipS
 	eq := sq.Eq{membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-TODO", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-xhEnpLFNpJ", "Errors.Query.InvalidRequest")
 	}
 	latestState, err := q.latestState(ctx, orgMemberTable, instanceMemberTable, projectMemberTable, projectGrantMemberTable)
 	if err != nil {
@@ -335,7 +335,7 @@ func prepareAdministratorsQuery(ctx context.Context, queries *MembershipSearchQu
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, zerrors.ThrowInternal(err, "QUERY-TODO", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-ajYcn0eK7f", "Errors.Query.CloseRows")
 			}
 
 			return &Administrators{
