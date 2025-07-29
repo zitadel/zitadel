@@ -30,9 +30,9 @@ COPY proto ./proto
 RUN pnpm turbo build:login:standalone
 
 FROM scratch AS build-out
-COPY --from=builder /build/apps/login/.next/standalone /
-COPY --from=builder /build/apps/login/.next/static /apps/login/.next/static
-COPY --from=builder /build/apps/login/public /apps/login/public
+COPY --from=builder /build/apps/login/.next/standalone ./
+COPY --from=builder /build/apps/login/.next/static ./.next/static
+COPY --from=builder /build/apps/login/public ./public
 
 FROM runtime AS login-standalone
 WORKDIR /runtime
@@ -41,7 +41,7 @@ RUN addgroup --system --gid 1001 nodejs && \
 # If /.env-file/.env is mounted into the container, its variables are made available to the server before it starts up.
 RUN mkdir -p /.env-file && touch /.env-file/.env && chown -R nextjs:nodejs /.env-file
 COPY --chown=nextjs:nodejs apps/login/scripts ./
-COPY --chown=nextjs:nodejs --from=build-out / ./
+COPY --chown=nextjs:nodejs --from=build-out . .
 # Debug the final structure
 USER nextjs
 ENV HOSTNAME="0.0.0.0"

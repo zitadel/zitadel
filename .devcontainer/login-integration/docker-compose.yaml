@@ -6,6 +6,9 @@ services:
 
   login-integration:
     container_name: login-integration
+    build:
+      context: ../..
+      dockerfile: build/login/Dockerfile
     image: "${LOGIN_TAG:-zitadel-login:local}"
     env_file: ../../apps/login/.env.test
     network_mode: service:mock-zitadel
