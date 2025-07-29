@@ -605,7 +605,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 						{Key: "added", Value: "value"},
 					},
 				}
-				return expectPreUserinfoExecution(ctx, t, instance, req, response)
+				return expectPreUserinfoExecution(ctx, t, instance, client.GetClientId(), req, response)
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -630,7 +630,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 						"addedLog",
 					},
 				}
-				return expectPreUserinfoExecution(ctx, t, instance, req, response)
+				return expectPreUserinfoExecution(ctx, t, instance, client.GetClientId(), req, response)
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -655,7 +655,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 						{Key: "key", Value: []byte("value")},
 					},
 				}
-				return expectPreUserinfoExecution(ctx, t, instance, req, response)
+				return expectPreUserinfoExecution(ctx, t, instance, client.GetClientId(), req, response)
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -692,7 +692,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 						{Key: "added3", Value: "value3"},
 					},
 				}
-				return expectPreUserinfoExecution(ctx, t, instance, req, response)
+				return expectPreUserinfoExecution(ctx, t, instance, client.GetClientId(), req, response)
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -755,7 +755,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 	}
 }
 
-func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *integration.Instance, req *oidc_pb.CreateCallbackRequest, response *oidc_api.ContextInfoResponse) (string, func()) {
+func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *integration.Instance, clientID string, req *oidc_pb.CreateCallbackRequest, response *oidc_api.ContextInfoResponse) (string, func()) {
 	userEmail := gofakeit.Email()
 	userPhone := "+41" + gofakeit.Phone()
 	userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
@@ -767,7 +767,7 @@ func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *int
 			SessionToken: sessionResp.GetSessionToken(),
 		},
 	}
-	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preuserinfo", userResp, userEmail, userPhone)
+	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preuserinfo", clientID, userResp, userEmail, userPhone)
 
 	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
@@ -845,7 +845,7 @@ func getAccessTokenClaims(ctx context.Context, t *testing.T, instance *integrati
 	return claims
 }
 
-func contextInfoForUserOIDC(instance *integration.Instance, function string, userResp *user.AddHumanUserResponse, email, phone string) *oidc_api.ContextInfo {
+func contextInfoForUserOIDC(instance *integration.Instance, function string, clientID string, userResp *user.AddHumanUserResponse, email, phone string) *oidc_api.ContextInfo {
 	return &oidc_api.ContextInfo{
 		Function: function,
 		UserInfo: &oidc.UserInfo{
@@ -878,6 +878,9 @@ func contextInfoForUserOIDC(instance *integration.Instance, function string, use
 			},
 		},
 		UserMetadata: nil,
+		Application: &oidc_api.ContextInfoApplication{
+			ClientID: clientID,
+		},
 		Org: &query.UserInfoOrg{
 			ID:            instance.DefaultOrg.GetId(),
 			Name:          instance.DefaultOrg.GetName(),
@@ -918,7 +921,7 @@ func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
 						{Key: "added1", Value: "value"},
 					},
 				}
-				return expectPreAccessTokenExecution(ctx, t, instance, req, response)
+				return expectPreAccessTokenExecution(ctx, t, instance, client.GetClientId(), req, response)
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -943,7 +946,7 @@ func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
 						"addedLog",
 					},
 				}
-				return expectPreAccessTokenExecution(ctx, t, instance, req, response)
+				return expectPreAccessTokenExecution(ctx, t, instance, client.GetClientId(), req, response)
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -968,7 +971,7 @@ func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
 						{Key: "key", Value: []byte("value")},
 					},
 				}
-				return expectPreAccessTokenExecution(ctx, t, instance, req, response)
+				return expectPreAccessTokenExecution(ctx, t, instance, client.GetClientId(), req, response)
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -1005,7 +1008,7 @@ func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
 						{Key: "added3", Value: "value3"},
 					},
 				}
-				return expectPreAccessTokenExecution(ctx, t, instance, req, response)
+				return expectPreAccessTokenExecution(ctx, t, instance, client.GetClientId(), req, response)
 			},
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
@@ -1060,7 +1063,7 @@ func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
 	}
 }
 
-func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *integration.Instance, req *oidc_pb.CreateCallbackRequest, response *oidc_api.ContextInfoResponse) (string, func()) {
+func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *integration.Instance, clientID string, req *oidc_pb.CreateCallbackRequest, response *oidc_api.ContextInfoResponse) (string, func()) {
 	userEmail := gofakeit.Email()
 	userPhone := "+41" + gofakeit.Phone()
 	userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
@@ -1072,7 +1075,7 @@ func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *
 			SessionToken: sessionResp.GetSessionToken(),
 		},
 	}
-	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preaccesstoken", userResp, userEmail, userPhone)
+	expectedContextInfo := contextInfoForUserOIDC(instance, "function/preaccesstoken", clientID, userResp, userEmail, userPhone)
 
 	targetURL, closeF, _, _ := integration.TestServerCall(expectedContextInfo, 0, http.StatusOK, response)
 
