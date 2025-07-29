@@ -53,6 +53,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli@0.80.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Lint and Unit Test All JavaScript Code

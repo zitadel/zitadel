@@ -25,3 +25,8 @@ jobs:
         run: npm run devcontainer:integration:login
         env:
           LOGIN_TAG: ${{ inputs.login_build_image }}
+          DOCKER_BUILDKIT: 1
+          BUILDKIT_PROGRESS: plain
+          # Add verbose logging
+          COMPOSE_LOG_LEVEL: DEBUG
+          DEVCONTAINER_LOG_LEVEL: trace
