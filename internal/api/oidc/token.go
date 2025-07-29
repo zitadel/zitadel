@@ -31,7 +31,7 @@ for example the v2 code exchange and refresh token.
 */
 
 func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.Client, session *command.OIDCSession, state, projectID string, projectRoleAssertion, accessTokenRoleAssertion, idTokenRoleAssertion, userInfoAssertion bool) (_ *oidc.AccessTokenResponse, err error) {
-	getUserInfo := s.getUserInfo(session.UserID, projectID, projectRoleAssertion, userInfoAssertion, session.Scope)
+	getUserInfo := s.getUserInfo(session.UserID, projectID, client.GetID(), projectRoleAssertion, userInfoAssertion, session.Scope)
 	getSigner := s.getSignerOnce()
 
 	resp := &oidc.AccessTokenResponse{
@@ -113,8 +113,8 @@ type userInfoFunc func(ctx context.Context, roleAssertion bool, triggerType doma
 
 // getUserInfo returns a function which retrieves userinfo from the database once.
 // However, each time, role claims are asserted and also action flows will trigger.
-func (s *Server) getUserInfo(userID, projectID string, projectRoleAssertion, userInfoAssertion bool, scope []string) userInfoFunc {
-	userInfo := s.userInfo(userID, scope, projectID, projectRoleAssertion, userInfoAssertion, false)
+func (s *Server) getUserInfo(userID, projectID, clientID string, projectRoleAssertion, userInfoAssertion bool, scope []string) userInfoFunc {
+	userInfo := s.userInfo(userID, scope, projectID, clientID, projectRoleAssertion, userInfoAssertion, false)
 	return func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (*oidc.UserInfo, error) {
 		return userInfo(ctx, roleAssertion, triggerType)
 	}

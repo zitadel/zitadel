@@ -39,7 +39,7 @@ export class ActionsTwoTargetsComponent {
       switchMap(() => {
         return this.actionService.listTargets({});
       }),
-      map(({ result }) => result),
+      map(({ targets }) => targets),
       catchError((err) => {
         this.toast.showError(err);
         return of([]);

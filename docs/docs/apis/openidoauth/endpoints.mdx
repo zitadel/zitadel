@@ -656,12 +656,14 @@ The endpoint has to be opened in the user agent (browser) to terminate the user 
 
 No parameters are needed apart from the user agent cookie, but you can provide the following to customize the behavior:
 
-| Parameter                | Description                                                                                                                      |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| id_token_hint            | the id_token that was previously issued to the client                                                                            |
-| client_id                | client_id of the application                                                                                                     |
-| post_logout_redirect_uri | Callback uri of the logout where the user (agent) will be redirected to. Must match exactly one of the preregistered in Console. |
-| state                    | Opaque value used to maintain state between the request and the callback                                                         |
+| Parameter                | Description                                                                                                                                                                                                                            |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| id_token_hint            | the id_token that was previously issued to the client                                                                                                                                                                                  |
+| client_id                | client_id of the application                                                                                                                                                                                                           |
+| post_logout_redirect_uri | Callback uri of the logout where the user (agent) will be redirected to. Must match exactly one of the preregistered in Console.                                                                                                       |
+| state                    | Opaque value used to maintain state between the request and the callback                                                                                                                                                               |
+| logout_hint              | A valid login name of a user. Will be used to select the user to logout. Only supported when using the login UI V2.                                                                                                                    |
+| ui_locales               | Spaces delimited list of preferred locales for the login UI, e.g. `de-CH de en`. If none is provided or matches the possible locales provided by the login UI, the `accept-language` header of the browser will be taken into account. |
 
 The `post_logout_redirect_uri` will be checked against the previously registered uris of the client provided by the `azp` claim of the `id_token_hint` or the `client_id` parameter.
 If both parameters are provided, they must be equal.
