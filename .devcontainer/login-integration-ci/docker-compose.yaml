@@ -2,9 +2,9 @@ services:
   devcontainer:
     container_name: devcontainer-login-integration
     env_file: ../../apps/login/.env.test
-    network_mode: host
     environment:
-      CORE_MOCK_STUBS_URL: http://localhost:22220/v1/stubs
+      CORE_MOCK_STUBS_URL: http://mock-zitadel:22220/v1/stubs
+      ZITADEL_API_URL: http://mock-zitadel:22222
     depends_on:
       login-integration:
         condition: service_healthy
@@ -13,18 +13,17 @@ services:
     container_name: login-integration
     image: "${LOGIN_TAG:-zitadel-login:local}"
     env_file: ../../apps/login/.env.test
-    network_mode: host
     environment:
       NODE_ENV: test
       PORT: 3001
       NEXT_PUBLIC_BASE_PATH: /ui/v2/login
+      ZITADEL_API_URL: http://mock-zitadel:22222
     depends_on:
       mock-zitadel:
         condition: service_started
 
   mock-zitadel:
     container_name: mock-zitadel
-    network_mode: host
     build:
       context: ../../apps/login/integration/core-mock
       additional_contexts:
