@@ -204,8 +204,8 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-EFe2f", "reduce.wrong.event.type %s", user.HumanInitialCodeAddedType)
 	}
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
 		alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 			user.UserV1InitialCodeAddedType, user.UserV1InitialCodeSentType,
 			user.HumanInitialCodeAddedType, user.HumanInitialCodeSentType)
@@ -254,8 +254,8 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 		return handler.NewNoOpStatement(e), nil
 	}
 
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
 		alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 			user.UserV1EmailCodeAddedType, user.UserV1EmailCodeSentType,
 			user.HumanEmailCodeAddedType, user.HumanEmailCodeSentType)
@@ -310,8 +310,8 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		return handler.NewNoOpStatement(e), nil
 	}
 
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
 		alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 			user.UserV1PasswordCodeAddedType, user.UserV1PasswordCodeSentType,
 			user.HumanPasswordCodeAddedType, user.HumanPasswordCodeSentType)
@@ -363,8 +363,8 @@ func (u *userNotifier) reduceOTPSMSCodeAdded(event eventstore.Event) (*handler.S
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASF3g", "reduce.wrong.event.type %s", user.HumanOTPSMSCodeAddedType)
 	}
 
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
 		alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 			user.HumanOTPSMSCodeAddedType,
 			user.HumanOTPSMSCodeSentType)
@@ -407,8 +407,8 @@ func (u *userNotifier) reduceSessionOTPSMSChallenged(event eventstore.Event) (*h
 		return handler.NewNoOpStatement(e), nil
 	}
 
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
 		alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 			session.OTPSMSChallengedType,
 			session.OTPSMSSentType)
@@ -458,8 +458,8 @@ func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JL3hw", "reduce.wrong.event.type %s", user.HumanOTPEmailCodeAddedType)
 	}
 
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
 		alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 			user.HumanOTPEmailCodeAddedType,
 			user.HumanOTPEmailCodeSentType)
@@ -510,8 +510,8 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 	if e.ReturnCode {
 		return handler.NewNoOpStatement(e), nil
 	}
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
 		alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 			session.OTPEmailChallengedType,
 			session.OTPEmailSentType)
@@ -576,8 +576,8 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Drh5w", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
 	}
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
 		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil,
 			user.UserDomainClaimedType, user.UserDomainClaimedSentType)
 		if err != nil {
@@ -622,8 +622,8 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 		return handler.NewNoOpStatement(e), nil
 	}
 
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
 		alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, map[string]interface{}{"id": e.ID}, user.HumanPasswordlessInitCodeSentType)
 		if err != nil {
 			return err
@@ -671,8 +671,8 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Yko2z8", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
 	}
 
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
 		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.HumanPasswordChangeSentType)
 		if err != nil {
 			return err
@@ -723,8 +723,8 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 		return handler.NewNoOpStatement(e), nil
 	}
 
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
 		alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 			user.UserV1PhoneCodeAddedType, user.UserV1PhoneCodeSentType,
 			user.HumanPhoneCodeAddedType, user.HumanPhoneCodeSentType)
@@ -771,8 +771,8 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 		return handler.NewNoOpStatement(e), nil
 	}
 
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, event.Aggregate())
 		alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
 			user.HumanInviteCodeAddedType, user.HumanInviteCodeSentType)
 		if err != nil {
