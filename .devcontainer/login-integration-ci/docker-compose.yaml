@@ -3,6 +3,8 @@ services:
     container_name: devcontainer-login-integration
     env_file: ../../apps/login/.env.test
     network_mode: host
+    environment:
+      CORE_MOCK_STUBS_URL: http://localhost:22220/v1/stubs
     depends_on:
       login-integration:
         condition: service_healthy
@@ -22,6 +24,7 @@ services:
 
   mock-zitadel:
     container_name: mock-zitadel
+    network_mode: host
     build:
       context: ../../apps/login/integration/core-mock
       cache_from:
