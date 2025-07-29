@@ -167,7 +167,7 @@ With [make](https://www.gnu.org/software/make/), you build a debuggable Zitadel 
 Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
-Zitadel uses [golangci-lint](https://golangci-lint.run) for code quality checks. Please use [this configuration](.golangci.yaml) when running `golangci-lint`. We recommend to set golangci-lint as linter in your IDE.
+Zitadel uses [golangci-lint v2](https://golangci-lint.run) for code quality checks. Please use [this configuration](.golangci.yaml) when running `golangci-lint`. We recommend to set golangci-lint as linter in your IDE.
 
 The commands in this section are tested against the following software versions:
 

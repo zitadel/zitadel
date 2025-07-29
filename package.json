@@ -13,7 +13,9 @@
     "devcontainer:integration:login:build": "npm run devcontainer:integration:login:build:env && npm run devcontainer:integration:login:build:services",
     "devcontainer:integration:login:build:env": "devcontainer build --config .devcontainer/login-integration/devcontainer.json --workspace-folder .",
     "devcontainer:integration:login:build:services": "COMPOSE_BAKE=1 docker compose --file  .devcontainer/base/docker-compose.yaml --file .devcontainer/login-integration/docker-compose.yaml build login-integration",
-    "devcontainer:integration:login:up": "devcontainer up --prebuild --config .devcontainer/login-integration/devcontainer.json --workspace-folder . ----remove-existing-container"
+    "devcontainer:integration:login:up": "devcontainer up --prebuild --config .devcontainer/login-integration/devcontainer.json --workspace-folder . --remove-existing-container",
+    "clean": "turbo run clean",
+    "clean:all": "pnpm run clean && rm -rf .turbo node_modules"
   },
   "pnpm": {
     "overrides": {

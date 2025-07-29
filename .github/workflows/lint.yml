@@ -53,13 +53,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: depot/setup-action@v1
-      - name: Install Dev Container CLI
-        run: npm install -g @devcontainers/cli@0.80.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Lint and Unit Test All JavaScript Code
         run: npm run devcontainer:lint-unit
-        env:
-          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
 
   core:
     name: core
@@ -78,7 +75,7 @@ jobs:
           path: ${{ inputs.core_cache_path }}
           key: ${{ inputs.core_cache_key }}
           fail-on-cache-miss: true
-      - uses: golangci/golangci-lint-action@v6
+      - uses: golangci/golangci-lint-action@v8
         with:
           version: ${{ inputs.go_lint_version }}
           github-token: ${{ github.token }}
