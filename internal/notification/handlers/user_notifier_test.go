@@ -188,7 +188,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -366,7 +366,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -601,7 +601,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -731,7 +731,7 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -906,7 +906,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1066,7 +1066,7 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1329,7 +1329,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1590,7 +1590,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1886,7 +1886,7 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 				assert.Nil(t, stmt.Execute)
 				return
 			}
-			err = stmt.Execute(nil, "")
+			err = stmt.Execute(t.Context(), nil, "")
 			if w.err != nil {
 				w.err(t, err)
 			} else {

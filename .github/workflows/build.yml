@@ -54,8 +54,6 @@ jobs:
       console_cache_path: ${{ needs.console.outputs.cache_path }}
       version: ${{ needs.version.outputs.version }}
       node_version: "20"
-    secrets:
-      DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
 
   core-unit-test:
     needs: core
@@ -81,7 +79,7 @@ jobs:
     with:
       node_version: "18"
       buf_version: "latest"
-      go_lint_version: "v1.64.8"
+      go_lint_version: "latest"
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
 
@@ -103,8 +101,6 @@ jobs:
     with:
       login_build_image_name: "ghcr.io/zitadel/zitadel-login-build"
       node_version: "20"
-    secrets:
-      DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
 
   e2e:
     uses: ./.github/workflows/e2e.yml
