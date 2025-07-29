@@ -59,6 +59,9 @@ jobs:
           provenance: true
           sbom: true
           targets: login-standalone
+          set: |
+            *.cache-from=type=gha
+            *.cache-to=type=gha,mode=max
           files: |
             ./apps/login/docker-bake.hcl
             ./apps/login/docker-bake-release.hcl
