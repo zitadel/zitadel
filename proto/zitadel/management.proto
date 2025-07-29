@@ -661,8 +661,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Unlock user";
-            description: "Unlock a user with the state 'locked'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'locked'.\n\nDeprecated: please use user service v2 UnlockUser"
             tags: "Users";
             deprecated: true;
             responses: {
@@ -799,8 +797,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            summary: "Bulk Set User Metadata";
-            description: "Add or update multiple metadata values for a user. Make sure the values are base64 encoded."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
