@@ -13,7 +13,6 @@ on:
     outputs:
       login_build_image:
           description: 'The full image tag of the standalone login image'
-          value: '${{ inputs.login_build_image_name }}:${{ github.event.pull_request.head.sha }}'
 
 permissions:
   packages: write
@@ -32,6 +31,18 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+      - name: Get short SHA
+        id: short-sha
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # For PRs: Use the HEAD SHA (not the merge commit)
+            SHORT_SHA=$(echo "${{ github.event.pull_request.head.sha }}" | cut -c1-7)
+          else
+            # For pushes: Use the current commit
+            SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          fi
+          echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "Short SHA: $SHORT_SHA"
       - name: Login meta
         id: login-meta
         uses: docker/metadata-action@v5
@@ -41,7 +52,7 @@ jobs:
           annotations: |
             manifest:org.opencontainers.image.licenses=MIT
           tags: |
-            type=sha,prefix=,suffix=,format=long
+            type=raw,value=${{ steps.short-sha.outputs.short_sha }}
       - name: Login to Docker registry
         uses: docker/login-action@v3
         with:
