@@ -8,7 +8,7 @@ import (
 )
 
 // Invoke provides a way to execute commands within the domain package.
-// It uses the [chain of responsibility](https://refactoring.guru/design-patterns/chain-of-responsibility) pattern to handle the command execution.
+// It uses the [chain of responsibility](https://github.com/zitadel/zitadel/wiki/WIP:-Software-Architecture#chain-of-responsibility) pattern to handle the command execution.
 // The default chain includes logging, tracing, and event publishing.
 // If you want to invoke multiple commands in a single transaction, you can use the [commandBatch].
 func Invoke(ctx context.Context, cmd Commander) error {
