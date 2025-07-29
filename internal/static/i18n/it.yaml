@@ -194,7 +194,7 @@ Errors:
     AlreadyExists: L'istanza esiste già
     NotChanged: Istanza non modificata
   Org:
-    AlreadyExists: Nome dell'organizzazione già preso
+    AlreadyExists: Nome o ID dell'organizzazione già utilizzato
     Invalid: L'organizzazione non è valida
     AlreadyDeactivated: L'organizzazione è già disattivata
     AlreadyActive: L'organizzazione è già attiva

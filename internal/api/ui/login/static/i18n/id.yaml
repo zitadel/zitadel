@@ -236,6 +236,7 @@ RegistrationUser:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
   GenderLabel: Jenis kelamin
   Female: Perempuan
   Male: Pria
@@ -279,6 +280,7 @@ ExternalRegistrationUserOverview:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
   TosAndPrivacyLabel: Syarat dan Ketentuan
   TosConfirm: Saya menerima itu
   TosLinkText: KL
@@ -351,6 +353,7 @@ ExternalNotFound:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
 DeviceAuth:
   Title: Otorisasi Perangkat
   UserCode:

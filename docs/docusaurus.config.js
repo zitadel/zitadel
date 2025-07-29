@@ -218,7 +218,6 @@ module.exports = {
           showLastUpdateTime: true,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
-
           docItemComponent: "@theme/ApiItem",
         },
         theme: {
@@ -244,6 +243,17 @@ module.exports = {
       },
     ],
     [
+      "@signalwire/docusaurus-plugin-llms-txt",
+      {
+        depth: 3,
+        logLevel: 1,
+        content: {
+          excludeRoutes: ["/search"],
+          enableMarkdownFiles: true,
+        },
+      },
+    ],
+    [
       "docusaurus-plugin-openapi-docs",
       {
         id: "apiDocs",
@@ -254,7 +264,7 @@ module.exports = {
             outputDir: "docs/apis/resources/auth",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           mgmt: {
@@ -262,7 +272,7 @@ module.exports = {
             outputDir: "docs/apis/resources/mgmt",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           admin: {
@@ -270,7 +280,7 @@ module.exports = {
             outputDir: "docs/apis/resources/admin",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           system: {
@@ -278,7 +288,7 @@ module.exports = {
             outputDir: "docs/apis/resources/system",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           user_v2: {

@@ -194,7 +194,7 @@ Errors:
     AlreadyExists: Экземпляр уже существует
     NotChanged: Экземпляр не изменён
   Org:
-    AlreadyExists: Название организации уже занято
+    AlreadyExists: Название организации или идентификатор уже занят
     Invalid: Организация недействительна
     AlreadyDeactivated: Организация уже деактивирована
     AlreadyActive: Организация уже активна

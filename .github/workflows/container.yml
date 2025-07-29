@@ -79,7 +79,7 @@ jobs:
           context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          file: build/Dockerfile
+          file: build/zitadel/Dockerfile
           target: artifact
           platforms: linux/${{ matrix.arch }}
           push: true
@@ -94,7 +94,7 @@ jobs:
           context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          file: build/Dockerfile
+          file: build/zitadel/Dockerfile
           target: final
           platforms: linux/${{ matrix.arch }}
           push: true
