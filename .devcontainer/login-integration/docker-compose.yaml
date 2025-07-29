@@ -21,6 +21,10 @@ services:
     container_name: mock-zitadel
     build:
       context: ../../apps/login/integration/core-mock
+      cache_from:
+        - type=gha
+      cache_to:
+        - type=gha,mode=max
     ports:
       - 22220:22220
       - 22222:22222

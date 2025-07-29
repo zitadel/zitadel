@@ -1,3 +1,9 @@
+x-build-cache: &build-cache
+  cache_from:
+    - type=gha
+  cache_to:
+    - type=gha,mode=max
+
 services:
 
   devcontainer:
@@ -5,6 +11,7 @@ services:
     build:
       context: ../..
       dockerfile: .devcontainer/base/Dockerfile
+      <<: *build-cache
     volumes:
       - ../../:/workspaces:cached
     command: sleep infinity
@@ -56,6 +63,7 @@ services:
     build:
       context: ../../apps/login/acceptance/setup
       dockerfile: ../go-command.Dockerfile
+      <<: *build-cache
     entrypoint: "./setup.sh"
     network_mode: service:devcontainer
     environment:
@@ -92,6 +100,7 @@ services:
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+      <<: *build-cache
     environment:
       PORT: '3333'
     command:
@@ -116,6 +125,7 @@ services:
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+      <<: *build-cache
     network_mode: service:devcontainer
     environment:
       API_URL: 'http://localhost:8080'
@@ -139,6 +149,7 @@ services:
   #      dockerfile: ../../go-command.Dockerfile
   #      args:
   #        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+  #      <<: *build-cache
   #    network_mode: service:devcontainer
   #    environment:
   #      API_URL: 'http://localhost:8080'
@@ -160,6 +171,7 @@ services:
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+      <<: *build-cache
     network_mode: service:devcontainer
     environment:
       API_URL: 'http://localhost:8080'
@@ -174,27 +186,27 @@ services:
     depends_on:
       configure-login:
         condition: "service_completed_successfully"
-
-#  mock-samlidp:
-#    container_name: mock-samlidp
-#    build:
-#      context: ../../apps/login/acceptance/idp/saml
-#      dockerfile: ../../go-command.Dockerfile
-#      args:
-#        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
-#    network_mode: service:devcontainer
-#    environment:
-#      API_URL: 'http://localhost:8080'
-#      API_DOMAIN: 'localhost'
-#      PAT_FILE: '/pat/zitadel-admin-sa.pat'
-#      SCHEMA: 'http'
-#      HOST: 'localhost'
-#      PORT: "8003"
-#    volumes:
-#      - "../apps/login/packages/acceptance/pat:/pat"
-#    depends_on:
-#      configure-login:
-#        condition: "service_completed_successfully"
+  #  mock-samlidp:
+  #    container_name: mock-samlidp
+  #    build:
+  #      context: ../../apps/login/acceptance/idp/saml
+  #      dockerfile: ../../go-command.Dockerfile
+  #      args:
+  #        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
+  #      <<: *build-cache
+  #    network_mode: service:devcontainer
+  #    environment:
+  #      API_URL: 'http://localhost:8080'
+  #      API_DOMAIN: 'localhost'
+  #      PAT_FILE: '/pat/zitadel-admin-sa.pat'
+  #      SCHEMA: 'http'
+  #      HOST: 'localhost'
+  #      PORT: "8003"
+  #    volumes:
+  #      - "../apps/login/packages/acceptance/pat:/pat"
+  #    depends_on:
+  #      configure-login:
+  #        condition: "service_completed_successfully"
 
 volumes:
   postgres-data:
