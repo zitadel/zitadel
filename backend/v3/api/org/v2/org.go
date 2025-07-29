@@ -145,7 +145,7 @@ func orgFilterToDomain(filter *org.OrganizationSearchFilter) domain.OrgsQueryOpt
 	case *org.OrganizationSearchFilter_IdFilter:
 		return domain.WithOrgByIDQuery(f.IdFilter.Id)
 	case *org.OrganizationSearchFilter_StateFilter:
-		return domain.WithOrgByStateQuery(api.V2BetaOrgStateToDomain(f.StateFilter.State))
+		return domain.WithOrgByStateQuery(orgStateToDomain(f.StateFilter.State))
 	default:
 		panic("unknown organization search filter: " + filter.String())
 	}
@@ -194,5 +194,17 @@ func orgFieldNameToDatabase(fieldName org.OrgFieldName) func(query *domain.OrgsQ
 		return domain.OrderOrgsByCreationDate
 	default:
 		return nil
+	}
+}
+
+func orgStateToDomain(state org.OrgState) domain.OrgState {
+	switch state {
+	case org.OrgState_ORG_STATE_ACTIVE:
+		return domain.OrgStateActive
+	case org.OrgState_ORG_STATE_INACTIVE:
+		return domain.OrgStateInactive
+	default:
+		// TODO: removed is not supported in the domain
+		panic("unknown org state: " + state.String())
 	}
 }
