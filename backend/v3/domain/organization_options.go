@@ -86,7 +86,7 @@ func (opt *orgByIDQueryOpt) applyOnOrgsQuery(query *OrgsQuery) {
 	query.conditions = append(query.conditions, query.repo.IDCondition(opt.id))
 }
 
-var _ OrgsQueryOpts = (*orgByIDQueryOpt)(nil)
+var _ OrgsQueryOpts = (*orgByStateQueryOpt)(nil)
 
 type orgByStateQueryOpt struct {
 	state OrgState
@@ -102,7 +102,7 @@ func (opt *orgByStateQueryOpt) applyOnOrgsQuery(query *OrgsQuery) {
 	query.conditions = append(query.conditions, query.repo.StateCondition(opt.state))
 }
 
-var _ OrgsQueryOpts = (*orgByIDQueryOpt)(nil)
+var _ OrgsQueryOpts = (*orgQuerySortingColumnOpt)(nil)
 
 type orgQuerySortingColumnOpt struct {
 	getColumn func(query *OrgsQuery) database.Column

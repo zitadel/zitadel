@@ -240,7 +240,7 @@ func (cmd *UpdateOrganizationCommand) Execute(ctx context.Context, opts *Command
 	_, err = cmd.repo.Update(ctx,
 		cmd.repo.IDCondition(cmd.OrgID),
 		cmd.InstanceID,
-		cmd.changes,
+		cmd.changes...,
 	)
 	return err
 }

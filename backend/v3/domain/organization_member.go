@@ -34,7 +34,7 @@ func (c *CreateOrgMemberCommand) Execute(ctx context.Context, opts *CommandOpts)
 
 // String implements [Commander].
 func (c *CreateOrgMemberCommand) String() string {
-	panic("unimplemented")
+	return "CreateOrgMemberCommand"
 }
 
 // MemberRepository is a sub repository of the org repository and maybe the instance repository.
