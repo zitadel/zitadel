@@ -3,9 +3,9 @@ services:
     container_name: devcontainer-login-integration
     env_file: ../../apps/login/.env.test
     network_mode: host
-  depends_on:
-    login-integration:
-      condition: service_healthy
+    depends_on:
+      login-integration:
+        condition: service_healthy
 
   login-integration:
     container_name: login-integration
