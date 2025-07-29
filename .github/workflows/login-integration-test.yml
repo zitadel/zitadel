@@ -36,3 +36,17 @@ jobs:
           # Add verbose logging
           COMPOSE_LOG_LEVEL: DEBUG
           DEVCONTAINER_LOG_LEVEL: trace
+      - name: Show Compose Status
+        if: failure()
+        run: docker compose --file .devcontainer/base/docker-compose.yaml --file .devcontainer/login-integration-ci/docker-compose.yaml ps
+      - name: Show Container Logs
+        if: failure()
+        run: docker compose --file .devcontainer/base/docker-compose.yaml --file .devcontainer/login-integration-ci/docker-compose.yaml logs --timestamps --no-color --tail 100 login-integration
+      - name: Inspect All Failed Containers
+        if: failure()
+        run: |
+          docker ps -a --filter "status=exited" --filter "status=created" --format "table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}"
+          for container in $(docker ps -a --filter "status=exited" --filter "status=created" -q); do
+            echo "Inspecting container $container"
+            docker inspect $container || true
+          done
