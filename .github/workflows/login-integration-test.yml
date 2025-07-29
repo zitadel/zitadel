@@ -21,10 +21,7 @@ jobs:
         run: npm install -g @devcontainers/cli@0.80.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Setup Depot
-        uses: depot/setup-action@v1
       - name: Run Integration Tests against the Login and a Mocked Zitadel API
         run: npm run devcontainer:integration:login
         env:
           LOGIN_TAG: ${{ inputs.login_build_image }}
-          DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
