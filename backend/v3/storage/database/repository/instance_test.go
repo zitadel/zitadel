@@ -538,7 +538,7 @@ func TestListInstance(t *testing.T) {
 			// check instance values
 			returnedInstances, err := instanceRepo.List(ctx,
 				database.WithCondition(condition),
-				database.WithOrderBy(instanceRepo.CreatedAtColumn(true)),
+				database.WithOrderBy(false, instanceRepo.CreatedAtColumn(true)),
 			)
 			require.NoError(t, err)
 			if tt.noInstanceReturned {
