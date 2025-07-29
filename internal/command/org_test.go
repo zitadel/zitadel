@@ -1296,7 +1296,9 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 		{
 			name: "org name empty, error",
 			fields: fields{
-				eventstore:  expectEventstore(),
+				eventstore: expectEventstore(
+					expectFilter(), // org already exists check
+				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID"),
 			},
 			args: args{
@@ -1329,6 +1331,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			name: "userID not existing, error",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // org already exists check
 					expectFilter(),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID"),
@@ -1351,7 +1354,9 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 		{
 			name: "human invalid, error",
 			fields: fields{
-				eventstore:  expectEventstore(),
+				eventstore: expectEventstore(
+					expectFilter(), // org already exists check
+				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID", "userID"),
 			},
 			args: args{
@@ -1384,6 +1389,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(), // add human exists check
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -1506,9 +1512,81 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			},
 		},
 		{
+			name: "org already exists",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("custom-org-ID").Aggregate, "Org"),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name:  "Org",
+					OrgID: "custom-org-ID",
+				},
+			},
+			res: res{
+				err: zerrors.ThrowAlreadyExists(nil, "ORG-laho2n", "Errors.Org.AlreadyExisting"),
+			},
+		},
+		{
+			name: "org with same id deleted",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("custom-org-ID").Aggregate, "Org"),
+						),
+						org.NewOrgRemovedEvent(
+							context.Background(), &org.NewAggregate("custom-org-ID").Aggregate,
+							"Org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}),
+					),
+					expectPush(
+						eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"Org",
+						)),
+						eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate, "org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainVerifiedEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"org.iam-domain",
+						)),
+						eventFromEventPusher(org.NewDomainPrimarySetEvent(context.Background(),
+							&org.NewAggregate("custom-org-ID").Aggregate,
+							"org.iam-domain",
+						)),
+					),
+				),
+			},
+			args: args{
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
+				setupOrg: &OrgSetup{
+					Name:  "Org",
+					OrgID: "custom-org-ID",
+				},
+			},
+			res: res{
+				createdOrg: &CreatedOrg{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "custom-org-ID",
+					},
+					OrgAdmins: []OrgAdmin{},
+				},
+			},
+		},
+		{
 			name: "no human added, custom org ID",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // org already exists check
 					expectPush(
 						eventFromEventPusher(org.NewOrgAddedEvent(context.Background(),
 							&org.NewAggregate("custom-org-ID").Aggregate,
@@ -1548,6 +1626,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			name: "existing human added",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(), // org already exists check
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1620,6 +1699,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(), // add machine exists check
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
