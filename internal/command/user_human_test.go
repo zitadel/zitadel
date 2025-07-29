@@ -4020,7 +4020,7 @@ func TestAddHumanCommand(t *testing.T) {
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-							return expectFilterOrganizationSettingsEvents(context.Background(), "org1", false, false), nil
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
@@ -4077,7 +4077,7 @@ func TestAddHumanCommand(t *testing.T) {
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-							return expectFilterOrganizationSettingsEvents(context.Background(), "org1", false, false), nil
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
@@ -4154,7 +4154,7 @@ func TestAddHumanCommand(t *testing.T) {
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 							// never set, as only used in creation of instance and org
-							return expectFilterOrganizationSettingsEvents(context.Background(), "org1", false, false), nil
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
@@ -4229,7 +4229,7 @@ func TestAddHumanCommand(t *testing.T) {
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-							return expectFilterOrganizationSettingsEvents(context.Background(), "org1", false, false), nil
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
@@ -4305,7 +4305,7 @@ func TestAddHumanCommand(t *testing.T) {
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-							return expectFilterOrganizationSettingsEvents(context.Background(), "org1", false, false), nil
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
@@ -4381,7 +4381,7 @@ func TestAddHumanCommand(t *testing.T) {
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-							return expectFilterOrganizationSettingsEvents(context.Background(), "org1", false, false), nil
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
