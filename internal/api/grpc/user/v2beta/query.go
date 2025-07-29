@@ -40,3 +40,7 @@ func (s *Server) ListUsers(ctx context.Context, req *connect.Request[user.ListUs
 		Details: object.ToListDetails(res.SearchResponse),
 	}), nil
 }
+
+func (s *Server) ListUsersByMetadata(ctx context.Context, req *connect.Request[user.ListUsersByMetadataRequest]) (*connect.Response[user.ListUsersByMetadataResponse], error) {
+	return nil, nil
+}
