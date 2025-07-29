@@ -2,13 +2,13 @@ services:
   devcontainer:
     container_name: devcontainer-login-integration
     env_file: ../../apps/login/.env.test
-    network_mode: service:mock-zitadel
+    network_mode: host
 
   login-integration:
     container_name: login-integration
     image: "${LOGIN_TAG:-zitadel-login:local}"
     env_file: ../../apps/login/.env.test
-    network_mode: service:mock-zitadel
+    network_mode: host
     environment:
       NODE_ENV: test
       PORT: 3001
@@ -22,7 +22,3 @@ services:
         - type=gha
       cache_to:
         - type=gha,mode=max
-    ports:
-      - 22220:22220
-      - 22222:22222
-      - 3001:3001

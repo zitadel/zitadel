@@ -3,7 +3,7 @@
 	"name": "Login Integration Hot Reload Container - Debug and Fix Pull Request Checks",
 	"dockerComposeFile": [
 		"../base/docker-compose.yaml",
-		"../login-integration/docker-compose.yaml",
+		"../login-integration-ci/docker-compose.yaml",
 		"docker-compose.yaml"
 	],
 	"service": "login-integration",
