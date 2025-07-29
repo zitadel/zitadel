@@ -71,6 +71,7 @@ jobs:
           NODE_VERSION: ${{ inputs.node_version }}
           DEPOT_TOKEN: ${{ secrets.DEPOT_TOKEN }}
         with:
+          source: .
           push: true
           provenance: true
           sbom: true
