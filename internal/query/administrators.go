@@ -165,12 +165,13 @@ func administratorProjectGrantCheckPermission(ctx context.Context, resourceOwner
 }
 
 func (q *Queries) SearchAdministrators(ctx context.Context, queries *MembershipSearchQuery, permissionCheck domain.PermissionCheck) (*Administrators, error) {
-	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
-	admins, err := q.searchAdministrators(ctx, queries, permissionCheckV2)
+	// removed as permission v2 is not implemented yet for project grant level permissions
+	// permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	admins, err := q.searchAdministrators(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+	if permissionCheck != nil { // && !authz.GetFeatures(ctx).PermissionCheckV2 {
 		administratorsCheckPermission(ctx, admins, permissionCheck)
 	}
 	return admins, nil
