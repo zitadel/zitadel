@@ -21,6 +21,10 @@ jobs:
         run: npm install -g @devcontainers/cli@0.80.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+      - name: Print Config
+        run: COMPOSE_BAKE=1 docker compose --file  .devcontainer/base/docker-compose.yaml --file .devcontainer/login-integration-ci/docker-compose.yaml config login-integration
+        env:
+          LOGIN_TAG: ${{ inputs.login_build_image }}
       - name: Pull Login Build Image
         run: docker pull ${{ inputs.login_build_image }}
       - name: Run Integration Tests against the Login and a Mocked Zitadel API
