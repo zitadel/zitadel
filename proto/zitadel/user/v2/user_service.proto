@@ -134,6 +134,13 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      // The /new path segment does not follow Zitadels API design.
+      // The only reason why it is used here is to avoid a conflict with the ListUsers endpoint, which already handles POST /v2/users.
+      post: "/v2/users/new"
+      body: "*"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -163,6 +170,8 @@ service UserService {
 
   // Create a new human user
   //
+  // Deprecated: Use [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) to create a new user of type human instead.
+  //
   // Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
     option (google.api.http) = {
@@ -181,6 +190,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -261,6 +271,8 @@ service UserService {
 
   // Change the user email
   //
+  // Deprecated: [Update the users email field](apis/resources/user_service_v2/user-service-update-user.api.mdx).
+  //
   // Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email..
   rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
     option (google.api.http) = {
@@ -275,6 +287,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -381,6 +394,8 @@ service UserService {
 
   // Set the user phone
   //
+  // Deprecated: [Update the users phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx).
+  //
   // Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms..
   rpc SetPhone(SetPhoneRequest) returns (SetPhoneResponse) {
     option (google.api.http) = {
@@ -395,6 +410,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -412,6 +428,8 @@ service UserService {
 
   // Delete the user phone
   //
+  // Deprecated: [Update the users phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx) to remove the phone number.
+  //
   // Delete the phone number of a user.
   rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
     option (google.api.http) = {
@@ -426,6 +444,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -441,7 +460,9 @@ service UserService {
     };
   }
 
-  // Resend code to verify user phone
+  // Resend code to verify user phone number
+  //
+  // Resend code to verify user phone number.
   rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone/resend"
@@ -470,9 +491,9 @@ service UserService {
     };
   }
 
-  // Verify the phone
+  // Verify the phone number
   //
-  // Verify the phone with the generated code..
+  // Verify the phone number with the generated code.
   rpc VerifyPhone (VerifyPhoneRequest) returns (VerifyPhoneResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone/verify"
@@ -510,6 +531,10 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      patch: "/v2/users/{user_id}"
+      body: "*"
+    };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
@@ -551,7 +576,9 @@ service UserService {
 
   // Update Human User
   //
-  // Update all information from a user..
+  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) to update a user of type human instead.
+  //
+  // Update all information from a user.
   rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
     option (google.api.http) = {
       put: "/v2/users/human/{user_id}"
@@ -565,6 +592,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -1352,6 +1380,8 @@ service UserService {
 
   // Change password
   //
+  // Deprecated: [Update the users password](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+  //
   // Change the password of a user with either a verification code or the current password..
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
@@ -1366,6 +1396,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -1392,6 +1423,11 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc AddSecret(AddSecretRequest) returns (AddSecretResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/secret"
+      body: "*"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1426,6 +1462,10 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc RemoveSecret(RemoveSecretRequest) returns (RemoveSecretResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/secret"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1451,6 +1491,11 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc AddKey(AddKeyRequest) returns (AddKeyResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/keys"
+      body: "*"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1485,6 +1530,10 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc RemoveKey(RemoveKeyRequest) returns (RemoveKeyResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/keys/{key_id}"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1509,6 +1558,11 @@ service UserService {
   // Required permission:
   //   - user.read
   rpc ListKeys(ListKeysRequest) returns (ListKeysResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/keys/search"
+      body: "*"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1540,6 +1594,11 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/pats"
+      body: "*"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1574,6 +1633,10 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/pats/{token_id}"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1598,6 +1661,11 @@ service UserService {
   // Required permission:
   //   - user.read
   rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/pats/search"
+      body: "*"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"

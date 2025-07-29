@@ -1153,6 +1153,11 @@ service AdminService {
         };
     }
 
+    // Get Organization By ID
+    //
+    // Deprecated: use [organization service v2 ListOrganizations](apis/resources/org_service_v2/organization-service-list-organizations.api.mdx) instead.
+    //
+    // Returns an organization by its ID. Make sure the user has the permissions to access the organization.
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
         option (google.api.http) = {
             get: "/orgs/{id}";
@@ -1164,8 +1169,7 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Get Organization By ID";
-            description: "Returns an organization by its ID. Make sure the user has the permissions to access the organization."
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -1175,6 +1179,11 @@ service AdminService {
         };
     }
 
+    // Is Organization Unique
+    //
+    // Deprecated: use [organization service v2 ListOrganizations](apis/resources/org_service_v2/organization-service-list-organizations.api.mdx) instead.
+    //
+    // Checks if an organization with the searched parameters already exists or not.
     rpc IsOrgUnique(IsOrgUniqueRequest) returns (IsOrgUniqueResponse) {
         option (google.api.http) = {
             get: "/orgs/_is_unique";
@@ -1186,8 +1195,7 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Is Organization Unique";
-            description: "Checks if an organization with the searched parameters already exists or not."
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -1220,6 +1228,11 @@ service AdminService {
         };
     }
 
+    // Get Default Organization
+    //
+    // Deprecated: use [organization service v2 ListOrganizations](apis/resources/org_service_v2/organization-service-list-organizations.api.mdx) instead.
+    //
+    // Get the default organization of the ZITADEL instance. If no specific organization is given on the register form, a user will be registered to the default organization.
     rpc GetDefaultOrg(GetDefaultOrgRequest) returns (GetDefaultOrgResponse) {
         option (google.api.http) = {
             get: "/orgs/default";
@@ -1232,13 +1245,16 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             tags: "Settings";
-            summary: "Get Default Organization";
-            description: "Get the default organization of the ZITADEL instance. If no specific organization is given on the register form, a user will be registered to the default organization."
+            deprecated: true;
         };
     }
 
-    // Deprecated: use ListOrganization [apis/resources/org_service_v2beta/organization-service-list-organizations.api.mdx] API instead
-    rpc ListOrgs(ListOrgsRequest) returns (ListOrgsResponse) {
+    // Search Organizations
+    //
+    // Deprecated: use [organization service v2 ListOrganizations](apis/resources/org_service_v2/organization-service-list-organizations.api.mdx) instead.
+    //
+    // Returns a list of organizations that match the requesting filters. All filters are applied with an AND condition.
+     rpc ListOrgs(ListOrgsRequest) returns (ListOrgsResponse) {
         option (google.api.http) = {
             post: "/orgs/_search";
             body: "*";
@@ -1250,8 +1266,6 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Search Organization";
-            description: "Returns a list of organizations that match the requesting filters. All filters are applied with an AND condition."
             responses: {
                 key: "200";
                 value: {
@@ -1273,7 +1287,11 @@ service AdminService {
         };
     }
 
-    // Deprecated: use CreateOrganization [apis/resources/org_service_v2beta/organization-service-create-organization.api.mdx] API instead
+    // Setup Organization
+    //
+    // Deprecated: use [organization service v2 CreateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-create-organization.api.mdx) instead.
+    //
+    // Create a new organization with an administrative user. If no specific roles are sent for the first user, the user will get the role ORG_OWNER.
     rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/_setup";
@@ -1286,8 +1304,6 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Setup Organization";
-            description: "Create a new organization with an administrative user. If no specific roles are sent for the first user, the user will get the role ORG_OWNER."
             responses: {
                 key: "200";
                 value: {
@@ -1309,7 +1325,11 @@ service AdminService {
         };
     }
 
-    // Deprecated: use DeleteOrganization [apis/resources/org_service_v2beta/organization-service-delete-organization.api.mdx] API instead
+    // Remove Organization
+    //
+    // Deprecated: use [organization service v2 DeleteOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization.api.mdx) instead.
+    //
+    // Deletes the organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in.
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
         option (google.api.http) = {
             delete: "/orgs/{org_id}"
@@ -1320,8 +1340,6 @@ service AdminService {
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Remove Organization";
-            description: "Deletes the organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in."
             responses: {
                 key: "200";
                 value: {
@@ -1342,7 +1360,6 @@ service AdminService {
             };
         };
     }
-
 
     rpc GetIDPByID(GetIDPByIDRequest) returns (GetIDPByIDResponse) {
         option (google.api.http) = {
