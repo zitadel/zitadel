@@ -15,6 +15,12 @@ CREATE TYPE zitadel.idp_type AS ENUM (
     'apple'
 );
 
+CREATE TYPE zitadel.idp_auto_linking_option AS ENUM (
+    'unspecified',
+    'username',
+    'email'
+);
+
 CREATE TABLE zitadel.identity_providers (
     instance_id TEXT NOT NULL
     , org_id TEXT
@@ -27,7 +33,7 @@ CREATE TABLE zitadel.identity_providers (
     , allow_auto_creation BOOLEAN NOT NULL DEFAULT TRUE
     , allow_auto_update BOOLEAN NOT NULL DEFAULT TRUE
     , allow_linking BOOLEAN NOT NULL DEFAULT TRUE
-    , allow_auto_linking BOOLEAN NOT NULL DEFAULT TRUE
+    , allow_auto_linking zitadel.idp_auto_linking_option NOT NULL DEFAULT 'unspecified'
     , styling_type SMALLINT
     , payload JSONB
     

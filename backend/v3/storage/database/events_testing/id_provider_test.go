@@ -22,7 +22,7 @@ import (
 func TestServer_TestIDProviderReduces(t *testing.T) {
 	instanceID := Instance.ID()
 
-	t.Run("test idp add reduces", func(t *testing.T) {
+	t.Run("test iam idp add reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		beforeCreate := time.Now()
@@ -57,13 +57,13 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, instanceID, idp.InstanceID)
 			assert.Equal(t, domain.IDPStateActive.String(), idp.State)
 			assert.Equal(t, true, idp.AutoRegister)
-			assert.Equal(t, int16(idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE), idp.StylingType)
+			assert.Equal(t, int16(idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE), *idp.StylingType)
 			assert.WithinRange(t, idp.UpdatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, idp.CreatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)
 	})
 
-	t.Run("test idp update reduces", func(t *testing.T) {
+	t.Run("test iam idp update reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		addOIDC, err := AdminClient.AddOIDCIDP(CTX, &admin.AddOIDCIDPRequest{
@@ -106,12 +106,12 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, addOIDC.IdpId, idp.ID)
 			assert.Equal(t, name, idp.Name)
 			assert.Equal(t, false, idp.AutoRegister)
-			assert.Equal(t, int16(idp_grpc.IDPStylingType_STYLING_TYPE_UNSPECIFIED), idp.StylingType)
+			assert.Equal(t, int16(idp_grpc.IDPStylingType_STYLING_TYPE_UNSPECIFIED), *idp.StylingType)
 			assert.WithinRange(t, idp.UpdatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)
 	})
 
-	t.Run("test idp deactivate reduces", func(t *testing.T) {
+	t.Run("test iam idp deactivate reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		addOIDC, err := AdminClient.AddOIDCIDP(CTX, &admin.AddOIDCIDPRequest{
@@ -153,7 +153,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test idp reactivate reduces", func(t *testing.T) {
+	t.Run("test iam idp reactivate reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		addOIDC, err := AdminClient.AddOIDCIDP(CTX, &admin.AddOIDCIDPRequest{
@@ -214,7 +214,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test idp remove reduces", func(t *testing.T) {
+	t.Run("test iam idp remove reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add idp
@@ -252,7 +252,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test idp oidc addded reduces", func(t *testing.T) {
+	t.Run("test iam idp oidc addded reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
@@ -295,7 +295,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test idp oidc changed reduces", func(t *testing.T) {
+	t.Run("test iam idp oidc changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
@@ -373,7 +373,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test idp jwt addded reduces", func(t *testing.T) {
+	t.Run("test iam idp jwt addded reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
@@ -399,7 +399,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			// event org.idp.jwt.config.added
+			// event iam.idp.jwt.config.added
 			// idp
 			assert.Equal(t, addJWT.IdpId, jwt.ID)
 			assert.Equal(t, domain.IDPTypeJWT.String(), jwt.Type)
@@ -413,7 +413,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test idp jwt changed reduces", func(t *testing.T) {
+	t.Run("test iam idp jwt changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
@@ -469,7 +469,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			// event org.idp.jwt.config.changed
+			// event iam.idp.jwt.config.changed
 			// idp
 			assert.Equal(t, addJWT.IdpId, updateJWT.ID)
 			assert.Equal(t, domain.IDPTypeJWT.String(), updateJWT.Type)
@@ -480,6 +480,297 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, "new_jwtEndpoint", updateJWT.JWTEndpoint)
 			assert.Equal(t, "new_issuer", updateJWT.Issuer)
 			assert.Equal(t, "new_keyEndpoint", updateJWT.KeysEndpoint)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp oauth added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add oauth
+		beforeCreate := time.Now().Add(-1 * time.Second)
+		addOAuth, err := AdminClient.AddGenericOAuthProvider(CTX, &admin.AddGenericOAuthProviderRequest{
+			Name:                  name,
+			ClientId:              "clientId",
+			ClientSecret:          "clientSecret",
+			AuthorizationEndpoint: "authoizationEndpoint",
+			TokenEndpoint:         "tokenEndpoint",
+			UserEndpoint:          "userEndpoint",
+			Scopes:                []string{"scope"},
+			IdAttribute:           "idAttribute",
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+			UsePkce: false,
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		// check values for oauth
+		var oauth *domain.IDPOAuth
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			oauth, err = idpRepo.GetOAuth(CTX, idpRepo.IDCondition(addOAuth.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.oauth.added
+			// idp
+			assert.Equal(t, addOAuth.Id, oauth.IdentityProvider.ID)
+			assert.Equal(t, domain.IDPTypeOAuth.String(), oauth.Type)
+
+			// oauth
+			assert.Equal(t, addOAuth.Id, oauth.IdentityProvider.ID)
+			assert.Equal(t, "clientId", oauth.ClientID)
+			assert.NotNil(t, oauth.ClientSecret)
+			assert.Equal(t, "authoizationEndpoint", oauth.AuthorizationEndpoint)
+			assert.Equal(t, "authoizationEndpoint", oauth.AuthorizationEndpoint)
+			assert.Equal(t, "tokenEndpoint", oauth.TokenEndpoint)
+			assert.Equal(t, "userEndpoint", oauth.UserEndpoint)
+			assert.Equal(t, "userEndpoint", oauth.UserEndpoint)
+			assert.Equal(t, []string{"scope"}, oauth.Scopes)
+			assert.Equal(t, false, oauth.AllowLinking)
+			assert.Equal(t, false, oauth.AllowCreation)
+			assert.Equal(t, false, oauth.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), oauth.AllowAutoLinking)
+			assert.Equal(t, false, oauth.UsePKCE)
+			assert.WithinRange(t, oauth.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, oauth.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instanceidp oauth changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add oauth
+		addOAuth, err := AdminClient.AddGenericOAuthProvider(CTX, &admin.AddGenericOAuthProviderRequest{
+			Name:                  name,
+			ClientId:              "clientId",
+			ClientSecret:          "clientSecret",
+			AuthorizationEndpoint: "authoizationEndpoint",
+			TokenEndpoint:         "tokenEndpoint",
+			UserEndpoint:          "userEndpoint",
+			Scopes:                []string{"scope"},
+			IdAttribute:           "idAttribute",
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+			UsePkce: false,
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		// check values for oauth
+		var oauth *domain.IDPOAuth
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			oauth, err = idpRepo.GetOAuth(CTX, idpRepo.IDCondition(addOAuth.Id), instanceID, nil)
+			require.NoError(t, err)
+		}, retryDuration, tick)
+
+		name = "new_" + name
+		beforeCreate := time.Now()
+		_, err = AdminClient.UpdateGenericOAuthProvider(CTX, &admin.UpdateGenericOAuthProviderRequest{
+			Id:                    addOAuth.Id,
+			Name:                  name,
+			ClientId:              "new_clientId",
+			ClientSecret:          "new_clientSecret",
+			AuthorizationEndpoint: "new_authoizationEndpoint",
+			TokenEndpoint:         "new_tokenEndpoint",
+			UserEndpoint:          "new_userEndpoint",
+			Scopes:                []string{"new_scope"},
+			IdAttribute:           "new_idAttribute",
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+			UsePkce: true,
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			updateOauth, err := idpRepo.GetOAuth(CTX,
+				idpRepo.IDCondition(addOAuth.Id),
+				instanceID,
+				nil,
+			)
+			require.NoError(t, err)
+
+			// event instance.idp.oauth.changed
+			// idp
+			assert.Equal(t, addOAuth.Id, oauth.IdentityProvider.ID)
+			assert.Equal(t, domain.IDPTypeOAuth.String(), oauth.Type)
+
+			// oauth
+			assert.Equal(t, addOAuth.Id, updateOauth.IdentityProvider.ID)
+			assert.Equal(t, "new_clientId", updateOauth.ClientID)
+			assert.NotEqual(t, oauth.ClientSecret, updateOauth.ClientSecret)
+			assert.Equal(t, "new_authoizationEndpoint", updateOauth.AuthorizationEndpoint)
+			assert.Equal(t, "new_tokenEndpoint", updateOauth.TokenEndpoint)
+			assert.Equal(t, "new_userEndpoint", updateOauth.UserEndpoint)
+			assert.Equal(t, []string{"new_scope"}, updateOauth.Scopes)
+			assert.Equal(t, true, updateOauth.AllowLinking)
+			assert.Equal(t, true, updateOauth.AllowCreation)
+			assert.Equal(t, true, updateOauth.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateOauth.AllowAutoLinking)
+			assert.Equal(t, true, updateOauth.UsePKCE)
+			assert.WithinRange(t, updateOauth.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp oidc added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add oidc
+		beforeCreate := time.Now().Add(-1 * time.Second)
+		addOIDC, err := AdminClient.AddGenericOIDCProvider(CTX, &admin.AddGenericOIDCProviderRequest{
+			Name:         name,
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Scopes:       []string{"scope"},
+			Issuer:       "issuer",
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+			IsIdTokenMapping: false,
+			UsePkce:          false,
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		// check values for oidc
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			oidc, err := idpRepo.GetOIDC(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.oidc added
+			// idp
+			assert.Equal(t, addOIDC.Id, oidc.ID)
+			assert.Equal(t, domain.IDPTypeOIDC.String(), oidc.Type)
+
+			// oidc
+			assert.Equal(t, addOIDC.Id, oidc.ID)
+			assert.Equal(t, "clientId", oidc.ClientID)
+			// assert.NotNil(t, oidc.ClientSecret)
+			// assert.Equal(t, "authoizationEndpoint", oidc.AuthorizationEndpoint)
+			// assert.Equal(t, "tokenEndpoint", oidc.TokenEndpoint)
+			// assert.Equal(t, "userEndpoint", oidc.UserEndpoint)
+			// assert.Equal(t, "userEndpoint", oidc.UserEndpoint)
+			assert.Equal(t, []string{"scope"}, oidc.Scopes)
+			assert.Equal(t, "issuer", oidc.Issuer)
+			assert.Equal(t, false, oidc.IsIDTokenMapping)
+			assert.Equal(t, false, oidc.AllowLinking)
+			assert.Equal(t, false, oidc.AllowCreation)
+			assert.Equal(t, false, oidc.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), oidc.AllowAutoLinking)
+			assert.Equal(t, false, oidc.UsePKCE)
+			assert.WithinRange(t, oidc.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, oidc.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instanceidp oidc changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		addOIDC, err := AdminClient.AddGenericOIDCProvider(CTX, &admin.AddGenericOIDCProviderRequest{
+			Name:         name,
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Scopes:       []string{"scope"},
+			Issuer:       "issuer",
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+			IsIdTokenMapping: false,
+			UsePkce:          false,
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		// check values for oidc
+		var oidc *domain.IDPOIDC
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			oidc, err = idpRepo.GetOIDC(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
+			require.NoError(t, err)
+		}, retryDuration, tick)
+
+		name = "new_" + name
+		beforeCreate := time.Now()
+		_, err = AdminClient.UpdateGenericOIDCProvider(CTX, &admin.UpdateGenericOIDCProviderRequest{
+			Id:           addOIDC.Id,
+			Name:         name,
+			Issuer:       "new_issuer",
+			ClientId:     "new_clientId",
+			ClientSecret: "new_clientSecret",
+			Scopes:       []string{"new_scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+			IsIdTokenMapping: true,
+			UsePkce:          true,
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			updateOIDC, err := idpRepo.GetOIDC(CTX,
+				idpRepo.IDCondition(addOIDC.Id),
+				instanceID,
+				nil,
+			)
+			require.NoError(t, err)
+
+			// event instance.idp.oidc.changed
+			// idp
+			assert.Equal(t, addOIDC.Id, oidc.ID)
+			assert.Equal(t, domain.IDPTypeOIDC.String(), oidc.Type)
+
+			// oidc
+			assert.Equal(t, addOIDC.Id, updateOIDC.ID)
+			assert.Equal(t, "new_clientId", updateOIDC.ClientID)
+			assert.NotEqual(t, oidc.ClientSecret, updateOIDC.ClientSecret)
+			// assert.Equal(t, "new_authoizationEndpoint", updateOIDC.AuthorizationEndpoint)
+			// assert.Equal(t, "new_tokenEndpoint", updateOIDC.TokenEndpoint)
+			assert.Equal(t, []string{"new_scope"}, updateOIDC.Scopes)
+			assert.Equal(t, true, updateOIDC.IsIDTokenMapping)
+			assert.Equal(t, true, updateOIDC.AllowLinking)
+			assert.Equal(t, true, updateOIDC.AllowCreation)
+			assert.Equal(t, true, updateOIDC.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateOIDC.AllowAutoLinking)
+			assert.Equal(t, true, updateOIDC.UsePKCE)
+			assert.WithinRange(t, updateOIDC.UpdatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)
 	})
 }

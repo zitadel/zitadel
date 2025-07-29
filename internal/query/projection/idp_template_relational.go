@@ -2,13 +2,27 @@ package projection
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
+)
+
+const (
+	IDPRelationalAllowCreationCol     = "allow_creation"
+	IDPRelationalAllowLinkingCol      = "allow_linking"
+	IDPRelationalAllowAutoCreationCol = "allow_auto_creation"
+	IDPRelationalAllowAutoUpdateCol   = "allow_auto_update"
+	IDPRelationalAllowAutoLinkingCol  = "allow_auto_linking"
 )
 
 type idpTemplateRelationalProjection struct {
@@ -25,7 +39,6 @@ func newIDPTemplateRelationalProjection(ctx context.Context, config handler.Conf
 
 func (*idpTemplateRelationalProjection) Name() string {
 	return IDPRelationalTable
-	// return IDPTemplateTable
 }
 
 func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer {
@@ -35,20 +48,20 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.OAuthIDPAddedEventType,
-					Reduce: p.reduceOAuthIDPAdded,
+					Reduce: p.reduceOAuthIDPRelationalAdded,
 				},
-				// 		{
-				// 			Event:  instance.OAuthIDPChangedEventType,
-				// 			Reduce: p.reduceOAuthIDPChanged,
-				// 		},
-				// 		{
-				// 			Event:  instance.OIDCIDPAddedEventType,
-				// 			Reduce: p.reduceOIDCIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  instance.OIDCIDPChangedEventType,
-				// 			Reduce: p.reduceOIDCIDPChanged,
-				// 		},
+				{
+					Event:  instance.OAuthIDPChangedEventType,
+					Reduce: p.reduceOAuthIDPRelationalChanged,
+				},
+				{
+					Event:  instance.OIDCIDPAddedEventType,
+					Reduce: p.reduceOIDCIDPRelationalAdded,
+				},
+				{
+					Event:  instance.OIDCIDPChangedEventType,
+					Reduce: p.reduceOIDCIDPRelationalChanged,
+				},
 				// 		{
 				// 			Event:  instance.OIDCIDPMigratedAzureADEventType,
 				// 			Reduce: p.reduceOIDCIDPMigratedAzureAD,
@@ -323,191 +336,218 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 	}
 }
 
-// func (p *idpTemplateProjection) reduceOAuthIDPAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.OAuthIDPAddedEvent
-// 	var idpOwnerType domain.IdentityProviderType
-// 	switch e := event.(type) {
-// 	case *org.OAuthIDPAddedEvent:
-// 		idpEvent = e.OAuthIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeOrg
-// 	case *instance.OAuthIDPAddedEvent:
-// 		idpEvent = e.OAuthIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeSystem
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPAddedEventType, instance.OAuthIDPAddedEventType})
-// 	}
+func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	// var idpEvent idp.OAuthIDPAddedEvent
+	// var idpOwnerType domain.IdentityProviderType
+	// switch e := event.(type) {
+	// case *org.OAuthIDPAddedEvent:
+	// 	idpEvent = e.OAuthIDPAddedEvent
+	// 	idpOwnerType = domain.IdentityProviderTypeOrg
+	// case *instance.OAuthIDPAddedEvent:
+	// 	idpEvent = e.OAuthIDPAddedEvent
+	// 	idpOwnerType = domain.IdentityProviderTypeSystem
+	// default:
+	// }
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
-// 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
-// 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-// 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
-// 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOAuth),
-// 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
-// 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
-// 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
-// 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-// 				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
-// 			},
-// 		),
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(OAuthIDCol, idpEvent.ID),
-// 				handler.NewCol(OAuthInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(OAuthClientIDCol, idpEvent.ClientID),
-// 				handler.NewCol(OAuthClientSecretCol, idpEvent.ClientSecret),
-// 				handler.NewCol(OAuthAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
-// 				handler.NewCol(OAuthTokenEndpointCol, idpEvent.TokenEndpoint),
-// 				handler.NewCol(OAuthUserEndpointCol, idpEvent.UserEndpoint),
-// 				handler.NewCol(OAuthScopesCol, database.TextArray[string](idpEvent.Scopes)),
-// 				handler.NewCol(OAuthIDAttributeCol, idpEvent.IDAttribute),
-// 				handler.NewCol(OAuthUsePKCECol, idpEvent.UsePKCE),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateOAuthSuffix),
-// 		),
-// 	), nil
-// }
+	e, ok := event.(*instance.OAuthIDPAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPAddedEventType, instance.OAuthIDPAddedEventType})
+	}
 
-// func (p *idpTemplateProjection) reduceOAuthIDPChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.OAuthIDPChangedEvent
-// 	switch e := event.(type) {
-// 	case *org.OAuthIDPChangedEvent:
-// 		idpEvent = e.OAuthIDPChangedEvent
-// 	case *instance.OAuthIDPChangedEvent:
-// 		idpEvent = e.OAuthIDPChangedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
-// 	}
+	oauth := domain.OAuth{
+		ID:                    e.ID,
+		Name:                  e.Name,
+		ClientID:              e.ClientID,
+		ClientSecret:          e.ClientSecret,
+		AuthorizationEndpoint: e.AuthorizationEndpoint,
+		TokenEndpoint:         e.TokenEndpoint,
+		UserEndpoint:          e.UserEndpoint,
+		Scopes:                e.Scopes,
+		IDAttribute:           e.IDAttribute,
+		UsePKCE:               e.UsePKCE,
+	}
 
-// 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-// 	ops = append(ops,
-// 		handler.AddUpdateStatement(
-// 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 	)
-// 	oauthCols := reduceOAuthIDPChangedColumns(idpEvent)
-// 	if len(oauthCols) > 0 {
-// 		ops = append(ops,
-// 			handler.AddUpdateStatement(
-// 				oauthCols,
-// 				[]handler.Condition{
-// 					handler.NewCond(OAuthIDCol, idpEvent.ID),
-// 					handler.NewCond(OAuthInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				},
-// 				handler.WithTableSuffix(IDPTemplateOAuthSuffix),
-// 			),
-// 		)
-// 	}
+	payload, err := json.Marshal(oauth)
+	if err != nil {
+		return nil, err
+	}
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		ops...,
-// 	), nil
-// }
+	return handler.NewMultiStatement(
+		e,
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, e.ID),
+				handler.NewCol(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateNameCol, e.Name),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOAuth.String()),
+				handler.NewCol(IDPRelationalAllowCreationCol, e.IsCreationAllowed),
+				handler.NewCol(IDPRelationalAllowLinkingCol, e.IsLinkingAllowed),
+				handler.NewCol(IDPRelationalAllowAutoCreationCol, e.IsAutoCreation),
+				handler.NewCol(IDPRelationalAllowAutoUpdateCol, e.IsAutoUpdate),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(e.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(CreatedAt, e.CreationDate()),
+			},
+		),
+	), nil
+}
 
-// func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.OIDCIDPAddedEvent
-// 	var idpOwnerType domain.IdentityProviderType
-// 	switch e := event.(type) {
-// 	case *org.OIDCIDPAddedEvent:
-// 		idpEvent = e.OIDCIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeOrg
-// 	case *instance.OIDCIDPAddedEvent:
-// 		idpEvent = e.OIDCIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeSystem
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPAddedEventType, instance.OIDCIDPAddedEventType})
-// 	}
+func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	// var idpEvent idp.OAuthIDPChangedEvent
+	// switch e := event.(type) {
+	// case *org.OAuthIDPChangedEvent:
+	// 	idpEvent = e.OAuthIDPChangedEvent
+	// case *instance.OAuthIDPChangedEvent:
+	// 	idpEvent = e.OAuthIDPChangedEvent
+	// default:
+	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
+	// }
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
-// 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
-// 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-// 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
-// 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOIDC),
-// 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
-// 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
-// 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
-// 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-// 				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
-// 			},
-// 		),
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(OIDCIDCol, idpEvent.ID),
-// 				handler.NewCol(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(OIDCIssuerCol, idpEvent.Issuer),
-// 				handler.NewCol(OIDCClientIDCol, idpEvent.ClientID),
-// 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
-// 				handler.NewCol(OIDCScopesCol, database.TextArray[string](idpEvent.Scopes)),
-// 				handler.NewCol(OIDCIDTokenMappingCol, idpEvent.IsIDTokenMapping),
-// 				handler.NewCol(OIDCUsePKCECol, idpEvent.UsePKCE),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateOIDCSuffix),
-// 		),
-// 	), nil
-// }
+	e, ok := event.(*instance.OAuthIDPChangedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
+	}
 
-// func (p *idpTemplateProjection) reduceOIDCIDPChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.OIDCIDPChangedEvent
-// 	switch e := event.(type) {
-// 	case *org.OIDCIDPChangedEvent:
-// 		idpEvent = e.OIDCIDPChangedEvent
-// 	case *instance.OIDCIDPChangedEvent:
-// 		idpEvent = e.OIDCIDPChangedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
-// 	}
+	oauth, err := p.idpRepo.GetOAuth(context.Background(), p.idpRepo.IDCondition(e.ID), e.Agg.InstanceID, nil)
+	if err != nil {
+		return nil, err
+	}
 
-// 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-// 	ops = append(ops,
-// 		handler.AddUpdateStatement(
-// 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 	)
-// 	oidcCols := reduceOIDCIDPChangedColumns(idpEvent)
-// 	if len(oidcCols) > 0 {
-// 		ops = append(ops,
-// 			handler.AddUpdateStatement(
-// 				oidcCols,
-// 				[]handler.Condition{
-// 					handler.NewCond(OIDCIDCol, idpEvent.ID),
-// 					handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				},
-// 				handler.WithTableSuffix(IDPTemplateOIDCSuffix),
-// 			),
-// 		)
-// 	}
+	columns := make([]handler.Column, 0, 7)
+	reduceIDPRelationalChangedTemplateColumns(e.Name, e.OptionChanges, &columns)
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		ops...,
-// 	), nil
-// }
+	payload := &oauth.OAuth
+	payloadChanged := reduceOAuthIDPRelationalChangedColumns(payload, &e.OAuthIDPChangedEvent)
+	if payloadChanged {
+		payload, err := json.Marshal(e)
+		if err != nil {
+			return nil, err
+		}
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+	}
+
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, e.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
+
+func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	// var idpEvent idp.OIDCIDPAddedEvent
+	// var idpOwnerType domain.IdentityProviderType
+	// switch e := event.(type) {
+	// case *org.OIDCIDPAddedEvent:
+	// 	idpEvent = e.OIDCIDPAddedEvent
+	// 	idpOwnerType = domain.IdentityProviderTypeOrg
+	// case *instance.OIDCIDPAddedEvent:
+	// 	idpEvent = e.OIDCIDPAddedEvent
+	// 	idpOwnerType = domain.IdentityProviderTypeSystem
+	// default:
+	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPAddedEventType, instance.OIDCIDPAddedEventType})
+	// }
+
+	e, ok := event.(*instance.OIDCIDPAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPAddedEventType, instance.OIDCIDPAddedEventType})
+	}
+
+	payload, err := json.Marshal(e)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewMultiStatement(
+		e,
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, e.ID),
+				handler.NewCol(CreatedAt, e.CreationDate()),
+				// handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				// handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				// handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, e.Name),
+				// handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOIDC.String()),
+				handler.NewCol(IDPRelationalAllowCreationCol, e.IsCreationAllowed),
+				handler.NewCol(IDPRelationalAllowLinkingCol, e.IsLinkingAllowed),
+				handler.NewCol(IDPRelationalAllowAutoCreationCol, e.IsAutoCreation),
+				handler.NewCol(IDPRelationalAllowAutoUpdateCol, e.IsAutoUpdate),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(e.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalPayloadCol, payload),
+			},
+		),
+	), nil
+}
+
+func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	// var idpEvent idp.OIDCIDPChangedEvent
+	// switch e := event.(type) {
+	// case *org.OIDCIDPChangedEvent:
+	// 	idpEvent = e.OIDCIDPChangedEvent
+	// case *instance.OIDCIDPChangedEvent:
+	// 	idpEvent = e.OIDCIDPChangedEvent
+	// default:
+	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
+	// }
+
+	e, ok := event.(*instance.OIDCIDPChangedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
+	}
+
+	oidc, err := p.idpRepo.GetOIDC(context.Background(), p.idpRepo.IDCondition(e.ID), e.Agg.InstanceID, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	columns := make([]handler.Column, 0, 7)
+	reduceIDPRelationalChangedTemplateColumns(e.Name, e.OptionChanges, &columns)
+
+	// ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
+	// ops = append(ops,
+	// 	handler.AddUpdateStatement(
+	// 		reduceIDPRelationalChangedTemplateColumns(e.Name, e.OptionChanges),
+	// 		[]handler.Condition{
+	// 			handler.NewCond(IDPTemplateIDCol, e.ID),
+	// 			handler.NewCond(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+	// 		},
+	// 	),
+	// )
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> OIDC CHANGED")
+	payload := &oidc.OIDC
+	payloadChanged := reduceOIDCIDPRelationalChangedColumns(payload, &e.OIDCIDPChangedEvent)
+	if payloadChanged {
+		payload, err := json.Marshal(e)
+		if err != nil {
+			return nil, err
+		}
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+	}
+
+	// return handler.NewMultiStatement(
+	// 	&e,
+	// 	ops...,
+	// ), nil
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, e.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
 
 // func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Event) (*handler.Statement, error) {
 // 	var idpEvent idp.OIDCIDPMigratedAzureADEvent
@@ -2174,3 +2214,90 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 // 	}
 // 	return SAMLCols
 // }
+
+func reduceIDPRelationalChangedTemplateColumns(name *string, optionChanges idp.OptionChanges, cols *[]handler.Column) {
+	if name != nil {
+		*cols = append(*cols, handler.NewCol(IDPTemplateNameCol, *name))
+	}
+	if optionChanges.IsCreationAllowed != nil {
+		*cols = append(*cols, handler.NewCol(IDPRelationalAllowCreationCol, *optionChanges.IsCreationAllowed))
+	}
+	if optionChanges.IsLinkingAllowed != nil {
+		*cols = append(*cols, handler.NewCol(IDPRelationalAllowLinkingCol, *optionChanges.IsLinkingAllowed))
+	}
+	if optionChanges.IsAutoCreation != nil {
+		*cols = append(*cols, handler.NewCol(IDPRelationalAllowAutoCreationCol, *optionChanges.IsAutoCreation))
+	}
+	if optionChanges.IsAutoUpdate != nil {
+		*cols = append(*cols, handler.NewCol(IDPRelationalAllowAutoUpdateCol, *optionChanges.IsAutoUpdate))
+	}
+	if optionChanges.AutoLinkingOption != nil {
+		*cols = append(*cols, handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(*optionChanges.AutoLinkingOption).String()))
+	}
+}
+
+func reduceOAuthIDPRelationalChangedColumns(payload *domain.OAuth, idpEvent *idp.OAuthIDPChangedEvent) bool {
+	payloadChange := false
+	if idpEvent.ClientID != nil {
+		payloadChange = true
+		payload.ClientID = *idpEvent.ClientID
+	}
+	if idpEvent.ClientSecret != nil {
+		payloadChange = true
+		payload.ClientSecret = idpEvent.ClientSecret
+	}
+	if idpEvent.AuthorizationEndpoint != nil {
+		payloadChange = true
+		payload.AuthorizationEndpoint = *idpEvent.AuthorizationEndpoint
+	}
+	if idpEvent.TokenEndpoint != nil {
+		payloadChange = true
+		payload.TokenEndpoint = *idpEvent.TokenEndpoint
+	}
+	if idpEvent.UserEndpoint != nil {
+		payloadChange = true
+		payload.UserEndpoint = *idpEvent.UserEndpoint
+	}
+	if idpEvent.Scopes != nil {
+		payloadChange = true
+		payload.Scopes = idpEvent.Scopes
+	}
+	if idpEvent.IDAttribute != nil {
+		payloadChange = true
+		payload.IDAttribute = *idpEvent.IDAttribute
+	}
+	if idpEvent.UsePKCE != nil {
+		payloadChange = true
+		payload.UsePKCE = *idpEvent.UsePKCE
+	}
+	return payloadChange
+}
+
+func reduceOIDCIDPRelationalChangedColumns(payload *domain.OIDC, idpEvent *idp.OIDCIDPChangedEvent) bool {
+	payloadChange := false
+	if idpEvent.ClientID != nil {
+		payloadChange = true
+		payload.ClientID = *idpEvent.ClientID
+	}
+	if idpEvent.ClientSecret != nil {
+		payloadChange = true
+		payload.ClientSecret = *idpEvent.ClientSecret
+	}
+	if idpEvent.Issuer != nil {
+		payloadChange = true
+		payload.Issuer = *idpEvent.Issuer
+	}
+	if idpEvent.Scopes != nil {
+		payloadChange = true
+		payload.Scopes = idpEvent.Scopes
+	}
+	if idpEvent.IsIDTokenMapping != nil {
+		payloadChange = true
+		payload.IsIDTokenMapping = *idpEvent.IsIDTokenMapping
+	}
+	if idpEvent.UsePKCE != nil {
+		payloadChange = true
+		payload.UsePKCE = *idpEvent.UsePKCE
+	}
+	return payloadChange
+}

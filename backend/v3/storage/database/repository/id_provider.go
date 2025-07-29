@@ -163,6 +163,28 @@ func (i *idProvider) GetJWT(ctx context.Context, id domain.IDPIdentifierConditio
 	return idpJWT, nil
 }
 
+func (i *idProvider) GetOAuth(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPOAuth, error) {
+	idpOAuth := &domain.IDPOAuth{}
+	var err error
+
+	idpOAuth.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpOAuth.Type != domain.IDPTypeOAuth.String() {
+		// TODO
+		return nil, errors.New("WRONG TYPE")
+	}
+
+	err = json.Unmarshal([]byte(*idpOAuth.Payload), idpOAuth)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpOAuth, nil
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
@@ -282,8 +304,8 @@ func (i idProvider) AllowLinkingCondition(allow bool) database.Condition {
 	return database.NewBooleanCondition(i.AllowLinkingColumn(), allow)
 }
 
-func (i idProvider) AllowAutoLinkingCondition(allow bool) database.Condition {
-	return database.NewBooleanCondition(i.AllowAutoLinkingColumn(), allow)
+func (i idProvider) AllowAutoLinkingCondition(linkingType domain.IDPAutoLinkingOption) database.Condition {
+	return database.NewTextCondition(i.AllowAutoLinkingColumn(), database.TextOperationEqual, linkingType.String())
 }
 
 func (i idProvider) StylingTypeCondition(style int16) database.Condition {

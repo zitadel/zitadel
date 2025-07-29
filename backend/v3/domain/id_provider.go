@@ -35,6 +35,15 @@ const (
 	IDPStateInactive
 )
 
+//go:generate enumer -type IDPAutoLinkingOption -transform lower -trimprefix IDPAutoLinkingOption
+type IDPAutoLinkingOption uint8
+
+const (
+	IDPAutoLinkingOptionUnspecified IDPAutoLinkingOption = iota
+	IDPAutoLinkingOptionUserName
+	IDPAutoLinkingOptionEmail
+)
+
 type OIDCMappingField int8
 
 const (
@@ -57,8 +66,8 @@ type IdentityProvider struct {
 	AllowAutoCreation bool      `json:"allowAutoCreation,omitempty" db:"allow_auto_creation"`
 	AllowAutoUpdate   bool      `json:"allowAutoUpdate,omitempty" db:"allow_auto_update"`
 	AllowLinking      bool      `json:"allowLinking,omitempty" db:"allow_linking"`
-	AllowAutoLinking  bool      `json:"allowAutoLinking,omitempty" db:"allow_auto_linking"`
-	StylingType       int16     `json:"stylingType,omitempty" db:"styling_type"`
+	AllowAutoLinking  string    `json:"allowAutoLinking,omitempty" db:"allow_auto_linking"`
+	StylingType       *int16    `json:"stylingType,omitempty" db:"styling_type"`
 	Payload           *string   `json:"payload,omitempty" db:"payload"`
 	CreatedAt         time.Time `json:"createdAt,omitempty" db:"created_at"`
 	UpdatedAt         time.Time `json:"updatedAt,omitempty" db:"updated_at"`
@@ -74,6 +83,8 @@ type OIDC struct {
 	Scopes                []string           `json:"scopes,omitempty"`
 	IDPDisplayNameMapping OIDCMappingField   `json:"IDPDisplayNameMapping,omitempty"`
 	UserNameMapping       OIDCMappingField   `json:"usernameMapping,omitempty"`
+	IsIDTokenMapping      bool               `json:"idTokenMapping,omitempty"`
+	UsePKCE               bool               `json:"usePKCE,omitempty"`
 }
 
 type IDPOIDC struct {
@@ -92,6 +103,24 @@ type JWT struct {
 type IDPJWT struct {
 	*IdentityProvider
 	JWT
+}
+
+type OAuth struct {
+	ID                    string              `json:"id"`
+	Name                  string              `json:"name,omitempty"`
+	ClientID              string              `json:"clientId,omitempty"`
+	ClientSecret          *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	AuthorizationEndpoint string              `json:"authorizationEndpoint,omitempty"`
+	TokenEndpoint         string              `json:"tokenEndpoint,omitempty"`
+	UserEndpoint          string              `json:"userEndpoint,omitempty"`
+	Scopes                []string            `json:"scopes,omitempty"`
+	IDAttribute           string              `json:"idAttribute,omitempty"`
+	UsePKCE               bool                `json:"usePKCE,omitempty"`
+}
+
+type IDPOAuth struct {
+	*IdentityProvider
+	OAuth
 }
 
 // IDPIdentifierCondition is used to help specify a single identity_provider,
@@ -132,7 +161,7 @@ type idProviderConditions interface {
 	AllowAutoCreationCondition(allow bool) database.Condition
 	AllowAutoUpdateCondition(allow bool) database.Condition
 	AllowLinkingCondition(allow bool) database.Condition
-	AllowAutoLinkingCondition(allow bool) database.Condition
+	AllowAutoLinkingCondition(linkingType IDPAutoLinkingOption) database.Condition
 	StylingTypeCondition(style int16) database.Condition
 	PayloadCondition(payload string) database.Condition
 }
@@ -164,4 +193,6 @@ type IDProviderRepository interface {
 
 	GetOIDC(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOIDC, error)
 	GetJWT(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPJWT, error)
+
+	GetOAuth(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOAuth, error)
 }
