@@ -79,7 +79,7 @@ jobs:
           path: ${{ inputs.core_cache_path }}
           key: ${{ inputs.core_cache_key }}
           fail-on-cache-miss: true
-      - uses: golangci/golangci-lint-action@v6
+      - uses: golangci/golangci-lint-action@v8
         with:
           version: ${{ inputs.go_lint_version }}
           github-token: ${{ github.token }}
