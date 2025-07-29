@@ -11,7 +11,7 @@ services:
     ports:
       - '5432:5432'
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
       interval: 10s
       timeout: 60s
       retries: 5
@@ -23,12 +23,8 @@ services:
     restart: 'no'
     networks:
       - 'storage'
-    image: 'ghcr.io/zitadel/zitadel:v4.0.0-rc.1'
-    command: [
-      init,
-      --config, /example-zitadel-config.yaml,
-      --config,  /example-zitadel-secrets.yaml
-    ]
+    image: 'ghcr.io/zitadel/zitadel:v4.0.0-rc.2'
+    command: [ init, --config, /example-zitadel-config.yaml, --config, /example-zitadel-secrets.yaml ]
     depends_on:
       db:
         condition: 'service_healthy'
@@ -40,14 +36,8 @@ services:
     restart: 'no'
     networks:
       - 'storage'
-    image: 'ghcr.io/zitadel/zitadel:v4.0.0-rc.1'
-    command: [
-      setup,
-      --config, /current-dir/example-zitadel-config.yaml,
-      --config, /current-dir/example-zitadel-secrets.yaml,
-      --steps, /current-dir/example-zitadel-init-steps.yaml,
-      --masterkey, MasterkeyNeedsToHave32Characters
-    ]
+    image: 'ghcr.io/zitadel/zitadel:v4.0.0-rc.2'
+    command: [ setup, --config, /current-dir/example-zitadel-config.yaml, --config, /current-dir/example-zitadel-secrets.yaml, --steps, /current-dir/example-zitadel-init-steps.yaml, --masterkey, MasterkeyNeedsToHave32Characters ]
     depends_on:
       zitadel-init:
         condition: 'service_completed_successfully'
@@ -66,13 +56,8 @@ services:
       - "traefik.http.services.zitadel.loadbalancer.passhostheader=true"
       - "traefik.http.services.zitadel.loadbalancer.server.scheme=h2c"
       - "traefik.http.services.zitadel.loadbalancer.server.port=8080"
-    image: 'ghcr.io/zitadel/zitadel:v4.0.0-rc.1'
-    command: [
-      start,
-      --config, /example-zitadel-config.yaml,
-      --config, /example-zitadel-secrets.yaml,
-      --masterkey, MasterkeyNeedsToHave32Characters
-    ]
+    image: 'ghcr.io/zitadel/zitadel:v4.0.0-rc.2'
+    command: [ start, --config, /example-zitadel-config.yaml, --config, /example-zitadel-secrets.yaml, --masterkey, MasterkeyNeedsToHave32Characters ]
     depends_on:
       zitadel-setup:
         condition: 'service_completed_successfully'
@@ -81,11 +66,7 @@ services:
       - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
       - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
     healthcheck:
-      test: [
-        "CMD", "/app/zitadel", "ready",
-        "--config", "/example-zitadel-config.yaml",
-        "--config", "/example-zitadel-secrets.yaml"
-      ]
+      test: [ "CMD", "/app/zitadel", "ready", "--config", "/example-zitadel-config.yaml", "--config", "/example-zitadel-secrets.yaml" ]
       interval: 10s
       timeout: 60s
       retries: 5
@@ -100,7 +81,7 @@ services:
       - "traefik.http.routers.login.tls=true" # Traefik uses a self-signed certificate
       - "traefik.http.services.login.loadbalancer.passhostheader=true"
       - "traefik.http.services.login.loadbalancer.server.port=3000"
-    image: 'ghcr.io/zitadel/zitadel-login:v4.0.0-rc.1'
+    image: 'ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2'
     environment:
       - ZITADEL_API_URL=http://zitadel:8080
       - CUSTOM_REQUEST_HEADERS=Host:localhost
@@ -133,6 +114,7 @@ services:
 networks:
   storage:
   backend:
+
 
 volumes:
   data:
