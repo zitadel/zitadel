@@ -31,7 +31,7 @@ jobs:
     permissions:
       packages: write
     outputs:
-      login_build_image: ${{ inputs.login_build_image_name }}:${{ steps.short_sha.outputs.short_sha }}
+      login_build_image: ${{ inputs.login_build_image_name }}:${{ steps.short-sha.outputs.short_sha }}
     steps:
       - uses: actions/checkout@v4
       - name: Get short SHA
