@@ -45,5 +45,5 @@ func (s OrgState) Valid() bool {
 }
 
 func (s OrgState) Exists() bool {
-	return s != OrgStateUnspecified && s != OrgStateRemoved
+	return s != OrgStateRemoved && s != OrgStateUnspecified
 }

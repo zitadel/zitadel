@@ -12,8 +12,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { State, WebKey } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
 import { CreateWebKeyRequestSchema } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
 import { RSAHasher, RSABits, ECDSACurve } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
-import { NewFeatureService } from 'src/app/services/new-feature.service';
-import { ActivatedRoute, Router } from '@angular/router';
 
 const CACHE_WARNING_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -22,9 +20,8 @@ const CACHE_WARNING_MS = 5 * 60 * 1000; // 5 minutes
   templateUrl: './oidc-webkeys.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OidcWebKeysComponent implements OnInit {
+export class OidcWebKeysComponent {
   protected readonly refresh = new Subject<true>();
-  protected readonly webKeysEnabled$: Observable<boolean>;
   protected readonly webKeys$: Observable<WebKey[]>;
   protected readonly inactiveWebKeys$: Observable<WebKey[]>;
   protected readonly nextWebKeyCandidate$: Observable<WebKey | undefined>;
@@ -34,17 +31,12 @@ export class OidcWebKeysComponent implements OnInit {
 
   constructor(
     private readonly webKeysService: WebKeysService,
-    private readonly featureService: NewFeatureService,
     private readonly toast: ToastService,
     private readonly timestampToDatePipe: TimestampToDatePipe,
     private readonly dialog: MatDialog,
     private readonly destroyRef: DestroyRef,
-    private readonly router: Router,
-    private readonly route: ActivatedRoute,
   ) {
-    this.webKeysEnabled$ = this.getWebKeysEnabled().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-
-    const webKeys$ = this.getWebKeys(this.webKeysEnabled$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    const webKeys$ = this.getWebKeys().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
     this.webKeys$ = webKeys$.pipe(map((webKeys) => webKeys.filter((webKey) => webKey.state !== State.INACTIVE)));
     this.inactiveWebKeys$ = webKeys$.pipe(map((webKeys) => webKeys.filter((webKey) => webKey.state === State.INACTIVE)));
@@ -52,34 +44,7 @@ export class OidcWebKeysComponent implements OnInit {
     this.nextWebKeyCandidate$ = this.getNextWebKeyCandidate(this.webKeys$);
   }
 
-  ngOnInit(): void {
-    // redirect away from this page if web keys are not enabled
-    // this also preloads the web keys enabled state
-    this.webKeysEnabled$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(async (webKeysEnabled) => {
-      if (webKeysEnabled) {
-        return;
-      }
-      await this.router.navigate([], {
-        relativeTo: this.route,
-        queryParamsHandling: 'merge',
-        queryParams: {
-          id: null,
-        },
-      });
-    });
-  }
-
-  private getWebKeysEnabled() {
-    return defer(() => this.featureService.getInstanceFeatures()).pipe(
-      map((features) => features.webKey?.enabled ?? false),
-      catchError((err) => {
-        this.toast.showError(err);
-        return of(false);
-      }),
-    );
-  }
-
-  private getWebKeys(webKeysEnabled$: Observable<boolean>) {
+  private getWebKeys() {
     return this.refresh.pipe(
       startWith(true),
       switchMap(() => {
@@ -87,12 +52,6 @@ export class OidcWebKeysComponent implements OnInit {
       }),
       map(({ webKeys }) => webKeys),
       catchError(async (err) => {
-        const webKeysEnabled = await firstValueFrom(webKeysEnabled$);
-        // suppress errors if web keys are not enabled
-        if (!webKeysEnabled) {
-          return [];
-        }
-
         this.toast.showError(err);
         return [];
       }),
