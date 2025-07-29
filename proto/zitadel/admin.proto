@@ -4030,7 +4030,7 @@ service AdminService {
 
     // List IAM Members
     //
-    // Deprecated: use [ListAdministrators](apis/resources/permission_service_v2/internal-permission-service-list-administrators.api.mdx) instead.
+    // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-list-administrators.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the instance level, matching the search queries. The search queries will be AND linked.
     rpc ListIAMMembers(ListIAMMembersRequest) returns (ListIAMMembersResponse) {
@@ -4058,7 +4058,7 @@ service AdminService {
 
     // Add IAM Member
     //
-    // Deprecated: use [CreateAdministrator](apis/resources/permission_service_v2/internal-permission-service-create-administrator.api.mdx) instead.
+    // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-create-administrator.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list with one or multiple roles.
     rpc AddIAMMember(AddIAMMemberRequest) returns (AddIAMMemberResponse) {
@@ -4097,7 +4097,7 @@ service AdminService {
 
     // Update IAM Member
     //
-    // Deprecated: use [UpdateAdministrator](apis/resources/permission_service_v2/internal-permission-service-update-administrator.api.mdx) instead.
+    // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-update-administrator.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateIAMMember(UpdateIAMMemberRequest) returns (UpdateIAMMemberResponse) {
@@ -4136,7 +4136,7 @@ service AdminService {
 
     // Remove IAM Member
     //
-    // Deprecated: use [DeleteAdministrator](apis/resources/permission_service_v2/internal-permission-service-delete-administrator.api.mdx) instead.
+    // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-delete-administrator.api.mdx) instead.
     //
     // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (organization, project).
     rpc RemoveIAMMember(RemoveIAMMemberRequest) returns (RemoveIAMMemberResponse) {
