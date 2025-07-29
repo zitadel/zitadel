@@ -84,7 +84,7 @@ func organizationSettingsToModel(filter *settings.OrganizationSettingsSearchFilt
 	case *settings.OrganizationSettingsSearchFilter_OrganizationScopedUsernamesFilter:
 		return organizationScopedUsernamesFilterToQuery(q.OrganizationScopedUsernamesFilter)
 	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, "SETTINGS-TODO", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "SETTINGS-uvTDqZHlvS", "List.Query.Invalid")
 	}
 }
 
