@@ -12,8 +12,8 @@ on:
         type: string
     outputs:
       login_build_image:
-          description: 'The full image tag of the standalone login image'
-          value: '${{ inputs.login_build_image_name }}:${{ steps.short-sha.outputs.short_sha }}'
+        description: 'The full image tag of the standalone login image'
+        value: ${{ jobs.login-container.outputs.login_build_image }}
 
 permissions:
   packages: write
@@ -30,6 +30,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+    outputs:
+      login_build_image: ${{ inputs.login_build_image_name }}:${{ steps.short_sha.outputs.short_sha }}
     steps:
       - uses: actions/checkout@v4
       - name: Get short SHA
