@@ -13,6 +13,7 @@ on:
     outputs:
       login_build_image:
           description: 'The full image tag of the standalone login image'
+          value: '${{ inputs.login_build_image_name }}:${{ steps.short-sha.outputs.short_sha }}'
 
 permissions:
   packages: write
