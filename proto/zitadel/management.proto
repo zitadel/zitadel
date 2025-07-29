@@ -1464,7 +1464,7 @@ service ManagementService {
 
     // Remove Multi-Factor U2F
     //
-    // Deprecated: use [user service v2 RemoveU2F](apis/resources/user_service_v2/user-service-remove-u2f.api.mdx) instead.
+    // Deprecated: use [user service v2 RemoveU2F](apis/resources/user_service_v2/user-service-remove-u-2-f.api.mdx) instead.
     //
     // Remove the configured Universal Second Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc.
     rpc RemoveHumanAuthFactorU2F(RemoveHumanAuthFactorU2FRequest) returns (RemoveHumanAuthFactorU2FResponse) {
@@ -1499,7 +1499,7 @@ service ManagementService {
 
     // Remove Multi-Factor OTP SMS
     //
-    // Deprecated: use [user service v2 RemoveOTPSMS](apis/resources/user_service_v2/user-service-remove-otp-sms.api.mdx) instead.
+    // Deprecated: use [user service v2 RemoveOTPSMS](apis/resources/user_service_v2/user-service-remove-otpsms.api.mdx) instead.
     //
     // Remove the configured One-Time Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
     rpc RemoveHumanAuthFactorOTPSMS(RemoveHumanAuthFactorOTPSMSRequest) returns (RemoveHumanAuthFactorOTPSMSResponse) {
@@ -2103,7 +2103,7 @@ service ManagementService {
 
     // List Social Logins
     //
-    // Deprecated: use [user service v2 ListLinkedIDPs](apis/resources/user_service_v2/user-service-list-linked-idps.api.mdx) instead.
+    // Deprecated: use [user service v2 ListLinkedIDPs](apis/resources/user_service_v2/user-service-list-idp-links.api.mdx) instead.
     //
     // Returns a list of all linked identity providers/social logins of the user. (e. Google, Microsoft, AzureAD, etc.).
     rpc ListHumanLinkedIDPs(ListHumanLinkedIDPsRequest) returns (ListHumanLinkedIDPsResponse) {
@@ -2132,7 +2132,7 @@ service ManagementService {
 
     // Remove Social Login
     //
-    // Deprecated: use [user service v2 ListLinkedIDPs](apis/resources/user_service_v2/user-service-list-linked-idps.api.mdx) instead.
+    // Deprecated: use [user service v2 RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp-link.api.mdx) instead.
     //
     // Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate.
     rpc RemoveHumanLinkedIDP(RemoveHumanLinkedIDPRequest) returns (RemoveHumanLinkedIDPResponse) {
