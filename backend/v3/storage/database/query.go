@@ -10,9 +10,10 @@ func WithCondition(condition Condition) QueryOption {
 }
 
 // WithOrderBy sets the columns to order the results by.
-func WithOrderBy(orderBy ...Column) QueryOption {
+func WithOrderBy(descending bool, orderBy ...Column) QueryOption {
 	return func(opts *QueryOpts) {
 		opts.OrderBy = orderBy
+		opts.OrderByDescending = descending
 	}
 }
 
@@ -69,6 +70,9 @@ type QueryOpts struct {
 	// OrderBy is the columns to order the results by.
 	// It is used to build the ORDER BY clause of the SQL statement.
 	OrderBy Columns
+	// OrderByDescending indicates if the results should be ordered in descending order.
+	// default is ascending order.
+	OrderByDescending bool
 	// Limit is the maximum number of results to return.
 	// It is used to build the LIMIT clause of the SQL statement.
 	Limit uint32
@@ -105,7 +109,15 @@ func (opts *QueryOpts) WriteOrderBy(builder *StatementBuilder) {
 		return
 	}
 	builder.WriteString(" ORDER BY ")
-	opts.OrderBy.Write(builder)
+	for i, col := range opts.OrderBy {
+		if i > 0 {
+			builder.WriteString(", ")
+		}
+		col.Write(builder)
+		if opts.OrderByDescending {
+			builder.WriteString(" DESC")
+		}
+	}
 }
 
 func (opts *QueryOpts) WriteLimit(builder *StatementBuilder) {
