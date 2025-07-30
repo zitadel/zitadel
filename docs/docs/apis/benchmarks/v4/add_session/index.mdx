@@ -1,0 +1,100 @@
+---
+title: create session benchmark of zitadel v4
+sidebar_label: create session
+---
+
+Benchmark results of v4 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value |
+|:--------------------------------------|:------|
+| Baseline                              | none  |
+| Purpose                               | Test current performance |
+| Test start                            | 11:31 UTC |
+| Test duration                         | 30min |
+| Executed test                         | add\_session |
+| k6 version                            | v1.0.0-rc1 |
+| VUs                                   | 600 |
+| Client location                       | US1 |
+| ZITADEL location                      | US1 |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7 |
+| ZITADEL Version                       | v4.0.0-rc2 |
+| ZITADEL feature flags                 | webKey: true, improvedPerformance: \[\"IMPROVED\_PERFORMANCE\_ORG\_BY\_ID\", \"IMPROVED\_PERFORMANCE\_PROJECT\", \"IMPROVED\_PERFORMANCE\_USER\_GRANT\", \"IMPROVED\_PERFORMANCE\_ORG\_DOMAIN\_VERIFIED\", \"IMPROVED\_PERFORMANCE\_PROJECT\_GRANT\"\] |
+| Database                              | type: psql<br />version: v17.4 |
+| Database location                     | US1 |
+| Database specification                | vCPU: 8<br/> memory: 32Gib |
+| ZITADEL metrics during test           |  |
+| Observed errors                       |  |
+| Top 3 most expensive database queries | 1: Query events by instance_id, aggregate_types, event_types, position<br/>2: write events<br/>3: list members<br/> |
+| k6 Iterations per second              |  |
+| k6 output                             | [output](#k6-output) |
+| flowchart outcome                     | 607 |
+
+## Endpoint latencies
+
+Until :37 were containers starting because it was a cold start test.
+
+import OutputSource from "./output.json";
+
+import { BenchmarkChart } from '/src/components/benchmark_chart';
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output {#k6-output}
+
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......................: 2244565 1213.769815/s
+    checks_succeeded...................: 99.99%  2244563 out of 2244565
+    checks_failed......................: 0.00%   2 out of 2244565
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✗ add Session status ok
+      ↳  99% — ✓ 1121975 / ✗ 2
+    ✓ add session is status ok
+    ✓ org removed
+
+    CUSTOM
+    add_session_duration....................................................: min=236ms    avg=962.51ms max=3.66s    p(50)=951ms    p(95)=1.33s    p(99)=1.55s   
+    login_ui_enter_login_name_duration......................................: min=184.04ms avg=184.04ms max=184.04ms p(50)=184.04ms p(95)=184.04ms p(99)=184.04ms
+    login_ui_enter_password_duration........................................: min=15.68ms  avg=15.68ms  max=15.68ms  p(50)=15.68ms  p(95)=15.68ms  p(99)=15.68ms 
+    login_ui_init_login_duration............................................: min=128.36ms avg=128.36ms max=128.36ms p(50)=128.36ms p(95)=128.36ms p(99)=128.36ms
+    login_ui_token_duration.................................................: min=87.2ms   avg=87.2ms   max=87.2ms   p(50)=87.2ms   p(95)=87.2ms   p(99)=87.2ms  
+    org_create_org_duration.................................................: min=76.73ms  avg=76.73ms  max=76.73ms  p(50)=76.73ms  p(95)=76.73ms  p(99)=76.73ms 
+    session_add_session_duration............................................: min=0s       avg=961.43ms max=3.66s    p(50)=950.06ms p(95)=1.33s    p(99)=1.55s   
+    user_create_human_duration..............................................: min=548.74ms avg=10.69s   max=16.39s   p(50)=13.39s   p(95)=15.97s   p(99)=16.28s  
+
+    HTTP
+    http_req_duration.......................................................: min=0s       avg=966.15ms max=18.87s   p(50)=950.04ms p(95)=1.33s    p(99)=1.55s   
+      { expected_response:true }............................................: min=15.68ms  avg=966.15ms max=18.87s   p(50)=950.04ms p(95)=1.33s    p(99)=1.55s   
+    http_req_failed.........................................................: 0.00%   2 out of 1123187
+    http_reqs...............................................................: 1123187 607.374025/s
+
+    EXECUTION
+    iteration_duration......................................................: min=1.63ms   avg=962.61ms max=3.66s    p(50)=951.17ms p(95)=1.33s    p(99)=1.55s   
+    iterations..............................................................: 1121977 606.719706/s
+    vus.....................................................................: 0       min=0            max=600
+    vus_max.................................................................: 600     min=600          max=600
+
+    NETWORK
+    data_received...........................................................: 617 MB  334 kB/s
+    data_sent...............................................................: 184 MB  100 kB/s
+
+running (30m49.3s), 000/600 VUs, 1121977 complete and 0 interrupted iterations
+default ✓ [======================================] 600 VUs  30m0s
+```
+
