@@ -1,13 +1,12 @@
 {
-  "name": "zitadel-docs",
-  "version": "0.0.0",
+  "name": "@zitadel/docs",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
     "dev": "docusaurus start",
     "start": "docusaurus start",
     "start:api": "pnpm run generate && docusaurus start",
-    "build": "pnpm run ensure-plugins && pnpm run generate && docusaurus build",
+    "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
@@ -16,7 +15,7 @@
     "write-heading-ids": "docusaurus write-heading-ids",
     "ensure-plugins": "if [ ! -f \"protoc-gen-connect-openapi/protoc-gen-connect-openapi\" ]; then sh ./plugin-download.sh; fi",
     "debug-plugins": "echo \"PWD: $(pwd)\" && echo \"Plugin file exists: $(test -f protoc-gen-connect-openapi/protoc-gen-connect-openapi && echo 'yes' || echo 'no')\" && echo \"Plugin executable: $(test -x protoc-gen-connect-openapi/protoc-gen-connect-openapi && echo 'yes' || echo 'no')\" && ls -la protoc-gen-connect-openapi/ || echo 'Plugin directory not found'",
-    "generate": "pnpm run generate:grpc && pnpm run generate:apidocs && pnpm run generate:configdocs",
+    "generate": "pnpm run generate:grpc && pnpm run generate:apidocs && pnpm run generate:configdocs && pnpm run ensure-plugins",
     "generate:grpc": "pnpm run ensure-plugins && buf generate ../proto",
     "generate:apidocs": "docusaurus gen-api-docs all",
     "generate:configdocs": "cp -r ../cmd/defaults.yaml ./docs/self-hosting/manage/configure/ && cp -r ../cmd/setup/steps.yaml ./docs/self-hosting/manage/configure/",
@@ -25,12 +24,30 @@
     "postinstall": "sh ./plugin-download.sh",
     "clean": "rm -rf node_modules .artifacts .docusaurus .turbo protoc-gen-connect-openapi docs/apis/resources"
   },
+  "nx": {
+    "targets": {
+      "generate": {
+        "outputs": [
+          "{projectRoot}/.artifacts/**"
+        ]
+      },
+      "build": {
+        "outputs": [
+          "{projectRoot}/build/**"
+        ],
+        "dependsOn": [
+          "^generate"
+        ]
+      }
+    }
+  },
   "dependencies": {
     "@bufbuild/buf": "^1.14.0",
     "@docusaurus/core": "^3.8.1",
     "@docusaurus/faster": "^3.8.1",
     "@docusaurus/preset-classic": "^3.8.1",
     "@docusaurus/theme-mermaid": "^3.8.1",
+    "@docusaurus/theme-common": "^3.8.1",
     "@docusaurus/theme-search-algolia": "^3.8.1",
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",

@@ -9,7 +9,7 @@ import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { Framework } from 'src/app/components/quickstart/quickstart.component';
-import frameworkDefinition from '../../../../../docs/frameworks.json';
+import frameworkDefinition from '../../../../../../docs/frameworks.json';
 import { NavigationService } from 'src/app/services/navigation.service';
 import { Location } from '@angular/common';
 
