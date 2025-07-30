@@ -751,10 +751,10 @@ module.exports = {
               label: "Organization (Beta)",
               link: {
                 type: "generated-index",
-                title: "Deprecated: Organization Service Beta API",
+                title: "Organization Service Beta API",
                 slug: "/apis/resources/org_service/v2beta",
                 description:
-                    "This beta API is intended to manage organizations for ZITADEL. It has now been deprecated and may be replaced or removed in future versions of the API. \n",
+                    "This beta API is intended to manage organizations for ZITADEL. Expect breaking changes to occur. Please use the v2 version for a stable API. \n",
               },
               items: sidebar_api_org_service_v2beta,
             },
