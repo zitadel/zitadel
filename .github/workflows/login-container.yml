@@ -64,7 +64,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Set up Docker Buildx
+        id: setup-buildx
         uses: docker/setup-buildx-action@v3
+      - name: Cache
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: .artifacts/cache-mount
+          key: login-build-cache-mount-${{ hashFiles('build/login/Dockerfile') }}
+      - name: Restore Docker login-build-cache-mount
+        uses: reproducible-containers/buildkit-cache-dance@v3
+        with:
+          builder: ${{ steps.setup-buildx.outputs.name }}
+          cache-dir: .artifacts/login-build-cache-mount
+          dockerfile: build/login/Dockerfile
+          skip-extraction: ${{ steps.cache.outputs.cache-hit }}        
       - name: Bake login multi-arch
         uses: docker/bake-action@v6
         env:
