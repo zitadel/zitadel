@@ -131,20 +131,9 @@ The user experience depends mainly on the operating system and browser.
 
 ## Hosted Login Version 2 (Beta)
 
-We have worked on a new, self-hostable implementation of our hosted login built with Next.js and leveraging our [Session API](/docs/guides/integrate/login/login-users#zitadels-session-api).
-This solution empowers you to easily fork and customize the login experience to perfectly match your brand and needs.
+The new, self-hostable implementation of our hosted login built with Next.js and leveraging our Session API empowers you to easily fork and customize the login experience to perfectly match your brand and needs. This is available for both, self-hosted and cloud customers.
 
-In this initial release, the new login is available for self-hosting only. We'll be progressively replacing the built-in login with this improved version, built with [TypeScript](https://github.com/zitadel/typescript).
-
-### Current State
-
-:::info
-The documentation describes the state of the feature in ZITADEL V3.
-:::
-
-Our primary goal for the TypeScript login system is to replace the existing login functionality within Zitadel Core, which is shipped with Zitadel automatically. This will allow us to leverage the benefits of the new system, including its modular architecture and enhanced security features.
-
-To achieve this, we are actively working on implementing the core features currently available in Zitadel Core, such as:
+The current implementation includes:
 
 - **Authentication Methods:**
   - Username and Password
@@ -172,15 +161,9 @@ For the first implementation we have excluded the following features:
   - As passkey and u2f is bound to a domain, it is important to notice, that setting up the authentication possibility in the ZITADEL management console (Self-service), will not work if the login runs on a different domain
 - Custom Login Texts
 
-### Beta Testing
-
-The TypeScript login system is currently in beta testing. Your feedback is invaluable in helping us refine and improve this new solution.
-At your convenience please open any issues faced on our Typescript Login GitHub repository to report bugs or suggest enhancements while more general feedback can be shared directly to fabienne@zitadel.com.
-Your contributions will play a crucial role in shaping the future of our login system. Thank you for your support!
-
 #### Step-by-step Guide
 
-**Trying out the new login:** To preview the new login without changing your current setup, the easiest way is to visit `https://<YOUR_ZITADEL_INSTANCE_DOMAIN>/ui/v2/login` on your Zitadel Cloud instance domain. You can also activate the v2 login for your apps, so users are redirected to `/ui/v2/login` for authentication.
+**Implementing the new login:** To preview the new login without changing your current setup, the easiest way is to visit `https://<YOUR_ZITADEL_INSTANCE_DOMAIN>/ui/v2/login` on your Zitadel Cloud instance domain. You can also activate the v2 login for your apps, so users are redirected to `/ui/v2/login` for authentication.
 
 **Customizing the new login:** The easiest way to actually customizing it is to fork the https://github.com/zitadel/typescript repo and use the "Deploy" button to run your code on Vercel.
 
@@ -223,7 +206,7 @@ Your contributions will play a crucial role in shaping the future of our login s
 
 ### Important Notes
 
-As this feature is currently in Beta, please be aware of some potential workarounds and important considerations before implementation.
+Please be aware of some potential workarounds and important considerations before implementation: 
 
 - **Create Users:** The new typescript login is built with the session and the user V2 API, the users V2 API does have some differences to the v1 API, so make sure you create users through the new API.
 - **External IDPs:** If you want to use external identity provider login, such as Login with Google or Apple. You can follow our existing setup guides, just make sure to use the following redirect url: $YOUR-DOMAIN/idps/callback
