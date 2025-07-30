@@ -42,7 +42,6 @@ RUN addgroup --system --gid 1001 nodejs && \
 RUN mkdir -p /.env-file && touch /.env-file/.env && chown -R nextjs:nodejs /.env-file
 COPY --chown=nextjs:nodejs apps/login/scripts ./
 COPY --chown=nextjs:nodejs --from=build-out . .
-# Debug the final structure
 USER nextjs
 ENV HOSTNAME="0.0.0.0"
 ENV PORT=3000
