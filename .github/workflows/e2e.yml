@@ -30,16 +30,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
-          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install
+      - name: Install Cypress binary
+        run: cd ./e2e && pnpm exec cypress install
       - name: Start DB and ZITADEL
-        run: ZITADEL_IMAGE=zitadel:local docker compose --file e2e/docker-compose.yaml up --detach --wait
-      - name: Cypress install
-        uses: cypress-io/github-action@v6
-        with:
-          browser: ${{ matrix.browser }}
-          install: true
-          runTests: false
+        run: |
+          cd ./e2e
+          ZITADEL_IMAGE=zitadel:local docker compose up --detach --wait
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
@@ -52,7 +50,6 @@ jobs:
           browser: ${{ matrix.browser }}
           config-file: cypress.config.ts
           install: false
-          runTests: true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
