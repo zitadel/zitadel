@@ -94,6 +94,7 @@ jobs:
       build_image_name: "ghcr.io/zitadel/zitadel-build"
 
   login-container:
+    needs: [compile]  
     uses: ./.github/workflows/login-container.yml
     permissions:
       packages: write
