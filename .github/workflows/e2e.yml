@@ -33,7 +33,7 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: pnpm-lock.yaml
       - name: Start DB and ZITADEL
-        run: ZITADEL_IMAGE=zitadel:local docker compose --file e2e/docker-compose.yml up --detach --wait
+        run: ZITADEL_IMAGE=zitadel:local docker compose --file e2e/docker-compose.yaml up --detach --wait
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
