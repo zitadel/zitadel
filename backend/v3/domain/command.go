@@ -23,6 +23,7 @@ type Invoker interface {
 
 // CommandOpts are passed to each command
 // they provide common fields used by commands like the database client.
+// Not thread safe because fields can change state during execution.
 type CommandOpts struct {
 	DB      database.QueryExecutor
 	Invoker Invoker

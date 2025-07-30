@@ -83,6 +83,7 @@ func newTraceInvoker(next Invoker) *traceInvoker {
 }
 
 // Invoke implements the [Invoker] interface.
+// TODO(adlerhurst): properly handle call stack, currently you would always get the line of the invoker instead of the code
 func (i *traceInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) (err error) {
 	ctx, span := tracer.Start(ctx, fmt.Sprintf("%T", command))
 	defer func() {
@@ -109,6 +110,7 @@ func newLoggingInvoker(next Invoker) *loggingInvoker {
 }
 
 // Invoke implements the [Invoker] interface.
+// TODO(adlerhurst): properly handle call stack, currently you would always get the line of the invoker instead of the code
 func (i *loggingInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) (err error) {
 	logger.InfoContext(ctx, "Invoking command", "command", command.String())
 
