@@ -290,7 +290,7 @@ service ActionService {
   //   - `actions`
   rpc ListTargets (ListTargetsRequest) returns (ListTargetsResponse) {
     option (google.api.http) = {
-      post: "/v2beta/actions/targets/_search",
+      post: "/v2beta/actions/targets/search",
       body: "*"
     };
 
@@ -372,7 +372,8 @@ service ActionService {
   //   - `actions`
   rpc ListExecutions (ListExecutionsRequest) returns (ListExecutionsResponse) {
     option (google.api.http) = {
-      post: "/v2beta/actions/executions/_search"
+      post: "/v2beta/actions/executions/search"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -663,8 +664,9 @@ message ListTargetsRequest {
 }
 
 message ListTargetsResponse {
+  reserved 'result';
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
-  repeated Target result = 2;
+  repeated Target targets = 2;
 }
 
 message SetExecutionRequest {
@@ -703,8 +705,9 @@ message ListExecutionsRequest {
 }
 
 message ListExecutionsResponse {
+  reserved 'result';
   zitadel.filter.v2beta.PaginationResponse pagination = 1;
-  repeated Execution result = 2;
+  repeated Execution executions = 2;
 }
 
 message ListExecutionFunctionsRequest{}

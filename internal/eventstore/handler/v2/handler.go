@@ -646,7 +646,7 @@ func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, statements 
 	for i, statement := range statements {
 		select {
 		case <-ctx.Done():
-			return lastProcessedIndex, nil
+			return lastProcessedIndex, ctx.Err()
 		default:
 			err := h.executeStatement(ctx, tx, statement)
 			if err != nil {
