@@ -185,6 +185,50 @@ func (i *idProvider) GetOAuth(ctx context.Context, id domain.IDPIdentifierCondit
 	return idpOAuth, nil
 }
 
+func (i *idProvider) GetOAzureAD(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPOAzureAD, error) {
+	idpAzure := &domain.IDPOAzureAD{}
+	var err error
+
+	idpAzure.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpAzure.Type != domain.IDPTypeAzure.String() {
+		// TODO
+		return nil, errors.New("WRONG TYPE")
+	}
+
+	err = json.Unmarshal([]byte(*idpAzure.Payload), idpAzure)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpAzure, nil
+}
+
+func (i *idProvider) GetGoogle(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGoogle, error) {
+	idpGoogle := &domain.IDPGoogle{}
+	var err error
+
+	idpGoogle.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpGoogle.Type != domain.IDPTypeGoogle.String() {
+		// TODO
+		return nil, errors.New("WRONG TYPE")
+	}
+
+	err = json.Unmarshal([]byte(*idpGoogle.Payload), idpGoogle)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpGoogle, nil
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------

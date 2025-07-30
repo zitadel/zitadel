@@ -17,7 +17,7 @@ const (
 	IDPTypeJWT
 	IDPTypeOAuth
 	IDPTypeLDAP
-	IDPTypeAzureAD
+	IDPTypeAzure
 	IDPTypeGitHub
 	IDPTypeGitHubEnterprise
 	IDPTypeGitLab
@@ -123,6 +123,43 @@ type IDPOAuth struct {
 	OAuth
 }
 
+//go:generate enumer -type AzureTenantType -transform lower -trimprefix AzureTenantType
+type AzureTenantType uint8
+
+const (
+	AzureTenantTypeCommon AzureTenantType = iota
+	AzureTenantTypeOrganizations
+	AzureTenantTypeConsumers
+)
+
+type Azure struct {
+	ID              string              `json:"id,omitempty"`
+	Name            string              `json:"name,omitempty"`
+	ClientID        string              `json:"client_id,omitempty"`
+	ClientSecret    *crypto.CryptoValue `json:"client_secret,omitempty"`
+	Scopes          []string            `json:"scopes,omitempty"`
+	Tenant          string              `json:"tenant,omitempty"`
+	IsEmailVerified bool                `json:"isEmailVerified,omitempty"`
+}
+
+type IDPOAzureAD struct {
+	*IdentityProvider
+	Azure
+}
+
+type Google struct {
+	ID           string              `json:"id"`
+	Name         string              `json:"name,omitempty"`
+	ClientID     string              `json:"clientId"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret"`
+	Scopes       []string            `json:"scopes,omitempty"`
+}
+
+type IDPGoogle struct {
+	*IdentityProvider
+	Google
+}
+
 // IDPIdentifierCondition is used to help specify a single identity_provider,
 // it will either be used as the  identity_provider ID or identity_provider name,
 // as identity_provider can be identified either using (instanceID + OrgID + ID) OR (instanceID + OrgID + name)
@@ -195,4 +232,7 @@ type IDProviderRepository interface {
 	GetJWT(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPJWT, error)
 
 	GetOAuth(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOAuth, error)
+
+	GetOAzureAD(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOAzureAD, error)
+	GetGoogle(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGoogle, error)
 }

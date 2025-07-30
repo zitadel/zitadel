@@ -62,14 +62,14 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  instance.OIDCIDPChangedEventType,
 					Reduce: p.reduceOIDCIDPRelationalChanged,
 				},
-				// 		{
-				// 			Event:  instance.OIDCIDPMigratedAzureADEventType,
-				// 			Reduce: p.reduceOIDCIDPMigratedAzureAD,
-				// 		},
-				// 		{
-				// 			Event:  instance.OIDCIDPMigratedGoogleEventType,
-				// 			Reduce: p.reduceOIDCIDPMigratedGoogle,
-				// 		},
+				{
+					Event:  instance.OIDCIDPMigratedAzureADEventType,
+					Reduce: p.reduceOIDCIDPRelationalMigratedAzureAD,
+				},
+				{
+					Event:  instance.OIDCIDPMigratedGoogleEventType,
+					Reduce: p.reduceOIDCIDPRelationalMigratedGoogle,
+				},
 				// 		{
 				// 			Event:  instance.JWTIDPAddedEventType,
 				// 			Reduce: p.reduceJWTIDPAdded,
@@ -349,6 +349,7 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event ev
 	// default:
 	// }
 
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> AZURE")
 	e, ok := event.(*instance.OAuthIDPAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPAddedEventType, instance.OAuthIDPAddedEventType})
@@ -522,7 +523,6 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event e
 	// 		},
 	// 	),
 	// )
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> OIDC CHANGED")
 	payload := &oidc.OIDC
 	payloadChanged := reduceOIDCIDPRelationalChangedColumns(payload, &e.OIDCIDPChangedEvent)
 	if payloadChanged {
@@ -549,107 +549,103 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event e
 	), nil
 }
 
-// func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.OIDCIDPMigratedAzureADEvent
-// 	switch e := event.(type) {
-// 	case *org.OIDCIDPMigratedAzureADEvent:
-// 		idpEvent = e.OIDCIDPMigratedAzureADEvent
-// 	case *instance.OIDCIDPMigratedAzureADEvent:
-// 		idpEvent = e.OIDCIDPMigratedAzureADEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
-// 	}
+func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD(event eventstore.Event) (*handler.Statement, error) {
+	// var idpEvent idp.OIDCIDPMigratedAzureADEvent
+	// switch e := event.(type) {
+	// case *org.OIDCIDPMigratedAzureADEvent:
+	// 	idpEvent = e.OIDCIDPMigratedAzureADEvent
+	// case *instance.OIDCIDPMigratedAzureADEvent:
+	// 	idpEvent = e.OIDCIDPMigratedAzureADEvent
+	// default:
+	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
+	// }
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-// 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzureAD),
-// 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
-// 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
-// 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
-// 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-// 				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 		handler.AddDeleteStatement(
-// 			[]handler.Condition{
-// 				handler.NewCond(OIDCIDCol, idpEvent.ID),
-// 				handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateOIDCSuffix),
-// 		),
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(AzureADIDCol, idpEvent.ID),
-// 				handler.NewCol(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(AzureADClientIDCol, idpEvent.ClientID),
-// 				handler.NewCol(AzureADClientSecretCol, idpEvent.ClientSecret),
-// 				handler.NewCol(AzureADScopesCol, database.TextArray[string](idpEvent.Scopes)),
-// 				handler.NewCol(AzureADTenantCol, idpEvent.Tenant),
-// 				handler.NewCol(AzureADIsEmailVerified, idpEvent.IsEmailVerified),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateAzureADSuffix),
-// 		),
-// 	), nil
-// }
+	e, ok := event.(*instance.OIDCIDPMigratedAzureADEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
+	}
 
-// func (p *idpTemplateProjection) reduceOIDCIDPMigratedGoogle(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.OIDCIDPMigratedGoogleEvent
-// 	switch e := event.(type) {
-// 	case *org.OIDCIDPMigratedGoogleEvent:
-// 		idpEvent = e.OIDCIDPMigratedGoogleEvent
-// 	case *instance.OIDCIDPMigratedGoogleEvent:
-// 		idpEvent = e.OIDCIDPMigratedGoogleEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
-// 	}
+	azure := domain.Azure{
+		ClientID:        e.ClientID,
+		ClientSecret:    e.ClientSecret,
+		Scopes:          e.Scopes,
+		Tenant:          e.Tenant,
+		IsEmailVerified: e.IsEmailVerified,
+	}
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-// 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle),
-// 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
-// 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
-// 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
-// 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-// 				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 		handler.AddDeleteStatement(
-// 			[]handler.Condition{
-// 				handler.NewCond(OIDCIDCol, idpEvent.ID),
-// 				handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateOIDCSuffix),
-// 		),
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(GoogleIDCol, idpEvent.ID),
-// 				handler.NewCol(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(GoogleClientIDCol, idpEvent.ClientID),
-// 				handler.NewCol(GoogleClientSecretCol, idpEvent.ClientSecret),
-// 				handler.NewCol(GoogleScopesCol, database.TextArray[string](idpEvent.Scopes)),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateGoogleSuffix),
-// 		),
-// 	), nil
-// }
+	payload, err := json.Marshal(azure)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateNameCol, e.Name),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzure.String()),
+				handler.NewCol(IDPRelationalAllowCreationCol, e.IsCreationAllowed),
+				handler.NewCol(IDPRelationalAllowLinkingCol, e.IsLinkingAllowed),
+				handler.NewCol(IDPRelationalAllowAutoCreationCol, e.IsAutoCreation),
+				handler.NewCol(IDPRelationalAllowAutoUpdateCol, e.IsAutoUpdate),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(e.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalPayloadCol, payload),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, e.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
+
+func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(event eventstore.Event) (*handler.Statement, error) {
+	// var idpEvent idp.OIDCIDPMigratedGoogleEvent
+	// switch e := event.(type) {
+	// case *org.OIDCIDPMigratedGoogleEvent:
+	// 	idpEvent = e.OIDCIDPMigratedGoogleEvent
+	// case *instance.OIDCIDPMigratedGoogleEvent:
+	// 	idpEvent = e.OIDCIDPMigratedGoogleEvent
+	// default:
+	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
+	// }
+
+	e, ok := event.(*instance.OIDCIDPMigratedGoogleEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
+	}
+
+	azure := domain.Google{
+		ClientID:     e.ClientID,
+		ClientSecret: e.ClientSecret,
+		Scopes:       e.Scopes,
+	}
+
+	payload, err := json.Marshal(azure)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateNameCol, e.Name),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle.String()),
+				handler.NewCol(IDPRelationalAllowCreationCol, e.IsCreationAllowed),
+				handler.NewCol(IDPRelationalAllowLinkingCol, e.IsLinkingAllowed),
+				handler.NewCol(IDPRelationalAllowAutoCreationCol, e.IsAutoCreation),
+				handler.NewCol(IDPRelationalAllowAutoUpdateCol, e.IsAutoUpdate),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(e.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalPayloadCol, payload),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, e.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
 
 // func (p *idpTemplateProjection) reduceJWTIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 // 	var idpEvent idp.JWTIDPAddedEvent

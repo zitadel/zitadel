@@ -37,8 +37,8 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
 			AutoRegister:       true,
 		})
-		require.NoError(t, err)
 		afterCreate := time.Now()
+		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
 
@@ -771,6 +771,170 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateOIDC.AllowAutoLinking)
 			assert.Equal(t, true, updateOIDC.UsePKCE)
 			assert.WithinRange(t, updateOIDC.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp oidc migrated azure migration reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// create OIDC
+		addOIDC, err := AdminClient.AddGenericOIDCProvider(CTX, &admin.AddGenericOIDCProviderRequest{
+			Name:         name,
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Scopes:       []string{"scope"},
+			Issuer:       "issuer",
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+			IsIdTokenMapping: false,
+			UsePkce:          false,
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		var oidc *domain.IDPOIDC
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			oidc, err = idpRepo.GetOIDC(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
+			require.NoError(t, err)
+			assert.Equal(t, domain.IDPTypeOIDC.String(), oidc.Type)
+		}, retryDuration, tick)
+
+		beforeCreate := time.Now()
+		_, err = AdminClient.MigrateGenericOIDCProvider(CTX, &admin.MigrateGenericOIDCProviderRequest{
+			Id: addOIDC.Id,
+			Template: &admin.MigrateGenericOIDCProviderRequest_Azure{
+				Azure: &admin.AddAzureADProviderRequest{
+					Name:         name,
+					ClientId:     "new_clientId",
+					ClientSecret: "new_clientSecret",
+					Tenant: &idp_grpc.AzureADTenant{
+						Type: &idp_grpc.AzureADTenant_TenantType{
+							TenantType: idp.AzureADTenantType_AZURE_AD_TENANT_TYPE_ORGANISATIONS,
+						},
+					},
+					EmailVerified: true,
+					Scopes:        []string{"new_scope"},
+					ProviderOptions: &idp_grpc.Options{
+						IsLinkingAllowed:  true,
+						IsCreationAllowed: true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+						AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+					},
+				},
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			azure, err := idpRepo.GetOAzureAD(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.oidc.migrated.azure
+			// idp
+			assert.Equal(t, addOIDC.Id, azure.IdentityProvider.ID)
+			assert.Equal(t, name, azure.IdentityProvider.Name)
+
+			// oidc
+			assert.Equal(t, "new_clientId", azure.ClientID)
+			assert.NotEqual(t, oidc.ClientSecret, azure.ClientSecret)
+			// type = azure
+			assert.Equal(t, domain.AzureTenantTypeOrganizations.String(), azure.Tenant)
+			assert.Equal(t, domain.IDPTypeAzure.String(), azure.Type)
+			assert.Equal(t, true, azure.IsEmailVerified)
+			assert.Equal(t, []string{"new_scope"}, azure.Scopes)
+			assert.Equal(t, true, azure.AllowLinking)
+			assert.Equal(t, true, azure.AllowCreation)
+			assert.Equal(t, true, azure.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), azure.AllowAutoLinking)
+			assert.WithinRange(t, azure.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp oidc migrated google migration reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// create OIDC
+		addOIDC, err := AdminClient.AddGenericOIDCProvider(CTX, &admin.AddGenericOIDCProviderRequest{
+			Name:         name,
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Scopes:       []string{"scope"},
+			Issuer:       "issuer",
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+			IsIdTokenMapping: false,
+			UsePkce:          false,
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		var oidc *domain.IDPOIDC
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			oidc, err = idpRepo.GetOIDC(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
+			require.NoError(t, err)
+			assert.Equal(t, domain.IDPTypeOIDC.String(), oidc.Type)
+		}, retryDuration, tick)
+
+		beforeCreate := time.Now()
+		_, err = AdminClient.MigrateGenericOIDCProvider(CTX, &admin.MigrateGenericOIDCProviderRequest{
+			Id: addOIDC.Id,
+			Template: &admin.MigrateGenericOIDCProviderRequest_Google{
+				Google: &admin.AddGoogleProviderRequest{
+					Name:         name,
+					ClientId:     "new_clientId",
+					ClientSecret: "new_clientSecret",
+					Scopes:       []string{"new_scope"},
+					ProviderOptions: &idp_grpc.Options{
+						IsLinkingAllowed:  true,
+						IsCreationAllowed: true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+						AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+					},
+				},
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			google, err := idpRepo.GetGoogle(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.oidc.migrated.google
+			// idp
+			assert.Equal(t, addOIDC.Id, google.IdentityProvider.ID)
+			assert.Equal(t, name, google.IdentityProvider.Name)
+
+			// oidc
+			assert.Equal(t, "new_clientId", google.ClientID)
+			assert.NotEqual(t, oidc.ClientSecret, google.ClientSecret)
+			// type = google
+			assert.Equal(t, domain.IDPTypeGoogle.String(), google.Type)
+			assert.Equal(t, []string{"new_scope"}, google.Scopes)
+			assert.Equal(t, true, google.AllowLinking)
+			assert.Equal(t, true, google.AllowCreation)
+			assert.Equal(t, true, google.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), google.AllowAutoLinking)
+			assert.WithinRange(t, google.UpdatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)
 	})
 }
