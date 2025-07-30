@@ -32,8 +32,8 @@ RUN --mount=type=cache,id=turbo,target=/build/.turbo \
 
 FROM scratch AS build-out
 COPY /apps/login/public ./apps/login/public
-COPY --from=builder /app/apps/login/.next/standalone ./
-COPY --from=builder /app/apps/login/.next/static ./apps/login/.next/static
+COPY --from=builder /build/apps/login/.next/standalone ./
+COPY --from=builder /build/apps/login/.next/static ./apps/login/.next/static
 
 FROM runtime AS login-standalone
 WORKDIR /runtime

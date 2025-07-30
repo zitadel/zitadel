@@ -77,6 +77,17 @@ jobs:
         with:
           builder: ${{ steps.setup-buildx.outputs.name }}
           cache-dir: .artifacts/login-build-cache-mount
+          cache-map: |
+            {
+              ".artifacts/login-build-cache-mount/pnpm":{
+                "id":"pnpm",
+                "target":"/pnpm/store"
+              },
+              ".artifacts/login-build-cache-mount/turbo":{
+                "id":"turbo",
+                "target":"/build/.turbo"
+              }
+            }
           dockerfile: build/login/Dockerfile
           skip-extraction: ${{ steps.cache.outputs.cache-hit }}        
       - name: Bake login multi-arch
