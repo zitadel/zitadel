@@ -291,6 +291,11 @@ service AdminService {
         };
     }
 
+    // Get My Instance
+    //
+    // Deprecated: use [instance service v2 GetInstance](apis/resources/instance_service_v2/zitadel-instance-v-2-beta-instance-service-get-instance.api.mdx) instead.
+    //
+    // Returns the details about the current instance such as the name, version, domains, etc.
     rpc GetMyInstance(GetMyInstanceRequest) returns (GetMyInstanceResponse) {
         option (google.api.http) = {
             get: "/instances/me";
@@ -302,11 +307,15 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
-            summary: "Get My Instance";
-            description: "Returns the details about the current instance such as the name, version, domains, etc."
+            deprecated: true;
         };
     }
 
+    // List Instance Domains
+    //
+    // Deprecated: use [instance service v2 GetInstance](apis/resources/instance_service_v2/zitadel-instance-v-2-beta-instance-service-get-instance.api.mdx) instead.
+    //
+    // Returns a list of domains that are configured for this ZITADEL instance. These domains are the URLs where ZITADEL is running.
     rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
         option (google.api.http) = {
             post: "/domains/_search";
@@ -318,11 +327,15 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
-            summary: "List Instance Domains";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are the URLs where ZITADEL is running."
+            deprecated: true;
         };
     }
 
+    // List Instance Trusted Domains
+    //
+    // Deprecated: use [instance service v2 ListTrustedDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-beta-instance-service-list-trusted-domains.api.mdx) instead.
+    //
+    // Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts.
     rpc ListInstanceTrustedDomains(ListInstanceTrustedDomainsRequest) returns (ListInstanceTrustedDomainsResponse) {
         option (google.api.http) = {
             post: "/trusted_domains/_search";
@@ -334,11 +347,15 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
-            summary: "List Instance Trusted Domains";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
+            deprecated: true;
         };
     }
 
+    // Add an Instance Trusted Domain
+    //
+    // Deprecated: use [instance service v2 ListTrustedDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-beta-instance-service-add-trusted-domain.api.mdx) instead.
+    //
+    // Add a domain to the list configured for this ZITADEL instance. These domains are trusted to be used as public hosts.
     rpc AddInstanceTrustedDomain(AddInstanceTrustedDomainRequest) returns (AddInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             post: "/trusted_domains";
@@ -351,11 +368,15 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
-            summary: "Add an Instance Trusted Domain";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
+            deprecated: true;
         };
     }
 
+    // Remove an Instance Trusted Domain
+    //
+    // Deprecated: use [instance service v2 ListTrustedDomains](apis/resources/instance_service_v2/zitadel-instance-v-2-beta-instance-service-remove-trusted-domain.api.mdx) instead.
+    //
+    // Removes a domain from the list configured for this ZITADEL instance. These domains are trusted to be used as public hosts.
     rpc RemoveInstanceTrustedDomain(RemoveInstanceTrustedDomainRequest) returns (RemoveInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             delete: "/trusted_domains/{domain}";
@@ -367,8 +388,7 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
-            summary: "Remove an Instance Trusted Domain";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
+            deprecated: true;
         };
     }
 
