@@ -18,6 +18,7 @@ import (
 )
 
 func TestSession_FetchUser(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		name        string
 		rootURL     string
@@ -367,6 +368,7 @@ func TestSession_FetchUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			a := assert.New(t)
 
 			provider, err := New(tt.fields.name, tt.fields.rootURL, tt.fields.metadata, tt.fields.certificate, tt.fields.key, tt.fields.options...)
