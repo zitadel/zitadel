@@ -26,7 +26,7 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
-      - run: pnpm ci --legacy-peer-deps
+      - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
 
       - run: npx nx affected -t build
