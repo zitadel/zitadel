@@ -15,8 +15,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
-	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 )
 
 func TestServer_GetTarget(t *testing.T) {
@@ -199,7 +199,7 @@ func TestServer_GetTarget(t *testing.T) {
 			}
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 2*time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := instance.Client.ActionV2beta.GetTarget(tt.args.ctx, tt.args.req)
+				got, err := instance.Client.ActionV2.GetTarget(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
 					assert.Error(ttt, err, "Error: "+err.Error())
 					return
@@ -419,7 +419,7 @@ func TestServer_ListTargets(t *testing.T) {
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := instance.Client.ActionV2beta.ListTargets(tt.args.ctx, tt.args.req)
+				got, listErr := instance.Client.ActionV2.ListTargets(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
 					require.Error(ttt, listErr, "Error: "+listErr.Error())
 					return
@@ -473,7 +473,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) {
 					cond := request.Filters[0].GetInConditionsFilter().GetConditions()[0]
-					resp := setExecution(ctx, t, instance, cond, []string{targetResp.GetId()})
+					resp := instance.SetExecution(ctx, t, cond, []string{targetResp.GetId()})
 
 					// Set expected response with used values for SetExecution
 					response.Executions[0].CreationDate = resp.GetSetDate()
@@ -542,7 +542,7 @@ func TestServer_ListExecutions(t *testing.T) {
 							},
 						},
 					}
-					resp := setExecution(ctx, t, instance, cond, []string{target.GetId()})
+					resp := instance.SetExecution(ctx, t, cond, []string{target.GetId()})
 
 					response.Executions[0].CreationDate = resp.GetSetDate()
 					response.Executions[0].ChangeDate = resp.GetSetDate()
@@ -603,7 +603,7 @@ func TestServer_ListExecutions(t *testing.T) {
 					}
 
 					cond1 := request.Filters[0].GetInConditionsFilter().GetConditions()[0]
-					resp1 := setExecution(ctx, t, instance, cond1, []string{targetResp.GetId()})
+					resp1 := instance.SetExecution(ctx, t, cond1, []string{targetResp.GetId()})
 					response.Executions[2] = &action.Execution{
 						CreationDate: resp1.GetSetDate(),
 						ChangeDate:   resp1.GetSetDate(),
@@ -612,7 +612,7 @@ func TestServer_ListExecutions(t *testing.T) {
 					}
 
 					cond2 := request.Filters[0].GetInConditionsFilter().GetConditions()[1]
-					resp2 := setExecution(ctx, t, instance, cond2, []string{targetResp.GetId()})
+					resp2 := instance.SetExecution(ctx, t, cond2, []string{targetResp.GetId()})
 					response.Executions[1] = &action.Execution{
 						CreationDate: resp2.GetSetDate(),
 						ChangeDate:   resp2.GetSetDate(),
@@ -621,7 +621,7 @@ func TestServer_ListExecutions(t *testing.T) {
 					}
 
 					cond3 := request.Filters[0].GetInConditionsFilter().GetConditions()[2]
-					resp3 := setExecution(ctx, t, instance, cond3, []string{targetResp.GetId()})
+					resp3 := instance.SetExecution(ctx, t, cond3, []string{targetResp.GetId()})
 					response.Executions[0] = &action.Execution{
 						CreationDate: resp3.GetSetDate(),
 						ChangeDate:   resp3.GetSetDate(),
@@ -652,7 +652,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) {
 					conditions := request.Filters[0].GetInConditionsFilter().GetConditions()
 					for i, cond := range conditions {
-						resp := setExecution(ctx, t, instance, cond, []string{targetResp.GetId()})
+						resp := instance.SetExecution(ctx, t, cond, []string{targetResp.GetId()})
 						response.Executions[(len(conditions)-1)-i] = &action.Execution{
 							CreationDate: resp.GetSetDate(),
 							ChangeDate:   resp.GetSetDate(),
@@ -708,7 +708,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) {
 					conditions := request.Filters[0].GetInConditionsFilter().GetConditions()
 					for i, cond := range conditions {
-						resp := setExecution(ctx, t, instance, cond, []string{targetResp.GetId()})
+						resp := instance.SetExecution(ctx, t, cond, []string{targetResp.GetId()})
 						response.Executions[i] = &action.Execution{
 							CreationDate: resp.GetSetDate(),
 							ChangeDate:   resp.GetSetDate(),
@@ -767,7 +767,7 @@ func TestServer_ListExecutions(t *testing.T) {
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := instance.Client.ActionV2beta.ListExecutions(tt.args.ctx, tt.args.req)
+				got, listErr := instance.Client.ActionV2.ListExecutions(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
 					require.Error(ttt, listErr, "Error: "+listErr.Error())
 					return

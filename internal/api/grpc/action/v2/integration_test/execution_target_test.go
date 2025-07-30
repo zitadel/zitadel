@@ -28,7 +28,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/query"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/metadata"
@@ -164,8 +164,8 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					}
 			},
 			clean: func(ctx context.Context) {
-				deleteExecution(ctx, t, instance, conditionRequestFullMethod(fullMethod))
-				deleteExecution(ctx, t, instance, conditionResponseFullMethod(fullMethod))
+				instance.DeleteExecution(ctx, t, conditionRequestFullMethod(fullMethod))
+				instance.DeleteExecution(ctx, t, conditionResponseFullMethod(fullMethod))
 			},
 			req: &action.GetTargetRequest{
 				Id: "something",
@@ -197,7 +197,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					}
 			},
 			clean: func(ctx context.Context) {
-				deleteExecution(ctx, t, instance, conditionRequestFullMethod(fullMethod))
+				instance.DeleteExecution(ctx, t, conditionRequestFullMethod(fullMethod))
 			},
 			req:     &action.GetTargetRequest{},
 			wantErr: true,
@@ -259,7 +259,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					}
 			},
 			clean: func(ctx context.Context) {
-				deleteExecution(ctx, t, instance, conditionResponseFullMethod(fullMethod))
+				instance.DeleteExecution(ctx, t, conditionResponseFullMethod(fullMethod))
 			},
 			req:     &action.GetTargetRequest{},
 			wantErr: true,
@@ -272,7 +272,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := instance.Client.ActionV2beta.GetTarget(tt.ctx, tt.req)
+				got, err := instance.Client.ActionV2.GetTarget(tt.ctx, tt.req)
 				if tt.wantErr {
 					require.Error(ttt, err)
 					return
@@ -288,13 +288,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			require.True(t, calledF())
 		})
 	}
-}
-
-func deleteExecution(ctx context.Context, t *testing.T, instance *integration.Instance, cond *action.Condition) {
-	_, err := instance.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
-		Condition: cond,
-	})
-	require.NoError(t, err)
 }
 
 func TestServer_ExecutionTarget_Event(t *testing.T) {
@@ -470,11 +463,11 @@ func TestServer_ExecutionTarget_Event_LongerThanTransactionTimeout(t *testing.T)
 }
 
 func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *integration.Instance, condition *action.Condition, targets []string) {
-	setExecution(ctx, t, instance, condition, targets)
+	instance.SetExecution(ctx, t, condition, targets)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-		got, err := instance.Client.ActionV2beta.ListExecutions(ctx, &action.ListExecutionsRequest{
+		got, err := instance.Client.ActionV2.ListExecutions(ctx, &action.ListExecutionsRequest{
 			Filters: []*action.ExecutionSearchFilter{
 				{Filter: &action.ExecutionSearchFilter_InConditionsFilter{
 					InConditionsFilter: &action.InConditionsFilter{Conditions: []*action.Condition{condition}},
@@ -498,21 +491,12 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 	return
 }
 
-func setExecution(ctx context.Context, t *testing.T, instance *integration.Instance, cond *action.Condition, targets []string) *action.SetExecutionResponse {
-	target, err := instance.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
-		Condition: cond,
-		Targets:   targets,
-	})
-	require.NoError(t, err)
-	return target
-}
-
 func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Instance, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
-	resp := createTarget(ctx, t, instance, "", endpoint, ty, interrupt)
+	resp := instance.CreateTarget(ctx, t, "", endpoint, ty, interrupt)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-		got, err := instance.Client.ActionV2beta.ListTargets(ctx, &action.ListTargetsRequest{
+		got, err := instance.Client.ActionV2.ListTargets(ctx, &action.ListTargetsRequest{
 			Filters: []*action.TargetSearchFilter{
 				{Filter: &action.TargetSearchFilter_InTargetIdsFilter{
 					InTargetIdsFilter: &action.InTargetIDsFilter{TargetIds: []string{resp.GetId()}},
@@ -543,38 +527,6 @@ func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Inst
 		}
 	}, retryDuration, tick, "timeout waiting for expected execution result")
 	return resp
-}
-
-func createTarget(ctx context.Context, t *testing.T, instance *integration.Instance, name, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
-	if name == "" {
-		name = gofakeit.Name()
-	}
-	req := &action.CreateTargetRequest{
-		Name:     name,
-		Endpoint: endpoint,
-		Timeout:  durationpb.New(5 * time.Second),
-	}
-	switch ty {
-	case domain.TargetTypeWebhook:
-		req.TargetType = &action.CreateTargetRequest_RestWebhook{
-			RestWebhook: &action.RESTWebhook{
-				InterruptOnError: interrupt,
-			},
-		}
-	case domain.TargetTypeCall:
-		req.TargetType = &action.CreateTargetRequest_RestCall{
-			RestCall: &action.RESTCall{
-				InterruptOnError: interrupt,
-			},
-		}
-	case domain.TargetTypeAsync:
-		req.TargetType = &action.CreateTargetRequest_RestAsync{
-			RestAsync: &action.RESTAsync{},
-		}
-	}
-	target, err := instance.Client.ActionV2beta.CreateTarget(ctx, req)
-	require.NoError(t, err)
-	return target
 }
 
 func conditionRequestFullMethod(fullMethod string) *action.Condition {
