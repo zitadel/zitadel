@@ -19,7 +19,7 @@ import (
 
 func TestServer_CreateTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	type want struct {
 		id           bool
 		creationDate bool
@@ -36,7 +36,7 @@ func TestServer_CreateTarget(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.CreateTargetRequest{
 				Name: gofakeit.Name(),
 			},
@@ -243,7 +243,7 @@ func assertCreateTargetResponse(t *testing.T, creationDate, changeDate time.Time
 
 func TestServer_UpdateTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	type args struct {
 		ctx context.Context
 		req *action.UpdateTargetRequest
@@ -267,7 +267,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 				request.Id = targetID
 			},
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.UpdateTargetRequest{
 					Name: gu.Ptr(gofakeit.Name()),
 				},
@@ -461,7 +461,7 @@ func assertUpdateTargetResponse(t *testing.T, creationDate, changeDate time.Time
 
 func TestServer_DeleteTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	tests := []struct {
 		name             string
 		ctx              context.Context
@@ -472,7 +472,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.DeleteTargetRequest{
 				Id: "notexisting",
 			},

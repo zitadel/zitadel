@@ -48,7 +48,7 @@ var (
 
 func TestServer_ExecutionTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	fullMethod := action.ActionService_GetTarget_FullMethodName
 
 	tests := []struct {
@@ -292,7 +292,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 
 func TestServer_ExecutionTarget_Event(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 	event := "session.added"
 	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 0, http.StatusOK, nil)
@@ -349,7 +349,7 @@ func TestServer_ExecutionTarget_Event(t *testing.T) {
 
 func TestServer_ExecutionTarget_Event_LongerThanTargetTimeout(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 	event := "session.added"
 	// call takes longer than timeout of target
@@ -401,7 +401,7 @@ func TestServer_ExecutionTarget_Event_LongerThanTargetTimeout(t *testing.T) {
 
 func TestServer_ExecutionTarget_Event_LongerThanTransactionTimeout(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 	event := "session.added"
 	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 1*time.Second, http.StatusOK, nil)
@@ -577,8 +577,8 @@ func conditionFunction(function string) *action.Condition {
 
 func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	ctxLoginClient := instance.WithAuthorization(CTX, integration.UserTypeLogin)
+	isolatedIAMCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	ctxLoginClient := instance.WithAuthorizationToken(CTX, integration.UserTypeLogin)
 
 	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, t, redirectURIImplicit, loginV2)
 	require.NoError(t, err)
@@ -893,8 +893,8 @@ func contextInfoForUserOIDC(instance *integration.Instance, function string, cli
 
 func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	ctxLoginClient := instance.WithAuthorization(CTX, integration.UserTypeLogin)
+	isolatedIAMCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	ctxLoginClient := instance.WithAuthorizationToken(CTX, integration.UserTypeLogin)
 
 	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, t, redirectURIImplicit, loginV2)
 	require.NoError(t, err)
@@ -1086,8 +1086,8 @@ func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *
 
 func TestServer_ExecutionTargetPreSAMLResponse(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	ctxLoginClient := instance.WithAuthorization(CTX, integration.UserTypeLogin)
+	isolatedIAMCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	ctxLoginClient := instance.WithAuthorizationToken(CTX, integration.UserTypeLogin)
 
 	idpMetadata, err := instance.GetSAMLIDPMetadata()
 	require.NoError(t, err)

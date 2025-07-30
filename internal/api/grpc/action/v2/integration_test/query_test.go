@@ -21,7 +21,7 @@ import (
 
 func TestServer_GetTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	type args struct {
 		ctx context.Context
 		dep func(context.Context, *action.GetTargetRequest, *action.GetTargetResponse) error
@@ -36,7 +36,7 @@ func TestServer_GetTarget(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.GetTargetRequest{},
 			},
 			wantErr: true,
@@ -213,7 +213,7 @@ func TestServer_GetTarget(t *testing.T) {
 
 func TestServer_ListTargets(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	type args struct {
 		ctx context.Context
 		dep func(context.Context, *action.ListTargetsRequest, *action.ListTargetsResponse)
@@ -228,7 +228,7 @@ func TestServer_ListTargets(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.ListTargetsRequest{},
 			},
 			wantErr: true,
@@ -445,7 +445,7 @@ func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationRes
 
 func TestServer_ListExecutions(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
 
 	type args struct {
@@ -462,7 +462,7 @@ func TestServer_ListExecutions(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.ListExecutionsRequest{},
 			},
 			wantErr: true,
