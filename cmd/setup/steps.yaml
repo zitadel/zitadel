@@ -36,8 +36,6 @@ FirstInstance:
     # In the FirstInstance.Org.Machine section, the initial organization's admin user with the role IAM_OWNER is defined.
     # If FirstInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role.
     Machine:
-      Roles: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_ROLES
-        - "IAM_OWNER"
       Machine:
         Username: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME
         Name: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME
