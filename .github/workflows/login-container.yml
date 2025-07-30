@@ -55,10 +55,10 @@ jobs:
         env:
           NODE_VERSION: ${{ inputs.node_version }}
         with:
+          source: .
           push: true
           provenance: true
           sbom: true
-          no-cache: true
           targets: login-standalone
           set: |
             *.cache-from=type=gha
