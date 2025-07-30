@@ -31,8 +31,8 @@ RUN pnpm turbo build:login:standalone
 
 FROM scratch AS build-out
 COPY /apps/login/public ./apps/login/public
-COPY --from=build /app/apps/login/.next/standalone ./
-COPY --from=build /app/apps/login/.next/static ./apps/login/.next/static
+COPY --from=builder /app/apps/login/.next/standalone ./
+COPY --from=builder /app/apps/login/.next/static ./apps/login/.next/static
 
 FROM runtime AS login-standalone
 WORKDIR /runtime
