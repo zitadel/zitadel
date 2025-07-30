@@ -114,6 +114,8 @@ This function generates a UUID using [google/uuid](https://github.com/google/uui
   Generates a UUID version 4, which is randomly generated
 - `uuid.v5(namespace, data)` *string*  
   Generates a UUID version 5, based on the provided namespace using SHA1
+- `uuid.v7()` *string*  
+  Generates a UUID version 7, based on date-time and random values
 
 #### Parameters
 
