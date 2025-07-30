@@ -472,6 +472,52 @@ func TestGetOrganization(t *testing.T) {
 			}
 		}(),
 		func() test {
+			organizationId := gofakeit.Name()
+			return test{
+				name: "happy path get using id including domain",
+				testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
+					organizationName := gofakeit.Name()
+
+					org := domain.Organization{
+						ID:         organizationId,
+						Name:       organizationName,
+						InstanceID: instanceId,
+						State:      domain.OrgStateActive,
+					}
+
+					// create organization
+					err := orgRepo.Create(ctx, &org)
+					require.NoError(t, err)
+
+					d := &domain.AddOrganizationDomain{
+						InstanceID: org.InstanceID,
+						OrgID:      org.ID,
+						Domain:     gofakeit.DomainName(),
+						IsVerified: true,
+						IsPrimary:  true,
+					}
+					err = orgRepo.Domains(false).Add(ctx, d)
+					require.NoError(t, err)
+
+					org.Domains = []*domain.OrganizationDomain{
+						{
+							InstanceID:     d.InstanceID,
+							OrgID:          d.OrgID,
+							ValidationType: d.ValidationType,
+							Domain:         d.Domain,
+							IsPrimary:      d.IsPrimary,
+							IsVerified:     d.IsVerified,
+							CreatedAt:      d.CreatedAt,
+							UpdatedAt:      d.UpdatedAt,
+						},
+					}
+
+					return &org
+				},
+				orgIdentifierCondition: orgRepo.IDCondition(organizationId),
+			}
+		}(),
+		func() test {
 			organizationName := gofakeit.Name()
 			return test{
 				name: "happy path get using name",

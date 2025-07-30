@@ -22,7 +22,7 @@ type Organization struct {
 	CreatedAt  time.Time `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt  time.Time `json:"updatedAt,omitzero" db:"updated_at"`
 
-	Domains []*OrganizationDomain `json:"domains,omitempty" db:"-"`
+	Domains []*OrganizationDomain `json:"domains,omitempty" db:"domains"`
 }
 
 // OrgIdentifierCondition is used to help specify a single Organization,

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -337,6 +338,51 @@ func TestGetInstance(t *testing.T) {
 				},
 			}
 		}(),
+		{
+			name: "happy path including domains",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
+				instanceRepo := repository.InstanceRepository(pool)
+				instanceId := gofakeit.Name()
+				instanceName := gofakeit.Name()
+
+				inst := domain.Instance{
+					ID:              instanceId,
+					Name:            instanceName,
+					DefaultOrgID:    "defaultOrgId",
+					IAMProjectID:    "iamProject",
+					ConsoleClientID: "consoleCLient",
+					ConsoleAppID:    "consoleApp",
+					DefaultLanguage: "defaultLanguage",
+				}
+
+				// create instance
+				err := instanceRepo.Create(ctx, &inst)
+				require.NoError(t, err)
+
+				domainRepo := instanceRepo.Domains(false)
+				d := &domain.AddInstanceDomain{
+					InstanceID:  inst.ID,
+					Domain:      gofakeit.DomainName(),
+					IsPrimary:   gu.Ptr(true),
+					IsGenerated: gu.Ptr(false),
+					Type:        domain.DomainTypeCustom,
+				}
+				err = domainRepo.Add(ctx, d)
+				require.NoError(t, err)
+
+				inst.Domains = append(inst.Domains, &domain.InstanceDomain{
+					InstanceID:  d.InstanceID,
+					Domain:      d.Domain,
+					IsPrimary:   d.IsPrimary,
+					IsGenerated: d.IsGenerated,
+					Type:        d.Type,
+					CreatedAt:   d.CreatedAt,
+					UpdatedAt:   d.UpdatedAt,
+				})
+
+				return &inst
+			},
+		},
 		{
 			name: "get non existent instance",
 			testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
