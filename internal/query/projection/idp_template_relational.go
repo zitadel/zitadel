@@ -70,10 +70,10 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  instance.OIDCIDPMigratedGoogleEventType,
 					Reduce: p.reduceOIDCIDPRelationalMigratedGoogle,
 				},
-				// 		{
-				// 			Event:  instance.JWTIDPAddedEventType,
-				// 			Reduce: p.reduceJWTIDPAdded,
-				// 		},
+				{
+					Event:  instance.JWTIDPAddedEventType,
+					Reduce: p.reduceJWTIDPReducedAdded,
+				},
 				// 		{
 				// 			Event:  instance.JWTIDPChangedEventType,
 				// 			Reduce: p.reduceJWTIDPChanged,
@@ -349,7 +349,6 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event ev
 	// default:
 	// }
 
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> AZURE")
 	e, ok := event.(*instance.OAuthIDPAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPAddedEventType, instance.OAuthIDPAddedEventType})
@@ -647,54 +646,58 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 	), nil
 }
 
-// func (p *idpTemplateProjection) reduceJWTIDPAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.JWTIDPAddedEvent
-// 	var idpOwnerType domain.IdentityProviderType
-// 	switch e := event.(type) {
-// 	case *org.JWTIDPAddedEvent:
-// 		idpEvent = e.JWTIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeOrg
-// 	case *instance.JWTIDPAddedEvent:
-// 		idpEvent = e.JWTIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeSystem
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xopi2s", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPAddedEventType, instance.JWTIDPAddedEventType})
-// 	}
+func (p *idpTemplateRelationalProjection) reduceJWTIDPReducedAdded(event eventstore.Event) (*handler.Statement, error) {
+	// var e idp.JWTIDPAddedEvent
+	// var idpOwnerType domain.IdentityProviderType
+	// switch e := event.(type) {
+	// case *org.JWTIDPAddedEvent:
+	// 	idpEvent = e.JWTIDPAddedEvent
+	// 	idpOwnerType = domain.IdentityProviderTypeOrg
+	// case *instance.JWTIDPAddedEvent:
+	// 	idpEvent = e.JWTIDPAddedEvent
+	// 	idpOwnerType = domain.IdentityProviderTypeSystem
+	// default:
+	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xopi2s", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPAddedEventType, instance.JWTIDPAddedEventType})
+	// }
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
-// 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
-// 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-// 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
-// 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeJWT),
-// 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
-// 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
-// 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
-// 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-// 				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
-// 			},
-// 		),
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(JWTIDCol, idpEvent.ID),
-// 				handler.NewCol(JWTInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(JWTIssuerCol, idpEvent.Issuer),
-// 				handler.NewCol(JWTEndpointCol, idpEvent.JWTEndpoint),
-// 				handler.NewCol(JWTKeysEndpointCol, idpEvent.KeysEndpoint),
-// 				handler.NewCol(JWTHeaderNameCol, idpEvent.HeaderName),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateJWTSuffix),
-// 		),
-// 	), nil
-// }
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> JWWWWWWT")
+	e, ok := event.(*instance.JWTIDPAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xopi2s", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPAddedEventType, instance.JWTIDPAddedEventType})
+	}
+
+	jwt := domain.JWT{
+		JWTEndpoint:  e.JWTEndpoint,
+		Issuer:       e.Issuer,
+		KeysEndpoint: e.KeysEndpoint,
+		HeaderName:   e.HeaderName,
+	}
+
+	payload, err := json.Marshal(jwt)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewMultiStatement(
+		e,
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, e.ID),
+				handler.NewCol(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateNameCol, e.Name),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeJWT.String()),
+				handler.NewCol(IDPRelationalAllowCreationCol, e.IsCreationAllowed),
+				handler.NewCol(IDPRelationalAllowLinkingCol, e.IsLinkingAllowed),
+				handler.NewCol(IDPRelationalAllowAutoCreationCol, e.IsAutoCreation),
+				handler.NewCol(IDPRelationalAllowAutoUpdateCol, e.IsAutoUpdate),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(e.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(CreatedAt, e.CreationDate()),
+			},
+		),
+	), nil
+}
 
 // func (p *idpTemplateProjection) reduceJWTIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 // 	var idpEvent idp.JWTIDPChangedEvent

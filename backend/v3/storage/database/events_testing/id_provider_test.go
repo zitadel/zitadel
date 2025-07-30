@@ -937,4 +937,55 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.WithinRange(t, google.UpdatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)
 	})
+
+	t.Run("test instance idp jwt added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add jwt
+		beforeCreate := time.Now().Add(-1 * time.Second)
+		addJWT, err := AdminClient.AddJWTProvider(CTX, &admin.AddJWTProviderRequest{
+			Name:         name,
+			Issuer:       "issuer",
+			JwtEndpoint:  "jwtEndpoint",
+			KeysEndpoint: "keyEndpoint",
+			HeaderName:   "headerName",
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		// check values for jwt
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			jwt, err := idpRepo.GetJWT(CTX, idpRepo.IDCondition(addJWT.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.jwt.added
+			// idp
+			assert.Equal(t, addJWT.Id, jwt.ID)
+			assert.Equal(t, domain.IDPTypeJWT.String(), jwt.Type)
+
+			// jwt
+			assert.Equal(t, addJWT.Id, jwt.ID)
+			assert.Equal(t, "jwtEndpoint", jwt.JWTEndpoint)
+			assert.Equal(t, "issuer", jwt.Issuer)
+			assert.Equal(t, "keyEndpoint", jwt.KeysEndpoint)
+			assert.Equal(t, "headerName", jwt.HeaderName)
+
+			assert.Equal(t, false, jwt.AllowLinking)
+			assert.Equal(t, false, jwt.AllowCreation)
+			assert.Equal(t, false, jwt.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), jwt.AllowAutoLinking)
+			assert.WithinRange(t, jwt.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, jwt.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
 }
