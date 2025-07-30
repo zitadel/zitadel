@@ -34,6 +34,12 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Start DB and ZITADEL
         run: ZITADEL_IMAGE=zitadel:local docker compose --file e2e/docker-compose.yaml up --detach --wait
+      - name: Cypress install
+        uses: cypress-io/github-action@v6
+        with:
+          browser: ${{ matrix.browser }}
+          install: true
+          runTests: false
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
@@ -45,7 +51,8 @@ jobs:
           working-directory: e2e
           browser: ${{ matrix.browser }}
           config-file: cypress.config.ts
-          install: ${{ matrix.browser == 'firefox' }}
+          install: false
+          runTests: true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
