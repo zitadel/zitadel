@@ -8,13 +8,24 @@ entrypoints:
     address: ":80"
 http:
   routers:
-    router:
+    zitadel:
       entryPoints:
         - "web"
       service: "zitadel"
-      rule: 'PathPrefix(`/`)'
+      rule: '!PathPrefix(`/ui/v2/login`)'
+    login:
+      entryPoints:
+        - "web"
+      service: "login"
+      rule: 'PathPrefix(`/ui/v2/login`)'
   services:
     zitadel:
       loadBalancer:
+        passHostHeader: true
         servers:
           - url: "h2c://zitadel-disabled-tls:8080"
+    login:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "http://login-disabled-tls:3000"
