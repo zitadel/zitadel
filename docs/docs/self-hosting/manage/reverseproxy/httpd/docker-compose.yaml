@@ -6,6 +6,8 @@ services:
       - "./httpd-disabled-tls.conf:/usr/local/apache2/conf/httpd.conf"
     ports:
       - "80:80"
+    networks:
+      - app      
     depends_on:
       zitadel-disabled-tls:
         condition: 'service_healthy'
@@ -18,6 +20,8 @@ services:
       - "./selfsigned.key:/etc/certs/selfsigned.key:ro"
     ports:
       - "443:443"
+    networks:
+      - app      
     depends_on:
       zitadel-external-tls:
         condition: 'service_healthy'
@@ -30,6 +34,8 @@ services:
       - "./selfsigned.key:/etc/certs/selfsigned.key:ro"
     ports:
       - "443:443"
+    networks:
+      - app
     depends_on:
       zitadel-enabled-tls:
         condition: 'service_healthy'
