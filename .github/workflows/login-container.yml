@@ -17,6 +17,7 @@ on:
 
 permissions:
   packages: write
+  id-token: write
 
 env:
   default_labels: |
@@ -27,9 +28,10 @@ env:
 jobs:
   login-container:
     name: Build Login Container
-    runs-on: depot-ubuntu-22.04-8
+    runs-on: ubuntu-latest
     permissions:
       packages: write
+      id-token: write
     outputs:
       login_build_image: ${{ steps.short-sha.outputs.login_build_image }}
     steps:
@@ -63,21 +65,19 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Set up Docker Buildx
-        id: setup-buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Set up Depot CLI
+        uses: depot/setup-action@v1
       - name: Bake login multi-arch
-        uses: docker/bake-action@v6
+        uses: depot/bake-action@v1
         env:
           NODE_VERSION: ${{ inputs.node_version }}
         with:
-          source: .
+          project: w47wkxzdtw
           push: true
           provenance: true
-          sbom: true
-          targets: login-standalone
+          # Only build for multiple platforms if triggered by workflow_dispatch
+          platforms: ${{ github.event_name == 'workflow_dispatch' && 'linux/amd64,linux/arm64' || '' }}
           files: |
             ./apps/login/docker-bake.hcl
-            ${{ github.event_name == 'workflow_dispatch' && './apps/login/docker-bake-release.hcl' || '' }}
             ./docker-bake.hcl
             cwd://${{ steps.login-meta.outputs.bake-file }}
