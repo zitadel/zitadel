@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/beevik/etree"
@@ -78,7 +79,7 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	userMapper := NewUser()
 	// nameID is required, but at least in ADFS it will not be sent unless explicitly configured
 	if s.Assertion.Subject == nil || s.Assertion.Subject.NameID == nil {
-		if s.TransientMappingAttributeName == "" {
+		if strings.TrimSpace(s.TransientMappingAttributeName) == "" {
 			return nil, zerrors.ThrowInvalidArgument(err, "SAML-EFG32", "Errors.Intent.MissingTransientMappingAttributeName")
 		}
 		// workaround to use the transient mapping attribute when the subject / nameID are missing (e.g. in ADFS, Shibboleth)
