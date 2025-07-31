@@ -27,7 +27,7 @@ env:
 jobs:
   login-container:
     name: Build Login Container
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-24.04
     permissions:
       packages: write
     outputs:
