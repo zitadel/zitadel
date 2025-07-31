@@ -543,7 +543,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instanceidp oauth changed reduces", func(t *testing.T) {
+	t.Run("test instance idp oauth changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oauth
@@ -986,6 +986,214 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), jwt.AllowAutoLinking)
 			assert.WithinRange(t, jwt.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, jwt.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp jwt changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add jwt
+		addJWT, err := AdminClient.AddJWTProvider(CTX, &admin.AddJWTProviderRequest{
+			Name:         name,
+			Issuer:       "issuer",
+			JwtEndpoint:  "jwtEndpoint",
+			KeysEndpoint: "keyEndpoint",
+			HeaderName:   "headerName",
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		require.NoError(t, err)
+
+		name = "new_" + name
+		// change jwt
+		beforeCreate := time.Now().Add(-1 * time.Second)
+		_, err = AdminClient.UpdateJWTProvider(CTX, &admin.UpdateJWTProviderRequest{
+			Id:           addJWT.Id,
+			Name:         name,
+			Issuer:       "new_issuer",
+			JwtEndpoint:  "new_jwtEndpoint",
+			KeysEndpoint: "new_keyEndpoint",
+			HeaderName:   "new_headerName",
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		// check values for jwt
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			jwt, err := idpRepo.GetJWT(CTX, idpRepo.IDCondition(addJWT.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.jwt.added
+			// idp
+			assert.Equal(t, addJWT.Id, jwt.ID)
+			assert.Equal(t, domain.IDPTypeJWT.String(), jwt.Type)
+
+			// jwt
+			assert.Equal(t, addJWT.Id, jwt.ID)
+			assert.Equal(t, "new_jwtEndpoint", jwt.JWTEndpoint)
+			assert.Equal(t, "new_issuer", jwt.Issuer)
+			assert.Equal(t, "new_keyEndpoint", jwt.KeysEndpoint)
+			assert.Equal(t, "new_headerName", jwt.HeaderName)
+
+			assert.Equal(t, true, jwt.AllowLinking)
+			assert.Equal(t, true, jwt.AllowCreation)
+			assert.Equal(t, true, jwt.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), jwt.AllowAutoLinking)
+			assert.WithinRange(t, jwt.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp azure added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add azure
+		beforeCreate := time.Now()
+		addAzure, err := AdminClient.AddAzureADProvider(CTX, &admin.AddAzureADProviderRequest{
+			Name:         name,
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Tenant: &idp_grpc.AzureADTenant{
+				Type: &idp_grpc.AzureADTenant_TenantType{
+					TenantType: idp.AzureADTenantType_AZURE_AD_TENANT_TYPE_ORGANISATIONS,
+				},
+			},
+			EmailVerified: true,
+			Scopes:        []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		// check values for azure
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			azure, err := idpRepo.GetOAzureAD(CTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.azure.added
+			// idp
+			assert.Equal(t, addAzure.Id, azure.IdentityProvider.ID)
+			assert.Equal(t, name, azure.IdentityProvider.Name)
+
+			assert.Equal(t, "clientId", azure.ClientID)
+			assert.NotNil(t, azure.ClientSecret)
+			assert.Equal(t, domain.AzureTenantTypeOrganizations.String(), azure.Tenant)
+			assert.Equal(t, domain.IDPTypeAzure.String(), azure.Type)
+			assert.Equal(t, true, azure.IsEmailVerified)
+			assert.Equal(t, []string{"scope"}, azure.Scopes)
+			assert.Equal(t, true, azure.AllowLinking)
+			assert.Equal(t, true, azure.AllowCreation)
+			assert.Equal(t, true, azure.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), azure.AllowAutoLinking)
+			assert.WithinRange(t, azure.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp azure changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add azure
+		addAzure, err := AdminClient.AddAzureADProvider(CTX, &admin.AddAzureADProviderRequest{
+			Name:         name,
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Tenant: &idp_grpc.AzureADTenant{
+				Type: &idp_grpc.AzureADTenant_TenantType{
+					TenantType: idp.AzureADTenantType_AZURE_AD_TENANT_TYPE_ORGANISATIONS,
+				},
+			},
+			EmailVerified: false,
+			Scopes:        []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		var azure *domain.IDPOAzureAD
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			azure, err = idpRepo.GetOAzureAD(CTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
+			require.NoError(t, err)
+			assert.Equal(t, addAzure.Id, azure.IdentityProvider.ID)
+		}, retryDuration, tick)
+
+		// change azure
+		beforeCreate := time.Now().Add(-1 * time.Second)
+		_, err = AdminClient.UpdateAzureADProvider(CTX, &admin.UpdateAzureADProviderRequest{
+			Id:           addAzure.Id,
+			Name:         name,
+			ClientId:     "new_clientId",
+			ClientSecret: "new_clientSecret",
+			Tenant: &idp_grpc.AzureADTenant{
+				Type: &idp_grpc.AzureADTenant_TenantType{
+					TenantType: idp.AzureADTenantType_AZURE_AD_TENANT_TYPE_CONSUMERS,
+				},
+			},
+			EmailVerified: true,
+			Scopes:        []string{"new_scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		// check values for azure
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			updateAzure, err := idpRepo.GetOAzureAD(CTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.azure.changed
+			// idp
+			assert.Equal(t, addAzure.Id, updateAzure.IdentityProvider.ID)
+			assert.Equal(t, name, updateAzure.IdentityProvider.Name)
+
+			assert.Equal(t, "new_clientId", updateAzure.ClientID)
+			assert.NotEqual(t, azure.ClientSecret, updateAzure.ClientSecret)
+			assert.Equal(t, domain.AzureTenantTypeConsumers.String(), updateAzure.Tenant)
+			assert.Equal(t, domain.IDPTypeAzure.String(), updateAzure.Type)
+			assert.Equal(t, true, updateAzure.IsEmailVerified)
+			assert.Equal(t, []string{"new_scope"}, updateAzure.Scopes)
+			assert.Equal(t, true, updateAzure.AllowLinking)
+			assert.Equal(t, true, updateAzure.AllowCreation)
+			assert.Equal(t, true, updateAzure.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), updateAzure.AllowAutoLinking)
+			assert.WithinRange(t, updateAzure.UpdatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)
 	})
 }

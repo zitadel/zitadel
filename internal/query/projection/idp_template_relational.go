@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
@@ -74,42 +73,48 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  instance.JWTIDPAddedEventType,
 					Reduce: p.reduceJWTIDPReducedAdded,
 				},
-				// 		{
-				// 			Event:  instance.JWTIDPChangedEventType,
-				// 			Reduce: p.reduceJWTIDPChanged,
-				// 		},
-				// 		{
-				// 			Event:  instance.IDPConfigAddedEventType,
-				// 			Reduce: p.reduceOldConfigAdded,
-				// 		},
+				{
+					Event:  instance.JWTIDPChangedEventType,
+					Reduce: p.reduceJWTIDPRelationalChanged,
+				},
+				// TODO
+				// {
+				// 	Event:  instance.IDPConfigAddedEventType,
+				// 	Reduce: p.reduceOldConfigAdded,
+				// },
+				// TODO
 				// 		{
 				// 			Event:  instance.IDPConfigChangedEventType,
 				// 			Reduce: p.reduceOldConfigChanged,
 				// 		},
+				// TODO
 				// 		{
 				// 			Event:  instance.IDPOIDCConfigAddedEventType,
 				// 			Reduce: p.reduceOldOIDCConfigAdded,
 				// 		},
+				// TODO
 				// 		{
 				// 			Event:  instance.IDPOIDCConfigChangedEventType,
 				// 			Reduce: p.reduceOldOIDCConfigChanged,
 				// 		},
+				// TODO
 				// 		{
 				// 			Event:  instance.IDPJWTConfigAddedEventType,
 				// 			Reduce: p.reduceOldJWTConfigAdded,
 				// 		},
+				// TODO
 				// 		{
 				// 			Event:  instance.IDPJWTConfigChangedEventType,
 				// 			Reduce: p.reduceOldJWTConfigChanged,
 				// 		},
-				// 		{
-				// 			Event:  instance.AzureADIDPAddedEventType,
-				// 			Reduce: p.reduceAzureADIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  instance.AzureADIDPChangedEventType,
-				// 			Reduce: p.reduceAzureADIDPChanged,
-				// 		},
+				{
+					Event:  instance.AzureADIDPAddedEventType,
+					Reduce: p.reduceAzureADIDPRelationalAdded,
+				},
+				{
+					Event:  instance.AzureADIDPChangedEventType,
+					Reduce: p.reduceAzureADIDPRelationalChanged,
+				},
 				// 		{
 				// 			Event:  instance.GitHubIDPAddedEventType,
 				// 			Reduce: p.reduceGitHubIDPAdded,
@@ -660,7 +665,6 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPReducedAdded(event eventst
 	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xopi2s", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPAddedEventType, instance.JWTIDPAddedEventType})
 	// }
 
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> JWWWWWWT")
 	e, ok := event.(*instance.JWTIDPAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xopi2s", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPAddedEventType, instance.JWTIDPAddedEventType})
@@ -699,48 +703,53 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPReducedAdded(event eventst
 	), nil
 }
 
-// func (p *idpTemplateProjection) reduceJWTIDPChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.JWTIDPChangedEvent
-// 	switch e := event.(type) {
-// 	case *org.JWTIDPChangedEvent:
-// 		idpEvent = e.JWTIDPChangedEvent
-// 	case *instance.JWTIDPChangedEvent:
-// 		idpEvent = e.JWTIDPChangedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
-// 	}
+func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	// var idpEvent idp.JWTIDPChangedEvent
+	// switch e := event.(type) {
+	// case *org.JWTIDPChangedEvent:
+	// 	idpEvent = e.JWTIDPChangedEvent
+	// case *instance.JWTIDPChangedEvent:
+	// 	idpEvent = e.JWTIDPChangedEvent
+	// default:
+	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
+	// }
 
-// 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-// 	ops = append(ops,
-// 		handler.AddUpdateStatement(
-// 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 	)
-// 	jwtCols := reduceJWTIDPChangedColumns(idpEvent)
-// 	if len(jwtCols) > 0 {
-// 		ops = append(ops,
-// 			handler.AddUpdateStatement(
-// 				jwtCols,
-// 				[]handler.Condition{
-// 					handler.NewCond(JWTIDCol, idpEvent.ID),
-// 					handler.NewCond(JWTInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				},
-// 				handler.WithTableSuffix(IDPTemplateJWTSuffix),
-// 			),
-// 		)
-// 	}
+	e, ok := event.(*instance.JWTIDPChangedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
+	}
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		ops...,
-// 	), nil
-// }
+	jwt, err := p.idpRepo.GetJWT(context.Background(), p.idpRepo.IDCondition(e.ID), e.Agg.InstanceID, nil)
+	if err != nil {
+		return nil, err
+	}
 
-// func (p *idpTemplateProjection) reduceOldConfigAdded(event eventstore.Event) (*handler.Statement, error) {
+	columns := make([]handler.Column, 0, 7)
+	reduceIDPRelationalChangedTemplateColumns(e.Name, e.OptionChanges, &columns)
+
+	payload := &jwt.JWT
+	payloadChanged := reduceJWTIDPRelationalChangedColumns(payload, &e.JWTIDPChangedEvent)
+	if payloadChanged {
+		payload, err := json.Marshal(e)
+		if err != nil {
+			return nil, err
+		}
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+	}
+
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, e.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
+
+// func (p *idpTemplateRelationalProjection) reduceOldConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 // 	var idpEvent idpconfig.IDPConfigAddedEvent
 // 	var idpOwnerType domain.IdentityProviderType
 // 	switch e := event.(type) {
@@ -999,96 +1008,132 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPReducedAdded(event eventst
 // 	), nil
 // }
 
-// func (p *idpTemplateProjection) reduceAzureADIDPAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.AzureADIDPAddedEvent
-// 	var idpOwnerType domain.IdentityProviderType
-// 	switch e := event.(type) {
-// 	case *org.AzureADIDPAddedEvent:
-// 		idpEvent = e.AzureADIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeOrg
-// 	case *instance.AzureADIDPAddedEvent:
-// 		idpEvent = e.AzureADIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeSystem
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPAddedEventType, instance.AzureADIDPAddedEventType})
-// 	}
+func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	// var idpEvent idp.AzureADIDPAddedEvent
+	// var idpOwnerType domain.IdentityProviderType
+	// switch e := event.(type) {
+	// case *org.AzureADIDPAddedEvent:
+	// 	idpEvent = e.AzureADIDPAddedEvent
+	// 	idpOwnerType = domain.IdentityProviderTypeOrg
+	// case *instance.AzureADIDPAddedEvent:
+	// 	idpEvent = e.AzureADIDPAddedEvent
+	// 	idpOwnerType = domain.IdentityProviderTypeSystem
+	// default:
+	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPAddedEventType, instance.AzureADIDPAddedEventType})
+	// }
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
-// 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
-// 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-// 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
-// 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzureAD),
-// 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
-// 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
-// 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
-// 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-// 				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
-// 			},
-// 		),
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(AzureADIDCol, idpEvent.ID),
-// 				handler.NewCol(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(AzureADClientIDCol, idpEvent.ClientID),
-// 				handler.NewCol(AzureADClientSecretCol, idpEvent.ClientSecret),
-// 				handler.NewCol(AzureADScopesCol, database.TextArray[string](idpEvent.Scopes)),
-// 				handler.NewCol(AzureADTenantCol, idpEvent.Tenant),
-// 				handler.NewCol(AzureADIsEmailVerified, idpEvent.IsEmailVerified),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateAzureADSuffix),
-// 		),
-// 	), nil
-// }
+	e, ok := event.(*instance.AzureADIDPAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPAddedEventType, instance.AzureADIDPAddedEventType})
+	}
 
-// func (p *idpTemplateProjection) reduceAzureADIDPChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.AzureADIDPChangedEvent
-// 	switch e := event.(type) {
-// 	case *org.AzureADIDPChangedEvent:
-// 		idpEvent = e.AzureADIDPChangedEvent
-// 	case *instance.AzureADIDPChangedEvent:
-// 		idpEvent = e.AzureADIDPChangedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
-// 	}
+	azure := domain.Azure{
+		ClientID:        e.ClientID,
+		ClientSecret:    e.ClientSecret,
+		Scopes:          e.Scopes,
+		Tenant:          e.Tenant,
+		IsEmailVerified: e.IsEmailVerified,
+	}
 
-// 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-// 	ops = append(ops,
-// 		handler.AddUpdateStatement(
-// 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 	)
-// 	githubCols := reduceAzureADIDPChangedColumns(idpEvent)
-// 	if len(githubCols) > 0 {
-// 		ops = append(ops,
-// 			handler.AddUpdateStatement(
-// 				githubCols,
-// 				[]handler.Condition{
-// 					handler.NewCond(AzureADIDCol, idpEvent.ID),
-// 					handler.NewCond(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				},
-// 				handler.WithTableSuffix(IDPTemplateAzureADSuffix),
-// 			),
-// 		)
-// 	}
+	payload, err := json.Marshal(azure)
+	if err != nil {
+		return nil, err
+	}
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		ops...,
-// 	), nil
-// }
+	return handler.NewMultiStatement(
+		e,
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, e.ID),
+				handler.NewCol(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateNameCol, e.Name),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzure.String()),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+				handler.NewCol(IDPRelationalAllowCreationCol, e.IsCreationAllowed),
+				handler.NewCol(IDPRelationalAllowLinkingCol, e.IsLinkingAllowed),
+				handler.NewCol(IDPRelationalAllowAutoCreationCol, e.IsAutoCreation),
+				handler.NewCol(IDPRelationalAllowAutoUpdateCol, e.IsAutoUpdate),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(e.AutoLinkingOption).String()),
+				handler.NewCol(CreatedAt, e.CreationDate()),
+				handler.NewCol(IDPRelationalPayloadCol, payload),
+			},
+		),
+	), nil
+}
+
+func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	// var idpEvent idp.AzureADIDPChangedEvent
+	// switch e := event.(type) {
+	// case *org.AzureADIDPChangedEvent:
+	// 	idpEvent = e.AzureADIDPChangedEvent
+	// case *instance.AzureADIDPChangedEvent:
+	// 	idpEvent = e.AzureADIDPChangedEvent
+	// default:
+	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
+	// }
+
+	e, ok := event.(*instance.AzureADIDPChangedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
+	}
+
+	oauth, err := p.idpRepo.GetOAzureAD(context.Background(), p.idpRepo.IDCondition(e.ID), e.Agg.InstanceID, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	columns := make([]handler.Column, 0, 7)
+	reduceIDPRelationalChangedTemplateColumns(e.Name, e.OptionChanges, &columns)
+
+	payload := &oauth.Azure
+	payloadChanged := reduceAzureADIDPRelationalChangedColumns(payload, &e.AzureADIDPChangedEvent)
+	if payloadChanged {
+		payload, err := json.Marshal(e)
+		if err != nil {
+			return nil, err
+		}
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+	}
+
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, e.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+
+	// ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
+	// ops = append(ops,
+	// 	handler.AddUpdateStatement(
+	// 		reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+	// 		[]handler.Condition{
+	// 			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+	// 			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+	// 		},
+	// 	),
+	// )
+	// if len(githubCols) > 0 {
+	// 	ops = append(ops,
+	// 		handler.AddUpdateStatement(
+	// 			githubCols,
+	// 			[]handler.Condition{
+	// 				handler.NewCond(AzureADIDCol, idpEvent.ID),
+	// 				handler.NewCond(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
+	// 			},
+	// 			handler.WithTableSuffix(IDPTemplateAzureADSuffix),
+	// 		),
+	// 	)
+	// }
+
+	// return handler.NewMultiStatement(
+	// 	&idpEvent,
+	// 	ops...,
+	// ), nil
+}
 
 // func (p *idpTemplateProjection) reduceGitHubIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 // 	var idpEvent idp.GitHubIDPAddedEvent
@@ -2297,6 +2342,52 @@ func reduceOIDCIDPRelationalChangedColumns(payload *domain.OIDC, idpEvent *idp.O
 	if idpEvent.UsePKCE != nil {
 		payloadChange = true
 		payload.UsePKCE = *idpEvent.UsePKCE
+	}
+	return payloadChange
+}
+
+func reduceJWTIDPRelationalChangedColumns(payload *domain.JWT, idpEvent *idp.JWTIDPChangedEvent) bool {
+	payloadChange := false
+	if idpEvent.JWTEndpoint != nil {
+		payloadChange = true
+		payload.JWTEndpoint = *idpEvent.JWTEndpoint
+	}
+	if idpEvent.KeysEndpoint != nil {
+		payloadChange = true
+		payload.KeysEndpoint = *idpEvent.KeysEndpoint
+	}
+	if idpEvent.HeaderName != nil {
+		payloadChange = true
+		payload.HeaderName = *idpEvent.HeaderName
+	}
+	if idpEvent.Issuer != nil {
+		payloadChange = true
+		payload.Issuer = *idpEvent.Issuer
+	}
+	return payloadChange
+}
+
+func reduceAzureADIDPRelationalChangedColumns(payload *domain.Azure, idpEvent *idp.AzureADIDPChangedEvent) bool {
+	payloadChange := false
+	if idpEvent.ClientID != nil {
+		payloadChange = true
+		payload.ClientID = *idpEvent.ClientID
+	}
+	if idpEvent.ClientSecret != nil {
+		payloadChange = true
+		payload.ClientSecret = idpEvent.ClientSecret
+	}
+	if idpEvent.Scopes != nil {
+		payloadChange = true
+		payload.Scopes = idpEvent.Scopes
+	}
+	if idpEvent.Tenant != nil {
+		payloadChange = true
+		payload.Tenant = *idpEvent.Tenant
+	}
+	if idpEvent.IsEmailVerified != nil {
+		payloadChange = true
+		payload.IsEmailVerified = *idpEvent.IsEmailVerified
 	}
 	return payloadChange
 }
