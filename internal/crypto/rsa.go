@@ -84,7 +84,7 @@ func generateCertificate(bits int, caPrivateKey *rsa.PrivateKey, ca []byte, info
 		return nil, nil, nil, err
 	}
 
-	certBytes := make([]byte, 0)
+	var certBytes []byte
 	if ca == nil {
 		cert.IsCA = true
 		cert.BasicConstraintsValid = true

@@ -40,7 +40,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 		return nil, err
 	}
 
-	ctx, userPermissionSpan := tracing.NewNamedSpan(ctx, "checkUserPermissions")
+	_, userPermissionSpan := tracing.NewNamedSpan(ctx, "checkUserPermissions")
 	err = checkUserPermissions(req, requestedPermissions, requiredAuthOption)
 	userPermissionSpan.EndWithError(err)
 	if err != nil {
