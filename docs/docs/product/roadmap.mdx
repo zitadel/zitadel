@@ -392,11 +392,105 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 </details>
 
 <details>
-    <summary>Deprecations</summary>
+    <summary>Deprecated endpoints</summary>
 
     <Deprecated/>
 
-    For a full list of deprecated end points please have a look at our [release notes](https://github.com/zitadel/zitadel/releases).
+    <details>
+        <summary>Organization Objects V1 > Users V1</summary>
+
+            - `AddMachineKey()`
+            - `AddMachineUser()`
+            - `AddPersonalAccessToken()`
+            - `BulkRemoveUserMetadata()`
+            - `BulkSetUserMetadata()`
+            - `GenerateMachineSecret()`
+            - `GetMachineKeyByIDs()`
+            - `GetOrgByDomainGlobal()`
+            - `GetPersonalAccessTokenByIDs()`
+            - `GetUserMetadata()`
+            - `ListAppKeys()`
+            - `ListMachineKeys()`
+            - `ListPersonalAccessTokens()`
+            - `ListUserMetadata()`
+            - `RemoveMachineKey()`
+            - `RemoveMachineSecret()`
+            - `RemovePersonalAccessToken()`
+            - `RemoveUserMetadata()`
+            - `SetUserMetadata()`
+            - `UpdateHumanPhone()`
+            - `UpdateMachine()`
+            - `UpdateUserName()`
+    </details>
+
+    <details>
+        <summary>Projects V1</summary>
+
+            - `AddProject()`
+            - `AddProjectGrant()`
+            - `AddProjectRole()`
+            - `BulkAddProjectRoles()`
+            - `DeactivateProject()`
+            - `DeactivateProjectGrant()`
+            - `GetGrantedProjectByID()`
+            - `GetProjectByID()`
+            - `GetProjectGrantByID()`
+            - `ListAllProjectGrants()`
+            - `ListGrantedProjectRoles()`
+            - `ListGrantedProjects()`
+            - `ListProjectGrants()`
+            - `ListProjectRoles()`
+            - `ListProjects()`
+            - `ReactivateProject()`
+            - `ReactivateProjectGrant()`
+            - `RemoveProject()`
+            - `RemoveProjectGrant()`
+            - `RemoveProjectRole()`
+            - `UpdateProject()`
+            - `UpdateProjectGrant()`
+            - `UpdateProjectRole()`
+    </details>
+
+    <details>
+        <summary>Members V1</summary>
+
+            - `AddIAMMember()`
+            - `AddOrgMember()`
+            - `AddProjectGrantMember()`
+            - `AddProjectMember()`
+            - `ListIAMMembers()`
+            - `ListOrgMembers()`
+            - `ListProjectGrantMembers()`
+            - `ListProjectMembers()`
+            - `ListUserMemberships()`
+            - `RemoveIAMMember()`
+            - `RemoveOrgMember()`
+            - `RemoveProjectGrantMember()`
+            - `RemoveProjectMember()`
+            - `UpdateIAMMember()`
+            - `UpdateOrgMember()`
+            - `UpdateProjectGrantMember()`
+            - `UpdateProjectMember()`
+    </details>
+
+    <details>
+        <summary>Instance Lifecycle V1 > System Service V1</summary>
+
+            - `AddInstanceTrustedDomain()`
+            - `GetMyInstance()`
+            - `ListInstanceDomains()`
+            - `ListInstanceTrustedDomains()`
+            - `RemoveInstanceTrustedDomain()`
+
+    </details>
+
+    <details>
+        <summary>Instance Objects V1 > Organizations V1 </summary>
+
+            - `GetDefaultOrg()`
+            - `GetOrgByID()`
+            - `IsOrgUnique()`
+    </details>
 </details>
 
 ### v5.x
