@@ -488,7 +488,6 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 			}
 		}
 	}, retryDuration, tick, "timeout waiting for expected execution result")
-	return
 }
 
 func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Instance, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {

@@ -278,7 +278,6 @@ func TestServer_UpdateTarget(t *testing.T) {
 			name: "not existing",
 			prepare: func(request *action.UpdateTargetRequest) {
 				request.Id = "notexisting"
-				return
 			},
 			args: args{
 				ctx: isolatedIAMOwnerCTX,

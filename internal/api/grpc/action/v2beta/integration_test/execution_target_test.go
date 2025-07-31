@@ -495,7 +495,6 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 			}
 		}
 	}, retryDuration, tick, "timeout waiting for expected execution result")
-	return
 }
 
 func setExecution(ctx context.Context, t *testing.T, instance *integration.Instance, cond *action.Condition, targets []string) *action.SetExecutionResponse {
