@@ -8,12 +8,12 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
+	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 )
 
 const (
