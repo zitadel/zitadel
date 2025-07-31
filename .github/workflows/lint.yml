@@ -46,22 +46,21 @@ jobs:
         with:
           against: "https://github.com/${{ github.repository }}.git#branch=${{ github.base_ref }}"
 
-  console:
+  turbo-lint-unit:
     if: ${{ github.event_name == 'pull_request' }}
-    name: console
+    name: turbo-lint-unit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Run lint and unit tests in dev container
+        uses: devcontainers/ci@v0.3
         with:
-          node-version: ${{ inputs.node_version }}
-          cache: "pnpm"
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --filter=console
-      - name: lint
-        run: make console_lint
+          push: never
+          configFile: .devcontainer/turbo-lint-unit/devcontainer.json
+          runCmd: echo "Successfully ran lint and unit tests in dev container postStartCommand"
 
   core:
     name: core
@@ -80,7 +79,7 @@ jobs:
           path: ${{ inputs.core_cache_path }}
           key: ${{ inputs.core_cache_key }}
           fail-on-cache-miss: true
-      - uses: golangci/golangci-lint-action@v6
+      - uses: golangci/golangci-lint-action@v8
         with:
           version: ${{ inputs.go_lint_version }}
           github-token: ${{ github.token }}

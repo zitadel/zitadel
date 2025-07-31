@@ -218,7 +218,7 @@ func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudi
 // Both tokens may point to the same object (subjectToken) in case of a regular Token Exchange.
 // When the subject and actor Tokens point to different objects, the new tokens will be for impersonation / delegation.
 func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenType, client *Client, subjectToken, actorToken *exchangeToken, audience, scopes []string) (_ *oidc.TokenExchangeResponse, err error) {
-	getUserInfo := s.getUserInfo(subjectToken.userID, client.client.ProjectID, client.client.ProjectRoleAssertion, client.IDTokenUserinfoClaimsAssertion(), scopes)
+	getUserInfo := s.getUserInfo(subjectToken.userID, client.client.ProjectID, client.GetID(), client.client.ProjectRoleAssertion, client.IDTokenUserinfoClaimsAssertion(), scopes)
 	getSigner := s.getSignerOnce()
 
 	resp := &oidc.TokenExchangeResponse{
