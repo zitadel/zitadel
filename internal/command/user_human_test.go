@@ -1775,6 +1775,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		{
 			name: "add human (with password and initial code), orgScopedUsername, ok",
 			given: func(t *testing.T) (fields, args) {
+				t.Helper()
+
 				return fields{
 						eventstore: expectEventstore(
 							expectFilter(

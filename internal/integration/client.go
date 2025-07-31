@@ -407,6 +407,8 @@ func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userI
 }
 
 func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, orgID string, organizationScopedUsernames bool) *settings_v2beta.SetOrganizationSettingsResponse {
+	t.Helper()
+
 	resp, err := i.Client.SettingsV2beta.SetOrganizationSettings(ctx,
 		&settings_v2beta.SetOrganizationSettingsRequest{
 			OrganizationId:              orgID,
@@ -418,6 +420,8 @@ func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, or
 }
 
 func (i *Instance) DeleteOrganizationSettings(ctx context.Context, t *testing.T, orgID string) *settings_v2beta.DeleteOrganizationSettingsResponse {
+	t.Helper()
+
 	resp, err := i.Client.SettingsV2beta.DeleteOrganizationSettings(ctx,
 		&settings_v2beta.DeleteOrganizationSettingsRequest{
 			OrganizationId: orgID,
