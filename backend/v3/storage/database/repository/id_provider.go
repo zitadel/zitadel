@@ -251,6 +251,28 @@ func (i *idProvider) GetGithub(ctx context.Context, id domain.IDPIdentifierCondi
 	return idpGithub, nil
 }
 
+func (i *idProvider) GetGithubEnterprise(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGithubEnterprise, error) {
+	idpGithubEnterprise := &domain.IDPGithubEnterprise{}
+	var err error
+
+	idpGithubEnterprise.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpGithubEnterprise.Type != domain.IDPTypeGithubEnterprise.String() {
+		// TODO
+		return nil, errors.New("WRONG TYPE")
+	}
+
+	err = json.Unmarshal([]byte(*idpGithubEnterprise.Payload), idpGithubEnterprise)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpGithubEnterprise, nil
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------

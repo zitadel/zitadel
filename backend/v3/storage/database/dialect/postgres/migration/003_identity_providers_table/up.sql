@@ -10,6 +10,7 @@ CREATE TYPE zitadel.idp_type AS ENUM (
     'saml',
     'ldap',
     'github',
+    'githubenterprise',
     'azure',
     'google',
     'microsoft',

@@ -19,9 +19,9 @@ const (
 	IDPTypeLDAP
 	IDPTypeAzure
 	IDPTypeGithub
-	IDPTypeGitHubEnterprise
-	IDPTypeGitLab
-	IDPTypeGitLabSelfHosted
+	IDPTypeGithubEnterprise
+	IDPTypeGitlab
+	IDPTypeGitlabSelfHosted
 	IDPTypeGoogle
 	IDPTypeApple
 	IDPTypeSAML
@@ -164,6 +164,20 @@ type IDPGithub struct {
 	Github
 }
 
+type GithubEnterprise struct {
+	ClientID              string              `json:"clientId,omitempty"`
+	ClientSecret          *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	AuthorizationEndpoint string              `json:"authorizationEndpoint,omitempty"`
+	TokenEndpoint         string              `json:"tokenEndpoint,omitempty"`
+	UserEndpoint          string              `json:"userEndpoint,omitempty"`
+	Scopes                []string            `json:"scopes,omitempty"`
+}
+
+type IDPGithubEnterprise struct {
+	*IdentityProvider
+	GithubEnterprise
+}
+
 // IDPIdentifierCondition is used to help specify a single identity_provider,
 // it will either be used as the  identity_provider ID or identity_provider name,
 // as identity_provider can be identified either using (instanceID + OrgID + ID) OR (instanceID + OrgID + name)
@@ -240,4 +254,5 @@ type IDProviderRepository interface {
 	GetOAzureAD(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOAzureAD, error)
 	GetGoogle(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGoogle, error)
 	GetGithub(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithub, error)
+	GetGithubEnterprise(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithubEnterprise, error)
 }

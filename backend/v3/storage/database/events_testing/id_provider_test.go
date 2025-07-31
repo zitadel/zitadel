@@ -528,7 +528,6 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, "authoizationEndpoint", oauth.AuthorizationEndpoint)
 			assert.Equal(t, "tokenEndpoint", oauth.TokenEndpoint)
 			assert.Equal(t, "userEndpoint", oauth.UserEndpoint)
-			assert.Equal(t, "userEndpoint", oauth.UserEndpoint)
 			assert.Equal(t, []string{"scope"}, oauth.Scopes)
 			assert.Equal(t, false, oauth.AllowLinking)
 			assert.Equal(t, false, oauth.AllowCreation)
@@ -672,7 +671,6 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			// assert.NotNil(t, oidc.ClientSecret)
 			// assert.Equal(t, "authoizationEndpoint", oidc.AuthorizationEndpoint)
 			// assert.Equal(t, "tokenEndpoint", oidc.TokenEndpoint)
-			// assert.Equal(t, "userEndpoint", oidc.UserEndpoint)
 			// assert.Equal(t, "userEndpoint", oidc.UserEndpoint)
 			assert.Equal(t, []string{"scope"}, oidc.Scopes)
 			assert.Equal(t, "issuer", oidc.Issuer)
@@ -1310,6 +1308,140 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, true, updateGithub.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateGithub.AllowAutoLinking)
 			assert.WithinRange(t, updateGithub.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp github enterprise added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add github enterprise
+		beforeCreate := time.Now()
+		addGithubEnterprise, err := AdminClient.AddGitHubEnterpriseServerProvider(CTX, &admin.AddGitHubEnterpriseServerProviderRequest{
+			Name:                  name,
+			ClientId:              "clientId",
+			ClientSecret:          "clientSecret",
+			AuthorizationEndpoint: "authoizationEndpoint",
+			TokenEndpoint:         "tokenEndpoint",
+			UserEndpoint:          "userEndpoint",
+			Scopes:                []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		// check values for github enterprise
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			githubEnterprise, err := idpRepo.GetGithubEnterprise(CTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.github_enterprise.added
+			// idp
+			assert.Equal(t, addGithubEnterprise.Id, githubEnterprise.ID)
+			assert.Equal(t, name, githubEnterprise.Name)
+
+			assert.Equal(t, domain.IDPTypeGithubEnterprise.String(), githubEnterprise.Type)
+			assert.Equal(t, "clientId", githubEnterprise.ClientID)
+			assert.NotNil(t, githubEnterprise.ClientSecret)
+			assert.Equal(t, "authoizationEndpoint", githubEnterprise.AuthorizationEndpoint)
+			assert.Equal(t, "tokenEndpoint", githubEnterprise.TokenEndpoint)
+			assert.Equal(t, "userEndpoint", githubEnterprise.UserEndpoint)
+			assert.Equal(t, []string{"scope"}, githubEnterprise.Scopes)
+			assert.Equal(t, false, githubEnterprise.AllowLinking)
+			assert.Equal(t, false, githubEnterprise.AllowCreation)
+			assert.Equal(t, false, githubEnterprise.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), githubEnterprise.AllowAutoLinking)
+			assert.WithinRange(t, githubEnterprise.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, githubEnterprise.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp github enterprise changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add github enterprise
+		addGithubEnterprise, err := AdminClient.AddGitHubEnterpriseServerProvider(CTX, &admin.AddGitHubEnterpriseServerProviderRequest{
+			Name:                  name,
+			ClientId:              "clientId",
+			ClientSecret:          "clientSecret",
+			AuthorizationEndpoint: "authoizationEndpoint",
+			TokenEndpoint:         "tokenEndpoint",
+			UserEndpoint:          "userEndpoint",
+			Scopes:                []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		var githubEnterprise *domain.IDPGithubEnterprise
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			githubEnterprise, err = idpRepo.GetGithubEnterprise(CTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, nil)
+			require.NoError(t, err)
+			assert.Equal(t, addGithubEnterprise.Id, githubEnterprise.ID)
+		}, retryDuration, tick)
+
+		name = "new_" + name
+		// change github enterprise
+		beforeCreate := time.Now()
+		_, err = AdminClient.UpdateGitHubEnterpriseServerProvider(CTX, &admin.UpdateGitHubEnterpriseServerProviderRequest{
+			Id:                    addGithubEnterprise.Id,
+			Name:                  name,
+			ClientId:              "new_clientId",
+			ClientSecret:          "new_clientSecret",
+			AuthorizationEndpoint: "new_authoizationEndpoint",
+			TokenEndpoint:         "new_tokenEndpoint",
+			UserEndpoint:          "new_userEndpoint",
+			Scopes:                []string{"new_scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		// check values for azure
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			updateGithubEnterprise, err := idpRepo.GetGithubEnterprise(CTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.github_enterprise.changed
+			// idp
+			assert.Equal(t, addGithubEnterprise.Id, updateGithubEnterprise.ID)
+			assert.Equal(t, name, updateGithubEnterprise.Name)
+
+			assert.Equal(t, domain.IDPTypeGithubEnterprise.String(), updateGithubEnterprise.Type)
+			assert.Equal(t, "new_clientId", updateGithubEnterprise.ClientID)
+			assert.NotNil(t, updateGithubEnterprise.ClientSecret)
+			assert.Equal(t, "new_authoizationEndpoint", updateGithubEnterprise.AuthorizationEndpoint)
+			assert.Equal(t, "new_tokenEndpoint", updateGithubEnterprise.TokenEndpoint)
+			assert.Equal(t, "new_userEndpoint", updateGithubEnterprise.UserEndpoint)
+			assert.Equal(t, []string{"new_scope"}, updateGithubEnterprise.Scopes)
+			assert.Equal(t, false, updateGithubEnterprise.AllowLinking)
+			assert.Equal(t, false, updateGithubEnterprise.AllowCreation)
+			assert.Equal(t, false, updateGithubEnterprise.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), updateGithubEnterprise.AllowAutoLinking)
+			assert.WithinRange(t, updateGithubEnterprise.UpdatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)
 	})
 }

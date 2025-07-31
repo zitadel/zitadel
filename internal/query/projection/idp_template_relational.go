@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
@@ -124,14 +123,14 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  instance.GitHubIDPChangedEventType,
 					Reduce: p.reduceGitHubIDPRelationalChanged,
 				},
-				// 		{
-				// 			Event:  instance.GitHubEnterpriseIDPAddedEventType,
-				// 			Reduce: p.reduceGitHubEnterpriseIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  instance.GitHubEnterpriseIDPChangedEventType,
-				// 			Reduce: p.reduceGitHubEnterpriseIDPChanged,
-				// 		},
+				{
+					Event:  instance.GitHubEnterpriseIDPAddedEventType,
+					Reduce: p.reduceGitHubEnterpriseIDPRelationalAdded,
+				},
+				{
+					Event:  instance.GitHubEnterpriseIDPChangedEventType,
+					Reduce: p.reduceGitHubEnterpriseIDPRelationalChanged,
+				},
 				// 		{
 				// 			Event:  instance.GitLabIDPAddedEventType,
 				// 			Reduce: p.reduceGitLabIDPAdded,
@@ -1190,57 +1189,6 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 	// ), nil
 }
 
-// func (p *idpTemplateProjection) reduceGitHubEnterpriseIDPAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.GitHubEnterpriseIDPAddedEvent
-// 	var idpOwnerType domain.IdentityProviderType
-// 	switch e := event.(type) {
-// 	case *org.GitHubEnterpriseIDPAddedEvent:
-// 		idpEvent = e.GitHubEnterpriseIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeOrg
-// 	case *instance.GitHubEnterpriseIDPAddedEvent:
-// 		idpEvent = e.GitHubEnterpriseIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeSystem
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Sf3g2a", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPAddedEventType, instance.GitHubEnterpriseIDPAddedEventType})
-// 	}
-
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
-// 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
-// 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-// 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
-// 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitHubEnterprise),
-// 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
-// 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
-// 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
-// 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-// 				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
-// 			},
-// 		),
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(GitHubEnterpriseIDCol, idpEvent.ID),
-// 				handler.NewCol(GitHubEnterpriseInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(GitHubEnterpriseClientIDCol, idpEvent.ClientID),
-// 				handler.NewCol(GitHubEnterpriseClientSecretCol, idpEvent.ClientSecret),
-// 				handler.NewCol(GitHubEnterpriseAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
-// 				handler.NewCol(GitHubEnterpriseTokenEndpointCol, idpEvent.TokenEndpoint),
-// 				handler.NewCol(GitHubEnterpriseUserEndpointCol, idpEvent.UserEndpoint),
-// 				handler.NewCol(GitHubEnterpriseScopesCol, database.TextArray[string](idpEvent.Scopes)),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateGitHubEnterpriseSuffix),
-// 		),
-// 	), nil
-// }
-
 func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
 	// var idpEvent idp.GitHubIDPChangedEvent
 	// switch e := event.(type) {
@@ -1275,8 +1223,105 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
 	}
 
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> *e.Name = %+v\n", *e.Name)
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> UPDATE GITHUB")
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, e.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
+
+func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	// var idpEvent idp.GitHubEnterpriseIDPAddedEvent
+	// var idpOwnerType domain.IdentityProviderType
+	// switch e := event.(type) {
+	// case *org.GitHubEnterpriseIDPAddedEvent:
+	// 	idpEvent = e.GitHubEnterpriseIDPAddedEvent
+	// 	idpOwnerType = domain.IdentityProviderTypeOrg
+	// case *instance.GitHubEnterpriseIDPAddedEvent:
+	// 	idpEvent = e.GitHubEnterpriseIDPAddedEvent
+	// 	idpOwnerType = domain.IdentityProviderTypeSystem
+	// default:
+	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Sf3g2a", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPAddedEventType, instance.GitHubEnterpriseIDPAddedEventType})
+	// }
+
+	e, ok := event.(*instance.GitHubEnterpriseIDPAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Sf3g2a", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPAddedEventType, instance.GitHubEnterpriseIDPAddedEventType})
+	}
+
+	githubEnterprise := domain.GithubEnterprise{
+		ClientID:              e.ClientID,
+		ClientSecret:          e.ClientSecret,
+		AuthorizationEndpoint: e.AuthorizationEndpoint,
+		TokenEndpoint:         e.TokenEndpoint,
+		UserEndpoint:          e.UserEndpoint,
+		Scopes:                e.Scopes,
+	}
+
+	payload, err := json.Marshal(githubEnterprise)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewMultiStatement(
+		e,
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, e.ID),
+				handler.NewCol(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateNameCol, e.Name),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGithubEnterprise.String()),
+				handler.NewCol(IDPRelationalAllowCreationCol, e.IsCreationAllowed),
+				handler.NewCol(IDPRelationalAllowLinkingCol, e.IsLinkingAllowed),
+				handler.NewCol(IDPRelationalAllowAutoCreationCol, e.IsAutoCreation),
+				handler.NewCol(IDPRelationalAllowAutoUpdateCol, e.IsAutoUpdate),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(e.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(CreatedAt, e.CreationDate()),
+			},
+		),
+	), nil
+}
+
+func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	// var idpEvent idp.GitHubEnterpriseIDPChangedEvent
+	// switch e := event.(type) {
+	// case *org.GitHubEnterpriseIDPChangedEvent:
+	// 	idpEvent = e.GitHubEnterpriseIDPChangedEvent
+	// case *instance.GitHubEnterpriseIDPChangedEvent:
+	// 	idpEvent = e.GitHubEnterpriseIDPChangedEvent
+	// default:
+	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
+	// }
+
+	e, ok := event.(*instance.GitHubEnterpriseIDPChangedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
+	}
+
+	githubEnterprise, err := p.idpRepo.GetGithubEnterprise(context.Background(), p.idpRepo.IDCondition(e.ID), e.Agg.InstanceID, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	columns := make([]handler.Column, 0, 7)
+	reduceIDPRelationalChangedTemplateColumns(e.Name, e.OptionChanges, &columns)
+
+	payload := &githubEnterprise.GithubEnterprise
+	payloadChanged := reduceGitHubEnterpriseIDPRelationalChangedColumns(payload, &e.GitHubEnterpriseIDPChangedEvent)
+	if payloadChanged {
+		payload, err := json.Marshal(payload)
+		if err != nil {
+			return nil, err
+		}
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+	}
 
 	return handler.NewMultiStatement(
 		e,
@@ -1299,16 +1344,15 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event
 	// 		},
 	// 	),
 	// )
-	// githubCols := reduceGitHubIDPChangedColumns(idpEvent)
 	// if len(githubCols) > 0 {
 	// 	ops = append(ops,
 	// 		handler.AddUpdateStatement(
 	// 			githubCols,
 	// 			[]handler.Condition{
-	// 				handler.NewCond(GitHubIDCol, idpEvent.ID),
-	// 				handler.NewCond(GitHubInstanceIDCol, idpEvent.Aggregate().InstanceID),
+	// 				handler.NewCond(GitHubEnterpriseIDCol, idpEvent.ID),
+	// 				handler.NewCond(GitHubEnterpriseInstanceIDCol, idpEvent.Aggregate().InstanceID),
 	// 			},
-	// 			handler.WithTableSuffix(IDPTemplateGitHubSuffix),
+	// 			handler.WithTableSuffix(IDPTemplateGitHubEnterpriseSuffix),
 	// 		),
 	// 	)
 	// }
@@ -1318,47 +1362,6 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event
 	// 	ops...,
 	// ), nil
 }
-
-// func (p *idpTemplateProjection) reduceGitHubEnterpriseIDPChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.GitHubEnterpriseIDPChangedEvent
-// 	switch e := event.(type) {
-// 	case *org.GitHubEnterpriseIDPChangedEvent:
-// 		idpEvent = e.GitHubEnterpriseIDPChangedEvent
-// 	case *instance.GitHubEnterpriseIDPChangedEvent:
-// 		idpEvent = e.GitHubEnterpriseIDPChangedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
-// 	}
-
-// 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-// 	ops = append(ops,
-// 		handler.AddUpdateStatement(
-// 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 	)
-// 	githubCols := reduceGitHubEnterpriseIDPChangedColumns(idpEvent)
-// 	if len(githubCols) > 0 {
-// 		ops = append(ops,
-// 			handler.AddUpdateStatement(
-// 				githubCols,
-// 				[]handler.Condition{
-// 					handler.NewCond(GitHubEnterpriseIDCol, idpEvent.ID),
-// 					handler.NewCond(GitHubEnterpriseInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				},
-// 				handler.WithTableSuffix(IDPTemplateGitHubEnterpriseSuffix),
-// 			),
-// 		)
-// 	}
-
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		ops...,
-// 	), nil
-// }
 
 // func (p *idpTemplateProjection) reduceGitLabIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 // 	var idpEvent idp.GitLabIDPAddedEvent
@@ -2445,6 +2448,35 @@ func reduceGitHubIDPRelationalChangedColumns(payload *domain.Github, idpEvent *i
 	if idpEvent.ClientSecret != nil {
 		payloadChange = true
 		payload.ClientSecret = idpEvent.ClientSecret
+	}
+	if idpEvent.Scopes != nil {
+		payloadChange = true
+		payload.Scopes = idpEvent.Scopes
+	}
+	return payloadChange
+}
+
+func reduceGitHubEnterpriseIDPRelationalChangedColumns(payload *domain.GithubEnterprise, idpEvent *idp.GitHubEnterpriseIDPChangedEvent) bool {
+	payloadChange := false
+	if idpEvent.ClientID != nil {
+		payloadChange = true
+		payload.ClientID = *idpEvent.ClientID
+	}
+	if idpEvent.ClientSecret != nil {
+		payloadChange = true
+		payload.ClientSecret = idpEvent.ClientSecret
+	}
+	if idpEvent.AuthorizationEndpoint != nil {
+		payloadChange = true
+		payload.AuthorizationEndpoint = *idpEvent.AuthorizationEndpoint
+	}
+	if idpEvent.TokenEndpoint != nil {
+		payloadChange = true
+		payload.TokenEndpoint = *idpEvent.TokenEndpoint
+	}
+	if idpEvent.UserEndpoint != nil {
+		payloadChange = true
+		payload.UserEndpoint = *idpEvent.UserEndpoint
 	}
 	if idpEvent.Scopes != nil {
 		payloadChange = true
