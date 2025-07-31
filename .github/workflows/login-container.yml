@@ -78,6 +78,6 @@ jobs:
           targets: login-standalone
           files: |
             ./apps/login/docker-bake.hcl
-            ./apps/login/docker-bake-release.hcl
+            ${{ github.event_name == 'workflow_dispatch' && './apps/login/docker-bake-release.hcl' || '' }}
             ./docker-bake.hcl
             cwd://${{ steps.login-meta.outputs.bake-file }}

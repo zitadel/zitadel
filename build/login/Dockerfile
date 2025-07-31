@@ -27,9 +27,10 @@ WORKDIR /build
 COPY --from=installer /install/ .
 COPY --from=pruner /prune/out/full/ .
 COPY proto ./proto
+ENV CI=true
 RUN --mount=type=cache,id=turbo,target=/build/.turbo/cache \
     --mount=type=cache,id=next,target=/build/apps/login/.next/cache \
-    pnpm turbo build:login:standalone
+    pnpm turbo build:login:standalone --cache-dir=/build/.turbo/cache
 
 FROM scratch AS build-out
 COPY /apps/login/public ./apps/login/public
