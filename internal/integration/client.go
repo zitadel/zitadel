@@ -21,7 +21,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration/scim"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
+	action_v2beta "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
@@ -69,7 +70,8 @@ type Client struct {
 	OIDCv2                   oidc_pb.OIDCServiceClient
 	OrgV2beta                org_v2beta.OrganizationServiceClient
 	OrgV2                    org.OrganizationServiceClient
-	ActionV2beta             action.ActionServiceClient
+	ActionV2beta             action_v2beta.ActionServiceClient
+	ActionV2                 action.ActionServiceClient
 	FeatureV2beta            feature_v2beta.FeatureServiceClient
 	FeatureV2                feature.FeatureServiceClient
 	UserSchemaV3             userschema_v3alpha.ZITADELUserSchemasClient
@@ -112,7 +114,8 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		OIDCv2:                   oidc_pb.NewOIDCServiceClient(cc),
 		OrgV2beta:                org_v2beta.NewOrganizationServiceClient(cc),
 		OrgV2:                    org.NewOrganizationServiceClient(cc),
-		ActionV2beta:             action.NewActionServiceClient(cc),
+		ActionV2beta:             action_v2beta.NewActionServiceClient(cc),
+		ActionV2:                 action.NewActionServiceClient(cc),
 		FeatureV2beta:            feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:                feature.NewFeatureServiceClient(cc),
 		UserSchemaV3:             userschema_v3alpha.NewZITADELUserSchemasClient(cc),
@@ -1036,27 +1039,27 @@ func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoin
 			RestAsync: &action.RESTAsync{},
 		}
 	}
-	target, err := i.Client.ActionV2beta.CreateTarget(ctx, req)
+	target, err := i.Client.ActionV2.CreateTarget(ctx, req)
 	require.NoError(t, err)
 	return target
 }
 
 func (i *Instance) DeleteTarget(ctx context.Context, t *testing.T, id string) {
-	_, err := i.Client.ActionV2beta.DeleteTarget(ctx, &action.DeleteTargetRequest{
+	_, err := i.Client.ActionV2.DeleteTarget(ctx, &action.DeleteTargetRequest{
 		Id: id,
 	})
 	require.NoError(t, err)
 }
 
 func (i *Instance) DeleteExecution(ctx context.Context, t *testing.T, cond *action.Condition) {
-	_, err := i.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
+	_, err := i.Client.ActionV2.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 	})
 	require.NoError(t, err)
 }
 
 func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []string) *action.SetExecutionResponse {
-	target, err := i.Client.ActionV2beta.SetExecution(ctx, &action.SetExecutionRequest{
+	target, err := i.Client.ActionV2.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 		Targets:   targets,
 	})
