@@ -15,6 +15,6 @@
 		22222,
 		3001
 	],
-	"onCreateCommand": "pnpm --filter @zitadel/login install --frozen-lockfile; pnpm --filter @zitadel/login exec cypress install",
+	"onCreateCommand": "pnpm --filter @zitadel/login install --frozen-lockfile --dev; pnpm --filter @zitadel/login exec cypress install",
 	"updateContentCommand": "pnpm --filter @zitadel/login test:integration:login"
 }

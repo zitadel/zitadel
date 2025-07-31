@@ -12,7 +12,8 @@ services:
     environment:
       ZITADEL_DATABASE_POSTGRES_HOST: db
       ZITADEL_EXTERNALSECURE: false
-
+      DISPLAY: ' '
+      
   db:
     container_name: db
     image: postgres:17.0-alpine3.19

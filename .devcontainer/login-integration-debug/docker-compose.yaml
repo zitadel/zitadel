@@ -3,7 +3,7 @@ services:
     container_name: login-integration-debug
     network_mode: service:mock-zitadel
     extends:
-      file: ../login-integration-ci/docker-compose.yaml
+      file: ../base/docker-compose.yaml
       service: devcontainer
 
   mock-zitadel:

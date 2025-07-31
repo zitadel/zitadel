@@ -10,15 +10,13 @@
 	"runServices": [
 		"login-integration"
 	],
-	"workspaceFolder": "/workspaces",
+	"workspaceFolder": "/workspaces/apps/login",
 	"forwardPorts": [
 		22220,
 		22222,
 		3001
 	],
-	"onCreateCommand": "pnpm install --filter . --filter @zitadel/login; cd apps/login; pnpm cypress install",
-	"postAttachCommand": "pnpm turbo daemon clean || true; pnpm turbo watch @zitadel/login#dev test:integration:login",
-	"features": {
-		"ghcr.io/devcontainers/features/docker-outside-of-docker": {}
-	}
+	"onCreateCommand": "pnpm install --frozen-lockfile --filter @zitadel/login --filter @zitadel/client --filter @zitadel/proto  --filter ../..",
+	"postStartCommand": "pnpm turbo daemon clean || true; (pnpm turbo @zitadel/login#dev&)",
+	"postAttachCommand": "echo 'THANKS FOR CONTRIBUTING TO ZITADEL!'; echo; echo; echo 'The login is running in hot reloading dev mode'; echo 'Run a specific test file like this:'; echo; echo 'pnpm cypress run --spec integration/login.cy.ts'; echo; echo 'Navigate to the page you want to fix at http://localhost:3001'; echo 'Change the code and reload the page to see the effects'; echo 'Repeat until all tests pass:'; echo; echo 'pnpm cypress run'"
 }
