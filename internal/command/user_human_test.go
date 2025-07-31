@@ -190,6 +190,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 				),
@@ -231,6 +232,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanAddedEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -299,6 +301,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanAddedEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -368,6 +371,77 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
+					expectPush(
+						user.NewHumanAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"",
+							"firstname lastname",
+							AllowedLanguage,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+						),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("userinit"),
+							},
+							time.Hour*1,
+							"",
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:     mockEncryptedCode("userinit", time.Hour),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address: "email@test.ch",
+					},
+					PreferredLanguage: AllowedLanguage,
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
+				},
+				wantID: "user1",
+			},
+		},
+		{
+			name: "add human (with initial code), orgScopedUsername, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								false,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilterOrganizationSettings("org1", true, true),
 					expectPush(
 						user.NewHumanAddedEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -437,6 +511,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -507,6 +582,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -580,6 +656,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -654,6 +731,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -714,6 +792,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -777,6 +856,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -840,6 +920,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -963,6 +1044,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1042,6 +1124,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1151,6 +1234,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						newAddHumanEvent("", false, true, "+41711234567", AllowedLanguage),
 						user.NewHumanInitialCodeAddedEvent(
@@ -1216,6 +1300,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1326,6 +1411,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						newAddHumanEvent("", false, true, "", AllowedLanguage),
 						user.NewHumanInitialCodeAddedEvent(
@@ -1524,6 +1610,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(),
 							expectFilter(),
 						),
@@ -1565,6 +1652,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1612,6 +1700,94 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										1,
+										false,
+										false,
+										false,
+										false,
+									),
+								),
+							),
+							expectPush(
+								newAddHumanEvent("$plain$x$password", true, true, "", AllowedLanguage),
+								user.NewHumanInitialCodeAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("a"),
+									},
+									time.Hour*1,
+									"",
+								),
+							),
+						),
+						idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+						userPasswordHasher: mockPasswordHasher("x"),
+					},
+					args{
+						ctx:   context.Background(),
+						orgID: "org1",
+						human: &domain.Human{
+							Username: "username",
+							Password: &domain.Password{
+								SecretString:   "password",
+								ChangeRequired: true,
+							},
+							Profile: &domain.Profile{
+								FirstName:         "firstname",
+								LastName:          "lastname",
+								PreferredLanguage: AllowedLanguage,
+							},
+							Email: &domain.Email{
+								EmailAddress: "email@test.ch",
+							},
+						},
+						secretGenerator: GetMockSecretGenerator(t),
+					}
+			},
+			res: res{
+				wantHuman: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: AllowedLanguage,
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+					State: domain.UserStateInitial,
+				},
+			},
+		},
+		{
+			name: "add human (with password and initial code), orgScopedUsername, ok",
+			given: func(t *testing.T) (fields, args) {
+				return fields{
+						eventstore: expectEventstore(
+							expectFilter(
+								eventFromEventPusher(
+									org.NewDomainPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										false,
+										true,
+										true,
+									),
+								),
+							),
+							expectFilterOrganizationSettings("org1", true, true),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1700,6 +1876,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1782,6 +1959,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1883,6 +2061,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1988,6 +2167,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2125,6 +2305,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2222,6 +2403,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2309,6 +2491,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2397,6 +2580,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2544,6 +2728,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2689,6 +2874,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -2863,6 +3049,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -3037,6 +3224,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -3218,6 +3406,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilterOrganizationSettings("org1", false, false),
 							expectFilter(
 								eventFromEventPusher(
 									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -3867,6 +4056,10 @@ func TestAddHumanCommand(t *testing.T) {
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 							return []eventstore.Event{
 								org.NewPasswordComplexityPolicyAddedEvent(
 									ctx,
@@ -3917,6 +4110,87 @@ func TestAddHumanCommand(t *testing.T) {
 									true,
 								),
 							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
+								org.NewPasswordComplexityPolicyAddedEvent(
+									ctx,
+									&org.NewAggregate("id").Aggregate,
+									2,
+									false,
+									false,
+									false,
+									false,
+								),
+							}, nil
+						}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					func() *user.HumanAddedEvent {
+						event := user.NewHumanAddedEvent(
+							context.Background(),
+							&agg.Aggregate,
+							"username",
+							"gigi",
+							"giraffe",
+							"",
+							"gigi giraffe",
+							AllowedLanguage,
+							0,
+							"support@zitadel.com",
+							true,
+						)
+						event.AddPasswordData("$plain$x$password", false)
+						return event
+					}(),
+					user.NewHumanEmailVerifiedEvent(context.Background(), &agg.Aggregate),
+				},
+			},
+		},
+		{
+			name: "correct, orgScopedUsername",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id"),
+			},
+			args: args{
+				human: &AddHuman{
+					Email:             Email{Address: "support@zitadel.com", Verified: true},
+					FirstName:         "gigi",
+					LastName:          "giraffe",
+					Password:          "password",
+					Username:          "username",
+					PreferredLanguage: AllowedLanguage,
+				},
+				orgID:   "ro",
+				hasher:  mockPasswordHasher("x"),
+				codeAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				filter: NewMultiFilter().Append(
+					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{}, nil
+					}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
+								org.NewDomainPolicyAddedEvent(
+									ctx,
+									&org.NewAggregate("id").Aggregate,
+									true,
+									true,
+									true,
+								),
+							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							// never set, as only used in creation of instance and org
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
@@ -3988,6 +4262,10 @@ func TestAddHumanCommand(t *testing.T) {
 									true,
 								),
 							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
@@ -4063,6 +4341,10 @@ func TestAddHumanCommand(t *testing.T) {
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 							return []eventstore.Event{
 								org.NewPasswordComplexityPolicyAddedEvent(
 									ctx,
@@ -4132,6 +4414,10 @@ func TestAddHumanCommand(t *testing.T) {
 									true,
 								),
 							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return expectFilterOrganizationSettingsEvents(ctx, "org1", false, false), nil
 						}).
 					Append(
 						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
