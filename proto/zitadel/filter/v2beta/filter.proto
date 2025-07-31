@@ -6,6 +6,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta;filter";
 
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
 
 enum TextFilterMethod {
   TEXT_FILTER_METHOD_EQUALS = 0;
@@ -54,6 +55,50 @@ message PaginationResponse {
   uint64 applied_limit = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"100\"";
+    }
+  ];
+}
+
+message IDFilter {
+  // Only return resources that belong to this id.
+  string id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"69629023906488337\"";
+    }
+  ];
+}
+
+message TimestampFilter {
+  // Filter resources by timestamp.
+  google.protobuf.Timestamp timestamp = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // Defines the condition (e.g., equals, before, after) that the timestamp of the retrieved resources should match.
+  TimestampFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+
+message InIDsFilter {
+  // Defines the ids to query for.
+  repeated string ids = 1 [
+    (validate.rules).repeated = {
+      unique: true
+      items: {
+        string: {
+          min_len: 1
+          max_len: 200
+        }
+      }
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "[\"69629023906488334\",\"69622366012355662\"]";
     }
   ];
 }

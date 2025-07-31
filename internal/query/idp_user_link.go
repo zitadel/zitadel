@@ -106,12 +106,27 @@ func idpLinksCheckPermission(ctx context.Context, links *IDPUserLinks, permissio
 	)
 }
 
+func idpLinksPermissionCheckV2(ctx context.Context, query sq.SelectBuilder, enabled bool, queries *IDPUserLinksSearchQuery) sq.SelectBuilder {
+	if !enabled {
+		return query
+	}
+	join, args := PermissionClause(
+		ctx,
+		IDPUserLinkResourceOwnerCol,
+		domain.PermissionUserRead,
+		SingleOrgPermissionOption(queries.Queries),
+		OwnedRowsPermissionOption(IDPUserLinkUserIDCol),
+	)
+	return query.JoinClause(join, args...)
+}
+
 func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, permissionCheck domain.PermissionCheck) (idps *IDPUserLinks, err error) {
-	links, err := q.idpUserLinks(ctx, queries, false)
+	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	links, err := q.idpUserLinks(ctx, queries, permissionCheckV2)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil && len(links.Links) > 0 {
+	if permissionCheck != nil && len(links.Links) > 0 && !permissionCheckV2 {
 		// when userID for query is provided, only one check has to be done
 		if queries.hasUserID() {
 			if err := userCheckPermission(ctx, links.Links[0].ResourceOwner, links.Links[0].UserID, permissionCheck); err != nil {
@@ -124,14 +139,15 @@ func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 	return links, nil
 }
 
-func (q *Queries) idpUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, withOwnerRemoved bool) (idps *IDPUserLinks, err error) {
+func (q *Queries) idpUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, permissionCheckV2 bool) (idps *IDPUserLinks, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareIDPUserLinksQuery()
-	eq := sq.Eq{IDPUserLinkInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[IDPUserLinkOwnerRemovedCol.identifier()] = false
+	query = idpLinksPermissionCheckV2(ctx, query, permissionCheckV2, queries)
+	eq := sq.Eq{
+		IDPUserLinkInstanceIDCol.identifier():   authz.GetInstance(ctx).InstanceID(),
+		IDPUserLinkOwnerRemovedCol.identifier(): false,
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {

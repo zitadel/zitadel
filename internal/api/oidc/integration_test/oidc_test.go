@@ -311,7 +311,7 @@ func Test_ZITADEL_API_terminated_session(t *testing.T) {
 	require.Equal(t, User.GetUserId(), myUserResp.GetUser().GetId())
 
 	// end session
-	postLogoutRedirect, err := rp.EndSession(CTX, provider, tokens.IDToken, logoutRedirectURI, "state")
+	postLogoutRedirect, err := rp.EndSession(CTX, provider, tokens.IDToken, logoutRedirectURI, "state", "", nil)
 	require.NoError(t, err)
 	assert.Equal(t, logoutRedirectURI+"?state=state", postLogoutRedirect.String())
 
@@ -421,21 +421,20 @@ type clientOpts struct {
 func createClientWithOpts(t testing.TB, instance *integration.Instance, opts clientOpts) (clientID, projectID string) {
 	ctx := instance.WithAuthorization(CTX, integration.UserTypeOrgOwner)
 
-	project, err := instance.CreateProject(ctx)
-	require.NoError(t, err)
+	project := instance.CreateProject(ctx, t.(*testing.T), "", gofakeit.AppName(), false, false)
 	app, err := instance.CreateOIDCClientLoginVersion(ctx, opts.redirectURI, opts.logoutURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, opts.devMode, opts.LoginVersion)
 	require.NoError(t, err)
 	return app.GetClientId(), project.GetId()
 }
 
 func createImplicitClient(t testing.TB) string {
-	app, err := Instance.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit, nil)
+	app, err := Instance.CreateOIDCImplicitFlowClient(CTX, t.(*testing.T), redirectURIImplicit, nil)
 	require.NoError(t, err)
 	return app.GetClientId()
 }
 
 func createImplicitClientNoLoginClientHeader(t testing.TB) string {
-	app, err := Instance.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit, &app.LoginVersion{Version: &app.LoginVersion_LoginV2{LoginV2: &app.LoginV2{BaseUri: nil}}})
+	app, err := Instance.CreateOIDCImplicitFlowClient(CTX, t.(*testing.T), redirectURIImplicit, &app.LoginVersion{Version: &app.LoginVersion_LoginV2{LoginV2: &app.LoginV2{BaseUri: nil}}})
 	require.NoError(t, err)
 	return app.GetClientId()
 }

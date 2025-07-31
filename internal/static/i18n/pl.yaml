@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Numer telefonu już zweryfikowany
       Empty: Numer telefonu jest pusty
       NotChanged: Numer telefonu nie zmieniony
+      VerifyingRemovalIsNotSupported: Usunięcie weryfikacji nie jest obsługiwane
     Address:
       NotFound: Adres nie znaleziony
       NotChanged: Adres nie zmieniony
@@ -193,7 +194,7 @@ Errors:
     AlreadyExists: Instancja już istnieje
     NotChanged: Instancja nie zmieniona
   Org:
-    AlreadyExists: Nazwa organizacji jest już zajęta
+    AlreadyExists: Nazwa lub identyfikator organizacji jest już zajęty
     Invalid: Organizacja jest nieprawidłowa
     AlreadyDeactivated: Organizacja jest już deaktywowana
     AlreadyActive: Organizacja jest już aktywna
@@ -436,8 +437,6 @@ Errors:
     Invalid: Uprawnienie użytkownika jest nieprawidłowe
     NotChanged: Uprawnienie użytkownika nie zostało zmienione
     IDMissing: Brak ID
-    NotActive: Uprawnienie użytkownika nie jest aktywne
-    NotInactive: Uprawnienie użytkownika nie jest dezaktywowane
     NoPermissionForProject: Użytkownik nie ma uprawnień do tego projektu
     RoleKeyNotFound: Rola nie znaleziona
   Member:

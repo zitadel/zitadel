@@ -1545,7 +1545,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1624,12 +1625,8 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Standaard inlogorganisatie",
       "LOGINDEFAULTORG_DESCRIPTION": "Als er geen organisatiecontext is ingesteld, gebruikt de inlog-UI de instellingen van de standaardorganisatie (en niet van de instantie)",
-      "OIDCLEGACYINTROSPECTION": "Oude OIDC-introspectie",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "We hebben onlangs het introspectie-endpoint opnieuw gefactoreerd omwille van de prestaties. Deze functie kan worden gebruikt om terug te keren naar de oude implementatie als er onverwachte bugs optreden.",
       "OIDCTOKENEXCHANGE": "OIDC-tokenuitwisseling",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Schakel het experimentele type verlening urn:ietf:params:oauth:grant-type:token-exchange in voor het OIDC-tokenendpoint. Tokenuitwisseling kan worden gebruikt om tokens met een kleinere scope op te vragen of om zich voor te doen als andere gebruikers. Raadpleeg het beveiligingsbeleid om impersonation op een instantie toe te staan.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC-triggers voor introspectieprojecties",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Schakel projectietriggers in tijdens een introspectieverzoek. Dit kan dienen als een tijdelijke oplossing als er merkbare consistentieproblemen optreden in het introspectieantwoord, maar het kan wel prestaties beïnvloeden. We zijn van plan om triggers voor introspectieverzoeken in de toekomst te verwijderen.",
       "USERSCHEMA": "Gebruikerschema",
       "USERSCHEMA_DESCRIPTION": "Met gebruikerschema's kunt u de dataschema's van gebruikers beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
       "ACTIONS": "Acties",
@@ -1644,8 +1641,6 @@
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om clients te informeren over het beëindigen van de sessie bij de OpenID-provider.",
       "PERMISSIONCHECKV2": "Permissiecontrole V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
-      "WEBKEY": "Websleutel",
-      "WEBKEY_DESCRIPTION": "Als de vlag is ingeschakeld, kunt u de nieuwe API en de bijbehorende functies gebruiken.",
       "STATES": {
         "INHERITED": "Overgenomen",
         "ENABLED": "Ingeschakeld",
@@ -1800,7 +1795,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -2772,7 +2768,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",

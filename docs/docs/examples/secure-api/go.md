@@ -6,30 +6,71 @@ sidebar_label: Go
 This integration guide shows you how to integrate **ZITADEL** into your Go API. It demonstrates how to secure your API using
 OAuth 2 Token Introspection.
 
+> ℹ️ These examples and guides are based on our official [Go SDK](https://github.com/zitadel/zitadel-go).
+>
+> The SDK is a convenient wrapper around our low-level [OIDC library](https://github.com/zitadel/oidc). For most use cases, using the helpers provided in our [Go SDK](https://github.com/zitadel/zitadel-go) is the recommended approach for implementing authentication.
+
 At the end of the guide you should have an API with a protected endpoint.
 
 > This documentation references our HTTP example. There's also one for GRPC. Check them out on [GitHub](https://github.com/zitadel/zitadel-go/blob/next/example/api/http/main.go).
 
-## Set up application and obtain keys
-
-Before we begin developing our API, we need to perform a few configuration steps in the ZITADEL Console.
-You'll need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
-Select the **API** application type and continue.
-
-![Create app in console](/img/go/api-create.png)
-
-We recommend that you use JWT Profile for authenticating at the Introspection Endpoint.
-
-![Create app in console](/img/go/api-create-auth.png)
-
-Then create a new key with your desired expiration date. Be sure to download it, as you won't be able to retrieve it again.
-
-![Create api key in console](/img/go/api-create-key.png)
-
 ## Prerequisites
 
-This will handle the OAuth 2.0 introspection request including authentication using JWT with Private Key using our [OIDC client library](https://github.com/zitadel/oidc).
-All that is required, is to create your API and download the private key file later called `Key JSON` for the service user.
+This will handle the OAuth 2.0 introspection request including authentication using JWT with Private Key using our [Go SDK](https://github.com/zitadel/zitadel-go).
+All that is required, is to create your API, create a private key and a personal access token for a service user.
+
+### Set up application and obtain keys
+
+Before we begin developing our API, we need to perform a few configuration steps in the ZITADEL Console.
+You'll need to provide some information about your app. We recommend creating a new app to start from scratch.
+
+Starting from the homepage of your console, click on Create Application
+
+![Create app in homepage](/img/go/api-create_application.png)
+
+Select a project from the dropdown and select *Other* as framework, then continue.
+
+![Framework Selection](/img/go/api-select_framework.png)
+
+Add your app name and select *API* as application type, then continue.
+
+![Application Type](/img/go/api-app_details.png)
+
+We recommend that you use JWT Profile for authenticating at the Introspection Endpoint. So select *JWT* as authentication method
+
+![JWT authentication method](/img/go/api-select_jwt.png)
+
+You then need to create a new JSON key.
+
+![New JSON key](/img/go/api-new_key.png)
+
+Select an expiration date that suits you.
+
+![Key expiration date](/img/go/api-expiration_date.png)
+
+And make sure to download it, as you won't be able to retrieve it again.
+
+![Key download](/img/go/api-download_key.png)
+
+Now we need to create a *Personal Access Token* to authenticate the client requests.
+
+On the user view, switch to *Service Users* and create a new one.
+
+![Service User Panel](/img/go/api-service_user_panel.png)
+
+Give the service user a name and a user name. Select `Bearer` as *Access Token Type*.
+
+![Service User Creation](/img/go/api-create_service_user.png)
+
+### Create service user and personal access token (PAT)
+
+Once done, from the left panel of the user management, click on Personal Access Token and create a new one.
+
+![Personal Access Token View](/img/go/api-PAT_view.png)
+
+Set an expiration date and then copy the PAT generated to somewhere safe. We will need it later.
+
+![PAT creation](/img/go/api-PAT_creation.png)
 
 ## Go Setup
 
@@ -88,7 +129,7 @@ Now you can call the API by browser or curl. Try the healthz endpoint first:
 curl -i http://localhost:8089/api/healthz
 ```
 
-it should return something like: 
+it should return something like:
 
 ```
 HTTP/1.1 200 OK
@@ -119,8 +160,7 @@ Content-Length: 44
 unauthorized: authorization header is empty
 ```
 
-Get a valid access_token for the API. You can either achieve this by getting an access token with the project_id in the audience
-or use a PAT of a service account.
+We need to use the personal access token generated previously.
 
 If you provide a valid Bearer Token:
 

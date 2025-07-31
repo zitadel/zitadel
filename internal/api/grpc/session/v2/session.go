@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"connectrpc.com/connect"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/structpb"
 
@@ -17,12 +18,12 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
-func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRequest) (*session.CreateSessionResponse, error) {
-	checks, metadata, userAgent, lifetime, err := s.createSessionRequestToCommand(ctx, req)
+func (s *Server) CreateSession(ctx context.Context, req *connect.Request[session.CreateSessionRequest]) (*connect.Response[session.CreateSessionResponse], error) {
+	checks, metadata, userAgent, lifetime, err := s.createSessionRequestToCommand(ctx, req.Msg)
 	if err != nil {
 		return nil, err
 	}
-	challengeResponse, cmds, err := s.challengesToCommand(req.GetChallenges(), checks)
+	challengeResponse, cmds, err := s.challengesToCommand(req.Msg.GetChallenges(), checks)
 	if err != nil {
 		return nil, err
 	}
@@ -32,43 +33,43 @@ func (s *Server) CreateSession(ctx context.Context, req *session.CreateSessionRe
 		return nil, err
 	}
 
-	return &session.CreateSessionResponse{
+	return connect.NewResponse(&session.CreateSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
 		SessionId:    set.ID,
 		SessionToken: set.NewToken,
 		Challenges:   challengeResponse,
-	}, nil
+	}), nil
 }
 
-func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest) (*session.SetSessionResponse, error) {
-	checks, err := s.setSessionRequestToCommand(ctx, req)
+func (s *Server) SetSession(ctx context.Context, req *connect.Request[session.SetSessionRequest]) (*connect.Response[session.SetSessionResponse], error) {
+	checks, err := s.setSessionRequestToCommand(ctx, req.Msg)
 	if err != nil {
 		return nil, err
 	}
-	challengeResponse, cmds, err := s.challengesToCommand(req.GetChallenges(), checks)
+	challengeResponse, cmds, err := s.challengesToCommand(req.Msg.GetChallenges(), checks)
 	if err != nil {
 		return nil, err
 	}
 
-	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), cmds, req.GetMetadata(), req.GetLifetime().AsDuration())
+	set, err := s.command.UpdateSession(ctx, req.Msg.GetSessionId(), req.Msg.GetSessionToken(), cmds, req.Msg.GetMetadata(), req.Msg.GetLifetime().AsDuration())
 	if err != nil {
 		return nil, err
 	}
-	return &session.SetSessionResponse{
+	return connect.NewResponse(&session.SetSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
 		SessionToken: set.NewToken,
 		Challenges:   challengeResponse,
-	}, nil
+	}), nil
 }
 
-func (s *Server) DeleteSession(ctx context.Context, req *session.DeleteSessionRequest) (*session.DeleteSessionResponse, error) {
-	details, err := s.command.TerminateSession(ctx, req.GetSessionId(), req.GetSessionToken())
+func (s *Server) DeleteSession(ctx context.Context, req *connect.Request[session.DeleteSessionRequest]) (*connect.Response[session.DeleteSessionResponse], error) {
+	details, err := s.command.TerminateSession(ctx, req.Msg.GetSessionId(), req.Msg.GetSessionToken())
 	if err != nil {
 		return nil, err
 	}
-	return &session.DeleteSessionResponse{
+	return connect.NewResponse(&session.DeleteSessionResponse{
 		Details: object.DomainToDetailsPb(details),
-	}, nil
+	}), nil
 }
 
 func (s *Server) createSessionRequestToCommand(ctx context.Context, req *session.CreateSessionRequest) ([]command.SessionCommand, map[string][]byte, *domain.UserAgent, time.Duration, error) {

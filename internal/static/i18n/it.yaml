@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefono già verificato
       Empty: Il telefono è vuoto
       NotChanged: Telefono non cambiato
+      VerifyingRemovalIsNotSupported: La rimozione della verifica non è supportata
     Address:
       NotFound: Indirizzo non trovato
       NotChanged: Indirizzo non cambiato
@@ -193,7 +194,7 @@ Errors:
     AlreadyExists: L'istanza esiste già
     NotChanged: Istanza non modificata
   Org:
-    AlreadyExists: Nome dell'organizzazione già preso
+    AlreadyExists: Nome o ID dell'organizzazione già utilizzato
     Invalid: L'organizzazione non è valida
     AlreadyDeactivated: L'organizzazione è già disattivata
     AlreadyActive: L'organizzazione è già attiva
@@ -436,8 +437,6 @@ Errors:
     Invalid: User Grant non è valido
     NotChanged: User Grant non è stata cambiato
     IDMissing: ID mancante
-    NotActive: User Grant non è attivo
-    NotInactive: User Grant non è disattivato
     NoPermissionForProject: L'utente non ha permessi su questo progetto
     RoleKeyNotFound: Ruolo non trovato
   Member:

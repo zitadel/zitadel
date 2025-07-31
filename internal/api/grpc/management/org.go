@@ -278,28 +278,28 @@ func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembers
 }
 
 func (s *Server) AddOrgMember(ctx context.Context, req *mgmt_pb.AddOrgMemberRequest) (*mgmt_pb.AddOrgMemberResponse, error) {
-	addedMember, err := s.command.AddOrgMember(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Roles...)
+	addedMember, err := s.command.AddOrgMember(ctx, AddOrgMemberRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddOrgMemberResponse{
 		Details: object.AddToDetailsPb(
 			addedMember.Sequence,
-			addedMember.ChangeDate,
+			addedMember.EventDate,
 			addedMember.ResourceOwner,
 		),
 	}, nil
 }
 
 func (s *Server) UpdateOrgMember(ctx context.Context, req *mgmt_pb.UpdateOrgMemberRequest) (*mgmt_pb.UpdateOrgMemberResponse, error) {
-	changedMember, err := s.command.ChangeOrgMember(ctx, UpdateOrgMemberRequestToDomain(ctx, req))
+	changedMember, err := s.command.ChangeOrgMember(ctx, UpdateOrgMemberRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateOrgMemberResponse{
 		Details: object.ChangeToDetailsPb(
 			changedMember.Sequence,
-			changedMember.ChangeDate,
+			changedMember.EventDate,
 			changedMember.ResourceOwner,
 		),
 	}, nil

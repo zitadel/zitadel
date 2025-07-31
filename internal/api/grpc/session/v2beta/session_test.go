@@ -328,22 +328,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "default request",
-			args: args{
-				ctx: authz.NewMockContext("123", "456", "789"),
-				req: &session.ListSessionsRequest{},
-			},
-			want: &query.SessionsSearchQueries{
-				SearchRequest: query.SearchRequest{
-					Offset: 0,
-					Limit:  0,
-					Asc:    false,
-				},
-				Queries: []query.SearchQuery{},
-			},
-		},
-		{
-			name: "default request with sorting column",
+			name: "sorting column",
 			args: args{
 				ctx: authz.NewMockContext("123", "456", "789"),
 				req: &session.ListSessionsRequest{
@@ -453,13 +438,6 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "creator only",
-			args: args{
-				ctx: authz.NewMockContext("123", "456", "789"),
-			},
-			want: []query.SearchQuery{},
-		},
-		{
 			name: "invalid argument",
 			args: args{
 				ctx: authz.NewMockContext("123", "456", "789"),
@@ -470,7 +448,7 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
 		},
 		{
-			name: "creator and sessions",
+			name: "sessions",
 			args: args{
 				ctx: authz.NewMockContext("123", "456", "789"),
 				queries: []*session.SearchQuery{

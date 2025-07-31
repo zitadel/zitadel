@@ -18,69 +18,11 @@ import (
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 )
 
-// TestServer_UserInfo is a top-level test which re-executes the actual
-// userinfo integration test against a matrix of different feature flags.
-// This ensure that the response of the different implementations remains the same.
 func TestServer_UserInfo(t *testing.T) {
-	iamOwnerCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	t.Cleanup(func() {
-		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(iamOwnerCTX, &feature.ResetInstanceFeaturesRequest{})
-		require.NoError(t, err)
-	})
-	tests := []struct {
-		name    string
-		legacy  bool
-		trigger bool
-		webKey  bool
-	}{
-		{
-			name:   "legacy enabled",
-			legacy: true,
-		},
-		{
-			name:    "legacy disabled, trigger disabled",
-			legacy:  false,
-			trigger: false,
-		},
-		{
-			name:    "legacy disabled, trigger enabled",
-			legacy:  false,
-			trigger: true,
-		},
-
-		// This is the only functional test we need to cover web keys.
-		// - By creating tokens the signer is tested
-		// - When obtaining the tokens, the RP verifies the ID Token using the key set from the jwks endpoint.
-		// - By calling userinfo with the access token as JWT, the Token Verifier with the public key cache is tested.
-		{
-			name:    "web keys",
-			legacy:  false,
-			trigger: false,
-			webKey:  true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := Instance.Client.FeatureV2.SetInstanceFeatures(iamOwnerCTX, &feature.SetInstanceFeaturesRequest{
-				OidcLegacyIntrospection:             &tt.legacy,
-				OidcTriggerIntrospectionProjections: &tt.trigger,
-				WebKey:                              &tt.webKey,
-			})
-			require.NoError(t, err)
-			testServer_UserInfo(t)
-		})
-	}
-}
-
-// testServer_UserInfo is the actual userinfo integration test,
-// which calls the userinfo endpoint with different client configurations, roles and token scopes.
-func testServer_UserInfo(t *testing.T) {
 	const (
 		roleFoo = "foo"
 		roleBar = "bar"
@@ -309,9 +251,7 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 		roleBar = "bar"
 	)
 
-	project, err := Instance.CreateProject(CTX)
-	projectID := project.GetId()
-	require.NoError(t, err)
+	projectID := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false).GetId()
 	user, _, clientID, clientSecret, err := Instance.CreateOIDCCredentialsClient(CTX)
 	require.NoError(t, err)
 	addProjectRolesGrants(t, user.GetUserId(), projectID, roleFoo, roleBar)

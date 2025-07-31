@@ -12,12 +12,22 @@ ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
 export GOCOVERDIR ZITADEL_MASTERKEY
 
+LOGIN_REMOTE_NAME := login
+LOGIN_REMOTE_URL ?= https://github.com/zitadel/typescript.git
+LOGIN_REMOTE_BRANCH ?= main
+
 .PHONY: compile
 compile: core_build console_build compile_pipeline
 
 .PHONY: docker_image
-docker_image: compile
-	DOCKER_BUILDKIT=1 docker build -f build/Dockerfile -t $(ZITADEL_IMAGE) .
+docker_image:
+	@if [ ! -f ./zitadel ]; then \
+		echo "Compiling zitadel binary"; \
+		$(MAKE) compile; \
+	else \
+		echo "Reusing precompiled zitadel binary"; \
+	fi
+	DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile -t $(ZITADEL_IMAGE) .
 
 .PHONY: compile_pipeline
 compile_pipeline: console_move
@@ -68,12 +78,13 @@ core_grpc_dependencies:
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.22.0 		# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2?tab=versions
 	go install github.com/envoyproxy/protoc-gen-validate@v1.1.0								# https://pkg.go.dev/github.com/envoyproxy/protoc-gen-validate?tab=versions
 	go install github.com/bufbuild/buf/cmd/buf@v1.45.0										# https://pkg.go.dev/github.com/bufbuild/buf/cmd/buf?tab=versions
+	go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1						# https://pkg.go.dev/connectrpc.com/connect/cmd/protoc-gen-connect-go?tab=versions
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
 	buf generate
 	mkdir -p pkg/grpc
-	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/
+	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/
 	mkdir -p openapi/v2/zitadel
 	cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel
 
@@ -86,18 +97,11 @@ console_move:
 
 .PHONY: console_dependencies
 console_dependencies:
-	cd console && \
-	yarn install --immutable
-
-.PHONY: console_client
-console_client:
-	cd console && \
-	yarn generate
+	npx pnpm install --frozen-lockfile --filter=./console
 
 .PHONY: console_build
-console_build: console_dependencies console_client
-	cd console && \
-	yarn build
+console_build: console_dependencies
+	npx pnpm turbo build --filter=./console
 
 .PHONY: clean
 clean:
@@ -112,7 +116,7 @@ core_unit_test:
 
 .PHONY: core_integration_db_up
 core_integration_db_up:
-	docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait cache
+	docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait cache postgres
 
 .PHONY: core_integration_db_down
 core_integration_db_down:
@@ -155,8 +159,7 @@ core_integration_test: core_integration_server_start core_integration_test_packa
 
 .PHONY: console_lint
 console_lint:
-	cd console && \
-	yarn lint
+	npx pnpm turbo lint --filter=./console
 
 .PHONY: core_lint
 core_lint:
@@ -165,3 +168,29 @@ core_lint:
 		--config ./.golangci.yaml \
 		--out-format=github-actions \
 		--concurrency=$$(getconf _NPROCESSORS_ONLN)
+
+.PHONY: login_pull
+login_pull: login_ensure_remote
+	@echo "Pulling changes from the 'apps/login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
+	git fetch $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
+	git merge -s ours --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/$(LOGIN_REMOTE_BRANCH) -m "Synthetic merge to align histories"
+	git push
+
+.PHONY: login_push
+login_push: login_ensure_remote
+	@echo "Pushing changes to the 'apps/login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
+	git subtree split --prefix=apps/login -b login-sync-tmp
+	git checkout login-sync-tmp
+	git fetch $(LOGIN_REMOTE_NAME) main
+	git merge -s ours --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/main -m "Synthetic merge to align histories"
+	git push $(LOGIN_REMOTE_NAME) login-sync-tmp:$(LOGIN_REMOTE_BRANCH)
+	git checkout -
+	git branch -D login-sync-tmp
+
+login_ensure_remote:
+	@if ! git remote get-url $(LOGIN_REMOTE_NAME) > /dev/null 2>&1; then \
+		echo "Adding remote $(LOGIN_REMOTE_NAME)"; \
+		git remote add $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_URL); \
+	else \
+		echo "Remote $(LOGIN_REMOTE_NAME) already exists."; \
+	fi

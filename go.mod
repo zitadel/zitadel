@@ -7,6 +7,9 @@ toolchain go1.24.1
 require (
 	cloud.google.com/go/profiler v0.4.2
 	cloud.google.com/go/storage v1.54.0
+	connectrpc.com/connect v1.18.1
+	connectrpc.com/grpcreflect v1.3.0
+	dario.cat/mergo v1.0.2
 	github.com/BurntSushi/toml v1.5.0
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.27.0
@@ -34,6 +37,7 @@ require (
 	github.com/go-webauthn/webauthn v0.10.2
 	github.com/goccy/go-json v0.10.5
 	github.com/golang/protobuf v1.5.4
+	github.com/google/go-cmp v0.7.0
 	github.com/gorilla/csrf v1.7.2
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.4.1
@@ -64,6 +68,8 @@ require (
 	github.com/riverqueue/river v0.22.0
 	github.com/riverqueue/river/riverdriver v0.22.0
 	github.com/riverqueue/river/rivertype v0.22.0
+	github.com/riverqueue/rivercontrib/otelriver v0.5.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/cors v1.11.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/shopspring/decimal v1.3.1
@@ -76,7 +82,7 @@ require (
 	github.com/twilio/twilio-go v1.26.1
 	github.com/zitadel/exifremove v0.1.0
 	github.com/zitadel/logging v0.6.2
-	github.com/zitadel/oidc/v3 v3.39.1
+	github.com/zitadel/oidc/v3 v3.42.0
 	github.com/zitadel/passwap v0.9.0
 	github.com/zitadel/saml v0.3.5
 	github.com/zitadel/schema v1.3.1
@@ -95,8 +101,8 @@ require (
 	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6
 	golang.org/x/net v0.40.0
 	golang.org/x/oauth2 v0.30.0
-	golang.org/x/sync v0.15.0
-	golang.org/x/text v0.26.0
+	golang.org/x/sync v0.16.0
+	golang.org/x/text v0.27.0
 	google.golang.org/api v0.233.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250512202823-5a2f75b736a9
 	google.golang.org/grpc v1.72.1
@@ -113,7 +119,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.51.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.51.0 // indirect
 	github.com/alicebob/gopher-json v0.0.0-20230218143504-906a9b012302 // indirect
-	github.com/bmatcuk/doublestar/v4 v4.8.1 // indirect
+	github.com/bmatcuk/doublestar/v4 v4.9.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20250121191232-2f005788dc42 // indirect
 	github.com/crewjam/httperr v0.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -145,7 +151,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/riverqueue/river/rivershared v0.22.0 // indirect
-	github.com/riverqueue/rivercontrib/otelriver v0.5.0 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.5.0 // indirect

@@ -48,6 +48,52 @@ When creating a new service, start with version `2`, as version `1` is reserved 
 
 Please check out the structure Buf style guide for more information about the folder and package structure: https://buf.build/docs/best-practices/style-guide/
 
+### Deprecations
+
+As a rule of thumb, redundant API methods are deprecated.
+
+- The proto option `grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation.deprecated` MUST be set to true.
+- One or more links to recommended replacement methods MUST be added to the deprecation message as a proto comment above the rpc spec.
+- Guidance for switching to the recommended methods for common use cases SHOULD be added as a proto comment above the rpc spec.
+
+#### Example
+
+```protobuf
+// Delete the user phone
+//
+// Deprecated: [Update the user's phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx) to remove the phone number.
+//
+// Delete the phone number of a user.
+rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
+  option (google.api.http) = {
+    delete: "/v2/users/{user_id}/phone"
+    body: "*"
+  };
+
+  option (zitadel.protoc_gen_zitadel.v2.options) = {
+    auth_option: {
+      permission: "authenticated"
+    }
+  };
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    deprecated: true;
+    responses: {
+      key: "200"
+      value: {
+        description: "OK";
+      }
+    };
+    responses: {
+      key: "404";
+      value: {
+        description: "User ID does not exist.";
+      }
+    }
+  };
+}
+```
+
 ### Explicitness
 
 Make the handling of the API as explicit as possible. Do not make assumptions about the client's knowledge of the system or the API. 
@@ -55,6 +101,10 @@ Provide clear and concise documentation for the API.
 
 Do not rely on implicit fallbacks or defaults if the client does not provide certain parameters.
 Only use defaults if they are explicitly documented, such as returning a result set for the whole instance if no filter is provided.
+
+Some API calls may create multiple resources such as in the case of `zitadel.org.v2.AddOrganization`, where you can create an organization AND multiple users as admin.
+In such cases the response should include **ALL** created resources and their ids. This removes any ambiguity from the users perspective whether or not
+the additional resources were created and it also helps in testing.
 
 ### Naming Conventions
 
@@ -68,6 +118,8 @@ For example, use `organization_id` instead of **org_id** or **resource_owner** f
 > Until then, please refer to the following issue: https://github.com/zitadel/zitadel/issues/5888
 
 #### Resources and Fields
+
+##### Context information in Requests
 
 When a context is required for creating a resource, the context is added as a field to the resource.
 For example, when creating a new user, the organization's id is required. The `organization_id` is added as a field to the `CreateUserRequest`.
@@ -83,8 +135,69 @@ message CreateUserRequest {
 ```
 
 Only allow providing a context where it is required. The context MUST not be provided if not required.
+If the context is required but deferrable, the context can be defaulted.
+For example, creating an Authorization without an organization id will default the organization id to the projects resource owner.
 For example, when retrieving or updating a user, the `organization_id` is not required, since the user can be determined by the user's id.
 However, it is possible to provide the `organization_id` as a filter to retrieve a list of users of a specific organization.
+
+##### Context information in Responses
+
+When the action of creation, update or deletion of a resource was successful, the returned response has to include the time of the operation and the generated identifiers.
+This is achieved through the addition of a timestamp attribute with the operation as a prefix, and the generated information as separate attributes.
+
+```protobuf
+message SetExecutionResponse {
+  // The timestamp of the execution set.
+  google.protobuf.Timestamp set_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message CreateTargetResponse {
+  // The unique identifier of the newly created target.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The timestamp of the target creation.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // Key used to sign and check payload sent to the target.
+  string signing_key = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"98KmsU67\""
+    }
+  ];
+}
+
+message UpdateProjectGrantResponse {
+  // The timestamp of the change of the project grant.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message DeleteProjectGrantResponse {
+  // The timestamp of the deletion of the project grant.
+  // Note that the deletion date is only guaranteed to be set if the deletion was successful during the request.
+  // In case the deletion occurred in a previous request, the deletion date might be empty.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+```
+
+##### Global messages
 
 Prevent the creation of global messages that are used in multiple resources unless they always follow the same pattern.
 Use dedicated fields as described above or create a separate message for the specific context, that is only used in the boundary of the same resource.  
@@ -94,6 +207,10 @@ But do not create a global `Context` message that is used across the whole API i
 The same applies to messages that are returned by multiple resources.  
 For example, information about the `User` might be different when managing the user resource itself than when it's returned
 as part of an authorization or a manager role, where only limited information is needed.
+
+On the other hand, types that always follow the same pattern and are used in multiple resources, such as `IDFilter`, `TimestampFilter` or `InIDsFilter` SHOULD be globalized and reused.
+
+##### Re-using messages
 
 Prevent reusing messages for the creation and the retrieval of a resource.
 Returning messages might contain additional information that is not required or even not available for the creation of the resource.  
@@ -158,7 +275,7 @@ Additionally, state changes, specific actions or operations that do not fit into
 The API uses OAuth 2 for authorization. There are corresponding middlewares that check the access token for validity and 
 automatically return an error if the token is invalid.
 
-Permissions grated to the user might be organization specific and can therefore only be checked based on the queried resource.
+Permissions granted to the user might be organization specific and can therefore only be checked based on the queried resource.
 In such case, the API does not check the permissions itself but relies on the checks of the functions that are called by the API.
 If the permission can be checked by the API itself, e.g. if the permission is instance wide, it can be annotated on the endpoint in the proto file (see below).
 In any case, the required permissions need to be documented in the [API documentation](#documentation).
@@ -186,32 +303,53 @@ In case the permission cannot be checked by the API itself, but all requests nee
 };
 ```
 
-## Pagination
+## Listing resources
 
 The API uses pagination for listing resources. The client can specify a limit and an offset to retrieve a subset of the resources.
 Additionally, the client can specify sorting options to sort the resources by a specific field.
 
-Most listing methods SHOULD provide use the `ListQuery` message to allow the client to specify the limit, offset, and sorting options.
-```protobuf
+### Pagination
 
-// ListQuery is a general query object for lists to allow pagination and sorting.
-message ListQuery {
-  uint64 offset = 1;
-  // limit is the maximum amount of objects returned. The default is set to 100
-  // with a maximum of 1000 in the runtime configuration.
-  // If the limit exceeds the maximum configured ZITADEL will throw an error.
-  // If no limit is present the default is taken.
-  uint32 limit = 2;
-  // Asc is the sorting order. If true the list is sorted ascending, if false
-  // the list is sorted descending. The default is descending.
-  bool asc = 3;
+Most listing methods SHOULD use the `PaginationRequest` message to allow the client to specify the limit, offset, and sorting options.
+```protobuf
+message ListTargetsRequest {
+  // List limitations and ordering.
+  optional zitadel.filter.v2beta.PaginationRequest pagination = 1;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional TargetFieldName sorting_column = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"TARGET_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+  // Define the criteria to query for.
+  repeated TargetSearchFilter filters = 3;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"sortingColumn\":\"TARGET_FIELD_NAME_CREATION_DATE\",\"filters\":[{\"targetNameFilter\":{\"targetName\":\"ip_allow_list\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"inTargetIdsFilter\":{\"targetIds\":[\"69629023906488334\",\"69622366012355662\"]}}]}";
+  };
 }
 ```
-On the corresponding responses the `ListDetails` can be used to return the total count of the resources
+
+On the corresponding responses the `PaginationResponse` can be used to return the total count of the resources
 and allow the user to handle their offset and limit accordingly.
 
 The API MUST enforce a reasonable maximum limit for the number of resources that can be retrieved and returned in a single request.
 The default limit is set to 100 and the maximum limit is set to 1000. If the client requests a limit that exceeds the maximum limit, an error is returned.
+
+### Filter method
+
+All filters in List operations SHOULD provide a method if not already specified by the filters name.
+```protobuf
+message TargetNameFilter {
+  // Defines the name of the target to query for.
+  string target_name = 1 [
+    (validate.rules).string = {max_len: 200}
+  ];
+  // Defines which text comparison method used for the name query.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+```
 
 ## Error Handling
 

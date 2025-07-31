@@ -371,7 +371,7 @@ The API documentation to create a target can be found [here](/apis/resources/act
 To ensure the integrity of request content, each call includes a 'ZITADEL-Signature' in the headers. This header contains an HMAC value computed from the request content and a timestamp, which can be used to time out requests. The logic for this process is provided in 'pkg/actions/signing.go'. The goal is to verify that the HMAC value in the header matches the HMAC value computed by the Target, ensuring that the sent and received requests are identical.
 
 Each Target resource now contains also a Signing Key, which gets generated and returned when a Target is [created](/apis/resources/action_service_v2/action-service-create-target),
-and can also be newly generated when a Target is [patched](/apis/resources/action_service_v2/action-service-patch-target).
+and can also be newly generated when a Target is [patched](/apis/resources/action_service_v2/action-service-update-target).
 
 For an example on how to check the signature, [refer to the example](/guides/integrate/actions/testing-request-signature).
 
@@ -406,17 +406,11 @@ If you then have a call on `/zitadel.user.v2.UserService/UpdateHumanUser` the fo
 
 And if you use a different service, for example `zitadel.session.v2.SessionService`, then the `all` Execution would still be used.
 
-### Targets and Includes
+### Targets
 
-:::info
-Includes are limited to 3 levels, which mean that include1->include2->include3 is the maximum for now.
-If you have feedback to the include logic, or a reason why 3 levels are not enough, please open [an issue on github](https://github.com/zitadel/zitadel/issues) or [start a discussion on github](https://github.com/zitadel/zitadel/discussions)/[start a topic on discord](https://zitadel.com/chat)
-:::
+An execution can contain only a list of Targets, and Targets are comma separated string values.
 
-An execution can not only contain a list of Targets, but also Includes.
-The Includes can be defined in the Execution directly, which means you include all defined Targets by a before set Execution.
-
-If you define 2 Executions as follows:
+Here's an example of a Target defined on a service (e.g. `zitadel.user.v2.UserService`)
 
 ```json
 {
@@ -426,13 +420,12 @@ If you define 2 Executions as follows:
     }
   },
   "targets": [
-    {
-      "target": "<TargetID1>"
-    }
+    "<TargetID1>"
   ]
 }
 ```
 
+Here's an example of a Target defined on a method (e.g. `/zitadel.user.v2.UserService/AddHumanUser`)
 ```json
 {
   "condition": {
@@ -441,21 +434,13 @@ If you define 2 Executions as follows:
     }
   },
   "targets": [
-    {
-      "target": "<TargetID2>"
-    },
-    {
-      "include": {
-        "request": {
-          "service": "zitadel.user.v2.UserService"
-        }
-      }
-    }
+    "<TargetID2>",
+    "<TargetID1>"
   ]
 }
 ```
 
-The called Targets on "/zitadel.user.v2.UserService/AddHumanUser" would be, in order:
+The called Targets on `/zitadel.user.v2.UserService/AddHumanUser` would be, in order:
 
 1. `<TargetID2>`
 2. `<TargetID1>`

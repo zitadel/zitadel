@@ -125,7 +125,7 @@ type userGrantProvider interface {
 
 type projectProvider interface {
 	ProjectByClientID(context.Context, string) (*query.Project, error)
-	SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries) (projects *query.ProjectGrants, err error)
+	SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries, permissionCheck domain.PermissionCheck) (projects *query.ProjectGrants, err error)
 }
 
 type applicationProvider interface {
@@ -1845,7 +1845,7 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 	if err != nil {
 		return false, err
 	}
-	grants, err := projectProvider.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectID, grantedOrg}})
+	grants, err := projectProvider.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectID, grantedOrg}}, nil)
 	if err != nil {
 		return false, err
 	}

@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefoon is al geverifieerd
       Empty: Telefoon is leeg
       NotChanged: Telefoon niet veranderd
+      VerifyingRemovalIsNotSupported: Verwijderen van verificatie is niet ondersteund
     Address:
       NotFound: Adres niet gevonden
       NotChanged: Adres niet veranderd
@@ -193,7 +194,7 @@ Errors:
     AlreadyExists: Instantie bestaat al
     NotChanged: Instantie is niet veranderd
   Org:
-    AlreadyExists: Organisatienaam is al in gebruik
+    AlreadyExists: Organisatienaam of -id is al in gebruik
     Invalid: Organisatie is ongeldig
     AlreadyDeactivated: Organisatie is al gedeactiveerd
     AlreadyActive: Organisatie is al actief
@@ -436,8 +437,6 @@ Errors:
     Invalid: Gebruikerstoekenning is ongeldig
     NotChanged: Gebruikerstoekenning is niet veranderd
     IDMissing: ID ontbreekt
-    NotActive: Gebruikerstoekenning is niet actief
-    NotInactive: Gebruikerstoekenning is niet gedeactiveerd
     NoPermissionForProject: Gebruiker heeft geen rechten op dit project
     RoleKeyNotFound: Rol niet gevonden
   Member:

@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Telefon már ellenőrizve
       Empty: A telefon mező üres
       NotChanged: Telefon nem lett megváltoztatva
+      VerifyingRemovalIsNotSupported: A telefon eltávolításának ellenőrzése nem támogatott
     Address:
       NotFound: Cím nem található
       NotChanged: Cím nem lett megváltoztatva
@@ -193,7 +194,7 @@ Errors:
     AlreadyExists: Az instance már létezik
     NotChanged: Az instance nem változott
   Org:
-    AlreadyExists: A szervezet neve már foglalt
+    AlreadyExists: A szervezet neve vagy azonosítója már foglalt
     Invalid: A szervezet érvénytelen
     AlreadyDeactivated: A szervezet már deaktiválva van
     AlreadyActive: A szervezet már aktív
@@ -435,8 +436,6 @@ Errors:
     Invalid: A felhasználói jogosultság érvénytelen
     NotChanged: A felhasználói jogosultság nem lett módosítva
     IDMissing: Hiányzó azonosító
-    NotActive: A felhasználói jogosultság nem aktív
-    NotInactive: A felhasználói jogosultság nincs kikapcsolva
     NoPermissionForProject: A felhasználónak nincs jogosultsága ebben a projektben
     RoleKeyNotFound: Szerepkör nem található
   Member:
