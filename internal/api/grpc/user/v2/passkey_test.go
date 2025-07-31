@@ -123,11 +123,11 @@ func Test_passkeyRegistrationDetailsToPb(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := passkeyRegistrationDetailsToPb(tt.args.details, tt.args.err)
 			require.ErrorIs(t, err, tt.wantErr)
-			if !proto.Equal(tt.want, got) {
+			if tt.want != nil && !proto.Equal(tt.want, got.Msg) {
 				t.Errorf("Not equal:\nExpected\n%s\nActual:%s", tt.want, got)
 			}
 			if tt.want != nil {
-				grpc.AllFieldsSet(t, got.ProtoReflect())
+				grpc.AllFieldsSet(t, got.Msg.ProtoReflect())
 			}
 		})
 	}
@@ -181,7 +181,9 @@ func Test_passkeyDetailsToPb(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := passkeyDetailsToPb(tt.args.details, tt.args.err)
 			require.ErrorIs(t, err, tt.args.err)
-			assert.Equal(t, tt.want, got)
+			if tt.want != nil {
+				assert.Equal(t, tt.want, got.Msg)
+			}
 		})
 	}
 }
@@ -242,9 +244,9 @@ func Test_passkeyCodeDetailsToPb(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := passkeyCodeDetailsToPb(tt.args.details, tt.args.err)
 			require.ErrorIs(t, err, tt.args.err)
-			assert.Equal(t, tt.want, got)
 			if tt.want != nil {
-				grpc.AllFieldsSet(t, got.ProtoReflect())
+				assert.Equal(t, tt.want, got.Msg)
+				grpc.AllFieldsSet(t, got.Msg.ProtoReflect())
 			}
 		})
 	}

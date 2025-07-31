@@ -18,6 +18,9 @@ on:
       version:
         required: true
         type: string
+      node_version:
+        required: true
+        type: string
 
 jobs:
   executable:
@@ -27,70 +30,59 @@ jobs:
       matrix:
         goos: [linux, darwin, windows]
         goarch: [amd64, arm64]
-    
+
     steps:
-    - 
-      uses: actions/checkout@v4
-    - 
-      uses: actions/cache/restore@v4
-      timeout-minutes: 1
-      name: restore console
-      with:
-        path: ${{ inputs.console_cache_path }}
-        key: ${{ inputs.console_cache_key }}
-        fail-on-cache-miss: true
-    - 
-      uses: actions/cache/restore@v4
-      timeout-minutes: 1
-      name: restore core
-      with:
-        path: ${{ inputs.core_cache_path }}
-        key: ${{ inputs.core_cache_key }}
-        fail-on-cache-miss: true
-    -
-      uses: actions/setup-go@v5
-      with:
-        go-version-file: 'go.mod'
-    - 
-      name: compile
-      timeout-minutes: 5
-      run: |
-        GOOS="${{matrix.goos}}" \
-        GOARCH="${{matrix.goarch}}" \
-        VERSION="${{ inputs.version }}" \
-        COMMIT_SHA="${{ github.sha }}" \
-        make compile_pipeline
-    -
-      name: create folder
-      run: |
-        mkdir zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
-        mv zitadel zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
-        cp LICENSE zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
-        cp README.md zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
-        tar -czvf zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
-    - 
-      uses: actions/upload-artifact@v4
-      with:
-        name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
-        path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
-  
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        timeout-minutes: 1
+        name: restore console
+        with:
+          path: ${{ inputs.console_cache_path }}
+          key: ${{ inputs.console_cache_key }}
+          fail-on-cache-miss: true
+      - uses: actions/cache/restore@v4
+        timeout-minutes: 1
+        name: restore core
+        with:
+          path: ${{ inputs.core_cache_path }}
+          key: ${{ inputs.core_cache_key }}
+          fail-on-cache-miss: true
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+      - name: compile
+        timeout-minutes: 5
+        run: |
+          GOOS="${{matrix.goos}}" \
+          GOARCH="${{matrix.goarch}}" \
+          VERSION="${{ inputs.version }}" \
+          COMMIT_SHA="${{ github.sha }}" \
+          make compile_pipeline
+      - name: create folder
+        run: |
+          mkdir zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+          mv zitadel zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+          cp LICENSE zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+          cp README.md zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+          tar -czvf zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+
   checksums:
     runs-on: ubuntu-latest
-    needs: executable
+    needs: [executable]
     steps:
-    - 
-      uses: actions/download-artifact@v4
-      with:
-        path: executables
-    - 
-      name: move files one folder up
-      run: mv */*.tar.gz . && find . -type d -empty -delete
-      working-directory: executables
-    -
-      run: sha256sum * > checksums.txt
-      working-directory: executables
-    - 
-      uses: actions/upload-artifact@v4
-      with:
-        name: checksums.txt
-        path: executables/checksums.txt
+      - uses: actions/download-artifact@v4
+        with:
+          path: executables
+      - name: move files one folder up
+        run: mv */*.tar.gz . && find . -type d -empty -delete
+        working-directory: executables
+      - run: sha256sum * > checksums.txt
+        working-directory: executables
+      - uses: actions/upload-artifact@v4
+        with:
+          name: checksums.txt
+          path: executables/checksums.txt

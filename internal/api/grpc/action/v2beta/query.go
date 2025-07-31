@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -22,14 +23,14 @@ const (
 	conditionIDEventGroupSegmentCount             = 1
 )
 
-func (s *Server) GetTarget(ctx context.Context, req *action.GetTargetRequest) (*action.GetTargetResponse, error) {
-	resp, err := s.query.GetTargetByID(ctx, req.GetId())
+func (s *Server) GetTarget(ctx context.Context, req *connect.Request[action.GetTargetRequest]) (*connect.Response[action.GetTargetResponse], error) {
+	resp, err := s.query.GetTargetByID(ctx, req.Msg.GetId())
 	if err != nil {
 		return nil, err
 	}
-	return &action.GetTargetResponse{
+	return connect.NewResponse(&action.GetTargetResponse{
 		Target: targetToPb(resp),
-	}, nil
+	}), nil
 }
 
 type InstanceContext interface {
@@ -41,8 +42,8 @@ type Context interface {
 	GetOwner() InstanceContext
 }
 
-func (s *Server) ListTargets(ctx context.Context, req *action.ListTargetsRequest) (*action.ListTargetsResponse, error) {
-	queries, err := s.ListTargetsRequestToModel(req)
+func (s *Server) ListTargets(ctx context.Context, req *connect.Request[action.ListTargetsRequest]) (*connect.Response[action.ListTargetsResponse], error) {
+	queries, err := s.ListTargetsRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -50,14 +51,14 @@ func (s *Server) ListTargets(ctx context.Context, req *action.ListTargetsRequest
 	if err != nil {
 		return nil, err
 	}
-	return &action.ListTargetsResponse{
-		Result:     targetsToPb(resp.Targets),
+	return connect.NewResponse(&action.ListTargetsResponse{
+		Targets:    targetsToPb(resp.Targets),
 		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListExecutions(ctx context.Context, req *action.ListExecutionsRequest) (*action.ListExecutionsResponse, error) {
-	queries, err := s.ListExecutionsRequestToModel(req)
+func (s *Server) ListExecutions(ctx context.Context, req *connect.Request[action.ListExecutionsRequest]) (*connect.Response[action.ListExecutionsResponse], error) {
+	queries, err := s.ListExecutionsRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -65,10 +66,10 @@ func (s *Server) ListExecutions(ctx context.Context, req *action.ListExecutionsR
 	if err != nil {
 		return nil, err
 	}
-	return &action.ListExecutionsResponse{
-		Result:     executionsToPb(resp.Executions),
+	return connect.NewResponse(&action.ListExecutionsResponse{
+		Executions: executionsToPb(resp.Executions),
 		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
-	}, nil
+	}), nil
 }
 
 func targetsToPb(targets []*query.Target) []*action.Target {

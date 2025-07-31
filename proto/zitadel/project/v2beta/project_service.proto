@@ -451,7 +451,7 @@ service ProjectService {
   //   - `project.role.read`
   rpc ListProjectRoles (ListProjectRolesRequest) returns (ListProjectRolesResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/projects/{project_id}/roles/search"
+      post: "/v2beta/projects/{project_id}/roles/search"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -638,7 +638,7 @@ service ProjectService {
   // Returns a list of project grants. A project grant is when the organization grants its project to another organization.
   //
   // Required permission:
-  //   - `project.grant.write`
+  //   - `project.grant.read`
   rpc ListProjectGrants(ListProjectGrantsRequest) returns (ListProjectGrantsResponse) {
     option (google.api.http) = {
       post: "/v2beta/projects/grants/search"
