@@ -3,8 +3,9 @@ services:
     container_name: devcontainer-login-integration
     env_file: ../../apps/login/.env.test
     environment:
-      CORE_MOCK_STUBS_URL: http://mock-zitadel:22220/v1/stubs
-      LOGIN_BASE_URL: http://login-integration:3001/ui/v2/login
+      CORE_MOCK_STUBS_URL: http://localhost:22220/v1/stubs
+      LOGIN_BASE_URL: http://localhost:3001/ui/v2/login
+    network_mode: service:mock-zitadel
     depends_on:
       login-integration:
         condition: service_healthy
@@ -17,11 +18,8 @@ services:
       NODE_ENV: test
       PORT: 3001
       NEXT_PUBLIC_BASE_PATH: /ui/v2/login
-      ZITADEL_API_URL: http://mock-zitadel:22222
-      CUSTOM_REQUEST_HEADERS: Host:localhost
-    depends_on:
-      mock-zitadel:
-        condition: service_started
+      ZITADEL_API_URL: http://localhost:22222
+    network_mode: service:mock-zitadel
 
   mock-zitadel:
     container_name: mock-zitadel
@@ -29,7 +27,3 @@ services:
       context: ../../apps/login/integration/core-mock
       additional_contexts:
         - zitadel-protos=../../proto
-      cache_from:
-        - type=gha
-      cache_to:
-        - type=gha,mode=max
