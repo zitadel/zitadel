@@ -55,3 +55,27 @@ message MetadataKeyFilter {
     }
   ];
 }
+
+message UserByMetadataSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+    MetadataKeyFilter key_filter = 1;
+    MetadataValueFilter value_filter = 2;
+  }
+}
+
+message MetadataValueFilter {
+  string value = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"my value\""
+      description: "A value matching the metadata values"
+    }
+  ];
+  zitadel.filter.v2.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which text equality method is used";
+    }
+  ];
+}
