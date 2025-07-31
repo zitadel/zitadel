@@ -113,7 +113,7 @@ func idsForEventType(eventType string) []string {
 }
 
 func (u *eventHandler) reduce(e eventstore.Event) (*handler.Statement, error) {
-	ctx := HandlerContext(e.Aggregate())
+	ctx := HandlerContext(context.Background(), e.Aggregate())
 
 	targets, err := u.query.TargetsByExecutionID(ctx, idsForEventType(string(e.Type())))
 	if err != nil {
@@ -125,8 +125,8 @@ func (u *eventHandler) reduce(e eventstore.Event) (*handler.Statement, error) {
 		return handler.NewNoOpStatement(e), nil
 	}
 
-	return handler.NewStatement(e, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(e.Aggregate())
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		ctx = HandlerContext(ctx, e.Aggregate())
 		req, err := NewRequest(e, targets)
 		if err != nil {
 			return err
