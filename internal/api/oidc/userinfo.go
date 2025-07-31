@@ -54,6 +54,7 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 		token.userID,
 		token.scope,
 		projectID,
+		token.clientID,
 		assertion,
 		true,
 		false,
@@ -86,6 +87,7 @@ func (s *Server) userInfo(
 	userID string,
 	scope []string,
 	projectID string,
+	clientID string,
 	projectRoleAssertion, userInfoAssertion, currentProjectOnly bool,
 ) func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (_ *oidc.UserInfo, err error) {
 	var (
@@ -120,7 +122,7 @@ func (s *Server) userInfo(
 			Claims:          maps.Clone(rawUserInfo.Claims),
 		}
 		assertRoles(projectID, qu, roleAudience, requestedRoles, roleAssertion, userInfo)
-		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType)
+		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType, clientID)
 	}
 }
 
@@ -285,7 +287,8 @@ func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	}
 }
 
-func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType) (err error) {
+//nolint:gocognit
+func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType, clientID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -316,6 +319,13 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
 					return func(goja.FunctionCall) goja.Value {
 						return object.GetOrganizationMetadata(ctx, s.query, c, qu.User.ResourceOwner)
+					}
+				}),
+			),
+			actions.SetFields("application",
+				actions.SetFields("getClientId", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						return c.Runtime.ToValue(clientID)
 					}
 				}),
 			),
@@ -427,6 +437,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		User:         qu.User,
 		UserMetadata: qu.Metadata,
 		Org:          qu.Org,
+		Application:  &ContextInfoApplication{ClientID: clientID},
 		UserGrants:   qu.UserGrants,
 	}
 
@@ -463,13 +474,17 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 }
 
 type ContextInfo struct {
-	Function     string               `json:"function,omitempty"`
-	UserInfo     *oidc.UserInfo       `json:"userinfo,omitempty"`
-	User         *query.User          `json:"user,omitempty"`
-	UserMetadata []query.UserMetadata `json:"user_metadata,omitempty"`
-	Org          *query.UserInfoOrg   `json:"org,omitempty"`
-	UserGrants   []query.UserGrant    `json:"user_grants,omitempty"`
-	Response     *ContextInfoResponse `json:"response,omitempty"`
+	Function     string                  `json:"function,omitempty"`
+	UserInfo     *oidc.UserInfo          `json:"userinfo,omitempty"`
+	User         *query.User             `json:"user,omitempty"`
+	UserMetadata []query.UserMetadata    `json:"user_metadata,omitempty"`
+	Org          *query.UserInfoOrg      `json:"org,omitempty"`
+	UserGrants   []query.UserGrant       `json:"user_grants,omitempty"`
+	Application  *ContextInfoApplication `json:"application,omitempty"`
+	Response     *ContextInfoResponse    `json:"response,omitempty"`
+}
+type ContextInfoApplication struct {
+	ClientID string `json:"client_id,omitempty"`
 }
 
 type ContextInfoResponse struct {

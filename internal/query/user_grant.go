@@ -305,12 +305,13 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, queries
 }
 
 func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, shouldTriggerBulk bool, permissionCheck domain.PermissionCheck) (*UserGrants, error) {
-	permissionCheckV2 := PermissionV2(ctx, permissionCheck)
-	grants, err := q.userGrants(ctx, queries, shouldTriggerBulk, permissionCheckV2)
+	// removed as permission v2 is not implemented yet for project grant level permissions
+	// permissionCheckV2 := PermissionV2(ctx, permissionCheck)
+	grants, err := q.userGrants(ctx, queries, shouldTriggerBulk, false)
 	if err != nil {
 		return nil, err
 	}
-	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+	if permissionCheck != nil { // && !authz.GetFeatures(ctx).PermissionCheckV2 {
 		userGrantsCheckPermission(ctx, grants, permissionCheck)
 	}
 	return grants, nil

@@ -5,6 +5,7 @@ import {
   CreateTargetRequestSchema,
   CreateTargetResponse,
   DeleteTargetRequestSchema,
+  DeleteTargetResponse,
   GetTargetRequestSchema,
   GetTargetResponse,
   ListExecutionFunctionsRequestSchema,
@@ -37,7 +38,7 @@ export class ActionService {
     return this.grpcService.actionNew.createTarget(req);
   }
 
-  public deleteTarget(req: MessageInitShape<typeof DeleteTargetRequestSchema>): Promise<CreateTargetResponse> {
+  public deleteTarget(req: MessageInitShape<typeof DeleteTargetRequestSchema>): Promise<DeleteTargetResponse> {
     return this.grpcService.actionNew.deleteTarget(req);
   }
 
