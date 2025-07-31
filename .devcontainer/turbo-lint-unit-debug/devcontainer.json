@@ -1,0 +1,21 @@
+{
+	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
+	"name": "turbo-lint-unit-debug",
+	"dockerComposeFile": [
+		"../base/docker-compose.yml",
+		"docker-compose.yml"
+	],
+	"service": "turbo-lint-unit-debug",
+	"runServices": ["turbo-lint-unit-debug"],
+	"workspaceFolder": "/workspaces",
+	"forwardPorts": [3001],
+	"onCreateCommand": "pnpm install --recursive",
+	"postAttachCommand": "pnpm turbo daemon clean; pnpm turbo watch lint test:unit",
+	"customizations": {
+		"jetbrains": {
+			"settings": {
+				"com.intellij:app:HttpConfigurable.use_proxy_pac": true
+			}
+		}
+	}
+}

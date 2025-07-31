@@ -14,7 +14,10 @@
     "NEXT_PUBLIC_BASE_PATH",
     "CUSTOM_REQUEST_HEADERS",
     "NODE_ENV",
-    "INKEEP_API_KEY"
+    "PORT",
+    "INKEEP_API_KEY",
+    "DISPLAY",
+    "CYPRESS_DISPLAY"
   ],
   "tasks": {
     "generate": {
@@ -22,23 +25,19 @@
     },
     "build": {},
     "build:login:standalone": {},
-    "build:client:standalone": {},
-    "test": {},
+    "quality": {
+      "with": [
+        "lint",
+        "test:unit",
+        "test:integration:login",
+        "test:acceptance",
+        "test:e2e"
+      ]
+    },
     "start": {},
-    "start:built": {},
     "test:unit": {},
-    "test:unit:standalone": {},
-    "test:integration": {},
-    "test:integration:setup": {
-      "with": ["dev"]
-    },
-    "test:acceptance:setup": {},
-    "test:acceptance:setup:dev": {
-      "with": ["dev"]
-    },
-    "test:watch": {
-      "persistent": true
-    },
+    "test:acceptance": {},
+    "test:e2e": {},
     "lint": {},
     "lint:fix": {},
     "dev": {

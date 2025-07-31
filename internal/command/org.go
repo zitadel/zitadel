@@ -522,10 +522,16 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 				return nil, zerrors.ThrowNotFound(nil, "COMMA-aps2n", "Errors.Org.NotFound")
 			}
 
-			domainPolicy, err := c.domainPolicyWriteModel(ctx, a.ID)
+			domainPolicy, err := domainPolicyWriteModel(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
 			}
+
+			organizationScopedUsername, err := checkOrganizationScopedUsernames(ctx, filter, a.ID, nil)
+			if err != nil {
+				return nil, err
+			}
+
 			usernames, err := OrgUsers(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
@@ -542,7 +548,7 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			if err != nil {
 				return nil, err
 			}
-			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain, domains, links, entityIds)}, nil
+			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername, domains, links, entityIds)}, nil
 		}, nil
 	}
 }
