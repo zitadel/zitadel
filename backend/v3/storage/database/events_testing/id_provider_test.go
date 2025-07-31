@@ -405,7 +405,6 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, domain.IDPTypeJWT.String(), jwt.Type)
 
 			// jwt
-			assert.Equal(t, addJWT.IdpId, jwt.IDPConfigID)
 			assert.Equal(t, "jwtEndpoint", jwt.JWTEndpoint)
 			assert.Equal(t, "issuer", jwt.Issuer)
 			assert.Equal(t, "keyEndpoint", jwt.KeysEndpoint)
@@ -443,7 +442,6 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		assert.Equal(t, domain.IDPTypeJWT.String(), jwt.Type)
 
 		// jwt
-		assert.Equal(t, addJWT.IdpId, jwt.IDPConfigID)
 		assert.Equal(t, "jwtEndpoint", jwt.JWTEndpoint)
 		assert.Equal(t, "issuer", jwt.Issuer)
 		assert.Equal(t, "keyEndpoint", jwt.KeysEndpoint)
@@ -476,7 +474,6 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.WithinRange(t, updateJWT.UpdatedAt, beforeCreate, afterCreate)
 
 			// jwt
-			assert.Equal(t, addJWT.IdpId, updateJWT.IDPConfigID)
 			assert.Equal(t, "new_jwtEndpoint", updateJWT.JWTEndpoint)
 			assert.Equal(t, "new_issuer", updateJWT.Issuer)
 			assert.Equal(t, "new_keyEndpoint", updateJWT.KeysEndpoint)
@@ -1095,8 +1092,8 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.azure.added
 			// idp
-			assert.Equal(t, addAzure.Id, azure.IdentityProvider.ID)
-			assert.Equal(t, name, azure.IdentityProvider.Name)
+			assert.Equal(t, addAzure.Id, azure.ID)
+			assert.Equal(t, name, azure.Name)
 
 			assert.Equal(t, "clientId", azure.ClientID)
 			assert.NotNil(t, azure.ClientSecret)
@@ -1147,6 +1144,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, addAzure.Id, azure.IdentityProvider.ID)
 		}, retryDuration, tick)
 
+		name = "new_" + name
 		// change azure
 		beforeCreate := time.Now().Add(-1 * time.Second)
 		_, err = AdminClient.UpdateAzureADProvider(CTX, &admin.UpdateAzureADProviderRequest{
@@ -1194,6 +1192,124 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, true, updateAzure.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), updateAzure.AllowAutoLinking)
 			assert.WithinRange(t, updateAzure.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp github added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add github
+		beforeCreate := time.Now()
+		addGithub, err := AdminClient.AddGitHubProvider(CTX, &admin.AddGitHubProviderRequest{
+			Name:         name,
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Scopes:       []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		// check values for github
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			github, err := idpRepo.GetGithub(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.github.added
+			// idp
+			assert.Equal(t, addGithub.Id, github.ID)
+			assert.Equal(t, name, github.Name)
+
+			assert.Equal(t, "clientId", github.ClientID)
+			assert.NotNil(t, github.ClientSecret)
+			assert.Equal(t, domain.IDPTypeGithub.String(), github.Type)
+			assert.Equal(t, []string{"scope"}, github.Scopes)
+			assert.Equal(t, false, github.AllowLinking)
+			assert.Equal(t, false, github.AllowCreation)
+			assert.Equal(t, false, github.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), github.AllowAutoLinking)
+			assert.WithinRange(t, github.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp github changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add github
+		addGithub, err := AdminClient.AddGitHubProvider(CTX, &admin.AddGitHubProviderRequest{
+			Name:         name,
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Scopes:       []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		var github *domain.IDPGithub
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			github, err = idpRepo.GetGithub(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
+			require.NoError(t, err)
+			assert.Equal(t, addGithub.Id, github.ID)
+		}, retryDuration, tick)
+
+		name = "new_" + name
+		// change github
+		beforeCreate := time.Now()
+		_, err = AdminClient.UpdateGitHubProvider(CTX, &admin.UpdateGitHubProviderRequest{
+			Id:           addGithub.Id,
+			Name:         name,
+			ClientId:     "new_clientId",
+			ClientSecret: "new_clientSecret",
+			Scopes:       []string{"new_scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		// check values for azure
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			updateGithub, err := idpRepo.GetGithub(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.github.changed
+			// idp
+			assert.Equal(t, addGithub.Id, updateGithub.ID)
+			assert.Equal(t, name, updateGithub.Name)
+
+			assert.Equal(t, "new_clientId", updateGithub.ClientID)
+			assert.NotEqual(t, github.ClientSecret, updateGithub.ClientSecret)
+			assert.Equal(t, domain.IDPTypeGithub.String(), updateGithub.Type)
+			assert.Equal(t, []string{"new_scope"}, updateGithub.Scopes)
+			assert.Equal(t, true, updateGithub.AllowLinking)
+			assert.Equal(t, true, updateGithub.AllowCreation)
+			assert.Equal(t, true, updateGithub.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateGithub.AllowAutoLinking)
+			assert.WithinRange(t, updateGithub.UpdatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)
 	})
 }

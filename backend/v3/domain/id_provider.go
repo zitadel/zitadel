@@ -18,7 +18,7 @@ const (
 	IDPTypeOAuth
 	IDPTypeLDAP
 	IDPTypeAzure
-	IDPTypeGitHub
+	IDPTypeGithub
 	IDPTypeGitHubEnterprise
 	IDPTypeGitLab
 	IDPTypeGitLabSelfHosted
@@ -93,7 +93,6 @@ type IDPOIDC struct {
 }
 
 type JWT struct {
-	IDPConfigID  string `json:"idpConfigId"`
 	JWTEndpoint  string `json:"jwtEndpoint,omitempty"`
 	Issuer       string `json:"issuer,omitempty"`
 	KeysEndpoint string `json:"keysEndpoint,omitempty"`
@@ -106,8 +105,6 @@ type IDPJWT struct {
 }
 
 type OAuth struct {
-	ID                    string              `json:"id"`
-	Name                  string              `json:"name,omitempty"`
 	ClientID              string              `json:"clientId,omitempty"`
 	ClientSecret          *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	AuthorizationEndpoint string              `json:"authorizationEndpoint,omitempty"`
@@ -133,8 +130,6 @@ const (
 )
 
 type Azure struct {
-	ID              string              `json:"id,omitempty"`
-	Name            string              `json:"name,omitempty"`
 	ClientID        string              `json:"client_id,omitempty"`
 	ClientSecret    *crypto.CryptoValue `json:"client_secret,omitempty"`
 	Scopes          []string            `json:"scopes,omitempty"`
@@ -148,8 +143,6 @@ type IDPOAzureAD struct {
 }
 
 type Google struct {
-	ID           string              `json:"id"`
-	Name         string              `json:"name,omitempty"`
 	ClientID     string              `json:"clientId"`
 	ClientSecret *crypto.CryptoValue `json:"clientSecret"`
 	Scopes       []string            `json:"scopes,omitempty"`
@@ -158,6 +151,17 @@ type Google struct {
 type IDPGoogle struct {
 	*IdentityProvider
 	Google
+}
+
+type Github struct {
+	ClientID     string              `json:"clientId"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret"`
+	Scopes       []string            `json:"scopes,omitempty"`
+}
+
+type IDPGithub struct {
+	*IdentityProvider
+	Github
 }
 
 // IDPIdentifierCondition is used to help specify a single identity_provider,
@@ -235,4 +239,5 @@ type IDProviderRepository interface {
 
 	GetOAzureAD(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOAzureAD, error)
 	GetGoogle(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGoogle, error)
+	GetGithub(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithub, error)
 }

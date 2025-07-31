@@ -229,6 +229,28 @@ func (i *idProvider) GetGoogle(ctx context.Context, id domain.IDPIdentifierCondi
 	return idpGoogle, nil
 }
 
+func (i *idProvider) GetGithub(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGithub, error) {
+	idpGithub := &domain.IDPGithub{}
+	var err error
+
+	idpGithub.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpGithub.Type != domain.IDPTypeGithub.String() {
+		// TODO
+		return nil, errors.New("WRONG TYPE")
+	}
+
+	err = json.Unmarshal([]byte(*idpGithub.Payload), idpGithub)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpGithub, nil
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------

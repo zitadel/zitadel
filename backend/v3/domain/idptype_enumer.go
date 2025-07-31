@@ -30,7 +30,7 @@ func _IDPTypeNoOp() {
 	_ = x[IDPTypeOAuth-(3)]
 	_ = x[IDPTypeLDAP-(4)]
 	_ = x[IDPTypeAzure-(5)]
-	_ = x[IDPTypeGitHub-(6)]
+	_ = x[IDPTypeGithub-(6)]
 	_ = x[IDPTypeGitHubEnterprise-(7)]
 	_ = x[IDPTypeGitLab-(8)]
 	_ = x[IDPTypeGitLabSelfHosted-(9)]
@@ -39,7 +39,7 @@ func _IDPTypeNoOp() {
 	_ = x[IDPTypeSAML-(12)]
 }
 
-var _IDPTypeValues = []IDPType{IDPTypeUnspecified, IDPTypeOIDC, IDPTypeJWT, IDPTypeOAuth, IDPTypeLDAP, IDPTypeAzure, IDPTypeGitHub, IDPTypeGitHubEnterprise, IDPTypeGitLab, IDPTypeGitLabSelfHosted, IDPTypeGoogle, IDPTypeApple, IDPTypeSAML}
+var _IDPTypeValues = []IDPType{IDPTypeUnspecified, IDPTypeOIDC, IDPTypeJWT, IDPTypeOAuth, IDPTypeLDAP, IDPTypeAzure, IDPTypeGithub, IDPTypeGitHubEnterprise, IDPTypeGitLab, IDPTypeGitLabSelfHosted, IDPTypeGoogle, IDPTypeApple, IDPTypeSAML}
 
 var _IDPTypeNameToValueMap = map[string]IDPType{
 	_IDPTypeName[0:11]:       IDPTypeUnspecified,
@@ -54,8 +54,8 @@ var _IDPTypeNameToValueMap = map[string]IDPType{
 	_IDPTypeLowerName[23:27]: IDPTypeLDAP,
 	_IDPTypeName[27:32]:      IDPTypeAzure,
 	_IDPTypeLowerName[27:32]: IDPTypeAzure,
-	_IDPTypeName[32:38]:      IDPTypeGitHub,
-	_IDPTypeLowerName[32:38]: IDPTypeGitHub,
+	_IDPTypeName[32:38]:      IDPTypeGithub,
+	_IDPTypeLowerName[32:38]: IDPTypeGithub,
 	_IDPTypeName[38:54]:      IDPTypeGitHubEnterprise,
 	_IDPTypeLowerName[38:54]: IDPTypeGitHubEnterprise,
 	_IDPTypeName[54:60]:      IDPTypeGitLab,
