@@ -1,0 +1,166 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "zitadel/filter/v2beta/filter.proto";
+
+package zitadel.internal_permission.v2beta;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/internal_permission/v2beta;internal_permission";
+
+message Administrator {
+  // CreationDate is the timestamp when the administrator role was granted.
+  google.protobuf.Timestamp creation_date = 1;
+  // ChangeDate is the timestamp when the administrator role was last updated.
+  // In case the administrator role was not updated, this field is equal to the creation date.
+  google.protobuf.Timestamp change_date = 2;
+  // User is the user who was granted the administrator role.
+  User user = 3;
+  // Resource is the type of the resource the administrator roles were granted for.
+  oneof resource {
+    // Instance is returned if the administrator roles were granted on the instance level.
+    bool instance = 4;
+    // Organization provides information about the organization the administrator roles were granted for.
+    Organization organization = 5;
+    // Project provides information about the project the administrator roles were granted for.
+    Project project = 6;
+    // ProjectGrant provides information about the project grant the administrator roles were granted for.
+    ProjectGrant project_grant = 7;
+  }
+  // Roles are the roles that were granted to the user for the specified resource.
+  repeated string roles = 8;
+}
+
+message User {
+  // ID is the unique identifier of the user.
+  string id = 1;
+  // PreferredLoginName is the preferred login name of the user. This value is unique across the whole instance.
+  string preferred_login_name = 2;
+  // DisplayName is the public display name of the user.
+  // By default it's the user's given name and family name, their username or their email address.
+  string display_name = 3;
+  // The organization the user belong to.
+  string organization_id = 4;
+}
+
+message Organization {
+  // ID is the unique identifier of the organization the user was granted the administrator role for.
+  string id = 1;
+  // Name is the name of the organization the user was granted the administrator role for.
+  string name = 2;
+}
+message Project {
+  // ID is the unique identifier of the project the user was granted the administrator role for.
+  string id = 1;
+  // Name is the name of the project the user was granted the administrator role for.
+  string name = 2;
+  // OrganizationID is the ID of the organization the project belongs to.
+  string organization_id = 3;
+}
+message ProjectGrant {
+  // ID is the unique identifier of the project grant the user was granted the administrator role for.
+  string id = 1;
+  // ProjectID is the ID of the project the project grant belongs to.
+  string project_id = 2;
+  // ProjectName is the name of the project the project grant belongs to.
+  string project_name = 3;
+  // OrganizationID is the ID of the organization the project grant belongs to.
+  string organization_id = 4;
+  // OrganizationID is the ID of the organization the project grant belongs to.
+  string granted_organization_id = 5;
+}
+
+message AdministratorSearchFilter{
+  oneof filter {
+    option (validate.required) = true;
+    // Search for administrator roles by their creation date.
+    zitadel.filter.v2beta.TimestampFilter creation_date = 1;
+    // Search for administrator roles by their change date.
+    zitadel.filter.v2beta.TimestampFilter change_date = 2;
+    // Search for administrators roles by the IDs of the users who was granted the administrator role.
+    zitadel.filter.v2beta.InIDsFilter in_user_ids_filter = 3;
+    // Search for administrators roles by the ID of the organization the user is part of.
+    zitadel.filter.v2beta.IDFilter user_organization_id = 4;
+    // Search for administrators roles by the preferred login name of the user.
+    UserPreferredLoginNameFilter user_preferred_login_name = 5;
+    // Search for administrators roles by the display name of the user.
+    UserDisplayNameFilter user_display_name = 6;
+    // Search for administrators roles granted for a specific resource.
+    ResourceFilter resource = 7;
+    // Search for administrators roles granted with a specific role.
+    RoleFilter role = 8;
+
+    // Combine multiple authorization queries with an AND operation.
+    AndFilter and = 9;
+    // Combine multiple authorization queries with an OR operation.
+    // For example, to search for authorizations of multiple OrganizationIDs.
+    OrFilter or = 10;
+    // Negate an authorization query.
+    NotFilter not = 11;
+  }
+}
+
+message UserPreferredLoginNameFilter {
+  // Search for administrators by the preferred login name of the user.
+  string preferred_login_name = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // Specify the method to search for the preferred login name. Default is EQUAL.
+  // For example, to search for all administrator roles of a user with a preferred login name
+  // containing a specific string, use CONTAINS or CONTAINS_IGNORE_CASE.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserDisplayNameFilter {
+  // Search for administrators by the display name of the user.
+  string display_name = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // Specify the method to search for the display name. Default is EQUAL.
+  // For example, to search for all administrator roles of a user with a display name
+  // containing a specific string, use CONTAINS or CONTAINS_IGNORE_CASE.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message ResourceFilter {
+  // Search for administrators by the granted resource.
+  oneof resource {
+    // Search for administrators granted on the instance level.
+    bool instance = 1;
+    // Search for administrators granted on a specific organization.
+    string organization_id = 2;
+    // Search for administrators granted on a specific project.
+    string project_id = 3;
+    // Search for administrators granted on a specific project grant.
+    string project_grant_id = 4;
+  }
+}
+
+message RoleFilter {
+  // Search for administrators by the granted role.
+  string role_key = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}
+
+message AndFilter {
+  repeated AdministratorSearchFilter queries = 1;
+}
+
+message OrFilter {
+  repeated AdministratorSearchFilter queries = 1;
+}
+
+message NotFilter {
+  AdministratorSearchFilter query = 1;
+}
+
+enum AdministratorFieldName {
+  ADMINISTRATOR_FIELD_NAME_UNSPECIFIED = 0;
+  ADMINISTRATOR_FIELD_NAME_USER_ID = 1;
+  ADMINISTRATOR_FIELD_NAME_CREATION_DATE = 2;
+  ADMINISTRATOR_FIELD_NAME_CHANGE_DATE = 3;
+}

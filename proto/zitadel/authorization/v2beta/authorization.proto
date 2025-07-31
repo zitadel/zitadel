@@ -1,0 +1,181 @@
+syntax = "proto3";
+
+package zitadel.authorization.v2beta;
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+import "zitadel/filter/v2beta/filter.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorization/v2beta;authorization";
+
+message Authorization {
+  // ID is the unique identifier of the authorization.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // ID is the unique identifier of the project the user was granted the authorization for.
+  string project_id = 2;
+  // Name is the name of the project the user was granted the authorization for.
+  string project_name = 3;
+  // OrganizationID is the ID of the organization the project belongs to.
+  string project_organization_id = 4;
+  // ID of the granted project, only provided if it is a granted project.
+  optional string project_grant_id = 5;
+  // ID of the organization the project is granted to, only provided if it is a granted project.
+  optional string granted_organization_id = 6;
+
+  // The unique identifier of the organization the authorization belongs to.
+  string organization_id = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // CreationDate is the timestamp when the authorization was created.
+  google.protobuf.Timestamp creation_date = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // ChangeDate is the timestamp when the authorization was last updated.
+  // In case the authorization was not updated, this field is equal to the creation date.
+  google.protobuf.Timestamp change_date = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+  // State is the current state of the authorization.
+  State state = 10;
+  User user = 11;
+  // Roles contains the roles the user was granted for the project.
+  repeated string roles = 12;
+}
+
+enum State {
+  STATE_UNSPECIFIED = 0;
+  // An active authorization grants the user access with the roles specified on the project.
+  STATE_ACTIVE = 1;
+  // An inactive authorization temporarily deactivates the granted access and roles.
+  // ZITADEL will not include the specific authorization in any authorization information like an access token.
+  // But the information can still be accessed using the API.
+  STATE_INACTIVE = 2;
+}
+
+message User {
+  // ID represents the ID of the user who was granted the authorization.
+  string id = 1;
+  // PreferredLoginName represents the preferred login name of the granted user.
+  string preferred_login_name = 2;
+  // DisplayName represents the public display name of the granted user.
+  string display_name = 3;
+  // AvatarURL is the URL to the user's public avatar image.
+  string avatar_url = 4;
+  // The organization the user belong to.
+  // This does not have to correspond with the authorizations organization.
+  string organization_id = 5;
+}
+
+message AuthorizationsSearchFilter {
+  oneof filter {
+    option (validate.required) = true;
+
+    // Search for authorizations by their IDs.
+    zitadel.filter.v2beta.InIDsFilter authorization_ids = 1;
+    // Search for an organizations authorizations by its ID.
+    zitadel.filter.v2beta.IDFilter organization_id = 2;
+    // Search for authorizations by their state.
+    StateQuery state = 3;
+    // Search for authorizations by the ID of the user who was granted the authorization.
+    zitadel.filter.v2beta.IDFilter user_id = 4;
+    // Search for authorizations by the ID of the organisation the user is part of.
+    zitadel.filter.v2beta.IDFilter user_organization_id = 5;
+    // Search for authorizations by the preferred login name of the granted user.
+    UserPreferredLoginNameQuery user_preferred_login_name = 6;
+    // Search for authorizations by the public display name of the granted user.
+    UserDisplayNameQuery user_display_name = 7;
+    // Search for authorizations by the ID of the project the user was granted the authorization for.
+    // This will also include authorizations granted for project grants of the same project.
+    zitadel.filter.v2beta.IDFilter project_id = 8;
+    // Search for authorizations by the name of the project the user was granted the authorization for.
+    // This will also include authorizations granted for project grants of the same project.
+    ProjectNameQuery project_name = 9;
+    // Search for authorizations by the key of the role the user was granted.
+    RoleKeyQuery role_key = 10;
+    // Search for authorizations by the ID of the project grant the user was granted the authorization for.
+    // This will also include authorizations granted for project grants of the same project.
+    zitadel.filter.v2beta.IDFilter project_grant_id = 11;
+  }
+}
+
+message StateQuery {
+  // Specify the state of the authorization to search for.
+  State state = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+}
+
+message UserPreferredLoginNameQuery {
+  // Specify the preferred login name of the granted user to search for.
+  string login_name = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // Specify the method to search for the preferred login name. Default is EQUAL.
+  // For example, to search for all authorizations granted to a user with
+  // a preferred login name containing a specific string, use CONTAINS or CONTAINS_IGNORE_CASE.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserDisplayNameQuery {
+  // Specify the public display name of the granted user to search for.
+  string display_name = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // Specify the method to search for the display name. Default is EQUAL.
+  // For example, to search for all authorizations granted to a user with
+  // a display name containing a specific string, use CONTAINS or CONTAINS_IGNORE_CASE.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message ProjectNameQuery {
+  // Specify the name of the project the user was granted the authorization for to search for.
+  // Note that this will also include authorizations granted for project grants of the same project.
+  string name = 1 [(validate.rules).string = {max_len: 200}];
+  // Specify the method to search for the project name. Default is EQUAL.
+  // For example, to search for all authorizations granted on a project with
+  // a name containing a specific string, use CONTAINS or CONTAINS_IGNORE_CASE.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message OrganizationNameQuery {
+  // Specify the name of the organization the authorization was granted for to search for.
+  // This can either be the organization the project or the project grant is part of.
+  string name = 1 [(validate.rules).string = {max_len: 200}];
+  // Specify the method to search for the organization name. Default is EQUAL.
+  // For example, to search for all authorizations with an organization name containing a specific string,
+  // use CONTAINS or CONTAINS_IGNORE_CASE.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message RoleKeyQuery {
+  // Specify the key of the role the user was granted to search for.
+  string key = 1 [(validate.rules).string = {max_len: 200}];
+  // Specify the method to search for the role key. Default is EQUAL.
+  // For example, to search for all authorizations starting with a specific role key,
+  // use STARTS_WITH or STARTS_WITH_IGNORE_CASE.
+  zitadel.filter.v2beta.TextFilterMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+enum AuthorizationFieldName {
+  AUTHORIZATION_FIELD_NAME_UNSPECIFIED = 0;
+  AUTHORIZATION_FIELD_NAME_CREATED_DATE = 1;
+  AUTHORIZATION_FIELD_NAME_CHANGED_DATE = 2;
+  AUTHORIZATION_FIELD_NAME_ID = 3;
+  AUTHORIZATION_FIELD_NAME_USER_ID = 4;
+  AUTHORIZATION_FIELD_NAME_PROJECT_ID = 5;
+  AUTHORIZATION_FIELD_NAME_ORGANIZATION_ID = 6;
+  AUTHORIZATION_FIELD_NAME_USER_ORGANIZATION_ID = 7;
+}
