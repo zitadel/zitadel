@@ -76,7 +76,7 @@ jobs:
           push: true
           provenance: true
           # Only build for multiple platforms if triggered by workflow_dispatch
-          platforms: ${{ github.event_name == 'workflow_dispatch' && 'linux/amd64,linux/arm64' || '' }}
+          build-platform: ${{ github.event_name == 'workflow_dispatch' && 'linux/amd64,linux/arm64' || '' }}
           files: |
             ./apps/login/docker-bake.hcl
             ./docker-bake.hcl
