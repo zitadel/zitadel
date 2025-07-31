@@ -61,6 +61,9 @@ message UserByMetadataSearchFilter {
     option (validate.required) = true;
     MetadataKeyFilter key_filter = 1;
     MetadataValueFilter value_filter = 2;
+    MetadataAndFilter and_filter = 3;
+    MetadataOrFilter or_filter = 4;
+    MetadataNotFilter not_filter = 5;
   }
 }
 
@@ -76,6 +79,30 @@ message MetadataValueFilter {
     (validate.rules).enum.defined_only = true,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines which bytes equality method is used";
+    }
+  ];
+}
+
+message MetadataAndFilter {
+  repeated UserByMetadataSearchFilter queries = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the sub queries to 'AND'"
+    }
+  ];
+}
+
+message MetadataOrFilter {
+  repeated UserByMetadataSearchFilter queries = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the sub queries to 'OR'"
+    }
+  ];
+}
+
+message MetadataNotFilter {
+  UserByMetadataSearchFilter query = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the sub query to negate (NOT)"
     }
   ];
 }
