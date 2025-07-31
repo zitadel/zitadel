@@ -539,7 +539,7 @@ export function SetAuthRequest() {
           <span className={hintClasses}>
             Enforce organization policies and user membership by requesting the{" "}
             <span className="text-purple-500">scope</span>{" "}
-            <code>urn:zitadel:iam:org:id:{Organization ID}</code>
+            <code>urn:zitadel:iam:org:id:{organizationId}</code>
           </span>
         </div>
       </div>
