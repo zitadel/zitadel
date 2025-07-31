@@ -21,7 +21,7 @@ func TestIsCodeExpired(t *testing.T) {
 			"not expired",
 			args{
 				creationDate: time.Now(),
-				expiry:       time.Duration(5 * time.Minute),
+				expiry:       5 * time.Minute,
 			},
 			false,
 		},
@@ -37,7 +37,7 @@ func TestIsCodeExpired(t *testing.T) {
 			"expired",
 			args{
 				creationDate: time.Now().Add(-5 * time.Minute),
-				expiry:       time.Duration(5 * time.Minute),
+				expiry:       5 * time.Minute,
 			},
 			true,
 		},

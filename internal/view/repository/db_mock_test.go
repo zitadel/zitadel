@@ -99,7 +99,7 @@ const (
 )
 
 func (key TestSearchKey) ToColumnName() string {
-	switch TestSearchKey(key) {
+	switch key {
 	case TestSearchKey_TEST:
 		return "test"
 	case TestSearchKey_ID:
