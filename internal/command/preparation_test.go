@@ -94,6 +94,8 @@ func (mf *MultiFilter) Filter() preparation.FilterToQueryReducer {
 }
 
 func assertObjectDetails(t *testing.T, want, got *domain.ObjectDetails) {
+	t.Helper()
+
 	if want == nil {
 		assert.Nil(t, got)
 		return

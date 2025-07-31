@@ -81,6 +81,8 @@ func Test_synchronizeRolePermissionCommands(t *testing.T) {
 		{
 			name: "query error",
 			mock: func(t *testing.T) *mock.SQLMock {
+				t.Helper()
+
 				return mock.NewSQLMock(t,
 					mock.ExpectQuery(instanceRolePermissionsSyncQuery,
 						mock.WithQueryArgs(aggregateID, target),
@@ -93,6 +95,8 @@ func Test_synchronizeRolePermissionCommands(t *testing.T) {
 		{
 			name: "no rows",
 			mock: func(t *testing.T) *mock.SQLMock {
+				t.Helper()
+
 				return mock.NewSQLMock(t,
 					mock.ExpectQuery(instanceRolePermissionsSyncQuery,
 						mock.WithQueryArgs(aggregateID, target),
@@ -104,6 +108,8 @@ func Test_synchronizeRolePermissionCommands(t *testing.T) {
 		{
 			name: "add and remove operations",
 			mock: func(t *testing.T) *mock.SQLMock {
+				t.Helper()
+
 				return mock.NewSQLMock(t,
 					mock.ExpectQuery(instanceRolePermissionsSyncQuery,
 						mock.WithQueryArgs(aggregateID, target),

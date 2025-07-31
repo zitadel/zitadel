@@ -56,6 +56,8 @@ type wantQuery struct {
 }
 
 func assertQuery(t *testing.T, stmt *Statement, want wantQuery) {
+	t.Helper()
+
 	if want.query != stmt.String() {
 		t.Errorf("unexpected query: want: %q got: %q", want.query, stmt.String())
 	}

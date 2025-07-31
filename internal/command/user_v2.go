@@ -151,7 +151,8 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 		return nil, err
 	}
 
-	var events []eventstore.Command
+	// UserRemoved + CascadingGrantIDs + CascadingUserMemberships.
+	var events = make([]eventstore.Command, 0, 1+len(cascadingGrantIDs)+len(cascadingUserMemberships))
 	events = append(events, user.NewUserRemovedEvent(ctx, &existingUser.Aggregate().Aggregate, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername))
 
 	for _, grantID := range cascadingGrantIDs {

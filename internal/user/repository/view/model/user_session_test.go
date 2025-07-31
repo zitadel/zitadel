@@ -68,9 +68,13 @@ func TestAppendEvent(t *testing.T) {
 					CreationDate: now(),
 					Typ:          user.UserV1PasswordChangedType,
 					Data: func() []byte {
-						d, _ := json.Marshal(&es_model.Password{
+						d, err := json.Marshal(&es_model.Password{
 							Secret: &crypto.CryptoValue{Crypted: []byte("test")},
 						})
+						if err != nil {
+							t.Fatalf("json.Marshal: %v", err)
+						}
+
 						return d
 					}(),
 				},
@@ -85,11 +89,15 @@ func TestAppendEvent(t *testing.T) {
 					CreationDate: now(),
 					Typ:          user.HumanPasswordChangedType,
 					Data: func() []byte {
-						d, _ := json.Marshal(&es_model.PasswordChange{
+						d, err := json.Marshal(&es_model.PasswordChange{
 							Password: es_model.Password{
 								Secret: &crypto.CryptoValue{Crypted: []byte("test")},
 							},
 						})
+						if err != nil {
+							t.Fatalf("json.Marshal: %v", err)
+						}
+
 						return d
 					}(),
 				},
@@ -104,12 +112,16 @@ func TestAppendEvent(t *testing.T) {
 					CreationDate: now(),
 					Typ:          user.HumanPasswordChangedType,
 					Data: func() []byte {
-						d, _ := json.Marshal(&es_model.PasswordChange{
+						d, err := json.Marshal(&es_model.PasswordChange{
 							Password: es_model.Password{
 								Secret: &crypto.CryptoValue{Crypted: []byte("test")},
 							},
 							UserAgentID: "id",
 						})
+						if err != nil {
+							t.Fatalf("json.Marshal: %v", err)
+						}
+
 						return d
 					}(),
 				},
@@ -136,9 +148,13 @@ func TestAppendEvent(t *testing.T) {
 					CreationDate: now(),
 					Typ:          user.HumanMFAOTPVerifiedType,
 					Data: func() []byte {
-						d, _ := json.Marshal(&es_model.OTPVerified{
+						d, err := json.Marshal(&es_model.OTPVerified{
 							UserAgentID: "id",
 						})
+						if err != nil {
+							t.Fatalf("json.Marshal: %v", err)
+						}
+
 						return d
 					}(),
 				},

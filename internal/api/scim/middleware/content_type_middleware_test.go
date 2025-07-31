@@ -36,7 +36,7 @@ func TestContentTypeMiddleware(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest("GET", "/", nil)
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
 			if tt.acceptHeader != "" {
 				req.Header.Set(zhttp.Accept, tt.acceptHeader)
 			}

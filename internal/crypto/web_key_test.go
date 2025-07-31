@@ -259,6 +259,8 @@ func Test_generateEncryptedWebKey(t *testing.T) {
 
 func assertJSONWebKey(keyID, algorithm, use string, isPublic bool) func(t *testing.T, got *jose.JSONWebKey) {
 	return func(t *testing.T, got *jose.JSONWebKey) {
+		t.Helper()
+
 		assert.NotNil(t, got)
 		assert.NotNil(t, got.Key, "key")
 		assert.Equal(t, keyID, got.KeyID, "keyID")

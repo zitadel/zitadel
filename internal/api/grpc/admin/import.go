@@ -103,7 +103,7 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 		defer cancel()
 
 		go func() {
-			orgs := make([]*admin_pb.DataOrg, 0)
+			var orgs []*admin_pb.DataOrg
 			if req.GetDataOrgsv1() != nil {
 				dataOrgs, err := s.dataOrgsV1ToDataOrgs(ctx, req.GetDataOrgsv1())
 				if err != nil {
@@ -199,7 +199,6 @@ func (s *Server) transportDataFromFile(ctx context.Context, v1Transformation boo
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	dataOrgs := make([]*admin_pb.DataOrg, 0)
 	data := make([]byte, 0)
 	if gcsInput != nil {
 		gcsData, err := getFileFromGCS(ctx, gcsInput)
@@ -228,6 +227,8 @@ func (s *Server) transportDataFromFile(ctx context.Context, v1Transformation boo
 			DiscardUnknown: true,
 		},
 	}
+
+	var dataOrgs []*admin_pb.DataOrg
 	if v1Transformation {
 		dataImportV1 := new(v1_pb.ImportDataOrg)
 		if err := jsonpb.Unmarshal(data, dataImportV1); err != nil {
@@ -267,7 +268,7 @@ func getFileFromS3(ctx context.Context, input *admin_pb.ImportDataRequest_S3Inpu
 		return nil, err
 	}
 	if !exists {
-		return nil, fmt.Errorf("bucket not existing: %v", err)
+		return nil, fmt.Errorf("bucket not existing: %w", err)
 	}
 
 	object, err := minioClient.GetObject(ctx, input.Bucket, input.Path, minio.GetObjectOptions{})

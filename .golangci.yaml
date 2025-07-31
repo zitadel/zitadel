@@ -2,84 +2,133 @@ version: "2"
 run:
   concurrency: 4
   go: "1.24"
+
+output:
+  formats:
+    text:
+      path: stdout
+      print-linter-name: true
+      print-issued-lines: true
+  sort-order:
+    - linter
+    - severity
+    - file
+
 linters:
   enable:
     - asciicheck
     - bodyclose
     - contextcheck
+    - errcheck
+    - errchkjson
     - errname
     - errorlint
     - exhaustive
     - gocognit
     - gocritic
-    - misspell
-    - nakedret
-    - nolintlint
-    - nosprintfhostport
-    - rowserrcheck
-    - sqlclosecheck
-    - unconvert
-    - errcheck
     - govet
     - ineffassign
-    - staticcheck
-    - unused
+    - misspell
+    - nakedret
     - nilnil
+    - nolintlint
+    - nosprintfhostport
+    - perfsprint
+    - prealloc
+    - rowserrcheck
+    - sqlclosecheck
+    - staticcheck
+    - thelper
+    - unconvert
+    - unused
+    - usestdlibvars
   disable:
+    # not needed because github does that out of the box
     - bidichk
+    # using contextcheck which looks more active
     - containedctx
+    # not use because gocognit is used
     - cyclop
+    # FUTURE: IMO it sometimes makes sense to declare consts or types after a func
     - decorder
+    # not required because of dependabot
     - depguard
+    # FUTURE: old code is not compatible
     - dogsled
+    # FUTURE: old code is not compatible
     - dupl
     - dupword
+    # FUTURE: checks for accident `1 * time.Second * time.Second`
     - durationcheck
+    # Not used in favore of errorlint
     - err113
-    - errchkjson
+    # Not all fields have to be initialized
     - exhaustruct
     - forbidigo
+    # not used because we mostly use `_, _ = a.(int)`
     - forcetypeassert
+    # not used because it ignores complexity
     - funlen
+    # We use some global variables which is ok IMO
     - gochecknoglobals
+    # we use inits for the database abstraction
     - gochecknoinits
+    # FUTURE: might be cool to check
     - goconst
+    # not used because cyclop also checks complexity of package
     - gocyclo
+    # FUTURE: checks if comments are written as specified
     - godot
+    # FUTURE: maybe makes sense later. IMO some view todos are ok for later tasks.
     - godox
+    # ignored because we don't write licenses as headers
     - goheader
+    # FUTURE: not a problem at the moment
     - gomoddirectives
+    # FUTURE: maybe interesting because of licenses
     - gomodguard
+    # FUTURE: not a problem at the moment
     - goprintffuncname
+    # TODO: I think it would be more interesting to integrate into gh code scanning: https://github.com/securego/gosec#integrating-with-code-scanning
     - gosec
+    # I think the groups (vars, consts, imports, ...) we have atm are ok
     - grouper
+    # FUTURE: aliasing of imports is more or less consistent
     - importas
+    # No need at the moment, repository abstraction was removed
     - interfacebloat
+    # FUTURE: check if no interface is returned
     - ireturn
+    # FUTURE: would make code more readable
     - lll
+    # FUTURE: useable as soon as we switch logger library
     - loggercheck
+    # not used because volume of halstead complexity feels strange as measurement https://en.wikipedia.org/wiki/Halstead_complexity_measures
     - maintidx
+    # I would prefer to use https://github.com/alexkohler/prealloc
     - makezero
-    - mnd
     - nestif
+    # FUTURE: check if it is allowed to return nil partially in error catch
     - nilerr
-    - nilnil
     - nlreturn
     - noctx
     - nonamedreturns
+    # FUTURE: will break all of our tests
     - paralleltest
-    - prealloc
+    # FUTURE: checks for overwrites
     - predeclared
     - promlinter
     - reassign
     - revive
+    # FUTURE: would help for new structs
     - tagliatelle
     - testableexamples
+    # don't use because we test some unexported functions
     - testpackage
-    - thelper
+    # FUTURE: nice to improve test quality
     - tparallel
     - unparam
-    - usestdlibvars
+    # I would not use it because it more or less checks if var lenght matches
     - varnamelen
     - wastedassign
     - whitespace
@@ -106,6 +155,7 @@ linters:
       - openapi
       - proto
       - tools
+      - login
       - third_party$
       - builtin$
       - examples$
@@ -145,6 +195,7 @@ formatters:
       - openapi
       - proto
       - tools
+      - login
       - third_party$
       - builtin$
       - examples$
