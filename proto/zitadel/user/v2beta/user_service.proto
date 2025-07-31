@@ -1985,6 +1985,7 @@ message ListUsersByMetadataRequest {
 
   // Pagination and sorting.
   zitadel.filter.v2.PaginationRequest pagination = 2;
+  UsersByMetadataSorting sorting_column = 3;
 }
 
 message ListUsersByMetadataResponse {
