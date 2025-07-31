@@ -24,9 +24,9 @@ type UserMetadataList struct {
 }
 
 type UserMetadata struct {
-	CreationDate  time.Time `json:"creation_date,omitempty"`
+	CreationDate  time.Time `json:"creation_date"`
 	UserID        string    `json:"-"`
-	ChangeDate    time.Time `json:"change_date,omitempty"`
+	ChangeDate    time.Time `json:"change_date"`
 	ResourceOwner string    `json:"resource_owner,omitempty"`
 	Sequence      uint64    `json:"sequence,omitempty"`
 	Key           string    `json:"key,omitempty"`

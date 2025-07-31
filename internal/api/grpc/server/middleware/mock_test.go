@@ -8,11 +8,11 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func emptyMockHandler(_ context.Context, req interface{}) (interface{}, error) {
+func emptyMockHandler(_ context.Context, req any) (any, error) {
 	return req, nil
 }
 
-func errorMockHandler(_ context.Context, req interface{}) (interface{}, error) {
+func errorMockHandler(_ context.Context, req any) (any, error) {
 	return nil, zerrors.ThrowInternal(nil, "test", "error")
 }
 

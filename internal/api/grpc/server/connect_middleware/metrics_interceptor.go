@@ -2,6 +2,7 @@ package connect_middleware
 
 import (
 	"context"
+	"slices"
 	"strings"
 
 	"connectrpc.com/connect"
@@ -87,10 +88,5 @@ func RegisterGrpcRequestCodeCounter(ctx context.Context, path string, err error)
 }
 
 func containsMetricsMethod(metricType metrics.MetricType, metricTypes []metrics.MetricType) bool {
-	for _, m := range metricTypes {
-		if m == metricType {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(metricTypes, metricType)
 }

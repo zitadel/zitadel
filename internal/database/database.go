@@ -69,7 +69,7 @@ const (
 )
 
 type Config struct {
-	Dialects  map[string]interface{} `mapstructure:",remain"`
+	Dialects  map[string]any `mapstructure:",remain"`
 	connector dialect.Connector
 }
 
@@ -153,8 +153,8 @@ func Connect(config Config, useAdmin bool) (*DB, error) {
 	}, nil
 }
 
-func DecodeHook(allowCockroach bool) func(from, to reflect.Value) (_ interface{}, err error) {
-	return func(from, to reflect.Value) (_ interface{}, err error) {
+func DecodeHook(allowCockroach bool) func(from, to reflect.Value) (_ any, err error) {
+	return func(from, to reflect.Value) (_ any, err error) {
 		if to.Type() != reflect.TypeOf(Config{}) {
 			return from.Interface(), nil
 		}

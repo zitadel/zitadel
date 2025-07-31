@@ -2,6 +2,7 @@ package authz
 
 import (
 	"context"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -125,12 +126,7 @@ func addRoleContextIDToPerm(perm, roleContextID string) string {
 }
 
 func ExistsPerm(existingPermissions []string, perm string) bool {
-	for _, existingPermission := range existingPermissions {
-		if existingPermission == perm {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(existingPermissions, perm)
 }
 
 func roleWithContext(membership *Membership) (roles []string, ctxID string) {

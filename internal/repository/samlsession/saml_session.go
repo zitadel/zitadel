@@ -31,7 +31,7 @@ type AddedEvent struct {
 	UserAgent         *domain.UserAgent           `json:"userAgent,omitempty"`
 }
 
-func (e *AddedEvent) Payload() interface{} {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
@@ -80,7 +80,7 @@ type SAMLResponseAddedEvent struct {
 	Lifetime time.Duration `json:"lifetime,omitempty"`
 }
 
-func (e *SAMLResponseAddedEvent) Payload() interface{} {
+func (e *SAMLResponseAddedEvent) Payload() any {
 	return e
 }
 
@@ -113,7 +113,7 @@ type SAMLResponseRevokedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *SAMLResponseRevokedEvent) Payload() interface{} {
+func (e *SAMLResponseRevokedEvent) Payload() any {
 	return e
 }
 

@@ -43,7 +43,7 @@ func NewAppleIDPAddedEvent(
 	}
 }
 
-func (e *AppleIDPAddedEvent) Payload() interface{} {
+func (e *AppleIDPAddedEvent) Payload() any {
 	return e
 }
 
@@ -139,7 +139,7 @@ func ChangeAppleOptions(options OptionChanges) func(*AppleIDPChangedEvent) {
 	}
 }
 
-func (e *AppleIDPChangedEvent) Payload() interface{} {
+func (e *AppleIDPChangedEvent) Payload() any {
 	return e
 }
 

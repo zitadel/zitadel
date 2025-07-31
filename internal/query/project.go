@@ -325,7 +325,7 @@ func NewGrantedProjectResourceOwnerSearchQuery(value string) (SearchQuery, error
 }
 
 func NewGrantedProjectIDSearchQuery(ids []string) (SearchQuery, error) {
-	list := make([]interface{}, len(ids))
+	list := make([]any, len(ids))
 	for i, value := range ids {
 		list[i] = value
 	}
@@ -357,7 +357,7 @@ func NewProjectNameSearchQuery(method TextComparison, value string) (SearchQuery
 }
 
 func NewProjectIDSearchQuery(ids []string) (SearchQuery, error) {
-	list := make([]interface{}, len(ids))
+	list := make([]any, len(ids))
 	for i, value := range ids {
 		list[i] = value
 	}

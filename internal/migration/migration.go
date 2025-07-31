@@ -160,6 +160,6 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 	if !ok {
 		return step.state != StepDone, nil
 	}
-	lastRun, _ := step.LastRun.(map[string]interface{})
+	lastRun, _ := step.LastRun.(map[string]any)
 	return repeatable.Check(lastRun), nil
 }

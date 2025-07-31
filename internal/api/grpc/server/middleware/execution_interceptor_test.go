@@ -87,7 +87,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 		reqBody    execution.ContextInfo
 		sleep      time.Duration
 		statusCode int
-		respBody   interface{}
+		respBody   any
 	}
 	type args struct {
 		ctx context.Context
@@ -95,10 +95,10 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 		executionTargets []execution.Target
 		targets          []target
 		fullMethod       string
-		req              interface{}
+		req              any
 	}
 	type res struct {
-		want    interface{}
+		want    any
 		wantErr bool
 	}
 	tests := []struct {
@@ -604,10 +604,10 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 }
 
 func testServerCall(
-	reqBody interface{},
+	reqBody any,
 	sleep time.Duration,
 	statusCode int,
-	respBody interface{},
+	respBody any,
 ) (string, func()) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		data, err := json.Marshal(reqBody)
@@ -656,7 +656,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 		reqBody    execution.ContextInfo
 		sleep      time.Duration
 		statusCode int
-		respBody   interface{}
+		respBody   any
 	}
 	type args struct {
 		ctx context.Context
@@ -664,11 +664,11 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 		executionTargets []execution.Target
 		targets          []target
 		fullMethod       string
-		req              interface{}
-		resp             interface{}
+		req              any
+		resp             any
 	}
 	type res struct {
-		want    interface{}
+		want    any
 		wantErr bool
 	}
 	tests := []struct {

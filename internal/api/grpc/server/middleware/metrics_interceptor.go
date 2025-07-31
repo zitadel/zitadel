@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"slices"
 	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -25,12 +26,12 @@ const (
 )
 
 func MetricsHandler(metricTypes []metrics.MetricType, ignoredMethodSuffixes ...string) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		return RegisterMetrics(ctx, req, info, handler, metricTypes, ignoredMethodSuffixes...)
 	}
 }
 
-func RegisterMetrics(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, metricTypes []metrics.MetricType, ignoredMethodSuffixes ...string) (_ interface{}, err error) {
+func RegisterMetrics(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, metricTypes []metrics.MetricType, ignoredMethodSuffixes ...string) (_ any, err error) {
 	if len(metricTypes) == 0 {
 		return handler(ctx, req)
 	}
@@ -78,10 +79,5 @@ func RegisterGrpcRequestCodeCounter(ctx context.Context, info *grpc.UnaryServerI
 }
 
 func containsMetricsMethod(metricType metrics.MetricType, metricTypes []metrics.MetricType) bool {
-	for _, m := range metricTypes {
-		if m == metricType {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(metricTypes, metricType)
 }

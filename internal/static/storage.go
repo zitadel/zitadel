@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type CreateStorage func(client *sql.DB, rawConfig map[string]interface{}) (Storage, error)
+type CreateStorage func(client *sql.DB, rawConfig map[string]any) (Storage, error)
 
 type Storage interface {
 	PutObject(ctx context.Context, instanceID, location, resourceOwner, name, contentType string, objectType ObjectType, object io.Reader, objectSize int64) (*Asset, error)

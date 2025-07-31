@@ -44,7 +44,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, title) = (projections.message_texts2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.title)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 								anyArg{},
@@ -83,7 +83,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, pre_header) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, pre_header) = (projections.message_texts2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.pre_header)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 								anyArg{},
@@ -122,7 +122,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, subject) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, subject) = (projections.message_texts2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.subject)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 								anyArg{},
@@ -161,7 +161,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, greeting) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, greeting) = (projections.message_texts2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.greeting)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 								anyArg{},
@@ -200,7 +200,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, text) = (projections.message_texts2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.text)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 								anyArg{},
@@ -239,7 +239,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, button_text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, button_text) = (projections.message_texts2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.button_text)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 								anyArg{},
@@ -278,7 +278,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, footer_text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, footer_text) = (projections.message_texts2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.footer_text)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 								anyArg{},
@@ -316,7 +316,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, title) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"",
@@ -348,7 +348,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.message_texts2 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},
@@ -378,7 +378,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, pre_header) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"",
@@ -414,7 +414,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, subject) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"",
@@ -450,7 +450,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, greeting) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"",
@@ -486,7 +486,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, text) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"",
@@ -522,7 +522,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, button_text) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"",
@@ -558,7 +558,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, footer_text) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"",
@@ -594,7 +594,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.message_texts2 WHERE (aggregate_id = $1) AND (type = $2) AND (language = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"InitCode",
 								"en",
@@ -628,7 +628,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.message_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, type, language, title) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (instance_id, aggregate_id, type, language) DO UPDATE SET (creation_date, change_date, sequence, state, title) = (projections.message_texts2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.title)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 								anyArg{},
@@ -666,7 +666,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.message_texts2 SET (change_date, sequence, title) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (type = $5) AND (language = $6) AND (instance_id = $7)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"",
@@ -698,7 +698,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.message_texts2 WHERE (instance_id = $1) AND (aggregate_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},

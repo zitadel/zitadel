@@ -25,7 +25,7 @@ type SAMLConfigAddedEvent struct {
 	LoginBaseURI string              `json:"loginBaseURI,omitempty"`
 }
 
-func (e *SAMLConfigAddedEvent) Payload() interface{} {
+func (e *SAMLConfigAddedEvent) Payload() any {
 	return e
 }
 
@@ -96,7 +96,7 @@ type SAMLConfigChangedEvent struct {
 	oldEntityID  string
 }
 
-func (e *SAMLConfigChangedEvent) Payload() interface{} {
+func (e *SAMLConfigChangedEvent) Payload() any {
 	return e
 }
 

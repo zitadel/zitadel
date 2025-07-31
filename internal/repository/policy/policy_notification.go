@@ -17,7 +17,7 @@ type NotificationPolicyAddedEvent struct {
 	PasswordChange bool `json:"passwordChange,omitempty"`
 }
 
-func (e *NotificationPolicyAddedEvent) Payload() interface{} {
+func (e *NotificationPolicyAddedEvent) Payload() any {
 	return e
 }
 
@@ -54,7 +54,7 @@ type NotificationPolicyChangedEvent struct {
 	PasswordChange *bool `json:"passwordChange,omitempty"`
 }
 
-func (e *NotificationPolicyChangedEvent) Payload() interface{} {
+func (e *NotificationPolicyChangedEvent) Payload() any {
 	return e
 }
 
@@ -103,7 +103,7 @@ type NotificationPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *NotificationPolicyRemovedEvent) Payload() interface{} {
+func (e *NotificationPolicyRemovedEvent) Payload() any {
 	return nil
 }
 

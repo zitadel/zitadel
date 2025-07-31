@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func applyRemovePatch(patcher ResourcePatcher, op *Operation, value interface{}) error {
+func applyRemovePatch(patcher ResourcePatcher, op *Operation, value any) error {
 	// the root cannot be removed
 	if op.Path == nil {
 		logging.Info("SCIM: remove patch without path")

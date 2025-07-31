@@ -45,7 +45,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.user_auth_methods5 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name, domain) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT (instance_id, user_id, method_type, token_id) DO UPDATE SET (creation_date, change_date, resource_owner, sequence, state, name, domain) = (projections.user_auth_methods5.creation_date, EXCLUDED.change_date, EXCLUDED.resource_owner, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.name, EXCLUDED.domain)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"token-id",
 								anyArg{},
 								anyArg{},
@@ -84,7 +84,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.user_auth_methods5 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name, domain) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT (instance_id, user_id, method_type, token_id) DO UPDATE SET (creation_date, change_date, resource_owner, sequence, state, name, domain) = (projections.user_auth_methods5.creation_date, EXCLUDED.change_date, EXCLUDED.resource_owner, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.name, EXCLUDED.domain)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"token-id",
 								anyArg{},
 								anyArg{},
@@ -123,7 +123,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.user_auth_methods5 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name, domain) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT (instance_id, user_id, method_type, token_id) DO UPDATE SET (creation_date, change_date, resource_owner, sequence, state, name, domain) = (projections.user_auth_methods5.creation_date, EXCLUDED.change_date, EXCLUDED.resource_owner, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.name, EXCLUDED.domain)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"token-id",
 								anyArg{},
 								anyArg{},
@@ -160,7 +160,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.user_auth_methods5 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, user_id, method_type, token_id) DO UPDATE SET (creation_date, change_date, resource_owner, sequence, state, name) = (projections.user_auth_methods5.creation_date, EXCLUDED.change_date, EXCLUDED.resource_owner, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.name)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"",
 								anyArg{},
 								anyArg{},
@@ -198,7 +198,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.user_auth_methods5 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8) AND (instance_id = $9)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"name",
@@ -235,7 +235,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.user_auth_methods5 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8) AND (instance_id = $9)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"name",
@@ -270,7 +270,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.user_auth_methods5 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8) AND (instance_id = $9)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"",
@@ -303,7 +303,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.user_auth_methods5 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"",
 								anyArg{},
 								anyArg{},
@@ -337,7 +337,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.user_auth_methods5 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"",
 								anyArg{},
 								anyArg{},
@@ -373,7 +373,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_auth_methods5 WHERE (user_id = $1) AND (method_type = $2) AND (resource_owner = $3) AND (instance_id = $4) AND (token_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								domain.UserAuthMethodTypePasswordless,
 								"ro-id",
@@ -404,7 +404,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_auth_methods5 WHERE (user_id = $1) AND (method_type = $2) AND (resource_owner = $3) AND (instance_id = $4) AND (token_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								domain.UserAuthMethodTypeU2F,
 								"ro-id",
@@ -433,7 +433,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_auth_methods5 WHERE (user_id = $1) AND (method_type = $2) AND (resource_owner = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								domain.UserAuthMethodTypeTOTP,
 								"ro-id",
@@ -461,7 +461,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_auth_methods5 WHERE (user_id = $1) AND (method_type = $2) AND (resource_owner = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								domain.UserAuthMethodTypeOTPSMS,
 								"ro-id",
@@ -489,7 +489,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_auth_methods5 WHERE (user_id = $1) AND (method_type = $2) AND (resource_owner = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								domain.UserAuthMethodTypeOTPSMS,
 								"ro-id",
@@ -517,7 +517,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_auth_methods5 WHERE (user_id = $1) AND (method_type = $2) AND (resource_owner = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								domain.UserAuthMethodTypeOTPEmail,
 								"ro-id",
@@ -546,7 +546,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_auth_methods5 WHERE (instance_id = $1) AND (resource_owner = $2) AND (user_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"ro-id",
 								"agg-id",
@@ -574,7 +574,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_auth_methods5 WHERE (instance_id = $1) AND (resource_owner = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},
@@ -601,7 +601,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_auth_methods5 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},

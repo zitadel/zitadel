@@ -50,7 +50,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence, description) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"test",
@@ -60,7 +60,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5_smtp SET (tls, sender_address, sender_name, reply_to_address, host, username) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								true,
 								"sender",
 								"name",
@@ -106,7 +106,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence, description) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"test",
@@ -116,7 +116,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5_smtp SET (tls, sender_address, sender_name, reply_to_address, host, username) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								true,
 								"sender",
 								"name",
@@ -156,7 +156,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence, description) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"test",
@@ -193,7 +193,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"config-id",
@@ -202,7 +202,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5_smtp SET sender_address = $1 WHERE (id = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"sender",
 								"config-id",
 								"instance-id",
@@ -238,7 +238,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence, description) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"test",
@@ -248,7 +248,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5_http SET endpoint = $1 WHERE (id = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"endpoint",
 								"config-id",
 								"instance-id",
@@ -283,7 +283,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence, description) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"test",
@@ -320,7 +320,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"config-id",
@@ -329,7 +329,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5_http SET endpoint = $1 WHERE (id = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"endpoint",
 								"config-id",
 								"instance-id",
@@ -372,7 +372,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.smtp_configs5 (creation_date, change_date, instance_id, resource_owner, aggregate_id, id, sequence, state, description) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								anyArg{},
 								"instance-id",
@@ -386,7 +386,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "INSERT INTO projections.smtp_configs5_smtp (instance_id, id, tls, sender_address, sender_name, reply_to_address, host, username, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"ro-id",
 								true,
@@ -437,7 +437,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.smtp_configs5 (creation_date, change_date, instance_id, resource_owner, aggregate_id, id, sequence, state, description) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								anyArg{},
 								"instance-id",
@@ -451,7 +451,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "INSERT INTO projections.smtp_configs5_smtp (instance_id, id, tls, sender_address, sender_name, reply_to_address, host, username, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"config-id",
 								true,
@@ -493,7 +493,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.smtp_configs5 (creation_date, change_date, instance_id, resource_owner, aggregate_id, id, sequence, state, description) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								anyArg{},
 								"instance-id",
@@ -507,7 +507,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "INSERT INTO projections.smtp_configs5_http (instance_id, id, endpoint) VALUES ($1, $2, $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"config-id",
 								"endpoint",
@@ -539,7 +539,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (NOT (id = $4)) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.SMTPConfigStateInactive,
@@ -550,7 +550,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.SMTPConfigStateActive,
@@ -583,7 +583,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (NOT (id = $4)) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.SMTPConfigStateInactive,
@@ -594,7 +594,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.SMTPConfigStateActive,
@@ -628,7 +628,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.SMTPConfigStateInactive,
@@ -661,7 +661,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.SMTPConfigStateInactive,
@@ -701,7 +701,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5_smtp SET password = $1 WHERE (id = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								"config-id",
 								"instance-id",
@@ -709,7 +709,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"config-id",
@@ -742,7 +742,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.smtp_configs5 WHERE (id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"config-id",
 								"instance-id",
 							},
@@ -772,7 +772,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.smtp_configs5 WHERE (id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"ro-id",
 								"instance-id",
 							},
@@ -799,7 +799,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.smtp_configs5 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},

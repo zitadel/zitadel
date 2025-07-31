@@ -47,7 +47,7 @@ type ProjectAddedEvent struct {
 	PrivateLabelingSetting domain.PrivateLabelingSetting `json:"privateLabelingSetting,omitempty"`
 }
 
-func (e *ProjectAddedEvent) Payload() interface{} {
+func (e *ProjectAddedEvent) Payload() any {
 	return e
 }
 
@@ -141,7 +141,7 @@ type ProjectChangeEvent struct {
 	oldName                string
 }
 
-func (e *ProjectChangeEvent) Payload() interface{} {
+func (e *ProjectChangeEvent) Payload() any {
 	return e
 }
 
@@ -248,7 +248,7 @@ type ProjectDeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ProjectDeactivatedEvent) Payload() interface{} {
+func (e *ProjectDeactivatedEvent) Payload() any {
 	return nil
 }
 
@@ -298,7 +298,7 @@ type ProjectReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ProjectReactivatedEvent) Payload() interface{} {
+func (e *ProjectReactivatedEvent) Payload() any {
 	return nil
 }
 
@@ -351,7 +351,7 @@ type ProjectRemovedEvent struct {
 	entityIDUniqueContraints []*eventstore.UniqueConstraint
 }
 
-func (e *ProjectRemovedEvent) Payload() interface{} {
+func (e *ProjectRemovedEvent) Payload() any {
 	return nil
 }
 

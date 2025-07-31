@@ -48,7 +48,7 @@ type ClientKey struct {
 	ClientID             string    `json:"clientId,omitempty"`
 	KeyID                string    `json:"keyId,omitempty"`
 	Type                 int32     `json:"type,omitempty"`
-	ExpirationDate       time.Time `json:"expirationDate,omitempty"`
+	ExpirationDate       time.Time `json:"expirationDate"`
 	PublicKey            []byte    `json:"publicKey,omitempty"`
 	privateKey           []byte
 }

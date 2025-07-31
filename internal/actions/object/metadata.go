@@ -94,7 +94,7 @@ func GetOrganizationMetadata(ctx context.Context, queries *query.Queries, c *act
 }
 
 func metadataByteArrayToValue(val []byte, runtime *goja.Runtime) goja.Value {
-	var value interface{}
+	var value any
 	if !json.Valid(val) {
 		var err error
 		val, err = json.Marshal(string(val))
@@ -175,7 +175,7 @@ func (md *MetadataList) AppendMetadataFunc(call goja.FunctionCall) goja.Value {
 	return nil
 }
 
-func (md *MetadataList) MetadataListFromDomain(runtime *goja.Runtime) interface{} {
+func (md *MetadataList) MetadataListFromDomain(runtime *goja.Runtime) any {
 	for i, metadata := range md.metadata {
 		md.metadata[i].Value = metadataByteArrayToValue(metadata.value, runtime)
 	}
@@ -217,8 +217,8 @@ func MetadataListToDomain(metadataList *MetadataList) []*domain.Metadata {
 
 // mapBytesToByteArray is used for backwards compatibility of old metadata.push method
 // converts the Javascript uint8 array which is exported as []interface{} to a []byte
-func mapBytesToByteArray(i interface{}) []byte {
-	bytes, ok := i.([]interface{})
+func mapBytesToByteArray(i any) []byte {
+	bytes, ok := i.([]any)
 	if !ok {
 		return nil
 	}

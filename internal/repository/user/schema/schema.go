@@ -47,7 +47,7 @@ func (e *CreatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *CreatedEvent) Payload() interface{} {
+func (e *CreatedEvent) Payload() any {
 	return e
 }
 
@@ -90,7 +90,7 @@ func (e *UpdatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *UpdatedEvent) Payload() interface{} {
+func (e *UpdatedEvent) Payload() any {
 	return e
 }
 
@@ -158,7 +158,7 @@ func (e *DeactivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *DeactivatedEvent) Payload() interface{} {
+func (e *DeactivatedEvent) Payload() any {
 	return e
 }
 
@@ -187,7 +187,7 @@ func (e *ReactivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *ReactivatedEvent) Payload() interface{} {
+func (e *ReactivatedEvent) Payload() any {
 	return e
 }
 
@@ -218,7 +218,7 @@ func (e *DeletedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *DeletedEvent) Payload() interface{} {
+func (e *DeletedEvent) Payload() any {
 	return e
 }
 

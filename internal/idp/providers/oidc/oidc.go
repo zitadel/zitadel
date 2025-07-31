@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"slices"
 
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -123,10 +124,8 @@ func setDefaultScope(scopes []string) []string {
 	if len(scopes) == 0 {
 		return []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopePhone}
 	}
-	for _, scope := range scopes {
-		if scope == oidc.ScopeOpenID {
-			return scopes
-		}
+	if slices.Contains(scopes, oidc.ScopeOpenID) {
+		return scopes
 	}
 	return append(scopes, oidc.ScopeOpenID)
 }

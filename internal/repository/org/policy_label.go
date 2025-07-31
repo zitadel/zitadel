@@ -458,7 +458,7 @@ type LabelPolicyAssetsRemovedEvent struct {
 	policy.LabelPolicyAssetsRemovedEvent
 }
 
-func (e *LabelPolicyAssetsRemovedEvent) Payload() interface{} {
+func (e *LabelPolicyAssetsRemovedEvent) Payload() any {
 	return nil
 }
 

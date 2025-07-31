@@ -190,9 +190,9 @@ func Test_AppsPrepare(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name:    "prepareAppsQuery no result",
@@ -1235,9 +1235,9 @@ func Test_AppPrepare(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name: "prepareAppQuery no result",
@@ -2034,9 +2034,9 @@ func Test_AppIDsPrepare(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name:    "prepareClientIDsQuery no result",
@@ -2120,9 +2120,9 @@ func Test_ProjectIDByAppPrepare(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name:    "prepareProjectIDByAppQuery no result",
@@ -2186,9 +2186,9 @@ func Test_ProjectByAppPrepare(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name:    "prepareProjectByAppQuery no result",

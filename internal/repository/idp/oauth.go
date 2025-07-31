@@ -52,7 +52,7 @@ func NewOAuthIDPAddedEvent(
 	}
 }
 
-func (e *OAuthIDPAddedEvent) Payload() interface{} {
+func (e *OAuthIDPAddedEvent) Payload() any {
 	return e
 }
 
@@ -168,7 +168,7 @@ func ChangeOAuthUsePKCE(usePKCE bool) func(*OAuthIDPChangedEvent) {
 	}
 }
 
-func (e *OAuthIDPChangedEvent) Payload() interface{} {
+func (e *OAuthIDPChangedEvent) Payload() any {
 	return e
 }
 

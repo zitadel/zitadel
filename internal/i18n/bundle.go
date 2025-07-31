@@ -65,7 +65,7 @@ func loadTranslationsFromFile(ns Namespace, fileInfo fs.FileInfo, dir http.FileS
 	logging.WithFields("namespace", ns, "file", fileInfo.Name()).OnError(err).Panic("unable to read translation file")
 
 	unmarshaler := map[string]i18n.UnmarshalFunc{
-		"yaml": func(data []byte, v interface{}) error { return yaml.Unmarshal(data, v) },
+		"yaml": func(data []byte, v any) error { return yaml.Unmarshal(data, v) },
 		"json": json.Unmarshal,
 		"toml": toml.Unmarshal,
 	}

@@ -182,7 +182,7 @@ func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (_ *domain.Cus
 	if err != nil {
 		return nil, err
 	}
-	loginTextMap := make(map[string]interface{})
+	loginTextMap := make(map[string]any)
 	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-m0Jf3", "Errors.TranslationFile.ReadError")
 	}
@@ -192,7 +192,7 @@ func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (_ *domain.Cus
 	}
 	for _, text := range texts.CustomTexts {
 		keys := strings.Split(text.Key, ".")
-		screenTextMap, ok := loginTextMap[keys[0]].(map[string]interface{})
+		screenTextMap, ok := loginTextMap[keys[0]].(map[string]any)
 		if !ok {
 			continue
 		}

@@ -42,9 +42,9 @@ func Test_OrgDomainPrepares(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name:    "prepareDomainsQuery no result",

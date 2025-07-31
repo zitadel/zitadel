@@ -45,7 +45,7 @@ func SecondFactorAddedEventMapper(event eventstore.Event) (eventstore.Event, err
 	return e, nil
 }
 
-func (e *SecondFactorAddedEvent) Payload() interface{} {
+func (e *SecondFactorAddedEvent) Payload() any {
 	return e
 }
 
@@ -81,7 +81,7 @@ func SecondFactorRemovedEventMapper(event eventstore.Event) (eventstore.Event, e
 	return e, nil
 }
 
-func (e *SecondFactorRemovedEvent) Payload() interface{} {
+func (e *SecondFactorRemovedEvent) Payload() any {
 	return e
 }
 
@@ -118,7 +118,7 @@ func MultiFactorAddedEventMapper(event eventstore.Event) (eventstore.Event, erro
 	return e, nil
 }
 
-func (e *MultiFactorAddedEvent) Payload() interface{} {
+func (e *MultiFactorAddedEvent) Payload() any {
 	return e
 }
 
@@ -154,7 +154,7 @@ func MultiFactorRemovedEventMapper(event eventstore.Event) (eventstore.Event, er
 	return e, nil
 }
 
-func (e *MultiFactorRemovedEvent) Payload() interface{} {
+func (e *MultiFactorRemovedEvent) Payload() any {
 	return e
 }
 

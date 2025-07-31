@@ -148,9 +148,9 @@ func Test_SessionsPrepare(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name:    "prepareSessionsQuery no result",
@@ -450,9 +450,9 @@ func Test_SessionPrepare(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name:    "prepareSessionQuery no result",

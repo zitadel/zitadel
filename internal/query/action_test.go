@@ -72,9 +72,9 @@ func Test_ActionPrepares(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name:    "prepareActionsQuery no result",

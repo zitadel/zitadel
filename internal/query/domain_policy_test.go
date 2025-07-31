@@ -45,9 +45,9 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name:    "prepareDomainPolicyQuery no result",

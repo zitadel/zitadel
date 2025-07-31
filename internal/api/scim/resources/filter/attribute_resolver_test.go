@@ -20,10 +20,10 @@ func TestAttributeResolver_resolveAttrPath(t *testing.T) {
 	tests := []struct {
 		name         string
 		schema       schemas.ScimSchemaType
-		item         interface{}
+		item         any
 		attrPath     *AttrPath
 		wantSegments []string
-		wantValue    interface{}
+		wantValue    any
 		wantErr      bool
 	}{
 		{

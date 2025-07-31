@@ -14,12 +14,12 @@ import (
 )
 
 func AuthorizationInterceptor(verifier authz.APITokenVerifier, systemUserPermissions authz.Config, authConfig authz.Config) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		return authorize(ctx, req, info, handler, verifier, systemUserPermissions, authConfig)
 	}
 }
 
-func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.APITokenVerifier, systemUserPermissions authz.Config, authConfig authz.Config) (_ interface{}, err error) {
+func authorize(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.APITokenVerifier, systemUserPermissions authz.Config, authConfig authz.Config) (_ any, err error) {
 	authOpt, needsToken := verifier.CheckAuthMethod(info.FullMethod)
 	if !needsToken {
 		return handler(ctx, req)
@@ -42,7 +42,7 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	return handler(ctxSetter(ctx), req)
 }
 
-func orgIDAndDomainFromRequest(ctx context.Context, req interface{}) (id, domain string) {
+func orgIDAndDomainFromRequest(ctx context.Context, req any) (id, domain string) {
 	orgID := grpc_util.GetHeader(ctx, http.ZitadelOrgID)
 	oz, ok := req.(OrganizationFromRequest)
 	if ok {

@@ -91,9 +91,9 @@ func (h *locker) Unlock(instanceIDs ...string) error {
 	return nil
 }
 
-func (h *locker) lockStatement(lockDuration time.Duration, instanceIDs database.TextArray[string]) (string, []interface{}) {
+func (h *locker) lockStatement(lockDuration time.Duration, instanceIDs database.TextArray[string]) (string, []any) {
 	valueQueries := make([]string, len(instanceIDs))
-	values := make([]interface{}, len(instanceIDs)+4)
+	values := make([]any, len(instanceIDs)+4)
 	values[0] = h.workerName
 	//the unit of crdb interval is seconds (https://www.cockroachlabs.com/docs/stable/interval.html).
 	values[1] = lockDuration

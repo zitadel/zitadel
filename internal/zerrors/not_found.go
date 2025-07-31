@@ -15,7 +15,7 @@ func ThrowNotFound(parent error, id, message string) error {
 	return &NotFoundError{CreateZitadelError(parent, id, message)}
 }
 
-func ThrowNotFoundf(parent error, id, format string, a ...interface{}) error {
+func ThrowNotFoundf(parent error, id, format string, a ...any) error {
 	return ThrowNotFound(parent, id, fmt.Sprintf(format, a...))
 }
 

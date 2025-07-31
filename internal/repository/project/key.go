@@ -22,11 +22,11 @@ type ApplicationKeyAddedEvent struct {
 	ClientID       string              `json:"clientId,omitempty"`
 	KeyID          string              `json:"keyId,omitempty"`
 	KeyType        domain.AuthNKeyType `json:"type,omitempty"`
-	ExpirationDate time.Time           `json:"expirationDate,omitempty"`
+	ExpirationDate time.Time           `json:"expirationDate"`
 	PublicKey      []byte              `json:"publicKey,omitempty"`
 }
 
-func (e *ApplicationKeyAddedEvent) Payload() interface{} {
+func (e *ApplicationKeyAddedEvent) Payload() any {
 	return e
 }
 
@@ -78,7 +78,7 @@ type ApplicationKeyRemovedEvent struct {
 	KeyID string `json:"keyId,omitempty"`
 }
 
-func (e *ApplicationKeyRemovedEvent) Payload() interface{} {
+func (e *ApplicationKeyRemovedEvent) Payload() any {
 	return e
 }
 

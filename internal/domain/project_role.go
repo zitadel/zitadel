@@ -2,6 +2,7 @@ package domain
 
 import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"slices"
 )
 
 type ProjectRole struct {
@@ -38,10 +39,5 @@ func HasInvalidRoles(validRoles, roles []string) bool {
 }
 
 func containsRoleKey(roleKey string, validRoles []string) bool {
-	for _, validRole := range validRoles {
-		if roleKey == validRole {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(validRoles, roleKey)
 }

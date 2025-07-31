@@ -56,14 +56,14 @@ var (
 func Test_authorize(t *testing.T) {
 	type args struct {
 		ctx        context.Context
-		req        interface{}
+		req        any
 		info       *grpc.UnaryServerInfo
 		handler    grpc.UnaryHandler
 		verifier   func() authz.APITokenVerifier
 		authConfig authz.Config
 	}
 	type res struct {
-		want    interface{}
+		want    any
 		wantErr bool
 	}
 	tests := []struct {

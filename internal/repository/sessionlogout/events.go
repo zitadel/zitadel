@@ -55,7 +55,7 @@ type BackChannelLogoutSentEvent struct {
 	OIDCSessionID string `json:"oidc_session_id"`
 }
 
-func (e *BackChannelLogoutSentEvent) Payload() interface{} {
+func (e *BackChannelLogoutSentEvent) Payload() any {
 	return e
 }
 

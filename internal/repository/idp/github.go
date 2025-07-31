@@ -37,7 +37,7 @@ func NewGitHubIDPAddedEvent(
 	}
 }
 
-func (e *GitHubIDPAddedEvent) Payload() interface{} {
+func (e *GitHubIDPAddedEvent) Payload() any {
 	return e
 }
 
@@ -118,7 +118,7 @@ func ChangeGitHubScopes(scopes []string) func(*GitHubIDPChangedEvent) {
 	}
 }
 
-func (e *GitHubIDPChangedEvent) Payload() interface{} {
+func (e *GitHubIDPChangedEvent) Payload() any {
 	return e
 }
 
@@ -179,7 +179,7 @@ func NewGitHubEnterpriseIDPAddedEvent(
 	}
 }
 
-func (e *GitHubEnterpriseIDPAddedEvent) Payload() interface{} {
+func (e *GitHubEnterpriseIDPAddedEvent) Payload() any {
 	return e
 }
 
@@ -281,7 +281,7 @@ func ChangeGitHubEnterpriseScopes(scopes []string) func(*GitHubEnterpriseIDPChan
 	}
 }
 
-func (e *GitHubEnterpriseIDPChangedEvent) Payload() interface{} {
+func (e *GitHubEnterpriseIDPChangedEvent) Payload() any {
 	return e
 }
 

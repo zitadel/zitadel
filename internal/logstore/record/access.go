@@ -1,6 +1,7 @@
 package record
 
 import (
+	"maps"
 	"net/http"
 	"strings"
 	"time"
@@ -104,9 +105,7 @@ func lowerKeys(header map[string][]string) map[string][]string {
 
 func redactKeys(header map[string][]string, redactKeysLower ...string) map[string][]string {
 	redactedKeys := make(map[string][]string, len(header))
-	for k, v := range header {
-		redactedKeys[k] = v
-	}
+	maps.Copy(redactedKeys, header)
 	for _, redactKey := range redactKeysLower {
 		if _, ok := redactedKeys[redactKey]; ok {
 			redactedKeys[redactKey] = []string{redacted}

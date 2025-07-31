@@ -7,7 +7,7 @@ import (
 
 func Test_eventData(t *testing.T) {
 	type args struct {
-		i interface{}
+		i any
 	}
 	tests := []struct {
 		name    string
@@ -40,7 +40,7 @@ func Test_eventData(t *testing.T) {
 		{
 			name: "from map",
 			args: args{
-				map[string]interface{}{"hodor": "asdf"},
+				map[string]any{"hodor": "asdf"},
 			},
 			want:    []byte(`{"hodor":"asdf"}`),
 			wantErr: false,

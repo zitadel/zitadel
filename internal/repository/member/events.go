@@ -44,7 +44,7 @@ type MemberAddedEvent struct {
 	UserID string   `json:"userId"`
 }
 
-func (e *MemberAddedEvent) Payload() interface{} {
+func (e *MemberAddedEvent) Payload() any {
 	return e
 }
 
@@ -111,7 +111,7 @@ type MemberChangedEvent struct {
 	UserID string   `json:"userId,omitempty"`
 }
 
-func (e *MemberChangedEvent) Payload() interface{} {
+func (e *MemberChangedEvent) Payload() any {
 	return e
 }
 
@@ -182,7 +182,7 @@ type MemberRemovedEvent struct {
 	UserID string `json:"userId"`
 }
 
-func (e *MemberRemovedEvent) Payload() interface{} {
+func (e *MemberRemovedEvent) Payload() any {
 	return e
 }
 
@@ -229,7 +229,7 @@ type MemberCascadeRemovedEvent struct {
 	UserID string `json:"userId"`
 }
 
-func (e *MemberCascadeRemovedEvent) Payload() interface{} {
+func (e *MemberCascadeRemovedEvent) Payload() any {
 	return e
 }
 

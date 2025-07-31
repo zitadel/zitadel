@@ -22,7 +22,7 @@ type TriggerActionsSetEvent struct {
 	ActionIDs   []string           `json:"actionIDs"`
 }
 
-func (e *TriggerActionsSetEvent) Payload() interface{} {
+func (e *TriggerActionsSetEvent) Payload() any {
 	return e
 }
 
@@ -65,7 +65,7 @@ type TriggerActionsCascadeRemovedEvent struct {
 	ActionID    string             `json:"actionID"`
 }
 
-func (e *TriggerActionsCascadeRemovedEvent) Payload() interface{} {
+func (e *TriggerActionsCascadeRemovedEvent) Payload() any {
 	return e
 }
 
@@ -104,7 +104,7 @@ type FlowClearedEvent struct {
 	FlowType domain.FlowType `json:"flowType"`
 }
 
-func (e *FlowClearedEvent) Payload() interface{} {
+func (e *FlowClearedEvent) Payload() any {
 	return e
 }
 

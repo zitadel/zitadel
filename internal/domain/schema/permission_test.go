@@ -238,7 +238,7 @@ func TestPermissionExtension(t *testing.T) {
 				return
 			}
 
-			var v interface{}
+			var v any
 			err = json.Unmarshal([]byte(tt.args.instance), &v)
 			require.NoError(t, err)
 

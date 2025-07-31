@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func applyReplacePatch(patcher ResourcePatcher, op *Operation, value interface{}) error {
+func applyReplacePatch(patcher ResourcePatcher, op *Operation, value any) error {
 	if op.Path == nil {
 		return flattenAndApplyPatchOperations(patcher, op, value)
 	}

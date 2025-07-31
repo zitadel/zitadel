@@ -160,7 +160,7 @@ var (
 	selectBuilderType = reflect.TypeOf(sq.SelectBuilder{})
 )
 
-func execScan(t testing.TB, client *database.DB, builder sq.SelectBuilder, scan interface{}, errCheck checkErr) (object interface{}, ok bool, didScan bool) {
+func execScan(t testing.TB, client *database.DB, builder sq.SelectBuilder, scan any, errCheck checkErr) (object any, ok bool, didScan bool) {
 	t.Helper()
 
 	scanType := reflect.TypeOf(scan)
@@ -242,7 +242,7 @@ func validateScan(scanType reflect.Type) error {
 	return nil
 }
 
-func execPrepare(prepare any, args []reflect.Value) (builder sq.SelectBuilder, scan interface{}, err error) {
+func execPrepare(prepare any, args []reflect.Value) (builder sq.SelectBuilder, scan any, err error) {
 	prepareVal := reflect.ValueOf(prepare)
 	if err := validatePrepare(prepareVal.Type(), len(args)); err != nil {
 		return sq.SelectBuilder{}, nil, err
@@ -292,7 +292,7 @@ func TestValidateScan(t *testing.T) {
 		},
 		{
 			name: "wrong output count",
-			t: reflect.TypeOf(func(interface{}) error {
+			t: reflect.TypeOf(func(any) error {
 				log.Fatal("should not be executed")
 				return nil
 			}),
@@ -300,7 +300,7 @@ func TestValidateScan(t *testing.T) {
 		},
 		{
 			name: "correct",
-			t: reflect.TypeOf(func(interface{}) (*struct{}, error) {
+			t: reflect.TypeOf(func(any) (*struct{}, error) {
 				log.Fatal("should not be executed")
 				return nil, nil
 			}),
@@ -330,7 +330,7 @@ func TestValidatePrepare(t *testing.T) {
 		},
 		{
 			name: "wong input count",
-			t: reflect.TypeOf(func(int) (sq.SelectBuilder, func(*sql.Rows) (interface{}, error)) {
+			t: reflect.TypeOf(func(int) (sq.SelectBuilder, func(*sql.Rows) (any, error)) {
 				log.Fatal("should not be executed")
 				return sq.SelectBuilder{}, nil
 			}),
@@ -346,7 +346,7 @@ func TestValidatePrepare(t *testing.T) {
 		},
 		{
 			name: "first output type wrong",
-			t: reflect.TypeOf(func() (*struct{}, func(*sql.Rows) (interface{}, error)) {
+			t: reflect.TypeOf(func() (*struct{}, func(*sql.Rows) (any, error)) {
 				log.Fatal("should not be executed")
 				return nil, nil
 			}),
@@ -362,7 +362,7 @@ func TestValidatePrepare(t *testing.T) {
 		},
 		{
 			name: "correct",
-			t: reflect.TypeOf(func() (sq.SelectBuilder, func(*sql.Rows) (interface{}, error)) {
+			t: reflect.TypeOf(func() (sq.SelectBuilder, func(*sql.Rows) (any, error)) {
 				log.Fatal("should not be executed")
 				return sq.SelectBuilder{}, nil
 			}),

@@ -22,7 +22,7 @@ func ThrowUnauthenticated(parent error, id, message string) error {
 	return &UnauthenticatedError{CreateZitadelError(parent, id, message)}
 }
 
-func ThrowUnauthenticatedf(parent error, id, format string, a ...interface{}) error {
+func ThrowUnauthenticatedf(parent error, id, format string, a ...any) error {
 	return ThrowUnauthenticated(parent, id, fmt.Sprintf(format, a...))
 }
 

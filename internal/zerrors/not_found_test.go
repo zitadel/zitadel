@@ -10,7 +10,7 @@ import (
 )
 
 func TestNotFoundError(t *testing.T) {
-	var notFoundError interface{} = new(zerrors.NotFoundError)
+	var notFoundError any = new(zerrors.NotFoundError)
 	_, ok := notFoundError.(zerrors.NotFound)
 	assert.True(t, ok)
 }

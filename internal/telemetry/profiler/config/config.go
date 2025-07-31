@@ -7,10 +7,10 @@ import (
 
 type Config struct {
 	Type   string
-	Config map[string]interface{} `mapstructure:",remain"`
+	Config map[string]any `mapstructure:",remain"`
 }
 
-var profiler = map[string]func(map[string]interface{}) error{
+var profiler = map[string]func(map[string]any) error{
 	"google": google.NewProfiler,
 	"none":   NoProfiler,
 	"":       NoProfiler,
@@ -25,6 +25,6 @@ func (c *Config) NewProfiler() error {
 	return t(c.Config)
 }
 
-func NoProfiler(_ map[string]interface{}) error {
+func NoProfiler(_ map[string]any) error {
 	return nil
 }

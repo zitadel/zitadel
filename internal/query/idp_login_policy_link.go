@@ -220,7 +220,7 @@ func prepareIDPLoginPolicyLinksQuery(ctx context.Context, resourceOwner string) 
 		}
 }
 
-func prepareIDPLoginPolicyLinksResourceOwnerQuery(ctx context.Context, resourceOwner string) (string, []interface{}, error) {
+func prepareIDPLoginPolicyLinksResourceOwnerQuery(ctx context.Context, resourceOwner string) (string, []any, error) {
 	eqPolicy := sq.Eq{idpLoginPolicyOwnerInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
 	return sq.Select(
 		idpLoginPolicyOwnerIDCol.identifier(),

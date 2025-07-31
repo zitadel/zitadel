@@ -44,7 +44,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.milestones3 (instance_id, type, reached_date) VALUES ($1, $2, $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								milestone.InstanceCreated,
 								now,
@@ -73,7 +73,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.milestones3 (instance_id, type, reached_date) VALUES ($1, $2, $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								milestone.InstanceCreated,
 								date,
@@ -102,7 +102,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.milestones3 SET last_pushed_date = $1 WHERE (instance_id = $2) AND (type = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								now,
 								"instance-id",
 								milestone.ProjectCreated,
@@ -131,7 +131,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.milestones3 SET last_pushed_date = $1 WHERE (instance_id = $2) AND (type = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								date,
 								"instance-id",
 								milestone.ProjectCreated,
@@ -159,7 +159,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.milestones3 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 							},
 						},

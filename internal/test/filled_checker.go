@@ -10,11 +10,11 @@ import (
 //
 // this wrapper is needed for internal testing
 type testingT interface {
-	Errorf(format string, args ...interface{})
+	Errorf(format string, args ...any)
 	Helper()
 }
 
-func AssertFieldsMapped(t testingT, object interface{}, ignoreFields ...string) (failed bool) {
+func AssertFieldsMapped(t testingT, object any, ignoreFields ...string) (failed bool) {
 	t.Helper()
 	val := reflect.ValueOf(object)
 

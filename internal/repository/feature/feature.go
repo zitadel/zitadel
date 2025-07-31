@@ -40,7 +40,7 @@ func (e *SetEvent[T]) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *SetEvent[T]) Payload() interface{} {
+func (e *SetEvent[T]) Payload() any {
 	return e
 }
 

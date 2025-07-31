@@ -128,17 +128,17 @@ func Test_redisCache_limiter(t *testing.T) {
 	defer cancel()
 
 	// CB is and should remain closed
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		err := c.Truncate(ctx)
 		require.NoError(t, err)
 	}
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		err := c.Truncate(canceledCtx)
 		require.ErrorIs(t, err, context.Canceled)
 	}
 
 	// Timeout err should open the CB after more than 2 failures
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		err := c.Truncate(timedOutCtx)
 		if i > 2 {
 			require.ErrorIs(t, err, gobreaker.ErrOpenState)

@@ -25,8 +25,8 @@ type EmailCode struct {
 	Expiry time.Duration       `json:"expiry,omitempty"`
 }
 
-func (e *Email) Changes(changed *Email) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
+func (e *Email) Changes(changed *Email) map[string]any {
+	changes := make(map[string]any, 1)
 	if changed.EmailAddress != "" && e.EmailAddress != changed.EmailAddress {
 		changes["email"] = changed.EmailAddress
 	}

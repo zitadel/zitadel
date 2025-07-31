@@ -10,7 +10,7 @@ import (
 )
 
 func TestUnavailableError(t *testing.T) {
-	var err interface{} = new(zerrors.UnavailableError)
+	var err any = new(zerrors.UnavailableError)
 	_, ok := err.(zerrors.Unavailable)
 	assert.True(t, ok)
 }

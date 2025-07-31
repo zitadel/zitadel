@@ -22,7 +22,7 @@ type HumanAddressChangedEvent struct {
 	StreetAddress *string `json:"streetAddress,omitempty"`
 }
 
-func (e *HumanAddressChangedEvent) Payload() interface{} {
+func (e *HumanAddressChangedEvent) Payload() any {
 	return e
 }
 

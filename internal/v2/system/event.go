@@ -22,7 +22,7 @@ func (e *IDGeneratedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = *b
 }
 
-func (e *IDGeneratedEvent) Payload() interface{} {
+func (e *IDGeneratedEvent) Payload() any {
 	return e
 }
 

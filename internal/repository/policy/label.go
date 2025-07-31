@@ -47,7 +47,7 @@ type LabelPolicyAddedEvent struct {
 	ThemeMode           domain.LabelPolicyThemeMode `json:"themeMode,omitempty"`
 }
 
-func (e *LabelPolicyAddedEvent) Payload() interface{} {
+func (e *LabelPolicyAddedEvent) Payload() any {
 	return e
 }
 
@@ -118,7 +118,7 @@ type LabelPolicyChangedEvent struct {
 	ThemeMode           *domain.LabelPolicyThemeMode `json:"themeMode,omitempty"`
 }
 
-func (e *LabelPolicyChangedEvent) Payload() interface{} {
+func (e *LabelPolicyChangedEvent) Payload() any {
 	return e
 }
 
@@ -233,7 +233,7 @@ type LabelPolicyActivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *LabelPolicyActivatedEvent) Payload() interface{} {
+func (e *LabelPolicyActivatedEvent) Payload() any {
 	return e
 }
 
@@ -257,7 +257,7 @@ type LabelPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *LabelPolicyRemovedEvent) Payload() interface{} {
+func (e *LabelPolicyRemovedEvent) Payload() any {
 	return e
 }
 
@@ -281,7 +281,7 @@ type LabelPolicyLogoAddedEvent struct {
 	asset.AddedEvent
 }
 
-func (e *LabelPolicyLogoAddedEvent) Payload() interface{} {
+func (e *LabelPolicyLogoAddedEvent) Payload() any {
 	return e
 }
 
@@ -308,7 +308,7 @@ type LabelPolicyLogoRemovedEvent struct {
 	asset.RemovedEvent
 }
 
-func (e *LabelPolicyLogoRemovedEvent) Payload() interface{} {
+func (e *LabelPolicyLogoRemovedEvent) Payload() any {
 	return e
 }
 
@@ -335,7 +335,7 @@ type LabelPolicyIconAddedEvent struct {
 	asset.AddedEvent
 }
 
-func (e *LabelPolicyIconAddedEvent) Payload() interface{} {
+func (e *LabelPolicyIconAddedEvent) Payload() any {
 	return e
 }
 
@@ -362,7 +362,7 @@ type LabelPolicyIconRemovedEvent struct {
 	asset.RemovedEvent
 }
 
-func (e *LabelPolicyIconRemovedEvent) Payload() interface{} {
+func (e *LabelPolicyIconRemovedEvent) Payload() any {
 	return e
 }
 
@@ -389,7 +389,7 @@ type LabelPolicyLogoDarkAddedEvent struct {
 	asset.AddedEvent
 }
 
-func (e *LabelPolicyLogoDarkAddedEvent) Payload() interface{} {
+func (e *LabelPolicyLogoDarkAddedEvent) Payload() any {
 	return e
 }
 
@@ -416,7 +416,7 @@ type LabelPolicyLogoDarkRemovedEvent struct {
 	asset.RemovedEvent
 }
 
-func (e *LabelPolicyLogoDarkRemovedEvent) Payload() interface{} {
+func (e *LabelPolicyLogoDarkRemovedEvent) Payload() any {
 	return e
 }
 
@@ -443,7 +443,7 @@ type LabelPolicyIconDarkAddedEvent struct {
 	asset.AddedEvent
 }
 
-func (e *LabelPolicyIconDarkAddedEvent) Payload() interface{} {
+func (e *LabelPolicyIconDarkAddedEvent) Payload() any {
 	return e
 }
 
@@ -470,7 +470,7 @@ type LabelPolicyIconDarkRemovedEvent struct {
 	asset.RemovedEvent
 }
 
-func (e *LabelPolicyIconDarkRemovedEvent) Payload() interface{} {
+func (e *LabelPolicyIconDarkRemovedEvent) Payload() any {
 	return e
 }
 
@@ -497,7 +497,7 @@ type LabelPolicyFontAddedEvent struct {
 	asset.AddedEvent
 }
 
-func (e *LabelPolicyFontAddedEvent) Payload() interface{} {
+func (e *LabelPolicyFontAddedEvent) Payload() any {
 	return e
 }
 
@@ -524,7 +524,7 @@ type LabelPolicyFontRemovedEvent struct {
 	asset.RemovedEvent
 }
 
-func (e *LabelPolicyFontRemovedEvent) Payload() interface{} {
+func (e *LabelPolicyFontRemovedEvent) Payload() any {
 	return e
 }
 
@@ -551,7 +551,7 @@ type LabelPolicyAssetsRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *LabelPolicyAssetsRemovedEvent) Payload() interface{} {
+func (e *LabelPolicyAssetsRemovedEvent) Payload() any {
 	return nil
 }
 

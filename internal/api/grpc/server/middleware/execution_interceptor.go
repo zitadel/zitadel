@@ -15,7 +15,7 @@ import (
 )
 
 func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		requestTargets, responseTargets := execution.QueryExecutionTargetsForRequestAndResponse(ctx, queries, info.FullMethod)
 
 		// call targets otherwise return req
@@ -33,7 +33,7 @@ func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 	}
 }
 
-func executeTargetsForRequest(ctx context.Context, targets []execution.Target, fullMethod string, req interface{}) (_ interface{}, err error) {
+func executeTargetsForRequest(ctx context.Context, targets []execution.Target, fullMethod string, req any) (_ any, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -55,7 +55,7 @@ func executeTargetsForRequest(ctx context.Context, targets []execution.Target, f
 	return execution.CallTargets(ctx, targets, info)
 }
 
-func executeTargetsForResponse(ctx context.Context, targets []execution.Target, fullMethod string, req, resp interface{}) (_ interface{}, err error) {
+func executeTargetsForResponse(ctx context.Context, targets []execution.Target, fullMethod string, req, resp any) (_ any, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -86,7 +86,7 @@ type ContextInfoRequest struct {
 	OrgID      string  `json:"orgID,omitempty"`
 	ProjectID  string  `json:"projectID,omitempty"`
 	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
+	Request    Message `json:"request"`
 }
 
 type Message struct {
@@ -117,7 +117,7 @@ func (c *ContextInfoRequest) SetHTTPResponseBody(resp []byte) error {
 	return json.Unmarshal(resp, &c.Request)
 }
 
-func (c *ContextInfoRequest) GetContent() interface{} {
+func (c *ContextInfoRequest) GetContent() any {
 	return c.Request.Message
 }
 
@@ -129,8 +129,8 @@ type ContextInfoResponse struct {
 	OrgID      string  `json:"orgID,omitempty"`
 	ProjectID  string  `json:"projectID,omitempty"`
 	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
-	Response   Message `json:"response,omitempty"`
+	Request    Message `json:"request"`
+	Response   Message `json:"response"`
 }
 
 func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
@@ -145,6 +145,6 @@ func (c *ContextInfoResponse) SetHTTPResponseBody(resp []byte) error {
 	return json.Unmarshal(resp, &c.Response)
 }
 
-func (c *ContextInfoResponse) GetContent() interface{} {
+func (c *ContextInfoResponse) GetContent() any {
 	return c.Response.Message
 }

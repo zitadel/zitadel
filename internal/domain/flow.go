@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"slices"
 	"strconv"
 )
 
@@ -41,12 +42,7 @@ func (s FlowType) Valid() bool {
 }
 
 func (s FlowType) HasTrigger(triggerType TriggerType) bool {
-	for _, trigger := range s.TriggerTypes() {
-		if trigger == triggerType {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(s.TriggerTypes(), triggerType)
 }
 
 func (s FlowType) TriggerTypes() []TriggerType {

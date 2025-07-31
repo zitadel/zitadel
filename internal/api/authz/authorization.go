@@ -20,7 +20,7 @@ const (
 // - the organization (**either** provided by ID or verified domain) exists
 // - the user is permitted to call the requested endpoint (permission option in proto)
 // it will pass the [CtxData] and permission of the user into the ctx [context.Context]
-func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, orgDomain string, verifier APITokenVerifier, systemRolePermissionMapping []RoleMapping, rolePermissionMapping []RoleMapping, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
+func CheckUserAuthorization(ctx context.Context, req any, token, orgID, orgDomain string, verifier APITokenVerifier, systemRolePermissionMapping []RoleMapping, rolePermissionMapping []RoleMapping, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
 	ctx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -55,7 +55,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 	}, nil
 }
 
-func checkUserPermissions(req interface{}, userPerms []string, authOpt Option) error {
+func checkUserPermissions(req any, userPerms []string, authOpt Option) error {
 	if len(userPerms) == 0 {
 		return zerrors.ThrowPermissionDenied(nil, "AUTH-5mWD2", "No matching permissions found")
 	}
@@ -83,7 +83,7 @@ func SplitPermission(perm string) (string, string) {
 	return splittedPerm[0], splittedPerm[1]
 }
 
-func hasContextPermission(req interface{}, fieldName string, permissions []string) bool {
+func hasContextPermission(req any, fieldName string, permissions []string) bool {
 	for _, perm := range permissions {
 		_, ctxID := SplitPermission(perm)
 		if checkPermissionContext(req, fieldName, ctxID) {
@@ -93,12 +93,12 @@ func hasContextPermission(req interface{}, fieldName string, permissions []strin
 	return false
 }
 
-func checkPermissionContext(req interface{}, fieldName, roleContextID string) bool {
+func checkPermissionContext(req any, fieldName, roleContextID string) bool {
 	field := getFieldFromReq(req, fieldName)
 	return field != "" && field == roleContextID
 }
 
-func getFieldFromReq(req interface{}, field string) string {
+func getFieldFromReq(req any, field string) string {
 	v := reflect.Indirect(reflect.ValueOf(req)).FieldByName(field)
 	if reflect.ValueOf(v).IsZero() {
 		return ""

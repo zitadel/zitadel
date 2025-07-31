@@ -340,9 +340,9 @@ func TestHTTP_buildHTTPRequest(t *testing.T) {
 				args: []goja.Value{
 					runtime.ToValue("http://my-url.ch"),
 					runtime.ToValue(struct {
-						Headers map[string][]interface{}
+						Headers map[string][]any
 					}{
-						Headers: map[string][]interface{}{"Authorization": {"some token"}},
+						Headers: map[string][]any{"Authorization": {"some token"}},
 					}),
 				},
 			},

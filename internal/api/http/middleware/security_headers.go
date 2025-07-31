@@ -94,11 +94,11 @@ func generateNonce(length uint) (string, error) {
 	return base64.StdEncoding.EncodeToString(b), nil
 }
 
-func saveContext(r *http.Request, key, value interface{}) *http.Request {
+func saveContext(r *http.Request, key, value any) *http.Request {
 	ctx := context.WithValue(r.Context(), key, value)
 	return r.WithContext(ctx)
 }
 
-func getContext(r *http.Request, key interface{}) interface{} {
+func getContext(r *http.Request, key any) any {
 	return r.Context().Value(key)
 }

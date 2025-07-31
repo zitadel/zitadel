@@ -38,7 +38,7 @@ func ComputeSignatureHeader(t time.Time, payload []byte, signingKey ...string) s
 
 func computeSignature(t time.Time, payload []byte, signingKey string) []byte {
 	mac := hmac.New(sha256.New, []byte(signingKey))
-	mac.Write([]byte(fmt.Sprintf("%d", t.Unix())))
+	mac.Write(fmt.Appendf(nil, "%d", t.Unix()))
 	mac.Write([]byte("."))
 	mac.Write(payload)
 	return mac.Sum(nil)
@@ -83,8 +83,8 @@ func parseSignatureHeader(header string) (*signedHeader, error) {
 		return sh, ErrNotSigned
 	}
 
-	pairs := strings.Split(header, ",")
-	for _, pair := range pairs {
+	pairs := strings.SplitSeq(header, ",")
+	for pair := range pairs {
 		parts := strings.Split(pair, "=")
 		if len(parts) != 2 {
 			return sh, ErrInvalidHeader

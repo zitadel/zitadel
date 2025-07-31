@@ -17,13 +17,13 @@ var _ idp.User = (*UserMapper)(nil)
 // It can be used in ZITADEL actions to map the `RawInfo`
 type UserMapper struct {
 	idAttribute string
-	RawInfo     map[string]interface{}
+	RawInfo     map[string]any
 }
 
 func NewUserMapper(idAttribute string) *UserMapper {
 	return &UserMapper{
 		idAttribute: idAttribute,
-		RawInfo:     make(map[string]interface{}),
+		RawInfo:     make(map[string]any),
 	}
 }
 

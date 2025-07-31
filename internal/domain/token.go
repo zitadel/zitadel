@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"slices"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -33,10 +34,8 @@ func RoleOrgIDsFromScope(scopes []string) (orgIDs []string) {
 }
 
 func addProjectID(audience []string, projectID string) []string {
-	for _, a := range audience {
-		if a == projectID {
-			return audience
-		}
+	if slices.Contains(audience, projectID) {
+		return audience
 	}
 	return append(audience, projectID)
 }

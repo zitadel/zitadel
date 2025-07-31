@@ -23,7 +23,7 @@ func InitStdoutChannel(config Config) channels.NotificationChannel {
 			content = html2text.HTML2Text(content)
 		}
 
-		logging.WithFields("logID", "NOTIF-c73ba").WithFields(map[string]interface{}{
+		logging.WithFields("logID", "NOTIF-c73ba").WithFields(map[string]any{
 			"type":    fmt.Sprintf("%T", message),
 			"content": content,
 		}).Info("handling notification message")

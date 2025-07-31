@@ -33,7 +33,7 @@ type storage struct {
 	client *sql.DB
 }
 
-func NewStorage(client *sql.DB, _ map[string]interface{}) (static.Storage, error) {
+func NewStorage(client *sql.DB, _ map[string]any) (static.Storage, error) {
 	return &storage{client: client}, nil
 }
 

@@ -73,7 +73,7 @@ func Test_authorize(t *testing.T) {
 		authConfig authz.Config
 	}
 	type res struct {
-		want    interface{}
+		want    any
 		wantErr bool
 	}
 	tests := []struct {

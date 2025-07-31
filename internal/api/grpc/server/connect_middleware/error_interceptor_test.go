@@ -17,7 +17,7 @@ func Test_toGRPCError(t *testing.T) {
 		handler func(t *testing.T) connect.UnaryFunc
 	}
 	type res struct {
-		want    interface{}
+		want    any
 		wantErr bool
 	}
 	tests := []struct {

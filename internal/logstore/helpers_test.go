@@ -65,7 +65,7 @@ func withLimiting() quotaOption {
 
 func repeat(value, times int) []int {
 	ints := make([]int, times)
-	for i := 0; i < times; i++ {
+	for i := range times {
 		ints[i] = value
 	}
 	return ints

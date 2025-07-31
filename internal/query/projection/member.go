@@ -42,14 +42,14 @@ type reduceMemberConfig struct {
 
 type reduceMemberOpt func(reduceMemberConfig) reduceMemberConfig
 
-func withMemberCol(col string, value interface{}) reduceMemberOpt {
+func withMemberCol(col string, value any) reduceMemberOpt {
 	return func(opt reduceMemberConfig) reduceMemberConfig {
 		opt.cols = append(opt.cols, handler.NewCol(col, value))
 		return opt
 	}
 }
 
-func withMemberCond(cond string, value interface{}) reduceMemberOpt {
+func withMemberCond(cond string, value any) reduceMemberOpt {
 	return func(opt reduceMemberConfig) reduceMemberConfig {
 		opt.conds = append(opt.conds, handler.NewCond(cond, value))
 		return opt
