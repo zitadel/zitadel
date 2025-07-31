@@ -131,14 +131,14 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  instance.GitHubEnterpriseIDPChangedEventType,
 					Reduce: p.reduceGitHubEnterpriseIDPRelationalChanged,
 				},
-				// 		{
-				// 			Event:  instance.GitLabIDPAddedEventType,
-				// 			Reduce: p.reduceGitLabIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  instance.GitLabIDPChangedEventType,
-				// 			Reduce: p.reduceGitLabIDPChanged,
-				// 		},
+				{
+					Event:  instance.GitLabIDPAddedEventType,
+					Reduce: p.reduceGitLabIDPRelationalAdded,
+				},
+				{
+					Event:  instance.GitLabIDPChangedEventType,
+					Reduce: p.reduceGitLabIDPRelationalChanged,
+				},
 				// 		{
 				// 			Event:  instance.GitLabSelfHostedIDPAddedEventType,
 				// 			Reduce: p.reduceGitLabSelfHostedIDPAdded,
@@ -1333,26 +1333,124 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalCha
 			},
 		),
 	), nil
+}
+
+func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	// var idpEvent idp.GitLabIDPAddedEvent
+	// var idpOwnerType domain.IdentityProviderType
+	// switch e := event.(type) {
+	// case *org.GitLabIDPAddedEvent:
+	// 	idpEvent = e.GitLabIDPAddedEvent
+	// 	idpOwnerType = domain.IdentityProviderTypeOrg
+	// case *instance.GitLabIDPAddedEvent:
+	// 	idpEvent = e.GitLabIDPAddedEvent
+	// 	idpOwnerType = domain.IdentityProviderTypeSystem
+	// default:
+	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPAddedEventType, instance.GitLabIDPAddedEventType})
+	// }
+
+	e, ok := event.(*instance.GitLabIDPAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPAddedEventType, instance.GitLabIDPAddedEventType})
+	}
+
+	gitlab := domain.Gitlab{
+		ClientID:     e.ClientID,
+		ClientSecret: e.ClientSecret,
+		Scopes:       e.Scopes,
+	}
+
+	payload, err := json.Marshal(gitlab)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewMultiStatement(
+		e,
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, e.ID),
+				handler.NewCol(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateNameCol, e.Name),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitlab.String()),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+				handler.NewCol(IDPRelationalAllowCreationCol, e.IsCreationAllowed),
+				handler.NewCol(IDPRelationalAllowLinkingCol, e.IsLinkingAllowed),
+				handler.NewCol(IDPRelationalAllowAutoCreationCol, e.IsAutoCreation),
+				handler.NewCol(IDPRelationalAllowAutoUpdateCol, e.IsAutoUpdate),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(e.AutoLinkingOption).String()),
+				handler.NewCol(CreatedAt, e.CreationDate()),
+				handler.NewCol(IDPRelationalPayloadCol, payload),
+			},
+		),
+	), nil
+}
+
+func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	// var idpEvent idp.GitLabIDPChangedEvent
+	// switch e := event.(type) {
+	// case *org.GitLabIDPChangedEvent:
+	// 	idpEvent = e.GitLabIDPChangedEvent
+	// case *instance.GitLabIDPChangedEvent:
+	// 	idpEvent = e.GitLabIDPChangedEvent
+	// default:
+	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
+	// }
+
+	e, ok := event.(*instance.GitLabIDPChangedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
+	}
+
+	oauth, err := p.idpRepo.GetGitlab(context.Background(), p.idpRepo.IDCondition(e.ID), e.Agg.InstanceID, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	columns := make([]handler.Column, 0, 7)
+	reduceIDPRelationalChangedTemplateColumns(e.Name, e.OptionChanges, &columns)
+
+	payload := &oauth.Gitlab
+	payloadChanged := reduceGitLabIDPRelationalChangedColumns(payload, &e.GitLabIDPChangedEvent)
+	if payloadChanged {
+		payload, err := json.Marshal(payload)
+		if err != nil {
+			return nil, err
+		}
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+	}
+
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, e.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
 
 	// ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	// ops = append(ops,
 	// 	handler.AddUpdateStatement(
-	// 		reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+	// reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 	// 		[]handler.Condition{
 	// 			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 	// 			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 	// 		},
 	// 	),
 	// )
-	// if len(githubCols) > 0 {
+	// gitlabCols := reduceGitLabIDPChangedColumns(idpEvent)
+	// if len(gitlabCols) > 0 {
 	// 	ops = append(ops,
 	// 		handler.AddUpdateStatement(
-	// 			githubCols,
+	// 			gitlabCols,
 	// 			[]handler.Condition{
-	// 				handler.NewCond(GitHubEnterpriseIDCol, idpEvent.ID),
-	// 				handler.NewCond(GitHubEnterpriseInstanceIDCol, idpEvent.Aggregate().InstanceID),
+	// 				handler.NewCond(GitLabIDCol, idpEvent.ID),
+	// 				handler.NewCond(GitLabInstanceIDCol, idpEvent.Aggregate().InstanceID),
 	// 			},
-	// 			handler.WithTableSuffix(IDPTemplateGitHubEnterpriseSuffix),
+	// 			handler.WithTableSuffix(IDPTemplateGitLabSuffix),
 	// 		),
 	// 	)
 	// }
@@ -1362,95 +1460,6 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalCha
 	// 	ops...,
 	// ), nil
 }
-
-// func (p *idpTemplateProjection) reduceGitLabIDPAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.GitLabIDPAddedEvent
-// 	var idpOwnerType domain.IdentityProviderType
-// 	switch e := event.(type) {
-// 	case *org.GitLabIDPAddedEvent:
-// 		idpEvent = e.GitLabIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeOrg
-// 	case *instance.GitLabIDPAddedEvent:
-// 		idpEvent = e.GitLabIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeSystem
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPAddedEventType, instance.GitLabIDPAddedEventType})
-// 	}
-
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
-// 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
-// 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-// 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
-// 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLab),
-// 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
-// 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
-// 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
-// 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-// 				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
-// 			},
-// 		),
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(GitLabIDCol, idpEvent.ID),
-// 				handler.NewCol(GitLabInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(GitLabClientIDCol, idpEvent.ClientID),
-// 				handler.NewCol(GitLabClientSecretCol, idpEvent.ClientSecret),
-// 				handler.NewCol(GitLabScopesCol, database.TextArray[string](idpEvent.Scopes)),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateGitLabSuffix),
-// 		),
-// 	), nil
-// }
-
-// func (p *idpTemplateProjection) reduceGitLabIDPChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.GitLabIDPChangedEvent
-// 	switch e := event.(type) {
-// 	case *org.GitLabIDPChangedEvent:
-// 		idpEvent = e.GitLabIDPChangedEvent
-// 	case *instance.GitLabIDPChangedEvent:
-// 		idpEvent = e.GitLabIDPChangedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
-// 	}
-
-// 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-// 	ops = append(ops,
-// 		handler.AddUpdateStatement(
-// 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 	)
-// 	gitlabCols := reduceGitLabIDPChangedColumns(idpEvent)
-// 	if len(gitlabCols) > 0 {
-// 		ops = append(ops,
-// 			handler.AddUpdateStatement(
-// 				gitlabCols,
-// 				[]handler.Condition{
-// 					handler.NewCond(GitLabIDCol, idpEvent.ID),
-// 					handler.NewCond(GitLabInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				},
-// 				handler.WithTableSuffix(IDPTemplateGitLabSuffix),
-// 			),
-// 		)
-// 	}
-
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		ops...,
-// 	), nil
-// }
 
 // func (p *idpTemplateProjection) reduceGitLabSelfHostedIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 // 	var idpEvent idp.GitLabSelfHostedIDPAddedEvent
@@ -2477,6 +2486,23 @@ func reduceGitHubEnterpriseIDPRelationalChangedColumns(payload *domain.GithubEnt
 	if idpEvent.UserEndpoint != nil {
 		payloadChange = true
 		payload.UserEndpoint = *idpEvent.UserEndpoint
+	}
+	if idpEvent.Scopes != nil {
+		payloadChange = true
+		payload.Scopes = idpEvent.Scopes
+	}
+	return payloadChange
+}
+
+func reduceGitLabIDPRelationalChangedColumns(payload *domain.Gitlab, idpEvent *idp.GitLabIDPChangedEvent) bool {
+	payloadChange := false
+	if idpEvent.ClientID != nil {
+		payloadChange = true
+		payload.ClientID = *idpEvent.ClientID
+	}
+	if idpEvent.ClientSecret != nil {
+		payloadChange = true
+		payload.ClientSecret = idpEvent.ClientSecret
 	}
 	if idpEvent.Scopes != nil {
 		payloadChange = true

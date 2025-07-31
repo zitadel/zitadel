@@ -1444,4 +1444,123 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.WithinRange(t, updateGithubEnterprise.UpdatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)
 	})
+
+	t.Run("test instance idp gitlab added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add gitlab
+		beforeCreate := time.Now()
+		addGithubEnterprise, err := AdminClient.AddGitLabProvider(CTX, &admin.AddGitLabProviderRequest{
+			Name:         name,
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Scopes:       []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		// check values for gitlab
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			githubEnterprise, err := idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.gitlab.added
+			// idp
+			assert.Equal(t, addGithubEnterprise.Id, githubEnterprise.ID)
+			assert.Equal(t, name, githubEnterprise.Name)
+
+			assert.Equal(t, domain.IDPTypeGitlab.String(), githubEnterprise.Type)
+			assert.Equal(t, "clientId", githubEnterprise.ClientID)
+			assert.NotNil(t, githubEnterprise.ClientSecret)
+			assert.Equal(t, []string{"scope"}, githubEnterprise.Scopes)
+			assert.Equal(t, false, githubEnterprise.AllowLinking)
+			assert.Equal(t, false, githubEnterprise.AllowCreation)
+			assert.Equal(t, false, githubEnterprise.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), githubEnterprise.AllowAutoLinking)
+			assert.WithinRange(t, githubEnterprise.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, githubEnterprise.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp gitlab changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add gitlab
+		addGithub, err := AdminClient.AddGitLabProvider(CTX, &admin.AddGitLabProviderRequest{
+			Name:         name,
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Scopes:       []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		var githlab *domain.IDPGitlab
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			githlab, err = idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
+			require.NoError(t, err)
+			assert.Equal(t, addGithub.Id, githlab.ID)
+		}, retryDuration, tick)
+
+		name = "new_" + name
+		// change gitlab
+		beforeCreate := time.Now()
+		_, err = AdminClient.UpdateGitLabProvider(CTX, &admin.UpdateGitLabProviderRequest{
+			Id:           addGithub.Id,
+			Name:         name,
+			ClientId:     "new_clientId",
+			ClientSecret: "new_clientSecret",
+			Scopes:       []string{"new_scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		// check values for gitlab
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			updateGithlab, err := idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.gitlab.changed
+			// idp
+			assert.Equal(t, addGithub.Id, updateGithlab.ID)
+			assert.Equal(t, name, updateGithlab.Name)
+
+			assert.Equal(t, "new_clientId", updateGithlab.ClientID)
+			assert.NotEqual(t, githlab.ClientSecret, updateGithlab.ClientSecret)
+			assert.Equal(t, domain.IDPTypeGitlab.String(), updateGithlab.Type)
+			assert.Equal(t, []string{"new_scope"}, updateGithlab.Scopes)
+			assert.Equal(t, true, updateGithlab.AllowLinking)
+			assert.Equal(t, true, updateGithlab.AllowCreation)
+			assert.Equal(t, true, updateGithlab.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateGithlab.AllowAutoLinking)
+			assert.WithinRange(t, updateGithlab.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
 }

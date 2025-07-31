@@ -178,6 +178,17 @@ type IDPGithubEnterprise struct {
 	GithubEnterprise
 }
 
+type Gitlab struct {
+	ClientID     string              `json:"clientId,omitempty"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	Scopes       []string            `json:"scopes,omitempty"`
+}
+
+type IDPGitlab struct {
+	*IdentityProvider
+	Gitlab
+}
+
 // IDPIdentifierCondition is used to help specify a single identity_provider,
 // it will either be used as the  identity_provider ID or identity_provider name,
 // as identity_provider can be identified either using (instanceID + OrgID + ID) OR (instanceID + OrgID + name)
@@ -255,4 +266,5 @@ type IDProviderRepository interface {
 	GetGoogle(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGoogle, error)
 	GetGithub(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithub, error)
 	GetGithubEnterprise(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithubEnterprise, error)
+	GetGitlab(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlab, error)
 }

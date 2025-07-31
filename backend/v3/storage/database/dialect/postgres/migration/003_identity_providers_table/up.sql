@@ -11,6 +11,7 @@ CREATE TYPE zitadel.idp_type AS ENUM (
     'ldap',
     'github',
     'githubenterprise',
+    'gitlab',
     'azure',
     'google',
     'microsoft',
