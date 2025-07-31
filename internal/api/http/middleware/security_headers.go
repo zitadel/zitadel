@@ -54,7 +54,6 @@ func (h *headers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				errorHandler = func(err error) http.Handler {
 					return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 						http.Error(w, err.Error(), http.StatusInternalServerError)
-						return
 					})
 				}
 			}

@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 	"time"
 
@@ -85,14 +86,16 @@ func (a *AccessInterceptor) Limit(w http.ResponseWriter, r *http.Request, public
 		}
 		deleteCookie = true
 	}
-	for _, ignoredPathPrefix := range publicAuthPathPrefixes {
-		if strings.HasPrefix(r.RequestURI, ignoredPathPrefix) {
-			return false
-		}
+
+	if slices.ContainsFunc(publicAuthPathPrefixes, func(ignoredPathPrefix string) bool {
+		return strings.HasPrefix(r.RequestURI, ignoredPathPrefix)
+	}) {
+		return false
 	}
+
 	remaining := a.logstoreSvc.Limit(ctx, instance.InstanceID())
 	if remaining != nil {
-		if remaining != nil && *remaining > 0 {
+		if *remaining > 0 {
 			deleteCookie = true
 			return false
 		}

@@ -3,6 +3,7 @@ package record
 import (
 	"maps"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 
@@ -73,12 +74,9 @@ func (a AccessLog) IsAuthenticated() bool {
 }
 
 func (a AccessLog) isUnaccountableEndpoint() bool {
-	for _, endpoint := range unaccountableEndpoints {
-		if strings.HasPrefix(a.RequestURL, endpoint) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(unaccountableEndpoints, func(endpoint string) bool {
+		return strings.HasPrefix(a.RequestURL, endpoint)
+	})
 }
 
 func (a AccessLog) Normalize() *AccessLog {

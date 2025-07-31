@@ -2,6 +2,7 @@ package assets
 
 import (
 	"context"
+	"slices"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -37,12 +38,9 @@ type labelPolicyLogoUploader struct {
 }
 
 func (l *labelPolicyLogoUploader) ContentTypeAllowed(contentType string) bool {
-	for _, ct := range l.contentTypes {
-		if strings.HasPrefix(contentType, ct) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(l.contentTypes, func(el string) bool {
+		return strings.HasPrefix(contentType, el)
+	})
 }
 
 func (l *labelPolicyLogoUploader) ObjectType() static.ObjectType {
@@ -168,12 +166,9 @@ type labelPolicyIconUploader struct {
 }
 
 func (l *labelPolicyIconUploader) ContentTypeAllowed(contentType string) bool {
-	for _, ct := range l.contentTypes {
-		if strings.HasPrefix(contentType, ct) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(l.contentTypes, func(el string) bool {
+		return strings.HasPrefix(contentType, el)
+	})
 }
 
 func (l *labelPolicyIconUploader) ObjectType() static.ObjectType {
@@ -291,12 +286,9 @@ type labelPolicyFontUploader struct {
 }
 
 func (l *labelPolicyFontUploader) ContentTypeAllowed(contentType string) bool {
-	for _, ct := range l.contentTypes {
-		if strings.HasPrefix(contentType, ct) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(l.contentTypes, func(el string) bool {
+		return strings.HasPrefix(contentType, el)
+	})
 }
 
 func (l *labelPolicyFontUploader) ObjectType() static.ObjectType {

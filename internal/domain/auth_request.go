@@ -213,10 +213,9 @@ func (a *AuthRequest) MFALevel() MFALevel {
 }
 
 func (a *AuthRequest) AppendAudIfNotExisting(aud string) {
-	if slices.Contains(a.Audience, aud) {
-		return
+	if !slices.Contains(a.Audience, aud) {
+		a.Audience = append(a.Audience, aud)
 	}
-	a.Audience = append(a.Audience, aud)
 }
 
 func (a *AuthRequest) GetScopeOrgPrimaryDomain() string {
