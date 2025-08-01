@@ -208,7 +208,7 @@ https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
 ### Retrieve roles using the auth API
 
 Now we will use the auth API to retrieve roles from a logged in user using the user’s token
-The base URL is: **https://$ZITADEL_DOMAIN/auth/v1**
+The base URL is: **https://$CUSTOM_DOMAIN/auth/v1**
 
 Let’s start with a user who has multiple roles in different organizations in a multi-tenanted set up. You can use the logged in user’s token or the machine user’s token to retrieve the authorizations using the [APIs listed under user authorizations/grants in the auth API](/docs/apis/resources/auth/user-authorizations-grants). 
 
@@ -471,12 +471,12 @@ curl -L -X POST 'https://$CUSTOM-DOMAIN/management/v1/users/grants/_search' \
 
 Returns a user grant per ID. A user grant is a role a user has for a specific project and organization.
 
-**URL: https://$ZITADEL_DOMAIN//management/v1/users/:userId/grants/:grantId**
+**URL: https://$CUSTOM_DOMAIN//management/v1/users/:userId/grants/:grantId**
 
 **cURL request:**
 
 ```bash 
-curl -L -X GET 'https://$ZITADEL_DOMAIN/management/v1/users/:userId/grants/:grantId' \
+curl -L -X GET 'https://$CUSTOM_DOMAIN/management/v1/users/:userId/grants/:grantId' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 ```

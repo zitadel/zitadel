@@ -76,7 +76,7 @@ With the user_code entered by the user you will now be able to get the informati
 
 ```bash
 curl --request GET \
-  --url https://$ZITADEL_DOMAIN/v2/oidc/device_authorization/FWRK-JGWK \
+  --url https://$CUSTOM_DOMAIN/v2/oidc/device_authorization/FWRK-JGWK \
   --header 'Authorization: Bearer '"$TOKEN"''
 ```
 
@@ -122,7 +122,7 @@ Read more about the [Authorize or Deny Device Authorization Request Documentatio
 Make sure that the authorization header is from an account which is permitted to finalize the Auth Request through the `IAM_LOGIN_CLIENT` role.
 ```bash
 curl --request POST \
-  --url $ZITADEL_DOMAIN/v2/oidc/device_authorization/XzNejv6NxqVU8Qur5uxEh7f_Wi1p0qUu4PJTJ6JUIx0xtJ2uqmU \
+  --url $CUSTOM_DOMAIN/v2/oidc/device_authorization/XzNejv6NxqVU8Qur5uxEh7f_Wi1p0qUu4PJTJ6JUIx0xtJ2uqmU \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -142,7 +142,7 @@ If the user denies the device authorization request, you can deny the request by
 
 ```bash
 curl --request POST \
-  --url $ZITADEL_DOMAIN/v2/oidc/device_authorization/ \
+  --url $CUSTOM_DOMAIN/v2/oidc/device_authorization/ \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \

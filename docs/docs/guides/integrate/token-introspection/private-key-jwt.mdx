@@ -161,7 +161,7 @@ def introspect_token(self, token_string):
     payload = {
         "iss": API_PRIVATE_KEY_FILE["client_id"],
         "sub": API_PRIVATE_KEY_FILE["client_id"],
-        "aud": ZITADEL_DOMAIN,
+        "aud": CUSTOM_DOMAIN,
         "exp": int(time.time()) + 60 * 60,  # Expires in 1 hour
         "iat": int(time.time())
     }
