@@ -81,7 +81,7 @@ type response struct {
 }
 
 func (r *response) Json() goja.Value {
-	var val interface{}
+	var val any
 
 	if err := json.Unmarshal([]byte(r.Body), &val); err != nil {
 		panic(err)

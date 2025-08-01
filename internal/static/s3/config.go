@@ -38,7 +38,7 @@ func (c *Config) NewStorage() (static.Storage, error) {
 	}, nil
 }
 
-func NewStorage(_ *sql.DB, rawConfig map[string]interface{}) (static.Storage, error) {
+func NewStorage(_ *sql.DB, rawConfig map[string]any) (static.Storage, error) {
 	configData, err := json.Marshal(rawConfig)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "MINIO-Ef2f2", "could not map config")

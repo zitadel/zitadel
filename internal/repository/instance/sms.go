@@ -65,7 +65,7 @@ func (e *SMSConfigTwilioAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *SMSConfigTwilioAddedEvent) Payload() interface{} {
+func (e *SMSConfigTwilioAddedEvent) Payload() any {
 	return e
 }
 
@@ -136,7 +136,7 @@ func (e *SMSConfigTwilioChangedEvent) SetBaseEvent(event *eventstore.BaseEvent) 
 	e.BaseEvent = event
 }
 
-func (e *SMSConfigTwilioChangedEvent) Payload() interface{} {
+func (e *SMSConfigTwilioChangedEvent) Payload() any {
 	return e
 }
 
@@ -172,7 +172,7 @@ func (e *SMSConfigTwilioTokenChangedEvent) SetBaseEvent(event *eventstore.BaseEv
 	e.BaseEvent = event
 }
 
-func (e *SMSConfigTwilioTokenChangedEvent) Payload() interface{} {
+func (e *SMSConfigTwilioTokenChangedEvent) Payload() any {
 	return e
 }
 
@@ -211,7 +211,7 @@ func (e *SMSConfigHTTPAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *SMSConfigHTTPAddedEvent) Payload() interface{} {
+func (e *SMSConfigHTTPAddedEvent) Payload() any {
 	return e
 }
 
@@ -267,7 +267,7 @@ func (e *SMSConfigHTTPChangedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *SMSConfigHTTPChangedEvent) Payload() interface{} {
+func (e *SMSConfigHTTPChangedEvent) Payload() any {
 	return e
 }
 
@@ -284,7 +284,7 @@ func (e *SMSConfigTwilioActivatedEvent) SetBaseEvent(event *eventstore.BaseEvent
 	e.BaseEvent = event
 }
 
-func (e *SMSConfigTwilioActivatedEvent) Payload() interface{} {
+func (e *SMSConfigTwilioActivatedEvent) Payload() any {
 	return e
 }
 
@@ -316,7 +316,7 @@ func (e *SMSConfigActivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *SMSConfigActivatedEvent) Payload() interface{} {
+func (e *SMSConfigActivatedEvent) Payload() any {
 	return e
 }
 
@@ -333,7 +333,7 @@ func (e *SMSConfigTwilioDeactivatedEvent) SetBaseEvent(event *eventstore.BaseEve
 	e.BaseEvent = event
 }
 
-func (e *SMSConfigTwilioDeactivatedEvent) Payload() interface{} {
+func (e *SMSConfigTwilioDeactivatedEvent) Payload() any {
 	return e
 }
 
@@ -365,7 +365,7 @@ func (e *SMSConfigDeactivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *SMSConfigDeactivatedEvent) Payload() interface{} {
+func (e *SMSConfigDeactivatedEvent) Payload() any {
 	return e
 }
 
@@ -382,7 +382,7 @@ func (e *SMSConfigTwilioRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) 
 	e.BaseEvent = event
 }
 
-func (e *SMSConfigTwilioRemovedEvent) Payload() interface{} {
+func (e *SMSConfigTwilioRemovedEvent) Payload() any {
 	return e
 }
 
@@ -414,7 +414,7 @@ func (e *SMSConfigRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *SMSConfigRemovedEvent) Payload() interface{} {
+func (e *SMSConfigRemovedEvent) Payload() any {
 	return e
 }
 

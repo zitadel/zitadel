@@ -166,7 +166,7 @@ func NewLDAPIDPAddedEvent(
 	}
 }
 
-func (e *LDAPIDPAddedEvent) Payload() interface{} {
+func (e *LDAPIDPAddedEvent) Payload() any {
 	return e
 }
 
@@ -337,7 +337,7 @@ func ChangeLDAPOptions(options OptionChanges) func(*LDAPIDPChangedEvent) {
 	}
 }
 
-func (e *LDAPIDPChangedEvent) Payload() interface{} {
+func (e *LDAPIDPChangedEvent) Payload() any {
 	return e
 }
 

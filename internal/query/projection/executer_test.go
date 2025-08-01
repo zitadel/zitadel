@@ -18,13 +18,13 @@ type execution struct {
 	expectedStmt string
 	gottenStmt   string
 
-	expectedArgs []interface{}
-	gottenArgs   []interface{}
+	expectedArgs []any
+	gottenArgs   []any
 }
 
 type anyArg struct{}
 
-func (e *testExecuter) Exec(stmt string, args ...interface{}) (sql.Result, error) {
+func (e *testExecuter) Exec(stmt string, args ...any) (sql.Result, error) {
 	if stmt == "SAVEPOINT exec_stmt" {
 		return nil, nil
 	}

@@ -24,7 +24,7 @@ type PrivacyPolicyAddedEvent struct {
 	CustomLinkText string              `json:"customLinkText,omitempty"`
 }
 
-func (e *PrivacyPolicyAddedEvent) Payload() interface{} {
+func (e *PrivacyPolicyAddedEvent) Payload() any {
 	return e
 }
 
@@ -76,7 +76,7 @@ type PrivacyPolicyChangedEvent struct {
 	CustomLinkText *string              `json:"customLinkText,omitempty"`
 }
 
-func (e *PrivacyPolicyChangedEvent) Payload() interface{} {
+func (e *PrivacyPolicyChangedEvent) Payload() any {
 	return e
 }
 
@@ -161,7 +161,7 @@ type PrivacyPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *PrivacyPolicyRemovedEvent) Payload() interface{} {
+func (e *PrivacyPolicyRemovedEvent) Payload() any {
 	return nil
 }
 

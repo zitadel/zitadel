@@ -19,11 +19,11 @@ type CustomTextSetEvent struct {
 
 	Template string       `json:"template,omitempty"`
 	Key      string       `json:"key,omitempty"`
-	Language language.Tag `json:"language,omitempty"`
+	Language language.Tag `json:"language"`
 	Text     string       `json:"text,omitempty"`
 }
 
-func (e *CustomTextSetEvent) Payload() interface{} {
+func (e *CustomTextSetEvent) Payload() any {
 	return e
 }
 
@@ -65,10 +65,10 @@ type CustomTextRemovedEvent struct {
 
 	Template string       `json:"template,omitempty"`
 	Key      string       `json:"key,omitempty"`
-	Language language.Tag `json:"language,omitempty"`
+	Language language.Tag `json:"language"`
 }
 
-func (e *CustomTextRemovedEvent) Payload() interface{} {
+func (e *CustomTextRemovedEvent) Payload() any {
 	return e
 }
 
@@ -102,10 +102,10 @@ type CustomTextTemplateRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Template string       `json:"template,omitempty"`
-	Language language.Tag `json:"language,omitempty"`
+	Language language.Tag `json:"language"`
 }
 
-func (e *CustomTextTemplateRemovedEvent) Payload() interface{} {
+func (e *CustomTextTemplateRemovedEvent) Payload() any {
 	return e
 }
 

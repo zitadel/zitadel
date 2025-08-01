@@ -51,7 +51,7 @@ const (
 type TokenSearchQuery struct {
 	Key    TokenSearchKey
 	Method domain.SearchMethod
-	Value  interface{}
+	Value  any
 }
 
 type TokenSearchResponse struct {

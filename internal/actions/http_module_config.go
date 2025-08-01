@@ -20,7 +20,7 @@ type HTTPConfig struct {
 	DenyList []AddressChecker
 }
 
-func HTTPConfigDecodeHook(from, to reflect.Value) (interface{}, error) {
+func HTTPConfigDecodeHook(from, to reflect.Value) (any, error) {
 	if to.Type() != reflect.TypeOf(HTTPConfig{}) {
 		return from.Interface(), nil
 	}
@@ -47,7 +47,7 @@ func HTTPConfigDecodeHook(from, to reflect.Value) (interface{}, error) {
 	}
 
 	for _, unsplit := range config.DenyList {
-		for _, split := range strings.Split(unsplit, ",") {
+		for split := range strings.SplitSeq(unsplit, ",") {
 			parsed, parseErr := NewHostChecker(split)
 			if parseErr != nil {
 				return nil, parseErr

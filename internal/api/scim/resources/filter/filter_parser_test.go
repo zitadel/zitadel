@@ -12,7 +12,7 @@ var longString = ""
 
 func init() {
 	var sb strings.Builder
-	for i := 0; i < maxInputLength+1; i++ {
+	for range maxInputLength + 1 {
 		sb.WriteRune('x')
 	}
 

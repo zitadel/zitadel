@@ -18,8 +18,8 @@ type APIConfig struct {
 	ClientKeys     []*ClientKey        `json:"-"`
 }
 
-func (c *APIConfig) Changes(changed *APIConfig) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
+func (c *APIConfig) Changes(changed *APIConfig) map[string]any {
+	changes := make(map[string]any, 1)
 	changes["appId"] = c.AppID
 	if c.AuthMethodType != changed.AuthMethodType {
 		changes["authMethodType"] = changed.AuthMethodType

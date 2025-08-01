@@ -1114,7 +1114,7 @@ func NewIDPRemovedEvent(
 	}
 }
 
-func (e *IDPRemovedEvent) Payload() interface{} {
+func (e *IDPRemovedEvent) Payload() any {
 	return e
 }
 

@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	Type   string
-	Config map[string]interface{} `mapstructure:",remain"`
+	Config map[string]any `mapstructure:",remain"`
 }
 
 func (c *Config) NewTracer() error {
@@ -21,7 +21,7 @@ func (c *Config) NewTracer() error {
 	return t(c.Config)
 }
 
-var tracer = map[string]func(map[string]interface{}) error{
+var tracer = map[string]func(map[string]any) error{
 	"otel":   otel.NewTracerFromConfig,
 	"google": google.NewTracer,
 	"log":    log.NewTracer,
@@ -29,6 +29,6 @@ var tracer = map[string]func(map[string]interface{}) error{
 	"":       NoTracer,
 }
 
-func NoTracer(_ map[string]interface{}) error {
+func NoTracer(_ map[string]any) error {
 	return nil
 }

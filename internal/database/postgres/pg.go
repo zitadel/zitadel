@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -44,15 +45,10 @@ type Config struct {
 }
 
 func (c *Config) MatchName(name string) bool {
-	for _, key := range []string{"pg", "postgres"} {
-		if strings.TrimSpace(strings.ToLower(name)) == key {
-			return true
-		}
-	}
-	return false
+	return slices.Contains([]string{"pg", "postgres"}, strings.TrimSpace(strings.ToLower(name)))
 }
 
-func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
+func (_ *Config) Decode(configs []any) (dialect.Connector, error) {
 	connector := new(Config)
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		DecodeHook:       mapstructure.StringToTimeDurationHookFunc(),

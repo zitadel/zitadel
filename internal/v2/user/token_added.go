@@ -16,8 +16,8 @@ type tokenAddedPayload struct {
 	Audience              []string           `json:"audience,omitempty"`
 	Scopes                []string           `json:"scopes,omitempty"`
 	AuthMethodsReferences []string           `json:"authMethodsReferences,omitempty"`
-	AuthTime              time.Time          `json:"authTime,omitempty"`
-	Expiration            time.Time          `json:"expiration,omitempty"`
+	AuthTime              time.Time          `json:"authTime"`
+	Expiration            time.Time          `json:"expiration"`
 	PreferredLanguage     string             `json:"preferredLanguage,omitempty"`
 	Reason                domain.TokenReason `json:"reason,omitempty"`
 	Actor                 *domain.TokenActor `json:"actor,omitempty"`

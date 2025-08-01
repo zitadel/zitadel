@@ -23,7 +23,7 @@ type PrivateKey interface {
 type PublicKey interface {
 	Key
 	Expiry() time.Time
-	Key() interface{}
+	Key() any
 }
 
 type PublicKeys struct {

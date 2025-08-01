@@ -101,7 +101,7 @@ func Test_handleEventExecution(t *testing.T) {
 					wantWorker{
 						targets:        mockTargets(1),
 						sendStatusCode: http.StatusOK,
-						err: func(tt assert.TestingT, err error, i ...interface{}) bool {
+						err: func(tt assert.TestingT, err error, i ...any) bool {
 							return errors.Is(err, new(river.JobCancelError))
 						},
 					}
@@ -203,7 +203,7 @@ func Test_handleEventExecution(t *testing.T) {
 					wantWorker{
 						targets:        mockTargets(1),
 						sendStatusCode: http.StatusBadRequest,
-						err: func(tt assert.TestingT, err error, i ...interface{}) bool {
+						err: func(tt assert.TestingT, err error, i ...any) bool {
 							return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
 						},
 					}

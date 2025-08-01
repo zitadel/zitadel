@@ -29,17 +29,19 @@ type Hasher struct {
 }
 
 func (h *Hasher) EncodingSupported(encodedHash string) bool {
-	for _, prefix := range h.Prefixes {
-		if strings.HasPrefix(encodedHash, prefix) {
-			return true
-		}
+	if slices.ContainsFunc(h.Prefixes, func(prefix string) bool {
+		return strings.HasPrefix(encodedHash, prefix)
+	}) {
+		return true
 	}
+
 	if h.HexSupported {
 		_, err := hex.DecodeString(encodedHash)
 		if err == nil {
 			return true
 		}
 	}
+
 	return false
 }
 

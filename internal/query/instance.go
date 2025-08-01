@@ -118,7 +118,7 @@ type InstanceSearchQueries struct {
 }
 
 func NewInstanceIDsListSearchQuery(ids ...string) (SearchQuery, error) {
-	list := make([]interface{}, len(ids))
+	list := make([]any, len(ids))
 	for i, value := range ids {
 		list[i] = value
 	}
@@ -126,7 +126,7 @@ func NewInstanceIDsListSearchQuery(ids ...string) (SearchQuery, error) {
 }
 
 func NewInstanceDomainsListSearchQuery(domains ...string) (SearchQuery, error) {
-	list := make([]interface{}, len(domains))
+	list := make([]any, len(domains))
 	for i, value := range domains {
 		list[i] = value
 	}
@@ -464,13 +464,13 @@ type authzInstance struct {
 	IAMProjectID    string                     `json:"iam_project_id,omitempty"`
 	ConsoleID       string                     `json:"console_id,omitempty"`
 	ConsoleAppID    string                     `json:"console_app_id,omitempty"`
-	DefaultLang     language.Tag               `json:"default_lang,omitempty"`
+	DefaultLang     language.Tag               `json:"default_lang"`
 	DefaultOrgID    string                     `json:"default_org_id,omitempty"`
-	CSP             csp                        `json:"csp,omitempty"`
+	CSP             csp                        `json:"csp"`
 	Impersonation   bool                       `json:"impersonation,omitempty"`
 	IsBlocked       *bool                      `json:"is_blocked,omitempty"`
 	LogRetention    *time.Duration             `json:"log_retention,omitempty"`
-	Feature         feature.Features           `json:"feature,omitempty"`
+	Feature         feature.Features           `json:"feature"`
 	ExternalDomains database.TextArray[string] `json:"external_domains,omitempty"`
 	TrustedDomains  database.TextArray[string] `json:"trusted_domains,omitempty"`
 }

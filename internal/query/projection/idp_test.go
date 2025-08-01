@@ -46,7 +46,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.idps3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"idp-config-id",
 								anyArg{},
 								anyArg{},
@@ -87,7 +87,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (name, styling_type, auto_register, change_date, sequence) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"custom-zitadel-instance",
 								domain.IDPConfigStylingTypeGoogle,
 								true,
@@ -121,7 +121,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								domain.IDPConfigStateInactive,
 								anyArg{},
 								uint64(15),
@@ -153,7 +153,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								domain.IDPConfigStateActive,
 								anyArg{},
 								uint64(15),
@@ -185,7 +185,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.idps3 WHERE (id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"idp-config-id",
 								"instance-id",
 							},
@@ -212,7 +212,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.idps3 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},
@@ -252,7 +252,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.IDPConfigTypeOIDC,
@@ -262,7 +262,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "INSERT INTO projections.idps3_oidc_config (idp_id, instance_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"idp-config-id",
 								"instance-id",
 								"client-id",
@@ -311,7 +311,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"idp-config-id",
@@ -320,7 +320,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.idps3_oidc_config SET (client_id, client_secret, issuer, authorization_endpoint, token_endpoint, scopes, display_name_mapping, username_mapping) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (idp_id = $9) AND (instance_id = $10)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"client-id",
 								anyArg{},
 								"issuer",
@@ -380,7 +380,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.IDPConfigTypeJWT,
@@ -390,7 +390,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "INSERT INTO projections.idps3_jwt_config (idp_id, instance_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"idp-config-id",
 								"instance-id",
 								"https://api.zitadel.ch/jwt",
@@ -427,7 +427,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"idp-config-id",
@@ -436,7 +436,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.idps3_jwt_config SET (endpoint, issuer, keys_endpoint, header_name) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"https://api.zitadel.ch/jwt",
 								"issuer",
 								"https://api.zitadel.ch/keys",
@@ -492,7 +492,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.idps3 (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"idp-config-id",
 								anyArg{},
 								anyArg{},
@@ -533,7 +533,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (name, styling_type, auto_register, change_date, sequence) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"custom-zitadel-instance",
 								domain.IDPConfigStylingTypeGoogle,
 								true,
@@ -567,7 +567,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								domain.IDPConfigStateInactive,
 								anyArg{},
 								uint64(15),
@@ -599,7 +599,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								domain.IDPConfigStateActive,
 								anyArg{},
 								uint64(15),
@@ -631,7 +631,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.idps3 WHERE (id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"idp-config-id",
 								"instance-id",
 							},
@@ -672,7 +672,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.IDPConfigTypeOIDC,
@@ -682,7 +682,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "INSERT INTO projections.idps3_oidc_config (idp_id, instance_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"idp-config-id",
 								"instance-id",
 								"client-id",
@@ -731,7 +731,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"idp-config-id",
@@ -740,7 +740,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.idps3_oidc_config SET (client_id, client_secret, issuer, authorization_endpoint, token_endpoint, scopes, display_name_mapping, username_mapping) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (idp_id = $9) AND (instance_id = $10)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"client-id",
 								anyArg{},
 								"issuer",
@@ -800,7 +800,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.IDPConfigTypeJWT,
@@ -810,7 +810,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "INSERT INTO projections.idps3_jwt_config (idp_id, instance_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"idp-config-id",
 								"instance-id",
 								"https://api.zitadel.ch/jwt",
@@ -847,7 +847,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"idp-config-id",
@@ -856,7 +856,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.idps3_jwt_config SET (endpoint, issuer, keys_endpoint, header_name) = ($1, $2, $3, $4) WHERE (idp_id = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"https://api.zitadel.ch/jwt",
 								"issuer",
 								"https://api.zitadel.ch/keys",
@@ -906,7 +906,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.idps3 WHERE (instance_id = $1) AND (resource_owner = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},

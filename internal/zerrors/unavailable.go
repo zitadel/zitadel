@@ -22,7 +22,7 @@ func ThrowUnavailable(parent error, id, message string) error {
 	return &UnavailableError{CreateZitadelError(parent, id, message)}
 }
 
-func ThrowUnavailablef(parent error, id, format string, a ...interface{}) error {
+func ThrowUnavailablef(parent error, id, format string, a ...any) error {
 	return ThrowUnavailable(parent, id, fmt.Sprintf(format, a...))
 }
 

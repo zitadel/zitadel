@@ -11,8 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, res interface{}) error {
-	return func(db *gorm.DB, res interface{}) error {
+func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, res any) error {
+	return func(db *gorm.DB, res any) error {
 		query := db.Table(table)
 		for _, q := range queries {
 			var err error
@@ -34,8 +34,8 @@ func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, r
 	}
 }
 
-func PrepareBulkSave(table string) func(db *gorm.DB, objects ...interface{}) error {
-	return func(db *gorm.DB, objects ...interface{}) error {
+func PrepareBulkSave(table string) func(db *gorm.DB, objects ...any) error {
+	return func(db *gorm.DB, objects ...any) error {
 		db = db.Table(table)
 		db = db.Begin()
 		defer db.RollbackUnlessCommitted()
@@ -55,8 +55,8 @@ func PrepareBulkSave(table string) func(db *gorm.DB, objects ...interface{}) err
 	}
 }
 
-func PrepareSave(table string) func(db *gorm.DB, object interface{}) error {
-	return func(db *gorm.DB, object interface{}) error {
+func PrepareSave(table string) func(db *gorm.DB, object any) error {
+	return func(db *gorm.DB, object any) error {
 		err := db.Table(table).Save(object).Error
 		if err != nil {
 			return zerrors.ThrowInternal(err, "VIEW-2m9fs", "unable to put object to view")
@@ -65,13 +65,13 @@ func PrepareSave(table string) func(db *gorm.DB, object interface{}) error {
 	}
 }
 
-func PrepareSaveOnConflict(table string, conflictColumns, updateColumns []string) func(db *gorm.DB, object interface{}) error {
+func PrepareSaveOnConflict(table string, conflictColumns, updateColumns []string) func(db *gorm.DB, object any) error {
 	updates := make([]string, len(updateColumns))
 	for i, column := range updateColumns {
 		updates[i] = column + "=excluded." + column
 	}
 	onConflict := fmt.Sprintf("ON CONFLICT (%s) DO UPDATE SET %s", strings.Join(conflictColumns, ","), strings.Join(updates, ","))
-	return func(db *gorm.DB, object interface{}) error {
+	return func(db *gorm.DB, object any) error {
 		err := db.Table(table).Set("gorm:insert_option", onConflict).Save(object).Error
 		if err != nil {
 			return zerrors.ThrowInternal(err, "VIEW-AfC7G", "unable to put object to view")
@@ -80,7 +80,7 @@ func PrepareSaveOnConflict(table string, conflictColumns, updateColumns []string
 	}
 }
 
-func PrepareDeleteByKey(table string, key ColumnKey, id interface{}) func(db *gorm.DB) error {
+func PrepareDeleteByKey(table string, key ColumnKey, id any) func(db *gorm.DB) error {
 	return func(db *gorm.DB) error {
 		err := db.Table(table).
 			Where(fmt.Sprintf("%s = ?", key.ToColumnName()), id).
@@ -93,7 +93,7 @@ func PrepareDeleteByKey(table string, key ColumnKey, id interface{}) func(db *go
 	}
 }
 
-func PrepareUpdateByKeys(table string, column ColumnKey, value interface{}, keys ...Key) func(db *gorm.DB) error {
+func PrepareUpdateByKeys(table string, column ColumnKey, value any, keys ...Key) func(db *gorm.DB) error {
 	return func(db *gorm.DB) error {
 		for _, key := range keys {
 			db = db.Table(table).
@@ -111,7 +111,7 @@ func PrepareUpdateByKeys(table string, column ColumnKey, value interface{}, keys
 
 type Key struct {
 	Key   ColumnKey
-	Value interface{}
+	Value any
 }
 
 func PrepareDeleteByKeys(table string, keys ...Key) func(db *gorm.DB) error {

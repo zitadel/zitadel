@@ -19,13 +19,13 @@ import (
 func Test_setInstance(t *testing.T) {
 	type args struct {
 		ctx      context.Context
-		req      interface{}
+		req      any
 		info     *grpc.UnaryServerInfo
 		handler  grpc.UnaryHandler
 		verifier authz.InstanceVerifier
 	}
 	type res struct {
-		want interface{}
+		want any
 		err  bool
 	}
 	tests := []struct {
@@ -61,7 +61,7 @@ func Test_setInstance(t *testing.T) {
 				ctx:      http_util.WithDomainContext(context.Background(), &http_util.DomainCtx{InstanceHost: "host"}),
 				req:      &mockRequest{},
 				verifier: &mockInstanceVerifier{instanceHost: "host"},
-				handler: func(ctx context.Context, req interface{}) (interface{}, error) {
+				handler: func(ctx context.Context, req any) (any, error) {
 					return req, nil
 				},
 			},
@@ -100,7 +100,7 @@ func Test_setInstance(t *testing.T) {
 				ctx:      http_util.WithDomainContext(context.Background(), &http_util.DomainCtx{InstanceHost: "host"}),
 				req:      &mockRequestWithExplicitInstance{},
 				verifier: &mockInstanceVerifier{instanceHost: "host"},
-				handler: func(ctx context.Context, req interface{}) (interface{}, error) {
+				handler: func(ctx context.Context, req any) (any, error) {
 					return req, nil
 				},
 			},
@@ -139,7 +139,7 @@ func Test_setInstance(t *testing.T) {
 					},
 				},
 				verifier: &mockInstanceVerifier{id: "existing instance id"},
-				handler: func(ctx context.Context, req interface{}) (interface{}, error) {
+				handler: func(ctx context.Context, req any) (any, error) {
 					return req, nil
 				},
 			},
@@ -184,7 +184,7 @@ func Test_setInstance(t *testing.T) {
 					},
 				},
 				verifier: &mockInstanceVerifier{instanceHost: "existing instance domain"},
-				handler: func(ctx context.Context, req interface{}) (interface{}, error) {
+				handler: func(ctx context.Context, req any) (any, error) {
 					return req, nil
 				},
 			},

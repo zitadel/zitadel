@@ -51,7 +51,7 @@ func NewIDPConfigAddedEvent(
 	}
 }
 
-func (e *IDPConfigAddedEvent) Payload() interface{} {
+func (e *IDPConfigAddedEvent) Payload() any {
 	return e
 }
 
@@ -82,7 +82,7 @@ type IDPConfigChangedEvent struct {
 	oldName      string                       `json:"-"`
 }
 
-func (e *IDPConfigChangedEvent) Payload() interface{} {
+func (e *IDPConfigChangedEvent) Payload() any {
 	return e
 }
 
@@ -166,7 +166,7 @@ func NewIDPConfigDeactivatedEvent(
 	}
 }
 
-func (e *IDPConfigDeactivatedEvent) Payload() interface{} {
+func (e *IDPConfigDeactivatedEvent) Payload() any {
 	return e
 }
 
@@ -204,7 +204,7 @@ func NewIDPConfigReactivatedEvent(
 	}
 }
 
-func (e *IDPConfigReactivatedEvent) Payload() interface{} {
+func (e *IDPConfigReactivatedEvent) Payload() any {
 	return e
 }
 
@@ -245,7 +245,7 @@ func NewIDPConfigRemovedEvent(
 	}
 }
 
-func (e *IDPConfigRemovedEvent) Payload() interface{} {
+func (e *IDPConfigRemovedEvent) Payload() any {
 	return e
 }
 

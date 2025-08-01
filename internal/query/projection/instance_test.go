@@ -37,7 +37,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.instances (id, creation_date, change_date, sequence, name) VALUES ($1, $2, $3, $4, $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								anyArg{},
 								anyArg{},
@@ -67,7 +67,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.instances WHERE (id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},
@@ -93,7 +93,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.instances SET (change_date, sequence, default_org_id) = ($1, $2, $3) WHERE (id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"orgid",
@@ -122,7 +122,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.instances SET (change_date, sequence, iam_project_id) = ($1, $2, $3) WHERE (id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"project-id",
@@ -151,7 +151,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.instances SET (change_date, sequence, default_language) = ($1, $2, $3) WHERE (id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"en",

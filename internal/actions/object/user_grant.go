@@ -163,7 +163,7 @@ func mapObjectToGrant(object *goja.Object, grant *UserGrant) {
 		case "projectGrantId", "projectGrantID":
 			grant.ProjectGrantID = object.Get(key).String()
 		case "roles":
-			if roles, ok := object.Get(key).Export().([]interface{}); ok {
+			if roles, ok := object.Get(key).Export().([]any); ok {
 				for _, role := range roles {
 					if r, ok := role.(string); ok {
 						grant.Roles = append(grant.Roles, r)

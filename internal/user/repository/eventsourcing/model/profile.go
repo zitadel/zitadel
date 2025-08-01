@@ -15,12 +15,12 @@ type Profile struct {
 	LastName          string      `json:"lastName,omitempty"`
 	NickName          string      `json:"nickName,omitempty"`
 	DisplayName       string      `json:"displayName,omitempty"`
-	PreferredLanguage LanguageTag `json:"preferredLanguage,omitempty"`
+	PreferredLanguage LanguageTag `json:"preferredLanguage"`
 	Gender            int32       `json:"gender,omitempty"`
 }
 
-func (p *Profile) Changes(changed *Profile) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
+func (p *Profile) Changes(changed *Profile) map[string]any {
+	changes := make(map[string]any, 1)
 	if changed.FirstName != "" && p.FirstName != changed.FirstName {
 		changes["firstName"] = changed.FirstName
 	}

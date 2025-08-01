@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/base64"
 	"encoding/json"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -39,7 +40,7 @@ func (c *CryptoValue) Value() (driver.Value, error) {
 	return json.Marshal(c)
 }
 
-func (c *CryptoValue) Scan(src interface{}) error {
+func (c *CryptoValue) Scan(src any) error {
 	if b, ok := src.([]byte); ok {
 		return json.Unmarshal(b, c)
 	}
@@ -107,10 +108,8 @@ func checkEncryptionAlgorithm(value *CryptoValue, alg EncryptionAlgorithm) error
 	if value.Algorithm != alg.Algorithm() {
 		return zerrors.ThrowInvalidArgument(nil, "CRYPT-Nx7XlT", "value was encrypted with a different key")
 	}
-	for _, id := range alg.DecryptionKeyIDs() {
-		if id == value.KeyID {
-			return nil
-		}
+	if slices.Contains(alg.DecryptionKeyIDs(), value.KeyID) {
+		return nil
 	}
 	return zerrors.ThrowInvalidArgument(nil, "CRYPT-Kq12vn", "value was encrypted with a different key")
 }

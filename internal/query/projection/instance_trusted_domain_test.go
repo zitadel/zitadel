@@ -37,7 +37,7 @@ func TestInstanceTrustedDomainProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.instance_trusted_domains (creation_date, change_date, sequence, domain, instance_id) VALUES ($1, $2, $3, $4, $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -67,7 +67,7 @@ func TestInstanceTrustedDomainProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.instance_trusted_domains WHERE (domain = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"domain.new",
 								"agg-id",
 							},
@@ -94,7 +94,7 @@ func TestInstanceTrustedDomainProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.instance_trusted_domains WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},

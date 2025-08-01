@@ -513,11 +513,12 @@ func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, to
 }
 
 func (o *OPStorage) assertProjectRoleScopesByProject(ctx context.Context, project *query.Project, scopes []string) ([]string, error) {
-	for _, scope := range scopes {
-		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
-			return scopes, nil
-		}
+	if slices.ContainsFunc(scopes, func(scope string) bool {
+		return strings.HasPrefix(scope, ScopeProjectRolePrefix)
+	}) {
+		return scopes, nil
 	}
+
 	if !project.ProjectRoleAssertion {
 		return scopes, nil
 	}

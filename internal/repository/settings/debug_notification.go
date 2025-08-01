@@ -20,7 +20,7 @@ type DebugNotificationProviderAddedEvent struct {
 	Compact bool `json:"compact,omitempty"`
 }
 
-func (e *DebugNotificationProviderAddedEvent) Payload() interface{} {
+func (e *DebugNotificationProviderAddedEvent) Payload() any {
 	return e
 }
 
@@ -57,7 +57,7 @@ type DebugNotificationProviderChangedEvent struct {
 	Compact *bool `json:"compact,omitempty"`
 }
 
-func (e *DebugNotificationProviderChangedEvent) Payload() interface{} {
+func (e *DebugNotificationProviderChangedEvent) Payload() any {
 	return e
 }
 
@@ -106,7 +106,7 @@ type DebugNotificationProviderRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *DebugNotificationProviderRemovedEvent) Payload() interface{} {
+func (e *DebugNotificationProviderRemovedEvent) Payload() any {
 	return nil
 }
 

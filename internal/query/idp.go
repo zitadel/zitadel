@@ -277,7 +277,7 @@ func NewIDPResourceOwnerSearchQuery(value string) (SearchQuery, error) {
 }
 
 func NewIDPResourceOwnerListSearchQuery(ids ...string) (SearchQuery, error) {
-	list := make([]interface{}, len(ids))
+	list := make([]any, len(ids))
 	for i, value := range ids {
 		list[i] = value
 	}

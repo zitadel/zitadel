@@ -22,7 +22,7 @@ func ThrowResourceExhausted(parent error, id, message string) error {
 	return &ResourceExhaustedError{CreateZitadelError(parent, id, message)}
 }
 
-func ThrowResourceExhaustedf(parent error, id, format string, a ...interface{}) error {
+func ThrowResourceExhaustedf(parent error, id, format string, a ...any) error {
 	return ThrowResourceExhausted(parent, id, fmt.Sprintf(format, a...))
 }
 

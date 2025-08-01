@@ -277,7 +277,7 @@ func TestActionProjection_reduces(t *testing.T) {
 						},
 						mapper: action.AddedEventMapper,
 					}, want{
-						err: func(tt assert.TestingT, err error, i ...interface{}) bool {
+						err: func(tt assert.TestingT, err error, i ...any) bool {
 							return errors.Is(err, zerrors.ThrowInternal(nil, "QUERY-37ardr0pki", "Errors.Query.CloseRows"))
 						},
 					}

@@ -27,10 +27,10 @@ func (s *testServer) Called() bool {
 }
 
 func testServerCall(
-	reqBody interface{},
+	reqBody any,
 	sleep time.Duration,
 	statusCode int,
-	respBody interface{},
+	respBody any,
 ) (string, func(), func() bool) {
 	server := &testServer{
 		called: false,

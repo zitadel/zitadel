@@ -40,7 +40,7 @@ type AddedEvent struct {
 	UserAgent            *domain.UserAgent `json:"user_agent,omitempty"`
 }
 
-func (e *AddedEvent) Payload() interface{} {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
@@ -84,7 +84,7 @@ type UserCheckedEvent struct {
 	PreferredLanguage *language.Tag `json:"preferredLanguage,omitempty"`
 }
 
-func (e *UserCheckedEvent) Payload() interface{} {
+func (e *UserCheckedEvent) Payload() any {
 	return e
 }
 
@@ -131,7 +131,7 @@ type PasswordCheckedEvent struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *PasswordCheckedEvent) Payload() interface{} {
+func (e *PasswordCheckedEvent) Payload() any {
 	return e
 }
 
@@ -172,7 +172,7 @@ type IntentCheckedEvent struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *IntentCheckedEvent) Payload() interface{} {
+func (e *IntentCheckedEvent) Payload() any {
 	return e
 }
 
@@ -216,7 +216,7 @@ type WebAuthNChallengedEvent struct {
 	RPID               string                             `json:"rpid,omitempty"`
 }
 
-func (e *WebAuthNChallengedEvent) Payload() interface{} {
+func (e *WebAuthNChallengedEvent) Payload() any {
 	return e
 }
 
@@ -256,7 +256,7 @@ type WebAuthNCheckedEvent struct {
 	UserVerified bool      `json:"userVerified,omitempty"`
 }
 
-func (e *WebAuthNCheckedEvent) Payload() interface{} {
+func (e *WebAuthNCheckedEvent) Payload() any {
 	return e
 }
 
@@ -291,7 +291,7 @@ type TOTPCheckedEvent struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *TOTPCheckedEvent) Payload() interface{} {
+func (e *TOTPCheckedEvent) Payload() any {
 	return e
 }
 
@@ -328,7 +328,7 @@ type OTPSMSChallengedEvent struct {
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
-func (e *OTPSMSChallengedEvent) Payload() interface{} {
+func (e *OTPSMSChallengedEvent) Payload() any {
 	return e
 }
 
@@ -372,7 +372,7 @@ type OTPSMSSentEvent struct {
 	GeneratorInfo *senders.CodeGeneratorInfo `json:"generatorInfo,omitempty"`
 }
 
-func (e *OTPSMSSentEvent) Payload() interface{} {
+func (e *OTPSMSSentEvent) Payload() any {
 	return e
 }
 
@@ -405,7 +405,7 @@ type OTPSMSCheckedEvent struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *OTPSMSCheckedEvent) Payload() interface{} {
+func (e *OTPSMSCheckedEvent) Payload() any {
 	return e
 }
 
@@ -442,7 +442,7 @@ type OTPEmailChallengedEvent struct {
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
-func (e *OTPEmailChallengedEvent) Payload() interface{} {
+func (e *OTPEmailChallengedEvent) Payload() any {
 	return e
 }
 
@@ -484,7 +484,7 @@ type OTPEmailSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *OTPEmailSentEvent) Payload() interface{} {
+func (e *OTPEmailSentEvent) Payload() any {
 	return e
 }
 
@@ -515,7 +515,7 @@ type OTPEmailCheckedEvent struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
-func (e *OTPEmailCheckedEvent) Payload() interface{} {
+func (e *OTPEmailCheckedEvent) Payload() any {
 	return e
 }
 
@@ -548,7 +548,7 @@ type TokenSetEvent struct {
 	TokenID string `json:"tokenID"`
 }
 
-func (e *TokenSetEvent) Payload() interface{} {
+func (e *TokenSetEvent) Payload() any {
 	return e
 }
 
@@ -589,7 +589,7 @@ type MetadataSetEvent struct {
 	Metadata map[string][]byte `json:"metadata"`
 }
 
-func (e *MetadataSetEvent) Payload() interface{} {
+func (e *MetadataSetEvent) Payload() any {
 	return e
 }
 
@@ -630,7 +630,7 @@ type LifetimeSetEvent struct {
 	Lifetime time.Duration `json:"lifetime"`
 }
 
-func (e *LifetimeSetEvent) Payload() interface{} {
+func (e *LifetimeSetEvent) Payload() any {
 	return e
 }
 
@@ -663,7 +663,7 @@ type TerminateEvent struct {
 	TriggeredAtOrigin string `json:"triggerOrigin,omitempty"`
 }
 
-func (e *TerminateEvent) Payload() interface{} {
+func (e *TerminateEvent) Payload() any {
 	return e
 }
 

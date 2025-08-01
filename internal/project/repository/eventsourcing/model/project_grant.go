@@ -23,8 +23,8 @@ type ProjectGrantID struct {
 	GrantID string `json:"grantId"`
 }
 
-func (g *ProjectGrant) Changes(changed *ProjectGrant) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
+func (g *ProjectGrant) Changes(changed *ProjectGrant) map[string]any {
+	changes := make(map[string]any, 1)
 	changes["grantId"] = g.GrantID
 	if !reflect.DeepEqual(g.RoleKeys, changed.RoleKeys) {
 		changes["roleKeys"] = changed.RoleKeys

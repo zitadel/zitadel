@@ -19,7 +19,7 @@ type AddedCertificateEvent struct {
 	Certificate *Key `json:"certificate"`
 }
 
-func (e *AddedCertificateEvent) Payload() interface{} {
+func (e *AddedCertificateEvent) Payload() any {
 	return e
 }
 

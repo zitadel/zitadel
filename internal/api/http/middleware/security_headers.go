@@ -54,7 +54,6 @@ func (h *headers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				errorHandler = func(err error) http.Handler {
 					return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 						http.Error(w, err.Error(), http.StatusInternalServerError)
-						return
 					})
 				}
 			}
@@ -94,11 +93,11 @@ func generateNonce(length uint) (string, error) {
 	return base64.StdEncoding.EncodeToString(b), nil
 }
 
-func saveContext(r *http.Request, key, value interface{}) *http.Request {
+func saveContext(r *http.Request, key, value any) *http.Request {
 	ctx := context.WithValue(r.Context(), key, value)
 	return r.WithContext(ctx)
 }
 
-func getContext(r *http.Request, key interface{}) interface{} {
+func getContext(r *http.Request, key any) any {
 	return r.Context().Value(key)
 }

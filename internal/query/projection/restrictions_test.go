@@ -36,7 +36,7 @@ func TestRestrictionsProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.restrictions2 (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id, disallow_public_org_registration) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id, disallow_public_org_registration) = (projections.restrictions2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id, EXCLUDED.disallow_public_org_registration)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"ro-id",
 								anyArg{},
@@ -67,7 +67,7 @@ func TestRestrictionsProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.restrictions2 (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id) = (projections.restrictions2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"ro-id",
 								anyArg{},

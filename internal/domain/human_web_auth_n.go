@@ -3,6 +3,7 @@ package domain
 import (
 	"bytes"
 	"fmt"
+	"slices"
 	"time"
 
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -63,11 +64,13 @@ func GetTokenToVerify(tokens []*WebAuthNToken) (int, *WebAuthNToken) {
 }
 
 func GetTokenByKeyID(tokens []*WebAuthNToken, keyID []byte) (int, *WebAuthNToken) {
-	for i, token := range tokens {
-		if bytes.Compare(token.KeyID, keyID) == 0 {
-			return i, token
-		}
+	idx := slices.IndexFunc(tokens, func (t *WebAuthNToken) bool {
+		return bytes.Equal(t.KeyID, keyID)
+	})
+	if idx >= 0 {
+		return idx, tokens[idx]
 	}
+
 	return -1, nil
 }
 

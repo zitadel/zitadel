@@ -69,7 +69,7 @@ func NewSecretGeneratorAddedEvent(
 	}
 }
 
-func (e *SecretGeneratorAddedEvent) Payload() interface{} {
+func (e *SecretGeneratorAddedEvent) Payload() any {
 	return e
 }
 
@@ -101,7 +101,7 @@ type SecretGeneratorChangedEvent struct {
 	IncludeSymbols      *bool                      `json:"includeSymbols,omitempty"`
 }
 
-func (e *SecretGeneratorChangedEvent) Payload() interface{} {
+func (e *SecretGeneratorChangedEvent) Payload() any {
 	return e
 }
 
@@ -189,7 +189,7 @@ type SecretGeneratorRemovedEvent struct {
 	GeneratorType domain.SecretGeneratorType `json:"generatorType"`
 }
 
-func (e *SecretGeneratorRemovedEvent) Payload() interface{} {
+func (e *SecretGeneratorRemovedEvent) Payload() any {
 	return e
 }
 

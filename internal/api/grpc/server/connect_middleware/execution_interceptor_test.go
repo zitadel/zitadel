@@ -109,7 +109,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 		req              connect.AnyRequest
 	}
 	type res struct {
-		want    interface{}
+		want    any
 		wantErr bool
 	}
 	tests := []struct {
@@ -615,7 +615,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 }
 
 func testServerCall(
-	reqBody interface{},
+	reqBody any,
 	sleep time.Duration,
 	statusCode int,
 	respBody connect.AnyResponse,
@@ -679,7 +679,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 		resp             connect.AnyResponse
 	}
 	type res struct {
-		want    interface{}
+		want    any
 		wantErr bool
 	}
 	tests := []struct {

@@ -254,7 +254,7 @@ func TestSubSelect_comp(t *testing.T) {
 		Queries []SearchQuery
 	}
 	type want struct {
-		query interface{}
+		query any
 		isNil bool
 	}
 	tests := []struct {
@@ -279,7 +279,7 @@ func TestSubSelect_comp(t *testing.T) {
 				Queries: []SearchQuery{&textQuery{testCol, "horst", TextEquals}},
 			},
 			want: want{
-				query: sq.Select("test_table.test_col").From("test_table").Where(sq.Eq{"test_table.test_col": interface{}("horst")}),
+				query: sq.Select("test_table.test_col").From("test_table").Where(sq.Eq{"test_table.test_col": any("horst")}),
 			},
 		},
 		{
@@ -289,7 +289,7 @@ func TestSubSelect_comp(t *testing.T) {
 				Queries: []SearchQuery{&textQuery{testColAlias, "horst", TextEquals}},
 			},
 			want: want{
-				query: sq.Select("test_alias.test_col").From("test_table AS test_alias").Where(sq.Eq{"test_alias.test_col": interface{}("horst")}),
+				query: sq.Select("test_alias.test_col").From("test_table AS test_alias").Where(sq.Eq{"test_alias.test_col": any("horst")}),
 			},
 		},
 		{
@@ -439,7 +439,7 @@ func TestColumnComparisonQuery_comp(t *testing.T) {
 		Compare       ColumnComparison
 	}
 	type want struct {
-		query interface{}
+		query any
 		isNil bool
 	}
 	tests := []struct {
@@ -516,7 +516,7 @@ func TestColumnComparisonQuery_comp(t *testing.T) {
 func TestNewListQuery(t *testing.T) {
 	type args struct {
 		column  Column
-		data    interface{}
+		data    any
 		compare ListComparison
 	}
 	tests := []struct {
@@ -529,7 +529,7 @@ func TestNewListQuery(t *testing.T) {
 			name: "too low compare",
 			args: args{
 				column:  testCol,
-				data:    []interface{}{"hurst"},
+				data:    []any{"hurst"},
 				compare: -1,
 			},
 			wantErr: func(err error) bool {
@@ -540,7 +540,7 @@ func TestNewListQuery(t *testing.T) {
 			name: "too high compare",
 			args: args{
 				column:  testCol,
-				data:    []interface{}{"hurst"},
+				data:    []any{"hurst"},
 				compare: listCompareMax,
 			},
 			wantErr: func(err error) bool {
@@ -551,7 +551,7 @@ func TestNewListQuery(t *testing.T) {
 			name: "no column",
 			args: args{
 				column:  Column{},
-				data:    []interface{}{"hurst"},
+				data:    []any{"hurst"},
 				compare: ListIn,
 			},
 			wantErr: func(err error) bool {
@@ -562,7 +562,7 @@ func TestNewListQuery(t *testing.T) {
 			name: "no column name",
 			args: args{
 				column:  testNoCol,
-				data:    []interface{}{"hurst"},
+				data:    []any{"hurst"},
 				compare: ListIn,
 			},
 			wantErr: func(err error) bool {
@@ -573,12 +573,12 @@ func TestNewListQuery(t *testing.T) {
 			name: "correct slice",
 			args: args{
 				column:  testCol,
-				data:    []interface{}{"hurst"},
+				data:    []any{"hurst"},
 				compare: ListIn,
 			},
 			want: &listQuery{
 				Column:  testCol,
-				Data:    []interface{}{"hurst"},
+				Data:    []any{"hurst"},
 				Compare: ListIn,
 			},
 		},
@@ -616,11 +616,11 @@ func TestNewListQuery(t *testing.T) {
 func TestListQuery_comp(t *testing.T) {
 	type fields struct {
 		Column  Column
-		Data    interface{}
+		Data    any
 		Compare ListComparison
 	}
 	type want struct {
-		query interface{}
+		query any
 		isNil bool
 	}
 	tests := []struct {
@@ -632,22 +632,22 @@ func TestListQuery_comp(t *testing.T) {
 			name: "in list one element",
 			fields: fields{
 				Column:  testCol,
-				Data:    []interface{}{"hurst"},
+				Data:    []any{"hurst"},
 				Compare: ListIn,
 			},
 			want: want{
-				query: sq.Eq{"test_table.test_col": []interface{}{"hurst"}},
+				query: sq.Eq{"test_table.test_col": []any{"hurst"}},
 			},
 		},
 		{
 			name: "in list three elements",
 			fields: fields{
 				Column:  testCol,
-				Data:    []interface{}{"hurst1", "hurst2", "hurst3"},
+				Data:    []any{"hurst1", "hurst2", "hurst3"},
 				Compare: ListIn,
 			},
 			want: want{
-				query: sq.Eq{"test_table.test_col": []interface{}{"hurst1", "hurst2", "hurst3"}},
+				query: sq.Eq{"test_table.test_col": []any{"hurst1", "hurst2", "hurst3"}},
 			},
 		},
 		{
@@ -731,7 +731,7 @@ func TestListQuery_comp(t *testing.T) {
 			name: "too high comparison",
 			fields: fields{
 				Column:  testCol,
-				Data:    []interface{}{"hurst"},
+				Data:    []any{"hurst"},
 				Compare: listCompareMax,
 			},
 			want: want{
@@ -742,7 +742,7 @@ func TestListQuery_comp(t *testing.T) {
 			name: "too low comparison",
 			fields: fields{
 				Column:  testCol,
-				Data:    []interface{}{"hurst"},
+				Data:    []any{"hurst"},
 				Compare: -1,
 			},
 			want: want{
@@ -1177,7 +1177,7 @@ func TestTextQuery_comp(t *testing.T) {
 		Compare TextComparison
 	}
 	type want struct {
-		query interface{}
+		query any
 		isNil bool
 	}
 	tests := []struct {
@@ -1382,7 +1382,7 @@ func TestTextQuery_comp(t *testing.T) {
 			want: want{
 				query: &listContains{
 					col:  testCol,
-					args: []interface{}{"Hurst"},
+					args: []any{"Hurst"},
 				},
 			},
 		},
@@ -1433,7 +1433,7 @@ func TestTextQuery_comp(t *testing.T) {
 func TestNewNumberQuery(t *testing.T) {
 	type args struct {
 		column  Column
-		value   interface{}
+		value   any
 		compare NumberComparison
 	}
 	tests := []struct {
@@ -1531,11 +1531,11 @@ func TestNewNumberQuery(t *testing.T) {
 func TestNumberQuery_comp(t *testing.T) {
 	type fields struct {
 		Column  Column
-		Number  interface{}
+		Number  any
 		Compare NumberComparison
 	}
 	type want struct {
-		query interface{}
+		query any
 		isNil bool
 	}
 	tests := []struct {
@@ -1619,7 +1619,7 @@ func TestNumberQuery_comp(t *testing.T) {
 			want: want{
 				query: &listContains{
 					col:  testCol,
-					args: []interface{}{42},
+					args: []any{42},
 				},
 			},
 		},
@@ -1788,7 +1788,7 @@ func TestOrQuery_comp(t *testing.T) {
 		queries []SearchQuery
 	}
 	type want struct {
-		query interface{}
+		query any
 		isNil bool
 	}
 	tests := []struct {
@@ -1903,7 +1903,7 @@ func TestAndQuery_comp(t *testing.T) {
 		queries []SearchQuery
 	}
 	type want struct {
-		query interface{}
+		query any
 		isNil bool
 	}
 	tests := []struct {
@@ -2015,7 +2015,7 @@ func TestNotQuery_comp(t *testing.T) {
 		query SearchQuery
 	}
 	type want struct {
-		query interface{}
+		query any
 		isNil bool
 	}
 	tests := []struct {
@@ -2102,7 +2102,7 @@ func TestAndOrQueryCombo(t *testing.T) {
 		query SearchQuery
 	}
 	type want struct {
-		query interface{}
+		query any
 		isNil bool
 	}
 	tests := []struct {
@@ -2213,7 +2213,7 @@ func TestInTextQuery_comp(t *testing.T) {
 		Values []string
 	}
 	type want struct {
-		query interface{}
+		query any
 		isNil bool
 	}
 	tests := []struct {
@@ -2259,7 +2259,7 @@ func TestBytesQuery_comp(t *testing.T) {
 		Compare BytesComparison
 	}
 	type want struct {
-		query interface{}
+		query any
 		err   bool
 		isNil bool
 	}

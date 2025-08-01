@@ -40,7 +40,7 @@ func TestOrganizationSettingsProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.organization_settings (instance_id, resource_owner, id, creation_date, change_date, sequence, organization_scoped_usernames) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, resource_owner, id) DO UPDATE SET (creation_date, change_date, sequence, organization_scoped_usernames) = (projections.organization_settings.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.organization_scoped_usernames)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"ro-id",
 								"agg-id",
@@ -73,7 +73,7 @@ func TestOrganizationSettingsProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.organization_settings WHERE (instance_id = $1) AND (resource_owner = $2) AND (id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"ro-id",
 								"agg-id",
@@ -101,7 +101,7 @@ func TestOrganizationSettingsProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.organization_settings WHERE (instance_id = $1) AND (resource_owner = $2) AND (id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"ro-id",
 								"agg-id",
@@ -129,7 +129,7 @@ func TestOrganizationSettingsProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.organization_settings WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},

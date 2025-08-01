@@ -79,7 +79,7 @@ func NewMembershipOrgIDQuery(value string) (SearchQuery, error) {
 }
 
 func NewMembershipResourceOwnersSearchQuery(ids ...string) (SearchQuery, error) {
-	list := make([]interface{}, len(ids))
+	list := make([]any, len(ids))
 	for i, value := range ids {
 		list[i] = value
 	}
@@ -224,12 +224,12 @@ var (
 	}
 )
 
-func getMembershipFromQuery(ctx context.Context, queries *MembershipSearchQuery, permissionV2 bool) (string, []interface{}) {
+func getMembershipFromQuery(ctx context.Context, queries *MembershipSearchQuery, permissionV2 bool) (string, []any) {
 	orgMembers, orgMembersArgs := prepareOrgMember(ctx, queries, permissionV2)
 	iamMembers, iamMembersArgs := prepareIAMMember(ctx, queries, permissionV2)
 	projectMembers, projectMembersArgs := prepareProjectMember(ctx, queries, permissionV2)
 	projectGrantMembers, projectGrantMembersArgs := prepareProjectGrantMember(ctx, queries, permissionV2)
-	args := make([]interface{}, 0)
+	args := make([]any, 0)
 	args = append(append(append(append(args, orgMembersArgs...), iamMembersArgs...), projectMembersArgs...), projectGrantMembersArgs...)
 
 	return "(" +
@@ -244,7 +244,7 @@ func getMembershipFromQuery(ctx context.Context, queries *MembershipSearchQuery,
 		args
 }
 
-func prepareMembershipsQuery(ctx context.Context, queries *MembershipSearchQuery, permissionV2 bool) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*Memberships, error)) {
+func prepareMembershipsQuery(ctx context.Context, queries *MembershipSearchQuery, permissionV2 bool) (sq.SelectBuilder, []any, func(*sql.Rows) (*Memberships, error)) {
 	query, args := getMembershipFromQuery(ctx, queries, permissionV2)
 	return sq.Select(
 			MembershipUserID.identifier(),
@@ -348,7 +348,7 @@ func prepareMembershipsQuery(ctx context.Context, queries *MembershipSearchQuery
 		}
 }
 
-func prepareOrgMember(ctx context.Context, query *MembershipSearchQuery, permissionV2 bool) (string, []interface{}) {
+func prepareOrgMember(ctx context.Context, query *MembershipSearchQuery, permissionV2 bool) (string, []any) {
 	builder := sq.Select(
 		OrgMemberUserID.identifier(),
 		OrgMemberRoles.identifier(),
@@ -372,7 +372,7 @@ func prepareOrgMember(ctx context.Context, query *MembershipSearchQuery, permiss
 	return builder.MustSql()
 }
 
-func prepareIAMMember(ctx context.Context, query *MembershipSearchQuery, permissionV2 bool) (string, []interface{}) {
+func prepareIAMMember(ctx context.Context, query *MembershipSearchQuery, permissionV2 bool) (string, []any) {
 	builder := sq.Select(
 		InstanceMemberUserID.identifier(),
 		InstanceMemberRoles.identifier(),
@@ -396,7 +396,7 @@ func prepareIAMMember(ctx context.Context, query *MembershipSearchQuery, permiss
 	return builder.MustSql()
 }
 
-func prepareProjectMember(ctx context.Context, query *MembershipSearchQuery, permissionV2 bool) (string, []interface{}) {
+func prepareProjectMember(ctx context.Context, query *MembershipSearchQuery, permissionV2 bool) (string, []any) {
 	builder := sq.Select(
 		ProjectMemberUserID.identifier(),
 		ProjectMemberRoles.identifier(),
@@ -421,7 +421,7 @@ func prepareProjectMember(ctx context.Context, query *MembershipSearchQuery, per
 	return builder.MustSql()
 }
 
-func prepareProjectGrantMember(ctx context.Context, query *MembershipSearchQuery, permissionV2 bool) (string, []interface{}) {
+func prepareProjectGrantMember(ctx context.Context, query *MembershipSearchQuery, permissionV2 bool) (string, []any) {
 	builder := sq.Select(
 		ProjectGrantMemberUserID.identifier(),
 		ProjectGrantMemberRoles.identifier(),

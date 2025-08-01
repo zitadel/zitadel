@@ -75,9 +75,9 @@ func Test_ProjectGrantMemberPrepares(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name:    "prepareProjectGrantMembersQuery no result",

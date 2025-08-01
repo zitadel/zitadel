@@ -96,7 +96,7 @@ type ContextInfoRequest struct {
 	OrgID      string  `json:"orgID,omitempty"`
 	ProjectID  string  `json:"projectID,omitempty"`
 	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
+	Request    Message `json:"request"`
 }
 
 type Message struct {
@@ -127,7 +127,7 @@ func (c *ContextInfoRequest) SetHTTPResponseBody(resp []byte) error {
 	return json.Unmarshal(resp, &c.Request)
 }
 
-func (c *ContextInfoRequest) GetContent() interface{} {
+func (c *ContextInfoRequest) GetContent() any {
 	return c.Request.Message
 }
 
@@ -139,8 +139,8 @@ type ContextInfoResponse struct {
 	OrgID      string  `json:"orgID,omitempty"`
 	ProjectID  string  `json:"projectID,omitempty"`
 	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
-	Response   Message `json:"response,omitempty"`
+	Request    Message `json:"request"`
+	Response   Message `json:"response"`
 }
 
 func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
@@ -155,6 +155,6 @@ func (c *ContextInfoResponse) SetHTTPResponseBody(resp []byte) error {
 	return json.Unmarshal(resp, &c.Response)
 }
 
-func (c *ContextInfoResponse) GetContent() interface{} {
+func (c *ContextInfoResponse) GetContent() any {
 	return c.Response.Message
 }

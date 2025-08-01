@@ -10,7 +10,7 @@ import (
 func TestNewFilter(t *testing.T) {
 	type args struct {
 		field     Field
-		value     interface{}
+		value     any
 		operation Operation
 	}
 	tests := []struct {
@@ -40,7 +40,7 @@ func TestNewFilter(t *testing.T) {
 func TestFilter_Validate(t *testing.T) {
 	type fields struct {
 		field     Field
-		value     interface{}
+		value     any
 		operation Operation
 		isNil     bool
 	}

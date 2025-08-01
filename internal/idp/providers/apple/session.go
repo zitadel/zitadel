@@ -24,7 +24,7 @@ func NewSession(provider *Provider, code, userFormValue string) *Session {
 }
 
 type userFormValue struct {
-	Name userNamesFormValue `json:"name,omitempty" schema:"name"`
+	Name userNamesFormValue `json:"name" schema:"name"`
 }
 
 type userNamesFormValue struct {

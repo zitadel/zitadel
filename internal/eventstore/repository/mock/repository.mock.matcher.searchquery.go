@@ -22,7 +22,7 @@ func (f *filterQueryMatcher) String() string {
 	return fmt.Sprintf("Filters: %s", strings.Join(filterLists, " "))
 }
 
-func (f *filterQueryMatcher) Matches(x interface{}) bool {
+func (f *filterQueryMatcher) Matches(x any) bool {
 	other := x.(*repository.SearchQuery)
 	if len(f.SubQueries) != len(other.SubQueries) {
 		return false
@@ -40,6 +40,6 @@ func (f *filterQueryMatcher) Matches(x interface{}) bool {
 	return true
 }
 
-func (f *filterQueryMatcher) Got(got interface{}) string {
+func (f *filterQueryMatcher) Got(got any) string {
 	return (*filterQueryMatcher)(got.(*repository.SearchQuery)).String()
 }

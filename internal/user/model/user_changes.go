@@ -17,5 +17,5 @@ type UserChange struct {
 	ModifierName      string                 `json:"-"`
 	ModifierLoginName string                 `json:"-"`
 	ModifierAvatarURL string                 `json:"-"`
-	Data              interface{}            `json:"data,omitempty"`
+	Data              any                    `json:"data,omitempty"`
 }

@@ -358,30 +358,21 @@ func CheckRedirectUrisImplicitAndCode(compliance *Compliance, appType *OIDCAppli
 }
 
 func urlsAreHttps(uris []string) bool {
-	for _, uri := range uris {
-		if !strings.HasPrefix(uri, https) {
-			return false
-		}
-	}
-	return true
+	return !slices.ContainsFunc(uris, func(uri string) bool {
+		return !strings.HasPrefix(uri, https)
+	})
 }
 
 func urlContainsPrefix(uris []string, prefix string) bool {
-	for _, uri := range uris {
-		if strings.HasPrefix(uri, prefix) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(uris, func(uri string) bool {
+		return strings.HasPrefix(uri, prefix)
+	})
 }
 
 func containsCustom(uris []string) bool {
-	for _, uri := range uris {
-		if !strings.HasPrefix(uri, http) && !strings.HasPrefix(uri, https) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(uris, func(uri string) bool {
+		return !strings.HasPrefix(uri, http) && !strings.HasPrefix(uri, https)
+	})
 }
 
 func onlyLocalhostIsHttp(uris []string) bool {

@@ -22,7 +22,7 @@ func ThrowUnimplemented(parent error, id, message string) error {
 	return &UnimplementedError{CreateZitadelError(parent, id, message)}
 }
 
-func ThrowUnimplementedf(parent error, id, format string, a ...interface{}) error {
+func ThrowUnimplementedf(parent error, id, format string, a ...any) error {
 	return ThrowUnimplemented(parent, id, fmt.Sprintf(format, a...))
 }
 

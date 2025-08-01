@@ -45,7 +45,7 @@ func (req RefreshTokenSearchQuery) GetMethod() domain.SearchMethod {
 	return req.Method
 }
 
-func (req RefreshTokenSearchQuery) GetValue() interface{} {
+func (req RefreshTokenSearchQuery) GetValue() any {
 	return req.Value
 }
 

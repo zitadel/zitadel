@@ -89,7 +89,7 @@ func commandsToSequences(ctx context.Context, commands []eventstore.Command) []*
 const argsPerCondition = 3
 
 func sequencesToSql(sequences []*latestSequence) (conditions []string, args []any) {
-	args = make([]interface{}, 0, len(sequences)*argsPerCondition)
+	args = make([]any, 0, len(sequences)*argsPerCondition)
 	conditions = make([]string, len(sequences))
 
 	for i, sequence := range sequences {

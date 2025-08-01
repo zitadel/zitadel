@@ -96,11 +96,11 @@ func (e *Event) Revision() uint16 {
 	return 0
 }
 
-func eventData(i interface{}) ([]byte, error) {
+func eventData(i any) ([]byte, error) {
 	switch v := i.(type) {
 	case []byte:
 		return v, nil
-	case map[string]interface{}:
+	case map[string]any:
 		bytes, err := json.Marshal(v)
 		if err != nil {
 			return nil, zerrors.ThrowInvalidArgument(err, "MODEL-s2fgE", "unable to marshal data")

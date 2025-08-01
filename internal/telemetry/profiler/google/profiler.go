@@ -10,7 +10,7 @@ type Config struct {
 	ProjectID string
 }
 
-func NewProfiler(rawConfig map[string]interface{}) (err error) {
+func NewProfiler(rawConfig map[string]any) (err error) {
 	c := new(Config)
 	c.ProjectID, _ = rawConfig["projectid"].(string)
 	return c.NewProfiler()

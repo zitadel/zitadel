@@ -23,11 +23,11 @@ func (f *filterMatcher) String() string {
 	return fmt.Sprintf("%d %d (content=%+v,type=%T,json=%s)", f.Field, f.Operation, f.Value, f.Value, string(jsonValue))
 }
 
-func (f *filterMatcher) Matches(x interface{}) bool {
+func (f *filterMatcher) Matches(x any) bool {
 	other := x.(*repository.Filter)
 	return f.Field == other.Field && f.Operation == other.Operation && reflect.DeepEqual(f.Value, other.Value)
 }
 
-func (f *filterMatcher) Got(got interface{}) string {
+func (f *filterMatcher) Got(got any) string {
 	return (*filterMatcher)(got.(*repository.Filter)).String()
 }
