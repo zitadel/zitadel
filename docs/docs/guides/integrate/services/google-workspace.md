@@ -33,25 +33,25 @@ Open the Google settings for [SSO with third-party IdP](https://admin.google.com
 
 ![SSO with third-party IdP](/img/guides/integrate/services/google-workspace-sso-overview.png)
 
-Download the public certificate from your ZITADEL instance by requesting `$YOUR_DOMAIN/saml/v2/certificate`
+Download the public certificate from your ZITADEL instance by requesting `$CUSTOM_DOMAIN/saml/v2/certificate`
 
 ```bash
- wget $YOUR_DOMAIN/saml/v2/certificate -O idp.crt
+ wget $CUSTOM_DOMAIN/saml/v2/certificate -O idp.crt
 ```
 
-Always replace `$YOUR_DOMAIN` with your custom domain.
+Always replace `$CUSTOM_DOMAIN` with your custom domain.
 
 Use the following configuration
 
 | Setting | Value |
 | --- | --- |
 | Set up SSO with third-party identity provider | Enable (check) |
-| Sign-in page URL | $YOUR_DOMAIN/saml/v2/SSO |
-| Sign-out page URL | $YOUR_DOMAIN/saml/v2/SLO |
+| Sign-in page URL | $CUSTOM_DOMAIN/saml/v2/SSO |
+| Sign-out page URL | $CUSTOM_DOMAIN/saml/v2/SLO |
 | Verification Certificate | Upload the certificate (idp.crt) |
 | Use a domain-specific issuer | Enable (check) |
 | Network masks | Leave blank|
-| Change password URL | $YOUR_DOMAIN/ui/console/users/me?id=security |
+| Change password URL | $CUSTOM_DOMAIN/ui/console/users/me?id=security |
 
 ### Create a SAML application in ZITADEL
 
