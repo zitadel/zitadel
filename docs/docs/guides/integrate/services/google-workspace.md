@@ -39,7 +39,7 @@ Download the public certificate from your ZITADEL instance by requesting `$YOUR_
  wget $YOUR_DOMAIN/saml/v2/certificate -O idp.crt
 ```
 
-Always replace `$YOUR_DOMAIN` with your instance domain.
+Always replace `$YOUR_DOMAIN` with your custom domain.
 
 Use the following configuration
 
@@ -125,7 +125,7 @@ Download the public certificate from your ZITADEL instance by requesting `$YOUR_
  wget $YOUR_DOMAIN/saml/v2/certificate -O idp.crt
 ```
 
-Always replace `$YOUR_DOMAIN` with your instance domain.
+Always replace `$YOUR_DOMAIN` with your custom domain.
 
 Use the following configuration
 

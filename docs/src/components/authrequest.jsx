@@ -196,7 +196,7 @@ export function SetAuthRequest() {
       </div>
       <div className="flex flex-col">
         <label className={`${labelClasses} text-yellow-500`}>
-          Instance Domain
+          Custom Domain
         </label>
         <input
           className={inputClasses(false)}
