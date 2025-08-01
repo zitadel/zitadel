@@ -250,8 +250,8 @@ module.exports = {
               items: [
                 {
                   type: "link",
-                  href: "/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta",
-                  label: "Login V2 [Beta]",
+                  href: "/docs/guides/integrate/login/hosted-login#hosted-login-version-2",
+                  label: "Login V2",
                 },
               ],
             },
