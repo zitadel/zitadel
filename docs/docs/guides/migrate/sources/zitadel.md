@@ -80,7 +80,7 @@ curl  --request POST \
 
 | Field            | Type            | Description                                                                                                                                                        |
 | ---------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| org_ids          | list of strings | provide a list of organizationIDs to select which organizations should be exported (eg, `[ "70669144072186707", "70671105999825752" ]`); leave empty to export all |
+| org_ids          | list of strings | provide a list of Organization IDs to select which organizations should be exported (eg, `[ "70669144072186707", "70671105999825752" ]`); leave empty to export all |
 | excluded_org_ids | list of strings | to exclude several organization, if for example no organizations are selected                                                                                      |
 | with_passwords   | bool            | to include the hashed_passwords of the users in the export                                                                                                         |
 | with_otp         | bool            | to include the OTP-code of the users in the export                                                                                                                 |
@@ -143,7 +143,7 @@ curl  --request POST \
 
 | Field            | Type                    | Description                                                                                                                                                        |
 | ---------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| org_ids          | list of strings         | provide a list of organizationIDs to select which organizations should be exported (eg, `[ "70669144072186707", "70671105999825752" ]`); leave empty to export all |
+| org_ids          | list of strings         | provide a list of Organization IDs to select which organizations should be exported (eg, `[ "70669144072186707", "70671105999825752" ]`); leave empty to export all |
 | excluded_org_ids | list of strings         | to exclude several organization, if for example no organizations are selected                                                                                      |
 | with_passwords   | bool                    | to include the hashed_passwords of the users in the export                                                                                                         |
 | with_otp         | bool                    | to include the OTP-code of the users in the export                                                                                                                 |
