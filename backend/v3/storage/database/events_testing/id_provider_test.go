@@ -1471,24 +1471,24 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		// check values for gitlab
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			githubEnterprise, err := idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, nil)
+			gitlab, err := idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.gitlab.added
 			// idp
-			assert.Equal(t, addGithubEnterprise.Id, githubEnterprise.ID)
-			assert.Equal(t, name, githubEnterprise.Name)
+			assert.Equal(t, addGithubEnterprise.Id, gitlab.ID)
+			assert.Equal(t, name, gitlab.Name)
 
-			assert.Equal(t, domain.IDPTypeGitlab.String(), githubEnterprise.Type)
-			assert.Equal(t, "clientId", githubEnterprise.ClientID)
-			assert.NotNil(t, githubEnterprise.ClientSecret)
-			assert.Equal(t, []string{"scope"}, githubEnterprise.Scopes)
-			assert.Equal(t, false, githubEnterprise.AllowLinking)
-			assert.Equal(t, false, githubEnterprise.AllowCreation)
-			assert.Equal(t, false, githubEnterprise.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), githubEnterprise.AllowAutoLinking)
-			assert.WithinRange(t, githubEnterprise.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, githubEnterprise.UpdatedAt, beforeCreate, afterCreate)
+			assert.Equal(t, domain.IDPTypeGitlab.String(), gitlab.Type)
+			assert.Equal(t, "clientId", gitlab.ClientID)
+			assert.NotNil(t, gitlab.ClientSecret)
+			assert.Equal(t, []string{"scope"}, gitlab.Scopes)
+			assert.Equal(t, false, gitlab.AllowLinking)
+			assert.Equal(t, false, gitlab.AllowCreation)
+			assert.Equal(t, false, gitlab.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), gitlab.AllowAutoLinking)
+			assert.WithinRange(t, gitlab.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, gitlab.UpdatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)
 	})
 
@@ -1561,6 +1561,249 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, true, updateGithlab.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateGithlab.AllowAutoLinking)
 			assert.WithinRange(t, updateGithlab.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp gitlab self hosted added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add gitlab self hosted
+		beforeCreate := time.Now()
+		addGitlabSelfHosted, err := AdminClient.AddGitLabSelfHostedProvider(CTX, &admin.AddGitLabSelfHostedProviderRequest{
+			Name:         name,
+			Issuer:       "issuer",
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Scopes:       []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		// check values for gitlab self hosted
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			gitlabSelfHosted, err := idpRepo.GetGitlabSelfHosting(CTX, idpRepo.IDCondition(addGitlabSelfHosted.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.gitlab_self_hosted.added
+			// idp
+			assert.Equal(t, addGitlabSelfHosted.Id, gitlabSelfHosted.ID)
+			assert.Equal(t, name, gitlabSelfHosted.Name)
+
+			assert.Equal(t, domain.IDPTypeGitlabSelfHosted.String(), gitlabSelfHosted.Type)
+			assert.Equal(t, "clientId", gitlabSelfHosted.ClientID)
+			assert.Equal(t, "issuer", gitlabSelfHosted.Issuer)
+			assert.NotNil(t, gitlabSelfHosted.ClientSecret)
+			assert.Equal(t, []string{"scope"}, gitlabSelfHosted.Scopes)
+			assert.Equal(t, false, gitlabSelfHosted.AllowLinking)
+			assert.Equal(t, false, gitlabSelfHosted.AllowCreation)
+			assert.Equal(t, false, gitlabSelfHosted.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), gitlabSelfHosted.AllowAutoLinking)
+			assert.WithinRange(t, gitlabSelfHosted.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, gitlabSelfHosted.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp gitlab self hosted changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add gitlab self hosted
+		addGitlabSelfHosted, err := AdminClient.AddGitLabSelfHostedProvider(CTX, &admin.AddGitLabSelfHostedProviderRequest{
+			Name:         name,
+			Issuer:       "issuer",
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Scopes:       []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		var githlabSelfHosted *domain.IDPGitlabSelfHosting
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			githlabSelfHosted, err = idpRepo.GetGitlabSelfHosting(CTX, idpRepo.IDCondition(addGitlabSelfHosted.Id), instanceID, nil)
+			require.NoError(t, err)
+			assert.Equal(t, addGitlabSelfHosted.Id, githlabSelfHosted.ID)
+		}, retryDuration, tick)
+
+		name = "new_" + name
+		// change gitlab self hosted
+		beforeCreate := time.Now()
+		_, err = AdminClient.UpdateGitLabSelfHostedProvider(CTX, &admin.UpdateGitLabSelfHostedProviderRequest{
+			Id:           addGitlabSelfHosted.Id,
+			Name:         name,
+			ClientId:     "new_clientId",
+			Issuer:       "new_issuer",
+			ClientSecret: "new_clientSecret",
+			Scopes:       []string{"new_scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		// check values for gitlab self hosted
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			updateGithlabSelfHosted, err := idpRepo.GetGitlabSelfHosting(CTX, idpRepo.IDCondition(addGitlabSelfHosted.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.gitlab_self_hosted.changed
+			// idp
+			assert.Equal(t, addGitlabSelfHosted.Id, updateGithlabSelfHosted.ID)
+			assert.Equal(t, name, updateGithlabSelfHosted.Name)
+
+			assert.Equal(t, "new_clientId", updateGithlabSelfHosted.ClientID)
+			assert.Equal(t, "new_issuer", updateGithlabSelfHosted.Issuer)
+			assert.NotEqual(t, githlabSelfHosted.ClientSecret, updateGithlabSelfHosted.ClientSecret)
+			assert.Equal(t, domain.IDPTypeGitlabSelfHosted.String(), updateGithlabSelfHosted.Type)
+			assert.Equal(t, []string{"new_scope"}, updateGithlabSelfHosted.Scopes)
+			assert.Equal(t, true, updateGithlabSelfHosted.AllowLinking)
+			assert.Equal(t, true, updateGithlabSelfHosted.AllowCreation)
+			assert.Equal(t, true, updateGithlabSelfHosted.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateGithlabSelfHosted.AllowAutoLinking)
+			assert.WithinRange(t, updateGithlabSelfHosted.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp google added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add google
+		beforeCreate := time.Now()
+		addGoogle, err := AdminClient.AddGoogleProvider(CTX, &admin.AddGoogleProviderRequest{
+			Name:         name,
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Scopes:       []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		// check values for google
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			google, err := idpRepo.GetGoogle(CTX, idpRepo.IDCondition(addGoogle.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.google.added
+			// idp
+			assert.Equal(t, addGoogle.Id, google.ID)
+			assert.Equal(t, name, google.Name)
+
+			assert.Equal(t, domain.IDPTypeGoogle.String(), google.Type)
+			assert.Equal(t, "clientId", google.ClientID)
+			assert.NotNil(t, google.ClientSecret)
+			assert.Equal(t, []string{"scope"}, google.Scopes)
+			assert.Equal(t, false, google.AllowLinking)
+			assert.Equal(t, false, google.AllowCreation)
+			assert.Equal(t, false, google.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), google.AllowAutoLinking)
+			assert.WithinRange(t, google.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, google.UpdatedAt, beforeCreate, afterCreate)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance idp google changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add google
+		addGoogle, err := AdminClient.AddGoogleProvider(CTX, &admin.AddGoogleProviderRequest{
+			Name:         name,
+			ClientId:     "clientId",
+			ClientSecret: "clientSecret",
+			Scopes:       []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		var google *domain.IDPGoogle
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			google, err = idpRepo.GetGoogle(CTX, idpRepo.IDCondition(addGoogle.Id), instanceID, nil)
+			require.NoError(t, err)
+			assert.Equal(t, addGoogle.Id, google.ID)
+		}, retryDuration, tick)
+
+		name = "new_" + name
+		// change google
+		beforeCreate := time.Now()
+		_, err = AdminClient.UpdateGoogleProvider(CTX, &admin.UpdateGoogleProviderRequest{
+			Id:           addGoogle.Id,
+			Name:         name,
+			ClientId:     "new_clientId",
+			ClientSecret: "new_clientSecret",
+			Scopes:       []string{"new_scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		// check values for google
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			updateGoogle, err := idpRepo.GetGoogle(CTX, idpRepo.IDCondition(addGoogle.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.google.changed
+			// idp
+			assert.Equal(t, addGoogle.Id, updateGoogle.ID)
+			assert.Equal(t, name, updateGoogle.Name)
+
+			assert.Equal(t, "new_clientId", updateGoogle.ClientID)
+			assert.NotEqual(t, google.ClientSecret, updateGoogle.ClientSecret)
+			assert.Equal(t, domain.IDPTypeGoogle.String(), updateGoogle.Type)
+			assert.Equal(t, []string{"new_scope"}, updateGoogle.Scopes)
+			assert.Equal(t, true, updateGoogle.AllowLinking)
+			assert.Equal(t, true, updateGoogle.AllowCreation)
+			assert.Equal(t, true, updateGoogle.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateGoogle.AllowAutoLinking)
+			assert.WithinRange(t, updateGoogle.UpdatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)
 	})
 }

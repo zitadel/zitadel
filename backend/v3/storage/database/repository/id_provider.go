@@ -295,6 +295,28 @@ func (i *idProvider) GetGitlab(ctx context.Context, id domain.IDPIdentifierCondi
 	return idpGitlab, nil
 }
 
+func (i *idProvider) GetGitlabSelfHosting(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGitlabSelfHosting, error) {
+	idpGitlabSelfHosting := &domain.IDPGitlabSelfHosting{}
+	var err error
+
+	idpGitlabSelfHosting.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpGitlabSelfHosting.Type != domain.IDPTypeGitlabSelfHosted.String() {
+		// TODO
+		return nil, errors.New("WRONG TYPE")
+	}
+
+	err = json.Unmarshal([]byte(*idpGitlabSelfHosting.Payload), idpGitlabSelfHosting)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpGitlabSelfHosting, nil
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------

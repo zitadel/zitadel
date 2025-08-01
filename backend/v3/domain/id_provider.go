@@ -189,6 +189,18 @@ type IDPGitlab struct {
 	Gitlab
 }
 
+type GitlabSelfHosting struct {
+	Issuer       string              `json:"issuer"`
+	ClientID     string              `json:"clientId,omitempty"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	Scopes       []string            `json:"scopes,omitempty"`
+}
+
+type IDPGitlabSelfHosting struct {
+	*IdentityProvider
+	GitlabSelfHosting
+}
+
 // IDPIdentifierCondition is used to help specify a single identity_provider,
 // it will either be used as the  identity_provider ID or identity_provider name,
 // as identity_provider can be identified either using (instanceID + OrgID + ID) OR (instanceID + OrgID + name)
@@ -267,4 +279,5 @@ type IDProviderRepository interface {
 	GetGithub(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithub, error)
 	GetGithubEnterprise(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithubEnterprise, error)
 	GetGitlab(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlab, error)
+	GetGitlabSelfHosting(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlabSelfHosting, error)
 }

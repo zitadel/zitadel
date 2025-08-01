@@ -12,6 +12,7 @@ CREATE TYPE zitadel.idp_type AS ENUM (
     'github',
     'githubenterprise',
     'gitlab',
+    'gitlabselfhosted',
     'azure',
     'google',
     'microsoft',
