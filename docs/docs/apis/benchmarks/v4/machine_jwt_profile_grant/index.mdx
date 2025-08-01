@@ -1,0 +1,46 @@
+---
+title: machine jwt profile grant benchmark of zitadel v4
+sidebar_label: machine jwt profile grant
+---
+
+Benchmark results of v4 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value |
+|:--------------------------------------|:------|
+| Baseline                              | none  |
+| Purpose                               | Test current performance |
+| Test start                            | 14:26 UTC |
+| Test duration                         | 30min |
+| Executed test                         | machine\_jwt\_profile\_grant |
+| k6 version                            | v1.0.0-rc1 |
+| VUs                                   | 600 |
+| Client location                       | US1 |
+| ZITADEL location                      | US1 |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7 |
+| ZITADEL Version                       | v4.0.0-rc2 |
+| ZITADEL feature flags                 | webKey: true, improvedPerformance: \[\"IMPROVED\_PERFORMANCE\_ORG\_BY\_ID\", \"IMPROVED\_PERFORMANCE\_PROJECT\", \"IMPROVED\_PERFORMANCE\_USER\_GRANT\", \"IMPROVED\_PERFORMANCE\_ORG\_DOMAIN\_VERIFIED\", \"IMPROVED\_PERFORMANCE\_PROJECT\_GRANT\"\] |
+| Database                              | type: psql<br />version: v17.4 |
+| Database location                     | US1 |
+| Database specification                | vCPU: 8<br/> memory: 32Gib |
+| ZITADEL metrics during test           |  |
+| Observed errors                       | Zitadel containers did not scale but database would have headroom |
+| Top 3 most expensive database queries | 1: Query events by instance id, aggregate types, event types, position<br/>2: write events<br/>3: get user by id<br/> |
+| k6 Iterations per second              |  |
+| k6 output                             | [output](#k6-output) |
+| flowchart outcome                     |  |
+
+## Endpoint latencies
+
+import OutputSource from "./output.json";
+
+import { BenchmarkChart } from '/src/components/benchmark_chart';
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output {#k6-output}
+
+```bash
+```
+
