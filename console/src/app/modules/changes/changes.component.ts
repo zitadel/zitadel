@@ -1,5 +1,5 @@
 import { KeyValue } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, Input, OnDestroy, OnInit } from '@angular/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, scan, take, takeUntil, tap } from 'rxjs/operators';
@@ -13,6 +13,7 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export enum ChangeType {
   MYUSER = 'myuser',
@@ -45,17 +46,18 @@ type ListChanges =
   | ListOrgChangesResponse.AsObject
   | ListAppChangesResponse.AsObject;
 
+// todo: update this component to react to input changes
 @Component({
   selector: 'cnsl-changes',
   templateUrl: './changes.component.html',
   styleUrls: ['./changes.component.scss'],
 })
-export class ChangesComponent implements OnInit, OnDestroy {
-  @Input() public changeType: ChangeType = ChangeType.USER;
+export class ChangesComponent implements OnInit {
+  @Input({ required: true }) public changeType!: ChangeType;
   @Input() public id: string = '';
   @Input() public secId: string = '';
   @Input() public sortDirectionAsc: boolean = true;
-  @Input() public refresh!: Observable<void>;
+  @Input() public refresh?: Observable<void>;
   public bottom: boolean = false;
 
   private _done: BehaviorSubject<any> = new BehaviorSubject(false);
@@ -65,28 +67,24 @@ export class ChangesComponent implements OnInit, OnDestroy {
   loading: Observable<boolean> = this._loading.asObservable();
   public data: Observable<MappedChange[]> = this._data.asObservable().pipe(
     scan((acc, val) => {
-      return false ? val.concat(acc) : acc.concat(val);
+      return acc.concat(val);
     }),
   );
   public changes!: ListChanges;
-  private destroyed$: Subject<void> = new Subject();
   constructor(
-    private mgmtUserService: ManagementService,
-    private authUserService: GrpcAuthService,
+    private readonly mgmtUserService: ManagementService,
+    private readonly authUserService: GrpcAuthService,
+    private readonly destroyRef: DestroyRef,
   ) {}
 
   ngOnInit(): void {
     this.init();
     if (this.refresh) {
-      this.refresh.pipe(takeUntil(this.destroyed$), debounceTime(2000)).subscribe(() => {
+      this.refresh.pipe(takeUntilDestroyed(this.destroyRef), debounceTime(2000)).subscribe(() => {
         this._data = new BehaviorSubject([]);
         this.init();
       });
     }
-  }
-
-  ngOnDestroy(): void {
-    this.destroyed$.next();
   }
 
   public init(): void {

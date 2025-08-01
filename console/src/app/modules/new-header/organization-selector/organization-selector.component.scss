@@ -1,0 +1,83 @@
+:host {
+  max-height: 100%;
+  height: 100%;
+}
+
+@mixin organization-selector-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .dropdown-label {
+    color: if($is-dark-theme, #ffffff60, #00000060);
+    font-size: 14px;
+  }
+
+  .back-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .focus-trapper {
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+    max-height: calc(100% - 10px);
+    // needed otherwise an unexpected scrollbar appears
+    height: calc(100% - 10px);
+    gap: 10px;
+  }
+
+  .org-header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .org-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    gap: 5px;
+  }
+
+  .dropdown-button {
+    height: 32px;
+    min-height: 32px;
+  }
+
+  .dropdown-button > span:nth-child(2) {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+  }
+
+  .form {
+    position: relative;
+  }
+
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+    // default input padding
+    left: 10px;
+    color: if($is-dark-theme, #ffffff60, #00000060);
+  }
+
+  .search-input {
+    margin-bottom: 0;
+    height: 32px;
+    // size of icon plus half of default padding of input
+    padding-left: calc(1rem + 15px);
+  }
+
+  .search-input::placeholder {
+    font-style: normal;
+  }
+}

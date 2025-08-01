@@ -8,20 +8,6 @@
   stateTooltip="{{ 'INSTANCE.STATE.' + instance?.state | translate }}"
 >
   <div topContributors class="instance-action-wrapper">
-    <a
-      mat-raised-button
-      color="primary"
-      *ngIf="customerPortalLink$ | async as customerPortalLink"
-      class="portal-link external-link"
-      [href]="customerPortalLink"
-      target="_blank"
-      rel="noreferrer"
-    >
-      <div class="cnsl-action-button">
-        <span class="portal-span">{{ 'MENU.CUSTOMERPORTAL' | translate }}</span>
-        <i class="las la-external-link-alt"></i>
-      </div>
-    </a>
     <cnsl-contributors
       [totalResult]="totalMemberResult"
       [loading]="loading$ | async"

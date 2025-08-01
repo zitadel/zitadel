@@ -43,7 +43,7 @@ export class StorageConfig {
 }
 
 export enum StorageKey {
-  organization = 'organization',
+  organizationId = 'organizationId',
 }
 
 export enum StorageLocation {

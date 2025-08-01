@@ -37,7 +37,6 @@ import {
   combineLatestWith,
   defer,
   EMPTY,
-  identity,
   mergeWith,
   Observable,
   ObservedValueOf,
