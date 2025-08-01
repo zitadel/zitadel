@@ -47,3 +47,40 @@ func OrgMetadataQueryToQuery(metadataQuery *meta_pb.MetadataQuery) (query.Search
 		return nil, zerrors.ThrowInvalidArgument(nil, "METAD-fdg23", "List.Query.Invalid")
 	}
 }
+
+func ProjectMetadataListToPb(dataList []*query.ProjectMetadata) []*meta_pb.Metadata {
+	mds := make([]*meta_pb.Metadata, len(dataList))
+	for i, data := range dataList {
+		mds[i] = ProjectMetadataToPb(data)
+	}
+	return mds
+}
+
+func ProjectMetadataToPb(data *query.ProjectMetadata) *meta_pb.Metadata {
+	return &meta_pb.Metadata{
+		Key:          data.Key,
+		Value:        data.Value,
+		CreationDate: timestamppb.New(data.CreationDate),
+		ChangeDate:   timestamppb.New(data.ChangeDate),
+	}
+}
+
+func ProjectMetadataQueriesToQuery(queries []*meta_pb.MetadataQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = ProjectMetadataQueryToQuery(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func ProjectMetadataQueryToQuery(metadataQuery *meta_pb.MetadataQuery) (query.SearchQuery, error) {
+	switch q := metadataQuery.Query.(type) {
+	case *meta_pb.MetadataQuery_KeyQuery:
+		return query.NewProjectMetadataKeySearchQuery(q.KeyQuery.Key, v2beta_object.TextMethodToQuery(q.KeyQuery.Method))
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "METAD-qbt9fN", "List.Query.Invalid")
+	}
+}
