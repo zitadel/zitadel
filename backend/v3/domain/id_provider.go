@@ -74,7 +74,6 @@ type IdentityProvider struct {
 }
 
 type OIDC struct {
-	IDPConfigID           string             `json:"idpConfigId"`
 	ClientID              string             `json:"clientId,omitempty"`
 	ClientSecret          crypto.CryptoValue `json:"clientSecret,omitempty"`
 	Issuer                string             `json:"issuer,omitempty"`

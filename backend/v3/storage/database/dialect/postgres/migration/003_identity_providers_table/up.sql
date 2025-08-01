@@ -4,6 +4,7 @@ CREATE TYPE zitadel.idp_state AS ENUM (
 );
 
 CREATE TYPE zitadel.idp_type AS ENUM (
+    'unspecified',
     'oidc',
     'jwt',
     'oauth',

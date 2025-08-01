@@ -97,13 +97,18 @@ func (p *idpRelationalProjection) reduceIDPRelationalAdded(event eventstore.Even
 	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(IDPIDCol, e.ConfigID),
-			handler.NewCol(IDPRelationalOrgIdCol, nil),
 			handler.NewCol(IDPInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgIdCol, nil),
+			handler.NewCol(IDPIDCol, e.ConfigID),
 			handler.NewCol(IDPStateCol, domain.IDPStateActive.String()),
 			handler.NewCol(IDPNameCol, e.Name),
-			handler.NewCol(IDPStylingTypeCol, e.StylingType),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeUnspecified.String()),
 			handler.NewCol(IDPRelationalAutoRegisterCol, e.AutoRegister),
+			handler.NewCol(IDPRelationalAllowCreationCol, true),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, false),
+			handler.NewCol(IDPRelationalAllowLinkingCol, true),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOptionUnspecified.String()),
+			handler.NewCol(IDPStylingTypeCol, e.StylingType),
 			handler.NewCol(CreatedAt, e.CreationDate()),
 		},
 	), nil
