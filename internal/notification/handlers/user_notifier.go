@@ -7,6 +7,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -417,12 +418,14 @@ func (u *userNotifier) reduceSessionOTPSMSChallenged(event eventstore.Event) (*h
 		if alreadyHandled {
 			return nil
 		}
-		s, err := u.queries.SessionByID(ctx, true, e.Aggregate().ID, "", nil)
+
+		ctx, err = u.queries.Origin(ctx, e)
 		if err != nil {
 			return err
 		}
 
-		ctx, err = u.queries.Origin(ctx, e)
+		sessionWriteModel := command.NewSessionWriteModel(e.Aggregate().ID, e.Aggregate().InstanceID)
+		err = u.queries.es.FilterToQueryReducer(ctx, sessionWriteModel)
 		if err != nil {
 			return err
 		}
@@ -432,8 +435,8 @@ func (u *userNotifier) reduceSessionOTPSMSChallenged(event eventstore.Event) (*h
 		return u.queue.Insert(ctx,
 			&notification.Request{
 				Aggregate:         e.Aggregate(),
-				UserID:            s.UserFactor.UserID,
-				UserResourceOwner: s.UserFactor.ResourceOwner,
+				UserID:            sessionWriteModel.UserID,
+				UserResourceOwner: sessionWriteModel.UserResourceOwner,
 				TriggeredAtOrigin: http_util.DomainContext(ctx).Origin(),
 				EventType:         e.EventType,
 				NotificationType:  domain.NotificationTypeSms,
