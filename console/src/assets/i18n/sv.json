@@ -2396,6 +2396,34 @@
     "USEPKCE": "Använd PKCE",
     "USEPKCE_DESC": "Avgör om parametrarna code_challenge och code_challenge_method ingår i autentiseringsbegäran"
   },
+  "CAPTCHA": {
+    "TITLE": "Captcha-verifiering",
+    "DESCRIPTION": "Lägg till Captcha i registrerings- och inloggningsformulär.",
+    "REGISTER": {
+      "TITLE": "Aktivera för registrering",
+      "DESCRIPTION": "Aktivera Captcha för registreringsformuläret."
+    },
+    "LOGIN": {
+      "TITLE": "Aktivera för inloggning",
+      "DESCRIPTION": "Aktivera Captcha för inloggningsformuläret."
+    },
+    "METHOD": {
+      "TITLE": "Captcha-metod",
+      "DESCRIPTION": "Välj vilken Captcha-metod som ska användas.",
+      "CONFIG": {
+        "SITE_KEY": {
+          "LABEL": "reCaptcha Site Key"
+        },
+        "SECRET_KEY": {
+          "LABEL": "reCaptcha Secret Key"
+        }
+      },
+      "LIST": {
+        "1": "Inaktiverad",
+        "2": "Recaptcha"
+      }
+    }
+  },
   "MFA": {
     "LIST": {
       "MULTIFACTORTITLE": "lösenordsfri",

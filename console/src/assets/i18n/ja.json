@@ -2392,6 +2392,34 @@
     "USEPKCE": "PKCEを使用する",
     "USEPKCE_DESC": "code_challenge パラメータと code_challenge_method パラメータが認証リクエストに含まれるかどうかを決定します。"
   },
+  "CAPTCHA": {
+    "TITLE": "Captcha検証",
+    "DESCRIPTION": "登録フォームとログインフォームにCaptchaを追加します。",
+    "REGISTER": {
+      "TITLE": "登録に有効化",
+      "DESCRIPTION": "登録フォームでCaptchaを有効にする。"
+    },
+    "LOGIN": {
+      "TITLE": "ログインに有効化",
+      "DESCRIPTION": "ログインフォームでCaptchaを有効にする。"
+    },
+    "METHOD": {
+      "TITLE": "Captcha方式",
+      "DESCRIPTION": "使用するCaptcha方式を選択してください。",
+      "CONFIG": {
+        "SITE_KEY": {
+          "LABEL": "reCaptcha サイトキー"
+        },
+        "SECRET_KEY": {
+          "LABEL": "reCaptcha シークレットキー"
+        }
+      },
+      "LIST": {
+        "1": "無効",
+        "2": "Recaptcha"
+      }
+    }
+  },
   "MFA": {
     "LIST": {
       "MULTIFACTORTITLE": "パスワードレス",

@@ -2172,6 +2172,34 @@
     "USEPKCE": "Gunakan PKCE",
     "USEPKCE_DESC": "Menentukan apakah parameter code_challenge dan code_challenge_method disertakan dalam permintaan autentikasi"
   },
+  "CAPTCHA": {
+    "TITLE": "Validasi Captcha",
+    "DESCRIPTION": "Tambahkan Captcha ke formulir pendaftaran dan login.",
+    "REGISTER": {
+      "TITLE": "Aktifkan untuk pendaftaran",
+      "DESCRIPTION": "Aktifkan Captcha untuk formulir pendaftaran."
+    },
+    "LOGIN": {
+      "TITLE": "Aktifkan untuk login",
+      "DESCRIPTION": "Aktifkan Captcha untuk formulir login."
+    },
+    "METHOD": {
+      "TITLE": "Metode Captcha",
+      "DESCRIPTION": "Pilih metode Captcha yang akan digunakan.",
+      "CONFIG": {
+        "SITE_KEY": {
+          "LABEL": "Kunci Situs reCaptcha"
+        },
+        "SECRET_KEY": {
+          "LABEL": "Kunci Rahasia reCaptcha"
+        }
+      },
+      "LIST": {
+        "1": "Dinonaktifkan",
+        "2": "Recaptcha"
+      }
+    }
+  },
   "MFA": {
     "LIST": {
       "MULTIFACTORTITLE": "Tanpa kata sandi",
