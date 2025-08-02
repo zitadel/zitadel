@@ -9,6 +9,7 @@ services:
     environment:
       CORE_MOCK_STUBS_URL: http://localhost:22220/v1/stubs
       LOGIN_BASE_URL: http://localhost:3001/ui/v2/login
+      CYPRESS_CACHE_FOLDER: /workspaces/.artifacts/cypress
     network_mode: service:mock-zitadel
     depends_on:
       login-integration:
