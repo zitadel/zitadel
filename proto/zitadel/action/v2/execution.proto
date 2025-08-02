@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package zitadel.action.v2;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v2;action";
+
+message Execution {
+  Condition condition = 1;
+  // The timestamp of the execution creation.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // The timestamp of the last change to the execution.
+  google.protobuf.Timestamp change_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+  // Ordered list of targets called during the execution.
+  repeated string targets = 4;
+}
+
+message Condition {
+  // Condition-types under which conditions the execution should happen, only one possible.
+  oneof condition_type {
+    option (validate.required) = true;
+
+    // Condition-type to execute if a request on the defined API point happens.
+    RequestExecution request = 1;
+    // Condition-type to execute on response if a request on the defined API point happens.
+    ResponseExecution response = 2;
+    // Condition-type to execute if function is used, replaces actions v1.
+    FunctionExecution function = 3;
+    // Condition-type to execute if an event is created in the system.
+    EventExecution event = 4;
+  }
+}
+
+message RequestExecution {
+  // Condition for the request execution. Only one is possible.
+  oneof condition{
+    option (validate.required) = true;
+    // GRPC-method as condition.
+    string method = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"/zitadel.session.v2.SessionService/ListSessions\"";
+      }
+    ];
+    // GRPC-service as condition.
+    string service = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"zitadel.session.v2.SessionService\"";
+      }
+    ];
+    // All calls to any available services and methods as condition.
+    bool all = 3 [(validate.rules).bool = {const: true}];
+  }
+}
+
+message ResponseExecution {
+  // Condition for the response execution. Only one is possible.
+  oneof condition{
+    option (validate.required) = true;
+    // GRPC-method as condition.
+    string method = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"/zitadel.session.v2.SessionService/ListSessions\"";
+      }
+    ];
+    // GRPC-service as condition.
+    string service = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"zitadel.session.v2.SessionService\"";
+      }
+    ];
+    // All calls to any available services and methods as condition.
+    bool all = 3 [(validate.rules).bool = {const: true}];
+  }
+}
+
+// Executed on the specified function
+message FunctionExecution {
+  string name = 1 [(validate.rules).string = {min_len: 1, max_len: 1000}];
+}
+
+message EventExecution {
+  // Condition for the event execution. Only one is possible.
+  oneof condition{
+    option (validate.required) = true;
+    // Event name as condition.
+    string event = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"user.human.added\"";
+      }
+    ];
+    // Event group as condition, all events under this group.
+    string group = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"user.human\"";
+      }
+    ];
+    // all events as condition.
+    bool all = 3 [(validate.rules).bool = {const: true}];
+  }
+}
