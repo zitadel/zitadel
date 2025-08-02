@@ -59,6 +59,15 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - name: Lint and Unit Test All JavaScript Code
         run: npm run devcontainer:lint-unit
+      - name: Fix Failures
+        if: failure()
+        run: |
+          echo "Reproduce this check locally:"
+          echo "npm run devcontainer:lint-unit"
+          echo "If you have pnpm installed, most linting errors can be fixed automatically:"
+          echo "pnpm turbo lint:fix"
+          echo "In other cases, you can open the dev container called \"Turbo Lint and Unit Tests\"."
+          echo "You will have the same environment as the pipeline check as well as some guidance on how to fix the errors."
 
   core:
     name: core
