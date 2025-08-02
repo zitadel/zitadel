@@ -4,7 +4,6 @@ services:
       file: ../base/docker-compose.yaml
       service: devcontainer
     container_name: login-integration-dev
-    image: "login-integration-dev:local"
     env_file: ../../apps/login/.env.test
     environment:
       CORE_MOCK_STUBS_URL: http://localhost:22220/v1/stubs
