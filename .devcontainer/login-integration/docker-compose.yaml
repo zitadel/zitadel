@@ -1,6 +1,10 @@
 services:
-  devcontainer:
-    container_name: devcontainer-login-integration
+  login-integration-dev:
+    extends:
+      file: ../base/docker-compose.yaml
+      service: devcontainer
+    container_name: login-integration-dev
+    image: "login-integration-dev:local"
     env_file: ../../apps/login/.env.test
     environment:
       CORE_MOCK_STUBS_URL: http://localhost:22220/v1/stubs
@@ -13,12 +17,10 @@ services:
   login-integration:
     container_name: login-integration
     image: "${LOGIN_TAG:-zitadel-login:local}"
+    build:
+      context: ../..
+      dockerfile: build/login/Dockerfile
     env_file: ../../apps/login/.env.test
-    environment:
-      NODE_ENV: test
-      PORT: 3001
-      NEXT_PUBLIC_BASE_PATH: /ui/v2/login
-      ZITADEL_API_URL: http://localhost:22222
     network_mode: service:mock-zitadel
 
   mock-zitadel:
@@ -27,3 +29,7 @@ services:
       context: ../../apps/login/integration/core-mock
       additional_contexts:
         - zitadel-protos=../../proto
+    ports:
+      - 22220:22220
+      - 22222:22222
+      - 3001:3001

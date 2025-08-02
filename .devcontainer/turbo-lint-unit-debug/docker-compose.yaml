@@ -1,6 +1,0 @@
-services:
-  turbo-lint-unit-debug:
-    container_name: turbo-lint-unit-debug
-    extends:
-      file: ../base/docker-compose.yaml
-      service: devcontainer

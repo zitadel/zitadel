@@ -7,10 +7,6 @@ export default defineConfig({
     baseUrl: process.env.LOGIN_BASE_URL || "http://localhost:3001/ui/v2/login",
     specPattern: "integration/integration/**/*.cy.{js,jsx,ts,tsx}",
     supportFile: "integration/support/e2e.{js,jsx,ts,tsx}",
-    responseTimeout: 5 * 60_000, // 5 minutes
-    pageLoadTimeout: 5 * 60_000, // 5 minutes
-    taskTimeout: 5 * 60_000, // 5 minutes
-    defaultCommandTimeout: 60_000, // 1 minute
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },

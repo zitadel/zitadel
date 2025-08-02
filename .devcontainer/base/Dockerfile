@@ -14,4 +14,6 @@ RUN apt-get update && \
     apt-get clean && \
     corepack enable && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack prepare pnpm@10.13.1 --activate
 
+COPY --chown=node:node commands /commands
+
 USER node

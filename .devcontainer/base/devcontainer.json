@@ -1,6 +1,6 @@
 {
 	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
-	"name": "Base Container. Install and run Components yourself",
+	"name": "Base: Build and Run the Components you need",
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "devcontainer",
 	"runServices": [
@@ -8,6 +8,9 @@
 		"db"
 	],
 	"workspaceFolder": "/workspaces",
+	"remoteEnv": {
+		"DISPLAY": ""
+	},
 	"forwardPorts": [
 		3000,
 		3001,

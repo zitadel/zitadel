@@ -166,7 +166,7 @@ describe("login", () => {
 
     it("should redirect a user with passwordless authentication to /passkey", () => {
       cy.visit("/loginname?loginName=john%40example.com&submit=true");
-      cy.url({ timeout: 5 * 60_000 }).should("include", Cypress.config().baseUrl + "/passkey");
+      cy.url().should("include", Cypress.config().baseUrl + "/passkey");
     });
   });
 });
