@@ -22,7 +22,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Pull Login Build Image
-        run: docker pull ${{ inputs.login_build_image }}
+        run: docker compose --file .devcontainer/login-integration/docker-compose.yaml pull
+        env:
+          LOGIN_TAG: ${{ inputs.login_build_image }}
       - name: Run Integration Tests against the Login and a Mocked Zitadel API
         run: npm run devcontainer:integration:login
         env:
