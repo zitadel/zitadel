@@ -1,11 +1,14 @@
+
 # .git
 .codecov
 .github
 .gitignore
 .dockerignore
 **/Dockerfile
-/k8s/
-/node_modules/
+**/node_modules
+**/.pnpm-store
+**/.turbo
+**/.next
 /console/src/app/proto/generated/
 /console/.angular
 /console/tmp/
@@ -24,5 +27,5 @@ console/.angular
 console/node_modules
 console/src/app/proto/generated/
 console/tmp/
-.vscode
 build/*.Dockerfile
+

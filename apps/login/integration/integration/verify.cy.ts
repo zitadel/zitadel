@@ -24,22 +24,22 @@ describe("verify email", () => {
         user: {
           userId: "221394658884845598",
           state: 1,
-          username: "john@zitadel.com",
-          loginNames: ["john@zitadel.com"],
-          preferredLoginName: "john@zitadel.com",
+          username: "john@example.com",
+          loginNames: ["john@example.com"],
+          preferredLoginName: "john@example.com",
           human: {
             userId: "221394658884845598",
             state: 1,
-            username: "john@zitadel.com",
-            loginNames: ["john@zitadel.com"],
-            preferredLoginName: "john@zitadel.com",
+            username: "john@example.com",
+            loginNames: ["john@example.com"],
+            preferredLoginName: "john@example.com",
             profile: {
               givenName: "John",
               familyName: "Doe",
-              avatarUrl: "https://zitadel.com/avatar.jpg",
+              avatarUrl: "https://example.com/avatar.jpg",
             },
             email: {
-              email: "john@zitadel.com",
+              email: "john@example.com",
               isVerified: false, // email is not verified yet
             },
           },
@@ -70,7 +70,7 @@ describe("verify email", () => {
           factors: {
             user: {
               id: "221394658884845598",
-              loginName: "john@zitadel.com",
+              loginName: "john@example.com",
             },
             password: undefined,
             webAuthN: undefined,
@@ -90,6 +90,6 @@ describe("verify email", () => {
     // TODO: Avoid uncaught exception in application
     cy.once("uncaught:exception", () => false);
     cy.visit("/verify?userId=221394658884845598&code=abc");
-    cy.contains("Could not verify email", { timeout: 10_000 });
+    cy.contains("Could not verify email");
   });
 });

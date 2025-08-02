@@ -27,6 +27,8 @@ declare namespace NodeJS {
     /**
      * Optional: custom request headers to be added to every request
      * Split by comma, key value pairs separated by colon
+     * For example: to call the Zitadel API at an internal address, you can set:
+     * `CUSTOM_REQUEST_HEADERS=Host:http://zitadel-internal:8080`
      */
     CUSTOM_REQUEST_HEADERS?: string;
   }

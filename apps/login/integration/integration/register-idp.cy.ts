@@ -15,7 +15,7 @@ describe("register idps", () => {
     cy.visit("/idp");
     cy.get('button[e2e="google"]').click();
     cy.origin(IDP_URL, { args: IDP_URL }, (url) => {
-      cy.location("href", { timeout: 10_000 }).should("eq", url);
+      cy.location("href").should("eq", url);
     });
   });
 });

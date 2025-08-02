@@ -6,8 +6,6 @@ target "login-standalone" {
 target "login-standalone-out" {
   inherits = ["login-standalone"]
   target   = "build-out"
-  output = [
-    "type=local,dest=.artifacts/login"
-  ]
+  output   = ["type=local,dest=.artifacts/login"]
 }
  
