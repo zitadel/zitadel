@@ -24,6 +24,7 @@ import (
 
 var (
 	creationDate = time.Date(2023, 10, 10, 14, 15, 0, 0, time.UTC)
+	expiration   = creationDate.Add(90 * time.Second)
 )
 
 func Test_sessionsToPb(t *testing.T) {
@@ -398,6 +399,12 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 						{Query: &session.SearchQuery_UserAgentQuery{
 							UserAgentQuery: &session.UserAgentQuery{},
 						}},
+						{Query: &session.SearchQuery_ExpirationDateQuery{
+							ExpirationDateQuery: &session.ExpirationDateQuery{
+								ExpirationDate: timestamppb.New(expiration),
+								Method:         objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_LESS_OR_EQUALS,
+							},
+						}},
 					},
 				},
 			},
@@ -414,6 +421,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 					mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampGreater),
 					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
 					mustNewTextQuery(t, query.SessionColumnUserAgentFingerprintID, "agent", query.TextEquals),
+					mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampLessOrEquals),
 				},
 			},
 		},
@@ -673,6 +681,33 @@ func Test_sessionQueryToQuery(t *testing.T) {
 					},
 				}},
 			want: mustNewTextQuery(t, query.SessionColumnUserAgentFingerprintID, "agent2", query.TextEquals),
+		},
+		{
+			name: "expiration date query",
+			args: args{
+				context.Background(),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_ExpirationDateQuery{
+						ExpirationDateQuery: &session.ExpirationDateQuery{
+							ExpirationDate: timestamppb.New(expiration),
+							Method:         objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_LESS,
+						},
+					},
+				}},
+			want: mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampLess),
+		},
+		{
+			name: "expiration date query with default method",
+			args: args{
+				context.Background(),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_ExpirationDateQuery{
+						ExpirationDateQuery: &session.ExpirationDateQuery{
+							ExpirationDate: timestamppb.New(expiration),
+						},
+					},
+				}},
+			want: mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampEquals),
 		},
 	}
 	for _, tt := range tests {
