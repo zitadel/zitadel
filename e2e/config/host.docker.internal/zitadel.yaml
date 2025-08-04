@@ -60,6 +60,9 @@ Projections:
 DefaultInstance:
   LoginPolicy:
     MfaInitSkipLifetime: "0"
+  Features:
+    LoginV2:
+      Required: false
 
 SystemAPIUsers:
 - cypress:

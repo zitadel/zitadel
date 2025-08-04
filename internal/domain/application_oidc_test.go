@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
@@ -25,7 +27,7 @@ func TestApplicationValid(t *testing.T) {
 					ObjectRoot:    models.ObjectRoot{AggregateID: "AggregateID"},
 					AppID:         "AppID",
 					AppName:       "AppName",
-					ClockSkew:     time.Minute * 1,
+					ClockSkew:     gu.Ptr(time.Minute * 1),
 					ResponseTypes: []OIDCResponseType{OIDCResponseTypeCode},
 					GrantTypes:    []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
 				},
@@ -39,7 +41,7 @@ func TestApplicationValid(t *testing.T) {
 					ObjectRoot:    models.ObjectRoot{AggregateID: "AggregateID"},
 					AppID:         "AppID",
 					AppName:       "AppName",
-					ClockSkew:     time.Minute * -1,
+					ClockSkew:     gu.Ptr(time.Minute * -1),
 					ResponseTypes: []OIDCResponseType{OIDCResponseTypeCode},
 					GrantTypes:    []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
 				},
@@ -190,9 +192,9 @@ func TestApplicationValid(t *testing.T) {
 
 func TestGetOIDCV1Compliance(t *testing.T) {
 	type args struct {
-		appType      OIDCApplicationType
+		appType      *OIDCApplicationType
 		grantTypes   []OIDCGrantType
-		authMethod   OIDCAuthMethodType
+		authMethod   *OIDCAuthMethodType
 		redirectUris []string
 	}
 	tests := []struct {
@@ -266,7 +268,7 @@ func Test_checkGrantTypesCombination(t *testing.T) {
 func Test_checkRedirectURIs(t *testing.T) {
 	type args struct {
 		grantTypes   []OIDCGrantType
-		appType      OIDCApplicationType
+		appType      *OIDCApplicationType
 		redirectUris []string
 	}
 	tests := []struct {
@@ -304,7 +306,7 @@ func Test_checkRedirectURIs(t *testing.T) {
 			args: args{
 				redirectUris: []string{"http://redirect.to/me"},
 				grantTypes:   []OIDCGrantType{OIDCGrantTypeImplicit},
-				appType:      OIDCApplicationTypeUserAgent,
+				appType:      gu.Ptr(OIDCApplicationTypeUserAgent),
 			},
 		},
 		{
@@ -316,7 +318,7 @@ func Test_checkRedirectURIs(t *testing.T) {
 			args: args{
 				redirectUris: []string{"http://redirect.to/me"},
 				grantTypes:   []OIDCGrantType{OIDCGrantTypeAuthorizationCode},
-				appType:      OIDCApplicationTypeUserAgent,
+				appType:      gu.Ptr(OIDCApplicationTypeUserAgent),
 			},
 		},
 	}
@@ -338,7 +340,7 @@ func Test_checkRedirectURIs(t *testing.T) {
 
 func Test_CheckRedirectUrisImplicitAndCode(t *testing.T) {
 	type args struct {
-		appType      OIDCApplicationType
+		appType      *OIDCApplicationType
 		redirectUris []string
 	}
 	tests := []struct {
@@ -356,17 +358,6 @@ func Test_CheckRedirectUrisImplicitAndCode(t *testing.T) {
 				redirectUris: []string{"https://redirect.to/me"},
 			},
 		},
-		// {
-		// 	name: "custom protocol, not native",
-		// 	want: &Compliance{
-		// 		NoneCompliant: true,
-		// 		Problems:      []string{"Application.OIDC.V1.Implicit.RedirectUris.CustomNotAllowed"},
-		// 	},
-		// 	args: args{
-		// 		redirectUris: []string{"protocol://redirect.to/me"},
-		// 		appType:      OIDCApplicationTypeWeb,
-		// 	},
-		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -386,7 +377,7 @@ func Test_CheckRedirectUrisImplicitAndCode(t *testing.T) {
 
 func TestCheckRedirectUrisImplicitAndCode(t *testing.T) {
 	type args struct {
-		appType      OIDCApplicationType
+		appType      *OIDCApplicationType
 		redirectUris []string
 	}
 	tests := []struct {
@@ -402,7 +393,7 @@ func TestCheckRedirectUrisImplicitAndCode(t *testing.T) {
 		{
 			name: "custom protocol not native app",
 			args: args{
-				appType:      OIDCApplicationTypeWeb,
+				appType:      gu.Ptr(OIDCApplicationTypeWeb),
 				redirectUris: []string{"custom://nirvana.com"},
 			},
 			want: &Compliance{
@@ -413,7 +404,7 @@ func TestCheckRedirectUrisImplicitAndCode(t *testing.T) {
 		{
 			name: "http localhost user agent app",
 			args: args{
-				appType:      OIDCApplicationTypeUserAgent,
+				appType:      gu.Ptr(OIDCApplicationTypeUserAgent),
 				redirectUris: []string{"http://localhost:9009"},
 			},
 			want: &Compliance{
@@ -424,7 +415,7 @@ func TestCheckRedirectUrisImplicitAndCode(t *testing.T) {
 		{
 			name: "http, not only localhost native app",
 			args: args{
-				appType:      OIDCApplicationTypeNative,
+				appType:      gu.Ptr(OIDCApplicationTypeNative),
 				redirectUris: []string{"http://nirvana.com", "http://localhost:9009"},
 			},
 			want: &Compliance{
@@ -435,7 +426,7 @@ func TestCheckRedirectUrisImplicitAndCode(t *testing.T) {
 		{
 			name: "not allowed combination",
 			args: args{
-				appType:      OIDCApplicationTypeNative,
+				appType:      gu.Ptr(OIDCApplicationTypeNative),
 				redirectUris: []string{"https://nirvana.com", "cutom://nirvana.com"},
 			},
 			want: &Compliance{
@@ -461,7 +452,7 @@ func TestCheckRedirectUrisImplicitAndCode(t *testing.T) {
 
 func TestCheckRedirectUrisImplicit(t *testing.T) {
 	type args struct {
-		appType      OIDCApplicationType
+		appType      *OIDCApplicationType
 		redirectUris []string
 	}
 	tests := []struct {
@@ -488,7 +479,7 @@ func TestCheckRedirectUrisImplicit(t *testing.T) {
 			name: "only http protocol, app type native, not only localhost",
 			args: args{
 				redirectUris: []string{"http://nirvana.com"},
-				appType:      OIDCApplicationTypeNative,
+				appType:      gu.Ptr(OIDCApplicationTypeNative),
 			},
 			want: &Compliance{
 				NoneCompliant: true,
@@ -499,7 +490,7 @@ func TestCheckRedirectUrisImplicit(t *testing.T) {
 			name: "only http protocol, app type native, only localhost",
 			args: args{
 				redirectUris: []string{"http://localhost:8080"},
-				appType:      OIDCApplicationTypeNative,
+				appType:      gu.Ptr(OIDCApplicationTypeNative),
 			},
 			want: &Compliance{
 				NoneCompliant: false,
@@ -510,7 +501,7 @@ func TestCheckRedirectUrisImplicit(t *testing.T) {
 			name: "only http protocol, app type web",
 			args: args{
 				redirectUris: []string{"http://nirvana.com"},
-				appType:      OIDCApplicationTypeWeb,
+				appType:      gu.Ptr(OIDCApplicationTypeWeb),
 			},
 			want: &Compliance{
 				NoneCompliant: true,
@@ -535,7 +526,7 @@ func TestCheckRedirectUrisImplicit(t *testing.T) {
 
 func TestCheckRedirectUrisCode(t *testing.T) {
 	type args struct {
-		appType      OIDCApplicationType
+		appType      *OIDCApplicationType
 		redirectUris []string
 	}
 	tests := []struct {
@@ -552,7 +543,7 @@ func TestCheckRedirectUrisCode(t *testing.T) {
 			name: "custom prefix, app type web",
 			args: args{
 				redirectUris: []string{"custom://nirvana.com"},
-				appType:      OIDCApplicationTypeWeb,
+				appType:      gu.Ptr(OIDCApplicationTypeWeb),
 			},
 			want: &Compliance{
 				NoneCompliant: true,
@@ -563,7 +554,7 @@ func TestCheckRedirectUrisCode(t *testing.T) {
 			name: "only http protocol, app type user agent",
 			args: args{
 				redirectUris: []string{"http://nirvana.com"},
-				appType:      OIDCApplicationTypeUserAgent,
+				appType:      gu.Ptr(OIDCApplicationTypeUserAgent),
 			},
 			want: &Compliance{
 				NoneCompliant: true,
@@ -574,7 +565,7 @@ func TestCheckRedirectUrisCode(t *testing.T) {
 			name: "only http protocol, app type native, only localhost",
 			args: args{
 				redirectUris: []string{"http://localhost:8080", "http://nirvana.com:8080"},
-				appType:      OIDCApplicationTypeNative,
+				appType:      gu.Ptr(OIDCApplicationTypeNative),
 			},
 			want: &Compliance{
 				NoneCompliant: true,
@@ -585,7 +576,7 @@ func TestCheckRedirectUrisCode(t *testing.T) {
 			name: "custom protocol, not native",
 			args: args{
 				redirectUris: []string{"custom://nirvana.com"},
-				appType:      OIDCApplicationTypeWeb,
+				appType:      gu.Ptr(OIDCApplicationTypeWeb),
 			},
 			want: &Compliance{
 				NoneCompliant: true,

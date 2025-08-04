@@ -48,6 +48,18 @@ const (
 	tmplExternalNotFoundOption = "externalnotfoundoption"
 )
 
+var (
+	samlFormPost = template.Must(template.New("saml-post-form").Parse(`<!DOCTYPE html><html><body>
+<form method="post" action="{{.URL}}" id="SAMLRequestForm">
+{{range $key, $value := .Fields}}
+<input type="hidden" name="{{$key}}" value="{{$value}}" />
+{{end}}
+<input id="SAMLSubmitButton" type="submit" value="Submit" />
+</form>
+<script>document.getElementById('SAMLSubmitButton').style.visibility="hidden";document.getElementById('SAMLRequestForm').submit();</script>
+</body></html>`))
+)
+
 type externalIDPData struct {
 	IDPConfigID string `schema:"idpConfigID"`
 }
@@ -201,15 +213,21 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.externalAuthFailed(w, r, authReq, err)
 		return
 	}
-
-	content, redirect := session.GetAuth(r.Context())
-	if redirect {
-		http.Redirect(w, r, content, http.StatusFound)
+	auth, err := session.GetAuth(r.Context())
+	if err != nil {
+		l.renderInternalError(w, r, authReq, err)
 		return
 	}
-	_, err = w.Write([]byte(content))
-	if err != nil {
-		l.renderError(w, r, authReq, err)
+	switch a := auth.(type) {
+	case *idp.RedirectAuth:
+		http.Redirect(w, r, a.RedirectURL, http.StatusFound)
+		return
+	case *idp.FormAuth:
+		err = samlFormPost.Execute(w, a)
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
+		}
 		return
 	}
 }
@@ -505,7 +523,7 @@ func (l *Login) handleExternalUserAuthenticated(
 // The decision, which information will be checked is based on the IdP template option.
 // The function returns a boolean whether a user was found or not.
 // If single a user was found, it will be automatically linked.
-func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser) (bool, error) {
+func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, human *domain.Human) (bool, error) {
 	queries := make([]query.SearchQuery, 0, 2)
 	switch provider.AutoLinking {
 	case domain.AutoLinkingOptionUnspecified:
@@ -514,7 +532,7 @@ func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, p
 	case domain.AutoLinkingOptionUsername:
 		// if we're checking for usernames there are to options:
 		//
-		// If no specific org has been requested (by id or domain scope), we'll check the provided username against
+		// If no specific org has been requested (by id or domain scope), we'll check the provided username (loginname) against
 		// all existing loginnames and directly use that result to either prompt or continue with other idp options.
 		if authReq.RequestedOrgID == "" {
 			user, err := l.query.GetNotifyUserByLoginName(r.Context(), false, externalUser.PreferredUsername)
@@ -526,8 +544,9 @@ func (l *Login) checkAutoLinking(r *http.Request, authReq *domain.AuthRequest, p
 			}
 			return true, nil
 		}
-		// If a specific org has been requested, we'll check the provided username against usernames (of that org).
-		usernameQuery, err := query.NewUserUsernameSearchQuery(externalUser.PreferredUsername, query.TextEqualsIgnoreCase)
+		// If a specific org has been requested, we'll check the username (org policy (suffixed or not) is already applied)
+		// against usernames (of that org).
+		usernameQuery, err := query.NewUserUsernameSearchQuery(human.Username, query.TextEqualsIgnoreCase)
 		if err != nil {
 			return false, nil
 		}
@@ -587,7 +606,7 @@ func (l *Login) createOrLinkUser(w http.ResponseWriter, r *http.Request, authReq
 	human, idpLink, _ := mapExternalUserToLoginUser(externalUser, orgIAMPolicy.UserLoginMustBeDomain)
 	// let's check if auto-linking is enabled and if the user would be found by the corresponding option
 	if provider.AutoLinking != domain.AutoLinkingOptionUnspecified {
-		userLinked, err = l.checkAutoLinking(r, authReq, provider, externalUser)
+		userLinked, err = l.checkAutoLinking(r, authReq, provider, externalUser, human)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
 			return false
@@ -1242,7 +1261,8 @@ func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserG
 		return nil
 	}
 	for _, grant := range userGrants {
-		_, err := l.command.AddUserGrant(setContext(ctx, resourceOwner), grant, resourceOwner)
+		grant.ResourceOwner = resourceOwner
+		_, err := l.command.AddUserGrant(setContext(ctx, resourceOwner), grant, nil)
 		if err != nil {
 			return err
 		}

@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
@@ -12,12 +13,12 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *user.ListPersonalAccessTokensRequest) (*user.ListPersonalAccessTokensResponse, error) {
-	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Pagination)
+func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *connect.Request[user.ListPersonalAccessTokensRequest]) (*connect.Response[user.ListPersonalAccessTokensResponse], error) {
+	offset, limit, asc, err := filter.PaginationPbToQuery(s.systemDefaults, req.Msg.GetPagination())
 	if err != nil {
 		return nil, err
 	}
-	filters, err := patFiltersToQueries(req.Filters)
+	filters, err := patFiltersToQueries(req.Msg.GetFilters())
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +27,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *user.ListPer
 			Offset:        offset,
 			Limit:         limit,
 			Asc:           asc,
-			SortingColumn: authnPersonalAccessTokenFieldNameToSortingColumn(req.SortingColumn),
+			SortingColumn: authnPersonalAccessTokenFieldNameToSortingColumn(req.Msg.SortingColumn),
 		},
 		Queries: filters,
 	}
@@ -48,7 +49,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *user.ListPer
 			ExpirationDate: timestamppb.New(pat.Expiration),
 		}
 	}
-	return resp, nil
+	return connect.NewResponse(resp), nil
 }
 
 func patFiltersToQueries(filters []*user.PersonalAccessTokensSearchFilter) (_ []query.SearchQuery, err error) {
