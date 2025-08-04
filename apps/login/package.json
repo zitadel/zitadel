@@ -35,9 +35,7 @@
       },
       "build:login:standalone": {
         "outputs": [
-          "{projectRoot}/dist/**",
-          "{projectRoot}/.next/**",
-          "{projectRoot}/!.next/cache/**"
+          "{projectRoot}/dist/**"
         ],
         "dependsOn": [
           "@zitadel/client#build"
