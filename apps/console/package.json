@@ -25,7 +25,8 @@
           "{projectRoot}/dist/**"
         ],
         "dependsOn": [
-          "generate"
+          "generate",
+          "@zitadel/proto:generate"
           ]
       }
     }
