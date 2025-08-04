@@ -128,7 +128,16 @@ func creationDateQueryToQuery(q *session.CreationDateQuery) (query.SearchQuery, 
 
 func expirationDateQueryToQuery(q *session.ExpirationDateQuery) (query.SearchQuery, error) {
 	comparison := timestampComparisons[q.GetMethod()]
-	return query.NewExpirationDateQuery(q.GetExpirationDate().AsTime(), comparison)
+	expirationDateQuery, err := query.NewExpirationDateQuery(q.GetExpirationDate().AsTime(), comparison)
+	if err != nil {
+		return nil, err
+	}
+	// include sessions without an expiration date by default
+	expirationDateIsNullQuery, err := query.NewIsNullQuery(query.SessionColumnExpiration)
+	if err != nil {
+		return nil, err
+	}
+	return query.NewOrQuery(expirationDateQuery, expirationDateIsNullQuery)
 }
 
 func fieldNameToSessionColumn(field session.SessionFieldName) query.Column {

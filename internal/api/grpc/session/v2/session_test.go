@@ -316,6 +316,18 @@ func mustNewTimestampQuery(t testing.TB, column query.Column, ts time.Time, comp
 	return q
 }
 
+func mustNewIsNullQuery(t testing.TB, column query.Column) query.SearchQuery {
+	q, err := query.NewIsNullQuery(column)
+	require.NoError(t, err)
+	return q
+}
+
+func mustNewOrQuery(t testing.TB, queries ...query.SearchQuery) query.SearchQuery {
+	q, err := query.NewOrQuery(queries...)
+	require.NoError(t, err)
+	return q
+}
+
 func Test_listSessionsRequestToQuery(t *testing.T) {
 	type args struct {
 		ctx context.Context
@@ -421,7 +433,8 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 					mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampGreater),
 					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
 					mustNewTextQuery(t, query.SessionColumnUserAgentFingerprintID, "agent", query.TextEquals),
-					mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampLessOrEquals),
+					mustNewOrQuery(t, mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampLessOrEquals),
+						mustNewIsNullQuery(t, query.SessionColumnExpiration)),
 				},
 			},
 		},
@@ -694,7 +707,8 @@ func Test_sessionQueryToQuery(t *testing.T) {
 						},
 					},
 				}},
-			want: mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampLess),
+			want: mustNewOrQuery(t, mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampLess),
+				mustNewIsNullQuery(t, query.SessionColumnExpiration)),
 		},
 		{
 			name: "expiration date query with default method",
@@ -707,7 +721,8 @@ func Test_sessionQueryToQuery(t *testing.T) {
 						},
 					},
 				}},
-			want: mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampEquals),
+			want: mustNewOrQuery(t, mustNewTimestampQuery(t, query.SessionColumnExpiration, expiration, query.TimestampEquals),
+				mustNewIsNullQuery(t, query.SessionColumnExpiration)),
 		},
 	}
 	for _, tt := range tests {
