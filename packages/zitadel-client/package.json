@@ -72,6 +72,18 @@
     "test:unit": "vitest --run",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": [
+          "{projectRoot}/dist/**"
+        ],
+        "dependsOn": [
+          "@zitadel/proto:generate"
+          ]
+      }
+    }
+  },
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.2",
     "@connectrpc/connect": "^2.0.0",
