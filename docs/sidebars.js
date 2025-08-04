@@ -1084,7 +1084,6 @@ module.exports = {
         "self-hosting/deploy/devcontainer",
         "self-hosting/deploy/knative",
         "self-hosting/deploy/kubernetes",
-        "self-hosting/deploy/loadbalancing-example/loadbalancing-example",
         "self-hosting/deploy/troubleshooting/troubleshooting",
       ],
     },
@@ -1118,6 +1117,7 @@ module.exports = {
         "self-hosting/manage/tls_modes",
         "self-hosting/manage/database/database",
         "self-hosting/manage/cache",
+        "self-hosting/manage/service_ping",
         "self-hosting/manage/updating_scaling",
         "self-hosting/manage/usage_control",
         {

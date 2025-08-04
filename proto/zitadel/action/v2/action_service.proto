@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package zitadel.action.v2beta;
+package zitadel.action.v2;
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -11,19 +11,19 @@ import "validate/validate.proto";
 
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
-import "zitadel/action/v2beta/target.proto";
-import "zitadel/action/v2beta/execution.proto";
-import "zitadel/action/v2beta/query.proto";
+import "zitadel/action/v2/target.proto";
+import "zitadel/action/v2/execution.proto";
+import "zitadel/action/v2/query.proto";
 import "google/protobuf/timestamp.proto";
-import "zitadel/filter/v2beta/filter.proto";
+import "zitadel/filter/v2/filter.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v2beta;action";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v2;action";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Action Service";
-    version: "2.0-beta";
-    description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance. This service is in beta state. It can AND will continue breaking until a stable version is released.";
+    version: "2.0";
+    description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -122,7 +122,7 @@ service ActionService {
   //   - `actions`
   rpc CreateTarget (CreateTargetRequest) returns (CreateTargetResponse) {
     option (google.api.http) = {
-      post: "/v2beta/actions/targets"
+      post: "/v2/actions/targets"
       body: "*"
     };
 
@@ -166,7 +166,7 @@ service ActionService {
   //   - `actions`
   rpc UpdateTarget (UpdateTargetRequest) returns (UpdateTargetResponse) {
     option (google.api.http) = {
-      post: "/v2beta/actions/targets/{id}"
+      post: "/v2/actions/targets/{id}"
       body: "*"
     };
 
@@ -211,7 +211,7 @@ service ActionService {
   //   - `actions`
   rpc DeleteTarget (DeleteTargetRequest) returns (DeleteTargetResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/actions/targets/{id}"
+      delete: "/v2/actions/targets/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -247,7 +247,7 @@ service ActionService {
   //   - `actions`
   rpc GetTarget (GetTargetRequest) returns (GetTargetResponse) {
     option (google.api.http) = {
-      get: "/v2beta/actions/targets/{id}"
+      get: "/v2/actions/targets/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -290,7 +290,7 @@ service ActionService {
   //   - `actions`
   rpc ListTargets (ListTargetsRequest) returns (ListTargetsResponse) {
     option (google.api.http) = {
-      post: "/v2beta/actions/targets/search",
+      post: "/v2/actions/targets/search",
       body: "*"
     };
 
@@ -334,7 +334,7 @@ service ActionService {
   //   - `actions`
   rpc SetExecution (SetExecutionRequest) returns (SetExecutionResponse) {
     option (google.api.http) = {
-      put: "/v2beta/actions/executions"
+      put: "/v2/actions/executions"
       body: "*"
     };
 
@@ -372,7 +372,7 @@ service ActionService {
   //   - `actions`
   rpc ListExecutions (ListExecutionsRequest) returns (ListExecutionsResponse) {
     option (google.api.http) = {
-      post: "/v2beta/actions/executions/search"
+      post: "/v2/actions/executions/search"
       body: "*"
     };
 
@@ -403,7 +403,7 @@ service ActionService {
   // List all available functions which can be used as condition for executions.
   rpc ListExecutionFunctions (ListExecutionFunctionsRequest) returns (ListExecutionFunctionsResponse) {
     option (google.api.http) = {
-      get: "/v2beta/actions/executions/functions"
+      get: "/v2/actions/executions/functions"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -427,7 +427,7 @@ service ActionService {
   // List all available methods which can be used as condition for executions.
   rpc ListExecutionMethods (ListExecutionMethodsRequest) returns (ListExecutionMethodsResponse) {
     option (google.api.http) = {
-      get: "/v2beta/actions/executions/methods"
+      get: "/v2/actions/executions/methods"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -451,7 +451,7 @@ service ActionService {
   // List all available services which can be used as condition for executions.
   rpc ListExecutionServices (ListExecutionServicesRequest) returns (ListExecutionServicesResponse) {
     option (google.api.http) = {
-      get: "/v2beta/actions/executions/services"
+      get: "/v2/actions/executions/services"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -649,7 +649,7 @@ message GetTargetResponse {
 
 message ListTargetsRequest {
   // List limitations and ordering.
-  optional zitadel.filter.v2beta.PaginationRequest pagination = 1;
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
   // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
   optional TargetFieldName sorting_column = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -665,7 +665,7 @@ message ListTargetsRequest {
 
 message ListTargetsResponse {
   reserved 'result';
-  zitadel.filter.v2beta.PaginationResponse pagination = 1;
+  zitadel.filter.v2.PaginationResponse pagination = 1;
   repeated Target targets = 2;
 }
 
@@ -675,7 +675,7 @@ message SetExecutionRequest {
   // Ordered list of targets called during the execution.
   repeated string targets = 2;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    example: "{\"condition\":{\"request\":{\"method\":\"zitadel.session.v2.SessionService/ListSessions\"}},\"targets\":[\"69629026806489455\"]}";
+    example: "{\"condition\":{\"request\":{\"method\":\"zitadel.session.v2.SessionService/ListSessions\"}},\"targets\":[{\"target\":\"69629026806489455\"}]}";
   };
 }
 
@@ -690,7 +690,7 @@ message SetExecutionResponse {
 
 message ListExecutionsRequest {
   // List limitations and ordering.
-  optional zitadel.filter.v2beta.PaginationRequest pagination = 1;
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
   // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
   optional ExecutionFieldName sorting_column = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -706,7 +706,7 @@ message ListExecutionsRequest {
 
 message ListExecutionsResponse {
   reserved 'result';
-  zitadel.filter.v2beta.PaginationResponse pagination = 1;
+  zitadel.filter.v2.PaginationResponse pagination = 1;
   repeated Execution executions = 2;
 }
 
