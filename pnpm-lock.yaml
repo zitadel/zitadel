@@ -13,6 +13,9 @@ importers:
 
   .:
     devDependencies:
+      '@bufbuild/buf':
+        specifier: ^1.55.1
+        version: 1.55.1
       '@changesets/cli':
         specifier: ^2.29.5
         version: 2.29.5

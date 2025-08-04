@@ -16,6 +16,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
     "@devcontainers/cli": "^0.80.0",
-    "nx":"21.3.10"
+    "nx":"21.3.10",
+    "@bufbuild/buf": "^1.55.1"
   }
 }
