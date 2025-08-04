@@ -26,7 +26,7 @@
         ],
         "dependsOn": [
           "generate",
-          "@zitadel/proto:generate"
+          "@zitadel/client:build"
           ]
       }
     }

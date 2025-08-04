@@ -28,7 +28,7 @@
           "{projectRoot}/dist/**"
         ],
         "dependsOn": [
-          "@zitadel/client#build"
+          "@zitadel/client:build"
         ]
       },
       "build:login:standalone": {
