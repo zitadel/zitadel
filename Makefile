@@ -17,7 +17,7 @@ LOGIN_REMOTE_URL ?= https://github.com/zitadel/typescript.git
 LOGIN_REMOTE_BRANCH ?= main
 
 .PHONY: compile
-compile: core_build console_build compile_pipeline
+compile: core_build console_move compile_pipeline
 
 .PHONY: docker_image
 docker_image:
@@ -93,15 +93,7 @@ core_build: core_dependencies core_api core_static core_assets
 
 .PHONY: console_move
 console_move:
-	cp -r console/dist/console/* internal/api/ui/console/static
-
-.PHONY: console_dependencies
-console_dependencies:
-	npx pnpm install --frozen-lockfile --filter=./console
-
-.PHONY: console_build
-console_build: console_dependencies
-	npx pnpm turbo build --filter=./console
+	cp -r apps/console/dist/console/* internal/api/ui/console/static
 
 .PHONY: clean
 clean:
@@ -156,10 +148,6 @@ core_integration_reports:
 
 .PHONY: core_integration_test
 core_integration_test: core_integration_server_start core_integration_test_packages core_integration_server_stop core_integration_reports
-
-.PHONY: console_lint
-console_lint:
-	npx pnpm turbo lint --filter=./console
 
 .PHONY: core_lint
 core_lint:

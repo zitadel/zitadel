@@ -3,9 +3,20 @@
   "private": true,
   "name": "zitadel",
   "scripts": {
-    "build": "make core_build"
+    "build": "make compile"
   },
-  "nx": {},
+"nx": {
+    "targets": {
+      "build": {
+        "outputs": [
+          "{workspaceRoot}/zitadel"
+        ],
+        "dependsOn": [
+          "@zitadel/console:build"
+          ]
+      }
+    }
+  },
   "pnpm": {
     "overrides": {
       "@typescript-eslint/parser": "^8.35.1",
