@@ -116,6 +116,7 @@ Errors:
       AlreadyVerified: Numărul de telefon este deja verificat
       Empty: Numărul de telefon este gol
       NotChanged: Numărul de telefon nu a fost schimbat
+      VerifyingRemovalIsNotSupported: Verificarea eliminării nu este acceptată
     Address:
       NotFound: Adresa nu a fost găsită
       NotChanged: Adresa nu a fost schimbată
@@ -194,7 +195,7 @@ Errors:
     AlreadyExists: Instanța există deja
     NotChanged: Instanța nu a fost schimbată
   Org:
-    AlreadyExists: Numele organizației este deja luat
+    AlreadyExists: Numele sau ID-ul organizației este deja utilizat
     Invalid: Organizația este invalidă
     AlreadyDeactivated: Organizația este deja dezactivată
     AlreadyActive: Organizația este deja activă
@@ -436,8 +437,6 @@ Errors:
         Invalid: Acordarea utilizatorului este invalidă
         NotChanged: Acordarea utilizatorului nu a fost schimbată
         IDMissing: Id lipsă
-        NotActive: Acordarea utilizatorului nu este activă
-        NotInactive: Acordarea utilizatorului nu este dezactivată
         NoPermissionForProject: Utilizatorul nu are permisiuni pentru acest proiect
         RoleKeyNotFound: Rolul nu a fost găsit
       Member:

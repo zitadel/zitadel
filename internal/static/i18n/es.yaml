@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: El teléfono ya se verificó
       Empty: El teléfono está vacío
       NotChanged: El teléfono no ha cambiado
+      VerifyingRemovalIsNotSupported: La verificación de eliminación no está soportada
     Address:
       NotFound: Dirección no encontrada
       NotChanged: La dirección no ha cambiado
@@ -193,7 +194,7 @@ Errors:
     AlreadyExists: La instancia ya existe
     NotChanged: La instancia no ha cambiado
   Org:
-    AlreadyExists: El nombre de la organización ya está cogido
+    AlreadyExists: El nombre o id de la organización ya está tomado
     Invalid: El nombre de la organización no es válido
     AlreadyDeactivated: La organización ya está desactivada
     AlreadyActive: La organización ya está activada
@@ -435,8 +436,6 @@ Errors:
     Invalid: La concesión de usuario no es válida
     NotChanged: La concesión de usuario no ha cambiado
     IDMissing: Falta Id
-    NotActive: La concesión de usuario no está activa
-    NotInactive: La concesión de usuario no está inactiva
     NoPermissionForProject: El usuario no tiene permisos en este proyecto
     RoleKeyNotFound: Rol no encontrado
   Member:

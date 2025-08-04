@@ -132,7 +132,6 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-vaipl7s13l", "Errors.User.UserIDMissing")
 	}
-
 	existingUser, err := c.userRemoveWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -143,16 +142,20 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner strin
 	if err := c.checkPermissionDeleteUser(ctx, existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
 		return nil, err
 	}
-
 	domainPolicy, err := c.domainPolicyWriteModel(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-l40ykb3xh2", "Errors.Org.DomainPolicy.NotExisting")
 	}
+	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, existingUser.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+
 	var events []eventstore.Command
-	events = append(events, user.NewUserRemovedEvent(ctx, &existingUser.Aggregate().Aggregate, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain))
+	events = append(events, user.NewUserRemovedEvent(ctx, &existingUser.Aggregate().Aggregate, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain || organizationScopedUsername))
 
 	for _, grantID := range cascadingGrantIDs {
-		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true)
+		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true, true, nil)
 		if err != nil {
 			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
 			continue

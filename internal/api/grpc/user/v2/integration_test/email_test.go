@@ -16,7 +16,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func TestServer_SetEmail(t *testing.T) {
+func TestServer_Deprecated_SetEmail(t *testing.T) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 
 	tests := []struct {

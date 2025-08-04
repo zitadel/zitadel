@@ -5,6 +5,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -121,7 +122,10 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	if resourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMA-095xh8fll1", "Errors.Internal")
 	}
-
+	if human.Details == nil {
+		human.Details = &domain.ObjectDetails{}
+	}
+	human.Details.ResourceOwner = resourceOwner
 	if err := human.Validate(c.userPasswordHasher); err != nil {
 		return err
 	}
@@ -132,7 +136,12 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			return err
 		}
 	}
-
+	// check for permission to create user on resourceOwner
+	if !human.Register {
+		if err := c.checkPermissionUpdateUser(ctx, resourceOwner, human.ID); err != nil {
+			return err
+		}
+	}
 	// only check if user is already existing
 	existingHuman, err := c.userExistsWriteModel(
 		ctx,
@@ -143,12 +152,6 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	}
 	if isUserStateExists(existingHuman.UserState) {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-7yiox1isql", "Errors.User.AlreadyExisting")
-	}
-	// check for permission to create user on resourceOwner
-	if !human.Register {
-		if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, human.ID); err != nil {
-			return err
-		}
 	}
 	// add resourceowner for the events with the aggregate
 	existingHuman.ResourceOwner = resourceOwner
@@ -161,6 +164,12 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	if err = c.userValidateDomain(ctx, resourceOwner, human.Username, domainPolicy.UserLoginMustBeDomain); err != nil {
 		return err
 	}
+
+	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, resourceOwner)
+	if err != nil {
+		return err
+	}
+
 	var createCmd humanCreationCommand
 	if human.Register {
 		createCmd = user.NewHumanRegisteredEvent(
@@ -174,7 +183,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			human.PreferredLanguage,
 			human.Gender,
 			human.Email.Address,
-			domainPolicy.UserLoginMustBeDomain,
+			domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
 			human.UserAgentID,
 		)
 	} else {
@@ -189,7 +198,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			human.PreferredLanguage,
 			human.Gender,
 			human.Email.Address,
-			domainPolicy.UserLoginMustBeDomain,
+			domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
 		)
 	}
 
@@ -203,17 +212,33 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		return err
 	}
 
-	cmds := make([]eventstore.Command, 0, 3)
-	cmds = append(cmds, createCmd)
-
-	cmds, err = c.addHumanCommandEmail(ctx, filter, cmds, existingHuman.Aggregate(), human, alg, allowInitMail)
+	cmds, err := c.addUserHumanCommands(ctx, filter, existingHuman, human, allowInitMail, alg, createCmd)
 	if err != nil {
 		return err
+	}
+	if len(cmds) == 0 {
+		human.Details = writeModelToObjectDetails(&existingHuman.WriteModel)
+		return nil
+	}
+	err = c.pushAppendAndReduce(ctx, existingHuman, cmds...)
+	if err != nil {
+		return err
+	}
+	human.Details = writeModelToObjectDetails(&existingHuman.WriteModel)
+	return nil
+}
+
+func (c *Commands) addUserHumanCommands(ctx context.Context, filter preparation.FilterToQueryReducer, existingHuman *UserV2WriteModel, human *AddHuman, allowInitMail bool, alg crypto.EncryptionAlgorithm, addUserCommand eventstore.Command) ([]eventstore.Command, error) {
+	cmds := []eventstore.Command{addUserCommand}
+	var err error
+	cmds, err = c.addHumanCommandEmail(ctx, filter, cmds, existingHuman.Aggregate(), human, alg, allowInitMail)
+	if err != nil {
+		return nil, err
 	}
 
 	cmds, err = c.addHumanCommandPhone(ctx, filter, cmds, existingHuman.Aggregate(), human, alg)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for _, metadataEntry := range human.Metadata {
@@ -227,7 +252,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	for _, link := range human.Links {
 		cmd, err := addLink(ctx, filter, existingHuman.Aggregate(), link)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		cmds = append(cmds, cmd)
 	}
@@ -235,7 +260,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	if human.TOTPSecret != "" {
 		encryptedSecret, err := crypto.Encrypt([]byte(human.TOTPSecret), c.multifactors.OTP.CryptoMFA)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		cmds = append(cmds,
 			user.NewHumanOTPAddedEvent(ctx, &existingHuman.Aggregate().Aggregate, encryptedSecret),
@@ -246,18 +271,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	if human.SetInactive {
 		cmds = append(cmds, user.NewUserDeactivatedEvent(ctx, &existingHuman.Aggregate().Aggregate))
 	}
-
-	if len(cmds) == 0 {
-		human.Details = writeModelToObjectDetails(&existingHuman.WriteModel)
-		return nil
-	}
-
-	err = c.pushAppendAndReduce(ctx, existingHuman, cmds...)
-	if err != nil {
-		return err
-	}
-	human.Details = writeModelToObjectDetails(&existingHuman.WriteModel)
-	return nil
+	return cmds, nil
 }
 
 func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg crypto.EncryptionAlgorithm) (err error) {
@@ -341,7 +355,6 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 	if human.State != nil {
 		// only allow toggling between active and inactive
 		// any other target state is not supported
-		// the existing human's state has to be the
 		switch {
 		case isUserStateActive(*human.State):
 			if isUserStateActive(existingHuman.UserState) {

@@ -116,6 +116,7 @@ Errors:
       AlreadyVerified: 電話番号はすでに認証済みです
       Empty: 電話番号が空です
       NotChanged: 電話番号が変更されていません
+      VerifyingRemovalIsNotSupported: 電話番号の削除を検証することはできません
     Address:
       NotFound: 住所が見つかりません
       NotChanged: 住所は変更されていません
@@ -194,7 +195,7 @@ Errors:
     AlreadyExists: すでに存在するインスタンス
     NotChanged: インスタンスは変更されていません
   Org:
-    AlreadyExists: 組織の名前はすでに使用されています
+    AlreadyExists: 組織名またはIDはすでに使用されています
     Invalid: 無効な組織です
     AlreadyDeactivated: 組織はすでに非アクティブです
     AlreadyActive: 組織はすでにアクティブです
@@ -436,8 +437,6 @@ Errors:
     Invalid: 無効なユーザーグラントです
     NotChanged: ユーザーグラントは変更されていません
     IDMissing: IDがありません
-    NotActive: ユーザーグラントはアクティブではありません
-    NotInactive: ユーザーグラントは非アクティブではありません
     NoPermissionForProject: ユーザーにはこのプロジェクトに許可がありません
     RoleKeyNotFound: ロールが見つかりません
   Member:

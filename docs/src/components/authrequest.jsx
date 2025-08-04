@@ -111,7 +111,7 @@ export function SetAuthRequest() {
     "urn:zitadel:iam:org:project:id:zitadel:aud",
     "urn:zitadel:iam:user:metadata",
     `urn:zitadel:iam:org:id:${
-      organizationId ? organizationId : "[organizationId]"
+      organizationId ? organizationId : "[Organization ID]"
     }`,
   ];
 
@@ -538,7 +538,7 @@ export function SetAuthRequest() {
               const value = event.target.value;
               setOrganizationId(value);
               allScopes[7] = `urn:zitadel:iam:org:id:${
-                value ? value : "[organizationId]"
+                value ? value : "[Organization ID]"
               }`;
               toggleScope(8, true);
               setScope(

@@ -17,7 +17,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func TestServer_SetPhone(t *testing.T) {
+func TestServer_Deprecated_SetPhone(t *testing.T) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 
 	tests := []struct {
@@ -249,14 +249,14 @@ func TestServer_VerifyPhone(t *testing.T) {
 	}
 }
 
-func TestServer_RemovePhone(t *testing.T) {
+func TestServer_Deprecated_RemovePhone(t *testing.T) {
 	userResp := Instance.CreateHumanUser(CTX)
 	failResp := Instance.CreateHumanUserNoPhone(CTX)
 	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
 	doubleRemoveUser := Instance.CreateHumanUser(CTX)
 
 	Instance.RegisterUserPasskey(CTX, otherUser)
-	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, otherUser)
 
 	tests := []struct {
 		name    string

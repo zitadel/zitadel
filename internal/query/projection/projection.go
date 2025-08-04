@@ -86,6 +86,8 @@ var (
 	UserSchemaProjection                *handler.Handler
 	WebKeyProjection                    *handler.Handler
 	DebugEventsProjection               *handler.Handler
+	HostedLoginTranslationProjection    *handler.Handler
+	OrganizationSettingsProjection      *handler.Handler
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
@@ -179,6 +181,8 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	UserSchemaProjection = newUserSchemaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_schemas"]))
 	WebKeyProjection = newWebKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["web_keys"]))
 	DebugEventsProjection = newDebugEventsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_events"]))
+	HostedLoginTranslationProjection = newHostedLoginTranslationProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["hosted_login_translation"]))
+	OrganizationSettingsProjection = newOrganizationSettingsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_settings"]))
 
 	ProjectGrantFields = newFillProjectGrantFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsProjectGrant]))
 	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
@@ -357,5 +361,7 @@ func newProjectionsList() {
 		UserSchemaProjection,
 		WebKeyProjection,
 		DebugEventsProjection,
+		HostedLoginTranslationProjection,
+		OrganizationSettingsProjection,
 	}
 }

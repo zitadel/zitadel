@@ -4,6 +4,7 @@ package user_test
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/url"
 	"os"
@@ -33,6 +34,7 @@ import (
 var (
 	CTX                            context.Context
 	IamCTX                         context.Context
+	LoginCTX                       context.Context
 	UserCTX                        context.Context
 	SystemCTX                      context.Context
 	SystemUserWithNoPermissionsCTX context.Context
@@ -50,6 +52,7 @@ func TestMain(m *testing.M) {
 		SystemUserWithNoPermissionsCTX = integration.WithSystemUserWithNoPermissionsAuthorization(ctx)
 		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
 		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		LoginCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
 		SystemCTX = integration.WithSystemAuthorization(ctx)
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 		Client = Instance.Client.UserV2
@@ -57,7 +60,7 @@ func TestMain(m *testing.M) {
 	}())
 }
 
-func TestServer_AddHumanUser(t *testing.T) {
+func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	type args struct {
 		ctx context.Context
@@ -652,6 +655,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			userID := fmt.Sprint(time.Now().UnixNano() + int64(i))
 			tt.args.req.UserId = &userID
+			// In order to prevent unique constraint errors, we set the email to a unique value
 			if email := tt.args.req.GetEmail(); email != nil {
 				email.Email = fmt.Sprintf("%s@me.now", userID)
 			}
@@ -666,7 +670,6 @@ func TestServer_AddHumanUser(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-
 			assert.Equal(t, tt.want.GetUserId(), got.GetUserId())
 			if tt.want.GetEmailCode() != "" {
 				assert.NotEmpty(t, got.GetEmailCode())
@@ -683,7 +686,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 	}
 }
 
-func TestServer_AddHumanUser_Permission(t *testing.T) {
+func TestServer_Deprecated_AddHumanUser_Permission(t *testing.T) {
 	newOrgOwnerEmail := gofakeit.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
 	type args struct {
@@ -876,7 +879,7 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 	}
 }
 
-func TestServer_UpdateHumanUser(t *testing.T) {
+func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		req *user.UpdateHumanUserRequest
@@ -1237,7 +1240,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 	}
 }
 
-func TestServer_UpdateHumanUser_Permission(t *testing.T) {
+func TestServer_Deprecated_UpdateHumanUser_Permission(t *testing.T) {
 	newOrgOwnerEmail := gofakeit.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
@@ -1818,7 +1821,7 @@ func TestServer_DeleteUser(t *testing.T) {
 					request.UserId = resp.GetUserId()
 					Instance.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
 					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
-					Instance.CreateOrgMembership(t, CTX, request.UserId)
+					Instance.CreateOrgMembership(t, CTX, Instance.DefaultOrg.Id, request.UserId)
 					return CTX
 				},
 			},
@@ -1834,15 +1837,26 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				req: &user.DeleteUserRequest{},
 				prepare: func(t *testing.T, request *user.DeleteUserRequest) context.Context {
-					removeUser, err := Instance.Client.Mgmt.AddMachineUser(CTX, &mgmt.AddMachineUserRequest{
-						UserName: gofakeit.Username(),
-						Name:     gofakeit.Name(),
+					removeUser, err := Client.CreateUser(CTX, &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserType: &user.CreateUserRequest_Human_{
+							Human: &user.CreateUserRequest_Human{
+								Profile: &user.SetHumanProfile{
+									GivenName:  "givenName",
+									FamilyName: "familyName",
+								},
+								Email: &user.SetHumanEmail{
+									Email:        gofakeit.Email(),
+									Verification: &user.SetHumanEmail_IsVerified{IsVerified: true},
+								},
+							},
+						},
 					})
-					request.UserId = removeUser.UserId
 					require.NoError(t, err)
-					tokenResp, err := Instance.Client.Mgmt.AddPersonalAccessToken(CTX, &mgmt.AddPersonalAccessTokenRequest{UserId: removeUser.UserId})
-					require.NoError(t, err)
-					return integration.WithAuthorizationToken(UserCTX, tokenResp.Token)
+					request.UserId = removeUser.Id
+					Instance.RegisterUserPasskey(CTX, removeUser.Id)
+					_, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, removeUser.Id)
+					return integration.WithAuthorizationToken(UserCTX, token)
 				},
 			},
 			want: &user.DeleteUserResponse{
@@ -2046,7 +2060,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
 				},
-				url:                "http://" + Instance.Domain + ":8000/sso",
+				url:                "http://localhost:8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
 			},
 			wantErr: false,
@@ -2070,7 +2084,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
 				},
-				url:                "http://" + Instance.Domain + ":8000/sso",
+				url:                "http://localhost:8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
 			},
 			wantErr: false,
@@ -2094,7 +2108,9 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
 				},
-				postForm: true,
+				url:                "http://localhost:8000/sso",
+				parametersExisting: []string{"RelayState", "SAMLRequest"},
+				postForm:           true,
 			},
 			wantErr: false,
 		},
@@ -2132,9 +2148,11 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			if tt.want.url != "" {
+			if tt.want.url != "" && !tt.want.postForm {
 				authUrl, err := url.Parse(got.GetAuthUrl())
 				require.NoError(t, err)
+
+				assert.Equal(t, tt.want.url, authUrl.Scheme+"://"+authUrl.Host+authUrl.Path)
 				require.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
 
 				for _, existing := range tt.want.parametersExisting {
@@ -2145,7 +2163,15 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				}
 			}
 			if tt.want.postForm {
-				assert.NotEmpty(t, got.GetPostForm())
+				assert.Equal(t, tt.want.url, got.GetFormData().GetUrl())
+
+				require.Len(t, got.GetFormData().GetFields(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
+				for _, existing := range tt.want.parametersExisting {
+					assert.Contains(t, got.GetFormData().GetFields(), existing)
+				}
+				for key, equal := range tt.want.parametersEqual {
+					assert.Equal(t, got.GetFormData().GetFields()[key], equal)
+				}
 			}
 			integration.AssertDetails(t, &user.StartIdentityProviderIntentResponse{
 				Details: tt.want.details,
@@ -2721,7 +2747,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 func ctxFromNewUserWithRegisteredPasswordlessLegacy(t *testing.T) (context.Context, string, *auth.AddMyPasswordlessResponse) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
 	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
 	pkr, err := Instance.Client.Auth.AddMyPasswordless(ctx, &auth.AddMyPasswordlessRequest{})
@@ -3610,7 +3636,6 @@ func TestServer_HumanMFAInitSkipped(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
-
 			got, err := Client.HumanMFAInitSkipped(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
@@ -3621,6 +3646,1719 @@ func TestServer_HumanMFAInitSkipped(t *testing.T) {
 			if tt.checkState != nil {
 				tt.checkState(t, tt.args.req.GetUserId(), got)
 			}
+		})
+	}
+}
+
+func TestServer_CreateUser(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		req *user.CreateUserRequest
+	}
+	type testCase struct {
+		args    args
+		want    *user.CreateUserResponse
+		wantErr bool
+	}
+	tests := []struct {
+		name     string
+		testCase func(runId string) testCase
+	}{
+		{
+			name: "default verification",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+					wantErr: false,
+				}
+			},
+		},
+		{
+			name: "return email verification code",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_ReturnCode{
+											ReturnCode: &user.ReturnEmailVerificationCode{},
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id:        "is generated",
+						EmailCode: gu.Ptr("something"),
+					},
+				}
+			},
+		},
+		{
+			name: "custom template",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_SendCode{
+											SendCode: &user.SendEmailVerificationCode{
+												UrlTemplate: gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+				}
+			},
+		},
+		{
+			name: "return phone verification code",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+									Phone: &user.SetHumanPhone{
+										Phone: "+41791234567",
+										Verification: &user.SetHumanPhone_ReturnCode{
+											ReturnCode: &user.ReturnPhoneVerificationCode{},
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id:        "is generated",
+						PhoneCode: gu.Ptr("something"),
+					},
+				}
+			},
+		},
+		{
+			name: "custom template error",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_SendCode{
+											SendCode: &user.SendEmailVerificationCode{
+												UrlTemplate: gu.Ptr("{{"),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "missing REQUIRED profile",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_ReturnCode{
+											ReturnCode: &user.ReturnEmailVerificationCode{},
+										},
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "missing REQUIRED email",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "missing empty email",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "missing idp",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+									IdpLinks: []*user.IDPLink{
+										{
+											IdpId:    "idpID",
+											UserId:   "userID",
+											UserName: "username",
+										},
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "with metadata",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+									Metadata: []*user.Metadata{
+										{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))},
+										{Key: "key2", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value2")))},
+										{Key: "key3", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value3")))},
+									},
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+				}
+			},
+		},
+		{
+			name: "with idp",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+									IdpLinks: []*user.IDPLink{
+										{
+											IdpId:    idpResp.Id,
+											UserId:   "userID",
+											UserName: "username",
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+				}
+			},
+		},
+		{
+			name: "with totp",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_IsVerified{
+											IsVerified: true,
+										},
+									},
+									TotpSecret: gu.Ptr("secret"),
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+				}
+			},
+		},
+		{
+			name: "password not complexity conform",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:         "Donald",
+										FamilyName:        "Duck",
+										NickName:          gu.Ptr("Dukkie"),
+										DisplayName:       gu.Ptr("Donald Duck"),
+										PreferredLanguage: gu.Ptr("en"),
+										Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+									PasswordType: &user.CreateUserRequest_Human_Password{
+										Password: &user.Password{
+											Password: "insufficient",
+										},
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "hashed password",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+									PasswordType: &user.CreateUserRequest_Human_HashedPassword{
+										HashedPassword: &user.HashedPassword{
+											Hash: "$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm",
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+				}
+			},
+		},
+		{
+			name: "unsupported hashed password",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+									PasswordType: &user.CreateUserRequest_Human_HashedPassword{
+										HashedPassword: &user.HashedPassword{
+											Hash: "$scrypt$ln=16,r=8,p=1$cmFuZG9tc2FsdGlzaGFyZA$Rh+NnJNo1I6nRwaNqbDm6kmADswD1+7FTKZ7Ln9D8nQ",
+										},
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "human default username",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+				}
+			},
+		},
+		{
+			name: "machine user",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name: "donald",
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+				}
+			},
+		},
+		{
+			name: "machine default username to generated id",
+			testCase: func(runId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name: "donald",
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: "is generated",
+					},
+				}
+			},
+		},
+		{
+			name: "machine default username to given id",
+			testCase: func(runId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							UserId:         &runId,
+							OrganizationId: Instance.DefaultOrg.Id,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name: "donald",
+								},
+							},
+						},
+					},
+					want: &user.CreateUserResponse{
+						Id: runId,
+					},
+				}
+			},
+		},
+		{
+			name: "org does not exist human, error",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: "does not exist",
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Human_{
+								Human: &user.CreateUserRequest_Human{
+									Profile: &user.SetHumanProfile{
+										GivenName:  "Donald",
+										FamilyName: "Duck",
+									},
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "org does not exist machine, error",
+			testCase: func(runId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				return testCase{
+					args: args{
+						CTX,
+						&user.CreateUserRequest{
+							OrganizationId: "does not exist",
+							Username:       &username,
+							UserType: &user.CreateUserRequest_Machine_{
+								Machine: &user.CreateUserRequest_Machine{
+									Name: gofakeit.Name(),
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			now := time.Now()
+			runId := fmt.Sprint(now.UnixNano() + int64(i))
+			test := tt.testCase(runId)
+			got, err := Client.CreateUser(test.args.ctx, test.args.req)
+			if test.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			creationDate := got.CreationDate.AsTime()
+			assert.Greater(t, creationDate, now, "creation date is before the test started")
+			assert.Less(t, creationDate, time.Now(), "creation date is in the future")
+			if test.want.GetEmailCode() != "" {
+				assert.NotEmpty(t, got.GetEmailCode(), "email code is empty")
+			} else {
+				assert.Empty(t, got.GetEmailCode(), "email code is not empty")
+			}
+			if test.want.GetPhoneCode() != "" {
+				assert.NotEmpty(t, got.GetPhoneCode(), "phone code is empty")
+			} else {
+				assert.Empty(t, got.GetPhoneCode(), "phone code is not empty")
+			}
+			if test.want.GetId() == "is generated" {
+				assert.Len(t, got.GetId(), 18, "ID is not 18 characters")
+			} else {
+				assert.Equal(t, test.want.GetId(), got.GetId(), "ID is not the same")
+			}
+		})
+	}
+}
+
+func TestServer_CreateUser_And_Compare(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		req *user.CreateUserRequest
+	}
+	type testCase struct {
+		name   string
+		args   args
+		assert func(t *testing.T, createResponse *user.CreateUserResponse, getResponse *user.GetUserByIDResponse)
+	}
+	tests := []struct {
+		name     string
+		testCase func(runId string) testCase
+	}{{
+		name: "human given username",
+		testCase: func(runId string) testCase {
+			username := fmt.Sprintf("donald.duck+%s", runId)
+			email := username + "@example.com"
+			return testCase{
+				args: args{
+					ctx: CTX,
+					req: &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						Username:       &username,
+						UserType: &user.CreateUserRequest_Human_{
+							Human: &user.CreateUserRequest_Human{
+								Profile: &user.SetHumanProfile{
+									GivenName:  "Donald",
+									FamilyName: "Duck",
+								},
+								Email: &user.SetHumanEmail{
+									Email: email,
+								},
+							},
+						},
+					},
+				},
+				assert: func(t *testing.T, _ *user.CreateUserResponse, getResponse *user.GetUserByIDResponse) {
+					assert.Equal(t, username, getResponse.GetUser().GetUsername())
+				},
+			}
+		},
+	}, {
+		name: "human username default to email",
+		testCase: func(runId string) testCase {
+			username := fmt.Sprintf("donald.duck+%s", runId)
+			email := username + "@example.com"
+			return testCase{
+				args: args{
+					ctx: CTX,
+					req: &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserType: &user.CreateUserRequest_Human_{
+							Human: &user.CreateUserRequest_Human{
+								Profile: &user.SetHumanProfile{
+									GivenName:  "Donald",
+									FamilyName: "Duck",
+								},
+								Email: &user.SetHumanEmail{
+									Email: email,
+								},
+							},
+						},
+					},
+				},
+				assert: func(t *testing.T, _ *user.CreateUserResponse, getResponse *user.GetUserByIDResponse) {
+					assert.Equal(t, email, getResponse.GetUser().GetUsername())
+				},
+			}
+		},
+	}, {
+		name: "machine username given",
+		testCase: func(runId string) testCase {
+			username := fmt.Sprintf("donald.duck+%s", runId)
+			return testCase{
+				args: args{
+					ctx: CTX,
+					req: &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						Username:       &username,
+						UserType: &user.CreateUserRequest_Machine_{
+							Machine: &user.CreateUserRequest_Machine{
+								Name: "donald",
+							},
+						},
+					},
+				},
+				assert: func(t *testing.T, _ *user.CreateUserResponse, getResponse *user.GetUserByIDResponse) {
+					assert.Equal(t, username, getResponse.GetUser().GetUsername())
+				},
+			}
+		},
+	}, {
+		name: "machine username default to generated id",
+		testCase: func(runId string) testCase {
+			return testCase{
+				args: args{
+					ctx: CTX,
+					req: &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserType: &user.CreateUserRequest_Machine_{
+							Machine: &user.CreateUserRequest_Machine{
+								Name: "donald",
+							},
+						},
+					},
+				},
+				assert: func(t *testing.T, createResponse *user.CreateUserResponse, getResponse *user.GetUserByIDResponse) {
+					assert.Equal(t, createResponse.GetId(), getResponse.GetUser().GetUsername())
+				},
+			}
+		},
+	}, {
+		name: "machine username default to given id",
+		testCase: func(runId string) testCase {
+			return testCase{
+				args: args{
+					ctx: CTX,
+					req: &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserId:         &runId,
+						UserType: &user.CreateUserRequest_Machine_{
+							Machine: &user.CreateUserRequest_Machine{
+								Name: "donald",
+							},
+						},
+					},
+				},
+				assert: func(t *testing.T, createResponse *user.CreateUserResponse, getResponse *user.GetUserByIDResponse) {
+					assert.Equal(t, runId, getResponse.GetUser().GetUsername())
+				},
+			}
+		},
+	}}
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			now := time.Now()
+			runId := fmt.Sprint(now.UnixNano() + int64(i))
+			test := tt.testCase(runId)
+			createResponse, err := Client.CreateUser(test.args.ctx, test.args.req)
+			require.NoError(t, err)
+			Instance.TriggerUserByID(test.args.ctx, createResponse.GetId())
+			getResponse, err := Client.GetUserByID(test.args.ctx, &user.GetUserByIDRequest{
+				UserId: createResponse.GetId(),
+			})
+			require.NoError(t, err)
+			test.assert(t, createResponse, getResponse)
+		})
+	}
+}
+
+func TestServer_CreateUser_Permission(t *testing.T) {
+	newOrgOwnerEmail := gofakeit.Email()
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	type args struct {
+		ctx context.Context
+		req *user.CreateUserRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "human system, ok",
+			args: args{
+				SystemCTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Human_{
+						Human: &user.CreateUserRequest_Human{
+							Profile: &user.SetHumanProfile{
+								GivenName:  "Donald",
+								FamilyName: "Duck",
+							},
+							Email: &user.SetHumanEmail{
+								Email: "this is overwritten with a unique address",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "human instance, ok",
+			args: args{
+				IamCTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Human_{
+						Human: &user.CreateUserRequest_Human{
+							Profile: &user.SetHumanProfile{
+								GivenName:  "Donald",
+								FamilyName: "Duck",
+							},
+							Email: &user.SetHumanEmail{
+								Email: "this is overwritten with a unique address",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "human org, error",
+			args: args{
+				CTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Human_{
+						Human: &user.CreateUserRequest_Human{
+							Profile: &user.SetHumanProfile{
+								GivenName:  "Donald",
+								FamilyName: "Duck",
+							},
+							Email: &user.SetHumanEmail{
+								Email: "this is overwritten with a unique address",
+							},
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "human user, error",
+			args: args{
+				UserCTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Human_{
+						Human: &user.CreateUserRequest_Human{
+							Profile: &user.SetHumanProfile{
+								GivenName:  "Donald",
+								FamilyName: "Duck",
+							},
+							Email: &user.SetHumanEmail{
+								Email: "this is overwritten with a unique address",
+							},
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "machine system, ok",
+			args: args{
+				SystemCTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Machine_{
+						Machine: &user.CreateUserRequest_Machine{
+							Name: "donald",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "machine instance, ok",
+			args: args{
+				IamCTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Machine_{
+						Machine: &user.CreateUserRequest_Machine{
+							Name: "donald",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "machine org, error",
+			args: args{
+				CTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Machine_{
+						Machine: &user.CreateUserRequest_Machine{
+							Name: "donald",
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "machine user, error",
+			args: args{
+				UserCTX,
+				&user.CreateUserRequest{
+					OrganizationId: newOrg.GetOrganizationId(),
+					UserType: &user.CreateUserRequest_Machine_{
+						Machine: &user.CreateUserRequest_Machine{
+							Name: "donald",
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			userID := fmt.Sprint(time.Now().UnixNano() + int64(i))
+			tt.args.req.UserId = &userID
+			if email := tt.args.req.GetHuman().GetEmail(); email != nil {
+				email.Email = fmt.Sprintf("%s@example.com", userID)
+			}
+			_, err := Client.CreateUser(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestServer_UpdateUserTypeHuman(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		req *user.UpdateUserRequest
+	}
+	type testCase struct {
+		args    args
+		want    *user.UpdateUserResponse
+		wantErr bool
+	}
+	tests := []struct {
+		name     string
+		testCase func(runId, userId string) testCase
+	}{
+		{
+			name: "default verification",
+			testCase: func(runId, userId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Email: &user.SetHumanEmail{
+										Email: email,
+									},
+								},
+							},
+						},
+					},
+					want:    &user.UpdateUserResponse{},
+					wantErr: false,
+				}
+			},
+		},
+		{
+			name: "return email verification code",
+			testCase: func(runId, userId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_ReturnCode{
+											ReturnCode: &user.ReturnEmailVerificationCode{},
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.UpdateUserResponse{
+						EmailCode: gu.Ptr("something"),
+					},
+				}
+			},
+		},
+		{
+			name: "custom template",
+			testCase: func(runId, userId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_SendCode{
+											SendCode: &user.SendEmailVerificationCode{
+												UrlTemplate: gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.UpdateUserResponse{},
+				}
+			},
+		},
+		{
+			name: "return phone verification code",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Phone: &user.SetHumanPhone{
+										Phone: "+41791234568",
+										Verification: &user.SetHumanPhone_ReturnCode{
+											ReturnCode: &user.ReturnPhoneVerificationCode{},
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.UpdateUserResponse{
+						PhoneCode: gu.Ptr("something"),
+					},
+				}
+			},
+		},
+		{
+			name: "custom template error",
+			testCase: func(runId, userId string) testCase {
+				username := fmt.Sprintf("donald.duck+%s", runId)
+				email := username + "@example.com"
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Email: &user.SetHumanEmail{
+										Email: email,
+										Verification: &user.SetHumanEmail_SendCode{
+											SendCode: &user.SendEmailVerificationCode{
+												UrlTemplate: gu.Ptr("{{"),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "missing empty email",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Email: &user.SetHumanEmail{},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "password not complexity conform",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Password: &user.SetPassword{
+										PasswordType: &user.SetPassword_Password{
+											Password: &user.Password{
+												Password: "insufficient",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "hashed password",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Password: &user.SetPassword{
+										PasswordType: &user.SetPassword_HashedPassword{
+											HashedPassword: &user.HashedPassword{
+												Hash: "$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					want: &user.UpdateUserResponse{},
+				}
+			},
+		},
+		{
+			name: "unsupported hashed password",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Password: &user.SetPassword{
+										PasswordType: &user.SetPassword_HashedPassword{
+											HashedPassword: &user.HashedPassword{
+												Hash: "$scrypt$ln=16,r=8,p=1$cmFuZG9tc2FsdGlzaGFyZA$Rh+NnJNo1I6nRwaNqbDm6kmADswD1+7FTKZ7Ln9D8nQ",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "update human user with machine fields, error",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									Name: &runId,
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			now := time.Now()
+			runId := fmt.Sprint(now.UnixNano() + int64(i))
+			userId := Instance.CreateUserTypeHuman(CTX, gofakeit.Email()).GetId()
+			test := tt.testCase(runId, userId)
+			got, err := Client.UpdateUser(test.args.ctx, test.args.req)
+			if test.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			changeDate := got.ChangeDate.AsTime()
+			assert.Greater(t, changeDate, now, "change date is before the test started")
+			assert.Less(t, changeDate, time.Now(), "change date is in the future")
+			if test.want.GetEmailCode() != "" {
+				assert.NotEmpty(t, got.GetEmailCode(), "email code is empty")
+			} else {
+				assert.Empty(t, got.GetEmailCode(), "email code is not empty")
+			}
+			if test.want.GetPhoneCode() != "" {
+				assert.NotEmpty(t, got.GetPhoneCode(), "phone code is empty")
+			} else {
+				assert.Empty(t, got.GetPhoneCode(), "phone code is not empty")
+			}
+		})
+	}
+}
+
+func TestServer_UpdateUserTypeMachine(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		req *user.UpdateUserRequest
+	}
+	type testCase struct {
+		args    args
+		wantErr bool
+	}
+	tests := []struct {
+		name     string
+		testCase func(runId, userId string) testCase
+	}{
+		{
+			name: "update machine, ok",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									Name: gu.Ptr("donald"),
+								},
+							},
+						},
+					},
+				}
+			},
+		},
+		{
+			name: "update machine user with human fields, error",
+			testCase: func(runId, userId string) testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: userId,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Profile: &user.UpdateUserRequest_Human_Profile{
+										GivenName: gu.Ptr("Donald"),
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			now := time.Now()
+			runId := fmt.Sprint(now.UnixNano() + int64(i))
+			userId := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id).GetId()
+			test := tt.testCase(runId, userId)
+			got, err := Client.UpdateUser(test.args.ctx, test.args.req)
+			if test.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			changeDate := got.ChangeDate.AsTime()
+			assert.Greater(t, changeDate, now, "change date is before the test started")
+			assert.Less(t, changeDate, time.Now(), "change date is in the future")
+		})
+	}
+}
+
+func TestServer_UpdateUser_And_Compare(t *testing.T) {
+	type args struct {
+		ctx    context.Context
+		create *user.CreateUserRequest
+		update *user.UpdateUserRequest
+	}
+	type testCase struct {
+		args   args
+		assert func(t *testing.T, getResponse *user.GetUserByIDResponse)
+	}
+	tests := []struct {
+		name     string
+		testCase func(runId string) testCase
+	}{{
+		name: "human remove phone",
+		testCase: func(runId string) testCase {
+			username := fmt.Sprintf("donald.duck+%s", runId)
+			email := username + "@example.com"
+			return testCase{
+				args: args{
+					ctx: CTX,
+					create: &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserId:         &runId,
+						UserType: &user.CreateUserRequest_Human_{
+							Human: &user.CreateUserRequest_Human{
+								Profile: &user.SetHumanProfile{
+									GivenName:  "Donald",
+									FamilyName: "Duck",
+								},
+								Email: &user.SetHumanEmail{
+									Email: email,
+								},
+								Phone: &user.SetHumanPhone{
+									Phone: "+1234567890",
+								},
+							},
+						},
+					},
+					update: &user.UpdateUserRequest{
+						UserId: runId,
+						UserType: &user.UpdateUserRequest_Human_{
+							Human: &user.UpdateUserRequest_Human{
+								Phone: &user.SetHumanPhone{},
+							},
+						},
+					},
+				},
+				assert: func(t *testing.T, getResponse *user.GetUserByIDResponse) {
+					assert.Empty(t, getResponse.GetUser().GetHuman().GetPhone().GetPhone(), "phone is not empty")
+				},
+			}
+		},
+	}, {
+		name: "human username",
+		testCase: func(runId string) testCase {
+			username := fmt.Sprintf("donald.duck+%s", runId)
+			email := username + "@example.com"
+			return testCase{
+				args: args{
+					ctx: CTX,
+					create: &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserId:         &runId,
+						UserType: &user.CreateUserRequest_Human_{
+							Human: &user.CreateUserRequest_Human{
+								Profile: &user.SetHumanProfile{
+									GivenName:  "Donald",
+									FamilyName: "Duck",
+								},
+								Email: &user.SetHumanEmail{
+									Email: email,
+								},
+							},
+						},
+					},
+					update: &user.UpdateUserRequest{
+						UserId:   runId,
+						Username: &username,
+						UserType: &user.UpdateUserRequest_Human_{
+							Human: &user.UpdateUserRequest_Human{},
+						},
+					},
+				},
+				assert: func(t *testing.T, getResponse *user.GetUserByIDResponse) {
+					assert.Equal(t, username, getResponse.GetUser().GetUsername())
+				},
+			}
+		},
+	}, {
+		name: "machine username",
+		testCase: func(runId string) testCase {
+			username := fmt.Sprintf("donald.duck+%s", runId)
+			return testCase{
+				args: args{
+					ctx: CTX,
+					create: &user.CreateUserRequest{
+						OrganizationId: Instance.DefaultOrg.Id,
+						UserId:         &runId,
+						UserType: &user.CreateUserRequest_Machine_{
+							Machine: &user.CreateUserRequest_Machine{
+								Name: "Donald",
+							},
+						},
+					},
+					update: &user.UpdateUserRequest{
+						UserId:   runId,
+						Username: &username,
+						UserType: &user.UpdateUserRequest_Machine_{
+							Machine: &user.UpdateUserRequest_Machine{},
+						},
+					},
+				},
+				assert: func(t *testing.T, getResponse *user.GetUserByIDResponse) {
+					assert.Equal(t, username, getResponse.GetUser().GetUsername())
+				},
+			}
+		},
+	}}
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			now := time.Now()
+			runId := fmt.Sprint(now.UnixNano() + int64(i))
+			test := tt.testCase(runId)
+			createResponse, err := Client.CreateUser(test.args.ctx, test.args.create)
+			require.NoError(t, err)
+			_, err = Client.UpdateUser(test.args.ctx, test.args.update)
+			require.NoError(t, err)
+			Instance.TriggerUserByID(test.args.ctx, createResponse.GetId())
+			getResponse, err := Client.GetUserByID(test.args.ctx, &user.GetUserByIDRequest{
+				UserId: createResponse.GetId(),
+			})
+			require.NoError(t, err)
+			test.assert(t, getResponse)
+		})
+	}
+}
+
+func TestServer_UpdateUser_Permission(t *testing.T) {
+	newOrgOwnerEmail := gofakeit.Email()
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	newHumanUserID := newOrg.CreatedAdmins[0].GetUserId()
+	machineUserResp, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
+		OrganizationId: newOrg.OrganizationId,
+		UserType: &user.CreateUserRequest_Machine_{
+			Machine: &user.CreateUserRequest_Machine{
+				Name: "Donald",
+			},
+		},
+	})
+	require.NoError(t, err)
+	newMachineUserID := machineUserResp.GetId()
+	Instance.TriggerUserByID(IamCTX, newMachineUserID)
+	type args struct {
+		ctx context.Context
+		req *user.UpdateUserRequest
+	}
+	type testCase struct {
+		args    args
+		wantErr bool
+	}
+	tests := []struct {
+		name     string
+		testCase func() testCase
+	}{
+		{
+			name: "human, system, ok",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						SystemCTX,
+						&user.UpdateUserRequest{
+							UserId: newHumanUserID,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Profile: &user.UpdateUserRequest_Human_Profile{
+										GivenName: gu.Ptr("Donald"),
+									},
+								},
+							},
+						},
+					},
+				}
+			},
+		},
+		{
+			name: "human instance, ok",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						IamCTX,
+						&user.UpdateUserRequest{
+							UserId: newHumanUserID,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Profile: &user.UpdateUserRequest_Human_Profile{
+										GivenName: gu.Ptr("Donald"),
+									},
+								},
+							},
+						},
+					},
+				}
+			},
+		},
+		{
+			name: "human org, error",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: newHumanUserID,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Profile: &user.UpdateUserRequest_Human_Profile{
+										GivenName: gu.Ptr("Donald"),
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "human user, error",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						UserCTX,
+						&user.UpdateUserRequest{
+							UserId: newHumanUserID,
+							UserType: &user.UpdateUserRequest_Human_{
+								Human: &user.UpdateUserRequest_Human{
+									Profile: &user.UpdateUserRequest_Human_Profile{
+										GivenName: gu.Ptr("Donald"),
+									},
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "machine system, ok",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						SystemCTX,
+						&user.UpdateUserRequest{
+							UserId: newMachineUserID,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									Name: gu.Ptr("Donald"),
+								},
+							},
+						},
+					},
+				}
+			},
+		},
+		{
+			name: "machine instance, ok",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						IamCTX,
+						&user.UpdateUserRequest{
+							UserId: newMachineUserID,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									Name: gu.Ptr("Donald"),
+								},
+							},
+						},
+					},
+				}
+			},
+		},
+		{
+			name: "machine org, error",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						CTX,
+						&user.UpdateUserRequest{
+							UserId: newMachineUserID,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									Name: gu.Ptr("Donald"),
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+		{
+			name: "machine user, error",
+			testCase: func() testCase {
+				return testCase{
+					args: args{
+						UserCTX,
+						&user.UpdateUserRequest{
+							UserId: newMachineUserID,
+							UserType: &user.UpdateUserRequest_Machine_{
+								Machine: &user.UpdateUserRequest_Machine{
+									Name: gu.Ptr("Donald"),
+								},
+							},
+						},
+					},
+					wantErr: true,
+				}
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			test := tt.testCase()
+			_, err := Client.UpdateUser(test.args.ctx, test.args.req)
+			if test.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
 		})
 	}
 }

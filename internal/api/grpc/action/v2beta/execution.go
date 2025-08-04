@@ -3,6 +3,7 @@ package action
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -13,8 +14,8 @@ import (
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 )
 
-func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionRequest) (*action.SetExecutionResponse, error) {
-	reqTargets := req.GetTargets()
+func (s *Server) SetExecution(ctx context.Context, req *connect.Request[action.SetExecutionRequest]) (*connect.Response[action.SetExecutionResponse], error) {
+	reqTargets := req.Msg.GetTargets()
 	targets := make([]*execution.Target, len(reqTargets))
 	for i, target := range reqTargets {
 		targets[i] = &execution.Target{Type: domain.ExecutionTargetTypeTarget, Target: target}
@@ -25,7 +26,7 @@ func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionReque
 	var err error
 	var details *domain.ObjectDetails
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	switch t := req.GetCondition().GetConditionType().(type) {
+	switch t := req.Msg.GetCondition().GetConditionType().(type) {
 	case *action.Condition_Request:
 		cond := executionConditionFromRequest(t.Request)
 		details, err = s.command.SetExecutionRequest(ctx, cond, set, instanceID)
@@ -43,27 +44,27 @@ func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionReque
 	if err != nil {
 		return nil, err
 	}
-	return &action.SetExecutionResponse{
+	return connect.NewResponse(&action.SetExecutionResponse{
 		SetDate: timestamppb.New(details.EventDate),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListExecutionFunctions(ctx context.Context, _ *action.ListExecutionFunctionsRequest) (*action.ListExecutionFunctionsResponse, error) {
-	return &action.ListExecutionFunctionsResponse{
+func (s *Server) ListExecutionFunctions(ctx context.Context, _ *connect.Request[action.ListExecutionFunctionsRequest]) (*connect.Response[action.ListExecutionFunctionsResponse], error) {
+	return connect.NewResponse(&action.ListExecutionFunctionsResponse{
 		Functions: s.ListActionFunctions(),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListExecutionMethods(ctx context.Context, _ *action.ListExecutionMethodsRequest) (*action.ListExecutionMethodsResponse, error) {
-	return &action.ListExecutionMethodsResponse{
+func (s *Server) ListExecutionMethods(ctx context.Context, _ *connect.Request[action.ListExecutionMethodsRequest]) (*connect.Response[action.ListExecutionMethodsResponse], error) {
+	return connect.NewResponse(&action.ListExecutionMethodsResponse{
 		Methods: s.ListGRPCMethods(),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListExecutionServices(ctx context.Context, _ *action.ListExecutionServicesRequest) (*action.ListExecutionServicesResponse, error) {
-	return &action.ListExecutionServicesResponse{
+func (s *Server) ListExecutionServices(ctx context.Context, _ *connect.Request[action.ListExecutionServicesRequest]) (*connect.Response[action.ListExecutionServicesResponse], error) {
+	return connect.NewResponse(&action.ListExecutionServicesResponse{
 		Services: s.ListGRPCServices(),
-	}, nil
+	}), nil
 }
 
 func executionConditionFromRequest(request *action.RequestExecution) *command.ExecutionAPICondition {

@@ -44,7 +44,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 				ctx:           context.Background(),
 				userID:        "",
 				resourceOwner: "org1",
-				set:           nil,
+				set:           new(GenerateMachineSecret),
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -59,7 +59,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 				ctx:           context.Background(),
 				userID:        "user1",
 				resourceOwner: "",
-				set:           nil,
+				set:           new(GenerateMachineSecret),
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -76,7 +76,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 				ctx:           context.Background(),
 				userID:        "user1",
 				resourceOwner: "org1",
-				set:           nil,
+				set:           new(GenerateMachineSecret),
 			},
 			res: res{
 				err: zerrors.IsPreconditionFailed,
@@ -289,7 +289,7 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			got, err := r.RemoveMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, nil)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

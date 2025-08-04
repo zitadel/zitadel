@@ -21,6 +21,9 @@ var (
 			http_utils.XUserAgent,
 			http_utils.XGrpcWeb,
 			http_utils.XRequestedWith,
+			http_utils.ConnectProtocolVersion,
+			http_utils.ConnectTimeoutMS,
+			http_utils.GRPCTimeout,
 		},
 		AllowedMethods: []string{
 			http.MethodOptions,
@@ -34,6 +37,9 @@ var (
 		ExposedHeaders: []string{
 			http_utils.Location,
 			http_utils.ContentLength,
+			http_utils.GrpcStatus,
+			http_utils.GrpcMessage,
+			http_utils.GrpcStatusDetailsBin,
 		},
 		AllowOriginFunc: func(_ string) bool {
 			return true
