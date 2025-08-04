@@ -19,7 +19,6 @@ permissions:
   issues: write
   pull-requests: write
   actions: write
-  id-token: write
 
 jobs:
   core:
@@ -30,6 +29,11 @@ jobs:
 
   console:
     uses: ./.github/workflows/console.yml
+    with:
+      node_version: "20"
+
+  docs:
+    uses: ./.github/workflows/docs.yml
     with:
       node_version: "20"
       buf_version: "latest"
@@ -75,19 +79,9 @@ jobs:
     with:
       node_version: "18"
       buf_version: "latest"
-      go_lint_version: "v1.64.8"
+      go_lint_version: "latest"
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
-
-  login-quality:
-    needs: [compile]
-    uses: ./.github/workflows/login-quality.yml
-    permissions:
-      actions: write
-      id-token: write
-    with:
-      ignore-run-cache:  ${{ github.event_name == 'workflow_dispatch' || fromJSON(github.run_attempt) > 1 }}
-      node_version: "20"
 
   container:
     needs: [compile]
@@ -101,7 +95,6 @@ jobs:
 
   login-container:
     uses: ./.github/workflows/login-container.yml
-    if: ${{ github.event_name == 'workflow_dispatch' }}
     permissions:
       packages: write
       id-token: write
@@ -121,7 +114,15 @@ jobs:
       issues: write
       pull-requests: write
     needs:
-      [version, core-unit-test, core-integration-test, lint, container, login-container, login-quality, e2e]
+      [
+        version,
+        core-unit-test,
+        core-integration-test,
+        lint,
+        container,
+        login-container,
+        e2e,
+      ]
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
