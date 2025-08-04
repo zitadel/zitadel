@@ -25,9 +25,7 @@
     "targets": {
       "build": {
         "outputs": [
-          "dist/**",
-          ".next/**",
-          "!.next/cache/**"
+          "{projectRoot}/dist/**"
         ],
         "dependsOn": [
           "@zitadel/client#build"
