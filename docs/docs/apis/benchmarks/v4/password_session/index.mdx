@@ -26,7 +26,7 @@ Benchmark results of v4 release of Zitadel.
 | Database specification                | vCPU: 8<br/> memory: 32Gib |
 | ZITADEL metrics during test           |  |
 | Observed errors                       | Container startup latency is > 3 minutes |
-| Top 3 most expensive database queries | 1: <br/>2: <br/>3: <br/> |
+| Top 3 most expensive database queries | 1: lock projection<br/>2: query events by instance id, aggregate types, event types, position<br/>3: query events by aggregate type, event type<br/> |
 | k6 Iterations per second              | 51 |
 | k6 output                             | [output](#k6-output) |
 | flowchart outcome                     |  |
