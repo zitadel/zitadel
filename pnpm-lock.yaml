@@ -25,6 +25,9 @@ importers:
       nx:
         specifier: 21.3.10
         version: 21.3.10(@swc/core@1.13.3)
+      sass:
+        specifier: 1.64.1
+        version: 1.64.1
 
   apps/console:
     dependencies:
