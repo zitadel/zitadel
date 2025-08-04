@@ -100,9 +100,7 @@ linters:
       - .keys
       - .vscode
       - build
-      - console
       - deploy
-      - docs
       - guides
       - internal/api/ui/login/static
       - openapi
@@ -111,6 +109,12 @@ linters:
       - third_party$
       - builtin$
       - examples$
+      - apps
+      - packages
+      - console
+      - docs
+      - load-test
+
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
@@ -135,9 +139,7 @@ formatters:
       - .keys
       - .vscode
       - build
-      - console
       - deploy
-      - docs
       - guides
       - internal/api/ui/login/static
       - openapi
@@ -146,3 +148,8 @@ formatters:
       - third_party$
       - builtin$
       - examples$
+      - apps
+      - packages
+      - console
+      - docs
+      - load-test
