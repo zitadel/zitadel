@@ -1,0 +1,22 @@
+# All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml
+
+ExternalSecure: true
+ExternalPort: 443
+
+# Traefik terminates TLS. Inside the Docker network, we use plain text.
+TLS.Enabled: false
+
+# If not using the docker compose example, adjust these values for connecting ZITADEL to your PostgreSQL
+Database:
+  postgres:
+    Host: 'db'
+    Port: 5432
+    Database: zitadel
+    User.SSL.Mode: 'disable'
+    Admin.SSL.Mode: 'disable'
+
+# Access logs allow us to debug Network issues
+LogStore.Access.Stdout.Enabled: true
+
+# Skipping the MFA init step allows us to immediately authenticate at the console
+DefaultInstance.LoginPolicy.MfaInitSkipLifetime: "0s"

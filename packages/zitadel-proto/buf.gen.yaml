@@ -1,0 +1,26 @@
+version: v2
+managed:
+  enabled: true
+plugins:
+  - remote: buf.build/bufbuild/es:v2.2.0
+    out: es
+    include_imports: true
+    opt:
+      - target=js
+      - json_types=true
+      - import_extension=js
+  - remote: buf.build/bufbuild/es:v2.2.0
+    out: cjs
+    include_imports: true
+    opt:
+      - target=js
+      - json_types=true
+      - import_extension=js
+      - js_import_style=legacy_commonjs 
+  - remote: buf.build/bufbuild/es:v2.2.0
+    out: types
+    include_imports: true
+    opt:
+      - target=dts
+      - json_types=true
+      - import_extension=js
