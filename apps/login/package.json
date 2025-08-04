@@ -21,6 +21,45 @@
     "test:acceptance:setup": "cd ../.. && make login_test_acceptance_setup_env && NODE_ENV=test turbo run test:acceptance:setup:dev",
     "test:acceptance:setup:dev": "cd ../.. && make login_test_acceptance_setup_dev"
   },
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": [
+          "dist/**",
+          ".next/**",
+          "!.next/cache/**"
+        ],
+        "dependsOn": [
+          "@zitadel/client#build"
+        ]
+      },
+      "build:login:standalone": {
+        "outputs": [
+          "dist/**",
+          ".next/**",
+          "!.next/cache/**"
+        ],
+        "dependsOn": [
+          "@zitadel/client#build"
+        ]
+      },
+      "dev": {
+        "dependsOn": [
+          "@zitadel/client#build"
+        ]
+      },
+      "test": {
+        "dependsOn": [
+          "@zitadel/client#build"
+        ]
+      },
+      "test:unit": {
+        "dependsOn": [
+          "@zitadel/client#build"
+        ]
+      }
+    }
+  },
   "git": {
     "pre-commit": "lint-staged"
   },
