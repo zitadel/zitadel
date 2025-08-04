@@ -18,10 +18,10 @@ const (
 	IDPTypeOAuth
 	IDPTypeLDAP
 	IDPTypeAzure
-	IDPTypeGithub
-	IDPTypeGithubEnterprise
-	IDPTypeGitlab
-	IDPTypeGitlabSelfHosted
+	IDPTypeGitHub
+	IDPTypeGitHubEnterprise
+	IDPTypeGitLab
+	IDPTypeGitLabSelfHosted
 	IDPTypeGoogle
 	IDPTypeApple
 	IDPTypeSAML

@@ -865,22 +865,24 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.oidc.migrated.azure
 			// idp
-			assert.Equal(t, addOIDC.Id, azure.IdentityProvider.ID)
-			assert.Equal(t, name, azure.IdentityProvider.Name)
-
-			// oidc
-			assert.Equal(t, "new_clientId", azure.ClientID)
-			assert.NotEqual(t, oidc.ClientSecret, azure.ClientSecret)
+			assert.Equal(t, instanceID, azure.InstanceID)
+			assert.Nil(t, azure.OrgID)
+			assert.Equal(t, addOIDC.Id, azure.ID)
+			assert.Equal(t, name, azure.Name)
 			// type = azure
-			assert.Equal(t, domain.AzureTenantTypeOrganizations.String(), azure.Tenant)
 			assert.Equal(t, domain.IDPTypeAzure.String(), azure.Type)
-			assert.Equal(t, true, azure.IsEmailVerified)
-			assert.Equal(t, []string{"new_scope"}, azure.Scopes)
 			assert.Equal(t, true, azure.AllowLinking)
 			assert.Equal(t, true, azure.AllowCreation)
 			assert.Equal(t, true, azure.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), azure.AllowAutoLinking)
 			assert.WithinRange(t, azure.UpdatedAt, beforeCreate, afterCreate)
+
+			// oidc
+			assert.Equal(t, "new_clientId", azure.ClientID)
+			assert.NotEqual(t, oidc.ClientSecret, azure.ClientSecret)
+			assert.Equal(t, domain.AzureTenantTypeOrganizations.String(), azure.Tenant)
+			assert.Equal(t, true, azure.IsEmailVerified)
+			assert.Equal(t, []string{"new_scope"}, azure.Scopes)
 		}, retryDuration, tick)
 	})
 
@@ -945,20 +947,22 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.oidc.migrated.google
 			// idp
-			assert.Equal(t, addOIDC.Id, google.IdentityProvider.ID)
-			assert.Equal(t, name, google.IdentityProvider.Name)
-
-			// oidc
-			assert.Equal(t, "new_clientId", google.ClientID)
-			assert.NotEqual(t, oidc.ClientSecret, google.ClientSecret)
+			assert.Equal(t, instanceID, google.InstanceID)
+			assert.Nil(t, google.OrgID)
+			assert.Equal(t, addOIDC.Id, google.ID)
+			assert.Equal(t, name, google.Name)
 			// type = google
 			assert.Equal(t, domain.IDPTypeGoogle.String(), google.Type)
-			assert.Equal(t, []string{"new_scope"}, google.Scopes)
 			assert.Equal(t, true, google.AllowLinking)
 			assert.Equal(t, true, google.AllowCreation)
 			assert.Equal(t, true, google.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), google.AllowAutoLinking)
 			assert.WithinRange(t, google.UpdatedAt, beforeCreate, afterCreate)
+
+			// oidc
+			assert.Equal(t, "new_clientId", google.ClientID)
+			assert.NotEqual(t, oidc.ClientSecret, google.ClientSecret)
+			assert.Equal(t, []string{"new_scope"}, google.Scopes)
 		}, retryDuration, tick)
 	})
 
@@ -994,22 +998,23 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.jwt.added
 			// idp
+			assert.Equal(t, instanceID, jwt.InstanceID)
+			assert.Nil(t, jwt.OrgID)
 			assert.Equal(t, addJWT.Id, jwt.ID)
+			assert.Equal(t, name, jwt.Name)
 			assert.Equal(t, domain.IDPTypeJWT.String(), jwt.Type)
-
-			// jwt
-			assert.Equal(t, addJWT.Id, jwt.ID)
-			assert.Equal(t, "jwtEndpoint", jwt.JWTEndpoint)
-			assert.Equal(t, "issuer", jwt.Issuer)
-			assert.Equal(t, "keyEndpoint", jwt.KeysEndpoint)
-			assert.Equal(t, "headerName", jwt.HeaderName)
-
 			assert.Equal(t, false, jwt.AllowLinking)
 			assert.Equal(t, false, jwt.AllowCreation)
 			assert.Equal(t, false, jwt.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), jwt.AllowAutoLinking)
 			assert.WithinRange(t, jwt.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, jwt.UpdatedAt, beforeCreate, afterCreate)
+
+			// jwt
+			assert.Equal(t, "jwtEndpoint", jwt.JWTEndpoint)
+			assert.Equal(t, "issuer", jwt.Issuer)
+			assert.Equal(t, "keyEndpoint", jwt.KeysEndpoint)
+			assert.Equal(t, "headerName", jwt.HeaderName)
 		}, retryDuration, tick)
 	})
 
@@ -1064,21 +1069,22 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.jwt.added
 			// idp
+			assert.Equal(t, instanceID, jwt.InstanceID)
+			assert.Nil(t, jwt.OrgID)
 			assert.Equal(t, addJWT.Id, jwt.ID)
+			assert.Equal(t, name, jwt.Name)
 			assert.Equal(t, domain.IDPTypeJWT.String(), jwt.Type)
-
-			// jwt
-			assert.Equal(t, addJWT.Id, jwt.ID)
-			assert.Equal(t, "new_jwtEndpoint", jwt.JWTEndpoint)
-			assert.Equal(t, "new_issuer", jwt.Issuer)
-			assert.Equal(t, "new_keyEndpoint", jwt.KeysEndpoint)
-			assert.Equal(t, "new_headerName", jwt.HeaderName)
-
 			assert.Equal(t, true, jwt.AllowLinking)
 			assert.Equal(t, true, jwt.AllowCreation)
 			assert.Equal(t, true, jwt.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), jwt.AllowAutoLinking)
 			assert.WithinRange(t, jwt.UpdatedAt, beforeCreate, afterCreate)
+
+			// jwt
+			assert.Equal(t, "new_jwtEndpoint", jwt.JWTEndpoint)
+			assert.Equal(t, "new_issuer", jwt.Issuer)
+			assert.Equal(t, "new_keyEndpoint", jwt.KeysEndpoint)
+			assert.Equal(t, "new_headerName", jwt.HeaderName)
 		}, retryDuration, tick)
 	})
 
@@ -1119,20 +1125,23 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.azure.added
 			// idp
+			assert.Equal(t, instanceID, azure.InstanceID)
+			assert.Nil(t, azure.OrgID)
 			assert.Equal(t, addAzure.Id, azure.ID)
 			assert.Equal(t, name, azure.Name)
-
-			assert.Equal(t, "clientId", azure.ClientID)
-			assert.NotNil(t, azure.ClientSecret)
-			assert.Equal(t, domain.AzureTenantTypeOrganizations.String(), azure.Tenant)
 			assert.Equal(t, domain.IDPTypeAzure.String(), azure.Type)
-			assert.Equal(t, true, azure.IsEmailVerified)
-			assert.Equal(t, []string{"scope"}, azure.Scopes)
 			assert.Equal(t, true, azure.AllowLinking)
 			assert.Equal(t, true, azure.AllowCreation)
 			assert.Equal(t, true, azure.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), azure.AllowAutoLinking)
 			assert.WithinRange(t, azure.UpdatedAt, beforeCreate, afterCreate)
+
+			// azure
+			assert.Equal(t, "clientId", azure.ClientID)
+			assert.NotNil(t, azure.ClientSecret)
+			assert.Equal(t, domain.AzureTenantTypeOrganizations.String(), azure.Tenant)
+			assert.Equal(t, true, azure.IsEmailVerified)
+			assert.Equal(t, []string{"scope"}, azure.Scopes)
 		}, retryDuration, tick)
 	})
 
@@ -1168,7 +1177,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			azure, err = idpRepo.GetOAzureAD(CTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
 			require.NoError(t, err)
-			assert.Equal(t, addAzure.Id, azure.IdentityProvider.ID)
+			assert.Equal(t, addAzure.Id, azure.ID)
 		}, retryDuration, tick)
 
 		name = "new_" + name
@@ -1205,20 +1214,23 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.azure.changed
 			// idp
-			assert.Equal(t, addAzure.Id, updateAzure.IdentityProvider.ID)
-			assert.Equal(t, name, updateAzure.IdentityProvider.Name)
-
-			assert.Equal(t, "new_clientId", updateAzure.ClientID)
-			assert.NotEqual(t, azure.ClientSecret, updateAzure.ClientSecret)
-			assert.Equal(t, domain.AzureTenantTypeConsumers.String(), updateAzure.Tenant)
+			assert.Equal(t, instanceID, updateAzure.InstanceID)
+			assert.Nil(t, updateAzure.OrgID)
+			assert.Equal(t, addAzure.Id, updateAzure.ID)
+			assert.Equal(t, name, updateAzure.Name)
 			assert.Equal(t, domain.IDPTypeAzure.String(), updateAzure.Type)
-			assert.Equal(t, true, updateAzure.IsEmailVerified)
-			assert.Equal(t, []string{"new_scope"}, updateAzure.Scopes)
 			assert.Equal(t, true, updateAzure.AllowLinking)
 			assert.Equal(t, true, updateAzure.AllowCreation)
 			assert.Equal(t, true, updateAzure.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), updateAzure.AllowAutoLinking)
 			assert.WithinRange(t, updateAzure.UpdatedAt, beforeCreate, afterCreate)
+
+			// azure
+			assert.Equal(t, "new_clientId", updateAzure.ClientID)
+			assert.NotEqual(t, azure.ClientSecret, updateAzure.ClientSecret)
+			assert.Equal(t, domain.AzureTenantTypeConsumers.String(), updateAzure.Tenant)
+			assert.Equal(t, true, updateAzure.IsEmailVerified)
+			assert.Equal(t, []string{"new_scope"}, updateAzure.Scopes)
 		}, retryDuration, tick)
 	})
 
@@ -1253,18 +1265,20 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.github.added
 			// idp
+			assert.Equal(t, instanceID, github.InstanceID)
+			assert.Nil(t, github.OrgID)
 			assert.Equal(t, addGithub.Id, github.ID)
 			assert.Equal(t, name, github.Name)
-
-			assert.Equal(t, "clientId", github.ClientID)
-			assert.NotNil(t, github.ClientSecret)
-			assert.Equal(t, domain.IDPTypeGithub.String(), github.Type)
-			assert.Equal(t, []string{"scope"}, github.Scopes)
+			assert.Equal(t, domain.IDPTypeGitHub.String(), github.Type)
 			assert.Equal(t, false, github.AllowLinking)
 			assert.Equal(t, false, github.AllowCreation)
 			assert.Equal(t, false, github.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), github.AllowAutoLinking)
 			assert.WithinRange(t, github.UpdatedAt, beforeCreate, afterCreate)
+
+			assert.Equal(t, "clientId", github.ClientID)
+			assert.NotNil(t, github.ClientSecret)
+			assert.Equal(t, []string{"scope"}, github.Scopes)
 		}, retryDuration, tick)
 	})
 
@@ -1325,18 +1339,21 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.github.changed
 			// idp
+			assert.Equal(t, instanceID, updateGithub.InstanceID)
+			assert.Nil(t, updateGithub.OrgID)
 			assert.Equal(t, addGithub.Id, updateGithub.ID)
 			assert.Equal(t, name, updateGithub.Name)
-
-			assert.Equal(t, "new_clientId", updateGithub.ClientID)
-			assert.NotEqual(t, github.ClientSecret, updateGithub.ClientSecret)
-			assert.Equal(t, domain.IDPTypeGithub.String(), updateGithub.Type)
-			assert.Equal(t, []string{"new_scope"}, updateGithub.Scopes)
+			assert.Equal(t, domain.IDPTypeGitHub.String(), updateGithub.Type)
 			assert.Equal(t, true, updateGithub.AllowLinking)
 			assert.Equal(t, true, updateGithub.AllowCreation)
 			assert.Equal(t, true, updateGithub.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateGithub.AllowAutoLinking)
 			assert.WithinRange(t, updateGithub.UpdatedAt, beforeCreate, afterCreate)
+
+			// github
+			assert.Equal(t, "new_clientId", updateGithub.ClientID)
+			assert.NotEqual(t, github.ClientSecret, updateGithub.ClientSecret)
+			assert.Equal(t, []string{"new_scope"}, updateGithub.Scopes)
 		}, retryDuration, tick)
 	})
 
@@ -1374,22 +1391,25 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.github_enterprise.added
 			// idp
+			assert.Equal(t, instanceID, githubEnterprise.InstanceID)
+			assert.Nil(t, githubEnterprise.OrgID)
 			assert.Equal(t, addGithubEnterprise.Id, githubEnterprise.ID)
 			assert.Equal(t, name, githubEnterprise.Name)
-
-			assert.Equal(t, domain.IDPTypeGithubEnterprise.String(), githubEnterprise.Type)
-			assert.Equal(t, "clientId", githubEnterprise.ClientID)
-			assert.NotNil(t, githubEnterprise.ClientSecret)
-			assert.Equal(t, "authoizationEndpoint", githubEnterprise.AuthorizationEndpoint)
-			assert.Equal(t, "tokenEndpoint", githubEnterprise.TokenEndpoint)
-			assert.Equal(t, "userEndpoint", githubEnterprise.UserEndpoint)
-			assert.Equal(t, []string{"scope"}, githubEnterprise.Scopes)
+			assert.Equal(t, domain.IDPTypeGitHubEnterprise.String(), githubEnterprise.Type)
 			assert.Equal(t, false, githubEnterprise.AllowLinking)
 			assert.Equal(t, false, githubEnterprise.AllowCreation)
 			assert.Equal(t, false, githubEnterprise.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), githubEnterprise.AllowAutoLinking)
 			assert.WithinRange(t, githubEnterprise.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, githubEnterprise.UpdatedAt, beforeCreate, afterCreate)
+
+			// github enterprise
+			assert.Equal(t, "clientId", githubEnterprise.ClientID)
+			assert.NotNil(t, githubEnterprise.ClientSecret)
+			assert.Equal(t, "authoizationEndpoint", githubEnterprise.AuthorizationEndpoint)
+			assert.Equal(t, "tokenEndpoint", githubEnterprise.TokenEndpoint)
+			assert.Equal(t, "userEndpoint", githubEnterprise.UserEndpoint)
+			assert.Equal(t, []string{"scope"}, githubEnterprise.Scopes)
 		}, retryDuration, tick)
 	})
 
@@ -1456,21 +1476,24 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.github_enterprise.changed
 			// idp
+			assert.Equal(t, instanceID, githubEnterprise.InstanceID)
+			assert.Nil(t, githubEnterprise.OrgID)
 			assert.Equal(t, addGithubEnterprise.Id, updateGithubEnterprise.ID)
 			assert.Equal(t, name, updateGithubEnterprise.Name)
+			assert.Equal(t, domain.IDPTypeGitHubEnterprise.String(), updateGithubEnterprise.Type)
+			assert.Equal(t, false, updateGithubEnterprise.AllowLinking)
+			assert.Equal(t, false, updateGithubEnterprise.AllowCreation)
+			assert.Equal(t, false, updateGithubEnterprise.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), updateGithubEnterprise.AllowAutoLinking)
+			assert.WithinRange(t, updateGithubEnterprise.UpdatedAt, beforeCreate, afterCreate)
 
-			assert.Equal(t, domain.IDPTypeGithubEnterprise.String(), updateGithubEnterprise.Type)
+			// github enterprise
 			assert.Equal(t, "new_clientId", updateGithubEnterprise.ClientID)
 			assert.NotNil(t, updateGithubEnterprise.ClientSecret)
 			assert.Equal(t, "new_authoizationEndpoint", updateGithubEnterprise.AuthorizationEndpoint)
 			assert.Equal(t, "new_tokenEndpoint", updateGithubEnterprise.TokenEndpoint)
 			assert.Equal(t, "new_userEndpoint", updateGithubEnterprise.UserEndpoint)
 			assert.Equal(t, []string{"new_scope"}, updateGithubEnterprise.Scopes)
-			assert.Equal(t, false, updateGithubEnterprise.AllowLinking)
-			assert.Equal(t, false, updateGithubEnterprise.AllowCreation)
-			assert.Equal(t, false, updateGithubEnterprise.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), updateGithubEnterprise.AllowAutoLinking)
-			assert.WithinRange(t, updateGithubEnterprise.UpdatedAt, beforeCreate, afterCreate)
 		}, retryDuration, tick)
 	})
 
@@ -1479,7 +1502,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 		// add gitlab
 		beforeCreate := time.Now()
-		addGithubEnterprise, err := AdminClient.AddGitLabProvider(CTX, &admin.AddGitLabProviderRequest{
+		addGithub, err := AdminClient.AddGitLabProvider(CTX, &admin.AddGitLabProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -1500,24 +1523,27 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		// check values for gitlab
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			gitlab, err := idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, nil)
+			gitlab, err := idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.gitlab.added
 			// idp
-			assert.Equal(t, addGithubEnterprise.Id, gitlab.ID)
+			assert.Equal(t, instanceID, gitlab.InstanceID)
+			assert.Nil(t, gitlab.OrgID)
+			assert.Equal(t, addGithub.Id, gitlab.ID)
 			assert.Equal(t, name, gitlab.Name)
-
-			assert.Equal(t, domain.IDPTypeGitlab.String(), gitlab.Type)
-			assert.Equal(t, "clientId", gitlab.ClientID)
-			assert.NotNil(t, gitlab.ClientSecret)
-			assert.Equal(t, []string{"scope"}, gitlab.Scopes)
+			assert.Equal(t, domain.IDPTypeGitLab.String(), gitlab.Type)
 			assert.Equal(t, false, gitlab.AllowLinking)
 			assert.Equal(t, false, gitlab.AllowCreation)
 			assert.Equal(t, false, gitlab.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), gitlab.AllowAutoLinking)
 			assert.WithinRange(t, gitlab.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, gitlab.UpdatedAt, beforeCreate, afterCreate)
+
+			// gitlab
+			assert.Equal(t, "clientId", gitlab.ClientID)
+			assert.NotNil(t, gitlab.ClientSecret)
+			assert.Equal(t, []string{"scope"}, gitlab.Scopes)
 		}, retryDuration, tick)
 	})
 
@@ -1525,7 +1551,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add gitlab
-		addGithub, err := AdminClient.AddGitLabProvider(CTX, &admin.AddGitLabProviderRequest{
+		addGitlab, err := AdminClient.AddGitLabProvider(CTX, &admin.AddGitLabProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -1545,16 +1571,16 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		var githlab *domain.IDPGitlab
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			githlab, err = idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
+			githlab, err = idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGitlab.Id), instanceID, nil)
 			require.NoError(t, err)
-			assert.Equal(t, addGithub.Id, githlab.ID)
+			assert.Equal(t, addGitlab.Id, githlab.ID)
 		}, retryDuration, tick)
 
 		name = "new_" + name
 		// change gitlab
 		beforeCreate := time.Now()
 		_, err = AdminClient.UpdateGitLabProvider(CTX, &admin.UpdateGitLabProviderRequest{
-			Id:           addGithub.Id,
+			Id:           addGitlab.Id,
 			Name:         name,
 			ClientId:     "new_clientId",
 			ClientSecret: "new_clientSecret",
@@ -1573,23 +1599,26 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		// check values for gitlab
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateGithlab, err := idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
+			updateGithlab, err := idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGitlab.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.gitlab.changed
 			// idp
-			assert.Equal(t, addGithub.Id, updateGithlab.ID)
+			assert.Equal(t, instanceID, updateGithlab.InstanceID)
+			assert.Nil(t, updateGithlab.OrgID)
+			assert.Equal(t, addGitlab.Id, updateGithlab.ID)
 			assert.Equal(t, name, updateGithlab.Name)
-
-			assert.Equal(t, "new_clientId", updateGithlab.ClientID)
-			assert.NotEqual(t, githlab.ClientSecret, updateGithlab.ClientSecret)
-			assert.Equal(t, domain.IDPTypeGitlab.String(), updateGithlab.Type)
-			assert.Equal(t, []string{"new_scope"}, updateGithlab.Scopes)
 			assert.Equal(t, true, updateGithlab.AllowLinking)
 			assert.Equal(t, true, updateGithlab.AllowCreation)
 			assert.Equal(t, true, updateGithlab.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateGithlab.AllowAutoLinking)
 			assert.WithinRange(t, updateGithlab.UpdatedAt, beforeCreate, afterCreate)
+
+			// gitlab
+			assert.Equal(t, "new_clientId", updateGithlab.ClientID)
+			assert.NotEqual(t, githlab.ClientSecret, updateGithlab.ClientSecret)
+			assert.Equal(t, domain.IDPTypeGitLab.String(), updateGithlab.Type)
+			assert.Equal(t, []string{"new_scope"}, updateGithlab.Scopes)
 		}, retryDuration, tick)
 	})
 
@@ -1625,20 +1654,23 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.gitlab_self_hosted.added
 			// idp
+			assert.Equal(t, instanceID, gitlabSelfHosted.InstanceID)
+			assert.Nil(t, gitlabSelfHosted.OrgID)
 			assert.Equal(t, addGitlabSelfHosted.Id, gitlabSelfHosted.ID)
 			assert.Equal(t, name, gitlabSelfHosted.Name)
-
-			assert.Equal(t, domain.IDPTypeGitlabSelfHosted.String(), gitlabSelfHosted.Type)
-			assert.Equal(t, "clientId", gitlabSelfHosted.ClientID)
-			assert.Equal(t, "issuer", gitlabSelfHosted.Issuer)
-			assert.NotNil(t, gitlabSelfHosted.ClientSecret)
-			assert.Equal(t, []string{"scope"}, gitlabSelfHosted.Scopes)
+			assert.Equal(t, domain.IDPTypeGitLabSelfHosted.String(), gitlabSelfHosted.Type)
 			assert.Equal(t, false, gitlabSelfHosted.AllowLinking)
 			assert.Equal(t, false, gitlabSelfHosted.AllowCreation)
 			assert.Equal(t, false, gitlabSelfHosted.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), gitlabSelfHosted.AllowAutoLinking)
 			assert.WithinRange(t, gitlabSelfHosted.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, gitlabSelfHosted.UpdatedAt, beforeCreate, afterCreate)
+
+			// gitlab self hosted
+			assert.Equal(t, "clientId", gitlabSelfHosted.ClientID)
+			assert.Equal(t, "issuer", gitlabSelfHosted.Issuer)
+			assert.NotNil(t, gitlabSelfHosted.ClientSecret)
+			assert.Equal(t, []string{"scope"}, gitlabSelfHosted.Scopes)
 		}, retryDuration, tick)
 	})
 
@@ -1701,19 +1733,22 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.gitlab_self_hosted.changed
 			// idp
+			assert.Equal(t, instanceID, updateGithlabSelfHosted.InstanceID)
+			assert.Nil(t, updateGithlabSelfHosted.OrgID)
 			assert.Equal(t, addGitlabSelfHosted.Id, updateGithlabSelfHosted.ID)
 			assert.Equal(t, name, updateGithlabSelfHosted.Name)
-
-			assert.Equal(t, "new_clientId", updateGithlabSelfHosted.ClientID)
-			assert.Equal(t, "new_issuer", updateGithlabSelfHosted.Issuer)
-			assert.NotEqual(t, githlabSelfHosted.ClientSecret, updateGithlabSelfHosted.ClientSecret)
-			assert.Equal(t, domain.IDPTypeGitlabSelfHosted.String(), updateGithlabSelfHosted.Type)
-			assert.Equal(t, []string{"new_scope"}, updateGithlabSelfHosted.Scopes)
+			assert.Equal(t, domain.IDPTypeGitLabSelfHosted.String(), updateGithlabSelfHosted.Type)
 			assert.Equal(t, true, updateGithlabSelfHosted.AllowLinking)
 			assert.Equal(t, true, updateGithlabSelfHosted.AllowCreation)
 			assert.Equal(t, true, updateGithlabSelfHosted.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateGithlabSelfHosted.AllowAutoLinking)
 			assert.WithinRange(t, updateGithlabSelfHosted.UpdatedAt, beforeCreate, afterCreate)
+
+			// gitlab self hosted
+			assert.Equal(t, "new_clientId", updateGithlabSelfHosted.ClientID)
+			assert.Equal(t, "new_issuer", updateGithlabSelfHosted.Issuer)
+			assert.NotEqual(t, githlabSelfHosted.ClientSecret, updateGithlabSelfHosted.ClientSecret)
+			assert.Equal(t, []string{"new_scope"}, updateGithlabSelfHosted.Scopes)
 		}, retryDuration, tick)
 	})
 
@@ -1748,19 +1783,22 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.google.added
 			// idp
+			assert.Equal(t, instanceID, google.InstanceID)
+			assert.Nil(t, google.OrgID)
 			assert.Equal(t, addGoogle.Id, google.ID)
 			assert.Equal(t, name, google.Name)
-
 			assert.Equal(t, domain.IDPTypeGoogle.String(), google.Type)
-			assert.Equal(t, "clientId", google.ClientID)
-			assert.NotNil(t, google.ClientSecret)
-			assert.Equal(t, []string{"scope"}, google.Scopes)
 			assert.Equal(t, false, google.AllowLinking)
 			assert.Equal(t, false, google.AllowCreation)
 			assert.Equal(t, false, google.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), google.AllowAutoLinking)
 			assert.WithinRange(t, google.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, google.UpdatedAt, beforeCreate, afterCreate)
+
+			// google
+			assert.Equal(t, "clientId", google.ClientID)
+			assert.NotNil(t, google.ClientSecret)
+			assert.Equal(t, []string{"scope"}, google.Scopes)
 		}, retryDuration, tick)
 	})
 
@@ -1821,18 +1859,21 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 			// event instance.idp.google.changed
 			// idp
+			assert.Equal(t, instanceID, updateGoogle.InstanceID)
+			assert.Nil(t, updateGoogle.OrgID)
 			assert.Equal(t, addGoogle.Id, updateGoogle.ID)
 			assert.Equal(t, name, updateGoogle.Name)
-
-			assert.Equal(t, "new_clientId", updateGoogle.ClientID)
-			assert.NotEqual(t, google.ClientSecret, updateGoogle.ClientSecret)
 			assert.Equal(t, domain.IDPTypeGoogle.String(), updateGoogle.Type)
-			assert.Equal(t, []string{"new_scope"}, updateGoogle.Scopes)
 			assert.Equal(t, true, updateGoogle.AllowLinking)
 			assert.Equal(t, true, updateGoogle.AllowCreation)
 			assert.Equal(t, true, updateGoogle.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateGoogle.AllowAutoLinking)
 			assert.WithinRange(t, updateGoogle.UpdatedAt, beforeCreate, afterCreate)
+
+			// google
+			assert.Equal(t, "new_clientId", updateGoogle.ClientID)
+			assert.NotEqual(t, google.ClientSecret, updateGoogle.ClientSecret)
+			assert.Equal(t, []string{"new_scope"}, updateGoogle.Scopes)
 		}, retryDuration, tick)
 	})
 }

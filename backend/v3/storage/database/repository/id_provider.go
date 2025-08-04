@@ -238,7 +238,7 @@ func (i *idProvider) GetGithub(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	if idpGithub.Type != domain.IDPTypeGithub.String() {
+	if idpGithub.Type != domain.IDPTypeGitHub.String() {
 		// TODO
 		return nil, errors.New("WRONG TYPE")
 	}
@@ -260,7 +260,7 @@ func (i *idProvider) GetGithubEnterprise(ctx context.Context, id domain.IDPIdent
 		return nil, err
 	}
 
-	if idpGithubEnterprise.Type != domain.IDPTypeGithubEnterprise.String() {
+	if idpGithubEnterprise.Type != domain.IDPTypeGitHubEnterprise.String() {
 		// TODO
 		return nil, errors.New("WRONG TYPE")
 	}
@@ -282,7 +282,7 @@ func (i *idProvider) GetGitlab(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	if idpGitlab.Type != domain.IDPTypeGitlab.String() {
+	if idpGitlab.Type != domain.IDPTypeGitLab.String() {
 		// TODO
 		return nil, errors.New("WRONG TYPE")
 	}
@@ -304,7 +304,7 @@ func (i *idProvider) GetGitlabSelfHosting(ctx context.Context, id domain.IDPIden
 		return nil, err
 	}
 
-	if idpGitlabSelfHosting.Type != domain.IDPTypeGitlabSelfHosted.String() {
+	if idpGitlabSelfHosting.Type != domain.IDPTypeGitLabSelfHosted.String() {
 		// TODO
 		return nil, errors.New("WRONG TYPE")
 	}

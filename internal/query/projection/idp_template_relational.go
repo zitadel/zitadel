@@ -45,6 +45,36 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 		{
 			Aggregate: instance.AggregateType,
 			EventReducers: []handler.EventReducer{
+				// TODO
+				// {
+				// 	Event:  instance.IDPConfigAddedEventType,
+				// 	Reduce: p.reduceOldConfigAdded,
+				// },
+				// TODO
+				// 		{
+				// 			Event:  instance.IDPConfigChangedEventType,
+				// 			Reduce: p.reduceOldConfigChanged,
+				// 		},
+				// TODO
+				// 		{
+				// 			Event:  instance.IDPOIDCConfigAddedEventType,
+				// 			Reduce: p.reduceOldOIDCConfigAdded,
+				// 		},
+				// TODO
+				// 		{
+				// 			Event:  instance.IDPOIDCConfigChangedEventType,
+				// 			Reduce: p.reduceOldOIDCConfigChanged,
+				// 		},
+				// TODO
+				// 		{
+				// 			Event:  instance.IDPJWTConfigAddedEventType,
+				// 			Reduce: p.reduceOldJWTConfigAdded,
+				// 		},
+				// TODO
+				// 		{
+				// 			Event:  instance.IDPJWTConfigChangedEventType,
+				// 			Reduce: p.reduceOldJWTConfigChanged,
+				// 		},
 				{
 					Event:  instance.OAuthIDPAddedEventType,
 					Reduce: p.reduceOAuthIDPRelationalAdded,
@@ -77,36 +107,6 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  instance.JWTIDPChangedEventType,
 					Reduce: p.reduceJWTIDPRelationalChanged,
 				},
-				// TODO
-				// {
-				// 	Event:  instance.IDPConfigAddedEventType,
-				// 	Reduce: p.reduceOldConfigAdded,
-				// },
-				// TODO
-				// 		{
-				// 			Event:  instance.IDPConfigChangedEventType,
-				// 			Reduce: p.reduceOldConfigChanged,
-				// 		},
-				// TODO
-				// 		{
-				// 			Event:  instance.IDPOIDCConfigAddedEventType,
-				// 			Reduce: p.reduceOldOIDCConfigAdded,
-				// 		},
-				// TODO
-				// 		{
-				// 			Event:  instance.IDPOIDCConfigChangedEventType,
-				// 			Reduce: p.reduceOldOIDCConfigChanged,
-				// 		},
-				// TODO
-				// 		{
-				// 			Event:  instance.IDPJWTConfigAddedEventType,
-				// 			Reduce: p.reduceOldJWTConfigAdded,
-				// 		},
-				// TODO
-				// 		{
-				// 			Event:  instance.IDPJWTConfigChangedEventType,
-				// 			Reduce: p.reduceOldJWTConfigChanged,
-				// 		},
 				{
 					Event:  instance.AzureADIDPAddedEventType,
 					Reduce: p.reduceAzureADIDPRelationalAdded,
@@ -1142,7 +1142,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 				handler.NewCol(IDPTemplateIDCol, e.ID),
 				handler.NewCol(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(IDPTemplateNameCol, e.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGithub.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitHub.String()),
 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, e.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, e.IsLinkingAllowed),
@@ -1276,7 +1276,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdd
 				handler.NewCol(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPTemplateNameCol, e.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGithubEnterprise.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitHubEnterprise.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, e.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, e.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, e.IsAutoCreation),
@@ -1372,7 +1372,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event e
 				handler.NewCol(IDPTemplateIDCol, e.ID),
 				handler.NewCol(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(IDPTemplateNameCol, e.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitlab.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLab.String()),
 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, e.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, e.IsLinkingAllowed),
@@ -1470,7 +1470,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdd
 				handler.NewCol(IDPTemplateIDCol, e.ID),
 				handler.NewCol(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(IDPTemplateNameCol, e.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitlabSelfHosted.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLabSelfHosted.String()),
 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, e.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, e.IsLinkingAllowed),
