@@ -1,6 +1,6 @@
 ---
-title: machine client credentials login benchmark of zitadel v4
-sidebar_label: machine client credentials login
+title: session with password benchmark of zitadel v4
+sidebar_label: password session
 ---
 
 Benchmark results of v4 release of Zitadel.
@@ -11,9 +11,9 @@ Benchmark results of v4 release of Zitadel.
 |:--------------------------------------|:------|
 | Baseline                              | none  |
 | Purpose                               | Test current performance |
-| Test start                            | UTC |
+| Test start                            | 15:14 UTC |
 | Test duration                         | 30min |
-| Executed test                         | machine\_client\_credentials\_login |
+| Executed test                         | password\_session |
 | k6 version                            | v1.0.0-rc1 |
 | VUs                                   | 600 |
 | Client location                       | US1 |
@@ -25,9 +25,9 @@ Benchmark results of v4 release of Zitadel.
 | Database location                     | US1 |
 | Database specification                | vCPU: 8<br/> memory: 32Gib |
 | ZITADEL metrics during test           |  |
-| Observed errors                       |  |
+| Observed errors                       | Container startup latency is > 3 minutes |
 | Top 3 most expensive database queries | 1: <br/>2: <br/>3: <br/> |
-| k6 Iterations per second              |  |
+| k6 Iterations per second              | 51 |
 | k6 output                             | [output](#k6-output) |
 | flowchart outcome                     |  |
 
@@ -42,5 +42,61 @@ import { BenchmarkChart } from '/src/components/benchmark_chart';
 ## k6 output {#k6-output}
 
 ```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......................: 188813 101.308159/s
+    checks_succeeded...................: 99.35% 187589 out of 188813
+    checks_failed......................: 0.64%  1224 out of 188813
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✓ set email otp status ok
+    ✗ add Session status ok
+      ↳  99% — ✓ 93457 / ✗ 686
+    ✗ set Session status ok
+      ↳  99% — ✓ 92919 / ✗ 538
+    ✓ org removed
+
+    CUSTOM
+    login_ui_enter_login_name_duration......................................: min=240.4ms  avg=240.4ms  max=240.4ms  p(50)=240.4ms  p(95)=240.4ms  p(99)=240.4ms 
+    login_ui_enter_password_duration........................................: min=14.32ms  avg=14.32ms  max=14.32ms  p(50)=14.32ms  p(95)=14.32ms  p(99)=14.32ms 
+    login_ui_init_login_duration............................................: min=84.45ms  avg=84.45ms  max=84.45ms  p(50)=84.45ms  p(95)=84.45ms  p(99)=84.45ms 
+    login_ui_token_duration.................................................: min=148.53ms avg=148.53ms max=148.53ms p(50)=148.53ms p(95)=148.53ms p(99)=148.53ms
+    org_create_org_duration.................................................: min=59.73ms  avg=59.73ms  max=59.73ms  p(50)=59.73ms  p(95)=59.73ms  p(99)=59.73ms 
+    password_session_duration...............................................: min=371ms    avg=10.97s   max=1m4s     p(50)=9.52s    p(95)=23.81s   p(99)=27.57s  
+    session_add_session_duration............................................: min=36.81ms  avg=10.62s   max=1m0s     p(50)=9.13s    p(95)=23.23s   p(99)=29.47s  
+    session_set_session_duration............................................: min=94.6ms   avg=881.65ms max=1m0s     p(50)=365.48ms p(95)=1.88s    p(99)=4.75s   
+    set_human_email_otp_duration............................................: min=39.12ms  avg=570.13ms max=868.83ms p(50)=549.06ms p(95)=844.01ms p(99)=864.28ms
+    user_create_human_duration..............................................: min=502.43ms avg=10.82s   max=16.72s   p(50)=13.42s   p(95)=16.28s   p(99)=16.56s  
+
+    HTTP
+    http_req_duration.......................................................: min=14.32ms  avg=5.75s    max=1m0s     p(50)=583.63ms p(95)=22.01s   p(99)=26.51s  
+      { expected_response:true }............................................: min=14.32ms  avg=5.47s    max=59.87s   p(50)=566.75ms p(95)=21.8s    p(99)=24.55s  
+    http_req_failed.........................................................: 0.64%  1224 out of 189410
+    http_reqs...............................................................: 189410 101.628481/s
+
+    EXECUTION
+    iteration_duration......................................................: min=38.37ms  avg=11.5s    max=1m21s    p(50)=9.68s    p(95)=24.21s   p(99)=54.53s  
+    iterations..............................................................: 94143  50.512698/s
+    vus.....................................................................: 0      min=0              max=600
+    vus_max.................................................................: 600    min=600            max=600
+
+    NETWORK
+    data_received...........................................................: 102 MB 55 kB/s
+    data_sent...............................................................: 45 MB  24 kB/s
+
+running (31m03.7s), 000/600 VUs, 94143 complete and 0 interrupted iterations
+default ✓ [======================================] 600 VUs  30m0s
 ```
 
