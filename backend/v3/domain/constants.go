@@ -10,7 +10,7 @@ import (
 )
 
 // The variables could also be moved to a struct.
-// I just started with the [singleton pattern](https://github.com/zitadel/zitadel/wiki/WIP:-Software-Architecture#singleton) and kept it like this.
+// I just started with the [singleton pattern](https://github.com/zitadel/zitadel/wiki/Software-Architecture#singleton) and kept it like this.
 var (
 	pool database.Pool
 	// userCodeAlgorithm crypto.EncryptionAlgorithm

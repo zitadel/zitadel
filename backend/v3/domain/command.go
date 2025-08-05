@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-// Commander is all it needs to implement the [command pattern](https://github.com/zitadel/zitadel/wiki/WIP:-Software-Architecture#command-pattern).
+// Commander is all it needs to implement the [command pattern](https://github.com/zitadel/zitadel/wiki/Software-Architecture#command-pattern).
 // It is the interface all manipulations need to implement.
 // If possible it should also be used for queries. We will find out if this is possible in the future.
 type Commander interface {
