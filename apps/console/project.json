@@ -1,0 +1,46 @@
+{
+  "name": "@zitadel/console",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/console",
+  "projectType": "application",
+  "release": {
+    "docker": {
+      "repositoryName": "zitadel/console"
+    }
+  },
+  "targets": {
+    "generate": {
+      "outputs": [
+        "{projectRoot}/src/app/proto/generated/**"
+      ]
+    },
+    "build": {
+      "outputs": [
+        "{projectRoot}/dist/**"
+      ],
+      "dependsOn": [
+        "generate",
+        "@zitadel/client:build"
+      ]
+    },
+    "docker:build": {
+      "dependsOn": [
+        "build"
+      ],
+      "options": {
+        "push": false,
+        "tags": [
+          "zitadel/console:latest"
+        ]
+      }
+    },
+    "docker:run": {
+      "options": {
+        "args": [
+          "-p",
+          "3001:3001"
+        ]
+      }
+    }
+  }
+}

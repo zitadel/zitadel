@@ -591,27 +591,6 @@ importers:
         specifier: ^13.13.3
         version: 13.17.0
 
-  hodor:
-    devDependencies:
-      '@bufbuild/buf':
-        specifier: ^1.55.1
-        version: 1.55.1
-      '@changesets/cli':
-        specifier: ^2.29.5
-        version: 2.29.5
-      '@devcontainers/cli':
-        specifier: ^0.80.0
-        version: 0.80.0
-      '@nx/docker':
-        specifier: 21.4.0-beta.5
-        version: 21.4.0-beta.5(nx@21.4.0-beta.5(@swc/core@1.13.3))
-      nx:
-        specifier: 21.4.0-beta.5
-        version: 21.4.0-beta.5(@swc/core@1.13.3)
-      sass:
-        specifier: 1.64.1
-        version: 1.64.1
-
   packages/zitadel-client:
     dependencies:
       '@bufbuild/protobuf':

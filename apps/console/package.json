@@ -13,40 +13,6 @@
     "generate": "pnpm exec buf generate ../../proto --include-imports --include-wkt",
     "clean": "rm -rf dist .angular node_modules src/app/proto/generated"
   },
-  "nx": {
-    "release": {
-      "docker": {
-        "repositoryName": "zitadel/console"
-      }
-    },
-    "targets": {
-      "generate": {
-        "outputs": [
-          "{projectRoot}/src/app/proto/generated/**"
-        ]
-      },
-      "build": {
-        "outputs": [
-          "{projectRoot}/dist/**"
-        ],
-        "dependsOn": [
-          "generate",
-          "@zitadel/client:build"
-        ]
-      },
-      "docker:build": {
-        "dependsOn": ["build"]
-      },
-      "docker:run": {
-        "options": {
-          "args": [
-            "-p",
-            "3001:3001"
-          ]
-        }
-      }
-    }
-  },
     "dependencies": {
     "@angular/animations": "^16.2.12",
     "@angular/cdk": "^16.2.14",
