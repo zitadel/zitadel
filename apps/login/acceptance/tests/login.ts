@@ -3,6 +3,7 @@ import { code, otpFromSink } from "./code";
 import { loginname } from "./loginname";
 import { password } from "./password";
 import { totp } from "./zitadel";
+import { Config } from "./config";
 
 export async function startLogin(page: Page) {
   await page.goto(`./loginname`);
@@ -25,14 +26,14 @@ export async function loginScreenExpect(page: Page, fullName: string) {
   await expect(page.getByRole("heading")).toContainText(fullName);
 }
 
-export async function loginWithPasswordAndEmailOTP(page: Page, username: string, password: string, email: string) {
+export async function loginWithPasswordAndEmailOTP(cfg: Config, page: Page, username: string, password: string, email: string) {
   await loginWithPassword(page, username, password);
-  await otpFromSink(page, email);
+  await otpFromSink(page, email, cfg);
 }
 
-export async function loginWithPasswordAndPhoneOTP(page: Page, username: string, password: string, phone: string) {
+export async function loginWithPasswordAndPhoneOTP(cfg: Config, page: Page, username: string, password: string, phone: string) {
   await loginWithPassword(page, username, password);
-  await otpFromSink(page, phone);
+  await otpFromSink(page, phone, cfg);
 }
 
 export async function loginWithPasswordAndTOTP(page: Page, username: string, password: string, secret: string) {

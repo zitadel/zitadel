@@ -1,16 +1,12 @@
 import { faker } from "@faker-js/faker";
 import { test as base } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
 import { code, codeResend, otpFromSink } from "./code";
 import { codeScreenExpect } from "./code-screen";
 import { loginScreenExpect, loginWithPassword, loginWithPasswordAndEmailOTP } from "./login";
 import { OtpType, PasswordUserWithOTP } from "./user";
+import { Config, ConfigReader } from "./config";
 
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
-
-const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
+const test = base.extend<{ user: PasswordUserWithOTP; cfg: Config }>({
   user: async ({ page }, use) => {
     const user = new PasswordUserWithOTP({
       email: faker.internet.email(),
@@ -29,9 +25,12 @@ const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
     await use(user);
     await user.cleanup();
   },
+  cfg: async ({}, use) => {
+    await use(new ConfigReader().config);
+  },
 });
 
-test.skip("DOESN'T WORK: username, password and email otp login, enter code manually", async ({ user, page }) => {
+test.skip("DOESN'T WORK: username, password and email otp login, enter code manually", async ({ cfg, user, page }) => {
   // Given email otp is enabled on the organization of the user
   // Given the user has only email otp configured as second factor
   // User enters username
@@ -39,7 +38,7 @@ test.skip("DOESN'T WORK: username, password and email otp login, enter code manu
   // User receives an email with a verification code
   // User enters the code into the ui
   // User is redirected to the app (default redirect url)
-  await loginWithPasswordAndEmailOTP(page, user.getUsername(), user.getPassword(), user.getUsername());
+  await loginWithPasswordAndEmailOTP(cfg, page, user.getUsername(), user.getPassword(), user.getUsername());
   await loginScreenExpect(page, user.getFullName());
 });
 
@@ -54,7 +53,7 @@ test("username, password and email otp login, click link in email", async ({ pag
   // User is redirected to the app (default redirect url)
 });
 
-test.skip("DOESN'T WORK: username, password and email otp login, resend code", async ({ user, page }) => {
+test.skip("DOESN'T WORK: username, password and email otp login, resend code", async ({ cfg, user, page }) => {
   // Given email otp is enabled on the organization of the user
   // Given the user has only email otp configured as second factor
   // User enters username
@@ -66,7 +65,7 @@ test.skip("DOESN'T WORK: username, password and email otp login, resend code", a
   // User is redirected to the app (default redirect url)
   await loginWithPassword(page, user.getUsername(), user.getPassword());
   await codeResend(page);
-  await otpFromSink(page, user.getUsername());
+  await otpFromSink(page, user.getUsername(), cfg);
   await loginScreenExpect(page, user.getFullName());
 });
 

@@ -1,39 +1,41 @@
 import { faker } from "@faker-js/faker";
-import { test } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
+import { test as base } from "@playwright/test";
 import { loginScreenExpect } from "./login";
 import { registerWithPasskey, registerWithPassword } from "./register";
 import { removeUserByUsername } from "./zitadel";
+import { Config, ConfigReader } from "./config";
 
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
+const test = base.extend<{ cfg: Config }>({
+  cfg: async ({ page }, use) => {
+    await use(new ConfigReader().config);
+  },
+});
 
-test("register with password", async ({ page }) => {
+test("register with password", async ({ page, cfg }) => {
   const username = faker.internet.email();
   const password = "Password1!";
   const firstname = faker.person.firstName();
   const lastname = faker.person.lastName();
 
-  await registerWithPassword(page, firstname, lastname, username, password, password);
+  await registerWithPassword(cfg, page, firstname, lastname, username, password, password);
   await loginScreenExpect(page, firstname + " " + lastname);
 
   // wait for projection of user
   await page.waitForTimeout(10000);
-  await removeUserByUsername(username);
+  await removeUserByUsername(username, cfg);
 });
 
-test("register with passkey", async ({ page }) => {
+test("register with passkey", async ({ page, cfg }) => {
   const username = faker.internet.email();
   const firstname = faker.person.firstName();
   const lastname = faker.person.lastName();
 
-  await registerWithPasskey(page, firstname, lastname, username);
+  await registerWithPasskey(cfg, page, firstname, lastname, username);
   await loginScreenExpect(page, firstname + " " + lastname);
 
   // wait for projection of user
   await page.waitForTimeout(10000);
-  await removeUserByUsername(username);
+  await removeUserByUsername(username, cfg);
 });
 
 test("register with username and password - only password enabled", async ({ page }) => {

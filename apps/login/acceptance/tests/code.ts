@@ -1,9 +1,10 @@
 import { Page } from "@playwright/test";
 import { codeScreen } from "./code-screen";
 import { getOtpFromSink } from "./sink";
+import { Config } from "./config";
 
-export async function otpFromSink(page: Page, key: string) {
-  const c = await getOtpFromSink(key);
+export async function otpFromSink(page: Page, key: string, cfg: Config) {
+  const c = await getOtpFromSink(cfg, key);
   await code(page, c);
 }
 

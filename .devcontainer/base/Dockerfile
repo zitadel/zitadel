@@ -4,7 +4,6 @@ ENV SHELL=/bin/bash \
     DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
-    CI=1 \
     PNPM_HOME=/home/node/.local/share/pnpm \
     PATH=/home/node/.local/share/pnpm:$PATH
 

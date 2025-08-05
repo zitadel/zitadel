@@ -2,14 +2,11 @@ import { Authenticator } from "@otplib/core";
 import { createDigest, createRandomBytes } from "@otplib/plugin-crypto";
 import { keyDecoder, keyEncoder } from "@otplib/plugin-thirty-two"; // use your chosen base32 plugin
 import axios from "axios";
-import dotenv from "dotenv";
 import { request } from "gaxios";
-import path from "path";
 import { OtpType, userProps } from "./user";
+import { Config } from "./config";
 
-dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
-
-export async function addUser(props: userProps) {
+export async function addUser(props: userProps, cfg: Config) {
   const body = {
     username: props.email,
     organization: {
@@ -21,44 +18,37 @@ export async function addUser(props: userProps) {
     },
     email: {
       email: props.email,
-      isVerified: true,
+      isVerified: props.isEmailVerified || undefined,
     },
     phone: {
       phone: props.phone,
-      isVerified: true,
+      isVerified: props.isPhoneVerified || undefined,
     },
     password: {
       password: props.password,
       changeRequired: props.passwordChangeRequired ?? false,
     },
   };
-  if (!props.isEmailVerified) {
-    delete body.email.isVerified;
-  }
-  if (!props.isPhoneVerified) {
-    delete body.phone.isVerified;
-  }
-
-  return await listCall(`${process.env.ZITADEL_API_URL}/v2/users/human`, body);
+  return await listCall(`${cfg.zitadelApiUrl}/v2/users/human`, body, cfg);
 }
 
-export async function removeUserByUsername(username: string) {
-  const resp = await getUserByUsername(username);
+export async function removeUserByUsername(username: string, cfg: Config) {
+  const resp = await getUserByUsername(username, cfg);
   if (!resp || !resp.result || !resp.result[0]) {
     return;
   }
-  await removeUser(resp.result[0].userId);
+  await removeUser(resp.result[0].userId, cfg);
 }
 
-export async function removeUser(id: string) {
-  await deleteCall(`${process.env.ZITADEL_API_URL}/v2/users/${id}`);
+export async function removeUser(id: string, cfg: Config) {
+  await deleteCall(`${cfg.zitadelApiUrl}/v2/users/${id}`, cfg);
 }
 
-async function deleteCall(url: string) {
+async function deleteCall(url: string, cfg: Config) {
   try {
     const response = await axios.delete(url, {
       headers: {
-        Authorization: `Bearer ${process.env.ZITADEL_ADMIN_TOKEN}`,
+        Authorization: `Bearer ${cfg.adminToken}`,
       },
     });
 
@@ -73,7 +63,7 @@ async function deleteCall(url: string) {
   }
 }
 
-export async function getUserByUsername(username: string): Promise<any> {
+export async function getUserByUsername(username: string, cfg: Config): Promise<any> {
   const listUsersBody = {
     queries: [
       {
@@ -84,15 +74,15 @@ export async function getUserByUsername(username: string): Promise<any> {
     ],
   };
 
-  return await listCall(`${process.env.ZITADEL_API_URL}/v2/users`, listUsersBody);
+  return await listCall(`${cfg.zitadelApiUrl}/v2/users`, listUsersBody, cfg);
 }
 
-async function listCall(url: string, data: any): Promise<any> {
+async function listCall(url: string, data: any, cfg: Config): Promise<any> {
   try {
     const response = await axios.post(url, data, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.ZITADEL_ADMIN_TOKEN}`,
+        Authorization: `Bearer ${cfg.adminToken}`,
       },
     });
 
@@ -109,7 +99,7 @@ async function listCall(url: string, data: any): Promise<any> {
   }
 }
 
-export async function activateOTP(userId: string, type: OtpType) {
+export async function activateOTP(userId: string, type: OtpType, cfg: Config) {
   let url = "otp_";
   switch (type) {
     case OtpType.sms:
@@ -120,15 +110,15 @@ export async function activateOTP(userId: string, type: OtpType) {
       break;
   }
 
-  await pushCall(`${process.env.ZITADEL_API_URL}/v2/users/${userId}/${url}`, {});
+  await pushCall(`${cfg.zitadelApiUrl}/v2/users/${userId}/${url}`, {}, cfg);
 }
 
-async function pushCall(url: string, data: any) {
+async function pushCall(url: string, data: any, cfg: Config) {
   try {
     const response = await axios.post(url, data, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.ZITADEL_ADMIN_TOKEN}`,
+        Authorization: `Bearer ${cfg.adminToken}`,
       },
     });
 
@@ -143,10 +133,10 @@ async function pushCall(url: string, data: any) {
   }
 }
 
-export async function addTOTP(userId: string): Promise<string> {
-  const response = await listCall(`${process.env.ZITADEL_API_URL}/v2/users/${userId}/totp`, {});
+export async function addTOTP(userId: string, cfg: Config): Promise<string> {
+  const response = await listCall(`${cfg.zitadelApiUrl}/v2/users/${userId}/totp`, {}, cfg);
   const code = totp(response.secret);
-  await pushCall(`${process.env.ZITADEL_API_URL}/v2/users/${userId}/totp/verify`, { code: code });
+  await pushCall(`${cfg.zitadelApiUrl}/v2/users/${userId}/totp/verify`, { code: code }, cfg);
   return response.secret;
 }
 
@@ -170,12 +160,12 @@ export function totp(secret: string) {
   return token;
 }
 
-export async function eventualNewUser(id: string) {
+export async function eventualNewUser(id: string, cfg: Config) {
   return request({
-    url: `${process.env.ZITADEL_API_URL}/v2/users/${id}`,
+    url: `${cfg.zitadelApiUrl}/v2/users/${id}`,
     method: "GET",
     headers: {
-      Authorization: `Bearer ${process.env.ZITADEL_ADMIN_TOKEN}`,
+      Authorization: `Bearer ${cfg.adminToken}`,
       "Content-Type": "application/json",
     },
     retryConfig: {

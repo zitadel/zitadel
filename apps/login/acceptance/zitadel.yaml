@@ -3,6 +3,7 @@ TLS.Enabled: false
 
 FirstInstance:
   PatPath: /pat/zitadel-admin-sa.pat
+  LoginClientPatPath: /pat/login-client-sa.pat
   Org:
     Human:
       UserName: zitadel-admin
@@ -60,6 +61,3 @@ Database:
     MaxConnLifetime: 1h
     MaxConnIdleTime: 5m
     User.Password: zitadel
-
-Logstore.Access.Stdout.Enabled: true
-Log.Formatter.Format: json

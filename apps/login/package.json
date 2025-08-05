@@ -16,9 +16,7 @@
     "lint-staged": "lint-staged",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next",
     "test:integration:login": "wait-on --simultaneous 1 http://localhost:3001/ui/v2/login/verify?userId=221394658884845598&code=abc && cypress run",
-    "test:acceptance": "dotenv -e ../login/.env.test.local playwright",
-    "test:acceptance:setup": "cd ../.. && make login_test_acceptance_setup_env && NODE_ENV=test turbo run test:acceptance:setup:dev",
-    "test:acceptance:setup:dev": "cd ../.. && make login_test_acceptance_setup_dev"
+    "test:acceptance:login": "wait-on --simultaneous 1 http://localhost:3000/ui/v2/login/loginname && playwright test"
   },
   "git": {
     "pre-commit": "lint-staged"
@@ -71,6 +69,7 @@
     "@vercel/git-hooks": "1.0.0",
     "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "10.4.21",
+    "axios": "^1.11.0",
     "concurrently": "^9.1.2",
     "cypress": "^14.5.2",
     "dotenv-cli": "^8.0.0",

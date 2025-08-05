@@ -1,24 +1,26 @@
 {
 	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
-	"name": "Login Integration",
+	"name": "Login Acceptance",
 	"dockerComposeFile": [
 		"./docker-compose.yaml"
 	],
-	"service": "login-integration-dev",
+	"service": "login-acceptance-dev",
 	"runServices": [
-		"login-integration"
+		"login-acceptance"
 	],
 	"workspaceFolder": "/workspaces/apps/login",
 	"forwardPorts": [
-		3001 // Login Dev
+		3000, // Login Dev
+		8080, // Zitadel API Dev
+		9323, // Playwright Report
 	],
 	"remoteEnv": {
 		"FAIL_COMMANDS_ON_ERRORS": "${localEnv:FAIL_COMMANDS_ON_ERRORS}",
 		"DISPLAY": "",
 		"CI": "${localEnv:CI}"
 	},
-	"updateContentCommand": "/commands/login-integration.update-content.sh",
-	"postAttachCommand": "/commands/login-integration.post-attach.sh",
+	"updateContentCommand": "/commands/login-acceptance.update-content.sh",
+	"postAttachCommand": "/commands/login-acceptance.post-attach.sh",
 	"features": {
 		"ghcr.io/devcontainers/features/docker-outside-of-docker": {}
 	}

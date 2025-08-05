@@ -1,25 +1,22 @@
 import { defineConfig, devices } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
-
-dotenv.config({ path: path.resolve(__dirname, "../login/.env.test.local") });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: "./tests",
+  testDir: './acceptance/tests',
+  testMatch: '*.spec.ts',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  expect: {
-    timeout: 10_000, // 10 seconds
-  },
-  timeout: 300 * 1000, // 5 minutes
-  globalTimeout: 30 * 60_000, // 30 minutes
+//  expect: {
+//    timeout: 10_000, // 10 seconds
+//  },
+//  timeout: 300 * 1000, // 5 minutes
+//  globalTimeout: 30 * 60_000, // 30 minutes
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ["line"],
@@ -28,7 +25,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.LOGIN_BASE_URL || "http://127.0.0.1:3000",
+    baseURL: process.env.LOGIN_BASE_URL || "http://localhost:3000/ui/v2/login/",
     trace: "retain-on-failure",
     headless: true,
     screenshot: "only-on-failure",

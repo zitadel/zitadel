@@ -3,8 +3,10 @@ import { emailVerify } from "./email-verify";
 import { passkeyRegister } from "./passkey";
 import { registerPasswordScreen, registerUserScreenPasskey, registerUserScreenPassword } from "./register-screen";
 import { getCodeFromSink } from "./sink";
+import { Config } from "./config";
 
 export async function registerWithPassword(
+  cfg: Config, 
   page: Page,
   firstname: string,
   lastname: string,
@@ -17,10 +19,10 @@ export async function registerWithPassword(
   await page.getByTestId("submit-button").click();
   await registerPasswordScreen(page, password1, password2);
   await page.getByTestId("submit-button").click();
-  await verifyEmail(page, email);
+  await verifyEmail(cfg, page, email);
 }
 
-export async function registerWithPasskey(page: Page, firstname: string, lastname: string, email: string): Promise<string> {
+export async function registerWithPasskey(cfg: Config, page: Page, firstname: string, lastname: string, email: string): Promise<string> {
   await page.goto("./register");
   await registerUserScreenPasskey(page, firstname, lastname, email);
   await page.getByTestId("submit-button").click();
@@ -29,11 +31,11 @@ export async function registerWithPasskey(page: Page, firstname: string, lastnam
   await page.waitForTimeout(10000);
   const authId = await passkeyRegister(page);
 
-  await verifyEmail(page, email);
+  await verifyEmail(cfg, page, email);
   return authId;
 }
 
-async function verifyEmail(page: Page, email: string) {
-  const c = await getCodeFromSink(email);
+async function verifyEmail(cfg: Config, page: Page, email: string) {
+  const c = await getCodeFromSink(cfg, email);
   await emailVerify(page, c);
 }

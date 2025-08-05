@@ -1,7 +1,8 @@
 import { Gaxios, GaxiosResponse } from "gaxios";
+import { Config } from "./config";
 
-const awaitNotification = new Gaxios({
-  url: process.env.SINK_NOTIFICATION_URL,
+const awaitNotification = (cfg: Config) => new Gaxios({
+  url: cfg.sinkNotificationUrl,
   method: "POST",
   retryConfig: {
     httpMethodsToRetry: ["POST"],
@@ -14,8 +15,8 @@ const awaitNotification = new Gaxios({
   },
 });
 
-export async function getOtpFromSink(recipient: string): Promise<any> {
-  return awaitNotification.request({ data: { recipient } }).then((response) => {
+export async function getOtpFromSink(cfg: Config, recipient: string): Promise<any> {
+  return awaitNotification(cfg).request({ data: { recipient } }).then((response) => {
     expectSuccess(response);
     const otp = response?.data?.args?.otp;
     if (!otp) {
@@ -25,8 +26,8 @@ export async function getOtpFromSink(recipient: string): Promise<any> {
   });
 }
 
-export async function getCodeFromSink(recipient: string): Promise<any> {
-  return awaitNotification.request({ data: { recipient } }).then((response) => {
+export async function getCodeFromSink(cfg: Config, recipient: string): Promise<any> {
+  return awaitNotification(cfg).request({ data: { recipient } }).then((response) => {
     expectSuccess(response);
     const code = response?.data?.args?.code;
     if (!code) {
