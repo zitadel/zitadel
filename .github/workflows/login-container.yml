@@ -43,7 +43,7 @@ jobs:
           annotations: |
             manifest:org.opencontainers.image.licenses=MIT
           tags: |
-            type=sha,prefix=,suffix=-debug,format=long
+            type=sha,prefix=,format=long
       - name: Login to Docker registry
         uses: docker/login-action@v3
         with:
