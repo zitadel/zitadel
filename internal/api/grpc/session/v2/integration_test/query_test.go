@@ -15,6 +15,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
@@ -679,6 +680,44 @@ func TestServer_ListSessions(t *testing.T) {
 			wantFactors:          []wantFactor{wantUserFactor},
 			wantErr:              true,
 		},
+		{
+			name: "list sessions, expiration date query, ok",
+			args: args{
+				IAMOwnerCTX,
+				&session.ListSessionsRequest{},
+				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
+					info := createSession(ctx, t, User.GetUserId(), "useragent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
+					request.Queries = append(request.Queries,
+						&session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}},
+						&session.SearchQuery{Query: &session.SearchQuery_ExpirationDateQuery{
+							ExpirationDateQuery: &session.ExpirationDateQuery{ExpirationDate: timestamppb.Now(),
+								Method: objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_GREATER_OR_EQUALS,
+							}}})
+					return []*sessionAttr{info}
+				},
+			},
+			wantExpirationWindow: time.Minute * 5,
+			wantFactors:          []wantFactor{wantUserFactor},
+			want: &session.ListSessionsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				Sessions: []*session.Session{
+					{
+						Metadata: map[string][]byte{"key": []byte("value")},
+						UserAgent: &session.UserAgent{
+							FingerprintId: gu.Ptr("useragent"),
+							Ip:            gu.Ptr("1.2.3.4"),
+							Description:   gu.Ptr("Description"),
+							Header: map[string]*session.UserAgent_HeaderValues{
+								"foo": {Values: []string{"foo", "bar"}},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -701,7 +740,7 @@ func TestServer_ListSessions(t *testing.T) {
 				}
 
 				// expected count of sessions is not equal to received sessions
-				if !assert.Equal(ttt, got.Details.TotalResult, tt.want.Details.TotalResult) || !assert.Len(ttt, got.Sessions, len(tt.want.Sessions)) {
+				if !assert.Equal(ttt, tt.want.Details.TotalResult, got.Details.TotalResult) || !assert.Len(ttt, got.Sessions, len(tt.want.Sessions)) {
 					return
 				}
 
@@ -726,4 +765,61 @@ func TestServer_ListSessions(t *testing.T) {
 			}, retryDuration, tick)
 		})
 	}
+}
+
+func TestServer_ListSessions_with_expiration_date_filter(t *testing.T) {
+	// session with no expiration
+	session1, err := Client.CreateSession(IAMOwnerCTX, &session.CreateSessionRequest{})
+	require.NoError(t, err)
+
+	// session with expiration
+	session2, err := Client.CreateSession(IAMOwnerCTX, &session.CreateSessionRequest{
+		Lifetime: durationpb.New(5 * time.Second),
+	})
+	require.NoError(t, err)
+
+	// wait until the second session expires
+	time.Sleep(10 * time.Second)
+
+	// with comparison method GREATER_OR_EQUALS, only the active session should be returned
+	listSessionsResponse1, err := Client.ListSessions(IAMOwnerCTX,
+		&session.ListSessionsRequest{
+			Queries: []*session.SearchQuery{
+				{
+					Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{session1.SessionId}}},
+				},
+				{
+					Query: &session.SearchQuery_ExpirationDateQuery{
+						ExpirationDateQuery: &session.ExpirationDateQuery{
+							ExpirationDate: timestamppb.Now(),
+							Method:         objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_GREATER_OR_EQUALS,
+						},
+					},
+				},
+			},
+		})
+	require.NoError(t, err)
+	assert.Equal(t, 1, len(listSessionsResponse1.Sessions))
+	assert.Equal(t, session1.SessionId, listSessionsResponse1.Sessions[0].Id)
+
+	// with comparison method LESS_OR_EQUALS, only the expired session should be returned
+	listSessionsResponse2, err := Client.ListSessions(IAMOwnerCTX,
+		&session.ListSessionsRequest{
+			Queries: []*session.SearchQuery{
+				{
+					Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{session2.SessionId}}},
+				},
+				{
+					Query: &session.SearchQuery_ExpirationDateQuery{
+						ExpirationDateQuery: &session.ExpirationDateQuery{
+							ExpirationDate: timestamppb.Now(),
+							Method:         objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_LESS_OR_EQUALS,
+						},
+					},
+				},
+			},
+		})
+	require.NoError(t, err)
+	assert.Equal(t, 1, len(listSessionsResponse2.Sessions))
+	assert.Equal(t, session2.SessionId, listSessionsResponse2.Sessions[0].Id)
 }

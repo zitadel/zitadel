@@ -128,16 +128,26 @@ func creationDateQueryToQuery(q *session.CreationDateQuery) (query.SearchQuery, 
 
 func expirationDateQueryToQuery(q *session.ExpirationDateQuery) (query.SearchQuery, error) {
 	comparison := timestampComparisons[q.GetMethod()]
+
+	// to obtain sessions with a set expiration date
 	expirationDateQuery, err := query.NewExpirationDateQuery(q.GetExpirationDate().AsTime(), comparison)
 	if err != nil {
 		return nil, err
 	}
-	// include sessions without an expiration date by default
-	expirationDateIsNullQuery, err := query.NewIsNullQuery(query.SessionColumnExpiration)
-	if err != nil {
-		return nil, err
+
+	switch comparison {
+	case query.TimestampEquals, query.TimestampLess, query.TimestampLessOrEquals:
+		return expirationDateQuery, nil
+	case query.TimestampGreater, query.TimestampGreaterOrEquals:
+		// to obtain sessions without an expiration date
+		expirationDateIsNullQuery, err := query.NewIsNullQuery(query.SessionColumnExpiration)
+		if err != nil {
+			return nil, err
+		}
+		return query.NewOrQuery(expirationDateQuery, expirationDateIsNullQuery)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-Dwigt", "List.Query.InvalidComparisonMethod")
 	}
-	return query.NewOrQuery(expirationDateQuery, expirationDateIsNullQuery)
 }
 
 func fieldNameToSessionColumn(field session.SessionFieldName) query.Column {
