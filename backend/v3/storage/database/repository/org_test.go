@@ -32,34 +32,32 @@ func TestCreateOrganization(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		testFunc     func(ctx context.Context, t *testing.T) *domain.Organization
-		organization domain.Organization
+		testFunc     func(ctx context.Context, t *testing.T) *domain.CreateOrganizationCommand
+		organization domain.CreateOrganizationCommand
 		err          error
 	}{
 		{
 			name: "happy path",
-			organization: func() domain.Organization {
+			organization: func() domain.CreateOrganizationCommand {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
-				organization := domain.Organization{
+				organization := domain.CreateOrganizationCommand{
 					ID:         organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.OrgStateActive,
 				}
 				return organization
 			}(),
 		},
 		{
 			name: "create organization without name",
-			organization: func() domain.Organization {
+			organization: func() domain.CreateOrganizationCommand {
 				organizationId := gofakeit.Name()
 				// organizationName := gofakeit.Name()
-				organization := domain.Organization{
+				organization := domain.CreateOrganizationCommand{
 					ID:         organizationId,
 					Name:       "",
 					InstanceID: instanceId,
-					State:      domain.OrgStateActive,
 				}
 				return organization
 			}(),
@@ -67,16 +65,15 @@ func TestCreateOrganization(t *testing.T) {
 		},
 		{
 			name: "adding org with same id twice",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
+			testFunc: func(ctx context.Context, t *testing.T) *domain.CreateOrganizationCommand {
 				organizationRepo := repository.OrganizationRepository(pool)
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
 
-				org := domain.Organization{
+				org := domain.CreateOrganizationCommand{
 					ID:         organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.OrgStateActive,
 				}
 
 				err := organizationRepo.Create(ctx, &org)
@@ -89,16 +86,15 @@ func TestCreateOrganization(t *testing.T) {
 		},
 		{
 			name: "adding org with same name twice",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
+			testFunc: func(ctx context.Context, t *testing.T) *domain.CreateOrganizationCommand {
 				organizationRepo := repository.OrganizationRepository(pool)
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
 
-				org := domain.Organization{
+				org := domain.CreateOrganizationCommand{
 					ID:         organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.OrgStateActive,
 				}
 
 				err := organizationRepo.Create(ctx, &org)
@@ -111,8 +107,8 @@ func TestCreateOrganization(t *testing.T) {
 		},
 		func() struct {
 			name         string
-			testFunc     func(ctx context.Context, t *testing.T) *domain.Organization
-			organization domain.Organization
+			testFunc     func(ctx context.Context, t *testing.T) *domain.CreateOrganizationCommand
+			organization domain.CreateOrganizationCommand
 			err          error
 		} {
 			orgID := gofakeit.Name()
@@ -120,12 +116,12 @@ func TestCreateOrganization(t *testing.T) {
 
 			return struct {
 				name         string
-				testFunc     func(ctx context.Context, t *testing.T) *domain.Organization
-				organization domain.Organization
+				testFunc     func(ctx context.Context, t *testing.T) *domain.CreateOrganizationCommand
+				organization domain.CreateOrganizationCommand
 				err          error
 			}{
 				name: "adding org with same name, different instance",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
+				testFunc: func(ctx context.Context, t *testing.T) *domain.CreateOrganizationCommand {
 					// create instance
 					instId := gofakeit.Name()
 					instance := domain.Instance{
@@ -143,11 +139,10 @@ func TestCreateOrganization(t *testing.T) {
 
 					organizationRepo := repository.OrganizationRepository(pool)
 
-					org := domain.Organization{
+					org := domain.CreateOrganizationCommand{
 						ID:         gofakeit.Name(),
 						Name:       organizationName,
 						InstanceID: instId,
-						State:      domain.OrgStateActive,
 					}
 
 					err = organizationRepo.Create(ctx, &org)
@@ -159,24 +154,22 @@ func TestCreateOrganization(t *testing.T) {
 					org.InstanceID = instanceId
 					return &org
 				},
-				organization: domain.Organization{
+				organization: domain.CreateOrganizationCommand{
 					ID:         orgID,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.OrgStateActive,
 				},
 			}
 		}(),
 		{
 			name: "adding organization with no id",
-			organization: func() domain.Organization {
+			organization: func() domain.CreateOrganizationCommand {
 				// organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
-				organization := domain.Organization{
+				organization := domain.CreateOrganizationCommand{
 					// ID:              organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.OrgStateActive,
 				}
 				return organization
 			}(),
@@ -184,13 +177,13 @@ func TestCreateOrganization(t *testing.T) {
 		},
 		{
 			name: "adding organization with no instance id",
-			organization: func() domain.Organization {
+			organization: func() domain.CreateOrganizationCommand {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
-				organization := domain.Organization{
-					ID:    organizationId,
-					Name:  organizationName,
-					State: domain.OrgStateActive,
+				organization := domain.CreateOrganizationCommand{
+					ID:         organizationId,
+					Name:       organizationName,
+					InstanceID: "",
 				}
 				return organization
 			}(),
@@ -198,14 +191,13 @@ func TestCreateOrganization(t *testing.T) {
 		},
 		{
 			name: "adding organization with non existent instance id",
-			organization: func() domain.Organization {
+			organization: func() domain.CreateOrganizationCommand {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
-				organization := domain.Organization{
+				organization := domain.CreateOrganizationCommand{
 					ID:         organizationId,
 					Name:       organizationName,
 					InstanceID: gofakeit.Name(),
-					State:      domain.OrgStateActive,
 				}
 				return organization
 			}(),
@@ -216,17 +208,17 @@ func TestCreateOrganization(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
 
-			var organization *domain.Organization
+			var command *domain.CreateOrganizationCommand
 			if tt.testFunc != nil {
-				organization = tt.testFunc(ctx, t)
+				command = tt.testFunc(ctx, t)
 			} else {
-				organization = &tt.organization
+				command = &tt.organization
 			}
 			organizationRepo := repository.OrganizationRepository(pool)
 
 			// create organization
 			beforeCreate := time.Now()
-			err = organizationRepo.Create(ctx, organization)
+			err = organizationRepo.Create(ctx, command)
 			assert.ErrorIs(t, err, tt.err)
 			if err != nil {
 				return
@@ -234,11 +226,11 @@ func TestCreateOrganization(t *testing.T) {
 			afterCreate := time.Now()
 
 			// check organization values
-			organization, err = organizationRepo.Get(ctx,
+			organization, err := organizationRepo.Get(ctx,
 				database.WithCondition(
 					database.And(
-						organizationRepo.IDCondition(organization.ID),
-						organizationRepo.InstanceIDCondition(organization.InstanceID),
+						organizationRepo.IDCondition(command.ID),
+						organizationRepo.InstanceIDCondition(command.InstanceID),
 					),
 				),
 			)
@@ -247,7 +239,7 @@ func TestCreateOrganization(t *testing.T) {
 			assert.Equal(t, tt.organization.ID, organization.ID)
 			assert.Equal(t, tt.organization.Name, organization.Name)
 			assert.Equal(t, tt.organization.InstanceID, organization.InstanceID)
-			assert.Equal(t, tt.organization.State, organization.State)
+			assert.Equal(t, domain.OrgStateActive, organization.State)
 			assert.WithinRange(t, organization.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, organization.UpdatedAt, beforeCreate, afterCreate)
 		})
@@ -283,20 +275,22 @@ func TestUpdateOrganization(t *testing.T) {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
 
-				org := domain.Organization{
+				org := domain.CreateOrganizationCommand{
 					ID:         organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.OrgStateActive,
 				}
 
 				// create organization
 				err := organizationRepo.Create(ctx, &org)
 				require.NoError(t, err)
 
-				// update with updated value
-				org.Name = "new_name"
-				return &org
+				return &domain.Organization{
+					ID:         org.ID,
+					Name:       "new_name",
+					InstanceID: org.InstanceID,
+					State:      domain.OrgStateActive,
+				}
 			},
 			update:       []database.Change{organizationRepo.SetName("new_name")},
 			rowsAffected: 1,
@@ -307,25 +301,30 @@ func TestUpdateOrganization(t *testing.T) {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
 
-				org := domain.Organization{
+				org := domain.CreateOrganizationCommand{
 					ID:         organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.OrgStateActive,
 				}
 
 				// create organization
 				err := organizationRepo.Create(ctx, &org)
 				require.NoError(t, err)
 
-				// delete instance
+				// delete organization
 				_, err = organizationRepo.Delete(ctx,
-					organizationRepo.IDCondition(org.ID),
-					org.InstanceID,
+					database.And(
+						organizationRepo.IDCondition(org.ID),
+						organizationRepo.InstanceIDCondition(org.InstanceID),
+					),
 				)
 				require.NoError(t, err)
 
-				return &org
+				return &domain.Organization{
+					ID:         org.ID,
+					Name:       org.Name,
+					InstanceID: org.InstanceID,
+				}
 			},
 			update:       []database.Change{organizationRepo.SetName("new_name")},
 			rowsAffected: 0,
@@ -336,20 +335,22 @@ func TestUpdateOrganization(t *testing.T) {
 				organizationId := gofakeit.Name()
 				organizationName := gofakeit.Name()
 
-				org := domain.Organization{
+				org := domain.CreateOrganizationCommand{
 					ID:         organizationId,
 					Name:       organizationName,
 					InstanceID: instanceId,
-					State:      domain.OrgStateActive,
 				}
 
 				// create organization
 				err := organizationRepo.Create(ctx, &org)
 				require.NoError(t, err)
 
-				// update with updated value
-				org.State = domain.OrgStateInactive
-				return &org
+				return &domain.Organization{
+					ID:         org.ID,
+					Name:       org.Name,
+					InstanceID: org.InstanceID,
+					State:      domain.OrgStateInactive,
+				}
 			},
 			update:       []database.Change{organizationRepo.SetState(domain.OrgStateInactive)},
 			rowsAffected: 1,
@@ -357,12 +358,10 @@ func TestUpdateOrganization(t *testing.T) {
 		{
 			name: "update non existent organization",
 			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
-				organizationId := gofakeit.Name()
 
-				org := domain.Organization{
-					ID: organizationId,
+				return &domain.Organization{
+					ID: gofakeit.UUID(),
 				}
-				return &org
 			},
 			update:       []database.Change{organizationRepo.SetName("new_name")},
 			rowsAffected: 0,
@@ -378,8 +377,10 @@ func TestUpdateOrganization(t *testing.T) {
 			// update org
 			beforeUpdate := time.Now()
 			rowsAffected, err := organizationRepo.Update(ctx,
-				organizationRepo.IDCondition(createdOrg.ID),
-				createdOrg.InstanceID,
+				database.And(
+					organizationRepo.IDCondition(createdOrg.ID),
+					organizationRepo.InstanceIDCondition(createdOrg.InstanceID),
+				),
 				tt.update...,
 			)
 			afterUpdate := time.Now()
@@ -431,20 +432,19 @@ func TestGetOrganization(t *testing.T) {
 	// create organization
 	// this org is created as an additional org which should NOT
 	// be returned in the results of the tests
-	org := domain.Organization{
+	org := domain.CreateOrganizationCommand{
 		ID:         gofakeit.Name(),
 		Name:       gofakeit.Name(),
 		InstanceID: instanceId,
-		State:      domain.OrgStateActive,
 	}
 	err = orgRepo.Create(t.Context(), &org)
 	require.NoError(t, err)
 
 	type test struct {
-		name                   string
-		testFunc               func(ctx context.Context, t *testing.T) *domain.Organization
-		orgIdentifierCondition domain.OrgIdentifierCondition
-		err                    error
+		name      string
+		testFunc  func(ctx context.Context, t *testing.T) *domain.Organization
+		condition database.Condition
+		err       error
 	}
 
 	tests := []test{
@@ -455,20 +455,24 @@ func TestGetOrganization(t *testing.T) {
 				testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
 					organizationName := gofakeit.Name()
 
-					org := domain.Organization{
+					org := domain.CreateOrganizationCommand{
 						ID:         organizationId,
 						Name:       organizationName,
 						InstanceID: instanceId,
-						State:      domain.OrgStateActive,
 					}
 
 					// create organization
 					err := orgRepo.Create(ctx, &org)
 					require.NoError(t, err)
 
-					return &org
+					return &domain.Organization{
+						ID:         org.ID,
+						Name:       org.Name,
+						InstanceID: org.InstanceID,
+						State:      domain.OrgStateActive,
+					}
 				},
-				orgIdentifierCondition: orgRepo.IDCondition(organizationId),
+				condition: orgRepo.IDCondition(organizationId),
 			}
 		}(),
 		func() test {
@@ -524,33 +528,33 @@ func TestGetOrganization(t *testing.T) {
 				testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
 					organizationId := gofakeit.Name()
 
-					org := domain.Organization{
+					org := domain.CreateOrganizationCommand{
 						ID:         organizationId,
 						Name:       organizationName,
 						InstanceID: instanceId,
-						State:      domain.OrgStateActive,
 					}
 
 					// create organization
 					err := orgRepo.Create(ctx, &org)
 					require.NoError(t, err)
 
-					return &org
+					return &domain.Organization{
+						ID:         org.ID,
+						Name:       org.Name,
+						InstanceID: org.InstanceID,
+						State:      domain.OrgStateActive,
+					}
 				},
-				orgIdentifierCondition: orgRepo.NameCondition(organizationName),
+				condition: orgRepo.NameCondition(database.TextOperationEqual, organizationName),
 			}
 		}(),
 		{
 			name: "get non existent organization",
 			testFunc: func(ctx context.Context, t *testing.T) *domain.Organization {
-				org := domain.Organization{
-					ID:   "non existent org",
-					Name: "non existent org",
-				}
-				return &org
+				return new(domain.Organization)
 			},
-			orgIdentifierCondition: orgRepo.NameCondition("non-existent-instance-name"),
-			err:                    new(database.NoRowFoundError),
+			condition: orgRepo.NameCondition(database.TextOperationEqual, "non-existent-instance-name"),
+			err:       new(database.NoRowFoundError),
 		},
 	}
 	for _, tt := range tests {
@@ -567,7 +571,7 @@ func TestGetOrganization(t *testing.T) {
 			returnedOrg, err := orgRepo.Get(ctx,
 				database.WithCondition(
 					database.And(
-						tt.orgIdentifierCondition,
+						tt.condition,
 						orgRepo.InstanceIDCondition(org.InstanceID),
 					),
 				),
@@ -627,18 +631,22 @@ func TestListOrganization(t *testing.T) {
 				organizations := make([]*domain.Organization, noOfOrganizations)
 				for i := range noOfOrganizations {
 
-					org := domain.Organization{
+					org := domain.CreateOrganizationCommand{
 						ID:         gofakeit.Name(),
 						Name:       gofakeit.Name(),
 						InstanceID: instanceId,
-						State:      domain.OrgStateActive,
 					}
 
 					// create organization
 					err := organizationRepo.Create(ctx, &org)
 					require.NoError(t, err)
 
-					organizations[i] = &org
+					organizations[i] = &domain.Organization{
+						ID:         org.ID,
+						Name:       org.Name,
+						InstanceID: org.InstanceID,
+						State:      domain.OrgStateActive,
+					}
 				}
 
 				return organizations
@@ -651,18 +659,22 @@ func TestListOrganization(t *testing.T) {
 				organizations := make([]*domain.Organization, noOfOrganizations)
 				for i := range noOfOrganizations {
 
-					org := domain.Organization{
+					org := domain.CreateOrganizationCommand{
 						ID:         gofakeit.Name(),
 						Name:       gofakeit.Name(),
 						InstanceID: instanceId,
-						State:      domain.OrgStateActive,
 					}
 
 					// create organization
 					err := organizationRepo.Create(ctx, &org)
 					require.NoError(t, err)
 
-					organizations[i] = &org
+					organizations[i] = &domain.Organization{
+						ID:         org.ID,
+						Name:       org.Name,
+						InstanceID: org.InstanceID,
+						State:      domain.OrgStateActive,
+					}
 				}
 
 				return organizations
@@ -676,11 +688,10 @@ func TestListOrganization(t *testing.T) {
 					// create organization
 					// this org is created as an additional org which should NOT
 					// be returned in the results of this test case
-					org := domain.Organization{
+					org := domain.CreateOrganizationCommand{
 						ID:         gofakeit.Name(),
 						Name:       gofakeit.Name(),
 						InstanceID: instanceId,
-						State:      domain.OrgStateActive,
 					}
 					err = organizationRepo.Create(ctx, &org)
 					require.NoError(t, err)
@@ -689,18 +700,22 @@ func TestListOrganization(t *testing.T) {
 					organizations := make([]*domain.Organization, noOfOrganizations)
 					for i := range noOfOrganizations {
 
-						org := domain.Organization{
+						org := domain.CreateOrganizationCommand{
 							ID:         organizationId,
 							Name:       gofakeit.Name(),
 							InstanceID: instanceId,
-							State:      domain.OrgStateActive,
 						}
 
 						// create organization
 						err := organizationRepo.Create(ctx, &org)
 						require.NoError(t, err)
 
-						organizations[i] = &org
+						organizations[i] = &domain.Organization{
+							ID:         org.ID,
+							Name:       org.Name,
+							InstanceID: org.InstanceID,
+							State:      domain.OrgStateActive,
+						}
 					}
 
 					return organizations
@@ -714,11 +729,10 @@ func TestListOrganization(t *testing.T) {
 				// create organization
 				// this org is created as an additional org which should NOT
 				// be returned in the results of this test case
-				org := domain.Organization{
+				org := domain.CreateOrganizationCommand{
 					ID:         gofakeit.Name(),
 					Name:       gofakeit.Name(),
 					InstanceID: instanceId,
-					State:      domain.OrgStateActive,
 				}
 				err = organizationRepo.Create(ctx, &org)
 				require.NoError(t, err)
@@ -727,18 +741,31 @@ func TestListOrganization(t *testing.T) {
 				organizations := make([]*domain.Organization, noOfOrganizations)
 				for i := range noOfOrganizations {
 
-					org := domain.Organization{
+					org := domain.CreateOrganizationCommand{
 						ID:         gofakeit.Name(),
 						Name:       gofakeit.Name(),
 						InstanceID: instanceId,
-						State:      domain.OrgStateInactive,
 					}
 
 					// create organization
 					err := organizationRepo.Create(ctx, &org)
 					require.NoError(t, err)
+					changedRows, err := organizationRepo.Update(ctx,
+						database.And(
+							organizationRepo.IDCondition(org.ID),
+							organizationRepo.InstanceIDCondition(org.InstanceID),
+						),
+						organizationRepo.SetState(domain.OrgStateInactive),
+					)
+					require.NoError(t, err)
+					require.Equal(t, int64(1), changedRows)
 
-					organizations[i] = &org
+					organizations[i] = &domain.Organization{
+						ID:         org.ID,
+						Name:       org.Name,
+						InstanceID: org.InstanceID,
+						State:      domain.OrgStateInactive,
+					}
 				}
 
 				return organizations
@@ -768,11 +795,10 @@ func TestListOrganization(t *testing.T) {
 					// create organization
 					// this org is created as an additional org which should NOT
 					// be returned in the results of this test case
-					org := domain.Organization{
+					org := domain.CreateOrganizationCommand{
 						ID:         gofakeit.Name(),
 						Name:       gofakeit.Name(),
 						InstanceID: instanceId_1,
-						State:      domain.OrgStateActive,
 					}
 					err = organizationRepo.Create(ctx, &org)
 					require.NoError(t, err)
@@ -794,18 +820,22 @@ func TestListOrganization(t *testing.T) {
 					organizations := make([]*domain.Organization, noOfOrganizations)
 					for i := range noOfOrganizations {
 
-						org := domain.Organization{
+						org := domain.CreateOrganizationCommand{
 							ID:         gofakeit.Name(),
 							Name:       gofakeit.Name(),
 							InstanceID: instanceId_2,
-							State:      domain.OrgStateActive,
 						}
 
 						// create organization
 						err := organizationRepo.Create(ctx, &org)
 						require.NoError(t, err)
 
-						organizations[i] = &org
+						organizations[i] = &domain.Organization{
+							ID:         org.ID,
+							Name:       org.Name,
+							InstanceID: org.InstanceID,
+							State:      domain.OrgStateActive,
+						}
 					}
 
 					return organizations
@@ -831,7 +861,7 @@ func TestListOrganization(t *testing.T) {
 			// check organization values
 			returnedOrgs, err := organizationRepo.List(ctx,
 				database.WithCondition(condition),
-				database.WithOrderBy(organizationRepo.CreatedAtColumn(true)),
+				database.WithOrderBy(false, organizationRepo.CreatedAtColumn(true)),
 			)
 			require.NoError(t, err)
 			if tt.noOrganizationReturned {
@@ -867,10 +897,10 @@ func TestDeleteOrganization(t *testing.T) {
 	require.NoError(t, err)
 
 	type test struct {
-		name                   string
-		testFunc               func(ctx context.Context, t *testing.T)
-		orgIdentifierCondition domain.OrgIdentifierCondition
-		noOfDeletedRows        int64
+		name            string
+		testFunc        func(ctx context.Context, t *testing.T)
+		condition       database.Condition
+		noOfDeletedRows int64
 	}
 	tests := []test{
 		func() test {
@@ -883,22 +913,26 @@ func TestDeleteOrganization(t *testing.T) {
 					organizations := make([]*domain.Organization, noOfOrganizations)
 					for i := range noOfOrganizations {
 
-						org := domain.Organization{
+						org := domain.CreateOrganizationCommand{
 							ID:         organizationId,
 							Name:       gofakeit.Name(),
 							InstanceID: instanceId,
-							State:      domain.OrgStateActive,
 						}
 
 						// create organization
 						err := organizationRepo.Create(ctx, &org)
 						require.NoError(t, err)
 
-						organizations[i] = &org
+						organizations[i] = &domain.Organization{
+							ID:         org.ID,
+							Name:       org.Name,
+							InstanceID: org.InstanceID,
+							State:      domain.OrgStateActive,
+						}
 					}
 				},
-				orgIdentifierCondition: organizationRepo.IDCondition(organizationId),
-				noOfDeletedRows:        noOfOrganizations,
+				condition:       organizationRepo.IDCondition(organizationId),
+				noOfDeletedRows: noOfOrganizations,
 			}
 		}(),
 		func() test {
@@ -911,30 +945,34 @@ func TestDeleteOrganization(t *testing.T) {
 					organizations := make([]*domain.Organization, noOfOrganizations)
 					for i := range noOfOrganizations {
 
-						org := domain.Organization{
+						org := domain.CreateOrganizationCommand{
 							ID:         gofakeit.Name(),
 							Name:       organizationName,
 							InstanceID: instanceId,
-							State:      domain.OrgStateActive,
 						}
 
 						// create organization
 						err := organizationRepo.Create(ctx, &org)
 						require.NoError(t, err)
 
-						organizations[i] = &org
+						organizations[i] = &domain.Organization{
+							ID:         org.ID,
+							Name:       org.Name,
+							InstanceID: org.InstanceID,
+							State:      domain.OrgStateActive,
+						}
 					}
 				},
-				orgIdentifierCondition: organizationRepo.NameCondition(organizationName),
-				noOfDeletedRows:        noOfOrganizations,
+				condition:       organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
+				noOfDeletedRows: noOfOrganizations,
 			}
 		}(),
 		func() test {
 			organizationRepo := repository.OrganizationRepository(pool)
-			non_existent_organization_name := gofakeit.Name()
+			nonExistentOrgName := gofakeit.Name()
 			return test{
-				name:                   "delete non existent organization",
-				orgIdentifierCondition: organizationRepo.NameCondition(non_existent_organization_name),
+				name:      "delete non existent organization",
+				condition: organizationRepo.NameCondition(database.TextOperationEqual, nonExistentOrgName),
 			}
 		}(),
 		func() test {
@@ -947,29 +985,35 @@ func TestDeleteOrganization(t *testing.T) {
 					organizations := make([]*domain.Organization, noOfOrganizations)
 					for i := range noOfOrganizations {
 
-						org := domain.Organization{
+						org := domain.CreateOrganizationCommand{
 							ID:         gofakeit.Name(),
 							Name:       organizationName,
 							InstanceID: instanceId,
-							State:      domain.OrgStateActive,
 						}
 
 						// create organization
 						err := organizationRepo.Create(ctx, &org)
 						require.NoError(t, err)
 
-						organizations[i] = &org
+						organizations[i] = &domain.Organization{
+							ID:         org.ID,
+							Name:       org.Name,
+							InstanceID: org.InstanceID,
+							State:      domain.OrgStateActive,
+						}
 					}
 
 					// delete organization
 					affectedRows, err := organizationRepo.Delete(ctx,
-						organizationRepo.NameCondition(organizationName),
-						organizations[0].InstanceID,
+						database.And(
+							organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
+							organizationRepo.InstanceIDCondition(organizations[0].InstanceID),
+						),
 					)
 					assert.Equal(t, int64(1), affectedRows)
 					require.NoError(t, err)
 				},
-				orgIdentifierCondition: organizationRepo.NameCondition(organizationName),
+				condition: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
 				// this test should return 0 affected rows as the org was already deleted
 				noOfDeletedRows: 0,
 			}
@@ -986,8 +1030,7 @@ func TestDeleteOrganization(t *testing.T) {
 
 			// delete organization
 			noOfDeletedRows, err := organizationRepo.Delete(ctx,
-				tt.orgIdentifierCondition,
-				instanceId,
+				tt.condition,
 			)
 			require.NoError(t, err)
 			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
@@ -996,7 +1039,7 @@ func TestDeleteOrganization(t *testing.T) {
 			organization, err := organizationRepo.Get(ctx,
 				database.WithCondition(
 					database.And(
-						tt.orgIdentifierCondition,
+						tt.condition,
 						organizationRepo.InstanceIDCondition(instanceId),
 					),
 				),

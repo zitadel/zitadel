@@ -1,21 +1,23 @@
-package orgv2
+package org
 
-// this file has been commented out to pass the linter
+import (
+	"github.com/zitadel/zitadel/backend/v3/telemetry/logging"
+	"github.com/zitadel/zitadel/backend/v3/telemetry/tracing"
+	"github.com/zitadel/zitadel/pkg/grpc/org/v2beta/orgconnect"
+)
 
-// import (
-// 	"github.com/zitadel/zitadel/backend/v3/telemetry/logging"
-// 	"github.com/zitadel/zitadel/backend/v3/telemetry/tracing"
-// )
+var _ orgconnect.OrganizationServiceHandler = (*Server)(nil)
 
-// var (
-// 	logger logging.Logger
-// 	tracer tracing.Tracer
-// )
+type Server struct {
+	orgconnect.UnimplementedOrganizationServiceHandler
 
-// func SetLogger(l logging.Logger) {
-// 	logger = l
-// }
+	logger logging.Logger
+	tracer tracing.Tracer
+}
 
-// func SetTracer(t tracing.Tracer) {
-// 	tracer = t
-// }
+func NewServer(logger logging.Logger, tracer tracing.Tracer) *Server {
+	return &Server{
+		logger: logger,
+		tracer: tracer,
+	}
+}
