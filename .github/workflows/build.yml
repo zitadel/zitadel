@@ -108,6 +108,12 @@ jobs:
     with:
       login_build_image: ${{ needs.login-container.outputs.login_build_image }}
 
+  login-acceptance-test: 
+    uses: ./.github/workflows/login-acceptance-test.yml
+    needs: [login-container, compile]
+    with:
+      login_build_image: ${{ needs.login-container.outputs.login_build_image }}
+
   e2e:
     uses: ./.github/workflows/e2e.yml
     needs: [compile]

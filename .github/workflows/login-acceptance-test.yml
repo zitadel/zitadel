@@ -6,9 +6,6 @@ on:
       login_build_image:
         required: true
         type: string
-      zitadel_build_image:
-        required: true
-        type: string
 
 permissions:
   packages: write
@@ -20,26 +17,30 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install Dev Container CLI
-        run: npm install -g @devcontainers/cli@0.80.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Pull Login Build Image
-        run: docker compose --file .devcontainer/login-acceptance/docker-compose.yaml pull
-        env:
-          LOGIN_TAG: ${{ inputs.login_build_image }}
-          ZITADEL_TAG: ${{ inputs.zitadel_build_image }}
-      - name: Run Integration Tests against the Login and a Mocked Zitadel API
+      - uses: actions/download-artifact@v4
+        with:
+          path: .artifacts
+          name: zitadel-linux-amd64
+      - name: Unpack executable
+        run: |
+          tar -xvf .artifacts/zitadel-linux-amd64.tar.gz
+          mv zitadel-linux-amd64/zitadel ./zitadel
+      - name: Build Zitadel Image
+        run: make docker_image
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli@0.80.0
+      - name: Run Integration Tests against the Login and the Zitadel API
         run: npm run devcontainer:acceptance:login
         env:
           LOGIN_TAG: ${{ inputs.login_build_image }}
-          ZITADEL_TAG: ${{ inputs.zitadel_build_image }}
           DOCKER_BUILDKIT: 1
       - name: Fix Failures
         if: failure()
         run: |
           echo "Reproduce this check locally:"
-          echo "LOGIN_TAG=${{ inputs.login_build_image }} ZITADEL_TAG=${{ inputs.login_build_image }} npm run devcontainer:acceptance:login"
+          echo "LOGIN_TAG=${{ inputs.login_build_image }} npm run devcontainer:acceptance:login"
           echo "To fix the failures, open the dev container called \"Login Acceptance\"."
           echo "You will have the same environment as the pipeline check as well as some guidance on how to fix the errors."
       - name: Show Compose Status
@@ -50,7 +51,6 @@ jobs:
         run: COMPOSE_BAKE=1 docker compose --file .devcontainer/login-acceptance/docker-compose.yaml config login-acceptance
         env:
           LOGIN_TAG: ${{ inputs.login_build_image }}
-          ZITADEL_TAG: ${{ inputs.zitadel_build_image }}
       - name: Show Container Logs
         if: failure()
         run: docker compose --file .devcontainer/login-acceptance/docker-compose.yaml logs --timestamps --no-color --tail 100 login-acceptance
