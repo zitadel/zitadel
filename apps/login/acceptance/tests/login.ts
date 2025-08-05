@@ -22,18 +22,18 @@ export async function loginWithPasskey(page: Page, authenticatorId: string, user
 }
 
 export async function loginScreenExpect(page: Page, fullName: string) {
-  await expect(page).toHaveURL(/.*signedin.*/);
+  await expect(page).toHaveURL(/.*signedin.*/, { timeout: 10_000 });
   await expect(page.getByRole("heading")).toContainText(fullName);
 }
 
-export async function loginWithPasswordAndEmailOTP(cfg: Config, page: Page, username: string, password: string, email: string) {
+export async function loginWithPasswordAndEmailOTP(cfg: Config, page: Page, since: Date, username: string, password: string, email: string) {
   await loginWithPassword(page, username, password);
-  await otpFromSink(page, email, cfg);
+  await otpFromSink(page, email, cfg, since);
 }
 
-export async function loginWithPasswordAndPhoneOTP(cfg: Config, page: Page, username: string, password: string, phone: string) {
+export async function loginWithPasswordAndPhoneOTP(cfg: Config, page: Page, since: Date, username: string, password: string, phone: string) {
   await loginWithPassword(page, username, password);
-  await otpFromSink(page, phone, cfg);
+  await otpFromSink(page, phone, cfg, since);
 }
 
 export async function loginWithPasswordAndTOTP(page: Page, username: string, password: string, secret: string) {

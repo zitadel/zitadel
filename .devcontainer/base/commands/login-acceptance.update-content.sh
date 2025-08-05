@@ -11,7 +11,7 @@ pnpm install --frozen-lockfile \
     --filter @zitadel/proto  \
     --filter zitadel-monorepo
 pnpm exec playwright install --with-deps
-pnpm test:acceptance:login
+PLAYWRIGHT_HTML_OPEN=never pnpm test:acceptance:login
 
 if [ "$FAIL_COMMANDS_ON_ERRORS" != "true" ]; then
     exit 0

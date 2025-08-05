@@ -4,8 +4,9 @@ import { code } from "./code";
 import { codeScreenExpect } from "./code-screen";
 import { loginScreenExpect, loginWithPassword, loginWithPasswordAndPhoneOTP } from "./login";
 import { OtpType, PasswordUserWithOTP } from "./user";
+import { Config, ConfigReader } from "./config";
 
-const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
+const test = base.extend<{ user: PasswordUserWithOTP; sink: any; cfg: Config }>({
   user: async ({ page }, use) => {
     const user = new PasswordUserWithOTP({
       email: faker.internet.email(),
@@ -24,9 +25,12 @@ const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
     await use(user);
     await user.cleanup();
   },
+    cfg: async ({}, use) => {
+      await use(new ConfigReader().config);
+    },
 });
 
-test.skip("DOESN'T WORK: username, password and sms otp login, enter code manually", async ({ user, page }) => {
+test("username, password and sms otp login, enter code manually", async ({ user, page, cfg }) => {
   // Given sms otp is enabled on the organization of the user
   // Given the user has only sms otp configured as second factor
   // User enters username
@@ -34,11 +38,11 @@ test.skip("DOESN'T WORK: username, password and sms otp login, enter code manual
   // User receives a sms with a verification code
   // User enters the code into the ui
   // User is redirected to the app (default redirect url)
-  await loginWithPasswordAndPhoneOTP(page, user.getUsername(), user.getPassword(), user.getPhone());
+  await loginWithPasswordAndPhoneOTP(cfg, page, new Date(), user.getUsername(), user.getPassword(), user.getPhone());
   await loginScreenExpect(page, user.getFullName());
 });
 
-test.skip("DOESN'T WORK: username, password and sms otp login, resend code", async ({ user, page }) => {
+test.skip("DUPLICATE TEST IMPLEMENTATION: username, password and sms otp login, resend code", async ({ user, page, cfg }) => {
   // Given sms otp is enabled on the organization of the user
   // Given the user has only sms otp configured as second factor
   // User enters username
@@ -47,7 +51,7 @@ test.skip("DOESN'T WORK: username, password and sms otp login, resend code", asy
   // User clicks resend code
   // User receives a new sms with a verification code
   // User is redirected to the app (default redirect url)
-  await loginWithPasswordAndPhoneOTP(page, user.getUsername(), user.getPassword(), user.getPhone());
+  await loginWithPasswordAndPhoneOTP(cfg, page, new Date(), user.getUsername(), user.getPassword(), user.getPhone());
   await loginScreenExpect(page, user.getFullName());
 });
 

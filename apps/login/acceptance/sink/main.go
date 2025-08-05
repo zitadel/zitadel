@@ -9,11 +9,13 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 type serializableData struct {
 	ContextInfo map[string]interface{} `json:"contextInfo,omitempty"`
 	Args        map[string]interface{} `json:"args,omitempty"`
+	Since       time.Time              `json:"since,omitempty"`
 }
 
 type response struct {
@@ -43,7 +45,9 @@ func main() {
 			return
 		}
 
-		serializableData := serializableData{}
+		serializableData := serializableData{
+			Since: time.Now(),
+		}
 		if err := json.Unmarshal(data, &serializableData); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -65,7 +69,9 @@ func main() {
 			return
 		}
 
-		serializableData := serializableData{}
+		serializableData := serializableData{
+			Since: time.Now(),
+		}
 		if err := json.Unmarshal(data, &serializableData); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -97,6 +103,17 @@ func main() {
 			http.Error(w, "No messages found for recipient: "+response.Recipient, http.StatusNotFound)
 			return
 		}
+		if sinceQuery := r.URL.Query().Get("since"); sinceQuery != "" {
+			sinceTime, err := time.Parse(time.RFC3339, sinceQuery)
+			if err != nil {
+				http.Error(w, "Invalid since query parameter: "+sinceQuery, http.StatusBadRequest)
+				return
+			}
+			if sinceTime.After(msg.Since) {
+				http.Error(w, "Found a notification but it's older than "+sinceQuery, http.StatusNotFound)
+				return
+			}
+		}
 		serializableData, err := json.Marshal(msg)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -105,6 +122,7 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(serializableData)
 	})
+
 	if *configureZitadel {
 		zitadelAPIToken, err := os.ReadFile(*zitadelAPITokenFile)
 		if err != nil {
@@ -114,7 +132,6 @@ func main() {
 		ensureProvider(*zitadelAPIUrl, cleanToken, *zitadelExternalDomain, *mockServiceURL, *email)
 		ensureProvider(*zitadelAPIUrl, cleanToken, *zitadelExternalDomain, *mockServiceURL, *sms)
 	}
-
 	fmt.Println("Starting server on", *port)
 	fmt.Println(*email, " for email handling")
 	fmt.Println(*sms, " for sms handling")

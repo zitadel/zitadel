@@ -9,13 +9,16 @@ echo
 echo
 echo -e "THANKS FOR CONTRIBUTING TO ZITADEL 🚀"
 echo
+nohup bash -c "pnpm playwright show-report --host 0.0.0.0 &"
+echo "View the Playwright report at http://localhost:9323"
+echo
 echo "Your dev container is configured for fixing login acceptance tests."
 echo "The login is running in a separate container with the same configuration."
 echo "It calls a local zitadel container with a fully implemented gRPC API."
 echo
 echo "Also the test suite is configured correctly."
-echo "For example, run a single test file:"
-echo "pnpm playwright test --spec acceptance/tests/admin.spec.ts"
+echo "For example, rerun only failed tests:"
+echo "pnpm playwright test --last-failed"
 echo
 echo "You can also run the test interactively."
 echo "However, this is only possible from outside the dev container." 

@@ -38,7 +38,7 @@ test.skip("DOESN'T WORK: username, password and email otp login, enter code manu
   // User receives an email with a verification code
   // User enters the code into the ui
   // User is redirected to the app (default redirect url)
-  await loginWithPasswordAndEmailOTP(cfg, page, user.getUsername(), user.getPassword(), user.getUsername());
+  await loginWithPasswordAndEmailOTP(cfg, page, new Date(), user.getUsername(), user.getPassword(), user.getUsername());
   await loginScreenExpect(page, user.getFullName());
 });
 
@@ -64,8 +64,9 @@ test.skip("DOESN'T WORK: username, password and email otp login, resend code", a
   // User enters the new code in the ui
   // User is redirected to the app (default redirect url)
   await loginWithPassword(page, user.getUsername(), user.getPassword());
+  const since = new Date();
   await codeResend(page);
-  await otpFromSink(page, user.getUsername(), cfg);
+  await otpFromSink(page, user.getUsername(), cfg, since);
   await loginScreenExpect(page, user.getFullName());
 });
 

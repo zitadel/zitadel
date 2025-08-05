@@ -12,7 +12,7 @@
 	"forwardPorts": [
 		3000, // Login Dev
 		8080, // Zitadel API Dev
-		9323, // Playwright Report
+		9323 // Playwright Report
 	],
 	"remoteEnv": {
 		"FAIL_COMMANDS_ON_ERRORS": "${localEnv:FAIL_COMMANDS_ON_ERRORS}",

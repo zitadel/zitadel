@@ -16,6 +16,7 @@ services:
       # Zitadel Configuration
       ZITADEL_DATABASE_POSTGRES_HOST: db-acceptance
     network_mode: service:zitadel
+    ipc: host
     depends_on:
       login-acceptance:
         condition: service_healthy
@@ -49,8 +50,9 @@ services:
       db-acceptance:
         condition: "service_healthy"
     ports:
-      - "8080:8080"
-      - "3000:3000"
+      - "8080:8080" # Zitadel API
+      - "3000:3000" # Login
+      - "9323:9323" # Playwright Report
 
   login-acceptance:
     container_name: login

@@ -5,8 +5,9 @@ import { loginname } from "./loginname";
 import { resetPassword, startResetPassword } from "./password";
 import { resetPasswordScreen, resetPasswordScreenExpect } from "./password-screen";
 import { PasswordUser } from "./user";
+import { Config, ConfigReader } from "./config";
 
-const test = base.extend<{ user: PasswordUser }>({
+const test = base.extend<{ user: PasswordUser; cfg: Config }>({
   user: async ({ page }, use) => {
     const user = new PasswordUser({
       email: faker.internet.email(),
@@ -23,25 +24,29 @@ const test = base.extend<{ user: PasswordUser }>({
     await use(user);
     await user.cleanup();
   },
+  cfg: async ({}, use) => {
+    await use(new ConfigReader().config);
+  },
 });
 
-test("username and password set login", async ({ user, page }) => {
+test("username and password set login", async ({ user, page, cfg }) => {
   const changedPw = "ChangedPw1!";
   await startLogin(page);
   await loginname(page, user.getUsername());
-  await resetPassword(page, user.getUsername(), changedPw);
+  await resetPassword(cfg, page, user.getUsername(), changedPw);
   await loginScreenExpect(page, user.getFullName());
 
   await loginWithPassword(page, user.getUsername(), changedPw);
   await loginScreenExpect(page, user.getFullName());
 });
 
-test("password set not with desired complexity", async ({ user, page }) => {
+test("password set not with desired complexity", async ({ user, page, cfg }) => {
   const changedPw1 = "change";
   const changedPw2 = "chang";
   await startLogin(page);
   await loginname(page, user.getUsername());
+  const codeSince = new Date();
   await startResetPassword(page);
-  await resetPasswordScreen(page, user.getUsername(), changedPw1, changedPw2);
+  await resetPasswordScreen(cfg, page, codeSince, user.getUsername(), changedPw1, changedPw2);
   await resetPasswordScreenExpect(page, changedPw1, changedPw2, false, false, false, false, true, false);
 });
