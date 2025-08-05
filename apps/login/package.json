@@ -22,6 +22,11 @@
     "test:acceptance:setup:dev": "cd ../.. && make login_test_acceptance_setup_dev"
   },
   "nx": {
+    "release": {
+      "docker": {
+        "repositoryName": "zitadel/login"
+      }
+    },
     "targets": {
       "build": {
         "outputs": [

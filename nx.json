@@ -1,5 +1,25 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "release": {
+    "releaseTagPattern": "release/{projectName}/{version}",
+    "groups": {
+      "test": {
+        "projects": ["@zitadel/login", "@zitadel/console"],
+        "projectsRelationship": "fixed",
+        "docker": {
+          "skipVersionActions": true,
+          "registryUrl": "ghcr.io",
+          "groupPreVersionCommand": "echo BEFORE VERSIONING"
+        },
+        "changelog": {
+          "projectChangelogs": true
+        }
+      }
+    },
+    "version": {
+      "conventionalCommits": true
+    }
+  },
   "namedInputs": {
     "proto": [
       "{workspaceRoot}/proto/**"
@@ -93,5 +113,14 @@
       "cache": false
     }
   },
-  "nxCloudId": "688a9021d48dce0efe0f119f"
+  "nxCloudId": "688a9021d48dce0efe0f119f",
+  "plugins": [
+    {
+      "plugin": "@nx/docker",
+      "options": {
+        "buildTarget": "docker:build",
+        "runTarget": "docker:run"
+      }
+    }
+  ]
 }

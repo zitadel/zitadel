@@ -15,6 +15,11 @@
   },
   "nx": {
     "targets": {
+      "release": {
+        "docker": {
+          "repositoryName": "zitadel/console"
+        }
+      },
       "generate": {
         "outputs": [
           "{projectRoot}/src/app/proto/generated/**"
@@ -27,7 +32,7 @@
         "dependsOn": [
           "generate",
           "@zitadel/client:build"
-          ]
+        ]
       }
     }
   },
