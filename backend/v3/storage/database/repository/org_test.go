@@ -320,8 +320,10 @@ func TestUpdateOrganization(t *testing.T) {
 
 				// delete instance
 				_, err = organizationRepo.Delete(ctx,
-					organizationRepo.IDCondition(org.ID),
-					org.InstanceID,
+					database.And(
+						organizationRepo.IDCondition(org.ID),
+						organizationRepo.InstanceIDCondition(org.InstanceID),
+					),
 				)
 				require.NoError(t, err)
 
@@ -378,8 +380,10 @@ func TestUpdateOrganization(t *testing.T) {
 			// update org
 			beforeUpdate := time.Now()
 			rowsAffected, err := organizationRepo.Update(ctx,
-				organizationRepo.IDCondition(createdOrg.ID),
-				createdOrg.InstanceID,
+				database.And(
+					organizationRepo.IDCondition(createdOrg.ID),
+					organizationRepo.InstanceIDCondition(createdOrg.InstanceID),
+				),
 				tt.update...,
 			)
 			afterUpdate := time.Now()
@@ -441,10 +445,10 @@ func TestGetOrganization(t *testing.T) {
 	require.NoError(t, err)
 
 	type test struct {
-		name                   string
-		testFunc               func(ctx context.Context, t *testing.T) *domain.Organization
-		orgIdentifierCondition domain.OrgIdentifierCondition
-		err                    error
+		name      string
+		testFunc  func(ctx context.Context, t *testing.T) *domain.Organization
+		condition database.Condition
+		err       error
 	}
 
 	tests := []test{
@@ -468,7 +472,7 @@ func TestGetOrganization(t *testing.T) {
 
 					return &org
 				},
-				orgIdentifierCondition: orgRepo.IDCondition(organizationId),
+				condition: orgRepo.IDCondition(organizationId),
 			}
 		}(),
 		func() test {
@@ -491,7 +495,7 @@ func TestGetOrganization(t *testing.T) {
 
 					return &org
 				},
-				orgIdentifierCondition: orgRepo.NameCondition(organizationName),
+				condition: orgRepo.NameCondition(database.TextOperationEqual, organizationName),
 			}
 		}(),
 		{
@@ -503,8 +507,8 @@ func TestGetOrganization(t *testing.T) {
 				}
 				return &org
 			},
-			orgIdentifierCondition: orgRepo.NameCondition("non-existent-instance-name"),
-			err:                    new(database.NoRowFoundError),
+			condition: orgRepo.NameCondition(database.TextOperationEqual, "non-existent-instance-name"),
+			err:       new(database.NoRowFoundError),
 		},
 	}
 	for _, tt := range tests {
@@ -521,7 +525,7 @@ func TestGetOrganization(t *testing.T) {
 			returnedOrg, err := orgRepo.Get(ctx,
 				database.WithCondition(
 					database.And(
-						tt.orgIdentifierCondition,
+						tt.condition,
 						orgRepo.InstanceIDCondition(org.InstanceID),
 					),
 				),
@@ -821,10 +825,10 @@ func TestDeleteOrganization(t *testing.T) {
 	require.NoError(t, err)
 
 	type test struct {
-		name                   string
-		testFunc               func(ctx context.Context, t *testing.T)
-		orgIdentifierCondition domain.OrgIdentifierCondition
-		noOfDeletedRows        int64
+		name            string
+		testFunc        func(ctx context.Context, t *testing.T)
+		condition       database.Condition
+		noOfDeletedRows int64
 	}
 	tests := []test{
 		func() test {
@@ -851,8 +855,8 @@ func TestDeleteOrganization(t *testing.T) {
 						organizations[i] = &org
 					}
 				},
-				orgIdentifierCondition: organizationRepo.IDCondition(organizationId),
-				noOfDeletedRows:        noOfOrganizations,
+				condition:       organizationRepo.IDCondition(organizationId),
+				noOfDeletedRows: noOfOrganizations,
 			}
 		}(),
 		func() test {
@@ -879,16 +883,16 @@ func TestDeleteOrganization(t *testing.T) {
 						organizations[i] = &org
 					}
 				},
-				orgIdentifierCondition: organizationRepo.NameCondition(organizationName),
-				noOfDeletedRows:        noOfOrganizations,
+				condition:       organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
+				noOfDeletedRows: noOfOrganizations,
 			}
 		}(),
 		func() test {
 			organizationRepo := repository.OrganizationRepository(pool)
-			non_existent_organization_name := gofakeit.Name()
+			nonExistentOrgName := gofakeit.Name()
 			return test{
-				name:                   "delete non existent organization",
-				orgIdentifierCondition: organizationRepo.NameCondition(non_existent_organization_name),
+				name:      "delete non existent organization",
+				condition: organizationRepo.NameCondition(database.TextOperationEqual, nonExistentOrgName),
 			}
 		}(),
 		func() test {
@@ -917,13 +921,15 @@ func TestDeleteOrganization(t *testing.T) {
 
 					// delete organization
 					affectedRows, err := organizationRepo.Delete(ctx,
-						organizationRepo.NameCondition(organizationName),
-						organizations[0].InstanceID,
+						database.And(
+							organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
+							organizationRepo.InstanceIDCondition(organizations[0].InstanceID),
+						),
 					)
 					assert.Equal(t, int64(1), affectedRows)
 					require.NoError(t, err)
 				},
-				orgIdentifierCondition: organizationRepo.NameCondition(organizationName),
+				condition: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
 				// this test should return 0 affected rows as the org was already deleted
 				noOfDeletedRows: 0,
 			}
@@ -940,8 +946,7 @@ func TestDeleteOrganization(t *testing.T) {
 
 			// delete organization
 			noOfDeletedRows, err := organizationRepo.Delete(ctx,
-				tt.orgIdentifierCondition,
-				instanceId,
+				tt.condition,
 			)
 			require.NoError(t, err)
 			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
@@ -950,7 +955,7 @@ func TestDeleteOrganization(t *testing.T) {
 			organization, err := organizationRepo.Get(ctx,
 				database.WithCondition(
 					database.And(
-						tt.orgIdentifierCondition,
+						tt.condition,
 						organizationRepo.InstanceIDCondition(instanceId),
 					),
 				),

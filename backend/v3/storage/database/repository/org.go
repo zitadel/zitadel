@@ -103,35 +103,24 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 }
 
 // Update implements [domain.OrganizationRepository].
-func (o *org) Update(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, changes ...database.Change) (int64, error) {
+func (o *org) Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error) {
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.organizations SET `)
-
-	instanceIDCondition := o.InstanceIDCondition(instanceID)
-
-	conditions := []database.Condition{id, instanceIDCondition}
 	database.Changes(changes).Write(&builder)
-	writeCondition(&builder, database.And(conditions...))
+	writeCondition(&builder, condition)
 
-	stmt := builder.String()
-
-	rowsAffected, err := o.client.Exec(ctx, stmt, builder.Args()...)
+	rowsAffected, err := o.client.Exec(ctx, builder.String(), builder.Args()...)
 	return rowsAffected, err
 }
 
 // Delete implements [domain.OrganizationRepository].
-func (o *org) Delete(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string) (int64, error) {
+func (o *org) Delete(ctx context.Context, condition database.Condition) (int64, error) {
 	builder := database.StatementBuilder{}
-
 	builder.WriteString(`DELETE FROM zitadel.organizations`)
-
-	instanceIDCondition := o.InstanceIDCondition(instanceID)
-
-	conditions := []database.Condition{id, instanceIDCondition}
-	writeCondition(&builder, database.And(conditions...))
+	writeCondition(&builder, condition)
 
 	return o.client.Exec(ctx, builder.String(), builder.Args()...)
 }
@@ -155,13 +144,13 @@ func (o org) SetState(state domain.OrgState) database.Change {
 // -------------------------------------------------------------
 
 // IDCondition implements [domain.organizationConditions].
-func (o org) IDCondition(id string) domain.OrgIdentifierCondition {
+func (o org) IDCondition(id string) database.Condition {
 	return database.NewTextCondition(o.IDColumn(true), database.TextOperationEqual, id)
 }
 
 // NameCondition implements [domain.organizationConditions].
-func (o org) NameCondition(name string) domain.OrgIdentifierCondition {
-	return database.NewTextCondition(o.NameColumn(true), database.TextOperationEqual, name)
+func (o org) NameCondition(op database.TextOperation, name string) database.Condition {
+	return database.NewTextCondition(o.NameColumn(true), op, name)
 }
 
 // InstanceIDCondition implements [domain.organizationConditions].

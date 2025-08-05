@@ -125,8 +125,10 @@ func NewActivateOrganizationCommand(instanceID, orgID string) *ActivateOrganizat
 func (cmd *ActivateOrganizationCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
 	repo := orgRepo(opts.DB)
 	_, err = repo.Update(ctx,
-		repo.IDCondition(cmd.OrgID),
-		cmd.InstanceID,
+		database.And(
+			repo.InstanceIDCondition(cmd.InstanceID),
+			repo.IDCondition(cmd.OrgID),
+		),
 		repo.SetState(OrgStateActive),
 	)
 	return err
@@ -160,8 +162,10 @@ func NewDeactivateOrganizationCommand(instanceID, orgID string) *DeactivateOrgan
 func (cmd *DeactivateOrganizationCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
 	repo := orgRepo(opts.DB)
 	_, err = repo.Update(ctx,
-		repo.IDCondition(cmd.OrgID),
-		cmd.InstanceID,
+		database.And(
+			repo.InstanceIDCondition(cmd.InstanceID),
+			repo.IDCondition(cmd.OrgID),
+		),
 		repo.SetState(OrgStateInactive),
 	)
 	return err
@@ -192,8 +196,10 @@ func NewDeleteOrganizationCommand(instanceID, orgID string) *DeleteOrganizationC
 func (cmd *DeleteOrganizationCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
 	repo := orgRepo(opts.DB)
 	_, err = repo.Delete(ctx,
-		repo.IDCondition(cmd.OrgID),
-		cmd.InstanceID,
+		database.And(
+			repo.InstanceIDCondition(cmd.InstanceID),
+			repo.IDCondition(cmd.OrgID),
+		),
 	)
 	return err
 }
@@ -238,8 +244,10 @@ func (cmd *UpdateOrganizationCommand) Execute(ctx context.Context, opts *Command
 	}
 
 	_, err = cmd.repo.Update(ctx,
-		cmd.repo.IDCondition(cmd.OrgID),
-		cmd.InstanceID,
+		database.And(
+			cmd.repo.InstanceIDCondition(cmd.InstanceID),
+			cmd.repo.IDCondition(cmd.OrgID),
+		),
 		cmd.changes...,
 	)
 	return err
