@@ -11,15 +11,15 @@
     "lint:check:prettier": "prettier --check src",
     "lint:fix": "prettier --write src",
     "generate": "pnpm exec buf generate ../../proto --include-imports --include-wkt",
-    "clean": "rm -rf dist .angular .turbo node_modules src/app/proto/generated"
+    "clean": "rm -rf dist .angular node_modules src/app/proto/generated"
   },
   "nx": {
+    "release": {
+      "docker": {
+        "repositoryName": "zitadel/console"
+      }
+    },
     "targets": {
-      "release": {
-        "docker": {
-          "repositoryName": "zitadel/console"
-        }
-      },
       "generate": {
         "outputs": [
           "{projectRoot}/src/app/proto/generated/**"
@@ -33,10 +33,21 @@
           "generate",
           "@zitadel/client:build"
         ]
+      },
+      "docker:build": {
+        "dependsOn": ["build"]
+      },
+      "docker:run": {
+        "options": {
+          "args": [
+            "-p",
+            "3001:3001"
+          ]
+        }
       }
     }
   },
-  "dependencies": {
+    "dependencies": {
     "@angular/animations": "^16.2.12",
     "@angular/cdk": "^16.2.14",
     "@angular/common": "^16.2.12",

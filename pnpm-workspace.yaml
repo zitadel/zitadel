@@ -3,3 +3,4 @@ packages:
   - "e2e"
   - "packages/*"
   - "apps/*"
+  - "hodor"

@@ -58,6 +58,19 @@
         "dependsOn": [
           "@zitadel/client#build"
         ]
+      },
+      "docker:build": {
+        "dependsOn": [
+          "build:login:standalone"
+        ]
+      },
+      "docker:run": {
+        "options": {
+          "args": [
+            "-p",
+            "3002:3002"
+          ]
+        }
       }
     }
   },
