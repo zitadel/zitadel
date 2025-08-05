@@ -32,11 +32,10 @@ func TestAddOrganizationDomain(t *testing.T) {
 
 	// create organization
 	orgID := gofakeit.UUID()
-	organization := domain.Organization{
+	organization := domain.CreateOrganizationCommand{
 		ID:         orgID,
 		Name:       gofakeit.Name(),
 		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
 	}
 
 	tests := []struct {
@@ -218,11 +217,10 @@ func TestGetOrganizationDomain(t *testing.T) {
 
 	// create organization
 	orgID := gofakeit.UUID()
-	organization := domain.Organization{
+	organization := domain.CreateOrganizationCommand{
 		ID:         orgID,
 		Name:       gofakeit.Name(),
 		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
 	}
 
 	tx, err := pool.Begin(t.Context(), nil)
@@ -376,11 +374,10 @@ func TestListOrganizationDomains(t *testing.T) {
 
 	// create organization
 	orgID := gofakeit.UUID()
-	organization := domain.Organization{
+	organization := domain.CreateOrganizationCommand{
 		ID:         orgID,
 		Name:       gofakeit.Name(),
 		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
 	}
 
 	tx, err := pool.Begin(t.Context(), nil)
@@ -512,11 +509,10 @@ func TestUpdateOrganizationDomain(t *testing.T) {
 
 	// create organization
 	orgID := gofakeit.UUID()
-	organization := domain.Organization{
+	organization := domain.CreateOrganizationCommand{
 		ID:         orgID,
 		Name:       gofakeit.Name(),
 		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
 	}
 
 	tx, err := pool.Begin(t.Context(), nil)
@@ -646,11 +642,10 @@ func TestRemoveOrganizationDomain(t *testing.T) {
 
 	// create organization
 	orgID := gofakeit.UUID()
-	organization := domain.Organization{
+	organization := domain.CreateOrganizationCommand{
 		ID:         orgID,
 		Name:       gofakeit.Name(),
 		InstanceID: instanceID,
-		State:      domain.OrgStateActive,
 	}
 
 	tx, err := pool.Begin(t.Context(), nil)

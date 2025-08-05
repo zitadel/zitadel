@@ -78,12 +78,7 @@ func (cmd *CreateOrganizationCommand) Execute(ctx context.Context, opts *Command
 	}
 	defer func() { err = close(ctx, err) }()
 
-	err = orgRepo(opts.DB).Create(ctx, &Organization{
-		ID:         cmd.ID,
-		Name:       cmd.Name,
-		InstanceID: cmd.InstanceID,
-		State:      OrgStateActive,
-	})
+	err = orgRepo(opts.DB).Create(ctx, cmd)
 	if err != nil {
 		return err
 	}

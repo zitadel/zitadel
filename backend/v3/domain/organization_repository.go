@@ -15,7 +15,7 @@ type OrganizationRepository interface {
 	Get(ctx context.Context, opts ...database.QueryOption) (*Organization, error)
 	List(ctx context.Context, opts ...database.QueryOption) ([]*Organization, error)
 
-	Create(ctx context.Context, instance *Organization) error
+	Create(ctx context.Context, org *CreateOrganizationCommand) error
 	Update(ctx context.Context, condition database.Condition, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, condition database.Condition) (int64, error)
 

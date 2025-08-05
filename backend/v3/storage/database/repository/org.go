@@ -91,15 +91,15 @@ func (o *org) joinDomains() database.QueryOption {
 
 const createOrganizationStmt = `INSERT INTO zitadel.organizations (id, name, instance_id, state)` +
 	` VALUES ($1, $2, $3, $4)` +
-	` RETURNING created_at, updated_at`
+	` RETURNING created_at`
 
 // Create implements [domain.OrganizationRepository].
-func (o *org) Create(ctx context.Context, organization *domain.Organization) error {
+func (o *org) Create(ctx context.Context, organization *domain.CreateOrganizationCommand) error {
 	builder := database.StatementBuilder{}
-	builder.AppendArgs(organization.ID, organization.Name, organization.InstanceID, organization.State)
+	builder.AppendArgs(organization.ID, organization.Name, organization.InstanceID, domain.OrgStateActive)
 	builder.WriteString(createOrganizationStmt)
 
-	return o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
+	return o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt)
 }
 
 // Update implements [domain.OrganizationRepository].
