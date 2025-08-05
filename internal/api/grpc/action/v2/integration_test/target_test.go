@@ -14,7 +14,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 )
 
 func TestServer_CreateTarget(t *testing.T) {
@@ -205,7 +205,7 @@ func TestServer_CreateTarget(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			creationDate := time.Now().UTC()
-			got, err := instance.Client.ActionV2beta.CreateTarget(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV2.CreateTarget(tt.ctx, tt.req)
 			changeDate := time.Now().UTC()
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -425,7 +425,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 			creationDate := time.Now().UTC()
 			tt.prepare(tt.args.req)
 
-			got, err := instance.Client.ActionV2beta.UpdateTarget(tt.args.ctx, tt.args.req)
+			got, err := instance.Client.ActionV2.UpdateTarget(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -525,7 +525,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 			if tt.prepare != nil {
 				creationDate, deletionDate = tt.prepare(tt.req)
 			}
-			got, err := instance.Client.ActionV2beta.DeleteTarget(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV2.DeleteTarget(tt.ctx, tt.req)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
