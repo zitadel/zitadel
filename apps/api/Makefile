@@ -35,7 +35,7 @@ docker_image:
 
 .PHONY: compile_pipeline
 compile_pipeline: console_move
-	CGO_ENABLED=0 go build -o apps/api/zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=$(COMMIT_SHA)' -X 'github.com/zitadel/zitadel/cmd/build.date=$(now)' -X 'github.com/zitadel/zitadel/cmd/build.version=$(VERSION)' "
+	CGO_ENABLED=0 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=$(COMMIT_SHA)' -X 'github.com/zitadel/zitadel/cmd/build.date=$(now)' -X 'github.com/zitadel/zitadel/cmd/build.version=$(VERSION)' "
 	chmod +x zitadel
 
 .PHONY: core_dependencies
@@ -86,7 +86,7 @@ core_grpc_dependencies:
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
-	PATH="$(go_bin):$(PATH)" npx buf generate
+	PATH="$(go_bin):$(PATH)" npx buf generate ../../proto
 	mkdir -p pkg/grpc
 	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/
 	mkdir -p openapi/v2/zitadel
@@ -97,7 +97,7 @@ core_build: core_dependencies core_api core_static core_assets
 
 .PHONY: console_move
 console_move:
-	cp -r apps/console/dist/console/* internal/api/ui/console/static
+	cp -r ../console/dist/console/* internal/api/ui/console/static
 
 .PHONY: clean
 clean:

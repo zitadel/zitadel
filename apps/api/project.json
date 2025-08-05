@@ -1,7 +1,7 @@
 {
     "name": "@zitadel/api",
-    "$schema": "node_modules/nx/schemas/project-schema.json",
-    "sourceRoot": ".",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/api",
     "projectType": "application",
     "release": {
         "docker": {
@@ -10,12 +10,13 @@
     },
     "targets": {
         "build": {
-            "command": "make compile",
+            "executor": "nx:run-commands",
             "options": {
-                "command": "make compile"
+                "command": "make compile",
+                "cwd": "{projectRoot}"
             },
             "outputs": [
-                "{workspaceRoot}/apps/api/zitadel"
+                "{projectRoot}/zitadel"
             ],
             "dependsOn": [
                 "@zitadel/console:build"
@@ -24,9 +25,6 @@
         "docker:build": {
             "dependsOn": [
                 "build"
-            ],
-            "images": [
-                "zitadel/zitadel:latest"
             ]
         },
         "docker:run": {

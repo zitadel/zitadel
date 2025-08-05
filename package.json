@@ -2,45 +2,6 @@
   "packageManager": "pnpm@9.1.2+sha256.19c17528f9ca20bd442e4ca42f00f1b9808a9cb419383cd04ba32ef19322aba7",
   "private": true,
   "name": "zitadel",
-  "scripts": {
-    "build": "make compile"
-  },
-  "nx": {
-    "release": {
-      "docker": {
-        "repositoryName": "zitadel/zitadel"
-      }
-    },
-    "targets": {
-      "build": {
-        "outputs": [
-          "{workspaceRoot}/zitadel"
-        ],
-        "dependsOn": [
-          "@zitadel/console:build"
-        ]
-      },
-      "docker:build": {
-        "dependsOn": [
-          "build"
-        ],
-        "options": {
-          "push": false,
-          "tags": [
-            "zitadel/zitadel:latest"
-          ]
-        }
-      },
-      "docker:run": {
-        "options": {
-          "args": [
-            "-p",
-            "3000:3000"
-          ]
-        }
-      }
-    }
-  },
   "pnpm": {
     "overrides": {
       "@typescript-eslint/parser": "^8.35.1",

@@ -1,0 +1,105 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+!/**/.env.test
+
+# Coverage
+coverage.txt
+profile.cov
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+#Debug
+__debug_bin*
+debug
+sandbox.go
+/cmd/dev/
+
+# IDE
+.idea
+.vscode
+.DS_STORE
+.run
+
+# credential
+google-credentials
+key.json
+.keys/*
+load-test/.keys
+
+# dumps
+.backups
+
+.local/*
+.build/
+
+#binaries
+cmd/zitadel/zitadel
+**/statik/statik.go
+/zitadelctl
+/zitadel
+
+# buildfolders and generated files
+tmp/
+console/src/app/proto/generated/
+**.pb.go
+!pkg/grpc/protoc/v2/options.pb.go
+**.proto.mock.go
+**.pb.*.go
+pkg/**/**.connect.go
+**.gen.go
+openapi/**/*.json
+/internal/api/assets/authz.go
+/internal/api/assets/router.go
+/internal/api/ui/console/static/*
+!/internal/api/ui/console/static/gitkeep
+docs/docs/apis/auth
+docs/docs/apis/admin
+docs/docs/apis/mgmt
+docs/docs/apis/system
+docs/docs/apis/proto
+**/.sass-cache
+/internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css
+/internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css.map
+zitadel-*-*
+!apps/**/zitadel-*-*
+
+# local
+build/local/*.env
+.notifications
+/.artifacts/*
+!/.artifacts/zitadel
+/zitadel
+node_modules/
+.kreya
+
+go.work
+go.work.sum
+# Local Netlify folder
+.netlify
+
+load-test/node_modules
+load-test/pnpm-debug.log
+load-test/dist
+load-test/output/*
+.vercel
+
+# Turbo
+.turbo/
+**/.turbo/
+
+# PNPM
+.pnpm-store
+
+
+.nx/cache
+.nx/workspace-data
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md
