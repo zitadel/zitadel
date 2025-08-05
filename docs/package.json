@@ -28,7 +28,7 @@
     "targets": {
       "generate": {
         "outputs": [
-          "{projectRoot}/.artifacts/**"
+          "{projectRoot}/apis/resources/**"
         ]
       },
       "build": {
