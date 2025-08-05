@@ -317,6 +317,28 @@ func (i *idProvider) GetGitlabSelfHosting(ctx context.Context, id domain.IDPIden
 	return idpGitlabSelfHosting, nil
 }
 
+func (i *idProvider) GetLDAP(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPLDAP, error) {
+	ldap := &domain.IDPLDAP{}
+	var err error
+
+	ldap.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if ldap.Type != domain.IDPTypeLDAP.String() {
+		// TODO
+		return nil, errors.New("WRONG TYPE")
+	}
+
+	err = json.Unmarshal([]byte(*ldap.Payload), ldap)
+	if err != nil {
+		return nil, err
+	}
+
+	return ldap, nil
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------

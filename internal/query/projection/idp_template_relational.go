@@ -156,14 +156,14 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  instance.GoogleIDPChangedEventType,
 					Reduce: p.reduceGoogleIDPRelationalChanged,
 				},
-				// 		{
-				// 			Event:  instance.LDAPIDPAddedEventType,
-				// 			Reduce: p.reduceLDAPIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  instance.LDAPIDPChangedEventType,
-				// 			Reduce: p.reduceLDAPIDPChanged,
-				// 		},
+				{
+					Event:  instance.LDAPIDPAddedEventType,
+					Reduce: p.reduceLDAPIDPAdded,
+				},
+				{
+					Event:  instance.LDAPIDPChangedEventType,
+					Reduce: p.reduceLDAPIDPChanged,
+				},
 				// 		{
 				// 			Event:  instance.AppleIDPAddedEventType,
 				// 			Reduce: p.reduceAppleIDPAdded,
@@ -301,14 +301,14 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  org.GoogleIDPChangedEventType,
 					Reduce: p.reduceGoogleIDPRelationalChanged,
 				},
-				// {
-				// 	Event:  org.LDAPIDPAddedEventType,
-				// 	Reduce: p.reduceLDAPIDPAdded,
-				// },
-				// 		{
-				// 			Event:  org.LDAPIDPChangedEventType,
-				// 			Reduce: p.reduceLDAPIDPChanged,
-				// 		},
+				{
+					Event:  org.LDAPIDPAddedEventType,
+					Reduce: p.reduceLDAPIDPAdded,
+				},
+				{
+					Event:  org.LDAPIDPChangedEventType,
+					Reduce: p.reduceLDAPIDPChanged,
+				},
 				// 		{
 				// 			Event:  org.AppleIDPAddedEventType,
 				// 			Reduce: p.reduceAppleIDPAdded,
@@ -1713,6 +1713,123 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 			},
 		),
 	), nil
+}
+
+func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.LDAPIDPAddedEvent
+	switch e := event.(type) {
+	case *org.LDAPIDPAddedEvent:
+		idpEvent = e.LDAPIDPAddedEvent
+	case *instance.LDAPIDPAddedEvent:
+		idpEvent = e.LDAPIDPAddedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPAddedEventType, instance.LDAPIDPAddedEventType})
+	}
+
+	ldap := db_domain.LDAP{
+		Servers:           idpEvent.Servers,
+		StartTLS:          idpEvent.StartTLS,
+		BaseDN:            idpEvent.BaseDN,
+		BindDN:            idpEvent.BindDN,
+		BindPassword:      idpEvent.BindPassword,
+		UserBase:          idpEvent.UserBase,
+		UserObjectClasses: idpEvent.UserObjectClasses,
+		UserFilters:       idpEvent.UserFilters,
+		Timeout:           idpEvent.Timeout,
+		LDAPAttributes: db_domain.LDAPAttributes{
+			IDAttribute:                idpEvent.IDAttribute,
+			FirstNameAttribute:         idpEvent.FirstNameAttribute,
+			LastNameAttribute:          idpEvent.LastNameAttribute,
+			DisplayNameAttribute:       idpEvent.DisplayNameAttribute,
+			NickNameAttribute:          idpEvent.NickNameAttribute,
+			PreferredUsernameAttribute: idpEvent.PreferredUsernameAttribute,
+			EmailAttribute:             idpEvent.EmailAttribute,
+			EmailVerifiedAttribute:     idpEvent.EmailVerifiedAttribute,
+			PhoneAttribute:             idpEvent.PhoneAttribute,
+			PhoneVerifiedAttribute:     idpEvent.PhoneVerifiedAttribute,
+			PreferredLanguageAttribute: idpEvent.PreferredLanguageAttribute,
+			AvatarURLAttribute:         idpEvent.AvatarURLAttribute,
+			ProfileAttribute:           idpEvent.ProfileAttribute,
+		},
+	}
+
+	payload, err := json.Marshal(ldap)
+	if err != nil {
+		return nil, err
+	}
+
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
+	return handler.NewMultiStatement(
+		&idpEvent,
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPRelationalOrgId, orgId),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeLDAP.String()),
+				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+				handler.NewCol(IDPRelationalPayloadCol, payload),
+			},
+		),
+	), nil
+}
+
+func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.LDAPIDPChangedEvent
+	switch e := event.(type) {
+	case *org.LDAPIDPChangedEvent:
+		idpEvent = e.LDAPIDPChangedEvent
+	case *instance.LDAPIDPChangedEvent:
+		idpEvent = e.LDAPIDPChangedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPChangedEventType, instance.LDAPIDPChangedEventType})
+	}
+
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
+	oauth, err := p.idpRepo.GetLDAP(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+	if err != nil {
+		return nil, err
+	}
+
+	columns := make([]handler.Column, 0, 7)
+	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+
+	payload := &oauth.LDAP
+	payloadChanged := reduceLDAPIDPRelationalChangedColumns(payload, &idpEvent)
+	if payloadChanged {
+		payload, err := json.Marshal(payload)
+		if err != nil {
+			return nil, err
+		}
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+	}
+
+	return handler.NewMultiStatement(
+		&idpEvent,
+		handler.AddUpdateStatement(
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
+			},
+		),
+	), nil
 
 	// ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	// ops = append(ops,
@@ -1724,16 +1841,17 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 	// 		},
 	// 	),
 	// )
-	// googleCols := reduceGoogleIDPRelationalChangedColumns(idpEvent)
-	// if len(googleCols) > 0 {
+
+	// ldapCols := reduceLDAPIDPChangedColumns(idpEvent)
+	// if len(ldapCols) > 0 {
 	// 	ops = append(ops,
 	// 		handler.AddUpdateStatement(
-	// 			googleCols,
+	// 			ldapCols,
 	// 			[]handler.Condition{
-	// 				handler.NewCond(GoogleIDCol, idpEvent.ID),
-	// 				handler.NewCond(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
+	// 				handler.NewCond(LDAPIDCol, idpEvent.ID),
+	// 				handler.NewCond(LDAPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 	// 			},
-	// 			handler.WithTableSuffix(IDPTemplateGoogleSuffix),
+	// 			handler.WithTableSuffix(IDPTemplateLDAPSuffix),
 	// 		),
 	// 	)
 	// }
@@ -1743,116 +1861,6 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 	// 	ops...,
 	// ), nil
 }
-
-// func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.LDAPIDPAddedEvent
-// 	var idpOwnerType domain.IdentityProviderType
-// 	switch e := event.(type) {
-// 	case *org.LDAPIDPAddedEvent:
-// 		idpEvent = e.LDAPIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeOrg
-// 	case *instance.LDAPIDPAddedEvent:
-// 		idpEvent = e.LDAPIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeSystem
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPAddedEventType, instance.LDAPIDPAddedEventType})
-// 	}
-
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
-// 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
-// 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-// 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
-// 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeLDAP),
-// 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
-// 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
-// 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
-// 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-// 				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
-// 			},
-// 		),
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(LDAPIDCol, idpEvent.ID),
-// 				handler.NewCol(LDAPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(LDAPServersCol, database.TextArray[string](idpEvent.Servers)),
-// 				handler.NewCol(LDAPStartTLSCol, idpEvent.StartTLS),
-// 				handler.NewCol(LDAPBaseDNCol, idpEvent.BaseDN),
-// 				handler.NewCol(LDAPBindDNCol, idpEvent.BindDN),
-// 				handler.NewCol(LDAPBindPasswordCol, idpEvent.BindPassword),
-// 				handler.NewCol(LDAPUserBaseCol, idpEvent.UserBase),
-// 				handler.NewCol(LDAPUserObjectClassesCol, database.TextArray[string](idpEvent.UserObjectClasses)),
-// 				handler.NewCol(LDAPUserFiltersCol, database.TextArray[string](idpEvent.UserFilters)),
-// 				handler.NewCol(LDAPTimeoutCol, idpEvent.Timeout),
-// 				handler.NewCol(LDAPRootCACol, idpEvent.RootCA),
-// 				handler.NewCol(LDAPIDAttributeCol, idpEvent.IDAttribute),
-// 				handler.NewCol(LDAPFirstNameAttributeCol, idpEvent.FirstNameAttribute),
-// 				handler.NewCol(LDAPLastNameAttributeCol, idpEvent.LastNameAttribute),
-// 				handler.NewCol(LDAPDisplayNameAttributeCol, idpEvent.DisplayNameAttribute),
-// 				handler.NewCol(LDAPNickNameAttributeCol, idpEvent.NickNameAttribute),
-// 				handler.NewCol(LDAPPreferredUsernameAttributeCol, idpEvent.PreferredUsernameAttribute),
-// 				handler.NewCol(LDAPEmailAttributeCol, idpEvent.EmailAttribute),
-// 				handler.NewCol(LDAPEmailVerifiedAttributeCol, idpEvent.EmailVerifiedAttribute),
-// 				handler.NewCol(LDAPPhoneAttributeCol, idpEvent.PhoneAttribute),
-// 				handler.NewCol(LDAPPhoneVerifiedAttributeCol, idpEvent.PhoneVerifiedAttribute),
-// 				handler.NewCol(LDAPPreferredLanguageAttributeCol, idpEvent.PreferredLanguageAttribute),
-// 				handler.NewCol(LDAPAvatarURLAttributeCol, idpEvent.AvatarURLAttribute),
-// 				handler.NewCol(LDAPProfileAttributeCol, idpEvent.ProfileAttribute),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateLDAPSuffix),
-// 		),
-// 	), nil
-// }
-
-// func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.LDAPIDPChangedEvent
-// 	switch e := event.(type) {
-// 	case *org.LDAPIDPChangedEvent:
-// 		idpEvent = e.LDAPIDPChangedEvent
-// 	case *instance.LDAPIDPChangedEvent:
-// 		idpEvent = e.LDAPIDPChangedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPChangedEventType, instance.LDAPIDPChangedEventType})
-// 	}
-
-// 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-// 	ops = append(ops,
-// 		handler.AddUpdateStatement(
-// 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 	)
-
-// 	ldapCols := reduceLDAPIDPChangedColumns(idpEvent)
-// 	if len(ldapCols) > 0 {
-// 		ops = append(ops,
-// 			handler.AddUpdateStatement(
-// 				ldapCols,
-// 				[]handler.Condition{
-// 					handler.NewCond(LDAPIDCol, idpEvent.ID),
-// 					handler.NewCond(LDAPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				},
-// 				handler.WithTableSuffix(IDPTemplateLDAPSuffix),
-// 			),
-// 		)
-// 	}
-
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		ops...,
-// 	), nil
-// }
 
 // func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 // 	var idpEvent idp.SAMLIDPAddedEvent
@@ -2649,6 +2657,103 @@ func reduceGoogleIDPRelationalChangedColumns(payload *db_domain.Google, idpEvent
 	if idpEvent.Scopes != nil {
 		payloadChange = true
 		payload.Scopes = idpEvent.Scopes
+	}
+	return payloadChange
+}
+
+func reduceLDAPIDPRelationalChangedColumns(payload *db_domain.LDAP, idpEvent *idp.LDAPIDPChangedEvent) bool {
+	payloadChange := false
+	if idpEvent.Servers != nil {
+		payloadChange = true
+		payload.Servers = idpEvent.Servers
+	}
+	if idpEvent.StartTLS != nil {
+		payloadChange = true
+		payload.StartTLS = *idpEvent.StartTLS
+	}
+	if idpEvent.BaseDN != nil {
+		payloadChange = true
+		payload.BaseDN = *idpEvent.BaseDN
+	}
+	if idpEvent.BindDN != nil {
+		payloadChange = true
+		payload.BindDN = *idpEvent.BindDN
+	}
+	if idpEvent.BindPassword != nil {
+		payloadChange = true
+		payload.BindPassword = idpEvent.BindPassword
+	}
+	if idpEvent.UserBase != nil {
+		payloadChange = true
+		payload.UserBase = *idpEvent.UserBase
+	}
+	if idpEvent.UserObjectClasses != nil {
+		payloadChange = true
+		payload.UserObjectClasses = idpEvent.UserObjectClasses
+	}
+	if idpEvent.UserFilters != nil {
+		payloadChange = true
+		payload.UserFilters = idpEvent.UserFilters
+	}
+	if idpEvent.Timeout != nil {
+		payloadChange = true
+		payload.Timeout = *idpEvent.Timeout
+	}
+	if idpEvent.RootCA != nil {
+		payloadChange = true
+		payload.RootCA = idpEvent.RootCA
+	}
+	if idpEvent.IDAttribute != nil {
+		payloadChange = true
+		payload.IDAttribute = *idpEvent.IDAttribute
+	}
+	if idpEvent.FirstNameAttribute != nil {
+		payloadChange = true
+		payload.FirstNameAttribute = *idpEvent.FirstNameAttribute
+	}
+	if idpEvent.LastNameAttribute != nil {
+		payloadChange = true
+		payload.LastNameAttribute = *idpEvent.LastNameAttribute
+	}
+	if idpEvent.DisplayNameAttribute != nil {
+		payloadChange = true
+		payload.DisplayNameAttribute = *idpEvent.DisplayNameAttribute
+	}
+	if idpEvent.NickNameAttribute != nil {
+		payloadChange = true
+		payload.NickNameAttribute = *idpEvent.NickNameAttribute
+	}
+	if idpEvent.PreferredUsernameAttribute != nil {
+		payloadChange = true
+		payload.PreferredUsernameAttribute = *idpEvent.PreferredUsernameAttribute
+	}
+	if idpEvent.EmailAttribute != nil {
+		payloadChange = true
+		payload.EmailAttribute = *idpEvent.EmailAttribute
+	}
+	if idpEvent.EmailVerifiedAttribute != nil {
+		payloadChange = true
+		payload.EmailVerifiedAttribute = *idpEvent.EmailVerifiedAttribute
+	}
+	if idpEvent.PhoneAttribute != nil {
+		payloadChange = true
+		payload.PhoneAttribute = *idpEvent.PhoneAttribute
+	}
+	if idpEvent.PhoneVerifiedAttribute != nil {
+		payloadChange = true
+		payload.PhoneVerifiedAttribute = *idpEvent.PhoneVerifiedAttribute
+	}
+	if idpEvent.PreferredLanguageAttribute != nil {
+		payloadChange = true
+		payload.PreferredLanguageAttribute = *idpEvent.PreferredLanguageAttribute
+	}
+	if idpEvent.AvatarURLAttribute != nil {
+		payloadChange = true
+		payload.AvatarURLAttribute = *idpEvent.AvatarURLAttribute
+	}
+	if idpEvent.ProfileAttribute != nil {
+		payloadChange = true
+		payload.ProfileAttribute = *idpEvent.ProfileAttribute
 	}
 	return payloadChange
 }

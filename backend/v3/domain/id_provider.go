@@ -200,6 +200,42 @@ type IDPGitlabSelfHosting struct {
 	GitlabSelfHosting
 }
 
+type LDAP struct {
+	Servers           []string            `json:"servers"`
+	StartTLS          bool                `json:"startTLS"`
+	BaseDN            string              `json:"baseDN"`
+	BindDN            string              `json:"bindDN"`
+	BindPassword      *crypto.CryptoValue `json:"bindPassword"`
+	UserBase          string              `json:"userBase"`
+	UserObjectClasses []string            `json:"userObjectClasses"`
+	UserFilters       []string            `json:"userFilters"`
+	Timeout           time.Duration       `json:"timeout"`
+	RootCA            []byte              `json:"rootCA"`
+
+	LDAPAttributes
+}
+
+type LDAPAttributes struct {
+	IDAttribute                string `json:"idAttribute,omitempty"`
+	FirstNameAttribute         string `json:"firstNameAttribute,omitempty"`
+	LastNameAttribute          string `json:"lastNameAttribute,omitempty"`
+	DisplayNameAttribute       string `json:"displayNameAttribute,omitempty"`
+	NickNameAttribute          string `json:"nickNameAttribute,omitempty"`
+	PreferredUsernameAttribute string `json:"preferredUsernameAttribute,omitempty"`
+	EmailAttribute             string `json:"emailAttribute,omitempty"`
+	EmailVerifiedAttribute     string `json:"emailVerifiedAttribute,omitempty"`
+	PhoneAttribute             string `json:"phoneAttribute,omitempty"`
+	PhoneVerifiedAttribute     string `json:"phoneVerifiedAttribute,omitempty"`
+	PreferredLanguageAttribute string `json:"preferredLanguageAttribute,omitempty"`
+	AvatarURLAttribute         string `json:"avatarURLAttribute,omitempty"`
+	ProfileAttribute           string `json:"profileAttribute,omitempty"`
+}
+
+type IDPLDAP struct {
+	*IdentityProvider
+	LDAP
+}
+
 // IDPIdentifierCondition is used to help specify a single identity_provider,
 // it will either be used as the  identity_provider ID or identity_provider name,
 // as identity_provider can be identified either using (instanceID + OrgID + ID) OR (instanceID + OrgID + name)
@@ -279,4 +315,5 @@ type IDProviderRepository interface {
 	GetGithubEnterprise(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithubEnterprise, error)
 	GetGitlab(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlab, error)
 	GetGitlabSelfHosting(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlabSelfHosting, error)
+	GetLDAP(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPLDAP, error)
 }

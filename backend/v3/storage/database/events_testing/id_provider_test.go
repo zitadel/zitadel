@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_grpc "github.com/zitadel/zitadel/pkg/grpc/idp"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 )
 
 func TestServer_TestIDProviderReduces(t *testing.T) {
@@ -1874,6 +1875,231 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, "new_clientId", updateGoogle.ClientID)
 			assert.NotEqual(t, google.ClientSecret, updateGoogle.ClientSecret)
 			assert.Equal(t, []string{"new_scope"}, updateGoogle.Scopes)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance ldap added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add ldap
+		beforeCreate := time.Now()
+		addLdap, err := AdminClient.AddLDAPProvider(CTX, &admin.AddLDAPProviderRequest{
+			Name:              name,
+			Servers:           []string{"servers"},
+			StartTls:          true,
+			BaseDn:            "baseDN",
+			BindDn:            "bindND",
+			BindPassword:      "bindPassword",
+			UserBase:          "userBase",
+			UserObjectClasses: []string{"userOhjectClasses"},
+			UserFilters:       []string{"userFilters"},
+			Timeout:           durationpb.New(time.Minute),
+			Attributes: &idp_grpc.LDAPAttributes{
+				IdAttribute:                "idAttribute",
+				FirstNameAttribute:         "firstNameAttribute",
+				LastNameAttribute:          "lastNameAttribute",
+				DisplayNameAttribute:       "displayNameAttribute",
+				NickNameAttribute:          "nickNameAttribute",
+				PreferredUsernameAttribute: "preferredUsernameAttribute",
+				EmailAttribute:             "emailAttribute",
+				EmailVerifiedAttribute:     "emailVerifiedAttribute",
+				PhoneAttribute:             "phoneAttribute",
+				PhoneVerifiedAttribute:     "phoneVerifiedAttribute",
+				PreferredLanguageAttribute: "preferredLanguageAttribute",
+				AvatarUrlAttribute:         "avatarUrlAttribute",
+				ProfileAttribute:           "profileAttribute",
+			},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			ldap, err := idpRepo.GetLDAP(CTX, idpRepo.IDCondition(addLdap.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.ldap.v2.added
+			// idp
+			assert.Equal(t, instanceID, ldap.InstanceID)
+			assert.Nil(t, ldap.OrgID)
+			assert.Equal(t, addLdap.Id, ldap.ID)
+			assert.Equal(t, name, ldap.Name)
+			assert.Equal(t, domain.IDPTypeLDAP.String(), ldap.Type)
+			assert.Equal(t, false, ldap.AllowLinking)
+			assert.Equal(t, false, ldap.AllowCreation)
+			assert.Equal(t, false, ldap.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), ldap.AllowAutoLinking)
+			assert.WithinRange(t, ldap.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, ldap.UpdatedAt, beforeCreate, afterCreate)
+
+			// ldap
+			assert.Equal(t, []string{"servers"}, ldap.Servers)
+			assert.Equal(t, true, ldap.StartTLS)
+			assert.Equal(t, "baseDN", ldap.BaseDN)
+			assert.Equal(t, "bindND", ldap.BindDN)
+			assert.NotNil(t, ldap.BindPassword)
+			assert.Equal(t, "userBase", ldap.UserBase)
+			assert.Equal(t, []string{"userOhjectClasses"}, ldap.UserObjectClasses)
+			assert.Equal(t, []string{"userFilters"}, ldap.UserFilters)
+			assert.Equal(t, time.Minute, ldap.Timeout)
+			assert.Equal(t, "idAttribute", ldap.IDAttribute)
+			assert.Equal(t, "firstNameAttribute", ldap.FirstNameAttribute)
+			assert.Equal(t, "lastNameAttribute", ldap.LastNameAttribute)
+			assert.Equal(t, "displayNameAttribute", ldap.DisplayNameAttribute)
+			assert.Equal(t, "nickNameAttribute", ldap.NickNameAttribute)
+			assert.Equal(t, "preferredUsernameAttribute", ldap.PreferredUsernameAttribute)
+			assert.Equal(t, "emailAttribute", ldap.EmailAttribute)
+			assert.Equal(t, "emailVerifiedAttribute", ldap.EmailVerifiedAttribute)
+			assert.Equal(t, "phoneAttribute", ldap.PhoneAttribute)
+			assert.Equal(t, "phoneVerifiedAttribute", ldap.PhoneVerifiedAttribute)
+			assert.Equal(t, "preferredLanguageAttribute", ldap.PreferredLanguageAttribute)
+			assert.Equal(t, "avatarUrlAttribute", ldap.AvatarURLAttribute)
+			assert.Equal(t, "profileAttribute", ldap.ProfileAttribute)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance ldap changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add ldap
+		addLdap, err := AdminClient.AddLDAPProvider(CTX, &admin.AddLDAPProviderRequest{
+			Name:              name,
+			Servers:           []string{"servers"},
+			StartTls:          true,
+			BaseDn:            "baseDN",
+			BindDn:            "bindND",
+			BindPassword:      "bindPassword",
+			UserBase:          "userBase",
+			UserObjectClasses: []string{"userOhjectClasses"},
+			UserFilters:       []string{"userFilters"},
+			Timeout:           durationpb.New(time.Minute),
+			Attributes: &idp_grpc.LDAPAttributes{
+				IdAttribute:                "idAttribute",
+				FirstNameAttribute:         "firstNameAttribute",
+				LastNameAttribute:          "lastNameAttribute",
+				DisplayNameAttribute:       "displayNameAttribute",
+				NickNameAttribute:          "nickNameAttribute",
+				PreferredUsernameAttribute: "preferredUsernameAttribute",
+				EmailAttribute:             "emailAttribute",
+				EmailVerifiedAttribute:     "emailVerifiedAttribute",
+				PhoneAttribute:             "phoneAttribute",
+				PhoneVerifiedAttribute:     "phoneVerifiedAttribute",
+				PreferredLanguageAttribute: "preferredLanguageAttribute",
+				AvatarUrlAttribute:         "avatarUrlAttribute",
+				ProfileAttribute:           "profileAttribute",
+			},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		var ldap *domain.IDPLDAP
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			ldap, err = idpRepo.GetLDAP(CTX, idpRepo.IDCondition(addLdap.Id), instanceID, nil)
+			require.NoError(t, err)
+			assert.Equal(t, addLdap.Id, ldap.ID)
+		}, retryDuration, tick)
+
+		name = "new_" + name
+		// change ldap
+		beforeCreate := time.Now()
+		_, err = AdminClient.UpdateLDAPProvider(CTX, &admin.UpdateLDAPProviderRequest{
+			Id:                addLdap.Id,
+			Name:              name,
+			Servers:           []string{"new_servers"},
+			StartTls:          false,
+			BaseDn:            "new_baseDN",
+			BindDn:            "new_bindND",
+			BindPassword:      "new_bindPassword",
+			UserBase:          "new_userBase",
+			UserObjectClasses: []string{"new_userOhjectClasses"},
+			UserFilters:       []string{"new_userFilters"},
+			Timeout:           durationpb.New(time.Second),
+			Attributes: &idp_grpc.LDAPAttributes{
+				IdAttribute:                "new_idAttribute",
+				FirstNameAttribute:         "new_firstNameAttribute",
+				LastNameAttribute:          "new_lastNameAttribute",
+				DisplayNameAttribute:       "new_displayNameAttribute",
+				NickNameAttribute:          "new_nickNameAttribute",
+				PreferredUsernameAttribute: "new_preferredUsernameAttribute",
+				EmailAttribute:             "new_emailAttribute",
+				EmailVerifiedAttribute:     "new_emailVerifiedAttribute",
+				PhoneAttribute:             "new_phoneAttribute",
+				PhoneVerifiedAttribute:     "new_phoneVerifiedAttribute",
+				PreferredLanguageAttribute: "new_preferredLanguageAttribute",
+				AvatarUrlAttribute:         "new_avatarUrlAttribute",
+				ProfileAttribute:           "new_profileAttribute",
+			},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		// check values for ldap
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			updateLdap, err := idpRepo.GetLDAP(CTX, idpRepo.IDCondition(addLdap.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.ldap.v2.changed
+			// idp
+			assert.Equal(t, instanceID, updateLdap.InstanceID)
+			assert.Nil(t, updateLdap.OrgID)
+			assert.Equal(t, addLdap.Id, updateLdap.ID)
+			assert.Equal(t, name, updateLdap.Name)
+			assert.Equal(t, domain.IDPTypeLDAP.String(), updateLdap.Type)
+			assert.Equal(t, true, updateLdap.AllowLinking)
+			assert.Equal(t, true, updateLdap.AllowCreation)
+			assert.Equal(t, true, updateLdap.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateLdap.AllowAutoLinking)
+			assert.WithinRange(t, updateLdap.UpdatedAt, beforeCreate, afterCreate)
+
+			// ldap
+			assert.Equal(t, []string{"new_servers"}, updateLdap.Servers)
+			assert.Equal(t, false, updateLdap.StartTLS)
+			assert.Equal(t, "new_baseDN", updateLdap.BaseDN)
+			assert.Equal(t, "new_bindND", updateLdap.BindDN)
+			assert.NotEqual(t, ldap.BindPassword, updateLdap.BindPassword)
+			assert.Equal(t, "new_userBase", updateLdap.UserBase)
+			assert.Equal(t, []string{"new_userOhjectClasses"}, updateLdap.UserObjectClasses)
+			assert.Equal(t, []string{"new_userFilters"}, updateLdap.UserFilters)
+			assert.Equal(t, time.Second, updateLdap.Timeout)
+			assert.Equal(t, "new_idAttribute", updateLdap.IDAttribute)
+			assert.Equal(t, "new_firstNameAttribute", updateLdap.FirstNameAttribute)
+			assert.Equal(t, "new_lastNameAttribute", updateLdap.LastNameAttribute)
+			assert.Equal(t, "new_displayNameAttribute", updateLdap.DisplayNameAttribute)
+			assert.Equal(t, "new_nickNameAttribute", updateLdap.NickNameAttribute)
+			assert.Equal(t, "new_preferredUsernameAttribute", updateLdap.PreferredUsernameAttribute)
+			assert.Equal(t, "new_emailAttribute", updateLdap.EmailAttribute)
+			assert.Equal(t, "new_emailVerifiedAttribute", updateLdap.EmailVerifiedAttribute)
+			assert.Equal(t, "new_phoneAttribute", updateLdap.PhoneAttribute)
+			assert.Equal(t, "new_phoneVerifiedAttribute", updateLdap.PhoneVerifiedAttribute)
+			assert.Equal(t, "new_preferredLanguageAttribute", updateLdap.PreferredLanguageAttribute)
+			assert.Equal(t, "new_avatarUrlAttribute", updateLdap.AvatarURLAttribute)
+			assert.Equal(t, "new_profileAttribute", updateLdap.ProfileAttribute)
 		}, retryDuration, tick)
 	})
 }
