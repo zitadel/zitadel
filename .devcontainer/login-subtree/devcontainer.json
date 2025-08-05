@@ -1,0 +1,22 @@
+{
+	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.base.schema.json",
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:20-bookworm",
+	"name": "Login Subtree Container - Use the Login As If You Would Have Forked the Mirror Repo",
+	"workspaceFolder": "/login",
+	"workspaceMount": "source=${localWorkspaceFolder}/apps/login,target=/login,type=bind,consistency=cached",
+	"mounts": [],
+	"forwardPorts": [
+		22220,
+		22222,
+		3000,
+		3001
+	],
+	"features": {
+		"ghcr.io/devcontainers/features/go:1": {
+			"version": "1.24"
+		},
+		"ghcr.io/guiyomh/features/golangci-lint:0": {},
+		"ghcr.io/jungaretti/features/make:1": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker": {}
+	}
+}
