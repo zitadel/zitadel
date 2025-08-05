@@ -2,6 +2,10 @@ go_bin := $(shell go env GOPATH)/bin
 gen_authopt_path := $(go_bin)/protoc-gen-authoption
 gen_zitadel_path := $(go_bin)/protoc-gen-zitadel
 
+.PHONY: hodor
+hodor: 
+	echo $(gen_authopt_path)
+
 now := $(shell date '+%Y-%m-%dT%T%z' | sed -E 's/.([0-9]{2})([0-9]{2})$$/-\1:\2/')
 VERSION ?= development-$(now)
 COMMIT_SHA ?= $(shell git rev-parse HEAD)
@@ -82,7 +86,7 @@ core_grpc_dependencies:
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
-	npx buf generate
+	PATH="$(go_bin):$(PATH)" npx buf generate
 	mkdir -p pkg/grpc
 	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/
 	mkdir -p openapi/v2/zitadel
