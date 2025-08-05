@@ -3,7 +3,7 @@ services:
   devcontainer:
     container_name: devcontainer
     build:
-      context: ../base
+      context: .
     volumes:
       - ../../:/workspaces:cached
     command: sleep infinity

@@ -423,6 +423,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
               if (allowed) {
                 this.oidcForm.enable();
+                this.oidcForm.controls['clientId'].disable();
                 this.oidcTokenForm.enable();
                 this.apiForm.enable();
                 this.samlForm.enable();

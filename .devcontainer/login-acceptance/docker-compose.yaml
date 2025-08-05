@@ -178,4 +178,3 @@ services:
   #    depends_on:
   #      configure-login:
   #        condition: "service_completed_successfully"
-

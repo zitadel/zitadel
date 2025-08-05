@@ -42,7 +42,7 @@ jobs:
         run: docker compose --file .devcontainer/login-integration/docker-compose.yaml ps
       - name: Print Config
         if: failure()
-        run: COMPOSE_BAKE=1 docker compose --file  .devcontainer/base/docker-compose.yaml --file .devcontainer/login-integration/docker-compose.yaml config login-integration
+        run: COMPOSE_BAKE=1 docker compose --file .devcontainer/login-integration/docker-compose.yaml config login-integration
         env:
           LOGIN_TAG: ${{ inputs.login_build_image }}
       - name: Show Container Logs
