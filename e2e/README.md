@@ -9,4 +9,3 @@ docker compose run e2e
 ```bash
 docker compose down
 ```
-
