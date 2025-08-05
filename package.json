@@ -8,6 +8,7 @@
     "devcontainer:lint-unit": "FAIL_COMMANDS_ON_ERRORS=true devcontainer up --prebuild --config .devcontainer/turbo-lint-unit/devcontainer.json --workspace-folder .",
     "devcontainer:integration:login": "FAIL_COMMANDS_ON_ERRORS=true devcontainer up --prebuild --config .devcontainer/login-integration/devcontainer.json --workspace-folder .",
     "devcontainer:acceptance:login": "FAIL_COMMANDS_ON_ERRORS=true devcontainer up --prebuild --config .devcontainer/login-acceptance/devcontainer.json --workspace-folder .",
+    "devcontainer:acceptance:login:build": "make docker_image && docker compose --file .devcontainer/login-acceptance/docker-compose.yaml build --pull",
     "clean": "turbo run clean",
     "clean:all": "pnpm run clean && rm -rf .turbo node_modules"
   },

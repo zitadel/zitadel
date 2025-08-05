@@ -32,7 +32,7 @@ services:
 
   zitadel:
     container_name: zitadel
-    image: "${ZITADEL_TAG:-ghcr.io/zitadel/zitadel:v4.0.0-rc.2}"
+    image: "${ZITADEL_TAG:-zitadel:local}"
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
     volumes:
       - ../../apps/login/acceptance/pat:/pat:delegated
@@ -56,7 +56,10 @@ services:
 
   login-acceptance:
     container_name: login
-    image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2}"
+    image: "${LOGIN_TAG:-zitadel-login:local}"
+    build:
+      context: ../..
+      dockerfile: build/login/Dockerfile
     network_mode: service:zitadel
     environment:
       NEXT_PUBLIC_BASE_PATH: /ui/v2/login
