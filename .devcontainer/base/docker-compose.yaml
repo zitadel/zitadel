@@ -1,20 +1,11 @@
-x-build-cache: &build-cache
-  cache_from:
-    - type=gha
-  cache_to:
-    - type=gha,mode=max
-
 services:
 
   devcontainer:
     container_name: devcontainer
     build:
-      context: .
-      <<: *build-cache
+      context: ../base
     volumes:
       - ../../:/workspaces:cached
-      - /tmp/.X11-unix:/tmp/.X11-unix:cached
-      - home-dir:/home/node:delegated
     command: sleep infinity
     working_dir: /workspaces
     environment:
@@ -39,34 +30,9 @@ services:
     ports:
       - "5432:5432"
 
-  mock-zitadel:
-    container_name: mock-zitadel
-    build:
-      context: ../../apps/login/integration/core-mock
-      <<: *build-cache
-    ports:
-      - 22220:22220
-      - 22222:22222
-
-  login-integration:
-    container_name: login-integration
-    build:
-      context: ../..
-      dockerfile: build/login/Dockerfile
-      <<: *build-cache
-    image: "${LOGIN_TAG:-zitadel-login:local}"
-    env_file: ../../apps/login/.env.test
-    network_mode: service:devcontainer
-    environment:
-      NODE_ENV: test
-      PORT: 3001
-    depends_on:
-      mock-zitadel:
-        condition: service_started
-
   zitadel:
-    image: "${ZITADEL_TAG:-ghcr.io/zitadel/zitadel:v4.0.0-rc.2}"
     container_name: zitadel
+    image: "${ZITADEL_TAG:-ghcr.io/zitadel/zitadel:latest}"
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
     volumes:
       - ../../apps/login/acceptance/pat:/pat:delegated
@@ -89,7 +55,6 @@ services:
     build:
       context: ../../apps/login/acceptance/setup
       dockerfile: ../go-command.Dockerfile
-      <<: *build-cache
     entrypoint: "./setup.sh"
     network_mode: service:devcontainer
     environment:
@@ -111,7 +76,7 @@ services:
 
   login-acceptance:
     container_name: login
-    image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2}"
+    image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:latest}"
     network_mode: service:devcontainer
     volumes:
       - ../../apps/login/.env.test.local:/env-files/.env:cached
@@ -126,7 +91,6 @@ services:
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
-      <<: *build-cache
     environment:
       PORT: '3333'
     command:
@@ -151,7 +115,6 @@ services:
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
-      <<: *build-cache
     network_mode: service:devcontainer
     environment:
       API_URL: 'http://localhost:8080'
@@ -175,7 +138,6 @@ services:
   #      dockerfile: ../../go-command.Dockerfile
   #      args:
   #        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
-  #      <<: *build-cache
   #    network_mode: service:devcontainer
   #    environment:
   #      API_URL: 'http://localhost:8080'
@@ -197,7 +159,6 @@ services:
       dockerfile: ../go-command.Dockerfile
       args:
         - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
-      <<: *build-cache
     network_mode: service:devcontainer
     environment:
       API_URL: 'http://localhost:8080'
@@ -219,7 +180,6 @@ services:
   #      dockerfile: ../../go-command.Dockerfile
   #      args:
   #        - LOGIN_TEST_ACCEPTANCE_GOLANG_TAG=${LOGIN_TEST_ACCEPTANCE_GOLANG_TAG:-golang:1.24-alpine}
-  #      <<: *build-cache
   #    network_mode: service:devcontainer
   #    environment:
   #      API_URL: 'http://localhost:8080'
@@ -236,4 +196,3 @@ services:
 
 volumes:
   postgres-data:
-  home-dir:
