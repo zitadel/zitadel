@@ -395,7 +395,7 @@ func (i idProvider) InstanceIDCondition(id string) database.Condition {
 
 func (i idProvider) OrgIDCondition(id *string) database.Condition {
 	if id == nil {
-		return nil
+		return database.IsNull(i.OrgIDColumn())
 	}
 	return database.NewTextCondition(i.OrgIDColumn(), database.TextOperationEqual, *id)
 }

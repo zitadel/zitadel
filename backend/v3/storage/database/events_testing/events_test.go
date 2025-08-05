@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
@@ -28,6 +29,7 @@ var (
 	SystemClient system.SystemServiceClient
 	OrgClient    v2beta_org.OrganizationServiceClient
 	AdminClient  admin.AdminServiceClient
+	MgmtClient           mgmt.ManagementServiceClient
 )
 
 var pool database.Pool
@@ -43,6 +45,7 @@ func TestMain(m *testing.M) {
 		SystemClient = integration.SystemClient()
 		OrgClient = Instance.Client.OrgV2beta
 		AdminClient = Instance.Client.Admin
+		MgmtClient = Instance.Client.Mgmt
 
 		var err error
 		dbConfig, err := pgxpool.ParseConfig(ConnString)

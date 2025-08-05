@@ -3,12 +3,14 @@ package projection
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -77,7 +79,7 @@ func (p *idpRelationalProjection) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  instance.IDPJWTConfigChangedEventType,
-					Reduce: p.reduceJWTConfigChanged,
+					Reduce: p.reduceJWTRelationalConfigChanged,
 				},
 				// {
 				// 	Event:  instance.InstanceRemovedEventType,
@@ -85,251 +87,402 @@ func (p *idpRelationalProjection) Reducers() []handler.AggregateReducer {
 				// },
 			},
 		},
+		{
+			Aggregate: org.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  org.IDPConfigAddedEventType,
+					Reduce: p.reduceIDPRelationalAdded,
+				},
+				{
+					Event:  org.IDPConfigChangedEventType,
+					Reduce: p.reduceIDPRelationalChanged,
+				},
+				{
+					Event:  org.IDPConfigDeactivatedEventType,
+					Reduce: p.reduceIDRelationalPDeactivated,
+				},
+				{
+					Event:  org.IDPConfigReactivatedEventType,
+					Reduce: p.reduceIDPRelationalReactivated,
+				},
+				{
+					Event:  org.IDPConfigRemovedEventType,
+					Reduce: p.reduceIDPRelationalRemoved,
+				},
+				{
+					Event:  org.IDPOIDCConfigAddedEventType,
+					Reduce: p.reduceOIDCRelationalConfigAdded,
+				},
+				{
+					Event:  org.IDPOIDCConfigChangedEventType,
+					Reduce: p.reduceOIDCRelationalConfigChanged,
+				},
+				{
+					Event:  org.IDPJWTConfigAddedEventType,
+					Reduce: p.reduceJWTRelationalConfigAdded,
+				},
+				{
+					Event:  org.IDPJWTConfigChangedEventType,
+					Reduce: p.reduceJWTRelationalConfigChanged,
+				},
+				// {
+				// 	Event:  org.OrgRemovedEventType,
+				// 	Reduce: p.reduceOwnerRemoved,
+				// },
+			},
+		},
 	}
 }
 
 func (p *idpRelationalProjection) reduceIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.IDPConfigAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fcUdQ", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigAddedEventType, instance.IDPConfigAddedEventType})
+	var idpEvent idpconfig.IDPConfigAddedEvent
+	switch e := event.(type) {
+	case *org.IDPConfigAddedEvent:
+		idpEvent = e.IDPConfigAddedEvent
+	case *instance.IDPConfigAddedEvent:
+		idpEvent = e.IDPConfigAddedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YcUdQ", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigAddedEventType, instance.IDPConfigAddedEventType})
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> idpEvent.Aggregate().InstanceID = %+v\n", idpEvent.Aggregate().InstanceID)
+	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> idpEvent.Aggregate().ResourceOwner = %+v\n", idpEvent.Aggregate().ResourceOwner)
+	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> idpEvent.Aggregate() = %+v\n", idpEvent.Aggregate())
+	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REDUCE ADD orgId = %+v\n", orgId)
+
 	return handler.NewCreateStatement(
-		e,
+		&idpEvent,
 		[]handler.Column{
-			handler.NewCol(IDPInstanceIDCol, e.Aggregate().InstanceID),
-			handler.NewCol(IDPRelationalOrgIdCol, nil),
-			handler.NewCol(IDPIDCol, e.ConfigID),
+			handler.NewCol(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgIdCol, orgId),
+			handler.NewCol(IDPIDCol, idpEvent.ConfigID),
 			handler.NewCol(IDPStateCol, domain.IDPStateActive.String()),
-			handler.NewCol(IDPNameCol, e.Name),
+			handler.NewCol(IDPNameCol, idpEvent.Name),
 			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeUnspecified.String()),
-			handler.NewCol(IDPRelationalAutoRegisterCol, e.AutoRegister),
+			handler.NewCol(IDPRelationalAutoRegisterCol, idpEvent.AutoRegister),
 			handler.NewCol(IDPRelationalAllowCreationCol, true),
 			handler.NewCol(IDPRelationalAllowAutoUpdateCol, false),
 			handler.NewCol(IDPRelationalAllowLinkingCol, true),
 			handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOptionUnspecified.String()),
-			handler.NewCol(IDPStylingTypeCol, e.StylingType),
-			handler.NewCol(CreatedAt, e.CreationDate()),
+			handler.NewCol(IDPStylingTypeCol, idpEvent.StylingType),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 		},
 	), nil
 }
 
 func (p *idpRelationalProjection) reduceIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.IDPConfigChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-NVvJD", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType})
+	var idpEvent idpconfig.IDPConfigChangedEvent
+	switch e := event.(type) {
+	case *org.IDPConfigChangedEvent:
+		idpEvent = e.IDPConfigChangedEvent
+	case *instance.IDPConfigChangedEvent:
+		idpEvent = e.IDPConfigChangedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YVvJD", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType})
+	}
+
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	cols := make([]handler.Column, 0, 5)
-	if e.Name != nil {
-		cols = append(cols, handler.NewCol(IDPNameCol, *e.Name))
+	if idpEvent.Name != nil {
+		cols = append(cols, handler.NewCol(IDPNameCol, *idpEvent.Name))
 	}
-	if e.StylingType != nil {
-		cols = append(cols, handler.NewCol(IDPStylingTypeCol, *e.StylingType))
+	if idpEvent.StylingType != nil {
+		cols = append(cols, handler.NewCol(IDPStylingTypeCol, *idpEvent.StylingType))
 	}
-	if e.AutoRegister != nil {
-		cols = append(cols, handler.NewCol(IDPRelationalAutoRegisterCol, *e.AutoRegister))
+	if idpEvent.AutoRegister != nil {
+		cols = append(cols, handler.NewCol(IDPRelationalAutoRegisterCol, *idpEvent.AutoRegister))
 	}
 	if len(cols) == 0 {
-		return handler.NewNoOpStatement(e), nil
+		return handler.NewNoOpStatement(&idpEvent), nil
 	}
 
 	return handler.NewUpdateStatement(
-		e,
+		&idpEvent,
 		cols,
 		[]handler.Condition{
-			handler.NewCond(IDPIDCol, e.ConfigID),
-			handler.NewCond(IDPInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCond(IDPRelationalOrgId, orgId),
 		},
 	), nil
 }
 
 func (p *idpRelationalProjection) reduceIDRelationalPDeactivated(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.IDPConfigDeactivatedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-94O5l", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigDeactivatedEventType, instance.IDPConfigDeactivatedEventType})
+	var idpEvent idpconfig.IDPConfigDeactivatedEvent
+	switch e := event.(type) {
+	case *org.IDPConfigDeactivatedEvent:
+		idpEvent = e.IDPConfigDeactivatedEvent
+	case *instance.IDPConfigDeactivatedEvent:
+		idpEvent = e.IDPConfigDeactivatedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y4O5l", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigDeactivatedEventType, instance.IDPConfigDeactivatedEventType})
+	}
+
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewUpdateStatement(
-		e,
+		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPStateCol, domain.IDPStateInactive.String()),
 		},
 		[]handler.Condition{
-			handler.NewCond(IDPIDCol, e.ConfigID),
-			handler.NewCond(IDPInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCond(IDPRelationalOrgId, orgId),
 		},
 	), nil
 }
 
 func (p *idpRelationalProjection) reduceIDPRelationalReactivated(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.IDPConfigReactivatedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-I8QyS", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigReactivatedEventType, instance.IDPConfigReactivatedEventType})
+	var idpEvent idpconfig.IDPConfigReactivatedEvent
+	switch e := event.(type) {
+	case *org.IDPConfigReactivatedEvent:
+		idpEvent = e.IDPConfigReactivatedEvent
+	case *instance.IDPConfigReactivatedEvent:
+		idpEvent = e.IDPConfigReactivatedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y8QyS", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigReactivatedEventType, instance.IDPConfigReactivatedEventType})
+	}
+
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewUpdateStatement(
-		e,
+		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPStateCol, domain.IDPStateActive.String()),
 		},
 		[]handler.Condition{
-			handler.NewCond(IDPIDCol, e.ConfigID),
-			handler.NewCond(IDPInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCond(IDPRelationalOrgId, orgId),
 		},
 	), nil
 }
 
 func (p *idpRelationalProjection) reduceIDPRelationalRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.IDPConfigRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-B4zy8", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
+	var idpEvent idpconfig.IDPConfigRemovedEvent
+	switch e := event.(type) {
+	case *org.IDPConfigRemovedEvent:
+		idpEvent = e.IDPConfigRemovedEvent
+	case *instance.IDPConfigRemovedEvent:
+		idpEvent = e.IDPConfigRemovedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y4zy8", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
+	}
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewDeleteStatement(
-		e,
+		&idpEvent,
 		[]handler.Condition{
-			handler.NewCond(IDPIDCol, e.ConfigID),
-			handler.NewCond(IDPInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCond(IDPRelationalOrgId, orgId),
 		},
 	), nil
 }
 
 func (p *idpRelationalProjection) reduceOIDCRelationalConfigAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.IDPOIDCConfigAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-2FuAA", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType})
+	var idpEvent idpconfig.OIDCConfigAddedEvent
+	switch e := event.(type) {
+	case *org.IDPOIDCConfigAddedEvent:
+		idpEvent = e.OIDCConfigAddedEvent
+	case *instance.IDPOIDCConfigAddedEvent:
+		idpEvent = e.OIDCConfigAddedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YFuAA", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType})
 	}
 
-	payload, err := json.Marshal(e)
+	payload, err := json.Marshal(idpEvent)
 	if err != nil {
 		return nil, err
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
 	return handler.NewUpdateStatement(
-		e,
+		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPRelationalPayloadCol, payload),
 			handler.NewCol(IDPTypeCol, domain.IDPTypeOIDC.String()),
 		},
 		[]handler.Condition{
-			handler.NewCond(IDPIDCol, e.IDPConfigID),
+			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCond(IDPRelationalOrgId, orgId),
 		},
 	), nil
 }
 
 func (p *idpRelationalProjection) reduceOIDCRelationalConfigChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.IDPOIDCConfigChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x2IBI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigChangedEventType, instance.IDPOIDCConfigChangedEventType})
+	var idpEvent idpconfig.OIDCConfigChangedEvent
+	switch e := event.(type) {
+	case *org.IDPOIDCConfigChangedEvent:
+		idpEvent = e.OIDCConfigChangedEvent
+	case *instance.IDPOIDCConfigChangedEvent:
+		idpEvent = e.OIDCConfigChangedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigChangedEventType, instance.IDPOIDCConfigChangedEventType})
 	}
 
-	oidc, err := p.idpRepo.GetOIDC(context.Background(), p.idpRepo.IDCondition(e.IDPConfigID), e.Agg.InstanceID, nil)
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
+	oidc, err := p.idpRepo.GetOIDC(context.Background(), p.idpRepo.IDCondition(idpEvent.IDPConfigID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
 
-	if e.ClientID != nil {
-		oidc.ClientID = *e.ClientID
+	if idpEvent.ClientID != nil {
+		oidc.ClientID = *idpEvent.ClientID
 	}
-	if e.ClientSecret != nil {
-		oidc.ClientSecret = *e.ClientSecret
+	if idpEvent.ClientSecret != nil {
+		oidc.ClientSecret = *idpEvent.ClientSecret
 	}
-	if e.Issuer != nil {
-		oidc.Issuer = *e.Issuer
+	if idpEvent.Issuer != nil {
+		oidc.Issuer = *idpEvent.Issuer
 	}
-	if e.AuthorizationEndpoint != nil {
-		oidc.AuthorizationEndpoint = *e.AuthorizationEndpoint
+	if idpEvent.AuthorizationEndpoint != nil {
+		oidc.AuthorizationEndpoint = *idpEvent.AuthorizationEndpoint
 	}
-	if e.TokenEndpoint != nil {
-		oidc.TokenEndpoint = *e.TokenEndpoint
+	if idpEvent.TokenEndpoint != nil {
+		oidc.TokenEndpoint = *idpEvent.TokenEndpoint
 	}
-	if e.Scopes != nil {
-		oidc.Scopes = e.Scopes
+	if idpEvent.Scopes != nil {
+		oidc.Scopes = idpEvent.Scopes
 	}
-	if e.IDPDisplayNameMapping != nil {
-		oidc.IDPDisplayNameMapping = domain.OIDCMappingField(*e.IDPDisplayNameMapping)
+	if idpEvent.IDPDisplayNameMapping != nil {
+		oidc.IDPDisplayNameMapping = domain.OIDCMappingField(*idpEvent.IDPDisplayNameMapping)
 	}
-	if e.UserNameMapping != nil {
-		oidc.UserNameMapping = domain.OIDCMappingField(*e.UserNameMapping)
+	if idpEvent.UserNameMapping != nil {
+		oidc.UserNameMapping = domain.OIDCMappingField(*idpEvent.UserNameMapping)
 	}
 
-	payload, err := json.Marshal(e)
+	payload, err := json.Marshal(idpEvent)
 	if err != nil {
 		return nil, err
 	}
 
 	return handler.NewUpdateStatement(
-		e,
+		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPRelationalPayloadCol, payload),
 			handler.NewCol(IDPTypeCol, domain.IDPTypeOIDC.String()),
 		},
 		[]handler.Condition{
-			handler.NewCond(IDPIDCol, e.IDPConfigID),
+			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCond(IDPRelationalOrgId, orgId),
 		},
 	), nil
 }
 
 func (p *idpRelationalProjection) reduceJWTRelationalConfigAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.IDPJWTConfigAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qvPdb", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType})
+	var idpEvent idpconfig.JWTConfigAddedEvent
+	switch e := event.(type) {
+	case *org.IDPJWTConfigAddedEvent:
+		idpEvent = e.JWTConfigAddedEvent
+	case *instance.IDPJWTConfigAddedEvent:
+		idpEvent = e.JWTConfigAddedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YvPdb", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType})
 	}
-	payload, err := json.Marshal(e)
+
+	payload, err := json.Marshal(idpEvent)
 	if err != nil {
 		return nil, err
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
 	return handler.NewUpdateStatement(
-		e,
+		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPRelationalPayloadCol, payload),
 			handler.NewCol(IDPTypeCol, domain.IDPTypeJWT.String()),
 		},
 		[]handler.Condition{
-			handler.NewCond(IDPIDCol, e.IDPConfigID),
+			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCond(IDPRelationalOrgId, orgId),
 		},
 	), nil
 }
 
-func (p *idpRelationalProjection) reduceJWTConfigChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.IDPJWTConfigChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-P2I9I", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigChangedEventType, instance.IDPJWTConfigChangedEventType})
+func (p *idpRelationalProjection) reduceJWTRelationalConfigChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idpconfig.JWTConfigChangedEvent
+	switch e := event.(type) {
+	case *org.IDPJWTConfigChangedEvent:
+		idpEvent = e.JWTConfigChangedEvent
+	case *instance.IDPJWTConfigChangedEvent:
+		idpEvent = e.JWTConfigChangedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigChangedEventType, instance.IDPJWTConfigChangedEventType})
 	}
 
-	jwt, err := p.idpRepo.GetJWT(context.Background(), p.idpRepo.IDCondition(e.IDPConfigID), e.Agg.InstanceID, nil)
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
+	jwt, err := p.idpRepo.GetJWT(context.Background(), p.idpRepo.IDCondition(idpEvent.IDPConfigID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
 
-	if e.JWTEndpoint != nil {
-		jwt.JWTEndpoint = *e.JWTEndpoint
+	if idpEvent.JWTEndpoint != nil {
+		jwt.JWTEndpoint = *idpEvent.JWTEndpoint
 	}
-	if e.Issuer != nil {
-		jwt.Issuer = *e.Issuer
+	if idpEvent.Issuer != nil {
+		jwt.Issuer = *idpEvent.Issuer
 	}
-	if e.KeysEndpoint != nil {
-		jwt.KeysEndpoint = *e.KeysEndpoint
+	if idpEvent.KeysEndpoint != nil {
+		jwt.KeysEndpoint = *idpEvent.KeysEndpoint
 	}
-	if e.HeaderName != nil {
-		jwt.HeaderName = *e.HeaderName
+	if idpEvent.HeaderName != nil {
+		jwt.HeaderName = *idpEvent.HeaderName
 	}
 
-	payload, err := json.Marshal(e)
+	payload, err := json.Marshal(idpEvent)
 	if err != nil {
 		return nil, err
 	}
 
 	return handler.NewUpdateStatement(
-		e,
+		&idpEvent,
 		[]handler.Column{
 			handler.NewCol(IDPRelationalPayloadCol, payload),
 			handler.NewCol(IDPTypeCol, domain.IDPTypeJWT.String()),
 		},
 		[]handler.Condition{
-			handler.NewCond(IDPIDCol, e.IDPConfigID),
+			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
+			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCond(IDPRelationalOrgId, orgId),
 		},
 	), nil
 }

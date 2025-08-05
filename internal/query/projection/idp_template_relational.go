@@ -17,6 +17,7 @@ import (
 )
 
 const (
+	IDPRelationalOrgId                = "org_id"
 	IDPRelationalAllowCreationCol     = "allow_creation"
 	IDPRelationalAllowLinkingCol      = "allow_linking"
 	IDPRelationalAllowAutoCreationCol = "allow_auto_creation"
@@ -101,7 +102,7 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 				},
 				{
 					Event:  instance.JWTIDPAddedEventType,
-					Reduce: p.reduceJWTIDPReducedAdded,
+					Reduce: p.reduceJWTIDPRelationalAdded,
 				},
 				{
 					Event:  instance.JWTIDPChangedEventType,
@@ -191,51 +192,51 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 				// 			Event:  instance.InstanceRemovedEventType,
 				// 			Reduce: reduceInstanceRemovedHelper(IDPTemplateInstanceIDCol),
 				// 		},
-				// 	},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  org.OAuthIDPAddedEventType,
+					Reduce: p.reduceOAuthIDPRelationalAdded,
+				},
+				{
+					Event:  org.OAuthIDPChangedEventType,
+					Reduce: p.reduceOAuthIDPRelationalChanged,
+				},
+				{
+					Event:  org.OIDCIDPAddedEventType,
+					Reduce: p.reduceOIDCIDPRelationalAdded,
+				},
+				{
+					Event:  org.OIDCIDPChangedEventType,
+					Reduce: p.reduceOIDCIDPRelationalChanged,
+				},
+				{
+					Event:  org.OIDCIDPMigratedAzureADEventType,
+					Reduce: p.reduceOIDCIDPRelationalMigratedAzureAD,
+				},
+				{
+					Event:  org.OIDCIDPMigratedGoogleEventType,
+					Reduce: p.reduceOIDCIDPRelationalMigratedGoogle,
+				},
+				{
+					Event:  org.JWTIDPAddedEventType,
+					Reduce: p.reduceJWTIDPRelationalAdded,
+				},
+				{
+					Event:  org.JWTIDPChangedEventType,
+					Reduce: p.reduceJWTIDPRelationalChanged,
+				},
+				// {
+				// 	Event:  org.IDPConfigAddedEventType,
+				// 	Reduce: p.reduceOldConfigAdded,
 				// },
 				// {
-				// 	Aggregate: org.AggregateType,
-				// 	EventReducers: []handler.EventReducer{
-				// 		{
-				// 			Event:  org.OAuthIDPAddedEventType,
-				// 			Reduce: p.reduceOAuthIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.OAuthIDPChangedEventType,
-				// 			Reduce: p.reduceOAuthIDPChanged,
-				// 		},
-				// 		{
-				// 			Event:  org.OIDCIDPAddedEventType,
-				// 			Reduce: p.reduceOIDCIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.OIDCIDPChangedEventType,
-				// 			Reduce: p.reduceOIDCIDPChanged,
-				// 		},
-				// 		{
-				// 			Event:  org.OIDCIDPMigratedAzureADEventType,
-				// 			Reduce: p.reduceOIDCIDPMigratedAzureAD,
-				// 		},
-				// 		{
-				// 			Event:  org.OIDCIDPMigratedGoogleEventType,
-				// 			Reduce: p.reduceOIDCIDPMigratedGoogle,
-				// 		},
-				// 		{
-				// 			Event:  org.JWTIDPAddedEventType,
-				// 			Reduce: p.reduceJWTIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.JWTIDPChangedEventType,
-				// 			Reduce: p.reduceJWTIDPChanged,
-				// 		},
-				// 		{
-				// 			Event:  org.IDPConfigAddedEventType,
-				// 			Reduce: p.reduceOldConfigAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.IDPConfigChangedEventType,
-				// 			Reduce: p.reduceOldConfigChanged,
-				// 		},
+				// 	Event:  org.IDPConfigChangedEventType,
+				// 	Reduce: p.reduceOldConfigChanged,
+				// },
 				// 		{
 				// 			Event:  org.IDPOIDCConfigAddedEventType,
 				// 			Reduce: p.reduceOldOIDCConfigAdded,
@@ -252,58 +253,58 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 				// 			Event:  org.IDPJWTConfigChangedEventType,
 				// 			Reduce: p.reduceOldJWTConfigChanged,
 				// 		},
-				// 		{
-				// 			Event:  org.AzureADIDPAddedEventType,
-				// 			Reduce: p.reduceAzureADIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.AzureADIDPChangedEventType,
-				// 			Reduce: p.reduceAzureADIDPChanged,
-				// 		},
-				// 		{
-				// 			Event:  org.GitHubIDPAddedEventType,
-				// 			Reduce: p.reduceGitHubIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.GitHubIDPChangedEventType,
-				// 			Reduce: p.reduceGitHubIDPChanged,
-				// 		},
-				// 		{
-				// 			Event:  org.GitHubEnterpriseIDPAddedEventType,
-				// 			Reduce: p.reduceGitHubEnterpriseIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.GitHubEnterpriseIDPChangedEventType,
-				// 			Reduce: p.reduceGitHubEnterpriseIDPChanged,
-				// 		},
-				// 		{
-				// 			Event:  org.GitLabIDPAddedEventType,
-				// 			Reduce: p.reduceGitLabIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.GitLabIDPChangedEventType,
-				// 			Reduce: p.reduceGitLabIDPChanged,
-				// 		},
-				// 		{
-				// 			Event:  org.GitLabSelfHostedIDPAddedEventType,
-				// 			Reduce: p.reduceGitLabSelfHostedIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.GitLabSelfHostedIDPChangedEventType,
-				// 			Reduce: p.reduceGitLabSelfHostedIDPChanged,
-				// 		},
-				// 		{
-				// 			Event:  org.GoogleIDPAddedEventType,
-				// 			Reduce: p.reduceGoogleIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.GoogleIDPChangedEventType,
-				// 			Reduce: p.reduceGoogleIDPChanged,
-				// 		},
-				// 		{
-				// 			Event:  org.LDAPIDPAddedEventType,
-				// 			Reduce: p.reduceLDAPIDPAdded,
-				// 		},
+				{
+					Event:  org.AzureADIDPAddedEventType,
+					Reduce: p.reduceAzureADIDPRelationalAdded,
+				},
+				{
+					Event:  org.AzureADIDPChangedEventType,
+					Reduce: p.reduceAzureADIDPRelationalChanged,
+				},
+				{
+					Event:  org.GitHubIDPAddedEventType,
+					Reduce: p.reduceGitHubIDPRelationalAdded,
+				},
+				{
+					Event:  org.GitHubIDPChangedEventType,
+					Reduce: p.reduceGitHubIDPRelationalChanged,
+				},
+				{
+					Event:  org.GitHubEnterpriseIDPAddedEventType,
+					Reduce: p.reduceGitHubEnterpriseIDPRelationalAdded,
+				},
+				{
+					Event:  org.GitHubEnterpriseIDPChangedEventType,
+					Reduce: p.reduceGitHubEnterpriseIDPRelationalChanged,
+				},
+				{
+					Event:  org.GitLabIDPAddedEventType,
+					Reduce: p.reduceGitLabIDPRelationalAdded,
+				},
+				{
+					Event:  org.GitLabIDPChangedEventType,
+					Reduce: p.reduceGitLabIDPRelationalChanged,
+				},
+				{
+					Event:  org.GitLabSelfHostedIDPAddedEventType,
+					Reduce: p.reduceGitLabSelfHostedIDPRelationalAdded,
+				},
+				{
+					Event:  org.GitLabSelfHostedIDPChangedEventType,
+					Reduce: p.reduceGitLabSelfHostedIDPRelationalChanged,
+				},
+				{
+					Event:  org.GoogleIDPAddedEventType,
+					Reduce: p.reduceGoogleIDPRelationalAdded,
+				},
+				{
+					Event:  org.GoogleIDPChangedEventType,
+					Reduce: p.reduceGoogleIDPRelationalChanged,
+				},
+				// {
+				// 	Event:  org.LDAPIDPAddedEventType,
+				// 	Reduce: p.reduceLDAPIDPAdded,
+				// },
 				// 		{
 				// 			Event:  org.LDAPIDPChangedEventType,
 				// 			Reduce: p.reduceLDAPIDPChanged,
@@ -368,11 +369,17 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event ev
 		return nil, err
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
@@ -400,7 +407,12 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalChanged(event 
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
 	}
 
-	oauth, err := p.idpRepo.GetOAuth(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, nil)
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
+	oauth, err := p.idpRepo.GetOAuth(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
@@ -425,6 +437,7 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalChanged(event 
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
 			},
 		),
 	), nil
@@ -451,13 +464,18 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eve
 		return nil, err
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeOIDC.String()),
@@ -467,6 +485,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eve
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
 				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			},
 		),
 	), nil
@@ -488,7 +507,12 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event e
 	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
 	// }
 
-	oidc, err := p.idpRepo.GetOIDC(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, nil)
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
+	oidc, err := p.idpRepo.GetOIDC(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
@@ -513,6 +537,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event e
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
 			},
 		),
 	), nil
@@ -547,6 +572,11 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 		return nil, err
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddUpdateStatement(
@@ -563,6 +593,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
 			},
 		),
 	), nil
@@ -595,6 +626,11 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 		return nil, err
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddUpdateStatement(
@@ -611,12 +647,13 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
 			},
 		),
 	), nil
 }
 
-func (p *idpTemplateRelationalProjection) reduceJWTIDPReducedAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idp.JWTIDPAddedEvent
 	switch e := event.(type) {
 	case *org.JWTIDPAddedEvent:
@@ -644,14 +681,20 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPReducedAdded(event eventst
 		return nil, err
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
 				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeJWT.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
@@ -680,8 +723,12 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event ev
 	// if !ok {
 	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
 	// }
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
 
-	jwt, err := p.idpRepo.GetJWT(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, nil)
+	jwt, err := p.idpRepo.GetJWT(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
@@ -706,6 +753,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event ev
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
 			},
 		),
 	), nil
@@ -999,12 +1047,18 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event 
 		return nil, err
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeAzure.String()),
 				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
@@ -1035,8 +1089,12 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(even
 	// if !ok {
 	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
 	// }
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
 
-	oauth, err := p.idpRepo.GetOAzureAD(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, nil)
+	oauth, err := p.idpRepo.GetOAzureAD(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
@@ -1061,6 +1119,7 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(even
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
 			},
 		),
 	), nil
@@ -1093,12 +1152,18 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 		return nil, err
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeGitHub.String()),
 				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
@@ -1162,8 +1227,12 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event
 	// if !ok {
 	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPChangedEventType, instance.GitHubIDPChangedEventType})
 	// }
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
 
-	github, err := p.idpRepo.GetGithub(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, nil)
+	github, err := p.idpRepo.GetGithub(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
@@ -1188,6 +1257,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
 			},
 		),
 	), nil
@@ -1223,12 +1293,18 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdd
 		return nil, err
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeGitHubEnterprise.String()),
@@ -1259,8 +1335,12 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalCha
 	// if !ok {
 	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
 	// }
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
 
-	githubEnterprise, err := p.idpRepo.GetGithubEnterprise(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, nil)
+	githubEnterprise, err := p.idpRepo.GetGithubEnterprise(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
@@ -1285,6 +1365,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalCha
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
 			},
 		),
 	), nil
@@ -1317,12 +1398,18 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event e
 		return nil, err
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeGitLab.String()),
 				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
@@ -1353,8 +1440,12 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event
 	// if !ok {
 	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
 	// }
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
 
-	oauth, err := p.idpRepo.GetGitlab(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, nil)
+	oauth, err := p.idpRepo.GetGitlab(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
@@ -1379,6 +1470,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
 			},
 		),
 	), nil
@@ -1412,12 +1504,18 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdd
 		return nil, err
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeGitLabSelfHosted.String()),
 				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
@@ -1448,8 +1546,12 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalCha
 	// if !ok {
 	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAf3g2", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPChangedEventType, instance.GitLabSelfHostedIDPChangedEventType})
 	// }
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
 
-	gitlabSelfHosted, err := p.idpRepo.GetGitlabSelfHosting(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, nil)
+	gitlabSelfHosted, err := p.idpRepo.GetGitlabSelfHosting(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
@@ -1474,6 +1576,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalCha
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
 			},
 		),
 	), nil
@@ -1535,12 +1638,17 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event e
 		return nil, err
 	}
 
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeGoogle.String()),
 				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
@@ -1571,8 +1679,12 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 	// if !ok {
 	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
 	// }
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
 
-	oauth, err := p.idpRepo.GetGoogle(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, nil)
+	oauth, err := p.idpRepo.GetGoogle(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
@@ -1597,6 +1709,7 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
 			},
 		),
 	), nil
