@@ -48,7 +48,7 @@ describe("register", () => {
           factors: {
             user: {
               id: "221394658884845598",
-              loginName: "john@zitadel.com",
+              loginName: "john@example.com",
             },
             password: undefined,
             webAuthN: undefined,
@@ -64,10 +64,10 @@ describe("register", () => {
     cy.visit("/register");
     cy.get('input[data-testid="firstname-text-input"]').focus().type("John");
     cy.get('input[data-testid="lastname-text-input"]').focus().type("Doe");
-    cy.get('input[data-testid="email-text-input"]').focus().type("john@zitadel.com");
+    cy.get('input[data-testid="email-text-input"]').focus().type("john@example.com");
     cy.get('input[type="checkbox"][value="privacypolicy"]').check();
     cy.get('input[type="checkbox"][value="tos"]').check();
     cy.get('button[type="submit"]').click();
-    cy.url({ timeout: 10_000 }).should("include", Cypress.config().baseUrl + "/passkey/set");
+    cy.url().should("include", Cypress.config().baseUrl + "/passkey/set");
   });
 });

@@ -1,0 +1,35 @@
+services:
+  login-integration-dev:
+    extends:
+      file: ../base/docker-compose.yaml
+      service: devcontainer
+    container_name: login-integration-dev
+    env_file: ../../apps/login/.env.test
+    environment:
+      CORE_MOCK_STUBS_URL: http://localhost:22220/v1/stubs
+      LOGIN_BASE_URL: http://localhost:3001/ui/v2/login
+      CYPRESS_CACHE_FOLDER: /workspaces/.artifacts/cypress
+    network_mode: service:mock-zitadel
+    depends_on:
+      login-integration:
+        condition: service_healthy
+
+  login-integration:
+    container_name: login-integration
+    image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:latest}"
+    build:
+      context: ../..
+      dockerfile: build/login/Dockerfile
+    env_file: ../../apps/login/.env.test
+    network_mode: service:mock-zitadel
+
+  mock-zitadel:
+    container_name: mock-zitadel
+    build:
+      context: ../../apps/login/integration/core-mock
+      additional_contexts:
+        - zitadel-protos=../../proto
+    ports:
+      - 22220:22220
+      - 22222:22222
+      - 3001:3001
