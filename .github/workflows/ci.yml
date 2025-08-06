@@ -27,5 +27,4 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
 
-      - name: build
-        run: npx nx run @zitadel/docs:build
+      - run: npx nx run @zitadel/docs:build
