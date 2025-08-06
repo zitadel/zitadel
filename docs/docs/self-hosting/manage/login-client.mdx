@@ -1,0 +1,47 @@
+---
+title: Connect your Self-Hosted Login UI to Zitadel
+sidebar_label: Create a Login Client
+---
+
+To enable your self-hosted Login UI to connect to the Zitadel API, it needs a token for a user with the IAM_LOGIN_CLIENT role.
+On new installations, the Zitadel setup job can be configured to automatically write a Personal Access Token (PAT) for the login client.
+Check out [one of the deployment examples](https://zitadel.com/docs/self-hosting/deploy/overview) to learn how to do this.
+
+However, if you want to replace the v1 login of an existing installation by a self-hosted v2 login, the setup job won't execute these steps.
+In that case, you can create a new PAT for the login client manually.
+
+## Create a Login Client User{#create-login-client}
+
+In the following URLs, replace the base URL and the user ID according to your environment.
+
+1. Create a new machine user, for example at http://localhost:8080/ui/console/users/create-machine
+2. Create a PAT, for example at http://localhost:8080/ui/console/users/332169800719532035?new=true&id=pat
+3. Save the PAT to a file, for example `/path/on/your/host/login-client.pat`
+4. Make sure the user has the `Iam Login Client` role (internally called `IAM_LOGIN_CLIENT`), for example at http://localhost:8080/ui/console/instance/members
+
+# Configure the Login UI
+
+Make sure your Login UI has the environment variable `ZITADEL_SERVICE_USER_TOKEN` set with your PAT.
+If you run the Login UI with Docker, you can also mount the file into the container and reference it by passing the environment variable `ZITADEL_SERVICE_USER_TOKEN_FILE`.
+For example:
+
+```bash
+docker run -p 3000:3000 -v /path/on/your/host/login-client.pat:/path/in/container/login-client.pat:ro -e ZITADEL_SERVICE_USER_TOKEN_FILE=/path/in/container/login-client.pat ghcr.io/zitadel/zitadel-login:latest
+```
+
+# Enable the Login UI for all users
+
+:::caution
+Before doing this, make sure you have a working PAT for an Iam Owner user.
+In case something goes wrong and you lock yourself out from the login screen, you can revert the changes.
+Create a machine user PAT like you created the [login client PAT above](#create-login-client), but give the user the Iam Owner role (internally called `IAM_OWNER`).
+:::
+
+Enable the `Login V2` feature flag, for example at the bottom of http://localhost:8080/ui/console/instance?id=features.
+Enter the base URI of your Login UI, for example `http://localhost:3000/ui/v2/login`.
+
+# Test
+
+That's it!
+Click your users avatar in the top right corner of the console and select `Log in With Another Account`.
+You should see the new Login UI.

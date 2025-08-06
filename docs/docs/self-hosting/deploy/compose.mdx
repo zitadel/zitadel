@@ -5,7 +5,6 @@ sidebar_label: Docker Compose
 
 import CodeBlock from '@theme/CodeBlock';
 import DockerComposeSource from '!!raw-loader!./docker-compose.yaml'
-import DockerComposeSaSource from '!!raw-loader!./docker-compose-sa.yaml'
 import Disclaimer from './_disclaimer.mdx'
 import DefaultUser from './_defaultuser.mdx'
 import Next from './_next.mdx'
@@ -32,6 +31,11 @@ docker compose up --detach
 ```
 
 <DefaultUser components={props.components} />
+
+:::info
+If you you ran these commands for an existing instance that still uses the login v1, [connect it to the now running v2 login](/self-hosting/manage/login-client#create-login-client).
+:::
+
 <NoteInstanceNotFound/>
 <Next components={props.components} />
 <Disclaimer components={props.components} />
