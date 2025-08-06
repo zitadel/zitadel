@@ -124,7 +124,6 @@ func verifyFactors(t assert.TestingT, factors *session.Factors, window time.Dura
 }
 
 func TestServer_CreateSession(t *testing.T) {
-	t.Parallel()
 	tests := []struct {
 		name                 string
 		req                  *session.CreateSessionRequest
@@ -252,7 +251,6 @@ func TestServer_CreateSession(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			got, err := Client.CreateSession(LoginCTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
@@ -265,7 +263,6 @@ func TestServer_CreateSession(t *testing.T) {
 }
 
 func TestServer_CreateSession_lock_user(t *testing.T) {
-	t.Parallel()
 	// create a separate org so we don't interfere with any other test
 	org := Instance.CreateOrganization(IAMOwnerCTX,
 		fmt.Sprintf("TestServer_CreateSession_lock_user_%s", gofakeit.AppName()),
@@ -308,7 +305,6 @@ func TestServer_CreateSession_lock_user(t *testing.T) {
 }
 
 func TestServer_CreateSession_webauthn(t *testing.T) {
-	t.Parallel()
 	// create new session with user and request the webauthn challenge
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
@@ -345,7 +341,6 @@ func TestServer_CreateSession_webauthn(t *testing.T) {
 }
 
 func TestServer_CreateSession_successfulIntent(t *testing.T) {
-	t.Parallel()
 	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
@@ -375,7 +370,6 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 }
 
 func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
-	t.Parallel()
 	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
 
 	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", User.GetUserId(), time.Now().Add(time.Hour))
@@ -398,7 +392,6 @@ func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
 }
 
 func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
-	t.Parallel()
 	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
 
 	// successful intent without known / linked user
@@ -427,7 +420,6 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 }
 
 func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
-	t.Parallel()
 	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
 
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
@@ -456,7 +448,6 @@ func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
 }
 
 func TestServer_CreateSession_reuseIntent(t *testing.T) {
-	t.Parallel()
 	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
@@ -499,7 +490,6 @@ func TestServer_CreateSession_reuseIntent(t *testing.T) {
 }
 
 func TestServer_CreateSession_expiredIntent(t *testing.T) {
-	t.Parallel()
 	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
@@ -563,7 +553,6 @@ func registerOTPEmail(ctx context.Context, t *testing.T, userID string) {
 }
 
 func TestServer_SetSession_flow_totp(t *testing.T) {
-	t.Parallel()
 	userExisting := createFullUser(CTX)
 
 	// create new, empty session
@@ -679,7 +668,6 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 }
 
 func TestServer_SetSession_flow(t *testing.T) {
-	t.Parallel()
 	// create new, empty session
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{})
 	require.NoError(t, err)
@@ -850,7 +838,6 @@ func TestServer_SetSession_flow(t *testing.T) {
 }
 
 func TestServer_SetSession_expired(t *testing.T) {
-	t.Parallel()
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 		Lifetime: durationpb.New(20 * time.Second),
 	})
@@ -873,7 +860,6 @@ func TestServer_SetSession_expired(t *testing.T) {
 }
 
 func TestServer_DeleteSession_token(t *testing.T) {
-	t.Parallel()
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{})
 	require.NoError(t, err)
 
@@ -891,7 +877,6 @@ func TestServer_DeleteSession_token(t *testing.T) {
 }
 
 func TestServer_DeleteSession_own_session(t *testing.T) {
-	t.Parallel()
 	// create two users for the test and a session each to get tokens for authorization
 	user1 := Instance.CreateHumanUser(CTX)
 	Instance.SetUserPassword(CTX, user1.GetUserId(), integration.UserPassword, false)
@@ -927,7 +912,6 @@ func TestServer_DeleteSession_own_session(t *testing.T) {
 }
 
 func TestServer_DeleteSession_with_permission(t *testing.T) {
-	t.Parallel()
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -947,14 +931,13 @@ func TestServer_DeleteSession_with_permission(t *testing.T) {
 }
 
 func TestServer_DeleteSession_expired(t *testing.T) {
-	t.Parallel()
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
-		Lifetime: durationpb.New(1 * time.Second),
+		Lifetime: durationpb.New(5 * time.Second),
 	})
 	require.NoError(t, err)
 
 	// wait until the token expires
-	time.Sleep(2 * time.Second)
+	time.Sleep(10 * time.Second)
 	_, err = Client.DeleteSession(Instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: gu.Ptr(createResp.GetSessionToken()),
@@ -969,7 +952,6 @@ func TestServer_DeleteSession_expired(t *testing.T) {
 }
 
 func Test_ZITADEL_API_missing_authentication(t *testing.T) {
-	t.Parallel()
 	// create new, empty session
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{})
 	require.NoError(t, err)
@@ -986,7 +968,6 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 }
 
 func Test_ZITADEL_API_success(t *testing.T) {
-	t.Parallel()
 	id, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, User.GetUserId())
 	ctx := integration.WithAuthorizationToken(context.Background(), token)
 
@@ -1003,7 +984,6 @@ func Test_ZITADEL_API_success(t *testing.T) {
 }
 
 func Test_ZITADEL_API_session_not_found(t *testing.T) {
-	t.Parallel()
 	id, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, User.GetUserId())
 
 	// test session token works
@@ -1035,7 +1015,6 @@ func Test_ZITADEL_API_session_not_found(t *testing.T) {
 }
 
 func Test_ZITADEL_API_session_expired(t *testing.T) {
-	t.Parallel()
 	id, token, _, _ := Instance.CreateVerifiedWebAuthNSessionWithLifetime(t, LoginCTX, User.GetUserId(), 20*time.Second)
 
 	// test session token works
