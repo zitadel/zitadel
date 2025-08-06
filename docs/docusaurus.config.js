@@ -460,7 +460,7 @@ module.exports = {
     '@docusaurus/theme-mermaid',
   ],
   future: {
-    v4: true, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
+    v4: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
     experimental_faster: {
       swcJsLoader: false, // Disabled because of memory usage > 8GB which is a problem on vercel default runners
       swcJsMinimizer: true,
