@@ -28,6 +28,16 @@
         "generate"
       ]
     },
+    "lint": {
+      "dependsOn": [
+        "generate"
+      ]
+    },
+    "lint:fix": {
+      "dependsOn": [
+        "generate"
+      ]
+    },
     "docker:build": {
       "dependsOn": [
         "build"

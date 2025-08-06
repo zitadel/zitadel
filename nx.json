@@ -1,27 +1,31 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "release": {
-    "releaseTagPattern": "release/{projectName}/{version}",
-    "groups": {
-      "test": {
-        "projects": [
+    "projects": [
           "@zitadel/login",
           "@zitadel/console",
-          "@zitadel/api"
+          "@zitadel/api",
+          "@zitadel/docs"
         ],
-        "projectsRelationship": "fixed",
-        "docker": {
-          "skipVersionActions": true,
-          "registryUrl": "ghcr.io",
-          "groupPreVersionCommand": "echo BEFORE VERSIONING"
-        },
-        "changelog": {
-          "projectChangelogs": true
-        }
+    "changelog": {
+      "workspaceChangelog": {
+        "createRelease": "github"
       }
     },
+    "projectsRelationship": "fixed",
     "version": {
-      "conventionalCommits": true
+      "conventionalCommits": true,
+      "fallbackCurrentVersionResolver": "disk"
+    },
+    "releaseTagPattern": "v{version}",
+    "docker": {
+      "skipVersionActions": true,
+      "registryUrl": "ghcr.io",
+      "groupPreVersionCommand": "echo BEFORE VERSIONING"
+        },
+    "dockerVersionScheme": {
+      "production": "{currentDate|YYMM.DD}.{shortCommitSha}",
+      "staging": "{currentDate|YYMM.DD}-staging.{shortCommitSha}"
     }
   },
   "namedInputs": {
