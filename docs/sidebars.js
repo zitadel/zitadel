@@ -751,10 +751,10 @@ module.exports = {
               label: "Organization (Beta)",
               link: {
                 type: "generated-index",
-                title: "Organization Service beta API",
+                title: "Organization Service Beta API",
                 slug: "/apis/resources/org_service/v2beta",
                 description:
-                    "This API is intended to manage organizations for ZITADEL. \n",
+                    "This beta API is intended to manage organizations for ZITADEL. Expect breaking changes to occur. Please use the v2 version for a stable API. \n",
               },
               items: sidebar_api_org_service_v2beta,
             },
@@ -1084,7 +1084,6 @@ module.exports = {
         "self-hosting/deploy/devcontainer",
         "self-hosting/deploy/knative",
         "self-hosting/deploy/kubernetes",
-        "self-hosting/deploy/loadbalancing-example/loadbalancing-example",
         "self-hosting/deploy/troubleshooting/troubleshooting",
       ],
     },
@@ -1118,6 +1117,7 @@ module.exports = {
         "self-hosting/manage/tls_modes",
         "self-hosting/manage/database/database",
         "self-hosting/manage/cache",
+        "self-hosting/manage/service_ping",
         "self-hosting/manage/updating_scaling",
         "self-hosting/manage/usage_control",
         {

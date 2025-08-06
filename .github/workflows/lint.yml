@@ -53,12 +53,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Run lint and unit tests in dev container
-        uses: devcontainers/ci@v0.3
-        with:
-          push: never
-          configFile: .devcontainer/turbo-lint-unit/devcontainer.json
-          runCmd: echo "Successfully ran lint and unit tests in dev container postStartCommand"
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli@0.80.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Lint and Unit Test All JavaScript Code
+        run: npm run devcontainer:lint-unit
+      - name: Fix Failures
+        if: failure()
+        run: |
+          echo "Reproduce this check locally:"
+          echo "npm run devcontainer:lint-unit"
+          echo "If you have pnpm installed, most linting errors can be fixed automatically:"
+          echo "pnpm turbo lint:fix"
+          echo "In other cases, you can open the dev container called \"Turbo Lint and Unit Tests\"."
+          echo "You will have the same environment as the pipeline check as well as some guidance on how to fix the errors."
 
   core:
     name: core
@@ -77,7 +86,7 @@ jobs:
           path: ${{ inputs.core_cache_path }}
           key: ${{ inputs.core_cache_key }}
           fail-on-cache-miss: true
-      - uses: golangci/golangci-lint-action@v6
+      - uses: golangci/golangci-lint-action@v8
         with:
           version: ${{ inputs.go_lint_version }}
           github-token: ${{ github.token }}
