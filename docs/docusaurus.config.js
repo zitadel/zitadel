@@ -5,7 +5,7 @@ module.exports = {
   url: "https://zitadel.com",
   baseUrl: "/docs",
   onBrokenLinks: "warn",
-  onBrokenAnchors: "warn",
+  onBrokenAnchors: "ignore",
   onBrokenMarkdownLinks: "throw",
   favicon: "img/favicon.ico",
   organizationName: "zitadel",
