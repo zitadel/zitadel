@@ -33,9 +33,12 @@ docker compose up
 <DefaultUser components={props.components} />
 
 :::info
-If you ran these commands for an existing instance that still uses the login v1, [connect it to the now running v2 login](/self-hosting/manage/login-client#create-login-client).
-Move the login client PAT to ./login-client.pat and restart the login container.
+If you ran these commands for an existing instance that still uses the login v1, [create a login client for it to the now running v2 login](/self-hosting/manage/login-client#create-login-client).
+Move the login client PAT to `./login-client.pat` and restart the login container.
+```bash
 docker compose restart login
+```
+Now, [enable the Login UI for all users](/self-hosting/manage/login-client#require-login-v2)
 :::
 
 <NoteInstanceNotFound/>
