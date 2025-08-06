@@ -14,7 +14,7 @@ export class AdditionalOriginsComponent implements OnInit, OnDestroy {
   @Input() public redirectControl: UntypedFormControl = new UntypedFormControl({ value: '', disabled: true });
   @Output() public changedUris: EventEmitter<string[]> = new EventEmitter<string[]>();
   @Input() public getValues: Observable<void> = new Observable();
-  public placeholder: string = '<scheme> "://" <hostname> [ ":" <port> ]';
+  @Input() public placeholder: string = '<scheme> "://" <hostname> [ ":" <port> ]';
 
   @ViewChild('originInput') input!: any;
   private sub: Subscription = new Subscription();

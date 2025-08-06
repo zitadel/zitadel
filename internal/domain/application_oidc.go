@@ -49,6 +49,7 @@ type OIDCApp struct {
 	BackChannelLogoutURI     *string
 	LoginVersion             *LoginVersion
 	LoginBaseURI             *string
+	AllowedScopePrefixes     []string
 
 	State AppState
 }
@@ -138,7 +139,7 @@ const (
 )
 
 func (a *OIDCApp) IsValid() bool {
-	if (a.ClockSkew != nil && (*a.ClockSkew > time.Second*5 || *a.ClockSkew < time.Second*0)) || !a.OriginsValid() {
+	if (a.ClockSkew != nil && (*a.ClockSkew > time.Second*5 || *a.ClockSkew < time.Second*0)) || !a.OriginsValid() || !a.AllowedScopePrefixesValid() {
 		return false
 	}
 	grantTypes := a.getRequiredGrantTypes()
@@ -157,6 +158,15 @@ func (a *OIDCApp) IsValid() bool {
 func (a *OIDCApp) OriginsValid() bool {
 	for _, origin := range a.AdditionalOrigins {
 		if !http_util.IsOrigin(strings.TrimSpace(origin)) {
+			return false
+		}
+	}
+	return true
+}
+
+func (a *OIDCApp) AllowedScopePrefixesValid() bool {
+	for _, prefix := range a.AllowedScopePrefixes {
+		if !strings.Contains(prefix, ":") || strings.HasPrefix(prefix, "urn:zitadel:") || strings.HasPrefix("urn:zitadel:", prefix) {
 			return false
 		}
 	}
