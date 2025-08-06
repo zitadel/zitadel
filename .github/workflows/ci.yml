@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   main:
-    runs-on: depot-ubuntu-24.04-arm-8
+    runs-on: depot-ubuntu-24.04-8
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,6 +29,3 @@ jobs:
 
       - name: build
         run: npx nx run @zitadel/docs:build
-        env:
-          NODE_OPTIONS: "--max-old-space-size=8192"
-          DEBUG: "docusaurus:*"
