@@ -1,6 +1,6 @@
 services:
   zitadel:
-    restart: always
+    restart: unless-stopped
     image: ghcr.io/zitadel/zitadel:latest
     command: start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
     environment:
@@ -74,7 +74,7 @@ services:
         restart: false
 
   db:
-    restart: always
+    restart: unless-stopped
     image: postgres:17-alpine
     environment:
       PGUSER: postgres

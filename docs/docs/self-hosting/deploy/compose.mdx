@@ -1,5 +1,5 @@
 ---
-title: Set up ZITADEL with Docker Compose
+title: Set up Zitadel with Docker Compose
 sidebar_label: Docker Compose
 ---
 
@@ -11,7 +11,7 @@ import Next from './_next.mdx'
 import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
 
 
-The setup is tested against Docker version 20.10.17 and Docker Compose version v2.2.3
+The setup is tested against Docker version 28.3.2 and Docker Compose version v2.38.2
 
 ## Docker compose
 
@@ -26,14 +26,14 @@ By executing the commands below, you will download the following file:
 # Download the docker compose example configuration.
 wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose.yaml
 
-# Run the database and application containers.
-docker compose up --detach
+# Run the PostgreSQL database, the Zitadel API and the Zitadel login.
+docker compose up
 ```
 
 <DefaultUser components={props.components} />
 
 :::info
-If you you ran these commands for an existing instance that still uses the login v1, [connect it to the now running v2 login](/self-hosting/manage/login-client#create-login-client).
+If you ran these commands for an existing instance that still uses the login v1, [connect it to the now running v2 login](/self-hosting/manage/login-client#create-login-client).
 :::
 
 <NoteInstanceNotFound/>
