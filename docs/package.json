@@ -4,7 +4,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "dev": "docusaurus start --port 3003 --host 0.0.0.0",
-    "build": "docusaurus build",
+    "build": "NODE_OPTIONS=--max-old-space-size=8192 && docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",

@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   main:
-    runs-on: depot-ubuntu-24.04-16
+    runs-on: depot-ubuntu-24.04-8
     steps:
       - uses: actions/checkout@v4
         with:
