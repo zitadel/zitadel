@@ -1,87 +1,41 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "defaultBase": "next",
   "release": {
-  "projects": [
-    "@zitadel/login",
-    "@zitadel/console",
-    "@zitadel/api",
-    "@zitadel/docs"
-  ],
-  "changelog": {
-    "workspaceChangelog": {
-      "file": false,
-      "createRelease": "github"
+    "projects": [
+      "@zitadel/login",
+      "@zitadel/console",
+      "@zitadel/api",
+      "@zitadel/docs"
+    ],
+    "changelog": {
+      "workspaceChangelog": {
+        "file": false,
+        "createRelease": "github"
+      }
+    },
+    "projectsRelationship": "fixed",
+    "version": {
+      "conventionalCommits": true
+    },
+    "releaseTagPattern": "v{version}",
+    "releaseTagPatternCheckAllBranchesWhen": true,
+    "docker": {
+      "skipVersionActions": true,
+      "registryUrl": "ghcr.io",
+      "groupPreVersionCommand": "echo BEFORE VERSIONING"
+    },
+    "dockerVersionScheme": {
+      "production": "{currentDate|YYMM.DD}.{shortCommitSha}",
+      "staging": "{currentDate|YYMM.DD}-staging.{shortCommitSha}"
     }
   },
-  "projectsRelationship": "fixed",
-  "version": {
-    "conventionalCommits": true,
-    "fallbackCurrentVersionResolver": "disk"
-  },
-  "releaseTagPattern": "v{version}",
-  "docker": {
-    "skipVersionActions": true,
-    "registryUrl": "ghcr.io",
-    "groupPreVersionCommand": "echo BEFORE VERSIONING"
-  },
-  "dockerVersionScheme": {
-    "production": "{currentDate|YYMM.DD}.{shortCommitSha}",
-    "staging": "{currentDate|YYMM.DD}-staging.{shortCommitSha}"
-  }
-},
   "namedInputs": {
     "proto": [
       "{workspaceRoot}/proto/**"
     ],
     "sharedGlobals": [
-      "{workspaceRoot}/**/.env.*local",
-      {
-        "env": "DEBUG"
-      },
-      {
-        "env": "VERCEL_URL"
-      },
-      {
-        "env": "EMAIL_VERIFICATION"
-      },
-      {
-        "env": "AUDIENCE"
-      },
-      {
-        "env": "SYSTEM_USER_ID"
-      },
-      {
-        "env": "SYSTEM_USER_PRIVATE_KEY"
-      },
-      {
-        "env": "ZITADEL_API_URL"
-      },
-      {
-        "env": "ZITADEL_SERVICE_USER_TOKEN"
-      },
-      {
-        "env": "NEXT_PUBLIC_BASE_PATH"
-      },
-      {
-        "env": "CUSTOM_REQUEST_HEADERS"
-      },
-      {
-        "env": "NODE_ENV"
-      },
-      {
-        "env": "PORT"
-      },
-      {
-        "env": "INKEEP_API_KEY"
-      },
-      {
-        "env": "DISPLAY"
-      },
-      {
-        "env": "CYPRESS_DISPLAY"
-      }
-    ],
+      "{workspaceRoot}/**/.env.*local"
+      ],
     "default": [
       "{projectRoot}/**/*",
       "sharedGlobals",
