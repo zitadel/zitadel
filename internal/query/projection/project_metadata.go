@@ -78,7 +78,7 @@ func (p *projectMetadataProjection) Reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: instance.AggregateType,
+			Aggregate: org.AggregateType,
 			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
