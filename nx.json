@@ -1,34 +1,35 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "next",
   "release": {
-    "projects": [
-          "@zitadel/login",
-          "@zitadel/console",
-          "@zitadel/api",
-          "@zitadel/docs"
-        ],
-    "changelog": {
-      "workspaceChangelog": {
-        "file": false,
-        "createRelease": "github"
-      }
-    },
-    "projectsRelationship": "fixed",
-    "version": {
-      "conventionalCommits": true,
-      "fallbackCurrentVersionResolver": "disk"
-    },
-    "releaseTagPattern": "v{version}",
-    "docker": {
-      "skipVersionActions": true,
-      "registryUrl": "ghcr.io",
-      "groupPreVersionCommand": "echo BEFORE VERSIONING"
-        },
-    "dockerVersionScheme": {
-      "production": "{currentDate|YYMM.DD}.{shortCommitSha}",
-      "staging": "{currentDate|YYMM.DD}-staging.{shortCommitSha}"
+  "projects": [
+    "@zitadel/login",
+    "@zitadel/console",
+    "@zitadel/api",
+    "@zitadel/docs"
+  ],
+  "changelog": {
+    "workspaceChangelog": {
+      "file": false,
+      "createRelease": "github"
     }
   },
+  "projectsRelationship": "fixed",
+  "version": {
+    "conventionalCommits": true,
+    "fallbackCurrentVersionResolver": "disk"
+  },
+  "releaseTagPattern": "v{version}",
+  "docker": {
+    "skipVersionActions": true,
+    "registryUrl": "ghcr.io",
+    "groupPreVersionCommand": "echo BEFORE VERSIONING"
+  },
+  "dockerVersionScheme": {
+    "production": "{currentDate|YYMM.DD}.{shortCommitSha}",
+    "staging": "{currentDate|YYMM.DD}-staging.{shortCommitSha}"
+  }
+},
   "namedInputs": {
     "proto": [
       "{workspaceRoot}/proto/**"
