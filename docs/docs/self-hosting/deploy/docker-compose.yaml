@@ -1,117 +1,87 @@
 services:
-
-  db:
-    image: postgres:17-alpine
-    restart: unless-stopped
+  zitadel:
+    restart: always
+    image: ghcr.io/zitadel/zitadel:latest
+    command: start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=postgres
-    networks:
-      - 'storage'
+      ZITADEL_DATABASE_POSTGRES_HOST: db
+      ZITADEL_DATABASE_POSTGRES_PORT: 5432
+      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
+      ZITADEL_EXTERNALSECURE: false
+      ZITADEL_TLS_ENABLED: false
+      ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /current-dir/login-client-pat
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME: login-client
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME: Automatically Initialized IAM Login Client
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE: '2029-01-01T00:00:00Z'
+      ZITADEL_OIDC_DEFAULTLOGINURLV2: http://localhost:3000/ui/v2/login/login?authRequest=
+      ZITADEL_OIDC_DEFAULTLOGOUTURLV2: http://localhost:3000/ui/v2/login/logout?post_logout_redirect=
+      ZITADEL_SAML_DEFAULTLOGINURLV2: http://localhost:3000/ui/v2/login/login?samlRequest=
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED: true
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI: http://localhost:3000/ui/v2/login
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
+      test:
+      - CMD
+      - /app/zitadel
+      - ready
       interval: 10s
       timeout: 60s
       retries: 5
       start_period: 10s
     volumes:
-      - 'data:/var/lib/postgresql/data:rw'
-
-  zitadel-init:
-    restart: 'no'
+      - .:/current-dir:delegated
+    ports:
+      - 8080:8080
+      - 3000:3000
     networks:
-      - 'storage'
-    image: 'ghcr.io/zitadel/zitadel:v4.0.0-rc.2'
-    command: [ init, --config, /example-zitadel-config.yaml, --config, /example-zitadel-secrets.yaml ]
+      - zitadel
     depends_on:
       db:
-        condition: 'service_healthy'
-    volumes:
-      - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
-      - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
-
-  zitadel-setup:
-    restart: 'no'
-    networks:
-      - 'storage'
-    image: 'ghcr.io/zitadel/zitadel:v4.0.0-rc.2'
-    command: [ setup, --config, /current-dir/example-zitadel-config.yaml, --config, /current-dir/example-zitadel-secrets.yaml, --steps, /current-dir/example-zitadel-init-steps.yaml, --masterkey, MasterkeyNeedsToHave32Characters ]
-    depends_on:
-      zitadel-init:
-        condition: 'service_completed_successfully'
-        restart: false
-    volumes:
-      - '.:/current-dir:rw'
-
-  zitadel:
-    restart: 'unless-stopped'
-    networks:
-      - 'backend'
-      - 'storage'
-    labels:
-      - "traefik.http.routers.zitadel.rule=!PathPrefix(`/ui/v2/login`)"
-      - "traefik.http.routers.zitadel.tls=true" # Traefik uses a self-signed certificate
-      - "traefik.http.services.zitadel.loadbalancer.passhostheader=true"
-      - "traefik.http.services.zitadel.loadbalancer.server.scheme=h2c"
-      - "traefik.http.services.zitadel.loadbalancer.server.port=8080"
-    image: 'ghcr.io/zitadel/zitadel:v4.0.0-rc.2'
-    command: [ start, --config, /example-zitadel-config.yaml, --config, /example-zitadel-secrets.yaml, --masterkey, MasterkeyNeedsToHave32Characters ]
-    depends_on:
-      zitadel-setup:
-        condition: 'service_completed_successfully'
-        restart: true
-    volumes:
-      - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
-      - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
-    healthcheck:
-      test: [ "CMD", "/app/zitadel", "ready", "--config", "/example-zitadel-config.yaml", "--config", "/example-zitadel-secrets.yaml" ]
-      interval: 10s
-      timeout: 60s
-      retries: 5
-      start_period: 10s
+        condition: service_healthy
 
   login:
-    restart: 'unless-stopped'
-    labels:
-      - "traefik.http.routers.login.rule=PathPrefix(`/ui/v2/login`)"
-      - "traefik.http.routers.login.tls=true" # Traefik uses a self-signed certificate
-      - "traefik.http.services.login.loadbalancer.passhostheader=true"
-      - "traefik.http.services.login.loadbalancer.server.port=3000"
-    image: 'ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2'
+    restart: unless-stopped
+    image: ghcr.io/zitadel/zitadel-login:latest
     # If you can't use the network_mode service:zitadel, you can pass the environment variable CUSTOM_REQUEST_HEADERS=Host:localhost instead.
-    network_mode: service:zitadel
     environment:
       - ZITADEL_API_URL=http://localhost:8080
       - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
       - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client-pat
     user: "${UID:-1000}"
+    network_mode: service:zitadel
     volumes:
-      - '.:/current-dir:ro'
-    depends_on:
-      zitadel-setup:
-        condition: 'service_completed_successfully'
-        restart: false
-
-  traefik:
-    image: traefik:latest
-    command: --providers.docker --api.insecure=true --entrypoints.websecure.address=:443 --log.level=DEBUG --accesslog
-    networks:
-      - 'backend'
-    ports:
-      - "443:443"
-      - "8080:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/current-dir:ro
     depends_on:
       zitadel:
-        condition: 'service_healthy'
-      login:
-        condition: 'service_started'
+        condition: service_healthy
+        restart: false
+
+  db:
+    restart: always
+    image: postgres:17-alpine
+    environment:
+      PGUSER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: 
+      - CMD-SHELL
+      - pg_isready
+      - -d
+      - zitadel
+      - -U
+      - postgres
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 20s
+    networks:
+      - zitadel
 
 networks:
-  storage:
-  backend:
-
-
-volumes:
-  data:
+  zitadel:
