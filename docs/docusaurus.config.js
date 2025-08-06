@@ -460,14 +460,14 @@ module.exports = {
     '@docusaurus/theme-mermaid',
   ],
   future: {
-    v4: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
+    v4: true, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
     experimental_faster: {
-      swcJsLoader: false, // Disabled because of memory usage > 8GB which is a problem on vercel default runners
+      swcJsLoader: true, // Disabled because of memory usage > 8GB which is a problem on vercel default runners
       swcJsMinimizer: true,
       swcHtmlMinimizer: true,
       lightningCssMinimizer: true,
       mdxCrossCompilerCache: true,
-      ssgWorkerThreads: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
+      ssgWorkerThreads: true, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
       rspackBundler: true,
       rspackPersistentCache: true,
     },
