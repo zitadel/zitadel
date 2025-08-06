@@ -26,6 +26,9 @@ By executing the commands below, you will download the following file:
 # Download the docker compose example configuration.
 wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose.yaml
 
+# Make sure you have the latest image versions
+docker compose pull
+
 # Run the PostgreSQL database, the Zitadel API and the Zitadel login.
 docker compose up
 ```
