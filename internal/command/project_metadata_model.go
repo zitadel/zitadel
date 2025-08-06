@@ -28,8 +28,6 @@ func (wm *ProjectMetadataWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.MetadataWriteModel.AppendEvents(&e.SetEvent)
 		case *project.MetadataRemovedEvent:
 			wm.MetadataWriteModel.AppendEvents(&e.RemovedEvent)
-		case *project.MetadataRemovedAllEvent:
-			wm.MetadataWriteModel.AppendEvents(&e.RemovedAllEvent)
 		}
 	}
 }
@@ -42,8 +40,7 @@ func (wm *ProjectMetadataWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(project.AggregateType).
 		EventTypes(
 			project.MetadataSetType,
-			project.MetadataRemovedType,
-			project.MetadataRemovedAllType).
+			project.MetadataRemovedType).
 		Builder()
 }
 
@@ -70,8 +67,6 @@ func (wm *ProjectMetadataListWriteModel) AppendEvents(events ...eventstore.Event
 			wm.MetadataListWriteModel.AppendEvents(&e.SetEvent)
 		case *project.MetadataRemovedEvent:
 			wm.MetadataListWriteModel.AppendEvents(&e.RemovedEvent)
-		case *project.MetadataRemovedAllEvent:
-			wm.MetadataListWriteModel.AppendEvents(&e.RemovedAllEvent)
 		}
 	}
 }
@@ -88,7 +83,6 @@ func (wm *ProjectMetadataListWriteModel) Query() *eventstore.SearchQueryBuilder 
 		AggregateTypes(project.AggregateType).
 		EventTypes(
 			project.MetadataSetType,
-			project.MetadataRemovedType,
-			project.MetadataRemovedAllType).
+			project.MetadataRemovedType).
 		Builder()
 }
