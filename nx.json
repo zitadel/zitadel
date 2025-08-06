@@ -4,7 +4,11 @@
     "releaseTagPattern": "release/{projectName}/{version}",
     "groups": {
       "test": {
-        "projects": ["@zitadel/login", "@zitadel/console", "@zitadel/api"],
+        "projects": [
+          "@zitadel/login",
+          "@zitadel/console",
+          "@zitadel/api"
+        ],
         "projectsRelationship": "fixed",
         "docker": {
           "skipVersionActions": true,

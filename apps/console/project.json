@@ -23,16 +23,15 @@
         "@zitadel/client:build"
       ]
     },
+    "dev": {
+      "dependsOn": [
+        "generate"
+      ]
+    },
     "docker:build": {
       "dependsOn": [
         "build"
-      ],
-      "options": {
-        "push": false,
-        "tags": [
-          "zitadel/console:latest"
-        ]
-      }
+      ]
     },
     "docker:run": {
       "options": {

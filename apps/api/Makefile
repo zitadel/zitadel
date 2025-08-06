@@ -155,10 +155,9 @@ core_integration_test: core_integration_server_start core_integration_test_packa
 
 .PHONY: core_lint
 core_lint:
-	golangci-lint run \
+	go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.3.1 run \
 		--timeout 10m \
 		--config ./.golangci.yaml \
-		--out-format=github-actions \
 		--concurrency=$$(getconf _NPROCESSORS_ONLN)
 
 .PHONY: login_pull
