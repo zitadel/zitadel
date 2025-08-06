@@ -1,0 +1,11 @@
+# All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml
+FirstInstance:
+  LoginClientPatPath: '/current-dir/login-client-pat'
+  Org:
+    # We want to authenticate immediately at the console without changing the password
+    Human.PasswordChangeRequired: false
+    LoginClient:
+      Machine:
+        Username: 'login-client'
+        Name: 'Automatically Initialized IAM Login Client'
+      Pat.ExpirationDate: '2029-01-01T00:00:00Z'

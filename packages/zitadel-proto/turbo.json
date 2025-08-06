@@ -1,0 +1,16 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "generate": {
+      "outputs": [
+        "zitadel/**",
+        "google/**",
+        "validate/**",
+        "protoc-gen-openapiv2/**",
+        "cjs/**",
+        "es/**",
+        "types/**"
+      ]
+    }
+  }
+}
