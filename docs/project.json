@@ -22,7 +22,7 @@
       "options": {
         "env": {
           "NODE_OPTIONS": "--max-old-space-size=4096",
-          "DEBUG": "docusaurus:*"
+          "DOCUSAURUS_PERF_LOGGER": true
         }
       }
     },
