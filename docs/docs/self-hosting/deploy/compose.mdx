@@ -34,6 +34,8 @@ docker compose up
 
 :::info
 If you ran these commands for an existing instance that still uses the login v1, [connect it to the now running v2 login](/self-hosting/manage/login-client#create-login-client).
+Move the login client PAT to ./login-client.pat and restart the login container.
+docker compose restart login
 :::
 
 <NoteInstanceNotFound/>
