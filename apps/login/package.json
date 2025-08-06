@@ -1,6 +1,7 @@
 {
   "packageManager": "pnpm@10.13.1",
   "name": "@zitadel/login",
+  "version": "4.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3002 -H 0.0.0.0",
