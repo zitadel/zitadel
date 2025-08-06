@@ -89,7 +89,34 @@ func TestProjectMetadataProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceOwnerRemoved(project removed)",
+			name: "reduceProjectRemoved",
+			args: args{
+				event: getEvent(
+					testEvent(
+						project.ProjectRemovedType,
+						project.AggregateType,
+						nil,
+					), project.ProjectRemovedEventMapper),
+			},
+			reduce: (&projectMetadataProjection{}).reduceProjectRemoved,
+			want: wantReduce{
+				aggregateType: project.AggregateType,
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.project_metadata WHERE (instance_id = $1) AND (project_id = $2)",
+							expectedArgs: []any{
+								"instance-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceOwnerRemoved(org removed)",
 			args: args{
 				event: getEvent(
 					testEvent(

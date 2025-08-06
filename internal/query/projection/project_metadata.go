@@ -69,6 +69,15 @@ func (p *projectMetadataProjection) Reducers() []handler.AggregateReducer {
 			},
 		},
 		{
+			Aggregate: project.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  project.ProjectRemovedType,
+					Reduce: p.reduceProjectRemoved,
+				},
+			},
+		},
+		{
 			Aggregate: instance.AggregateType,
 			EventReducers: []handler.EventReducer{
 				{
@@ -141,6 +150,21 @@ func (p *projectMetadataProjection) reduceOwnerRemoved(event eventstore.Event) (
 		[]handler.Condition{
 			handler.NewCond(ProjectMetadataColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(ProjectMetadataColumnResourceOwner, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *projectMetadataProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*project.ProjectRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-ydmC4w", "reduce.wrong.event.type %s", project.ProjectRemovedType)
+	}
+
+	return handler.NewDeleteStatement(
+		e,
+		[]handler.Condition{
+			handler.NewCond(ProjectMetadataColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(ProjectMetadataColumnProjectID, e.Aggregate().ID),
 		},
 	), nil
 }
