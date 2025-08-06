@@ -6,7 +6,8 @@
     "overrides": {
       "@typescript-eslint/parser": "^8.35.1",
       "@zitadel/client": "workspace:*",
-      "@zitadel/proto": "workspace:*"
+      "@zitadel/proto": "workspace:*",
+      "@rspack/core": "1.4.11"
     }
   },
   "devDependencies": {
