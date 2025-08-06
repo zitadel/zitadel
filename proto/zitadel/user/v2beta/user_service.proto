@@ -1989,7 +1989,7 @@ message ListUsersByMetadataRequest {
 }
 
 message ListUsersByMetadataResponse {
-  repeated User users = 1;
+  repeated UserByMetadata users = 1;
 
   // Contains the total number of apps matching the query and the applied limit.
   zitadel.filter.v2.PaginationResponse pagination = 2;

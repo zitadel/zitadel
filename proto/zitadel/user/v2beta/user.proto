@@ -269,3 +269,21 @@ enum UsersByMetadataSorting {
     USERS_BY_METADATA_SORT_BY_NICK_NAME = 10;
     USERS_BY_METADATA_SORT_BY_UNSPECIFIED = 11;
 }
+
+message UserByMetadata {
+  User user = 1;
+  string key = 2 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"key\""
+    }
+  ];
+  bytes value = 3 [
+    (validate.rules).bytes = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"bXkgdmFsdWU=\""
+      description: "A base64 encoded value"
+    }
+  ];
+
+}
