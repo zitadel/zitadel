@@ -10,7 +10,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 )
 
 func Test_createTargetToCommand(t *testing.T) {

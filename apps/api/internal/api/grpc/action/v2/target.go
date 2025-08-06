@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 )
 
 func (s *Server) CreateTarget(ctx context.Context, req *connect.Request[action.CreateTargetRequest]) (*connect.Response[action.CreateTargetResponse], error) {
@@ -89,11 +89,8 @@ func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {
 }
 
 func updateTargetToCommand(req *action.UpdateTargetRequest) *command.ChangeTarget {
-	expirationSigningKey := false
 	// TODO handle expiration, currently only immediate expiration is supported
-	if req.GetExpirationSigningKey() != nil {
-		expirationSigningKey = true
-	}
+	expirationSigningKey := req.GetExpirationSigningKey() != nil
 
 	if req == nil {
 		return nil

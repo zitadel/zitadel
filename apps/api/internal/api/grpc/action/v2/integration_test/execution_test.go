@@ -12,12 +12,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 )
 
 func TestServer_SetExecution_Request(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
@@ -29,7 +29,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Request{
@@ -62,7 +62,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					ConditionType: &action.Condition_Request{
 						Request: &action.RequestExecution{
 							Condition: &action.RequestExecution_Method{
-								Method: "/zitadel.session.v2beta.NotExistingService/List",
+								Method: "/zitadel.session.v2.NotExistingService/List",
 							},
 						},
 					},
@@ -79,7 +79,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					ConditionType: &action.Condition_Request{
 						Request: &action.RequestExecution{
 							Condition: &action.RequestExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/ListSessions",
+								Method: "/zitadel.session.v2.SessionService/ListSessions",
 							},
 						},
 					},
@@ -113,7 +113,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					ConditionType: &action.Condition_Request{
 						Request: &action.RequestExecution{
 							Condition: &action.RequestExecution_Service{
-								Service: "zitadel.session.v2beta.SessionService",
+								Service: "zitadel.session.v2.SessionService",
 							},
 						},
 					},
@@ -144,7 +144,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// We want to have the same response no matter how often we call the function
 			creationDate := time.Now().UTC()
-			got, err := instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV2.SetExecution(tt.ctx, tt.req)
 			setDate := time.Now().UTC()
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -174,7 +174,7 @@ func assertSetExecutionResponse(t *testing.T, creationDate, setDate time.Time, e
 
 func TestServer_SetExecution_Response(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
@@ -186,7 +186,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -219,7 +219,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					ConditionType: &action.Condition_Response{
 						Response: &action.ResponseExecution{
 							Condition: &action.ResponseExecution_Method{
-								Method: "/zitadel.session.v2beta.NotExistingService/List",
+								Method: "/zitadel.session.v2.NotExistingService/List",
 							},
 						},
 					},
@@ -236,7 +236,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					ConditionType: &action.Condition_Response{
 						Response: &action.ResponseExecution{
 							Condition: &action.ResponseExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/ListSessions",
+								Method: "/zitadel.session.v2.SessionService/ListSessions",
 							},
 						},
 					},
@@ -270,7 +270,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					ConditionType: &action.Condition_Response{
 						Response: &action.ResponseExecution{
 							Condition: &action.ResponseExecution_Service{
-								Service: "zitadel.session.v2beta.SessionService",
+								Service: "zitadel.session.v2.SessionService",
 							},
 						},
 					},
@@ -300,7 +300,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			creationDate := time.Now().UTC()
-			got, err := instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV2.SetExecution(tt.ctx, tt.req)
 			setDate := time.Now().UTC()
 			if tt.wantErr {
 				require.Error(t, err)
@@ -318,7 +318,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 
 func TestServer_SetExecution_Event(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
@@ -330,7 +330,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Event{
@@ -463,7 +463,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			creationDate := time.Now().UTC()
-			got, err := instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV2.SetExecution(tt.ctx, tt.req)
 			setDate := time.Now().UTC()
 			if tt.wantErr {
 				require.Error(t, err)
@@ -481,7 +481,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 
 func TestServer_SetExecution_Function(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
@@ -493,7 +493,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -548,7 +548,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			creationDate := time.Now().UTC()
-			got, err := instance.Client.ActionV2beta.SetExecution(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV2.SetExecution(tt.ctx, tt.req)
 			setDate := time.Now().UTC()
 			if tt.wantErr {
 				require.Error(t, err)

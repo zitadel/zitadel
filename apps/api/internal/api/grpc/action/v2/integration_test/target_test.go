@@ -14,12 +14,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 )
 
 func TestServer_CreateTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	type want struct {
 		id           bool
 		creationDate bool
@@ -36,7 +36,7 @@ func TestServer_CreateTarget(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.CreateTargetRequest{
 				Name: gofakeit.Name(),
 			},
@@ -205,7 +205,7 @@ func TestServer_CreateTarget(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			creationDate := time.Now().UTC()
-			got, err := instance.Client.ActionV2beta.CreateTarget(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV2.CreateTarget(tt.ctx, tt.req)
 			changeDate := time.Now().UTC()
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -243,7 +243,7 @@ func assertCreateTargetResponse(t *testing.T, creationDate, changeDate time.Time
 
 func TestServer_UpdateTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	type args struct {
 		ctx context.Context
 		req *action.UpdateTargetRequest
@@ -267,7 +267,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 				request.Id = targetID
 			},
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.UpdateTargetRequest{
 					Name: gu.Ptr(gofakeit.Name()),
 				},
@@ -278,7 +278,6 @@ func TestServer_UpdateTarget(t *testing.T) {
 			name: "not existing",
 			prepare: func(request *action.UpdateTargetRequest) {
 				request.Id = "notexisting"
-				return
 			},
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
@@ -426,7 +425,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 			creationDate := time.Now().UTC()
 			tt.prepare(tt.args.req)
 
-			got, err := instance.Client.ActionV2beta.UpdateTarget(tt.args.ctx, tt.args.req)
+			got, err := instance.Client.ActionV2.UpdateTarget(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -461,7 +460,7 @@ func assertUpdateTargetResponse(t *testing.T, creationDate, changeDate time.Time
 
 func TestServer_DeleteTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	tests := []struct {
 		name             string
 		ctx              context.Context
@@ -472,7 +471,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.DeleteTargetRequest{
 				Id: "notexisting",
 			},
@@ -526,7 +525,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 			if tt.prepare != nil {
 				creationDate, deletionDate = tt.prepare(tt.req)
 			}
-			got, err := instance.Client.ActionV2beta.DeleteTarget(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV2.DeleteTarget(tt.ctx, tt.req)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return

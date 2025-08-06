@@ -8,12 +8,12 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
+	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 )
 
 const (
@@ -82,7 +82,7 @@ func targetsToPb(targets []*query.Target) []*action.Target {
 
 func targetToPb(t *query.Target) *action.Target {
 	target := &action.Target{
-		Id:         t.ObjectDetails.ID,
+		Id:         t.ID,
 		Name:       t.Name,
 		Timeout:    durationpb.New(t.Timeout),
 		Endpoint:   t.Endpoint,
@@ -99,11 +99,11 @@ func targetToPb(t *query.Target) *action.Target {
 		target.TargetType = nil
 	}
 
-	if !t.ObjectDetails.EventDate.IsZero() {
-		target.ChangeDate = timestamppb.New(t.ObjectDetails.EventDate)
+	if !t.EventDate.IsZero() {
+		target.ChangeDate = timestamppb.New(t.EventDate)
 	}
-	if !t.ObjectDetails.CreationDate.IsZero() {
-		target.CreationDate = timestamppb.New(t.ObjectDetails.CreationDate)
+	if !t.CreationDate.IsZero() {
+		target.CreationDate = timestamppb.New(t.CreationDate)
 	}
 	return target
 }
@@ -334,11 +334,11 @@ func executionToPb(e *query.Execution) *action.Execution {
 		Condition: executionIDToCondition(e.ID),
 		Targets:   targets,
 	}
-	if !e.ObjectDetails.EventDate.IsZero() {
-		exec.ChangeDate = timestamppb.New(e.ObjectDetails.EventDate)
+	if !e.EventDate.IsZero() {
+		exec.ChangeDate = timestamppb.New(e.EventDate)
 	}
-	if !e.ObjectDetails.CreationDate.IsZero() {
-		exec.CreationDate = timestamppb.New(e.ObjectDetails.CreationDate)
+	if !e.CreationDate.IsZero() {
+		exec.CreationDate = timestamppb.New(e.CreationDate)
 	}
 	return exec
 }

@@ -15,13 +15,13 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
-	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
 )
 
 func TestServer_GetTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	type args struct {
 		ctx context.Context
 		dep func(context.Context, *action.GetTargetRequest, *action.GetTargetResponse) error
@@ -36,7 +36,7 @@ func TestServer_GetTarget(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.GetTargetRequest{},
 			},
 			wantErr: true,
@@ -199,7 +199,7 @@ func TestServer_GetTarget(t *testing.T) {
 			}
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 2*time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := instance.Client.ActionV2beta.GetTarget(tt.args.ctx, tt.args.req)
+				got, err := instance.Client.ActionV2.GetTarget(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
 					assert.Error(ttt, err, "Error: "+err.Error())
 					return
@@ -213,7 +213,7 @@ func TestServer_GetTarget(t *testing.T) {
 
 func TestServer_ListTargets(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	type args struct {
 		ctx context.Context
 		dep func(context.Context, *action.ListTargetsRequest, *action.ListTargetsResponse)
@@ -228,7 +228,7 @@ func TestServer_ListTargets(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.ListTargetsRequest{},
 			},
 			wantErr: true,
@@ -419,7 +419,7 @@ func TestServer_ListTargets(t *testing.T) {
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := instance.Client.ActionV2beta.ListTargets(tt.args.ctx, tt.args.req)
+				got, listErr := instance.Client.ActionV2.ListTargets(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
 					require.Error(ttt, listErr, "Error: "+listErr.Error())
 					return
@@ -445,7 +445,7 @@ func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationRes
 
 func TestServer_ListExecutions(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
 
 	type args struct {
@@ -462,7 +462,7 @@ func TestServer_ListExecutions(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.ListExecutionsRequest{},
 			},
 			wantErr: true,
@@ -767,7 +767,7 @@ func TestServer_ListExecutions(t *testing.T) {
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := instance.Client.ActionV2beta.ListExecutions(tt.args.ctx, tt.args.req)
+				got, listErr := instance.Client.ActionV2.ListExecutions(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
 					require.Error(ttt, listErr, "Error: "+listErr.Error())
 					return

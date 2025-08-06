@@ -28,7 +28,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/query"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/metadata"
@@ -48,7 +48,7 @@ var (
 
 func TestServer_ExecutionTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	fullMethod := action.ActionService_GetTarget_FullMethodName
 
 	tests := []struct {
@@ -272,7 +272,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := instance.Client.ActionV2beta.GetTarget(tt.ctx, tt.req)
+				got, err := instance.Client.ActionV2.GetTarget(tt.ctx, tt.req)
 				if tt.wantErr {
 					require.Error(ttt, err)
 					return
@@ -292,7 +292,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 
 func TestServer_ExecutionTarget_Event(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 	event := "session.added"
 	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 0, http.StatusOK, nil)
@@ -349,7 +349,7 @@ func TestServer_ExecutionTarget_Event(t *testing.T) {
 
 func TestServer_ExecutionTarget_Event_LongerThanTargetTimeout(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 	event := "session.added"
 	// call takes longer than timeout of target
@@ -401,7 +401,7 @@ func TestServer_ExecutionTarget_Event_LongerThanTargetTimeout(t *testing.T) {
 
 func TestServer_ExecutionTarget_Event_LongerThanTransactionTimeout(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 	event := "session.added"
 	urlRequest, closeF, calledF, resetF := integration.TestServerCall(nil, 1*time.Second, http.StatusOK, nil)
@@ -467,7 +467,7 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-		got, err := instance.Client.ActionV2beta.ListExecutions(ctx, &action.ListExecutionsRequest{
+		got, err := instance.Client.ActionV2.ListExecutions(ctx, &action.ListExecutionsRequest{
 			Filters: []*action.ExecutionSearchFilter{
 				{Filter: &action.ExecutionSearchFilter_InConditionsFilter{
 					InConditionsFilter: &action.InConditionsFilter{Conditions: []*action.Condition{condition}},
@@ -488,7 +488,6 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 			}
 		}
 	}, retryDuration, tick, "timeout waiting for expected execution result")
-	return
 }
 
 func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Instance, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
@@ -496,7 +495,7 @@ func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Inst
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-		got, err := instance.Client.ActionV2beta.ListTargets(ctx, &action.ListTargetsRequest{
+		got, err := instance.Client.ActionV2.ListTargets(ctx, &action.ListTargetsRequest{
 			Filters: []*action.TargetSearchFilter{
 				{Filter: &action.TargetSearchFilter_InTargetIdsFilter{
 					InTargetIdsFilter: &action.InTargetIDsFilter{TargetIds: []string{resp.GetId()}},
@@ -577,8 +576,8 @@ func conditionFunction(function string) *action.Condition {
 
 func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	ctxLoginClient := instance.WithAuthorization(CTX, integration.UserTypeLogin)
+	isolatedIAMCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	ctxLoginClient := instance.WithAuthorizationToken(CTX, integration.UserTypeLogin)
 
 	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, t, redirectURIImplicit, loginV2)
 	require.NoError(t, err)
@@ -893,8 +892,8 @@ func contextInfoForUserOIDC(instance *integration.Instance, function string, cli
 
 func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	ctxLoginClient := instance.WithAuthorization(CTX, integration.UserTypeLogin)
+	isolatedIAMCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	ctxLoginClient := instance.WithAuthorizationToken(CTX, integration.UserTypeLogin)
 
 	client, err := instance.CreateOIDCImplicitFlowClient(isolatedIAMCtx, t, redirectURIImplicit, loginV2)
 	require.NoError(t, err)
@@ -1086,8 +1085,8 @@ func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *
 
 func TestServer_ExecutionTargetPreSAMLResponse(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	ctxLoginClient := instance.WithAuthorization(CTX, integration.UserTypeLogin)
+	isolatedIAMCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	ctxLoginClient := instance.WithAuthorizationToken(CTX, integration.UserTypeLogin)
 
 	idpMetadata, err := instance.GetSAMLIDPMetadata()
 	require.NoError(t, err)

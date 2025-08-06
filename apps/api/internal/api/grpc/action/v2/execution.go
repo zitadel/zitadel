@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 )
 
 func (s *Server) SetExecution(ctx context.Context, req *connect.Request[action.SetExecutionRequest]) (*connect.Response[action.SetExecutionResponse], error) {

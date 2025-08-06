@@ -11,8 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/action/v2beta/actionconnect"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/action/v2/actionconnect"
 )
 
 var _ actionconnect.ActionServiceHandler = (*Server)(nil)
@@ -51,7 +51,7 @@ func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (str
 }
 
 func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
-	return action.File_zitadel_action_v2beta_action_service_proto
+	return action.File_zitadel_action_v2_action_service_proto
 }
 
 func (s *Server) AppName() string {
