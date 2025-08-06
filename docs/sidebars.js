@@ -1107,6 +1107,7 @@ module.exports = {
       items: [
         "self-hosting/manage/production",
         "self-hosting/manage/productionchecklist",
+        "self-hosting/manage/login-client",
         "self-hosting/manage/configure/configure",
         {
           type: "category",
