@@ -27,4 +27,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
 
-      - run: npx nx run @zitadel/docs:build
+      - name: build
+        run: npx nx run @zitadel/docs:build
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
+          DEBUG: "docusaurus:*"
