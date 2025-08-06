@@ -44,6 +44,7 @@ type Session struct {
 	Metadata       map[string][]byte
 	UserAgent      domain.UserAgent
 	Expiration     time.Time
+	Scopes         []string
 }
 
 type SessionUserFactor struct {
@@ -244,6 +245,10 @@ var (
 		name:  projection.SessionColumnExpiration,
 		table: sessionsTable,
 	}
+	SessionColumnScopes = Column{
+		name:  projection.SessionColumnScopes,
+		table: sessionsTable,
+	}
 )
 
 func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string, permissionCheck domain.PermissionCheck) (session *Session, err error) {
@@ -390,6 +395,7 @@ func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, 
 			SessionColumnUserAgentDescription.identifier(),
 			SessionColumnUserAgentHeader.identifier(),
 			SessionColumnExpiration.identifier(),
+			SessionColumnScopes.identifier(),
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
@@ -415,6 +421,7 @@ func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, 
 				userAgentIP         sql.NullString
 				userAgentHeader     database.Map[[]string]
 				expiration          sql.NullTime
+				scopes              database.TextArray[string]
 			)
 
 			err := row.Scan(
@@ -444,6 +451,7 @@ func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, 
 				&session.UserAgent.Description,
 				&userAgentHeader,
 				&expiration,
+				&scopes,
 			)
 
 			if err != nil {
@@ -471,6 +479,7 @@ func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, 
 				session.UserAgent.IP = net.ParseIP(userAgentIP.String)
 			}
 			session.Expiration = expiration.Time
+			session.Scopes = scopes
 			return session, token.String, nil
 		}
 }
@@ -502,6 +511,7 @@ func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error
 			SessionColumnUserAgentDescription.identifier(),
 			SessionColumnUserAgentHeader.identifier(),
 			SessionColumnExpiration.identifier(),
+			SessionColumnScopes.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
@@ -530,6 +540,7 @@ func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error
 					userAgentIP         sql.NullString
 					userAgentHeader     database.Map[[]string]
 					expiration          sql.NullTime
+					scopes              database.TextArray[string]
 				)
 
 				err := rows.Scan(
@@ -558,6 +569,7 @@ func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error
 					&session.UserAgent.Description,
 					&userAgentHeader,
 					&expiration,
+					&scopes,
 					&sessions.Count,
 				)
 
@@ -582,6 +594,7 @@ func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error
 					session.UserAgent.IP = net.ParseIP(userAgentIP.String)
 				}
 				session.Expiration = expiration.Time
+				session.Scopes = scopes
 
 				sessions.Sessions = append(sessions.Sessions, session)
 			}

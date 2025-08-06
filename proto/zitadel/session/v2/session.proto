@@ -46,6 +46,7 @@ message Session {
       description: "\"time the session will be automatically invalidated\"";
     }
   ];
+  repeated string scopes = 9;
 }
 
 message Factors {

@@ -153,6 +153,7 @@ func sessionToPb(s *query.Session) *session.Session {
 		Metadata:       s.Metadata,
 		UserAgent:      userAgentToPb(s.UserAgent),
 		ExpirationDate: expirationToPb(s.Expiration),
+		Scopes:         s.Scopes,
 	}
 }
 

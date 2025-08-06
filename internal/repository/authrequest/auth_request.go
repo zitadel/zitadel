@@ -114,6 +114,7 @@ type SessionLinkedEvent struct {
 	UserID      string                      `json:"user_id"`
 	AuthTime    time.Time                   `json:"auth_time"`
 	AuthMethods []domain.UserAuthMethodType `json:"auth_methods"`
+	Scope       []string                    `json:"scope"`
 }
 
 func (e *SessionLinkedEvent) Payload() interface{} {
@@ -130,6 +131,7 @@ func NewSessionLinkedEvent(ctx context.Context,
 	userID string,
 	authTime time.Time,
 	authMethods []domain.UserAuthMethodType,
+	scope []string,
 ) *SessionLinkedEvent {
 	return &SessionLinkedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -141,6 +143,7 @@ func NewSessionLinkedEvent(ctx context.Context,
 		UserID:      userID,
 		AuthTime:    authTime,
 		AuthMethods: authMethods,
+		Scope:       scope,
 	}
 }
 

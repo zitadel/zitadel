@@ -123,6 +123,7 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 		sessionWriteModel.UserID,
 		sessionWriteModel.AuthenticationTime(),
 		sessionWriteModel.AuthMethodTypes(),
+		writeModel.Scope,
 	)); err != nil {
 		return nil, nil, err
 	}

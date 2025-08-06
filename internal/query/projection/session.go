@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -41,6 +42,7 @@ const (
 	SessionColumnUserAgentDescription   = "user_agent_description"
 	SessionColumnUserAgentHeader        = "user_agent_header"
 	SessionColumnExpiration             = "expiration"
+	SessionColumnScopes                 = "scopes"
 )
 
 type sessionProjection struct{}
@@ -81,6 +83,7 @@ func (*sessionProjection) Init() *old_handler.Check {
 			handler.NewColumn(SessionColumnUserAgentDescription, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SessionColumnUserAgentHeader, handler.ColumnTypeJSONB, handler.Nullable()),
 			handler.NewColumn(SessionColumnExpiration, handler.ColumnTypeTimestamp, handler.Nullable()),
+			handler.NewColumn(SessionColumnScopes, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(SessionColumnInstanceID, SessionColumnID),
 			handler.WithIndex(handler.NewIndex(
@@ -144,6 +147,15 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  session.TerminateType,
 					Reduce: p.reduceSessionTerminated,
+				},
+			},
+		},
+		{
+			Aggregate: authrequest.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  authrequest.SessionLinkedType,
+					Reduce: p.reduceAuthRequestSessionLinked,
 				},
 			},
 		},
@@ -436,6 +448,23 @@ func (p *sessionProjection) reducePasswordChanged(event eventstore.Event) (*hand
 			handler.NewCond(SessionColumnUserID, e.Aggregate().ID),
 			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewLessThanCond(SessionColumnPasswordCheckedAt, e.CreationDate()),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceAuthRequestSessionLinked(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*authrequest.SessionLinkedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-AuthReqSessLinked", "reduce.wrong.event.type %s", authrequest.SessionLinkedType)
+	}
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnScopes, e.Scope),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.SessionID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
