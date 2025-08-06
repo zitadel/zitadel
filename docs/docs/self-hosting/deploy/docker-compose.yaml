@@ -63,7 +63,7 @@ services:
     environment:
       - ZITADEL_API_URL=http://localhost:8080
       - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
-      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client-pat
+      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
     user: "${UID:-1000}"
     network_mode: service:zitadel
     volumes:
