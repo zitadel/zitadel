@@ -18,7 +18,7 @@ jobs:
           filter: tree:0
           fetch-depth: 0
 
-      - run: npx nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
+      #- run: npx nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
 
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
@@ -29,7 +29,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
 
-      - run: npx nx affected -t build
+      - run: npx nx run @zitadel/docs:build
 
       - run: npx nx fix-ci
         if: always()
