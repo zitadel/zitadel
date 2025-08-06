@@ -75,7 +75,7 @@ var (
 	}
 )
 
-func (q *Queries) GetProjectMetadataByKey(ctx context.Context, shouldTriggerBulk bool, projectID string, key string, withOwnerRemoved bool, queries ...SearchQuery) (metadata *ProjectMetadata, err error) {
+func (q *Queries) GetProjectMetadataByKey(ctx context.Context, shouldTriggerBulk bool, projectID string, key string, queries ...SearchQuery) (metadata *ProjectMetadata, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -107,7 +107,7 @@ func (q *Queries) GetProjectMetadataByKey(ctx context.Context, shouldTriggerBulk
 	return metadata, err
 }
 
-func (q *Queries) SearchProjectMetadata(ctx context.Context, shouldTriggerBulk bool, projectID string, queries *ProjectMetadataSearchQueries, withOwnerRemoved bool) (metadata *ProjectMetadataList, err error) {
+func (q *Queries) SearchProjectMetadata(ctx context.Context, shouldTriggerBulk bool, projectID string, queries *ProjectMetadataSearchQueries) (metadata *ProjectMetadataList, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

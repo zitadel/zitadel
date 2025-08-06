@@ -31,7 +31,7 @@ func (s *Server) ListProjectMetadata(
 		return nil, err
 	}
 
-	res, err := s.query.SearchProjectMetadata(ctx, true, request.Msg.GetProjectId(), metadataQueries, false)
+	res, err := s.query.SearchProjectMetadata(ctx, true, request.Msg.GetProjectId(), metadataQueries)
 	if err != nil {
 		return nil, err
 	}
