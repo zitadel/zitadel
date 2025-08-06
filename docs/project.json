@@ -3,17 +3,33 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "generate": {
-      "outputs": ["{projectRoot}/apis/resources/**"]
+      "outputs": [
+        "{projectRoot}/apis/resources/**"
+      ]
     },
     "start": {
-      "dependsOn": ["generate"]
+      "dependsOn": [
+        "generate"
+      ]
     },
     "build": {
-      "outputs": ["{projectRoot}/build/**"],
-      "dependsOn": ["generate"]
+      "outputs": [
+        "{projectRoot}/build/**"
+      ],
+      "dependsOn": [
+        "generate"
+      ],
+      "options": {
+        "env": {
+          "NODE_OPTIONS": "--max-old-space-size=4096",
+          "DEBUG": "docusaurus:*"
+        }
+      }
     },
     "dev": {
-      "dependsOn": ["build"]
+      "dependsOn": [
+        "build"
+      ]
     },
     "docker:build": {
       "dependsOn": [
