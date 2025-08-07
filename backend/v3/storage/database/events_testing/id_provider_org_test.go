@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	zitadel_internal_domain "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_grpc "github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -2138,6 +2139,299 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			assert.Equal(t, "new_preferredLanguageAttribute", updateLdap.PreferredLanguageAttribute)
 			assert.Equal(t, "new_avatarUrlAttribute", updateLdap.AvatarURLAttribute)
 			assert.Equal(t, "new_profileAttribute", updateLdap.ProfileAttribute)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance apple added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add apple
+		beforeCreate := time.Now()
+		// addApple, err := AdminClient.AddAppleProvider(CTX, &admin.AddAppleProviderRequest{
+		addApple, err := MgmtClient.AddAppleProvider(CTX, &management.AddAppleProviderRequest{
+			Name:       name,
+			ClientId:   "clientID",
+			TeamId:     "teamIDteam",
+			KeyId:      "keyIDKeyId",
+			PrivateKey: []byte("privateKey"),
+			Scopes:     []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			apple, err := idpRepo.GetApple(CTX, idpRepo.IDCondition(addApple.Id), instanceID, &orgID)
+			require.NoError(t, err)
+
+			// event instance.idp.apple.added
+			// idp
+			assert.Equal(t, instanceID, apple.InstanceID)
+			assert.Equal(t, orgID, *apple.OrgID)
+			assert.Equal(t, addApple.Id, apple.ID)
+			assert.Equal(t, name, apple.Name)
+			assert.Equal(t, domain.IDPTypeApple.String(), apple.Type)
+			assert.Equal(t, false, apple.AllowLinking)
+			assert.Equal(t, false, apple.AllowCreation)
+			assert.Equal(t, false, apple.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), apple.AllowAutoLinking)
+			assert.WithinRange(t, apple.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, apple.UpdatedAt, beforeCreate, afterCreate)
+
+			// apple
+			assert.Equal(t, "clientID", apple.ClientID)
+			assert.Equal(t, "teamIDteam", apple.TeamID)
+			assert.Equal(t, "keyIDKeyId", apple.KeyID)
+			assert.NotNil(t, apple.PrivateKey)
+			assert.Equal(t, []string{"scope"}, apple.Scopes)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance apple changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add apple
+		addApple, err := MgmtClient.AddAppleProvider(CTX, &management.AddAppleProviderRequest{
+			Name:       name,
+			ClientId:   "clientID",
+			TeamId:     "teamIDteam",
+			KeyId:      "keyIDKeyId",
+			PrivateKey: []byte("privateKey"),
+			Scopes:     []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		var apple *domain.IDPApple
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			apple, err = idpRepo.GetApple(CTX, idpRepo.IDCondition(addApple.Id), instanceID, &orgID)
+			require.NoError(t, err)
+			assert.Equal(t, addApple.Id, apple.ID)
+		}, retryDuration, tick)
+
+		name = "new_" + name
+		// change apple
+		beforeCreate := time.Now()
+		// _, err = AdminClient.UpdateAppleProvider(CTX, &admin.UpdateAppleProviderRequest{
+		_, err = MgmtClient.UpdateAppleProvider(CTX, &management.UpdateAppleProviderRequest{
+			Id:         addApple.Id,
+			Name:       name,
+			ClientId:   "new_clientID",
+			TeamId:     "new_teamID",
+			KeyId:      "new_kKeyId",
+			PrivateKey: []byte("new_privateKey"),
+			Scopes:     []string{"new_scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		// check values for apple
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			updateApple, err := idpRepo.GetApple(CTX, idpRepo.IDCondition(addApple.Id), instanceID, &orgID)
+			require.NoError(t, err)
+
+			// event nstance.idp.apple.changed
+			// idp
+			assert.Equal(t, instanceID, updateApple.InstanceID)
+			assert.Equal(t, orgID, *updateApple.OrgID)
+			assert.Equal(t, addApple.Id, updateApple.ID)
+			assert.Equal(t, name, updateApple.Name)
+			assert.Equal(t, domain.IDPTypeApple.String(), updateApple.Type)
+			assert.Equal(t, true, updateApple.AllowLinking)
+			assert.Equal(t, true, updateApple.AllowCreation)
+			assert.Equal(t, true, updateApple.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateApple.AllowAutoLinking)
+			assert.WithinRange(t, updateApple.UpdatedAt, beforeCreate, afterCreate)
+
+			// apple
+			assert.Equal(t, "new_clientID", updateApple.ClientID)
+			assert.Equal(t, "new_teamID", updateApple.TeamID)
+			assert.Equal(t, "new_kKeyId", updateApple.KeyID)
+			assert.NotEqual(t, apple.PrivateKey, updateApple.PrivateKey)
+			assert.Equal(t, []string{"new_scope"}, updateApple.Scopes)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance saml added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+		federatedLogoutEnabled := false
+
+		// add saml
+		beforeCreate := time.Now()
+		addSAML, err := MgmtClient.AddSAMLProvider(CTX, &management.AddSAMLProviderRequest{
+			Name: name,
+			Metadata: &management.AddSAMLProviderRequest_MetadataXml{
+				MetadataXml: validSAMLMetadata1,
+			},
+			Binding:                       idp.SAMLBinding_SAML_BINDING_POST,
+			WithSignedRequest:             false,
+			TransientMappingAttributeName: &name,
+			FederatedLogoutEnabled:        &federatedLogoutEnabled,
+			NameIdFormat:                  idp.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_TRANSIENT.Enum(),
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			saml, err := idpRepo.GetSAML(CTX, idpRepo.IDCondition(addSAML.Id), instanceID, &orgID)
+			require.NoError(t, err)
+
+			// event instance.idp.saml.added
+			// idp
+			assert.Equal(t, instanceID, saml.InstanceID)
+			assert.Equal(t, orgID, *saml.OrgID)
+			assert.Equal(t, addSAML.Id, saml.ID)
+			assert.Equal(t, name, saml.Name)
+			assert.Equal(t, domain.IDPTypeSAML.String(), saml.Type)
+			assert.Equal(t, false, saml.AllowLinking)
+			assert.Equal(t, false, saml.AllowCreation)
+			assert.Equal(t, false, saml.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), saml.AllowAutoLinking)
+			assert.WithinRange(t, saml.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, saml.UpdatedAt, beforeCreate, afterCreate)
+
+			// saml
+			assert.Equal(t, validSAMLMetadata1, saml.Metadata)
+			assert.NotNil(t, saml.Key)
+			assert.NotNil(t, saml.Certificate)
+			assert.NotNil(t, saml.Binding)
+			assert.Equal(t, false, saml.WithSignedRequest)
+			assert.Equal(t, zitadel_internal_domain.SAMLNameIDFormatTransient, *saml.NameIDFormat)
+			assert.Equal(t, name, saml.TransientMappingAttributeName)
+			assert.Equal(t, false, saml.FederatedLogoutEnabled)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance saml changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+		federatedLogoutEnabled := false
+
+		// add saml
+		addSAML, err := MgmtClient.AddSAMLProvider(CTX, &management.AddSAMLProviderRequest{
+			Name: name,
+			// Metadata: &admin.AddSAMLProviderRequest_MetadataXml{
+			Metadata: &management.AddSAMLProviderRequest_MetadataXml{
+				MetadataXml: validSAMLMetadata1,
+			},
+			Binding:                       idp.SAMLBinding_SAML_BINDING_POST,
+			WithSignedRequest:             false,
+			TransientMappingAttributeName: &name,
+			FederatedLogoutEnabled:        &federatedLogoutEnabled,
+			NameIdFormat:                  idp.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_TRANSIENT.Enum(),
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		var saml *domain.IDPSAML
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			saml, err = idpRepo.GetSAML(CTX, idpRepo.IDCondition(addSAML.Id), instanceID, &orgID)
+			require.NoError(t, err)
+			assert.Equal(t, addSAML.Id, saml.ID)
+		}, retryDuration, tick)
+
+		name = "new_" + name
+		federatedLogoutEnabled = true
+		// change saml
+		beforeCreate := time.Now()
+		_, err = MgmtClient.UpdateSAMLProvider(CTX, &management.UpdateSAMLProviderRequest{
+			Id:   addSAML.Id,
+			Name: name,
+			// Metadata: &admin.UpdateSAMLProviderRequest_MetadataXml{
+			Metadata: &management.UpdateSAMLProviderRequest_MetadataXml{
+				MetadataXml: validSAMLMetadata2,
+			},
+			Binding:                       idp.SAMLBinding_SAML_BINDING_ARTIFACT,
+			WithSignedRequest:             true,
+			TransientMappingAttributeName: &name,
+			FederatedLogoutEnabled:        &federatedLogoutEnabled,
+			NameIdFormat:                  idp.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_EMAIL_ADDRESS.Enum(),
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		// check values for apple
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			updateSAML, err := idpRepo.GetSAML(CTX, idpRepo.IDCondition(addSAML.Id), instanceID, &orgID)
+			require.NoError(t, err)
+
+			// event instance.idp.saml.changed
+			// idp
+			assert.Equal(t, instanceID, updateSAML.InstanceID)
+			assert.Equal(t, orgID, *updateSAML.OrgID)
+			assert.Equal(t, addSAML.Id, updateSAML.ID)
+			assert.Equal(t, name, updateSAML.Name)
+			assert.Equal(t, domain.IDPTypeSAML.String(), updateSAML.Type)
+			assert.Equal(t, true, updateSAML.AllowLinking)
+			assert.Equal(t, true, updateSAML.AllowCreation)
+			assert.Equal(t, true, updateSAML.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateSAML.AllowAutoLinking)
+			assert.WithinRange(t, updateSAML.UpdatedAt, beforeCreate, afterCreate)
+
+			// saml
+			assert.Equal(t, validSAMLMetadata2, updateSAML.Metadata)
+			assert.NotNil(t, updateSAML.Key)
+			// assert.NotEqual(t, saml.Key, updateSAML.Key) // https://github.com/zitadel/zitadel/issues/10414
+			assert.NotNil(t, updateSAML.Certificate)
+			// assert.NotEqual(t, saml.Certificate, updateSAML.Certificate) // https://github.com/zitadel/zitadel/issues/10414
+			assert.NotNil(t, updateSAML.Binding)
+			assert.NotEqual(t, saml.Binding, updateSAML.Binding)
+			assert.Equal(t, true, updateSAML.WithSignedRequest)
+			assert.Equal(t, zitadel_internal_domain.SAMLNameIDFormatEmailAddress, *updateSAML.NameIDFormat)
+			assert.Equal(t, name, updateSAML.TransientMappingAttributeName)
+			assert.Equal(t, true, updateSAML.FederatedLogoutEnabled)
 		}, retryDuration, tick)
 	})
 }

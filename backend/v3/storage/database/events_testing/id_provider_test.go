@@ -13,12 +13,130 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	zitadel_internal_domain "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_grpc "github.com/zitadel/zitadel/pkg/grpc/idp"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 )
+
+var validSAMLMetadata1 = []byte(`<?xml version="1.0" encoding="UTF-8"?>
+<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://localhost:8080/saml/v2/metadata" ID="_8b02ecf6-aea4-4eda-96c6-190551f05b07">
+  <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+    <SignedInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+      <CanonicalizationMethod xmlns="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"></CanonicalizationMethod>
+      <SignatureMethod xmlns="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"></SignatureMethod>
+      <Reference xmlns="http://www.w3.org/2000/09/xmldsig#" URI="#_8b02ecf6-aea4-4eda-96c6-190551f05b07">
+        <Transforms xmlns="http://www.w3.org/2000/09/xmldsig#">
+          <Transform xmlns="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"></Transform>
+          <Transform xmlns="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"></Transform>
+        </Transforms>
+        <DigestMethod xmlns="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></DigestMethod>
+        <DigestValue xmlns="http://www.w3.org/2000/09/xmldsig#">Tyw4csdpNNq0E7wi5FXWdVNkdPNg+cM6kK21VB2+iF0=</DigestValue>
+      </Reference>
+    </SignedInfo>
+    <SignatureValue xmlns="http://www.w3.org/2000/09/xmldsig#">hWQSYmnBJENy/okk2qRDuHaZiyqpDsdV6BF9/T/LNjUh/8z4dV2NEZvkNhFEyQ+bqdj+NmRWvKqpg1dtgNJxQc32+IsLQvXNYyhMCtyG570/jaTOtm8daV4NKJyTV7SdwM6yfXgubz5YCRTyV13W2gBIFYppIRImIv5NDcjz+lEmWhnrkw8G2wRSFUY7VvkDn9rgsTzw/Pnsw6hlzpjGDYPMPx3ux3kjFVevdhFGNo+VC7t9ozruuGyH3yue9Re6FZoqa4oyWaPSOwei0ZH6UNqkX93Eo5Y49QKwaO8Rm+kWsOhdTqebVmCc+SpWbbrZbQj4nSLgWGlvCkZSivmH7ezr4Ol1ZkRetQ92UQ7xJS7E0y6uXAGvdgpDnyqHCOFfhTS6yqltHtc3m7JZex327xkv6e69uAEOSiv++sifVUIE0h/5u3hZLvwmTPrkoRVY4wgZ4ieb86QPvhw4UPeYapOhCBk5RfjoEFIeYwPUw5rtOlpTyeBJiKMpH1+mDAoa+8HQytZoMrnnY1s612vINtY7jU5igMwIk6MitQpRGibnBVBHRc2A6aE+XS333ganFK9hX6TzNkpHUb66NINDZ8Rgb1thn3MABArGlomtM5/enrAixWExZp70TSElor7SBdBW57H7OZCYUCobZuPRDLsCO6LLKeVrbdygWeRqr/o=</SignatureValue>
+    <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+	  <X509Data xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<X509Certificate xmlns="http://www.w3.org/2000/09/xmldsig#">MIIFIjCCAwqgAwIBAgICA7YwDQYJKoZIhvcNAQELBQAwLDEQMA4GA1UEChMHWklUQURFTDEYMBYGA1UEAxMPWklUQURFTCBTQU1MIENBMB4XDTI0MTEyNzEwMjc0NFoXDTI1MTEyNzE2Mjc0NFowMjEQMA4GA1UEChMHWklUQURFTDEeMBwGA1UEAxMVWklUQURFTCBTQU1MIG1ldGFkYXRhMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEApEpYT7EjbRBp0Hw7PGCiSgUoJtwd2nwZOhGy5WZVWvraAtHzW5ih2B6UwEShjwCmRJZeKYEN9JKJbpAy2EdL/l2rm/pArVNvSQu6sN4izz5p2rd9NfHAO3/EcvYdrelWLQj8WQx6LVM282Z4wbclp8Jz1y8Ow43352hGfFVc1x8gauoNl5MAy4kdbvs8UqihqcRmEyIOWl6UwTApb+XIRSRz0Yop99Fv9ALJwfUppsx+d4j9rlRDvrQJMJz7GC/19L9INTbY0HsVEiTltdAWHwREwrpwxNJQt42p3W/zpf1mjwXd3qNNDZAr1t2POPP4SXd598kabBZ3EMWGGxFw+NYYajyjG5EFOZw09FFJn2jIcovejvigfdqem5DGPECvHefqcqHkBPGukI3RaotXpAYyAGfnV7slVytSW484IX3KloAJLICbETbFGGsGQzIDw8rUqWyaOCOttw2fVNDyRFUMHrGe1PhJ9qA1If+KCWYD0iJqF03rIEhdrvNSdQNYkRa0DdtpacQLpzQtqsUioODqX0W3uzLceJEXLBbU0ZEk8mWZM/auwMo3ycPNXDVwrb6AkUKar+sqSumUuixw7da3KF1/mynh6M2Eo4NRB16oUiyN0EYrit/RRJjsTdH+71cj0V+8KqO88cBpmm+lO6x4RM5xpOf/EwwQHivxgRkCAwEAAaNIMEYwDgYDVR0PAQH/BAQDAgWgMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFIzl7uckcPWldirXeOFL3rH6K8FLMA0GCSqGSIb3DQEBCwUAA4ICAQBz+7R99uX1Us9T4BB2RK3RD9K8Q5foNmxJ8GbxpOQFL8IG1DE3FqBssciJkOsKY+1+Y6eow2TgmD9MxfCY444C8k8YDDjxIcs+4dEaWMUxA6NoEy378ciy0U1E6rpYLxWYTxXmsELyODWwTrRNIiWfbBD2m0w9HYbK6QvX6IYQqYoTOJJ3WJKsMCeQ8XhQsJYNINZEq8RsERY/aikOlTWN7ax4Mkr3bfnz1euXGClExCOM6ej4m2I33i4nyYBvvRkRRZRQCfkAQ+5WFVZoVXrQHNe/Oifit7tfLaDuybcjgkzzY3o0YbczzbdV69fVoj53VpR3QQOB+PCF/VJPUMtUFPEC05yH76g24KVBiM/Ws8GaERW1AxgupHSmvTY3GSiwDXQ2NzgDxUHfRHo8rxenJdEcPlGM0DstbUONDSFGLwvGDiidUVtqj1UB4yGL26bgtmwf61G4qsTn9PJMWdRmCeeOf7fmloRxTA0EEey3bulBBHim466tWHUhgOP+g1X0iE7CnwL8aJ//CCiQOAv1O6x5RLyxrmVTehPLr1T8qvnBmxpmuYU0kfbYpO3tMVe7VLabBx0cYh7izClZKHhgEj1w4aE9tIk7nqVAwvVocT3io8RrcKixlnBrFd7RYIuF3+RsYC/kYEgnZYKAig5u2TySgGmJ7nIS24FYW68WDg==</X509Certificate>
+      </X509Data>
+	</KeyInfo>
+  </Signature>
+  <IDPSSODescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" WantAuthnRequestsSigned="1" ID="_fd70402c-8a31-4a9a-a4a7-da526524c609" validUntil="2024-12-02T16:54:55.656Z" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+	<SingleSignOnService xmlns="urn:oasis:names:tc:SAML:2.0:metadata" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://localhost:8080/saml/v2/SSO"></SingleSignOnService>
+	<SingleSignOnService xmlns="urn:oasis:names:tc:SAML:2.0:metadata" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://localhost:8080/saml/v2/SSO"></SingleSignOnService>
+	<AttributeProfile>urn:oasis:names:tc:SAML:2.0:profiles:attribute:basic</AttributeProfile>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="Email" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="SurName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="FirstName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="FullName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="UserName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="UserID" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<SingleLogoutService xmlns="urn:oasis:names:tc:SAML:2.0:metadata" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://localhost:8080/saml/v2/SLO"></SingleLogoutService>
+	<SingleLogoutService xmlns="urn:oasis:names:tc:SAML:2.0:metadata" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://localhost:8080/saml/v2/SLO"></SingleLogoutService>
+	<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+	<KeyDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" use="signing">
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<KeyName>http://localhost:8080/saml/v2/metadata IDP signing</KeyName>
+		<X509Data xmlns="http://www.w3.org/2000/09/xmldsig#">
+		  <X509Certificate xmlns="http://www.w3.org/2000/09/xmldsig#">MIIFIjCCAwqgAwIBAgICA7QwDQYJKoZIhvcNAQELBQAwLDEQMA4GA1UEChMHWklUQURFTDEYMBYGA1UEAxMPWklUQURFTCBTQU1MIENBMB4XDTI0MTEyNzEwMjUwMloXDTI1MTEyNzE2MjUwMlowMjEQMA4GA1UEChMHWklUQURFTDEeMBwGA1UEAxMVWklUQURFTCBTQU1MIHJlc3BvbnNlMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA2lUgaI6AS/9xvM9DNSWK6Ho64LpK8UIioM26QfvAfeQ/I2pgX6SwWxEbd7qv+PkJzaFTjrXSlwOmWsJYma+UsdyFClaGFRyCgY8SWxPceandC8a+hQIDS/irLd9XF33RWp0b/09HjQl+n0HZ4teUFDUd2U1mUf3XCpn0+Ho316bmi6xSW6zaMy5RsbUl01hgWj2fgapAsGAHSBphwCE3Dz/9I/UfHWQw1k2/UTgjc9uIujcza6WgOxfsKluXYIOxwNKTfmzzOJMUwXz6GRgB2jhQI29MuKOZOITA7pXq5kZKf0lSRU8zKFTMJaK4zAHQ6f877Drr8XdAHemuXGZ2JdH/Dbdwarzy3YBMCWsAYlpeEvaVAdiSpyR7fAZktNuHd39Zg00Vlj2wdc44Vk5yVssW7pv5qnVZ7JTrXX2uBYFecLAXmplQ2ph1VdSXZLEDGgjiNA2T/fBj7G4/VjsuCBZFm1I0KCJp3HWEJx5dwwhSVc5wOJEzl7fMuPYMKWH/RM6P/7LnO1ulpdmiKPa4gHzdg3hDZn42NKcVt3UYf0phtxpWMrZp/DUEeizhckrC4ed6cfGtS3CUtJEqoycrCROJ5Hy+ONHl5Aqxt+JoPU+t/XATuctfPxQVcDr0itHzo2cjh/AVTU+IC7C0oQHSS9CC8Fp58UqbtYwFtSAd7ecCAwEAAaNIMEYwDgYDVR0PAQH/BAQDAgWgMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFIzl7uckcPWldirXeOFL3rH6K8FLMA0GCSqGSIb3DQEBCwUAA4ICAQAp+IGZScVIbRdCq5HPjlYBPOY7UbL8ZXnlMW/HLELV9GndnULuFhnuQTIdA5dquCsk8RI1fKsScEV1rqWvHZeSo5nVbvUaPJctoD/4GACqE6F8axs1AgSOvpJMyuycjSzSh6gDM1z37Fdqc/2IRqgi7SKdDsfJpi8XW8LtErpp4kyE1rEXopsXG2fe1UH25bZpXraUqYvp61rwVUCazAtV/U7ARG5AnT0mPqzUriIPrfL+v/+2ntV/BSc8/uCqYnHbwpIwjPURCaxo1Pmm6EEkm+V/Ss4ieNwwkD2bLLLST1LoVMim7Ebfy53PEKpsznKsGlVSu0YYKUsStWQVpwhKQw0bQLCJHdpvZtZSDgS9RbSMZz+aY/fpoNx6wDvmMgtdrb3pVXZ8vPKdq9YDrGfFqP60QdZ3CuSHXCM/zX4742GgImJ4KYAcTuF1+BkGf5JLAJOUZBkfCQ/kBT5wr8+EotLxASOC6717whLBYMEG6N8osEk+LDqoJRTLqkzirJsyOHWChKK47yGkdS3HBIZfo91QrJwKpfATYziBjEnqipkTu+6jFylBIkxKTPye4b3vgcodZP8LSNVXAsMGTPNPJxzPWQ37ba4zMnYZ5iUerlaox/SNsn68DT6RajIb1A1JDq+HNFc3hQP2bzk2y5pCax8zo5swjdklnm4clfB2Lw==</X509Certificate>
+		</X509Data>
+      </KeyInfo>
+	</KeyDescriptor>
+  </IDPSSODescriptor>
+  <AttributeAuthorityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" ID="_b3fed381-af56-4160-abf5-5ffd1e21cf61" validUntil="2024-12-02T16:54:55.656Z" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+	<AttributeService xmlns="urn:oasis:names:tc:SAML:2.0:metadata" Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://localhost:8080/saml/v2/attribute"></AttributeService>
+	<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+	<AttributeProfile>urn:oasis:names:tc:SAML:2.0:profiles:attribute:basic</AttributeProfile>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="Email" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="SurName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="FirstName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="FullName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="UserName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="UserID" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><AttributeValue></AttributeValue></Attribute>
+	<KeyDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" use="signing">
+	  <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<KeyName>http://localhost:8080/saml/v2/metadata IDP signing</KeyName>
+  		<X509Data xmlns="http://www.w3.org/2000/09/xmldsig#">
+		  <X509Certificate xmlns="http://www.w3.org/2000/09/xmldsig#">MIIFIjCCAwqgAwIBAgICA7QwDQYJKoZIhvcNAQELBQAwLDEQMA4GA1UEChMHWklUQURFTDEYMBYGA1UEAxMPWklUQURFTCBTQU1MIENBMB4XDTI0MTEyNzEwMjUwMloXDTI1MTEyNzE2MjUwMlowMjEQMA4GA1UEChMHWklUQURFTDEeMBwGA1UEAxMVWklUQURFTCBTQU1MIHJlc3BvbnNlMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA2lUgaI6AS/9xvM9DNSWK6Ho64LpK8UIioM26QfvAfeQ/I2pgX6SwWxEbd7qv+PkJzaFTjrXSlwOmWsJYma+UsdyFClaGFRyCgY8SWxPceandC8a+hQIDS/irLd9XF33RWp0b/09HjQl+n0HZ4teUFDUd2U1mUf3XCpn0+Ho316bmi6xSW6zaMy5RsbUl01hgWj2fgapAsGAHSBphwCE3Dz/9I/UfHWQw1k2/UTgjc9uIujcza6WgOxfsKluXYIOxwNKTfmzzOJMUwXz6GRgB2jhQI29MuKOZOITA7pXq5kZKf0lSRU8zKFTMJaK4zAHQ6f877Drr8XdAHemuXGZ2JdH/Dbdwarzy3YBMCWsAYlpeEvaVAdiSpyR7fAZktNuHd39Zg00Vlj2wdc44Vk5yVssW7pv5qnVZ7JTrXX2uBYFecLAXmplQ2ph1VdSXZLEDGgjiNA2T/fBj7G4/VjsuCBZFm1I0KCJp3HWEJx5dwwhSVc5wOJEzl7fMuPYMKWH/RM6P/7LnO1ulpdmiKPa4gHzdg3hDZn42NKcVt3UYf0phtxpWMrZp/DUEeizhckrC4ed6cfGtS3CUtJEqoycrCROJ5Hy+ONHl5Aqxt+JoPU+t/XATuctfPxQVcDr0itHzo2cjh/AVTU+IC7C0oQHSS9CC8Fp58UqbtYwFtSAd7ecCAwEAAaNIMEYwDgYDVR0PAQH/BAQDAgWgMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFIzl7uckcPWldirXeOFL3rH6K8FLMA0GCSqGSIb3DQEBCwUAA4ICAQAp+IGZScVIbRdCq5HPjlYBPOY7UbL8ZXnlMW/HLELV9GndnULuFhnuQTIdA5dquCsk8RI1fKsScEV1rqWvHZeSo5nVbvUaPJctoD/4GACqE6F8axs1AgSOvpJMyuycjSzSh6gDM1z37Fdqc/2IRqgi7SKdDsfJpi8XW8LtErpp4kyE1rEXopsXG2fe1UH25bZpXraUqYvp61rwVUCazAtV/U7ARG5AnT0mPqzUriIPrfL+v/+2ntV/BSc8/uCqYnHbwpIwjPURCaxo1Pmm6EEkm+V/Ss4ieNwwkD2bLLLST1LoVMim7Ebfy53PEKpsznKsGlVSu0YYKUsStWQVpwhKQw0bQLCJHdpvZtZSDgS9RbSMZz+aY/fpoNx6wDvmMgtdrb3pVXZ8vPKdq9YDrGfFqP60QdZ3CuSHXCM/zX4742GgImJ4KYAcTuF1+BkGf5JLAJOUZBkfCQ/kBT5wr8+EotLxASOC6717whLBYMEG6N8osEk+LDqoJRTLqkzirJsyOHWChKK47yGkdS3HBIZfo91QrJwKpfATYziBjEnqipkTu+6jFylBIkxKTPye4b3vgcodZP8LSNVXAsMGTPNPJxzPWQ37ba4zMnYZ5iUerlaox/SNsn68DT6RajIb1A1JDq+HNFc3hQP2bzk2y5pCax8zo5swjdklnm4clfB2Lw==</X509Certificate>
+		</X509Data>
+	  </KeyInfo>
+	</KeyDescriptor>
+  </AttributeAuthorityDescriptor>
+</EntityDescriptor>`)
+
+var validSAMLMetadata2 = []byte(`<?xml version="1.0" encoding="UTF-8"?>
+	<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="https://idp-saml.ua3.int/simplesaml/saml2/idp/metadata.php">
+  <md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <md:KeyDescriptor use="signing">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:X509Data>
+          <ds:X509Certificate>MIID7TCCAtWgAwIBAgIJANn3qP9lF7M3MA0GCSqGSIb3DQEBCwUAMIGMMQswCQYDVQQGEwJVQTEXMBUGA1UE
+		  CAwOS2hhcmtpdiBSZWdpb24xEDAOBgNVBAcMB0toYXJrb3YxDzANBgNVBAoMBk9yYWNsZTEYMBYGA1UEAwwPc3RzeWJvdi12bTEudWEzMScw
+		  JQYJKoZIhvcNAQkBFhhzZXJnaWkudHN5Ym92QG9yYWNsZS5jb20wHhcNMTUxMjI1MTIyMjU5WhcNMjUxMjI0MTIyMjU5WjCBjDELMAkGA1UE
+		  BhMCVUExFzAVBgNVBAgMDktoYXJraXYgUmVnaW9uMRAwDgYDVQQHDAdLaGFya292MQ8wDQYDVQQKDAZPcmFjbGUxGDAWBgNVBAMMD3N0c3lib
+		  3Ytdm0xLnVhMzEnMCUGCSqGSIb3DQEJARYYc2VyZ2lpLnRzeWJvdkBvcmFjbGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCA
+		  QEAw4OFwuUNjn6xxb/OuAnmQA6mCWPY2hKMoOz0cAajUHjNZZMwGnuEeUyPtEcULfz2MYo1yKQLxVj3pY0HTIQAzpY8o+xCqJFQmdMiakb
+		  PFHlh4z/qqiS5jHng6JCeUpCIxeiTG9JXVwF1ErBEZbwZYjVxa6S+0grVkS3YxuH4uTyqxskuGnHK/AviTHLBrLfSrbFKYuQUrXyy6X22wpzo
+		  bQ3Z+4bhEE8SXQtVbQdy7K0MKWYopNhX05SMTv7yMfUGp8EkGNyJ5Km8AuQt6ZCbVao6cHL2hSujQiN6aMjKbdzHeA1QEicppnnoG/Zefyi/
+		  okWdlLAaLjcpYrjUSWQJZQIDAQABo1AwTjAdBgNVHQ4EFgQUIKa0zeXmAJsCuNhJjhU0o7KiQgYwHwYDVR0jBBgwFoAUIKa0zeXmAJsCuNhJj
+		  hU0o7KiQgYwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAJawU5WRXqkW4emm+djpJAxZ0076qPgEsaaog6ng4MLAlU7RmfIY/
+		  l0VhXQegvhIBfG4OfduuzGaqd9y4IsQZFJ0yuotl96iEVcqg7hJ1LEY6UT6u6dZyGj1a9I6IlwJm/9CXFZHuVqGJkMfQZ4gaunE4c5gjbQA5/
+		  +PEJwPorKn48w8bojymV8hriqzrmaP8eQNuZUJsJdnKENOE5/asGyj+R2YfP6bmlOX3q0ozLcyJbXeZ6IvDFdRiDH5wO4JqW/ujvdvC553y
+		  CO3xxsorB4xCupuHu/c7vkzNpaKjYdmGRkqhEqBcCqYSxdwIFc1xhOwYPWKJzgn7pGQsT7yNJg==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:KeyDescriptor use="encryption">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:X509Data>
+          <ds:X509Certificate>MIID7TCCAtWgAwIBAgIJANn3qP9lF7M3MA0GCSqGSIb3DQEBCwUAMIGMMQswCQYDVQQGEwJVQTEXMBUGA1
+		  UECAwOS2hhcmtpdiBSZWdpb24xEDAOBgNVBAcMB0toYXJrb3YxDzANBgNVBAoMBk9yYWNsZTEYMBYGA1UEAwwPc3RzeWJvdi12bTEud
+		  WEzMScwJQYJKoZIhvcNAQkBFhhzZXJnaWkudHN5Ym92QG9yYWNsZS5jb20wHhcNMTUxMjI1MTIyMjU5WhcNMjUxMjI0MTIyMjU5WjCB
+		  jDELMAkGA1UEBhMCVUExFzAVBgNVBAgMDktoYXJraXYgUmVnaW9uMRAwDgYDVQQHDAdLaGFya292MQ8wDQYDVQQKDAZPcmFjbGUxGDA
+		  WBgNVBAMMD3N0c3lib3Ytdm0xLnVhMzEnMCUGCSqGSIb3DQEJARYYc2VyZ2lpLnRzeWJvdkBvcmFjbGUuY29tMIIBIjANBgkqhkiG9w0B
+		  AQEFAAOCAQ8AMIIBCgKCAQEAw4OFwuUNjn6xxb/OuAnmQA6mCWPY2hKMoOz0cAajUHjNZZMwGnuEeUyPtEcULfz2MYo1yKQLxVj3pY0HT
+		  IQAzpY8o+xCqJFQmdMiakbPFHlh4z/qqiS5jHng6JCeUpCIxeiTG9JXVwF1ErBEZbwZYjVxa6S+0grVkS3YxuH4uTyqxskuGnHK/
+		  AviTHLBrLfSrbFKYuQUrXyy6X22wpzobQ3Z+4bhEE8SXQtVbQdy7K0MKWYopNhX05SMTv7yMfUGp8EkGNyJ5Km8AuQt6ZCbVao6cHL2h
+		  SujQiN6aMjKbdzHeA1QEicppnnoG/Zefyi/okWdlLAaLjcpYrjUSWQJZQIDAQABo1AwTjAdBgNVHQ4EFgQUIKa0zeXmAJsCuNhJjhU0o
+		  7KiQgYwHwYDVR0jBBgwFoAUIKa0zeXmAJsCuNhJjhU0o7KiQgYwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAJawU5WRXq
+		  kW4emm+djpJAxZ0076qPgEsaaog6ng4MLAlU7RmfIY/l0VhXQegvhIBfG4OfduuzGaqd9y4IsQZFJ0yuotl96iEVcqg7hJ1LEY6UT6u6d
+		  ZyGj1a9I6IlwJm/9CXFZHuVqGJkMfQZ4gaunE4c5gjbQA5/+PEJwPorKn48w8bojymV8hriqzrmaP8eQNuZUJsJdnKENOE5/
+		  asGyj+R2YfP6bmlOX3q0ozLcyJbXeZ6IvDFdRiDH5wO4JqW/ujvdvC553yCO3xxsorB4xCupuHu/c7vkzNpaKjYdmGRkqhEqBcCqYSxd
+		  wIFc1xhOwYPWKJzgn7pGQsT7yNJg==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://idp-saml.ua3.int/simplesaml/saml2/idp/SingleLogoutService.php"/>
+    <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
+    <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://idp-saml.ua3.int/simplesaml/saml2/idp/SSOService.php"/>
+  </md:IDPSSODescriptor>
+  <md:ContactPerson contactType="technical">
+    <md:SurName>Administrator</md:SurName>
+    <md:EmailAddress>name@emailprovider.com</md:EmailAddress>
+  </md:ContactPerson>
+</md:EntityDescriptor>`)
 
 func TestServer_TestIDProviderReduces(t *testing.T) {
 	instanceID := Instance.ID()
@@ -2100,6 +2218,295 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, "new_preferredLanguageAttribute", updateLdap.PreferredLanguageAttribute)
 			assert.Equal(t, "new_avatarUrlAttribute", updateLdap.AvatarURLAttribute)
 			assert.Equal(t, "new_profileAttribute", updateLdap.ProfileAttribute)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance apple added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add apple
+		beforeCreate := time.Now()
+		addApple, err := AdminClient.AddAppleProvider(CTX, &admin.AddAppleProviderRequest{
+			Name:       name,
+			ClientId:   "clientID",
+			TeamId:     "teamIDteam",
+			KeyId:      "keyIDKeyId",
+			PrivateKey: []byte("privateKey"),
+			Scopes:     []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			apple, err := idpRepo.GetApple(CTX, idpRepo.IDCondition(addApple.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.apple.added
+			// idp
+			assert.Equal(t, instanceID, apple.InstanceID)
+			assert.Nil(t, apple.OrgID)
+			assert.Equal(t, addApple.Id, apple.ID)
+			assert.Equal(t, name, apple.Name)
+			assert.Equal(t, domain.IDPTypeApple.String(), apple.Type)
+			assert.Equal(t, false, apple.AllowLinking)
+			assert.Equal(t, false, apple.AllowCreation)
+			assert.Equal(t, false, apple.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), apple.AllowAutoLinking)
+			assert.WithinRange(t, apple.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, apple.UpdatedAt, beforeCreate, afterCreate)
+
+			// apple
+			assert.Equal(t, "clientID", apple.ClientID)
+			assert.Equal(t, "teamIDteam", apple.TeamID)
+			assert.Equal(t, "keyIDKeyId", apple.KeyID)
+			assert.NotNil(t, apple.PrivateKey)
+			assert.Equal(t, []string{"scope"}, apple.Scopes)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance apple changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add apple
+		addApple, err := AdminClient.AddAppleProvider(CTX, &admin.AddAppleProviderRequest{
+			Name:       name,
+			ClientId:   "clientID",
+			TeamId:     "teamIDteam",
+			KeyId:      "keyIDKeyId",
+			PrivateKey: []byte("privateKey"),
+			Scopes:     []string{"scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		var apple *domain.IDPApple
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			apple, err = idpRepo.GetApple(CTX, idpRepo.IDCondition(addApple.Id), instanceID, nil)
+			require.NoError(t, err)
+			assert.Equal(t, addApple.Id, apple.ID)
+		}, retryDuration, tick)
+
+		name = "new_" + name
+		// change apple
+		beforeCreate := time.Now()
+		_, err = AdminClient.UpdateAppleProvider(CTX, &admin.UpdateAppleProviderRequest{
+			Id:         addApple.Id,
+			Name:       name,
+			ClientId:   "new_clientID",
+			TeamId:     "new_teamID",
+			KeyId:      "new_kKeyId",
+			PrivateKey: []byte("new_privateKey"),
+			Scopes:     []string{"new_scope"},
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		// check values for apple
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			updateApple, err := idpRepo.GetApple(CTX, idpRepo.IDCondition(addApple.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event nstance.idp.apple.changed
+			// idp
+			assert.Equal(t, instanceID, updateApple.InstanceID)
+			assert.Nil(t, updateApple.OrgID)
+			assert.Equal(t, addApple.Id, updateApple.ID)
+			assert.Equal(t, name, updateApple.Name)
+			assert.Equal(t, domain.IDPTypeApple.String(), updateApple.Type)
+			assert.Equal(t, true, updateApple.AllowLinking)
+			assert.Equal(t, true, updateApple.AllowCreation)
+			assert.Equal(t, true, updateApple.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateApple.AllowAutoLinking)
+			assert.WithinRange(t, updateApple.UpdatedAt, beforeCreate, afterCreate)
+
+			// apple
+			assert.Equal(t, "new_clientID", updateApple.ClientID)
+			assert.Equal(t, "new_teamID", updateApple.TeamID)
+			assert.Equal(t, "new_kKeyId", updateApple.KeyID)
+			assert.NotEqual(t, apple.PrivateKey, updateApple.PrivateKey)
+			assert.Equal(t, []string{"new_scope"}, updateApple.Scopes)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance saml added reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+		federatedLogoutEnabled := false
+
+		// add saml
+		beforeCreate := time.Now()
+		addSAML, err := AdminClient.AddSAMLProvider(CTX, &admin.AddSAMLProviderRequest{
+			Name: name,
+			Metadata: &admin.AddSAMLProviderRequest_MetadataXml{
+				MetadataXml: validSAMLMetadata1,
+			},
+			Binding:                       idp.SAMLBinding_SAML_BINDING_POST,
+			WithSignedRequest:             false,
+			TransientMappingAttributeName: &name,
+			FederatedLogoutEnabled:        &federatedLogoutEnabled,
+			NameIdFormat:                  idp.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_TRANSIENT.Enum(),
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			saml, err := idpRepo.GetSAML(CTX, idpRepo.IDCondition(addSAML.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.saml.added
+			// idp
+			assert.Equal(t, instanceID, saml.InstanceID)
+			assert.Nil(t, saml.OrgID)
+			assert.Equal(t, addSAML.Id, saml.ID)
+			assert.Equal(t, name, saml.Name)
+			assert.Equal(t, domain.IDPTypeSAML.String(), saml.Type)
+			assert.Equal(t, false, saml.AllowLinking)
+			assert.Equal(t, false, saml.AllowCreation)
+			assert.Equal(t, false, saml.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail.String(), saml.AllowAutoLinking)
+			assert.WithinRange(t, saml.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, saml.UpdatedAt, beforeCreate, afterCreate)
+
+			// saml
+			assert.Equal(t, validSAMLMetadata1, saml.Metadata)
+			assert.NotNil(t, saml.Key)
+			assert.NotNil(t, saml.Certificate)
+			assert.NotNil(t, saml.Binding)
+			assert.Equal(t, false, saml.WithSignedRequest)
+			assert.Equal(t, zitadel_internal_domain.SAMLNameIDFormatTransient, *saml.NameIDFormat)
+			assert.Equal(t, name, saml.TransientMappingAttributeName)
+			assert.Equal(t, false, saml.FederatedLogoutEnabled)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance saml changed reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+		federatedLogoutEnabled := false
+
+		// add saml
+		addSAML, err := AdminClient.AddSAMLProvider(CTX, &admin.AddSAMLProviderRequest{
+			Name: name,
+			Metadata: &admin.AddSAMLProviderRequest_MetadataXml{
+				MetadataXml: validSAMLMetadata1,
+			},
+			Binding:                       idp.SAMLBinding_SAML_BINDING_POST,
+			WithSignedRequest:             false,
+			TransientMappingAttributeName: &name,
+			FederatedLogoutEnabled:        &federatedLogoutEnabled,
+			NameIdFormat:                  idp.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_TRANSIENT.Enum(),
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  false,
+				IsCreationAllowed: false,
+				IsAutoCreation:    false,
+				IsAutoUpdate:      false,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
+			},
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		var saml *domain.IDPSAML
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			saml, err = idpRepo.GetSAML(CTX, idpRepo.IDCondition(addSAML.Id), instanceID, nil)
+			require.NoError(t, err)
+			assert.Equal(t, addSAML.Id, saml.ID)
+		}, retryDuration, tick)
+
+		name = "new_" + name
+		federatedLogoutEnabled = true
+		// change saml
+		beforeCreate := time.Now()
+		_, err = AdminClient.UpdateSAMLProvider(CTX, &admin.UpdateSAMLProviderRequest{
+			Id:   addSAML.Id,
+			Name: name,
+			Metadata: &admin.UpdateSAMLProviderRequest_MetadataXml{
+				MetadataXml: validSAMLMetadata2,
+			},
+			Binding:                       idp.SAMLBinding_SAML_BINDING_ARTIFACT,
+			WithSignedRequest:             true,
+			TransientMappingAttributeName: &name,
+			FederatedLogoutEnabled:        &federatedLogoutEnabled,
+			NameIdFormat:                  idp.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_EMAIL_ADDRESS.Enum(),
+			ProviderOptions: &idp_grpc.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			},
+		})
+		afterCreate := time.Now()
+		require.NoError(t, err)
+
+		// check values for apple
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			updateSAML, err := idpRepo.GetSAML(CTX, idpRepo.IDCondition(addSAML.Id), instanceID, nil)
+			require.NoError(t, err)
+
+			// event instance.idp.saml.changed
+			// idp
+			assert.Equal(t, instanceID, updateSAML.InstanceID)
+			assert.Nil(t, updateSAML.OrgID)
+			assert.Equal(t, addSAML.Id, updateSAML.ID)
+			assert.Equal(t, name, updateSAML.Name)
+			assert.Equal(t, domain.IDPTypeSAML.String(), updateSAML.Type)
+			assert.Equal(t, true, updateSAML.AllowLinking)
+			assert.Equal(t, true, updateSAML.AllowCreation)
+			assert.Equal(t, true, updateSAML.AllowAutoUpdate)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName.String(), updateSAML.AllowAutoLinking)
+			assert.WithinRange(t, updateSAML.UpdatedAt, beforeCreate, afterCreate)
+
+			// saml
+			assert.Equal(t, validSAMLMetadata2, updateSAML.Metadata)
+			assert.NotNil(t, updateSAML.Key)
+			// assert.NotEqual(t, saml.Key, updateSAML.Key) // https://github.com/zitadel/zitadel/issues/10414
+			assert.NotNil(t, updateSAML.Certificate)
+			// assert.NotEqual(t, saml.Certificate, updateSAML.Certificate) // https://github.com/zitadel/zitadel/issues/10414
+			assert.NotNil(t, updateSAML.Binding)
+			assert.NotEqual(t, saml.Binding, updateSAML.Binding)
+			assert.Equal(t, true, updateSAML.WithSignedRequest)
+			assert.Equal(t, zitadel_internal_domain.SAMLNameIDFormatEmailAddress, *updateSAML.NameIDFormat)
+			assert.Equal(t, name, updateSAML.TransientMappingAttributeName)
+			assert.Equal(t, true, updateSAML.FederatedLogoutEnabled)
 		}, retryDuration, tick)
 	})
 }

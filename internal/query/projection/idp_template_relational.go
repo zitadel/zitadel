@@ -3,7 +3,9 @@ package projection
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
+	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 
@@ -164,30 +166,30 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  instance.LDAPIDPChangedEventType,
 					Reduce: p.reduceLDAPIDPChanged,
 				},
-				// 		{
-				// 			Event:  instance.AppleIDPAddedEventType,
-				// 			Reduce: p.reduceAppleIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  instance.AppleIDPChangedEventType,
-				// 			Reduce: p.reduceAppleIDPChanged,
-				// 		},
-				// 		{
-				// 			Event:  instance.SAMLIDPAddedEventType,
-				// 			Reduce: p.reduceSAMLIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  instance.SAMLIDPChangedEventType,
-				// 			Reduce: p.reduceSAMLIDPChanged,
-				// 		},
+				{
+					Event:  instance.AppleIDPAddedEventType,
+					Reduce: p.reduceAppleIDPAdded,
+				},
+				{
+					Event:  instance.AppleIDPChangedEventType,
+					Reduce: p.reduceAppleIDPChanged,
+				},
+				{
+					Event:  instance.SAMLIDPAddedEventType,
+					Reduce: p.reduceSAMLIDPAdded,
+				},
+				{
+					Event:  instance.SAMLIDPChangedEventType,
+					Reduce: p.reduceSAMLIDPChanged,
+				},
 				// 		{
 				// 			Event:  instance.IDPConfigRemovedEventType,
 				// 			Reduce: p.reduceIDPConfigRemoved,
 				// 		},
-				// 		{
-				// 			Event:  instance.IDPRemovedEventType,
-				// 			Reduce: p.reduceIDPRemoved,
-				// 		},
+				{
+					Event:  instance.IDPRemovedEventType,
+					Reduce: p.reduceIDPRemoved,
+				},
 				// 		{
 				// 			Event:  instance.InstanceRemovedEventType,
 				// 			Reduce: reduceInstanceRemovedHelper(IDPTemplateInstanceIDCol),
@@ -309,30 +311,30 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  org.LDAPIDPChangedEventType,
 					Reduce: p.reduceLDAPIDPChanged,
 				},
-				// 		{
-				// 			Event:  org.AppleIDPAddedEventType,
-				// 			Reduce: p.reduceAppleIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.AppleIDPChangedEventType,
-				// 			Reduce: p.reduceAppleIDPChanged,
-				// 		},
-				// 		{
-				// 			Event:  org.SAMLIDPAddedEventType,
-				// 			Reduce: p.reduceSAMLIDPAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.SAMLIDPChangedEventType,
-				// 			Reduce: p.reduceSAMLIDPChanged,
-				// 		},
+				{
+					Event:  org.AppleIDPAddedEventType,
+					Reduce: p.reduceAppleIDPAdded,
+				},
+				{
+					Event:  org.AppleIDPChangedEventType,
+					Reduce: p.reduceAppleIDPChanged,
+				},
+				{
+					Event:  org.SAMLIDPAddedEventType,
+					Reduce: p.reduceSAMLIDPAdded,
+				},
+				{
+					Event:  org.SAMLIDPChangedEventType,
+					Reduce: p.reduceSAMLIDPChanged,
+				},
 				// 		{
 				// 			Event:  org.IDPConfigRemovedEventType,
 				// 			Reduce: p.reduceIDPConfigRemoved,
 				// 		},
-				// 		{
-				// 			Event:  org.IDPRemovedEventType,
-				// 			Reduce: p.reduceIDPRemoved,
-				// 		},
+				{
+					Event:  org.IDPRemovedEventType,
+					Reduce: p.reduceIDPRemoved,
+				},
 				// 		{
 				// 			Event:  org.OrgRemovedEventType,
 				// 			Reduce: p.reduceOwnerRemoved,
@@ -1862,195 +1864,235 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.
 	// ), nil
 }
 
-// func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.SAMLIDPAddedEvent
-// 	var idpOwnerType domain.IdentityProviderType
-// 	switch e := event.(type) {
-// 	case *org.SAMLIDPAddedEvent:
-// 		idpEvent = e.SAMLIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeOrg
-// 	case *instance.SAMLIDPAddedEvent:
-// 		idpEvent = e.SAMLIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeSystem
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPAddedEventType, instance.SAMLIDPAddedEventType})
-// 	}
+func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.AppleIDPAddedEvent
+	switch e := event.(type) {
+	case *org.AppleIDPAddedEvent:
+		idpEvent = e.AppleIDPAddedEvent
+	case *instance.AppleIDPAddedEvent:
+		idpEvent = e.AppleIDPAddedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YFvg3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPAddedEventType /*, instance.AppleIDPAddedEventType*/})
+	}
 
-// 	columns := []handler.Column{
-// 		handler.NewCol(SAMLIDCol, idpEvent.ID),
-// 		handler.NewCol(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 		handler.NewCol(SAMLMetadataCol, idpEvent.Metadata),
-// 		handler.NewCol(SAMLKeyCol, idpEvent.Key),
-// 		handler.NewCol(SAMLCertificateCol, idpEvent.Certificate),
-// 		handler.NewCol(SAMLBindingCol, idpEvent.Binding),
-// 		handler.NewCol(SAMLWithSignedRequestCol, idpEvent.WithSignedRequest),
-// 		handler.NewCol(SAMLTransientMappingAttributeName, idpEvent.TransientMappingAttributeName),
-// 		handler.NewCol(SAMLFederatedLogoutEnabled, idpEvent.FederatedLogoutEnabled),
-// 	}
-// 	if idpEvent.NameIDFormat != nil {
-// 		columns = append(columns, handler.NewCol(SAMLNameIDFormatCol, *idpEvent.NameIDFormat))
-// 	}
+	apple := db_domain.Apple{
+		ClientID:   idpEvent.ClientID,
+		TeamID:     idpEvent.TeamID,
+		KeyID:      idpEvent.KeyID,
+		PrivateKey: idpEvent.PrivateKey,
+		Scopes:     idpEvent.Scopes,
+	}
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
-// 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
-// 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-// 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
-// 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeSAML),
-// 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
-// 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
-// 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
-// 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-// 				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
-// 			},
-// 		),
-// 		handler.AddCreateStatement(
-// 			columns,
-// 			handler.WithTableSuffix(IDPTemplateSAMLSuffix),
-// 		),
-// 	), nil
-// }
+	payload, err := json.Marshal(apple)
+	if err != nil {
+		return nil, err
+	}
 
-// func (p *idpTemplateProjection) reduceSAMLIDPChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.SAMLIDPChangedEvent
-// 	switch e := event.(type) {
-// 	case *org.SAMLIDPChangedEvent:
-// 		idpEvent = e.SAMLIDPChangedEvent
-// 	case *instance.SAMLIDPChangedEvent:
-// 		idpEvent = e.SAMLIDPChangedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-o7c0fii4ad", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPChangedEventType, instance.SAMLIDPChangedEventType})
-// 	}
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
 
-// 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-// 	ops = append(ops,
-// 		handler.AddUpdateStatement(
-// 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 	)
+	return handler.NewMultiStatement(
+		&idpEvent,
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPRelationalOrgId, orgId),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeApple.String()),
+				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+				handler.NewCol(IDPRelationalPayloadCol, payload),
+			},
+		),
+	), nil
+}
 
-// 	SAMLCols := reduceSAMLIDPChangedColumns(idpEvent)
-// 	if len(SAMLCols) > 0 {
-// 		ops = append(ops,
-// 			handler.AddUpdateStatement(
-// 				SAMLCols,
-// 				[]handler.Condition{
-// 					handler.NewCond(SAMLIDCol, idpEvent.ID),
-// 					handler.NewCond(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				},
-// 				handler.WithTableSuffix(IDPTemplateSAMLSuffix),
-// 			),
-// 		)
-// 	}
+func (p *idpTemplateRelationalProjection) reduceAppleIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.AppleIDPChangedEvent
+	switch e := event.(type) {
+	case *org.AppleIDPChangedEvent:
+		idpEvent = e.AppleIDPChangedEvent
+	case *instance.AppleIDPChangedEvent:
+		idpEvent = e.AppleIDPChangedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YBez3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPChangedEventType /*, instance.AppleIDPChangedEventType*/})
+	}
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		ops...,
-// 	), nil
-// }
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
 
-// func (p *idpTemplateProjection) reduceAppleIDPAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.AppleIDPAddedEvent
-// 	var idpOwnerType domain.IdentityProviderType
-// 	switch e := event.(type) {
-// 	case *org.AppleIDPAddedEvent:
-// 		idpEvent = e.AppleIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeOrg
-// 	case *instance.AppleIDPAddedEvent:
-// 		idpEvent = e.AppleIDPAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeSystem
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SFvg3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPAddedEventType /*, instance.AppleIDPAddedEventType*/})
-// 	}
+	apple, err := p.idpRepo.GetApple(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+	if err != nil {
+		return nil, err
+	}
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
-// 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
-// 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-// 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
-// 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeApple),
-// 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
-// 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
-// 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
-// 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-// 				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
-// 			},
-// 		),
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(AppleIDCol, idpEvent.ID),
-// 				handler.NewCol(AppleInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(AppleClientIDCol, idpEvent.ClientID),
-// 				handler.NewCol(AppleTeamIDCol, idpEvent.TeamID),
-// 				handler.NewCol(AppleKeyIDCol, idpEvent.KeyID),
-// 				handler.NewCol(ApplePrivateKeyCol, idpEvent.PrivateKey),
-// 				handler.NewCol(AppleScopesCol, database.TextArray[string](idpEvent.Scopes)),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateAppleSuffix),
-// 		),
-// 	), nil
-// }
+	columns := make([]handler.Column, 0, 7)
+	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
 
-// func (p *idpTemplateProjection) reduceAppleIDPChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.AppleIDPChangedEvent
-// 	switch e := event.(type) {
-// 	case *org.AppleIDPChangedEvent:
-// 		idpEvent = e.AppleIDPChangedEvent
-// 	case *instance.AppleIDPChangedEvent:
-// 		idpEvent = e.AppleIDPChangedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-GBez3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPChangedEventType /*, instance.AppleIDPChangedEventType*/})
-// 	}
+	payload := &apple.Apple
+	payloadChanged := reduceAppleIDPRelationalChangedColumns(payload, &idpEvent)
+	if payloadChanged {
+		payload, err := json.Marshal(payload)
+		if err != nil {
+			return nil, err
+		}
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+	}
 
-// 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-// 	ops = append(ops,
-// 		handler.AddUpdateStatement(
-// 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 	)
-// 	appleCols := reduceAppleIDPChangedColumns(idpEvent)
-// 	if len(appleCols) > 0 {
-// 		ops = append(ops,
-// 			handler.AddUpdateStatement(
-// 				appleCols,
-// 				[]handler.Condition{
-// 					handler.NewCond(AppleIDCol, idpEvent.ID),
-// 					handler.NewCond(AppleInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				},
-// 				handler.WithTableSuffix(IDPTemplateAppleSuffix),
-// 			),
-// 		)
-// 	}
+	return handler.NewMultiStatement(
+		&idpEvent,
+		handler.AddUpdateStatement(
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
+			},
+		),
+	), nil
+}
 
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		ops...,
-// 	), nil
-// }
+func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.SAMLIDPAddedEvent
+	switch e := event.(type) {
+	case *org.SAMLIDPAddedEvent:
+		idpEvent = e.SAMLIDPAddedEvent
+	case *instance.SAMLIDPAddedEvent:
+		idpEvent = e.SAMLIDPAddedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ys02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPAddedEventType, instance.SAMLIDPAddedEventType})
+	}
+
+	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> idpEvent.NameIDFormat = %+v\n", idpEvent.NameIDFormat)
+
+	saml := db_domain.SAML{
+		Metadata:                      idpEvent.Metadata,
+		Key:                           idpEvent.Key,
+		Certificate:                   idpEvent.Certificate,
+		Binding:                       idpEvent.Binding,
+		WithSignedRequest:             idpEvent.WithSignedRequest,
+		NameIDFormat:                  idpEvent.NameIDFormat,
+		TransientMappingAttributeName: idpEvent.TransientMappingAttributeName,
+		FederatedLogoutEnabled:        idpEvent.FederatedLogoutEnabled,
+	}
+
+	payload, err := json.Marshal(saml)
+	if err != nil {
+		return nil, err
+	}
+
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
+	return handler.NewMultiStatement(
+		&idpEvent,
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPRelationalOrgId, orgId),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeSAML.String()),
+				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+				handler.NewCol(IDPRelationalPayloadCol, payload),
+			},
+		),
+	), nil
+}
+
+func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.SAMLIDPChangedEvent
+	switch e := event.(type) {
+	case *org.SAMLIDPChangedEvent:
+		idpEvent = e.SAMLIDPChangedEvent
+	case *instance.SAMLIDPChangedEvent:
+		idpEvent = e.SAMLIDPChangedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y7c0fii4ad", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPChangedEventType, instance.SAMLIDPChangedEventType})
+	}
+
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
+	saml, err := p.idpRepo.GetSAML(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+	if err != nil {
+		return nil, err
+	}
+
+	columns := make([]handler.Column, 0, 7)
+	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+
+	payload := &saml.SAML
+	payloadChanged := reduceSAMLIDPRelationalChangedColumns(payload, &idpEvent)
+	if payloadChanged {
+		payload, err := json.Marshal(payload)
+		if err != nil {
+			return nil, err
+		}
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+	}
+
+	return handler.NewMultiStatement(
+		&idpEvent,
+		handler.AddUpdateStatement(
+			columns,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCond(IDPRelationalOrgId, orgId),
+			},
+		),
+	), nil
+
+	// ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
+	// ops = append(ops,
+	// 	handler.AddUpdateStatement(
+	// 		reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+	// 		[]handler.Condition{
+	// 			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+	// 			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+	// 		},
+	// 	),
+	// )
+
+	// if len(SAMLCols) > 0 {
+	// 	ops = append(ops,
+	// 		handler.AddUpdateStatement(
+	// 			SAMLCols,
+	// 			[]handler.Condition{
+	// 				handler.NewCond(SAMLIDCol, idpEvent.ID),
+	// 				handler.NewCond(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
+	// 			},
+	// 			handler.WithTableSuffix(IDPTemplateSAMLSuffix),
+	// 		),
+	// 	)
+	// }
+
+	// return handler.NewMultiStatement(
+	// 	&idpEvent,
+	// 	ops...,
+	// ), nil
+}
 
 // func (p *idpTemplateProjection) reduceIDPConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
 // 	var idpEvent idpconfig.IDPConfigRemovedEvent
@@ -2072,25 +2114,25 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.
 // 	), nil
 // }
 
-// func (p *idpTemplateProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idp.RemovedEvent
-// 	switch e := event.(type) {
-// 	case *org.IDPRemovedEvent:
-// 		idpEvent = e.RemovedEvent
-// 	case *instance.IDPRemovedEvent:
-// 		idpEvent = e.RemovedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xbcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
-// 	}
+func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.RemovedEvent
+	switch e := event.(type) {
+	case *org.IDPRemovedEvent:
+		idpEvent = e.RemovedEvent
+	case *instance.IDPRemovedEvent:
+		idpEvent = e.RemovedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xbcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
+	}
 
-// 	return handler.NewDeleteStatement(
-// 		&idpEvent,
-// 		[]handler.Condition{
-// 			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-// 			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 		},
-// 	), nil
-// }
+	return handler.NewDeleteStatement(
+		&idpEvent,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+		},
+	), nil
+}
 
 // func (p *idpTemplateProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 // 	e, ok := event.(*org.OrgRemovedEvent)
@@ -2754,6 +2796,71 @@ func reduceLDAPIDPRelationalChangedColumns(payload *db_domain.LDAP, idpEvent *id
 	if idpEvent.ProfileAttribute != nil {
 		payloadChange = true
 		payload.ProfileAttribute = *idpEvent.ProfileAttribute
+	}
+	return payloadChange
+}
+
+func reduceAppleIDPRelationalChangedColumns(payload *domain.Apple, idpEvent *idp.AppleIDPChangedEvent) bool {
+	payloadChange := false
+	if idpEvent.ClientID != nil {
+		payloadChange = true
+		payload.ClientID = *idpEvent.ClientID
+	}
+	if idpEvent.TeamID != nil {
+		payloadChange = true
+		payload.TeamID = *idpEvent.TeamID
+	}
+	if idpEvent.KeyID != nil {
+		payloadChange = true
+		payload.KeyID = *idpEvent.KeyID
+	}
+	if idpEvent.PrivateKey != nil {
+		payloadChange = true
+		payload.PrivateKey = idpEvent.PrivateKey
+	}
+	if idpEvent.Scopes != nil {
+		payloadChange = true
+		payload.Scopes = idpEvent.Scopes
+	}
+	return payloadChange
+}
+
+func reduceSAMLIDPRelationalChangedColumns(payload *domain.SAML, idpEvent *idp.SAMLIDPChangedEvent) bool {
+	payloadChange := false
+	if idpEvent.Metadata != nil {
+		payloadChange = true
+		payload.Metadata = idpEvent.Metadata
+		fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> METTTADATA")
+	}
+	if idpEvent.Key != nil {
+		payloadChange = true
+		payload.Key = idpEvent.Key
+		fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> KEEEEEEEEEEEEEEY")
+	}
+	if idpEvent.Certificate != nil {
+		payloadChange = true
+		payload.Certificate = idpEvent.Certificate
+	}
+	if idpEvent.Binding != nil {
+		payloadChange = true
+		payload.Binding = *idpEvent.Binding
+		fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> BINDING")
+	}
+	if idpEvent.WithSignedRequest != nil {
+		payloadChange = true
+		payload.WithSignedRequest = *idpEvent.WithSignedRequest
+	}
+	if idpEvent.NameIDFormat != nil {
+		payloadChange = true
+		payload.NameIDFormat = idpEvent.NameIDFormat
+	}
+	if idpEvent.TransientMappingAttributeName != nil {
+		payloadChange = true
+		payload.TransientMappingAttributeName = *idpEvent.TransientMappingAttributeName
+	}
+	if idpEvent.FederatedLogoutEnabled != nil {
+		payloadChange = true
+		payload.FederatedLogoutEnabled = *idpEvent.FederatedLogoutEnabled
 	}
 	return payloadChange
 }

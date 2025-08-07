@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 //go:generate enumer -type IDPType -transform lower -trimprefix IDPType
@@ -236,6 +237,35 @@ type IDPLDAP struct {
 	LDAP
 }
 
+type Apple struct {
+	ClientID   string              `json:"clientId"`
+	TeamID     string              `json:"teamId"`
+	KeyID      string              `json:"keyId"`
+	PrivateKey *crypto.CryptoValue `json:"privateKey"`
+	Scopes     []string            `json:"scopes,omitempty"`
+}
+
+type IDPApple struct {
+	*IdentityProvider
+	Apple
+}
+
+type SAML struct {
+	Metadata                      []byte                   `json:"metadata,omitempty"`
+	Key                           *crypto.CryptoValue      `json:"key,omitempty"`
+	Certificate                   []byte                   `json:"certificate,omitempty"`
+	Binding                       string                   `json:"binding,omitempty"`
+	WithSignedRequest             bool                     `json:"withSignedRequest,omitempty"`
+	NameIDFormat                  *domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"`
+	TransientMappingAttributeName string                   `json:"transientMappingAttributeName,omitempty"`
+	FederatedLogoutEnabled        bool                     `json:"federatedLogoutEnabled,omitempty"`
+}
+
+type IDPSAML struct {
+	*IdentityProvider
+	SAML
+}
+
 // IDPIdentifierCondition is used to help specify a single identity_provider,
 // it will either be used as the  identity_provider ID or identity_provider name,
 // as identity_provider can be identified either using (instanceID + OrgID + ID) OR (instanceID + OrgID + name)
@@ -316,4 +346,6 @@ type IDProviderRepository interface {
 	GetGitlab(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlab, error)
 	GetGitlabSelfHosting(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGitlabSelfHosting, error)
 	GetLDAP(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPLDAP, error)
+	GetApple(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPApple, error)
+	GetSAML(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPSAML, error)
 }

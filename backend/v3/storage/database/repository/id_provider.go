@@ -339,6 +339,50 @@ func (i *idProvider) GetLDAP(ctx context.Context, id domain.IDPIdentifierConditi
 	return ldap, nil
 }
 
+func (i *idProvider) GetApple(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPApple, error) {
+	apple := &domain.IDPApple{}
+	var err error
+
+	apple.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if apple.Type != domain.IDPTypeApple.String() {
+		// TODO
+		return nil, errors.New("WRONG TYPE")
+	}
+
+	err = json.Unmarshal([]byte(*apple.Payload), apple)
+	if err != nil {
+		return nil, err
+	}
+
+	return apple, nil
+}
+
+func (i *idProvider) GetSAML(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPSAML, error) {
+	saml := &domain.IDPSAML{}
+	var err error
+
+	saml.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if saml.Type != domain.IDPTypeSAML.String() {
+		// TODO
+		return nil, errors.New("WRONG TYPE")
+	}
+
+	err = json.Unmarshal([]byte(*saml.Payload), saml)
+	if err != nil {
+		return nil, err
+	}
+
+	return saml, nil
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
