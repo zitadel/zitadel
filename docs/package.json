@@ -12,9 +12,10 @@
     "write-heading-ids": "docusaurus write-heading-ids",
     "ensure-plugins": "if [ ! -f \"protoc-gen-connect-openapi/protoc-gen-connect-openapi\" ]; then sh ./plugin-download.sh; fi",
     "debug-plugins": "echo \"PWD: $(pwd)\" && echo \"Plugin file exists: $(test -f protoc-gen-connect-openapi/protoc-gen-connect-openapi && echo 'yes' || echo 'no')\" && echo \"Plugin executable: $(test -x protoc-gen-connect-openapi/protoc-gen-connect-openapi && echo 'yes' || echo 'no')\" && ls -la protoc-gen-connect-openapi/ || echo 'Plugin directory not found'",
-    "generate": "pnpm run generate:grpc && pnpm run generate:apidocs && pnpm run ensure-plugins",
+    "generate": "pnpm run generate:grpc && pnpm run generate:apidocs && pnpm run generate:configdocs",
     "generate:grpc": "pnpm run ensure-plugins && buf generate ../proto",
     "generate:apidocs": "docusaurus gen-api-docs all",
+    "generate:configdocs": "cp -r ../apps/api/cmd/defaults.yaml ./docs/self-hosting/manage/configure/ && cp -r ../apps/api/cmd/setup/steps.yaml ./docs/self-hosting/manage/configure/",
     "generate:re-gen": "yarn generate:clean-all && pnpm generate",
     "generate:clean-all": "docusaurus clean-api-docs all",
     "postinstall": "sh ./plugin-download.sh",
@@ -25,13 +26,13 @@
     "@docusaurus/core": "^3.8.1",
     "@docusaurus/faster": "^3.8.1",
     "@docusaurus/preset-classic": "^3.8.1",
-    "@docusaurus/theme-mermaid": "^3.8.1",
     "@docusaurus/theme-common": "^3.8.1",
+    "@docusaurus/theme-mermaid": "^3.8.1",
     "@docusaurus/theme-search-algolia": "^3.8.1",
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
-    "@signalwire/docusaurus-plugin-llms-txt": "^1.2.0",
     "@inkeep/cxkit-docusaurus": "^0.5.89",
+    "@signalwire/docusaurus-plugin-llms-txt": "^1.2.0",
     "autoprefixer": "^10.4.13",
     "clsx": "^1.2.1",
     "docusaurus-plugin-image-zoom": "^3.0.1",
@@ -62,6 +63,7 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.8.1",
     "@docusaurus/types": "^3.8.1",
+    "@nx-extend/docusaurus": "^4.0.0",
     "tailwindcss": "^3.2.4"
   }
 }

@@ -4,7 +4,8 @@
   "targets": {
     "generate": {
       "outputs": [
-        "{projectRoot}/docs/apis/resources/**"
+        "{projectRoot}/docs/apis/resources/**",
+        "{projectRoot}/docs/self-hosting/manage/configure/*.yaml"
       ]
     },
     "start": {
