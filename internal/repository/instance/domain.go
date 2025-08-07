@@ -148,23 +148,10 @@ func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 
 func (e *DomainRemovedEvent) Fields() []*eventstore.FieldOperation {
 	return []*eventstore.FieldOperation{
-		eventstore.SetField(
+		eventstore.RemoveSearchFieldsByAggregateAndObjectAndField(
 			e.Aggregate(),
 			domainSearchObject(e.Domain),
 			InstanceDomainSearchField,
-			&eventstore.Value{
-				Value:        e.Domain,
-				MustBeUnique: true,
-				ShouldIndex:  true,
-			},
-
-			eventstore.FieldTypeInstanceID,
-			eventstore.FieldTypeResourceOwner,
-			eventstore.FieldTypeAggregateType,
-			eventstore.FieldTypeAggregateID,
-			eventstore.FieldTypeObjectType,
-			eventstore.FieldTypeObjectID,
-			eventstore.FieldTypeFieldName,
 		),
 	}
 }
