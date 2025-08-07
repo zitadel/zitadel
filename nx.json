@@ -1,0 +1,56 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "release": {
+    "projects": [
+      "@zitadel/login",
+      "@zitadel/console",
+      "@zitadel/api",
+      "@zitadel/docs"
+    ],
+    "changelog": {
+      "workspaceChangelog": {
+        "file": false,
+        "createRelease": "github"
+      }
+    },
+    "projectsRelationship": "fixed",
+    "version": {
+      "conventionalCommits": true
+    },
+    "releaseTagPattern": "v{version}",
+    "releaseTagPatternCheckAllBranchesWhen": true,
+    "docker": {
+      "skipVersionActions": true,
+      "registryUrl": "ghcr.io",
+      "groupPreVersionCommand": "echo BEFORE VERSIONING"
+    },
+    "dockerVersionScheme": {
+      "production": "{currentDate|YYMM.DD}.{shortCommitSha}",
+      "staging": "{currentDate|YYMM.DD}-staging.{shortCommitSha}"
+    }
+  },
+  "namedInputs": {
+    "proto": [
+      "{workspaceRoot}/proto/**"
+    ],
+    "sharedGlobals": [
+      "{workspaceRoot}/**/.env.*local"
+      ],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals",
+      "proto"
+    ]
+  },
+  "targetDefaults": {},
+  "nxCloudId": "688a9021d48dce0efe0f119f",
+  "plugins": [
+    {
+      "plugin": "@nx/docker",
+      "options": {
+        "buildTarget": "docker:build",
+        "runTarget": "docker:run"
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - move-go
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  main:
+    runs-on: depot-ubuntu-latest-8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: tree:0
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+      - uses: nrwl/nx-set-shas@v4
+
+      - run: npx nx affected -t build

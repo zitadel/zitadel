@@ -1,0 +1,44 @@
+{
+  "name": "@zitadel/docs",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "generate": {
+      "outputs": [
+        "{projectRoot}/docs/apis/resources/**",
+        "{projectRoot}/docs/self-hosting/manage/configure/*.yaml"
+      ]
+    },
+    "start": {
+      "dependsOn": [
+        "generate"
+      ]
+    },
+    "build": {
+      "outputs": [
+        "{projectRoot}/build/**"
+      ],
+      "dependsOn": [
+        "generate",
+        "{workspaceRoot}/apps/api/cmd/**/*.yaml"
+      ]
+    },
+    "dev": {
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "docker:build": {
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "docker:run": {
+      "options": {
+        "args": [
+          "-p",
+          "3003:3003"
+        ]
+      }
+    }
+  }
+}

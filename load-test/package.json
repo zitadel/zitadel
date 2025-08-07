@@ -1,12 +1,5 @@
 {
-    "name": "typescript",
-    "version": "1.0.0",
-    "repository": "ssh://git@github.com/zitadel/zitadel.git",
-    "author": "ZITADEL Authors <hi@zitadel.com>",
-    "engines": {
-        "node": "18 || 20"
-    },
-    "license": "Apache-2.0",
+    "name": "@zitadel/load-test",
     "devDependencies": {
         "@babel/core": "7.23.7",
         "@babel/plugin-proposal-class-properties": "7.13.0",

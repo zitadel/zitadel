@@ -215,8 +215,8 @@ module.exports = {
         docs: {
           routeBasePath: "/",
           sidebarPath: require.resolve("./sidebars.js"),
-          showLastUpdateAuthor: true,
-          showLastUpdateTime: true,
+          showLastUpdateAuthor: false,
+          showLastUpdateTime: false,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
           docItemComponent: "@theme/ApiItem",
@@ -460,16 +460,7 @@ module.exports = {
     '@docusaurus/theme-mermaid',
   ],
   future: {
-    v4: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
-    experimental_faster: {
-      swcJsLoader: false, // Disabled because of memory usage > 8GB which is a problem on vercel default runners
-      swcJsMinimizer: true,
-      swcHtmlMinimizer: true,
-      lightningCssMinimizer: true,
-      mdxCrossCompilerCache: true,
-      ssgWorkerThreads: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040
-      rspackBundler: true,
-      rspackPersistentCache: true,
-    },
+    v4: true,
+    experimental_faster: true
   },
 };
