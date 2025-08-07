@@ -343,6 +343,10 @@ func NewCreationDateQuery(datetime time.Time, compare TimestampComparison) (Sear
 	return NewTimestampQuery(SessionColumnCreationDate, datetime, compare)
 }
 
+func NewExpirationDateQuery(datetime time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(SessionColumnExpiration, datetime, compare)
+}
+
 func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, string, error)) {
 	return sq.Select(
 			SessionColumnID.identifier(),
