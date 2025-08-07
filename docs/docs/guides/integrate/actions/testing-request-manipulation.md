@@ -154,9 +154,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
         }
     },
     "targets": [
-        {
-            "target": "<TargetID returned>"
-        }
+        "<TargetID returned>"
     ]
 }'
 ```
