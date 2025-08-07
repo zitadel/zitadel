@@ -1,18 +1,20 @@
 {
 	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
-	"name": "turbo-lint-unit",
+	"name": "Turbo Lint and Unit Tests",
 	"dockerComposeFile": [
-		"../base/docker-compose.yml"
+		"../base/docker-compose.yaml"
 	],
 	"service": "devcontainer",
-	"runServices": ["devcontainer"],
+	"runServices": [
+		"devcontainer"
+	],
 	"workspaceFolder": "/workspaces",
-	"postStartCommand": "pnpm install --frozen-lockfile --recursive && pnpm turbo lint test:unit",
-	"customizations": {
-		"jetbrains": {
-			"settings": {
-				"com.intellij:app:HttpConfigurable.use_proxy_pac": true
-			}
-		}
-	}
+	"forwardPorts": [
+		3001
+	],
+	"remoteEnv": {
+		"FAIL_COMMANDS_ON_ERRORS": "${localEnv:FAIL_COMMANDS_ON_ERRORS}"
+	},
+	"updateContentCommand": "/commands/turbo-lint-unit.update-content.sh",
+	"postAttachCommand": "/commands/turbo-lint-unit.post-attach.sh"
 }
