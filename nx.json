@@ -42,41 +42,7 @@
       "proto"
     ]
   },
-  "targetDefaults": {
-    "generate": {
-      "cache": true
-    },
-    "build": {
-      "cache": true
-    },
-    "quality": {
-      "cache": true
-    },
-    "start": {
-      "cache": true
-    },
-    "test:unit": {
-      "cache": true
-    },
-    "test:acceptance": {
-      "cache": true
-    },
-    "test:e2e": {
-      "cache": true
-    },
-    "lint": {
-      "cache": true
-    },
-    "lint:fix": {
-      "cache": true
-    },
-    "dev": {
-      "cache": false
-    },
-    "clean": {
-      "cache": false
-    }
-  },
+  "targetDefaults": {},
   "nxCloudId": "688a9021d48dce0efe0f119f",
   "plugins": [
     {

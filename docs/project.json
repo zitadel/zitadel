@@ -19,13 +19,7 @@
       "dependsOn": [
         "generate",
         "{workspaceRoot}/apps/api/cmd/**/*.yaml"
-      ],
-      "options": {
-        "env": {
-          "NODE_OPTIONS": "--max-old-space-size=4096",
-          "DOCUSAURUS_PERF_LOGGER": true
-        }
-      }
+      ]
     },
     "dev": {
       "dependsOn": [
