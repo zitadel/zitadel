@@ -930,6 +930,27 @@ func TestServer_DeleteSession_with_permission(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestServer_DeleteSession_expired(t *testing.T) {
+	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+		Lifetime: durationpb.New(5 * time.Second),
+	})
+	require.NoError(t, err)
+
+	// wait until the token expires
+	time.Sleep(10 * time.Second)
+	_, err = Client.DeleteSession(Instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: gu.Ptr(createResp.GetSessionToken()),
+	})
+	require.NoError(t, err)
+
+	// get session should return an error
+	sessionResp, err := Client.GetSession(Instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
+		&session.GetSessionRequest{SessionId: createResp.GetSessionId()})
+	require.Error(t, err)
+	require.Nil(t, sessionResp)
+}
+
 func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 	// create new, empty session
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{})
