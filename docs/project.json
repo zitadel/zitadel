@@ -17,7 +17,8 @@
         "{projectRoot}/build/**"
       ],
       "dependsOn": [
-        "generate"
+        "generate",
+        "{workspaceRoot}/apps/api/cmd/**/*.yaml"
       ],
       "options": {
         "env": {
