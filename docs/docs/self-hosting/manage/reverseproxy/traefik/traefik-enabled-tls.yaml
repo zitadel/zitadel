@@ -36,6 +36,8 @@ http:
   serversTransports:
     zitadel:
       insecureSkipVerify: true
+    login:
+      insecureSkipVerify: true
 tls:
   stores:
     default:

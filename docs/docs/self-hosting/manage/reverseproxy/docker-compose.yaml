@@ -3,7 +3,7 @@ services:
   zitadel-disabled-tls:
     extends:
       service: zitadel-init
-    command: 'start-from-setup --init-projections --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters"'
     environment:
       ZITADEL_EXTERNALPORT: 80
       ZITADEL_EXTERNALSECURE: false
@@ -20,7 +20,7 @@ services:
   zitadel-external-tls:
     extends:
       service: zitadel-init
-    command: 'start-from-setup --init-projections --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters"'
     environment:
       ZITADEL_EXTERNALPORT: 443
       ZITADEL_EXTERNALSECURE: true
@@ -37,7 +37,7 @@ services:
   zitadel-enabled-tls:
     extends:
       service: zitadel-init
-    command: 'start-from-setup --init-projections --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters"'
     environment:
       ZITADEL_EXTERNALPORT: 443
       ZITADEL_EXTERNALSECURE: true
@@ -57,8 +57,8 @@ services:
         condition: 'service_healthy'
 
   zitadel-init:
-    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:v4.0.0-rc.2}'
-    command: 'init --config /zitadel.yaml'
+    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
+    command: 'init'
     depends_on:
       db:
         condition: 'service_healthy'
@@ -75,8 +75,8 @@ services:
       # database configuration
       ZITADEL_DATABASE_POSTGRES_HOST: db
       ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel_pw
-      # Set up a service account with IAM_LOGIN_CLIENT role and write the PAT to the file ./login-client-pat
-      ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /current-dir/login-client-pat
+      # Set up a service account with IAM_LOGIN_CLIENT role and write the PAT to the file ./login-client.pat
+      ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /current-dir/login-client.pat
       ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME: login-client
       ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME: Automatically Initialized IAM Login Client
       ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE: '2029-01-01T00:00:00Z'
@@ -110,12 +110,13 @@ services:
 
   login-disabled-tls:
     restart: 'unless-stopped'
-    image: 'ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2'
+    image: 'ghcr.io/zitadel/zitadel-login:latest'
     environment:
       - ZITADEL_API_URL=http://zitadel-disabled-tls:8080
       - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
-      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client-pat
+      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
       - CUSTOM_REQUEST_HEADERS=Host:127.0.0.1.sslip.io
+      - NODE_ENV=test
     volumes:
       - '.:/current-dir:ro'
     networks:
@@ -126,11 +127,11 @@ services:
 
   login-external-tls:
     restart: 'unless-stopped'
-    image: 'ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2'
+    image: 'ghcr.io/zitadel/zitadel-login:latest'
     environment:
       - ZITADEL_API_URL=http://zitadel-external-tls:8080
       - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
-      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client-pat
+      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
       - CUSTOM_REQUEST_HEADERS=Host:127.0.0.1.sslip.io
     volumes:
       - '.:/current-dir:ro'
@@ -142,12 +143,13 @@ services:
 
   login-enabled-tls:
     restart: 'unless-stopped'
-    image: 'ghcr.io/zitadel/zitadel-login:v4.0.0-rc.2'
+    image: 'ghcr.io/zitadel/zitadel-login:latest'
     environment:
       - ZITADEL_API_URL=https://zitadel-enabled-tls:8080
       - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
-      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client-pat
+      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
       - CUSTOM_REQUEST_HEADERS=Host:127.0.0.1.sslip.io
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
     volumes:
       - '.:/current-dir:ro'
     networks:

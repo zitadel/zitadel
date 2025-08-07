@@ -48,7 +48,7 @@ export const Commands = ({mode, name, lower, configfilename}) => {
                 {'\n'}
                 {genCert}
                 {'# Run the database,  and '}{name}{'.'}{'\n'}
-                {'docker compose --file docker-compose-base.yaml --file docker-compose-'}{lower}{'.yaml up --detach --wait db zitadel-init zitadel-'}{mode}{'-tls proxy-'}{mode}{'-tls'}{'\n'}
+                {'docker compose --file docker-compose-base.yaml --file docker-compose-'}{lower}{'.yaml up --detach --wait db zitadel-init zitadel-'}{mode}{'-tls login-'}{mode}{'-tls proxy-'}{mode}{'-tls'}{'\n'}
                 {'\n'}
                 {'# Test that gRPC and HTTP APIs work. Empty brackets like {} means success.\n'}
                 {'# Make sure you have the grpcurl cli installed on your machine https://github.com/fullstorydev/grpcurl?tab=readme-ov-file#installation\n'}
