@@ -4,7 +4,7 @@
   "targets": {
     "generate": {
       "outputs": [
-        "{projectRoot}/apis/resources/**"
+        "{projectRoot}/docs/apis/resources/**"
       ]
     },
     "start": {
