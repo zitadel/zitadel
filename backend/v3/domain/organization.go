@@ -37,7 +37,7 @@ type organizationColumns interface {
 	IDColumn() database.Column
 	// NameColumn returns the column for the name field.
 	NameColumn() database.Column
-	// InstanceIDColumn returns the column for the default org id field
+	// InstanceIDColumn returns the column for the instance id field
 	InstanceIDColumn() database.Column
 	// StateColumn returns the column for the name field.
 	StateColumn() database.Column
