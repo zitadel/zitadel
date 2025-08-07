@@ -1,5 +1,5 @@
 
-const sidebar_api_auth = require("./docs/apis/resources/auth/sidebar.ts").default
+const sidebar_api_auth  = require("./docs/apis/resources/auth/sidebar.ts").default
 const sidebar_api_mgmt = require("./docs/apis/resources/mgmt/sidebar.ts").default
 const sidebar_api_admin = require("./docs/apis/resources/admin/sidebar.ts").default
 const sidebar_api_system = require("./docs/apis/resources/system/sidebar.ts").default
@@ -682,7 +682,7 @@ module.exports = {
                 title: "User Service API",
                 slug: "/apis/resources/user_service_v2",
                 description:
-                  "This API is intended to manage users in a ZITADEL instance.\n",
+                    "This API is intended to manage users in a ZITADEL instance.\n",
               },
               items: sidebar_api_user_service_v2,
             },
@@ -694,7 +694,7 @@ module.exports = {
                 title: "Session Service API",
                 slug: "/apis/resources/session_service_v2",
                 description:
-                  "This API is intended to manage sessions in a ZITADEL instance.\n",
+                    "This API is intended to manage sessions in a ZITADEL instance.\n",
               },
               items: sidebar_api_session_service_v2,
             },
@@ -706,7 +706,7 @@ module.exports = {
                 title: "OIDC Service API",
                 slug: "/apis/resources/oidc_service_v2",
                 description:
-                  "Get OIDC Auth Request details and create callback URLs.\n",
+                    "Get OIDC Auth Request details and create callback URLs.\n",
               },
               items: sidebar_api_oidc_service_v2,
             },
@@ -718,7 +718,7 @@ module.exports = {
                 title: "Settings Service API",
                 slug: "/apis/resources/settings_service_v2",
                 description:
-                  "This API is intended to manage settings in a ZITADEL instance.\n",
+                    "This API is intended to manage settings in a ZITADEL instance.\n",
               },
               items: sidebar_api_settings_service_v2,
             },
@@ -730,7 +730,7 @@ module.exports = {
                 title: "Feature Service API",
                 slug: "/apis/resources/feature_service_v2",
                 description:
-                  'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n',
+                    'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n',
               },
               items: sidebar_api_feature_service_v2,
             },
@@ -742,7 +742,7 @@ module.exports = {
                 title: "Organization Service API",
                 slug: "/apis/resources/org_service/v2",
                 description:
-                  "This API is intended to manage organizations for ZITADEL. \n",
+                    "This API is intended to manage organizations for ZITADEL. \n",
               },
               items: sidebar_api_org_service_v2,
             },
@@ -766,7 +766,7 @@ module.exports = {
                 title: "Identity Provider Service API",
                 slug: "/apis/resources/idp_service_v2",
                 description:
-                  "This API is intended to manage identity providers (IdPs) for ZITADEL.\n",
+                    "This API is intended to manage identity providers (IdPs) for ZITADEL.\n",
               },
               items: sidebar_api_idp_service_v2,
             },
@@ -778,9 +778,9 @@ module.exports = {
                 title: "Web Key Service API",
                 slug: "/apis/resources/webkey_service_v2",
                 description:
-                  "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
-                  "\n" +
-                  "The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n",
+                    "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
+                    "\n"+
+                    "The public key endpoint (outside of this service) is used to retrieve the public keys of the active and inactive keys.\n",
               },
               items: sidebar_api_webkey_service_v2
             },
@@ -792,16 +792,16 @@ module.exports = {
                 title: "Action Service API (Beta)",
                 slug: "/apis/resources/action_service_v2",
                 description:
-                  "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
-                  "\n" +
-                  "This service is in beta state. It can AND will continue breaking until a stable version is released.\n" +
-                  "\n" +
-                  "The version 2 of actions provide much more options to customize ZITADELs behaviour than previous action versions.\n" +
-                  "Also, v2 actions are available instance-wide, whereas previous actions had to be managed for each organization individually\n" +
-                  "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v2 action executions anymore.\n" +
-                  "Instead, it calls external endpoints which are implemented and maintained by action v2 users.\n" +
-                  "\n" +
-                  "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running Zitadel V3.",
+                    "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
+                    "\n" +
+                    "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
+                    "\n" +
+                    "The version 2 of actions provide much more options to customize ZITADELs behaviour than previous action versions.\n" +
+                    "Also, v2 actions are available instance-wide, whereas previous actions had to be managed for each organization individually\n" +
+                    "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v2 action executions anymore.\n" +
+                    "Instead, it calls external endpoints which are implemented and maintained by action v2 users.\n"+
+                    "\n" +
+                    "Please make sure to enable the `actions` feature flag on your instance to use this service and that you're running Zitadel V3.",
               },
               items: sidebar_api_actions_v2,
             },
@@ -813,12 +813,12 @@ module.exports = {
                 title: "Instance Service API (Beta)",
                 slug: "/apis/resources/instance_service_v2",
                 description:
-                  "This API is intended to manage instances, custom domains and trusted domains in ZITADEL.\n" +
-                  "\n" +
-                  "This service is in beta state. It can AND will continue breaking until a stable version is released.\n" +
-                  "\n" +
-                  "This v2 of the API provides the same functionalities as the v1, but organised on a per resource basis.\n" +
-                  "The whole functionality related to domains (custom and trusted) has been moved under this instance API."
+                    "This API is intended to manage instances, custom domains and trusted domains in ZITADEL.\n" +
+                    "\n" +
+                    "This service is in beta state. It can AND will continue breaking until a stable version is released.\n"+
+                    "\n" +
+                    "This v2 of the API provides the same functionalities as the v1, but organised on a per resource basis.\n" +
+                    "The whole functionality related to domains (custom and trusted) has been moved under this instance API."
                 ,
               },
               items: sidebar_api_instance_service_v2,
@@ -831,9 +831,9 @@ module.exports = {
                 title: "Project Service API (Beta)",
                 slug: "/apis/resources/project_service_v2",
                 description:
-                  "This API is intended to manage projects and subresources for ZITADEL. \n" +
-                  "\n" +
-                  "This service is in beta state. It can AND will continue breaking until a stable version is released.",
+                    "This API is intended to manage projects and subresources for ZITADEL. \n" +
+                    "\n" +
+                    "This service is in beta state. It can AND will continue breaking until a stable version is released.",
               },
               items: sidebar_api_project_service_v2,
             },
@@ -845,11 +845,11 @@ module.exports = {
                 title: "Application Service API (Beta)",
                 slug: "/apis/resources/application_service_v2",
                 description:
-                  "This API lets you manage Zitadel applications (API, SAML, OIDC).\n" +
-                  "\n" +
-                  "The API offers generic endpoints that work for all app types (API, SAML, OIDC), " +
-                  "\n" +
-                  "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+                    "This API lets you manage Zitadel applications (API, SAML, OIDC).\n"+
+                    "\n"+
+                    "The API offers generic endpoints that work for all app types (API, SAML, OIDC), "+
+                    "\n"+
+                    "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
               },
               items: sidebar_api_app_v2,
             },
@@ -861,12 +861,12 @@ module.exports = {
                 title: "Authorization Service API (Beta)",
                 slug: "/apis/resources/authorization_service_v2",
                 description:
-                  "AuthorizationService provides methods to manage authorizations for users within your projects and applications.\n" +
-                  "\n" +
-                  "For managing permissions and roles for ZITADEL internal resources, like organizations, projects,\n" +
-                  "users, etc., please use the InternalPermissionService." +
-                  "\n" +
-                  "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+                    "AuthorizationService provides methods to manage authorizations for users within your projects and applications.\n" +
+                    "\n" +
+                    "For managing permissions and roles for ZITADEL internal resources, like organizations, projects,\n" +
+                    "users, etc., please use the InternalPermissionService."+
+                    "\n"+
+                    "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
               },
               items: sidebar_api_authorization_service_v2,
             },
@@ -878,9 +878,9 @@ module.exports = {
                 title: "Permission Service API (Beta)",
                 slug: "/apis/resources/permission_service_v2",
                 description:
-                  "This API is intended to manage internal permissions in ZITADEL.\n" +
-                  "\n" +
-                  "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
+                    "This API is intended to manage internal permissions in ZITADEL.\n" +
+                    "\n"+
+                    "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
               },
               items: sidebar_api_permission_service_v2,
             },
