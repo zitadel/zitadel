@@ -11,14 +11,12 @@ permissions:
 
 jobs:
   main:
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest-8
     steps:
       - uses: actions/checkout@v4
         with:
           filter: tree:0
           fetch-depth: 0
-
-      - run: npx nx start-ci-run --distribute-on="3 linux-extra-large-js" --stop-agents-after="build"
 
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
