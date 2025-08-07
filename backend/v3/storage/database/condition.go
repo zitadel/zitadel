@@ -113,6 +113,15 @@ func NewBooleanCondition[V Boolean](col Column, value V) Condition {
 	})
 }
 
+// NewColumnCondition creates a condition that compares two columns on equality.
+func NewColumnCondition(col1, col2 Column) Condition {
+	return valueCondition(func(builder *StatementBuilder) {
+		col1.Write(builder)
+		builder.WriteString(" = ")
+		col2.Write(builder)
+	})
+}
+
 // Write implements [Condition].
 func (c valueCondition) Write(builder *StatementBuilder) {
 	c(builder)

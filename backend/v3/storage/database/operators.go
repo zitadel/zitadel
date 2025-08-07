@@ -137,6 +137,6 @@ const (
 
 func writeBooleanOperation[T Boolean](builder *StatementBuilder, col Column, value T) {
 	col.Write(builder)
-	builder.WriteString(" IS ")
+	builder.WriteString(" = ")
 	builder.WriteArg(value)
 }
