@@ -688,7 +688,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 
 func TestServer_Deprecated_AddHumanUser_Permission(t *testing.T) {
 	newOrgOwnerEmail := gofakeit.Email()
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -1242,7 +1242,7 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 
 func TestServer_Deprecated_UpdateHumanUser_Permission(t *testing.T) {
 	newOrgOwnerEmail := gofakeit.Email()
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
@@ -1756,7 +1756,7 @@ func TestServer_ReactivateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	projectResp := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
+	projectResp := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
 
 	type args struct {
 		req     *user.DeleteUserRequest
