@@ -6,18 +6,20 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-type DomainValidationType string
+//go:generate enumer -type DomainValidationType -transform lower -trimprefix DomainValidationType -sql
+type DomainValidationType uint8
 
 const (
-	DomainValidationTypeDNS  DomainValidationType = "dns"
-	DomainValidationTypeHTTP DomainValidationType = "http"
+	DomainValidationTypeDNS DomainValidationType = iota
+	DomainValidationTypeHTTP
 )
 
-type DomainType string
+//go:generate enumer -type DomainType -transform lower -trimprefix DomainType -sql
+type DomainType uint8
 
 const (
-	DomainTypeCustom  DomainType = "custom"
-	DomainTypeTrusted DomainType = "trusted"
+	DomainTypeCustom DomainType = iota
+	DomainTypeTrusted
 )
 
 type domainColumns interface {

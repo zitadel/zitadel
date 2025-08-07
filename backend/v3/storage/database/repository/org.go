@@ -171,7 +171,7 @@ func (o org) InstanceIDCondition(instanceID string) database.Condition {
 
 // StateCondition implements [domain.organizationConditions].
 func (o org) StateCondition(state domain.OrgState) database.Condition {
-	return database.NewTextCondition(o.StateColumn(true), database.TextOperationEqual, state)
+	return database.NewTextCondition(o.StateColumn(true), database.TextOperationEqual, state.String())
 }
 
 // -------------------------------------------------------------

@@ -459,7 +459,7 @@ func TestGetOrganization(t *testing.T) {
 						ID:         organizationId,
 						Name:       organizationName,
 						InstanceID: instanceId,
-						State:      domain.OrgStateActive,
+						State:      domain.OrgStateInactive,
 					}
 
 					// create organization

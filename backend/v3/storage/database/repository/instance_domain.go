@@ -138,7 +138,7 @@ func (i instanceDomain) IsPrimaryCondition(isPrimary bool) database.Condition {
 
 // TypeCondition implements [domain.InstanceDomainRepository].
 func (i instanceDomain) TypeCondition(typ domain.DomainType) database.Condition {
-	return database.NewTextCondition(i.TypeColumn(true), database.TextOperationEqual, typ)
+	return database.NewTextCondition(i.TypeColumn(true), database.TextOperationEqual, typ.String())
 }
 
 // -------------------------------------------------------------

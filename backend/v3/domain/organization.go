@@ -7,11 +7,12 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-type OrgState string
+//go:generate enumer -type OrgState -transform lower -trimprefix OrgState -sql
+type OrgState uint8
 
 const (
-	OrgStateActive   OrgState = "active"
-	OrgStateInactive OrgState = "inactive"
+	OrgStateActive OrgState = iota
+	OrgStateInactive
 )
 
 type Organization struct {
