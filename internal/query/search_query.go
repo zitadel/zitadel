@@ -675,6 +675,9 @@ type TimestampQuery struct {
 }
 
 func NewTimestampQuery(c Column, value time.Time, compare TimestampComparison) (*TimestampQuery, error) {
+	if c.isZero() {
+		return nil, ErrMissingColumn
+	}
 	return &TimestampQuery{
 		Column:  c,
 		Compare: compare,

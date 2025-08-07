@@ -16,11 +16,11 @@ import (
 )
 
 func TestServer_AddProjectRole(t *testing.T) {
-	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
-	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
-	alreadyExistingProject := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-	alreadyExistingProjectRoleName := gofakeit.AppName()
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.ProjectName(), gofakeit.Email())
+	alreadyExistingProject := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+	alreadyExistingProjectRoleName := integration.RoleDisplayName()
 	instance.AddProjectRole(iamOwnerCtx, t, alreadyExistingProject.GetId(), alreadyExistingProjectRoleName, alreadyExistingProjectRoleName, "")
 
 	type want struct {
@@ -38,12 +38,12 @@ func TestServer_AddProjectRole(t *testing.T) {
 			name: "empty key",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *project.AddProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 			},
 			req: &project.AddProjectRoleRequest{
 				RoleKey:     "",
-				DisplayName: gofakeit.AppName(),
+				DisplayName: integration.ProjectName(),
 			},
 			wantErr: true,
 		},
@@ -51,11 +51,11 @@ func TestServer_AddProjectRole(t *testing.T) {
 			name: "empty displayname",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *project.AddProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 			},
 			req: &project.AddProjectRoleRequest{
-				RoleKey:     gofakeit.AppName(),
+				RoleKey:     integration.RoleKey(),
 				DisplayName: "",
 			},
 			wantErr: true,
@@ -76,12 +76,12 @@ func TestServer_AddProjectRole(t *testing.T) {
 			name: "empty, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *project.AddProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 			},
 			req: &project.AddProjectRoleRequest{
-				RoleKey:     gofakeit.Name(),
-				DisplayName: gofakeit.Name(),
+				RoleKey:     integration.RoleKey(),
+				DisplayName: integration.RoleDisplayName(),
 			},
 			want: want{
 				creationDate: true,
@@ -108,11 +108,11 @@ func TestServer_AddProjectRole(t *testing.T) {
 }
 
 func TestServer_AddProjectRole_Permission(t *testing.T) {
-	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
-	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
-	alreadyExistingProject := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-	alreadyExistingProjectRoleName := gofakeit.AppName()
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	alreadyExistingProject := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+	alreadyExistingProjectRoleName := integration.RoleKey()
 	instance.AddProjectRole(iamOwnerCtx, t, alreadyExistingProject.GetId(), alreadyExistingProjectRoleName, alreadyExistingProjectRoleName, "")
 
 	type want struct {
@@ -130,51 +130,51 @@ func TestServer_AddProjectRole_Permission(t *testing.T) {
 			name: "unauthenticated",
 			ctx:  CTX,
 			prepare: func(request *project.AddProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 			},
 			req: &project.AddProjectRoleRequest{
-				RoleKey:     gofakeit.AppName(),
-				DisplayName: gofakeit.AppName(),
+				RoleKey:     integration.RoleKey(),
+				DisplayName: integration.RoleDisplayName(),
 			},
 			wantErr: true,
 		},
 		{
 			name: "no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *project.AddProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 			},
 			req: &project.AddProjectRoleRequest{
-				RoleKey:     gofakeit.AppName(),
-				DisplayName: gofakeit.AppName(),
+				RoleKey:     integration.RoleKey(),
+				DisplayName: integration.RoleDisplayName(),
 			},
 			wantErr: true,
 		},
 		{
 			name: "organization owner, other org",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			prepare: func(request *project.AddProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 			},
 			req: &project.AddProjectRoleRequest{
-				RoleKey:     gofakeit.AppName(),
-				DisplayName: gofakeit.AppName(),
+				RoleKey:     integration.RoleKey(),
+				DisplayName: integration.RoleDisplayName(),
 			},
 			wantErr: true,
 		},
 		{
 			name: "organization owner, ok",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			prepare: func(request *project.AddProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false)
+				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 			},
 			req: &project.AddProjectRoleRequest{
-				RoleKey:     gofakeit.AppName(),
-				DisplayName: gofakeit.AppName(),
+				RoleKey:     integration.RoleKey(),
+				DisplayName: integration.RoleDisplayName(),
 			},
 			want: want{
 				creationDate: true,
@@ -184,12 +184,12 @@ func TestServer_AddProjectRole_Permission(t *testing.T) {
 			name: "instance owner, ok",
 			ctx:  iamOwnerCtx,
 			prepare: func(request *project.AddProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 				request.ProjectId = projectResp.GetId()
 			},
 			req: &project.AddProjectRoleRequest{
-				RoleKey:     gofakeit.AppName(),
-				DisplayName: gofakeit.AppName(),
+				RoleKey:     integration.RoleKey(),
+				DisplayName: integration.RoleDisplayName(),
 			},
 			want: want{
 				creationDate: true,
@@ -228,8 +228,8 @@ func assertAddProjectRoleResponse(t *testing.T, creationDate, changeDate time.Ti
 }
 
 func TestServer_UpdateProjectRole(t *testing.T) {
-	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 
 	type args struct {
 		ctx context.Context
@@ -249,14 +249,14 @@ func TestServer_UpdateProjectRole(t *testing.T) {
 		{
 			name: "missing permission",
 			prepare: func(request *project.UpdateProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
 			},
 			args: args{
-				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 				req: &project.UpdateProjectRoleRequest{
 					DisplayName: gu.Ptr("changed"),
 				},
@@ -280,8 +280,8 @@ func TestServer_UpdateProjectRole(t *testing.T) {
 		{
 			name: "no change, ok",
 			prepare: func(request *project.UpdateProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
@@ -299,8 +299,8 @@ func TestServer_UpdateProjectRole(t *testing.T) {
 		{
 			name: "change display name, ok",
 			prepare: func(request *project.UpdateProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
@@ -308,7 +308,7 @@ func TestServer_UpdateProjectRole(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				req: &project.UpdateProjectRoleRequest{
-					DisplayName: gu.Ptr(gofakeit.AppName()),
+					DisplayName: gu.Ptr(integration.RoleKey()),
 				},
 			},
 			want: want{
@@ -319,8 +319,8 @@ func TestServer_UpdateProjectRole(t *testing.T) {
 		{
 			name: "change full, ok",
 			prepare: func(request *project.UpdateProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
@@ -328,8 +328,8 @@ func TestServer_UpdateProjectRole(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				req: &project.UpdateProjectRoleRequest{
-					DisplayName: gu.Ptr(gofakeit.AppName()),
-					Group:       gu.Ptr(gofakeit.AppName()),
+					DisplayName: gu.Ptr(integration.RoleKey()),
+					Group:       gu.Ptr(integration.RoleKey()),
 				},
 			},
 			want: want{
@@ -359,8 +359,8 @@ func TestServer_UpdateProjectRole(t *testing.T) {
 }
 
 func TestServer_UpdateProjectRole_Permission(t *testing.T) {
-	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 
 	type args struct {
 		ctx context.Context
@@ -380,8 +380,8 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 		{
 			name: "unauthenicated",
 			prepare: func(request *project.UpdateProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
@@ -397,14 +397,14 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 		{
 			name: "no permission",
 			prepare: func(request *project.UpdateProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
 			},
 			args: args{
-				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 				req: &project.UpdateProjectRoleRequest{
 					DisplayName: gu.Ptr("changed"),
 				},
@@ -414,14 +414,14 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 		{
 			name: "organization owner, other org",
 			prepare: func(request *project.UpdateProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
 			},
 			args: args{
-				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				req: &project.UpdateProjectRoleRequest{
 					DisplayName: gu.Ptr("changed"),
 				},
@@ -431,16 +431,16 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 		{
 			name: "organization owner, ok",
 			prepare: func(request *project.UpdateProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
 			},
 			args: args{
-				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				req: &project.UpdateProjectRoleRequest{
-					DisplayName: gu.Ptr(gofakeit.AppName()),
+					DisplayName: gu.Ptr(integration.RoleKey()),
 				},
 			},
 			want: want{
@@ -451,8 +451,8 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 		{
 			name: "instance owner, ok",
 			prepare: func(request *project.UpdateProjectRoleRequest) {
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
@@ -460,7 +460,7 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				req: &project.UpdateProjectRoleRequest{
-					DisplayName: gu.Ptr(gofakeit.AppName()),
+					DisplayName: gu.Ptr(integration.RoleKey()),
 				},
 			},
 			want: want{
@@ -502,8 +502,8 @@ func assertUpdateProjectRoleResponse(t *testing.T, creationDate, changeDate time
 }
 
 func TestServer_DeleteProjectRole(t *testing.T) {
-	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 
 	tests := []struct {
 		name             string
@@ -536,8 +536,8 @@ func TestServer_DeleteProjectRole(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *project.RemoveProjectRoleRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
@@ -551,8 +551,8 @@ func TestServer_DeleteProjectRole(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *project.RemoveProjectRoleRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
@@ -581,8 +581,8 @@ func TestServer_DeleteProjectRole(t *testing.T) {
 }
 
 func TestServer_DeleteProjectRole_Permission(t *testing.T) {
-	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.AppName(), gofakeit.Email())
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 
 	tests := []struct {
 		name             string
@@ -597,8 +597,8 @@ func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 			ctx:  CTX,
 			prepare: func(request *project.RemoveProjectRoleRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
@@ -609,11 +609,11 @@ func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 		},
 		{
 			name: "no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 			prepare: func(request *project.RemoveProjectRoleRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
@@ -624,11 +624,11 @@ func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 		},
 		{
 			name: "organization owner, other org",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			prepare: func(request *project.RemoveProjectRoleRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
@@ -639,11 +639,11 @@ func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 		},
 		{
 			name: "organization owner, ok",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			prepare: func(request *project.RemoveProjectRoleRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
@@ -657,8 +657,8 @@ func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 			ctx:  iamOwnerCtx,
 			prepare: func(request *project.RemoveProjectRoleRequest) (time.Time, time.Time) {
 				creationDate := time.Now().UTC()
-				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), gofakeit.AppName(), false, false)
-				roleName := gofakeit.AppName()
+				projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
+				roleName := integration.RoleKey()
 				instance.AddProjectRole(iamOwnerCtx, t, projectResp.GetId(), roleName, roleName, "")
 				request.ProjectId = projectResp.GetId()
 				request.RoleKey = roleName
