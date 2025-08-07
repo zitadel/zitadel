@@ -15,11 +15,13 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 func TestServer_GetSession(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		ctx context.Context
 		req *session.GetSessionRequest
@@ -211,6 +213,7 @@ func TestServer_GetSession(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			var sequence uint64
 			if tt.args.dep != nil {
 				sequence = tt.args.dep(LoginCTX, t, tt.args.req)
@@ -223,9 +226,7 @@ func TestServer_GetSession(t *testing.T) {
 					assert.Error(ttt, err)
 					return
 				}
-				if !assert.NoError(ttt, err) {
-					return
-				}
+				require.NoError(ttt, err)
 
 				tt.want.Session.Id = tt.args.req.SessionId
 				tt.want.Session.Sequence = sequence
@@ -302,6 +303,7 @@ func createSession(ctx context.Context, t *testing.T, userID string, userAgent s
 }
 
 func TestServer_ListSessions(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		ctx context.Context
 		req *session.ListSessionsRequest
@@ -679,9 +681,48 @@ func TestServer_ListSessions(t *testing.T) {
 			wantFactors:          []wantFactor{wantUserFactor},
 			wantErr:              true,
 		},
+		{
+			name: "list sessions, expiration date query, ok",
+			args: args{
+				IAMOwnerCTX,
+				&session.ListSessionsRequest{},
+				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
+					info := createSession(ctx, t, User.GetUserId(), "useragent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
+					request.Queries = append(request.Queries,
+						&session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}},
+						&session.SearchQuery{Query: &session.SearchQuery_ExpirationDateQuery{
+							ExpirationDateQuery: &session.ExpirationDateQuery{ExpirationDate: timestamppb.Now(),
+								Method: objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_GREATER_OR_EQUALS,
+							}}})
+					return []*sessionAttr{info}
+				},
+			},
+			wantExpirationWindow: time.Minute * 5,
+			wantFactors:          []wantFactor{wantUserFactor},
+			want: &session.ListSessionsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				Sessions: []*session.Session{
+					{
+						Metadata: map[string][]byte{"key": []byte("value")},
+						UserAgent: &session.UserAgent{
+							FingerprintId: gu.Ptr("useragent"),
+							Ip:            gu.Ptr("1.2.3.4"),
+							Description:   gu.Ptr("Description"),
+							Header: map[string]*session.UserAgent_HeaderValues{
+								"foo": {Values: []string{"foo", "bar"}},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			infos := tt.args.dep(LoginCTX, t, tt.args.req)
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
@@ -691,19 +732,15 @@ func TestServer_ListSessions(t *testing.T) {
 					assert.Error(ttt, err)
 					return
 				}
-				if !assert.NoError(ttt, err) {
-					return
-				}
+				require.NoError(ttt, err)
 
 				// expected count of sessions is not equal to created dependencies
-				if !assert.Len(ttt, tt.want.Sessions, len(infos)) {
-					return
-				}
+				require.Len(ttt, tt.want.Sessions, len(infos))
+
 
 				// expected count of sessions is not equal to received sessions
-				if !assert.Equal(ttt, got.Details.TotalResult, tt.want.Details.TotalResult) || !assert.Len(ttt, got.Sessions, len(tt.want.Sessions)) {
-					return
-				}
+				require.Equal(ttt, tt.want.Details.TotalResult, got.Details.TotalResult)
+				require.Len(ttt, got.Sessions, len(tt.want.Sessions))
 
 				for i := range infos {
 					tt.want.Sessions[i].Id = infos[i].ID
@@ -726,4 +763,62 @@ func TestServer_ListSessions(t *testing.T) {
 			}, retryDuration, tick)
 		})
 	}
+}
+
+func TestServer_ListSessions_with_expiration_date_filter(t *testing.T) {
+	t.Parallel()
+	// session with no expiration
+	session1, err := Client.CreateSession(IAMOwnerCTX, &session.CreateSessionRequest{})
+	require.NoError(t, err)
+
+	// session with expiration
+	session2, err := Client.CreateSession(IAMOwnerCTX, &session.CreateSessionRequest{
+		Lifetime: durationpb.New(1 * time.Second),
+	})
+	require.NoError(t, err)
+
+	// wait until the second session expires
+	time.Sleep(2 * time.Second)
+
+	// with comparison method GREATER_OR_EQUALS, only the active session should be returned
+	listSessionsResponse1, err := Client.ListSessions(IAMOwnerCTX,
+		&session.ListSessionsRequest{
+			Queries: []*session.SearchQuery{
+				{
+					Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{session1.SessionId}}},
+				},
+				{
+					Query: &session.SearchQuery_ExpirationDateQuery{
+						ExpirationDateQuery: &session.ExpirationDateQuery{
+							ExpirationDate: timestamppb.Now(),
+							Method:         objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_GREATER_OR_EQUALS,
+						},
+					},
+				},
+			},
+		})
+	require.NoError(t, err)
+	require.Len(t, listSessionsResponse1.Sessions, 1)
+	assert.Equal(t, session1.SessionId, listSessionsResponse1.Sessions[0].Id)
+
+	// with comparison method LESS_OR_EQUALS, only the expired session should be returned
+	listSessionsResponse2, err := Client.ListSessions(IAMOwnerCTX,
+		&session.ListSessionsRequest{
+			Queries: []*session.SearchQuery{
+				{
+					Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{session2.SessionId}}},
+				},
+				{
+					Query: &session.SearchQuery_ExpirationDateQuery{
+						ExpirationDateQuery: &session.ExpirationDateQuery{
+							ExpirationDate: timestamppb.Now(),
+							Method:         objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_LESS_OR_EQUALS,
+						},
+					},
+				},
+			},
+		})
+	require.NoError(t, err)
+	require.Len(t, listSessionsResponse2.Sessions, 1)
+	assert.Equal(t, session2.SessionId, listSessionsResponse2.Sessions[0].Id)
 }
