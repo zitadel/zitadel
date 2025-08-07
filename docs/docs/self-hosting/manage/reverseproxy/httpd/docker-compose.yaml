@@ -1,7 +1,7 @@
 services:
 
   proxy-disabled-tls:
-    image: "httpd:2.4.58-alpine"
+    image: "httpd:latest"
     volumes:
       - "./httpd-disabled-tls.conf:/usr/local/apache2/conf/httpd.conf"
     ports:
@@ -13,7 +13,7 @@ services:
         condition: 'service_healthy'
 
   proxy-external-tls:
-    image: "httpd:2.4.58-alpine"
+    image: "httpd:latest"
     volumes:
       - "./httpd-external-tls.conf:/usr/local/apache2/conf/httpd.conf"
       - "./selfsigned.crt:/etc/certs/selfsigned.crt:ro"
@@ -27,7 +27,7 @@ services:
         condition: 'service_healthy'
 
   proxy-enabled-tls:
-    image: "httpd:2.4.58-alpine"
+    image: "httpd:latest"
     volumes:
       - "./httpd-enabled-tls.conf:/usr/local/apache2/conf/httpd.conf"
       - "./selfsigned.crt:/etc/certs/selfsigned.crt:ro"
