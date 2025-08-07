@@ -4,7 +4,6 @@ package user_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -99,7 +98,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 }
 
 func TestServer_ListIDPLinks(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks-%s", gofakeit.AppName()), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 
 	instanceIdpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, gofakeit.Email(), gofakeit.Phone())
@@ -253,7 +252,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 }
 
 func TestServer_RemoveIDPLink(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks-%s", gofakeit.AppName()), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 
 	instanceIdpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, gofakeit.Email(), gofakeit.Phone())

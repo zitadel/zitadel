@@ -37,20 +37,20 @@ func TestServer_ImportData(t *testing.T) {
 							{
 								OrgId: orgIDs[0],
 								Org: &management.AddOrgRequest{
-									Name: gofakeit.ProductName(),
+									Name: integration.OrganizationName(),
 								},
 								Projects: []*v1.DataProject{
 									{
 										ProjectId: projectIDs[0],
 										Project: &management.AddProjectRequest{
-											Name:                 gofakeit.AppName(),
+											Name:                 integration.ProjectName(),
 											ProjectRoleAssertion: true,
 										},
 									},
 									{
 										ProjectId: projectIDs[1],
 										Project: &management.AddProjectRequest{
-											Name:                 gofakeit.AppName(),
+											Name:                 integration.ProjectName(),
 											ProjectRoleAssertion: false,
 										},
 									},
@@ -149,7 +149,7 @@ func TestServer_ImportData(t *testing.T) {
 							{
 								OrgId: orgIDs[1],
 								Org: &management.AddOrgRequest{
-									Name: gofakeit.ProductName(),
+									Name: integration.OrganizationName(),
 								},
 								UserGrants: []*management.AddUserGrantRequest{
 									{
@@ -167,7 +167,7 @@ func TestServer_ImportData(t *testing.T) {
 							{
 								OrgId: orgIDs[2],
 								Org: &management.AddOrgRequest{
-									Name: gofakeit.ProductName(),
+									Name: integration.OrganizationName(),
 								},
 								UserGrants: []*management.AddUserGrantRequest{
 									{
@@ -262,26 +262,26 @@ func TestServer_ImportData(t *testing.T) {
 							{
 								OrgId: orgIDs[4],
 								Org: &management.AddOrgRequest{
-									Name: gofakeit.ProductName(),
+									Name: integration.OrganizationName(),
 								},
 							},
 							{
 								OrgId: orgIDs[3],
 								Org: &management.AddOrgRequest{
-									Name: gofakeit.ProductName(),
+									Name: integration.OrganizationName(),
 								},
 								Projects: []*v1.DataProject{
 									{
 										ProjectId: projectIDs[2],
 										Project: &management.AddProjectRequest{
-											Name:                 gofakeit.AppName(),
+											Name:                 integration.ProjectName(),
 											ProjectRoleAssertion: true,
 										},
 									},
 									{
 										ProjectId: projectIDs[3],
 										Project: &management.AddProjectRequest{
-											Name:                 gofakeit.AppName(),
+											Name:                 integration.ProjectName(),
 											ProjectRoleAssertion: false,
 										},
 									},
@@ -375,19 +375,19 @@ func TestServer_ImportData(t *testing.T) {
 							{
 								OrgId: orgIDs[6],
 								Org: &management.AddOrgRequest{
-									Name: gofakeit.ProductName(),
+									Name: integration.OrganizationName(),
 								},
 							},
 							{
 								OrgId: orgIDs[5],
 								Org: &management.AddOrgRequest{
-									Name: gofakeit.ProductName(),
+									Name: integration.OrganizationName(),
 								},
 								Projects: []*v1.DataProject{
 									{
 										ProjectId: projectIDs[4],
 										Project: &management.AddProjectRequest{
-											Name:                 gofakeit.AppName(),
+											Name:                 integration.ProjectName(),
 											ProjectRoleAssertion: true,
 										},
 									},
