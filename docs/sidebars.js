@@ -1082,7 +1082,6 @@ module.exports = {
         "self-hosting/deploy/macos",
         "self-hosting/deploy/compose",
         "self-hosting/deploy/devcontainer",
-        "self-hosting/deploy/knative",
         "self-hosting/deploy/kubernetes",
         "self-hosting/deploy/troubleshooting/troubleshooting",
       ],
