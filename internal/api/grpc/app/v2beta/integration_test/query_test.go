@@ -23,7 +23,7 @@ import (
 func TestGetApplication(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instance, IAMOwnerCtx)
 
-	apiAppName := gofakeit.AppName()
+	apiAppName := integration.ApplicationName()
 	createdApiApp, errAPIAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: p.GetId(),
 		Name:      apiAppName,
@@ -35,7 +35,7 @@ func TestGetApplication(t *testing.T) {
 	})
 	require.Nil(t, errAPIAppCreation)
 
-	samlAppName := gofakeit.AppName()
+	samlAppName := integration.ApplicationName()
 	createdSAMLApp, errSAMLAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: p.GetId(),
 		Name:      samlAppName,
@@ -48,7 +48,7 @@ func TestGetApplication(t *testing.T) {
 	})
 	require.Nil(t, errSAMLAppCreation)
 
-	oidcAppName := gofakeit.AppName()
+	oidcAppName := integration.ApplicationName()
 	createdOIDCApp, errOIDCAppCreation := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: p.GetId(),
 		Name:      oidcAppName,
@@ -464,7 +464,7 @@ func TestListApplications_WithPermissionV2(t *testing.T) {
 	p, projectOwnerCtx := getProjectAndProjectContext(t, instancePermissionV2, iamOwnerCtx)
 	_, otherProjectOwnerCtx := getProjectAndProjectContext(t, instancePermissionV2, iamOwnerCtx)
 
-	appName1, appName2, appName3 := gofakeit.AppName(), gofakeit.AppName(), gofakeit.AppName()
+	appName1, appName2, appName3 := integration.ApplicationName(), integration.ApplicationName(), integration.ApplicationName()
 	reqForAPIAppCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
 	}
