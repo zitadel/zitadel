@@ -64,7 +64,7 @@ services:
         condition: 'service_healthy'
     environment:
       # Using an external domain other than localhost proofs, that the proxy configuration works.
-      # If ZITADEL can't resolve a requests original host to this domain,
+      # If Zitadel can't resolve a requests original host to this domain,
       # it will return a 404 Instance not found error.
       ZITADEL_EXTERNALDOMAIN: 127.0.0.1.sslip.io
       # In case something doesn't work as expected,
