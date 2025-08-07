@@ -1101,6 +1101,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
@@ -1143,6 +1144,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(),
@@ -1183,6 +1185,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1397,6 +1400,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(), // org member check
 					expectFilter(
 						eventFromEventPusher(
@@ -1706,6 +1710,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 					expectFilter(),
 					expectFilter(), // org member check
