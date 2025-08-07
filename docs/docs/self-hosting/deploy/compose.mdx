@@ -9,7 +9,7 @@ import Disclaimer from './_disclaimer.mdx'
 import DefaultUser from './_defaultuser.mdx'
 import Next from './_next.mdx'
 import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
-
+import SwitchToLoginV2 from './_switch-to-login-v2.mdx';
 
 The setup is tested against Docker version 28.3.2 and Docker Compose version v2.38.2
 
@@ -26,6 +26,9 @@ By executing the commands below, you will download the following file:
 # Download the docker compose example configuration.
 wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose.yaml
 
+# Download the basic Zitadel configuration.
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/zitadel.yaml
+
 # Make sure you have the latest image versions
 docker compose pull
 
@@ -34,16 +37,7 @@ docker compose up
 ```
 
 <DefaultUser components={props.components} />
-
-:::info
-If you ran these commands for an existing instance that still uses the login v1, [create a login client for it to the now running v2 login](/self-hosting/manage/login-client#create-login-client).
-Move the login client PAT to `./login-client.pat` and restart the login container.
-```bash
-docker compose restart login
-```
-Now, [enable the Login UI for all users](/self-hosting/manage/login-client#require-login-v2)
-:::
-
+<SwitchToLoginV2/>
 <NoteInstanceNotFound/>
 <Next components={props.components} />
 <Disclaimer components={props.components} />

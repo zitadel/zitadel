@@ -1,0 +1,43 @@
+ExternalSecure: false
+TLS:
+  Enabled: false
+Database:
+  Postgres:
+    Admin:
+      Username: postgres
+      Password: postgres
+      SSL:
+        Mode: disable
+FirstInstance:
+  LoginClientPATPath: ./login-client.pat
+  PATPath: ./admin.pat
+  Org:
+    Human:
+      PasswordChangeRequired: false
+    LoginClient:
+      # By configuring a login client, the setup job creates a user of type machine with the role IAM_LOGIN_CLIENT.
+      # It writes a PAT to the path specified in ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH.
+      # The PAT is passed to the login container via the environment variable ZITADEL_SERVICE_USER_TOKEN_FILE.
+      Machine:
+        Username: login-client
+        Name: Automatically Initialized IAM_LOGIN_CLIENT
+      PATExpirationDate: 2029-01-01T00:00:00Z
+    Machine:
+      # By configuring a machine, the setup job creates a user of type machine with the role IAM_OWNER.
+      # It writes a personal access token (PAT) to the path specified in ZITADEL_FIRSTINSTANCE_PATPATH.
+      # The PAT can be used to provision resources with [Terraform](/docs/guides/manage/terraform-provider), for example.    
+      Machine:
+        Username: admin
+        Name: Automatically Initialized IAM_OWNER
+      MachineKey:
+        Type: 1
+DefaultInstance:
+  Features:
+    LoginV2:
+      Required: true
+      BaseUri: http://localhost:3000/ui/v2/login
+OIDC:
+  DefaultLoginURLV2: http://localhost:3000/ui/v2/login/login?authRequest=
+  DefaultLogoutURLV2: http://localhost:3000/ui/v2/login/logout?post_logout_redirect=
+SAML:
+  DefaultLoginURLV2: http://localhost:3000/ui/v2/login/login?samlRequest=

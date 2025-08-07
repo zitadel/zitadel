@@ -7,6 +7,7 @@ import Disclaimer from "./_disclaimer.mdx";
 import DefaultUser from "./_defaultuser.mdx";
 import Next from "./_next.mdx";
 import NoteInstanceNotFound from "./troubleshooting/_note_instance_not_found.mdx";
+import SwitchToLoginV2 from "./_switch-to-login-v2.mdx";
 
 ## Install PostgreSQL
 
@@ -20,46 +21,59 @@ sudo systemctl start postgresql
 sudo systemctl enable postgresql
 ```
 
-## Install Zitadel
+## Download the Zitadel API binary and the login assets
 
 Download the Zitadel release according to your architecture from [Github](https://github.com/zitadel/zitadel/releases/latest), unpack the archive and copy zitadel binary to /usr/local/bin
 
 ```bash
-LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep location: | cut -d '/' -f 8 | tr -d '\r'); ARCH=$(uname -m); case $ARCH in armv5*) ARCH="armv5";; armv6*) ARCH="armv6";; armv7*) ARCH="arm";; aarch64) ARCH="arm64";; x86) ARCH="386";; x86_64) ARCH="amd64";;  i686) ARCH="386";; i386) ARCH="386";; esac; wget -c https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel-linux-$ARCH.tar.gz -O - | tar -xz && sudo mv zitadel-linux-$ARCH/zitadel /usr/local/bin
+LATEST=$( \
+  curl -i https://github.com/zitadel/zitadel/releases/latest | \
+  grep location: | \
+  cut -d '/' -f 8 | \
+  tr -d '\r')
+ARCH=$(uname -m)
+case $ARCH in armv5*)ARCH="armv5";;
+              armv6*) ARCH="armv6";;
+              armv7*) ARCH="arm";;
+              aarch64) ARCH="arm64";;
+              x86) ARCH="386";;
+              x86_64) ARCH="amd64";;
+              i686) ARCH="386";;
+              i386) ARCH="386";;
+esac
+# Download and extract the API binary
+wget -c https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel-linux-$ARCH.tar.gz -O - | \
+tar -xz && sudo mv zitadel-linux-$ARCH/zitadel /usr/local/bin
+
+# Download and extract the login assets
+wget -c https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel-login-$ARCH.tar.gz -O - | \
+tar -xz && sudo mv zitadel-login-linux-$ARCH/zitadel-login ./zitadel-login
 ```
 
 ## Run Zitadel
 
 ```bash
-ZITADEL_DATABASE_POSTGRES_HOST=localhost ZITADEL_DATABASE_POSTGRES_PORT=5432 ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+# Download the basic configuration
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/zitadel.yaml
+
+# Run the API binary
+zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --config ./zitadel.yaml --steps ./zitadel.yaml
+```
+
+## Run the login
+
+Make sure you have [Node.js installed](https://nodejs.org/en/download).
+
+```bash
+# Run the login standalone server
+export ZITADEL_API_URL=http://localhost:8080
+export NEXT_PUBLIC_BASE_PATH=/ui/v2/login
+export ZITADEL_SERVICE_USER_TOKEN=$(cat ./login-client.pat)
+node ./zitadel-login/server.js
 ```
 
 <DefaultUser components={props.components} />
-
+<SwitchToLoginV2/>
 <NoteInstanceNotFound />
-
-## VideoGuide
-
-<iframe
-  width="100%"
-  height="315"
-  src="https://www.youtube.com/embed/YVLua-q7dbs"
-  title="YouTube video player"
-  frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowfullscreen
-></iframe>
-
-### Setup Zitadel with a service account
-
-```bash
-ZITADEL_DATABASE_POSTGRES_HOST=localhost ZITADEL_DATABASE_POSTGRES_PORT=5432 ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable ZITADEL_EXTERNALSECURE=false ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH=/tmp/zitadel-admin-sa.json ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME=zitadel-admin-sa ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME=Admin ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE=1 zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
-
-# then you can move your machine key
-mv /tmp/zitadel-admin-sa.json $HOME/zitadel-admin-sa.json
-```
-
-This key can be used to provision resources with for example [Terraform](/docs/guides/manage/terraform-provider).
-
 <Next components={props.components} />
 <Disclaimer components={props.components} />

@@ -2,40 +2,11 @@ services:
   zitadel:
     restart: unless-stopped
     image: ghcr.io/zitadel/zitadel:latest
-    command: start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+    command: start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /current-dir/zitadel.yaml --steps /current-dir/zitadel.yaml
     environment:
-      ZITADEL_EXTERNALSECURE: false
-      ZITADEL_TLS_ENABLED: false
       ZITADEL_DATABASE_POSTGRES_HOST: db
-      ZITADEL_DATABASE_POSTGRES_PORT: 5432
-      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
-      # By configuring a login client, the setup job creates a user of type machine with the role IAM_LOGIN_CLIENT.
-      # It writes a PAT to the path specified in ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH.
-      # The PAT is passed to the login container via the environment variable ZITADEL_SERVICE_USER_TOKEN_FILE.
       ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /current-dir/login-client.pat
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
-      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME: login-client
-      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME: Automatically Initialized IAM_LOGIN_CLIENT
-      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE: '2029-01-01T00:00:00Z'
-      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED: true
-      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI: http://localhost:3000/ui/v2/login
-      ZITADEL_OIDC_DEFAULTLOGINURLV2: http://localhost:3000/ui/v2/login/login?authRequest=
-      ZITADEL_OIDC_DEFAULTLOGOUTURLV2: http://localhost:3000/ui/v2/login/logout?post_logout_redirect=
-      ZITADEL_SAML_DEFAULTLOGINURLV2: http://localhost:3000/ui/v2/login/login?samlRequest=
-      # By configuring a machine, the setup job creates a user of type machine with the role IAM_OWNER.
-      # It writes a personal access token (PAT) to the path specified in ZITADEL_FIRSTINSTANCE_PATPATH.
-      # The PAT can be used to provision resources with [Terraform](/docs/guides/manage/terraform-provider), for example.
       ZITADEL_FIRSTINSTANCE_PATPATH: /current-dir/admin.pat
-      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME: admin
-      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME: Automatically Initialized IAM_OWNER
-      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE: 1
-
     healthcheck:
       test:
       - CMD
