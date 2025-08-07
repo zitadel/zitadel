@@ -5,4 +5,5 @@ https://127.0.0.1.sslip.io {
 			tls_insecure_skip_verify
 		}
 	}
+	reverse_proxy /ui/v2/login/* http://login-enabled-tls:3000
 }
