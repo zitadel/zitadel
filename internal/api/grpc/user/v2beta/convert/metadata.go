@@ -9,7 +9,23 @@ import (
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
-func ListUsersByMetadataRequestToModel(req *user.ListUsersByMetadataRequest, sysDefaults systemdefaults.SystemDefaults) (*query.UserSearchQueries, error) {
+func UsersByMetadataModelToGRPC(usersAndMetas []*query.UserByMetadata, assetPrefix string) []*user.UserByMetadata {
+	toReturn := make([]*user.UserByMetadata, len(usersAndMetas))
+
+	for i, userAndMeta := range usersAndMetas {
+		userWithMeta := &user.UserByMetadata{
+			User:  UserToPb(userAndMeta.User, assetPrefix),
+			Key:   userAndMeta.Key,
+			Value: userAndMeta.Value,
+		}
+
+		toReturn[i] = userWithMeta
+	}
+
+	return toReturn
+}
+
+func ListUsersByMetadataRequestToModel(req *user.ListUsersByMetadataRequest, sysDefaults systemdefaults.SystemDefaults) (*query.UsersByMetadataSearchQueries, error) {
 	offset, limit, asc, err := filter.PaginationPbToQuery(sysDefaults, req.GetPagination())
 	if err != nil {
 		return nil, err
@@ -20,7 +36,7 @@ func ListUsersByMetadataRequestToModel(req *user.ListUsersByMetadataRequest, sys
 		return nil, err
 	}
 
-	return &query.UserSearchQueries{
+	return &query.UsersByMetadataSearchQueries{
 		SearchRequest: query.SearchRequest{
 			Offset:        offset,
 			Limit:         limit,

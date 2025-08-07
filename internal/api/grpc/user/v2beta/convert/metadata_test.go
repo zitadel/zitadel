@@ -271,3 +271,86 @@ func Test_ListUsersByMetadataRequestToModel(t *testing.T) {
 		assert.Nil(t, model)
 	})
 }
+func Test_UsersByMetadataModelToGRPC(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name             string
+		inputUsers       []*query.UserByMetadata
+		inputAssetPrefix string
+		expectedUsers    []*user.UserByMetadata
+	}{
+		{
+			name:             "nil input",
+			inputAssetPrefix: "prefix",
+			expectedUsers:    nil,
+		},
+		{
+			name:             "empty UsersByMeta",
+			inputUsers:       []*query.UserByMetadata{},
+			inputAssetPrefix: "prefix",
+			expectedUsers:    []*user.UserByMetadata{},
+		},
+		{
+			name: "single user",
+			inputUsers: []*query.UserByMetadata{
+				{
+					User:  &query.User{ID: "user1", Username: "testuser"},
+					Key:   "key1",
+					Value: []byte("value1"),
+				},
+			},
+			inputAssetPrefix: "prefix",
+			expectedUsers: []*user.UserByMetadata{
+				{
+					User:  &user.User{UserId: "user1", Username: "testuser"},
+					Key:   "key1",
+					Value: []byte("value1"),
+				},
+			},
+		},
+		{
+			name: "multiple users",
+			inputUsers: []*query.UserByMetadata{
+				{
+					User:  &query.User{ID: "u1", Username: "user1"},
+					Key:   "k1",
+					Value: []byte("v1"),
+				},
+				{
+					User:  &query.User{ID: "u2", Username: "user2"},
+					Key:   "k2",
+					Value: []byte("v2"),
+				},
+			},
+			inputAssetPrefix: "prefix",
+			expectedUsers: []*user.UserByMetadata{
+				{
+					User:  &user.User{UserId: "u1", Username: "user1"},
+					Key:   "k1",
+					Value: []byte("v1"),
+				},
+				{
+					User:  &user.User{UserId: "u2", Username: "user2"},
+					Key:   "k2",
+					Value: []byte("v2"),
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			result := UsersByMetadataModelToGRPC(tc.inputUsers, tc.inputAssetPrefix)
+
+			require.Len(t, result, len(tc.expectedUsers))
+			for i := range tc.expectedUsers {
+				assert.Equal(t, tc.expectedUsers[i].User.UserId, result[i].User.UserId)
+				assert.Equal(t, tc.expectedUsers[i].User.Username, result[i].User.Username)
+				assert.Equal(t, tc.expectedUsers[i].Key, result[i].Key)
+				assert.Equal(t, tc.expectedUsers[i].Value, result[i].Value)
+			}
+		})
+	}
+}
