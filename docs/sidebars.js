@@ -1120,6 +1120,7 @@ module.exports = {
             "self-hosting/manage/reverseproxy/traefik/traefik",
             "self-hosting/manage/reverseproxy/nginx/nginx",
             "self-hosting/manage/reverseproxy/caddy/caddy",
+            "self-hosting/manage/reverseproxy/httpd/httpd",
             "self-hosting/manage/reverseproxy/cloudflare/cloudflare",
             "self-hosting/manage/reverseproxy/cloudflare_tunnel/cloudflare_tunnel",
             "self-hosting/manage/reverseproxy/zitadel_cloud/zitadel_cloud",
