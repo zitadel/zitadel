@@ -41,7 +41,7 @@ func TestServer_GetSecuritySettings(t *testing.T) {
 	}{
 		{
 			name:    "permission error",
-			ctx:     Instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			ctx:     Instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 			wantErr: true,
 		},
 		{
@@ -96,26 +96,26 @@ func idpResponse(id, name string, linking, creation, autoCreation, autoUpdate bo
 
 func TestServer_GetActiveIdentityProviders(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
-	instance.AddGenericOAuthProvider(isolatedIAMOwnerCTX, gofakeit.AppName()) // inactive
-	idpActiveName := gofakeit.AppName()
+	instance.AddGenericOAuthProvider(isolatedIAMOwnerCTX, integration.IDPName()) // inactive
+	idpActiveName := integration.IDPName()
 	idpActiveResp := instance.AddGenericOAuthProvider(isolatedIAMOwnerCTX, idpActiveName)
 	instance.AddProviderToDefaultLoginPolicy(isolatedIAMOwnerCTX, idpActiveResp.GetId())
 	idpActiveResponse := idpResponse(idpActiveResp.GetId(), idpActiveName, true, true, true, true, idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME)
-	idpLinkingDisallowedName := gofakeit.AppName()
+	idpLinkingDisallowedName := integration.IDPName()
 	idpLinkingDisallowedResp := instance.AddGenericOAuthProviderWithOptions(isolatedIAMOwnerCTX, idpLinkingDisallowedName, false, true, true, idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME)
 	instance.AddProviderToDefaultLoginPolicy(isolatedIAMOwnerCTX, idpLinkingDisallowedResp.GetId())
 	idpLinkingDisallowedResponse := idpResponse(idpLinkingDisallowedResp.GetId(), idpLinkingDisallowedName, false, true, true, true, idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME)
-	idpCreationDisallowedName := gofakeit.AppName()
+	idpCreationDisallowedName := integration.IDPName()
 	idpCreationDisallowedResp := instance.AddGenericOAuthProviderWithOptions(isolatedIAMOwnerCTX, idpCreationDisallowedName, true, false, true, idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME)
 	instance.AddProviderToDefaultLoginPolicy(isolatedIAMOwnerCTX, idpCreationDisallowedResp.GetId())
 	idpCreationDisallowedResponse := idpResponse(idpCreationDisallowedResp.GetId(), idpCreationDisallowedName, true, false, true, true, idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME)
-	idpNoAutoCreationName := gofakeit.AppName()
+	idpNoAutoCreationName := integration.IDPName()
 	idpNoAutoCreationResp := instance.AddGenericOAuthProviderWithOptions(isolatedIAMOwnerCTX, idpNoAutoCreationName, true, true, false, idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME)
 	instance.AddProviderToDefaultLoginPolicy(isolatedIAMOwnerCTX, idpNoAutoCreationResp.GetId())
 	idpNoAutoCreationResponse := idpResponse(idpNoAutoCreationResp.GetId(), idpNoAutoCreationName, true, true, false, true, idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME)
-	idpNoAutoLinkingName := gofakeit.AppName()
+	idpNoAutoLinkingName := integration.IDPName()
 	idpNoAutoLinkingResp := instance.AddGenericOAuthProviderWithOptions(isolatedIAMOwnerCTX, idpNoAutoLinkingName, true, true, true, idp.AutoLinkingOption_AUTO_LINKING_OPTION_UNSPECIFIED)
 	instance.AddProviderToDefaultLoginPolicy(isolatedIAMOwnerCTX, idpNoAutoLinkingResp.GetId())
 	idpNoAutoLinkingResponse := idpResponse(idpNoAutoLinkingResp.GetId(), idpNoAutoLinkingName, true, true, true, true, idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_UNSPECIFIED)
@@ -133,7 +133,7 @@ func TestServer_GetActiveIdentityProviders(t *testing.T) {
 		{
 			name: "permission error",
 			args: args{
-				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 				req: &settings.GetActiveIdentityProvidersRequest{},
 			},
 			wantErr: true,
