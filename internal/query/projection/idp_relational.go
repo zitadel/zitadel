@@ -473,18 +473,3 @@ func (p *idpRelationalProjection) reduceJWTRelationalConfigChanged(event eventst
 		},
 	), nil
 }
-
-// func (p *idpProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
-// 	e, ok := event.(*org.OrgRemovedEvent)
-// 	if !ok {
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-YsbQC", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
-// 	}
-
-// 	return handler.NewDeleteStatement(
-// 		e,
-// 		[]handler.Condition{
-// 			handler.NewCond(IDPInstanceIDCol, e.Aggregate().InstanceID),
-// 			handler.NewCond(IDPResourceOwnerCol, e.Aggregate().ID),
-// 		},
-// 	), nil
-// }

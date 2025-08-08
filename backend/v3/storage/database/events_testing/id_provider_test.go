@@ -3,7 +3,6 @@
 package events_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -177,7 +176,6 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, addOIDC.IdpId, idp.ID)
 			assert.Equal(t, domain.IDPStateActive.String(), idp.State)
 			assert.Equal(t, name, idp.Name)
-			// assert.Equal(t, domain.IDPTypeUnspecified.String(), idp.Type)
 			assert.Equal(t, true, idp.AutoRegister)
 			assert.Equal(t, true, idp.AllowCreation)
 			assert.Equal(t, false, idp.AllowAutoUpdate)
@@ -453,19 +451,6 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 			assert.Equal(t, addOIDC.IdpId, oidc.ID)
 		}, retryDuration, tick)
 
-		// // idp
-		// assert.Equal(t, addOIDC.IdpId, oidc.ID)
-		// assert.Equal(t, domain.IDPTypeOIDC.String(), oidc.Type)
-
-		// // oidc
-		// assert.Equal(t, instanceID, oidc.InstanceID)
-		// assert.Nil(t, oidc.OrgID)
-		// assert.Equal(t, "issuer", oidc.Issuer)
-		// assert.Equal(t, "clientID", oidc.ClientID)
-		// assert.Equal(t, []string{"scope"}, oidc.Scopes)
-		// assert.Equal(t, domain.OIDCMappingField(idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL), oidc.IDPDisplayNameMapping)
-		// assert.Equal(t, domain.OIDCMappingField(idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL), oidc.UserNameMapping)
-
 		beforeCreate := time.Now()
 		_, err = AdminClient.UpdateIDPOIDCConfig(CTX, &admin.UpdateIDPOIDCConfigRequest{
 			IdpId:              addOIDC.IdpId,
@@ -569,25 +554,6 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
-
-		// check original values for jwt
-		// var jwt *domain.IDPJWT
-		// retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
-		// assert.EventuallyWithT(t, func(t *assert.CollectT) {
-		// 	jwt, err = idpRepo.GetJWT(CTX, idpRepo.IDCondition(addJWT.IdpId), instanceID, nil)
-		// 	require.NoError(t, err)
-		// 	assert.Equal(t, addJWT.IdpId, jwt.ID)
-		// }, retryDuration, tick)
-
-		// // idp
-		// assert.Equal(t, addJWT.IdpId, jwt.ID)
-		// assert.Equal(t, domain.IDPTypeJWT.String(), jwt.Type)
-
-		// // jwt
-		// assert.Equal(t, "jwtEndpoint", jwt.JWTEndpoint)
-		// assert.Equal(t, "issuer", jwt.Issuer)
-		// assert.Equal(t, "keyEndpoint", jwt.KeysEndpoint)
-		// assert.Equal(t, "headerName", jwt.HeaderName)
 
 		beforeCreate := time.Now()
 		_, err = AdminClient.UpdateIDPJWTConfig(CTX, &admin.UpdateIDPJWTConfigRequest{
@@ -2555,7 +2521,6 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 				instanceID,
 				nil,
 			)
-			fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> err = %+v\n", err)
 			require.ErrorIs(t, &database.NoRowFoundError{}, err)
 		}, retryDuration, tick)
 	})

@@ -2,6 +2,7 @@ package projection
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -683,6 +684,7 @@ func (p *idpTemplateProjection) Reducers() []handler.AggregateReducer {
 }
 
 func (p *idpTemplateProjection) reduceOAuthIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> OAUTH ORIGINAL")
 	var idpEvent idp.OAuthIDPAddedEvent
 	var idpOwnerType domain.IdentityProviderType
 	switch e := event.(type) {
@@ -2169,6 +2171,8 @@ func (p *idpTemplateProjection) reduceIDPConfigRemoved(event eventstore.Event) (
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAFet", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
+
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> IDP CONFIG REMOVED")
 
 	return handler.NewDeleteStatement(
 		&idpEvent,

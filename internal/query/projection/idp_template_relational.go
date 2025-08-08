@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
@@ -193,30 +192,6 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  org.JWTIDPChangedEventType,
 					Reduce: p.reduceJWTIDPRelationalChanged,
 				},
-				// {
-				// 	Event:  org.IDPConfigAddedEventType,
-				// 	Reduce: p.reduceOldConfigAdded,
-				// },
-				// {
-				// 	Event:  org.IDPConfigChangedEventType,
-				// 	Reduce: p.reduceOldConfigChanged,
-				// },
-				// 		{
-				// 			Event:  org.IDPOIDCConfigAddedEventType,
-				// 			Reduce: p.reduceOldOIDCConfigAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.IDPOIDCConfigChangedEventType,
-				// 			Reduce: p.reduceOldOIDCConfigChanged,
-				// 		},
-				// 		{
-				// 			Event:  org.IDPJWTConfigAddedEventType,
-				// 			Reduce: p.reduceOldJWTConfigAdded,
-				// 		},
-				// 		{
-				// 			Event:  org.IDPJWTConfigChangedEventType,
-				// 			Reduce: p.reduceOldJWTConfigChanged,
-				// 		},
 				{
 					Event:  org.AzureADIDPAddedEventType,
 					Reduce: p.reduceAzureADIDPRelationalAdded,
@@ -289,18 +264,10 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  org.SAMLIDPChangedEventType,
 					Reduce: p.reduceSAMLIDPChanged,
 				},
-				// 		{
-				// 			Event:  org.IDPConfigRemovedEventType,
-				// 			Reduce: p.reduceIDPConfigRemoved,
-				// 		},
 				{
 					Event:  org.IDPRemovedEventType,
 					Reduce: p.reduceIDPRemoved,
 				},
-				// 		{
-				// 			Event:  org.OrgRemovedEventType,
-				// 			Reduce: p.reduceOwnerRemoved,
-				// 		},
 			},
 		},
 	}
@@ -418,11 +385,6 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eve
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ys02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPAddedEventType, instance.OIDCIDPAddedEventType})
 	}
 
-	// idpEvent, ok := event.(*instance.OIDCIDPAddedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPAddedEventType, instance.OIDCIDPAddedEventType})
-	// }
-
 	payload, err := json.Marshal(idpEvent)
 	if err != nil {
 		return nil, err
@@ -465,11 +427,6 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event e
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
 	}
-
-	// idpEvent, ok := event.(*instance.OIDCIDPChangedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
-	// }
 
 	var orgId *string
 	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
@@ -517,11 +474,6 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
 	}
-
-	// idpEvent, ok := event.(*instance.OIDCIDPMigratedAzureADEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
-	// }
 
 	azure := db_domain.Azure{
 		ClientID:        idpEvent.ClientID,
@@ -574,11 +526,6 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
 	}
 
-	// idpEvent, ok := event.(*instance.OIDCIDPMigratedGoogleEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
-	// }
-
 	google := db_domain.Google{
 		ClientID:     idpEvent.ClientID,
 		ClientSecret: idpEvent.ClientSecret,
@@ -627,11 +574,6 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalAdded(event even
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Yopi2s", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPAddedEventType, instance.JWTIDPAddedEventType})
 	}
-
-	// idpEvent, ok := event.(*instance.JWTIDPAddedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xopi2s", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPAddedEventType, instance.JWTIDPAddedEventType})
-	// }
 
 	jwt := db_domain.JWT{
 		JWTEndpoint:  idpEvent.JWTEndpoint,
@@ -683,10 +625,6 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event ev
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
 	}
 
-	// idpEvent, ok := event.(*instance.JWTIDPChangedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
-	// }
 	var orgId *string
 	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
 		orgId = &idpEvent.Aggregate().ResourceOwner
@@ -723,265 +661,6 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event ev
 	), nil
 }
 
-// func (p *idpTemplateRelationalProjection) reduceOldConfigAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idpconfig.IDPConfigAddedEvent
-// 	var idpOwnerType domain.IdentityProviderType
-// 	switch e := event.(type) {
-// 	case *org.IDPConfigAddedEvent:
-// 		idpEvent = e.IDPConfigAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeOrg
-// 	case *instance.IDPConfigAddedEvent:
-// 		idpEvent = e.IDPConfigAddedEvent
-// 		idpOwnerType = domain.IdentityProviderTypeSystem
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ADfeg", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigAddedEventType, instance.IDPConfigAddedEventType})
-// 	}
-
-// 	return handler.NewCreateStatement(
-// 		event,
-// 		[]handler.Column{
-// 			handler.NewCol(IDPTemplateIDCol, idpEvent.ConfigID),
-// 			handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
-// 			handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 			handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 			handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
-// 			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
-// 			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-// 			handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
-// 			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeUnspecified),
-// 			handler.NewCol(IDPTemplateIsCreationAllowedCol, true),
-// 			handler.NewCol(IDPTemplateIsLinkingAllowedCol, true),
-// 			handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.AutoRegister),
-// 			handler.NewCol(IDPTemplateIsAutoUpdateCol, false),
-// 			handler.NewCol(IDPTemplateAutoLinkingCol, domain.AutoLinkingOptionUnspecified),
-// 		},
-// 	), nil
-// }
-
-// func (p *idpTemplateProjection) reduceOldConfigChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idpconfig.IDPConfigChangedEvent
-// 	switch e := event.(type) {
-// 	case *org.IDPConfigChangedEvent:
-// 		idpEvent = e.IDPConfigChangedEvent
-// 	case *instance.IDPConfigChangedEvent:
-// 		idpEvent = e.IDPConfigChangedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAfg2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType})
-// 	}
-
-// 	cols := make([]handler.Column, 0, 4)
-// 	if idpEvent.Name != nil {
-// 		cols = append(cols, handler.NewCol(IDPTemplateNameCol, *idpEvent.Name))
-// 	}
-// 	if idpEvent.AutoRegister != nil {
-// 		cols = append(cols, handler.NewCol(IDPTemplateIsAutoCreationCol, *idpEvent.AutoRegister))
-// 	}
-// 	cols = append(cols,
-// 		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 	)
-
-// 	return handler.NewUpdateStatement(
-// 		event,
-// 		cols,
-// 		[]handler.Condition{
-// 			handler.NewCond(IDPTemplateIDCol, idpEvent.ConfigID),
-// 			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 		},
-// 	), nil
-// }
-
-// func (p *idpTemplateProjection) reduceOldOIDCConfigAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idpconfig.OIDCConfigAddedEvent
-// 	switch e := event.(type) {
-// 	case *org.IDPOIDCConfigAddedEvent:
-// 		idpEvent = e.OIDCConfigAddedEvent
-// 	case *instance.IDPOIDCConfigAddedEvent:
-// 		idpEvent = e.OIDCConfigAddedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASFdq2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType})
-// 	}
-
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOIDC),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.IDPConfigID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(OIDCIDCol, idpEvent.IDPConfigID),
-// 				handler.NewCol(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(OIDCIssuerCol, idpEvent.Issuer),
-// 				handler.NewCol(OIDCClientIDCol, idpEvent.ClientID),
-// 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
-// 				handler.NewCol(OIDCScopesCol, database.TextArray[string](idpEvent.Scopes)),
-// 				handler.NewCol(OIDCIDTokenMappingCol, true),
-// 				handler.NewCol(OIDCUsePKCECol, false),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateOIDCSuffix),
-// 		),
-// 	), nil
-// }
-
-// func (p *idpTemplateProjection) reduceOldOIDCConfigChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idpconfig.OIDCConfigChangedEvent
-// 	switch e := event.(type) {
-// 	case *org.IDPOIDCConfigChangedEvent:
-// 		idpEvent = e.OIDCConfigChangedEvent
-// 	case *instance.IDPOIDCConfigChangedEvent:
-// 		idpEvent = e.OIDCConfigChangedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
-// 	}
-
-// 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-// 	ops = append(ops,
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.IDPConfigID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 	)
-// 	oidcCols := make([]handler.Column, 0, 4)
-// 	if idpEvent.ClientID != nil {
-// 		oidcCols = append(oidcCols, handler.NewCol(OIDCClientIDCol, *idpEvent.ClientID))
-// 	}
-// 	if idpEvent.ClientSecret != nil {
-// 		oidcCols = append(oidcCols, handler.NewCol(OIDCClientSecretCol, *idpEvent.ClientSecret))
-// 	}
-// 	if idpEvent.Issuer != nil {
-// 		oidcCols = append(oidcCols, handler.NewCol(OIDCIssuerCol, *idpEvent.Issuer))
-// 	}
-// 	if idpEvent.Scopes != nil {
-// 		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.TextArray[string](idpEvent.Scopes)))
-// 	}
-// 	if len(oidcCols) > 0 {
-// 		ops = append(ops,
-// 			handler.AddUpdateStatement(
-// 				oidcCols,
-// 				[]handler.Condition{
-// 					handler.NewCond(OIDCIDCol, idpEvent.IDPConfigID),
-// 					handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				},
-// 				handler.WithTableSuffix(IDPTemplateOIDCSuffix),
-// 			),
-// 		)
-// 	}
-
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		ops...,
-// 	), nil
-// }
-
-// func (p *idpTemplateProjection) reduceOldJWTConfigAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idpconfig.JWTConfigAddedEvent
-// 	switch e := event.(type) {
-// 	case *org.IDPJWTConfigAddedEvent:
-// 		idpEvent = e.JWTConfigAddedEvent
-// 	case *instance.IDPJWTConfigAddedEvent:
-// 		idpEvent = e.JWTConfigAddedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASFdq2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType})
-// 	}
-
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeJWT),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.IDPConfigID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 		handler.AddCreateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(JWTIDCol, idpEvent.IDPConfigID),
-// 				handler.NewCol(JWTInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				handler.NewCol(JWTIssuerCol, idpEvent.Issuer),
-// 				handler.NewCol(JWTEndpointCol, idpEvent.JWTEndpoint),
-// 				handler.NewCol(JWTKeysEndpointCol, idpEvent.KeysEndpoint),
-// 				handler.NewCol(JWTHeaderNameCol, idpEvent.HeaderName),
-// 			},
-// 			handler.WithTableSuffix(IDPTemplateJWTSuffix),
-// 		),
-// 	), nil
-// }
-
-// func (p *idpTemplateProjection) reduceOldJWTConfigChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idpconfig.JWTConfigChangedEvent
-// 	switch e := event.(type) {
-// 	case *org.IDPJWTConfigChangedEvent:
-// 		idpEvent = e.JWTConfigChangedEvent
-// 	case *instance.IDPJWTConfigChangedEvent:
-// 		idpEvent = e.JWTConfigChangedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
-// 	}
-
-// 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-// 	ops = append(ops,
-// 		handler.AddUpdateStatement(
-// 			[]handler.Column{
-// 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-// 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-// 			},
-// 			[]handler.Condition{
-// 				handler.NewCond(IDPTemplateIDCol, idpEvent.IDPConfigID),
-// 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 			},
-// 		),
-// 	)
-// 	jwtCols := make([]handler.Column, 0, 4)
-// 	if idpEvent.JWTEndpoint != nil {
-// 		jwtCols = append(jwtCols, handler.NewCol(JWTEndpointCol, *idpEvent.JWTEndpoint))
-// 	}
-// 	if idpEvent.KeysEndpoint != nil {
-// 		jwtCols = append(jwtCols, handler.NewCol(JWTKeysEndpointCol, *idpEvent.KeysEndpoint))
-// 	}
-// 	if idpEvent.HeaderName != nil {
-// 		jwtCols = append(jwtCols, handler.NewCol(JWTHeaderNameCol, *idpEvent.HeaderName))
-// 	}
-// 	if idpEvent.Issuer != nil {
-// 		jwtCols = append(jwtCols, handler.NewCol(JWTIssuerCol, *idpEvent.Issuer))
-// 	}
-// 	if len(jwtCols) > 0 {
-// 		ops = append(ops,
-// 			handler.AddUpdateStatement(
-// 				jwtCols,
-// 				[]handler.Condition{
-// 					handler.NewCond(JWTIDCol, idpEvent.IDPConfigID),
-// 					handler.NewCond(JWTInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 				},
-// 				handler.WithTableSuffix(IDPTemplateJWTSuffix),
-// 			),
-// 		)
-// 	}
-
-// 	return handler.NewMultiStatement(
-// 		&idpEvent,
-// 		ops...,
-// 	), nil
-// }
-
 func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idp.AzureADIDPAddedEvent
 	switch e := event.(type) {
@@ -992,11 +671,6 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event 
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPAddedEventType, instance.AzureADIDPAddedEventType})
 	}
-
-	// idpEvent, ok := event.(*instance.AzureADIDPAddedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPAddedEventType, instance.AzureADIDPAddedEventType})
-	// }
 
 	azure := db_domain.Azure{
 		ClientID:        idpEvent.ClientID,
@@ -1049,10 +723,6 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(even
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
 	}
 
-	// idpEvent, ok := event.(*instance.AzureADIDPChangedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
-	// }
 	var orgId *string
 	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
 		orgId = &idpEvent.Aggregate().ResourceOwner
@@ -1100,11 +770,6 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPAddedEventType, instance.GitHubIDPAddedEventType})
 	}
 
-	// idpEvent, ok := event.(*instance.GitHubIDPAddedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPAddedEventType, instance.GitHubIDPAddedEventType})
-	// }
-
 	github := db_domain.Github{
 		ClientID:     idpEvent.ClientID,
 		ClientSecret: idpEvent.ClientSecret,
@@ -1141,39 +806,6 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 			},
 		),
 	), nil
-
-	// return handler.NewMultiStatement(
-	// 	&idpEvent,
-	// 	handler.AddCreateStatement(
-	// 		[]handler.Column{
-	// 			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-	// 			handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
-	// 			handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-	// 			handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-	// 			handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
-	// 			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-	// 			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
-	// 			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-	// 			handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
-	// 			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGithub),
-	// 			handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
-	// 			handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
-	// 			handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
-	// 			handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-	// 			handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
-	// 		},
-	// 	),
-	// 	handler.AddCreateStatement(
-	// 		[]handler.Column{
-	// 			handler.NewCol(GitHubIDCol, idpEvent.ID),
-	// 			handler.NewCol(GitHubInstanceIDCol, idpEvent.Aggregate().InstanceID),
-	// 			handler.NewCol(GitHubClientIDCol, idpEvent.ClientID),
-	// 			handler.NewCol(GitHubClientSecretCol, idpEvent.ClientSecret),
-	// 			handler.NewCol(GitHubScopesCol, database.TextArray[string](idpEvent.Scopes)),
-	// 		},
-	// 		handler.WithTableSuffix(IDPTemplateGitHubSuffix),
-	// 	),
-	// ), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
@@ -1187,10 +819,6 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPChangedEventType, instance.GitHubIDPChangedEventType})
 	}
 
-	// idpEvent, ok := event.(*instance.GitHubIDPChangedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPChangedEventType, instance.GitHubIDPChangedEventType})
-	// }
 	var orgId *string
 	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
 		orgId = &idpEvent.Aggregate().ResourceOwner
@@ -1237,11 +865,6 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdd
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Yf3g2a", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPAddedEventType, instance.GitHubEnterpriseIDPAddedEventType})
 	}
-
-	// idpEvent, ok := event.(*instance.GitHubEnterpriseIDPAddedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Sf3g2a", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPAddedEventType, instance.GitHubEnterpriseIDPAddedEventType})
-	// }
 
 	githubEnterprise := db_domain.GithubEnterprise{
 		ClientID:              idpEvent.ClientID,
@@ -1295,10 +918,6 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalCha
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
 	}
 
-	// idpEvent, ok := event.(*instance.GitHubEnterpriseIDPChangedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
-	// }
 	var orgId *string
 	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
 		orgId = &idpEvent.Aggregate().ResourceOwner
@@ -1345,11 +964,6 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event e
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPAddedEventType, instance.GitLabIDPAddedEventType})
 	}
-
-	// idpEvent, ok := event.(*instance.GitLabIDPAddedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPAddedEventType, instance.GitLabIDPAddedEventType})
-	// }
 
 	gitlab := db_domain.Gitlab{
 		ClientID:     idpEvent.ClientID,
@@ -1400,10 +1014,6 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
 	}
 
-	// idpEvent, ok := event.(*instance.GitLabIDPChangedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
-	// }
 	var orgId *string
 	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
 		orgId = &idpEvent.Aggregate().ResourceOwner
@@ -1450,11 +1060,6 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdd
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YAF3gw", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPAddedEventType, instance.GitLabSelfHostedIDPAddedEventType})
 	}
-
-	// idpEvent, ok := event.(*instance.GitLabSelfHostedIDPAddedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAF3gw", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPAddedEventType, instance.GitLabSelfHostedIDPAddedEventType})
-	// }
 
 	gitlabSelfHosting := db_domain.GitlabSelfHosting{
 		Issuer:       idpEvent.Issuer,
@@ -1506,10 +1111,6 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalCha
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YAf3g2", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPChangedEventType, instance.GitLabSelfHostedIDPChangedEventType})
 	}
 
-	// idpEvent, ok := event.(*instance.GitLabSelfHostedIDPChangedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAf3g2", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPChangedEventType, instance.GitLabSelfHostedIDPChangedEventType})
-	// }
 	var orgId *string
 	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
 		orgId = &idpEvent.Aggregate().ResourceOwner
@@ -1544,35 +1145,6 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalCha
 			},
 		),
 	), nil
-
-	// ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-	// ops = append(ops,
-	// 	handler.AddUpdateStatement(
-	// 		reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
-	// 		[]handler.Condition{
-	// 			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-	// 			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-	// 		},
-	// 	),
-	// )
-	// gitlabCols := reduceGitLabSelfHostedIDPRelationalChangedColumns(idpEvent)
-	// if len(gitlabCols) > 0 {
-	// 	ops = append(ops,
-	// 		handler.AddUpdateStatement(
-	// 			gitlabCols,
-	// 			[]handler.Condition{
-	// 				handler.NewCond(GitLabSelfHostedIDCol, idpEvent.ID),
-	// 				handler.NewCond(GitLabSelfHostedInstanceIDCol, idpEvent.Aggregate().InstanceID),
-	// 			},
-	// 			handler.WithTableSuffix(IDPTemplateGitLabSelfHostedSuffix),
-	// 		),
-	// 	)
-	// }
-
-	// return handler.NewMultiStatement(
-	// 	&idpEvent,
-	// 	ops...,
-	// ), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -1585,11 +1157,6 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event e
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Yp9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPAddedEventType, instance.GoogleIDPAddedEventType})
 	}
-
-	// idpEvent, ok := event.(*instance.GoogleIDPAddedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPAddedEventType, instance.GoogleIDPAddedEventType})
-	// }
 
 	google := db_domain.Google{
 		ClientID:     idpEvent.ClientID,
@@ -1639,10 +1206,6 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
 	}
 
-	// idpEvent, ok := event.(*instance.GoogleIDPChangedEvent)
-	// if !ok {
-	// 	return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
-	// }
 	var orgId *string
 	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
 		orgId = &idpEvent.Aggregate().ResourceOwner
@@ -1794,36 +1357,6 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.
 			},
 		),
 	), nil
-
-	// ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-	// ops = append(ops,
-	// 	handler.AddUpdateStatement(
-	// 		reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
-	// 		[]handler.Condition{
-	// 			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-	// 			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-	// 		},
-	// 	),
-	// )
-
-	// ldapCols := reduceLDAPIDPChangedColumns(idpEvent)
-	// if len(ldapCols) > 0 {
-	// 	ops = append(ops,
-	// 		handler.AddUpdateStatement(
-	// 			ldapCols,
-	// 			[]handler.Condition{
-	// 				handler.NewCond(LDAPIDCol, idpEvent.ID),
-	// 				handler.NewCond(LDAPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-	// 			},
-	// 			handler.WithTableSuffix(IDPTemplateLDAPSuffix),
-	// 		),
-	// 	)
-	// }
-
-	// return handler.NewMultiStatement(
-	// 	&idpEvent,
-	// 	ops...,
-	// ), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -1935,8 +1468,6 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Ev
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ys02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPAddedEventType, instance.SAMLIDPAddedEventType})
 	}
 
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> idpEvent.NameIDFormat = %+v\n", idpEvent.NameIDFormat)
-
 	saml := db_domain.SAML{
 		Metadata:                      idpEvent.Metadata,
 		Key:                           idpEvent.Key,
@@ -2025,61 +1556,9 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.
 			},
 		),
 	), nil
-
-	// ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
-	// ops = append(ops,
-	// 	handler.AddUpdateStatement(
-	// 		reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
-	// 		[]handler.Condition{
-	// 			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-	// 			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-	// 		},
-	// 	),
-	// )
-
-	// if len(SAMLCols) > 0 {
-	// 	ops = append(ops,
-	// 		handler.AddUpdateStatement(
-	// 			SAMLCols,
-	// 			[]handler.Condition{
-	// 				handler.NewCond(SAMLIDCol, idpEvent.ID),
-	// 				handler.NewCond(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
-	// 			},
-	// 			handler.WithTableSuffix(IDPTemplateSAMLSuffix),
-	// 		),
-	// 	)
-	// }
-
-	// return handler.NewMultiStatement(
-	// 	&idpEvent,
-	// 	ops...,
-	// ), nil
 }
 
-// func (p *idpTemplateProjection) reduceIDPConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
-// 	var idpEvent idpconfig.IDPConfigRemovedEvent
-// 	switch e := event.(type) {
-// 	case *org.IDPConfigRemovedEvent:
-// 		idpEvent = e.IDPConfigRemovedEvent
-// 	case *instance.IDPConfigRemovedEvent:
-// 		idpEvent = e.IDPConfigRemovedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAFet", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
-// 	}
-
-// 	return handler.NewDeleteStatement(
-// 		&idpEvent,
-// 		[]handler.Condition{
-// 			handler.NewCond(IDPTemplateIDCol, idpEvent.ConfigID),
-// 			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-// 		},
-// 	), nil
-// }
-
 func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
 	var idpEvent idp.RemovedEvent
 	switch e := event.(type) {
 	case *org.IDPRemovedEvent:
@@ -2095,20 +1574,6 @@ func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Even
 		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
-
 	return handler.NewDeleteStatement(
 		&idpEvent,
 		[]handler.Condition{
@@ -2118,341 +1583,6 @@ func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Even
 		},
 	), nil
 }
-
-// func (p *idpTemplateProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
-// 	e, ok := event.(*org.OrgRemovedEvent)
-// 	if !ok {
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Jp0D2K", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
-// 	}
-
-// 	return handler.NewDeleteStatement(
-// 		e,
-// 		[]handler.Condition{
-// 			handler.NewCond(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
-// 			handler.NewCond(IDPTemplateResourceOwnerCol, e.Aggregate().ID),
-// 		},
-// 	), nil
-// }
-
-// func reduceIDPChangedTemplateColumns(name *string, creationDate time.Time, sequence uint64, optionChanges idp.OptionChanges) []handler.Column {
-// 	cols := make([]handler.Column, 0, 7)
-// 	if name != nil {
-// 		cols = append(cols, handler.NewCol(IDPTemplateNameCol, *name))
-// 	}
-// 	if optionChanges.IsCreationAllowed != nil {
-// 		cols = append(cols, handler.NewCol(IDPTemplateIsCreationAllowedCol, *optionChanges.IsCreationAllowed))
-// 	}
-// 	if optionChanges.IsLinkingAllowed != nil {
-// 		cols = append(cols, handler.NewCol(IDPTemplateIsLinkingAllowedCol, *optionChanges.IsLinkingAllowed))
-// 	}
-// 	if optionChanges.IsAutoCreation != nil {
-// 		cols = append(cols, handler.NewCol(IDPTemplateIsAutoCreationCol, *optionChanges.IsAutoCreation))
-// 	}
-// 	if optionChanges.IsAutoUpdate != nil {
-// 		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *optionChanges.IsAutoUpdate))
-// 	}
-// 	if optionChanges.AutoLinkingOption != nil {
-// 		cols = append(cols, handler.NewCol(IDPTemplateAutoLinkingCol, *optionChanges.AutoLinkingOption))
-// 	}
-// 	return append(cols,
-// 		handler.NewCol(IDPTemplateChangeDateCol, creationDate),
-// 		handler.NewCol(IDPTemplateSequenceCol, sequence),
-// 	)
-// }
-
-// func reduceOAuthIDPChangedColumns(idpEvent idp.OAuthIDPChangedEvent) []handler.Column {
-// 	oauthCols := make([]handler.Column, 0, 7)
-// 	if idpEvent.ClientID != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(OAuthClientIDCol, *idpEvent.ClientID))
-// 	}
-// 	if idpEvent.ClientSecret != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(OAuthClientSecretCol, *idpEvent.ClientSecret))
-// 	}
-// 	if idpEvent.AuthorizationEndpoint != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(OAuthAuthorizationEndpointCol, *idpEvent.AuthorizationEndpoint))
-// 	}
-// 	if idpEvent.TokenEndpoint != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(OAuthTokenEndpointCol, *idpEvent.TokenEndpoint))
-// 	}
-// 	if idpEvent.UserEndpoint != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(OAuthUserEndpointCol, *idpEvent.UserEndpoint))
-// 	}
-// 	if idpEvent.Scopes != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(OAuthScopesCol, database.TextArray[string](idpEvent.Scopes)))
-// 	}
-// 	if idpEvent.IDAttribute != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(OAuthIDAttributeCol, *idpEvent.IDAttribute))
-// 	}
-// 	if idpEvent.UsePKCE != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(OAuthUsePKCECol, *idpEvent.UsePKCE))
-// 	}
-// 	return oauthCols
-// }
-
-// func reduceOIDCIDPChangedColumns(idpEvent idp.OIDCIDPChangedEvent) []handler.Column {
-// 	oidcCols := make([]handler.Column, 0, 5)
-// 	if idpEvent.ClientID != nil {
-// 		oidcCols = append(oidcCols, handler.NewCol(OIDCClientIDCol, *idpEvent.ClientID))
-// 	}
-// 	if idpEvent.ClientSecret != nil {
-// 		oidcCols = append(oidcCols, handler.NewCol(OIDCClientSecretCol, *idpEvent.ClientSecret))
-// 	}
-// 	if idpEvent.Issuer != nil {
-// 		oidcCols = append(oidcCols, handler.NewCol(OIDCIssuerCol, *idpEvent.Issuer))
-// 	}
-// 	if idpEvent.Scopes != nil {
-// 		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.TextArray[string](idpEvent.Scopes)))
-// 	}
-// 	if idpEvent.IsIDTokenMapping != nil {
-// 		oidcCols = append(oidcCols, handler.NewCol(OIDCIDTokenMappingCol, *idpEvent.IsIDTokenMapping))
-// 	}
-// 	if idpEvent.UsePKCE != nil {
-// 		oidcCols = append(oidcCols, handler.NewCol(OIDCUsePKCECol, *idpEvent.UsePKCE))
-// 	}
-// 	return oidcCols
-// }
-
-// func reduceJWTIDPChangedColumns(idpEvent idp.JWTIDPChangedEvent) []handler.Column {
-// 	jwtCols := make([]handler.Column, 0, 4)
-// 	if idpEvent.JWTEndpoint != nil {
-// 		jwtCols = append(jwtCols, handler.NewCol(JWTEndpointCol, *idpEvent.JWTEndpoint))
-// 	}
-// 	if idpEvent.KeysEndpoint != nil {
-// 		jwtCols = append(jwtCols, handler.NewCol(JWTKeysEndpointCol, *idpEvent.KeysEndpoint))
-// 	}
-// 	if idpEvent.HeaderName != nil {
-// 		jwtCols = append(jwtCols, handler.NewCol(JWTHeaderNameCol, *idpEvent.HeaderName))
-// 	}
-// 	if idpEvent.Issuer != nil {
-// 		jwtCols = append(jwtCols, handler.NewCol(JWTIssuerCol, *idpEvent.Issuer))
-// 	}
-// 	return jwtCols
-// }
-
-// func reduceAzureADIDPChangedColumns(idpEvent idp.AzureADIDPChangedEvent) []handler.Column {
-// 	azureADCols := make([]handler.Column, 0, 5)
-// 	if idpEvent.ClientID != nil {
-// 		azureADCols = append(azureADCols, handler.NewCol(AzureADClientIDCol, *idpEvent.ClientID))
-// 	}
-// 	if idpEvent.ClientSecret != nil {
-// 		azureADCols = append(azureADCols, handler.NewCol(AzureADClientSecretCol, *idpEvent.ClientSecret))
-// 	}
-// 	if idpEvent.Scopes != nil {
-// 		azureADCols = append(azureADCols, handler.NewCol(AzureADScopesCol, database.TextArray[string](idpEvent.Scopes)))
-// 	}
-// 	if idpEvent.Tenant != nil {
-// 		azureADCols = append(azureADCols, handler.NewCol(AzureADTenantCol, *idpEvent.Tenant))
-// 	}
-// 	if idpEvent.IsEmailVerified != nil {
-// 		azureADCols = append(azureADCols, handler.NewCol(AzureADIsEmailVerified, *idpEvent.IsEmailVerified))
-// 	}
-// 	return azureADCols
-// }
-
-// func reduceGitHubIDPChangedColumns(idpEvent idp.GitHubIDPChangedEvent) []handler.Column {
-// 	oauthCols := make([]handler.Column, 0, 3)
-// 	if idpEvent.ClientID != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(GitHubClientIDCol, *idpEvent.ClientID))
-// 	}
-// 	if idpEvent.ClientSecret != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(GitHubClientSecretCol, *idpEvent.ClientSecret))
-// 	}
-// 	if idpEvent.Scopes != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(GitHubScopesCol, database.TextArray[string](idpEvent.Scopes)))
-// 	}
-// 	return oauthCols
-// }
-
-// func reduceGitHubEnterpriseIDPChangedColumns(idpEvent idp.GitHubEnterpriseIDPChangedEvent) []handler.Column {
-// 	oauthCols := make([]handler.Column, 0, 6)
-// 	if idpEvent.ClientID != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(GitHubEnterpriseClientIDCol, *idpEvent.ClientID))
-// 	}
-// 	if idpEvent.ClientSecret != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(GitHubEnterpriseClientSecretCol, *idpEvent.ClientSecret))
-// 	}
-// 	if idpEvent.AuthorizationEndpoint != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(GitHubEnterpriseAuthorizationEndpointCol, *idpEvent.AuthorizationEndpoint))
-// 	}
-// 	if idpEvent.TokenEndpoint != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(GitHubEnterpriseTokenEndpointCol, *idpEvent.TokenEndpoint))
-// 	}
-// 	if idpEvent.UserEndpoint != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(GitHubEnterpriseUserEndpointCol, *idpEvent.UserEndpoint))
-// 	}
-// 	if idpEvent.Scopes != nil {
-// 		oauthCols = append(oauthCols, handler.NewCol(GitHubEnterpriseScopesCol, database.TextArray[string](idpEvent.Scopes)))
-// 	}
-// 	return oauthCols
-// }
-
-// func reduceGitLabIDPChangedColumns(idpEvent idp.GitLabIDPChangedEvent) []handler.Column {
-// 	gitlabCols := make([]handler.Column, 0, 3)
-// 	if idpEvent.ClientID != nil {
-// 		gitlabCols = append(gitlabCols, handler.NewCol(GitLabClientIDCol, *idpEvent.ClientID))
-// 	}
-// 	if idpEvent.ClientSecret != nil {
-// 		gitlabCols = append(gitlabCols, handler.NewCol(GitLabClientSecretCol, *idpEvent.ClientSecret))
-// 	}
-// 	if idpEvent.Scopes != nil {
-// 		gitlabCols = append(gitlabCols, handler.NewCol(GitLabScopesCol, database.TextArray[string](idpEvent.Scopes)))
-// 	}
-// 	return gitlabCols
-// }
-
-// func reduceGitLabSelfHostedIDPChangedColumns(idpEvent idp.GitLabSelfHostedIDPChangedEvent) []handler.Column {
-// 	gitlabCols := make([]handler.Column, 0, 4)
-// 	if idpEvent.Issuer != nil {
-// 		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedIssuerCol, *idpEvent.Issuer))
-// 	}
-// 	if idpEvent.ClientID != nil {
-// 		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedClientIDCol, *idpEvent.ClientID))
-// 	}
-// 	if idpEvent.ClientSecret != nil {
-// 		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedClientSecretCol, *idpEvent.ClientSecret))
-// 	}
-// 	if idpEvent.Scopes != nil {
-// 		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedScopesCol, database.TextArray[string](idpEvent.Scopes)))
-// 	}
-// 	return gitlabCols
-// }
-
-// func reduceGoogleIDPChangedColumns(idpEvent idp.GoogleIDPChangedEvent) []handler.Column {
-// 	googleCols := make([]handler.Column, 0, 3)
-// 	if idpEvent.ClientID != nil {
-// 		googleCols = append(googleCols, handler.NewCol(GoogleClientIDCol, *idpEvent.ClientID))
-// 	}
-// 	if idpEvent.ClientSecret != nil {
-// 		googleCols = append(googleCols, handler.NewCol(GoogleClientSecretCol, *idpEvent.ClientSecret))
-// 	}
-// 	if idpEvent.Scopes != nil {
-// 		googleCols = append(googleCols, handler.NewCol(GoogleScopesCol, database.TextArray[string](idpEvent.Scopes)))
-// 	}
-// 	return googleCols
-// }
-
-// func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Column {
-// 	ldapCols := make([]handler.Column, 0, 22)
-// 	if idpEvent.Servers != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPServersCol, database.TextArray[string](idpEvent.Servers)))
-// 	}
-// 	if idpEvent.StartTLS != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPStartTLSCol, *idpEvent.StartTLS))
-// 	}
-// 	if idpEvent.BaseDN != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPBaseDNCol, *idpEvent.BaseDN))
-// 	}
-// 	if idpEvent.BindDN != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPBindDNCol, *idpEvent.BindDN))
-// 	}
-// 	if idpEvent.BindPassword != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPBindPasswordCol, idpEvent.BindPassword))
-// 	}
-// 	if idpEvent.UserBase != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPUserBaseCol, *idpEvent.UserBase))
-// 	}
-// 	if idpEvent.UserObjectClasses != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPUserObjectClassesCol, database.TextArray[string](idpEvent.UserObjectClasses)))
-// 	}
-// 	if idpEvent.UserFilters != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPUserFiltersCol, database.TextArray[string](idpEvent.UserFilters)))
-// 	}
-// 	if idpEvent.Timeout != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPTimeoutCol, *idpEvent.Timeout))
-// 	}
-// 	if idpEvent.RootCA != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPRootCACol, idpEvent.RootCA))
-// 	}
-// 	if idpEvent.IDAttribute != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPIDAttributeCol, *idpEvent.IDAttribute))
-// 	}
-// 	if idpEvent.FirstNameAttribute != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPFirstNameAttributeCol, *idpEvent.FirstNameAttribute))
-// 	}
-// 	if idpEvent.LastNameAttribute != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPLastNameAttributeCol, *idpEvent.LastNameAttribute))
-// 	}
-// 	if idpEvent.DisplayNameAttribute != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPDisplayNameAttributeCol, *idpEvent.DisplayNameAttribute))
-// 	}
-// 	if idpEvent.NickNameAttribute != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPNickNameAttributeCol, *idpEvent.NickNameAttribute))
-// 	}
-// 	if idpEvent.PreferredUsernameAttribute != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPPreferredUsernameAttributeCol, *idpEvent.PreferredUsernameAttribute))
-// 	}
-// 	if idpEvent.EmailAttribute != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPEmailAttributeCol, *idpEvent.EmailAttribute))
-// 	}
-// 	if idpEvent.EmailVerifiedAttribute != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPEmailVerifiedAttributeCol, *idpEvent.EmailVerifiedAttribute))
-// 	}
-// 	if idpEvent.PhoneAttribute != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPPhoneAttributeCol, *idpEvent.PhoneAttribute))
-// 	}
-// 	if idpEvent.PhoneVerifiedAttribute != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPPhoneVerifiedAttributeCol, *idpEvent.PhoneVerifiedAttribute))
-// 	}
-// 	if idpEvent.PreferredLanguageAttribute != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPPreferredLanguageAttributeCol, *idpEvent.PreferredLanguageAttribute))
-// 	}
-// 	if idpEvent.AvatarURLAttribute != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPAvatarURLAttributeCol, *idpEvent.AvatarURLAttribute))
-// 	}
-// 	if idpEvent.ProfileAttribute != nil {
-// 		ldapCols = append(ldapCols, handler.NewCol(LDAPProfileAttributeCol, *idpEvent.ProfileAttribute))
-// 	}
-// 	return ldapCols
-// }
-
-// func reduceAppleIDPChangedColumns(idpEvent idp.AppleIDPChangedEvent) []handler.Column {
-// 	appleCols := make([]handler.Column, 0, 5)
-// 	if idpEvent.ClientID != nil {
-// 		appleCols = append(appleCols, handler.NewCol(AppleClientIDCol, *idpEvent.ClientID))
-// 	}
-// 	if idpEvent.TeamID != nil {
-// 		appleCols = append(appleCols, handler.NewCol(AppleTeamIDCol, *idpEvent.TeamID))
-// 	}
-// 	if idpEvent.KeyID != nil {
-// 		appleCols = append(appleCols, handler.NewCol(AppleKeyIDCol, *idpEvent.KeyID))
-// 	}
-// 	if idpEvent.PrivateKey != nil {
-// 		appleCols = append(appleCols, handler.NewCol(ApplePrivateKeyCol, *idpEvent.PrivateKey))
-// 	}
-// 	if idpEvent.Scopes != nil {
-// 		appleCols = append(appleCols, handler.NewCol(AppleScopesCol, database.TextArray[string](idpEvent.Scopes)))
-// 	}
-// 	return appleCols
-// }
-
-// func reduceSAMLIDPChangedColumns(idpEvent idp.SAMLIDPChangedEvent) []handler.Column {
-// 	SAMLCols := make([]handler.Column, 0, 5)
-// 	if idpEvent.Metadata != nil {
-// 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLMetadataCol, idpEvent.Metadata))
-// 	}
-// 	if idpEvent.Key != nil {
-// 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLKeyCol, idpEvent.Key))
-// 	}
-// 	if idpEvent.Certificate != nil {
-// 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLCertificateCol, idpEvent.Certificate))
-// 	}
-// 	if idpEvent.Binding != nil {
-// 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLBindingCol, *idpEvent.Binding))
-// 	}
-// 	if idpEvent.WithSignedRequest != nil {
-// 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLWithSignedRequestCol, *idpEvent.WithSignedRequest))
-// 	}
-// 	if idpEvent.NameIDFormat != nil {
-// 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLNameIDFormatCol, *idpEvent.NameIDFormat))
-// 	}
-// 	if idpEvent.TransientMappingAttributeName != nil {
-// 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLTransientMappingAttributeName, *idpEvent.TransientMappingAttributeName))
-// 	}
-// 	if idpEvent.FederatedLogoutEnabled != nil {
-// 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLFederatedLogoutEnabled, *idpEvent.FederatedLogoutEnabled))
-// 	}
-// 	return SAMLCols
-// }
 
 func reduceIDPRelationalChangedTemplateColumns(name *string, optionChanges idp.OptionChanges, cols *[]handler.Column) {
 	if name != nil {
