@@ -26,7 +26,7 @@ import "validate/validate.proto";
 
 package zitadel.management.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/management";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/management";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
@@ -191,11 +191,11 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         }
     }
     extensions: {
-		key: "x-zitadel-orgid";
-		value: {
-			string_value: "$YOUR-ORGANIZATION";
-		}
-	}
+        key: "x-zitadel-orgid";
+        value: {
+            string_value: "$YOUR-ORGANIZATION";
+        }
+    }
 };
 
 service ManagementService {
@@ -280,7 +280,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 ListUsers, with InUserIDQuery
+    // User by ID
+    //
+    // Deprecated: use [user service v2 ListUsers with InUserIDQuery](apis/resources/user_service_v2/user-service-list-users.api.mdx) instead.
+    //
+    // Returns the full user object (human or machine) including the profile, email, etc.
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
             get: "/users/{id}"
@@ -291,8 +295,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "User by ID";
-            description: "Returns the full user object (human or machine) including the profile, email, etc.\n\nDeprecated: please use user service v2 GetUserByID"
             tags: "Users";
             deprecated: true;
             responses: {
@@ -312,7 +314,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 ListUsers, with LoginNameQuery
+    // Get User by login name (globally)
+    //
+    // Deprecated: use [user service v2 ListUsers with LoginNameQuery](apis/resources/user_service_v2/user-service-list-users.api.mdx) instead.
+    //
+    // Get a user by login name searched over all organizations. The request only returns data if the login name matches exactly.
     rpc GetUserByLoginNameGlobal(GetUserByLoginNameGlobalRequest) returns (GetUserByLoginNameGlobalResponse) {
         option (google.api.http) = {
             get: "/global/users/_by_login_name"
@@ -323,8 +329,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get User by login name (globally)";
-            description: "Get a user by login name searched over all organizations. The request only returns data if the login name matches exactly.\n\nDeprecated: please use user service v2 ListUsers, with LoginNameQuery"
             tags: "Users";
             tags: "Global";
             deprecated: true;
@@ -337,7 +341,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 ListUsers
+    // Search Users
+    //
+    // Deprecated: use [user service v2 ListUsers](apis/resources/user_service_v2/user-service-list-users.api.mdx) instead.
+    //
+    // Search for users within an organization. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination.
     rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
         option (google.api.http) = {
             post: "/users/_search"
@@ -351,8 +359,6 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             deprecated: true;
-            summary: "Search Users";
-            description: "Search for users within an organization. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination.\n\nDeprecated: please use user service v2 ListUsers"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -406,7 +412,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 ListUsers, is unique when no user is returned
+    // Check for existing user
+    //
+    // Deprecated: use [user service v2 ListUsers](apis/resources/user_service_v2/user-service-list-users.api.mdx) instead, is unique if no user returned.
+    //
+    // Returns if a user with the requested email or username is unique. So you can create the user.
     rpc IsUserUnique(IsUserUniqueRequest) returns (IsUserUniqueResponse) {
         option (google.api.http) = {
             get: "/users/_is_unique"
@@ -419,8 +429,6 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             deprecated: true;
-            summary: "Check for existing user";
-            description: "Returns if a user with the requested email or username is unique. So you can create the user. \n\nDeprecated: please use user service v2 ListUsers, is unique when no user is returned"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -434,7 +442,7 @@ service ManagementService {
 
     // Create User (Human)
     //
-    // Deprecated: use [ImportHumanUser](apis/resources/mgmt/management-service-import-human-user.api.mdx) instead.
+    // Deprecated: use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) instead.
     //
     // Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
     rpc AddHumanUser(AddHumanUserRequest) returns (AddHumanUserResponse) {
@@ -463,7 +471,7 @@ service ManagementService {
 
     // Create/Import User (Human)
     //
-    // Deprecated: use [UpdateHumanUser](apis/resources/user_service_v2/user-service-update-human-user.api.mdx) instead.
+    // Deprecated: use [user service v2 UpdateHumanUser](apis/resources/user_service_v2/user-service-update-human-user.api.mdx) instead.
     //
     // Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.
     rpc ImportHumanUser(ImportHumanUserRequest) returns (ImportHumanUserResponse) {
@@ -493,6 +501,8 @@ service ManagementService {
 
     // Create User (Machine)
     //
+    // Deprecated: use [user service v2 CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) instead.
+    //
     // Create a new user with the type machine for your API, service or device. These users are used for non-interactive authentication flows.
     rpc AddMachineUser(AddMachineUserRequest) returns (AddMachineUserResponse) {
         option (google.api.http) = {
@@ -505,6 +515,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -524,7 +535,13 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 DeactivateUser
+    // Deactivate User
+    //
+    // Deprecated: use [user service v2 DeactivateUser](apis/resources/user_service_v2/user-service-deactivate-user.api.mdx) instead.
+    //
+    // The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore.
+    // The endpoint returns an error if the user is already in the state 'deactivated'.
+    // Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data.
     rpc DeactivateUser(DeactivateUserRequest) returns (DeactivateUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_deactivate"
@@ -536,8 +553,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Deactivate user";
-            description: "The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data.\n\nDeprecated: please use user service v2 DeactivateUser"
             tags: "Users";
             deprecated: true;
             responses: {
@@ -557,7 +572,12 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 ReactivateUser
+    // Deactivate User
+    //
+    // Deprecated: use [user service v2 ReactivateUser](apis/resources/user_service_v2/user-service-reactivate-user.api.mdx) instead.
+    //
+    // Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward.
+    // The endpoint returns an error if the user is not in the state 'deactivated'.
     rpc ReactivateUser(ReactivateUserRequest) returns (ReactivateUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_reactivate"
@@ -569,8 +589,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Reactivate user";
-            description: "Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'deactivated'.\n\nDeprecated: please use user service v2 ReactivateUser"
             tags: "Users";
             deprecated: true;
             responses: {
@@ -590,7 +608,13 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 LockUser
+    // Lock User
+    //
+    // Deprecated: use [user service v2 LockUser](apis/resources/user_service_v2/user-service-lock-user.api.mdx) instead.
+    //
+    // The state of the user will be changed to 'locked'. The user will not be able to log in anymore.
+    // The endpoint returns an error if the user is already in the state 'locked'.
+    // Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.).
     rpc LockUser(LockUserRequest) returns (LockUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_lock"
@@ -602,8 +626,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Lock user";
-            description: "The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.),\n\nDeprecated: please use user service v2 LockUser"
             tags: "Users";
             deprecated: true;
             responses: {
@@ -623,7 +645,12 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 UnlockUser
+    // Unlock User
+    //
+    // Deprecated: use [user service v2 UnlockUser](apis/resources/user_service_v2/user-service-unlock-user.api.mdx) instead.
+    //
+    // Unlock a user with the state 'locked'. The user will be able to log in again afterward.
+    // The endpoint returns an error if the user is not in the state 'locked'.
     rpc UnlockUser(UnlockUserRequest) returns (UnlockUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_unlock"
@@ -635,8 +662,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Unlock user";
-            description: "Unlock a user with the state 'locked'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'locked'.\n\nDeprecated: please use user service v2 UnlockUser"
             tags: "Users";
             deprecated: true;
             responses: {
@@ -656,7 +681,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 RemoveUser
+    // Unlock User
+    //
+    // Deprecated: use [user service v2 DeleteUser](apis/resources/user_service_v2/user-service-delete-user.api.mdx) instead.
+    //
+    // The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found.
     rpc RemoveUser(RemoveUserRequest) returns (RemoveUserResponse) {
         option (google.api.http) = {
             delete: "/users/{id}"
@@ -667,8 +696,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Delete user";
-            description: "The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found.\n\nDeprecated: please use user service v2 RemoveUser"
             tags: "Users";
             deprecated: true;
             responses: {
@@ -690,7 +717,9 @@ service ManagementService {
 
     // Change user name
     //
-    // Change the username of the user. Be aware that the user has to log in with the newly added username afterward
+    // Deprecated: use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+    //
+    // Change the username of the user. Be aware that the user has to log in with the newly added username afterward.
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/username"
@@ -703,6 +732,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -720,6 +750,11 @@ service ManagementService {
         };
     }
 
+    // Set User Metadata
+    //
+    // Deprecated: use [SetUserMetadata](apis/resources/user_service_v2/user-service-set-user-metadata.api.mdx) instead.
+    //
+    // This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
     rpc SetUserMetadata(SetUserMetadataRequest) returns (SetUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/{key}"
@@ -733,8 +768,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            summary: "Set User Metadata";
-            description: "This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -746,6 +780,11 @@ service ManagementService {
         };
     }
 
+    // Bulk Set User Metadata
+    //
+    // Deprecated: use [SetUserMetadata](apis/resources/user_service_v2/user-service-set-user-metadata.api.mdx) instead.
+    //
+    // Add or update multiple metadata values for a user. Make sure the values are base64 encoded.
     rpc BulkSetUserMetadata(BulkSetUserMetadataRequest) returns (BulkSetUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/_bulk"
@@ -759,8 +798,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            summary: "Bulk Set User Metadata";
-            description: "Add or update multiple metadata values for a user. Make sure the values are base64 encoded."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -772,6 +810,11 @@ service ManagementService {
         };
     }
 
+    // Search User Metadata
+    //
+    // Deprecated: use [ListUserMetadata](apis/resources/user_service_v2/user-service-list-user-metadata.api.mdx) instead.
+    //
+    // Get the metadata of a user filtered by your query.
     rpc ListUserMetadata(ListUserMetadataRequest) returns (ListUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/_search"
@@ -785,8 +828,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            summary: "Search User Metadata";
-            description: "Get the metadata of a user filtered by your query."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -798,6 +840,11 @@ service ManagementService {
         };
     }
 
+    // Get User Metadata By Key
+    //
+    // Deprecated: use [ListUserMetadata](apis/resources/user_service_v2/user-service-list-user-metadata.api.mdx) instead.
+    //
+    // Get a metadata object from a user by a specific key.
     rpc GetUserMetadata(GetUserMetadataRequest) returns (GetUserMetadataResponse) {
         option (google.api.http) = {
             get: "/users/{id}/metadata/{key}"
@@ -810,8 +857,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            summary: "Get User Metadata By Key";
-            description: "Get a metadata object from a user by a specific key."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -823,6 +869,11 @@ service ManagementService {
         };
     }
 
+    // Delete User Metadata By Key
+    //
+    // Deprecated: use [DeleteUserMetadata](apis/resources/user_service_v2/user-service-delete-user-metadata.api.mdx) instead.
+    //
+    // Get a metadata object from a user by a specific key.
     rpc RemoveUserMetadata(RemoveUserMetadataRequest) returns (RemoveUserMetadataResponse) {
         option (google.api.http) = {
             delete: "/users/{id}/metadata/{key}"
@@ -835,8 +886,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            summary: "Delete User Metadata By Key";
-            description: "Remove a metadata object from a user with a specific key."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -848,6 +898,11 @@ service ManagementService {
         };
     }
 
+    // Delete User Metadata By Key
+    //
+    // Deprecated: use [DeleteUserMetadata](apis/resources/user_service_v2/user-service-delete-user-metadata.api.mdx) instead.
+    //
+    // Remove a list of metadata objects from a user with a list of keys.
     rpc BulkRemoveUserMetadata(BulkRemoveUserMetadataRequest) returns (BulkRemoveUserMetadataResponse) {
         option (google.api.http) = {
             delete: "/users/{id}/metadata/_bulk"
@@ -861,8 +916,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Metadata";
-            summary: "Bulk Delete Metadata";
-            description: "Remove a list of metadata objects from a user with a list of keys."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -874,7 +928,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 GetUserByID
+    // Get User Profile (Human)
+    //
+    // Deprecated: use [user service v2 GetUserByID](apis/resources/user_service_v2/user-service-get-user-by-id.api.mdx) instead.
+    //
+    // Get basic information like first_name and last_name of a user.
     rpc GetHumanProfile(GetHumanProfileRequest) returns (GetHumanProfileResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/profile"
@@ -885,8 +943,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get User Profile (Human)";
-            description: "Get basic information like first_name and last_name of a user.\n\nDeprecated: please use user service v2 GetUserByID"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -943,7 +999,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 GetUserByID
+    // Get User Email (Human)
+    //
+    // Deprecated: use [user service v2 GetUserByID](apis/resources/user_service_v2/user-service-get-user-by-id.api.mdx) instead.
+    //
+    // Get the email address and the verification state of the address.
     rpc GetHumanEmail(GetHumanEmailRequest) returns (GetHumanEmailResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/email"
@@ -954,8 +1014,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get User Email (Human)";
-            description: "Get the email address and the verification state of the address.\n\nDeprecated: please use user service v2 GetUserByID"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1012,8 +1070,12 @@ service ManagementService {
         };
     }
 
-    // Deprecated: not used anymore in user state
-    // To resend a verification email use the user service v2 ResendEmailCode
+
+    // Resend User Initialization Email
+    //
+    // Deprecated: not used anymore in user state so will be removed.
+    //
+    // A newly created user will get an initialization email to verify the email address and set a password. Resend the email with this request to the user's email address, or a newly added address.
     rpc ResendHumanInitialization(ResendHumanInitializationRequest) returns (ResendHumanInitializationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/_resend_initialization"
@@ -1025,8 +1087,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Resend User Initialization Email";
-            description: "A newly created user will get an initialization email to verify the email address and set a password. Resend the email with this request to the user's email address, or a newly added address.\n\nDeprecated: not used anymore in user state"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1083,7 +1143,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 GetUserByID
+    // Get User Phone (Human)
+    //
+    // Deprecated: use [user service v2 GetUserByID](apis/resources/user_service_v2/user-service-get-user-by-id.api.mdx) instead.
+    //
+    // Get the phone number and the verification state of the number. The phone number is only for informational purposes and to send messages, not for Authentication (2FA).
     rpc GetHumanPhone(GetHumanPhoneRequest) returns (GetHumanPhoneResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/phone"
@@ -1094,8 +1158,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get User Phone (Human)";
-            description: "Get the phone number and the verification state of the number. The phone number is only for informational purposes and to send messages, not for Authentication (2FA).\n\nDeprecated: please use user service v2 GetUserByID"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1118,6 +1180,8 @@ service ManagementService {
 
     // Update User Phone (Human)
     //
+    // Deprecated: use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+    //
     // Change the phone number of a user. If the state is set to not verified, the user will get an SMS to verify (if a notification provider is configured). The phone number is only for informational purposes and to send messages, not for Authentication (2FA).
     rpc UpdateHumanPhone(UpdateHumanPhoneRequest) returns (UpdateHumanPhoneResponse) {
         option (google.api.http) = {
@@ -1132,6 +1196,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1220,6 +1285,9 @@ service ManagementService {
         };
     }
 
+    // Delete User Avatar (Human)
+    //
+    // Removes the avatar that is currently set on the user.
     rpc RemoveHumanAvatar(RemoveHumanAvatarRequest) returns (RemoveHumanAvatarResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/avatar"
@@ -1230,8 +1298,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Delete User Avatar (Human)";
-            description: "Removes the avatar that is currently set on the user."
             tags: "Users";
             tags: "User Human"
             responses: {
@@ -1349,7 +1415,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 ListAuthenticationMethodTypes
+    // Get User Authentication Factors (2FA/MFA)
+    //
+    // Deprecated: use [user service v2 ListAuthenticationMethodTypes](apis/resources/user_service_v2/user-service-list-authentication-method-types.api.mdx) instead.
+    //
+    // Get a list of authentication factors the user has set. Including Second Factors (2FA) and Multi-Factors (MFA).
     rpc ListHumanAuthFactors(ListHumanAuthFactorsRequest) returns (ListHumanAuthFactorsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/auth_factors/_search"
@@ -1360,8 +1430,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get User Authentication Factors (2FA/MFA)";
-            description: "Get a list of authentication factors the user has set. Including Second Factors (2FA) and Multi-Factors (MFA).\n\nDeprecated: please use user service v2 ListAuthenticationMethodTypes"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1382,7 +1450,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 RemoveTOTP
+    // Remove Multi-Factor OTP
+    //
+    // Deprecated: use [user service v2 RemoveTOTP](apis/resources/user_service_v2/user-service-remove-totp.api.mdx) instead.
+    //
+    // Remove the configured One-Time Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.
     rpc RemoveHumanAuthFactorOTP(RemoveHumanAuthFactorOTPRequest) returns (RemoveHumanAuthFactorOTPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp"
@@ -1393,8 +1465,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Remove Multi-Factor OTP";
-            description: "Remove the configured One-Time Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.\n\nDeprecated: please use user service v2 RemoveTOTP"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1415,7 +1485,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 RemoveU2F
+    // Remove Multi-Factor U2F
+    //
+    // Deprecated: use [user service v2 RemoveU2F](apis/resources/user_service_v2/user-service-remove-u-2-f.api.mdx) instead.
+    //
+    // Remove the configured Universal Second Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc.
     rpc RemoveHumanAuthFactorU2F(RemoveHumanAuthFactorU2FRequest) returns (RemoveHumanAuthFactorU2FResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/u2f/{token_id}"
@@ -1426,9 +1500,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Remove Multi-Factor U2F";
             deprecated: true;
-            description: "Remove the configured Universal Second Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc.\n\nDeprecated: please use user service v2 RemoveU2F"
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1448,7 +1520,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 RemoveOTPSMS
+    // Remove Multi-Factor OTP SMS
+    //
+    // Deprecated: use [user service v2 RemoveOTPSMS](apis/resources/user_service_v2/user-service-remove-otpsms.api.mdx) instead.
+    //
+    // Remove the configured One-Time Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
     rpc RemoveHumanAuthFactorOTPSMS(RemoveHumanAuthFactorOTPSMSRequest) returns (RemoveHumanAuthFactorOTPSMSResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp_sms"
@@ -1459,8 +1535,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Remove Multi-Factor OTP SMS";
-            description: "Remove the configured One-Time Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPSMS"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1481,7 +1555,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 RemoveOTPEmail
+    // Remove Multi-Factor OTP Email
+    //
+    // Deprecated: use [user service v2 RemoveOTPEmail](apis/resources/user_service_v2/user-service-remove-otp-email.api.mdx) instead.
+    //
+    // Remove the configured One-Time Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.
     rpc RemoveHumanAuthFactorOTPEmail(RemoveHumanAuthFactorOTPEmailRequest) returns (RemoveHumanAuthFactorOTPEmailResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp_email"
@@ -1492,8 +1570,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Remove Multi-Factor OTP SMS";
-            description: "Remove the configured One-Time Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPEmail"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1514,7 +1590,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 ListPasskeys
+    // Search Passwordless/Passkey authentication
+    //
+    // Deprecated: use [user service v2 ListPasskeys](apis/resources/user_service_v2/user-service-list-passkeys.api.mdx) instead.
+    //
+    // Get a list of configured passwordless/passkey authentication methods from the user. Passwordless/passkey is a device-dependent authentication like FingerScan, WindowsHello or a Hardware Token.
     rpc ListHumanPasswordless(ListHumanPasswordlessRequest) returns (ListHumanPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_search"
@@ -1525,9 +1605,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Search Passwordless/Passkey authentication";
             deprecated: true;
-            description: "Get a list of configured passwordless/passkey authentication methods from the user. Passwordless/passkey is a device-dependent authentication like FingerScan, WindowsHello or a Hardware Token.\n\nDeprecated: please use user service v2 ListPasskeys"
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1547,7 +1625,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 RegisterPasskey
+    // Add Passwordless/Passkey Registration Link
+    //
+    // Deprecated: use [user service v2 RegisterPasskey](apis/resources/user_service_v2/user-service-register-passkey.api.mdx) instead.
+    //
+    // Adds a new passwordless/passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
     rpc AddPasswordlessRegistration(AddPasswordlessRegistrationRequest) returns (AddPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_link"
@@ -1557,8 +1639,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Add Passwordless/Passkey Registration Link";
-            description: "Adds a new passwordless/passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone\n\nDeprecated: please use user service v2 RegisterPasskey"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1579,7 +1659,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 RegisterPasskey
+    // Send Passwordless/Passkey Registration Link
+    //
+    // Deprecated: use [user service v2 RegisterPasskey](apis/resources/user_service_v2/user-service-register-passkey.api.mdx) instead.
+    //
+    // Adds a new passwordless/passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.
     rpc SendPasswordlessRegistration(SendPasswordlessRegistrationRequest) returns (SendPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_send_link"
@@ -1590,8 +1674,6 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Send Passwordless/Passkey Registration Link";
-            description: "Adds a new passwordless/passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.\n\nDeprecated: please use user service v2 RegisterPasskey"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1612,7 +1694,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 RemovePasskey
+    // Delete Passwordless/Passkey
+    //
+    // Deprecated: use [user service v2 RemovePasskey](apis/resources/user_service_v2/user-service-remove-passkey.api.mdx) instead.
+    //
+    // Remove a configured passwordless/passkey authentication method from the user. (e.g FaceID, FingerScane, WindowsHello, etc.).
     rpc RemoveHumanPasswordless(RemoveHumanPasswordlessRequest) returns (RemoveHumanPasswordlessResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/passwordless/{token_id}"
@@ -1623,9 +1709,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Delete Passwordless/Passkey";
             deprecated: true;
-            description: "Remove a configured passwordless/passkey authentication method from the user. (e.g FaceID, FingerScane, WindowsHello, etc.).\n\nDeprecated: please use user service v2 RemovePasskey"
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1647,6 +1731,8 @@ service ManagementService {
 
     // Update Machine User
     //
+    // Deprecated: use [user service v2 UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+    //
     // Change a service account/machine user. It is used for accounts with non-interactive authentication possibilities.
     rpc UpdateMachine(UpdateMachineRequest) returns (UpdateMachineResponse) {
         option (google.api.http) = {
@@ -1661,6 +1747,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Machine";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1680,6 +1767,8 @@ service ManagementService {
 
     // Create Secret for Machine User
     //
+    // Deprecated: use [user service v2 AddSecret](apis/resources/user_service_v2/user-service-add-secret.api.mdx) instead.
+    //
     // Create a new secret for a machine user/service account. It is used to authenticate the user (client credential grant).
     rpc GenerateMachineSecret(GenerateMachineSecretRequest) returns (GenerateMachineSecretResponse) {
         option (google.api.http) = {
@@ -1694,6 +1783,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Machine";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1713,6 +1803,8 @@ service ManagementService {
 
     // Delete Secret of Machine User
     //
+    // Deprecated: use [user service v2 RemoveSecret](apis/resources/user_service_v2/user-service-remove-secret.api.mdx) instead.
+    //
     // Delete a secret of a machine user/service account. The user will not be able to authenticate with the secret afterward.
     rpc RemoveMachineSecret(RemoveMachineSecretRequest) returns (RemoveMachineSecretResponse) {
         option (google.api.http) = {
@@ -1726,6 +1818,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Machine";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1745,6 +1838,8 @@ service ManagementService {
 
     // Get Machine user Key By ID
     //
+    // Deprecated: use [user service v2 ListUsers](apis/resources/user_service_v2/user-service-list-users.api.mdx) instead.
+    //
     // Get a specific Key of a machine user by its id. Machine keys are used to authenticate with jwt profile authentication.
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
         option (google.api.http) = {
@@ -1758,6 +1853,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Machine";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1777,6 +1873,8 @@ service ManagementService {
 
     // List Machine Keys
     //
+    // Deprecated: use [user service v2 ListKeys](apis/resources/user_service_v2/user-service-list-keys.api.mdx) instead.
+    //
     // Get the list of keys of a machine user. Machine keys are used to authenticate with jwt profile authentication.
     rpc ListMachineKeys(ListMachineKeysRequest) returns (ListMachineKeysResponse) {
         option (google.api.http) = {
@@ -1791,6 +1889,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Machine";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1810,6 +1909,8 @@ service ManagementService {
 
     // Create Key for machine user
     //
+    // Deprecated: use [user service v2 AddKey](apis/resources/user_service_v2/user-service-add-key.api.mdx) instead.
+    //
     // If a public key is not supplied, a new key is generated and will be returned in the response.
     // Make sure to store the returned key.
     // If an RSA public key is supplied, the private key is omitted from the response.
@@ -1827,6 +1928,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Machine";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1846,6 +1948,8 @@ service ManagementService {
 
     // Delete Key for machine user
     //
+    // Deprecated: use [user service v2 RemoveKey](apis/resources/user_service_v2/user-service-remove-key.api.mdx) instead.
+    //
     // Delete a specific key from a user.
     // The user will not be able to authenticate with that key afterward.
     rpc RemoveMachineKey(RemoveMachineKeyRequest) returns (RemoveMachineKeyResponse) {
@@ -1860,6 +1964,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Machine";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1879,6 +1984,8 @@ service ManagementService {
 
     // Get Personal-Access-Token (PAT) by ID
     //
+    // Deprecated: use [user service v2 ListPersonalAccessTokens](apis/resources/user_service_v2/user-service-list-personal-access-tokens.api.mdx) instead.
+    //
     // Returns the PAT for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header.
     rpc GetPersonalAccessTokenByIDs(GetPersonalAccessTokenByIDsRequest) returns (GetPersonalAccessTokenByIDsResponse) {
         option (google.api.http) = {
@@ -1892,6 +1999,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Machine";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1911,6 +2019,8 @@ service ManagementService {
 
     // List Personal-Access-Tokens (PATs)
     //
+    // Deprecated: use [user service v2 ListPersonalAccessTokens](apis/resources/user_service_v2/user-service-list-personal-access-tokens.api.mdx) instead.
+    //
     // Returns a list of PATs for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header.
     rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
         option (google.api.http) = {
@@ -1925,6 +2035,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Machine";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1944,6 +2055,8 @@ service ManagementService {
 
     // Create a Personal-Access-Token (PAT)
     //
+    // Deprecated: use [user service v2 AddPersonalAccessToken](apis/resources/user_service_v2/user-service-add-personal-access-token.api.mdx) instead.
+    //
     // Generates a new PAT for the user. Currently only available for machine users.
     // The token will be returned in the response, make sure to store it.
     // PATs are ready-to-use tokens and can be sent directly in the authentication header.
@@ -1960,6 +2073,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Machine";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1979,6 +2093,8 @@ service ManagementService {
 
     // Remove a Personal-Access-Token (PAT) by ID
     //
+    // Deprecated: use [user service v2 RemovePersonalAccessToken](apis/resources/user_service_v2/user-service-remove-personal-access-token.api.mdx) instead.
+    //
     // Delete a PAT from a user. Afterward, the user will not be able to authenticate with that token anymore.
     rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
         option (google.api.http) = {
@@ -1990,6 +2106,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            deprecated: true;
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -2009,7 +2126,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use user service v2 ListLinkedIDPs
+    // List Social Logins
+    //
+    // Deprecated: use [user service v2 ListLinkedIDPs](apis/resources/user_service_v2/user-service-list-idp-links.api.mdx) instead.
+    //
+    // Returns a list of all linked identity providers/social logins of the user. (e. Google, Microsoft, AzureAD, etc.).
     rpc ListHumanLinkedIDPs(ListHumanLinkedIDPsRequest) returns (ListHumanLinkedIDPsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/idps/_search"
@@ -2022,9 +2143,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users"
-            summary: "List Social Logins";
             deprecated: true;
-            description: "Returns a list of all linked identity providers/social logins of the user. (e. Google, Microsoft, AzureAD, etc.).\n\nDeprecated: please use user service v2 ListLinkedIDPs"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2036,7 +2155,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: please use [user service v2 RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp-link.api.mdx)
+    // Remove Social Login
+    //
+    // Deprecated: use [user service v2 RemoveIDPLink](apis/resources/user_service_v2/user-service-remove-idp-link.api.mdx) instead.
+    //
+    // Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate.
     rpc RemoveHumanLinkedIDP(RemoveHumanLinkedIDPRequest) returns (RemoveHumanLinkedIDPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/idps/{idp_id}/{linked_user_id}"
@@ -2048,9 +2171,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users"
-            summary: "Remove Social Login";
             deprecated: true;
-            description: "Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate.\n\nDeprecated: please use user service v2 RemoveLinkedIDP"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2062,6 +2183,11 @@ service ManagementService {
         };
     }
 
+    // List ZITADEL Permissions
+    //
+    // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-list-administrators.api.mdx) instead.
+    //
+    // Show all the permissions the user has in ZITADEL (ZITADEL Manager).
     rpc ListUserMemberships(ListUserMembershipsRequest) returns (ListUserMembershipsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/memberships/_search"
@@ -2074,8 +2200,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users"
-            summary: "List ZITADEL Permissions";
-            description: "Show all the permissions the user has in ZITADEL (ZITADEL Manager)."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2111,6 +2236,11 @@ service ManagementService {
         };
     }
 
+    // Get Organization By Domain
+    //
+    // Deprecated: use [organization v2 service ListOrganizations](apis/resources/org_service_v2/organization-service-list-organizations.api.mdx) instead.
+    //
+    // Search an organization by the domain, overall organizations. The domain must match exactly.
     rpc GetOrgByDomainGlobal(GetOrgByDomainGlobalRequest) returns (GetOrgByDomainGlobalResponse) {
         option (google.api.http) = {
             get: "/global/orgs/_by_domain"
@@ -2122,8 +2252,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Get Organization By Domain";
-            description: "Search an organization by the domain, overall organizations. The domain must match exactly."
+            deprecated: true;
         };
     }
 
@@ -2152,7 +2281,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use CreateOrganization [apis/resources/org_service_v2beta/organization-service-create-organization.api.mdx] API instead
+    // Create Organization
+    //
+    // Deprecated: use [organization service v2 CreateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-create-organization.api.mdx) instead
+    //
+    // Create a new organization. Based on the given name a domain will be generated to be able to identify users within an organization.
     rpc AddOrg(AddOrgRequest) returns (AddOrgResponse) {
         option (google.api.http) = {
             post: "/orgs"
@@ -2165,8 +2298,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Create Organization";
-            description: "Create a new organization. Based on the given name a domain will be generated to be able to identify users within an organization."
             deprecated: true
             parameters: {
                 headers: {
@@ -2179,7 +2310,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use UpdateOrganization [apis/resources/org_service_v2beta/organization-service-update-organization.api.mdx] API instead
+    // Update Organization
+    //
+    // Deprecated: use [organization service v2 UpdateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-update-organization.api.mdx) instead.
+    //
+    // Change the name of the organization.
     rpc UpdateOrg(UpdateOrgRequest) returns (UpdateOrgResponse) {
         option (google.api.http) = {
             put: "/orgs/me"
@@ -2192,8 +2327,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Update Organization";
-            description: "Change the name of the organization."
             deprecated: true
             parameters: {
                 headers: {
@@ -2206,7 +2339,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use DeactivateOrganization [apis/resources/org_service_v2beta/organization-service-deactivate-organization.api.mdx] API instead
+    // Deactivate Organization
+    //
+    // Deprecated: use [organization service v2 DeactivateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-deactivate-organization.api.mdx) instead.
+    //
+    // Sets the state of my organization to deactivated. Users of this organization will not be able to log in.
     rpc DeactivateOrg(DeactivateOrgRequest) returns (DeactivateOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/me/_deactivate"
@@ -2219,8 +2356,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Deactivate Organization";
-            description: "Sets the state of my organization to deactivated. Users of this organization will not be able to log in."
             deprecated: true
             parameters: {
                 headers: {
@@ -2233,7 +2368,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use ActivateOrganization [apis/resources/org_service_v2beta/organization-service-activate-organization.api.mdx] API instead
+    // Reactivate Organization
+    //
+    // Deprecated: use [organization service v2 ActivateOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-activate-organization.api.mdx) instead.
+    //
+    // Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again.
     rpc ReactivateOrg(ReactivateOrgRequest) returns (ReactivateOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/me/_reactivate"
@@ -2246,8 +2385,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Reactivate Organization";
-            description: "Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again."
             deprecated: true
             parameters: {
                 headers: {
@@ -2260,7 +2397,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use DeleteOrganization [apis/resources/org_service_v2beta/organization-service-delete-organization.api.mdx] API instead
+    // Delete Organization
+    //
+    // Deprecated: use [organization service v2 DeleteOrganization](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization.api.mdx) instead.
+    //
+    // Deletes my organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in.
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
         option (google.api.http) = {
             delete: "/orgs/me"
@@ -2272,8 +2413,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Delete Organization";
-            description: "Deletes my organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in."
             deprecated: true
             parameters: {
                 headers: {
@@ -2286,7 +2425,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use SetOrganizationMetadata [apis/resources/org_service_v2beta/organization-service-set-organization-metadata.api.mdx] API instead
+    // Set Organization Metadata
+    //
+    // Deprecated: use [organization service v2 SetOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-set-organization-metadata.api.mdx) instead.
+    //
+    // This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded.
     rpc SetOrgMetadata(SetOrgMetadataRequest) returns (SetOrgMetadataResponse) {
         option (google.api.http) = {
             post: "/metadata/{key}"
@@ -2300,8 +2443,6 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             tags: "Organization Metadata";
-            summary: "Set Organization Metadata";
-            description: "This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
             deprecated: true
             parameters: {
                 headers: {
@@ -2314,7 +2455,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use SetOrganizationMetadata [apis/resources/org_service_v2beta/organization-service-set-organization-metadata.api.mdx] API instead
+    // Bulk Set Organization Metadata
+    //
+    // Deprecated: use [organization service v2 SetOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-set-organization-metadata.api.mdx) instead.
+    //
+    // This endpoint sets a list of metadata to the organization. Make sure the values are base64 encoded.
     rpc BulkSetOrgMetadata(BulkSetOrgMetadataRequest) returns (BulkSetOrgMetadataResponse) {
         option (google.api.http) = {
             post: "/metadata/_bulk"
@@ -2328,8 +2473,6 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             tags: "Organization Metadata";
-            summary: "Bulk Set Organization Metadata";
-            description: "This endpoint sets a list of metadata to the organization. Make sure the values are base64 encoded."
             deprecated: true
             parameters: {
                 headers: {
@@ -2342,7 +2485,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use ListOrganizationMetadata [apis/resources/org_service_v2beta/organization-service-list-organization-metadata.api.mdx] API instead
+    // Search Organization Metadata
+    //
+    // Deprecated: use [organization service v2 ListOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-list-organization-metadata.api.mdx) instead.
+    //
+    // Get the metadata of an organization filtered by your query.
     rpc ListOrgMetadata(ListOrgMetadataRequest) returns (ListOrgMetadataResponse) {
         option (google.api.http) = {
             post: "/metadata/_search"
@@ -2356,8 +2503,6 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             tags: "Organization Metadata";
-            summary: "Search Organization Metadata";
-            description: "Get the metadata of an organization filtered by your query."
             deprecated: true
             parameters: {
                 headers: {
@@ -2370,7 +2515,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use ListOrganizationMetadata [apis/resources/org_service_v2beta/organization-service-list-organization-metadata.api.mdx] API instead
+    // Get Organization Metadata By Key
+    //
+    // Deprecated: use [organization service v2 ListOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-list-organization-metadata.api.mdx) instead.
+    //
+    // Get a metadata object from an organization by a specific key.
     rpc GetOrgMetadata(GetOrgMetadataRequest) returns (GetOrgMetadataResponse) {
         option (google.api.http) = {
             get: "/metadata/{key}"
@@ -2383,8 +2532,6 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             tags: "Organization Metadata";
-            summary: "Get Organization Metadata By Key";
-            description: "Get a metadata object from an organization by a specific key."
             deprecated: true
             parameters: {
                 headers: {
@@ -2397,7 +2544,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use DeleteOrganizationMetadata [apis/resources/org_service_v2beta/organization-service-delete-organization-metadata.api.mdx] API instead
+    // Delete Organization Metadata By Key
+    //
+    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization-metadata.api.mdx) instead.
+    //
+    // Remove a metadata object from an organization with a specific key.
     rpc RemoveOrgMetadata(RemoveOrgMetadataRequest) returns (RemoveOrgMetadataResponse) {
         option (google.api.http) = {
             delete: "/metadata/{key}"
@@ -2410,8 +2561,6 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
             tags: "Organization Metadata";
-            summary: "Delete Organization Metadata By Key";
-            description: "Remove a metadata object from an organization with a specific key."
             deprecated: true
             parameters: {
                 headers: {
@@ -2424,7 +2573,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use DeleteOrganizationMetadata [apis/resources/org_service_v2beta/organization-service-delete-organization-metadata.api.mdx] API instead
+    // Bulk Delete Metadata
+    //
+    // Deprecated: use [organization service v2 DeleteOrganizationMetadata](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization-metadata.api.mdx) instead.
+    //
+    // Remove a list of metadata objects from an organization with a list of keys.
     rpc BulkRemoveOrgMetadata(BulkRemoveOrgMetadataRequest) returns (BulkRemoveOrgMetadataResponse) {
         option (google.api.http) = {
             delete: "/metadata/_bulk"
@@ -2439,8 +2592,6 @@ service ManagementService {
             tags: "Organizations";
             tags: "Organization Metadata";
             deprecated: true
-            summary: "Bulk Delete Metadata";
-            description: "Remove a list of metadata objects from an organization with a list of keys."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2452,7 +2603,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use AddOrganizationDomain [apis/resources/org_service_v2beta/organization-service-add-organization-domain.api.mdx] API instead
+    // Add Domain
+    //
+    // Deprecated: use [organization service v2 AddOrganizationDomain](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-add-organization-domain.api.mdx) instead.
+    //
+    // Add a new domain to an organization. The domains are used to identify to which organization a user belongs.
     rpc AddOrgDomain(AddOrgDomainRequest) returns (AddOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains"
@@ -2465,8 +2620,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Add Domain";
-            description: "Add a new domain to an organization. The domains are used to identify to which organization a user belongs."
             deprecated: true
             parameters: {
                 headers: {
@@ -2479,7 +2632,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use ListOrganizationDomains [apis/resources/org_service_v2beta/organization-service-list-organization-domains.api.mdx] API instead
+    // Search Domains
+    //
+    // Deprecated: use [organization service v2 ListOrganizationDomains](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-list-organization-domains.api.mdx) instead.
+    //
+    // Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs.
     rpc ListOrgDomains(ListOrgDomainsRequest) returns (ListOrgDomainsResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/_search"
@@ -2492,8 +2649,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Search Domains";
-            description: "Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs."
             deprecated: true
             parameters: {
                 headers: {
@@ -2506,7 +2661,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use DeleteOrganizationDomain [apis/resources/org_service_v2beta/organization-service-delete-organization-domain.api.mdx] API instead
+    // Remove Domain
+    //
+    // Deprecated: use [organization service v2 DeleteOrganizationDomain](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-delete-organization-domain.api.mdx) instead.
+    //
+    // Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead.
     rpc RemoveOrgDomain(RemoveOrgDomainRequest) returns (RemoveOrgDomainResponse) {
         option (google.api.http) = {
             delete: "/orgs/me/domains/{domain}"
@@ -2518,8 +2677,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Remove Domain";
-            description: "Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead."
             deprecated: true
             parameters: {
                 headers: {
@@ -2532,7 +2689,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use GenerateOrganizationDomainValidation [apis/resources/org_service_v2beta/organization-service-generate-organization-domain-validation.api.mdx] API instead
+    // Generate Domain Verification
+    //
+    // Deprecated: use [organization service v2 GenerateOrganizationDomainValidation](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-generate-organization-domain-validation.api.mdx) instead.
+    //
+    // Generate a new file to be able to verify your domain with DNS or HTTP challenge.
     rpc GenerateOrgDomainValidation(GenerateOrgDomainValidationRequest) returns (GenerateOrgDomainValidationResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/validation/_generate"
@@ -2545,8 +2706,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Generate Domain Verification";
-            description: "Generate a new file to be able to verify your domain with DNS or HTTP challenge."
             deprecated: true
             parameters: {
                 headers: {
@@ -2559,7 +2718,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: use VerifyOrganizationDomain [apis/resources/org_service_v2beta/organization-service-verify-organization-domain.api.mdx] API instead
+    // Verify Domain
+    //
+    // Deprecated: use [organization service v2 VerifyOrganizationDomain](apis/resources/org_service_v2beta/zitadel-org-v-2-beta-organization-service-verify-organization-domain.api.mdx) instead.
+    //
+    // Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique.
     rpc ValidateOrgDomain(ValidateOrgDomainRequest) returns (ValidateOrgDomainResponse) {
         option (google.api.http) = {
             post: "/orgs/me/domains/{domain}/validation/_validate"
@@ -2572,8 +2735,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Organizations";
-            summary: "Verify Domain";
-            description: "Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique."
             deprecated: true
             parameters: {
                 headers: {
@@ -2636,6 +2797,11 @@ service ManagementService {
         };
     }
 
+    // List Organization Members
+    //
+    // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-list-administrators.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the organization level, matching the search queries. The search queries will be AND linked.
     rpc ListOrgMembers(ListOrgMembersRequest) returns (ListOrgMembersResponse) {
         option (google.api.http) = {
             post: "/orgs/me/members/_search"
@@ -2650,8 +2816,7 @@ service ManagementService {
             tags: "Organizations"
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "List Organization Members";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the organization level, matching the search queries. The search queries will be AND linked."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2663,6 +2828,11 @@ service ManagementService {
         };
     }
 
+    // Add Organization Member
+    //
+    // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-create-administrator.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the organization level with one or multiple roles.
     rpc AddOrgMember(AddOrgMemberRequest) returns (AddOrgMemberResponse) {
         option (google.api.http) = {
             post: "/orgs/me/members"
@@ -2677,8 +2847,7 @@ service ManagementService {
             tags: "Organizations";
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Add Organization Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the organization level with one or multiple roles."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2690,6 +2859,11 @@ service ManagementService {
         };
     }
 
+    // Update Organization Member
+    //
+    // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-update-administrator.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateOrgMember(UpdateOrgMemberRequest) returns (UpdateOrgMemberResponse) {
         option (google.api.http) = {
             put: "/orgs/me/members/{user_id}"
@@ -2704,8 +2878,7 @@ service ManagementService {
             tags: "Organizations";
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Update Organization Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2717,6 +2890,11 @@ service ManagementService {
         };
     }
 
+    // Remove Organization Member
+    //
+    // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-delete-administrator.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (iam, project).
     rpc RemoveOrgMember(RemoveOrgMemberRequest) returns (RemoveOrgMemberResponse) {
         option (google.api.http) = {
             delete: "/orgs/me/members/{user_id}"
@@ -2730,8 +2908,7 @@ service ManagementService {
             tags: "Organizations";
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Remove Organization Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (iam, project)"
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2743,7 +2920,12 @@ service ManagementService {
         };
     }
 
-   rpc GetProjectByID(GetProjectByIDRequest) returns (GetProjectByIDResponse) {
+    // Get Project By ID
+    //
+    // Deprecated: use [project v2 service GetProject](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-get-project.api.mdx) instead.
+    //
+    // Returns a project owned by the organization (no granted projects). A Project is a vessel for different applications sharing the same role context.
+    rpc GetProjectByID(GetProjectByIDRequest) returns (GetProjectByIDResponse) {
         option (google.api.http) = {
             get: "/projects/{id}"
         };
@@ -2755,8 +2937,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Get Project By ID";
-            description: "Returns a project owned by the organization (no granted projects). A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2768,6 +2949,11 @@ service ManagementService {
         };
     }
 
+    // Get Granted Project By ID
+    //
+    // Deprecated: use [project v2 service ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-project-grants.api.mdx) instead.
+    //
+    // Returns a project owned by another organization and granted to my organization. A Project is a vessel for different applications sharing the same role context.
     rpc GetGrantedProjectByID(GetGrantedProjectByIDRequest) returns (GetGrantedProjectByIDResponse) {
         option (google.api.http) = {
             get: "/granted_projects/{project_id}/grants/{grant_id}"
@@ -2780,8 +2966,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Get Granted Project By ID";
-            description: "Returns a project owned by another organization and granted to my organization. A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2793,6 +2978,11 @@ service ManagementService {
         };
     }
 
+    // Search Project
+    //
+    // Deprecated: use [project v2 service ListProjects](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-projects.api.mdx) instead.
+    //
+    // Lists projects my organization is the owner of (no granted projects). A Project is a vessel for different applications sharing the same role context.
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {
         option (google.api.http) = {
             post: "/projects/_search"
@@ -2805,8 +2995,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Search Project";
-            description: "Lists projects my organization is the owner of (no granted projects). A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2818,6 +3007,11 @@ service ManagementService {
         };
     }
 
+    // Search Granted Project
+    //
+    // Deprecated: use [project v2 service ListProjects](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-projects.api.mdx) instead.
+    //
+    // Lists projects my organization got granted from another organization. A Project is a vessel for different applications sharing the same role context.
     rpc ListGrantedProjects(ListGrantedProjectsRequest) returns (ListGrantedProjectsResponse) {
         option (google.api.http) = {
             post: "/granted_projects/_search"
@@ -2830,8 +3024,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Search Granted Project";
-            description: "Lists projects my organization got granted from another organization. A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2843,6 +3036,11 @@ service ManagementService {
         };
     }
 
+    // Search Granted Project Roles
+    //
+    // Deprecated: use [project v2 service ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-project-grants.api.mdx) instead.
+    //
+    // Lists the roles a granted projects has. These are the roles, that have been granted by the owner organization to my organization.
     rpc ListGrantedProjectRoles(ListGrantedProjectRolesRequest) returns (ListGrantedProjectRolesResponse) {
         option (google.api.http) = {
             get: "/granted_projects/{project_id}/grants/{grant_id}/roles/_search"
@@ -2855,8 +3053,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Search Granted Project Roles";
-            description: "Lists the roles a granted projects has. These are the roles, that have been granted by the owner organization to my organization."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2893,6 +3090,11 @@ service ManagementService {
         };
     }
 
+    // Create Project
+    //
+    // Deprecated: use [project v2 service CreateProject](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-create-project.api.mdx) instead.
+    //
+    // Create a new project. A Project is a vessel for different applications sharing the same role context.
     rpc AddProject(AddProjectRequest) returns (AddProjectResponse) {
         option (google.api.http) = {
             post: "/projects"
@@ -2905,8 +3107,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Create Project";
-            description: "Create a new project. A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2918,6 +3119,11 @@ service ManagementService {
         };
     }
 
+    // Update Project
+    //
+    // Deprecated: use [project v2 service UpdateProject](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-update-project.api.mdx) instead.
+    //
+    // Update a project and its settings. A Project is a vessel for different applications sharing the same role context.
     rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {
         option (google.api.http) = {
             put: "/projects/{id}"
@@ -2931,8 +3137,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Update Project";
-            description: "Update a project and its settings. A Project is a vessel for different applications sharing the same role context."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2944,6 +3149,11 @@ service ManagementService {
         };
     }
 
+    // Deactivate Project
+    //
+    // Deprecated: use [project v2 service DeactivateProject](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-deactivate-project.api.mdx) instead.
+    //
+    // Set the state of a project to deactivated. Request returns an error if the project is already deactivated.
     rpc DeactivateProject(DeactivateProjectRequest) returns (DeactivateProjectResponse) {
         option (google.api.http) = {
             post: "/projects/{id}/_deactivate"
@@ -2957,8 +3167,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Deactivate Project";
-            description: "Set the state of a project to deactivated. Request returns an error if the project is already deactivated."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2970,6 +3179,11 @@ service ManagementService {
         };
     }
 
+    // Reactivate Project
+    //
+    // Deprecated: use [project v2 service ActivateProject](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-activate-project.api.mdx) instead.
+    //
+    // Set the state of a project to active. Request returns an error if the project is not deactivated.
     rpc ReactivateProject(ReactivateProjectRequest) returns (ReactivateProjectResponse) {
         option (google.api.http) = {
             post: "/projects/{id}/_reactivate"
@@ -2983,8 +3197,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Reactivate Project";
-            description: "Set the state of a project to active. Request returns an error if the project is not deactivated."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -2996,6 +3209,11 @@ service ManagementService {
         };
     }
 
+    // Remove Project
+    //
+    // Deprecated: use [project v2 service DeleteProject](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-delete-project.api.mdx) instead.
+    //
+    // Set the state of a project to active. Request returns an error if the project is not deactivated.
     rpc RemoveProject(RemoveProjectRequest) returns (RemoveProjectResponse) {
         option (google.api.http) = {
             delete: "/projects/{id}"
@@ -3008,8 +3226,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Remove Project";
-            description: "Project and all its sub-resources like project grants, applications, roles and user grants will be removed."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3021,6 +3238,11 @@ service ManagementService {
         };
     }
 
+    // Search Project Roles
+    //
+    // Deprecated: use [project v2 service ListProjectRoles](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-project-roles.api.mdx) instead.
+    //
+    // Returns all roles of a project matching the search query.
     rpc ListProjectRoles(ListProjectRolesRequest) returns (ListProjectRolesResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/roles/_search"
@@ -3034,8 +3256,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Roles";
-            summary: "Search Project Roles";
-            description: "Returns all roles of a project matching the search query."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3047,6 +3268,11 @@ service ManagementService {
         };
     }
 
+    // Add Project Role
+    //
+    // Deprecated: use [project v2 service AddProjectRole](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-add-project-role.api.mdx) instead.
+    //
+    // Add a new project role to a project. The key must be unique within the project.
     rpc AddProjectRole(AddProjectRoleRequest) returns (AddProjectRoleResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/roles"
@@ -3060,8 +3286,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Roles";
-            summary: "Add Project Role";
-            description: "Add a new project role to a project. The key must be unique within the project."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3073,6 +3298,11 @@ service ManagementService {
         };
     }
 
+    // Bulk Add Project Role
+    //
+    // Deprecated: use [project v2 service AddProjectRole](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-add-project-role.api.mdx) instead.
+    //
+    // Add a list of roles to a project. The keys must be unique within the project.
     rpc BulkAddProjectRoles(BulkAddProjectRolesRequest) returns (BulkAddProjectRolesResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/roles/_bulk"
@@ -3086,8 +3316,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Roles";
-            summary: "Bulk Add Project Role";
-            description: "Add a list of roles to a project. The keys must be unique within the project."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3099,9 +3328,14 @@ service ManagementService {
         };
     }
 
+    // Change Project Role
+    //
+    // Deprecated: use [project v2 service UpdateProjectRole](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-update-project-role.api.mdx) instead.
+    //
+    // Change a project role. The key is not editable. If a key should change, remove the role and create a new one.
     rpc UpdateProjectRole(UpdateProjectRoleRequest) returns (UpdateProjectRoleResponse) {
         option (google.api.http) = {
-            put: "/projects/{project_id}/roles/{role_key}"
+            put: "/projects/{project_id}/roles/{role_key=**}"
             body: "*"
         };
 
@@ -3112,8 +3346,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Roles";
-            summary: "Change Project Role";
-            description: "Change a project role. The key is not editable. If a key should change, remove the role and create a new one."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3125,9 +3358,14 @@ service ManagementService {
         };
     }
 
+    // Remove Project Role
+    //
+    // Deprecated: use [project v2 service RemoveProjectRole](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-remove-project-role.api.mdx) instead.
+    //
+    // Removes the role from the project and on every resource it has a dependency. This includes project grants and user grants.
     rpc RemoveProjectRole(RemoveProjectRoleRequest) returns (RemoveProjectRoleResponse) {
         option (google.api.http) = {
-            delete: "/projects/{project_id}/roles/{role_key}"
+            delete: "/projects/{project_id}/roles/{role_key=**}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -3137,8 +3375,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Roles";
-            summary: "Remove Project Role";
-            description: "Removes the role from the project and on every resource it has a dependency. This includes project grants and user grants."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3176,6 +3413,11 @@ service ManagementService {
         };
     }
 
+    // List Project Members
+    //
+    // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-list-administrators.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project level, matching the search queries. The search queries will be AND linked.
     rpc ListProjectMembers(ListProjectMembersRequest) returns (ListProjectMembersResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/members/_search"
@@ -3191,8 +3433,7 @@ service ManagementService {
             tags: "Projects"
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "List Project Members";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project level, matching the search queries. The search queries will be AND linked."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3204,6 +3445,11 @@ service ManagementService {
         };
     }
 
+    // Add Project Member
+    //
+    // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-create-administrator.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the project level with one or multiple roles.
     rpc AddProjectMember(AddProjectMemberRequest) returns (AddProjectMemberResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/members"
@@ -3219,8 +3465,7 @@ service ManagementService {
             tags: "Projects";
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Add Project Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the project level with one or multiple roles."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3232,6 +3477,11 @@ service ManagementService {
         };
     }
 
+    // Update Project Member
+    //
+    // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-update-administrator.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateProjectMember(UpdateProjectMemberRequest) returns (UpdateProjectMemberResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/members/{user_id}"
@@ -3247,8 +3497,7 @@ service ManagementService {
             tags: "Projects";
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Update Project Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3260,6 +3509,11 @@ service ManagementService {
         };
     }
 
+    // Remove Project Member
+    //
+    // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-delete-administrator.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an project level. The user can still have roles on another level (iam, organization).
     rpc RemoveProjectMember(RemoveProjectMemberRequest) returns (RemoveProjectMemberResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/members/{user_id}"
@@ -3274,8 +3528,7 @@ service ManagementService {
             tags: "Projects";
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Remove Project Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an project level. The user can still have roles on another level (iam, organization)"
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3287,7 +3540,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [GetApplication](/apis/resources/application_service_v2/application-service-get-application.api.mdx) instead to fetch an app
+    // Get Application By ID
+    //
+    // Deprecated: Use [GetApplication](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-get-application.api.mdx) instead to fetch an app
+    //
+    // Get an application of any type (OIDC, API, SAML).
     rpc GetAppByID(GetAppByIDRequest) returns (GetAppByIDResponse) {
         option (google.api.http) = {
             get: "/projects/{project_id}/apps/{app_id}"
@@ -3300,8 +3557,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Get Application By ID";
-            description: "Get an application of any type (OIDC, API, SAML)"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3314,7 +3569,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [ListApplications](/apis/resources/application_service_v2/application-service-list-applications.api.mdx) instead to list applications
+    // Search Applications
+    //
+    // Deprecated: Use [ListApplications](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-list-applications.api.mdx) instead to list applications
+    //
+    // Returns all applications within a project, that match the query.
     rpc ListApps(ListAppsRequest) returns (ListAppsResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/_search"
@@ -3328,8 +3587,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Search Applications";
-            description: "Returns all applications within a project, that match the query."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3367,7 +3624,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [CreateApplication](/apis/resources/application_service_v2/application-service-create-application.api.mdx) instead to create an OIDC application
+    // Create Application (OIDC)
+    //
+    // Deprecated: Use [CreateApplication](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-create-application.api.mdx) instead to create an OIDC application.
+    //
+    // Create a new OIDC client. The client id will be generated and returned in the response. Depending on the chosen configuration also a secret will be returned.
     rpc AddOIDCApp(AddOIDCAppRequest) returns (AddOIDCAppResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/oidc"
@@ -3381,8 +3642,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Create Application (OIDC)";
-            description: "Create a new OIDC client. The client id will be generated and returned in the response. Depending on the chosen configuration also a secret will be returned."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3395,22 +3654,24 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [CreateApplication](/apis/resources/application_service_v2/application-service-create-application.api.mdx) instead to create a SAML application
+    // Create Application (SAML)
+    //
+    // Deprecated: Use [CreateApplication](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-create-application.api.mdx) instead to create a SAML application.
+    //
+    // Create a new SAML client. Returns an entity ID.
     rpc AddSAMLApp(AddSAMLAppRequest) returns (AddSAMLAppResponse) {
         option (google.api.http) = {
-        post: "/projects/{project_id}/apps/saml"
-        body: "*"
+            post: "/projects/{project_id}/apps/saml"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
-        permission: "project.app.write"
-        check_field_name: "ProjectId"
+            permission: "project.app.write"
+            check_field_name: "ProjectId"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Create Application (SAML)";
-            description: "Create a new SAML client. Returns an entity ID"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3425,25 +3686,23 @@ service ManagementService {
 
     // Create Application (API)
     //
+    // Deprecated: Use [CreateApplication](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-create-application.api.mdx) instead to create an API application
+    //
     // Create a new API client. The client id will be generated and returned in the response.
     // Depending on the chosen configuration also a secret will be generated and returned.
-    //
-    // Deprecated: Use [CreateApplication](/apis/resources/application_service_v2/application-service-create-application.api.mdx) instead to create an API application
     rpc AddAPIApp(AddAPIAppRequest) returns (AddAPIAppResponse) {
         option (google.api.http) = {
-        post: "/projects/{project_id}/apps/api"
-        body: "*"
+            post: "/projects/{project_id}/apps/api"
+            body: "*"
         };
 
-            option (zitadel.v1.auth_option) = {
-                permission: "project.app.write"
-                check_field_name: "ProjectId"
-            };
+        option (zitadel.v1.auth_option) = {
+            permission: "project.app.write"
+            check_field_name: "ProjectId"
+        };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Create Application (API)";
-            description: "Create a new API client. The client id will be generated and returned in the response. Depending on the chosen configuration also a secret will be generated and returned."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3456,9 +3715,11 @@ service ManagementService {
         };
     }
 
-    // Changes application
+    // Update Application
     //
-    // Deprecated: Use [PatchApplication](/apis/resources/application_service_v2/application-service-patch-application.api.mdx) instead to update the generic params of an app
+    // Deprecated: Use [PatchApplication](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-update-application.api.mdx) instead to update the generic params of an app.
+    //
+    // Update the basic information of an application. This doesn't include information that are dependent on the application type (OIDC, API, SAML)
     rpc UpdateApp(UpdateAppRequest) returns (UpdateAppResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/apps/{app_id}"
@@ -3472,8 +3733,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Update Application";
-            description: "Update the basic information of an application. This doesn't include information that are dependent on the application type (OIDC, API, SAML)"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3486,7 +3745,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [PatchApplication](/apis/resources/application_service_v2/application-service-patch-application.api.mdx) instead to update the config of an OIDC app 
+    // Update OIDC Application Config
+    //
+    // Deprecated: Use [PatchApplication](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-update-application.api.mdx) instead to update the config of an OIDC app.
+    //
+    // Update the OIDC specific configuration of an application.
     rpc UpdateOIDCAppConfig(UpdateOIDCAppConfigRequest) returns (UpdateOIDCAppConfigResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/apps/{app_id}/oidc_config"
@@ -3500,8 +3763,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Update OIDC Application Config";
-            description: "Update the OIDC specific configuration of an application."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3514,22 +3775,24 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [PatchApplication](/apis/resources/application_service_v2/application-service-patch-application.api.mdx) instead to update the config of a SAML app
+    // Update SAML Application Config
+    //
+    // Deprecated: Use [PatchApplication](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-update-application.api.mdx) instead to update the config of a SAML app.
+    //
+    // Update the SAML specific configuration of an application.
     rpc UpdateSAMLAppConfig(UpdateSAMLAppConfigRequest) returns (UpdateSAMLAppConfigResponse) {
         option (google.api.http) = {
-        put: "/projects/{project_id}/apps/{app_id}/saml_config"
-        body: "*"
+            put: "/projects/{project_id}/apps/{app_id}/saml_config"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
-        permission: "project.app.write"
-        check_field_name: "ProjectId"
+            permission: "project.app.write"
+            check_field_name: "ProjectId"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Update SAML Application Config";
-            description: "Update the SAML specific configuration of an application."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3542,22 +3805,24 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [PatchApplication](/apis/resources/application_service_v2/application-service-patch-application.api.mdx) instead to update the config of an API app
+    // Update API Application Config
+    //
+    // Deprecated: Use [PatchApplication](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-update-application.api.mdx) instead to update the config of an API app.
+    //
+    // Update the OIDC-specific configuration of an application.
     rpc UpdateAPIAppConfig(UpdateAPIAppConfigRequest) returns (UpdateAPIAppConfigResponse) {
         option (google.api.http) = {
-        put: "/projects/{project_id}/apps/{app_id}/api_config"
-        body: "*"
+            put: "/projects/{project_id}/apps/{app_id}/api_config"
+            body: "*"
         };
 
-            option (zitadel.v1.auth_option) = {
-                permission: "project.app.write"
-                check_field_name: "ProjectId"
-            };
+        option (zitadel.v1.auth_option) = {
+            permission: "project.app.write"
+            check_field_name: "ProjectId"
+        };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Update API Application Config";
-            description: "Update the OIDC-specific configuration of an application."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3570,7 +3835,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [DeactivateApplication](/apis/resources/application_service_v2/application-service-deactivate-application.api.mdx) instead to deactivate an app
+    // Deactivate Application
+    //
+    // Deprecated: Use [DeactivateApplication](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-deactivate-application.api.mdx) instead to deactivate an app.
+    //
+    // Set the state of an application to deactivated. It is not possible to request tokens for deactivated apps. Request returns an error if the application is already deactivated.
     rpc DeactivateApp(DeactivateAppRequest) returns (DeactivateAppResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/_deactivate"
@@ -3584,8 +3853,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Deactivate Application";
-            description: "Set the state of an application to deactivated. It is not possible to request tokens for deactivated apps. Request returns an error if the application is already deactivated."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3598,7 +3865,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [ReactivateApplication](/apis/resources/application_service_v2/application-service-reactivate-application.api.mdx) instead to reactivate an app
+    // Reactivate Application
+    //
+    // Deprecated: Use [ReactivateApplication](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-reactivate-application.api.mdx) instead to reactivate an app.
+    //
+    // Set the state of an application to active. Request returns an error if the application is not deactivated.
     rpc ReactivateApp(ReactivateAppRequest) returns (ReactivateAppResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/_reactivate"
@@ -3612,8 +3883,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Reactivate Application";
-            description: "Set the state of an application to active. Request returns an error if the application is not deactivated."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3626,7 +3895,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [DeleteApplication](/apis/resources/application_service_v2/application-service-delete-application.api.mdx) instead to delete an app
+    // Remove Application
+    //
+    // Deprecated: Use [DeleteApplication](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-delete-application.api.mdx) instead to delete an app.
+    //
+    // Remove an application. It is not possible to request tokens for removed apps. Request returns an error if the application is already deactivated.
     rpc RemoveApp(RemoveAppRequest) returns (RemoveAppResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/apps/{app_id}"
@@ -3639,8 +3912,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Remove Application";
-            description: "Remove an application. It is not possible to request tokens for removed apps. Request returns an error if the application is already deactivated."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3653,7 +3924,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [RegenerateClientSecret](/apis/resources/application_service_v2/application-service-regenerate-client-secret.api.mdx) instead to regenerate an OIDC app client secret
+    // Generate New OIDC Client Secret
+    //
+    // Deprecated: Use [RegenerateClientSecret](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-regenerate-client-secret.api.mdx) instead to regenerate an OIDC app client secret.
+    //
+    // Generates a new client secret for the OIDC application, make sure to save the response.
     rpc RegenerateOIDCClientSecret(RegenerateOIDCClientSecretRequest) returns (RegenerateOIDCClientSecretResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/oidc_config/_generate_client_secret"
@@ -3667,8 +3942,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Generate New OIDC Client Secret";
-            description: "Generates a new client secret for the OIDC application, make sure to save the response"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3681,7 +3954,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [RegenerateClientSecret](/apis/resources/application_service_v2/application-service-regenerate-client-secret.api.mdx) instead to regenerate an API app client secret
+    // Generate New API Client Secret
+    //
+    // Deprecated: Use [RegenerateClientSecret](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-regenerate-client-secret.api.mdx) instead to regenerate an API app client secret
+    //
+    // Generates a new client secret for the API application, make sure to save the response.
     rpc RegenerateAPIClientSecret(RegenerateAPIClientSecretRequest) returns (RegenerateAPIClientSecretResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/api_config/_generate_client_secret"
@@ -3695,8 +3972,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Generate New API Client Secret";
-            description: "Generates a new client secret for the API application, make sure to save the response"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3709,7 +3984,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [GetApplicationKey](/apis/resources/application_service_v2/application-service-get-application-key.api.mdx) instead to get an application key
+    // Get Application Key By ID
+    //
+    // Deprecated: Use [GetApplicationKey](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-get-application-key.api.mdx) instead to get an application key.
+    //
+    // Returns an application key. Keys are used for authorizing API Applications.
     rpc GetAppKey(GetAppKeyRequest) returns (GetAppKeyResponse) {
         option (google.api.http) = {
             get: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
@@ -3722,8 +4001,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Get Application Key By ID";
-            description: "Returns an application key. Keys are used for authorizing API Applications."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3736,7 +4013,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [ListApplicationKeys](/apis/resources/application_service_v2/application-service-list-application-keys.api.mdx) instead to list application keys
+    // List Application Keys
+    //
+    // Deprecated: Use [ListApplicationKeys](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-list-application-keys.api.mdx) instead to list application keys.
+    //
+    // Search application keys. Keys are used for authorizing API Applications.
     rpc ListAppKeys(ListAppKeysRequest) returns (ListAppKeysResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/keys/_search"
@@ -3749,9 +4030,8 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            deprecated: true;
             tags: "Applications";
-            summary: "List Application Keys";
-            description: "Search application keys. Keys are used for authorizing API Applications."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3763,8 +4043,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [CreateApplicationKey](/apis/resources/application_service_v2/application-service-create-application-key.api.mdx) instead to
-    // create an application key
+    // Create Application Key
+    //
+    // Deprecated: Use [CreateApplicationKey](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-create-application-key.api.mdx) instead to create an application key.
+    //
+    // Create a new application key, they are used for authorizing API Applications. Key details will be returned in the response, make sure to save it.
     rpc AddAppKey(AddAppKeyRequest) returns (AddAppKeyResponse){
         option (google.api.http) = {
             post: "/projects/{project_id}/apps/{app_id}/keys"
@@ -3778,8 +4061,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Create Application Key";
-            description: "Create a new application key, they are used for authorizing API Applications. Key details will be returned in the response, make sure to save it."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3792,8 +4073,11 @@ service ManagementService {
         };
     }
 
-    // Deprecated: Use [DeleteApplicationKey](/apis/resources/application_service_v2/application-service-delete-application-key.api.mdx) instead to
-    // delete an application key
+    // Delete Application Key
+    //
+    // Deprecated: Use [DeleteApplicationKey](/apis/resources/application_service_v2/zitadel-app-v-2-beta-app-service-delete-application-key.api.mdx) instead to delete an application key.
+    //
+    // Remove an application key. The API application will not be able to authorize with the key anymore.
     rpc RemoveAppKey(RemoveAppKeyRequest) returns (RemoveAppKeyResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/apps/{app_id}/keys/{key_id}"
@@ -3806,8 +4090,6 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Applications";
-            summary: "Delete Application Key";
-            description: "Remove an application key. The API application will not be able to authorize with the key anymore."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3845,6 +4127,11 @@ service ManagementService {
         };
     }
 
+    // Project Grant By ID
+    //
+    // Deprecated: use [ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-project-grants.api.mdx) instead.
+    //
+    // Returns a project grant. A project grant is when the organization grants its project to another organization.
     rpc GetProjectGrantByID(GetProjectGrantByIDRequest) returns (GetProjectGrantByIDResponse) {
         option (google.api.http) = {
             get: "/projects/{project_id}/grants/{grant_id}"
@@ -3856,8 +4143,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Projects";
-            summary: "Project Grant By ID";
-            description: "Returns a project grant. A project grant is when the organization grants its project to another organization."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3869,6 +4155,11 @@ service ManagementService {
         };
     }
 
+    // Search Project Grants from Project
+    //
+    // Deprecated: use [ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-project-grants.api.mdx) instead.
+    //
+    // Returns a list of project grants for a specific project. A project grant is when the organization grants its project to another organization.
     rpc ListProjectGrants(ListProjectGrantsRequest) returns (ListProjectGrantsResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/_search"
@@ -3882,8 +4173,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Search Project Grants from Project";
-            description: "Returns a list of project grants for a specific project. A project grant is when the organization grants its project to another organization."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3895,6 +4185,11 @@ service ManagementService {
         };
     }
 
+    // Search Project Grants
+    //
+    // Deprecated: use [ListProjectGrants](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-list-project-grants.api.mdx) instead.
+    //
+    // Returns a list of project grants. A project grant is when the organization grants its project to another organization.
     rpc ListAllProjectGrants(ListAllProjectGrantsRequest) returns (ListAllProjectGrantsResponse) {
         option (google.api.http) = {
             post: "/projectgrants/_search"
@@ -3907,8 +4202,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Search Project Grants";
-            description: "Returns a list of project grants. A project grant is when the organization grants its project to another organization."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3920,6 +4214,11 @@ service ManagementService {
         };
     }
 
+    // Add Project Grant
+    //
+    // Deprecated: use [CreateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-create-project-grant.api.mdx) instead.
+    //
+    // Grant a project to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization.
     rpc AddProjectGrant(AddProjectGrantRequest) returns (AddProjectGrantResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants"
@@ -3932,8 +4231,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Add Project Grant";
-            description: "Grant a project to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization"
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3945,6 +4243,11 @@ service ManagementService {
         };
     }
 
+    // Change Project Grant
+    //
+    // Deprecated: use [UpdateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-update-project-grant.api.mdx) instead.
+    //
+    // Change the roles of the project that is granted to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization.
     rpc UpdateProjectGrant(UpdateProjectGrantRequest) returns (UpdateProjectGrantResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/grants/{grant_id}"
@@ -3957,8 +4260,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Change Project Grant";
-            description: "Change the roles of the project that is granted to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization"
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3970,6 +4272,11 @@ service ManagementService {
         };
     }
 
+    // Deactivate Project Grant
+    //
+    // Deprecated: use [DeactivateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-deactivate-project-grant.api.mdx) instead.
+    //
+    // Set the state of the project grant to deactivated. The grant has to be active to be able to deactivate.
     rpc DeactivateProjectGrant(DeactivateProjectGrantRequest) returns (DeactivateProjectGrantResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/{grant_id}/_deactivate"
@@ -3982,8 +4289,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Deactivate Project Grant";
-            description: "Set the state of the project grant to deactivated. The grant has to be active to be able to deactivate."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3995,6 +4301,11 @@ service ManagementService {
         };
     }
 
+    // Reactivate Project Grant
+    //
+    // Deprecated: use [ActivateProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-activate-project-grant.api.mdx) instead.
+    //
+    // Set the state of the project grant to active. The grant has to be deactivated to be able to reactivate.
     rpc ReactivateProjectGrant(ReactivateProjectGrantRequest) returns (ReactivateProjectGrantResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/{grant_id}/_reactivate"
@@ -4007,8 +4318,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Reactivate Project Grant";
-            description: "Set the state of the project grant to active. The grant has to be deactivated to be able to reactivate."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4020,6 +4330,11 @@ service ManagementService {
         };
     }
 
+    // Remove Project Grant
+    //
+    // Deprecated: use [DeleteProjectGrant](apis/resources/project_service_v2/zitadel-project-v-2-beta-project-service-delete-project-grant.api.mdx) instead.
+    //
+    // Remove a project grant. All user grants for this project grant will also be removed. A user will not have access to the project afterward (if permissions are checked).
     rpc RemoveProjectGrant(RemoveProjectGrantRequest) returns (RemoveProjectGrantResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/grants/{grant_id}"
@@ -4031,8 +4346,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Project Grants";
-            summary: "Remove Project Grant";
-            description: "Remove a project grant. All user grants for this project grant will also be removed. A user will not have access to the project afterward (if permissions are checked)."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4070,6 +4384,11 @@ service ManagementService {
         };
     }
 
+    // List Project Grant Members
+    //
+    // Deprecated: use [ListAdministrators](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-list-administrators.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked.
     rpc ListProjectGrantMembers(ListProjectGrantMembersRequest) returns (ListProjectGrantMembersResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/{grant_id}/members/_search"
@@ -4084,8 +4403,7 @@ service ManagementService {
             tags: "Project Grants"
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "List Project Grant Members";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4097,6 +4415,11 @@ service ManagementService {
         };
     }
 
+    // Add Project Grant Member
+    //
+    // Deprecated: use [CreateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-create-administrator.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked.
     rpc AddProjectGrantMember(AddProjectGrantMemberRequest) returns (AddProjectGrantMemberResponse) {
         option (google.api.http) = {
             post: "/projects/{project_id}/grants/{grant_id}/members"
@@ -4111,8 +4434,7 @@ service ManagementService {
             tags: "Project Grants";
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Add Project Grant Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the project grant level with one or multiple roles."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4124,6 +4446,11 @@ service ManagementService {
         };
     }
 
+    // Update Project Grant Member
+    //
+    // Deprecated: use [UpdateAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-update-administrator.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove).
     rpc UpdateProjectGrantMember(UpdateProjectGrantMemberRequest) returns (UpdateProjectGrantMemberResponse) {
         option (google.api.http) = {
             put: "/projects/{project_id}/grants/{grant_id}/members/{user_id}"
@@ -4138,8 +4465,7 @@ service ManagementService {
             tags: "Project Grants";
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Update Project Grant Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4151,6 +4477,11 @@ service ManagementService {
         };
     }
 
+    // Remove Project Grant Member
+    //
+    // Deprecated: use [DeleteAdministrator](apis/resources/internal_permission_service_v2/zitadel-internal-permission-v-2-beta-internal-permission-service-delete-administrator.api.mdx) instead.
+    //
+    // Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on a project grant level. The user can still have roles on another level (iam, organization, project).
     rpc RemoveProjectGrantMember(RemoveProjectGrantMemberRequest) returns (RemoveProjectGrantMemberResponse) {
         option (google.api.http) = {
             delete: "/projects/{project_id}/grants/{grant_id}/members/{user_id}"
@@ -4164,8 +4495,7 @@ service ManagementService {
             tags: "Project Grants";
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "Remove Project Grant Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on a project grant level. The user can still have roles on another level (iam, organization, project)"
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -9049,8 +9379,8 @@ message AddMachineKeyRequest {
     ];
     bytes public_key = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-           example: "\"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1...\"";
-           description: "Optionally provide a public key of your own generated RSA private key.";
+            example: "\"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1...\"";
+            description: "Optionally provide a public key of your own generated RSA private key.";
         }
     ];
 }
@@ -9159,7 +9489,7 @@ message GetMyOrgResponse {
 
 message GetOrgByDomainGlobalRequest {
     string domain = 1 [
-        (validate.rules).string = {min_len: 1, max_len: 200} ,
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             min_length: 1;
@@ -9976,31 +10306,31 @@ message AddOIDCAppResponse {
 }
 
 message AddSAMLAppRequest {
-  string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  string name = 2 [
-      (validate.rules).string = {min_len: 1, max_len: 200},
-      (google.api.field_behavior) = REQUIRED,
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-          min_length: 1;
-          max_length: 200;
-          example: "\"MySAMLApp\"";
-      }
-  ];
-  oneof metadata {
-      option (validate.required) = true;
-      bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
-      string metadata_url = 4 [(validate.rules).string.max_len = 200];
-  }
-  zitadel.app.v1.LoginVersion login_version = 5 [
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-          description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
-      }
-  ];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"MySAMLApp\"";
+        }
+    ];
+    oneof metadata {
+        option (validate.required) = true;
+        bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
+        string metadata_url = 4 [(validate.rules).string.max_len = 200];
+    }
+    zitadel.app.v1.LoginVersion login_version = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
+        }
+    ];
 }
 
 message AddSAMLAppResponse {
-  string app_id = 1;
-  zitadel.v1.ObjectDetails details = 2;
+    string app_id = 1;
+    zitadel.v1.ObjectDetails details = 2;
 }
 
 message AddAPIAppRequest {
@@ -10148,27 +10478,27 @@ message UpdateOIDCAppConfigRequest {
 }
 
 message UpdateOIDCAppConfigResponse {
-  zitadel.v1.ObjectDetails details = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateSAMLAppConfigRequest {
-  string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
-  oneof metadata {
-      option (validate.required) = true;
-      bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
-      string metadata_url = 4 [(validate.rules).string.max_len = 200];
-  }
-  zitadel.app.v1.LoginVersion login_version = 5 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
+    oneof metadata {
+        option (validate.required) = true;
+        bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
+        string metadata_url = 4 [(validate.rules).string.max_len = 200];
     }
-  ];
+    zitadel.app.v1.LoginVersion login_version = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
+        }
+    ];
 }
 
 message UpdateSAMLAppConfigResponse {
-  zitadel.v1.ObjectDetails details = 1;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateAPIAppConfigRequest {
@@ -13623,7 +13953,7 @@ message UpdateAppleProviderRequest {
     bytes private_key = 6 [
         (validate.rules).bytes = {max_len: 5000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-          max_length: 5000,
+            max_length: 5000,
             example: "\"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1...\"";
             description: "Private Key generated by Apple";
         }
@@ -13737,12 +14067,12 @@ message UpdateActionRequest {
     ];
     string script = 3 [
         (validate.rules).string = {min_len: 1, max_bytes: 40000},
-         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-             example: "\"function log(context, calls){console.log(context)}\"";
-             description: "Javascript code that should be executed"
-             min_length: 1;
-             max_length: 10000;
-         }
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"function log(context, calls){console.log(context)}\"";
+            description: "Javascript code that should be executed"
+            min_length: 1;
+            max_length: 10000;
+        }
     ];
     google.protobuf.Duration timeout = 4 [
         (validate.rules).duration = {gte: {}, lte: {seconds: 20}},
@@ -13847,7 +14177,7 @@ message SetTriggerActionsRequest {
     string trigger_type = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"1\"";
-         }
+        }
     ];
     repeated string action_ids = 3;
 }

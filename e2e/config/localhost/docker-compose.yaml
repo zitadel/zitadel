@@ -5,12 +5,12 @@ services:
     image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
     build:
       context: ../../..
-      dockerfile: ./build/Dockerfile
+      dockerfile: ./build/zitadel/Dockerfile
       target: artifact
       cache_from:
-      - type=gha
+        - type=gha
       cache_to:
-      - type=gha,mode=max
+        - type=gha,mode=max
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     depends_on:
       db:
@@ -18,15 +18,15 @@ services:
     volumes:
       - ./zitadel.yaml:/zitadel.yaml
     ports:
-    - "8080:8080"
+      - "8080:8080"
     healthcheck:
-      test: ["CMD", "/app/zitadel", "ready", "--config", "/zitadel.yaml" ]
+      test: [ "CMD", "/app/zitadel", "ready", "--config", "/zitadel.yaml" ]
       interval: '10s'
       timeout: '5s'
       retries: 5
       start_period: '10s'
     extra_hosts:
-    - "host.docker.internal:host-gateway"
+      - "host.docker.internal:host-gateway"
 
   db:
     restart: 'always'
@@ -35,7 +35,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "zitadel", "-U", "postgres"]
+      test: [ "CMD-SHELL", "pg_isready", "-d", "zitadel", "-U", "postgres" ]
       interval: '10s'
       timeout: '30s'
       retries: 5

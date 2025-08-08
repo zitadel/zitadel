@@ -1,18 +1,17 @@
 ---
-title: Set up ZITADEL with Docker Compose
+title: Set up Zitadel with Docker Compose
 sidebar_label: Docker Compose
 ---
 
 import CodeBlock from '@theme/CodeBlock';
 import DockerComposeSource from '!!raw-loader!./docker-compose.yaml'
-import DockerComposeSaSource from '!!raw-loader!./docker-compose-sa.yaml'
 import Disclaimer from './_disclaimer.mdx'
 import DefaultUser from './_defaultuser.mdx'
 import Next from './_next.mdx'
 import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
 
 
-The setup is tested against Docker version 20.10.17 and Docker Compose version v2.2.3
+The setup is tested against Docker version 28.3.2 and Docker Compose version v2.38.2
 
 ## Docker compose
 
@@ -27,41 +26,24 @@ By executing the commands below, you will download the following file:
 # Download the docker compose example configuration.
 wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose.yaml
 
-# Run the database and application containers.
-docker compose up --detach
+# Make sure you have the latest image versions
+docker compose pull
+
+# Run the PostgreSQL database, the Zitadel API and the Zitadel login.
+docker compose up
 ```
 
 <DefaultUser components={props.components} />
 
-<NoteInstanceNotFound/>
-
-## VideoGuide
-<iframe width="100%" height="315" src="https://www.youtube.com/embed/-02FaoN9Fko" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-## Docker compose with service account
-
-By executing the commands below, you will download the following file:
-
-<details>
-    <summary>docker-compose-sa.yaml</summary>
-    <CodeBlock language="yaml">{DockerComposeSaSource}</CodeBlock>
-</details>
-
+:::info
+If you ran these commands for an existing instance that still uses the login v1, [create a login client for it to the now running v2 login](/self-hosting/manage/login-client#create-login-client).
+Move the login client PAT to `./login-client.pat` and restart the login container.
 ```bash
-# Download the docker compose example configuration.
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose-sa.yaml -O docker-compose.yaml
-
-# create the machine key directory
-mkdir machinekey
-
-# Run the database and application containers.
-docker compose up --detach
-
-# then you can move your machine key
-mv ./machinekey/zitadel-admin-sa.json $HOME/zitadel-admin-sa.json
+docker compose restart login
 ```
+Now, [enable the Login UI for all users](/self-hosting/manage/login-client#require-login-v2)
+:::
 
-This key can be used to provision resources with for example [Terraform](/docs/guides/manage/terraform-provider).
-
+<NoteInstanceNotFound/>
 <Next components={props.components} />
 <Disclaimer components={props.components} />

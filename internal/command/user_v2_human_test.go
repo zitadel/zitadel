@@ -60,6 +60,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 	}
 
 	userAgg := user.NewAggregate("user1", "org1")
+	orgAgg := org.NewAggregate("org1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	totpSecret := "TOTPSecret"
@@ -191,7 +192,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
@@ -199,6 +200,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 						),
 					),
 					expectFilter(),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -233,13 +235,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanRegisteredEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -335,13 +338,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanAddedEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -412,6 +416,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -483,6 +488,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						newAddHumanEvent("", false, true, "", language.English),
 						user.NewHumanEmailCodeAddedEventV2(context.Background(),
@@ -542,6 +548,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -616,6 +623,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -684,13 +692,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -748,13 +757,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -812,13 +822,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -876,7 +887,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
@@ -929,7 +940,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
@@ -944,6 +955,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1017,13 +1029,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1127,13 +1140,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1232,13 +1246,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						newAddHumanEvent("", false, true, "+41711234567", language.English),
 						user.NewHumanInitialCodeAddedEvent(
@@ -1305,6 +1320,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
@@ -1409,13 +1425,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						newAddHumanEvent("", false, true, "", language.English),
 						user.NewHumanInitialCodeAddedEvent(
@@ -1479,13 +1496,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGoogleIDPAddedEvent(context.Background(),
@@ -1566,13 +1584,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGoogleIDPAddedEvent(context.Background(),
@@ -1646,13 +1665,98 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
+					expectPush(
+						user.NewHumanRegisteredEvent(context.Background(),
+							&userAgg.Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"",
+							"firstname lastname",
+							language.English,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+							"userAgentID",
+						),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("userinit"),
+							},
+							time.Hour*1,
+							"authRequestID",
+						),
+						user.NewHumanOTPAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							totpSecretEnc,
+						),
+						user.NewHumanOTPVerifiedEvent(context.Background(),
+							&userAgg.Aggregate,
+							"",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				newCode:         mockEncryptedCode("userinit", time.Hour),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address: "email@test.ch",
+					},
+					PreferredLanguage: language.English,
+					Register:          true,
+					UserAgentID:       "userAgentID",
+					AuthRequestID:     "authRequestID",
+					TOTPSecret:        totpSecret,
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
+				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
+				},
+				wantID: "user1",
+			},
+		},
+		{
+			name: "register human with TOTPSecret, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&orgAgg.Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanRegisteredEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -1729,7 +1833,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
@@ -1775,14 +1879,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "register human (validate domain), ok",
+			name: "register human (validate domain), orgScopedUsername, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
@@ -1797,6 +1901,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", true, true),
 					expectPush(
 						user.NewHumanRegisteredEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -1808,7 +1913,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							language.English,
 							domain.GenderUnspecified,
 							"email@example.com",
-							false,
+							true,
 							"userAgentID",
 						),
 						user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -1864,7 +1969,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
@@ -1886,6 +1991,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanRegisteredEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -1953,7 +2059,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								false,
 								true,
 								true,
@@ -1979,6 +2085,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewHumanRegisteredEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -2107,6 +2214,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 	}
 
 	userAgg := user.NewAggregate("user1", "org1")
+	orgAgg := user.NewAggregate("org1", "org1")
 
 	tests := []struct {
 		name   string
@@ -2199,18 +2307,67 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewUsernameChangedEvent(context.Background(),
 							&userAgg.Aggregate,
 							"username",
 							"changed",
+							true,
+							false,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Username: gu.Ptr("changed"),
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "change human username, orgScopedUsername, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, false, "", language.English),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&orgAgg.Aggregate,
+								false,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilterOrganizationSettings("org1", true, true),
+					expectPush(
+						user.NewUsernameChangedEvent(context.Background(),
+							&userAgg.Aggregate,
+							"username",
+							"changed",
+							false,
 							true,
 						),
 					),

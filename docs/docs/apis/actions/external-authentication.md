@@ -27,7 +27,7 @@ The first parameter contains the following fields
   - `idToken` *string*  
     The id token provided by the identity provider.
   - `v1`
-    - `externalUser()` [*externalUser*](./objects#external-user)
+    - `externalUser` [*externalUser*](./objects#external-user)
     - `authError` *string*  
       This is a verification errors string representation. If the verification succeeds, this is "none"
     - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)

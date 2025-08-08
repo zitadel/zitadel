@@ -4,7 +4,6 @@ package user_test
 
 import (
 	"context"
-	"fmt"
 	"slices"
 	"testing"
 	"time"
@@ -110,7 +109,7 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 
 func TestServer_AddPersonalAccessToken_Permission(t *testing.T) {
 	OrgCTX := CTX
-	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddPersonalAccessToken-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	otherOrgUser, err := Client.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
@@ -249,7 +248,7 @@ func TestServer_RemovePersonalAccessToken(t *testing.T) {
 }
 
 func TestServer_RemovePersonalAccessToken_Permission(t *testing.T) {
-	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("RemovePersonalAccessToken-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	otherOrgUser, err := Client.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
@@ -328,7 +327,7 @@ func TestServer_ListPersonalAccessTokens(t *testing.T) {
 		want *user.ListPersonalAccessTokensResponse
 	}
 	OrgCTX := CTX
-	otherOrg := Instance.CreateOrganization(SystemCTX, fmt.Sprintf("ListPersonalAccessTokens-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(SystemCTX, integration.OrganizationName(), gofakeit.Email())
 	otherOrgUser, err := Client.CreateUser(SystemCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
