@@ -1,0 +1,106 @@
+---
+title: machine client credentials login benchmark of zitadel v4
+sidebar_label: machine client credentials login
+---
+
+Benchmark results of v4 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value |
+|:--------------------------------------|:------|
+| Baseline                              | none  |
+| Purpose                               | Test current performance |
+| Test start                            | 08:28 UTC |
+| Test duration                         | 30min |
+| Executed test                         | machine\_client\_credentials\_login |
+| k6 version                            | v1.0.0-rc1 |
+| VUs                                   | 600 |
+| Client location                       | US1 |
+| ZITADEL location                      | US1 |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7 |
+| ZITADEL Version                       | v4.0.0-rc2 |
+| ZITADEL feature flags                 | webKey: true, improvedPerformance: \[\"IMPROVED\_PERFORMANCE\_ORG\_BY\_ID\", \"IMPROVED\_PERFORMANCE\_PROJECT\", \"IMPROVED\_PERFORMANCE\_USER\_GRANT\", \"IMPROVED\_PERFORMANCE\_ORG\_DOMAIN\_VERIFIED\", \"IMPROVED\_PERFORMANCE\_PROJECT\_GRANT\"\] |
+| Database                              | type: psql<br />version: v17.4 |
+| Database location                     | US1 |
+| Database specification                | vCPU: 8<br/> memory: 32Gib |
+| ZITADEL metrics during test           |  |
+| Observed errors                       |  |
+| Top 3 most expensive database queries | 1: Locking projections for reduce<br/>2: Query events by aggregate type and event type<br/>3: user by id query<br/> |
+| k6 Iterations per second              | 424 |
+| k6 output                             | [output](#k6-output) |
+| flowchart outcome                     |  |
+
+## Endpoint latencies
+
+Until :37 were containers starting because it was a cold start test.
+
+import OutputSource from "./output.json";
+
+import { BenchmarkChart } from '/src/components/benchmark_chart';
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output {#k6-output}
+
+```bash
+
+  █ TOTAL RESULTS 
+
+    checks_total.......................: 2336254 1274.250394/s
+    checks_succeeded...................: 99.99%  2336250 out of 2336254
+    checks_failed......................: 0.00%   4 out of 2336254
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✓ generate machine secret status ok
+    ✓ openid configuration
+    ✗ client credentials status ok
+      ↳  99% — ✓ 778146 / ✗ 3
+    ✓ client credentials token ok
+    ✗ userinfo status ok
+      ↳  99% — ✓ 778145 / ✗ 1
+    ✓ org removed
+
+    CUSTOM
+    login_ui_enter_login_name_duration......................................: min=191.97ms avg=191.97ms max=191.97ms p(50)=191.97ms p(95)=191.97ms p(99)=191.97ms
+    login_ui_enter_password_duration........................................: min=14.65ms  avg=14.65ms  max=14.65ms  p(50)=14.65ms  p(95)=14.65ms  p(99)=14.65ms 
+    login_ui_init_login_duration............................................: min=91.36ms  avg=91.36ms  max=91.36ms  p(50)=91.36ms  p(95)=91.36ms  p(99)=91.36ms 
+    login_ui_token_duration.................................................: min=93.72ms  avg=93.72ms  max=93.72ms  p(50)=93.72ms  p(95)=93.72ms  p(99)=93.72ms 
+    oidc_client_credentials_duration........................................: min=244.96µs avg=794.35ms max=2.22s    p(50)=783.9ms  p(95)=1.1s     p(99)=1.23s   
+    oidc_user_info_duration.................................................: min=578.67µs avg=592.86ms max=1.98s    p(50)=583.33ms p(95)=840.94ms p(99)=939.62ms
+    org_create_org_duration.................................................: min=60.95ms  avg=60.95ms  max=60.95ms  p(50)=60.95ms  p(95)=60.95ms  p(99)=60.95ms 
+    user_add_machine_secret_duration........................................: min=54.63ms  avg=2.62s    max=4.92s    p(50)=2.67s    p(95)=4.69s    p(99)=4.87s   
+    user_create_machine_duration............................................: min=159.68ms avg=681.87ms max=868.85ms p(50)=746.38ms p(95)=840.65ms p(99)=859.33ms
+
+    HTTP
+    http_req_duration.......................................................: min=244.96µs avg=693.86ms max=4.92s    p(50)=671.37ms p(95)=1.05s    p(99)=1.18s   
+      { expected_response:true }............................................: min=14.27ms  avg=693.86ms max=4.92s    p(50)=671.37ms p(95)=1.05s    p(99)=1.18s   
+    http_req_failed.........................................................: 0.00%   4 out of 1558705
+    http_reqs...............................................................: 1558705 850.156045/s
+
+    EXECUTION
+    iteration_duration......................................................: min=656.54µs avg=1.38s    max=3.43s    p(50)=1.38s    p(95)=1.8s     p(99)=2.01s   
+    iterations..............................................................: 778149  424.421604/s
+    vus.....................................................................: 292     min=0            max=600
+    vus_max.................................................................: 600     min=600          max=600
+
+    NETWORK
+    data_received...........................................................: 1.6 GB  898 kB/s
+    data_sent...............................................................: 528 MB  288 kB/s
+
+running (30m33.4s), 000/600 VUs, 778149 complete and 0 interrupted iterations
+default ✓ [======================================] 600 VUs  30m0s
+```
+

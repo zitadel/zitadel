@@ -1,0 +1,101 @@
+---
+title: otp session benchmark of zitadel v4
+sidebar_label: otp session
+---
+
+Benchmark results of v4 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value |
+|:--------------------------------------|:------|
+| Baseline                              | none  |
+| Purpose                               | Test current performance |
+| Test start                            | 14:56 UTC |
+| Test duration                         | 30min |
+| Executed test                         | otp_session |
+| k6 version                            | v1.0.0-rc1 |
+| VUs                                   | 600 |
+| Client location                       | US1 |
+| ZITADEL location                      | US1 |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7 |
+| ZITADEL Version                       | v4.0.0-rc2 |
+| ZITADEL feature flags                 | webKey: true, improvedPerformance: \[\"IMPROVED\_PERFORMANCE\_ORG\_BY\_ID\", \"IMPROVED\_PERFORMANCE\_PROJECT\", \"IMPROVED\_PERFORMANCE\_USER\_GRANT\", \"IMPROVED\_PERFORMANCE\_ORG\_DOMAIN\_VERIFIED\", \"IMPROVED\_PERFORMANCE\_PROJECT\_GRANT\"\] |
+| Database                              | type: psql<br />version: v17.4 |
+| Database location                     | US1 |
+| Database specification                | vCPU: 8<br/> memory: 32Gib |
+| ZITADEL metrics during test           |  |
+| Observed errors                       | database usage was 80% |
+| Top 3 most expensive database queries | 1: query events by instance id, aggregate types, event types, position<br/>2: lock projection<br/>3: write events<br/> |
+| k6 Iterations per second              | 60 |
+| k6 output                             | [output](#k6-output) |
+| flowchart outcome                     |  |
+
+## Endpoint latencies
+
+import OutputSource from "./output.json";
+
+import { BenchmarkChart } from '/src/components/benchmark_chart';
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output {#k6-output}
+
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......................: 338059 181.945817/s
+    checks_succeeded...................: 99.99% 338058 out of 338059
+    checks_failed......................: 0.00%  1 out of 338059
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✓ set email otp status ok
+    ✓ add Session status ok
+    ✗ set Session status ok
+      ↳  99% — ✓ 224563 / ✗ 1
+    ✓ org removed
+
+    CUSTOM
+    login_ui_enter_login_name_duration......................................: min=179.7ms  avg=179.7ms  max=179.7ms  p(50)=179.7ms  p(95)=179.7ms  p(99)=179.7ms 
+    login_ui_enter_password_duration........................................: min=14.73ms  avg=14.73ms  max=14.73ms  p(50)=14.73ms  p(95)=14.73ms  p(99)=14.73ms 
+    login_ui_init_login_duration............................................: min=76.13ms  avg=76.13ms  max=76.13ms  p(50)=76.13ms  p(95)=76.13ms  p(99)=76.13ms 
+    login_ui_token_duration.................................................: min=152.52ms avg=152.52ms max=152.52ms p(50)=152.52ms p(95)=152.52ms p(99)=152.52ms
+    org_create_org_duration.................................................: min=59.87ms  avg=59.87ms  max=59.87ms  p(50)=59.87ms  p(95)=59.87ms  p(99)=59.87ms 
+    otp_session_duration....................................................: min=2.2s     avg=9.63s    max=15.61s   p(50)=9.59s    p(95)=12.09s   p(99)=13.33s  
+    session_add_session_duration............................................: min=154ms    avg=8.31s    max=12.63s   p(50)=8.42s    p(95)=10.1s    p(99)=10.52s  
+    session_set_session_duration............................................: min=0s       avg=659.94ms max=4.45s    p(50)=513.63ms p(95)=1.62s    p(99)=1.9s    
+    set_human_email_otp_duration............................................: min=29.12ms  avg=494.09ms max=806.37ms p(50)=581.1ms  p(95)=646.91ms p(99)=680.35ms
+    user_create_human_duration..............................................: min=698.95ms avg=9.83s    max=17.55s   p(50)=11.1s    p(95)=17s      p(99)=17.46s  
+
+    HTTP
+    http_req_duration.......................................................: min=0s       avg=3.21s    max=20.01s   p(50)=1.21s    p(95)=9.59s    p(99)=10.3s   
+      { expected_response:true }............................................: min=14.73ms  avg=3.21s    max=20.01s   p(50)=1.21s    p(95)=9.59s    p(99)=10.3s   
+    http_req_failed.........................................................: 0.00%  1 out of 338656
+    http_reqs...............................................................: 338656 182.267126/s
+
+    EXECUTION
+    iteration_duration......................................................: min=2.2s     avg=9.63s    max=15.61s   p(50)=9.59s    p(95)=12.09s   p(99)=13.33s  
+    iterations..............................................................: 112282 60.43099/s
+    vus.....................................................................: 0      min=0           max=600
+    vus_max.................................................................: 600    min=600         max=600
+
+    NETWORK
+    data_received...........................................................: 183 MB 98 kB/s
+    data_sent...............................................................: 82 MB  44 kB/s
+
+running (30m58.0s), 000/600 VUs, 112282 complete and 0 interrupted iterations
+default ✓ [======================================] 600 VUs  30m0s
+```
+
