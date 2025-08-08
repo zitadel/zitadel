@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
@@ -131,7 +132,8 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			)
 			// event instance.removed
 			assert.Nil(t, instance)
-			require.Equal(t, repository.ErrResourceDoesNotExist, err)
+			// require.Equal(t, repository.ErrResourceDoesNotExist, err)
+			require.ErrorIs(t, &database.NoRowFoundError{}, err)
 		}, retryDuration, tick)
 	})
 }
