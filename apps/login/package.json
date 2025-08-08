@@ -20,11 +20,6 @@
     "test:acceptance:setup": "cd ../.. && make login_test_acceptance_setup_env && NODE_ENV=test turbo run test:acceptance:setup:dev",
     "test:acceptance:setup:dev": "cd ../.. && make login_test_acceptance_setup_dev"
   },
-  "pnpm": {
-    "overrides": {
-      "form-data@>=4.0.0 <4.0.4": ">=4.0.4"
-    }
-  },
   "git": {
     "pre-commit": "lint-staged"
   },
