@@ -13,12 +13,13 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/zitadel/zitadel/internal/integration"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
 func TestCreateApplication(t *testing.T) {
-	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 
 	t.Parallel()
 
@@ -202,7 +203,7 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			inputCtx: LoginUserCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: p.GetId(),
-				Name:      gofakeit.Name(),
+				Name:      integration.ApplicationName(),
 				CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
 					ApiRequest: &app.CreateAPIApplicationRequest{
 						AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
@@ -271,7 +272,7 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			inputCtx: OrgOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: p.GetId(),
-				Name:      gofakeit.Name(),
+				Name:      integration.ApplicationName(),
 				CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
 					ApiRequest: &app.CreateAPIApplicationRequest{
 						AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
@@ -340,7 +341,7 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 			inputCtx: projectOwnerCtx,
 			creationRequest: &app.CreateApplicationRequest{
 				ProjectId: p.GetId(),
-				Name:      gofakeit.Name(),
+				Name:      integration.ApplicationName(),
 				CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
 					ApiRequest: &app.CreateAPIApplicationRequest{
 						AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
@@ -421,10 +422,10 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 }
 
 func TestUpdateApplication(t *testing.T) {
-	orgNotInCtx := instance.CreateOrganization(IAMOwnerCtx, gofakeit.Name(), gofakeit.Email())
+	orgNotInCtx := instance.CreateOrganization(IAMOwnerCtx, integration.ProjectName(), gofakeit.Email())
 	pNotInCtx := instance.CreateProject(IAMOwnerCtx, t, orgNotInCtx.GetOrganizationId(), gofakeit.AppName(), false, false)
 
-	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 
 	baseURI := "http://example.com"
 
@@ -855,7 +856,7 @@ func TestUpdateApplication_WithDifferentPermissions(t *testing.T) {
 }
 
 func TestDeleteApplication(t *testing.T) {
-	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
@@ -975,7 +976,7 @@ func TestDeleteApplication_WithDifferentPermissions(t *testing.T) {
 }
 
 func TestDeactivateApplication(t *testing.T) {
-	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
@@ -1096,7 +1097,7 @@ func TestDeactivateApplication_WithDifferentPermissions(t *testing.T) {
 }
 
 func TestReactivateApplication(t *testing.T) {
-	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 
 	reqForAppNameCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
@@ -1229,7 +1230,7 @@ func TestReactivateApplication_WithDifferentPermissions(t *testing.T) {
 }
 
 func TestRegenerateClientSecret(t *testing.T) {
-	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), gofakeit.Name(), false, false)
+	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 
 	reqForApiAppCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},
