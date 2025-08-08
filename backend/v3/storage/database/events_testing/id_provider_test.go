@@ -138,7 +138,7 @@ var validSAMLMetadata2 = []byte(`<?xml version="1.0" encoding="UTF-8"?>
   </md:ContactPerson>
 </md:EntityDescriptor>`)
 
-func TestServer_TestIDProviderReduces(t *testing.T) {
+func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 	instanceID := Instance.ID()
 
 	t.Run("test iam idp add reduces", func(t *testing.T) {
@@ -593,7 +593,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oauth
-		beforeCreate := time.Now().Add(-1 * time.Second)
+		beforeCreate := time.Now()
 		addOAuth, err := AdminClient.AddGenericOAuthProvider(CTX, &admin.AddGenericOAuthProviderRequest{
 			Name:                  name,
 			ClientId:              "clientId",
@@ -1056,7 +1056,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
-		beforeCreate := time.Now().Add(-1 * time.Second)
+		beforeCreate := time.Now()
 		addJWT, err := AdminClient.AddJWTProvider(CTX, &admin.AddJWTProviderRequest{
 			Name:         name,
 			Issuer:       "issuer",
@@ -1126,7 +1126,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change jwt
-		beforeCreate := time.Now().Add(-1 * time.Second)
+		beforeCreate := time.Now()
 		_, err = AdminClient.UpdateJWTProvider(CTX, &admin.UpdateJWTProviderRequest{
 			Id:           addJWT.Id,
 			Name:         name,
@@ -1268,7 +1268,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change azure
-		beforeCreate := time.Now().Add(-1 * time.Second)
+		beforeCreate := time.Now()
 		_, err = AdminClient.UpdateAzureADProvider(CTX, &admin.UpdateAzureADProviderRequest{
 			Id:           addAzure.Id,
 			Name:         name,

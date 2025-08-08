@@ -941,7 +941,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
-		beforeCreate := time.Now().Add(-1 * time.Second)
+		beforeCreate := time.Now()
 		addJWT, err := MgmtClient.AddJWTProvider(CTX, &management.AddJWTProviderRequest{
 			Name:         name,
 			Issuer:       "issuer",
@@ -1011,7 +1011,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change jwt
-		beforeCreate := time.Now().Add(-1 * time.Second)
+		beforeCreate := time.Now()
 		_, err = MgmtClient.UpdateJWTProvider(CTX, &management.UpdateJWTProviderRequest{
 			Id:           addJWT.Id,
 			Name:         name,
@@ -1153,7 +1153,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change azure
-		beforeCreate := time.Now().Add(-1 * time.Second)
+		beforeCreate := time.Now()
 		_, err = MgmtClient.UpdateAzureADProvider(CTX, &management.UpdateAzureADProviderRequest{
 			Id:           addAzure.Id,
 			Name:         name,
