@@ -19,6 +19,10 @@ import (
 )
 
 const (
+	IDPRelationalTable                = "zitadel.identity_providers"
+	IDPRelationalOrgIdCol             = "org_id"
+	IDPRelationalAutoRegisterCol      = "auto_register"
+	IDPRelationalPayloadCol           = "payload"
 	IDPRelationalOrgId                = "org_id"
 	IDPRelationalAllowCreationCol     = "allow_creation"
 	IDPRelationalAllowLinkingCol      = "allow_linking"
