@@ -21,6 +21,7 @@ import (
 )
 
 func TestCommands_CreateInviteCode(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		checkPermission             domain.PermissionCheck
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
@@ -323,9 +324,348 @@ func TestCommands_CreateInviteCode(t *testing.T) {
 				returnCode: nil,
 			},
 		},
+		{
+			"create ok after three verification failures",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+						// first invite code generated and returned
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code1"),
+								},
+								time.Hour,
+								"",
+								true,
+								"",
+								"",
+							),
+						),
+						// simulate three failed verification attempts
+						eventFromEventPusher(
+							user.NewHumanInviteCheckFailedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInviteCheckFailedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInviteCheckFailedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code2"),
+								},
+								time.Hour,
+								"",
+								false,
+								"",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code2", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
+			},
+			args{
+				ctx: context.Background(),
+				invite: &CreateUserInvite{
+					UserID: "userID",
+				},
+			},
+			want{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "userID",
+				},
+				returnCode: nil,
+			},
+		},
+		{
+			"return ok after three verification failures",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+						// first invite code generated and returned
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code1"),
+								},
+								time.Hour,
+								"",
+								true,
+								"",
+								"",
+							),
+						),
+						// simulate three failed verification attempts
+						eventFromEventPusher(
+							user.NewHumanInviteCheckFailedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInviteCheckFailedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInviteCheckFailedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code2"),
+								},
+								time.Hour,
+								"",
+								true,
+								"",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code2", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
+			},
+			args{
+				ctx: context.Background(),
+				invite: &CreateUserInvite{
+					UserID:     "userID",
+					ReturnCode: true,
+				},
+			},
+			want{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "userID",
+				},
+				returnCode: gu.Ptr("code2"),
+			},
+		},
+		{
+			"create ok after verification fails due to invite code expiration",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+						// first invite code generated and returned
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code1"),
+								},
+								-5*time.Minute, // expired code
+								"",
+								true,
+								"",
+								"",
+							),
+						),
+						// simulate a failed verification attempt due to expiry
+						eventFromEventPusher(
+							user.NewHumanInviteCheckFailedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code2"),
+								},
+								time.Hour,
+								"",
+								false,
+								"",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code2", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
+			},
+			args{
+				ctx: context.Background(),
+				invite: &CreateUserInvite{
+					UserID: "userID",
+				},
+			},
+			want{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "userID",
+				},
+				returnCode: nil,
+			},
+		},
+		{
+			"return ok after verification fails due to invite code expiration",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+						// first invite code generated and returned
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code1"),
+								},
+								-5*time.Minute, // expired code
+								"",
+								true,
+								"",
+								"",
+							),
+						),
+						// simulate a failed verification attempt due to expiry
+						eventFromEventPusher(
+							user.NewHumanInviteCheckFailedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code2"),
+								},
+								time.Hour,
+								"",
+								true,
+								"",
+								"",
+							),
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code2", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
+			},
+			args{
+				ctx: context.Background(),
+				invite: &CreateUserInvite{
+					UserID:     "userID",
+					ReturnCode: true,
+				},
+			},
+			want{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "userID",
+				},
+				returnCode: gu.Ptr("code2"),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := &Commands{
 				checkPermission:             tt.fields.checkPermission,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
@@ -342,6 +682,7 @@ func TestCommands_CreateInviteCode(t *testing.T) {
 }
 
 func TestCommands_ResendInviteCode(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		checkPermission             domain.PermissionCheck
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
@@ -713,6 +1054,7 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := &Commands{
 				checkPermission:             tt.fields.checkPermission,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
@@ -727,6 +1069,7 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 }
 
 func TestCommands_InviteCodeSent(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
@@ -845,6 +1188,7 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
@@ -855,6 +1199,7 @@ func TestCommands_InviteCodeSent(t *testing.T) {
 }
 
 func TestCommands_VerifyInviteCode(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		eventstore     func(*testing.T) *eventstore.Eventstore
 		userEncryption crypto.EncryptionAlgorithm
@@ -940,6 +1285,7 @@ func TestCommands_VerifyInviteCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := &Commands{
 				eventstore:     tt.fields.eventstore(t),
 				userEncryption: tt.fields.userEncryption,
@@ -952,6 +1298,7 @@ func TestCommands_VerifyInviteCode(t *testing.T) {
 }
 
 func TestCommands_VerifyInviteCodeSetPassword(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		eventstore         func(*testing.T) *eventstore.Eventstore
 		userEncryption     crypto.EncryptionAlgorithm
@@ -1268,6 +1615,7 @@ func TestCommands_VerifyInviteCodeSetPassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := &Commands{
 				eventstore:         tt.fields.eventstore(t),
 				userEncryption:     tt.fields.userEncryption,

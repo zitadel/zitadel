@@ -3,20 +3,21 @@
   "version": "0.0.0",
   "scripts": {
     "open": "pnpm exec cypress open",
-    "e2e": "pnpm exec cypress run",
-    "open:golang": "pnpm run open --",
-    "e2e:golang": "pnpm run e2e --",
-    "open:golangangular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 pnpm run open --",
-    "e2e:golangangular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 pnpm run e2e --",
-    "open:angulargolang": "pnpm run open:golangangular --",
-    "e2e:angulargolang": "pnpm run e2e:golangangular --",
-    "open:angular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 CYPRESS_WEBHOOK_HANDLER_HOST=host.docker.internal pnpm run open --",
-    "e2e:angular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 CYPRESS_WEBHOOK_HANDLER_HOST=host.docker.internal pnpm run e2e --",
+    "test:e2e": "pnpm exec cypress run",
+    "test:open:golang": "pnpm run open --",
+    "test:e2e:golang": "pnpm run e2e --",
+    "test:open:golangangular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 pnpm run open --",
+    "test:e2e:golangangular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 pnpm run e2e --",
+    "test:open:angulargolang": "pnpm run open:golangangular --",
+    "test:e2e:angulargolang": "pnpm run e2e:golangangular --",
+    "test:open:angular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 CYPRESS_WEBHOOK_HANDLER_HOST=host.docker.internal pnpm run open --",
+    "test:e2e:angular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 CYPRESS_WEBHOOK_HANDLER_HOST=host.docker.internal pnpm run e2e --",
     "lint": "prettier --check cypress",
-    "lint:fix": "prettier --write cypress"
+    "lint:fix": "prettier --write cypress",
+    "clean": "rm -rf .turbo node_modules"
   },
   "private": true,
-  "dependencies": {
+  "devDependencies": {
     "@types/pg": "^8.11.6",
     "cypress-wait-until": "^3.0.2",
     "jsonwebtoken": "^9.0.2",
@@ -25,10 +26,8 @@
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
     "uuid": "^10.0.0",
-    "wait-on": "^7.2.0"
-  },
-  "devDependencies": {
+    "wait-on": "^7.2.0",
     "@types/node": "^22.3.0",
-    "cypress": "^13.13.3"
+    "cypress": "^14.5.3"
   }
 }
