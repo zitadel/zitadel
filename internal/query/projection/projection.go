@@ -39,7 +39,6 @@ var (
 	OrgDomainProjection                 *handler.Handler
 	LoginPolicyProjection               *handler.Handler
 	IDPProjection                       *handler.Handler
-	IDPRelationalProjection             *handler.Handler
 	IDPTemplateRelationalProjection     *handler.Handler
 	AppProjection                       *handler.Handler
 	IDPUserLinkProjection               *handler.Handler
@@ -139,7 +138,6 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	OrgDomainProjection = newOrgDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_domains"]))
 	LoginPolicyProjection = newLoginPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_policies"]))
 	IDPProjection = newIDPProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idps"]))
-	IDPRelationalProjection = newIDPRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idps_relational"]))
 	AppProjection = newAppProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["apps"]))
 	IDPUserLinkProjection = newIDPUserLinkProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_user_links"]))
 	IDPLoginPolicyLinkProjection = newIDPLoginPolicyLinkProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_login_policy_links"]))
@@ -321,7 +319,6 @@ func newProjectionsList() {
 		OrgDomainProjection,
 		LoginPolicyProjection,
 		IDPProjection,
-		IDPRelationalProjection,
 		IDPTemplateRelationalProjection,
 		IDPTemplateProjection,
 		AppProjection,
