@@ -8,6 +8,7 @@ overrides:
   '@typescript-eslint/parser': ^8.35.1
   '@zitadel/client': workspace:*
   '@zitadel/proto': workspace:*
+  form-data@>=4.0.0 <4.0.4: '>=4.0.4'
 
 importers:
 
@@ -11877,6 +11878,7 @@ packages:
   puppeteer@22.15.0:
     resolution: {integrity: sha512-XjCY1SiSEi1T7iSYuxS82ft85kwDJUS7wj1Z0eGVXKdtr5g4xnVcbjwxhq5xBnpK/E7x1VZZoJDxpjAOasHT4Q==}
     engines: {node: '>=18'}
+    deprecated: < 24.9.0 is no longer supported
     hasBin: true
 
   qjobs@1.2.0:
