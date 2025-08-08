@@ -209,17 +209,18 @@ func Init(ctx context.Context) error {
 	return nil
 }
 
-func Start(ctx context.Context) {
+func Start(ctx context.Context) error {
 	projectionTableMap := make(map[string]bool, len(projections))
 	for _, projection := range projections {
 		table := projection.String()
 		if projectionTableMap[table] {
-			panic("projeciton for " + projection.String() + " already added")
+			return fmt.Errorf("projeciton for %s already added", table)
 		}
 		projectionTableMap[table] = true
 
 		projection.Start(ctx)
 	}
+	return nil
 }
 
 func ProjectInstance(ctx context.Context) error {
