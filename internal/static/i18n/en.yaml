@@ -611,6 +611,12 @@ Errors:
     FeatureDisabled: Web key feature disabled
     NoActive: No active web key found
     NotFound: Web key not found
+  Captcha:
+    InitializationFailed: Failed to initialize Captcha
+    InvalidCaptcha: Captcha verification failed. The token is invalid or expired
+    MissingToken: Captcha token is missing
+    UnexpectedType: Unexpected Captcha type in configuration
+    ValidationFailed: An error occurred while validating the Captcha token
 
 AggregateTypes:
   action: Action
@@ -1365,7 +1371,6 @@ EventTypes:
         code:
           added: Phone number verification code generated
           sent: Phone number verification code sent
-
 
   web_key:
     added: Web Key added

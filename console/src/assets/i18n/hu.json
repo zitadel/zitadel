@@ -2390,6 +2390,34 @@
     "USEPKCE": "PKCE használata",
     "USEPKCE_DESC": "Meghatározza, hogy a code_challenge és a code_challenge_method paraméterek szerepeljenek-e a hitelesítési kérelemben"
   },
+  "CAPTCHA": {
+    "TITLE": "Captcha ellenőrzés",
+    "DESCRIPTION": "Captcha hozzáadása a regisztrációs és bejelentkezési űrlapokhoz.",
+    "REGISTER": {
+      "TITLE": "Engedélyezés regisztrációhoz",
+      "DESCRIPTION": "Engedélyezze a Captcha-t a regisztrációs űrlaphoz."
+    },
+    "LOGIN": {
+      "TITLE": "Engedélyezés bejelentkezéshez",
+      "DESCRIPTION": "Engedélyezze a Captcha-t a bejelentkezési űrlaphoz."
+    },
+    "METHOD": {
+      "TITLE": "Captcha módszer",
+      "DESCRIPTION": "Válassza ki a használandó Captcha módszert.",
+      "CONFIG": {
+        "SITE_KEY": {
+          "LABEL": "reCaptcha Site Key"
+        },
+        "SECRET_KEY": {
+          "LABEL": "reCaptcha Secret Key"
+        }
+      },
+      "LIST": {
+        "1": "Letiltva",
+        "2": "Recaptcha"
+      }
+    }
+  },
   "MFA": {
     "LIST": {
       "MULTIFACTORTITLE": "Jelszó nélküli",
