@@ -300,6 +300,15 @@ module.exports = {
               categoryLinkSource: "auto",
             },
           },
+          user_v2beta: {
+            specPath:
+              ".artifacts/openapi/zitadel/user/v2beta/user_service.swagger.json",
+            outputDir: "docs/apis/resources/user_service_v2beta",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
+            },
+          },
           session_v2: {
             specPath:
               ".artifacts/openapi/zitadel/session/v2/session_service.swagger.json",

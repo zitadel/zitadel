@@ -5,6 +5,7 @@ const sidebar_api_admin = require("./docs/apis/resources/admin/sidebar.ts").defa
 const sidebar_api_system = require("./docs/apis/resources/system/sidebar.ts").default
 
 const sidebar_api_user_service_v2 = require("./docs/apis/resources/user_service_v2/sidebar.ts").default
+const sidebar_api_user_service_v2beta = require("./docs/apis/resources/user_service_v2beta/sidebar.ts").default
 const sidebar_api_session_service_v2 = require("./docs/apis/resources/session_service_v2/sidebar.ts").default
 const sidebar_api_oidc_service_v2 = require("./docs/apis/resources/oidc_service_v2/sidebar.ts").default
 const sidebar_api_settings_service_v2 = require("./docs/apis/resources/settings_service_v2/sidebar.ts").default
@@ -685,6 +686,18 @@ module.exports = {
                     "This API is intended to manage users in a ZITADEL instance.\n",
               },
               items: sidebar_api_user_service_v2,
+            },
+            {
+              type: "category",
+              label: "User (beta)",
+              link: {
+                type: "generated-index",
+                title: "User Service API",
+                slug: "/apis/resources/user_service_v2beta",
+                description:
+                    "This API is intended to manage users in a ZITADEL instance.\n",
+              },
+              items: sidebar_api_user_service_v2beta,
             },
             {
               type: "category",
