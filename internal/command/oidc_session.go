@@ -259,6 +259,35 @@ func oidcSessionTokenIDsFromToken(token string) (oidcSessionID, refreshTokenID, 
 	return "", "", "", zerrors.ThrowPreconditionFailed(nil, "OIDCS-S87kl", "Errors.OIDCSession.Token.Invalid")
 }
 
+// checkSessionTerminationPermission will check that the caller is either terminating the own session or
+// is granted the "oidc_session.delete" permission on the resource owner of the authenticated user.
+func (c *Commands) checkOidcSessionTerminationPermission(ctx context.Context, model *OIDCSessionWriteModel) error {
+	if model.UserID != "" && model.UserID == authz.GetCtxData(ctx).UserID {
+		return nil
+	}
+	return c.checkPermission(ctx, domain.PermissionOidcSessionDelete, model.UserResourceOwner, model.UserID)
+}
+
+func (c *Commands) TerminateOIDCSession(ctx context.Context, sessionID string) (*domain.ObjectDetails, error) {
+	writeModel := NewOIDCSessionWriteModel(sessionID, "")
+	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "OIDCS-ERR01", "Errors.Internal")
+	}
+	if err := c.checkOidcSessionTerminationPermission(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	if writeModel.State != domain.OIDCSessionStateActive {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDCS-ERR02", "Errors.OIDCSession.ID.Invalid")
+	}
+
+	err = c.pushAppendAndReduce(ctx, writeModel, oidcsession.NewTerminatedEvent(ctx, writeModel.aggregate))
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+}
+
 // RevokeOIDCSessionToken revokes an access_token or refresh_token
 // if the OIDCSession cannot be retrieved by the provided token, is not active or if the token is already revoked,
 // then no error will be returned.
