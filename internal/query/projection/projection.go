@@ -210,7 +210,14 @@ func Init(ctx context.Context) error {
 }
 
 func Start(ctx context.Context) {
+	projectionTableMap := make(map[string]bool, len(projections))
 	for _, projection := range projections {
+		table := projection.String()
+		if projectionTableMap[table] {
+			panic("projeciton for " + projection.String() + " already added")
+		}
+		projectionTableMap[table] = true
+
 		projection.Start(ctx)
 	}
 }
