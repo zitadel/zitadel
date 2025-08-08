@@ -83,7 +83,7 @@ func PrepareSaveOnConflict(table string, conflictColumns, updateColumns []string
 func PrepareDeleteByKey(table string, key ColumnKey, id interface{}) func(db *gorm.DB) error {
 	return func(db *gorm.DB) error {
 		err := db.Table(table).
-			Where(fmt.Sprintf("%s = ?", key.ToColumnName()), id).
+			Where(key.ToColumnName()+" = ?", id).
 			Delete(nil).
 			Error
 		if err != nil {
@@ -97,7 +97,7 @@ func PrepareUpdateByKeys(table string, column ColumnKey, value interface{}, keys
 	return func(db *gorm.DB) error {
 		for _, key := range keys {
 			db = db.Table(table).
-				Where(fmt.Sprintf("%s = ?", key.Key.ToColumnName()), key.Value)
+				Where(key.Key.ToColumnName()+" = ?", key.Value)
 		}
 		err := db.
 			Update(column.ToColumnName(), value).
@@ -118,7 +118,7 @@ func PrepareDeleteByKeys(table string, keys ...Key) func(db *gorm.DB) error {
 	return func(db *gorm.DB) error {
 		for _, key := range keys {
 			db = db.Table(table).
-				Where(fmt.Sprintf("%s = ?", key.Key.ToColumnName()), key.Value)
+				Where(key.Key.ToColumnName()+" = ?", key.Value)
 		}
 		err := db.
 			Delete(nil).

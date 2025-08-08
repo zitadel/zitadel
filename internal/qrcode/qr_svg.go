@@ -4,7 +4,7 @@ import (
 	"errors"
 	"image/color"
 
-	"github.com/ajstarks/svgo"
+	svg "github.com/ajstarks/svgo"
 	"github.com/boombuler/barcode"
 )
 
@@ -63,7 +63,7 @@ func (qs *QrSVG) SetStartPoint(x, y int) {
 
 // StartQrSVG creates a start for writing an SVG file that
 // only contains a barcode. This is similar to the svg.Start() method.
-// This fucntion should only be used if you only want to write a QR code
+// This function should only be used if you only want to write a QR code
 // to the SVG. Otherwise use the regular svg.Start() method to start your
 // SVG file.
 func (qs *QrSVG) StartQrSVG(s *svg.SVG) {

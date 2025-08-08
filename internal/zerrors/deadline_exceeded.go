@@ -1,6 +1,7 @@
 package zerrors
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -29,8 +30,8 @@ func ThrowDeadlineExceededf(parent error, id, format string, a ...interface{}) e
 func (err *DeadlineExceededError) IsDeadlineExceeded() {}
 
 func IsDeadlineExceeded(err error) bool {
-	_, ok := err.(DeadlineExceeded)
-	return ok
+	var tmp DeadlineExceeded
+	return errors.As(err, &tmp)
 }
 
 func (err *DeadlineExceededError) Is(target error) bool {

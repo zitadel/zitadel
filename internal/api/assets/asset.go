@@ -177,7 +177,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 		resourceOwner := uploader.ResourceOwner(authz.GetInstance(ctx), ctxData)
 		objectName, err := uploader.ObjectName(ctxData)
 		if err != nil {
-			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
+			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %w", err), http.StatusInternalServerError)
 			return
 		}
 		uploadInfo := &command.AssetUpload{
@@ -210,7 +210,7 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 		}
 		objectName, err := downloader.ObjectName(ctx, path)
 		if err != nil {
-			s.ErrorHandler()(w, r, fmt.Errorf("download failed: %v", err), http.StatusInternalServerError)
+			s.ErrorHandler()(w, r, fmt.Errorf("download failed: %w", err), http.StatusInternalServerError)
 			return
 		}
 		if objectName == "" {
@@ -239,7 +239,7 @@ func GetAsset(w http.ResponseWriter, r *http.Request, resourceOwner, objectName 
 	if info.Hash == strings.Trim(r.Header.Get(http_util.IfNoneMatch), "\"") {
 		w.Header().Set(http_util.LastModified, info.LastModified.Format(time.RFC1123))
 		w.Header().Set(http_util.Etag, "\""+info.Hash+"\"")
-		w.WriteHeader(304)
+		w.WriteHeader(http.StatusNotModified)
 		return nil
 	}
 	w.Header().Set(http_util.ContentLength, strconv.FormatInt(info.Size, 10))

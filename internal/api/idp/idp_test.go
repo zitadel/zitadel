@@ -1,6 +1,7 @@
 package idp
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
@@ -58,7 +59,7 @@ func Test_redirectToSuccessURL(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest("GET", "http://example.com", nil)
+			req := httptest.NewRequest(http.MethodGet, "http://example.com", nil)
 			resp := httptest.NewRecorder()
 
 			wm := command.NewIDPIntentWriteModel(tt.args.id, tt.args.id, tt.args.maxIdPIntentLifetime)
@@ -115,7 +116,7 @@ func Test_redirectToFailureURL(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest("GET", "http://example.com", nil)
+			req := httptest.NewRequest(http.MethodGet, "http://example.com", nil)
 			resp := httptest.NewRecorder()
 
 			wm := command.NewIDPIntentWriteModel(tt.args.id, tt.args.id, tt.args.maxIdPIntentLifetime)
@@ -159,7 +160,7 @@ func Test_redirectToFailureURLErr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest("GET", "http://example.com", nil)
+			req := httptest.NewRequest(http.MethodGet, "http://example.com", nil)
 			resp := httptest.NewRecorder()
 
 			wm := command.NewIDPIntentWriteModel(tt.args.id, tt.args.id, tt.args.maxIdPIntentLifetime)
@@ -211,7 +212,7 @@ func Test_parseCallbackRequest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest("GET", tt.args.url, nil)
+			req := httptest.NewRequest(http.MethodGet, tt.args.url, nil)
 			handler := Handler{parser: form.NewParser()}
 
 			data, err := handler.parseCallbackRequest(req)

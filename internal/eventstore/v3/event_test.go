@@ -92,6 +92,8 @@ func Test_commandToEvent(t *testing.T) {
 			},
 			want: want{
 				err: func(t *testing.T, err error) {
+					t.Helper()
+
 					assert.Error(t, err)
 				},
 			},
@@ -100,6 +102,8 @@ func Test_commandToEvent(t *testing.T) {
 	for _, tt := range tests {
 		if tt.want.err == nil {
 			tt.want.err = func(t *testing.T, err error) {
+				t.Helper()
+
 				require.NoError(t, err)
 			}
 		}
@@ -213,6 +217,8 @@ func Test_commandToEventOld(t *testing.T) {
 			},
 			want: want{
 				err: func(t *testing.T, err error) {
+					t.Helper()
+
 					assert.Error(t, err)
 				},
 			},
@@ -221,6 +227,8 @@ func Test_commandToEventOld(t *testing.T) {
 	for _, tt := range tests {
 		if tt.want.err == nil {
 			tt.want.err = func(t *testing.T, err error) {
+				t.Helper()
+
 				require.NoError(t, err)
 			}
 		}
@@ -268,6 +276,8 @@ func Test_commandsToEvents(t *testing.T) {
 				events:   []eventstore.Event{},
 				commands: []*command{},
 				err: func(t *testing.T, err error) {
+					t.Helper()
+
 					require.NoError(t, err)
 				},
 			},
@@ -304,6 +314,8 @@ func Test_commandsToEvents(t *testing.T) {
 					},
 				},
 				err: func(t *testing.T, err error) {
+					t.Helper()
+
 					require.NoError(t, err)
 				},
 			},
@@ -340,6 +352,8 @@ func Test_commandsToEvents(t *testing.T) {
 					},
 				},
 				err: func(t *testing.T, err error) {
+					t.Helper()
+
 					require.NoError(t, err)
 				},
 			},
@@ -376,6 +390,8 @@ func Test_commandsToEvents(t *testing.T) {
 					},
 				},
 				err: func(t *testing.T, err error) {
+					t.Helper()
+
 					require.NoError(t, err)
 				},
 			},
@@ -431,6 +447,8 @@ func Test_commandsToEvents(t *testing.T) {
 					},
 				},
 				err: func(t *testing.T, err error) {
+					t.Helper()
+
 					require.NoError(t, err)
 				},
 			},
@@ -450,6 +468,8 @@ func Test_commandsToEvents(t *testing.T) {
 				events:   nil,
 				commands: nil,
 				err: func(t *testing.T, err error) {
+					t.Helper()
+
 					assert.Error(t, err)
 				},
 			},

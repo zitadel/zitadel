@@ -34,7 +34,7 @@ func (s *Session) GetAuth(ctx context.Context) (idp.Auth, error) {
 
 // RetrievePreviousID implements the [idp.SessionSupportsMigration] interface by returning the `sub` from the userinfo endpoint
 func (s *Session) RetrievePreviousID() (string, error) {
-	req, err := http.NewRequest("GET", userinfoEndpoint, nil)
+	req, err := http.NewRequest(http.MethodGet, userinfoEndpoint, nil)
 	if err != nil {
 		return "", err
 	}

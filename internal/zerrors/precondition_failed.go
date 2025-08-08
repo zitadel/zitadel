@@ -1,6 +1,7 @@
 package zerrors
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -29,8 +30,8 @@ func ThrowPreconditionFailedf(parent error, id, format string, a ...interface{})
 func (err *PreconditionFailedError) IsPreconditionFailed() {}
 
 func IsPreconditionFailed(err error) bool {
-	_, ok := err.(PreconditionFailed)
-	return ok
+	var tmp PreconditionFailed
+	return errors.As(err, &tmp)
 }
 
 func (err *PreconditionFailedError) Is(target error) bool {

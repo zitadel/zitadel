@@ -51,7 +51,7 @@ func AppOIDCConfigToPb(app *query.OIDCApp) *app_pb.App_OidcConfig {
 			ClientId:                 app.ClientID,
 			AuthMethodType:           OIDCAuthMethodTypeToPb(app.AuthMethodType),
 			PostLogoutRedirectUris:   app.PostLogoutRedirectURIs,
-			Version:                  OIDCVersionToPb(domain.OIDCVersion(app.Version)),
+			Version:                  OIDCVersionToPb(app.Version),
 			NoneCompliant:            len(app.ComplianceProblems) != 0,
 			ComplianceProblems:       ComplianceProblemsToLocalizedMessages(app.ComplianceProblems),
 			DevMode:                  app.IsDevMode,

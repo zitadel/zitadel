@@ -2123,7 +2123,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"userObjectClasses": ["object"],
 	"userFilters": ["filter"],
 	"timeout": 30000000000,
-	"rootCA": `+stringToJSONByte("certificate")+`,
+	"rootCA": `+stringToJSONByte(t, "certificate")+`,
 	"idAttribute": "id",
 	"firstNameAttribute": "first",
 	"lastNameAttribute": "last",
@@ -2228,7 +2228,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"userObjectClasses": ["object"],
 	"userFilters": ["filter"],
 	"timeout": 30000000000,
-	"rootCA": `+stringToJSONByte("certificate")+`,
+	"rootCA": `+stringToJSONByte(t, "certificate")+`,
 	"idAttribute": "id",
 	"firstNameAttribute": "first",
 	"lastNameAttribute": "last",
@@ -2375,7 +2375,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"userObjectClasses": ["object"],
 	"userFilters": ["filter"],
 	"timeout": 30000000000,
-	"rootCA": `+stringToJSONByte("certificate")+`,
+	"rootCA": `+stringToJSONByte(t, "certificate")+`,
 	"idAttribute": "id",
 	"firstNameAttribute": "first",
 	"lastNameAttribute": "last",
@@ -2778,13 +2778,13 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"metadata": `+stringToJSONByte("metadata")+`,
+	"metadata": `+stringToJSONByte(t, "metadata")+`,
 	"key": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
     },
-	"certificate": `+stringToJSONByte("certificate")+`,
+	"certificate": `+stringToJSONByte(t, "certificate")+`,
 	"binding": "binding",
 	"nameIDFormat": 3,
 	"transientMappingAttributeName": "customAttribute",
@@ -2852,13 +2852,13 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"metadata": `+stringToJSONByte("metadata")+`,
+	"metadata": `+stringToJSONByte(t, "metadata")+`,
 	"key": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
     },
-	"certificate": `+stringToJSONByte("certificate")+`,
+	"certificate": `+stringToJSONByte(t, "certificate")+`,
 	"binding": "binding",
 	"nameIDFormat": 3,
 	"transientMappingAttributeName": "customAttribute",
@@ -2967,13 +2967,13 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 					[]byte(`{
 	"id": "idp-id",
 	"name": "custom-zitadel-instance",
-	"metadata": `+stringToJSONByte("metadata")+`,
+	"metadata": `+stringToJSONByte(t, "metadata")+`,
 	"key": {
         "cryptoType": 0,
         "algorithm": "RSA-265",
         "keyId": "key-id"
     },
-	"certificate": `+stringToJSONByte("certificate")+`,
+	"certificate": `+stringToJSONByte(t, "certificate")+`,
 	"binding": "binding",
 	"withSignedRequest": true,
 	"isCreationAllowed": true,
@@ -4454,7 +4454,13 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	}
 }
 
-func stringToJSONByte(data string) string {
-	jsondata, _ := json.Marshal([]byte(data))
+func stringToJSONByte(t *testing.T, data string) string {
+	t.Helper()
+
+	jsondata, err := json.Marshal([]byte(data))
+	if err != nil {
+		t.Fatalf("json.Marhal: %v", err)
+	}
+
 	return string(jsondata)
 }
