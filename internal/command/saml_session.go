@@ -93,7 +93,7 @@ func (c *Commands) CreateSAMLSessionFromSAMLRequest(ctx context.Context, samlReq
 }
 
 func (c *Commands) newSAMLSessionAddEvents(ctx context.Context, userID, resourceOwner string, pending ...eventstore.Command) (*SAMLSessionEvents, error) {
-	userStateModel, err := c.userStateWriteModel(ctx, userID)
+	userStateModel, err := c.userStateWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}

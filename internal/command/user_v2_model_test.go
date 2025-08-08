@@ -1992,7 +1992,7 @@ func TestCommandSide_userStateWriteModel(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userStateWriteModel(tt.args.ctx, tt.args.userID)
+			wm, err := r.userStateWriteModel(tt.args.ctx, tt.args.userID, "")
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()

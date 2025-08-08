@@ -295,7 +295,7 @@ func (c *Commands) RevokeOIDCSessionToken(ctx context.Context, token, clientID s
 }
 
 func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, userID, resourceOwner string, pending ...eventstore.Command) (*OIDCSessionEvents, error) {
-	userStateModel, err := c.userStateWriteModel(ctx, userID)
+	userStateModel, err := c.userStateWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -358,7 +358,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 	if err = sessionWriteModel.CheckRefreshToken(refreshTokenID); err != nil {
 		return nil, err
 	}
-	userStateWriteModel, err := c.userStateWriteModel(ctx, sessionWriteModel.UserID)
+	userStateWriteModel, err := c.userStateWriteModel(ctx, sessionWriteModel.UserID, sessionWriteModel.UserResourceOwner)
 	if err != nil {
 		return nil, err
 	}
