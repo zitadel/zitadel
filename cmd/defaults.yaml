@@ -572,6 +572,12 @@ Login:
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_LOGIN_CACHE_SHAREDMAXAGE
   DefaultOTPEmailURLV2: "/otp/verify?loginName={{.LoginName}}&code={{.Code}}" # ZITADEL_LOGIN_CACHE_DEFAULTOTPEMAILURLV2
+  DefaultBasePath: "/ui/v2/login"
+  DefaultPaths:
+    LoginPath: "/login"
+    PasswordSetPath: "/password/set"
+    EmailCodePath: "/verify"
+    OTPEmailPath: /otp/verify?loginName={{.LoginName}}&code={{.Code}}
 
 Console:
   ShortCache:
