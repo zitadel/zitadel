@@ -55,7 +55,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			// event iam.idp.config.added
+			// event org.idp.config.added
 			assert.Equal(t, instanceID, idp.InstanceID)
 			assert.Equal(t, orgID, *idp.OrgID)
 			assert.Equal(t, addOIDC.IdpId, idp.ID)
@@ -111,7 +111,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			// event iam.idp.config.changed
+			// event org.idp.config.changed
 			assert.Equal(t, addOIDC.IdpId, idp.ID)
 			assert.Equal(t, name, idp.Name)
 			assert.Equal(t, false, idp.AutoRegister)
@@ -155,7 +155,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			// event iam.idp.config.deactivated
+			// event org.idp.config.deactivated
 			assert.Equal(t, addOIDC.IdpId, idp.ID)
 			assert.Equal(t, domain.IDPStateInactive.String(), idp.State)
 			assert.WithinRange(t, idp.UpdatedAt, beforeCreate, afterCreate)
@@ -216,7 +216,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			// event iam.idp.config.reactivated
+			// event org.idp.config.reactivated
 			assert.Equal(t, addOIDC.IdpId, idp.ID)
 			assert.Equal(t, domain.IDPStateActive.String(), idp.State)
 			assert.WithinRange(t, idp.UpdatedAt, beforeCreate, afterCreate)
@@ -256,7 +256,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				&orgID,
 			)
 
-			// event iam.idp.config.remove
+			// event org.idp.config.remove
 			require.ErrorIs(t, &database.NoRowFoundError{}, err)
 		}, retryDuration, tick)
 	})
@@ -406,7 +406,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			// event iam.idp.jwt.config.added
+			// event org.idp.jwt.config.added
 			// idp
 			assert.Equal(t, instanceID, jwt.InstanceID)
 			assert.Equal(t, orgID, *jwt.OrgID)
@@ -460,7 +460,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			// event iam.idp.jwt.config.changed
+			// event org.idp.jwt.config.changed
 			// idp
 			assert.Equal(t, addJWT.IdpId, updateJWT.ID)
 			assert.Equal(t, orgID, *updateJWT.OrgID)
@@ -475,7 +475,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp oauth added reduces", func(t *testing.T) {
+	t.Run("test org idp oauth added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oauth
@@ -510,7 +510,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			oauth, err = idpRepo.GetOAuth(CTX, idpRepo.IDCondition(addOAuth.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.oauth.added
+			// event org.idp.oauth.added
 			// idp
 			assert.Equal(t, instanceID, oauth.InstanceID)
 			assert.Equal(t, orgID, *oauth.OrgID)
@@ -536,7 +536,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp oauth changed reduces", func(t *testing.T) {
+	t.Run("test org idp oauth changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oauth
@@ -604,7 +604,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			// event instance.idp.oauth.changed
+			// event org.idp.oauth.changed
 			// idp
 			assert.Equal(t, instanceID, updateOauth.InstanceID)
 			assert.Equal(t, orgID, *updateOauth.OrgID)
@@ -628,7 +628,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp oidc added reduces", func(t *testing.T) {
+	t.Run("test org idp oidc added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
@@ -660,7 +660,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			oidc, err := idpRepo.GetOIDC(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.oidc added
+			// event org.idp.oidc added
 			// idp
 			assert.Equal(t, instanceID, oidc.InstanceID)
 			assert.Equal(t, orgID, *oidc.OrgID)
@@ -747,7 +747,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			// event instance.idp.oidc.changed
+			// event org.idp.oidc.changed
 			// idp
 			assert.Equal(t, instanceID, updateOIDC.InstanceID)
 			assert.Equal(t, orgID, *updateOIDC.OrgID)
@@ -769,7 +769,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp oidc migrated azure migration reduces", func(t *testing.T) {
+	t.Run("test org idp oidc migrated azure migration reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// create OIDC
@@ -834,7 +834,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			azure, err := idpRepo.GetOAzureAD(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.oidc.migrated.azure
+			// event org.idp.oidc.migrated.azure
 			// idp
 			assert.Equal(t, instanceID, azure.InstanceID)
 			assert.Equal(t, orgID, *azure.OrgID)
@@ -857,7 +857,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp oidc migrated google migration reduces", func(t *testing.T) {
+	t.Run("test org idp oidc migrated google migration reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// create OIDC
@@ -916,7 +916,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			google, err := idpRepo.GetGoogle(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.oidc.migrated.google
+			// event org.idp.oidc.migrated.google
 			// idp
 			assert.Equal(t, instanceID, google.InstanceID)
 			assert.Equal(t, orgID, *google.OrgID)
@@ -937,7 +937,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp jwt added reduces", func(t *testing.T) {
+	t.Run("test org idp jwt added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
@@ -967,7 +967,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			jwt, err := idpRepo.GetJWT(CTX, idpRepo.IDCondition(addJWT.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.jwt.added
+			// event org.idp.jwt.added
 			// idp
 			assert.Equal(t, instanceID, jwt.InstanceID)
 			assert.Equal(t, orgID, *jwt.OrgID)
@@ -989,7 +989,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp jwt changed reduces", func(t *testing.T) {
+	t.Run("test org idp jwt changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
@@ -1038,7 +1038,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateJwt, err := idpRepo.GetJWT(CTX, idpRepo.IDCondition(addJWT.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.jwt.added
+			// event org.idp.jwt.added
 			// idp
 			assert.Equal(t, instanceID, updateJwt.InstanceID)
 			assert.Equal(t, orgID, *updateJwt.OrgID)
@@ -1059,7 +1059,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp azure added reduces", func(t *testing.T) {
+	t.Run("test org idp azure added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add azure
@@ -1094,7 +1094,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			azure, err := idpRepo.GetOAzureAD(CTX, idpRepo.IDCondition(addAzure.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.azure.added
+			// event org.idp.azure.added
 			// idp
 			assert.Equal(t, instanceID, azure.InstanceID)
 			assert.Equal(t, orgID, *azure.OrgID)
@@ -1116,7 +1116,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp azure changed reduces", func(t *testing.T) {
+	t.Run("test org idp azure changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add azure
@@ -1183,7 +1183,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateAzure, err := idpRepo.GetOAzureAD(CTX, idpRepo.IDCondition(addAzure.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.azure.changed
+			// event org.idp.azure.changed
 			// idp
 			assert.Equal(t, instanceID, updateAzure.InstanceID)
 			assert.Equal(t, orgID, *updateAzure.OrgID)
@@ -1205,7 +1205,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp github added reduces", func(t *testing.T) {
+	t.Run("test org idp github added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add github
@@ -1234,7 +1234,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			github, err := idpRepo.GetGithub(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.github.added
+			// event org.idp.github.added
 			// idp
 			assert.Equal(t, instanceID, github.InstanceID)
 			assert.Equal(t, orgID, *github.OrgID)
@@ -1253,7 +1253,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp github changed reduces", func(t *testing.T) {
+	t.Run("test org idp github changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add github
@@ -1308,7 +1308,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateGithub, err := idpRepo.GetGithub(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.github.changed
+			// event org.idp.github.changed
 			// idp
 			assert.Equal(t, instanceID, updateGithub.InstanceID)
 			assert.Equal(t, orgID, *updateGithub.OrgID)
@@ -1328,7 +1328,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp github enterprise added reduces", func(t *testing.T) {
+	t.Run("test org idp github enterprise added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add github enterprise
@@ -1360,7 +1360,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			githubEnterprise, err := idpRepo.GetGithubEnterprise(CTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.github_enterprise.added
+			// event org.idp.github_enterprise.added
 			// idp
 			assert.Equal(t, instanceID, githubEnterprise.InstanceID)
 			assert.Equal(t, orgID, *githubEnterprise.OrgID)
@@ -1384,7 +1384,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp github enterprise changed reduces", func(t *testing.T) {
+	t.Run("test org idp github enterprise changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add github enterprise
@@ -1445,7 +1445,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateGithubEnterprise, err := idpRepo.GetGithubEnterprise(CTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.github_enterprise.changed
+			// event org.idp.github_enterprise.changed
 			// idp
 			assert.Equal(t, instanceID, githubEnterprise.InstanceID)
 			assert.Equal(t, orgID, *githubEnterprise.OrgID)
@@ -1468,7 +1468,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp gitlab added reduces", func(t *testing.T) {
+	t.Run("test org idp gitlab added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add gitlab
@@ -1497,7 +1497,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			gitlab, err := idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.gitlab.added
+			// event org.idp.gitlab.added
 			// idp
 			assert.Equal(t, instanceID, gitlab.InstanceID)
 			assert.Equal(t, orgID, *gitlab.OrgID)
@@ -1518,7 +1518,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp gitlab changed reduces", func(t *testing.T) {
+	t.Run("test org idp gitlab changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add gitlab
@@ -1573,7 +1573,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateGithlab, err := idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGitlab.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.gitlab.changed
+			// event org.idp.gitlab.changed
 			// idp
 			assert.Equal(t, instanceID, updateGithlab.InstanceID)
 			assert.Equal(t, orgID, *updateGithlab.OrgID)
@@ -1593,7 +1593,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp gitlab self hosted added reduces", func(t *testing.T) {
+	t.Run("test org idp gitlab self hosted added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add gitlab self hosted
@@ -1623,7 +1623,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			gitlabSelfHosted, err := idpRepo.GetGitlabSelfHosting(CTX, idpRepo.IDCondition(addGitlabSelfHosted.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.gitlab_self_hosted.added
+			// event org.idp.gitlab_self_hosted.added
 			// idp
 			assert.Equal(t, instanceID, gitlabSelfHosted.InstanceID)
 			assert.Equal(t, orgID, *gitlabSelfHosted.OrgID)
@@ -1645,7 +1645,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp gitlab self hosted changed reduces", func(t *testing.T) {
+	t.Run("test org idp gitlab self hosted changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add gitlab self hosted
@@ -1702,7 +1702,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateGithlabSelfHosted, err := idpRepo.GetGitlabSelfHosting(CTX, idpRepo.IDCondition(addGitlabSelfHosted.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.gitlab_self_hosted.changed
+			// event org.idp.gitlab_self_hosted.changed
 			// idp
 			assert.Equal(t, instanceID, updateGithlabSelfHosted.InstanceID)
 			assert.Equal(t, orgID, *updateGithlabSelfHosted.OrgID)
@@ -1723,7 +1723,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp google added reduces", func(t *testing.T) {
+	t.Run("test org idp google added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add google
@@ -1752,7 +1752,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			google, err := idpRepo.GetGoogle(CTX, idpRepo.IDCondition(addGoogle.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.google.added
+			// event org.idp.google.added
 			// idp
 			assert.Equal(t, instanceID, google.InstanceID)
 			assert.Equal(t, orgID, *google.OrgID)
@@ -1773,7 +1773,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance idp google changed reduces", func(t *testing.T) {
+	t.Run("test org idp google changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add google
@@ -1828,7 +1828,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateGoogle, err := idpRepo.GetGoogle(CTX, idpRepo.IDCondition(addGoogle.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.google.changed
+			// event org.idp.google.changed
 			// idp
 			assert.Equal(t, instanceID, updateGoogle.InstanceID)
 			assert.Equal(t, orgID, *updateGoogle.OrgID)
@@ -1848,7 +1848,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance ldap added reduces", func(t *testing.T) {
+	t.Run("test org ldap added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add ldap
@@ -1897,7 +1897,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			ldap, err := idpRepo.GetLDAP(CTX, idpRepo.IDCondition(addLdap.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.ldap.v2.added
+			// event org.idp.ldap.v2.added
 			// idp
 			assert.Equal(t, instanceID, ldap.InstanceID)
 			assert.Equal(t, orgID, *ldap.OrgID)
@@ -1937,7 +1937,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance ldap changed reduces", func(t *testing.T) {
+	t.Run("test org ldap changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add ldap
@@ -2034,7 +2034,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateLdap, err := idpRepo.GetLDAP(CTX, idpRepo.IDCondition(addLdap.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.ldap.v2.changed
+			// event org.idp.ldap.v2.changed
 			// idp
 			assert.Equal(t, instanceID, updateLdap.InstanceID)
 			assert.Equal(t, orgID, *updateLdap.OrgID)
@@ -2073,7 +2073,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance apple added reduces", func(t *testing.T) {
+	t.Run("test org apple added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add apple
@@ -2103,7 +2103,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			apple, err := idpRepo.GetApple(CTX, idpRepo.IDCondition(addApple.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.apple.added
+			// event org.idp.apple.added
 			// idp
 			assert.Equal(t, instanceID, apple.InstanceID)
 			assert.Equal(t, orgID, *apple.OrgID)
@@ -2126,7 +2126,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance apple changed reduces", func(t *testing.T) {
+	t.Run("test org apple changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add apple
@@ -2207,7 +2207,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance saml added reduces", func(t *testing.T) {
+	t.Run("test org saml added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 		federatedLogoutEnabled := false
 
@@ -2241,7 +2241,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			saml, err := idpRepo.GetSAML(CTX, idpRepo.IDCondition(addSAML.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.saml.added
+			// event org.idp.saml.added
 			// idp
 			assert.Equal(t, instanceID, saml.InstanceID)
 			assert.Equal(t, orgID, *saml.OrgID)
@@ -2267,7 +2267,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance saml changed reduces", func(t *testing.T) {
+	t.Run("test org saml changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 		federatedLogoutEnabled := false
 
@@ -2334,7 +2334,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			updateSAML, err := idpRepo.GetSAML(CTX, idpRepo.IDCondition(addSAML.Id), instanceID, &orgID)
 			require.NoError(t, err)
 
-			// event instance.idp.saml.changed
+			// event org.idp.saml.changed
 			// idp
 			assert.Equal(t, instanceID, updateSAML.InstanceID)
 			assert.Equal(t, orgID, *updateSAML.OrgID)
@@ -2362,7 +2362,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance iam remove reduces", func(t *testing.T) {
+	t.Run("test org iam remove reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add idp
