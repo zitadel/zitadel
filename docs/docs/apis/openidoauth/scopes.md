@@ -16,10 +16,6 @@ ZITADEL supports the usage of scopes as way of requesting information from the I
 | phone          | Optional scope to request the phone of the subject                             |
 | offline_access | Optional scope to request a refresh_token (only possible when using code flow) |
 
-## Custom Scopes
-
-> This feature is not yet released
-
 ## Reserved Scopes
 
 In addition to the standard compliant scopes we utilize the following scopes.
