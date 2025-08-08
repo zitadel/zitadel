@@ -510,7 +510,7 @@ func (l *Login) handleExternalUserAuthenticated(
 		}
 	}
 	if len(externalUser.Metadatas) > 0 {
-		_, err = l.command.BulkSetUserMetadata(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.Metadatas...)
+		err = l.bulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, externalUser.Metadatas)
 		if err != nil && !userLinked {
 			l.renderError(w, r, authReq, err)
 			return
