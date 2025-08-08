@@ -273,6 +273,7 @@ func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler
 	if customConfig.TransactionDuration != nil {
 		config.TransactionDuration = *customConfig.TransactionDuration
 	}
+	config.SkipInstanceIDs = append(config.SkipInstanceIDs, customConfig.SkipInstanceIDs...)
 
 	return config
 }
