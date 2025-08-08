@@ -442,7 +442,7 @@ func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationRes
 }
 
 func createAuthorization(ctx context.Context, instance *integration.Instance, t *testing.T, orgID, userID string, grant bool) *authorization.Authorization {
-	projectName := gofakeit.AppName()
+	projectName := integration.ProjectName()
 	projectResp := instance.CreateProject(ctx, t, orgID, projectName, false, false)
 
 	if grant {
@@ -476,7 +476,7 @@ func createAuthorizationForProject(ctx context.Context, instance *integration.In
 }
 
 func createAuthorizationWithProjectGrant(ctx context.Context, instance *integration.Instance, t *testing.T, orgID, userID, projectName, projectID string) *authorization.Authorization {
-	grantedOrgName := gofakeit.Company() + integration.RandString(10)
+	grantedOrgName := integration.OrganizationName()
 	grantedOrg := instance.CreateOrganization(ctx, grantedOrgName, gofakeit.Email())
 	instance.CreateProjectGrant(ctx, t, projectID, grantedOrg.GetOrganizationId())
 
@@ -510,7 +510,7 @@ func createAuthorizationForProjectGrant(ctx context.Context, instance *integrati
 }
 
 func createProject(ctx context.Context, instance *integration.Instance, t *testing.T, orgID string, projectRoleCheck, hasProjectCheck bool) *project.Project {
-	name := gofakeit.AppName()
+	name := integration.ProjectName()
 	resp := instance.CreateProject(ctx, t, orgID, name, projectRoleCheck, hasProjectCheck)
 	return &project.Project{
 		Id:                     resp.GetId(),
@@ -527,7 +527,7 @@ func createProject(ctx context.Context, instance *integration.Instance, t *testi
 }
 
 func createGrantedProject(ctx context.Context, instance *integration.Instance, t *testing.T, projectToGrant *project.Project) *project.Project {
-	grantedOrgName := gofakeit.AppName()
+	grantedOrgName := integration.OrganizationName()
 	grantedOrg := instance.CreateOrganization(ctx, grantedOrgName, gofakeit.Email())
 	projectGrantResp := instance.CreateProjectGrant(ctx, t, projectToGrant.GetId(), grantedOrg.GetOrganizationId())
 

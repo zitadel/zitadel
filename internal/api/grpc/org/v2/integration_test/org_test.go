@@ -74,7 +74,7 @@ func TestServer_AddOrganization(t *testing.T) {
 			name: "invalid admin type",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Admins: []*org.AddOrganizationRequest_Admin{
 					{},
 				},
@@ -85,7 +85,7 @@ func TestServer_AddOrganization(t *testing.T) {
 			name: "no admin, custom org ID",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
-				Name:  gofakeit.AppName(),
+				Name:  integration.OrganizationName(),
 				OrgId: gu.Ptr("custom-org-ID"),
 			},
 			want: &org.AddOrganizationResponse{
@@ -97,7 +97,7 @@ func TestServer_AddOrganization(t *testing.T) {
 			name: "admin with init with userID passed for Human admin",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Admins: []*org.AddOrganizationRequest_Admin{
 					{
 						UserType: &org.AddOrganizationRequest_Admin_Human{
@@ -133,7 +133,7 @@ func TestServer_AddOrganization(t *testing.T) {
 			name: "existing user and new human with idp",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Admins: []*org.AddOrganizationRequest_Admin{
 					{
 						UserType: &org.AddOrganizationRequest_Admin_UserId{UserId: User.GetUserId()},
