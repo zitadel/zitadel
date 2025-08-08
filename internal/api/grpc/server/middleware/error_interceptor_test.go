@@ -11,11 +11,11 @@ import (
 func Test_toGRPCError(t *testing.T) {
 	type args struct {
 		ctx     context.Context
-		req     interface{}
+		req     any
 		handler grpc.UnaryHandler
 	}
 	type res struct {
-		want    interface{}
+		want    any
 		wantErr bool
 	}
 	tests := []struct {

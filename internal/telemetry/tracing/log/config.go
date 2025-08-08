@@ -13,7 +13,7 @@ type Config struct {
 	ServiceName string
 }
 
-func NewTracer(rawConfig map[string]interface{}) (err error) {
+func NewTracer(rawConfig map[string]any) (err error) {
 	c := new(Config)
 	c.Fraction, err = otel.FractionFromConfig(rawConfig["fraction"])
 	c.ServiceName, _ = rawConfig["servicename"].(string)

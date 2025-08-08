@@ -89,9 +89,9 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name:    "prepareSMSConfigsQuery no result",
@@ -363,9 +363,9 @@ func Test_SMSConfigPrepare(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name:    "prepareSMSConfigQuery no result",

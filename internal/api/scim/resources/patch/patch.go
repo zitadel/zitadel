@@ -78,7 +78,7 @@ func (op *Operation) validate() error {
 	return nil
 }
 
-func (ops OperationCollection) Apply(patcher ResourcePatcher, value interface{}) error {
+func (ops OperationCollection) Apply(patcher ResourcePatcher, value any) error {
 	for _, op := range ops {
 		if err := op.validate(); err != nil {
 			return err
@@ -92,7 +92,7 @@ func (ops OperationCollection) Apply(patcher ResourcePatcher, value interface{})
 	return nil
 }
 
-func (op *Operation) apply(patcher ResourcePatcher, value interface{}) error {
+func (op *Operation) apply(patcher ResourcePatcher, value any) error {
 	switch op.Operation {
 	case OperationTypeRemove:
 		return applyRemovePatch(patcher, op, value)
@@ -114,7 +114,7 @@ func (o OperationType) isValid() bool {
 	}
 }
 
-func flattenAndApplyPatchOperations(patcher ResourcePatcher, op *Operation, value interface{}) error {
+func flattenAndApplyPatchOperations(patcher ResourcePatcher, op *Operation, value any) error {
 	ops, err := flattenPatchOperations(op)
 	if err != nil {
 		return err

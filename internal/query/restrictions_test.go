@@ -39,11 +39,11 @@ func Test_RestrictionsPrepare(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
 		err             checkErr
-		object          interface{}
+		object          any
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
 	}{
 		{

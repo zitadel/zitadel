@@ -229,7 +229,7 @@ func (ci *checkInit) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(migration.SystemAggregate).
 		AggregateIDs(migration.SystemAggregateID).
 		EventTypes(migration.DoneType).
-		EventData(map[string]interface{}{
+		EventData(map[string]any{
 			"name": ci.projectionName,
 		}).
 		Builder()
@@ -330,12 +330,7 @@ func (h *Handler) subscribe(ctx context.Context) {
 }
 
 func instanceSolved(solvedInstances []string, instanceID string) bool {
-	for _, solvedInstance := range solvedInstances {
-		if solvedInstance == instanceID {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(solvedInstances, instanceID)
 }
 
 func checkAdditionalEvents(eventQueue chan eventstore.Event, event eventstore.Event) []eventstore.Event {

@@ -39,7 +39,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.orgs1 SET (change_date, sequence, primary_domain) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"domain.new",
@@ -69,7 +69,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.orgs1 SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.OrgStateActive,
@@ -99,7 +99,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.orgs1 SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.OrgStateInactive,
@@ -129,7 +129,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.orgs1 SET (change_date, sequence, name) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"new name",
@@ -176,7 +176,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.orgs1 (id, creation_date, change_date, resource_owner, instance_id, sequence, name, org_state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								anyArg{},
 								anyArg{},
@@ -209,7 +209,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.orgs1 WHERE (id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 							},
@@ -236,7 +236,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.orgs1 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},

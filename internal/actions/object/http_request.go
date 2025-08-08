@@ -1,14 +1,15 @@
 package object
 
 import (
+	"maps"
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/actions"
 )
 
 // HTTPRequestField accepts the http.Request by value, so it's not mutated
-func HTTPRequestField(request *http.Request) func(c *actions.FieldConfig) interface{} {
-	return func(c *actions.FieldConfig) interface{} {
+func HTTPRequestField(request *http.Request) func(c *actions.FieldConfig) any {
+	return func(c *actions.FieldConfig) any {
 		return c.Runtime.ToValue(&httpRequest{
 			Method:        request.Method,
 			Url:           request.URL.String(),
@@ -37,8 +38,6 @@ type httpRequest struct {
 
 func copyMap(src map[string][]string) map[string][]string {
 	dst := make(map[string][]string)
-	for k, v := range src {
-		dst[k] = v
-	}
+	maps.Copy(dst, src)
 	return dst
 }

@@ -8,10 +8,10 @@ import (
 
 type Config struct {
 	Type   string
-	Config map[string]interface{} `mapstructure:",remain"`
+	Config map[string]any `mapstructure:",remain"`
 }
 
-var meter = map[string]func(map[string]interface{}) error{
+var meter = map[string]func(map[string]any) error{
 	"otel": otel.NewTracerFromConfig,
 	"none": registerNoopMetrics,
 	"":     registerNoopMetrics,
@@ -31,7 +31,7 @@ func (c *Config) NewMeter() error {
 	return t(c.Config)
 }
 
-func registerNoopMetrics(rawConfig map[string]interface{}) (err error) {
+func registerNoopMetrics(rawConfig map[string]any) (err error) {
 	metrics.M = &metrics.NoopMetrics{}
 	return nil
 }

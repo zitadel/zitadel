@@ -442,7 +442,7 @@ func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, u
 			AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
 			EventTypes(project.GrantAddedType).
-			EventData(map[string]interface{}{
+			EventData(map[string]any{
 				"grantId": grantID,
 			})
 	}

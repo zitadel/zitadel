@@ -22,7 +22,7 @@ func ThrowPermissionDenied(parent error, id, message string) error {
 	return &PermissionDeniedError{CreateZitadelError(parent, id, message)}
 }
 
-func ThrowPermissionDeniedf(parent error, id, format string, a ...interface{}) error {
+func ThrowPermissionDeniedf(parent error, id, format string, a ...any) error {
 	return ThrowPermissionDenied(parent, id, fmt.Sprintf(format, a...))
 }
 

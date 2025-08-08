@@ -30,7 +30,7 @@ func (e *PhoneUpdatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *PhoneUpdatedEvent) Payload() interface{} {
+func (e *PhoneUpdatedEvent) Payload() any {
 	return e
 }
 
@@ -58,7 +58,7 @@ type PhoneVerifiedEvent struct {
 func (e *PhoneVerifiedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
-func (e *PhoneVerifiedEvent) Payload() interface{} {
+func (e *PhoneVerifiedEvent) Payload() any {
 	return nil
 }
 
@@ -84,7 +84,7 @@ func (e *PhoneVerificationFailedEvent) SetBaseEvent(event *eventstore.BaseEvent)
 	e.BaseEvent = event
 }
 
-func (e *PhoneVerificationFailedEvent) Payload() interface{} {
+func (e *PhoneVerificationFailedEvent) Payload() any {
 	return nil
 }
 
@@ -112,7 +112,7 @@ type PhoneCodeAddedEvent struct {
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
-func (e *PhoneCodeAddedEvent) Payload() interface{} {
+func (e *PhoneCodeAddedEvent) Payload() any {
 	return e
 }
 
@@ -156,7 +156,7 @@ type PhoneCodeSentEvent struct {
 	GeneratorInfo *senders.CodeGeneratorInfo `json:"generatorInfo,omitempty"`
 }
 
-func (e *PhoneCodeSentEvent) Payload() interface{} {
+func (e *PhoneCodeSentEvent) Payload() any {
 	return e
 }
 

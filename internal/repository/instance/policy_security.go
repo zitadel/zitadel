@@ -67,7 +67,7 @@ func ChangeSecurityPolicyEnableImpersonation(enabled bool) func(event *SecurityP
 	}
 }
 
-func (e *SecurityPolicySetEvent) Payload() interface{} {
+func (e *SecurityPolicySetEvent) Payload() any {
 	return e
 }
 

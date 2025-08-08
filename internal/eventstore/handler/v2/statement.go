@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -177,14 +178,14 @@ var _ ValueContainer = (*onlySetValueOnInsert)(nil)
 
 type onlySetValueOnInsert struct {
 	Table string
-	Value interface{}
+	Value any
 }
 
-func (c *onlySetValueOnInsert) GetValue() interface{} {
+func (c *onlySetValueOnInsert) GetValue() any {
 	return c.Value
 }
 
-func OnlySetValueOnInsert(table string, value interface{}) *onlySetValueOnInsert {
+func OnlySetValueOnInsert(table string, value any) *onlySetValueOnInsert {
 	return &onlySetValueOnInsert{
 		Table: table,
 		Value: value,
@@ -193,16 +194,16 @@ func OnlySetValueOnInsert(table string, value interface{}) *onlySetValueOnInsert
 
 type onlySetValueInCase struct {
 	Table     string
-	Value     interface{}
+	Value     any
 	Condition Condition
 }
 
-func (c *onlySetValueInCase) GetValue() interface{} {
+func (c *onlySetValueInCase) GetValue() any {
 	return c.Value
 }
 
 // ColumnChangedCondition checks the current value and if it changed to a specific new value
-func ColumnChangedCondition(table, column string, currentValue, newValue interface{}) Condition {
+func ColumnChangedCondition(table, column string, currentValue, newValue any) Condition {
 	return func(param string) (string, []any) {
 		index, _ := strconv.Atoi(param)
 		return fmt.Sprintf("%[1]s.%[2]s = $%[3]d AND EXCLUDED.%[2]s = $%[4]d", table, column, index, index+1), []any{currentValue, newValue}
@@ -237,7 +238,7 @@ func ConditionOr(conditions ...Condition) Condition {
 }
 
 // OnlySetValueInCase will only update to the desired value if the condition applies
-func OnlySetValueInCase(table string, value interface{}, condition Condition) *onlySetValueInCase {
+func OnlySetValueInCase(table string, value any, condition Condition) *onlySetValueInCase {
 	return &onlySetValueInCase{
 		Table:     table,
 		Value:     value,
@@ -245,7 +246,7 @@ func OnlySetValueInCase(table string, value interface{}, condition Condition) *o
 	}
 }
 
-func getUpdateCols(cols []Column, conflictTarget, params []string, args []interface{}) (updateCols, updateVals []string, updatedArgs []interface{}) {
+func getUpdateCols(cols []Column, conflictTarget, params []string, args []any) (updateCols, updateVals []string, updatedArgs []any) {
 	updateCols = make([]string, len(cols))
 	updateVals = make([]string, len(cols))
 	updatedArgs = args
@@ -263,18 +264,14 @@ func getUpdateCols(cols []Column, conflictTarget, params []string, args []interf
 		default:
 			updateVals[i] = "EXCLUDED" + "." + col.Name
 		}
-		for _, conflict := range conflictTarget {
-			if conflict == col.Name {
-				copy(updateCols[i:], updateCols[i+1:])
-				updateCols[len(updateCols)-1] = ""
-				updateCols = updateCols[:len(updateCols)-1]
+		if slices.Contains(conflictTarget, col.Name) {
+			copy(updateCols[i:], updateCols[i+1:])
+			updateCols[len(updateCols)-1] = ""
+			updateCols = updateCols[:len(updateCols)-1]
 
-				copy(updateVals[i:], updateVals[i+1:])
-				updateVals[len(updateVals)-1] = ""
-				updateVals = updateVals[:len(updateVals)-1]
-
-				break
-			}
+			copy(updateVals[i:], updateVals[i+1:])
+			updateVals[len(updateVals)-1] = ""
+			updateVals = updateVals[:len(updateVals)-1]
 		}
 	}
 
@@ -403,7 +400,7 @@ func AddSleepStatement(d time.Duration, opts ...execOption) func(eventstore.Even
 	}
 }
 
-func NewArrayAppendCol(column string, value interface{}) Column {
+func NewArrayAppendCol(column string, value any) Column {
 	return Column{
 		Name:  column,
 		Value: value,
@@ -413,7 +410,7 @@ func NewArrayAppendCol(column string, value interface{}) Column {
 	}
 }
 
-func NewArrayRemoveCol(column string, value interface{}) Column {
+func NewArrayRemoveCol(column string, value any) Column {
 	return Column{
 		Name:  column,
 		Value: value,
@@ -423,7 +420,7 @@ func NewArrayRemoveCol(column string, value interface{}) Column {
 	}
 }
 
-func NewArrayIntersectCol(column string, value interface{}) Column {
+func NewArrayIntersectCol(column string, value any) Column {
 	var arrayType string
 	switch value.(type) {
 
@@ -457,7 +454,7 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to []Column, n
 	selectColumns := make([]string, len(from))
 	updateColumns := make([]string, len(columnNames))
 	argCounter := 0
-	args := []interface{}{}
+	args := []any{}
 
 	for i, col := range from {
 		columnNames[i] = to[i].Name
@@ -518,12 +515,12 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to []Column, n
 }
 
 type ValueContainer interface {
-	GetValue() interface{}
+	GetValue() any
 }
 
-func columnsToQuery(cols []Column) (names []string, parameters []string, values []interface{}) {
+func columnsToQuery(cols []Column) (names []string, parameters []string, values []any) {
 	names = make([]string, len(cols))
-	values = make([]interface{}, len(cols))
+	values = make([]any, len(cols))
 	parameters = make([]string, len(cols))
 	var parameterIndex int
 	for i, col := range cols {
@@ -546,7 +543,7 @@ func columnsToQuery(cols []Column) (names []string, parameters []string, values 
 	return names, parameters, values[:parameterIndex]
 }
 
-func conditionsToWhere(conds []Condition, paramOffset int) (wheres []string, values []interface{}) {
+func conditionsToWhere(conds []Condition, paramOffset int) (wheres []string, values []any) {
 	wheres = make([]string, len(conds))
 	values = make([]any, 0, len(conds))
 
@@ -563,18 +560,18 @@ func conditionsToWhere(conds []Condition, paramOffset int) (wheres []string, val
 
 type Column struct {
 	Name         string
-	Value        interface{}
+	Value        any
 	ParameterOpt func(string) string
 }
 
-func NewCol(name string, value interface{}) Column {
+func NewCol(name string, value any) Column {
 	return Column{
 		Name:  name,
 		Value: value,
 	}
 }
 
-func NewJSONCol(name string, value interface{}) Column {
+func NewJSONCol(name string, value any) Column {
 	marshalled, err := json.Marshal(value)
 	if err != nil {
 		logging.WithFields("column", name).WithError(err).Panic("unable to marshal column")
@@ -597,7 +594,7 @@ type Condition func(param string) (string, []any)
 
 type NamespacedCondition func(namespace string) Condition
 
-func NewCond(name string, value interface{}) Condition {
+func NewCond(name string, value any) Condition {
 	return func(param string) (string, []any) {
 		return name + " = " + param, []any{value}
 	}
@@ -609,13 +606,13 @@ func NewUnequalCond(name string, value any) Condition {
 	}
 }
 
-func NewNamespacedCondition(name string, value interface{}) NamespacedCondition {
+func NewNamespacedCondition(name string, value any) NamespacedCondition {
 	return func(namespace string) Condition {
 		return NewCond(namespace+"."+name, value)
 	}
 }
 
-func NewLessThanCond(column string, value interface{}) Condition {
+func NewLessThanCond(column string, value any) Condition {
 	return func(param string) (string, []any) {
 		return column + " < " + param, []any{value}
 	}
@@ -657,14 +654,14 @@ func NewOneOfTextCond(column string, values []string) Condition {
 }
 
 type Executer interface {
-	Exec(string, ...interface{}) (sql.Result, error)
+	Exec(string, ...any) (sql.Result, error)
 }
 
 type execOption func(*execConfig)
 type execConfig struct {
 	tableName string
 
-	args []interface{}
+	args []any
 	err  error
 }
 

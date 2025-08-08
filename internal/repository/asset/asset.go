@@ -16,7 +16,7 @@ type AddedEvent struct {
 	StoreKey string `json:"storeKey"`
 }
 
-func (e *AddedEvent) Payload() interface{} {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
@@ -54,7 +54,7 @@ type RemovedEvent struct {
 	StoreKey string `json:"storeKey"`
 }
 
-func (e *RemovedEvent) Payload() interface{} {
+func (e *RemovedEvent) Payload() any {
 	return e
 }
 

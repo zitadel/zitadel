@@ -102,7 +102,7 @@ const (
 type UserSearchQuery struct {
 	Key    UserSearchKey
 	Method domain.SearchMethod
-	Value  interface{}
+	Value  any
 }
 
 type UserSearchResponse struct {

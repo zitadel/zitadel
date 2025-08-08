@@ -40,7 +40,7 @@ type AddedEvent struct {
 	AllowedToFail bool          `json:"allowedToFail"`
 }
 
-func (e *AddedEvent) Payload() interface{} {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
@@ -92,7 +92,7 @@ type ChangedEvent struct {
 	oldName       string
 }
 
-func (e *ChangedEvent) Payload() interface{} {
+func (e *ChangedEvent) Payload() any {
 	return e
 }
 
@@ -171,7 +171,7 @@ type DeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *DeactivatedEvent) Payload() interface{} {
+func (e *DeactivatedEvent) Payload() any {
 	return nil
 }
 
@@ -199,7 +199,7 @@ type ReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ReactivatedEvent) Payload() interface{} {
+func (e *ReactivatedEvent) Payload() any {
 	return nil
 }
 
@@ -229,7 +229,7 @@ type RemovedEvent struct {
 	name string
 }
 
-func (e *RemovedEvent) Payload() interface{} {
+func (e *RemovedEvent) Payload() any {
 	return e
 }
 

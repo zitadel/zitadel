@@ -16,7 +16,7 @@ type Corrected struct {
 
 var _ eventstore.Command = (*Corrected)(nil)
 
-func (e *Corrected) Payload() interface{} {
+func (e *Corrected) Payload() any {
 	return e
 }
 

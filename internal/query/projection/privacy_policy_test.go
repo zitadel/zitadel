@@ -46,7 +46,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.privacy_policies4 (creation_date, change_date, sequence, id, state, privacy_link, tos_link, help_link, support_email, docs_link, custom_link, custom_link_text, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -93,7 +93,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.privacy_policies4 SET (change_date, sequence, privacy_link, tos_link, help_link, support_email, docs_link, custom_link, custom_link_text) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (id = $10) AND (instance_id = $11)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"http://privacy.link",
@@ -129,7 +129,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.privacy_policies4 WHERE (id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 							},
@@ -155,7 +155,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.privacy_policies4 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},
@@ -188,7 +188,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.privacy_policies4 (creation_date, change_date, sequence, id, state, privacy_link, tos_link, help_link, support_email, docs_link, custom_link, custom_link_text, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -235,7 +235,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.privacy_policies4 SET (change_date, sequence, privacy_link, tos_link, help_link, support_email, docs_link, custom_link, custom_link_text) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (id = $10) AND (instance_id = $11)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"http://privacy.link",
@@ -271,7 +271,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.privacy_policies4 WHERE (instance_id = $1) AND (resource_owner = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},

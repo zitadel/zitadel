@@ -15,18 +15,18 @@ type ValidatableConfiguration interface {
 	Validate() error
 }
 
-type ReaderFunc func(data []byte, o interface{}) error
+type ReaderFunc func(data []byte, o any) error
 
 var (
 	JSONReader = json.Unmarshal
 	TOMLReader = toml.Unmarshal
-	YAMLReader = func(data []byte, o interface{}) error { return yaml.Unmarshal(data, o) }
+	YAMLReader = func(data []byte, o any) error { return yaml.Unmarshal(data, o) }
 )
 
 // Read deserializes each config file to the target obj
 // using a Reader (depending on file extension)
 // env vars are replaced in the config file as well as the file path
-func Read(obj interface{}, configFiles ...string) error {
+func Read(obj any, configFiles ...string) error {
 	for _, cf := range configFiles {
 		readerFunc, err := readerFuncForFile(cf)
 		if err != nil {
@@ -46,7 +46,7 @@ func Read(obj interface{}, configFiles ...string) error {
 	return nil
 }
 
-func readConfigFile(readerFunc ReaderFunc, configFile string, obj interface{}) error {
+func readConfigFile(readerFunc ReaderFunc, configFile string, obj any) error {
 	configFile = os.ExpandEnv(configFile)
 
 	configStr, err := os.ReadFile(configFile)

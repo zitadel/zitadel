@@ -32,7 +32,7 @@ type AddedEvent struct {
 	ConfigType crypto.WebKeyConfigType `json:"configType"`
 }
 
-func (e *AddedEvent) Payload() interface{} {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
@@ -74,7 +74,7 @@ type ActivatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ActivatedEvent) Payload() interface{} {
+func (e *ActivatedEvent) Payload() any {
 	return e
 }
 
@@ -103,7 +103,7 @@ type DeactivatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 }
 
-func (e *DeactivatedEvent) Payload() interface{} {
+func (e *DeactivatedEvent) Payload() any {
 	return e
 }
 
@@ -132,7 +132,7 @@ type RemovedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 }
 
-func (e *RemovedEvent) Payload() interface{} {
+func (e *RemovedEvent) Payload() any {
 	return e
 }
 

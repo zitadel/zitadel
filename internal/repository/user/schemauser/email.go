@@ -29,7 +29,7 @@ func (e *EmailUpdatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *EmailUpdatedEvent) Payload() interface{} {
+func (e *EmailUpdatedEvent) Payload() any {
 	return e
 }
 
@@ -58,7 +58,7 @@ func (e *EmailVerifiedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *EmailVerifiedEvent) Payload() interface{} {
+func (e *EmailVerifiedEvent) Payload() any {
 	return nil
 }
 
@@ -83,7 +83,7 @@ type EmailVerificationFailedEvent struct {
 func (e *EmailVerificationFailedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
-func (e *EmailVerificationFailedEvent) Payload() interface{} {
+func (e *EmailVerificationFailedEvent) Payload() any {
 	return nil
 }
 
@@ -115,7 +115,7 @@ func (e *EmailCodeAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *EmailCodeAddedEvent) Payload() interface{} {
+func (e *EmailCodeAddedEvent) Payload() any {
 	return e
 }
 
@@ -156,7 +156,7 @@ type EmailCodeSentEvent struct {
 func (e *EmailCodeSentEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
-func (e *EmailCodeSentEvent) Payload() interface{} {
+func (e *EmailCodeSentEvent) Payload() any {
 	return nil
 }
 

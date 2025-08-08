@@ -21,11 +21,11 @@ type MachineKeyAddedEvent struct {
 
 	KeyID          string              `json:"keyId,omitempty"`
 	KeyType        domain.AuthNKeyType `json:"type,omitempty"`
-	ExpirationDate time.Time           `json:"expirationDate,omitempty"`
+	ExpirationDate time.Time           `json:"expirationDate"`
 	PublicKey      []byte              `json:"publicKey,omitempty"`
 }
 
-func (e *MachineKeyAddedEvent) Payload() interface{} {
+func (e *MachineKeyAddedEvent) Payload() any {
 	return e
 }
 
@@ -78,7 +78,7 @@ type MachineKeyRemovedEvent struct {
 	KeyID string `json:"keyId,omitempty"`
 }
 
-func (e *MachineKeyRemovedEvent) Payload() interface{} {
+func (e *MachineKeyRemovedEvent) Payload() any {
 	return e
 }
 

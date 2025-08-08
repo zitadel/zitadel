@@ -56,7 +56,7 @@ const (
 type UserMembershipSearchQuery struct {
 	Key    UserMembershipSearchKey
 	Method domain.SearchMethod
-	Value  interface{}
+	Value  any
 }
 
 type UserMembershipSearchResponse struct {

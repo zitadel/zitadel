@@ -19,8 +19,8 @@ type Address struct {
 	StreetAddress string `json:"streetAddress,omitempty"`
 }
 
-func (a *Address) Changes(changed *Address) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
+func (a *Address) Changes(changed *Address) map[string]any {
+	changes := make(map[string]any, 1)
 	if a.Country != changed.Country {
 		changes["country"] = changed.Country
 	}

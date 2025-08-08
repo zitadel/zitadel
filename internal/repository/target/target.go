@@ -73,7 +73,7 @@ func (e *ChangedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = *b
 }
 
-func (e *ChangedEvent) Payload() interface{} {
+func (e *ChangedEvent) Payload() any {
 	return e
 }
 

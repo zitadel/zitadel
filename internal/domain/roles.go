@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -32,10 +33,7 @@ func CheckForInvalidRoles(roles []string, rolePrefix string, validRoles []authz.
 }
 
 func containsRole(role, rolePrefix string, validRoles []authz.RoleMapping) bool {
-	for _, validRole := range validRoles {
-		if role == validRole.Role && strings.HasPrefix(role, rolePrefix) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(validRoles, func (validRole authz.RoleMapping) bool {
+		return role == validRole.Role && strings.HasPrefix(role, rolePrefix)
+	})
 }

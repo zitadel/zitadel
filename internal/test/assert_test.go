@@ -14,8 +14,8 @@ func TestPartiallyDeepEqual(t *testing.T) {
 	}
 
 	type args struct {
-		expected interface{}
-		actual   interface{}
+		expected any
+		actual   any
 	}
 	tests := []struct {
 		name string

@@ -215,7 +215,7 @@ func (s *sessionTerminatedModel) Query() *eventstore.SearchQueryBuilder {
 				EventTypes(
 					user.HumanSignedOutType,
 				).
-				EventData(map[string]interface{}{"userAgentID": s.fingerPrintID}).
+				EventData(map[string]any{"userAgentID": s.fingerPrintID}).
 				PositionAfter(s.position).
 				Builder()
 		}

@@ -26,7 +26,7 @@ type AddedEvent struct {
 	Permission            string `json:"permission"`
 }
 
-func (e *AddedEvent) Payload() interface{} {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
@@ -76,7 +76,7 @@ type RemovedEvent struct {
 	Permission            string `json:"permission"`
 }
 
-func (e *RemovedEvent) Payload() interface{} {
+func (e *RemovedEvent) Payload() any {
 	return e
 }
 

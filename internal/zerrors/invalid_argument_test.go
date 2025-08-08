@@ -10,7 +10,7 @@ import (
 )
 
 func TestInvalidArgumentError(t *testing.T) {
-	var invalidArgumentError interface{} = new(zerrors.InvalidArgumentError)
+	var invalidArgumentError any = new(zerrors.InvalidArgumentError)
 	_, ok := invalidArgumentError.(zerrors.InvalidArgument)
 	assert.True(t, ok)
 }

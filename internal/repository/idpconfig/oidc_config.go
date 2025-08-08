@@ -27,7 +27,7 @@ type OIDCConfigAddedEvent struct {
 	UserNameMapping       domain.OIDCMappingField `json:"usernameMapping,omitempty"`
 }
 
-func (e *OIDCConfigAddedEvent) Payload() interface{} {
+func (e *OIDCConfigAddedEvent) Payload() any {
 	return e
 }
 
@@ -91,7 +91,7 @@ type OIDCConfigChangedEvent struct {
 	UserNameMapping       *domain.OIDCMappingField `json:"usernameMapping,omitempty"`
 }
 
-func (e *OIDCConfigChangedEvent) Payload() interface{} {
+func (e *OIDCConfigChangedEvent) Payload() any {
 	return e
 }
 

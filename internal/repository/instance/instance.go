@@ -19,7 +19,7 @@ type InstanceAddedEvent struct {
 	Name string `json:"name,omitempty"`
 }
 
-func (e *InstanceAddedEvent) Payload() interface{} {
+func (e *InstanceAddedEvent) Payload() any {
 	return e
 }
 
@@ -56,7 +56,7 @@ type InstanceChangedEvent struct {
 	Name string `json:"name,omitempty"`
 }
 
-func (e *InstanceChangedEvent) Payload() interface{} {
+func (e *InstanceChangedEvent) Payload() any {
 	return e
 }
 
@@ -93,7 +93,7 @@ type InstanceRemovedEvent struct {
 	domains              []string
 }
 
-func (e *InstanceRemovedEvent) Payload() interface{} {
+func (e *InstanceRemovedEvent) Payload() any {
 	return nil
 }
 

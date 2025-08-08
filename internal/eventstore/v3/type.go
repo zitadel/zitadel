@@ -7,7 +7,7 @@ import "database/sql/driver"
 type Payload []byte
 
 // Scan implements the Scanner interface.
-func (data *Payload) Scan(value interface{}) error {
+func (data *Payload) Scan(value any) error {
 	if value == nil {
 		*data = nil
 		return nil

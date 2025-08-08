@@ -3,6 +3,7 @@ package i18n
 import (
 	"context"
 	"net/http"
+	"slices"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -71,11 +72,8 @@ func (t *Translator) AddMessages(tag language.Tag, messages ...Message) error {
 		return nil
 	}
 	var isAllowed bool
-	for _, allowed := range t.allowedLanguages {
-		if allowed == tag {
-			isAllowed = true
-			break
-		}
+	if slices.Contains(t.allowedLanguages, tag) {
+		isAllowed = true
 	}
 	if !isAllowed {
 		return nil
@@ -90,20 +88,20 @@ func (t *Translator) AddMessages(tag language.Tag, messages ...Message) error {
 	return t.bundle.AddMessages(tag, i18nMessages...)
 }
 
-func (t *Translator) LocalizeFromRequest(r *http.Request, id string, args map[string]interface{}) string {
+func (t *Translator) LocalizeFromRequest(r *http.Request, id string, args map[string]any) string {
 	return localize(t.localizerFromRequest(r), id, args)
 }
 
-func (t *Translator) LocalizeFromCtx(ctx context.Context, id string, args map[string]interface{}) string {
+func (t *Translator) LocalizeFromCtx(ctx context.Context, id string, args map[string]any) string {
 	return localize(t.localizerFromCtx(ctx), id, args)
 }
 
-func (t *Translator) Localize(id string, args map[string]interface{}, langs ...string) string {
+func (t *Translator) Localize(id string, args map[string]any, langs ...string) string {
 	return localize(t.localizer(langs...), id, args)
 }
 
 func (t *Translator) LocalizeWithoutArgs(id string, langs ...string) string {
-	return localize(t.localizer(langs...), id, map[string]interface{}{})
+	return localize(t.localizer(langs...), id, map[string]any{})
 }
 
 func (t *Translator) Lang(r *http.Request) language.Tag {
@@ -164,7 +162,7 @@ func getAcceptLanguageHeader(ctx context.Context) string {
 	return metautils.ExtractIncoming(ctx).Get("grpcgateway-accept-language")
 }
 
-func localize(localizer *i18n.Localizer, id string, args map[string]interface{}) string {
+func localize(localizer *i18n.Localizer, id string, args map[string]any) string {
 	s, err := localizer.Localize(&i18n.LocalizeConfig{
 		MessageID:    id,
 		TemplateData: args,

@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/logging"
 )
 
-func MarshalJSON(w http.ResponseWriter, i interface{}, err error, statusCode int) {
+func MarshalJSON(w http.ResponseWriter, i any, err error, statusCode int) {
 	if err != nil {
 		http.Error(w, err.Error(), statusCode)
 		return

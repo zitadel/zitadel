@@ -104,6 +104,6 @@ func genericRowQuery[R any](
 	return resp, err
 }
 
-func combineToWhereStmt(query sq.SelectBuilder, toQuery func(query sq.SelectBuilder) sq.SelectBuilder, eq interface{}) sq.SelectBuilder {
+func combineToWhereStmt(query sq.SelectBuilder, toQuery func(query sq.SelectBuilder) sq.SelectBuilder, eq any) sq.SelectBuilder {
 	return toQuery(query).Where(eq)
 }

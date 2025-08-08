@@ -13,7 +13,7 @@ import (
 type AssetStorageConfig struct {
 	Type   string
 	Cache  middleware.CacheConfig
-	Config map[string]interface{} `mapstructure:",remain"`
+	Config map[string]any `mapstructure:",remain"`
 }
 
 func (a *AssetStorageConfig) NewStorage(client *sql.DB) (static.Storage, error) {
