@@ -17,7 +17,7 @@ func (c *Commands) LockUserV2(ctx context.Context, userID string) (*domain.Objec
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-agz3eczifm", "Errors.User.UserIDMissing")
 	}
 
-	existingHuman, err := c.userStateWriteModel(ctx, userID)
+	existingHuman, err := c.userStateWriteModel(ctx, userID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (c *Commands) UnlockUserV2(ctx context.Context, userID string) (*domain.Obj
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-a9ld4xckax", "Errors.User.UserIDMissing")
 	}
 
-	existingHuman, err := c.userStateWriteModel(ctx, userID)
+	existingHuman, err := c.userStateWriteModel(ctx, userID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (c *Commands) DeactivateUserV2(ctx context.Context, userID string) (*domain
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-78iiirat8y", "Errors.User.UserIDMissing")
 	}
 
-	existingHuman, err := c.userStateWriteModel(ctx, userID)
+	existingHuman, err := c.userStateWriteModel(ctx, userID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-0nx1ie38fw", "Errors.User.UserIDMissing")
 	}
 
-	existingHuman, err := c.userStateWriteModel(ctx, userID)
+	existingHuman, err := c.userStateWriteModel(ctx, userID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -116,11 +116,11 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain
 	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
 }
 
-func (c *Commands) userStateWriteModel(ctx context.Context, userID string) (writeModel *UserV2WriteModel, err error) {
+func (c *Commands) userStateWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *UserV2WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewUserStateWriteModel(userID, "")
+	writeModel = NewUserStateWriteModel(userID, resourceOwner)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

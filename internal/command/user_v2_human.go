@@ -511,7 +511,7 @@ func (c *Commands) HumanMFAInitSkippedV2(ctx context.Context, userID string) (*d
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Wei5kooz1i", "Errors.User.UserIDMissing")
 	}
 
-	existingHuman, err := c.userStateWriteModel(ctx, userID)
+	existingHuman, err := c.userStateWriteModel(ctx, userID, "")
 	if err != nil {
 		return nil, err
 	}
