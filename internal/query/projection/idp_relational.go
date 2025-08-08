@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
@@ -81,10 +80,6 @@ func (p *idpRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.IDPJWTConfigChangedEventType,
 					Reduce: p.reduceJWTRelationalConfigChanged,
 				},
-				// {
-				// 	Event:  instance.InstanceRemovedEventType,
-				// 	Reduce: reduceInstanceRemovedHelper(IDPInstanceIDCol),
-				// },
 			},
 		},
 		{
@@ -126,10 +121,6 @@ func (p *idpRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  org.IDPJWTConfigChangedEventType,
 					Reduce: p.reduceJWTRelationalConfigChanged,
 				},
-				// {
-				// 	Event:  org.OrgRemovedEventType,
-				// 	Reduce: p.reduceOwnerRemoved,
-				// },
 			},
 		},
 	}
@@ -150,10 +141,6 @@ func (p *idpRelationalProjection) reduceIDPRelationalAdded(event eventstore.Even
 	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
 		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> idpEvent.Aggregate().InstanceID = %+v\n", idpEvent.Aggregate().InstanceID)
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> idpEvent.Aggregate().ResourceOwner = %+v\n", idpEvent.Aggregate().ResourceOwner)
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> idpEvent.Aggregate() = %+v\n", idpEvent.Aggregate())
-	fmt.Printf("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REDUCE ADD orgId = %+v\n", orgId)
 
 	return handler.NewCreateStatement(
 		&idpEvent,

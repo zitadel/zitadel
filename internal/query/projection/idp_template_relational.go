@@ -48,36 +48,6 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 		{
 			Aggregate: instance.AggregateType,
 			EventReducers: []handler.EventReducer{
-				// TODO
-				// {
-				// 	Event:  instance.IDPConfigAddedEventType,
-				// 	Reduce: p.reduceOldConfigAdded,
-				// },
-				// TODO
-				// 		{
-				// 			Event:  instance.IDPConfigChangedEventType,
-				// 			Reduce: p.reduceOldConfigChanged,
-				// 		},
-				// TODO
-				// 		{
-				// 			Event:  instance.IDPOIDCConfigAddedEventType,
-				// 			Reduce: p.reduceOldOIDCConfigAdded,
-				// 		},
-				// TODO
-				// 		{
-				// 			Event:  instance.IDPOIDCConfigChangedEventType,
-				// 			Reduce: p.reduceOldOIDCConfigChanged,
-				// 		},
-				// TODO
-				// 		{
-				// 			Event:  instance.IDPJWTConfigAddedEventType,
-				// 			Reduce: p.reduceOldJWTConfigAdded,
-				// 		},
-				// TODO
-				// 		{
-				// 			Event:  instance.IDPJWTConfigChangedEventType,
-				// 			Reduce: p.reduceOldJWTConfigChanged,
-				// 		},
 				{
 					Event:  instance.OAuthIDPAddedEventType,
 					Reduce: p.reduceOAuthIDPRelationalAdded,
@@ -182,18 +152,10 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  instance.SAMLIDPChangedEventType,
 					Reduce: p.reduceSAMLIDPChanged,
 				},
-				// 		{
-				// 			Event:  instance.IDPConfigRemovedEventType,
-				// 			Reduce: p.reduceIDPConfigRemoved,
-				// 		},
 				{
 					Event:  instance.IDPRemovedEventType,
 					Reduce: p.reduceIDPRemoved,
 				},
-				// 		{
-				// 			Event:  instance.InstanceRemovedEventType,
-				// 			Reduce: reduceInstanceRemovedHelper(IDPTemplateInstanceIDCol),
-				// 		},
 			},
 		},
 		{
@@ -2115,6 +2077,9 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.
 // }
 
 func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
 	var idpEvent idp.RemovedEvent
 	switch e := event.(type) {
 	case *org.IDPRemovedEvent:
@@ -2122,14 +2087,34 @@ func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Even
 	case *instance.IDPRemovedEvent:
 		idpEvent = e.RemovedEvent
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xbcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ybcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
 	}
+
+	var orgId *string
+	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+		orgId = &idpEvent.Aggregate().ResourceOwner
+	}
+
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
+	fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOVE IDPPPPPPPPPPPPPPPP")
 
 	return handler.NewDeleteStatement(
 		&idpEvent,
 		[]handler.Condition{
 			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCond(IDPRelationalOrgId, orgId),
 		},
 	), nil
 }
@@ -2830,12 +2815,10 @@ func reduceSAMLIDPRelationalChangedColumns(payload *domain.SAML, idpEvent *idp.S
 	if idpEvent.Metadata != nil {
 		payloadChange = true
 		payload.Metadata = idpEvent.Metadata
-		fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> METTTADATA")
 	}
 	if idpEvent.Key != nil {
 		payloadChange = true
 		payload.Key = idpEvent.Key
-		fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> KEEEEEEEEEEEEEEY")
 	}
 	if idpEvent.Certificate != nil {
 		payloadChange = true
@@ -2844,7 +2827,6 @@ func reduceSAMLIDPRelationalChangedColumns(payload *domain.SAML, idpEvent *idp.S
 	if idpEvent.Binding != nil {
 		payloadChange = true
 		payload.Binding = *idpEvent.Binding
-		fmt.Println("@@ >>>>>>>>>>>>>>>>>>>>>>>>>>>> BINDING")
 	}
 	if idpEvent.WithSignedRequest != nil {
 		payloadChange = true

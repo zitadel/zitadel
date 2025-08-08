@@ -61,7 +61,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			assert.Equal(t, addOIDC.IdpId, idp.ID)
 			assert.Equal(t, domain.IDPStateActive.String(), idp.State)
 			assert.Equal(t, name, idp.Name)
-			// assert.Equal(t, domain.IDPTypeUnspecified.String(), idp.Type)
 			assert.Equal(t, true, idp.AutoRegister)
 			assert.Equal(t, true, idp.AllowCreation)
 			assert.Equal(t, false, idp.AllowAutoUpdate)
@@ -92,7 +91,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name = "new_" + name
 
 		beforeCreate := time.Now()
-		// _, err = MgmtClient.UpdateIDP(CTX, &admin.UpdateIDPRequest{
 		_, err = MgmtClient.UpdateOrgIDP(CTX, &management.UpdateOrgIDPRequest{
 			IdpId:        addOIDC.IdpId,
 			Name:         name,
@@ -245,7 +243,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		// remove idp
-		// _, err = MgmtClient.RemoveIDP(CTX, &admin.RemoveIDPRequest{
 		_, err = MgmtClient.RemoveOrgIDP(CTX, &management.RemoveOrgIDPRequest{
 			IdpId: addOIDC.IdpId,
 		})
@@ -339,19 +336,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			assert.Equal(t, addOIDC.IdpId, oidc.ID)
 		}, retryDuration, tick)
 
-		// // idp
-		// assert.Equal(t, addOIDC.IdpId, oidc.ID)
-		// assert.Equal(t, domain.IDPTypeOIDC.String(), oidc.Type)
-
-		// // oidc
-		// assert.Equal(t, instanceID, oidc.InstanceID)
-		// assert.Nil(t, oidc.OrgID)
-		// assert.Equal(t, "issuer", oidc.Issuer)
-		// assert.Equal(t, "clientID", oidc.ClientID)
-		// assert.Equal(t, []string{"scope"}, oidc.Scopes)
-		// assert.Equal(t, domain.OIDCMappingField(idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL), oidc.IDPDisplayNameMapping)
-		// assert.Equal(t, domain.OIDCMappingField(idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL), oidc.UserNameMapping)
-
 		beforeCreate := time.Now()
 		_, err = MgmtClient.UpdateOrgIDPOIDCConfig(CTX, &management.UpdateOrgIDPOIDCConfigRequest{
 			IdpId:              addOIDC.IdpId,
@@ -400,7 +384,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
-		// addJWT, err := MgmtClient.AddJWTIDP(CTX, &admin.AddJWTIDPRequest{
 		addJWT, err := MgmtClient.AddOrgJWTIDP(CTX, &management.AddOrgJWTIDPRequest{
 			Name:         name,
 			StylingType:  idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
@@ -457,27 +440,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository(pool)
 
-		// check original values for jwt
-		// var jwt *domain.IDPJWT
-		// retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
-		// assert.EventuallyWithT(t, func(t *assert.CollectT) {
-		// 	jwt, err = idpRepo.GetJWT(CTX, idpRepo.IDCondition(addJWT.IdpId), instanceID, nil)
-		// 	require.NoError(t, err)
-		// 	assert.Equal(t, addJWT.IdpId, jwt.ID)
-		// }, retryDuration, tick)
-
-		// // idp
-		// assert.Equal(t, addJWT.IdpId, jwt.ID)
-		// assert.Equal(t, domain.IDPTypeJWT.String(), jwt.Type)
-
-		// // jwt
-		// assert.Equal(t, "jwtEndpoint", jwt.JWTEndpoint)
-		// assert.Equal(t, "issuer", jwt.Issuer)
-		// assert.Equal(t, "keyEndpoint", jwt.KeysEndpoint)
-		// assert.Equal(t, "headerName", jwt.HeaderName)
-
 		beforeCreate := time.Now()
-		// _, err = MgmtClient.UpdateIDPJWTConfig(CTX, &admin.UpdateIDPJWTConfigRequest{
 		_, err = MgmtClient.UpdateOrgIDPJWTConfig(CTX, &management.UpdateOrgIDPJWTConfigRequest{
 			IdpId:        addJWT.IdpId,
 			JwtEndpoint:  "new_jwtEndpoint",
@@ -517,7 +480,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		// add oauth
 		beforeCreate := time.Now()
-		// addOAuth, err := MgmtClient.AddGenericOAuthProvider(CTX, &admin.AddGenericOAuthProviderRequest{
 		addOAuth, err := MgmtClient.AddGenericOAuthProvider(CTX, &management.AddGenericOAuthProviderRequest{
 			Name:                  name,
 			ClientId:              "clientId",
@@ -578,7 +540,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oauth
-		// addOAuth, err := MgmtClient.AddGenericOAuthProvider(CTX, &admin.AddGenericOAuthProviderRequest{
 		addOAuth, err := MgmtClient.AddGenericOAuthProvider(CTX, &management.AddGenericOAuthProviderRequest{
 			Name:                  name,
 			ClientId:              "clientId",
@@ -612,7 +573,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		name = "new_" + name
 		beforeCreate := time.Now()
-		// _, err = MgmtClient.UpdateGenericOAuthProvider(CTX, &admin.UpdateGenericOAuthProviderRequest{
 		_, err = MgmtClient.UpdateGenericOAuthProvider(CTX, &management.UpdateGenericOAuthProviderRequest{
 			Id:                    addOAuth.Id,
 			Name:                  name,
@@ -673,7 +633,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		// add oidc
 		beforeCreate := time.Now()
-		// addOIDC, err := MgmtClient.AddGenericOIDCProvider(CTX, &admin.AddGenericOIDCProviderRequest{
 		addOIDC, err := MgmtClient.AddGenericOIDCProvider(CTX, &management.AddGenericOIDCProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -729,7 +688,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 	t.Run("test instanceidp oidc changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
-		// addOIDC, err := MgmtClient.AddGenericOIDCProvider(CTX, &admin.AddGenericOIDCProviderRequest{
 		addOIDC, err := MgmtClient.AddGenericOIDCProvider(CTX, &management.AddGenericOIDCProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -760,7 +718,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		name = "new_" + name
 		beforeCreate := time.Now()
-		// _, err = MgmtClient.UpdateGenericOIDCProvider(CTX, &admin.UpdateGenericOIDCProviderRequest{
 		_, err = MgmtClient.UpdateGenericOIDCProvider(CTX, &management.UpdateGenericOIDCProviderRequest{
 			Id:           addOIDC.Id,
 			Name:         name,
@@ -816,7 +773,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// create OIDC
-		// addOIDC, err := MgmtClient.AddGenericOIDCProvider(CTX, &admin.AddGenericOIDCProviderRequest{
 		addOIDC, err := MgmtClient.AddGenericOIDCProvider(CTX, &management.AddGenericOIDCProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -846,7 +802,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		beforeCreate := time.Now()
-		// _, err = MgmtClient.MigrateGenericOIDCProvider(CTX, &admin.MigrateGenericOIDCProviderRequest{
 		_, err = MgmtClient.MigrateGenericOIDCProvider(CTX, &management.MigrateGenericOIDCProviderRequest{
 			Id: addOIDC.Id,
 			Template: &management.MigrateGenericOIDCProviderRequest_Azure{
@@ -906,7 +861,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// create OIDC
-		// addOIDC, err := MgmtClient.AddGenericOIDCProvider(CTX, &admin.AddGenericOIDCProviderRequest{
 		addOIDC, err := MgmtClient.AddGenericOIDCProvider(CTX, &management.AddGenericOIDCProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -936,7 +890,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		beforeCreate := time.Now()
-		// _, err = MgmtClient.MigrateGenericOIDCProvider(CTX, &admin.MigrateGenericOIDCProviderRequest{
 		_, err = MgmtClient.MigrateGenericOIDCProvider(CTX, &management.MigrateGenericOIDCProviderRequest{
 			Id: addOIDC.Id,
 			Template: &management.MigrateGenericOIDCProviderRequest_Google{
@@ -1040,7 +993,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
-		// addJWT, err := MgmtClient.AddJWTProvider(CTX, &admin.AddJWTProviderRequest{
 		addJWT, err := MgmtClient.AddJWTProvider(CTX, &management.AddJWTProviderRequest{
 			Name:         name,
 			Issuer:       "issuer",
@@ -1112,7 +1064,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		// add azure
 		beforeCreate := time.Now()
-		// addAzure, err := MgmtClient.AddAzureADProvider(CTX, &admin.AddAzureADProviderRequest{
 		addAzure, err := MgmtClient.AddAzureADProvider(CTX, &management.AddAzureADProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1169,7 +1120,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add azure
-		// addAzure, err := MgmtClient.AddAzureADProvider(CTX, &admin.AddAzureADProviderRequest{
 		addAzure, err := MgmtClient.AddAzureADProvider(CTX, &management.AddAzureADProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1204,7 +1154,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name = "new_" + name
 		// change azure
 		beforeCreate := time.Now().Add(-1 * time.Second)
-		// _, err = MgmtClient.UpdateAzureADProvider(CTX, &admin.UpdateAzureADProviderRequest{
 		_, err = MgmtClient.UpdateAzureADProvider(CTX, &management.UpdateAzureADProviderRequest{
 			Id:           addAzure.Id,
 			Name:         name,
@@ -1261,7 +1210,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		// add github
 		beforeCreate := time.Now()
-		// addGithub, err := MgmtClient.AddGitHubProvider(CTX, &admin.AddGitHubProviderRequest{
 		addGithub, err := MgmtClient.AddGitHubProvider(CTX, &management.AddGitHubProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1309,7 +1257,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add github
-		// addGithub, err := MgmtClient.AddGitHubProvider(CTX, &admin.AddGitHubProviderRequest{
 		addGithub, err := MgmtClient.AddGitHubProvider(CTX, &management.AddGitHubProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1338,7 +1285,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name = "new_" + name
 		// change github
 		beforeCreate := time.Now()
-		// _, err = MgmtClient.UpdateGitHubProvider(CTX, &admin.UpdateGitHubProviderRequest{
 		_, err = MgmtClient.UpdateGitHubProvider(CTX, &management.UpdateGitHubProviderRequest{
 			Id:           addGithub.Id,
 			Name:         name,
@@ -1387,7 +1333,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		// add github enterprise
 		beforeCreate := time.Now()
-		// addGithubEnterprise, err := MgmtClient.AddGitHubEnterpriseServerProvider(CTX, &admin.AddGitHubEnterpriseServerProviderRequest{
 		addGithubEnterprise, err := MgmtClient.AddGitHubEnterpriseServerProvider(CTX, &management.AddGitHubEnterpriseServerProviderRequest{
 			Name:                  name,
 			ClientId:              "clientId",
@@ -1443,7 +1388,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add github enterprise
-		// addGithubEnterprise, err := MgmtClient.AddGitHubEnterpriseServerProvider(CTX, &admin.AddGitHubEnterpriseServerProviderRequest{
 		addGithubEnterprise, err := MgmtClient.AddGitHubEnterpriseServerProvider(CTX, &management.AddGitHubEnterpriseServerProviderRequest{
 			Name:                  name,
 			ClientId:              "clientId",
@@ -1475,7 +1419,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name = "new_" + name
 		// change github enterprise
 		beforeCreate := time.Now()
-		// _, err = MgmtClient.UpdateGitHubEnterpriseServerProvider(CTX, &admin.UpdateGitHubEnterpriseServerProviderRequest{
 		_, err = MgmtClient.UpdateGitHubEnterpriseServerProvider(CTX, &management.UpdateGitHubEnterpriseServerProviderRequest{
 			Id:                    addGithubEnterprise.Id,
 			Name:                  name,
@@ -1530,7 +1473,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		// add gitlab
 		beforeCreate := time.Now()
-		// addGithub, err := MgmtClient.AddGitLabProvider(CTX, &admin.AddGitLabProviderRequest{
 		addGithub, err := MgmtClient.AddGitLabProvider(CTX, &management.AddGitLabProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1580,7 +1522,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add gitlab
-		// addGitlab, err := MgmtClient.AddGitLabProvider(CTX, &admin.AddGitLabProviderRequest{
 		addGitlab, err := MgmtClient.AddGitLabProvider(CTX, &management.AddGitLabProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1609,7 +1550,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name = "new_" + name
 		// change gitlab
 		beforeCreate := time.Now()
-		// _, err = MgmtClient.UpdateGitLabProvider(CTX, &admin.UpdateGitLabProviderRequest{
 		_, err = MgmtClient.UpdateGitLabProvider(CTX, &management.UpdateGitLabProviderRequest{
 			Id:           addGitlab.Id,
 			Name:         name,
@@ -1658,7 +1598,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		// add gitlab self hosted
 		beforeCreate := time.Now()
-		// addGitlabSelfHosted, err := MgmtClient.AddGitLabSelfHostedProvider(CTX, &admin.AddGitLabSelfHostedProviderRequest{
 		addGitlabSelfHosted, err := MgmtClient.AddGitLabSelfHostedProvider(CTX, &management.AddGitLabSelfHostedProviderRequest{
 			Name:         name,
 			Issuer:       "issuer",
@@ -1710,7 +1649,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add gitlab self hosted
-		// addGitlabSelfHosted, err := MgmtClient.AddGitLabSelfHostedProvider(CTX, &admin.AddGitLabSelfHostedProviderRequest{
 		addGitlabSelfHosted, err := MgmtClient.AddGitLabSelfHostedProvider(CTX, &management.AddGitLabSelfHostedProviderRequest{
 			Name:         name,
 			Issuer:       "issuer",
@@ -1740,7 +1678,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name = "new_" + name
 		// change gitlab self hosted
 		beforeCreate := time.Now()
-		// _, err = MgmtClient.UpdateGitLabSelfHostedProvider(CTX, &admin.UpdateGitLabSelfHostedProviderRequest{
 		_, err = MgmtClient.UpdateGitLabSelfHostedProvider(CTX, &management.UpdateGitLabSelfHostedProviderRequest{
 			Id:           addGitlabSelfHosted.Id,
 			Name:         name,
@@ -1791,7 +1728,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		// add google
 		beforeCreate := time.Now()
-		// addGoogle, err := MgmtClient.AddGoogleProvider(CTX, &admin.AddGoogleProviderRequest{
 		addGoogle, err := MgmtClient.AddGoogleProvider(CTX, &management.AddGoogleProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1841,7 +1777,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add google
-		// addGoogle, err := MgmtClient.AddGoogleProvider(CTX, &admin.AddGoogleProviderRequest{
 		addGoogle, err := MgmtClient.AddGoogleProvider(CTX, &management.AddGoogleProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1870,7 +1805,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name = "new_" + name
 		// change google
 		beforeCreate := time.Now()
-		// _, err = MgmtClient.UpdateGoogleProvider(CTX, &admin.UpdateGoogleProviderRequest{
 		_, err = MgmtClient.UpdateGoogleProvider(CTX, &management.UpdateGoogleProviderRequest{
 			Id:           addGoogle.Id,
 			Name:         name,
@@ -1919,7 +1853,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		// add ldap
 		beforeCreate := time.Now()
-		// addLdap, err := AdminClient.AddLDAPProvider(CTX, &admin.AddLDAPProviderRequest{
 		addLdap, err := MgmtClient.AddLDAPProvider(CTX, &management.AddLDAPProviderRequest{
 			Name:              name,
 			Servers:           []string{"servers"},
@@ -2008,7 +1941,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add ldap
-		// addLdap, err := AdminClient.AddLDAPProvider(CTX, &admin.AddLDAPProviderRequest{
 		addLdap, err := MgmtClient.AddLDAPProvider(CTX, &management.AddLDAPProviderRequest{
 			Name:              name,
 			Servers:           []string{"servers"},
@@ -2058,7 +1990,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name = "new_" + name
 		// change ldap
 		beforeCreate := time.Now()
-		// _, err = AdminClient.UpdateLDAPProvider(CTX, &admin.UpdateLDAPProviderRequest{
 		_, err = MgmtClient.UpdateLDAPProvider(CTX, &management.UpdateLDAPProviderRequest{
 			Id:                addLdap.Id,
 			Name:              name,
@@ -2147,7 +2078,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		// add apple
 		beforeCreate := time.Now()
-		// addApple, err := AdminClient.AddAppleProvider(CTX, &admin.AddAppleProviderRequest{
 		addApple, err := MgmtClient.AddAppleProvider(CTX, &management.AddAppleProviderRequest{
 			Name:       name,
 			ClientId:   "clientID",
@@ -2230,7 +2160,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		name = "new_" + name
 		// change apple
 		beforeCreate := time.Now()
-		// _, err = AdminClient.UpdateAppleProvider(CTX, &admin.UpdateAppleProviderRequest{
 		_, err = MgmtClient.UpdateAppleProvider(CTX, &management.UpdateAppleProviderRequest{
 			Id:         addApple.Id,
 			Name:       name,
@@ -2345,7 +2274,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		// add saml
 		addSAML, err := MgmtClient.AddSAMLProvider(CTX, &management.AddSAMLProviderRequest{
 			Name: name,
-			// Metadata: &admin.AddSAMLProviderRequest_MetadataXml{
 			Metadata: &management.AddSAMLProviderRequest_MetadataXml{
 				MetadataXml: validSAMLMetadata1,
 			},
@@ -2381,7 +2309,6 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 		_, err = MgmtClient.UpdateSAMLProvider(CTX, &management.UpdateSAMLProviderRequest{
 			Id:   addSAML.Id,
 			Name: name,
-			// Metadata: &admin.UpdateSAMLProviderRequest_MetadataXml{
 			Metadata: &management.UpdateSAMLProviderRequest_MetadataXml{
 				MetadataXml: validSAMLMetadata2,
 			},
@@ -2432,6 +2359,54 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			assert.Equal(t, zitadel_internal_domain.SAMLNameIDFormatEmailAddress, *updateSAML.NameIDFormat)
 			assert.Equal(t, name, updateSAML.TransientMappingAttributeName)
 			assert.Equal(t, true, updateSAML.FederatedLogoutEnabled)
+		}, retryDuration, tick)
+	})
+
+	t.Run("test instance iam remove reduces", func(t *testing.T) {
+		name := gofakeit.Name()
+
+		// add idp
+		addOIDC, err := MgmtClient.AddOrgOIDCIDP(CTX, &management.AddOrgOIDCIDPRequest{
+			Name:               name,
+			StylingType:        idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
+			ClientId:           "clientID",
+			ClientSecret:       "clientSecret",
+			Issuer:             "issuer",
+			Scopes:             []string{"scope"},
+			DisplayNameMapping: idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
+			UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
+			AutoRegister:       true,
+		})
+		require.NoError(t, err)
+
+		idpRepo := repository.IDProviderRepository(pool)
+
+		// check idp exists
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := idpRepo.Get(CTX,
+				idpRepo.IDCondition(addOIDC.IdpId),
+				instanceID,
+				&orgID,
+			)
+			require.NoError(t, err)
+		}, retryDuration, tick)
+
+		// remove idp
+		_, err = MgmtClient.DeleteProvider(CTX, &management.DeleteProviderRequest{
+			Id: addOIDC.IdpId,
+		})
+		require.NoError(t, err)
+
+		// check idp is removed
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			_, err := idpRepo.Get(CTX,
+				idpRepo.IDCondition(addOIDC.IdpId),
+				instanceID,
+				&orgID,
+			)
+			require.ErrorIs(t, &database.NoRowFoundError{}, err)
 		}, retryDuration, tick)
 	})
 }
