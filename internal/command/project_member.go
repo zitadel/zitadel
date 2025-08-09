@@ -45,7 +45,7 @@ func (c *Commands) addProjectMember(ctx context.Context, projectAgg *eventstore.
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-3m9ds", "Errors.Project.Member.Invalid")
 	}
 
-	err = c.checkUserExists(ctx, addedMember.UserID, "")
+	_, err = c.checkUserExists(ctx, addedMember.UserID, "")
 	if err != nil {
 		return nil, err
 	}

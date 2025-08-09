@@ -45,7 +45,12 @@ func (h *UsersHandler) mapToAddHuman(ctx context.Context, scimUser *ScimUser) (*
 	}
 	human.Metadata = md
 
-	if scimUser.Password != nil {
+	// Okta sends a random password during SCIM provisioning
+	// irrespective of whether the Sync Password option is enabled or disabled on Okta.
+	// This password does not comply with Zitadel's password complexity, and
+	// the following workaround ignores the random password as it does not add any value.
+	ignorePasswordOnCreate := metadata.GetScimContextData(ctx).IgnorePasswordOnCreate
+	if scimUser.Password != nil && !ignorePasswordOnCreate {
 		human.Password = scimUser.Password.String()
 		scimUser.Password = nil
 	}
