@@ -1,7 +1,5 @@
 import { faker } from "@faker-js/faker";
 import { test as base } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
 import { loginScreenExpect, loginWithPassword, startLogin } from "./login";
 import { loginname } from "./loginname";
 import { loginnameScreenExpect } from "./loginname-screen";
@@ -9,10 +7,7 @@ import { password } from "./password";
 import { passwordScreenExpect } from "./password-screen";
 import { PasswordUser } from "./user";
 
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, "../../login/.env.test.local") });
-
-const test = base.extend<{ user: PasswordUser }>({
+const test = base.extend<{ user: PasswordUser, adminToken: string }>({
   user: async ({ page }, use) => {
     const user = new PasswordUser({
       email: faker.internet.email(),

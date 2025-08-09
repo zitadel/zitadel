@@ -1,5 +1,6 @@
 import { expect, Page } from "@playwright/test";
 import { getCodeFromSink } from "./sink";
+import { Config } from "./config";
 
 const codeField = "code-text-input";
 const passwordField = "password-text-input";
@@ -73,8 +74,8 @@ async function checkContent(page: Page, testid: string, match: boolean) {
   }
 }
 
-export async function resetPasswordScreen(page: Page, username: string, password1: string, password2: string) {
-  const c = await getCodeFromSink(username);
+export async function resetPasswordScreen(cfg: Config, page: Page, codeSince: Date, username: string, password1: string, password2: string) {
+  const c = await getCodeFromSink(cfg, username, codeSince);
   await page.getByTestId(codeField).pressSequentially(c);
   await page.getByTestId(passwordSetField).pressSequentially(password1);
   await page.getByTestId(passwordSetConfirmField).pressSequentially(password2);
