@@ -42,7 +42,7 @@ func initScimContext(ctx context.Context, q *query.Queries) (context.Context, er
 	}
 	queries := sresources.BuildMetadataQueries(ctx, metadataKeys)
 
-	metadataList, err := q.SearchUserMetadata(ctx, false, userID, queries, nil)
+	metadataList, err := q.SearchUserMetadata(ctx, false, userID, queries, false)
 	if err != nil {
 		if zerrors.IsNotFound(err) {
 			return ctx, nil
