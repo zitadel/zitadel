@@ -78,7 +78,7 @@ export default async function Page(props: {
           allowRegister={!!loginSettings?.allowRegister}
         ></UsernameForm>
 
-        {identityProviders && loginSettings?.allowExternalIdp && (
+        {loginSettings?.allowExternalIdp && !!identityProviders?.length && (
           <div className="w-full pb-4 pt-6">
             <SignInWithIdp
               identityProviders={identityProviders}

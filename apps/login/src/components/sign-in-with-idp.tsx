@@ -80,7 +80,7 @@ export function SignInWithIdp({
       <p className="ztdl-p text-center">
         <Translated i18nKey="orSignInWith" namespace="idp" />
       </p>
-      {!!identityProviders.length && identityProviders?.map(renderIDPButton)}
+      {!!identityProviders?.length && identityProviders?.map(renderIDPButton)}
       {state?.error && (
         <div className="py-4">
           <Alert>{state?.error}</Alert>

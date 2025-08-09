@@ -38,7 +38,7 @@ export default async function Page(props: {
           <Translated i18nKey="description" namespace="idp" />
         </p>
 
-        {identityProviders && (
+        {!!identityProviders?.length && (
           <SignInWithIdp
             identityProviders={identityProviders}
             requestId={requestId}
