@@ -14,14 +14,19 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
+	v2 "github.com/zitadel/zitadel/pkg/grpc/metadata/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	object_v2beta "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func detailsV2ToV2beta(obj *object.Details) *object_v2beta.Details {
@@ -85,23 +90,23 @@ func TestServer_GetUserByID(t *testing.T) {
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
 	type args struct {
 		ctx context.Context
-		req *user.GetUserByIDRequest
-		dep func(ctx context.Context, request *user.GetUserByIDRequest) *userAttr
+		req *user_v2beta.GetUserByIDRequest
+		dep func(ctx context.Context, request *user_v2beta.GetUserByIDRequest) *userAttr
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.GetUserByIDResponse
+		want    *user_v2beta.GetUserByIDResponse
 		wantErr bool
 	}{
 		{
 			name: "user by ID, no id provided",
 			args: args{
 				IamCTX,
-				&user.GetUserByIDRequest{
+				&user_v2beta.GetUserByIDRequest{
 					UserId: "",
 				},
-				func(ctx context.Context, request *user.GetUserByIDRequest) *userAttr {
+				func(ctx context.Context, request *user_v2beta.GetUserByIDRequest) *userAttr {
 					return nil
 				},
 			},
@@ -111,10 +116,10 @@ func TestServer_GetUserByID(t *testing.T) {
 			name: "user by ID, not found",
 			args: args{
 				IamCTX,
-				&user.GetUserByIDRequest{
+				&user_v2beta.GetUserByIDRequest{
 					UserId: "unknown",
 				},
-				func(ctx context.Context, request *user.GetUserByIDRequest) *userAttr {
+				func(ctx context.Context, request *user_v2beta.GetUserByIDRequest) *userAttr {
 					return nil
 				},
 			},
@@ -124,34 +129,34 @@ func TestServer_GetUserByID(t *testing.T) {
 			name: "user by ID, ok",
 			args: args{
 				IamCTX,
-				&user.GetUserByIDRequest{},
-				func(ctx context.Context, request *user.GetUserByIDRequest) *userAttr {
+				&user_v2beta.GetUserByIDRequest{},
+				func(ctx context.Context, request *user_v2beta.GetUserByIDRequest) *userAttr {
 					info := createUser(ctx, orgResp.OrganizationId, false)
 					request.UserId = info.UserID
 					return &info
 				},
 			},
-			want: &user.GetUserByIDResponse{
-				User: &user.User{
-					State:              user.UserState_USER_STATE_ACTIVE,
+			want: &user_v2beta.GetUserByIDResponse{
+				User: &user_v2beta.User{
+					State:              user_v2beta.UserState_USER_STATE_ACTIVE,
 					Username:           "",
 					LoginNames:         nil,
 					PreferredLoginName: "",
-					Type: &user.User_Human{
-						Human: &user.HumanUser{
-							Profile: &user.HumanProfile{
+					Type: &user_v2beta.User_Human{
+						Human: &user_v2beta.HumanUser{
+							Profile: &user_v2beta.HumanProfile{
 								GivenName:         "Mickey",
 								FamilyName:        "Mouse",
 								NickName:          gu.Ptr("Mickey"),
 								DisplayName:       gu.Ptr("Mickey Mouse"),
 								PreferredLanguage: gu.Ptr("nl"),
-								Gender:            user.Gender_GENDER_MALE.Enum(),
+								Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								AvatarUrl:         "",
 							},
-							Email: &user.HumanEmail{
+							Email: &user_v2beta.HumanEmail{
 								IsVerified: true,
 							},
-							Phone: &user.HumanPhone{
+							Phone: &user_v2beta.HumanPhone{
 								IsVerified: true,
 							},
 						},
@@ -167,34 +172,34 @@ func TestServer_GetUserByID(t *testing.T) {
 			name: "user by ID, passwordChangeRequired, ok",
 			args: args{
 				IamCTX,
-				&user.GetUserByIDRequest{},
-				func(ctx context.Context, request *user.GetUserByIDRequest) *userAttr {
+				&user_v2beta.GetUserByIDRequest{},
+				func(ctx context.Context, request *user_v2beta.GetUserByIDRequest) *userAttr {
 					info := createUser(ctx, orgResp.OrganizationId, true)
 					request.UserId = info.UserID
 					return &info
 				},
 			},
-			want: &user.GetUserByIDResponse{
-				User: &user.User{
-					State:              user.UserState_USER_STATE_ACTIVE,
+			want: &user_v2beta.GetUserByIDResponse{
+				User: &user_v2beta.User{
+					State:              user_v2beta.UserState_USER_STATE_ACTIVE,
 					Username:           "",
 					LoginNames:         nil,
 					PreferredLoginName: "",
-					Type: &user.User_Human{
-						Human: &user.HumanUser{
-							Profile: &user.HumanProfile{
+					Type: &user_v2beta.User_Human{
+						Human: &user_v2beta.HumanUser{
+							Profile: &user_v2beta.HumanProfile{
 								GivenName:         "Mickey",
 								FamilyName:        "Mouse",
 								NickName:          gu.Ptr("Mickey"),
 								DisplayName:       gu.Ptr("Mickey Mouse"),
 								PreferredLanguage: gu.Ptr("nl"),
-								Gender:            user.Gender_GENDER_MALE.Enum(),
+								Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								AvatarUrl:         "",
 							},
-							Email: &user.HumanEmail{
+							Email: &user_v2beta.HumanEmail{
 								IsVerified: true,
 							},
-							Phone: &user.HumanPhone{
+							Phone: &user_v2beta.HumanPhone{
 								IsVerified: true,
 							},
 							PasswordChangeRequired: true,
@@ -250,43 +255,43 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
-		req *user.GetUserByIDRequest
+		req *user_v2beta.GetUserByIDRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.GetUserByIDResponse
+		want    *user_v2beta.GetUserByIDResponse
 		wantErr bool
 	}{
 		{
 			name: "System, ok",
 			args: args{
 				SystemCTX,
-				&user.GetUserByIDRequest{
+				&user_v2beta.GetUserByIDRequest{
 					UserId: newUserID,
 				},
 			},
-			want: &user.GetUserByIDResponse{
-				User: &user.User{
-					State:              user.UserState_USER_STATE_ACTIVE,
+			want: &user_v2beta.GetUserByIDResponse{
+				User: &user_v2beta.User{
+					State:              user_v2beta.UserState_USER_STATE_ACTIVE,
 					Username:           "",
 					LoginNames:         nil,
 					PreferredLoginName: "",
-					Type: &user.User_Human{
-						Human: &user.HumanUser{
-							Profile: &user.HumanProfile{
+					Type: &user_v2beta.User_Human{
+						Human: &user_v2beta.HumanUser{
+							Profile: &user_v2beta.HumanProfile{
 								GivenName:         "firstname",
 								FamilyName:        "lastname",
 								NickName:          gu.Ptr(""),
 								DisplayName:       gu.Ptr("firstname lastname"),
 								PreferredLanguage: gu.Ptr("und"),
-								Gender:            user.Gender_GENDER_UNSPECIFIED.Enum(),
+								Gender:            user_v2beta.Gender_GENDER_UNSPECIFIED.Enum(),
 								AvatarUrl:         "",
 							},
-							Email: &user.HumanEmail{
+							Email: &user_v2beta.HumanEmail{
 								Email: newOrgOwnerEmail,
 							},
-							Phone: &user.HumanPhone{},
+							Phone: &user_v2beta.HumanPhone{},
 						},
 					},
 				},
@@ -300,31 +305,31 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 			name: "Instance, ok",
 			args: args{
 				IamCTX,
-				&user.GetUserByIDRequest{
+				&user_v2beta.GetUserByIDRequest{
 					UserId: newUserID,
 				},
 			},
-			want: &user.GetUserByIDResponse{
-				User: &user.User{
-					State:              user.UserState_USER_STATE_ACTIVE,
+			want: &user_v2beta.GetUserByIDResponse{
+				User: &user_v2beta.User{
+					State:              user_v2beta.UserState_USER_STATE_ACTIVE,
 					Username:           "",
 					LoginNames:         nil,
 					PreferredLoginName: "",
-					Type: &user.User_Human{
-						Human: &user.HumanUser{
-							Profile: &user.HumanProfile{
+					Type: &user_v2beta.User_Human{
+						Human: &user_v2beta.HumanUser{
+							Profile: &user_v2beta.HumanProfile{
 								GivenName:         "firstname",
 								FamilyName:        "lastname",
 								NickName:          gu.Ptr(""),
 								DisplayName:       gu.Ptr("firstname lastname"),
 								PreferredLanguage: gu.Ptr("und"),
-								Gender:            user.Gender_GENDER_UNSPECIFIED.Enum(),
+								Gender:            user_v2beta.Gender_GENDER_UNSPECIFIED.Enum(),
 								AvatarUrl:         "",
 							},
-							Email: &user.HumanEmail{
+							Email: &user_v2beta.HumanEmail{
 								Email: newOrgOwnerEmail,
 							},
-							Phone: &user.HumanPhone{},
+							Phone: &user_v2beta.HumanPhone{},
 						},
 					},
 				},
@@ -338,7 +343,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 			name: "Org, error",
 			args: args{
 				CTX,
-				&user.GetUserByIDRequest{
+				&user_v2beta.GetUserByIDRequest{
 					UserId: newUserID,
 				},
 			},
@@ -348,7 +353,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 			name: "User, error",
 			args: args{
 				UserCTX,
-				&user.GetUserByIDRequest{
+				&user_v2beta.GetUserByIDRequest{
 					UserId: newUserID,
 				},
 			},
@@ -441,33 +446,33 @@ func TestServer_ListUsers(t *testing.T) {
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
 	type args struct {
 		ctx context.Context
-		req *user.ListUsersRequest
-		dep func(ctx context.Context, request *user.ListUsersRequest) userAttrs
+		req *user_v2beta.ListUsersRequest
+		dep func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.ListUsersResponse
+		want    *user_v2beta.ListUsersResponse
 		wantErr bool
 	}{
 		{
 			name: "list user by id, no permission machine user",
 			args: args{
 				UserCTX,
-				&user.ListUsersRequest{},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+				&user_v2beta.ListUsersRequest{},
+				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					info := createUser(ctx, orgResp.OrganizationId, false)
 					request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
 					return []userAttr{}
 				},
 			},
-			want: &user.ListUsersResponse{
+			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 0,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result:        []*user.User{},
+				Result:        []*user_v2beta.User{},
 			},
 		},
 		{
@@ -493,35 +498,35 @@ func TestServer_ListUsers(t *testing.T) {
 				HumanCTX := integration.WithAuthorizationToken(IamCTX, createResp.GetSessionToken())
 				return args{
 					HumanCTX,
-					&user.ListUsersRequest{},
-					func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					&user_v2beta.ListUsersRequest{},
+					func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 						return []userAttr{info}
 					},
 				}
 			}(),
-			want: &user.ListUsersResponse{ // human user should return itself when calling ListUsers() even if it has no permissions
+			want: &user_v2beta.ListUsersResponse{ // human user should return itself when calling ListUsers() even if it has no permissions
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result: []*user.User{
+				Result: []*user_v2beta.User{
 					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 								PasswordChangeRequired: true,
@@ -536,38 +541,38 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user by id, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+				&user_v2beta.ListUsersRequest{},
+				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					info := createUser(ctx, orgResp.OrganizationId, false)
-					request.Queries = []*user.SearchQuery{}
+					request.Queries = []*user_v2beta.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
 					return []userAttr{info}
 				},
 			},
-			want: &user.ListUsersResponse{
+			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result: []*user.User{
+				Result: []*user_v2beta.User{
 					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
@@ -580,38 +585,38 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user by id, passwordChangeRequired, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+				&user_v2beta.ListUsersRequest{},
+				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					info := createUser(ctx, orgResp.OrganizationId, true)
-					request.Queries = []*user.SearchQuery{}
+					request.Queries = []*user_v2beta.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserIDsQuery([]string{info.UserID}))
 					return []userAttr{info}
 				},
 			},
-			want: &user.ListUsersResponse{
+			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result: []*user.User{
+				Result: []*user_v2beta.User{
 					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 								PasswordChangeRequired: true,
@@ -626,80 +631,80 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user by id multiple, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+				&user_v2beta.ListUsersRequest{},
+				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
-					request.Queries = []*user.SearchQuery{}
+					request.Queries = []*user_v2beta.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserIDsQuery(infos.userIDs()))
 					return infos
 				},
 			},
-			want: &user.ListUsersResponse{
+			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result: []*user.User{
+				Result: []*user_v2beta.User{
 					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
 						},
 					},
 					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
 						},
 					},
 					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
@@ -712,38 +717,38 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user by username, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+				&user_v2beta.ListUsersRequest{},
+				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					info := createUser(ctx, orgResp.OrganizationId, false)
-					request.Queries = []*user.SearchQuery{}
+					request.Queries = []*user_v2beta.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, UsernameQuery(info.Username))
 					return []userAttr{info}
 				},
 			},
-			want: &user.ListUsersResponse{
+			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result: []*user.User{
+				Result: []*user_v2beta.User{
 					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
@@ -756,41 +761,41 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user in emails, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
+				&user_v2beta.ListUsersRequest{
+					Queries: []*user_v2beta.SearchQuery{
 						OrganizationIdQuery(orgResp.OrganizationId),
 					},
 				},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					info := createUser(ctx, orgResp.OrganizationId, false)
-					request.Queries = []*user.SearchQuery{}
+					request.Queries = []*user_v2beta.SearchQuery{}
 					request.Queries = append(request.Queries, InUserEmailsQuery([]string{info.Username}))
 					return []userAttr{info}
 				},
 			},
-			want: &user.ListUsersResponse{
+			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result: []*user.User{
+				Result: []*user_v2beta.User{
 					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
@@ -803,78 +808,78 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user in emails multiple, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+				&user_v2beta.ListUsersRequest{},
+				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
-					request.Queries = []*user.SearchQuery{}
+					request.Queries = []*user_v2beta.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
 					return infos
 				},
 			},
-			want: &user.ListUsersResponse{
+			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result: []*user.User{
+				Result: []*user_v2beta.User{
 					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
 						},
 					}, {
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
 						},
 					}, {
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
@@ -887,61 +892,61 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user in emails no found, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
+				&user_v2beta.ListUsersRequest{
+					Queries: []*user_v2beta.SearchQuery{
 						OrganizationIdQuery(orgResp.OrganizationId),
 						InUserEmailsQuery([]string{"notfound"}),
 					},
 				},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					return []userAttr{}
 				},
 			},
-			want: &user.ListUsersResponse{
+			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 0,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result:        []*user.User{},
+				Result:        []*user_v2beta.User{},
 			},
 		},
 		{
 			name: "list user phone, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+				&user_v2beta.ListUsersRequest{},
+				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					info := createUser(ctx, orgResp.OrganizationId, false)
-					request.Queries = []*user.SearchQuery{}
+					request.Queries = []*user_v2beta.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, PhoneQuery(info.Phone))
 					return []userAttr{info}
 				},
 			},
-			want: &user.ListUsersResponse{
+			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result: []*user.User{
+				Result: []*user_v2beta.User{
 					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
@@ -954,103 +959,103 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user in emails no found, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
+				&user_v2beta.ListUsersRequest{
+					Queries: []*user_v2beta.SearchQuery{
 						OrganizationIdQuery(orgResp.OrganizationId),
 						InUserEmailsQuery([]string{"notfound"}),
 					},
 				},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					return []userAttr{}
 				},
 			},
-			want: &user.ListUsersResponse{
+			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 0,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result:        []*user.User{},
+				Result:        []*user_v2beta.User{},
 			},
 		},
 		{
 			name: "list user resourceowner multiple, ok",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+				&user_v2beta.ListUsersRequest{},
+				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					orgResp := Instance.CreateOrganization(ctx, fmt.Sprintf("ListUsersResourceowner-%s", gofakeit.AppName()), gofakeit.Email())
 
 					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
-					request.Queries = []*user.SearchQuery{}
+					request.Queries = []*user_v2beta.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
 					return infos
 				},
 			},
-			want: &user.ListUsersResponse{
+			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result: []*user.User{
+				Result: []*user_v2beta.User{
 					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
 						},
 					}, {
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
 						},
 					}, {
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
@@ -1063,38 +1068,38 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user with org query",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+				&user_v2beta.ListUsersRequest{},
+				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
 					info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
-					request.Queries = []*user.SearchQuery{}
+					request.Queries = []*user_v2beta.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests.OrganizationId))
 					return []userAttr{info, {}}
 				},
 			},
-			want: &user.ListUsersResponse{
+			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 2,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result: []*user.User{
+				Result: []*user_v2beta.User{
 					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
+						State: user_v2beta.UserState_USER_STATE_ACTIVE,
+						Type: &user_v2beta.User_Human{
+							Human: &user_v2beta.HumanUser{
+								Profile: &user_v2beta.HumanProfile{
 									GivenName:         "Mickey",
 									FamilyName:        "Mouse",
 									NickName:          gu.Ptr("Mickey"),
 									DisplayName:       gu.Ptr("Mickey Mouse"),
 									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
+									Gender:            user_v2beta.Gender_GENDER_MALE.Enum(),
 								},
-								Email: &user.HumanEmail{
+								Email: &user_v2beta.HumanEmail{
 									IsVerified: true,
 								},
-								Phone: &user.HumanPhone{
+								Phone: &user_v2beta.HumanPhone{
 									IsVerified: true,
 								},
 							},
@@ -1109,24 +1114,24 @@ func TestServer_ListUsers(t *testing.T) {
 			name: "list user with wrong org query",
 			args: args{
 				IamCTX,
-				&user.ListUsersRequest{},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+				&user_v2beta.ListUsersRequest{},
+				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
 					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
 					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
 					// info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					createUser(ctx, orgRespForOrgTests.OrganizationId, false)
-					request.Queries = []*user.SearchQuery{}
+					request.Queries = []*user_v2beta.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests2.OrganizationId))
 					return []userAttr{{}}
 				},
 			},
-			want: &user.ListUsersResponse{
+			want: &user_v2beta.ListUsersResponse{
 				Details: &object_v2beta.ListDetails{
 					TotalResult: 0,
 					Timestamp:   timestamppb.Now(),
 				},
 				SortingColumn: 0,
-				Result: []*user.User{
+				Result: []*user_v2beta.User{
 					// this is the admin of the org craated in Instance.CreateOrganization()
 					nil,
 				},
@@ -1189,52 +1194,294 @@ func TestServer_ListUsers(t *testing.T) {
 	}
 }
 
-func InUserIDsQuery(ids []string) *user.SearchQuery {
-	return &user.SearchQuery{
-		Query: &user.SearchQuery_InUserIdsQuery{
-			InUserIdsQuery: &user.InUserIDQuery{
+func InUserIDsQuery(ids []string) *user_v2beta.SearchQuery {
+	return &user_v2beta.SearchQuery{
+		Query: &user_v2beta.SearchQuery_InUserIdsQuery{
+			InUserIdsQuery: &user_v2beta.InUserIDQuery{
 				UserIds: ids,
 			},
 		},
 	}
 }
 
-func InUserEmailsQuery(emails []string) *user.SearchQuery {
-	return &user.SearchQuery{
-		Query: &user.SearchQuery_InUserEmailsQuery{
-			InUserEmailsQuery: &user.InUserEmailsQuery{
+func InUserEmailsQuery(emails []string) *user_v2beta.SearchQuery {
+	return &user_v2beta.SearchQuery{
+		Query: &user_v2beta.SearchQuery_InUserEmailsQuery{
+			InUserEmailsQuery: &user_v2beta.InUserEmailsQuery{
 				UserEmails: emails,
 			},
 		},
 	}
 }
 
-func PhoneQuery(number string) *user.SearchQuery {
-	return &user.SearchQuery{
-		Query: &user.SearchQuery_PhoneQuery{
-			PhoneQuery: &user.PhoneQuery{
+func PhoneQuery(number string) *user_v2beta.SearchQuery {
+	return &user_v2beta.SearchQuery{
+		Query: &user_v2beta.SearchQuery_PhoneQuery{
+			PhoneQuery: &user_v2beta.PhoneQuery{
 				Number: number,
 			},
 		},
 	}
 }
 
-func UsernameQuery(username string) *user.SearchQuery {
-	return &user.SearchQuery{
-		Query: &user.SearchQuery_UserNameQuery{
-			UserNameQuery: &user.UserNameQuery{
+func UsernameQuery(username string) *user_v2beta.SearchQuery {
+	return &user_v2beta.SearchQuery{
+		Query: &user_v2beta.SearchQuery_UserNameQuery{
+			UserNameQuery: &user_v2beta.UserNameQuery{
 				UserName: username,
 			},
 		},
 	}
 }
 
-func OrganizationIdQuery(resourceowner string) *user.SearchQuery {
-	return &user.SearchQuery{
-		Query: &user.SearchQuery_OrganizationIdQuery{
-			OrganizationIdQuery: &user.OrganizationIdQuery{
+func OrganizationIdQuery(resourceowner string) *user_v2beta.SearchQuery {
+	return &user_v2beta.SearchQuery{
+		Query: &user_v2beta.SearchQuery_OrganizationIdQuery{
+			OrganizationIdQuery: &user_v2beta.OrganizationIdQuery{
 				OrganizationId: resourceowner,
 			},
 		},
+	}
+}
+
+func TestListUsersByMetadata(t *testing.T) {
+	t.Parallel()
+
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+
+	usr1, err := Instance.Client.UserV2.CreateUser(IamCTX, &user_v2.CreateUserRequest{
+		OrganizationId: orgResp.GetOrganizationId(),
+		UserType: &user_v2.CreateUserRequest_Machine_{
+			Machine: &user_v2.CreateUserRequest_Machine{Name: "Robot", Description: gu.Ptr("This is a test robot")},
+		},
+	})
+	require.NoError(t, err)
+
+	usr2 := createUser(IamCTX, orgResp.GetOrganizationId(), false)
+	usr3 := createUser(IamCTX, orgResp.GetOrganizationId(), false)
+
+	// Create a context with usr1 access
+	patRes, err := Instance.Client.UserV2.AddPersonalAccessToken(IamCTX, &user_v2.AddPersonalAccessTokenRequest{
+		UserId:         usr1.GetId(),
+		ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
+	})
+	require.NoError(t, err)
+
+	usr1Ctx := integration.WithAuthorizationToken(context.Background(), patRes.GetToken())
+
+	_, err1 := Instance.Client.UserV2.SetUserMetadata(IamCTX, &user_v2.SetUserMetadataRequest{
+		UserId:   usr1.GetId(),
+		Metadata: []*user_v2.Metadata{{Key: "hello", Value: []byte("world")}},
+	})
+	require.NoError(t, err1)
+
+	_, err2 := Instance.Client.UserV2.SetUserMetadata(IamCTX, &user_v2.SetUserMetadataRequest{
+		UserId:   usr2.UserID,
+		Metadata: []*user_v2.Metadata{{Key: "hello", Value: []byte("poopsie")}},
+	})
+	require.NoError(t, err2)
+
+	_, err3 := Instance.Client.UserV2.SetUserMetadata(IamCTX, &user_v2.SetUserMetadataRequest{
+		UserId:   usr3.UserID,
+		Metadata: []*user_v2.Metadata{{Key: "other-key", Value: []byte("other value")}},
+	})
+	require.NoError(t, err3)
+
+	t.Cleanup(func() {
+		_, err = Instance.Client.UserV2.DeleteUserMetadata(IamCTX, &user_v2.DeleteUserMetadataRequest{
+			UserId: usr1.GetId(),
+			Keys:   []string{"hello"},
+		})
+		require.NoError(t, err)
+
+		_, err = Instance.Client.UserV2.DeleteUserMetadata(IamCTX, &user_v2.DeleteUserMetadataRequest{
+			UserId: usr2.UserID,
+			Keys:   []string{"hello"},
+		})
+		require.NoError(t, err)
+
+		_, err = Instance.Client.UserV2.DeleteUserMetadata(IamCTX, &user_v2.DeleteUserMetadataRequest{
+			UserId: usr3.UserID,
+			Keys:   []string{"other-key"},
+		})
+		require.NoError(t, err)
+
+		_, err = Instance.Client.UserV2.DeleteUser(IamCTX, &user_v2.DeleteUserRequest{UserId: usr1.GetId()})
+		require.NoError(t, err)
+
+		_, err = Instance.Client.UserV2.DeleteUser(IamCTX, &user_v2.DeleteUserRequest{UserId: usr2.UserID})
+		require.NoError(t, err)
+
+		_, err = Instance.Client.UserV2.DeleteUser(IamCTX, &user_v2.DeleteUserRequest{UserId: usr3.UserID})
+		require.NoError(t, err)
+	})
+
+	type result struct {
+		userID      string
+		key         string
+		value       []byte
+		usrVariable string // To easily identify which user result is failing
+	}
+
+	tt := []struct {
+		testName string
+
+		instanceSetup    func(t *testing.T)
+		instanceTeardown func(t *testing.T) func()
+
+		inputRequest *user_v2beta.ListUsersByMetadataRequest
+		inputContext context.Context
+
+		expectedError                error
+		expectedResult               []result
+		expectedTotalPaginationCount uint
+	}{
+		{
+			testName:         "when user is unauthN should return unauthN error",
+			instanceSetup:    func(t *testing.T) {},
+			instanceTeardown: func(t *testing.T) func() { return func() {} },
+			inputContext:     context.Background(),
+			inputRequest: &user_v2beta.ListUsersByMetadataRequest{
+				Filters: []*v2.UserByMetadataSearchFilter{
+					{Filter: &v2.UserByMetadataSearchFilter_KeyFilter{KeyFilter: &v2.MetadataKeyFilter{Key: "hello", Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS}}},
+				},
+			},
+			expectedError: status.Error(codes.Unauthenticated, "auth header missing"),
+		},
+		{
+			testName:         "with perms v2 disabled query by key or value should return 3 results sorted by meta key descending",
+			instanceSetup:    func(t *testing.T) {},
+			instanceTeardown: func(t *testing.T) func() { return func() {} },
+			inputContext:     IamCTX,
+			inputRequest: &user_v2beta.ListUsersByMetadataRequest{
+				Filters: []*v2.UserByMetadataSearchFilter{
+					{
+						Filter: &v2.UserByMetadataSearchFilter_OrFilter{
+							OrFilter: &v2.MetadataOrFilter{
+								Queries: []*v2.UserByMetadataSearchFilter{
+									{Filter: &v2.UserByMetadataSearchFilter_KeyFilter{KeyFilter: &v2.MetadataKeyFilter{
+										Key:    "hel",
+										Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_CONTAINS,
+									}}},
+									{Filter: &v2.UserByMetadataSearchFilter_ValueFilter{ValueFilter: &v2.MetadataValueFilter{
+										Value:  []byte("other value"),
+										Method: filter.ByteFilterMethod_BYTE_FILTER_METHOD_EQUALS,
+									}}},
+								},
+							},
+						},
+					},
+				},
+				SortingColumn: user_v2beta.UsersByMetadataSorting_USERS_BY_METADATA_SORT_BY_METADATA_KEY,
+			},
+			expectedResult: []result{
+				{key: "other-key", value: []byte("other value"), userID: usr3.UserID},
+				{key: "hello", value: []byte("world"), userID: usr1.GetId()},
+				{key: "hello", value: []byte("poopsie"), userID: usr2.UserID},
+			},
+			expectedTotalPaginationCount: 3,
+		},
+		{
+			testName:         "with perms v2 disabled when login user querying should return its result only",
+			instanceSetup:    func(t *testing.T) {},
+			instanceTeardown: func(t *testing.T) func() { return func() {} },
+			inputContext:     usr1Ctx,
+			inputRequest: &user_v2beta.ListUsersByMetadataRequest{
+				Filters: []*v2.UserByMetadataSearchFilter{
+					{
+						Filter: &v2.UserByMetadataSearchFilter_OrFilter{
+							OrFilter: &v2.MetadataOrFilter{
+								Queries: []*v2.UserByMetadataSearchFilter{
+									{Filter: &v2.UserByMetadataSearchFilter_KeyFilter{KeyFilter: &v2.MetadataKeyFilter{
+										Key:    "hel",
+										Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_CONTAINS,
+									}}},
+									{Filter: &v2.UserByMetadataSearchFilter_ValueFilter{ValueFilter: &v2.MetadataValueFilter{
+										Value:  []byte("other value"),
+										Method: filter.ByteFilterMethod_BYTE_FILTER_METHOD_EQUALS,
+									}}},
+								},
+							},
+						},
+					},
+				},
+				SortingColumn: user_v2beta.UsersByMetadataSorting_USERS_BY_METADATA_SORT_BY_METADATA_KEY,
+			},
+			expectedResult: []result{
+				{key: "hello", value: []byte("world"), userID: usr1.GetId()},
+			},
+			expectedTotalPaginationCount: 3,
+		},
+		{
+			testName: "with perms v2 enabled when login user querying should return its result only",
+			instanceSetup: func(t *testing.T) {
+				_, err := Instance.Client.FeatureV2.SetInstanceFeatures(IamCTX, &feature.SetInstanceFeaturesRequest{PermissionCheckV2: gu.Ptr(true)})
+				require.NoError(t, err)
+			},
+			instanceTeardown: func(t *testing.T) func() {
+				return func() {
+					_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IamCTX, &feature.ResetInstanceFeaturesRequest{})
+					require.NoError(t, err)
+				}
+			},
+			inputContext: usr1Ctx,
+			inputRequest: &user_v2beta.ListUsersByMetadataRequest{
+				Filters: []*v2.UserByMetadataSearchFilter{
+					{
+						Filter: &v2.UserByMetadataSearchFilter_OrFilter{
+							OrFilter: &v2.MetadataOrFilter{
+								Queries: []*v2.UserByMetadataSearchFilter{
+									{Filter: &v2.UserByMetadataSearchFilter_KeyFilter{KeyFilter: &v2.MetadataKeyFilter{
+										Key:    "hel",
+										Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_CONTAINS,
+									}}},
+									{Filter: &v2.UserByMetadataSearchFilter_ValueFilter{ValueFilter: &v2.MetadataValueFilter{
+										Value:  []byte("other value"),
+										Method: filter.ByteFilterMethod_BYTE_FILTER_METHOD_EQUALS,
+									}}},
+								},
+							},
+						},
+					},
+				},
+				SortingColumn: user_v2beta.UsersByMetadataSorting_USERS_BY_METADATA_SORT_BY_METADATA_KEY,
+			},
+			expectedResult: []result{
+				{key: "hello", value: []byte("world"), userID: usr1.GetId()},
+			},
+			expectedTotalPaginationCount: 1,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
+			t.Cleanup(tc.instanceTeardown(t))
+
+			// Given
+			tc.instanceSetup(t)
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.inputContext, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+
+				// Test
+				res, err := Instance.Client.UserV2beta.ListUsersByMetadata(tc.inputContext, tc.inputRequest)
+
+				// Verify
+				require.Equal(ttt, tc.expectedError, err)
+
+				if tc.expectedError == nil {
+					require.Len(ttt, res.GetUsers(), len(tc.expectedResult))
+					for i, userAndMeta := range res.GetUsers() {
+						assert.Equal(ttt, tc.expectedResult[i].key, userAndMeta.GetKey(), "expecting %s", tc.expectedResult[i].usrVariable)
+						assert.Equal(ttt, tc.expectedResult[i].value, userAndMeta.GetValue(), "expecting %s", tc.expectedResult[i].usrVariable)
+
+						require.NotNil(ttt, userAndMeta.GetUser())
+						assert.Equal(ttt, tc.expectedResult[i].userID, userAndMeta.GetUser().GetUserId(), "expecting %s", tc.expectedResult[i].usrVariable)
+					}
+					assert.Equal(ttt, uint64(tc.expectedTotalPaginationCount), res.GetPagination().GetTotalResult())
+				}
+			}, retryDuration, tick, "timeout waiting for expected execution result")
+		})
 	}
 }
