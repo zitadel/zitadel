@@ -112,7 +112,7 @@ core_unit_test:
 
 .PHONY: core_integration_db_up
 core_integration_db_up:
-	docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait cache
+	docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait
 
 .PHONY: core_integration_db_down
 core_integration_db_down:
