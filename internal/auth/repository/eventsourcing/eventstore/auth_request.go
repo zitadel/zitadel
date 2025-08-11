@@ -600,7 +600,9 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 		return err
 	}
 	if len(metadatas) > 0 {
-		_, err = repo.Command.BulkSetUserMetadata(ctx, request.UserID, request.UserOrgID, metadatas...)
+		// user context necessary due to permission check in command
+		userCtx := authz.SetCtxData(ctx, authz.CtxData{UserID: request.UserID, OrgID: request.UserOrgID})
+		_, err := repo.Command.BulkSetUserMetadata(userCtx, request.UserID, request.UserOrgID, metadatas...)
 		if err != nil {
 			return err
 		}

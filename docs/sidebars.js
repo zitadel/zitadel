@@ -7,6 +7,7 @@ const sidebar_api_system = require("./docs/apis/resources/system/sidebar.ts").de
 const sidebar_api_user_service_v2 = require("./docs/apis/resources/user_service_v2/sidebar.ts").default
 const sidebar_api_session_service_v2 = require("./docs/apis/resources/session_service_v2/sidebar.ts").default
 const sidebar_api_oidc_service_v2 = require("./docs/apis/resources/oidc_service_v2/sidebar.ts").default
+const sidebar_api_saml_service_v2 = require("./docs/apis/resources/saml_service_v2/sidebar.ts").default
 const sidebar_api_settings_service_v2 = require("./docs/apis/resources/settings_service_v2/sidebar.ts").default
 const sidebar_api_feature_service_v2 = require("./docs/apis/resources/feature_service_v2/sidebar.ts").default
 const sidebar_api_org_service_v2 = require("./docs/apis/resources/org_service_v2/sidebar.ts").default
@@ -17,7 +18,7 @@ const sidebar_api_project_service_v2 = require("./docs/apis/resources/project_se
 const sidebar_api_webkey_service_v2 = require("./docs/apis/resources/webkey_service_v2/sidebar.ts").default
 const sidebar_api_instance_service_v2 = require("./docs/apis/resources/instance_service_v2/sidebar.ts").default
 const sidebar_api_authorization_service_v2 = require("./docs/apis/resources/authorization_service_v2/sidebar.ts").default
-const sidebar_api_permission_service_v2 = require("./docs/apis/resources/internal_permission_service_v2/sidebar.ts").default
+const sidebar_api_internal_permission_service_v2 = require("./docs/apis/resources/internal_permission_service_v2/sidebar.ts").default
 const sidebar_api_app_v2 = require("./docs/apis/resources/application_service_v2/sidebar.ts").default
 
 module.exports = {
@@ -712,6 +713,18 @@ module.exports = {
             },
             {
               type: "category",
+              label: "SAML",
+              link: {
+                type: "generated-index",
+                title: "SAML Service API",
+                slug: "/apis/resources/saml_service_v2",
+                description:
+                  "Get SAML Request details and create responses.\n",
+              },
+              items: sidebar_api_saml_service_v2,
+            },
+            {
+              type: "category",
               label: "Settings",
               link: {
                 type: "generated-index",
@@ -872,17 +885,17 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Permissions (Beta)",
+              label: "Internal Permissions (Beta)",
               link: {
                 type: "generated-index",
-                title: "Permission Service API (Beta)",
-                slug: "/apis/resources/permission_service_v2",
+                title: "Internal Permission Service API (Beta)",
+                slug: "/apis/resources/internal_permission_service_v2",
                 description:
                     "This API is intended to manage internal permissions in ZITADEL.\n" +
                     "\n"+
                     "This API is in beta state. It can AND will continue breaking until a stable version is released.\n"
               },
-              items: sidebar_api_permission_service_v2,
+              items: sidebar_api_internal_permission_service_v2,
             },
           ],
         },
@@ -1107,6 +1120,7 @@ module.exports = {
             "self-hosting/manage/reverseproxy/traefik/traefik",
             "self-hosting/manage/reverseproxy/nginx/nginx",
             "self-hosting/manage/reverseproxy/caddy/caddy",
+            "self-hosting/manage/reverseproxy/httpd/httpd",
             "self-hosting/manage/reverseproxy/cloudflare/cloudflare",
             "self-hosting/manage/reverseproxy/cloudflare_tunnel/cloudflare_tunnel",
             "self-hosting/manage/reverseproxy/zitadel_cloud/zitadel_cloud",
