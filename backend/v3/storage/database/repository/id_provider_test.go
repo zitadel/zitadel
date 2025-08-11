@@ -15,6 +15,8 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 )
 
+var sytlingType int16 = 1
+
 func TestCreateIDProvider(t *testing.T) {
 	// create instance
 	instanceId := gofakeit.Name()
@@ -65,7 +67,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       1,
+				StylingType:       &sytlingType,
 				Payload:           gu.Ptr("{}"),
 			},
 		},
@@ -82,7 +84,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       1,
+				StylingType:       &sytlingType,
 				Payload:           gu.Ptr("{}"),
 			},
 			err: new(database.CheckError),
@@ -103,7 +105,7 @@ func TestCreateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 
@@ -131,7 +133,7 @@ func TestCreateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 
@@ -188,7 +190,7 @@ func TestCreateIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 
@@ -212,7 +214,7 @@ func TestCreateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				},
 			}
@@ -230,7 +232,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       1,
+				StylingType:       &sytlingType,
 				Payload:           gu.Ptr("{}"),
 			},
 			err: new(database.CheckError),
@@ -248,7 +250,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       1,
+				StylingType:       &sytlingType,
 				Payload:           gu.Ptr("{}"),
 			},
 			err: new(database.CheckError),
@@ -265,7 +267,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       1,
+				StylingType:       &sytlingType,
 				Payload:           gu.Ptr("{}"),
 			},
 			err: new(database.IntegrityViolationError),
@@ -283,7 +285,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       1,
+				StylingType:       &sytlingType,
 				Payload:           gu.Ptr("{}"),
 			},
 			err: new(database.ForeignKeyError),
@@ -301,7 +303,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoCreation: true,
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
-				StylingType:       1,
+				StylingType:       &sytlingType,
 				Payload:           gu.Ptr("{}"),
 			},
 			err: new(database.ForeignKeyError),
@@ -404,7 +406,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 
@@ -430,7 +432,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 
@@ -456,7 +458,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 
@@ -482,7 +484,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 
@@ -508,7 +510,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 
@@ -534,13 +536,14 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
-				idp.StylingType = 2
+				newStyleType := int16(2)
+				idp.StylingType = &newStyleType
 				return &idp
 			},
 			update:       []database.Change{idpRepo.SetStylingType(2)},
@@ -560,7 +563,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 
@@ -689,7 +692,7 @@ func TestGetIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 
@@ -716,7 +719,7 @@ func TestGetIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 
@@ -741,7 +744,7 @@ func TestGetIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 
@@ -766,7 +769,7 @@ func TestGetIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 
@@ -794,7 +797,7 @@ func TestGetIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 
@@ -823,7 +826,7 @@ func TestGetIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 
@@ -958,7 +961,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
@@ -979,7 +982,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 
@@ -1022,7 +1025,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
@@ -1043,7 +1046,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 
@@ -1075,7 +1078,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 
@@ -1106,7 +1109,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 
@@ -1138,7 +1141,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 					err := idpRepo.Create(ctx, &idp)
@@ -1159,7 +1162,7 @@ func TestListIDProvider(t *testing.T) {
 							AllowAutoCreation: true,
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
-							StylingType:       1,
+							StylingType:       &sytlingType,
 							Payload:           gu.Ptr("{}"),
 						}
 
@@ -1192,7 +1195,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
@@ -1214,7 +1217,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 
@@ -1247,7 +1250,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 					err := idpRepo.Create(ctx, &idp)
@@ -1268,7 +1271,7 @@ func TestListIDProvider(t *testing.T) {
 							AllowAutoCreation: true,
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
-							StylingType:       1,
+							StylingType:       &sytlingType,
 							Payload:           gu.Ptr("{}"),
 						}
 
@@ -1300,7 +1303,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
@@ -1322,7 +1325,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 
@@ -1353,7 +1356,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
@@ -1375,7 +1378,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 
@@ -1406,7 +1409,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
@@ -1428,7 +1431,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: false,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 
@@ -1460,7 +1463,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
@@ -1482,7 +1485,7 @@ func TestListIDProvider(t *testing.T) {
 						// AllowAutoUpdate set to false
 						AllowAutoUpdate: false,
 						AllowLinking:    true,
-						StylingType:     1,
+						StylingType:     &sytlingType,
 						Payload:         gu.Ptr("{}"),
 					}
 
@@ -1514,7 +1517,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
@@ -1536,7 +1539,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						// AllowLinking set to false
 						AllowLinking: false,
-						StylingType:  1,
+						StylingType:  &sytlingType,
 						Payload:      gu.Ptr("{}"),
 					}
 
@@ -1567,7 +1570,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoCreation: true,
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
-					StylingType:       1,
+					StylingType:       &sytlingType,
 					Payload:           gu.Ptr("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
@@ -1575,6 +1578,7 @@ func TestListIDProvider(t *testing.T) {
 
 				noOfIDPs := 1
 				idps := make([]*domain.IdentityProvider, noOfIDPs)
+				sytlingType := int16(4)
 				for i := range noOfIDPs {
 
 					idp := domain.IdentityProvider{
@@ -1589,7 +1593,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						// StylingType set to 4
-						StylingType: 4,
+						StylingType: &sytlingType,
 						Payload:     gu.Ptr("{}"),
 					}
 
@@ -1622,7 +1626,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoCreation: true,
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
-						StylingType:       1,
+						StylingType:       &sytlingType,
 						Payload:           gu.Ptr("{}"),
 					}
 					err := idpRepo.Create(ctx, &idp)
@@ -1643,7 +1647,7 @@ func TestListIDProvider(t *testing.T) {
 							AllowAutoCreation: true,
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
-							StylingType:       1,
+							StylingType:       &sytlingType,
 							Payload:           &payload,
 						}
 
@@ -1755,7 +1759,7 @@ func TestDeleteIDProvider(t *testing.T) {
 							AllowAutoCreation: true,
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
-							StylingType:       1,
+							StylingType:       &sytlingType,
 							Payload:           gu.Ptr("{}"),
 						}
 
@@ -1785,7 +1789,7 @@ func TestDeleteIDProvider(t *testing.T) {
 							AllowAutoCreation: true,
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
-							StylingType:       1,
+							StylingType:       &sytlingType,
 							Payload:           gu.Ptr("{}"),
 						}
 
@@ -1820,7 +1824,7 @@ func TestDeleteIDProvider(t *testing.T) {
 							AllowAutoCreation: true,
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
-							StylingType:       1,
+							StylingType:       &sytlingType,
 							Payload:           gu.Ptr("{}"),
 						}
 
