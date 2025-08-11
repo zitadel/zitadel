@@ -20,7 +20,7 @@ func TestStart(t *testing.T) {
 			name: "happy path",
 			projections: func(t *testing.T) []projection {
 				ctrl := gomock.NewController(t)
-				projections := make([]projection, 5, 5)
+				projections := make([]projection, 5)
 
 				for i := range 5 {
 					mock := NewMockprojection(ctrl)
@@ -35,7 +35,7 @@ func TestStart(t *testing.T) {
 		{
 			name: "same projection used twice error",
 			projections: func(t *testing.T) []projection {
-				projections := make([]projection, 5, 5)
+				projections := make([]projection, 5)
 
 				ctrl := gomock.NewController(t)
 				mock := NewMockprojection(ctrl)
