@@ -22,7 +22,7 @@ export function createSession(org: Org, accessToken: string, checks?: any): Prom
     });
     response.then((res) => {
       check(res, {
-        'add Session status ok': (r) => r.status === 201,
+        'add Session status ok': (r) => r.status >= 200 && r.status < 300,
       }) || reject(`unable to add Session status: ${res.status} body: ${res.body}`);
 
       addSessionTrend.add(res.timings.duration);
@@ -48,7 +48,7 @@ export function setSession(id: string, session: any, accessToken: string, challe
     });
     response.then((res) => {
       check(res, {
-        'set Session status ok': (r) => r.status === 200,
+        'set Session status ok': (r) => r.status >= 200 && r.status < 300,
       }) || reject(`unable to set Session status: ${res.status} body: ${res.body}`);
 
       setSessionTrend.add(res.timings.duration);

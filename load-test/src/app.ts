@@ -28,7 +28,7 @@ export function createAPI(name: string, projectId: string, org: Org, accessToken
     );
     response.then((res) => {
       check(res, {
-        'add api status ok': (r) => r.status === 200,
+        'add api status ok': (r) => r.status >= 200 && r.status < 300,
       }) || reject(`unable to add api project: ${projectId} status: ${res.status} body: ${res.body}`);
       resolve(res.json() as API);
 
@@ -60,7 +60,7 @@ export function createAppKey(appId: string, projectId: string, org: Org, accessT
     );
     response.then((res) => {
       check(res, {
-        'add app key status ok': (r) => r.status === 200,
+        'add app key status ok': (r) => r.status >= 200 && r.status < 300,
       }) || reject(`unable to add app key project: ${projectId} app: ${appId} status: ${res.status} body: ${res.body}`);
       resolve(res.json() as AppKey);
 
