@@ -9,6 +9,7 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -18,7 +19,6 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	idp_grpc "github.com/zitadel/zitadel/pkg/grpc/idp"
-	durationpb "google.golang.org/protobuf/types/known/durationpb"
 )
 
 var validSAMLMetadata1 = []byte(`<?xml version="1.0" encoding="UTF-8"?>

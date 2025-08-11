@@ -29,7 +29,7 @@ var (
 	SystemClient system.SystemServiceClient
 	OrgClient    v2beta_org.OrganizationServiceClient
 	AdminClient  admin.AdminServiceClient
-	MgmtClient           mgmt.ManagementServiceClient
+	MgmtClient   mgmt.ManagementServiceClient
 )
 
 var pool database.Pool
