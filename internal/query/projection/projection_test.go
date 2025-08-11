@@ -52,7 +52,6 @@ func TestStart(t *testing.T) {
 
 				mock = NewMockprojection(ctrl)
 				mock.EXPECT().String().Return(duplicateName)
-				mock.EXPECT().Start(gomock.Any())
 				projections[4] = mock
 
 				return projections
