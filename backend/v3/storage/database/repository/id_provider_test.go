@@ -1674,8 +1674,6 @@ func TestListIDProvider(t *testing.T) {
 				require.NoError(t, err)
 			})
 
-			ctx := context.WithoutCancel(t.Context())
-
 			idps := tt.testFunc(ctx, t)
 
 			// check idp values

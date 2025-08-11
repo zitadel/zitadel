@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
-	db_domain "github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -31,7 +30,7 @@ const (
 )
 
 type idpTemplateRelationalProjection struct {
-	idpRepo db_domain.IDProviderRepository
+	idpRepo domain.IDProviderRepository
 }
 
 func newIDPTemplateRelationalProjection(ctx context.Context, config handler.Config) *handler.Handler {
@@ -708,7 +707,7 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event ev
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Yap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPAddedEventType, instance.OAuthIDPAddedEventType})
 	}
 
-	oauth := db_domain.OAuth{
+	oauth := domain.OAuth{
 		ClientID:              idpEvent.ClientID,
 		ClientSecret:          idpEvent.ClientSecret,
 		AuthorizationEndpoint: idpEvent.AuthorizationEndpoint,
@@ -736,14 +735,14 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event ev
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeOAuth.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOAuth.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			},
@@ -826,14 +825,14 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eve
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeOIDC.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOIDC.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			},
@@ -899,7 +898,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
 	}
 
-	azure := db_domain.Azure{
+	azure := domain.Azure{
 		ClientID:        idpEvent.ClientID,
 		ClientSecret:    idpEvent.ClientSecret,
 		Scopes:          idpEvent.Scopes,
@@ -922,12 +921,12 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeAzure.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzure.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
 			[]handler.Condition{
@@ -950,7 +949,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
 	}
 
-	google := db_domain.Google{
+	google := domain.Google{
 		ClientID:     idpEvent.ClientID,
 		ClientSecret: idpEvent.ClientSecret,
 		Scopes:       idpEvent.Scopes,
@@ -971,12 +970,12 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeGoogle.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
 			[]handler.Condition{
@@ -999,7 +998,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalAdded(event even
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Yopi2s", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPAddedEventType, instance.JWTIDPAddedEventType})
 	}
 
-	jwt := db_domain.JWT{
+	jwt := domain.JWT{
 		JWTEndpoint:  idpEvent.JWTEndpoint,
 		Issuer:       idpEvent.Issuer,
 		KeysEndpoint: idpEvent.KeysEndpoint,
@@ -1024,13 +1023,13 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalAdded(event even
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeJWT.String()),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeJWT.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			},
@@ -1096,7 +1095,7 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event 
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPAddedEventType, instance.AzureADIDPAddedEventType})
 	}
 
-	azure := db_domain.Azure{
+	azure := domain.Azure{
 		ClientID:        idpEvent.ClientID,
 		ClientSecret:    idpEvent.ClientSecret,
 		Scopes:          idpEvent.Scopes,
@@ -1122,13 +1121,13 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event 
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeAzure.String()),
-				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzure.String()),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1194,7 +1193,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPAddedEventType, instance.GitHubIDPAddedEventType})
 	}
 
-	github := db_domain.Github{
+	github := domain.Github{
 		ClientID:     idpEvent.ClientID,
 		ClientSecret: idpEvent.ClientSecret,
 		Scopes:       idpEvent.Scopes,
@@ -1218,13 +1217,13 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeGitHub.String()),
-				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitHub.String()),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1290,7 +1289,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdd
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Yf3g2a", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPAddedEventType, instance.GitHubEnterpriseIDPAddedEventType})
 	}
 
-	githubEnterprise := db_domain.GithubEnterprise{
+	githubEnterprise := domain.GithubEnterprise{
 		ClientID:              idpEvent.ClientID,
 		ClientSecret:          idpEvent.ClientSecret,
 		AuthorizationEndpoint: idpEvent.AuthorizationEndpoint,
@@ -1316,14 +1315,14 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdd
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeGitHubEnterprise.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitHubEnterprise.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			},
@@ -1389,7 +1388,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event e
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPAddedEventType, instance.GitLabIDPAddedEventType})
 	}
 
-	gitlab := db_domain.Gitlab{
+	gitlab := domain.Gitlab{
 		ClientID:     idpEvent.ClientID,
 		ClientSecret: idpEvent.ClientSecret,
 		Scopes:       idpEvent.Scopes,
@@ -1413,13 +1412,13 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event e
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeGitLab.String()),
-				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLab.String()),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1485,7 +1484,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdd
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YAF3gw", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPAddedEventType, instance.GitLabSelfHostedIDPAddedEventType})
 	}
 
-	gitlabSelfHosting := db_domain.GitlabSelfHosting{
+	gitlabSelfHosting := domain.GitlabSelfHosting{
 		Issuer:       idpEvent.Issuer,
 		ClientID:     idpEvent.ClientID,
 		ClientSecret: idpEvent.ClientSecret,
@@ -1510,13 +1509,13 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdd
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeGitLabSelfHosted.String()),
-				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLabSelfHosted.String()),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1582,7 +1581,7 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event e
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Yp9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPAddedEventType, instance.GoogleIDPAddedEventType})
 	}
 
-	google := db_domain.Google{
+	google := domain.Google{
 		ClientID:     idpEvent.ClientID,
 		ClientSecret: idpEvent.ClientSecret,
 		Scopes:       idpEvent.Scopes,
@@ -1605,13 +1604,13 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event e
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeGoogle.String()),
-				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle.String()),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1677,7 +1676,7 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Ev
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPAddedEventType, instance.LDAPIDPAddedEventType})
 	}
 
-	ldap := db_domain.LDAP{
+	ldap := domain.LDAP{
 		Servers:           idpEvent.Servers,
 		StartTLS:          idpEvent.StartTLS,
 		BaseDN:            idpEvent.BaseDN,
@@ -1687,7 +1686,7 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Ev
 		UserObjectClasses: idpEvent.UserObjectClasses,
 		UserFilters:       idpEvent.UserFilters,
 		Timeout:           idpEvent.Timeout,
-		LDAPAttributes: db_domain.LDAPAttributes{
+		LDAPAttributes: domain.LDAPAttributes{
 			IDAttribute:                idpEvent.IDAttribute,
 			FirstNameAttribute:         idpEvent.FirstNameAttribute,
 			LastNameAttribute:          idpEvent.LastNameAttribute,
@@ -1722,13 +1721,13 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Ev
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeLDAP.String()),
-				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeLDAP.String()),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1794,7 +1793,7 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.E
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YFvg3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPAddedEventType /*, instance.AppleIDPAddedEventType*/})
 	}
 
-	apple := db_domain.Apple{
+	apple := domain.Apple{
 		ClientID:   idpEvent.ClientID,
 		TeamID:     idpEvent.TeamID,
 		KeyID:      idpEvent.KeyID,
@@ -1820,13 +1819,13 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.E
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeApple.String()),
-				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeApple.String()),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1892,7 +1891,7 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Ev
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ys02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPAddedEventType, instance.SAMLIDPAddedEventType})
 	}
 
-	saml := db_domain.SAML{
+	saml := domain.SAML{
 		Metadata:                      idpEvent.Metadata,
 		Key:                           idpEvent.Key,
 		Certificate:                   idpEvent.Certificate,
@@ -1921,13 +1920,13 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Ev
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPRelationalOrgId, orgId),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, db_domain.IDPTypeSAML.String()),
-				handler.NewCol(IDPTemplateStateCol, db_domain.IDPStateActive.String()),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeSAML.String()),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
 				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -2025,11 +2024,11 @@ func reduceIDPRelationalChangedTemplateColumns(name *string, optionChanges idp.O
 		*cols = append(*cols, handler.NewCol(IDPRelationalAllowAutoUpdateCol, *optionChanges.IsAutoUpdate))
 	}
 	if optionChanges.AutoLinkingOption != nil {
-		*cols = append(*cols, handler.NewCol(IDPRelationalAllowAutoLinkingCol, db_domain.IDPAutoLinkingOption(*optionChanges.AutoLinkingOption).String()))
+		*cols = append(*cols, handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(*optionChanges.AutoLinkingOption).String()))
 	}
 }
 
-func reduceOAuthIDPRelationalChangedColumns(payload *db_domain.OAuth, idpEvent *idp.OAuthIDPChangedEvent) bool {
+func reduceOAuthIDPRelationalChangedColumns(payload *domain.OAuth, idpEvent *idp.OAuthIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2066,7 +2065,7 @@ func reduceOAuthIDPRelationalChangedColumns(payload *db_domain.OAuth, idpEvent *
 	return payloadChange
 }
 
-func reduceOIDCIDPRelationalChangedColumns(payload *db_domain.OIDC, idpEvent *idp.OIDCIDPChangedEvent) bool {
+func reduceOIDCIDPRelationalChangedColumns(payload *domain.OIDC, idpEvent *idp.OIDCIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2095,7 +2094,7 @@ func reduceOIDCIDPRelationalChangedColumns(payload *db_domain.OIDC, idpEvent *id
 	return payloadChange
 }
 
-func reduceJWTIDPRelationalChangedColumns(payload *db_domain.JWT, idpEvent *idp.JWTIDPChangedEvent) bool {
+func reduceJWTIDPRelationalChangedColumns(payload *domain.JWT, idpEvent *idp.JWTIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.JWTEndpoint != nil {
 		payloadChange = true
@@ -2116,7 +2115,7 @@ func reduceJWTIDPRelationalChangedColumns(payload *db_domain.JWT, idpEvent *idp.
 	return payloadChange
 }
 
-func reduceAzureADIDPRelationalChangedColumns(payload *db_domain.Azure, idpEvent *idp.AzureADIDPChangedEvent) bool {
+func reduceAzureADIDPRelationalChangedColumns(payload *domain.Azure, idpEvent *idp.AzureADIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2141,7 +2140,7 @@ func reduceAzureADIDPRelationalChangedColumns(payload *db_domain.Azure, idpEvent
 	return payloadChange
 }
 
-func reduceGitHubIDPRelationalChangedColumns(payload *db_domain.Github, idpEvent *idp.GitHubIDPChangedEvent) bool {
+func reduceGitHubIDPRelationalChangedColumns(payload *domain.Github, idpEvent *idp.GitHubIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2158,7 +2157,7 @@ func reduceGitHubIDPRelationalChangedColumns(payload *db_domain.Github, idpEvent
 	return payloadChange
 }
 
-func reduceGitHubEnterpriseIDPRelationalChangedColumns(payload *db_domain.GithubEnterprise, idpEvent *idp.GitHubEnterpriseIDPChangedEvent) bool {
+func reduceGitHubEnterpriseIDPRelationalChangedColumns(payload *domain.GithubEnterprise, idpEvent *idp.GitHubEnterpriseIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2187,7 +2186,7 @@ func reduceGitHubEnterpriseIDPRelationalChangedColumns(payload *db_domain.Github
 	return payloadChange
 }
 
-func reduceGitLabIDPRelationalChangedColumns(payload *db_domain.Gitlab, idpEvent *idp.GitLabIDPChangedEvent) bool {
+func reduceGitLabIDPRelationalChangedColumns(payload *domain.Gitlab, idpEvent *idp.GitLabIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2204,7 +2203,7 @@ func reduceGitLabIDPRelationalChangedColumns(payload *db_domain.Gitlab, idpEvent
 	return payloadChange
 }
 
-func reduceGitLabSelfHostedIDPRelationalChangedColumns(payload *db_domain.GitlabSelfHosting, idpEvent *idp.GitLabSelfHostedIDPChangedEvent) bool {
+func reduceGitLabSelfHostedIDPRelationalChangedColumns(payload *domain.GitlabSelfHosting, idpEvent *idp.GitLabSelfHostedIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2225,7 +2224,7 @@ func reduceGitLabSelfHostedIDPRelationalChangedColumns(payload *db_domain.Gitlab
 	return payloadChange
 }
 
-func reduceGoogleIDPRelationalChangedColumns(payload *db_domain.Google, idpEvent *idp.GoogleIDPChangedEvent) bool {
+func reduceGoogleIDPRelationalChangedColumns(payload *domain.Google, idpEvent *idp.GoogleIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2242,7 +2241,7 @@ func reduceGoogleIDPRelationalChangedColumns(payload *db_domain.Google, idpEvent
 	return payloadChange
 }
 
-func reduceLDAPIDPRelationalChangedColumns(payload *db_domain.LDAP, idpEvent *idp.LDAPIDPChangedEvent) bool {
+func reduceLDAPIDPRelationalChangedColumns(payload *domain.LDAP, idpEvent *idp.LDAPIDPChangedEvent) bool {
 	payloadChange := false
 	if idpEvent.Servers != nil {
 		payloadChange = true
