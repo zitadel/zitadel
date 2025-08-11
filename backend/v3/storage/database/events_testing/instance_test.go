@@ -132,7 +132,6 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			)
 			// event instance.removed
 			assert.Nil(t, instance)
-			// require.Equal(t, repository.ErrResourceDoesNotExist, err)
 			require.ErrorIs(t, &database.NoRowFoundError{}, err)
 		}, retryDuration, tick)
 	})
