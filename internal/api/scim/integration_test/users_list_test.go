@@ -23,15 +23,6 @@ var totalCountOfHumanUsers = 13
 /*
 	func TestListUser(t *testing.T) {
 		createdUserIDs := createUsers(t, CTX, Instance.DefaultOrg.Id)
-		defer func() {
-			// only the full user needs to be deleted, all others have random identification data
-			// fullUser is always the first one.
-			_, err := Instance.Client.UserV2.DeleteUser(CTX, &user_v2.DeleteUserRequest{
-				UserId: createdUserIDs[0],
-			})
-			require.NoError(t, err)
-		}()
-
 		// secondary organization with same set of users,
 		// these should never be modified.
 		// This allows testing list requests without filters.
@@ -451,7 +442,7 @@ func createUsers(t *testing.T, ctx context.Context, orgID string) []string {
 
 	// create the full scim user if on primary org
 	if orgID == Instance.DefaultOrg.Id {
-		fullUserCreatedResp, err := Instance.Client.SCIM.Users.Create(ctx, orgID, fullUserJson)
+		fullUserCreatedResp, err := Instance.Client.SCIM.Users.Create(ctx, orgID, withUsername(fullUserJson, gofakeit.Username()))
 		require.NoError(t, err)
 		createdUserIDs = append(createdUserIDs, fullUserCreatedResp.ID)
 		count--
