@@ -1635,8 +1635,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Wenn das Flag aktiviert ist, können Sie eine einzelne Sitzung über die Login-Benutzeroberfläche beenden, indem Sie einen id_token mit einem `sid` Claim als id_token_hint am Endpunkt end_session übergeben. Beachten Sie, dass derzeit alle Sitzungen desselben Benutzeragenten (Browser) in der Login-Benutzeroberfläche beendet werden. Sitzungen, die über die Session API verwaltet werden, ermöglichen bereits die Beendigung einzelner Sitzungen.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Wenn die Flagge aktiviert ist, wird der OIDC-Elternfehler in der Konsole protokolliert.",
-      "DISABLEUSERTOKENEVENT": "Benutzer-Token-Ereignis deaktivieren",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Backchannel-Logout aktivieren",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Der Back-Channel-Logout implementiert OpenID Connect Back-Channel Logout 1.0 und kann verwendet werden, um Clients über die Beendigung der Sitzung beim OpenID-Provider zu benachrichtigen.",
       "PERMISSIONCHECKV2": "Berechtigungsprüfung V2",
