@@ -57,13 +57,11 @@ type Features struct {
 type ImprovedPerformanceType int32
 
 const (
-	ImprovedPerformanceTypeUnspecified ImprovedPerformanceType = iota
-	// _ImprovedPerformanceTypeOrgByID reserves index 1 because it got removed
-	_ImprovedPerformanceTypeOrgByID
-	ImprovedPerformanceTypeProjectGrant
-	ImprovedPerformanceTypeProject
-	ImprovedPerformanceTypeUserGrant
-	ImprovedPerformanceTypeOrgDomainVerified
+	ImprovedPerformanceTypeUnspecified       ImprovedPerformanceType = 0
+	ImprovedPerformanceTypeProjectGrant      ImprovedPerformanceType = 2
+	ImprovedPerformanceTypeProject           ImprovedPerformanceType = 3
+	ImprovedPerformanceTypeUserGrant         ImprovedPerformanceType = 4
+	ImprovedPerformanceTypeOrgDomainVerified ImprovedPerformanceType = 5
 )
 
 func (f Features) ShouldUseImprovedPerformance(typ ImprovedPerformanceType) bool {
