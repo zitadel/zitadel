@@ -180,7 +180,8 @@ func (q *Queries) searchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 		AuthNKeyColumnEnabled.identifier():    true,
 		AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	stmt, args, err := query.Where(eq).ToSql()
+
+	stmt, args, err := query.Where(eq).OrderBy(AuthNKeyColumnCreationDate.identifier()).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-SAf3f", "Errors.Query.InvalidRequest")
 	}
