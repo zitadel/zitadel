@@ -20,7 +20,7 @@ import (
 func TestServer_ListAppKeys(t *testing.T) {
 	// create project
 	prjName := gofakeit.Name()
-	createPrjRes, err := Instance.Client.Projectv2Beta.CreateProject(OrgCTX, &project.CreateProjectRequest{
+	createPrjRes, err := Instance.Client.Projectv2Beta.CreateProject(OrgIAMCTX, &project.CreateProjectRequest{
 		Name:           prjName,
 		OrganizationId: Instance.DefaultOrg.Id,
 	})
@@ -28,7 +28,7 @@ func TestServer_ListAppKeys(t *testing.T) {
 	prjId := createPrjRes.Id
 
 	// add app to project
-	createAppjRes, err := Instance.Client.AppV2Beta.CreateApplication(CTX, &app.CreateApplicationRequest{
+	createAppjRes, err := Instance.Client.AppV2Beta.CreateApplication(IAMOwnerCTX, &app.CreateApplicationRequest{
 		ProjectId: prjId,
 		Name:      gofakeit.Name(),
 		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
@@ -50,7 +50,7 @@ func TestServer_ListAppKeys(t *testing.T) {
 			name: "happy path",
 			expectedKeyIdsFunc: func() []string {
 				// add other app to project
-				createOtherAppjRes, err := Instance.Client.AppV2Beta.CreateApplication(CTX, &app.CreateApplicationRequest{
+				createOtherAppjRes, err := Instance.Client.AppV2Beta.CreateApplication(IAMOwnerCTX, &app.CreateApplicationRequest{
 					ProjectId: prjId,
 					Name:      gofakeit.Name(),
 					CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
@@ -63,7 +63,7 @@ func TestServer_ListAppKeys(t *testing.T) {
 				otherAppId := createOtherAppjRes.AppId
 				// add other project key ids - These SHOULD NOT be returned when calling ListAppKeys()
 				for range 5 {
-					_, err := Instance.Client.AppV2Beta.CreateApplicationKey(CTX, &app.CreateApplicationKeyRequest{
+					_, err := Instance.Client.AppV2Beta.CreateApplicationKey(IAMOwnerCTX, &app.CreateApplicationKeyRequest{
 						AppId:          otherAppId,
 						ProjectId:      prjId,
 						ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
@@ -74,7 +74,7 @@ func TestServer_ListAppKeys(t *testing.T) {
 				// create app keys we expect to be rturned form ListAppKeys()
 				keyIDs := make([]string, 5)
 				for i := range len(keyIDs) {
-					res, err := Instance.Client.AppV2Beta.CreateApplicationKey(CTX, &app.CreateApplicationKeyRequest{
+					res, err := Instance.Client.AppV2Beta.CreateApplicationKey(IAMOwnerCTX, &app.CreateApplicationKeyRequest{
 						AppId:          appId,
 						ProjectId:      prjId,
 						ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
@@ -89,7 +89,7 @@ func TestServer_ListAppKeys(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(t.Context(), time.Minute)
-			res, err := Client.ListAppKeys(CTX, &management.ListAppKeysRequest{
+			res, err := Client.ListAppKeys(IAMOwnerCTX, &management.ListAppKeysRequest{
 				AppId:     appId,
 				ProjectId: prjId,
 			})
@@ -97,6 +97,7 @@ func TestServer_ListAppKeys(t *testing.T) {
 
 			expectedKeyIdsFunc := tt.expectedKeyIdsFunc()
 			assert.NotEqual(t, len(expectedKeyIdsFunc), res.GetResult())
+
 			for i, key := range res.GetResult() {
 				assert.Equal(t, expectedKeyIdsFunc[i], key.Id)
 			}
