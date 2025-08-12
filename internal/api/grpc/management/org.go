@@ -21,7 +21,7 @@ import (
 )
 
 func (s *Server) GetMyOrg(ctx context.Context, req *mgmt_pb.GetMyOrgRequest) (*mgmt_pb.GetMyOrgResponse, error) {
-	org, err := s.query.OrgByID(ctx, true, authz.GetCtxData(ctx).OrgID)
+	org, err := s.query.OrgByID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

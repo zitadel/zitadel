@@ -68,7 +68,7 @@ func Test_systemFeaturesToPb(t *testing.T) {
 		},
 		ImprovedPerformance: query.FeatureSource[[]feature.ImprovedPerformanceType]{
 			Level: feature.LevelSystem,
-			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgByID},
+			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
 		},
 		OIDCSingleV1SessionTermination: query.FeatureSource[bool]{
 			Level: feature.LevelSystem,
@@ -102,7 +102,7 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
 		ImprovedPerformance: &feature_pb.ImprovedPerformanceFeatureFlag{
-			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID},
+			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED},
 			Source:         feature_pb.Source_SOURCE_SYSTEM,
 		},
 		OidcSingleV1SessionTermination: &feature_pb.FeatureFlag{
@@ -168,7 +168,7 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		},
 		ImprovedPerformance: query.FeatureSource[[]feature.ImprovedPerformanceType]{
 			Level: feature.LevelSystem,
-			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgByID},
+			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgDomainVerified},
 		},
 		WebKey: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
@@ -206,7 +206,7 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
 		ImprovedPerformance: &feature_pb.ImprovedPerformanceFeatureFlag{
-			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID},
+			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED},
 			Source:         feature_pb.Source_SOURCE_SYSTEM,
 		},
 		WebKey: &feature_pb.FeatureFlag{

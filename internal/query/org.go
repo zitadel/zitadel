@@ -8,13 +8,10 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	es "github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -109,7 +106,7 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (org *Org, err error) {
+func (q *Queries) OrgByID(ctx context.Context, id string) (org *Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -121,10 +118,6 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 			q.caches.org.Set(ctx, org)
 		}
 	}()
-
-	if !authz.GetInstance(ctx).Features().ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeOrgByID) {
-		return q.oldOrgByID(ctx, shouldTriggerBulk, id)
-	}
 
 	foundOrg := readmodel.NewOrg(id)
 	eventCount, err := q.eventStoreV4.Query(
@@ -154,33 +147,6 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 		Name:          foundOrg.Name,
 		Domain:        foundOrg.PrimaryDomain.Domain,
 	}, nil
-}
-
-func (q *Queries) oldOrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (org *Org, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	if shouldTriggerBulk {
-		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerOrgProjection")
-		ctx, err = projection.OrgProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
-		traceSpan.EndWithError(err)
-	}
-
-	stmt, scan := prepareOrgQuery()
-	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnID.identifier():         id,
-		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
-	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		org, err = scan(row)
-		return err
-	}, query, args...)
-	return org, err
 }
 
 func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (org *Org, err error) {
@@ -276,7 +242,7 @@ func (q *Queries) ExistsOrg(ctx context.Context, id, domain string) (verifiedID 
 
 	var org *Org
 	if id != "" {
-		org, err = q.OrgByID(ctx, true, id)
+		org, err = q.OrgByID(ctx, id)
 	} else {
 		org, err = q.OrgByVerifiedDomain(ctx, domain)
 	}
