@@ -1,7 +1,8 @@
 import { Gaxios, GaxiosResponse } from "gaxios";
+import { Config } from "./config";
 
-const awaitNotification = new Gaxios({
-  url: process.env.SINK_NOTIFICATION_URL,
+const awaitNotification = (cfg: Config, since: Date) => new Gaxios({
+  url: `${cfg.sinkNotificationUrl}?since=${since.toISOString()}`,
   method: "POST",
   retryConfig: {
     httpMethodsToRetry: ["POST"],
@@ -14,10 +15,11 @@ const awaitNotification = new Gaxios({
   },
 });
 
-export async function getOtpFromSink(recipient: string): Promise<any> {
-  return awaitNotification.request({ data: { recipient } }).then((response) => {
+export async function getOtpFromSink(cfg: Config, recipient: string, since: Date): Promise<any> {
+  console.log(`Awaiting notification from url ${cfg.sinkNotificationUrl} for recipient ${recipient}`);
+  return awaitNotification(cfg, since).request({ data: { recipient } }).then((response) => {
     expectSuccess(response);
-    const otp = response?.data?.args?.otp;
+    const otp = response?.data?.args?.oTP;
     if (!otp) {
       throw new Error(`Response does not contain an otp property: ${JSON.stringify(response.data, null, 2)}`);
     }
@@ -25,8 +27,9 @@ export async function getOtpFromSink(recipient: string): Promise<any> {
   });
 }
 
-export async function getCodeFromSink(recipient: string): Promise<any> {
-  return awaitNotification.request({ data: { recipient } }).then((response) => {
+export async function getCodeFromSink(cfg: Config, recipient: string, since: Date): Promise<any> {
+  console.log(`Awaiting notification from url ${cfg.sinkNotificationUrl} for recipient ${recipient}`);
+  return awaitNotification(cfg, since).request({ data: { recipient } }).then((response) => {
     expectSuccess(response);
     const code = response?.data?.args?.code;
     if (!code) {

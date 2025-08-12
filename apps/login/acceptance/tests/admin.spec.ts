@@ -1,7 +1,14 @@
-import { test } from "@playwright/test";
+import { test as base } from "@playwright/test";
 import { loginScreenExpect, loginWithPassword } from "./login";
+import { Config, ConfigReader } from "./config";
 
-test("admin login", async ({ page }) => {
-  await loginWithPassword(page, process.env["ZITADEL_ADMIN_USER"], "Password1!");
+const test = base.extend<{ cfg: Config }>({
+  cfg: async ({}, use) => {
+    await use(new ConfigReader().config);
+  },
+});
+
+test("admin login", async ({ page, cfg }) => {
+  await loginWithPassword(page, cfg.zitadelAdminUser , "Password1!");
   await loginScreenExpect(page, "ZITADEL Admin");
 });

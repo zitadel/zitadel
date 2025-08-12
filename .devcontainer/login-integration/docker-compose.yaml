@@ -16,10 +16,10 @@ services:
 
   login-integration:
     container_name: login-integration
-    image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:latest}"
+    image: "${LOGIN_TAG:-zitadel-login:local}"
     build:
       context: ../..
-      dockerfile: build/login/Dockerfile
+      dockerfile: build/login/Dockerfile    
     env_file: ../../apps/login/.env.test
     network_mode: service:mock-zitadel
 

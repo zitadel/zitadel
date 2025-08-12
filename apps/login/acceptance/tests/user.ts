@@ -1,6 +1,7 @@
 import { Page } from "@playwright/test";
 import { registerWithPasskey } from "./register";
 import { activateOTP, addTOTP, addUser, eventualNewUser, getUserByUsername, removeUser } from "./zitadel";
+import { ConfigReader } from './config'
 
 export interface userProps {
   email: string;
@@ -14,22 +15,23 @@ export interface userProps {
   isPhoneVerified?: boolean;
 }
 
-class User {
+class User extends ConfigReader {
   private readonly props: userProps;
   private user: string;
 
   constructor(userProps: userProps) {
+    super();
     this.props = userProps;
   }
 
   async ensure(page: Page) {
-    const response = await addUser(this.props);
-
+    const response = await addUser(this.props, this.config);
     this.setUserId(response.userId);
+    eventualNewUser(this.getUserId(), this.config);
   }
 
   async cleanup() {
-    await removeUser(this.getUserId());
+    await removeUser(this.getUserId(), this.config);
   }
 
   public setUserId(userId: string) {
@@ -68,7 +70,6 @@ class User {
 export class PasswordUser extends User {
   async ensure(page: Page) {
     await super.ensure(page);
-    await eventualNewUser(this.getUserId());
   }
 }
 
@@ -110,8 +111,7 @@ export class PasswordUserWithOTP extends User {
 
   async ensure(page: Page) {
     await super.ensure(page);
-    await activateOTP(this.getUserId(), this.type);
-    await eventualNewUser(this.getUserId());
+    await activateOTP(this.getUserId(), this.type, this.config);
   }
 }
 
@@ -120,8 +120,7 @@ export class PasswordUserWithTOTP extends User {
 
   async ensure(page: Page) {
     await super.ensure(page);
-    this.secret = await addTOTP(this.getUserId());
-    await eventualNewUser(this.getUserId());
+    this.secret = await addTOTP(this.getUserId(), this.config);
   }
 
   public getSecret(): string {
@@ -156,7 +155,7 @@ export class PasskeyUser extends User {
   }
 
   public async ensure(page: Page) {
-    const authId = await registerWithPasskey(page, this.getFirstname(), this.getLastname(), this.getUsername());
+    const authId = await registerWithPasskey(this.config, page, this.getFirstname(), this.getLastname(), this.getUsername());
     this.authenticatorId = authId;
 
     // wait for projection of user
@@ -164,11 +163,11 @@ export class PasskeyUser extends User {
   }
 
   async cleanup() {
-    const resp: any = await getUserByUsername(this.getUsername());
+    const resp: any = await getUserByUsername(this.getUsername(), this.config);
     if (!resp || !resp.result || !resp.result[0]) {
       return;
     }
-    await removeUser(resp.result[0].userId);
+    await removeUser(resp.result[0].userId, this.config);
   }
 
   public getAuthenticatorId(): string {
