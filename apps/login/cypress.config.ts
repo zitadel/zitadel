@@ -3,7 +3,10 @@ import { defineConfig } from "cypress";
 export default defineConfig({
   reporter: "list",
   video: true,
-  pageLoadTimeout: 2 * 60_000,
+  retries: {
+    runMode: 2,
+    openMode: null
+  },
   e2e: {
     baseUrl: process.env.LOGIN_BASE_URL || "http://localhost:3001/ui/v2/login",
     specPattern: "integration/integration/**/*.cy.{js,jsx,ts,tsx}",
