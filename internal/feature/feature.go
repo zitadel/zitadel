@@ -58,7 +58,7 @@ type ImprovedPerformanceType int32
 
 const (
 	// Reserved: 1
-	
+
 	ImprovedPerformanceTypeUnspecified       ImprovedPerformanceType = 0
 	ImprovedPerformanceTypeProjectGrant      ImprovedPerformanceType = 2
 	ImprovedPerformanceTypeProject           ImprovedPerformanceType = 3
