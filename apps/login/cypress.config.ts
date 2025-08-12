@@ -5,7 +5,7 @@ export default defineConfig({
   video: true,
   retries: {
     runMode: 2,
-    openMode: null
+    runMode: 2
   },
   e2e: {
     baseUrl: process.env.LOGIN_BASE_URL || "http://localhost:3001/ui/v2/login",
