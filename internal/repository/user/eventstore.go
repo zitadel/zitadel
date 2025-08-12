@@ -133,7 +133,6 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, PersonalAccessTokenRemovedType, PersonalAccessTokenRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretSetType, MachineSecretSetEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretRemovedType, MachineSecretRemovedEventMapper)
-	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretCheckSucceededType, MachineSecretCheckSucceededEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretCheckFailedType, MachineSecretCheckFailedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretHashUpdatedType, eventstore.GenericEventMapper[MachineSecretHashUpdatedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, HumanInviteCodeAddedType, eventstore.GenericEventMapper[HumanInviteCodeAddedEvent])

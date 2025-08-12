@@ -9,12 +9,11 @@ import (
 )
 
 const (
-	machineSecretPrefix             = machineEventPrefix + "secret."
-	MachineSecretSetType            = machineSecretPrefix + "set"
-	MachineSecretHashUpdatedType    = machineSecretPrefix + "updated"
-	MachineSecretRemovedType        = machineSecretPrefix + "removed"
-	MachineSecretCheckSucceededType = machineSecretPrefix + "check.succeeded"
-	MachineSecretCheckFailedType    = machineSecretPrefix + "check.failed"
+	machineSecretPrefix          = machineEventPrefix + "secret."
+	MachineSecretSetType         = machineSecretPrefix + "set"
+	MachineSecretHashUpdatedType = machineSecretPrefix + "updated"
+	MachineSecretRemovedType     = machineSecretPrefix + "removed"
+	MachineSecretCheckFailedType = machineSecretPrefix + "check.failed"
 )
 
 type MachineSecretSetEvent struct {
@@ -96,43 +95,6 @@ func MachineSecretRemovedEventMapper(event eventstore.Event) (eventstore.Event, 
 	}
 
 	return credentialsRemoved, nil
-}
-
-type MachineSecretCheckSucceededEvent struct {
-	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *MachineSecretCheckSucceededEvent) Payload() interface{} {
-	return e
-}
-
-func (e *MachineSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
-}
-
-func NewMachineSecretCheckSucceededEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-) *MachineSecretCheckSucceededEvent {
-	return &MachineSecretCheckSucceededEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			MachineSecretCheckSucceededType,
-		),
-	}
-}
-
-func MachineSecretCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	check := &MachineSecretCheckSucceededEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(check)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "USER-x002n1p", "unable to unmarshal machine secret check succeeded")
-	}
-
-	return check, nil
 }
 
 type MachineSecretCheckFailedEvent struct {

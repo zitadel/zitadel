@@ -111,14 +111,10 @@ func prepareRemoveMachineSecret(a *user.Aggregate, check PermissionCheck) prepar
 
 func (c *Commands) MachineSecretCheckSucceeded(ctx context.Context, userID, resourceOwner, updated string) {
 	agg := user.NewAggregate(userID, resourceOwner)
-	cmds := append(
-		make([]eventstore.Command, 0, 2),
-		user.NewMachineSecretCheckSucceededEvent(ctx, &agg.Aggregate),
-	)
 	if updated != "" {
-		cmds = append(cmds, user.NewMachineSecretHashUpdatedEvent(ctx, &agg.Aggregate, updated))
+		cmds := []eventstore.Command{user.NewMachineSecretHashUpdatedEvent(ctx, &agg.Aggregate, updated)}
+		c.asyncPush(ctx, cmds...)
 	}
-	c.asyncPush(ctx, cmds...)
 }
 
 func (c *Commands) MachineSecretCheckFailed(ctx context.Context, userID, resourceOwner string) {
