@@ -861,7 +861,7 @@ func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) 
 	if err != nil {
 		return nil, err
 	}
-	resourceOwner, err := o.query.OrgByID(ctx, true, user.ResourceOwner)
+	resourceOwner, err := o.query.OrgByID(ctx, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
