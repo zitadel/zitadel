@@ -169,8 +169,8 @@ func (q *Queries) searchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	case JoinFilterUnspecified:
 		// Select all authN keys
 	case JoinFilterApp:
-		joinCol := ProjectColumnID
-		query = query.Join(joinCol.table.identifier() + " ON " + AuthNKeyColumnIdentifier.identifier() + " = " + joinCol.identifier())
+		joinCol := AppColumnID
+		query = query.Join(joinCol.table.identifier() + " ON " + AuthNKeyColumnObjectID.identifier() + " = " + joinCol.identifier())
 	case JoinFilterUserMachine:
 		joinCol := MachineUserIDCol
 		query = query.Join(joinCol.table.identifier() + " ON " + AuthNKeyColumnIdentifier.identifier() + " = " + joinCol.identifier())
