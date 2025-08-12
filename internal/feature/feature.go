@@ -58,7 +58,8 @@ type ImprovedPerformanceType int32
 
 const (
 	ImprovedPerformanceTypeUnspecified ImprovedPerformanceType = iota
-	ImprovedPerformanceTypeOrgByID
+	// _ImprovedPerformanceTypeOrgByID reserves index 1 because it got removed
+	_ImprovedPerformanceTypeOrgByID
 	ImprovedPerformanceTypeProjectGrant
 	ImprovedPerformanceTypeProject
 	ImprovedPerformanceTypeUserGrant
