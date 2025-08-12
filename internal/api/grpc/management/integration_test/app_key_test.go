@@ -20,7 +20,7 @@ import (
 func TestServer_ListAppKeys(t *testing.T) {
 	// create project
 	prjName := gofakeit.Name()
-	createPrjRes, err := Instance.Client.Projectv2Beta.CreateProject(OrgIAMCTX, &project.CreateProjectRequest{
+	createPrjRes, err := Instance.Client.Projectv2Beta.CreateProject(IAMOwnerCTX, &project.CreateProjectRequest{
 		Name:           prjName,
 		OrganizationId: Instance.DefaultOrg.Id,
 	})
@@ -88,20 +88,21 @@ func TestServer_ListAppKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(t.Context(), time.Minute)
-			res, err := Client.ListAppKeys(IAMOwnerCTX, &management.ListAppKeysRequest{
-				AppId:     appId,
-				ProjectId: prjId,
-			})
-			require.NoError(t, err)
-
-			expectedKeyIdsFunc := tt.expectedKeyIdsFunc()
-			assert.NotEqual(t, len(expectedKeyIdsFunc), res.GetResult())
-
-			for i, key := range res.GetResult() {
-				assert.Equal(t, expectedKeyIdsFunc[i], key.Id)
-			}
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 			assert.EventuallyWithT(t, func(ct *assert.CollectT) {
+				expectedKeyIds := tt.expectedKeyIdsFunc()
+
+				res, err := Client.ListAppKeys(IAMOwnerCTX, &management.ListAppKeysRequest{
+					AppId:     appId,
+					ProjectId: prjId,
+				})
+				require.NoError(t, err)
+
+				assert.Equal(t, len(expectedKeyIds), len(res.GetResult()))
+
+				for i, key := range res.GetResult() {
+					assert.Equal(t, expectedKeyIds[i], key.Id)
+				}
 			}, retryDuration, tick)
 		})
 	}
