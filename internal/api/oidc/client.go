@@ -261,7 +261,7 @@ func (s *Server) checkOrgScopes(ctx context.Context, resourceOwner string, scope
 	if slices.ContainsFunc(scopes, func(scope string) bool {
 		return strings.HasPrefix(scope, domain.OrgDomainPrimaryScope)
 	}) {
-		org, err := s.query.OrgByID(ctx, false, resourceOwner)
+		org, err := s.query.OrgByID(ctx, resourceOwner)
 		if err != nil {
 			return nil, err
 		}
