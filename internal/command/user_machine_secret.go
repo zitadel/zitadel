@@ -116,8 +116,3 @@ func (c *Commands) MachineSecretCheckSucceeded(ctx context.Context, userID, reso
 		c.asyncPush(ctx, cmds...)
 	}
 }
-
-func (c *Commands) MachineSecretCheckFailed(ctx context.Context, userID, resourceOwner string) {
-	agg := user.NewAggregate(userID, resourceOwner)
-	c.asyncPush(ctx, user.NewMachineSecretCheckFailedEvent(ctx, &agg.Aggregate))
-}

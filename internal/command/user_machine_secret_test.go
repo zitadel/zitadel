@@ -346,19 +346,3 @@ func TestCommands_MachineSecretCheckSucceeded(t *testing.T) {
 		})
 	}
 }
-
-func TestCommands_MachineSecretCheckFailed(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	agg := user.NewAggregate("userID", "orgID")
-	cmd := user.NewMachineSecretCheckFailedEvent(ctx, &agg.Aggregate)
-
-	c := &Commands{
-		eventstore: eventstoreExpect(t,
-			expectPushSlow(time.Second/100, cmd),
-		),
-	}
-	c.MachineSecretCheckFailed(ctx, "userID", "orgID")
-	require.NoError(t, c.Close(ctx))
-}
