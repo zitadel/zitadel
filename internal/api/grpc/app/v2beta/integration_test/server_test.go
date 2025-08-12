@@ -52,7 +52,7 @@ func TestMain(m *testing.M) {
 }
 
 func getProjectAndProjectContext(t *testing.T, inst *integration.Instance, ctx context.Context) (*project_v2beta.CreateProjectResponse, context.Context) {
-	project := inst.CreateProject(ctx, t, inst.DefaultOrg.GetId(), gofakeit.Name(), false, false)
+	project := inst.CreateProject(ctx, t, inst.DefaultOrg.GetId(), integration.ProjectName(), false, false)
 	userResp := inst.CreateMachineUser(ctx)
 	patResp := inst.CreatePersonalAccessToken(ctx, userResp.GetUserId())
 	inst.CreateProjectMembership(t, ctx, project.GetId(), userResp.GetUserId())
@@ -83,7 +83,7 @@ func samlMetadataGen(entityID string) []byte {
 
 func createSAMLAppWithName(t *testing.T, baseURI, projectID string) ([]byte, *app.CreateApplicationResponse, string) {
 	samlMetas := samlMetadataGen(gofakeit.URL())
-	appName := gofakeit.AppName()
+	appName := integration.ApplicationName()
 
 	appForSAMLConfigChange, appSAMLConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: projectID,
@@ -114,7 +114,7 @@ func createSAMLApp(t *testing.T, baseURI, projectID string) ([]byte, *app.Create
 }
 
 func createOIDCAppWithName(t *testing.T, baseURI, projectID string) (*app.CreateApplicationResponse, string) {
-	appName := gofakeit.AppName()
+	appName := integration.ApplicationName()
 
 	appForOIDCConfigChange, appOIDCConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{
 		ProjectId: projectID,
@@ -152,7 +152,7 @@ func createOIDCApp(t *testing.T, baseURI, projctID string) *app.CreateApplicatio
 }
 
 func createAPIAppWithName(t *testing.T, ctx context.Context, inst *integration.Instance, projectID string) (*app.CreateApplicationResponse, string) {
-	appName := gofakeit.AppName()
+	appName := integration.ApplicationName()
 
 	reqForAPIAppCreation := &app.CreateApplicationRequest_ApiRequest{
 		ApiRequest: &app.CreateAPIApplicationRequest{AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT},

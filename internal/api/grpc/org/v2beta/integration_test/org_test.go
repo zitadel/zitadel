@@ -99,7 +99,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 			name: "invalid admin type",
 			ctx:  CTX,
 			req: &v2beta_org.CreateOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
 					{},
 				},
@@ -110,7 +110,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 			name: "existing user as admin",
 			ctx:  CTX,
 			req: &v2beta_org.CreateOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
 					{
 						UserType: &v2beta_org.CreateOrganizationRequest_Admin_UserId{UserId: User.GetUserId()},
@@ -133,7 +133,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 			name: "admin with init",
 			ctx:  CTX,
 			req: &v2beta_org.CreateOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
 					{
 						UserType: &v2beta_org.CreateOrganizationRequest_Admin_Human{
@@ -172,7 +172,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 			name: "existing user and new human with idp",
 			ctx:  CTX,
 			req: &v2beta_org.CreateOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
 					{
 						UserType: &v2beta_org.CreateOrganizationRequest_Admin_UserId{UserId: User.GetUserId()},
@@ -227,7 +227,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 			ctx:  CTX,
 			id:   "custom_id",
 			req: &v2beta_org.CreateOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Id:   gu.Ptr("custom_id"),
 			},
 			want: &v2beta_org.CreateOrganizationResponse{
@@ -1099,7 +1099,7 @@ func TestServer_AddOrganizationDomain_ClaimDomain(t *testing.T) {
 	// create an organization, ensure it has globally unique usernames
 	// and create a user with a loginname that matches the domain later on
 	organization, err := Client.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
-		Name: gofakeit.AppName(),
+		Name: integration.OrganizationName(),
 	})
 	require.NoError(t, err)
 	_, err = Instance.Client.Admin.AddCustomDomainPolicy(CTX, &admin.AddCustomDomainPolicyRequest{
@@ -1113,7 +1113,7 @@ func TestServer_AddOrganizationDomain_ClaimDomain(t *testing.T) {
 	// create another organization, ensure it has globally unique usernames
 	// and create a user with a loginname that matches the domain later on
 	otherOrg, err := Client.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
-		Name: gofakeit.AppName(),
+		Name: integration.OrganizationName(),
 	})
 	require.NoError(t, err)
 	_, err = Instance.Client.Admin.AddCustomDomainPolicy(CTX, &admin.AddCustomDomainPolicyRequest{
