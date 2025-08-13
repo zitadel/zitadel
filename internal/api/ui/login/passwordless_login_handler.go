@@ -70,7 +70,7 @@ func (l *Login) handlePasswordlessVerification(w http.ResponseWriter, r *http.Re
 
 	metadata, actionErr := l.runPostInternalAuthenticationActions(authReq, r, authMethodPasswordless, err)
 	if err == nil && actionErr == nil && len(metadata) > 0 {
-		_, err = l.command.BulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata...)
+		err = l.bulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata)
 	} else if actionErr != nil && err == nil {
 		err = actionErr
 	}
