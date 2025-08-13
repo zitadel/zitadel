@@ -1,7 +1,11 @@
 package group
 
 import (
+	"net/http"
+
 	"connectrpc.com/connect"
+	"google.golang.org/protobuf/reflect/protoreflect"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
@@ -10,8 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	group "github.com/zitadel/zitadel/pkg/grpc/group/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/group/v2beta/groupconnect"
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"net/http"
 )
 
 var _ groupconnect.GroupServiceHandler = (*Server)(nil)
