@@ -4,7 +4,6 @@ export default defineConfig({
   reporter: "list",
   video: true,
   retries: {
-    runMode: 2,
     runMode: 2
   },
   e2e: {
