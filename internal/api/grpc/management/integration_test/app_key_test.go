@@ -3,6 +3,7 @@
 package management_test
 
 import (
+	"slices"
 	"testing"
 	"time"
 
@@ -97,11 +98,10 @@ func TestServer_ListAppKeys(t *testing.T) {
 					ProjectId: prjId,
 				})
 				require.NoError(t, err)
-
 				assert.Equal(t, len(expectedKeyIds), len(res.GetResult()))
 
-				for i, key := range res.GetResult() {
-					assert.Equal(t, expectedKeyIds[i], key.Id)
+				for _, key := range res.GetResult() {
+					assert.True(t, slices.Contains(expectedKeyIds, key.Id))
 				}
 			}, retryDuration, tick)
 		})

@@ -169,11 +169,9 @@ func (q *Queries) searchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	case JoinFilterUnspecified:
 		// Select all authN keys
 	case JoinFilterApp:
-		joinCol := AppColumnID
-		query = query.Join(joinCol.table.identifier() + " ON " + AuthNKeyColumnObjectID.identifier() + " = " + joinCol.identifier())
+		query = query.Join(join(AppColumnID, AuthNKeyColumnObjectID))
 	case JoinFilterUserMachine:
-		joinCol := MachineUserIDCol
-		query = query.Join(joinCol.table.identifier() + " ON " + AuthNKeyColumnIdentifier.identifier() + " = " + joinCol.identifier())
+		query = query.Join(join(MachineUserIDCol, AuthNKeyColumnIdentifier))
 		query = userPermissionCheckV2WithCustomColumns(ctx, query, permissionCheckV2, queries.Queries, AuthNKeyColumnResourceOwner, AuthNKeyColumnIdentifier)
 	}
 	eq := sq.Eq{
@@ -181,7 +179,7 @@ func (q *Queries) searchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 		AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 
-	stmt, args, err := query.Where(eq).OrderBy(AuthNKeyColumnCreationDate.identifier()).ToSql()
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-SAf3f", "Errors.Query.InvalidRequest")
 	}
