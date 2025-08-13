@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  form-data@>=4.0.0 <4.0.4: '>=4.0.4'
+
 importers:
 
   .:
