@@ -524,7 +524,7 @@ OIDC:
     PollInterval: 5s # ZITADEL_OIDC_DEVICEAUTH_POLLINTERVAL
     UserCode:
       CharSet: "BCDFGHJKLMNPQRSTVWXZ" # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARSET
-      CharAmount: 8 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARARMOUNT
+      CharAmount: 8 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARAMOUNT
       DashInterval: 4 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_DASHINTERVAL
   DefaultLoginURLV2: "/ui/v2/login/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/ui/v2/login/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
@@ -1210,11 +1210,13 @@ ServicePing:
   # By setting Enabled to false, the service ping is disabled completely.
   Enabled: true # ZITADEL_SERVICEPING_ENABLED
   # The endpoint to which the reports are sent. The endpoint is used as a base path. Individual reports are sent to the endpoint with a specific path.
-  Endpoint: "https://zitadel.cloud/api/ping" # ZITADEL_SERVICEPING_ENDPOINT
+  Endpoint: "https://zitadel.com/api/ping" # ZITADEL_SERVICEPING_ENDPOINT
   # Interval at which the service ping is sent to the endpoint.
   # The interval is in the format of a cron expression.
-  # By default, it is set to every day at midnight:
-  Interval: "0 0 * * *" # ZITADEL_SERVICEPING_INTERVAL
+  # By default, it is set to every daily.
+  # Note that if the interval is set to `@daily`, we randomize the time to prevent all systems from sending their reports at the same time.
+  # If you want to send the service ping at a specific time, you can set the interval to a cron expression like "@midnight" or "15 4 * * *".
+  Interval: "@daily" # ZITADEL_SERVICEPING_INTERVAL
   # Maximum number of attempts for each individual report to be sent.
   # If one report fails, it will be retried up to this number of times.
   # Other reports will still be handled in parallel and have their own retry count.
@@ -1231,8 +1233,9 @@ ServicePing:
     # ResourceCount is a periodic report of the number of resources in ZITADEL.
     # This includes the number of users, organizations, projects, and other resources.
     ResourceCount:
-        Enabled: true # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_ENABLED
-        BulkSize: 10000 # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_BULKSIZE
+      Enabled: true # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_ENABLED
+      # The number of counts that are sent in one batch.
+      BulkSize: 10000 # ZITADEL_SERVICEPING_TELEMETRY_RESOURCECOUNT_BULKSIZE
 
 InternalAuthZ:
   # Configure the RolePermissionMappings by environment variable using JSON notation:
@@ -1355,6 +1358,7 @@ InternalAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.read"
+        - "session.write"
         - "session.delete"
         - "action.target.read"
         - "action.target.write"
@@ -1364,8 +1368,6 @@ InternalAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
-        - "session.read"
-        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1459,6 +1461,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
@@ -1486,6 +1489,7 @@ InternalAuthZ:
         - "project.grant.write"
         - "project.grant.delete"
         - "project.grant.member.read"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
@@ -1549,6 +1553,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_LOGIN_CLIENT"
       Permissions:
@@ -1584,6 +1589,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "session.read"
+        - "session.write"
         - "session.link"
         - "session.delete"
         - "userschema.read"
@@ -1604,6 +1610,7 @@ InternalAuthZ:
         - "policy.read"
         - "project.read"
         - "project.role.read"
+        - "session.read"
         - "session.delete"
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
@@ -1911,6 +1918,7 @@ SystemAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.read"
+        - "session.write"
         - "session.delete"
         - "action.target.read"
         - "action.target.write"
@@ -1920,8 +1928,6 @@ SystemAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
-        - "session.read"
-        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -2015,6 +2021,7 @@ SystemAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
@@ -2042,6 +2049,7 @@ SystemAuthZ:
         - "project.grant.write"
         - "project.grant.delete"
         - "project.grant.member.read"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
@@ -2084,6 +2092,7 @@ SystemAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "session.read"
+        - "session.write"
         - "session.link"
         - "session.delete"
         - "userschema.read"

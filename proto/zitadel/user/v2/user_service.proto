@@ -22,6 +22,7 @@ import "zitadel/user/v2/key.proto";
 import "zitadel/user/v2/pat.proto";
 import "zitadel/user/v2/query.proto";
 import "zitadel/filter/v2/filter.proto";
+import "zitadel/metadata/v2/metadata.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
 
@@ -133,6 +134,13 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      // The /new path segment does not follow Zitadels API design.
+      // The only reason why it is used here is to avoid a conflict with the ListUsers endpoint, which already handles POST /v2/users.
+      post: "/v2/users/new"
+      body: "*"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -162,6 +170,8 @@ service UserService {
 
   // Create a new human user
   //
+  // Deprecated: Use [CreateUser](apis/resources/user_service_v2/user-service-create-user.api.mdx) to create a new user of type human instead.
+  //
   // Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
     option (google.api.http) = {
@@ -180,6 +190,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -260,6 +271,8 @@ service UserService {
 
   // Change the user email
   //
+  // Deprecated: [Update the users email field](apis/resources/user_service_v2/user-service-update-user.api.mdx).
+  //
   // Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email..
   rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
     option (google.api.http) = {
@@ -274,6 +287,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -380,6 +394,8 @@ service UserService {
 
   // Set the user phone
   //
+  // Deprecated: [Update the users phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx).
+  //
   // Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms..
   rpc SetPhone(SetPhoneRequest) returns (SetPhoneResponse) {
     option (google.api.http) = {
@@ -394,6 +410,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -411,6 +428,8 @@ service UserService {
 
   // Delete the user phone
   //
+  // Deprecated: [Update the users phone field](apis/resources/user_service_v2/user-service-update-user.api.mdx) to remove the phone number.
+  //
   // Delete the phone number of a user.
   rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
     option (google.api.http) = {
@@ -425,6 +444,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -440,7 +460,9 @@ service UserService {
     };
   }
 
-  // Resend code to verify user phone
+  // Resend code to verify user phone number
+  //
+  // Resend code to verify user phone number.
   rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone/resend"
@@ -469,9 +491,9 @@ service UserService {
     };
   }
 
-  // Verify the phone
+  // Verify the phone number
   //
-  // Verify the phone with the generated code..
+  // Verify the phone number with the generated code.
   rpc VerifyPhone (VerifyPhoneRequest) returns (VerifyPhoneResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone/verify"
@@ -509,6 +531,10 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      patch: "/v2/users/{user_id}"
+      body: "*"
+    };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
@@ -550,7 +576,9 @@ service UserService {
 
   // Update Human User
   //
-  // Update all information from a user..
+  // Deprecated: Use [UpdateUser](apis/resources/user_service_v2/user-service-update-user.api.mdx) to update a user of type human instead.
+  //
+  // Update all information from a user.
   rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
     option (google.api.http) = {
       put: "/v2/users/human/{user_id}"
@@ -564,6 +592,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -1351,6 +1380,8 @@ service UserService {
 
   // Change password
   //
+  // Deprecated: [Update the users password](apis/resources/user_service_v2/user-service-update-user.api.mdx) instead.
+  //
   // Change the password of a user with either a verification code or the current password..
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
@@ -1365,6 +1396,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -1391,6 +1423,11 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc AddSecret(AddSecretRequest) returns (AddSecretResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/secret"
+      body: "*"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1425,6 +1462,10 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc RemoveSecret(RemoveSecretRequest) returns (RemoveSecretResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/secret"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1450,6 +1491,11 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc AddKey(AddKeyRequest) returns (AddKeyResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/keys"
+      body: "*"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1484,6 +1530,10 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc RemoveKey(RemoveKeyRequest) returns (RemoveKeyResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/keys/{key_id}"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1508,6 +1558,11 @@ service UserService {
   // Required permission:
   //   - user.read
   rpc ListKeys(ListKeysRequest) returns (ListKeysResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/keys/search"
+      body: "*"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1539,6 +1594,11 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/pats"
+      body: "*"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1573,6 +1633,10 @@ service UserService {
   // Required permission:
   //   - user.write
   rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/pats/{token_id}"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1597,6 +1661,11 @@ service UserService {
   // Required permission:
   //   - user.read
   rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/pats/search"
+      body: "*"
+    };
+
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
@@ -1670,6 +1739,7 @@ service UserService {
   // Create an invite code for a user to initialize their first authentication method (password, passkeys, IdP) depending on the organization's available methods.
   // If an invite code has been created previously, it's url template and application name will be used as defaults for the new code.
   // The new code will overwrite the previous one and make it invalid.
+  // Note: It is possible to reissue a new code only when the previous code has expired, or when the user provides a wrong code three or more times during verification.
   rpc CreateInviteCode (CreateInviteCodeRequest) returns (CreateInviteCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/invite_code"
@@ -1793,6 +1863,84 @@ service UserService {
       }
     };
   }
+  // Set User Metadata
+  //
+  // Sets a list of key value pairs. Existing metadata entries with matching keys are overwritten. Existing metadata entries without matching keys are untouched. To remove metadata entries, use [DeleteUserMetadata](apis/resources/user_service_v2/user-service-delete-user-metadata.api.mdx). For HTTP requests, make sure the bytes array value is base64 encoded.
+  //
+  // Required permission:
+  //  - `user.write`
+  rpc SetUserMetadata(SetUserMetadataRequest) returns (SetUserMetadataResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/metadata"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+      responses: {
+        key: "400"
+        value: {
+          description: "User not found";
+        }
+      };
+    };
+  }
+
+  // List User Metadata
+  //
+  // List metadata of an user filtered by query.
+  //
+  // Required permission:
+  //  - `user.read`
+  rpc ListUserMetadata(ListUserMetadataRequest) returns (ListUserMetadataResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/metadata/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {auth_option: {
+      permission: "user.read"
+    }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+    };
+  }
+
+  // Delete User Metadata
+  //
+  // Delete metadata objects from an user with a specific key.
+  //
+  // Required permission:
+  //  - `user.write`
+  rpc DeleteUserMetadata(DeleteUserMetadataRequest) returns (DeleteUserMetadataResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/metadata"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+      };
+    };
+  }
 }
 
 message AddHumanUserRequest{
@@ -1888,6 +2036,13 @@ message CreateUserRequest{
         min_length: 1,
         max_length: 200,
         example: "\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
+      }
+    ];
+
+    // Metadata to bet set. The values have to be base64 encoded.
+    repeated Metadata metadata = 9 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "[{\"key\": \"test1\", \"value\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"key\": \"test2\", \"value\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
       }
     ];
   }
@@ -3455,4 +3610,80 @@ message ListPersonalAccessTokensRequest {
 message ListPersonalAccessTokensResponse {
   zitadel.filter.v2.PaginationResponse pagination = 1;
   repeated PersonalAccessToken result = 2;
+}
+
+message Metadata {
+  // Key in the metadata key/value pair.
+  string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Value in the metadata key/value pair.
+  bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message SetUserMetadataRequest{
+  // ID of the user under which the metadata gets set.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // Metadata to bet set. The values have to be base64 encoded.
+  repeated Metadata metadata = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[{\"key\": \"test1\", \"value\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"key\": \"test2\", \"value\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
+    }
+  ];
+}
+
+message SetUserMetadataResponse{
+  // The timestamp of the update of the user metadata.
+  google.protobuf.Timestamp set_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message ListUserMetadataRequest {
+  // ID of the user under which the metadata is to be listed.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 2;
+  // Define the criteria to query for.
+  repeated zitadel.metadata.v2.MetadataSearchFilter filters = 3;
+}
+
+message ListUserMetadataResponse {
+  // Pagination of the users metadata results.
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+  // The user metadata requested.
+  repeated zitadel.metadata.v2.Metadata metadata = 2;
+}
+
+message DeleteUserMetadataRequest {
+  // ID of the user which metadata is to be deleted is stored on.
+  string user_id = 1;
+  // The keys for the user metadata to be deleted.
+  repeated string keys = 2 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
+}
+
+message DeleteUserMetadataResponse{
+  // The timestamp of the deletion of the user metadata.
+  google.protobuf.Timestamp deletion_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
 }

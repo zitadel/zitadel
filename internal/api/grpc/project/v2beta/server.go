@@ -1,21 +1,23 @@
 package project
 
 import (
-	"google.golang.org/grpc"
+	"net/http"
+
+	"connectrpc.com/connect"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	project "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/project/v2beta/projectconnect"
 )
 
-var _ project.ProjectServiceServer = (*Server)(nil)
+var _ projectconnect.ProjectServiceHandler = (*Server)(nil)
 
 type Server struct {
-	project.UnimplementedProjectServiceServer
 	systemDefaults systemdefaults.SystemDefaults
 	command        *command.Commands
 	query          *query.Queries
@@ -39,8 +41,12 @@ func CreateServer(
 	}
 }
 
-func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	project.RegisterProjectServiceServer(grpcServer, s)
+func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler) {
+	return projectconnect.NewProjectServiceHandler(s, connect.WithInterceptors(interceptors...))
+}
+
+func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
+	return project.File_zitadel_project_v2beta_project_service_proto
 }
 
 func (s *Server) AppName() string {
@@ -53,8 +59,4 @@ func (s *Server) MethodPrefix() string {
 
 func (s *Server) AuthMethods() authz.MethodMapping {
 	return project.ProjectService_AuthMethods
-}
-
-func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return project.RegisterProjectServiceHandler
 }

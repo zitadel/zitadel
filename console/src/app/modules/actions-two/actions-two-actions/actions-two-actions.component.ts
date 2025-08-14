@@ -45,7 +45,7 @@ export class ActionsTwoActionsComponent {
       switchMap(() => {
         return this.actionService.listExecutions({ sortingColumn: ExecutionFieldName.ID, pagination: { asc: true } });
       }),
-      map(({ result }) => result.map(correctlyTypeExecution)),
+      map(({ executions }) => executions.map(correctlyTypeExecution)),
       catchError((err) => {
         this.toast.showError(err);
         return of([]);
@@ -59,7 +59,7 @@ export class ActionsTwoActionsComponent {
       switchMap(() => {
         return this.actionService.listTargets({});
       }),
-      map(({ result }) => result),
+      map(({ targets }) => targets),
       catchError((err) => {
         this.toast.showError(err);
         return of([]);
