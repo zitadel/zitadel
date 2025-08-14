@@ -615,6 +615,12 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 
 	idx := skipPreviouslyReducedStatements(statements, currentState)
 	if idx+1 == len(statements) {
+		// All statements were already processed - update state to the last statement
+		h.log().WithField("statements_count", len(statements)).
+			WithField("position", currentState.position).
+			WithField("offset", currentState.offset).
+			Debug("all statements already processed")
+
 		currentState.position = statements[len(statements)-1].Position
 		currentState.offset = statements[len(statements)-1].offset
 		currentState.aggregateID = statements[len(statements)-1].Aggregate.ID
@@ -625,6 +631,14 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return nil, false, nil
 	}
 	statements = statements[idx+1:]
+
+	if idx >= 0 {
+		h.log().WithField("skipped_statements", idx+1).
+			WithField("total_statements", len(statements)+idx+1).
+			WithField("position", currentState.position).
+			WithField("offset", currentState.offset).
+			Debug("skipped previously processed statements")
+	}
 
 	additionalIteration = eventAmount == int(h.bulkLimit)
 	if len(statements) < len(events) {
@@ -702,9 +716,10 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 
 	if currentState.position.GreaterThan(decimal.Decimal{}) {
 		builder = builder.PositionAtLeast(currentState.position)
-		if currentState.offset > 0 {
-			builder = builder.Offset(currentState.offset)
-		}
+		// Note: We don't use offset in the query to avoid race conditions where events
+		// are added between reading the current state and executing this query.
+		// The skipPreviouslyReducedStatements function handles filtering already processed
+		// events based on exact position, aggregateID, aggregateType, and sequence matching.
 	}
 
 	if h.queryGlobal {
