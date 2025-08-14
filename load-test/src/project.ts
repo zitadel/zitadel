@@ -27,7 +27,7 @@ export function createProject(name: string, org: Org, accessToken: string): Prom
     );
     response.then((res) => {
       check(res, {
-        'add project status ok': (r) => r.status === 200,
+        'add project status ok': (r) => r.status >= 200 && r.status < 300,
       }) || reject(`unable to add project status: ${res.status} body: ${res.body}`);
 
       addProjectTrend.add(res.timings.duration);

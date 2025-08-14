@@ -1,0 +1,58 @@
+name: Integration test core
+
+on: 
+  workflow_call: 
+    inputs:
+      login_build_image:
+        required: true
+        type: string
+
+permissions:
+  packages: write
+
+jobs:
+  login-integration-test:
+    name: login-integration-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli@0.80.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Pull Login Build Image
+        run: docker compose --file .devcontainer/login-integration/docker-compose.yaml pull
+        env:
+          LOGIN_TAG: ${{ inputs.login_build_image }}
+      - name: Run Integration Tests against the Login and a Mocked Zitadel API
+        run: npm run devcontainer:integration:login
+        env:
+          LOGIN_TAG: ${{ inputs.login_build_image }}
+          DOCKER_BUILDKIT: 1
+      - name: Fix Failures
+        if: failure()
+        run: |
+          echo "Reproduce this check locally:"
+          echo "LOGIN_TAG=${{ inputs.login_build_image }} npm run devcontainer:integration:login"
+          echo "To fix the failures, open the dev container called \"Login Integration Tests\"."
+          echo "You will have the same environment as the pipeline check as well as some guidance on how to fix the errors."
+      - name: Show Compose Status
+        if: failure()
+        run: docker compose --file .devcontainer/base/docker-compose.yaml --file .devcontainer/login-integration/docker-compose.yaml ps
+      - name: Print Config
+        if: failure()
+        run: COMPOSE_BAKE=1 docker compose --file  .devcontainer/base/docker-compose.yaml --file .devcontainer/login-integration/docker-compose.yaml config login-integration
+        env:
+          LOGIN_TAG: ${{ inputs.login_build_image }}
+      - name: Show Container Logs
+        if: failure()
+        run: docker compose --file .devcontainer/base/docker-compose.yaml --file .devcontainer/login-integration/docker-compose.yaml logs --timestamps --no-color --tail 100 login-integration
+      - name: Inspect All Failed Containers
+        if: failure()
+        run: |
+          docker ps -a --filter "status=exited" --filter "status=created" --format "table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}"
+          for container in $(docker ps -a --filter "status=exited" --filter "status=created" -q); do
+            echo "Inspecting container $container"
+            docker inspect $container || true
+          done

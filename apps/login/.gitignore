@@ -2,6 +2,7 @@ custom-config.js
 .env*.local
 standalone
 tsconfig.tsbuildinfo
+cypress
 
 .DS_Store
 node_modules
@@ -11,6 +12,5 @@ node_modules
 dist
 dist-ssr
 *.local
-.env
 .vscode
 /blob-report/

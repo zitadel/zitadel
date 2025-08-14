@@ -209,10 +209,18 @@ func Init(ctx context.Context) error {
 	return nil
 }
 
-func Start(ctx context.Context) {
+func Start(ctx context.Context) error {
+	projectionTableMap := make(map[string]bool, len(projections))
 	for _, projection := range projections {
+		table := projection.String()
+		if projectionTableMap[table] {
+			return fmt.Errorf("projeciton for %s already added", table)
+		}
+		projectionTableMap[table] = true
+
 		projection.Start(ctx)
 	}
+	return nil
 }
 
 func ProjectInstance(ctx context.Context) error {
@@ -275,6 +283,7 @@ func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler
 	if customConfig.TransactionDuration != nil {
 		config.TransactionDuration = *customConfig.TransactionDuration
 	}
+	config.SkipInstanceIDs = append(config.SkipInstanceIDs, customConfig.SkipInstanceIDs...)
 
 	return config
 }
