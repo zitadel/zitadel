@@ -3,31 +3,35 @@ import { login, User } from '../../support/login/users';
 
 describe('features settings', () => {
   const featuresPath = '/instance?id=features';
+  let featureChanged = false;
 
   beforeEach(() => {
     cy.context().as('ctx');
     cy.visit(featuresPath);
+    featureChanged = false; // Reset the flag before each test
   });
 
   afterEach(() => {
-    // Reset features after each test to ensure clean state
-    cy.get('body').then(($body) => {
-      if ($body.find('button:contains("Reset")').length > 0) {
-        cy.get('button').contains('Reset').click();
+    // Only reset features if a feature was actually changed during the test
+    if (featureChanged) {
+      cy.get('body').then(($body) => {
+        if ($body.find('button:contains("Reset")').length > 0) {
+          cy.get('button').contains('Reset').click();
 
-        // Wait for the reset operation to complete
-        cy.wait(1500);
+          // Wait for the reset operation to complete
+          cy.wait(1500);
 
-        // Optionally wait for toast message to appear and disappear
-        cy.get('body').then(($body) => {
-          if ($body.find('simple-snack-bar, .mat-snack-bar-container').length > 0) {
-            cy.get('simple-snack-bar, .mat-snack-bar-container', { timeout: 5000 }).should('exist');
-            // Wait for toast to disappear
-            cy.get('simple-snack-bar, .mat-snack-bar-container', { timeout: 10000 }).should('not.exist');
-          }
-        });
-      }
-    });
+          // Optionally wait for toast message to appear and disappear
+          cy.get('body').then(($body) => {
+            if ($body.find('simple-snack-bar, .mat-snack-bar-container').length > 0) {
+              cy.get('simple-snack-bar, .mat-snack-bar-container', { timeout: 5000 }).should('exist');
+              // Wait for toast to disappear
+              cy.get('simple-snack-bar, .mat-snack-bar-container', { timeout: 10000 }).should('not.exist');
+            }
+          });
+        }
+      });
+    }
   });
 
   it('should display features page with correct elements', () => {
@@ -66,6 +70,9 @@ describe('features settings', () => {
         cy.get('mat-button-toggle').first().click();
       });
 
+    // Mark that a feature was changed
+    featureChanged = true;
+
     // Wait for the save operation
     cy.wait(1500);
 
@@ -88,6 +95,15 @@ describe('features settings', () => {
             cy.get('cnsl-feature-toggle').should('be.visible');
             cy.get('mat-button-toggle').should('be.visible');
 
+            // Actually toggle the loginV2 feature to test functionality
+            cy.get('mat-button-toggle').first().click();
+
+            // Mark that a feature was changed
+            featureChanged = true;
+
+            // Wait for save operation
+            cy.wait(1500);
+
             // May have a base URI input field if loginV2 is enabled
             cy.get('body').then(() => {
               if (Cypress.$('input[cnslInput]').length > 0) {
@@ -103,6 +119,19 @@ describe('features settings', () => {
   });
 
   it('should reset features when reset button is clicked', () => {
+    // First, change a feature to test the reset functionality
+    cy.get('cnsl-feature-toggle')
+      .first()
+      .within(() => {
+        cy.get('mat-button-toggle').first().click();
+      });
+
+    // Mark that a feature was changed
+    featureChanged = true;
+
+    // Wait for the save operation
+    cy.wait(1500);
+
     // Click reset button if it exists (depends on permissions)
     cy.get('body').then(($body) => {
       if ($body.find('button:contains("Reset")').length > 0) {
@@ -113,6 +142,9 @@ describe('features settings', () => {
 
         // Should show a toast message
         cy.get('simple-snack-bar, .mat-snack-bar-container', { timeout: 5000 }).should('exist');
+
+        // Reset the flag since we manually reset
+        featureChanged = false;
       }
     });
 
@@ -197,6 +229,9 @@ describe('features settings', () => {
           .within(() => {
             cy.get('mat-button-toggle').first().click();
           });
+
+        // Mark that a feature was changed
+        featureChanged = true;
 
         // Wait for save operation
         cy.wait(1500);
