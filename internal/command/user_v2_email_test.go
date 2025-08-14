@@ -1160,8 +1160,9 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 
 func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		checkPermission domain.PermissionCheck
+		eventstore                  *eventstore.Eventstore
+		checkPermission             domain.PermissionCheck
+		defaultEmailCodeURLTemplate func(ctx context.Context) string
 	}
 	type args struct {
 		userID     string
@@ -1324,7 +1325,8 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "" },
 			},
 			args: args{
 				userID:     "user1",
@@ -1380,7 +1382,8 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "" },
 			},
 			args: args{
 				userID:     "user1",
@@ -1458,8 +1461,9 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:      tt.fields.eventstore,
-				checkPermission: tt.fields.checkPermission,
+				eventstore:                  tt.fields.eventstore,
+				checkPermission:             tt.fields.checkPermission,
+				defaultEmailCodeURLTemplate: tt.fields.defaultEmailCodeURLTemplate,
 			}
 			got, err := c.changeUserEmailWithGenerator(context.Background(), tt.args.userID, tt.args.email, GetMockSecretGenerator(t), tt.args.returnCode, tt.args.urlTmpl)
 			require.ErrorIs(t, tt.wantErr, err)
@@ -1470,8 +1474,9 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 
 func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		checkPermission domain.PermissionCheck
+		eventstore                  *eventstore.Eventstore
+		checkPermission             domain.PermissionCheck
+		defaultEmailCodeURLTemplate func(ctx context.Context) string
 	}
 	type args struct {
 		userID        string
@@ -1577,7 +1582,8 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "" },
 			},
 			args: args{
 				userID:        "user1",
@@ -1642,7 +1648,8 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "" },
 			},
 			args: args{
 				userID:        "user1",
@@ -1726,7 +1733,8 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "" },
 			},
 			args: args{
 				userID:        "user1",
@@ -1800,8 +1808,9 @@ func TestCommands_sendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:      tt.fields.eventstore,
-				checkPermission: tt.fields.checkPermission,
+				eventstore:                  tt.fields.eventstore,
+				checkPermission:             tt.fields.checkPermission,
+				defaultEmailCodeURLTemplate: tt.fields.defaultEmailCodeURLTemplate,
 			}
 			got, err := c.sendUserEmailCodeWithGenerator(context.Background(), tt.args.userID, GetMockSecretGenerator(t), tt.args.returnCode, tt.args.urlTmpl, tt.args.checkExisting)
 			require.ErrorIs(t, err, tt.wantErr)

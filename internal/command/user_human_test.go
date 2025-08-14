@@ -8,6 +8,7 @@ import (
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
@@ -44,6 +45,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		newCode                     encrypedCodeFunc
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		defaultSecretGenerators     *SecretGenerators
+		defaultEmailCodeURLTemplate func(ctx context.Context) string
 	}
 	type args struct {
 		ctx             context.Context
@@ -539,10 +541,11 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 				),
-				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordHasher: mockPasswordHasher("x"),
-				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:            mockEncryptedCode("userinit", time.Hour),
+				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher:          mockPasswordHasher("x"),
+				codeAlg:                     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:                     mockEncryptedCode("userinit", time.Hour),
+				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "" },
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -686,10 +689,11 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						),
 					),
 				),
-				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordHasher: mockPasswordHasher("x"),
-				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:            mockEncryptedCode("emailCode", time.Hour),
+				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher:          mockPasswordHasher("x"),
+				codeAlg:                     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:                     mockEncryptedCode("emailCode", time.Hour),
+				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "" },
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1477,12 +1481,11 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				newEncryptedCode:            tt.fields.newCode,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				defaultEmailCodeURLTemplate: tt.fields.defaultEmailCodeURLTemplate,
 			}
 			err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail)
 			if tt.res.err == nil {
-				if !assert.NoError(t, err) {
-					t.FailNow()
-				}
+				require.NoError(t, err)
 			} else if !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
 				return
