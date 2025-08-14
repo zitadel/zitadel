@@ -23,8 +23,7 @@ For production setups, we recommend that you [run ZITADEL in a highly available 
 As all shared state is managed in the database,
 the ZITADEL binary itself is stateless.
 You can easily run as many ZITADEL binaries in parallel as you want.
-If you use [Knative](/docs/self-hosting/deploy/knative)
-or [Google Cloud Run](https://cloud.google.com/run) (which uses Knative, too),
+If you use [Google Cloud Run](https://cloud.google.com/run) (which builds on Knative),
 you can even scale to zero.
 Especially if you use an autoscaler that scales to zero,
 it is crucial that you minimize startup times.
