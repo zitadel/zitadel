@@ -38,6 +38,10 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 	if err != nil {
 		return nil, err
 	}
+
+	if !wm.SecretChangeRequired {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-SFRK2", "either current_password or verification_code must be provided")
+	}
 	return c.setPassword(
 		ctx,
 		wm,
