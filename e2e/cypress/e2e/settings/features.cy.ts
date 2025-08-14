@@ -86,7 +86,7 @@ describe('features settings', () => {
     cy.get('body').then(($body) => {
       if ($body.find('button:contains("Reset")').length > 0) {
         cy.get('button').contains('Reset').click();
-        
+
         // Wait for the reset operation
         cy.wait(1500);
 
@@ -115,7 +115,7 @@ describe('features settings', () => {
 
       // Verify that the same number of toggles are still present
       cy.get('cnsl-feature-toggle').should('have.length', initialCount);
-      
+
       // Verify that toggles are still functional
       cy.get('cnsl-feature-toggle')
         .first()
@@ -169,7 +169,7 @@ describe('features settings', () => {
       it(`should be able to toggle ${featureName} feature`, () => {
         // Look for the specific feature - it might be in the component text or aria-label
         cy.get('cnsl-feature-toggle').should('have.length.greaterThan', 0);
-        
+
         // Try to find and toggle any available feature
         cy.get('cnsl-feature-toggle')
           .first()
