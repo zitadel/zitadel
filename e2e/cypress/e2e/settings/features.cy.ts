@@ -9,6 +9,27 @@ describe('features settings', () => {
     cy.visit(featuresPath);
   });
 
+  afterEach(() => {
+    // Reset features after each test to ensure clean state
+    cy.get('body').then(($body) => {
+      if ($body.find('button:contains("Reset")').length > 0) {
+        cy.get('button').contains('Reset').click();
+
+        // Wait for the reset operation to complete
+        cy.wait(1500);
+
+        // Optionally wait for toast message to appear and disappear
+        cy.get('body').then(($body) => {
+          if ($body.find('simple-snack-bar, .mat-snack-bar-container').length > 0) {
+            cy.get('simple-snack-bar, .mat-snack-bar-container', { timeout: 5000 }).should('exist');
+            // Wait for toast to disappear
+            cy.get('simple-snack-bar, .mat-snack-bar-container', { timeout: 10000 }).should('not.exist');
+          }
+        });
+      }
+    });
+  });
+
   it('should display features page with correct elements', () => {
     // Check page title contains relevant text (flexible for translation issues)
     cy.get('h2').should('be.visible').and('contain.text', 'Feature');
