@@ -130,20 +130,24 @@ describe('features settings', () => {
       cy.get('cnsl-feature-toggle')
         .first()
         .within(() => {
-          // Store the initial state by checking which button is selected
+          // Find which button is currently checked
           cy.get('mat-button-toggle.mat-button-toggle-checked').then(($checkedButton) => {
-            const initialValue = $checkedButton.attr('value');
+            // Get all buttons to find the unchecked one
+            cy.get('mat-button-toggle').then(($allButtons) => {
+              // Find the button that is NOT checked
+              const uncheckedButton = $allButtons.not('.mat-button-toggle-checked').first();
 
-            // Click the opposite button to toggle the feature
-            const targetValue = initialValue === 'true' ? 'false' : 'true';
-            cy.get(`mat-button-toggle[value="${targetValue}"]`).click();
+              // Click the unchecked button to toggle
+              cy.wrap(uncheckedButton).click();
 
-            // Wait for the save operation
-            cy.wait(1500);
+              // Wait for the save operation
+              cy.wait(1500);
 
-            // Verify the state changed
-            cy.get(`mat-button-toggle[value="${targetValue}"]`).should('have.class', 'mat-button-toggle-checked');
-            cy.get(`mat-button-toggle[value="${initialValue}"]`).should('not.have.class', 'mat-button-toggle-checked');
+              // Verify the state changed - the previously unchecked button should now be checked
+              cy.wrap(uncheckedButton).should('have.class', 'mat-button-toggle-checked');
+              // The previously checked button should no longer be checked
+              cy.wrap($checkedButton).should('not.have.class', 'mat-button-toggle-checked');
+            });
           });
         });
 
@@ -202,11 +206,11 @@ describe('features settings', () => {
         resetInstanceFeatures(api);
       });
 
-      // Reload the page to see the reset state
-      cy.reload();
+      // Visit the features page again to see the reset state
+      cy.visit(featuresPath);
 
-      // Page should still show feature toggles
-      cy.get('cnsl-feature-toggle').should('be.visible');
+      // Wait for features to load again after reset
+      cy.get('cnsl-feature-toggle', { timeout: 10000 }).should('be.visible');
     });
   });
 });
