@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -30,6 +31,8 @@ type Server struct {
 	assetAPIPrefix func(context.Context) string
 
 	checkPermission domain.PermissionCheck
+
+	systemDefaults systemdefaults.SystemDefaults
 }
 
 type Config struct{}
