@@ -315,9 +315,27 @@ enum AuthFactorState {
   AUTH_FACTOR_STATE_REMOVED = 3;
 }
 
-message AuthFactorOTP {}
-message AuthFactorOTPSMS {}
-message AuthFactorOTPEmail {}
+message AuthFactorOTP {
+  string name = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"TOTP Authenticator\""
+    }
+  ];
+}
+message AuthFactorOTPSMS {
+  string name = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"SMS Authentication\""
+    }
+  ];
+}
+message AuthFactorOTPEmail {
+  string name = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Email Authentication\""
+    }
+  ];
+}
 
 message AuthFactorU2F {
   string id = 1 [

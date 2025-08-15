@@ -90,7 +90,9 @@ func AuthMethodToPb(mfa *query.AuthMethod) *user_pb.AuthFactor {
 	switch mfa.Type {
 	case domain.UserAuthMethodTypeTOTP:
 		factor.Type = &user_pb.AuthFactor_Otp{
-			Otp: &user_pb.AuthFactorOTP{},
+			Otp: &user_pb.AuthFactorOTP{
+				Name: mfa.Name,
+			},
 		}
 	case domain.UserAuthMethodTypeU2F:
 		factor.Type = &user_pb.AuthFactor_U2F{
@@ -101,11 +103,15 @@ func AuthMethodToPb(mfa *query.AuthMethod) *user_pb.AuthFactor {
 		}
 	case domain.UserAuthMethodTypeOTPSMS:
 		factor.Type = &user_pb.AuthFactor_OtpSms{
-			OtpSms: &user_pb.AuthFactorOTPSMS{},
+			OtpSms: &user_pb.AuthFactorOTPSMS{
+				Name: mfa.Name,
+			},
 		}
 	case domain.UserAuthMethodTypeOTPEmail:
 		factor.Type = &user_pb.AuthFactor_OtpEmail{
-			OtpEmail: &user_pb.AuthFactorOTPEmail{},
+			OtpEmail: &user_pb.AuthFactorOTPEmail{
+				Name: mfa.Name,
+			},
 		}
 	case domain.UserAuthMethodTypeUnspecified:
 	case domain.UserAuthMethodTypePasswordless:
