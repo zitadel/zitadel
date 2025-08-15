@@ -1406,7 +1406,7 @@
         "VERIFICATION_SKIP": "U kunt de verificatie voorlopig overslaan en doorgaan met het aanmaken van uw organisatie, maar om uw domein te gebruiken moet deze stap worden voltooid!",
         "VERIFICATION_VALIDATION_DESC": "Verwijder de verificatiecode niet, aangezien ZITADEL van tijd tot tijd het eigendom van uw domein opnieuw zal controleren.",
         "VERIFICATION_NEWTOKEN_TITLE": "Vraag een nieuw token aan",
-        "VERIFICATION_VALIDATION_ONGOING": "De methode {{ value }} is geselecteerd om uw domein te verifiëren. Klik op de knop om een ​​verificatiecontrole te activeren of het verificatieproces opnieuw in te stellen.",
+        "VERIFICATION_VALIDATION_ONGOING": "De methode {{ value }} is geselecteerd om uw domein te verifiëren. Klik op de knop om een   verificatiecontrole te activeren of het verificatieproces opnieuw in te stellen.",
         "VERIFICATION_SUCCESSFUL": "Domein succesvol geverifieerd!",
         "RESETMETHOD": "Verificatiemethode opnieuw instellen"
       },
@@ -2388,6 +2388,34 @@
     "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt.",
     "USEPKCE": "Gebruik PKCE",
     "USEPKCE_DESC": "Bepaalt of de parameters code_challenge en code_challenge_method zijn opgenomen in het verificatieverzoek"
+  },
+  "CAPTCHA": {
+    "TITLE": "Captcha-validatie",
+    "DESCRIPTION": "Voeg Captcha toe aan het registratie- en loginformulier.",
+    "REGISTER": {
+      "TITLE": "Inschakelen voor registratie",
+      "DESCRIPTION": "Schakel Captcha in voor het registratieformulier."
+    },
+    "LOGIN": {
+      "TITLE": "Inschakelen voor login",
+      "DESCRIPTION": "Schakel Captcha in voor het loginformulier."
+    },
+    "METHOD": {
+      "TITLE": "Captcha-methode",
+      "DESCRIPTION": "Selecteer de te gebruiken Captcha-methode.",
+      "CONFIG": {
+        "SITE_KEY": {
+          "LABEL": "reCaptcha Site Key"
+        },
+        "SECRET_KEY": {
+          "LABEL": "reCaptcha Secret Key"
+        }
+      },
+      "LIST": {
+        "1": "Uitgeschakeld",
+        "2": "Recaptcha"
+      }
+    }
   },
   "MFA": {
     "LIST": {

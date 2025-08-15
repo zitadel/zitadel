@@ -2392,6 +2392,34 @@
     "USEPKCE": "PKCE 사용",
     "USEPKCE_DESC": "code_challenge 및 code_challenge_method 매개변수가 인증 요청에 포함되는지 여부를 결정합니다"
   },
+  "CAPTCHA": {
+    "TITLE": "Captcha 검증",
+    "DESCRIPTION": "회원가입 및 로그인 양식에 Captcha를 추가합니다.",
+    "REGISTER": {
+      "TITLE": "회원가입에 사용",
+      "DESCRIPTION": "회원가입 양식에 Captcha를 활성화합니다."
+    },
+    "LOGIN": {
+      "TITLE": "로그인에 사용",
+      "DESCRIPTION": "로그인 양식에 Captcha를 활성화합니다."
+    },
+    "METHOD": {
+      "TITLE": "Captcha 방법",
+      "DESCRIPTION": "사용할 Captcha 방법을 선택하세요.",
+      "CONFIG": {
+        "SITE_KEY": {
+          "LABEL": "reCaptcha 사이트 키"
+        },
+        "SECRET_KEY": {
+          "LABEL": "reCaptcha 시크릿 키"
+        }
+      },
+      "LIST": {
+        "1": "비활성화",
+        "2": "Recaptcha"
+      }
+    }
+  },
   "MFA": {
     "LIST": {
       "MULTIFACTORTITLE": "비밀번호 없는 인증",
