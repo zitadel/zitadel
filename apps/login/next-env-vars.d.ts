@@ -31,5 +31,10 @@ declare namespace NodeJS {
      * `CUSTOM_REQUEST_HEADERS=Host:http://zitadel-internal:8080`
      */
     CUSTOM_REQUEST_HEADERS?: string;
+
+    /**
+     * Optional: the site title
+     */
+    SITE_TITLE?: string;
   }
 }

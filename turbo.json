@@ -19,7 +19,8 @@
     "PORT",
     "INKEEP_API_KEY",
     "DISPLAY",
-    "CYPRESS_DISPLAY"
+    "CYPRESS_DISPLAY",
+    "SITE_TITLE"
   ],
   "tasks": {
     "generate": {
