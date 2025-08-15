@@ -5,7 +5,6 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/user/v2beta/convert"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -40,23 +39,4 @@ func (s *Server) ListUsers(ctx context.Context, req *connect.Request[user.ListUs
 		Result:  convert.UsersToPb(res.Users, s.assetAPIPrefix(ctx)),
 		Details: object.ToListDetails(res.SearchResponse),
 	}), nil
-}
-
-func (s *Server) ListUsersByMetadata(ctx context.Context, req *connect.Request[user.ListUsersByMetadataRequest]) (*connect.Response[user.ListUsersByMetadataResponse], error) {
-	queries, err := convert.ListUsersByMetadataRequestToModel(req.Msg, s.systemDefaults)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := s.query.SearchUsersByMetadata(ctx, queries, s.checkPermission)
-	if err != nil {
-		return nil, err
-	}
-
-	return &connect.Response[user.ListUsersByMetadataResponse]{
-		Msg: &user.ListUsersByMetadataResponse{
-			Users:      convert.UsersByMetadataModelToGRPC(res.UsersByMeta, s.assetAPIPrefix(ctx)),
-			Pagination: filter.QueryToPaginationPb(queries.SearchRequest, res.SearchResponse),
-		},
-	}, nil
 }

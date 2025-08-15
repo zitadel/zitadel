@@ -254,36 +254,3 @@ enum UserState {
   USER_STATE_LOCKED = 4;
   USER_STATE_INITIAL = 5;
 }
-
-enum UsersByMetadataSorting {
-    USERS_BY_METADATA_SORT_BY_METADATA_KEY = 0;
-    USERS_BY_METADATA_SORT_BY_METADATA_VALUE = 1;
-    USERS_BY_METADATA_SORT_BY_USER_ID = 2;
-    USERS_BY_METADATA_SORT_BY_EMAIL = 3;
-    USERS_BY_METADATA_SORT_BY_FIRST_NAME = 4;
-    USERS_BY_METADATA_SORT_BY_LAST_NAME = 5;
-    USERS_BY_METADATA_SORT_BY_DISPLAY_NAME = 6;
-    USERS_BY_METADATA_SORT_BY_USER_NAME = 7;
-    USERS_BY_METADATA_SORT_BY_STATE = 8;
-    USERS_BY_METADATA_SORT_BY_TYPE = 9;
-    USERS_BY_METADATA_SORT_BY_NICK_NAME = 10;
-    USERS_BY_METADATA_SORT_BY_UNSPECIFIED = 11;
-}
-
-message UserByMetadata {
-  User user = 1;
-  string key = 2 [
-    (validate.rules).string = {max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"key\""
-    }
-  ];
-  bytes value = 3 [
-    (validate.rules).bytes = {max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"bXkgdmFsdWU=\""
-      description: "A base64 encoded value"
-    }
-  ];
-
-}

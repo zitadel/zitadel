@@ -11,8 +11,6 @@ import "zitadel/user/v2beta/idp.proto";
 import "zitadel/user/v2beta/password.proto";
 import "zitadel/user/v2beta/user.proto";
 import "zitadel/user/v2beta/query.proto";
-import "zitadel/metadata/v2/metadata.proto";
-import "zitadel/filter/v2/filter.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
@@ -1068,34 +1066,6 @@ service UserService {
     };
   }
 
-  // List users by metadata
-  //
-  // Returns a list of users matching the input metadata key, value or both.
-  //
-  // Required permission:
-  //  - `user.read`
-  rpc ListUsersByMetadata (ListUsersByMetadataRequest) returns (ListUsersByMetadataResponse) {
-    option (google.api.http) = {
-      post: "/v2beta/users/metadata/search"
-      body: "*"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "authenticated"
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
-        key: "200"
-        value: {
-          description: "The list of users matching the search criteria";
-        }
-      };
-    };
-
-  }
 }
 
 message AddHumanUserRequest{
@@ -1978,19 +1948,4 @@ enum AuthenticationMethodType {
   AUTHENTICATION_METHOD_TYPE_U2F = 5;
   AUTHENTICATION_METHOD_TYPE_OTP_SMS = 6;
   AUTHENTICATION_METHOD_TYPE_OTP_EMAIL = 7;
-}
-
-message ListUsersByMetadataRequest {
-  repeated zitadel.metadata.v2.UserByMetadataSearchFilter filters = 1;
-
-  // Pagination and sorting.
-  zitadel.filter.v2.PaginationRequest pagination = 2;
-  UsersByMetadataSorting sorting_column = 3;
-}
-
-message ListUsersByMetadataResponse {
-  repeated UserByMetadata users = 1;
-
-  // Contains the total number of apps matching the query and the applied limit.
-  zitadel.filter.v2.PaginationResponse pagination = 2;
 }
