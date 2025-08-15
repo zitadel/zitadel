@@ -1,0 +1,107 @@
+---
+title: oidc session benchmark of zitadel v4
+sidebar_label: oidc session
+---
+
+Benchmark results of v4 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value |
+|:--------------------------------------|:------|
+| Baseline                              | none  |
+| Purpose                               | Test current performance |
+| Test start                            | 12:33 UTC |
+| Test duration                         | 30min |
+| Executed test                         | oidc_session |
+| k6 version                            | v1.0.0-rc1 |
+| VUs                                   | 600 |
+| Client location                       | US1 |
+| ZITADEL location                      | US1 |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7 |
+| ZITADEL Version                       | v4.0.0-rc2 |
+| ZITADEL feature flags                 | webKey: true, improvedPerformance: \[\"IMPROVED\_PERFORMANCE\_ORG\_BY\_ID\", \"IMPROVED\_PERFORMANCE\_PROJECT\", \"IMPROVED\_PERFORMANCE\_USER\_GRANT\", \"IMPROVED\_PERFORMANCE\_ORG\_DOMAIN\_VERIFIED\", \"IMPROVED\_PERFORMANCE\_PROJECT\_GRANT\"\] |
+| Database                              | type: psql<br />version: v17.4 |
+| Database location                     | US1 |
+| Database specification                | vCPU: 8<br/> memory: 32Gib |
+| ZITADEL metrics during test           |  |
+| Observed errors                       | Database CPU usage was 60% |
+| Top 3 most expensive database queries | 1: query events by instance id, aggregate types, event types, position<br/>2: writing events<br/>3: query memberships<br/> |
+| k6 Iterations per second              | 105 |
+| k6 output                             | [output](#k6-output) |
+| flowchart outcome                     | |
+
+## Endpoint latencies
+
+import OutputSource from "./output.json";
+
+import { BenchmarkChart } from '/src/components/benchmark_chart';
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output {#k6-output}
+
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......................: 1061560 420.116279/s
+    checks_succeeded...................: 99.99%  1061559 out of 1061560
+    checks_failed......................: 0.00%   1 out of 1061560
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ create user is status ok
+    ✓ generate machine key status ok
+    ✓ member added successful
+    ✓ openid configuration
+    ✓ access token returned
+    ✓ auth request id returned
+    ✗ add Session status ok
+      ↳  99% — ✓ 265394 / ✗ 1
+    ✓ finalize auth request status ok
+    ✓ org removed
+
+    CUSTOM
+    login_ui_enter_login_name_duration......................................: min=100.93ms avg=100.93ms max=100.93ms p(50)=100.93ms p(95)=100.93ms p(99)=100.93ms
+    login_ui_enter_password_duration........................................: min=4.86ms   avg=4.86ms   max=4.86ms   p(50)=4.86ms   p(95)=4.86ms   p(99)=4.86ms  
+    login_ui_init_login_duration............................................: min=71.62ms  avg=497.81ms max=19m45s   p(50)=442.5ms  p(95)=557.71ms p(99)=642.49ms
+    login_ui_token_duration.................................................: min=80.88ms  avg=80.88ms  max=80.88ms  p(50)=80.88ms  p(95)=80.88ms  p(99)=80.88ms 
+    membership_iam_member...................................................: min=65.45ms  avg=65.45ms  max=65.45ms  p(50)=65.45ms  p(95)=65.45ms  p(99)=65.45ms 
+    oidc_auth_request_finalize..............................................: min=89.04ms  avg=1.32s    max=2m8s     p(50)=1.26s    p(95)=1.62s    p(99)=1.78s   
+    oidc_session_duration...................................................: min=1.73s    avg=2.88s    max=21m54s   p(50)=2.73s    p(95)=3.26s    p(99)=3.54s   
+    oidc_token_duration.....................................................: min=34.16ms  avg=34.16ms  max=34.16ms  p(50)=34.16ms  p(95)=34.16ms  p(99)=34.16ms 
+    org_create_org_duration.................................................: min=41.58ms  avg=41.58ms  max=41.58ms  p(50)=41.58ms  p(95)=41.58ms  p(99)=41.58ms 
+    session_add_session_duration............................................: min=105.71ms avg=1.06s    max=15m9s    p(50)=1s       p(95)=1.34s    p(99)=1.5s    
+    user_add_machine_key_duration...........................................: min=50.3ms   avg=50.3ms   max=50.3ms   p(50)=50.3ms   p(95)=50.3ms   p(99)=50.3ms  
+    user_create_machine_duration............................................: min=32.72ms  avg=32.72ms  max=32.72ms  p(50)=32.72ms  p(95)=32.72ms  p(99)=32.72ms 
+
+    HTTP
+    http_req_duration.......................................................: min=4.86ms   avg=1.04s    max=19m45s   p(50)=966.65ms p(95)=1.5s     p(99)=1.68s   
+      { expected_response:true }............................................: min=4.86ms   avg=987.51ms max=19m45s   p(50)=966.55ms p(95)=1.5s     p(99)=1.68s   
+    http_req_failed.........................................................: 0.01%  144 out of 796955
+    http_reqs...............................................................: 796955 315.397876/s
+
+    EXECUTION
+    iteration_duration......................................................: min=1.73s    avg=2.88s    max=21m55s   p(50)=2.73s    p(95)=3.26s    p(99)=3.54s   
+    iterations..............................................................: 265117 104.921029/s
+    vus.....................................................................: 0      min=0             max=600
+    vus_max.................................................................: 600    min=600           max=600
+
+    NETWORK
+    data_received...........................................................: 475 MB 188 kB/s
+    data_sent...............................................................: 200 MB 79 kB/s
+
+running (42m06.8s), 000/600 VUs, 265104 complete and 600 interrupted iterations
+default ✓ [======================================] 600 VUs  30m0s
+```
+
