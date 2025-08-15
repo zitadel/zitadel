@@ -16,6 +16,7 @@ export function apiAuth(): Cypress.Chainable<API> {
       oauthBaseURL: `${backendUrl}/oauth/v2`,
       oidcBaseURL: `${backendUrl}/oidc/v1`,
       samlBaseURL: `${backendUrl}/saml/v2`,
+      featuresBaseURL: `${backendUrl}/v2/features`,
     };
   });
 }

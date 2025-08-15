@@ -10,6 +10,7 @@ export interface API extends Token {
   oidcBaseURL: string;
   oauthBaseURL: string;
   samlBaseURL: string;
+  featuresBaseURL: string;
 }
 
 export interface SystemAPI extends Token {
