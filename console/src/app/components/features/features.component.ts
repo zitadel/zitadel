@@ -29,7 +29,6 @@ import { LoginV2FeatureToggleComponent } from '../feature-toggle/login-v2-featur
 const FEATURE_KEYS = [
   'consoleUseV2UserApi',
   'debugOidcParentError',
-  'disableUserTokenEvent',
   'enableBackChannelLogout',
   // 'improvedPerformance',
   'loginDefaultOrg',

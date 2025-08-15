@@ -69,10 +69,6 @@ func (*systemFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceSystemSetFeature[[]feature.ImprovedPerformanceType],
 			},
 			{
-				Event:  feature_v2.SystemDisableUserTokenEvent,
-				Reduce: reduceSystemSetFeature[bool],
-			},
-			{
 				Event:  feature_v2.SystemEnableBackChannelLogout,
 				Reduce: reduceSystemSetFeature[bool],
 			},

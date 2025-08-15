@@ -21,7 +21,6 @@ import (
 type MockQueries struct {
 	ctrl     *gomock.Controller
 	recorder *MockQueriesMockRecorder
-	isgomock struct{}
 }
 
 // MockQueriesMockRecorder is the mock recorder for MockQueries.
@@ -42,31 +41,31 @@ func (m *MockQueries) EXPECT() *MockQueriesMockRecorder {
 }
 
 // ListResourceCounts mocks base method.
-func (m *MockQueries) ListResourceCounts(ctx context.Context, lastID, size int) ([]query.ResourceCount, error) {
+func (m *MockQueries) ListResourceCounts(arg0 context.Context, arg1, arg2 int) ([]query.ResourceCount, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListResourceCounts", ctx, lastID, size)
+	ret := m.ctrl.Call(m, "ListResourceCounts", arg0, arg1, arg2)
 	ret0, _ := ret[0].([]query.ResourceCount)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListResourceCounts indicates an expected call of ListResourceCounts.
-func (mr *MockQueriesMockRecorder) ListResourceCounts(ctx, lastID, size any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) ListResourceCounts(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListResourceCounts", reflect.TypeOf((*MockQueries)(nil).ListResourceCounts), ctx, lastID, size)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListResourceCounts", reflect.TypeOf((*MockQueries)(nil).ListResourceCounts), arg0, arg1, arg2)
 }
 
 // SearchInstances mocks base method.
-func (m *MockQueries) SearchInstances(ctx context.Context, queries *query.InstanceSearchQueries) (*query.Instances, error) {
+func (m *MockQueries) SearchInstances(arg0 context.Context, arg1 *query.InstanceSearchQueries) (*query.Instances, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SearchInstances", ctx, queries)
+	ret := m.ctrl.Call(m, "SearchInstances", arg0, arg1)
 	ret0, _ := ret[0].(*query.Instances)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SearchInstances indicates an expected call of SearchInstances.
-func (mr *MockQueriesMockRecorder) SearchInstances(ctx, queries any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) SearchInstances(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchInstances", reflect.TypeOf((*MockQueries)(nil).SearchInstances), ctx, queries)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchInstances", reflect.TypeOf((*MockQueries)(nil).SearchInstances), arg0, arg1)
 }

@@ -11,8 +11,9 @@ import "zitadel/feature/v2/feature.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2;feature";
 
 message SetSystemFeaturesRequest{
-  reserved 2, 3, 6;
-  reserved "oidc_trigger_introspection_projections", "oidc_legacy_introspection", "actions";
+  reserved 2, 3, 6, 9;
+  reserved "oidc_trigger_introspection_projections", "oidc_legacy_introspection", "actions", "disable_user_token_event";
+
   optional bool login_default_org = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
@@ -50,13 +51,6 @@ message SetSystemFeaturesRequest{
     }
   ];
 
-  optional bool disable_user_token_event = 9 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
-    }
-  ];
-
   optional bool enable_back_channel_logout = 10 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
@@ -91,8 +85,9 @@ message ResetSystemFeaturesResponse {
 message GetSystemFeaturesRequest {}
 
 message GetSystemFeaturesResponse {
-  reserved 3, 4, 7;
-  reserved "oidc_trigger_introspection_projections", "oidc_legacy_introspection", "actions";
+  reserved 3, 4, 7, 10;
+  reserved "oidc_trigger_introspection_projections", "oidc_legacy_introspection", "actions", "disable_user_token_event";
+
   zitadel.object.v2.Details details = 1;
   FeatureFlag login_default_org = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -126,13 +121,6 @@ message GetSystemFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.";
-    }
-  ];
-
-  FeatureFlag disable_user_token_event = 10 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
     }
   ];
 

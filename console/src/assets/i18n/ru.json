@@ -1688,8 +1688,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Если флаг включен, вы сможете завершить отдельный сеанс из интерфейса пользователя входа, предоставив id_token с претензией `sid` в качестве id_token_hint на конечной точке end_session. Обратите внимание, что в настоящее время все сеансы одного и того же пользовательского агента (браузера) завершаются в интерфейсе пользователя входа. Сеансы, управляемые через API сеанса, уже позволяют завершать отдельные сеансы.",
       "DEBUGOIDCPARENTERROR": "Отладка Ошибки Родителя OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Если флаг включен, ошибка родителя OIDC будет записана в консоль.",
-      "DISABLEUSERTOKENEVENT": "Отключить Событие Токена Пользователя",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Включить Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout реализует OpenID Connect Back-Channel Logout 1.0 и может использоваться для уведомления клиентов о завершении сеанса у поставщика OpenID.",
       "PERMISSIONCHECKV2": "Проверка Разрешений V2",
