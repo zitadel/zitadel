@@ -52,6 +52,7 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 		BackChannelLogoutURI:     gu.Ptr(writeModel.BackChannelLogoutURI),
 		LoginVersion:             gu.Ptr(writeModel.LoginVersion),
 		LoginBaseURI:             gu.Ptr(writeModel.LoginBaseURI),
+		AllowedScopePrefixes:     writeModel.AllowedScopePrefixes,
 	}
 }
 

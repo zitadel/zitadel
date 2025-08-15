@@ -65,6 +65,7 @@ func AppOIDCConfigToPb(app *query.OIDCApp) *app_pb.App_OidcConfig {
 			SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
 			BackChannelLogoutUri:     app.BackChannelLogoutURI,
 			LoginVersion:             loginVersionToPb(app.LoginVersion, app.LoginBaseURI),
+			AllowedScopePrefixes:     app.AllowedScopePrefixes,
 		},
 	}
 }
