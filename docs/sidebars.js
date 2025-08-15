@@ -187,6 +187,7 @@ module.exports = {
             "guides/manage/user/reg-create-user",
             "guides/manage/customize/user-metadata",
             "guides/manage/user/scim2",
+            "guides/manage/user/scim-okta-guide",
           ],
         },
         "guides/manage/terraform-provider",
