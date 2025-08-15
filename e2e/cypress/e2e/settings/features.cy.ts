@@ -20,11 +20,13 @@ describe('features settings', () => {
       cy.get('a[href*="feature-service"]').should('be.visible').and('have.attr', 'target', '_blank');
 
       // Check reset button is present (if available)
-      cy.get('body').then(($body) => {
-        if ($body.find('[data-e2e="reset-features-button"]').length > 0) {
-          cy.get('[data-e2e="reset-features-button"]').should('be.visible');
-        }
-      });
+      cy.get('body')
+        .find('[data-e2e="reset-features-button"]')
+        .then(($btn) => {
+          if ($btn.length > 0) {
+            cy.get('[data-e2e="reset-features-button"]').should('be.visible');
+          }
+        });
     });
 
     it('should display feature toggles', () => {
@@ -92,21 +94,25 @@ describe('features settings', () => {
         });
 
       // Reset button should be focusable (if available)
-      cy.get('body').then(($body) => {
-        if ($body.find('[data-e2e="reset-features-button"]').length > 0) {
-          cy.get('[data-e2e="reset-features-button"]').focus().should('be.focused');
-        }
-      });
+      cy.get('body')
+        .find('[data-e2e="reset-features-button"]')
+        .then(($btn) => {
+          if ($btn.length > 0) {
+            cy.get('[data-e2e="reset-features-button"]').focus().should('be.focused');
+          }
+        });
     });
 
     describe('permissions', () => {
       it('should show appropriate elements for admin users', () => {
         // Admin should see reset button (if available)
-        cy.get('body').then(($body) => {
-          if ($body.find('[data-e2e="reset-features-button"]').length > 0) {
-            cy.get('[data-e2e="reset-features-button"]').should('be.visible');
-          }
-        });
+        cy.get('body')
+          .find('[data-e2e="reset-features-button"]')
+          .then(($btn) => {
+            if ($btn.length > 0) {
+              cy.get('[data-e2e="reset-features-button"]').should('be.visible');
+            }
+          });
 
         // Admin should see all feature toggles
         cy.get('cnsl-feature-toggle').should('have.length.greaterThan', 0);
@@ -161,52 +167,37 @@ describe('features settings', () => {
 
     it('should handle loginV2 feature toggle', () => {
       // Check if loginV2 feature toggle exists
-      cy.get('body').then(($body) => {
-        if ($body.find('cnsl-login-v2-feature-toggle').length > 0) {
-          cy.get('cnsl-login-v2-feature-toggle')
-            .should('be.visible')
-            .within(() => {
-              // Should have a feature toggle (with button toggles)
-              cy.get('cnsl-feature-toggle').should('be.visible');
-              cy.get('mat-button-toggle').should('be.visible');
+      cy.get('cnsl-login-v2-feature-toggle')
+        .should('be.visible')
+        .within(() => {
+          // Should have a feature toggle (with button toggles)
+          cy.get('cnsl-feature-toggle').should('be.visible');
+          cy.get('mat-button-toggle').should('be.visible');
 
-              // Actually toggle the loginV2 feature to test functionality
-              // Check current state and click the opposite to ensure we trigger a change
-              cy.get('mat-button-toggle').then(($buttons) => {
-                const uncheckedButtons = $buttons.not('.mat-button-toggle-checked');
+          // Actually toggle the loginV2 feature to test functionality
+          // Check current state and click the opposite to ensure we trigger a change
+          cy.get('mat-button-toggle').then(($buttons) => {
+            const uncheckedButtons = $buttons.not('.mat-button-toggle-checked');
 
-                if (uncheckedButtons.length > 0) {
-                  // Click an unchecked button to enable it
-                  cy.wrap(uncheckedButtons.first()).click();
-                } else {
-                  // All buttons are checked, click the first one to toggle it
-                  cy.wrap($buttons.first()).click();
-                }
-              });
+            if (uncheckedButtons.length > 0) {
+              // Click an unchecked button to enable it
+              cy.wrap(uncheckedButtons.first()).click();
+            } else {
+              // All buttons are checked, click the first one to toggle it
+              cy.wrap($buttons.first()).click();
+            }
+          });
 
-              // Check for success toast since we made a real change
-              cy.shouldConfirmSuccess();
+          // Check for success toast since we made a real change
+          cy.shouldConfirmSuccess();
 
-              // Check if a base URI input field appears after enabling loginV2
-              cy.get('cnsl-login-v2-feature-toggle').within(() => {
-                cy.get('body').then(($body) => {
-                  const inputExists =
-                    $body.find(
-                      'input[cnslInput], input[data-e2e*="uri"], input[placeholder*="URI"], input[placeholder*="uri"]',
-                    ).length > 0;
-                  if (inputExists) {
-                    cy.get('input[cnslInput], input[data-e2e*="uri"], input[placeholder*="URI"], input[placeholder*="uri"]')
-                      .should('be.visible')
-                      .and('not.be.disabled');
-                  }
-                });
-              });
-            });
-        } else {
-          // If loginV2 toggle doesn't exist, just verify regular toggles work
-          cy.get('cnsl-feature-toggle').should('have.length.greaterThan', 0);
-        }
-      });
+          // Check if a base URI input field appears after enabling loginV2
+          cy.get('cnsl-login-v2-feature-toggle').within(() => {
+            cy.get('input[cnslInput], input[data-e2e*="uri"], input[placeholder*="URI"], input[placeholder*="uri"]')
+              .should('be.visible')
+              .and('not.be.disabled');
+          });
+        });
     });
 
     it('should reset features when reset button is clicked', () => {
@@ -238,17 +229,19 @@ describe('features settings', () => {
         });
 
       // Click the reset button (if available)
-      cy.get('body').then(($body) => {
-        if ($body.find('[data-e2e="reset-features-button"]').length > 0) {
-          cy.get('[data-e2e="reset-features-button"]').click();
+      cy.get('body')
+        .find('[data-e2e="reset-features-button"]')
+        .then(($btn) => {
+          if ($btn.length > 0) {
+            cy.get('[data-e2e="reset-features-button"]').click();
 
-          // Check for success toast from reset operation
-          cy.shouldConfirmSuccess();
+            // Check for success toast from reset operation
+            cy.shouldConfirmSuccess();
 
-          // Verify features are still loaded and functional after UI reset
-          cy.get('cnsl-feature-toggle').should('be.visible');
-        }
-      });
+            // Verify features are still loaded and functional after UI reset
+            cy.get('cnsl-feature-toggle').should('be.visible');
+          }
+        });
     });
   });
 });
