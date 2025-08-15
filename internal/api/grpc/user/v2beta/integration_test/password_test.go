@@ -4,6 +4,7 @@ package user_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/muhlemmer/gu"
@@ -111,13 +112,15 @@ func TestServer_SetPassword(t *testing.T) {
 		ctx context.Context
 		req *user.SetPasswordRequest
 	}
-	tests := []struct {
+	type test struct {
 		name    string
 		prepare func(request *user.SetPasswordRequest) error
 		args    args
 		want    *user.SetPasswordResponse
 		wantErr bool
-	}{
+		err     error
+	}
+	tests := []test{
 		{
 			name: "missing user id",
 			prepare: func(request *user.SetPasswordRequest) error {
@@ -216,6 +219,104 @@ func TestServer_SetPassword(t *testing.T) {
 				},
 			},
 		},
+		func() test {
+			userID := Instance.CreateHumanUser(CTX).GetUserId()
+			return test{
+				name: "set password without current password/verification code, by the same user",
+				prepare: func(request *user.SetPasswordRequest) error {
+					request.UserId = userID
+					_, err := Client.SetPassword(CTX, &user.SetPasswordRequest{
+						UserId: userID,
+						NewPassword: &user.Password{
+							Password: "InitialPassw0rd!",
+						},
+					})
+					return err
+				},
+				args: args{
+					ctx: func() context.Context {
+						Instance.RegisterUserPasskey(CTX, userID)
+						_, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
+						return integration.WithAuthorizationToken(context.Background(), token)
+					}(),
+					req: &user.SetPasswordRequest{},
+				},
+				want: &user.SetPasswordResponse{
+					Details: &object.Details{
+						ChangeDate:    timestamppb.Now(),
+						ResourceOwner: Instance.DefaultOrg.Id,
+					},
+				},
+				wantErr: true,
+				err:     errors.New("membership not found (AUTHZ-cdgFk)"),
+			}
+		}(),
+		{
+			name: "set password without current password/verification code, by other user",
+			prepare: func(request *user.SetPasswordRequest) error {
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				request.UserId = userID
+				_, err := Client.SetPassword(CTX, &user.SetPasswordRequest{
+					UserId: userID,
+					NewPassword: &user.Password{
+						Password: "InitialPassw0rd!",
+					},
+				})
+				return err
+			},
+			args: args{
+				ctx: func() context.Context {
+					otherUserID := Instance.CreateHumanUser(CTX).GetUserId()
+					Instance.RegisterUserPasskey(CTX, otherUserID)
+					_, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, otherUserID)
+					return integration.WithAuthorizationToken(context.Background(), token)
+				}(),
+				req: &user.SetPasswordRequest{
+					NewPassword: &user.Password{
+						Password: "Secr3tP4ssw0rd!",
+					},
+				},
+			},
+			want: &user.SetPasswordResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+			wantErr: true,
+			err:     errors.New("membership not found (AUTHZ-cdgFk)"),
+		},
+		{
+			name: "set password without current password/verification code, with org owner permission",
+			prepare: func(request *user.SetPasswordRequest) error {
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				request.UserId = userID
+				_, err := Client.SetPassword(CTX, &user.SetPasswordRequest{
+					UserId: userID,
+					NewPassword: &user.Password{
+						Password: "InitialPassw0rd!",
+					},
+				})
+				return err
+			},
+			args: args{
+				ctx: Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				req: &user.SetPasswordRequest{
+					NewPassword: &user.Password{
+						Password: "Secr3tP4ssw0rd!",
+					},
+					Verification: &user.SetPasswordRequest_CurrentPassword{
+						CurrentPassword: "InitialPassw0rd!",
+					},
+				},
+			},
+			want: &user.SetPasswordResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -224,9 +325,14 @@ func TestServer_SetPassword(t *testing.T) {
 
 			got, err := Client.SetPassword(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				if tt.err != nil {
+					require.ErrorContains(t, err, tt.err.Error())
+				} else {
+					require.Error(t, err)
+				}
 				return
 			}
+
 			require.NoError(t, err)
 			require.NotNil(t, got)
 			integration.AssertDetails(t, tt.want, got)

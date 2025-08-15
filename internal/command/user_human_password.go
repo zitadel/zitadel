@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/passwap"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -34,14 +35,22 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.IDMissing")
 	}
+
+	if orgID == "" {
+		user, err := c.userWriteModelByID(ctx, userID, "")
+		if err != nil {
+			return nil, err
+		}
+		orgID = user.ResourceOwner
+	}
+
+	callersUserID := authz.GetCtxData(ctx).UserID
+
 	wm, err := c.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return nil, err
 	}
 
-	if !wm.SecretChangeRequired {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-SFRK2", "either current_password or verification_code must be provided")
-	}
 	return c.setPassword(
 		ctx,
 		wm,
@@ -49,7 +58,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 		"", // current api implementations never provide an encoded password
 		"",
 		oneTime,
-		c.setPasswordWithPermission(wm.AggregateID, wm.ResourceOwner),
+		c.setPasswordWithPermission(callersUserID, orgID),
 	)
 }
 
@@ -116,7 +125,7 @@ type setPasswordVerification func(ctx context.Context) (newEncodedPassword strin
 // setPasswordWithPermission returns a permission check as [setPasswordVerification] implementation
 func (c *Commands) setPasswordWithPermission(userID, orgID string) setPasswordVerification {
 	return func(ctx context.Context) (_ string, err error) {
-		return "", c.checkPermissionUpdateUser(ctx, orgID, userID)
+		return "", c.checkPermission(ctx, domain.PermissionOrgMemberWrite, orgID, userID)
 	}
 }
 
