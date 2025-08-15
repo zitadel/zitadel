@@ -683,7 +683,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								Crypted:    []byte("emailCode"),
 							},
 							1*time.Hour,
-							"",
+							"http://example.com/{{.user}}/email/{{.code}}",
 							true,
 							"",
 						),
@@ -693,7 +693,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				userPasswordHasher:          mockPasswordHasher("x"),
 				codeAlg:                     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				newCode:                     mockEncryptedCode("emailCode", time.Hour),
-				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "" },
+				defaultEmailCodeURLTemplate: func(_ context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
 			},
 			args: args{
 				ctx:   context.Background(),

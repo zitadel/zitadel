@@ -501,7 +501,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("emailverify"),
 							},
 							1*time.Hour,
-							"",
+							"http://example.com/{{.user}}/email/{{.code}}",
 							false,
 							"",
 						),
@@ -510,7 +510,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:                     mockEncryptedCode("emailverify", time.Hour),
-				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "" },
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -649,7 +649,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("emailCode"),
 							},
 							1*time.Hour,
-							"",
+							"http://example.com/{{.user}}/email/{{.code}}",
 							true,
 							"",
 						),
@@ -659,7 +659,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher:          mockPasswordHasher("x"),
 				newCode:                     mockEncryptedCode("emailCode", time.Hour),
-				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "" },
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1522,7 +1522,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					),
 					expectPush(
 						newRegisterHumanEvent("email@test.ch", "", false, true, "", language.English),
-						user.NewHumanEmailCodeAddedEvent(
+						user.NewHumanEmailCodeAddedEventV2(
 							context.Background(),
 							&userAgg.Aggregate,
 							&crypto.CryptoValue{
@@ -1532,6 +1532,8 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("mailVerify"),
 							},
 							time.Hour,
+							"http://example.com/{{.user}}/email/{{.code}}",
+							false,
 							"authRequestID",
 						),
 						user.NewUserIDPLinkAddedEvent(
@@ -1546,7 +1548,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission:             newMockPermissionCheckAllowed(),
 				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				newCode:                     mockEncryptedCode("mailVerify", time.Hour),
-				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "" },
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2561,7 +2563,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 								Crypted:    []byte("emailCode"),
 							},
 							time.Hour,
-							"",
+							"http://example.com/{{.user}}/email/{{.code}}",
 							false,
 							"",
 						),
@@ -2569,7 +2571,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newCode:                     mockEncryptedCode("emailCode", time.Hour),
-				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "" },
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2742,7 +2744,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 								Crypted:    []byte("emailCode"),
 							},
 							time.Hour,
-							"",
+							"http://example.com/{{.user}}/email/{{.code}}",
 							true,
 							"",
 						),
@@ -2750,7 +2752,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				),
 				checkPermission:             newMockPermissionCheckAllowed(),
 				newCode:                     mockEncryptedCode("emailCode", time.Hour),
-				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "" },
+				defaultEmailCodeURLTemplate: func(ctx context.Context) string { return "http://example.com/{{.user}}/email/{{.code}}" },
 			},
 			args: args{
 				ctx:   context.Background(),
