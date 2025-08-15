@@ -109,11 +109,11 @@ clean:
 	$(RM) $(gen_authopt_path)
 	$(RM) $(gen_zitadel_path)
 	$(RM) -r tmp/
-	$(RM) -r $(shell find docs/apis/assets -type f ! -name 'assets.md')
-	$(RM) -r $(shell find openapi/ -type f ! -name 'handler.go')
-	$(RM) $(shell find . -name 'statik.go')
+	find docs/apis/assets -type f ! -name 'assets.md' -delete 
+	find openapi/ -type f ! -name 'handler.go' -delete 
+	find . -name 'statik.go' -delete
 	$(RM) -r console/dist
-	$(RM) -r $(shell find internal/api/ui/console/static -type f ! -name 'gitkeep')
+	find internal/api/ui/console/static -type f ! -name 'gitkeep' -delete
 	$(RM) zitadel
 
 .PHONY: core_unit_test
