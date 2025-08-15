@@ -49,6 +49,9 @@ func (*userMetadataProjection) Init() *old_handler.Check {
 		},
 			handler.NewPrimaryKey(UserMetadataColumnInstanceID, UserMetadataColumnUserID, UserMetadataColumnKey),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserGrantResourceOwner})),
+			handler.WithIndex(handler.NewIndex("metadata_key", []string{UserMetadataColumnKey})),
+			handler.WithIndex(handler.NewIndex("metadata_value", []string{UserMetadataColumnValue})),
+			handler.WithIndex(handler.NewIndex("metadata_key_and_value", []string{UserMetadataColumnKey, UserMetadataColumnValue})),
 		),
 	)
 }
