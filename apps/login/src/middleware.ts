@@ -11,6 +11,7 @@ export const config = {
     "/oidc/:path*",
     "/idps/callback/:path*",
     "/saml/:path*",
+    "/assets/:path*",
     "/:path*",
   ],
 };
@@ -55,6 +56,7 @@ export async function middleware(request: NextRequest) {
     "/oidc/",
     "/idps/callback/",
     "/saml/",
+    "/assets/",
   ];
 
   const isMatched = proxyPaths.some((prefix) =>
