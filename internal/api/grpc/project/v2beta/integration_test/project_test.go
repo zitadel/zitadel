@@ -259,7 +259,6 @@ func TestServer_UpdateProject(t *testing.T) {
 			name: "not existing",
 			prepare: func(request *project.UpdateProjectRequest) {
 				request.Id = "notexisting"
-				return
 			},
 			args: args{
 				ctx: iamOwnerCtx,
@@ -742,7 +741,6 @@ func TestServer_DeactivateProject(t *testing.T) {
 			name: "not existing",
 			prepare: func(request *project.DeactivateProjectRequest) {
 				request.Id = "notexisting"
-				return
 			},
 			args: args{
 				ctx: iamOwnerCtx,
