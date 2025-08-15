@@ -19,10 +19,10 @@ describe('features settings', () => {
       // Check info link
       cy.get('a[href*="feature-service"]').should('be.visible').and('have.attr', 'target', '_blank');
 
-      // Check reset button is present (might be hidden based on permissions)
+      // Check reset button is present (if available)
       cy.get('body').then(($body) => {
-        if ($body.find('button:contains("Reset")').length > 0) {
-          cy.get('button').contains('Reset').should('be.visible');
+        if ($body.find('[data-e2e="reset-features-button"]').length > 0) {
+          cy.get('[data-e2e="reset-features-button"]').should('be.visible');
         }
       });
     });
@@ -91,20 +91,20 @@ describe('features settings', () => {
           cy.get('mat-button-toggle button').first().focus().should('be.focused');
         });
 
-      // Reset button should be focusable if it exists
+      // Reset button should be focusable (if available)
       cy.get('body').then(($body) => {
-        if ($body.find('button:contains("Reset")').length > 0) {
-          cy.get('button').contains('Reset').focus().should('be.focused');
+        if ($body.find('[data-e2e="reset-features-button"]').length > 0) {
+          cy.get('[data-e2e="reset-features-button"]').focus().should('be.focused');
         }
       });
     });
 
     describe('permissions', () => {
       it('should show appropriate elements for admin users', () => {
-        // Admin should see reset button if they have permissions
+        // Admin should see reset button (if available)
         cy.get('body').then(($body) => {
-          if ($body.find('button:contains("Reset")').length > 0) {
-            cy.get('button').contains('Reset').should('be.visible');
+          if ($body.find('[data-e2e="reset-features-button"]').length > 0) {
+            cy.get('[data-e2e="reset-features-button"]').should('be.visible');
           }
         });
 
@@ -130,33 +130,33 @@ describe('features settings', () => {
       cy.get('cnsl-feature-toggle')
         .first()
         .within(() => {
-          // Find which button is currently checked
-          cy.get('mat-button-toggle.mat-button-toggle-checked').then(($checkedButton) => {
-            // Get all buttons to find the unchecked one
-            cy.get('mat-button-toggle').then(($allButtons) => {
-              // Find the button that is NOT checked
-              const uncheckedButton = $allButtons.not('.mat-button-toggle-checked').first();
+          // Ensure we always trigger a state change by clicking an unchecked button
+          cy.get('mat-button-toggle').then(($allButtons) => {
+            const uncheckedButtons = $allButtons.not('.mat-button-toggle-checked');
 
-              // Click the unchecked button to toggle
-              cy.wrap(uncheckedButton).click();
+            if (uncheckedButtons.length > 0) {
+              // Click an unchecked button to enable it
+              const targetButton = uncheckedButtons.first();
+              cy.wrap(targetButton).click();
 
-              // Wait for the save operation
-              cy.wait(1500);
+              // Check for success toast since we made a real change
+              cy.shouldConfirmSuccess();
 
-              // Verify the state changed - the previously unchecked button should now be checked
-              cy.wrap(uncheckedButton).should('have.class', 'mat-button-toggle-checked');
-              // The previously checked button should no longer be checked
-              cy.wrap($checkedButton).should('not.have.class', 'mat-button-toggle-checked');
-            });
+              // Verify the toggle reflected the new state
+              cy.wrap(targetButton).should('have.class', 'mat-button-toggle-checked');
+            } else {
+              // All buttons are checked, click the first one to uncheck it
+              const targetButton = $allButtons.first();
+              cy.wrap(targetButton).click();
+
+              // Check for success toast since we made a real change
+              cy.shouldConfirmSuccess();
+
+              // Verify the toggle reflected the new state (should be unchecked now)
+              cy.wrap(targetButton).should('not.have.class', 'mat-button-toggle-checked');
+            }
           });
         });
-
-      // Toast messages might not always appear, so make this optional
-      cy.get('body').then(($body) => {
-        if ($body.find('simple-snack-bar, .mat-snack-bar-container').length > 0) {
-          cy.get('simple-snack-bar, .mat-snack-bar-container', { timeout: 5000 }).should('exist');
-        }
-      });
     });
 
     it('should handle loginV2 feature toggle', () => {
@@ -171,16 +171,35 @@ describe('features settings', () => {
               cy.get('mat-button-toggle').should('be.visible');
 
               // Actually toggle the loginV2 feature to test functionality
-              cy.get('mat-button-toggle').first().click();
+              // Check current state and click the opposite to ensure we trigger a change
+              cy.get('mat-button-toggle').then(($buttons) => {
+                const uncheckedButtons = $buttons.not('.mat-button-toggle-checked');
 
-              // Wait for save operation
-              cy.wait(1500);
-
-              // May have a base URI input field if loginV2 is enabled
-              cy.get('body').then(() => {
-                if (Cypress.$('input[cnslInput]').length > 0) {
-                  cy.get('input[cnslInput]').should('be.visible');
+                if (uncheckedButtons.length > 0) {
+                  // Click an unchecked button to enable it
+                  cy.wrap(uncheckedButtons.first()).click();
+                } else {
+                  // All buttons are checked, click the first one to toggle it
+                  cy.wrap($buttons.first()).click();
                 }
+              });
+
+              // Check for success toast since we made a real change
+              cy.shouldConfirmSuccess();
+
+              // Check if a base URI input field appears after enabling loginV2
+              cy.get('cnsl-login-v2-feature-toggle').within(() => {
+                cy.get('body').then(($body) => {
+                  const inputExists =
+                    $body.find(
+                      'input[cnslInput], input[data-e2e*="uri"], input[placeholder*="URI"], input[placeholder*="uri"]',
+                    ).length > 0;
+                  if (inputExists) {
+                    cy.get('input[cnslInput], input[data-e2e*="uri"], input[placeholder*="URI"], input[placeholder*="uri"]')
+                      .should('be.visible')
+                      .and('not.be.disabled');
+                  }
+                });
               });
             });
         } else {
@@ -191,26 +210,45 @@ describe('features settings', () => {
     });
 
     it('should reset features when reset button is clicked', () => {
-      // First, change a feature to test the reset functionality
+      // Change a feature first to have something to reset
       cy.get('cnsl-feature-toggle')
         .first()
         .within(() => {
-          cy.get('mat-button-toggle').first().click();
+          // Check current state and click the opposite to ensure we trigger a change
+          cy.get('mat-button-toggle').then(($buttons) => {
+            const checkedButton = $buttons.filter('.mat-button-toggle-checked');
+            const uncheckedButtons = $buttons.not('.mat-button-toggle-checked');
+
+            if (uncheckedButtons.length > 0) {
+              // Click an unchecked button to enable it
+              cy.wrap(uncheckedButtons.first()).click();
+              // Check for success toast since we made a real change
+              cy.shouldConfirmSuccess();
+              // Verify the change was applied
+              cy.wrap(uncheckedButtons.first()).should('have.class', 'mat-button-toggle-checked');
+            } else {
+              // All buttons are checked, click the first one to uncheck it
+              cy.wrap(checkedButton.first()).click();
+              // Check for success toast since we made a real change
+              cy.shouldConfirmSuccess();
+              // Verify the change was applied
+              cy.wrap(checkedButton.first()).should('not.have.class', 'mat-button-toggle-checked');
+            }
+          });
         });
 
-      // Wait for the save operation
-      cy.wait(1500);
+      // Click the reset button (if available)
+      cy.get('body').then(($body) => {
+        if ($body.find('[data-e2e="reset-features-button"]').length > 0) {
+          cy.get('[data-e2e="reset-features-button"]').click();
 
-      // Reset using API instead of UI button
-      apiAuth().then((api) => {
-        resetInstanceFeatures(api);
+          // Check for success toast from reset operation
+          cy.shouldConfirmSuccess();
+
+          // Verify features are still loaded and functional after UI reset
+          cy.get('cnsl-feature-toggle').should('be.visible');
+        }
       });
-
-      // Visit the features page again to see the reset state
-      cy.visit(featuresPath);
-
-      // Wait for features to load again after reset
-      cy.get('cnsl-feature-toggle', { timeout: 10000 }).should('be.visible');
     });
   });
 });

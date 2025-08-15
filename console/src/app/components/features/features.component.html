@@ -13,7 +13,7 @@
   <p class="events-desc cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.FEATURES.DESCRIPTION' | translate }}</p>
 
   <ng-template cnslHasRole [hasRole]="['iam.restrictions.write']">
-    <button color="warn" (click)="resetFeatures()" mat-stroked-button>
+    <button color="warn" (click)="resetFeatures()" mat-stroked-button data-e2e="reset-features-button">
       {{ 'SETTING.FEATURES.RESET' | translate }}
     </button>
   </ng-template>
