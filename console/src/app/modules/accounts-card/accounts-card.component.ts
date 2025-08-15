@@ -16,6 +16,7 @@ import {
   of,
   ReplaySubject,
   shareReplay,
+  Subject,
   switchMap,
   timeout,
   TimeoutError,
@@ -24,7 +25,7 @@ import {
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { SessionState as V2SessionState } from '@zitadel/proto/zitadel/user_pb';
-import { filter, withLatestFrom } from 'rxjs/operators';
+import { filter, startWith, withLatestFrom } from 'rxjs/operators';
 
 interface V1AndV2Session {
   displayName: string;
@@ -53,6 +54,7 @@ export class AccountsCardComponent {
   protected readonly UserState = UserState;
   private readonly labelpolicy = toSignal(this.userService.labelpolicy$, { initialValue: undefined });
   protected readonly sessions$: Observable<V1AndV2Session[]>;
+  protected readonly refresh$ = new Subject<true>();
 
   constructor(
     protected readonly authService: AuthenticationService,
@@ -62,7 +64,13 @@ export class AccountsCardComponent {
     private readonly featureService: NewFeatureService,
     private readonly toast: ToastService,
   ) {
-    this.sessions$ = this.getSessions().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.sessions$ = this.refresh$.pipe(
+      startWith(true),
+      switchMap(() => {
+        return this.getSessions();
+      }),
+      shareReplay({ refCount: true, bufferSize: 1 }),
+    );
   }
 
   private getUseLoginV2() {
@@ -164,11 +172,17 @@ export class AccountsCardComponent {
     this.authService.authenticate(configWithPrompt).then();
   }
 
-  public logout(): void {
+  public logoutAll(): void {
     const lP = JSON.stringify(this.labelpolicy());
     localStorage.setItem('labelPolicyOnSignout', lP);
 
     this.authService.signout();
     this.closedCard.emit();
+  }
+
+  public async logoutSession($event: MouseEvent, session: V1AndV2Session) {
+    $event.stopPropagation();
+    this.authService.signoutSession(session.loginName);
+    this.refresh$.next(true);
   }
 }
