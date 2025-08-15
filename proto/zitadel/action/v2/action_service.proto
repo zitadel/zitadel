@@ -1,0 +1,728 @@
+syntax = "proto3";
+
+package zitadel.action.v2;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+import "zitadel/action/v2/target.proto";
+import "zitadel/action/v2/execution.proto";
+import "zitadel/action/v2/query.proto";
+import "google/protobuf/timestamp.proto";
+import "zitadel/filter/v2/filter.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v2;action";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Action Service";
+    version: "2.0";
+    description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSING.md";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$CUSTOM-DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+// Service to manage custom executions.
+// The service provides methods to create, update, delete and list targets and executions.
+service ActionService {
+
+  // Create Target
+  //
+  // Create a new target to your endpoint, which can be used in executions.
+  //
+  // Required permission:
+  //   - `action.target.write`
+  //
+  // Required feature flag:
+  //   - `actions`
+  rpc CreateTarget (CreateTargetRequest) returns (CreateTargetResponse) {
+    option (google.api.http) = {
+      post: "/v2/actions/targets"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Target created successfully";
+        };
+      };
+      responses: {
+        key: "409"
+        value: {
+          description: "The target to create already exists.";
+        }
+      };
+      responses: {
+        key: "400"
+        value: {
+          description: "The feature flag `actions` is not enabled.";
+        }
+      };
+    };
+  }
+
+  // Update Target
+  //
+  // Update an existing target.
+  // To generate a new signing key set the optional expirationSigningKey.
+  //
+  // Required permission:
+  //   - `action.target.write`
+  //
+  // Required feature flag:
+  //   - `actions`
+  rpc UpdateTarget (UpdateTargetRequest) returns (UpdateTargetResponse) {
+    option (google.api.http) = {
+      post: "/v2/actions/targets/{id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Target successfully updated or left unchanged";
+        };
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The target to update does not exist.";
+        }
+      };
+      responses: {
+        key: "400"
+        value: {
+          description: "The feature flag `actions` is not enabled.";
+        }
+      };
+    };
+  }
+
+  // Delete Target
+  //
+  // Delete an existing target. This will remove it from any configured execution as well.
+  // In case the target is not found, the request will return a successful response as
+  // the desired state is already achieved.
+  //
+  // Required permission:
+  //   - `action.target.delete`
+  //
+  // Required feature flag:
+  //   - `actions`
+  rpc DeleteTarget (DeleteTargetRequest) returns (DeleteTargetResponse) {
+    option (google.api.http) = {
+      delete: "/v2/actions/targets/{id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.delete"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Target deleted successfully";
+        };
+      };
+      responses: {
+        key: "400"
+        value: {
+          description: "The feature flag `actions` is not enabled.";
+        }
+      };
+    };
+  }
+
+  // Get Target
+  //
+  // Returns the target identified by the requested ID.
+  //
+  // Required permission:
+  //   - `action.target.read`
+  //
+  // Required feature flag:
+  //   - `actions`
+  rpc GetTarget (GetTargetRequest) returns (GetTargetResponse) {
+    option (google.api.http) = {
+      get: "/v2/actions/targets/{id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Target retrieved successfully";
+        }
+      };
+      responses: {
+        key: "404"
+        value: {
+          description: "The target to update does not exist.";
+        }
+      };
+      responses: {
+        key: "400"
+        value: {
+          description: "The feature flag `actions` is not enabled.";
+        }
+      };
+    };
+  }
+
+  // List targets
+  //
+  // List all matching targets. By default all targets of the instance are returned.
+  // Make sure to include a limit and sorting for pagination.
+  //
+  // Required permission:
+  //   - `action.target.read`
+  //
+  // Required feature flag:
+  //   - `actions`
+  rpc ListTargets (ListTargetsRequest) returns (ListTargetsResponse) {
+    option (google.api.http) = {
+      post: "/v2/actions/targets/search",
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all targets matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+        };
+      };
+      responses: {
+        key: "400"
+        value: {
+          description: "The feature flag `actions` is not enabled.";
+        }
+      };
+    };
+  }
+
+  // Set Execution
+  //
+  // Sets an execution to call a target or include the targets of another execution.
+  // Setting an empty list of targets will remove all targets from the execution, making it a noop.
+  //
+  // Required permission:
+  //   - `action.execution.write`
+  //
+  // Required feature flag:
+  //   - `actions`
+  rpc SetExecution (SetExecutionRequest) returns (SetExecutionResponse) {
+    option (google.api.http) = {
+      put: "/v2/actions/executions"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.execution.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Execution successfully updated or left unchanged";
+        };
+      };
+      responses: {
+        key: "400"
+        value: {
+          description: "Condition to set execution does not exist or the feature flag `actions` is not enabled.";
+        }
+      };
+    };
+  }
+
+  // List Executions
+  //
+  // List all matching executions. By default all executions of the instance are returned that have at least one execution target.
+  // Make sure to include a limit and sorting for pagination.
+  //
+  // Required permission:
+  //   - `action.execution.read`
+  //
+  // Required feature flag:
+  //   - `actions`
+  rpc ListExecutions (ListExecutionsRequest) returns (ListExecutionsResponse) {
+    option (google.api.http) = {
+      post: "/v2/actions/executions/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all non noop executions matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "Invalid list query or the feature flag `actions` is not enabled.";
+        };
+      };
+    };
+  }
+
+  // List Execution Functions
+  //
+  // List all available functions which can be used as condition for executions.
+  rpc ListExecutionFunctions (ListExecutionFunctionsRequest) returns (ListExecutionFunctionsResponse) {
+    option (google.api.http) = {
+      get: "/v2/actions/executions/functions"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "List all functions successfully";
+        };
+      };
+    };
+  }
+
+  // List Execution Methods
+  //
+  // List all available methods which can be used as condition for executions.
+  rpc ListExecutionMethods (ListExecutionMethodsRequest) returns (ListExecutionMethodsResponse) {
+    option (google.api.http) = {
+      get: "/v2/actions/executions/methods"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "List all methods successfully";
+        };
+      };
+    };
+  }
+
+  // List Execution Services
+  //
+  // List all available services which can be used as condition for executions.
+  rpc ListExecutionServices (ListExecutionServicesRequest) returns (ListExecutionServicesResponse) {
+    option (google.api.http) = {
+      get: "/v2/actions/executions/services"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "List all services successfully";
+        };
+      };
+    };
+  }
+}
+
+message CreateTargetRequest {
+  string name = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 1000},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"ip_allow_list\"";
+      min_length: 1
+      max_length: 1000
+    }
+  ];
+  // Defines the target type and how the response of the target is treated.
+  oneof target_type {
+    option (validate.required) = true;
+    // Wait for response but response body is ignored, status is checked, call is sent as post.
+    RESTWebhook rest_webhook = 2;
+    // Wait for response and response body is used, status is checked, call is sent as post.
+    RESTCall rest_call = 3;
+    // Call is executed in parallel to others, ZITADEL does not wait until the call is finished. The state is ignored, call is sent as post.
+    RESTAsync rest_async = 4;
+  }
+  // Timeout defines the duration until ZITADEL cancels the execution.
+  // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails. Depending on the target type and possible setting on `interrupt_on_error` following targets will not be called. In case of a `rest_async` target only this specific target will fail, without any influence on other targets of the same execution.
+  google.protobuf.Duration timeout = 5 [
+    (validate.rules).duration = {gte: {}, lte: {seconds: 270}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"10s\"";
+    }
+  ];
+  string endpoint = 6 [
+    (validate.rules).string = {min_len: 1, max_len: 1000},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://example.com/hooks/ip_check\""
+      min_length: 1
+      max_length: 1000
+    }
+  ];
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"name\": \"ip_allow_list\",\"restWebhook\":{\"interruptOnError\":true},\"timeout\":\"10s\",\"endpoint\":\"https://example.com/hooks/ip_check\"}";
+  };
+}
+
+message CreateTargetResponse {
+  // The unique identifier of the newly created target.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // The timestamp of the target creation.
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+  // Key used to sign and check payload sent to the target.
+  string signing_key = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"98KmsU67\""
+    }
+  ];
+}
+
+message UpdateTargetRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  optional string name = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 1000},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"ip_allow_list\""
+      min_length: 1
+      max_length: 1000
+    }
+  ];
+  // Defines the target type and how the response of the target is treated.
+  oneof target_type {
+    // Wait for response but response body is ignored, status is checked, call is sent as post.
+    RESTWebhook rest_webhook = 3;
+    // Wait for response and response body is used, status is checked, call is sent as post.
+    RESTCall rest_call = 4;
+    // Call is executed in parallel to others, ZITADEL does not wait until the call is finished. The state is ignored, call is sent as post.
+    RESTAsync rest_async = 5;
+  }
+  // Timeout defines the duration until ZITADEL cancels the execution.
+  // If the target doesn't respond before this timeout expires, then the connection is closed and the action fails. Depending on the target type and possible setting on `interrupt_on_error` following targets will not be called. In case of a `rest_async` target only this specific target will fail, without any influence on other targets of the same execution.
+  optional google.protobuf.Duration timeout = 6 [
+    (validate.rules).duration = {gte: {}, lte: {seconds: 270}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"10s\"";
+    }
+  ];
+  optional string endpoint = 7 [
+    (validate.rules).string = {min_len: 1, max_len: 1000},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://example.com/hooks/ip_check\""
+      min_length: 1
+      max_length: 1000
+    }
+  ];
+  // Regenerate the key used for signing and checking the payload sent to the target.
+  // Set the graceful period for the existing key. During that time, the previous
+  // signing key and the new one will be used to sign the request to allow you a smooth
+  // transition onf your API.
+  //
+  // Note that we currently only allow an immediate rotation ("0s") and will support
+  // longer expirations in the future.
+  optional google.protobuf.Duration expiration_signing_key = 8 [
+    (validate.rules).duration = {const: {seconds: 0, nanos: 0}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"0s\""
+      minimum: 0
+      maximum: 0
+    }
+  ];
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"name\": \"ip_allow_list\",\"restCall\":{\"interruptOnError\":true},\"timeout\":\"10s\",\"endpoint\":\"https://example.com/hooks/ip_check\",\"expirationSigningKey\":\"0s\"}";
+  };
+}
+
+message UpdateTargetResponse {
+  // The timestamp of the change of the target.
+  google.protobuf.Timestamp change_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+  // Key used to sign and check payload sent to the target.
+  optional string signing_key = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"98KmsU67\""
+    }
+  ];
+}
+
+message DeleteTargetRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message DeleteTargetResponse {
+  // The timestamp of the deletion of the target.
+  // Note that the deletion date is only guaranteed to be set if the deletion was successful during the request.
+  // In case the deletion occurred in a previous request, the deletion date might be empty.
+  google.protobuf.Timestamp deletion_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+}
+
+message GetTargetRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message GetTargetResponse {
+  Target target = 1;
+}
+
+message ListTargetsRequest {
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional TargetFieldName sorting_column = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"TARGET_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+  // Define the criteria to query for.
+  repeated TargetSearchFilter filters = 3;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"sortingColumn\":\"TARGET_FIELD_NAME_CREATION_DATE\",\"filters\":[{\"targetNameFilter\":{\"targetName\":\"ip_allow_list\",\"method\":\"TEXT_FILTER_METHOD_EQUALS\"}},{\"inTargetIdsFilter\":{\"targetIds\":[\"69629023906488334\",\"69622366012355662\"]}}]}";
+  };
+}
+
+message ListTargetsResponse {
+  reserved 'result';
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+  repeated Target targets = 2;
+}
+
+message SetExecutionRequest {
+  // Condition defining when the execution should be used.
+  Condition condition = 1;
+  // Ordered list of targets called during the execution.
+  repeated string targets = 2;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"condition\":{\"request\":{\"method\":\"zitadel.session.v2.SessionService/ListSessions\"}},\"targets\":[{\"target\":\"69629026806489455\"}]}";
+  };
+}
+
+message SetExecutionResponse {
+  // The timestamp of the execution set.
+  google.protobuf.Timestamp set_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2024-12-18T07:50:47.492Z\"";
+    }
+  ];
+}
+
+message ListExecutionsRequest {
+  // List limitations and ordering.
+  optional zitadel.filter.v2.PaginationRequest pagination = 1;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional ExecutionFieldName sorting_column = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"EXECUTION_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+  // Define the criteria to query for.
+  repeated ExecutionSearchFilter filters = 3;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    example: "{\"pagination\":{\"offset\":0,\"limit\":0,\"asc\":true},\"sortingColumn\":\"EXECUTION_FIELD_NAME_ID\",\"filters\":[{\"targetFilter\":{\"targetId\":\"69629023906488334\"}}]}";
+  };
+}
+
+message ListExecutionsResponse {
+  reserved 'result';
+  zitadel.filter.v2.PaginationResponse pagination = 1;
+  repeated Execution executions = 2;
+}
+
+message ListExecutionFunctionsRequest{}
+message ListExecutionFunctionsResponse{
+  // All available methods
+  repeated string functions = 1;
+}
+message ListExecutionMethodsRequest{}
+message ListExecutionMethodsResponse{
+  // All available methods
+  repeated string methods = 1;
+}
+
+message ListExecutionServicesRequest{}
+message ListExecutionServicesResponse{
+  // All available methods
+  repeated string services = 1;
+}

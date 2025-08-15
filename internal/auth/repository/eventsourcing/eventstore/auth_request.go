@@ -114,7 +114,7 @@ type userCommandProvider interface {
 }
 
 type orgViewProvider interface {
-	OrgByID(context.Context, bool, string) (*query.Org, error)
+	OrgByID(context.Context, string) (*query.Org, error)
 	OrgByPrimaryDomain(context.Context, string) (*query.Org, error)
 }
 
@@ -600,7 +600,9 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 		return err
 	}
 	if len(metadatas) > 0 {
-		_, err = repo.Command.BulkSetUserMetadata(ctx, request.UserID, request.UserOrgID, metadatas...)
+		// user context necessary due to permission check in command
+		userCtx := authz.SetCtxData(ctx, authz.CtxData{UserID: request.UserID, OrgID: request.UserOrgID})
+		_, err := repo.Command.BulkSetUserMetadata(userCtx, request.UserID, request.UserOrgID, metadatas...)
 		if err != nil {
 			return err
 		}
@@ -1548,7 +1550,7 @@ func (repo *AuthRequestRepo) getDomainPolicy(ctx context.Context, orgID string) 
 func setOrgID(ctx context.Context, orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
 	orgID := request.GetScopeOrgID()
 	if orgID != "" {
-		org, err := orgViewProvider.OrgByID(ctx, false, orgID)
+		org, err := orgViewProvider.OrgByID(ctx, orgID)
 		if err != nil {
 			return err
 		}
@@ -1721,7 +1723,7 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	if !(user.State == user_model.UserStateActive || user.State == user_model.UserStateInitial) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.NotActive")
 	}
-	org, err := queries.OrgByID(ctx, false, user.ResourceOwner)
+	org, err := queries.OrgByID(ctx, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

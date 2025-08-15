@@ -7,6 +7,7 @@
 
 # Test binary, build with `go test -c`
 *.test
+!/**/.env.test
 
 # Coverage
 coverage.txt
@@ -68,6 +69,7 @@ docs/docs/apis/proto
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css.map
 zitadel-*-*
+!apps/**/zitadel-*-*
 
 # local
 build/local/*.env
@@ -92,3 +94,6 @@ load-test/output/*
 # Turbo
 .turbo/
 **/.turbo/
+
+# PNPM
+.pnpm-store

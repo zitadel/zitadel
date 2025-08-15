@@ -1,0 +1,200 @@
+---
+title: Ruby Client
+sidebar_label: 'Ruby Client'
+---
+
+<table>
+	<tr>
+		<td width="100px">
+			<img width="100px" src="/docs/img/tech/ruby.svg" alt="ruby logo"/>
+		</td>
+		<td>
+			This guide covers the official Zitadel Management API Client for Ruby (3.1+), which allows you to programmatically manage resources in your Zitadel instance.
+		</td>
+	</tr>
+</table>
+
+:::info
+**This is a Management API Client, not an Authentication SDK.**
+
+This library is designed for server-to-server communication to manage your Zitadel instance (e.g., creating users, managing projects, and updating settings). It is **not** intended for handling end-user login flows in your web application. For user authentication, you should use a standard OIDC library with your Ruby framework of choice.
+:::
+
+The Zitadel Ruby Client provides an idiomatic way to access the full gamut of Zitadel's v2 Management APIs from your Ruby backend.
+
+> Please be aware that this client library is currently in an **incubating stage**.
+While it is available for use, the API and its functionality may evolve, potentially introducing
+breaking changes in future updates. We advise caution when considering it for production environments.
+
+### Installation
+
+You can add the client library to your project using RubyGems. Add this line to your application's Gemfile:
+
+```ruby
+gem install zitadel-client --pre
+```
+
+### Using the SDK
+
+Your SDK offers three ways to authenticate with Zitadel. Each method has its
+own benefits—choose the one that fits your situation best.
+
+#### 1. Private Key JWT Authentication
+
+**What is it?**
+You use a JSON Web Token (JWT) that you sign with a private key stored in a
+JSON file. This process creates a secure token.
+
+**When should you use it?**
+
+- **Best for production:** It offers strong security.
+- **Advanced control:** You can adjust token settings like expiration.
+
+**How do you use it?**
+
+1. Save your private key in a JSON file.
+2. Use the provided method to create an authenticator.
+
+**Example:**
+
+```ruby
+require 'zitadel-client'
+require 'securerandom'
+
+client = Zitadel::Client::Zitadel.with_private_key("https://example.us1.zitadel.cloud", "path/to/jwt-key.json")
+
+begin
+  response = client.users.add_human_user(
+    Zitadel::Client::UserServiceAddHumanUserRequest.new(
+      username: SecureRandom.hex,
+      profile: Zitadel::Client::UserServiceSetHumanProfile.new(
+        given_name: 'John',
+        family_name: 'Doe'
+      ),
+      email: Zitadel::Client::UserServiceSetHumanEmail.new(
+        email: "john.doe@example.com"
+      )
+    )
+  )
+  puts "User created: #{response}"
+rescue StandardError => e
+  puts "Error: #{e.message}"
+end
+```
+
+#### 2. Client Credentials Grant
+
+**What is it?**
+This method uses a client ID and client secret to get a secure access token,
+which is then used to authenticate.
+
+**When should you use it?**
+
+- **Simple and straightforward:** Good for server-to-server communication.
+- **Trusted environments:** Use it when both servers are owned or trusted.
+
+**How do you use it?**
+
+1. Provide your client ID and client secret.
+2. Use the provided method to create an authenticator.
+
+**Example:**
+
+```ruby
+require 'zitadel-client'
+require 'securerandom'
+
+client = Zitadel::Client::Zitadel.with_client_credentials("https://example.us1.zitadel.cloud", "id", "secret")
+
+begin
+  response = client.users.add_human_user(
+    Zitadel::Client::UserServiceAddHumanUserRequest.new(
+      username: SecureRandom.hex,
+      profile: Zitadel::Client::UserServiceSetHumanProfile.new(
+        given_name: 'John',
+        family_name: 'Doe'
+      ),
+      email: Zitadel::Client::UserServiceSetHumanEmail.new(
+        email: "john.doe@example.com"
+      )
+    )
+  )
+  puts "User created: #{response}"
+rescue StandardError => e
+  puts "Error: #{e.message}"
+end
+```
+
+#### 3. Personal Access Tokens (PATs)
+
+**What is it?**
+A Personal Access Token (PAT) is a pre-generated token that you can use to
+authenticate without exchanging credentials every time.
+
+**When should you use it?**
+
+- **Easy to use:** Great for development or testing scenarios.
+- **Quick setup:** No need for dynamic token generation.
+
+**How do you use it?**
+
+1. Obtain a valid personal access token from your account.
+2. Use the provided method to create an authenticator.
+
+**Example:**
+
+```ruby
+require 'zitadel-client'
+require 'securerandom'
+
+client = Zitadel::Client::Zitadel.with_access_token("https://example.us1.zitadel.cloud", "token")
+
+begin
+  response = client.users.add_human_user(
+    Zitadel::Client::UserServiceAddHumanUserRequest.new(
+      username: SecureRandom.hex,
+      profile: Zitadel::Client::UserServiceSetHumanProfile.new(
+        given_name: 'John',
+        family_name: 'Doe'
+      ),
+      email: Zitadel::Client::UserServiceSetHumanEmail.new(
+        email: "john.doe@example.com"
+      )
+    )
+  )
+  puts "User created: #{response}"
+rescue StandardError => e
+  puts "Error: #{e.message}"
+end
+```
+
+---
+
+Choose the authentication method that best suits your needs based on your
+environment and security requirements. For more details, please refer to the
+[Zitadel documentation on authenticating service users](https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users).
+
+### Debugging
+
+The SDK supports debug logging, which can be enabled for troubleshooting
+and debugging purposes. You can enable debug logging by setting the `debug`
+flag to `true` when initializing the `Zitadel` client, like this:
+
+```ruby
+zitadel = zitadel.Zitadel("your-zitadel-base-url", 'your-valid-token', lambda config: config.debug = True)
+```
+
+When enabled, the SDK will log additional information, such as HTTP request
+and response details, which can be useful for identifying issues in the
+integration or troubleshooting unexpected behavior.
+
+### Versioning
+
+The client library's versioning is aligned with the Zitadel core project. The major version of the
+client corresponds to the major version of Zitadel it is designed to work with. For example,
+v2.x.x of the client is built for and tested against Zitadel v2, ensuring a predictable and stable integration.
+
+### Resources
+
+- [GitHub Repository](https://github.com/zitadel/client-ruby): For source code, examples, and to report issues.
+- [RubyGems Package](https://rubygems.org/gems/zitadel-client): The official package artifact for RubyGems.

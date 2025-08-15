@@ -23,6 +23,7 @@ module.exports = {
     description:
       "Documentation for ZITADEL - Identity infrastructure, simplified for you.",
   },
+
   themeConfig: {
     metadata: [
       {
@@ -450,9 +451,13 @@ module.exports = {
       };
     },
   ],
+  markdown: {
+    mermaid:true,
+  },
   themes: [
     "docusaurus-theme-github-codeblock",
     "docusaurus-theme-openapi-docs",
+    '@docusaurus/theme-mermaid',
   ],
   future: {
     v4: false, // Disabled because of some problems related to https://github.com/facebook/docusaurus/issues/11040

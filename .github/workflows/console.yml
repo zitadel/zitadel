@@ -6,9 +6,6 @@ on:
       node_version:
         required: true
         type: string
-      buf_version:
-        required: true
-        type: string
     outputs:
       cache_key:
         value: ${{ jobs.build.outputs.cache_key }}
@@ -36,11 +33,6 @@ jobs:
             console-
           path: ${{ env.cache_path }}
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        uses: bufbuild/buf-setup-action@v1
-        with:
-          github_token: ${{ github.token }}
-          version: ${{ inputs.buf_version }}
-      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         uses: pnpm/action-setup@v4
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         uses: actions/setup-node@v4
@@ -50,7 +42,7 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         name: Build console with Turbo
         run: pnpm turbo build --filter=./console

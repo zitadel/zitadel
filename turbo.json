@@ -1,7 +1,9 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
   "globalEnv": [
     "DEBUG",
     "VERCEL_URL",
@@ -14,7 +16,10 @@
     "NEXT_PUBLIC_BASE_PATH",
     "CUSTOM_REQUEST_HEADERS",
     "NODE_ENV",
+    "PORT",
     "INKEEP_API_KEY",
+    "DISPLAY",
+    "CYPRESS_DISPLAY",
     "SITE_TITLE"
   ],
   "tasks": {
@@ -23,23 +28,20 @@
     },
     "build": {},
     "build:login:standalone": {},
-    "build:client:standalone": {},
-    "test": {},
+    "quality": {
+      "with": [
+        "lint",
+        "test:unit",
+        "test:integration:login",
+        "test:acceptance",
+        "test:e2e"
+      ]
+    },
     "start": {},
-    "start:built": {},
     "test:unit": {},
-    "test:unit:standalone": {},
-    "test:integration": {},
-    "test:integration:setup": {
-      "with": ["dev"]
-    },
-    "test:acceptance:setup": {},
-    "test:acceptance:setup:dev": {
-      "with": ["dev"]
-    },
-    "test:watch": {
-      "persistent": true
-    },
+    "test:integration:login": {},
+    "test:acceptance": {},
+    "test:e2e": {},
     "lint": {},
     "lint:fix": {},
     "dev": {
