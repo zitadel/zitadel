@@ -27,7 +27,7 @@
     "@angular/platform-browser-dynamic": "^16.2.12",
     "@angular/router": "^16.2.12",
     "@angular/service-worker": "^16.2.12",
-    "@bufbuild/protobuf": "^2.6.1",
+    "@bufbuild/protobuf": "^2.6.3",
     "@connectrpc/connect": "^2.0.0",
     "@connectrpc/connect-web": "^2.0.0",
     "@ctrl/ngx-codemirror": "^6.1.0",
@@ -51,12 +51,12 @@
     "moment": "^2.30.1",
     "ngx-color": "^9.0.0",
     "opentype.js": "^1.3.4",
-    "posthog-js": "^1.232.7",
+    "posthog-js": "^1.259.0",
     "rxjs": "^7.8.2",
     "tinycolor2": "^1.6.0",
     "tslib": "^2.7.0",
     "uuid": "^10.0.0",
-    "zone.js": "~0.13.3"
+    "zone.js": "~0.15.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.2.2",
@@ -80,9 +80,9 @@
     "@types/qrcode": "^1.5.2",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
+    "@typescript-eslint/parser": "^8.39.0",
     "eslint": "^8.57.1",
-    "jasmine-core": "~5.6.0",
+    "jasmine-core": "~5.9.0",
     "jasmine-spec-reporter": "~7.0.0",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
@@ -92,6 +92,6 @@
     "karma-jasmine-html-reporter": "^2.1.0",
     "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.1.0",
-    "typescript": "5.1"
+    "typescript": "5.9"
   }
 }
