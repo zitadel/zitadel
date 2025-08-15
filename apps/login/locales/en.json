@@ -26,6 +26,10 @@
     "description": "Enter your login data.",
     "register": "Register new user",
     "submit": "Continue",
+    "loginname": "Loginname",
+    "username": "Username",
+    "usernameOrPhoneNumber": "Username or phone number",
+    "usernameOrEmail": "Username or email",
     "required": {
       "loginName": "This field is required"
     }
@@ -36,6 +40,7 @@
       "description": "Enter your password.",
       "resetPassword": "Reset Password",
       "submit": "Continue",
+      "password": "Password",
       "required": {
         "password": "This field is required"
       }
@@ -47,6 +52,9 @@
       "noCodeReceived": "Didn't receive a code?",
       "resend": "Resend code",
       "submit": "Continue",
+      "code": "Code",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
       "required": {
         "code": "This field is required",
         "newPassword": "You have to provide a password!",
@@ -57,6 +65,8 @@
       "title": "Change Password",
       "description": "Set the password for your account",
       "submit": "Continue",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
       "required": {
         "newPassword": "You have to provide a new password!",
         "confirmPassword": "This field is required"
@@ -129,6 +139,7 @@
       "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
       "submit": "Continue",
+      "code": "Code",
       "required": {
         "code": "This field is required"
       }
@@ -140,6 +151,7 @@
       "emailDescription": "Enter your email address to receive a code via email.",
       "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
       "submit": "Continue",
+      "code": "Code",
       "required": {
         "code": "This field is required"
       }
@@ -200,11 +212,16 @@
       "title": "Set Password",
       "description": "Set the password for your account",
       "submit": "Continue",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
       "required": {
         "password": "You have to provide a password!",
         "confirmPassword": "This field is required"
       }
     },
+    "firstname": "First name",
+    "lastname": "Last name",
+    "email": "E-mail",
     "required": {
       "firstname": "This field is required",
       "lastname": "This field is required",
@@ -246,6 +263,7 @@
       "resendCode": "Resend code",
       "codeSent": "A code has just been sent to your email address.",
       "submit": "Continue",
+      "code": "Code",
       "required": {
         "code": "This field is required"
       }
@@ -263,6 +281,7 @@
       "title": "Device code",
       "description": "Enter the code displayed on your app or device.",
       "submit": "Continue",
+      "code": "Code",
       "required": {
         "code": "This field is required"
       }
