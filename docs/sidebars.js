@@ -208,7 +208,6 @@ module.exports = {
             "guides/migrate/sources/auth0",
             "guides/migrate/sources/keycloak-guide",
             "guides/migrate/sources/auth0-guide",
-            "guides/migrate/sources/keycloak",
           ],
         },
       ],
