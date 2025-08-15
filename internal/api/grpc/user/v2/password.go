@@ -53,7 +53,7 @@ func (s *Server) SetPassword(ctx context.Context, req *connect.Request[user.SetP
 
 	switch v := req.Msg.GetVerification().(type) {
 	case *user.SetPasswordRequest_CurrentPassword:
-		details, err = s.command.ChangePassword(CurrentPassword, req.serId(), v.CurrentPassword, req.Msg.GetNewPassword().GetPassword(), "", req.Msg.GetNewPassword().GetChangeRequired())
+		details, err = s.command.ChangePassword(ctx, "", req.Msg.GetUserId(), v.CurrentPassword, req.Msg.GetNewPassword().GetPassword(), "", req.Msg.GetNewPassword().GetChangeRequired())
 	case *user.SetPasswordRequest_VerificationCode:
 		details, err = s.command.SetPasswordWithVerifyCode(ctx, "", req.Msg.GetUserId(), v.VerificationCode, req.Msg.GetNewPassword().GetPassword(), "", req.Msg.GetNewPassword().GetChangeRequired())
 	case nil:
