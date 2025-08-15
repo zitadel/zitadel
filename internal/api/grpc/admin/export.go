@@ -426,7 +426,8 @@ func (s *Server) getLoginPolicy(ctx context.Context, orgID string, orgIDPs []str
 					break
 				}
 			}
-			ownerType := idp_pb.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED
+
+			var ownerType idp_pb.IDPOwnerType
 			if found {
 				ownerType = idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG
 			} else {

@@ -16,6 +16,8 @@ type expect func(mockRepository *mock.MockRepository)
 
 func expectEventstore(expects ...expect) func(*testing.T) *eventstore.Eventstore {
 	return func(t *testing.T) *eventstore.Eventstore {
+		t.Helper()
+
 		m := mock.NewRepo(t)
 		for _, e := range expects {
 			e(m)

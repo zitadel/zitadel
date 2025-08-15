@@ -145,13 +145,15 @@ func mockQueryErr(stmt string, err error, args ...driver.Value) func(m sqlmock.S
 	}
 }
 
-func execMock(t testing.TB, exp sqlExpectation, run func(db *sql.DB)) {
+func execMock(tb testing.TB, exp sqlExpectation, run func(db *sql.DB)) {
+	tb.Helper()
+
 	db, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
-	require.NoError(t, err)
+	require.NoError(tb, err)
 	defer db.Close()
 	mock = exp(mock)
 	run(db)
-	assert.NoError(t, mock.ExpectationsWereMet())
+	assert.NoError(tb, mock.ExpectationsWereMet())
 }
 
 var (
@@ -160,8 +162,8 @@ var (
 	selectBuilderType = reflect.TypeOf(sq.SelectBuilder{})
 )
 
-func execScan(t testing.TB, client *database.DB, builder sq.SelectBuilder, scan interface{}, errCheck checkErr) (object interface{}, ok bool, didScan bool) {
-	t.Helper()
+func execScan(tb testing.TB, client *database.DB, builder sq.SelectBuilder, scan interface{}, errCheck checkErr) (object interface{}, ok bool, didScan bool) {
+	tb.Helper()
 
 	scanType := reflect.TypeOf(scan)
 	err := validateScan(scanType)
@@ -211,7 +213,7 @@ func execScan(t testing.TB, client *database.DB, builder sq.SelectBuilder, scan 
 	if err != nil {
 		err, ok := errCheck(err)
 		if !ok {
-			t.Fatal(err)
+			tb.Fatal(err)
 		}
 		if didScan {
 			return res[0].Interface(), ok, didScan

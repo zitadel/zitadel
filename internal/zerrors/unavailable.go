@@ -1,6 +1,7 @@
 package zerrors
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -29,8 +30,8 @@ func ThrowUnavailablef(parent error, id, format string, a ...interface{}) error 
 func (err *UnavailableError) IsUnavailable() {}
 
 func IsUnavailable(err error) bool {
-	_, ok := err.(Unavailable)
-	return ok
+	var tmp Unavailable
+	return errors.As(err, &tmp)
 }
 
 func (err *UnavailableError) Is(target error) bool {

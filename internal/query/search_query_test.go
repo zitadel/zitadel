@@ -1610,7 +1610,7 @@ func TestNumberQuery_comp(t *testing.T) {
 			},
 		},
 		{
-			name: "list containts",
+			name: "list contains",
 			fields: fields{
 				Column:  testCol,
 				Number:  42,

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -412,6 +413,8 @@ func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userI
 }
 
 func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, orgID string, organizationScopedUsernames bool) *settings_v2beta.SetOrganizationSettingsResponse {
+	t.Helper()
+
 	resp, err := i.Client.SettingsV2beta.SetOrganizationSettings(ctx,
 		&settings_v2beta.SetOrganizationSettingsRequest{
 			OrganizationId:              orgID,
@@ -423,6 +426,8 @@ func (i *Instance) SetOrganizationSettings(ctx context.Context, t *testing.T, or
 }
 
 func (i *Instance) DeleteOrganizationSettings(ctx context.Context, t *testing.T, orgID string) *settings_v2beta.DeleteOrganizationSettingsResponse {
+	t.Helper()
+
 	resp, err := i.Client.SettingsV2beta.DeleteOrganizationSettings(ctx,
 		&settings_v2beta.DeleteOrganizationSettingsRequest{
 			OrganizationId: orgID,
@@ -562,6 +567,8 @@ func (i *Instance) SetUserPassword(ctx context.Context, userID, password string,
 }
 
 func (i *Instance) CreateProject(ctx context.Context, t *testing.T, orgID, name string, projectRoleCheck, hasProjectCheck bool) *project_v2beta.CreateProjectResponse {
+	t.Helper()
+
 	if orgID == "" {
 		orgID = i.DefaultOrg.GetId()
 	}
@@ -577,6 +584,8 @@ func (i *Instance) CreateProject(ctx context.Context, t *testing.T, orgID, name 
 }
 
 func (i *Instance) DeleteProject(ctx context.Context, t *testing.T, projectID string) *project_v2beta.DeleteProjectResponse {
+	t.Helper()
+
 	resp, err := i.Client.Projectv2Beta.DeleteProject(ctx, &project_v2beta.DeleteProjectRequest{
 		Id: projectID,
 	})
@@ -585,6 +594,8 @@ func (i *Instance) DeleteProject(ctx context.Context, t *testing.T, projectID st
 }
 
 func (i *Instance) DeactivateProject(ctx context.Context, t *testing.T, projectID string) *project_v2beta.DeactivateProjectResponse {
+	t.Helper()
+
 	resp, err := i.Client.Projectv2Beta.DeactivateProject(ctx, &project_v2beta.DeactivateProjectRequest{
 		Id: projectID,
 	})
@@ -593,6 +604,8 @@ func (i *Instance) DeactivateProject(ctx context.Context, t *testing.T, projectI
 }
 
 func (i *Instance) ActivateProject(ctx context.Context, t *testing.T, projectID string) *project_v2beta.ActivateProjectResponse {
+	t.Helper()
+
 	resp, err := i.Client.Projectv2Beta.ActivateProject(ctx, &project_v2beta.ActivateProjectRequest{
 		Id: projectID,
 	})
@@ -601,6 +614,8 @@ func (i *Instance) ActivateProject(ctx context.Context, t *testing.T, projectID 
 }
 
 func (i *Instance) AddProjectRole(ctx context.Context, t *testing.T, projectID, roleKey, displayName, group string) *project_v2beta.AddProjectRoleResponse {
+	t.Helper()
+
 	var groupP *string
 	if group != "" {
 		groupP = &group
@@ -617,6 +632,8 @@ func (i *Instance) AddProjectRole(ctx context.Context, t *testing.T, projectID, 
 }
 
 func (i *Instance) RemoveProjectRole(ctx context.Context, t *testing.T, projectID, roleKey string) *project_v2beta.RemoveProjectRoleResponse {
+	t.Helper()
+
 	resp, err := i.Client.Projectv2Beta.RemoveProjectRole(ctx, &project_v2beta.RemoveProjectRoleRequest{
 		ProjectId: projectID,
 		RoleKey:   roleKey,
@@ -821,10 +838,14 @@ func (i *Instance) CreateIntent(ctx context.Context, idpID string) *user_v2.Star
 }
 
 func (i *Instance) CreateVerifiedWebAuthNSession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
+	t.Helper()
+
 	return i.CreateVerifiedWebAuthNSessionWithLifetime(t, ctx, userID, 0)
 }
 
 func (i *Instance) CreateVerifiedWebAuthNSessionWithLifetime(t *testing.T, ctx context.Context, userID string, lifetime time.Duration) (id, token string, start, change time.Time) {
+	t.Helper()
+
 	var sessionLifetime *durationpb.Duration
 	if lifetime > 0 {
 		sessionLifetime = durationpb.New(lifetime)
@@ -862,6 +883,8 @@ func (i *Instance) CreateVerifiedWebAuthNSessionWithLifetime(t *testing.T, ctx c
 }
 
 func (i *Instance) CreatePasswordSession(t *testing.T, ctx context.Context, userID, password string) (id, token string, start, change time.Time) {
+	t.Helper()
+
 	createResp, err := i.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -878,6 +901,8 @@ func (i *Instance) CreatePasswordSession(t *testing.T, ctx context.Context, user
 }
 
 func (i *Instance) CreateIntentSession(t *testing.T, ctx context.Context, userID, intentID, intentToken string) (id, token string, start, change time.Time) {
+	t.Helper()
+
 	createResp, err := i.Client.SessionV2.CreateSession(ctx, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -895,6 +920,8 @@ func (i *Instance) CreateIntentSession(t *testing.T, ctx context.Context, userID
 }
 
 func (i *Instance) CreateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string, roles ...string) *project_v2beta.CreateProjectGrantResponse {
+	t.Helper()
+
 	resp, err := i.Client.Projectv2Beta.CreateProjectGrant(ctx, &project_v2beta.CreateProjectGrantRequest{
 		GrantedOrganizationId: grantedOrgID,
 		ProjectId:             projectID,
@@ -905,6 +932,8 @@ func (i *Instance) CreateProjectGrant(ctx context.Context, t *testing.T, project
 }
 
 func (i *Instance) DeleteProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2beta.DeleteProjectGrantResponse {
+	t.Helper()
+
 	resp, err := i.Client.Projectv2Beta.DeleteProjectGrant(ctx, &project_v2beta.DeleteProjectGrantRequest{
 		GrantedOrganizationId: grantedOrgID,
 		ProjectId:             projectID,
@@ -914,6 +943,8 @@ func (i *Instance) DeleteProjectGrant(ctx context.Context, t *testing.T, project
 }
 
 func (i *Instance) DeactivateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2beta.DeactivateProjectGrantResponse {
+	t.Helper()
+
 	resp, err := i.Client.Projectv2Beta.DeactivateProjectGrant(ctx, &project_v2beta.DeactivateProjectGrantRequest{
 		ProjectId:             projectID,
 		GrantedOrganizationId: grantedOrgID,
@@ -923,6 +954,8 @@ func (i *Instance) DeactivateProjectGrant(ctx context.Context, t *testing.T, pro
 }
 
 func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, projectID, grantedOrgID string) *project_v2beta.ActivateProjectGrantResponse {
+	t.Helper()
+
 	resp, err := i.Client.Projectv2Beta.ActivateProjectGrant(ctx, &project_v2beta.ActivateProjectGrantRequest{
 		ProjectId:             projectID,
 		GrantedOrganizationId: grantedOrgID,
@@ -932,6 +965,8 @@ func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, proje
 }
 
 func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, projectID, userID string) *mgmt.AddUserGrantResponse {
+	t.Helper()
+
 	resp, err := i.Client.Mgmt.AddUserGrant(ctx, &mgmt.AddUserGrantRequest{
 		UserId:    userID,
 		ProjectId: projectID,
@@ -951,6 +986,8 @@ func (i *Instance) CreateProjectGrantUserGrant(ctx context.Context, orgID, proje
 }
 
 func (i *Instance) CreateInstanceMembership(t *testing.T, ctx context.Context, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
+	t.Helper()
+
 	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
 		Resource: &internal_permission_v2beta.ResourceType{
 			Resource: &internal_permission_v2beta.ResourceType_Instance{Instance: true},
@@ -963,6 +1000,8 @@ func (i *Instance) CreateInstanceMembership(t *testing.T, ctx context.Context, u
 }
 
 func (i *Instance) DeleteInstanceMembership(t *testing.T, ctx context.Context, userID string) {
+	t.Helper()
+
 	_, err := i.Client.Admin.RemoveIAMMember(ctx, &admin.RemoveIAMMemberRequest{
 		UserId: userID,
 	})
@@ -970,6 +1009,8 @@ func (i *Instance) DeleteInstanceMembership(t *testing.T, ctx context.Context, u
 }
 
 func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, orgID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
+	t.Helper()
+
 	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
 		Resource: &internal_permission_v2beta.ResourceType{
 			Resource: &internal_permission_v2beta.ResourceType_OrganizationId{OrganizationId: orgID},
@@ -982,6 +1023,8 @@ func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, orgID,
 }
 
 func (i *Instance) DeleteOrgMembership(t *testing.T, ctx context.Context, userID string) {
+	t.Helper()
+
 	_, err := i.Client.Mgmt.RemoveOrgMember(ctx, &mgmt.RemoveOrgMemberRequest{
 		UserId: userID,
 	})
@@ -989,6 +1032,8 @@ func (i *Instance) DeleteOrgMembership(t *testing.T, ctx context.Context, userID
 }
 
 func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
+	t.Helper()
+
 	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
 		Resource: &internal_permission_v2beta.ResourceType{
 			Resource: &internal_permission_v2beta.ResourceType_ProjectId{ProjectId: projectID},
@@ -1001,6 +1046,8 @@ func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, pr
 }
 
 func (i *Instance) DeleteProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) {
+	t.Helper()
+
 	_, err := i.Client.InternalPermissionv2Beta.DeleteAdministrator(ctx, &internal_permission_v2beta.DeleteAdministratorRequest{
 		Resource: &internal_permission_v2beta.ResourceType{Resource: &internal_permission_v2beta.ResourceType_ProjectId{ProjectId: projectID}},
 		UserId:   userID,
@@ -1009,6 +1056,8 @@ func (i *Instance) DeleteProjectMembership(t *testing.T, ctx context.Context, pr
 }
 
 func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
+	t.Helper()
+
 	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
 		Resource: &internal_permission_v2beta.ResourceType{
 			Resource: &internal_permission_v2beta.ResourceType_ProjectGrant_{ProjectGrant: &internal_permission_v2beta.ResourceType_ProjectGrant{
@@ -1024,6 +1073,8 @@ func (i *Instance) CreateProjectGrantMembership(t *testing.T, ctx context.Contex
 }
 
 func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Context, projectID, grantID, userID string) {
+	t.Helper()
+
 	_, err := i.Client.InternalPermissionv2Beta.DeleteAdministrator(ctx, &internal_permission_v2beta.DeleteAdministratorRequest{
 		Resource: &internal_permission_v2beta.ResourceType{
 			Resource: &internal_permission_v2beta.ResourceType_ProjectGrant_{ProjectGrant: &internal_permission_v2beta.ResourceType_ProjectGrant{
@@ -1037,6 +1088,8 @@ func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Contex
 }
 
 func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
+	t.Helper()
+
 	if name == "" {
 		name = gofakeit.Name()
 	}
@@ -1069,6 +1122,8 @@ func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoin
 }
 
 func (i *Instance) DeleteTarget(ctx context.Context, t *testing.T, id string) {
+	t.Helper()
+
 	_, err := i.Client.ActionV2.DeleteTarget(ctx, &action.DeleteTargetRequest{
 		Id: id,
 	})
@@ -1076,6 +1131,8 @@ func (i *Instance) DeleteTarget(ctx context.Context, t *testing.T, id string) {
 }
 
 func (i *Instance) DeleteExecution(ctx context.Context, t *testing.T, cond *action.Condition) {
+	t.Helper()
+
 	_, err := i.Client.ActionV2.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 	})
@@ -1083,6 +1140,8 @@ func (i *Instance) DeleteExecution(ctx context.Context, t *testing.T, cond *acti
 }
 
 func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []string) *action.SetExecutionResponse {
+	t.Helper()
+
 	target, err := i.Client.ActionV2.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 		Targets:   targets,
@@ -1092,7 +1151,7 @@ func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.
 }
 
 func (i *Instance) CreateUserSchemaEmpty(ctx context.Context) *userschema_v3alpha.CreateUserSchemaResponse {
-	return i.CreateUserSchemaEmptyWithType(ctx, fmt.Sprint(time.Now().UnixNano()+1))
+	return i.CreateUserSchemaEmptyWithType(ctx, strconv.FormatInt(time.Now().UnixNano()+1, 10))
 }
 
 func (i *Instance) CreateUserSchema(ctx context.Context, schemaData []byte) *userschema_v3alpha.CreateUserSchemaResponse {
@@ -1101,7 +1160,7 @@ func (i *Instance) CreateUserSchema(ctx context.Context, schemaData []byte) *use
 	logging.OnError(err).Fatal("create userschema unmarshal")
 	schema, err := i.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
 		UserSchema: &userschema_v3alpha.UserSchema{
-			Type: fmt.Sprint(time.Now().UnixNano() + 1),
+			Type: strconv.FormatInt(time.Now().UnixNano()+1, 10),
 			DataType: &userschema_v3alpha.UserSchema_Schema{
 				Schema: userSchema,
 			},

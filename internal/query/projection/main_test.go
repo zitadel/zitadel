@@ -13,6 +13,8 @@ import (
 type expect func(mockRepository *mock.MockRepository)
 
 func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
+	t.Helper()
+
 	m := mock.NewRepo(t)
 	for _, e := range expects {
 		e(m)

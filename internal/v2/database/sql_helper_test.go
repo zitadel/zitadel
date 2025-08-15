@@ -26,13 +26,7 @@ func TestCloseTx(t *testing.T) {
 				},
 				err: errExec,
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errExec)
-				if !is {
-					t.Errorf("execution error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr: assertErrBuilder(errExec),
 		},
 		{
 			name: "exec err and rollback err",
@@ -45,13 +39,7 @@ func TestCloseTx(t *testing.T) {
 				},
 				err: errExec,
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errExec)
-				if !is {
-					t.Errorf("execution error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr: assertErrBuilder(errExec),
 		},
 		{
 			name: "commit Err",
@@ -64,13 +52,7 @@ func TestCloseTx(t *testing.T) {
 				},
 				err: nil,
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errCommit)
-				if !is {
-					t.Errorf("commit error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr: assertErrBuilder(errCommit),
 		},
 		{
 			name: "no err",
@@ -82,13 +64,7 @@ func TestCloseTx(t *testing.T) {
 				},
 				err: nil,
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr: assertErrBuilder(nil),
 		},
 	}
 	for _, tt := range tests {
@@ -121,13 +97,7 @@ func TestMapRows(t *testing.T) {
 				mapper: nil,
 			},
 			wantResult: nil,
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errClose)
-				if !is {
-					t.Errorf("close error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr:  assertErrBuilder(errClose),
 		},
 		{
 			name: "no rows, close err",
@@ -138,13 +108,7 @@ func TestMapRows(t *testing.T) {
 				mapper: nil,
 			},
 			wantResult: nil,
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errRows)
-				if !is {
-					t.Errorf("rows error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr:  assertErrBuilder(errRows),
 		},
 		{
 			name: "scan err",
@@ -162,13 +126,7 @@ func TestMapRows(t *testing.T) {
 				},
 			},
 			wantResult: nil,
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errScan)
-				if !is {
-					t.Errorf("scan error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr:  assertErrBuilder(errScan),
 		},
 		{
 			name: "exec err",
@@ -181,13 +139,7 @@ func TestMapRows(t *testing.T) {
 				},
 			},
 			wantResult: nil,
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errExec)
-				if !is {
-					t.Errorf("exec error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr:  assertErrBuilder(errExec),
 		},
 		{
 			name: "exec err, close err",
@@ -201,13 +153,7 @@ func TestMapRows(t *testing.T) {
 				},
 			},
 			wantResult: nil,
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errExec)
-				if !is {
-					t.Errorf("exec error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr:  assertErrBuilder(errExec),
 		},
 		{
 			name: "rows err",
@@ -225,13 +171,7 @@ func TestMapRows(t *testing.T) {
 				},
 			},
 			wantResult: nil,
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errRows)
-				if !is {
-					t.Errorf("rows error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr:  assertErrBuilder(errRows),
 		},
 		{
 			name: "no err",
@@ -248,13 +188,7 @@ func TestMapRows(t *testing.T) {
 				},
 			},
 			wantResult: []*string{&emptyString},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr:  assertErrBuilder(nil),
 		},
 	}
 	for _, tt := range tests {
@@ -286,13 +220,7 @@ func TestMapRowsToObject(t *testing.T) {
 				},
 				mapper: nil,
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errClose)
-				if !is {
-					t.Errorf("close error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr: assertErrBuilder(errClose),
 		},
 		{
 			name: "no rows, close err",
@@ -302,13 +230,7 @@ func TestMapRowsToObject(t *testing.T) {
 				},
 				mapper: nil,
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errRows)
-				if !is {
-					t.Errorf("rows error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr: assertErrBuilder(errRows),
 		},
 		{
 			name: "scan err",
@@ -325,13 +247,7 @@ func TestMapRowsToObject(t *testing.T) {
 					return nil
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errScan)
-				if !is {
-					t.Errorf("scan error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr: assertErrBuilder(errScan),
 		},
 		{
 			name: "exec err",
@@ -343,13 +259,7 @@ func TestMapRowsToObject(t *testing.T) {
 					return errExec
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errExec)
-				if !is {
-					t.Errorf("exec error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr: assertErrBuilder(errExec),
 		},
 		{
 			name: "exec err, close err",
@@ -362,13 +272,7 @@ func TestMapRowsToObject(t *testing.T) {
 					return errExec
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errExec)
-				if !is {
-					t.Errorf("exec error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr: assertErrBuilder(errExec),
 		},
 		{
 			name: "rows err",
@@ -382,13 +286,7 @@ func TestMapRowsToObject(t *testing.T) {
 					return scan(&s)
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := errors.Is(err, errRows)
-				if !is {
-					t.Errorf("rows error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr: assertErrBuilder(errRows),
 		},
 		{
 			name: "no err",
@@ -401,13 +299,7 @@ func TestMapRowsToObject(t *testing.T) {
 					return scan(&s)
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected, got: %v", err)
-				}
-				return is
-			},
+			assertErr: assertErrBuilder(nil),
 		},
 	}
 	for _, tt := range tests {
@@ -455,6 +347,8 @@ func (t *testTx) Rollback() error {
 }
 
 func (tx *testTx) assert(t *testing.T) {
+	t.Helper()
+
 	if tx.commit.didExecute != tx.commit.shouldExecute {
 		t.Errorf("unexpected execution of commit: should %v, did: %v", tx.commit.shouldExecute, tx.commit.didExecute)
 	}
@@ -470,6 +364,18 @@ var (
 	errRows  = errors.New("err rows")
 	errScan  = errors.New("err scan")
 )
+
+func assertErrBuilder(target error) func(t *testing.T, err error) bool {
+	return func(t *testing.T, err error) bool {
+		t.Helper()
+
+		is := errors.Is(err, target)
+		if !is {
+			t.Errorf("wrong error, got: %v, want: %v", err, target)
+		}
+		return is
+	}
+}
 
 type testRows struct {
 	closeErr  bool

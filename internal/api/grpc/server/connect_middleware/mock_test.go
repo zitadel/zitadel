@@ -14,6 +14,8 @@ import (
 
 func emptyMockHandler(resp connect.AnyResponse, expectedCtxData authz.CtxData) func(*testing.T) connect.UnaryFunc {
 	return func(t *testing.T) connect.UnaryFunc {
+		t.Helper()
+
 		return func(ctx context.Context, _ connect.AnyRequest) (connect.AnyResponse, error) {
 			assert.Equal(t, expectedCtxData, authz.GetCtxData(ctx))
 			return resp, nil
@@ -23,6 +25,8 @@ func emptyMockHandler(resp connect.AnyResponse, expectedCtxData authz.CtxData) f
 
 func errorMockHandler() func(*testing.T) connect.UnaryFunc {
 	return func(t *testing.T) connect.UnaryFunc {
+		t.Helper()
+
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
 			return nil, zerrors.ThrowInternal(nil, "test", "error")
 		}

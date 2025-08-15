@@ -653,9 +653,11 @@ func TestLimits_ResetLimits(t *testing.T) {
 	}{
 		{
 			name: "not found",
-			fields: func(tt *testing.T) *eventstore.Eventstore {
+			fields: func(t *testing.T) *eventstore.Eventstore {
+				t.Helper()
+
 				return eventstoreExpect(
-					tt,
+					t,
 					expectFilter(),
 				)
 			},
@@ -670,7 +672,9 @@ func TestLimits_ResetLimits(t *testing.T) {
 		},
 		{
 			name: "already removed",
-			fields: func(tt *testing.T) *eventstore.Eventstore {
+			fields: func(t *testing.T) *eventstore.Eventstore {
+				t.Helper()
+
 				return eventstoreExpect(
 					t,
 					expectFilter(
@@ -703,7 +707,9 @@ func TestLimits_ResetLimits(t *testing.T) {
 		},
 		{
 			name: "reset limits, ok",
-			fields: func(tt *testing.T) *eventstore.Eventstore {
+			fields: func(t *testing.T) *eventstore.Eventstore {
+				t.Helper()
+
 				return eventstoreExpect(
 					t,
 					expectFilter(

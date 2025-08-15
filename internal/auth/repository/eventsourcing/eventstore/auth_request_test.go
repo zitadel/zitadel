@@ -320,6 +320,8 @@ type mockPasswordReset struct {
 
 func newMockPasswordReset(expectCall bool) func(*testing.T) passwordReset {
 	return func(t *testing.T) passwordReset {
+		t.Helper()
+
 		return &mockPasswordReset{
 			t:          t,
 			expectCall: expectCall,
@@ -2879,7 +2881,11 @@ func Test_userSessionByIDs(t *testing.T) {
 							Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
 							CreationDate:  testNow,
 							Data: func() []byte {
-								data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
+								data, err := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
+								if err != nil {
+									t.Fatalf("json.Marshal: %v", err)
+								}
+
 								return data
 							}(),
 						},
@@ -2908,7 +2914,11 @@ func Test_userSessionByIDs(t *testing.T) {
 							Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
 							CreationDate:  testNow,
 							Data: func() []byte {
-								data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
+								data, err := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
+								if err != nil {
+									t.Fatalf("json.Marshal: %v", err)
+								}
+
 								return data
 							}(),
 						},
@@ -2969,7 +2979,11 @@ func Test_userSessionByIDs(t *testing.T) {
 							Typ:           user_repo.HumanPasswordCheckSucceededType,
 							CreationDate:  testNow,
 							Data: func() []byte {
-								data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
+								data, err := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
+								if err != nil {
+									t.Fatalf("json.Marshal: %v", err)
+								}
+
 								return data
 							}(),
 						},
@@ -3069,7 +3083,11 @@ func Test_userByID(t *testing.T) {
 							Typ:           user_repo.UserV1PasswordChangedType,
 							CreationDate:  testNow,
 							Data: func() []byte {
-								data, _ := json.Marshal(user_es_model.Password{ChangeRequired: false, Secret: &crypto.CryptoValue{}})
+								data, err := json.Marshal(user_es_model.Password{ChangeRequired: false, Secret: &crypto.CryptoValue{}})
+								if err != nil {
+									t.Fatalf("json.Marshal: %v", err)
+								}
+
 								return data
 							}(),
 						},
@@ -3186,8 +3204,10 @@ func TestAuthRequestRepo_VerifyPassword_IgnoreUnknownUsernames(t *testing.T) {
 		{
 			name: "no user",
 			fields: fields{
-				AuthRequests: func(tt *testing.T, userID string) cache.AuthRequestCache {
-					m := mock.NewMockAuthRequestCache(gomock.NewController(tt))
+				AuthRequests: func(t *testing.T, userID string) cache.AuthRequestCache {
+					t.Helper()
+
+					m := mock.NewMockAuthRequestCache(gomock.NewController(t))
 					a := authRequest(userID)
 					m.EXPECT().GetAuthRequestByID(gomock.Any(), "authRequestID").Return(a, nil)
 					m.EXPECT().CacheAuthRequest(gomock.Any(), a)
@@ -3211,8 +3231,10 @@ func TestAuthRequestRepo_VerifyPassword_IgnoreUnknownUsernames(t *testing.T) {
 		{
 			name: "invalid password",
 			fields: fields{
-				AuthRequests: func(tt *testing.T, userID string) cache.AuthRequestCache {
-					m := mock.NewMockAuthRequestCache(gomock.NewController(tt))
+				AuthRequests: func(t *testing.T, userID string) cache.AuthRequestCache {
+					t.Helper()
+
+					m := mock.NewMockAuthRequestCache(gomock.NewController(t))
 					a := authRequest(userID)
 					m.EXPECT().GetAuthRequestByID(gomock.Any(), "authRequestID").Return(a, nil)
 					m.EXPECT().CacheAuthRequest(gomock.Any(), a)

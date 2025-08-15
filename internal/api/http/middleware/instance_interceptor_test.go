@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -291,13 +291,13 @@ type mockInstanceVerifier struct {
 
 func (m *mockInstanceVerifier) InstanceByHost(_ context.Context, instanceHost, publicHost string) (authz.Instance, error) {
 	if instanceHost != m.instanceHost {
-		return nil, fmt.Errorf("invalid host")
+		return nil, errors.New("invalid host")
 	}
 	if publicHost == "" {
 		return &mockInstance{}, nil
 	}
 	if publicHost != instanceHost && publicHost != m.publicHost {
-		return nil, fmt.Errorf("invalid host")
+		return nil, errors.New("invalid host")
 	}
 	return &mockInstance{}, nil
 }
