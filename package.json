@@ -10,13 +10,6 @@
     "clean": "turbo run clean",
     "clean:all": "pnpm run clean && rm -rf .turbo node_modules"
   },
-  "pnpm": {
-    "overrides": {
-      "@typescript-eslint/parser": "^8.35.1",
-      "@zitadel/client": "workspace:*",
-      "@zitadel/proto": "workspace:*"
-    }
-  },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
     "@devcontainers/cli": "^0.80.0",

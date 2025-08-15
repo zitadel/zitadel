@@ -97,7 +97,7 @@ console_move:
 
 .PHONY: console_dependencies
 console_dependencies:
-	npx pnpm install --frozen-lockfile --filter=./console
+	npx pnpm install --frozen-lockfile --filter=console...
 
 .PHONY: console_build
 console_build: console_dependencies
