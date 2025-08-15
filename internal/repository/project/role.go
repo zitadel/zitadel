@@ -43,7 +43,7 @@ type RoleAddedEvent struct {
 	Group       string `json:"group,omitempty"`
 }
 
-func (e *RoleAddedEvent) Payload() interface{} {
+func (e *RoleAddedEvent) Payload() any {
 	return e
 }
 
@@ -144,7 +144,7 @@ type RoleChangedEvent struct {
 	Group       *string `json:"group,omitempty"`
 }
 
-func (e *RoleChangedEvent) Payload() interface{} {
+func (e *RoleChangedEvent) Payload() any {
 	return e
 }
 
@@ -257,7 +257,7 @@ type RoleRemovedEvent struct {
 	Key string `json:"key,omitempty"`
 }
 
-func (e *RoleRemovedEvent) Payload() interface{} {
+func (e *RoleRemovedEvent) Payload() any {
 	return e
 }
 

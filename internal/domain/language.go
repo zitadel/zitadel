@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"slices"
 
 	"golang.org/x/text/language"
 
@@ -121,10 +122,5 @@ func languagesAreContained(languages, search []language.Tag) bool {
 }
 
 func languageIsContained(languages []language.Tag, search language.Tag) bool {
-	for _, lang := range languages {
-		if lang == search {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(languages, search)
 }

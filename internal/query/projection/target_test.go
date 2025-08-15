@@ -42,7 +42,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.targets2 (instance_id, resource_owner, id, creation_date, change_date, sequence, name, endpoint, target_type, timeout, interrupt_on_error, signing_key) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"ro-id",
 								"agg-id",
@@ -81,7 +81,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.targets2 SET (change_date, sequence, resource_owner, name, target_type, endpoint, timeout, interrupt_on_error, signing_key) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (instance_id = $10) AND (id = $11)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"ro-id",
@@ -119,7 +119,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.targets2 WHERE (instance_id = $1) AND (id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},
@@ -148,7 +148,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.targets2 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},

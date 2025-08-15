@@ -35,7 +35,7 @@ type HumanPasswordChangedEvent struct {
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
-func (e *HumanPasswordChangedEvent) Payload() interface{} {
+func (e *HumanPasswordChangedEvent) Payload() any {
 	return e
 }
 
@@ -93,7 +93,7 @@ type HumanPasswordCodeAddedEvent struct {
 	GeneratorID   string `json:"generatorId,omitempty"`
 }
 
-func (e *HumanPasswordCodeAddedEvent) Payload() interface{} {
+func (e *HumanPasswordCodeAddedEvent) Payload() any {
 	return e
 }
 
@@ -177,7 +177,7 @@ func (e *HumanPasswordCodeSentEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *HumanPasswordCodeSentEvent) Payload() interface{} {
+func (e *HumanPasswordCodeSentEvent) Payload() any {
 	return e
 }
 
@@ -200,7 +200,7 @@ type HumanPasswordChangeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanPasswordChangeSentEvent) Payload() interface{} {
+func (e *HumanPasswordChangeSentEvent) Payload() any {
 	return nil
 }
 
@@ -229,7 +229,7 @@ type HumanPasswordCheckSucceededEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanPasswordCheckSucceededEvent) Payload() interface{} {
+func (e *HumanPasswordCheckSucceededEvent) Payload() any {
 	return e
 }
 
@@ -269,7 +269,7 @@ type HumanPasswordCheckFailedEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanPasswordCheckFailedEvent) Payload() interface{} {
+func (e *HumanPasswordCheckFailedEvent) Payload() any {
 	return e
 }
 
@@ -309,7 +309,7 @@ type HumanPasswordHashUpdatedEvent struct {
 	EncodedHash          string `json:"encodedHash,omitempty"`
 }
 
-func (e *HumanPasswordHashUpdatedEvent) Payload() interface{} {
+func (e *HumanPasswordHashUpdatedEvent) Payload() any {
 	return e
 }
 

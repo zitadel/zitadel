@@ -1,7 +1,9 @@
 package record
 
 import (
+	"maps"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 
@@ -72,12 +74,9 @@ func (a AccessLog) IsAuthenticated() bool {
 }
 
 func (a AccessLog) isUnaccountableEndpoint() bool {
-	for _, endpoint := range unaccountableEndpoints {
-		if strings.HasPrefix(a.RequestURL, endpoint) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(unaccountableEndpoints, func(endpoint string) bool {
+		return strings.HasPrefix(a.RequestURL, endpoint)
+	})
 }
 
 func (a AccessLog) Normalize() *AccessLog {
@@ -104,9 +103,7 @@ func lowerKeys(header map[string][]string) map[string][]string {
 
 func redactKeys(header map[string][]string, redactKeysLower ...string) map[string][]string {
 	redactedKeys := make(map[string][]string, len(header))
-	for k, v := range header {
-		redactedKeys[k] = v
-	}
+	maps.Copy(redactedKeys, header)
 	for _, redactKey := range redactKeysLower {
 		if _, ok := redactedKeys[redactKey]; ok {
 			redactedKeys[redactKey] = []string{redacted}

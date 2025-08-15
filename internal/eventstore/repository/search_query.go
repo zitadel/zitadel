@@ -38,7 +38,7 @@ type SearchQuery struct {
 // Filter represents all fields needed to compare a field of an event with a value
 type Filter struct {
 	Field     Field
-	Value     interface{}
+	Value     any
 	Operation Operation
 }
 
@@ -95,7 +95,7 @@ const (
 )
 
 // NewFilter is used in tests. Use searchQuery.*Filter() instead
-func NewFilter(field Field, value interface{}, operation Operation) *Filter {
+func NewFilter(field Field, value any, operation Operation) *Filter {
 	return &Filter{
 		Field:     field,
 		Value:     value,

@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/gorilla/securecookie"
@@ -102,7 +103,7 @@ func (c *CookieHandler) GetCookieValue(r *http.Request, name string) (string, er
 	return cookie.Value, nil
 }
 
-func (c *CookieHandler) GetEncryptedCookieValue(r *http.Request, name string, value interface{}) error {
+func (c *CookieHandler) GetEncryptedCookieValue(r *http.Request, name string, value any) error {
 	cookie, err := r.Cookie(SetCookiePrefix(name, c.secureOnly, c.prefix))
 	if err != nil {
 		return err
@@ -117,7 +118,7 @@ func (c *CookieHandler) SetCookie(w http.ResponseWriter, name, domain, value str
 	c.httpSet(w, name, domain, value, c.maxAge)
 }
 
-func (c *CookieHandler) SetEncryptedCookie(w http.ResponseWriter, name, domain string, value interface{}, sameSiteNone bool) error {
+func (c *CookieHandler) SetEncryptedCookie(w http.ResponseWriter, name, domain string, value any, sameSiteNone bool) error {
 	if c.securecookie == nil {
 		return zerrors.ThrowInternal(nil, "HTTP-s2HUtx", "securecookie not configured")
 	}
@@ -162,10 +163,8 @@ func (c *CookieHandler) httpSetWithSameSite(w http.ResponseWriter, name, host, v
 		SameSite: sameSite,
 	})
 	varyValues := w.Header().Values("vary")
-	for _, vary := range varyValues {
-		if vary == "Cookie" {
-			return
-		}
+	if slices.Contains(varyValues, "Cookie") {
+		return
 	}
 	w.Header().Add("vary", "Cookie")
 }

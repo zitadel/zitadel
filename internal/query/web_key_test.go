@@ -330,7 +330,7 @@ func TestQueries_GetWebKeySet(t *testing.T) {
 	}
 	expectedRows := make([][]driver.Value, 3)
 
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		_, pubKey, err := crypto.GenerateEncryptedWebKey(strconv.Itoa(i), alg, conf)
 		require.NoError(t, err)
 		pubKeyJSON, err := json.Marshal(pubKey)

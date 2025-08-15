@@ -43,7 +43,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.lockout_policies3 (creation_date, change_date, sequence, id, state, max_password_attempts, max_otp_attempts, show_failure, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -83,7 +83,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.lockout_policies3 SET (change_date, sequence, max_password_attempts, max_otp_attempts, show_failure) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								uint64(10),
@@ -115,7 +115,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.lockout_policies3 WHERE (id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 							},
@@ -142,7 +142,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.lockout_policies3 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},
@@ -172,7 +172,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.lockout_policies3 (creation_date, change_date, sequence, id, state, max_password_attempts, max_otp_attempts, show_failure, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -212,7 +212,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.lockout_policies3 SET (change_date, sequence, max_password_attempts, max_otp_attempts, show_failure) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								uint64(10),
@@ -244,7 +244,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.lockout_policies3 WHERE (instance_id = $1) AND (resource_owner = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},

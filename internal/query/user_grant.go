@@ -22,8 +22,8 @@ import (
 type UserGrant struct {
 	// ID represents the aggregate id (id of the user grant)
 	ID           string                     `json:"id,omitempty"`
-	CreationDate time.Time                  `json:"creation_date,omitempty"`
-	ChangeDate   time.Time                  `json:"change_date,omitempty"`
+	CreationDate time.Time                  `json:"creation_date"`
+	ChangeDate   time.Time                  `json:"change_date"`
 	Sequence     uint64                     `json:"sequence,omitempty"`
 	Roles        database.TextArray[string] `json:"roles,omitempty"`
 	// GrantID represents the project grant id
@@ -137,7 +137,7 @@ func NewUserGrantIDSearchQuery(id string) (SearchQuery, error) {
 }
 
 func NewUserGrantInIDsSearchQuery(ids []string) (SearchQuery, error) {
-	list := make([]interface{}, len(ids))
+	list := make([]any, len(ids))
 	for i, value := range ids {
 		list[i] = value
 	}
@@ -201,7 +201,7 @@ func NewUserGrantWithGrantedQuery(owner string) (SearchQuery, error) {
 }
 
 func NewUserGrantContainsRolesSearchQuery(roles ...string) (SearchQuery, error) {
-	r := make([]interface{}, len(roles))
+	r := make([]any, len(roles))
 	for i, role := range roles {
 		r[i] = role
 	}

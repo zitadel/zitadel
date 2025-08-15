@@ -80,7 +80,7 @@ func NewRemovedEvent(
 	}
 }
 
-func (e *RemovedEvent) Payload() interface{} {
+func (e *RemovedEvent) Payload() any {
 	return e
 }
 

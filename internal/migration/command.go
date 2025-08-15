@@ -40,7 +40,7 @@ func setupStartedCmd(ctx context.Context, migration Migration) eventstore.Comman
 func setupDoneCmd(ctx context.Context, migration Migration, err error) eventstore.Command {
 	ctx = authz.SetCtxData(service.WithService(ctx, "system"), authz.CtxData{UserID: "system", OrgID: "SYSTEM", ResourceOwner: "SYSTEM"})
 	typ := DoneType
-	var lastRun interface{}
+	var lastRun any
 	if repeatable, ok := migration.(RepeatableMigration); ok {
 		typ = repeatableDoneType
 		lastRun = repeatable
@@ -64,7 +64,7 @@ func setupDoneCmd(ctx context.Context, migration Migration, err error) eventstor
 	return s
 }
 
-func (s *SetupStep) Payload() interface{} {
+func (s *SetupStep) Payload() any {
 	return s
 }
 

@@ -315,7 +315,7 @@ func Test_CallTargets(t *testing.T) {
 		targets []*mockTarget
 	}
 	type res struct {
-		ret     interface{}
+		ret     any
 		wantErr bool
 	}
 	tests := []struct {
@@ -491,8 +491,8 @@ type callTestServer struct {
 func testServers(
 	t *testing.T,
 	c []*callTestServer,
-	call func([]string) (interface{}, error),
-) (interface{}, error) {
+	call func([]string) (any, error),
+) (any, error) {
 	urls := make([]string, len(c))
 	for i := range c {
 		url, close := listen(t, c[i])
@@ -565,8 +565,8 @@ func testCallTarget(ctx context.Context,
 func testCallTargets(ctx context.Context,
 	info *middleware.ContextInfoRequest,
 	target []*mockTarget,
-) func([]string) (interface{}, error) {
-	return func(urls []string) (interface{}, error) {
+) func([]string) (any, error) {
+	return func(urls []string) (any, error) {
 		targets := make([]execution.Target, len(target))
 		for i, t := range target {
 			t.Endpoint = urls[i]

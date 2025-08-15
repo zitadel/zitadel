@@ -45,7 +45,7 @@ func NewOIDCIDPAddedEvent(
 	}
 }
 
-func (e *OIDCIDPAddedEvent) Payload() interface{} {
+func (e *OIDCIDPAddedEvent) Payload() any {
 	return e
 }
 
@@ -148,7 +148,7 @@ func ChangeOIDCUsePKCE(usePKCE bool) func(*OIDCIDPChangedEvent) {
 	}
 }
 
-func (e *OIDCIDPChangedEvent) Payload() interface{} {
+func (e *OIDCIDPChangedEvent) Payload() any {
 	return e
 }
 
@@ -199,7 +199,7 @@ func NewOIDCIDPMigratedAzureADEvent(
 	}
 }
 
-func (e *OIDCIDPMigratedAzureADEvent) Data() interface{} {
+func (e *OIDCIDPMigratedAzureADEvent) Data() any {
 	return e
 }
 
@@ -242,7 +242,7 @@ func NewOIDCIDPMigratedGoogleEvent(
 	}
 }
 
-func (e *OIDCIDPMigratedGoogleEvent) Data() interface{} {
+func (e *OIDCIDPMigratedGoogleEvent) Data() any {
 	return e
 }
 

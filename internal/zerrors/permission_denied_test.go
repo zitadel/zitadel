@@ -10,7 +10,7 @@ import (
 )
 
 func TestPermissionDeniedError(t *testing.T) {
-	var err interface{} = new(zerrors.PermissionDeniedError)
+	var err any = new(zerrors.PermissionDeniedError)
 	_, ok := err.(zerrors.PermissionDenied)
 	assert.True(t, ok)
 }

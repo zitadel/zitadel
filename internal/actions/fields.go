@@ -5,7 +5,7 @@ import (
 	"github.com/zitadel/logging"
 )
 
-type fields map[string]interface{}
+type fields map[string]any
 
 type FieldOption func(*FieldConfig)
 
@@ -15,7 +15,7 @@ type FieldConfig struct {
 	Runtime *goja.Runtime
 }
 
-func SetFields(name string, values ...interface{}) FieldOption {
+func SetFields(name string, values ...any) FieldOption {
 	return func(p *FieldConfig) {
 		if len(values) == 0 {
 			return
@@ -57,13 +57,13 @@ func SetFields(name string, values ...interface{}) FieldOption {
 	}
 }
 
-func (f *FieldConfig) set(name string, value interface{}) {
+func (f *FieldConfig) set(name string, value any) {
 	if _, ok := f.fields[name]; ok {
 		logging.WithFields("name", name).Error("tried to overwrite field")
 		panic("tried to overwrite field")
 	}
 	switch v := value.(type) {
-	case func(config *FieldConfig) interface{}:
+	case func(config *FieldConfig) any:
 		f.fields[name] = v(f)
 	case func(config *FieldConfig) func(call goja.FunctionCall) goja.Value:
 		f.fields[name] = v(f)

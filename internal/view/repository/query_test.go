@@ -163,7 +163,7 @@ func TestSetQuery(t *testing.T) {
 	exprPrefix := `(SELECT test_field FROM "test_table"  WHERE `
 	type args struct {
 		key    ColumnKey
-		value  interface{}
+		value  any
 		method domain.SearchMethod
 	}
 	type want struct {

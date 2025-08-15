@@ -118,7 +118,7 @@ func (t WebAuthNTokens) Value() (driver.Value, error) {
 	return json.Marshal(&t)
 }
 
-func (t *WebAuthNTokens) Scan(src interface{}) error {
+func (t *WebAuthNTokens) Scan(src any) error {
 	if b, ok := src.([]byte); ok {
 		return json.Unmarshal(b, t)
 	}

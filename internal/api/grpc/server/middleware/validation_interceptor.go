@@ -12,7 +12,7 @@ import (
 )
 
 func ValidationHandler() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		return validate(ctx, req, info, handler)
 	}
 }
@@ -23,7 +23,7 @@ type validator interface {
 	Validate() error
 }
 
-func validate(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func validate(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 	validate, ok := req.(validator)
 	if !ok {
 		return handler(ctx, req)

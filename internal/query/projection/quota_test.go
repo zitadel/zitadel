@@ -51,7 +51,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.quotas (limit_usage, amount, from_anchor, interval, id, instance_id, unit) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, unit) DO UPDATE SET (limit_usage, amount, from_anchor, interval, id) = (EXCLUDED.limit_usage, EXCLUDED.amount, EXCLUDED.from_anchor, EXCLUDED.interval, EXCLUDED.id)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								true,
 								uint64(10),
 								time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
@@ -96,7 +96,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.quotas (limit_usage, amount, from_anchor, interval, id, instance_id, unit) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, unit) DO UPDATE SET (limit_usage, amount, from_anchor, interval, id) = (EXCLUDED.limit_usage, EXCLUDED.amount, EXCLUDED.from_anchor, EXCLUDED.interval, EXCLUDED.id)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								true,
 								uint64(10),
 								time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
@@ -108,14 +108,14 @@ func TestQuotasProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "DELETE FROM projections.quotas_notifications WHERE (instance_id = $1) AND (unit = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								quota.RequestsAllAuthenticated,
 							},
 						},
 						{
 							expectedStmt: "INSERT INTO projections.quotas_notifications (instance_id, unit, id, call_url, percent, repeat) VALUES ($1, $2, $3, $4, $5, $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								quota.RequestsAllAuthenticated,
 								"id",
@@ -151,7 +151,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.quotas (limit_usage, amount, from_anchor, interval, id, instance_id, unit) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, unit) DO UPDATE SET (limit_usage, amount, from_anchor, interval, id) = (EXCLUDED.limit_usage, EXCLUDED.amount, EXCLUDED.from_anchor, EXCLUDED.interval, EXCLUDED.id)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								true,
 								uint64(10),
 								time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
@@ -196,7 +196,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.quotas (limit_usage, amount, from_anchor, interval, id, instance_id, unit) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, unit) DO UPDATE SET (limit_usage, amount, from_anchor, interval, id) = (EXCLUDED.limit_usage, EXCLUDED.amount, EXCLUDED.from_anchor, EXCLUDED.interval, EXCLUDED.id)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								true,
 								uint64(10),
 								time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
@@ -208,14 +208,14 @@ func TestQuotasProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "DELETE FROM projections.quotas_notifications WHERE (instance_id = $1) AND (unit = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								quota.RequestsAllAuthenticated,
 							},
 						},
 						{
 							expectedStmt: "INSERT INTO projections.quotas_notifications (instance_id, unit, id, call_url, percent, repeat) VALUES ($1, $2, $3, $4, $5, $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								quota.RequestsAllAuthenticated,
 								"id",
@@ -252,7 +252,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.quotas_notifications SET (latest_due_period_start, next_due_threshold) = ($1, $2) WHERE (instance_id = $3) AND (unit = $4) AND (id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 								uint16(300),
 								"instance-id",
@@ -283,21 +283,21 @@ func TestQuotasProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.quotas_periods WHERE (instance_id = $1) AND (unit = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								quota.RequestsAllAuthenticated,
 							},
 						},
 						{
 							expectedStmt: "DELETE FROM projections.quotas_notifications WHERE (instance_id = $1) AND (unit = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								quota.RequestsAllAuthenticated,
 							},
 						},
 						{
 							expectedStmt: "DELETE FROM projections.quotas WHERE (instance_id = $1) AND (unit = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								quota.RequestsAllAuthenticated,
 							},
@@ -324,19 +324,19 @@ func TestQuotasProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.quotas_periods WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 							},
 						},
 						{
 							expectedStmt: "DELETE FROM projections.quotas_notifications WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 							},
 						},
 						{
 							expectedStmt: "DELETE FROM projections.quotas WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 							},
 						},

@@ -1,5 +1,7 @@
 package org
 
+import "slices"
+
 type State uint8
 
 const (
@@ -27,10 +29,5 @@ func (s State) IsValidStates(states ...State) bool {
 	if !s.IsValid() {
 		return false
 	}
-	for _, state := range states {
-		if s.Is(state) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(states, s.Is)
 }

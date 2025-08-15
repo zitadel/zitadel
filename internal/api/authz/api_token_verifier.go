@@ -2,6 +2,7 @@ package authz
 
 import (
 	"context"
+	"maps"
 	"sync"
 
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -39,9 +40,7 @@ func (v *ApiTokenVerifier) RegisterServer(appName, methodPrefix string, mappings
 	if v.authMethods == nil {
 		v.authMethods = make(map[string]Option)
 	}
-	for method, option := range mappings {
-		v.authMethods[method] = option
-	}
+	maps.Copy(v.authMethods, mappings)
 }
 
 func (v *ApiTokenVerifier) SearchMyMemberships(ctx context.Context, orgID string, shouldTriggerBulk bool) (_ []*Membership, err error) {

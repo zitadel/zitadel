@@ -40,7 +40,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.user_schemas1 (id, creation_date, change_date, sequence, instance_id, state, type, revision, schema, possible_authenticators) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								anyArg{},
 								anyArg{},
@@ -75,7 +75,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.user_schemas1 SET (change_date, sequence, type, schema, revision, possible_authenticators) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"type",
@@ -108,7 +108,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.user_schemas1 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.UserSchemaStateInactive,
@@ -138,7 +138,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.user_schemas1 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.UserSchemaStateActive,
@@ -168,7 +168,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_schemas1 WHERE (id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 							},
@@ -195,7 +195,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_schemas1 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},

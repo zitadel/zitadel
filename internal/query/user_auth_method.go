@@ -294,7 +294,7 @@ func NewUserAuthMethodStateSearchQuery(value domain.MFAState) (SearchQuery, erro
 }
 
 func NewUserAuthMethodTypesSearchQuery(values ...domain.UserAuthMethodType) (SearchQuery, error) {
-	list := make([]interface{}, len(values))
+	list := make([]any, len(values))
 	for i, value := range values {
 		list[i] = value
 	}
@@ -302,7 +302,7 @@ func NewUserAuthMethodTypesSearchQuery(values ...domain.UserAuthMethodType) (Sea
 }
 
 func NewUserAuthMethodStatesSearchQuery(values ...domain.MFAState) (SearchQuery, error) {
-	list := make([]interface{}, len(values))
+	list := make([]any, len(values))
 	for i, value := range values {
 		list[i] = value
 	}
@@ -506,7 +506,7 @@ func prepareAuthMethodsIDPsQuery() (string, error) {
 	return idpsQuery, err
 }
 
-func prepareAuthMethodQuery(activeOnly bool, includeWithoutDomain bool, queryDomain string) (string, []interface{}, error) {
+func prepareAuthMethodQuery(activeOnly bool, includeWithoutDomain bool, queryDomain string) (string, []any, error) {
 	q := sq.Select(
 		"DISTINCT("+authMethodTypeType.identifier()+")",
 		authMethodTypeUserID.identifier(),

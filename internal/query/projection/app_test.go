@@ -47,7 +47,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.apps7 (id, name, project_id, creation_date, change_date, resource_owner, instance_id, state, sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"app-id",
 								"my-app",
 								"agg-id",
@@ -84,7 +84,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (name, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"my-app",
 								anyArg{},
 								uint64(15),
@@ -137,7 +137,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								domain.AppStateInactive,
 								anyArg{},
 								uint64(15),
@@ -169,7 +169,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								domain.AppStateActive,
 								anyArg{},
 								uint64(15),
@@ -201,7 +201,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.apps7 WHERE (id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"app-id",
 								"instance-id",
 							},
@@ -228,7 +228,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.apps7 WHERE (project_id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 							},
@@ -255,7 +255,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.apps7 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},
@@ -286,7 +286,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.apps7_api_configs (app_id, instance_id, client_id, client_secret, auth_method) VALUES ($1, $2, $3, $4, $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"app-id",
 								"instance-id",
 								"client-id",
@@ -296,7 +296,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"app-id",
@@ -330,7 +330,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.apps7_api_configs (app_id, instance_id, client_id, client_secret, auth_method) VALUES ($1, $2, $3, $4, $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"app-id",
 								"instance-id",
 								"client-id",
@@ -340,7 +340,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"app-id",
@@ -373,7 +373,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.apps7_api_configs SET auth_method = $1 WHERE (app_id = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								domain.APIAuthMethodTypePrivateKeyJWT,
 								"app-id",
 								"instance-id",
@@ -381,7 +381,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"app-id",
@@ -434,7 +434,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.apps7_api_configs SET client_secret = $1 WHERE (app_id = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"secret",
 								"app-id",
 								"instance-id",
@@ -442,7 +442,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"app-id",
@@ -474,7 +474,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.apps7_api_configs SET client_secret = $1 WHERE (app_id = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"secret",
 								"app-id",
 								"instance-id",
@@ -482,7 +482,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"app-id",
@@ -514,7 +514,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.apps7_api_configs SET client_secret = $1 WHERE (app_id = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"secret",
 								"app-id",
 								"instance-id",
@@ -522,7 +522,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"app-id",
@@ -573,7 +573,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.apps7_oidc_configs (app_id, instance_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page, back_channel_logout_uri, login_version, login_base_uri) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"app-id",
 								"instance-id",
 								domain.OIDCVersionV1,
@@ -600,7 +600,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"app-id",
@@ -651,7 +651,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.apps7_oidc_configs (app_id, instance_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page, back_channel_logout_uri, login_version, login_base_uri) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"app-id",
 								"instance-id",
 								domain.OIDCVersionV1,
@@ -678,7 +678,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"app-id",
@@ -726,7 +726,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.apps7_oidc_configs SET (version, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page, back_channel_logout_uri, login_version) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) WHERE (app_id = $18) AND (instance_id = $19)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								domain.OIDCVersionV1,
 								database.TextArray[string]{"redirect.one.ch", "redirect.two.ch"},
 								database.NumberArray[domain.OIDCResponseType]{1, 2},
@@ -750,7 +750,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"app-id",
@@ -803,7 +803,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.apps7_oidc_configs SET client_secret = $1 WHERE (app_id = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"secret",
 								"app-id",
 								"instance-id",
@@ -811,7 +811,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"app-id",
@@ -843,7 +843,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.apps7_oidc_configs SET client_secret = $1 WHERE (app_id = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"secret",
 								"app-id",
 								"instance-id",
@@ -851,7 +851,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"app-id",
@@ -883,7 +883,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.apps7_oidc_configs SET client_secret = $1 WHERE (app_id = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"secret",
 								"app-id",
 								"instance-id",
@@ -891,7 +891,7 @@ func TestAppProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "UPDATE projections.apps7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"app-id",
@@ -920,7 +920,7 @@ func TestAppProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.apps7 WHERE (instance_id = $1) AND (resource_owner = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},

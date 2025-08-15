@@ -52,7 +52,7 @@ func NewTrustedDomainAddedEvent(
 	return event
 }
 
-func (e *TrustedDomainAddedEvent) Payload() interface{} {
+func (e *TrustedDomainAddedEvent) Payload() any {
 	return e
 }
 
@@ -86,7 +86,7 @@ func NewTrustedDomainRemovedEvent(
 	return event
 }
 
-func (e *TrustedDomainRemovedEvent) Payload() interface{} {
+func (e *TrustedDomainRemovedEvent) Payload() any {
 	return e
 }
 

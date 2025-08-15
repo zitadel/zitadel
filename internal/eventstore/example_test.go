@@ -57,7 +57,7 @@ func UserAddedEventMapper() (eventstore.AggregateType, eventstore.EventType, fun
 	}
 }
 
-func (e *UserAddedEvent) Payload() interface{} {
+func (e *UserAddedEvent) Payload() any {
 	return e
 }
 
@@ -102,7 +102,7 @@ func UserFirstNameChangedMapper() (eventstore.AggregateType, eventstore.EventTyp
 	}
 }
 
-func (e *UserFirstNameChangedEvent) Payload() interface{} {
+func (e *UserFirstNameChangedEvent) Payload() any {
 	return e
 }
 
@@ -139,7 +139,7 @@ func UserPasswordCheckedMapper() (eventstore.AggregateType, eventstore.EventType
 	}
 }
 
-func (e *UserPasswordCheckedEvent) Payload() interface{} {
+func (e *UserPasswordCheckedEvent) Payload() any {
 	return nil
 }
 
@@ -176,7 +176,7 @@ func UserDeletedMapper() (eventstore.AggregateType, eventstore.EventType, func(e
 	}
 }
 
-func (e *UserDeletedEvent) Payload() interface{} {
+func (e *UserDeletedEvent) Payload() any {
 	return nil
 }
 

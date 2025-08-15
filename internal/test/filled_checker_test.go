@@ -9,7 +9,7 @@ import (
 
 func TestCheckAllFieldsIgnores(t *testing.T) {
 	type args struct {
-		object        interface{}
+		object        any
 		ignoredFields []string
 	}
 	type res struct {
@@ -284,7 +284,7 @@ type mappedExpecter struct {
 	notFilledFields string
 }
 
-func (e *mappedExpecter) Errorf(format string, args ...interface{}) {
+func (e *mappedExpecter) Errorf(format string, args ...any) {
 	if format == "expected fields are not empty:\n\t%s\n" {
 		e.notEmptyFields = args[0].(string)
 	}

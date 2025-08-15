@@ -27,7 +27,7 @@ type HumanEmailChangedEvent struct {
 	EmailAddress domain.EmailAddress `json:"email,omitempty"`
 }
 
-func (e *HumanEmailChangedEvent) Payload() interface{} {
+func (e *HumanEmailChangedEvent) Payload() any {
 	return e
 }
 
@@ -64,7 +64,7 @@ type HumanEmailVerifiedEvent struct {
 	IsEmailVerified bool `json:"-"`
 }
 
-func (e *HumanEmailVerifiedEvent) Payload() interface{} {
+func (e *HumanEmailVerifiedEvent) Payload() any {
 	return nil
 }
 
@@ -94,7 +94,7 @@ type HumanEmailVerificationFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanEmailVerificationFailedEvent) Payload() interface{} {
+func (e *HumanEmailVerificationFailedEvent) Payload() any {
 	return nil
 }
 
@@ -130,7 +130,7 @@ type HumanEmailCodeAddedEvent struct {
 	AuthRequestID string `json:"authRequestID,omitempty"`
 }
 
-func (e *HumanEmailCodeAddedEvent) Payload() interface{} {
+func (e *HumanEmailCodeAddedEvent) Payload() any {
 	return e
 }
 
@@ -192,7 +192,7 @@ type HumanEmailCodeSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanEmailCodeSentEvent) Payload() interface{} {
+func (e *HumanEmailCodeSentEvent) Payload() any {
 	return nil
 }
 

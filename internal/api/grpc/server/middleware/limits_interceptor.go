@@ -16,7 +16,7 @@ func LimitsInterceptor(ignoreService ...string) grpc.UnaryServerInterceptor {
 			ignoreService[idx] = "/" + service
 		}
 	}
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ interface{}, err error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
 		for _, service := range ignoreService {
 			if strings.HasPrefix(info.FullMethod, service) {
 				return handler(ctx, req)

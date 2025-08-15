@@ -18,7 +18,7 @@ type Config struct {
 	ServiceName string
 }
 
-func NewTracerFromConfig(rawConfig map[string]interface{}) (err error) {
+func NewTracerFromConfig(rawConfig map[string]any) (err error) {
 	c := new(Config)
 	c.Endpoint, _ = rawConfig["endpoint"].(string)
 	c.ServiceName, _ = rawConfig["servicename"].(string)
@@ -29,7 +29,7 @@ func NewTracerFromConfig(rawConfig map[string]interface{}) (err error) {
 	return c.NewTracer()
 }
 
-func FractionFromConfig(i interface{}) (float64, error) {
+func FractionFromConfig(i any) (float64, error) {
 	if i == nil {
 		return 0, nil
 	}

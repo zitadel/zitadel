@@ -32,7 +32,7 @@ type HumanRefreshTokenAddedEvent struct {
 	Actor                 *domain.TokenActor `json:"actor,omitempty"`
 }
 
-func (e *HumanRefreshTokenAddedEvent) Payload() interface{} {
+func (e *HumanRefreshTokenAddedEvent) Payload() any {
 	return e
 }
 
@@ -99,7 +99,7 @@ type HumanRefreshTokenRenewedEvent struct {
 	IdleExpiration time.Duration `json:"idleExpiration"`
 }
 
-func (e *HumanRefreshTokenRenewedEvent) Payload() interface{} {
+func (e *HumanRefreshTokenRenewedEvent) Payload() any {
 	return e
 }
 
@@ -148,7 +148,7 @@ type HumanRefreshTokenRemovedEvent struct {
 	TokenID string `json:"tokenId"`
 }
 
-func (e *HumanRefreshTokenRemovedEvent) Payload() interface{} {
+func (e *HumanRefreshTokenRemovedEvent) Payload() any {
 	return e
 }
 

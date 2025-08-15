@@ -22,7 +22,7 @@ func ThrowInternal(parent error, id, message string) error {
 	return &InternalError{CreateZitadelError(parent, id, message)}
 }
 
-func ThrowInternalf(parent error, id, format string, a ...interface{}) error {
+func ThrowInternalf(parent error, id, format string, a ...any) error {
 	return ThrowInternal(parent, id, fmt.Sprintf(format, a...))
 }
 

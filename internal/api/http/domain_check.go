@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -68,10 +69,8 @@ func ValidateDomainDNS(domain, verifier string) error {
 		return zerrors.ThrowInternal(err, "HTTP-Hwsw2", "Errors.Internal")
 	}
 
-	for _, record := range txtRecords {
-		if record == verifier {
-			return nil
-		}
+	if slices.Contains(txtRecords, verifier) {
+		return nil
 	}
 	return zerrors.ThrowNotFound(err, "ORG-G28if", "Errors.Org.DomainVerificationTXTNoMatch")
 }

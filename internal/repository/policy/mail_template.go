@@ -19,7 +19,7 @@ type MailTemplateAddedEvent struct {
 	Template []byte `json:"template,omitempty"`
 }
 
-func (e *MailTemplateAddedEvent) Payload() interface{} {
+func (e *MailTemplateAddedEvent) Payload() any {
 	return e
 }
 
@@ -56,7 +56,7 @@ type MailTemplateChangedEvent struct {
 	Template *[]byte `json:"template,omitempty"`
 }
 
-func (e *MailTemplateChangedEvent) Payload() interface{} {
+func (e *MailTemplateChangedEvent) Payload() any {
 	return e
 }
 
@@ -105,7 +105,7 @@ type MailTemplateRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *MailTemplateRemovedEvent) Payload() interface{} {
+func (e *MailTemplateRemovedEvent) Payload() any {
 	return nil
 }
 

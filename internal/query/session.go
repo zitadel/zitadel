@@ -339,7 +339,7 @@ func (q *Queries) searchSessions(ctx context.Context, queries *SessionsSearchQue
 }
 
 func NewSessionIDsSearchQuery(ids []string) (SearchQuery, error) {
-	list := make([]interface{}, len(ids))
+	list := make([]any, len(ids))
 	for i, value := range ids {
 		list[i] = value
 	}

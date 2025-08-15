@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 )
@@ -93,19 +94,9 @@ type Aggregate struct {
 type AggregateType string
 
 func isAggregateTypes(a *Aggregate, types ...AggregateType) bool {
-	for _, typ := range types {
-		if a.Type == typ {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(types, a.Type)
 }
 
 func isAggregateIDs(a *Aggregate, ids ...string) bool {
-	for _, id := range ids {
-		if a.ID == id {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(ids, a.ID)
 }

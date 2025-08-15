@@ -8,7 +8,7 @@ type Config struct {
 	MeterName string
 }
 
-func NewTracerFromConfig(rawConfig map[string]interface{}) (err error) {
+func NewTracerFromConfig(rawConfig map[string]any) (err error) {
 	c := new(Config)
 	c.MeterName, _ = rawConfig["metername"].(string)
 	return c.NewMetrics()

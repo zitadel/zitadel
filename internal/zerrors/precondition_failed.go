@@ -22,7 +22,7 @@ func ThrowPreconditionFailed(parent error, id, message string) error {
 	return &PreconditionFailedError{CreateZitadelError(parent, id, message)}
 }
 
-func ThrowPreconditionFailedf(parent error, id, format string, a ...interface{}) error {
+func ThrowPreconditionFailedf(parent error, id, format string, a ...any) error {
 	return ThrowPreconditionFailed(parent, id, fmt.Sprintf(format, a...))
 }
 

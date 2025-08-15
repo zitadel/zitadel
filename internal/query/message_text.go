@@ -200,7 +200,7 @@ func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageTy
 	if err != nil {
 		return nil, err
 	}
-	notificationTextMap := make(map[string]interface{})
+	notificationTextMap := make(map[string]any)
 	if err := yaml.Unmarshal(contents, &notificationTextMap); err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-ekjFF", "Errors.TranslationFile.ReadError")
 	}
@@ -209,7 +209,7 @@ func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageTy
 		return nil, err
 	}
 	for _, text := range texts.CustomTexts {
-		messageTextMap, ok := notificationTextMap[messageType].(map[string]interface{})
+		messageTextMap, ok := notificationTextMap[messageType].(map[string]any)
 		if !ok {
 			continue
 		}

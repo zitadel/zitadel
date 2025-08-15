@@ -115,7 +115,7 @@ func (c *AuthRequestCache) getAuthRequest(ctx context.Context, key, value, insta
 	return request, nil
 }
 
-func (c *AuthRequestCache) saveAuthRequest(ctx context.Context, request *domain.AuthRequest, query string, date time.Time, param interface{}) error {
+func (c *AuthRequestCache) saveAuthRequest(ctx context.Context, request *domain.AuthRequest, query string, date time.Time, param any) error {
 	b, err := json.Marshal(request)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "CACHE-os0GH", "Errors.Internal")

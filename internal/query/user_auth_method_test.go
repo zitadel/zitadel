@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"testing"
 
 	sq "github.com/Masterminds/squirrel"
@@ -166,10 +167,8 @@ func TestUser_authMethodsCheckPermission(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			checkPermission := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-				for _, perm := range tt.permissions {
-					if resourceID == perm {
-						return nil
-					}
+				if slices.Contains(tt.permissions, resourceID) {
+					return nil
 				}
 				return errors.New("failed")
 			}
@@ -273,9 +272,9 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		prepare interface{}
+		prepare any
 		want    want
-		object  interface{}
+		object  any
 	}{
 		{
 			name:    "prepareUserAuthMethodsQuery no result",

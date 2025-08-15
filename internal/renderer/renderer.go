@@ -26,7 +26,7 @@ type Renderer struct {
 	cookieName string
 }
 
-func NewRenderer(tmplMapping map[string]string, funcs map[string]interface{}, cookieName string) (*Renderer, error) {
+func NewRenderer(tmplMapping map[string]string, funcs map[string]any, cookieName string) (*Renderer, error) {
 	var err error
 	r := &Renderer{cookieName: cookieName}
 	err = r.loadTemplates(i18n.LoadFilesystem(i18n.LOGIN), nil, tmplMapping, funcs)
@@ -36,7 +36,7 @@ func NewRenderer(tmplMapping map[string]string, funcs map[string]interface{}, co
 	return r, nil
 }
 
-func (r *Renderer) RenderTemplate(w http.ResponseWriter, req *http.Request, translator *i18n.Translator, tmpl *template.Template, data interface{}, reqFuncs map[string]interface{}) {
+func (r *Renderer) RenderTemplate(w http.ResponseWriter, req *http.Request, translator *i18n.Translator, tmpl *template.Template, data any, reqFuncs map[string]any) {
 	reqFuncs = r.registerTranslateFn(req, translator, reqFuncs)
 	if err := tmpl.Funcs(reqFuncs).Execute(w, data); err != nil {
 		logging.Log("RENDE-lF8F6w").WithError(err).WithField("template", tmpl.Name).Error("error rendering template")
@@ -47,7 +47,7 @@ func (r *Renderer) NewTranslator(ctx context.Context, allowedLanguages []languag
 	return i18n.NewLoginTranslator(authz.GetInstance(ctx).DefaultLanguage(), allowedLanguages, r.cookieName)
 }
 
-func (r *Renderer) Localize(translator *i18n.Translator, id string, args map[string]interface{}) string {
+func (r *Renderer) Localize(translator *i18n.Translator, id string, args map[string]any) string {
 	if translator == nil {
 		return ""
 	}
@@ -61,7 +61,7 @@ func (r *Renderer) AddMessages(translator *i18n.Translator, tag language.Tag, me
 	return translator.AddMessages(tag, messages...)
 }
 
-func (r *Renderer) LocalizeFromRequest(translator *i18n.Translator, req *http.Request, id string, args map[string]interface{}) string {
+func (r *Renderer) LocalizeFromRequest(translator *i18n.Translator, req *http.Request, id string, args map[string]any) string {
 	if translator == nil {
 		return ""
 	}
@@ -74,9 +74,9 @@ func (r *Renderer) ReqLang(translator *i18n.Translator, req *http.Request) langu
 	return translator.Lang(req)
 }
 
-func (r *Renderer) loadTemplates(dir http.FileSystem, translator *i18n.Translator, tmplMapping map[string]string, funcs map[string]interface{}) error {
+func (r *Renderer) loadTemplates(dir http.FileSystem, translator *i18n.Translator, tmplMapping map[string]string, funcs map[string]any) error {
 	funcs = r.registerTranslateFn(nil, translator, funcs)
-	funcs[TranslateFn] = func(id string, args ...interface{}) string {
+	funcs[TranslateFn] = func(id string, args ...any) string {
 		return id
 	}
 	templatesDir, err := dir.Open(templatesPath)
@@ -101,7 +101,7 @@ func (r *Renderer) loadTemplates(dir http.FileSystem, translator *i18n.Translato
 	return nil
 }
 
-func (r *Renderer) addFileToTemplate(dir http.FileSystem, tmpl *template.Template, tmplMapping map[string]string, funcs map[string]interface{}, file os.FileInfo) error {
+func (r *Renderer) addFileToTemplate(dir http.FileSystem, tmpl *template.Template, tmplMapping map[string]string, funcs map[string]any, file os.FileInfo) error {
 	f, err := dir.Open(templatesPath + "/" + file.Name())
 	if err != nil {
 		return err
@@ -116,15 +116,15 @@ func (r *Renderer) addFileToTemplate(dir http.FileSystem, tmpl *template.Templat
 	return err
 }
 
-func (r *Renderer) registerTranslateFn(req *http.Request, translator *i18n.Translator, funcs map[string]interface{}) map[string]interface{} {
+func (r *Renderer) registerTranslateFn(req *http.Request, translator *i18n.Translator, funcs map[string]any) map[string]any {
 	if funcs == nil {
-		funcs = make(map[string]interface{})
+		funcs = make(map[string]any)
 	}
 	if translator == nil {
 		return funcs
 	}
-	funcs[TranslateFn] = func(id string, args ...interface{}) template.HTML {
-		m := map[string]interface{}{}
+	funcs[TranslateFn] = func(id string, args ...any) template.HTML {
+		m := map[string]any{}
 		var key string
 		for i, arg := range args {
 			if i%2 == 0 {

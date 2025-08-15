@@ -12,7 +12,7 @@ const (
 	templateFileName = "template.html"
 )
 
-func GetParsedTemplate(mailhtml string, contentData interface{}) (string, error) {
+func GetParsedTemplate(mailhtml string, contentData any) (string, error) {
 	template, err := ParseTemplateFile(mailhtml, contentData)
 	if err != nil {
 		return "", err
@@ -20,7 +20,7 @@ func GetParsedTemplate(mailhtml string, contentData interface{}) (string, error)
 	return ParseTemplateText(template, contentData)
 }
 
-func ParseTemplateFile(mailhtml string, data interface{}) (string, error) {
+func ParseTemplateFile(mailhtml string, data any) (string, error) {
 	tmpl, err := template.New("tmpl").Parse(mailhtml)
 	if err != nil {
 		return "", err
@@ -29,7 +29,7 @@ func ParseTemplateFile(mailhtml string, data interface{}) (string, error) {
 	return parseTemplate(tmpl, data)
 }
 
-func ParseTemplateText(text string, data interface{}) (string, error) {
+func ParseTemplateText(text string, data any) (string, error) {
 	template, err := template.New("template").Parse(text)
 	if err != nil {
 		return "", err
@@ -37,7 +37,7 @@ func ParseTemplateText(text string, data interface{}) (string, error) {
 	return parseTemplate(template, data)
 }
 
-func parseTemplate(template *template.Template, data interface{}) (string, error) {
+func parseTemplate(template *template.Template, data any) (string, error) {
 	buf := new(bytes.Buffer)
 	if err := template.Execute(buf, data); err != nil {
 		return "", err

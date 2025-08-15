@@ -71,7 +71,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.project_grant_members4 (user_id, user_resource_owner, roles, creation_date, change_date, sequence, resource_owner, instance_id, project_id, grant_id, granted_org) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"user-id",
 								"org1",
 								database.TextArray[string]{"role"},
@@ -169,7 +169,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.project_grant_members4 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_id = $5) AND (project_id = $6) AND (grant_id = $7)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								database.TextArray[string]{"role", "changed"},
 								anyArg{},
 								uint64(15),
@@ -204,7 +204,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.project_grant_members4 WHERE (instance_id = $1) AND (user_id = $2) AND (project_id = $3) AND (grant_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"user-id",
 								"agg-id",
@@ -236,7 +236,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.project_grant_members4 WHERE (instance_id = $1) AND (user_id = $2) AND (project_id = $3) AND (grant_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"user-id",
 								"agg-id",
@@ -265,7 +265,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.project_grant_members4 WHERE (instance_id = $1) AND (user_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},
@@ -292,7 +292,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.project_grant_members4 WHERE (instance_id = $1) AND (project_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},
@@ -318,7 +318,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.project_grant_members4 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},
@@ -344,7 +344,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.project_grant_members4 WHERE (instance_id = $1) AND (grant_id = $2) AND (project_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"grant-id",
 								"agg-id",
@@ -372,21 +372,21 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.project_grant_members4 WHERE (instance_id = $1) AND (resource_owner = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},
 						},
 						{
 							expectedStmt: "DELETE FROM projections.project_grant_members4 WHERE (instance_id = $1) AND (user_resource_owner = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},
 						},
 						{
 							expectedStmt: "DELETE FROM projections.project_grant_members4 WHERE (instance_id = $1) AND (granted_org = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},

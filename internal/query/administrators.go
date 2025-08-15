@@ -204,7 +204,7 @@ func (q *Queries) searchAdministrators(ctx context.Context, queries *MembershipS
 	return administrators, nil
 }
 
-func prepareAdministratorsQuery(ctx context.Context, queries *MembershipSearchQuery, permissionV2 bool) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*Administrators, error)) {
+func prepareAdministratorsQuery(ctx context.Context, queries *MembershipSearchQuery, permissionV2 bool) (sq.SelectBuilder, []any, func(*sql.Rows) (*Administrators, error)) {
 	query, args := getMembershipFromQuery(ctx, queries, permissionV2)
 	return sq.Select(
 			MembershipUserID.identifier(),

@@ -7,13 +7,13 @@ import (
 )
 
 type ExecutionLog struct {
-	LogDate    time.Time              `json:"logDate"`
-	Took       time.Duration          `json:"took"`
-	Message    string                 `json:"message"`
-	LogLevel   logrus.Level           `json:"logLevel"`
-	InstanceID string                 `json:"instanceId"`
-	ActionID   string                 `json:"actionId,omitempty"`
-	Metadata   map[string]interface{} `json:"metadata,omitempty"`
+	LogDate    time.Time      `json:"logDate"`
+	Took       time.Duration  `json:"took"`
+	Message    string         `json:"message"`
+	LogLevel   logrus.Level   `json:"logLevel"`
+	InstanceID string         `json:"instanceId"`
+	ActionID   string         `json:"actionId,omitempty"`
+	Metadata   map[string]any `json:"metadata,omitempty"`
 }
 
 func (e ExecutionLog) Normalize() *ExecutionLog {

@@ -45,7 +45,7 @@ func (req UserSearchQuery) GetMethod() domain.SearchMethod {
 	return req.Method
 }
 
-func (req UserSearchQuery) GetValue() interface{} {
+func (req UserSearchQuery) GetValue() any {
 	return req.Value
 }
 

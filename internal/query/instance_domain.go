@@ -86,7 +86,7 @@ func (q *Queries) SearchInstanceDomainsGlobal(ctx context.Context, queries *Inst
 	return q.queryInstanceDomains(ctx, stmt, scan, args...)
 }
 
-func (q *Queries) queryInstanceDomains(ctx context.Context, stmt string, scan func(*sql.Rows) (*InstanceDomains, error), args ...interface{}) (domains *InstanceDomains, err error) {
+func (q *Queries) queryInstanceDomains(ctx context.Context, stmt string, scan func(*sql.Rows) (*InstanceDomains, error), args ...any) (domains *InstanceDomains, err error) {
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
 		domains, err = scan(rows)
 		return err

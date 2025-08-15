@@ -1,6 +1,7 @@
 package eventstore
 
 import (
+	"slices"
 	"time"
 )
 
@@ -56,11 +57,5 @@ func Type[T TypeChecker]() string {
 func IsType[T TypeChecker](types ...string) bool {
 	gotten := Type[T]()
 
-	for _, typ := range types {
-		if gotten == typ {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(types, gotten)
 }
