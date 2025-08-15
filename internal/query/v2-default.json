@@ -1881,5 +1881,227 @@
             "failedLoading": "加载数据失败，请再试一次。",
             "tryagain": "重试"
         }
+    },
+    "tr":{
+        "common": {
+            "back": "Geri"
+        },
+        "accounts": {
+            "title": "Hesaplar",
+            "description": "Kullanmak istediğiniz hesabı seçin.",
+            "addAnother": "Başka bir hesap ekle",
+            "noResults": "Hesap bulunamadı"
+        },
+        "loginname": {
+            "title": "Tekrar hoş geldiniz!",
+            "description": "Giriş bilgilerinizi girin.",
+            "register": "Yeni kullanıcı kaydet"
+        },
+        "password": {
+            "verify": {
+            "title": "Şifre",
+            "description": "Şifrenizi girin.",
+            "resetPassword": "Şifreyi Sıfırla",
+            "submit": "Devam Et"
+            },
+            "set": {
+            "title": "Şifre Belirle",
+            "description": "Hesabınız için şifre belirleyin",
+            "codeSent": "E-posta adresinize bir kod gönderildi.",
+            "noCodeReceived": "Kod almadınız mı?",
+            "resend": "Kodu tekrar gönder",
+            "submit": "Devam Et"
+            },
+            "change": {
+            "title": "Şifre Değiştir",
+            "description": "Hesabınız için şifre belirleyin",
+            "submit": "Devam Et"
+            }
+        },
+        "idp": {
+            "title": "SSO ile giriş yap",
+            "description": "Giriş yapmak için aşağıdaki sağlayıcılardan birini seçin",
+            "signInWithApple": "Apple ile giriş yap",
+            "signInWithGoogle": "Google ile giriş yap",
+            "signInWithAzureAD": "AzureAD ile giriş yap",
+            "signInWithGithub": "GitHub ile giriş yap",
+            "signInWithGitlab": "GitLab ile giriş yap",
+            "loginSuccess": {
+            "title": "Giriş başarılı",
+            "description": "Başarıyla giriş yaptınız!"
+            },
+            "linkingSuccess": {
+            "title": "Hesap bağlandı",
+            "description": "Hesabınızı başarıyla bağladınız!"
+            },
+            "registerSuccess": {
+            "title": "Kayıt başarılı",
+            "description": "Başarıyla kayıt oldunuz!"
+            },
+            "loginError": {
+            "title": "Giriş başarısız",
+            "description": "Giriş yapmaya çalışırken bir hata oluştu."
+            },
+            "linkingError": {
+            "title": "Hesap bağlama başarısız",
+            "description": "Hesabınızı bağlamaya çalışırken bir hata oluştu."
+            }
+        },
+        "mfa": {
+            "verify": {
+            "title": "Kimliğinizi doğrulayın",
+            "description": "Aşağıdaki faktörlerden birini seçin.",
+            "noResults": "Kurulum için kullanılabilir ikinci faktör yok."
+            },
+            "set": {
+            "title": "2-Faktör kur",
+            "description": "Aşağıdaki ikinci faktörlerden birini seçin.",
+            "skip": "Atla"
+            }
+        },
+        "otp": {
+            "verify": {
+            "title": "2-Faktör doğrula",
+            "totpDescription": "Kimlik doğrulayıcı uygulamanızdan kodu girin.",
+            "smsDescription": "SMS ile aldığınız kodu girin.",
+            "emailDescription": "E-posta ile aldığınız kodu girin.",
+            "noCodeReceived": "Kod almadınız mı?",
+            "resendCode": "Kodu tekrar gönder",
+            "submit": "Devam Et"
+            },
+            "set": {
+            "title": "2-Faktör kur",
+            "totpDescription": "QR kodunu kimlik doğrulayıcı uygulamanızla tarayın.",
+            "smsDescription": "SMS ile kod almak için telefon numaranızı girin.",
+            "emailDescription": "E-posta ile kod almak için e-posta adresinizi girin.",
+            "totpRegisterDescription": "QR Kodunu tarayın veya URL'ye manuel olarak gidin.",
+            "submit": "Devam Et"
+            }
+        },
+        "passkey": {
+            "verify": {
+            "title": "Passkey ile kimlik doğrula",
+            "description": "Cihazınız parmak izinizi, yüzünüzü veya ekran kilidinizi isteyecek",
+            "usePassword": "Şifre kullan",
+            "submit": "Devam Et"
+            },
+            "set": {
+            "title": "Passkey kur",
+            "description": "Cihazınız parmak izinizi, yüzünüzü veya ekran kilidinizi isteyecek",
+            "info": {
+                "description": "Passkey, parmak iziniz, Apple FaceID veya benzeri gibi bir cihazda kimlik doğrulama yöntemidir.",
+                "link": "Şifresiz Kimlik Doğrulama"
+            },
+            "skip": "Atla",
+            "submit": "Devam Et"
+            }
+        },
+        "u2f": {
+            "verify": {
+            "title": "2-Faktör doğrula",
+            "description": "Cihazınızla hesabınızı doğrulayın."
+            },
+            "set": {
+            "title": "2-Faktör kur",
+            "description": "Bir cihazı ikinci faktör olarak kurun.",
+            "submit": "Devam Et"
+            }
+        },
+        "register": {
+            "methods": {
+            "passkey": "Passkey",
+            "password": "Şifre"
+            },
+            "disabled": {
+            "title": "Kayıt devre dışı",
+            "description": "Kayıt devre dışı. Lütfen yöneticinizle iletişime geçin."
+            },
+            "missingdata": {
+            "title": "Eksik veri",
+            "description": "Kayıt olmak için e-posta, ad ve soyadı sağlayın."
+            },
+            "title": "Kayıt Ol",
+            "description": "ZITADEL hesabınızı oluşturun.",
+            "selectMethod": "Kimlik doğrulamak istediğiniz yöntemi seçin",
+            "agreeTo": "Kayıt olmak için şartları ve koşulları kabul etmelisiniz",
+            "termsOfService": "Hizmet Şartları",
+            "privacyPolicy": "Gizlilik Politikası",
+            "submit": "Devam Et",
+            "password": {
+            "title": "Şifre Belirle",
+            "description": "Hesabınız için şifre belirleyin",
+            "submit": "Devam Et"
+            }
+        },
+        "invite": {
+            "title": "Kullanıcı Davet Et",
+            "description": "Davet etmek istediğiniz kullanıcının e-posta adresini ve adını sağlayın.",
+            "info": "Kullanıcı daha fazla talimat içeren bir e-posta alacaktır.",
+            "notAllowed": "Ayarlarınız kullanıcı davet etmenize izin vermiyor.",
+            "submit": "Devam Et",
+            "success": {
+            "title": "Kullanıcı davet edildi",
+            "description": "E-posta başarıyla gönderildi.",
+            "verified": "Kullanıcı davet edildi ve e-postasını zaten doğruladı.",
+            "notVerifiedYet": "Kullanıcı davet edildi. Daha fazla talimat içeren bir e-posta alacaklar.",
+            "submit": "Başka bir kullanıcı davet et"
+            }
+        },
+        "signedin": {
+            "title": "Hoş geldiniz {user}!",
+            "description": "Giriş yaptınız.",
+            "continue": "Devam Et",
+            "error": {
+            "title": "Hata",
+            "description": "Giriş yapmaya çalışırken bir hata oluştu."
+            }
+        },
+        "verify": {
+            "userIdMissing": "userId sağlanmadı!",
+            "success": "Kullanıcı başarıyla doğrulandı.",
+            "setupAuthenticator": "Kimlik doğrulayıcı kur",
+            "verify": {
+            "title": "Kullanıcıyı doğrula",
+            "description": "Doğrulama e-postasında sağlanan kodu girin.",
+            "noCodeReceived": "Kod almadınız mı?",
+            "resendCode": "Kodu tekrar gönder",
+            "submit": "Devam Et"
+            }
+        },
+        "authenticator": {
+            "title": "Kimlik doğrulama yöntemi seç",
+            "description": "Kimlik doğrulamak istediğiniz yöntemi seçin",
+            "noMethodsAvailable": "Kullanılabilir kimlik doğrulama yöntemi yok",
+            "allSetup": "Zaten bir kimlik doğrulayıcı kurdunuz!",
+            "linkWithIDP": "veya bir Kimlik Sağlayıcısı ile bağla"
+        },
+        "device": {
+            "usercode": {
+            "title": "Cihaz kodu",
+            "description": "Uygulamanızda veya cihazınızda görüntülenen kodu girin.",
+            "submit": "Devam Et"
+            },
+            "request": {
+            "title": "{appName} bağlanmak istiyor",
+            "description": "{appName} şunlara erişecek:",
+            "disclaimer": "İzin Ver'e tıklayarak, {appName} ve Zitadel'in bilgilerinizi kendi hizmet şartları ve gizlilik politikalarına uygun olarak kullanmasına izin verirsiniz. Bu erişimi istediğiniz zaman iptal edebilirsiniz.",
+            "submit": "İzin Ver",
+            "deny": "Reddet"
+            },
+            "scope": {
+            "openid": "Kimliğinizi doğrulayın.",
+            "email": "E-posta adresinizi görüntüleyin.",
+            "profile": "Tam profil bilgilerinizi görüntüleyin.",
+            "offline_access": "Hesabınıza çevrimdışı erişime izin verin."
+            }
+        },
+        "error": {
+            "noUserCode": "Kullanıcı kodu sağlanmadı!",
+            "noDeviceRequest": "Cihaz isteği bulunamadı.",
+            "unknownContext": "Kullanıcının bağlamı alınamadı. Önce kullanıcı adını girdiğinizden emin olun veya arama parametresi olarak bir loginName sağlayın.",
+            "sessionExpired": "Mevcut oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
+            "failedLoading": "Veri yüklenemedi. Lütfen tekrar deneyin.",
+            "tryagain": "Tekrar Dene"
+        }
     }
 }

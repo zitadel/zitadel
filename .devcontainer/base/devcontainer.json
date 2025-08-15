@@ -1,0 +1,29 @@
+{
+	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
+	"name": "Base: Build and Run the Components you need",
+	"dockerComposeFile": "docker-compose.yaml",
+	"service": "devcontainer",
+	"runServices": [
+		"devContainer",
+		"db"
+	],
+	"workspaceFolder": "/workspaces",
+	"remoteEnv": {
+		"DISPLAY": ""
+	},
+	"forwardPorts": [
+		3000,
+		3001,
+		4200,
+		8080
+	],
+	"onCreateCommand": "pnpm install --frozen-lockfile --recursive --prefer-offline",
+	"features": {
+		"ghcr.io/devcontainers/features/go:1": {
+			"version": "1.24"
+		},
+		"ghcr.io/guiyomh/features/golangci-lint:0": {},
+		"ghcr.io/jungaretti/features/make:1": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker": {}
+	}
+}

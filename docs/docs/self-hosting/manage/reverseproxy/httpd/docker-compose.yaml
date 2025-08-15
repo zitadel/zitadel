@@ -1,35 +1,41 @@
 services:
 
   proxy-disabled-tls:
-    image: "httpd:2.4.58-alpine"
+    image: "httpd:latest"
     volumes:
       - "./httpd-disabled-tls.conf:/usr/local/apache2/conf/httpd.conf"
     ports:
       - "80:80"
+    networks:
+      - app      
     depends_on:
       zitadel-disabled-tls:
         condition: 'service_healthy'
 
   proxy-external-tls:
-    image: "httpd:2.4.58-alpine"
+    image: "httpd:latest"
     volumes:
       - "./httpd-external-tls.conf:/usr/local/apache2/conf/httpd.conf"
       - "./selfsigned.crt:/etc/certs/selfsigned.crt:ro"
       - "./selfsigned.key:/etc/certs/selfsigned.key:ro"
     ports:
       - "443:443"
+    networks:
+      - app      
     depends_on:
       zitadel-external-tls:
         condition: 'service_healthy'
 
   proxy-enabled-tls:
-    image: "httpd:2.4.58-alpine"
+    image: "httpd:latest"
     volumes:
       - "./httpd-enabled-tls.conf:/usr/local/apache2/conf/httpd.conf"
       - "./selfsigned.crt:/etc/certs/selfsigned.crt:ro"
       - "./selfsigned.key:/etc/certs/selfsigned.key:ro"
     ports:
       - "443:443"
+    networks:
+      - app
     depends_on:
       zitadel-enabled-tls:
         condition: 'service_healthy'

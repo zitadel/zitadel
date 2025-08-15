@@ -12,8 +12,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { State, WebKey } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
 import { CreateWebKeyRequestSchema } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
 import { RSAHasher, RSABits, ECDSACurve } from '@zitadel/proto/zitadel/webkey/v2beta/key_pb';
-import { NewFeatureService } from 'src/app/services/new-feature.service';
-import { ActivatedRoute, Router } from '@angular/router';
 
 const CACHE_WARNING_MS = 5 * 60 * 1000; // 5 minutes
 

@@ -27,7 +27,7 @@ docker_image:
 	else \
 		echo "Reusing precompiled zitadel binary"; \
 	fi
-	DOCKER_BUILDKIT=1 docker build -f build/Dockerfile -t $(ZITADEL_IMAGE) .
+	DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile -t $(ZITADEL_IMAGE) .
 
 .PHONY: compile_pipeline
 compile_pipeline: console_move
@@ -97,17 +97,11 @@ console_move:
 
 .PHONY: console_dependencies
 console_dependencies:
-	pnpm install
-
-.PHONY: console_client
-console_client:
-	cd console && \
-	pnpm generate
+	npx pnpm install --frozen-lockfile --filter=console...
 
 .PHONY: console_build
-console_build: console_dependencies console_client
-	cd console && \
-	pnpm build
+console_build: console_dependencies
+	npx pnpm turbo build --filter=./console
 
 .PHONY: clean
 clean:
@@ -165,7 +159,7 @@ core_integration_test: core_integration_server_start core_integration_test_packa
 
 .PHONY: console_lint
 console_lint:
-	pnpm turbo lint --filter=./console
+	npx pnpm turbo lint --filter=./console
 
 .PHONY: core_lint
 core_lint:
@@ -177,15 +171,15 @@ core_lint:
 
 .PHONY: login_pull
 login_pull: login_ensure_remote
-	@echo "Pulling changes from the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
+	@echo "Pulling changes from the 'apps/login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
 	git fetch $(LOGIN_REMOTE_NAME) $(LOGIN_REMOTE_BRANCH)
 	git merge -s ours --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/$(LOGIN_REMOTE_BRANCH) -m "Synthetic merge to align histories"
 	git push
 
 .PHONY: login_push
 login_push: login_ensure_remote
-	@echo "Pushing changes to the 'login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
-	git subtree split --prefix=login -b login-sync-tmp
+	@echo "Pushing changes to the 'apps/login' subtree on remote $(LOGIN_REMOTE_NAME) branch $(LOGIN_REMOTE_BRANCH)"
+	git subtree split --prefix=apps/login -b login-sync-tmp
 	git checkout login-sync-tmp
 	git fetch $(LOGIN_REMOTE_NAME) main
 	git merge -s ours --allow-unrelated-histories $(LOGIN_REMOTE_NAME)/main -m "Synthetic merge to align histories"
@@ -200,16 +194,3 @@ login_ensure_remote:
 	else \
 		echo "Remote $(LOGIN_REMOTE_NAME) already exists."; \
 	fi
-
-export LOGIN_DIR := ./login/
-export LOGIN_BAKE_CLI_ADDITIONAL_ARGS := --set login-*.context=./login/ --file ./docker-bake.hcl
-export ZITADEL_TAG ?= $(ZITADEL_IMAGE)
-include login/Makefile
-
-# Intentional override of login_test_acceptance_build
-login_test_acceptance_build: docker_image
-	@echo "Building login test acceptance environment with the local zitadel image"
-	$(MAKE) login_test_acceptance_build_compose login_test_acceptance_build_bake
-
-login_dev: docker_image typescript_generate login_test_acceptance_build_compose login_test_acceptance_cleanup login_test_acceptance_setup_dev
-	@echo "Starting login test environment with the local zitadel image"

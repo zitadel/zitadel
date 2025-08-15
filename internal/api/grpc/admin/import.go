@@ -310,7 +310,7 @@ func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 	_, err = s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), setOrgInactive, []string{})
 	if err != nil {
 		*errors = append(*errors, &admin_pb.ImportDataError{Type: "org", Id: org.GetOrgId(), Message: err.Error()})
-		if _, err := s.query.OrgByID(ctx, true, org.OrgId); err != nil {
+		if _, err := s.query.OrgByID(ctx, org.OrgId); err != nil {
 			// TODO: Only nil if err != not found
 			return nil
 		}
