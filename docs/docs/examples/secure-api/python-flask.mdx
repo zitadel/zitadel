@@ -179,10 +179,11 @@ class ZitadelIntrospectTokenValidator(IntrospectTokenValidator):
         res = self.introspect_token(*args, **kwargs)
         return res
 ```
-3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Instance Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](/docs/guides/start/quickstart#referred1).
+
+3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Custom Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](/docs/guides/start/quickstart#referred1).
 
 ```python
-ZITADEL_DOMAIN = "https://your-domain-abcdef.zitadel.cloud"
+ZITADEL_DOMAIN = "https://custom-domain-abcdef.zitadel.cloud"
 CLIENT_ID = "197....@projectname"
 CLIENT_SECRET = "NVAp70IqiGmJldbS...."
 ```
