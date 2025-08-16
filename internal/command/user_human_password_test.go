@@ -12,6 +12,7 @@ import (
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -231,6 +232,90 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 				ctx:           context.Background(),
 				userID:        "user1",
 				resourceOwner: "org1",
+				password:      "password",
+				oneTime:       false,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "change password no one time, no orgID passed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						func() *user.HumanPasswordChangedEvent {
+							e := user.NewHumanPasswordChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"$plain$x$password",
+								false,
+								"",
+							)
+							e.User = "callersUserID"
+							return e
+						}(),
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				checkPermission:    newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx: func() context.Context {
+					return authz.SetCtxData(context.Background(), authz.CtxData{UserID: "callersUserID"})
+				}(),
+				userID:        "user1",
+				resourceOwner: "", // no orgID
 				password:      "password",
 				oneTime:       false,
 			},
