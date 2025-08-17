@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	CTX, OrgCTX context.Context
-	Instance    *integration.Instance
-	Client      mgmt_pb.ManagementServiceClient
+	CTX, IAMOwnerCTX, OrgCTX context.Context
+	Instance            *integration.Instance
+	Client              mgmt_pb.ManagementServiceClient
 )
 
 func TestMain(m *testing.M) {
@@ -25,6 +25,7 @@ func TestMain(m *testing.M) {
 
 		Instance = integration.NewInstance(ctx)
 		CTX = ctx
+		IAMOwnerCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		OrgCTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 		Client = Instance.Client.Mgmt
 		return m.Run()
