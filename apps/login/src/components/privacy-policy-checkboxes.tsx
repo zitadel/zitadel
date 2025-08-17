@@ -17,8 +17,8 @@ type AcceptanceState = {
 
 export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
   const [acceptanceState, setAcceptanceState] = useState<AcceptanceState>({
-    tosAccepted: false,
-    privacyPolicyAccepted: false,
+    tosAccepted: !legal.tosLink, // set initial state to accepted if tos or privacy policy links are empty
+    privacyPolicyAccepted: !legal.privacyPolicyLink,
   });
 
   return (
