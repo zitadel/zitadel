@@ -1,4 +1,7 @@
 // Theme configuration system for customizable login experience
+"use client";
+
+import { useState, useEffect } from "react";
 
 export type ThemeRoundness = "edgy" | "mid" | "full";
 export type ThemeLayout = "side-by-side" | "top-to-bottom";
@@ -72,6 +75,53 @@ export function getThemeConfig(): ThemeConfig {
   };
 }
 
+/**
+ * Custom hook that returns the effective layout mode, taking into account
+ * both the theme configuration and responsive breakpoints.
+ *
+ * On medium screens and below (md: max-width 767px), it will automatically
+ * switch to top-to-bottom layout regardless of the theme setting.
+ */
+export function useResponsiveLayout(): { isSideBySide: boolean; isResponsiveOverride: boolean } {
+  const themeConfig = getThemeConfig();
+  const [isMdOrSmaller, setIsMdOrSmaller] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    // Mark as hydrated on client side
+    setIsHydrated(true);
+
+    // Check if we're in a browser environment
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia("(max-width: 767px)"); // md breakpoint is 768px in Tailwind
+
+    // Set initial value
+    setIsMdOrSmaller(mediaQuery.matches);
+
+    // Listen for changes
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsMdOrSmaller(e.matches);
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+
+    // Cleanup
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  const configuredSideBySide = themeConfig.layout === "side-by-side";
+
+  // During SSR or before hydration, assume desktop (side-by-side if configured)
+  // This prevents hydration mismatches
+  const isSideBySide = configuredSideBySide && (isHydrated ? !isMdOrSmaller : true);
+  const isResponsiveOverride = configuredSideBySide && isHydrated && isMdOrSmaller;
+
+  return { isSideBySide, isResponsiveOverride };
+}
+
 // Roundness CSS classes
 export const ROUNDNESS_CLASSES = {
   edgy: {
@@ -113,22 +163,6 @@ export function getComponentRoundness(componentType: keyof ComponentRoundnessCon
   return ROUNDNESS_CLASSES[roundnessLevel][componentType];
 }
 
-// Layout CSS classes
-export const LAYOUT_CLASSES = {
-  "side-by-side": {
-    container: "lg:grid lg:grid-cols-2 lg:gap-8 min-h-screen",
-    brandSection: "hidden lg:flex lg:items-center lg:justify-center",
-    formSection: "flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8",
-    formContainer: "w-full max-w-md space-y-8",
-  },
-  "top-to-bottom": {
-    container: "min-h-screen flex flex-col",
-    brandSection: "flex-shrink-0 py-16 text-center",
-    formSection: "flex-1 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8",
-    formContainer: "w-full max-w-md space-y-8",
-  },
-} as const;
-
 // Spacing configuration
 export const SPACING_STYLES = {
   regular: {
@@ -156,25 +190,3 @@ export const APPEARANCE_STYLES = {
     background: "bg-background-light-400 dark:bg-background-dark-500", // Current system (shade 400)
   },
 } as const;
-
-// Helper function to get CSS classes for current theme
-export function getThemeClasses(theme: ThemeConfig) {
-  const roundness = ROUNDNESS_CLASSES[theme.roundness];
-  const layout = LAYOUT_CLASSES[theme.layout];
-  const spacing = SPACING_STYLES[theme.spacing];
-  const appearance = APPEARANCE_STYLES[theme.appearance];
-
-  return {
-    roundness,
-    layout,
-    spacing,
-    appearance,
-    backgroundImage: theme.backgroundImage
-      ? {
-          container: "relative",
-          overlay: "absolute inset-0 bg-black bg-opacity-50",
-          background: `bg-cover bg-center bg-no-repeat`,
-        }
-      : null,
-  };
-}

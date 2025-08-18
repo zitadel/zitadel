@@ -266,15 +266,16 @@ interface ComponentSpacingConfig {
 }
 
 export const DEFAULT_COMPONENT_SPACING: ComponentSpacingConfig = {
-  card: "regular",      // Cards use standard spacing
-  button: "compact",    // Buttons use tighter spacing
-  form: "regular",      // Forms use comfortable spacing
+  card: "regular", // Cards use standard spacing
+  button: "compact", // Buttons use tighter spacing
+  form: "regular", // Forms use comfortable spacing
   navigation: "compact", // Navigation uses efficient spacing
-  avatar: "compact",    // Avatars use minimal spacing
+  avatar: "compact", // Avatars use minimal spacing
 };
 ```
 
 This would enable scenarios like:
+
 - **Dense navigation bars** with compact spacing while maintaining **comfortable form layouts**
 - **Tight button groups** alongside **spacious card layouts**
 - **Context-aware spacing** that adapts to component purpose
@@ -284,6 +285,7 @@ This would enable scenarios like:
 The future of component theming lies in CSS custom properties and data attributes:
 
 #### **CSS Custom Properties Approach**
+
 ```css
 /* Global theme variables */
 :root {
@@ -306,9 +308,10 @@ The future of component theming lies in CSS custom properties and data attribute
 ```
 
 #### **Data Attribute System**
+
 ```typescript
 // Component renders with theme data attributes
-<button 
+<button
   data-theme-component="button"
   data-theme-variant="primary"
   data-theme-size="medium"
@@ -334,20 +337,21 @@ The future of component theming lies in CSS custom properties and data attribute
 ```
 
 #### **CSS-in-JS Integration**
+
 ```typescript
 // Future: Dynamic CSS injection based on theme
 const generateThemeCSS = (theme: ThemeConfig) => `
   .zitadel-button {
     background: ${theme.colors.primary};
-    border-radius: ${theme.roundness === 'full' ? '9999px' : '0.5rem'};
-    padding: ${theme.spacing === 'compact' ? '0.5rem 1rem' : '0.75rem 1.5rem'};
+    border-radius: ${theme.roundness === "full" ? "9999px" : "0.5rem"};
+    padding: ${theme.spacing === "compact" ? "0.5rem 1rem" : "0.75rem 1.5rem"};
     transition: all 0.2s ease;
   }
   
   .zitadel-button:hover {
     background: ${theme.colors.primaryHover};
-    transform: ${theme.appearance === 'material' ? 'translateY(-1px)' : 'none'};
-    box-shadow: ${theme.appearance === 'material' ? '0 4px 12px rgba(0,0,0,0.15)' : 'none'};
+    transform: ${theme.appearance === "material" ? "translateY(-1px)" : "none"};
+    box-shadow: ${theme.appearance === "material" ? "0 4px 12px rgba(0,0,0,0.15)" : "none"};
   }
 `;
 ```
@@ -355,6 +359,7 @@ const generateThemeCSS = (theme: ThemeConfig) => `
 ### **Advanced Customization Patterns**
 
 #### **Conditional Component Theming**
+
 ```typescript
 interface ConditionalTheme {
   condition: (context: ThemeContext) => boolean;
@@ -363,21 +368,22 @@ interface ConditionalTheme {
 
 const contextualThemes: ConditionalTheme[] = [
   {
-    condition: (ctx) => ctx.userRole === 'admin',
-    theme: { appearance: 'material', roundness: 'edgy' }
+    condition: (ctx) => ctx.userRole === "admin",
+    theme: { appearance: "material", roundness: "edgy" },
   },
   {
-    condition: (ctx) => ctx.deviceType === 'mobile',
-    theme: { spacing: 'compact', layout: 'top-to-bottom' }
+    condition: (ctx) => ctx.deviceType === "mobile",
+    theme: { spacing: "compact", layout: "top-to-bottom" },
   },
   {
-    condition: (ctx) => ctx.timeOfDay === 'night',
-    theme: { appearance: 'dark', roundness: 'full' }
-  }
+    condition: (ctx) => ctx.timeOfDay === "night",
+    theme: { appearance: "dark", roundness: "full" },
+  },
 ];
 ```
 
 #### **Component Composition Theming**
+
 ```typescript
 // Theme inheritance and composition
 interface CompositeTheme {
@@ -388,13 +394,13 @@ interface CompositeTheme {
 }
 
 const enterpriseTheme: CompositeTheme = {
-  base: { roundness: 'mid', appearance: 'material' },
+  base: { roundness: "mid", appearance: "material" },
   overrides: {
-    'auth.loginForm': { roundness: 'edgy', spacing: 'compact' },
-    'auth.idpButtons': { appearance: 'flat', roundness: 'full' },
-    'navigation.*': { spacing: 'compact' },
-    '*.primaryButton': { appearance: 'material' }
-  }
+    "auth.loginForm": { roundness: "edgy", spacing: "compact" },
+    "auth.idpButtons": { appearance: "flat", roundness: "full" },
+    "navigation.*": { spacing: "compact" },
+    "*.primaryButton": { appearance: "material" },
+  },
 };
 ```
 
@@ -406,42 +412,42 @@ Imagine a future where themes are primarily defined in CSS, with JavaScript acti
 /* themes/corporate.css */
 @layer zitadel-theme {
   :root {
-    --zitadel-theme-name: 'corporate';
+    --zitadel-theme-name: "corporate";
     --zitadel-primary: #1e3a8a;
     --zitadel-secondary: #e5e7eb;
     --zitadel-radius-sm: 0.25rem;
     --zitadel-radius-md: 0.375rem;
     --zitadel-radius-lg: 0.5rem;
   }
-  
+
   .zitadel-component {
     border-radius: var(--zitadel-radius-md);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .zitadel-button {
     background: var(--zitadel-primary);
     color: white;
     padding: 0.75rem 1.5rem;
     border-radius: var(--zitadel-radius-lg);
-    
+
     &:hover {
       background: color-mix(in srgb, var(--zitadel-primary) 90%, black);
       transform: translateY(-1px);
     }
-    
+
     &[data-variant="secondary"] {
       background: transparent;
       color: var(--zitadel-primary);
       border: 2px solid var(--zitadel-primary);
     }
   }
-  
+
   .zitadel-card {
     border-radius: var(--zitadel-radius-lg);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     background: white;
-    
+
     @media (prefers-color-scheme: dark) {
       background: #1f2937;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
@@ -458,7 +464,7 @@ class CSSThemeManager {
     this.injectThemeCSS(themeCSS);
     this.updateComponentDataAttributes(themeName);
   }
-  
+
   private updateComponentDataAttributes(themeName: string) {
     document.documentElement.dataset.zitadelTheme = themeName;
     // Components automatically pick up new styling
@@ -467,6 +473,7 @@ class CSSThemeManager {
 ```
 
 This approach would provide:
+
 - **Designer-friendly** theme creation
 - **Performance benefits** through CSS optimization
 - **Dynamic theme switching** without JavaScript recalculation
@@ -478,49 +485,52 @@ This approach would provide:
 The component-specific approach could extend to many other visual properties:
 
 #### **Component-Based Typography**
+
 ```typescript
 interface ComponentTypographyConfig {
-  heading: 'large' | 'medium' | 'small';
-  body: 'readable' | 'compact' | 'dense';
-  button: 'bold' | 'medium' | 'light';
-  navigation: 'uppercase' | 'normal' | 'small-caps';
+  heading: "large" | "medium" | "small";
+  body: "readable" | "compact" | "dense";
+  button: "bold" | "medium" | "light";
+  navigation: "uppercase" | "normal" | "small-caps";
 }
 
 // Different components could have different typography styles
 export const DEFAULT_COMPONENT_TYPOGRAPHY: ComponentTypographyConfig = {
-  heading: 'large',     // Headings are prominent
-  body: 'readable',     // Body text is optimized for reading
-  button: 'medium',     // Buttons use moderate weight
-  navigation: 'uppercase', // Navigation uses all caps for structure
+  heading: "large", // Headings are prominent
+  body: "readable", // Body text is optimized for reading
+  button: "medium", // Buttons use moderate weight
+  navigation: "uppercase", // Navigation uses all caps for structure
 };
 ```
 
 #### **Component-Based Animation**
+
 ```typescript
 interface ComponentAnimationConfig {
-  buttons: 'none' | 'subtle' | 'playful';
-  forms: 'none' | 'smooth' | 'bouncy';
-  navigation: 'instant' | 'slide' | 'fade';
-  feedback: 'minimal' | 'standard' | 'expressive';
+  buttons: "none" | "subtle" | "playful";
+  forms: "none" | "smooth" | "bouncy";
+  navigation: "instant" | "slide" | "fade";
+  feedback: "minimal" | "standard" | "expressive";
 }
 
 // Example: Enterprise might prefer minimal animations, consumer apps might be more playful
 const enterpriseAnimations: ComponentAnimationConfig = {
-  buttons: 'subtle',     // Professional, minimal hover effects
-  forms: 'smooth',       // Clean form transitions
-  navigation: 'instant', // Fast, efficient navigation
-  feedback: 'minimal',   // Subtle success/error states
+  buttons: "subtle", // Professional, minimal hover effects
+  forms: "smooth", // Clean form transitions
+  navigation: "instant", // Fast, efficient navigation
+  feedback: "minimal", // Subtle success/error states
 };
 
 const consumerAnimations: ComponentAnimationConfig = {
-  buttons: 'playful',    // Fun hover and click effects
-  forms: 'bouncy',       // Engaging form interactions
-  navigation: 'slide',   // Smooth page transitions
-  feedback: 'expressive', // Clear, animated feedback
+  buttons: "playful", // Fun hover and click effects
+  forms: "bouncy", // Engaging form interactions
+  navigation: "slide", // Smooth page transitions
+  feedback: "expressive", // Clear, animated feedback
 };
 ```
 
 #### **Component-Based Color Systems**
+
 ```typescript
 interface ComponentColorConfig {
   primary: ColorScheme;
@@ -538,29 +548,30 @@ interface ColorScheme {
 
 // Different components could use different color schemes
 const componentColors = {
-  buttons: 'primary',
-  links: 'accent',
-  navigation: 'secondary',
-  alerts: 'semantic',
-  forms: 'secondary'
+  buttons: "primary",
+  links: "accent",
+  navigation: "secondary",
+  alerts: "semantic",
+  forms: "secondary",
 };
 ```
 
 #### **Component-Based Interaction Patterns**
+
 ```typescript
 interface ComponentInteractionConfig {
-  buttons: 'click' | 'hover' | 'tap';
-  navigation: 'click' | 'hover-preview' | 'gesture';
-  forms: 'focus' | 'hover' | 'touch-optimized';
-  tooltips: 'hover' | 'click' | 'disabled';
+  buttons: "click" | "hover" | "tap";
+  navigation: "click" | "hover-preview" | "gesture";
+  forms: "focus" | "hover" | "touch-optimized";
+  tooltips: "hover" | "click" | "disabled";
 }
 
 // Mobile-first might emphasize touch interactions
 const mobileInteractions: ComponentInteractionConfig = {
-  buttons: 'tap',           // Optimized for touch
-  navigation: 'gesture',    // Swipe navigation
-  forms: 'touch-optimized', // Large touch targets
-  tooltips: 'click',        // Click to show tooltips
+  buttons: "tap", // Optimized for touch
+  navigation: "gesture", // Swipe navigation
+  forms: "touch-optimized", // Large touch targets
+  tooltips: "click", // Click to show tooltips
 };
 ```
 
@@ -569,6 +580,7 @@ const mobileInteractions: ComponentInteractionConfig = {
 Since we currently use Tailwind CSS classes, enterprise customers who need complete styling control will require robust CSS override mechanisms. Here are several approaches we could implement:
 
 #### **CSS Custom Properties with Tailwind Integration**
+
 ```css
 /* Customer's custom.css - loaded after our styles */
 :root {
@@ -593,47 +605,51 @@ Since we currently use Tailwind CSS classes, enterprise customers who need compl
 ```
 
 #### **CSS Injection API**
+
 ```typescript
 // Future API for runtime CSS injection
 interface ZitadelCSSOverride {
   selector: string;
   styles: CSSStyleDeclaration | string;
-  priority?: 'low' | 'normal' | 'high' | 'important';
+  priority?: "low" | "normal" | "high" | "important";
 }
 
 class ZitadelCustomizer {
   // Inject custom CSS at runtime
   addCustomCSS(overrides: ZitadelCSSOverride[]) {
     const styleSheet = this.createCustomStyleSheet();
-    
-    overrides.forEach(({ selector, styles, priority = 'normal' }) => {
+
+    overrides.forEach(({ selector, styles, priority = "normal" }) => {
       const rule = this.generateCSSRule(selector, styles, priority);
       styleSheet.insertRule(rule);
     });
   }
-  
+
   // Override specific components
   overrideComponent(componentName: string, styles: Partial<CSSStyleDeclaration>) {
-    this.addCustomCSS([{
-      selector: `[data-zitadel-component="${componentName}"]`,
-      styles,
-      priority: 'high'
-    }]);
+    this.addCustomCSS([
+      {
+        selector: `[data-zitadel-component="${componentName}"]`,
+        styles,
+        priority: "high",
+      },
+    ]);
   }
 }
 
 // Usage
 const customizer = new ZitadelCustomizer();
 
-customizer.overrideComponent('button', {
-  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-  border: 'none',
-  borderRadius: '8px',
-  boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
+customizer.overrideComponent("button", {
+  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  border: "none",
+  borderRadius: "8px",
+  boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)",
 });
 ```
 
 #### **Tailwind CSS Override Patterns**
+
 ```css
 /* Method 1: CSS Layers (Modern approach) */
 @layer customer-overrides {
@@ -643,7 +659,7 @@ customizer.overrideComponent('button', {
     @apply shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
     @apply transition-all duration-200 ease-in-out;
   }
-  
+
   .zitadel-input {
     @apply border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200;
     @apply bg-white dark:bg-gray-800 dark:border-gray-600;
@@ -671,6 +687,7 @@ customizer.overrideComponent('button', {
 ```
 
 #### **Dynamic Tailwind Class Override System**
+
 ```typescript
 // Future: Runtime Tailwind class replacement
 interface TailwindOverride {
@@ -681,17 +698,17 @@ interface TailwindOverride {
 
 class TailwindOverrideManager {
   private overrides: Map<string, TailwindOverride> = new Map();
-  
+
   addOverride(override: TailwindOverride) {
     this.overrides.set(override.component, override);
     this.applyOverrides();
   }
-  
+
   private applyOverrides() {
     this.overrides.forEach((override, componentName) => {
       const elements = document.querySelectorAll(`[data-zitadel-component="${componentName}"]`);
-      
-      elements.forEach(element => {
+
+      elements.forEach((element) => {
         // Remove original Tailwind classes
         element.classList.remove(...override.originalClasses);
         // Add custom classes
@@ -705,13 +722,21 @@ class TailwindOverrideManager {
 const overrideManager = new TailwindOverrideManager();
 
 overrideManager.addOverride({
-  component: 'button',
-  originalClasses: ['bg-blue-500', 'hover:bg-blue-600', 'rounded-md'],
-  overrideClasses: ['bg-gradient-to-r', 'from-purple-500', 'to-pink-500', 'hover:from-purple-600', 'hover:to-pink-600', 'rounded-lg']
+  component: "button",
+  originalClasses: ["bg-blue-500", "hover:bg-blue-600", "rounded-md"],
+  overrideClasses: [
+    "bg-gradient-to-r",
+    "from-purple-500",
+    "to-pink-500",
+    "hover:from-purple-600",
+    "hover:to-pink-600",
+    "rounded-lg",
+  ],
 });
 ```
 
 #### **CSS Module Override System**
+
 ```typescript
 // Future: CSS-in-JS with override support
 interface ComponentStyleOverrides {
@@ -745,7 +770,7 @@ const customerOverrides: ComponentStyleOverrides = {
         background: transparent;
         border: 2px solid #667eea;
         color: #667eea;
-      `
+      `,
     },
     states: {
       hover: `
@@ -755,8 +780,8 @@ const customerOverrides: ComponentStyleOverrides = {
       active: `
         transform: translateY(0);
         box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-      `
-    }
+      `,
+    },
   },
   input: {
     base: `
@@ -771,13 +796,14 @@ const customerOverrides: ComponentStyleOverrides = {
         border-color: #667eea;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         outline: none;
-      `
-    }
-  }
+      `,
+    },
+  },
 };
 ```
 
 #### **CSS Variable Bridge System**
+
 ```typescript
 // Bridge between our theme system and customer CSS
 interface CSSVariableBridge {
@@ -795,9 +821,9 @@ class ZitadelCSSBridge implements CSSVariableBridge {
         --zitadel-appearance: ${theme.appearance};
         
         /* Component-specific variables */
-        --zitadel-button-roundness: ${this.getComponentRoundness('button', theme)};
-        --zitadel-card-roundness: ${this.getComponentRoundness('card', theme)};
-        --zitadel-input-roundness: ${this.getComponentRoundness('input', theme)};
+        --zitadel-button-roundness: ${this.getComponentRoundness("button", theme)};
+        --zitadel-card-roundness: ${this.getComponentRoundness("card", theme)};
+        --zitadel-input-roundness: ${this.getComponentRoundness("input", theme)};
         
         /* Color system variables */
         --zitadel-primary: #3b82f6;
@@ -809,11 +835,11 @@ class ZitadelCSSBridge implements CSSVariableBridge {
       }
     `;
   }
-  
+
   injectCustomerOverrides(customerCSS: string): void {
-    const styleElement = document.createElement('style');
+    const styleElement = document.createElement("style");
     styleElement.textContent = customerCSS;
-    styleElement.dataset.zitadelCustomerOverrides = 'true';
+    styleElement.dataset.zitadelCustomerOverrides = "true";
     document.head.appendChild(styleElement);
   }
 }
@@ -844,6 +870,7 @@ bridge.injectCustomerOverrides(customerCSS);
 ```
 
 #### **Configuration-Based Override System**
+
 ```typescript
 // Customer configuration that generates CSS overrides
 interface CustomerStyleConfig {
@@ -861,25 +888,25 @@ interface CustomerStyleConfig {
 
 const customerConfig: CustomerStyleConfig = {
   cssOverrides: {
-    '.zitadel-button': {
-      background: 'linear-gradient(45deg, #ff6b6b, #4ecdc4)',
-      border: 'none',
-      borderRadius: '8px',
-      color: 'white'
+    ".zitadel-button": {
+      background: "linear-gradient(45deg, #ff6b6b, #4ecdc4)",
+      border: "none",
+      borderRadius: "8px",
+      color: "white",
     },
-    '.zitadel-input:focus': {
-      borderColor: '#4ecdc4',
-      boxShadow: '0 0 0 3px rgba(78, 205, 196, 0.1)'
-    }
+    ".zitadel-input:focus": {
+      borderColor: "#4ecdc4",
+      boxShadow: "0 0 0 3px rgba(78, 205, 196, 0.1)",
+    },
   },
   componentOverrides: {
     button: {
-      classes: ['custom-button', 'gradient-bg'],
-      styles: 'padding: 16px 32px; font-weight: 700;'
+      classes: ["custom-button", "gradient-bg"],
+      styles: "padding: 16px 32px; font-weight: 700;",
     },
     card: {
-      styles: 'box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: none;'
-    }
+      styles: "box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: none;",
+    },
   },
   customCSS: `
     @keyframes slideIn {
@@ -890,7 +917,7 @@ const customerConfig: CustomerStyleConfig = {
     .zitadel-login-form {
       animation: slideIn 0.3s ease-out;
     }
-  `
+  `,
 };
 ```
 

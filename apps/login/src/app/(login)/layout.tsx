@@ -42,9 +42,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                 <div
                   className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
                 >
-                  <div className="relative mx-auto w-full max-w-[440px] py-8">
+                  <div className="relative mx-auto w-full max-w-[1200px] py-8">
                     {children}
-                    <div className="flex flex-row items-center justify-end space-x-4 py-4">
+                    <div className="flex flex-row items-center justify-end space-x-4 py-4 px-8">
                       <LanguageSwitcher />
                       <ThemeSwitch />
                     </div>
