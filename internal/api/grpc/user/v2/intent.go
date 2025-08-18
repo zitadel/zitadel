@@ -179,13 +179,13 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *connec
 		case *apple.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, apple.InitUser())
 		case *oauth.Provider:
-			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, p.User())
 		case *oidc.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, oidc.InitUser())
 		case *jwt.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, jwt.InitUser())
 		case *azuread.Provider:
-			idpUser, err = unmarshalRawIdpUser(intent.IDPUser, p.User())
+			idpUser, err = unmarshalIdpUser(intent.IDPUser, p.User())
 		case *github.Provider:
 			idpUser, err = unmarshalIdpUser(intent.IDPUser, &github.User{})
 		case *gitlab.Provider:
@@ -205,22 +205,6 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *connec
 		idpIntent.AddHumanUser = idpUserToAddHumanUser(idpUser, idpIntent.IdpInformation.IdpId)
 	}
 	return connect.NewResponse(idpIntent), nil
-}
-
-type rawUserMapper struct {
-	RawInfo map[string]interface{}
-}
-
-func unmarshalRawIdpUser(idpUserData []byte, idpUser idp.User) (idp.User, error) {
-	userMapper := &rawUserMapper{}
-	if err := json.Unmarshal(idpUserData, userMapper); err != nil {
-		return nil, err
-	}
-	idpUserData, err := json.Marshal(userMapper.RawInfo)
-	if err != nil {
-		return nil, err
-	}
-	return unmarshalIdpUser(idpUserData, idpUser)
 }
 
 func unmarshalIdpUser(idpUserData []byte, idpUser idp.User) (idp.User, error) {
