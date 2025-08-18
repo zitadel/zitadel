@@ -52,7 +52,7 @@ const (
 type MetadataSearchQuery struct {
 	Key    MetadataSearchKey
 	Method SearchMethod
-	Value  interface{}
+	Value  any
 }
 
 type MetadataSearchResponse struct {

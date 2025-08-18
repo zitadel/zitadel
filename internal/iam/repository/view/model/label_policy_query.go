@@ -17,7 +17,7 @@ func (req LabelPolicySearchQuery) GetMethod() domain.SearchMethod {
 	return req.Method
 }
 
-func (req LabelPolicySearchQuery) GetValue() interface{} {
+func (req LabelPolicySearchQuery) GetValue() any {
 	return req.Value
 }
 

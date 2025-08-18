@@ -14,7 +14,7 @@ type Config struct {
 	ServiceName string
 }
 
-func NewTracer(rawConfig map[string]interface{}) (err error) {
+func NewTracer(rawConfig map[string]any) (err error) {
 	c := new(Config)
 	c.ProjectID, _ = rawConfig["projectid"].(string)
 	c.ServiceName, _ = rawConfig["servicename"].(string)

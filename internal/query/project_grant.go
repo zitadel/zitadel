@@ -275,7 +275,7 @@ func (q *ProjectGrantSearchQueries) AppendPermissionQueries(permissions []string
 }
 
 func NewProjectGrantProjectIDsSearchQuery(ids []string) (SearchQuery, error) {
-	list := make([]interface{}, len(ids))
+	list := make([]any, len(ids))
 	for i, value := range ids {
 		list[i] = value
 	}
@@ -283,7 +283,7 @@ func NewProjectGrantProjectIDsSearchQuery(ids []string) (SearchQuery, error) {
 }
 
 func NewProjectGrantIDsSearchQuery(values []string) (SearchQuery, error) {
-	list := make([]interface{}, len(values))
+	list := make([]any, len(values))
 	for i, value := range values {
 		list[i] = value
 	}

@@ -71,7 +71,7 @@ func (err *ZitadelError) Is(target error) bool {
 	return true
 }
 
-func (err *ZitadelError) As(target interface{}) bool {
+func (err *ZitadelError) As(target any) bool {
 	_, ok := target.(**ZitadelError)
 	if !ok {
 		return false

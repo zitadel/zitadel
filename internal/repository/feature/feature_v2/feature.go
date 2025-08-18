@@ -57,7 +57,7 @@ func (e *ResetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *ResetEvent) Payload() interface{} {
+func (e *ResetEvent) Payload() any {
 	return e
 }
 
@@ -86,7 +86,7 @@ func (e *SetEvent[T]) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *SetEvent[T]) Payload() interface{} {
+func (e *SetEvent[T]) Payload() any {
 	return e
 }
 

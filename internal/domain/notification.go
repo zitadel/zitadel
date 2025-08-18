@@ -49,8 +49,8 @@ type NotificationArguments struct {
 
 // ToMap creates a type safe map of the notification arguments.
 // Since these arguments are used in text template, all keys must be PascalCase and types must remain the same (e.g. Duration).
-func (n *NotificationArguments) ToMap() map[string]interface{} {
-	m := make(map[string]interface{})
+func (n *NotificationArguments) ToMap() map[string]any {
+	m := make(map[string]any)
 	if n == nil {
 		return m
 	}

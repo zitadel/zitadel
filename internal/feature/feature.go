@@ -47,7 +47,7 @@ type Features struct {
 	OIDCSingleV1SessionTermination bool                      `json:"oidc_single_v1_session_termination,omitempty"`
 	DisableUserTokenEvent          bool                      `json:"disable_user_token_event,omitempty"`
 	EnableBackChannelLogout        bool                      `json:"enable_back_channel_logout,omitempty"`
-	LoginV2                        LoginV2                   `json:"login_v2,omitempty"`
+	LoginV2                        LoginV2                   `json:"login_v2"`
 	PermissionCheckV2              bool                      `json:"permission_check_v2,omitempty"`
 	ConsoleUseV2UserApi            bool                      `json:"console_use_v2_user_api,omitempty"`
 }

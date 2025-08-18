@@ -48,7 +48,7 @@ type OIDCConfigAddedEvent struct {
 	LoginBaseURI             string                     `json:"loginBaseURI,omitempty"`
 }
 
-func (e *OIDCConfigAddedEvent) Payload() interface{} {
+func (e *OIDCConfigAddedEvent) Payload() any {
 	return e
 }
 
@@ -242,7 +242,7 @@ type OIDCConfigChangedEvent struct {
 	LoginBaseURI             *string                     `json:"loginBaseURI,omitempty"`
 }
 
-func (e *OIDCConfigChangedEvent) Payload() interface{} {
+func (e *OIDCConfigChangedEvent) Payload() any {
 	return e
 }
 
@@ -420,7 +420,7 @@ type OIDCConfigSecretChangedEvent struct {
 	HashedSecret string              `json:"hashedSecret,omitempty"`
 }
 
-func (e *OIDCConfigSecretChangedEvent) Payload() interface{} {
+func (e *OIDCConfigSecretChangedEvent) Payload() any {
 	return e
 }
 
@@ -486,7 +486,7 @@ func (e *OIDCConfigSecretHashUpdatedEvent) SetBaseEvent(b *eventstore.BaseEvent)
 	e.BaseEvent = b
 }
 
-func (e *OIDCConfigSecretHashUpdatedEvent) Payload() interface{} {
+func (e *OIDCConfigSecretHashUpdatedEvent) Payload() any {
 	return e
 }
 

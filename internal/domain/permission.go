@@ -1,5 +1,7 @@
 package domain
 
+import "slices"
+
 import "context"
 
 type Permissions struct {
@@ -16,10 +18,8 @@ func (p *Permissions) appendPermission(ctxID, permission string) {
 	if ctxID != "" {
 		permission = permission + ":" + ctxID
 	}
-	for _, existingPermission := range p.Permissions {
-		if existingPermission == permission {
-			return
-		}
+	if slices.Contains(p.Permissions, permission) {
+		return
 	}
 	p.Permissions = append(p.Permissions, permission)
 }

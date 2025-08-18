@@ -53,7 +53,7 @@ const (
 type UserSessionSearchQuery struct {
 	Key    UserSessionSearchKey
 	Method domain.SearchMethod
-	Value  interface{}
+	Value  any
 }
 
 type UserSessionSearchResponse struct {

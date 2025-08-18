@@ -10,7 +10,7 @@ import (
 )
 
 func TestDeadlineExceededError(t *testing.T) {
-	var err interface{} = new(zerrors.DeadlineExceededError)
+	var err any = new(zerrors.DeadlineExceededError)
 	_, ok := err.(zerrors.DeadlineExceeded)
 	assert.True(t, ok)
 }

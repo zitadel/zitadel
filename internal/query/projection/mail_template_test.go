@@ -41,7 +41,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.mail_templates2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, is_default, template) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 								anyArg{},
@@ -76,7 +76,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.mail_templates2 SET (change_date, sequence, template) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								[]byte("<table></table>"),
@@ -106,7 +106,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.mail_templates2 WHERE (aggregate_id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 							},
@@ -133,7 +133,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.mail_templates2 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},
@@ -161,7 +161,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.mail_templates2 (aggregate_id, instance_id, creation_date, change_date, sequence, state, is_default, template) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 								anyArg{},
@@ -196,7 +196,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.mail_templates2 SET (change_date, sequence, template) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								[]byte("<table></table>"),
@@ -226,7 +226,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.mail_templates2 WHERE (instance_id = $1) AND (aggregate_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},

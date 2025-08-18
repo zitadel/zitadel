@@ -37,7 +37,7 @@ type LoginPolicyAddedEvent struct {
 	MultiFactorCheckLifetime   time.Duration           `json:"multiFactorCheckLifetime,omitempty"`
 }
 
-func (e *LoginPolicyAddedEvent) Payload() interface{} {
+func (e *LoginPolicyAddedEvent) Payload() any {
 	return e
 }
 
@@ -122,7 +122,7 @@ type LoginPolicyChangedEvent struct {
 	MultiFactorCheckLifetime   *time.Duration           `json:"multiFactorCheckLifetime,omitempty"`
 }
 
-func (e *LoginPolicyChangedEvent) Payload() interface{} {
+func (e *LoginPolicyChangedEvent) Payload() any {
 	return e
 }
 
@@ -267,7 +267,7 @@ type LoginPolicyRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *LoginPolicyRemovedEvent) Payload() interface{} {
+func (e *LoginPolicyRemovedEvent) Payload() any {
 	return nil
 }
 

@@ -17,7 +17,7 @@ type User struct {
 	EmailVerified     bool                `json:"emailVerified,omitempty"`
 	Phone             domain.PhoneNumber  `json:"phone,omitempty"`
 	PhoneVerified     bool                `json:"phoneVerified,omitempty"`
-	PreferredLanguage language.Tag        `json:"preferredLanguage,omitempty"`
+	PreferredLanguage language.Tag        `json:"preferredLanguage"`
 	AvatarURL         string              `json:"avatarURL,omitempty"`
 	Profile           string              `json:"profile,omitempty"`
 }

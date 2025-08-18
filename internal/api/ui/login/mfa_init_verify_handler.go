@@ -92,5 +92,5 @@ func generateQrCode(url string) (string, error) {
 	qs.WriteQrSVG(s)
 
 	s.End()
-	return string(b.Bytes()), nil
+	return b.String(), nil
 }

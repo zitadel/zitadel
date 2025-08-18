@@ -22,7 +22,7 @@ import (
 
 type ContextInfo interface {
 	GetHTTPRequestBody() []byte
-	GetContent() interface{}
+	GetContent() any
 	SetHTTPResponseBody([]byte) error
 }
 
@@ -40,7 +40,7 @@ func CallTargets(
 	ctx context.Context,
 	targets []Target,
 	info ContextInfo,
-) (_ interface{}, err error) {
+) (_ any, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

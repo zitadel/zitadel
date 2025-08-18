@@ -39,7 +39,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.label_policies3 (creation_date, change_date, sequence, id, state, is_default, resource_owner, instance_id, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled, theme_mode) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -84,7 +84,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color, theme_mode) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9) AND (instance_id = $10)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"#5282c1",
@@ -119,7 +119,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.label_policies3 WHERE (id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 							},
@@ -146,7 +146,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.label_policies3 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},
@@ -172,7 +172,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.label_policies3 (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode) SELECT $1, $2, $3, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode FROM projections.label_policies3 AS copy_table WHERE (copy_table.id = $4) AND (copy_table.state = $5) AND (copy_table.instance_id = $6) ON CONFLICT (instance_id, id, state) DO UPDATE SET (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode) = ($1, $2, $3, EXCLUDED.creation_date, EXCLUDED.resource_owner, EXCLUDED.instance_id, EXCLUDED.id, EXCLUDED.is_default, EXCLUDED.hide_login_name_suffix, EXCLUDED.font_url, EXCLUDED.watermark_disabled, EXCLUDED.should_error_popup, EXCLUDED.light_primary_color, EXCLUDED.light_warn_color, EXCLUDED.light_background_color, EXCLUDED.light_font_color, EXCLUDED.light_logo_url, EXCLUDED.light_icon_url, EXCLUDED.dark_primary_color, EXCLUDED.dark_warn_color, EXCLUDED.dark_background_color, EXCLUDED.dark_font_color, EXCLUDED.dark_logo_url, EXCLUDED.dark_icon_url, EXCLUDED.theme_mode)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.LabelPolicyStateActive,
@@ -203,7 +203,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"/path/to/logo.png",
@@ -234,7 +234,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"/path/to/logo.png",
@@ -265,7 +265,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"/path/to/icon.png",
@@ -296,7 +296,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"/path/to/icon.png",
@@ -327,7 +327,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								nil,
@@ -358,7 +358,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								nil,
@@ -389,7 +389,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								nil,
@@ -420,7 +420,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								nil,
@@ -451,7 +451,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"/path/to/font.ttf",
@@ -482,7 +482,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								nil,
@@ -513,7 +513,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9) AND (instance_id = $10)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								nil,
@@ -548,7 +548,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.label_policies3 (creation_date, change_date, sequence, id, state, is_default, resource_owner, instance_id, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled, theme_mode) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -593,7 +593,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled, theme_mode) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) WHERE (id = $15) AND (state = $16) AND (instance_id = $17)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"#5282c1",
@@ -635,7 +635,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.label_policies3 (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode) SELECT $1, $2, $3, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode FROM projections.label_policies3 AS copy_table WHERE (copy_table.id = $4) AND (copy_table.state = $5) AND (copy_table.instance_id = $6) ON CONFLICT (instance_id, id, state) DO UPDATE SET (change_date, sequence, state, creation_date, resource_owner, instance_id, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url, theme_mode) = ($1, $2, $3, EXCLUDED.creation_date, EXCLUDED.resource_owner, EXCLUDED.instance_id, EXCLUDED.id, EXCLUDED.is_default, EXCLUDED.hide_login_name_suffix, EXCLUDED.font_url, EXCLUDED.watermark_disabled, EXCLUDED.should_error_popup, EXCLUDED.light_primary_color, EXCLUDED.light_warn_color, EXCLUDED.light_background_color, EXCLUDED.light_font_color, EXCLUDED.light_logo_url, EXCLUDED.light_icon_url, EXCLUDED.dark_primary_color, EXCLUDED.dark_warn_color, EXCLUDED.dark_background_color, EXCLUDED.dark_font_color, EXCLUDED.dark_logo_url, EXCLUDED.dark_icon_url, EXCLUDED.theme_mode)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								domain.LabelPolicyStateActive,
@@ -666,7 +666,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"/path/to/logo.png",
@@ -697,7 +697,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"/path/to/logo.png",
@@ -728,7 +728,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"/path/to/icon.png",
@@ -759,7 +759,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"/path/to/icon.png",
@@ -790,7 +790,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								nil,
@@ -821,7 +821,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								nil,
@@ -852,7 +852,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								nil,
@@ -883,7 +883,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								nil,
@@ -914,7 +914,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								"/path/to/font.ttf",
@@ -945,7 +945,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5) AND (instance_id = $6)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								nil,
@@ -976,7 +976,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.label_policies3 SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9) AND (instance_id = $10)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								nil,
@@ -1011,7 +1011,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.label_policies3 WHERE (instance_id = $1) AND (resource_owner = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},

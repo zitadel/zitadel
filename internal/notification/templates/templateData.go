@@ -34,7 +34,7 @@ type TemplateData struct {
 	FooterText    string `json:"footerText,omitempty"`
 }
 
-func (data *TemplateData) Translate(translator *i18n.Translator, msgType string, args map[string]interface{}, langs ...string) {
+func (data *TemplateData) Translate(translator *i18n.Translator, msgType string, args map[string]any, langs ...string) {
 	data.Title = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageTitle), args, langs...)
 	data.PreHeader = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessagePreHeader), args, langs...)
 	data.Subject = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageSubject), args, langs...)

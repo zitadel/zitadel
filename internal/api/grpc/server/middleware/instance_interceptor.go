@@ -27,12 +27,12 @@ const (
 func InstanceInterceptor(verifier authz.InstanceVerifier, externalDomain string, explicitInstanceIdServices ...string) grpc.UnaryServerInterceptor {
 	translator, err := i18n.NewZitadelTranslator(language.English)
 	logging.OnError(err).Panic("unable to get translator")
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		return setInstance(ctx, req, info, handler, verifier, externalDomain, translator, explicitInstanceIdServices...)
 	}
 }
 
-func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, externalDomain string, translator *i18n.Translator, idFromRequestsServices ...string) (_ interface{}, err error) {
+func setInstance(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, externalDomain string, translator *i18n.Translator, idFromRequestsServices ...string) (_ any, err error) {
 	interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -65,7 +65,7 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	return addInstanceByRequestedHost(interceptorCtx, req, handler, verifier, translator, externalDomain)
 }
 
-func addInstanceByID(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, id string) (interface{}, error) {
+func addInstanceByID(ctx context.Context, req any, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, id string) (any, error) {
 	instance, err := verifier.InstanceByID(ctx, id)
 	if err != nil {
 		notFoundErr := new(zerrors.ZitadelError)
@@ -77,7 +77,7 @@ func addInstanceByID(ctx context.Context, req interface{}, handler grpc.UnaryHan
 	return handler(authz.WithInstance(ctx, instance), req)
 }
 
-func addInstanceByDomain(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, domain string) (interface{}, error) {
+func addInstanceByDomain(ctx context.Context, req any, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, domain string) (any, error) {
 	instance, err := verifier.InstanceByHost(ctx, domain, "")
 	if err != nil {
 		notFoundErr := new(zerrors.NotFoundError)
@@ -89,7 +89,7 @@ func addInstanceByDomain(ctx context.Context, req interface{}, handler grpc.Unar
 	return handler(authz.WithInstance(ctx, instance), req)
 }
 
-func addInstanceByRequestedHost(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, externalDomain string) (interface{}, error) {
+func addInstanceByRequestedHost(ctx context.Context, req any, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, externalDomain string) (any, error) {
 	requestContext := zitadel_http.DomainContext(ctx)
 	if requestContext.InstanceHost == "" {
 		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).Error("unable to set instance")

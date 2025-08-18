@@ -3,6 +3,7 @@ package cockroach
 import (
 	"context"
 	"database/sql"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -44,12 +45,7 @@ type Config struct {
 }
 
 func (c *Config) MatchName(name string) bool {
-	for _, key := range []string{"crdb", "cockroach"} {
-		if strings.TrimSpace(strings.ToLower(name)) == key {
-			return true
-		}
-	}
-	return false
+	return slices.Contains([]string{"crdb", "cockroach"}, strings.TrimSpace(strings.ToLower(name)))
 }
 
 func (_ *Config) Decode(configs []any) (dialect.Connector, error) {

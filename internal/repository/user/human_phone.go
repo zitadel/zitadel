@@ -28,7 +28,7 @@ type HumanPhoneChangedEvent struct {
 	PhoneNumber domain.PhoneNumber `json:"phone,omitempty"`
 }
 
-func (e *HumanPhoneChangedEvent) Payload() interface{} {
+func (e *HumanPhoneChangedEvent) Payload() any {
 	return e
 }
 
@@ -63,7 +63,7 @@ type HumanPhoneRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanPhoneRemovedEvent) Payload() interface{} {
+func (e *HumanPhoneRemovedEvent) Payload() any {
 	return nil
 }
 
@@ -93,7 +93,7 @@ type HumanPhoneVerifiedEvent struct {
 	IsPhoneVerified bool `json:"-"`
 }
 
-func (e *HumanPhoneVerifiedEvent) Payload() interface{} {
+func (e *HumanPhoneVerifiedEvent) Payload() any {
 	return nil
 }
 
@@ -122,7 +122,7 @@ type HumanPhoneVerificationFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanPhoneVerificationFailedEvent) Payload() interface{} {
+func (e *HumanPhoneVerificationFailedEvent) Payload() any {
 	return nil
 }
 
@@ -156,7 +156,7 @@ type HumanPhoneCodeAddedEvent struct {
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
-func (e *HumanPhoneCodeAddedEvent) Payload() interface{} {
+func (e *HumanPhoneCodeAddedEvent) Payload() any {
 	return e
 }
 
@@ -222,7 +222,7 @@ func (e *HumanPhoneCodeSentEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *HumanPhoneCodeSentEvent) Payload() interface{} {
+func (e *HumanPhoneCodeSentEvent) Payload() any {
 	return e
 }
 

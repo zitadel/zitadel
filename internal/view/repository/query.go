@@ -21,15 +21,15 @@ type SearchRequest interface {
 type SearchQuery interface {
 	GetKey() ColumnKey
 	GetMethod() domain.SearchMethod
-	GetValue() interface{}
+	GetValue() any
 }
 
 type ColumnKey interface {
 	ToColumnName() string
 }
 
-func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, res interface{}) (uint64, error) {
-	return func(db *gorm.DB, res interface{}) (uint64, error) {
+func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, res any) (uint64, error) {
+	return func(db *gorm.DB, res any) (uint64, error) {
 		var count uint64 = 0
 		query := db.Table(table)
 		if column := request.GetSortingColumn(); column != nil {
@@ -64,7 +64,7 @@ func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, r
 	}
 }
 
-func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method domain.SearchMethod) (*gorm.DB, error) {
+func SetQuery(query *gorm.DB, key ColumnKey, value any, method domain.SearchMethod) (*gorm.DB, error) {
 	column := key.ToColumnName()
 	if column == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "VIEW-7dz3w", "Column name missing")

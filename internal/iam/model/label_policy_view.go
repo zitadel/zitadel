@@ -17,5 +17,5 @@ const (
 type LabelPolicySearchQuery struct {
 	Key    LabelPolicySearchKey
 	Method domain.SearchMethod
-	Value  interface{}
+	Value  any
 }

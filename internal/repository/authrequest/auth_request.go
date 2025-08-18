@@ -41,7 +41,7 @@ type AddedEvent struct {
 	Issuer           string                    `json:"issuer,omitempty"`
 }
 
-func (e *AddedEvent) Payload() interface{} {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
@@ -116,7 +116,7 @@ type SessionLinkedEvent struct {
 	AuthMethods []domain.UserAuthMethodType `json:"auth_methods"`
 }
 
-func (e *SessionLinkedEvent) Payload() interface{} {
+func (e *SessionLinkedEvent) Payload() any {
 	return e
 }
 
@@ -162,7 +162,7 @@ type FailedEvent struct {
 	Reason domain.OIDCErrorReason `json:"reason,omitempty"`
 }
 
-func (e *FailedEvent) Payload() interface{} {
+func (e *FailedEvent) Payload() any {
 	return e
 }
 
@@ -201,7 +201,7 @@ type CodeAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *CodeAddedEvent) Payload() interface{} {
+func (e *CodeAddedEvent) Payload() any {
 	return e
 }
 
@@ -237,7 +237,7 @@ type CodeExchangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *CodeExchangedEvent) Payload() interface{} {
+func (e *CodeExchangedEvent) Payload() any {
 	return nil
 }
 
@@ -267,7 +267,7 @@ type SucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *SucceededEvent) Payload() interface{} {
+func (e *SucceededEvent) Payload() any {
 	return nil
 }
 

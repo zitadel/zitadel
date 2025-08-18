@@ -20,7 +20,7 @@ type AddedEvent struct {
 	Blob                 *string       `json:"blob,omitempty"`
 }
 
-func (e *AddedEvent) Payload() interface{} {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
@@ -58,7 +58,7 @@ type ChangedEvent struct {
 	Blob                 *string       `json:"blob,omitempty"`
 }
 
-func (e *ChangedEvent) Payload() interface{} {
+func (e *ChangedEvent) Payload() any {
 	return e
 }
 
@@ -95,7 +95,7 @@ type RemovedEvent struct {
 	ProjectionSleep      time.Duration `json:"projectionSleep,omitempty"`
 }
 
-func (e *RemovedEvent) Payload() interface{} {
+func (e *RemovedEvent) Payload() any {
 	return nil
 }
 

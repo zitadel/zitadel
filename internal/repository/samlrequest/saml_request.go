@@ -34,7 +34,7 @@ func (e *AddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *AddedEvent) Payload() interface{} {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
@@ -81,7 +81,7 @@ type SessionLinkedEvent struct {
 	AuthMethods []domain.UserAuthMethodType `json:"auth_methods"`
 }
 
-func (e *SessionLinkedEvent) Payload() interface{} {
+func (e *SessionLinkedEvent) Payload() any {
 	return e
 }
 
@@ -119,7 +119,7 @@ type FailedEvent struct {
 	Reason domain.SAMLErrorReason `json:"reason,omitempty"`
 }
 
-func (e *FailedEvent) Payload() interface{} {
+func (e *FailedEvent) Payload() any {
 	return e
 }
 
@@ -150,7 +150,7 @@ type SucceededEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 }
 
-func (e *SucceededEvent) Payload() interface{} {
+func (e *SucceededEvent) Payload() any {
 	return nil
 }
 

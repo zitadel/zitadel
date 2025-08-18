@@ -25,8 +25,8 @@ type PhoneCode struct {
 	Expiry time.Duration       `json:"expiry,omitempty"`
 }
 
-func (p *Phone) Changes(changed *Phone) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
+func (p *Phone) Changes(changed *Phone) map[string]any {
+	changes := make(map[string]any, 1)
 	if changed.PhoneNumber != "" && p.PhoneNumber != changed.PhoneNumber {
 		changes["phone"] = changed.PhoneNumber
 	}

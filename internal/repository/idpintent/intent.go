@@ -81,7 +81,7 @@ type SucceededEvent struct {
 
 	IDPAccessToken *crypto.CryptoValue `json:"idpAccessToken,omitempty"`
 	IDPIDToken     string              `json:"idpIdToken,omitempty"`
-	ExpiresAt      time.Time           `json:"expiresAt,omitempty"`
+	ExpiresAt      time.Time           `json:"expiresAt"`
 }
 
 func NewSucceededEvent(
@@ -111,7 +111,7 @@ func NewSucceededEvent(
 	}
 }
 
-func (e *SucceededEvent) Payload() interface{} {
+func (e *SucceededEvent) Payload() any {
 	return e
 }
 
@@ -141,7 +141,7 @@ type SAMLSucceededEvent struct {
 	UserID      string `json:"userId,omitempty"`
 
 	Assertion *crypto.CryptoValue `json:"assertion,omitempty"`
-	ExpiresAt time.Time           `json:"expiresAt,omitempty"`
+	ExpiresAt time.Time           `json:"expiresAt"`
 }
 
 func NewSAMLSucceededEvent(
@@ -169,7 +169,7 @@ func NewSAMLSucceededEvent(
 	}
 }
 
-func (e *SAMLSucceededEvent) Payload() interface{} {
+func (e *SAMLSucceededEvent) Payload() any {
 	return e
 }
 
@@ -211,7 +211,7 @@ func NewSAMLRequestEvent(
 	}
 }
 
-func (e *SAMLRequestEvent) Payload() interface{} {
+func (e *SAMLRequestEvent) Payload() any {
 	return e
 }
 
@@ -241,7 +241,7 @@ type LDAPSucceededEvent struct {
 	UserID      string `json:"userId,omitempty"`
 
 	EntryAttributes map[string][]string `json:"user,omitempty"`
-	ExpiresAt       time.Time           `json:"expiresAt,omitempty"`
+	ExpiresAt       time.Time           `json:"expiresAt"`
 }
 
 func NewLDAPSucceededEvent(
@@ -269,7 +269,7 @@ func NewLDAPSucceededEvent(
 	}
 }
 
-func (e *LDAPSucceededEvent) Payload() interface{} {
+func (e *LDAPSucceededEvent) Payload() any {
 	return e
 }
 
@@ -311,7 +311,7 @@ func NewFailedEvent(
 	}
 }
 
-func (e *FailedEvent) Payload() interface{} {
+func (e *FailedEvent) Payload() any {
 	return e
 }
 
@@ -349,7 +349,7 @@ func NewConsumedEvent(
 	}
 }
 
-func (e *ConsumedEvent) Payload() interface{} {
+func (e *ConsumedEvent) Payload() any {
 	return e
 }
 

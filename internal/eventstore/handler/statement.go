@@ -5,5 +5,5 @@ import (
 )
 
 type Executer interface {
-	Exec(string, ...interface{}) (sql.Result, error)
+	Exec(string, ...any) (sql.Result, error)
 }

@@ -26,7 +26,7 @@ type MachineSecretSetEvent struct {
 	HashedSecret string              `json:"hashedSecret,omitempty"`
 }
 
-func (e *MachineSecretSetEvent) Payload() interface{} {
+func (e *MachineSecretSetEvent) Payload() any {
 	return e
 }
 
@@ -65,7 +65,7 @@ type MachineSecretRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *MachineSecretRemovedEvent) Payload() interface{} {
+func (e *MachineSecretRemovedEvent) Payload() any {
 	return e
 }
 
@@ -102,7 +102,7 @@ type MachineSecretCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *MachineSecretCheckSucceededEvent) Payload() interface{} {
+func (e *MachineSecretCheckSucceededEvent) Payload() any {
 	return e
 }
 
@@ -139,7 +139,7 @@ type MachineSecretCheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *MachineSecretCheckFailedEvent) Payload() interface{} {
+func (e *MachineSecretCheckFailedEvent) Payload() any {
 	return e
 }
 
@@ -196,7 +196,7 @@ func (e *MachineSecretHashUpdatedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
-func (e *MachineSecretHashUpdatedEvent) Payload() interface{} {
+func (e *MachineSecretHashUpdatedEvent) Payload() any {
 	return e
 }
 

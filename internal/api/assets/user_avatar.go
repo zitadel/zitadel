@@ -2,6 +2,7 @@ package assets
 
 import (
 	"context"
+	"slices"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -20,12 +21,9 @@ type myHumanAvatarUploader struct {
 }
 
 func (l *myHumanAvatarUploader) ContentTypeAllowed(contentType string) bool {
-	for _, ct := range l.contentTypes {
-		if strings.HasPrefix(contentType, ct) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(l.contentTypes, func(el string) bool {
+		return strings.HasPrefix(contentType, el)
+	})
 }
 
 func (l *myHumanAvatarUploader) ObjectType() static.ObjectType {

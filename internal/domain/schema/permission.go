@@ -34,12 +34,12 @@ type permissionExtension struct {
 
 // Compile implements the [jsonschema.ExtCompiler] interface.
 // It parses the permission schema extension / annotation of the passed field.
-func (c permissionExtension) Compile(ctx jsonschema.CompilerContext, m map[string]interface{}) (_ jsonschema.ExtSchema, err error) {
+func (c permissionExtension) Compile(ctx jsonschema.CompilerContext, m map[string]any) (_ jsonschema.ExtSchema, err error) {
 	perm, ok := m[PermissionProperty]
 	if !ok {
 		return nil, nil
 	}
-	p, ok := perm.(map[string]interface{})
+	p, ok := perm.(map[string]any)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgument(nil, "SCHEMA-WR5gs", "invalid permission")
 	}
@@ -70,7 +70,7 @@ type permissionExtensionConfig struct {
 
 // Validate implements the [jsonschema.ExtSchema] interface.
 // It validates the fields of the json instance according to the permission schema.
-func (s permissionExtensionConfig) Validate(ctx jsonschema.ValidationContext, v interface{}) error {
+func (s permissionExtensionConfig) Validate(ctx jsonschema.ValidationContext, v any) error {
 	switch s.role {
 	case RoleSelf:
 		if s.permissions.self == nil || !s.permissions.self.write {

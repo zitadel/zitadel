@@ -86,7 +86,7 @@ func (req TestSearchQuery) GetMethod() domain.SearchMethod {
 	return req.method
 }
 
-func (req TestSearchQuery) GetValue() interface{} {
+func (req TestSearchQuery) GetValue() any {
 	return req.value
 }
 
@@ -250,7 +250,7 @@ func (db *dbMock) expectRemove(table, key, value string) *dbMock {
 }
 
 func (db *dbMock) expectRemoveKeys(table string, keys ...Key) *dbMock {
-	keyNames := make([]interface{}, len(keys))
+	keyNames := make([]any, len(keys))
 	keyValues := make([]driver.Value, len(keys))
 	for i, key := range keys {
 		keyNames[i] = key.Key.ToColumnName()
@@ -310,7 +310,7 @@ func (db *dbMock) expectGetSearchRequestNoParams(table string, resultAmount, tot
 	queryCount := fmt.Sprintf(expectedSearchCount, table)
 
 	rows := db.mock.NewRows([]string{"id"})
-	for i := 0; i < resultAmount; i++ {
+	for i := range resultAmount {
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 
@@ -327,7 +327,7 @@ func (db *dbMock) expectGetSearchRequestWithLimit(table string, limit, resultAmo
 	queryCount := fmt.Sprintf(expectedSearchLimitCount, table)
 
 	rows := db.mock.NewRows([]string{"id"})
-	for i := 0; i < resultAmount; i++ {
+	for i := range resultAmount {
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 
@@ -343,7 +343,7 @@ func (db *dbMock) expectGetSearchRequestWithOffset(table string, offset, resultA
 	queryCount := fmt.Sprintf(expectedSearchOffsetCount, table)
 
 	rows := db.mock.NewRows([]string{"id"})
-	for i := 0; i < resultAmount; i++ {
+	for i := range resultAmount {
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 
@@ -359,7 +359,7 @@ func (db *dbMock) expectGetSearchRequestWithSorting(table, sorting string, sorti
 	queryCount := fmt.Sprintf(expectedSearchSortingCount, table)
 
 	rows := db.mock.NewRows([]string{"id"})
-	for i := 0; i < resultAmount; i++ {
+	for i := range resultAmount {
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 
@@ -375,7 +375,7 @@ func (db *dbMock) expectGetSearchRequestWithSearchQuery(table, key, method, valu
 	queryCount := fmt.Sprintf(expectedSearchQueryCount, table, key, method)
 
 	rows := db.mock.NewRows([]string{"id"})
-	for i := 0; i < resultAmount; i++ {
+	for i := range resultAmount {
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 
@@ -393,7 +393,7 @@ func (db *dbMock) expectGetSearchRequestWithAllParams(table, key, method, value,
 	queryCount := fmt.Sprintf(expectedSearchQueryAllParamCount, table, key, method)
 
 	rows := db.mock.NewRows([]string{"id"})
-	for i := 0; i < resultAmount; i++ {
+	for i := range resultAmount {
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 
@@ -411,7 +411,7 @@ func (db *dbMock) expectGetSearchRequestErr(table string, resultAmount, total in
 	queryCount := fmt.Sprintf(expectedSearchCount, table)
 
 	rows := db.mock.NewRows([]string{"id"})
-	for i := 0; i < resultAmount; i++ {
+	for i := range resultAmount {
 		rows.AddRow(fmt.Sprintf("hodor-%d", i))
 	}
 

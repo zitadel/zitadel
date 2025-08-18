@@ -38,7 +38,7 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.oidc_settings2 SET (change_date, sequence, access_token_lifetime, id_token_lifetime, refresh_token_idle_expiration, refresh_token_expiration) = ($1, $2, $3, $4, $5, $6) WHERE (aggregate_id = $7) AND (instance_id = $8)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								anyArg{},
 								uint64(15),
 								time.Millisecond * 10,
@@ -71,7 +71,7 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.oidc_settings2 (aggregate_id, creation_date, change_date, resource_owner, instance_id, sequence, access_token_lifetime, id_token_lifetime, refresh_token_idle_expiration, refresh_token_expiration) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								anyArg{},
 								anyArg{},
@@ -106,7 +106,7 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.oidc_settings2 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},

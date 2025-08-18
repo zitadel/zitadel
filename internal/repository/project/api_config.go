@@ -30,7 +30,7 @@ type APIConfigAddedEvent struct {
 	AuthMethodType domain.APIAuthMethodType `json:"authMethodType,omitempty"`
 }
 
-func (e *APIConfigAddedEvent) Payload() interface{} {
+func (e *APIConfigAddedEvent) Payload() any {
 	return e
 }
 
@@ -98,7 +98,7 @@ type APIConfigChangedEvent struct {
 	AuthMethodType *domain.APIAuthMethodType `json:"authMethodType,omitempty"`
 }
 
-func (e *APIConfigChangedEvent) Payload() interface{} {
+func (e *APIConfigChangedEvent) Payload() any {
 	return e
 }
 
@@ -162,7 +162,7 @@ type APIConfigSecretChangedEvent struct {
 	HashedSecret string              `json:"hashedSecret,omitempty"`
 }
 
-func (e *APIConfigSecretChangedEvent) Payload() interface{} {
+func (e *APIConfigSecretChangedEvent) Payload() any {
 	return e
 }
 
@@ -228,7 +228,7 @@ func (e *APIConfigSecretHashUpdatedEvent) SetBaseEvent(b *eventstore.BaseEvent) 
 	e.BaseEvent = b
 }
 
-func (e *APIConfigSecretHashUpdatedEvent) Payload() interface{} {
+func (e *APIConfigSecretHashUpdatedEvent) Payload() any {
 	return e
 }
 

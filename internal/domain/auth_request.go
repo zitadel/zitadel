@@ -118,12 +118,7 @@ const (
 )
 
 func IsPrompt(prompt []Prompt, requestedPrompt Prompt) bool {
-	for _, p := range prompt {
-		if p == requestedPrompt {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(prompt, requestedPrompt)
 }
 
 type LevelOfAssurance int
@@ -218,20 +213,17 @@ func (a *AuthRequest) MFALevel() MFALevel {
 }
 
 func (a *AuthRequest) AppendAudIfNotExisting(aud string) {
-	for _, a := range a.Audience {
-		if a == aud {
-			return
-		}
+	if !slices.Contains(a.Audience, aud) {
+		a.Audience = append(a.Audience, aud)
 	}
-	a.Audience = append(a.Audience, aud)
 }
 
 func (a *AuthRequest) GetScopeOrgPrimaryDomain() string {
 	switch request := a.Request.(type) {
 	case *AuthRequestOIDC:
 		for _, scope := range request.Scopes {
-			if strings.HasPrefix(scope, OrgDomainPrimaryScope) {
-				return strings.TrimPrefix(scope, OrgDomainPrimaryScope)
+			if after, ok := strings.CutPrefix(scope, OrgDomainPrimaryScope); ok {
+				return after
 			}
 		}
 	}
@@ -242,8 +234,8 @@ func (a *AuthRequest) GetScopeOrgID() string {
 	switch request := a.Request.(type) {
 	case *AuthRequestOIDC:
 		for _, scope := range request.Scopes {
-			if strings.HasPrefix(scope, OrgIDScope) {
-				return strings.TrimPrefix(scope, OrgIDScope)
+			if after, ok := strings.CutPrefix(scope, OrgIDScope); ok {
+				return after
 			}
 		}
 	}

@@ -22,7 +22,7 @@ func ThrowUnknown(parent error, id, message string) error {
 	return &UnknownError{CreateZitadelError(parent, id, message)}
 }
 
-func ThrowUnknownf(parent error, id, format string, a ...interface{}) error {
+func ThrowUnknownf(parent error, id, format string, a ...any) error {
 	return ThrowUnknown(parent, id, fmt.Sprintf(format, a...))
 }
 

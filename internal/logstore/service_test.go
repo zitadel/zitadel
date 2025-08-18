@@ -238,7 +238,7 @@ func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *e
 
 func when(svc *logstore.Service[*emittermock.Record], ctx context.Context, clock *clock.Mock) *uint64 {
 	var remaining *uint64
-	for i := 0; i < ticks; i++ {
+	for range ticks {
 		svc.Handle(ctx, emittermock.NewRecord(clock))
 		runtime.Gosched()
 		remaining = svc.Limit(ctx, "non-empty-instance-id")

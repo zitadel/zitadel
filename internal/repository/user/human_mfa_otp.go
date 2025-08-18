@@ -40,7 +40,7 @@ type HumanOTPAddedEvent struct {
 	Secret *crypto.CryptoValue `json:"otpSecret,omitempty"`
 }
 
-func (e *HumanOTPAddedEvent) Payload() interface{} {
+func (e *HumanOTPAddedEvent) Payload() any {
 	return e
 }
 
@@ -79,7 +79,7 @@ type HumanOTPVerifiedEvent struct {
 	UserAgentID          string `json:"userAgentID,omitempty"`
 }
 
-func (e *HumanOTPVerifiedEvent) Payload() interface{} {
+func (e *HumanOTPVerifiedEvent) Payload() any {
 	return e
 }
 
@@ -113,7 +113,7 @@ type HumanOTPRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanOTPRemovedEvent) Payload() interface{} {
+func (e *HumanOTPRemovedEvent) Payload() any {
 	return nil
 }
 
@@ -145,7 +145,7 @@ type HumanOTPCheckSucceededEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanOTPCheckSucceededEvent) Payload() interface{} {
+func (e *HumanOTPCheckSucceededEvent) Payload() any {
 	return e
 }
 
@@ -184,7 +184,7 @@ type HumanOTPCheckFailedEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanOTPCheckFailedEvent) Payload() interface{} {
+func (e *HumanOTPCheckFailedEvent) Payload() any {
 	return e
 }
 
@@ -222,7 +222,7 @@ type HumanOTPSMSAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanOTPSMSAddedEvent) Payload() interface{} {
+func (e *HumanOTPSMSAddedEvent) Payload() any {
 	return nil
 }
 
@@ -251,7 +251,7 @@ type HumanOTPSMSRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanOTPSMSRemovedEvent) Payload() interface{} {
+func (e *HumanOTPSMSRemovedEvent) Payload() any {
 	return nil
 }
 
@@ -286,7 +286,7 @@ type HumanOTPSMSCodeAddedEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanOTPSMSCodeAddedEvent) Payload() interface{} {
+func (e *HumanOTPSMSCodeAddedEvent) Payload() any {
 	return e
 }
 
@@ -330,7 +330,7 @@ type HumanOTPSMSCodeSentEvent struct {
 	GeneratorInfo *senders.CodeGeneratorInfo `json:"generatorInfo,omitempty"`
 }
 
-func (e *HumanOTPSMSCodeSentEvent) Payload() interface{} {
+func (e *HumanOTPSMSCodeSentEvent) Payload() any {
 	return e
 }
 
@@ -362,7 +362,7 @@ type HumanOTPSMSCheckSucceededEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanOTPSMSCheckSucceededEvent) Payload() interface{} {
+func (e *HumanOTPSMSCheckSucceededEvent) Payload() any {
 	return e
 }
 
@@ -394,7 +394,7 @@ type HumanOTPSMSCheckFailedEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanOTPSMSCheckFailedEvent) Payload() interface{} {
+func (e *HumanOTPSMSCheckFailedEvent) Payload() any {
 	return e
 }
 
@@ -425,7 +425,7 @@ type HumanOTPEmailAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanOTPEmailAddedEvent) Payload() interface{} {
+func (e *HumanOTPEmailAddedEvent) Payload() any {
 	return nil
 }
 
@@ -454,7 +454,7 @@ type HumanOTPEmailRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *HumanOTPEmailRemovedEvent) Payload() interface{} {
+func (e *HumanOTPEmailRemovedEvent) Payload() any {
 	return nil
 }
 
@@ -488,7 +488,7 @@ type HumanOTPEmailCodeAddedEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanOTPEmailCodeAddedEvent) Payload() interface{} {
+func (e *HumanOTPEmailCodeAddedEvent) Payload() any {
 	return e
 }
 
@@ -532,7 +532,7 @@ type HumanOTPEmailCodeSentEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanOTPEmailCodeSentEvent) Payload() interface{} {
+func (e *HumanOTPEmailCodeSentEvent) Payload() any {
 	return e
 }
 
@@ -562,7 +562,7 @@ type HumanOTPEmailCheckSucceededEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanOTPEmailCheckSucceededEvent) Payload() interface{} {
+func (e *HumanOTPEmailCheckSucceededEvent) Payload() any {
 	return e
 }
 
@@ -594,7 +594,7 @@ type HumanOTPEmailCheckFailedEvent struct {
 	*AuthRequestInfo
 }
 
-func (e *HumanOTPEmailCheckFailedEvent) Payload() interface{} {
+func (e *HumanOTPEmailCheckFailedEvent) Payload() any {
 	return e
 }
 

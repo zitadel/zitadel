@@ -18,7 +18,7 @@ func NewParser() *Parser {
 	return &Parser{d}
 }
 
-func (p *Parser) Parse(r *http.Request, data interface{}) error {
+func (p *Parser) Parse(r *http.Request, data any) error {
 	err := r.ParseForm()
 	if err != nil {
 		return zerrors.ThrowInternal(err, "FORM-lCC9zI", "Errors.Internal")

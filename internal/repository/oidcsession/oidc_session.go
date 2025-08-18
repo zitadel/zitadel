@@ -36,7 +36,7 @@ type AddedEvent struct {
 	UserAgent         *domain.UserAgent           `json:"userAgent,omitempty"`
 }
 
-func (e *AddedEvent) Payload() interface{} {
+func (e *AddedEvent) Payload() any {
 	return e
 }
 
@@ -92,7 +92,7 @@ type AccessTokenAddedEvent struct {
 	Actor    *domain.TokenActor `json:"actor,omitempty"`
 }
 
-func (e *AccessTokenAddedEvent) Payload() interface{} {
+func (e *AccessTokenAddedEvent) Payload() any {
 	return e
 }
 
@@ -131,7 +131,7 @@ type AccessTokenRevokedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *AccessTokenRevokedEvent) Payload() interface{} {
+func (e *AccessTokenRevokedEvent) Payload() any {
 	return e
 }
 
@@ -164,7 +164,7 @@ type RefreshTokenAddedEvent struct {
 	IdleLifetime time.Duration `json:"idleLifetime"`
 }
 
-func (e *RefreshTokenAddedEvent) Payload() interface{} {
+func (e *RefreshTokenAddedEvent) Payload() any {
 	return e
 }
 
@@ -202,7 +202,7 @@ type RefreshTokenRenewedEvent struct {
 	IdleLifetime time.Duration `json:"idleLifetime"`
 }
 
-func (e *RefreshTokenRenewedEvent) Payload() interface{} {
+func (e *RefreshTokenRenewedEvent) Payload() any {
 	return e
 }
 
@@ -235,7 +235,7 @@ type RefreshTokenRevokedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *RefreshTokenRevokedEvent) Payload() interface{} {
+func (e *RefreshTokenRevokedEvent) Payload() any {
 	return e
 }
 

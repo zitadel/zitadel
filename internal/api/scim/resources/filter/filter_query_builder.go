@@ -264,7 +264,7 @@ func (b *queryBuilder) buildNumberQuery(left *QueryFieldInfo, right CompValue, o
 		return nil, serrors.ThrowInvalidFilter(zerrors.ThrowInvalidArgument(nil, "SCIM-FF424", "Invalid filter expression: unsupported comparison operator for number fields"))
 	}
 
-	var value interface{}
+	var value any
 	if right.Int != nil {
 		value = *right.Int
 	} else {

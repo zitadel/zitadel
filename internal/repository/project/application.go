@@ -38,7 +38,7 @@ type ApplicationAddedEvent struct {
 	Name  string `json:"name,omitempty"`
 }
 
-func (e *ApplicationAddedEvent) Payload() interface{} {
+func (e *ApplicationAddedEvent) Payload() any {
 	return e
 }
 
@@ -84,7 +84,7 @@ type ApplicationChangedEvent struct {
 	oldName string
 }
 
-func (e *ApplicationChangedEvent) Payload() interface{} {
+func (e *ApplicationChangedEvent) Payload() any {
 	return e
 }
 
@@ -133,7 +133,7 @@ type ApplicationDeactivatedEvent struct {
 	AppID string `json:"appId,omitempty"`
 }
 
-func (e *ApplicationDeactivatedEvent) Payload() interface{} {
+func (e *ApplicationDeactivatedEvent) Payload() any {
 	return e
 }
 
@@ -175,7 +175,7 @@ type ApplicationReactivatedEvent struct {
 	AppID string `json:"appId,omitempty"`
 }
 
-func (e *ApplicationReactivatedEvent) Payload() interface{} {
+func (e *ApplicationReactivatedEvent) Payload() any {
 	return e
 }
 
@@ -219,7 +219,7 @@ type ApplicationRemovedEvent struct {
 	entityID string
 }
 
-func (e *ApplicationRemovedEvent) Payload() interface{} {
+func (e *ApplicationRemovedEvent) Payload() any {
 	return e
 }
 

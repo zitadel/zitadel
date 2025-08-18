@@ -26,7 +26,7 @@ type HumanProfileChangedEvent struct {
 	Gender            *domain.Gender `json:"gender,omitempty"`
 }
 
-func (e *HumanProfileChangedEvent) Payload() interface{} {
+func (e *HumanProfileChangedEvent) Payload() any {
 	return e
 }
 

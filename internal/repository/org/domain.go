@@ -43,7 +43,7 @@ type DomainAddedEvent struct {
 	Domain string `json:"domain,omitempty"`
 }
 
-func (e *DomainAddedEvent) Payload() interface{} {
+func (e *DomainAddedEvent) Payload() any {
 	return e
 }
 
@@ -104,7 +104,7 @@ type DomainVerificationAddedEvent struct {
 	ValidationCode *crypto.CryptoValue            `json:"validationCode,omitempty"`
 }
 
-func (e *DomainVerificationAddedEvent) Payload() interface{} {
+func (e *DomainVerificationAddedEvent) Payload() any {
 	return e
 }
 
@@ -148,7 +148,7 @@ type DomainVerificationFailedEvent struct {
 	Domain string `json:"domain,omitempty"`
 }
 
-func (e *DomainVerificationFailedEvent) Payload() interface{} {
+func (e *DomainVerificationFailedEvent) Payload() any {
 	return e
 }
 
@@ -185,7 +185,7 @@ type DomainVerifiedEvent struct {
 	Domain string `json:"domain,omitempty"`
 }
 
-func (e *DomainVerifiedEvent) Payload() interface{} {
+func (e *DomainVerifiedEvent) Payload() any {
 	return e
 }
 
@@ -244,7 +244,7 @@ type DomainPrimarySetEvent struct {
 	Domain string `json:"domain,omitempty"`
 }
 
-func (e *DomainPrimarySetEvent) Payload() interface{} {
+func (e *DomainPrimarySetEvent) Payload() any {
 	return e
 }
 
@@ -282,7 +282,7 @@ type DomainRemovedEvent struct {
 	isVerified bool
 }
 
-func (e *DomainRemovedEvent) Payload() interface{} {
+func (e *DomainRemovedEvent) Payload() any {
 	return e
 }
 

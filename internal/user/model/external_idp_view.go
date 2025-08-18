@@ -42,7 +42,7 @@ const (
 type ExternalIDPSearchQuery struct {
 	Key    ExternalIDPSearchKey
 	Method domain.SearchMethod
-	Value  interface{}
+	Value  any
 }
 
 type ExternalIDPSearchResponse struct {

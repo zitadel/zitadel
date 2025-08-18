@@ -128,7 +128,7 @@ func TestProvider_FetchUser(t *testing.T) {
 					gock.New(issuer).
 						Get("/user").
 						Reply(200).
-						JSON(map[string]interface{}{
+						JSON(map[string]any{
 							"userID": "id",
 							"custom": "claim",
 						})
@@ -147,7 +147,7 @@ func TestProvider_FetchUser(t *testing.T) {
 			want: want{
 				user: &UserMapper{
 					idAttribute: "userID",
-					RawInfo: map[string]interface{}{
+					RawInfo: map[string]any{
 						"userID": "id",
 						"custom": "claim",
 					},
@@ -196,7 +196,7 @@ func TestProvider_FetchUser(t *testing.T) {
 					gock.New(issuer).
 						Get("/user").
 						Reply(200).
-						JSON(map[string]interface{}{
+						JSON(map[string]any{
 							"userID": "id",
 							"custom": "claim",
 						})
@@ -211,7 +211,7 @@ func TestProvider_FetchUser(t *testing.T) {
 			want: want{
 				user: &UserMapper{
 					idAttribute: "userID",
-					RawInfo: map[string]interface{}{
+					RawInfo: map[string]any{
 						"userID": "id",
 						"custom": "claim",
 					},

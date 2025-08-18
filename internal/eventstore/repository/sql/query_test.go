@@ -83,17 +83,17 @@ func Test_prepareColumns(t *testing.T) {
 	var reducedEvents []eventstore.Event
 
 	type fields struct {
-		dbRow []interface{}
+		dbRow []any
 	}
 	type args struct {
 		columns eventstore.Columns
-		dest    interface{}
+		dest    any
 		dbErr   error
 		useV1   bool
 	}
 	type res struct {
 		query    string
-		expected interface{}
+		expected any
 		dbErr    func(error) bool
 	}
 	tests := []struct {
@@ -122,7 +122,7 @@ func Test_prepareColumns(t *testing.T) {
 				expected: decimal.NewFromInt(42),
 			},
 			fields: fields{
-				dbRow: []interface{}{decimal.NewNullDecimal(decimal.NewFromInt(42))},
+				dbRow: []any{decimal.NewNullDecimal(decimal.NewFromInt(42))},
 			},
 		},
 		{
@@ -136,7 +136,7 @@ func Test_prepareColumns(t *testing.T) {
 				expected: decimal.NewFromInt(42),
 			},
 			fields: fields{
-				dbRow: []interface{}{decimal.NewNullDecimal(decimal.NewFromInt(42))},
+				dbRow: []any{decimal.NewNullDecimal(decimal.NewFromInt(42))},
 			},
 		},
 		{
@@ -167,7 +167,7 @@ func Test_prepareColumns(t *testing.T) {
 				},
 			},
 			fields: fields{
-				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", eventstore.Version("")},
+				dbRow: []any{time.Time{}, eventstore.EventType(""), uint64(5), sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", eventstore.Version("")},
 			},
 		},
 		{
@@ -186,7 +186,7 @@ func Test_prepareColumns(t *testing.T) {
 				},
 			},
 			fields: fields{
-				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), decimal.NewNullDecimal(decimal.NewFromInt(42)), sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
+				dbRow: []any{time.Time{}, eventstore.EventType(""), uint64(5), decimal.NewNullDecimal(decimal.NewFromInt(42)), sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
 			},
 		},
 		{
@@ -205,7 +205,7 @@ func Test_prepareColumns(t *testing.T) {
 				},
 			},
 			fields: fields{
-				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), decimal.NullDecimal{}, sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
+				dbRow: []any{time.Time{}, eventstore.EventType(""), uint64(5), decimal.NullDecimal{}, sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
 			},
 		},
 		{
@@ -275,8 +275,8 @@ func Test_prepareColumns(t *testing.T) {
 	}
 }
 
-func prepareTestScan(err error, res []interface{}) scan {
-	return func(dests ...interface{}) error {
+func prepareTestScan(err error, res []any) scan {
+	return func(dests ...any) error {
 		if err != nil {
 			return err
 		}
@@ -305,7 +305,7 @@ func Test_prepareCondition(t *testing.T) {
 	}
 	type res struct {
 		clause string
-		values []interface{}
+		values []any
 	}
 	tests := []struct {
 		name string
@@ -406,7 +406,7 @@ func Test_prepareCondition(t *testing.T) {
 			},
 			res: res{
 				clause: " WHERE aggregate_type = ANY(?) AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')",
-				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, database.TextArray[string]{}},
+				values: []any{[]eventstore.AggregateType{"user", "org"}, database.TextArray[string]{}},
 			},
 		},
 		{
@@ -423,7 +423,7 @@ func Test_prepareCondition(t *testing.T) {
 			},
 			res: res{
 				clause: ` WHERE aggregate_type = ANY(?) AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')`,
-				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, database.TextArray[string]{}},
+				values: []any{[]eventstore.AggregateType{"user", "org"}, database.TextArray[string]{}},
 			},
 		},
 		{
@@ -443,7 +443,7 @@ func Test_prepareCondition(t *testing.T) {
 			},
 			res: res{
 				clause: " WHERE aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')",
-				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, "1234", []eventstore.EventType{"user.created", "org.created"}, database.TextArray[string]{}},
+				values: []any{[]eventstore.AggregateType{"user", "org"}, "1234", []eventstore.EventType{"user.created", "org.created"}, database.TextArray[string]{}},
 			},
 		},
 		{
@@ -462,7 +462,7 @@ func Test_prepareCondition(t *testing.T) {
 			},
 			res: res{
 				clause: ` WHERE aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')`,
-				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, "1234", []eventstore.EventType{"user.created", "org.created"}, database.TextArray[string]{}},
+				values: []any{[]eventstore.AggregateType{"user", "org"}, "1234", []eventstore.EventType{"user.created", "org.created"}, database.TextArray[string]{}},
 			},
 		},
 	}

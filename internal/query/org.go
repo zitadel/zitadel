@@ -337,7 +337,7 @@ func NewOrgStateSearchQuery(value domain_pkg.OrgState) (SearchQuery, error) {
 }
 
 func NewOrgIDsSearchQuery(ids ...string) (SearchQuery, error) {
-	list := make([]interface{}, len(ids))
+	list := make([]any, len(ids))
 	for i, value := range ids {
 		list[i] = value
 	}

@@ -27,8 +27,8 @@ type Users struct {
 
 type User struct {
 	ID                 string                     `json:"id,omitempty"`
-	CreationDate       time.Time                  `json:"creation_date,omitempty"`
-	ChangeDate         time.Time                  `json:"change_date,omitempty"`
+	CreationDate       time.Time                  `json:"creation_date"`
+	ChangeDate         time.Time                  `json:"change_date"`
 	ResourceOwner      string                     `json:"resource_owner,omitempty"`
 	Sequence           uint64                     `json:"sequence,omitempty"`
 	State              domain.UserState           `json:"state,omitempty"`
@@ -46,15 +46,15 @@ type Human struct {
 	NickName               string              `json:"nick_name,omitempty"`
 	DisplayName            string              `json:"display_name,omitempty"`
 	AvatarKey              string              `json:"avatar_key,omitempty"`
-	PreferredLanguage      language.Tag        `json:"preferred_language,omitempty"`
+	PreferredLanguage      language.Tag        `json:"preferred_language"`
 	Gender                 domain.Gender       `json:"gender,omitempty"`
 	Email                  domain.EmailAddress `json:"email,omitempty"`
 	IsEmailVerified        bool                `json:"is_email_verified,omitempty"`
 	Phone                  domain.PhoneNumber  `json:"phone,omitempty"`
 	IsPhoneVerified        bool                `json:"is_phone_verified,omitempty"`
 	PasswordChangeRequired bool                `json:"password_change_required,omitempty"`
-	PasswordChanged        time.Time           `json:"password_changed,omitempty"`
-	MFAInitSkipped         time.Time           `json:"mfa_init_skipped,omitempty"`
+	PasswordChanged        time.Time           `json:"password_changed"`
+	MFAInitSkipped         time.Time           `json:"mfa_init_skipped"`
 }
 
 type Profile struct {

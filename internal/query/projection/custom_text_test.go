@@ -43,7 +43,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.custom_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, aggregate_id, template, key, language) DO UPDATE SET (creation_date, change_date, sequence, is_default, text) = (projections.custom_texts2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.is_default, EXCLUDED.text)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 								anyArg{},
@@ -82,7 +82,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.custom_texts2 WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"InitCode",
 								"Text",
@@ -116,7 +116,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.custom_texts2 WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"InitCode",
 								"en",
@@ -145,7 +145,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.custom_texts2 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},
@@ -176,7 +176,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.custom_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, aggregate_id, template, key, language) DO UPDATE SET (creation_date, change_date, sequence, is_default, text) = (projections.custom_texts2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.is_default, EXCLUDED.text)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 								anyArg{},
@@ -215,7 +215,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.custom_texts2 WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4) AND (instance_id = $5)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"InitCode",
 								"Text",
@@ -249,7 +249,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.custom_texts2 WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"InitCode",
 								"en",
@@ -278,7 +278,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.custom_texts2 WHERE (instance_id = $1) AND (aggregate_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},

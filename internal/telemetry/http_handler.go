@@ -2,6 +2,7 @@ package telemetry
 
 import (
 	"net/http"
+	"slices"
 	"strings"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -11,12 +12,9 @@ import (
 
 func shouldNotIgnore(endpoints ...string) func(r *http.Request) bool {
 	return func(r *http.Request) bool {
-		for _, endpoint := range endpoints {
-			if strings.HasPrefix(r.URL.RequestURI(), endpoint) {
-				return false
-			}
-		}
-		return true
+		return !slices.ContainsFunc(endpoints, func(endpoint string) bool {
+			return strings.HasPrefix(r.URL.RequestURI(), endpoint)
+		})
 	}
 }
 

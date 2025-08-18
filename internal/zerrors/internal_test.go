@@ -10,7 +10,7 @@ import (
 )
 
 func TestInternalError(t *testing.T) {
-	var err interface{} = new(zerrors.InternalError)
+	var err any = new(zerrors.InternalError)
 	_, ok := err.(zerrors.Internal)
 	assert.True(t, ok)
 }

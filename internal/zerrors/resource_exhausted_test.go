@@ -10,7 +10,7 @@ import (
 )
 
 func TestResourceExhaustedError(t *testing.T) {
-	var err interface{} = new(zerrors.ResourceExhaustedError)
+	var err any = new(zerrors.ResourceExhaustedError)
 	_, ok := err.(zerrors.ResourceExhausted)
 	assert.True(t, ok)
 }

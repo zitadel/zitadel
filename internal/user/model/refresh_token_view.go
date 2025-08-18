@@ -50,7 +50,7 @@ const (
 type RefreshTokenSearchQuery struct {
 	Key    RefreshTokenSearchKey
 	Method domain.SearchMethod
-	Value  interface{}
+	Value  any
 }
 
 type RefreshTokenSearchResponse struct {

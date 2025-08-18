@@ -174,7 +174,7 @@ func (q *NotQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (notQ NotQuery) ToSql() (sql string, args []interface{}, err error) {
+func (notQ NotQuery) ToSql() (sql string, args []any, err error) {
 	querySql, queryArgs, queryErr := notQ.query.comp().ToSql()
 	// Handle the error from the query's ToSql() function.
 	if queryErr != nil {
@@ -379,11 +379,11 @@ const (
 
 type NumberQuery struct {
 	Column  Column
-	Number  interface{}
+	Number  any
 	Compare NumberComparison
 }
 
-func NewNumberQuery(c Column, value interface{}, compare NumberComparison) (*NumberQuery, error) {
+func NewNumberQuery(c Column, value any, compare NumberComparison) (*NumberQuery, error) {
 	if compare < 0 || compare >= numberCompareMax {
 		return nil, ErrInvalidCompare
 	}
@@ -426,7 +426,7 @@ func (q *NumberQuery) comp() sq.Sqlizer {
 	case NumberGreaterOrEqual:
 		return sq.GtOrEq{q.Column.identifier(): q.Number}
 	case NumberListContains:
-		return &listContains{col: q.Column, args: []interface{}{q.Number}}
+		return &listContains{col: q.Column, args: []any{q.Number}}
 	case numberCompareMax:
 		return nil
 	}
@@ -499,11 +499,11 @@ func (q *SubSelect) comp() sq.Sqlizer {
 
 type listQuery struct {
 	Column  Column
-	Data    interface{}
+	Data    any
 	Compare ListComparison
 }
 
-func NewListQuery(column Column, value interface{}, compare ListComparison) (*listQuery, error) {
+func NewListQuery(column Column, value any, compare ListComparison) (*listQuery, error) {
 	if compare < 0 || compare >= listCompareMax {
 		return nil, ErrInvalidCompare
 	}
@@ -790,10 +790,10 @@ func join(join, from Column) string {
 
 type listContains struct {
 	col  Column
-	args interface{}
+	args any
 }
 
-func NewListContains(c Column, value interface{}) (*listContains, error) {
+func NewListContains(c Column, value any) (*listContains, error) {
 	return &listContains{
 		col:  c,
 		args: value,
@@ -808,8 +808,8 @@ func (q *listContains) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (q *listContains) ToSql() (string, []interface{}, error) {
-	return q.col.identifier() + " @> ? ", []interface{}{q.args}, nil
+func (q *listContains) ToSql() (string, []any, error) {
+	return q.col.identifier() + " @> ? ", []any{q.args}, nil
 }
 
 func (q *listContains) comp() sq.Sqlizer {

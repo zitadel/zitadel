@@ -33,7 +33,7 @@ type FilteredValuesEvaluationResultMatch struct {
 	SourceIndex int
 }
 
-type EvaluationResult interface{}
+type EvaluationResult any
 
 func NewEvaluator(schema schemas.ScimSchemaType) *Evaluator {
 	return &Evaluator{

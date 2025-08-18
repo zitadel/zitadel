@@ -17,7 +17,7 @@ type HostedLoginTranslationSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	Translation map[string]any `json:"translation,omitempty"`
-	Language    language.Tag   `json:"language,omitempty"`
+	Language    language.Tag   `json:"language"`
 	Level       string         `json:"level,omitempty"`
 }
 

@@ -68,7 +68,7 @@ func Benchmark_Push_SameAggregate(b *testing.B) {
 				cleanupEventstore(clients[pusherKey])
 				b.StartTimer()
 
-				for n := 0; n < b.N; n++ {
+				for b.Loop() {
 					_, err := store.Push(ctx, store.Client().DB, cmds...)
 					if err != nil {
 						b.Error(err)

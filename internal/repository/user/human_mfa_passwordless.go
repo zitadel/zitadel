@@ -275,7 +275,7 @@ type HumanPasswordlessInitCodeAddedEvent struct {
 	Expiry time.Duration       `json:"expiry"`
 }
 
-func (e *HumanPasswordlessInitCodeAddedEvent) Payload() interface{} {
+func (e *HumanPasswordlessInitCodeAddedEvent) Payload() any {
 	return e
 }
 
@@ -324,7 +324,7 @@ type HumanPasswordlessInitCodeRequestedEvent struct {
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
-func (e *HumanPasswordlessInitCodeRequestedEvent) Payload() interface{} {
+func (e *HumanPasswordlessInitCodeRequestedEvent) Payload() any {
 	return e
 }
 
@@ -377,7 +377,7 @@ type HumanPasswordlessInitCodeSentEvent struct {
 	ID string `json:"id"`
 }
 
-func (e *HumanPasswordlessInitCodeSentEvent) Payload() interface{} {
+func (e *HumanPasswordlessInitCodeSentEvent) Payload() any {
 	return e
 }
 
@@ -417,7 +417,7 @@ type HumanPasswordlessInitCodeCheckFailedEvent struct {
 	ID string `json:"id"`
 }
 
-func (e *HumanPasswordlessInitCodeCheckFailedEvent) Payload() interface{} {
+func (e *HumanPasswordlessInitCodeCheckFailedEvent) Payload() any {
 	return e
 }
 
@@ -457,7 +457,7 @@ type HumanPasswordlessInitCodeCheckSucceededEvent struct {
 	ID string `json:"id"`
 }
 
-func (e *HumanPasswordlessInitCodeCheckSucceededEvent) Payload() interface{} {
+func (e *HumanPasswordlessInitCodeCheckSucceededEvent) Payload() any {
 	return e
 }
 

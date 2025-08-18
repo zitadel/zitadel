@@ -68,9 +68,9 @@ var (
 	KeyProjection                       *handler.Handler
 	SecurityPolicyProjection            *handler.Handler
 	NotificationPolicyProjection        *handler.Handler
-	NotificationsProjection             interface{}
-	NotificationsQuotaProjection        interface{}
-	TelemetryPusherProjection           interface{}
+	NotificationsProjection             any
+	NotificationsQuotaProjection        any
+	TelemetryPusherProjection           any
 	DeviceAuthProjection                *handler.Handler
 	SessionProjection                   *handler.Handler
 	AuthRequestProjection               *handler.Handler

@@ -68,7 +68,7 @@ type InitColumn struct {
 	Name          string
 	Type          ColumnType
 	nullable      bool
-	defaultValue  interface{}
+	defaultValue  any
 	deleteCascade string
 }
 
@@ -93,7 +93,7 @@ func Nullable() ColumnOption {
 	}
 }
 
-func Default(value interface{}) ColumnOption {
+func Default(value any) ColumnOption {
 	return func(c *InitColumn) {
 		c.defaultValue = value
 	}
@@ -386,7 +386,7 @@ func createColumnsStatement(cols []*InitColumn, tableName string) string {
 	return strings.Join(columns, ",")
 }
 
-func defaultValue(value interface{}) string {
+func defaultValue(value any) string {
 	switch v := value.(type) {
 	case string:
 		return "'" + v + "'"

@@ -68,7 +68,7 @@ func (e *SMTPConfigAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *SMTPConfigAddedEvent) Payload() interface{} {
+func (e *SMTPConfigAddedEvent) Payload() any {
 	return e
 }
 
@@ -93,7 +93,7 @@ func (e *SMTPConfigChangedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *SMTPConfigChangedEvent) Payload() interface{} {
+func (e *SMTPConfigChangedEvent) Payload() any {
 	return e
 }
 
@@ -206,7 +206,7 @@ func (e *SMTPConfigPasswordChangedEvent) SetBaseEvent(event *eventstore.BaseEven
 	e.BaseEvent = event
 }
 
-func (e *SMTPConfigPasswordChangedEvent) Payload() interface{} {
+func (e *SMTPConfigPasswordChangedEvent) Payload() any {
 	return e
 }
 
@@ -244,7 +244,7 @@ func (e *SMTPConfigHTTPAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *SMTPConfigHTTPAddedEvent) Payload() interface{} {
+func (e *SMTPConfigHTTPAddedEvent) Payload() any {
 	return e
 }
 
@@ -263,7 +263,7 @@ func (e *SMTPConfigHTTPChangedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *SMTPConfigHTTPChangedEvent) Payload() interface{} {
+func (e *SMTPConfigHTTPChangedEvent) Payload() any {
 	return e
 }
 
@@ -338,7 +338,7 @@ func (e *SMTPConfigActivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *SMTPConfigActivatedEvent) Payload() interface{} {
+func (e *SMTPConfigActivatedEvent) Payload() any {
 	return e
 }
 
@@ -370,7 +370,7 @@ func (e *SMTPConfigDeactivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *SMTPConfigDeactivatedEvent) Payload() interface{} {
+func (e *SMTPConfigDeactivatedEvent) Payload() any {
 	return e
 }
 
@@ -401,7 +401,7 @@ func NewSMTPConfigRemovedEvent(
 func (e *SMTPConfigRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
-func (e *SMTPConfigRemovedEvent) Payload() interface{} {
+func (e *SMTPConfigRemovedEvent) Payload() any {
 	return e
 }
 

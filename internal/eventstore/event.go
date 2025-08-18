@@ -3,6 +3,7 @@ package eventstore
 import (
 	"encoding/json"
 	"reflect"
+	"slices"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -102,10 +103,5 @@ func GenericEventMapper[T any, PT BaseEventSetter[T]](event Event) (Event, error
 }
 
 func isEventTypes(command Command, types ...EventType) bool {
-	for _, typ := range types {
-		if command.Type() == typ {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(types, command.Type())
 }

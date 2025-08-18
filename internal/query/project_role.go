@@ -197,7 +197,7 @@ func NewProjectRoleKeySearchQuery(method TextComparison, value string) (SearchQu
 }
 
 func NewProjectRoleKeysSearchQuery(values []string) (SearchQuery, error) {
-	list := make([]interface{}, len(values))
+	list := make([]any, len(values))
 	for i, value := range values {
 		list[i] = value
 	}

@@ -39,7 +39,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.flow_triggers3 WHERE (flow_type = $1) AND (trigger_type = $2) AND (resource_owner = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								domain.FlowTypeExternalAuthentication,
 								domain.TriggerTypePostAuthentication,
 								"ro-id",
@@ -48,7 +48,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "INSERT INTO projections.flow_triggers3 (resource_owner, instance_id, flow_type, change_date, sequence, trigger_type, action_id, trigger_sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"ro-id",
 								"instance-id",
 								domain.FlowTypeExternalAuthentication,
@@ -61,7 +61,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 						},
 						{
 							expectedStmt: "INSERT INTO projections.flow_triggers3 (resource_owner, instance_id, flow_type, change_date, sequence, trigger_type, action_id, trigger_sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"ro-id",
 								"instance-id",
 								domain.FlowTypeExternalAuthentication,
@@ -94,7 +94,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.flow_triggers3 WHERE (flow_type = $1) AND (resource_owner = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								domain.FlowTypeExternalAuthentication,
 								"ro-id",
 								"instance-id",
@@ -122,7 +122,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.flow_triggers3 WHERE (instance_id = $1) AND (resource_owner = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},
@@ -149,7 +149,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.flow_triggers3 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},

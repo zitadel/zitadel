@@ -37,7 +37,7 @@ func NewGoogleIDPAddedEvent(
 	}
 }
 
-func (e *GoogleIDPAddedEvent) Payload() interface{} {
+func (e *GoogleIDPAddedEvent) Payload() any {
 	return e
 }
 
@@ -118,7 +118,7 @@ func ChangeGoogleOptions(options OptionChanges) func(*GoogleIDPChangedEvent) {
 	}
 }
 
-func (e *GoogleIDPChangedEvent) Payload() interface{} {
+func (e *GoogleIDPChangedEvent) Payload() any {
 	return e
 }
 

@@ -59,7 +59,7 @@ func (q *Queries) SearchInstanceTrustedDomains(ctx context.Context, queries *Ins
 	return q.queryInstanceTrustedDomains(ctx, stmt, scan, args...)
 }
 
-func (q *Queries) queryInstanceTrustedDomains(ctx context.Context, stmt string, scan func(*sql.Rows) (*InstanceTrustedDomains, error), args ...interface{}) (domains *InstanceTrustedDomains, err error) {
+func (q *Queries) queryInstanceTrustedDomains(ctx context.Context, stmt string, scan func(*sql.Rows) (*InstanceTrustedDomains, error), args ...any) (domains *InstanceTrustedDomains, err error) {
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
 		domains, err = scan(rows)
 		return err

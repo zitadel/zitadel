@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	"net/url"
+	"slices"
 )
 
 func GetOriginFromURLString(s string) (string, error) {
@@ -14,12 +15,7 @@ func GetOriginFromURLString(s string) (string, error) {
 }
 
 func IsOriginAllowed(allowList []string, origin string) bool {
-	for _, allowed := range allowList {
-		if allowed == origin {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(allowList, origin)
 }
 
 // IsOrigin checks if provided string is an origin (scheme://hostname[:port]) without path, query or fragment

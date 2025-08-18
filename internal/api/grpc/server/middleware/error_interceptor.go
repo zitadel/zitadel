@@ -10,12 +10,12 @@ import (
 )
 
 func ErrorHandler() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		return toGRPCError(ctx, req, handler)
 	}
 }
 
-func toGRPCError(ctx context.Context, req interface{}, handler grpc.UnaryHandler) (interface{}, error) {
+func toGRPCError(ctx context.Context, req any, handler grpc.UnaryHandler) (any, error) {
 	resp, err := handler(ctx, req)
 	return resp, gerrors.ZITADELToGRPCError(err)
 }

@@ -15,7 +15,7 @@ type humanRegisteredPayload struct {
 	LastName          string              `json:"lastName,omitempty"`
 	NickName          string              `json:"nickName,omitempty"`
 	DisplayName       string              `json:"displayName,omitempty"`
-	PreferredLanguage language.Tag        `json:"preferredLanguage,omitempty"`
+	PreferredLanguage language.Tag        `json:"preferredLanguage"`
 	Gender            domain.Gender       `json:"gender,omitempty"`
 	EmailAddress      domain.EmailAddress `json:"email,omitempty"`
 	PhoneNumber       domain.PhoneNumber  `json:"phone,omitempty"`

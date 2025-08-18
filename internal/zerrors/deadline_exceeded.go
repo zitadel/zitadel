@@ -22,7 +22,7 @@ func ThrowDeadlineExceeded(parent error, id, message string) error {
 	return &DeadlineExceededError{CreateZitadelError(parent, id, message)}
 }
 
-func ThrowDeadlineExceededf(parent error, id, format string, a ...interface{}) error {
+func ThrowDeadlineExceededf(parent error, id, format string, a ...any) error {
 	return ThrowDeadlineExceeded(parent, id, fmt.Sprintf(format, a...))
 }
 

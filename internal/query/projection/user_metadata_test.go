@@ -42,7 +42,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "INSERT INTO projections.user_metadata5 (instance_id, user_id, key, resource_owner, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, user_id, key) DO UPDATE SET (resource_owner, creation_date, change_date, sequence, value) = (EXCLUDED.resource_owner, projections.user_metadata5.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 								"key",
@@ -77,7 +77,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_metadata5 WHERE (user_id = $1) AND (key = $2) AND (instance_id = $3)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"key",
 								"instance-id",
@@ -105,7 +105,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_metadata5 WHERE (user_id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 							},
@@ -132,7 +132,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_metadata5 WHERE (user_id = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 								"instance-id",
 							},
@@ -159,7 +159,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_metadata5 WHERE (instance_id = $1) AND (resource_owner = $2)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"instance-id",
 								"agg-id",
 							},
@@ -186,7 +186,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_metadata5 WHERE (instance_id = $1)",
-							expectedArgs: []interface{}{
+							expectedArgs: []any{
 								"agg-id",
 							},
 						},

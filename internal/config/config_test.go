@@ -31,14 +31,14 @@ func (v *validatable) Validate() error {
 
 func TestRead(t *testing.T) {
 	type args struct {
-		obj         interface{}
+		obj         any
 		configFiles []string
 	}
 	tests := []struct {
 		name    string
 		args    args
 		wantErr bool
-		want    interface{}
+		want    any
 	}{
 		{
 			"not supoorted config file error",
@@ -186,7 +186,7 @@ func Test_readConfigFile(t *testing.T) {
 	type args struct {
 		configReader ReaderFunc
 		configFile   string
-		obj          interface{}
+		obj          any
 	}
 	tests := []struct {
 		name    string
