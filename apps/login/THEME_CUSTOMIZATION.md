@@ -25,14 +25,19 @@ Controls the overall page structure:
 - **`side-by-side`** - Brand section on left, form on right (desktop view)
 - **`top-to-bottom`** - Brand section on top, form below (mobile-first)
 
-### 🎨 Preset (`NEXT_PUBLIC_THEME_PRESET`)
+### 📏 Spacing (`NEXT_PUBLIC_THEME_SPACING`)
 
-Complete color schemes and styling:
+Controls spacing and padding throughout the interface:
 
-- **`professional`** - Blue-based corporate theme
-- **`modern`** - Purple/pink gradients with trendy styling
-- **`minimal`** - Clean black and white design
-- **`corporate`** - Traditional indigo business theme
+- **`regular`** - Standard spacing with comfortable padding (p-6, space-y-6)
+- **`compact`** - Tighter spacing for information-dense layouts (p-4, space-y-4)
+
+### 🎨 Appearance (`NEXT_PUBLIC_THEME_APPEARANCE`)
+
+Complete design philosophies:
+
+- **`flat`** - Minimal flat design with cards matching background color, subtle borders, and normal typography
+- **`material`** - Material Design inspired with elevated cards, proper contrast, and medium typography
 
 ### 🖼️ Background Image (`NEXT_PUBLIC_THEME_BACKGROUND_IMAGE`)
 
@@ -49,7 +54,8 @@ Add a custom background image:
 ```env
 NEXT_PUBLIC_THEME_ROUNDNESS=full
 NEXT_PUBLIC_THEME_LAYOUT=side-by-side
-NEXT_PUBLIC_THEME_PRESET=modern
+NEXT_PUBLIC_THEME_SPACING=regular
+NEXT_PUBLIC_THEME_APPEARANCE=material
 NEXT_PUBLIC_THEME_BACKGROUND_IMAGE=/images/tech-gradient.jpg
 ```
 
@@ -58,7 +64,8 @@ NEXT_PUBLIC_THEME_BACKGROUND_IMAGE=/images/tech-gradient.jpg
 ```env
 NEXT_PUBLIC_THEME_ROUNDNESS=edgy
 NEXT_PUBLIC_THEME_LAYOUT=top-to-bottom
-NEXT_PUBLIC_THEME_PRESET=corporate
+NEXT_PUBLIC_THEME_SPACING=regular
+NEXT_PUBLIC_THEME_APPEARANCE=material
 ```
 
 ### Minimal SaaS
@@ -66,7 +73,8 @@ NEXT_PUBLIC_THEME_PRESET=corporate
 ```env
 NEXT_PUBLIC_THEME_ROUNDNESS=mid
 NEXT_PUBLIC_THEME_LAYOUT=side-by-side
-NEXT_PUBLIC_THEME_PRESET=minimal
+NEXT_PUBLIC_THEME_SPACING=compact
+NEXT_PUBLIC_THEME_APPEARANCE=flat
 ```
 
 ### Creative Agency
@@ -74,8 +82,27 @@ NEXT_PUBLIC_THEME_PRESET=minimal
 ```env
 NEXT_PUBLIC_THEME_ROUNDNESS=full
 NEXT_PUBLIC_THEME_LAYOUT=top-to-bottom
-NEXT_PUBLIC_THEME_PRESET=modern
+NEXT_PUBLIC_THEME_SPACING=regular
+NEXT_PUBLIC_THEME_APPEARANCE=material
 NEXT_PUBLIC_THEME_BACKGROUND_IMAGE=/images/creative-workspace.jpg
+```
+
+### Flat Design App
+
+```env
+NEXT_PUBLIC_THEME_ROUNDNESS=mid
+NEXT_PUBLIC_THEME_LAYOUT=side-by-side
+NEXT_PUBLIC_THEME_SPACING=compact
+NEXT_PUBLIC_THEME_APPEARANCE=flat
+```
+
+### Material Design System
+
+```env
+NEXT_PUBLIC_THEME_ROUNDNESS=mid
+NEXT_PUBLIC_THEME_LAYOUT=side-by-side
+NEXT_PUBLIC_THEME_SPACING=regular
+NEXT_PUBLIC_THEME_APPEARANCE=material
 ```
 
 ## Advanced Customization
@@ -84,13 +111,13 @@ For more detailed customization beyond these presets, you can:
 
 1. **Custom CSS**: Add your own CSS files in the `src/styles/` directory
 2. **Component Override**: Modify the theme configuration in `src/lib/theme.ts`
-3. **Custom Presets**: Add new preset options to the `PRESET_STYLES` object
+3. **Custom Appearances**: Add new appearance options to the `APPEARANCE_STYLES` or `SPACING_STYLES` objects
 
 ## Troubleshooting
 
 ### Theme not applying
 
-- Ensure you're using `NEXT_PUBLIC_` prefix for all theme variables
+- Ensure you're using `NEXT_PUBLIC_` prefix for all theme variables (`NEXT_PUBLIC_THEME_ROUNDNESS`, `NEXT_PUBLIC_THEME_SPACING`, `NEXT_PUBLIC_THEME_APPEARANCE`, etc.)
 - Restart your development server after changing environment variables
 - Check that your `.env.local` file is in the root of the login app directory
 

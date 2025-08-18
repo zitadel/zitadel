@@ -2,20 +2,23 @@
 
 export type ThemeRoundness = "edgy" | "mid" | "full";
 export type ThemeLayout = "side-by-side" | "top-to-bottom";
-export type ThemePreset = "professional" | "modern" | "minimal" | "corporate";
+export type ThemeAppearance = "flat" | "material";
+export type ThemeSpacing = "regular" | "compact";
 
 export interface ThemeConfig {
   roundness: ThemeRoundness;
   layout: ThemeLayout;
   backgroundImage?: string;
-  preset: ThemePreset;
+  appearance: ThemeAppearance;
+  spacing: ThemeSpacing;
 }
 
 // Default theme configuration
 export const DEFAULT_THEME: ThemeConfig = {
   roundness: "mid",
   layout: "side-by-side",
-  preset: "professional",
+  appearance: "flat",
+  spacing: "regular",
 };
 
 // Get theme configuration from environment variables
@@ -24,7 +27,8 @@ export function getThemeConfig(): ThemeConfig {
     roundness: (process.env.NEXT_PUBLIC_THEME_ROUNDNESS as ThemeRoundness) || DEFAULT_THEME.roundness,
     layout: (process.env.NEXT_PUBLIC_THEME_LAYOUT as ThemeLayout) || DEFAULT_THEME.layout,
     backgroundImage: process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE || undefined,
-    preset: (process.env.NEXT_PUBLIC_THEME_PRESET as ThemePreset) || DEFAULT_THEME.preset,
+    appearance: (process.env.NEXT_PUBLIC_THEME_APPEARANCE as ThemeAppearance) || DEFAULT_THEME.appearance,
+    spacing: (process.env.NEXT_PUBLIC_THEME_SPACING as ThemeSpacing) || DEFAULT_THEME.spacing,
   };
 }
 
@@ -66,31 +70,29 @@ export const LAYOUT_CLASSES = {
   },
 } as const;
 
-// Preset styling (non-color related)
-export const PRESET_STYLES = {
-  professional: {
-    card: "shadow-lg border",
+// Spacing configuration
+export const SPACING_STYLES = {
+  regular: {
     spacing: "space-y-6",
     padding: "p-6",
-    typography: "font-medium",
   },
-  modern: {
-    card: "shadow-xl border-0",
-    spacing: "space-y-8",
-    padding: "p-8",
-    typography: "font-semibold",
-  },
-  minimal: {
-    card: "shadow-sm border",
+  compact: {
     spacing: "space-y-4",
     padding: "p-4",
-    typography: "font-normal",
   },
-  corporate: {
-    card: "shadow-md border",
-    spacing: "space-y-6",
-    padding: "p-6",
+} as const;
+
+// Appearance styling (complete design philosophies)
+export const APPEARANCE_STYLES = {
+  flat: {
+    card: "shadow-sm border border-opacity-20",
+    typography: "font-normal",
+    background: "bg-background-light-500 dark:bg-background-dark-500", // Same as usual background
+  },
+  material: {
+    card: "shadow-lg border-0",
     typography: "font-medium",
+    background: "bg-background-light-400 dark:bg-background-dark-500", // Current system (shade 400)
   },
 } as const;
 
@@ -98,12 +100,14 @@ export const PRESET_STYLES = {
 export function getThemeClasses(theme: ThemeConfig) {
   const roundness = ROUNDNESS_CLASSES[theme.roundness];
   const layout = LAYOUT_CLASSES[theme.layout];
-  const preset = PRESET_STYLES[theme.preset];
+  const spacing = SPACING_STYLES[theme.spacing];
+  const appearance = APPEARANCE_STYLES[theme.appearance];
 
   return {
     roundness,
     layout,
-    preset,
+    spacing,
+    appearance,
     backgroundImage: theme.backgroundImage
       ? {
           container: "relative",

@@ -3,7 +3,7 @@
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { clsx } from "clsx";
 import { ChangeEvent, DetailedHTMLProps, forwardRef, InputHTMLAttributes, ReactNode } from "react";
-import { getThemeConfig, ROUNDNESS_CLASSES, PRESET_STYLES } from "@/lib/theme";
+import { getThemeConfig, ROUNDNESS_CLASSES, APPEARANCE_STYLES } from "@/lib/theme";
 import { getInputRoundnessClasses } from "@/lib/themeUtils";
 
 export type TextInputProps = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
@@ -42,7 +42,20 @@ function getDefaultInputRoundness(): string {
 // eslint-disable-next-line react/display-name
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   (
-    { label, placeholder, defaultValue, suffix, required = false, error, disabled, success, onChange, onBlur, roundness, ...props },
+    {
+      label,
+      placeholder,
+      defaultValue,
+      suffix,
+      required = false,
+      error,
+      disabled,
+      success,
+      onChange,
+      onBlur,
+      roundness,
+      ...props
+    },
     ref,
   ) => {
     // Use theme-based roundness if not explicitly provided

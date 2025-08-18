@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from "react";
 import { getButtonRoundnessClasses, getTypographyClasses, ThemeableProps } from "@/lib/themeUtils";
-import { getThemeConfig, ROUNDNESS_CLASSES, PRESET_STYLES } from "@/lib/theme";
+import { getThemeConfig, ROUNDNESS_CLASSES, APPEARANCE_STYLES } from "@/lib/theme";
 
 export enum ButtonSizes {
   Small = "Small",
@@ -63,7 +63,7 @@ function getDefaultButtonRoundness(): string {
 // Helper function to get default typography from centralized theme system
 function getDefaultButtonTypography(): string {
   const themeConfig = getThemeConfig();
-  return PRESET_STYLES[themeConfig.preset].typography;
+  return APPEARANCE_STYLES[themeConfig.appearance].typography;
 }
 
 // eslint-disable-next-line react/display-name

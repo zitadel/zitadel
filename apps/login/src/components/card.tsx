@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { HTMLAttributes, forwardRef, ReactNode } from "react";
-import { getThemeConfig, ROUNDNESS_CLASSES, PRESET_STYLES } from "@/lib/theme";
+import { getThemeConfig, ROUNDNESS_CLASSES, APPEARANCE_STYLES, SPACING_STYLES } from "@/lib/theme";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
@@ -17,7 +17,22 @@ function getDefaultCardRoundness(): string {
 // Helper function to get default padding from centralized theme system
 function getDefaultCardPadding(): string {
   const themeConfig = getThemeConfig();
-  return PRESET_STYLES[themeConfig.preset].padding;
+  return SPACING_STYLES[themeConfig.spacing].padding;
+}
+
+// Helper function to get default background from centralized theme system
+function getDefaultCardBackground(): string {
+  const themeConfig = getThemeConfig();
+  const appearance = APPEARANCE_STYLES[themeConfig.appearance];
+
+  // Use appearance-specific background if defined, otherwise fallback to material design (current system)
+  return (appearance as any).background || "bg-background-light-400 dark:bg-background-dark-500";
+}
+
+// Helper function to get default card styling from centralized theme system
+function getDefaultCardStyling(): string {
+  const themeConfig = getThemeConfig();
+  return APPEARANCE_STYLES[themeConfig.appearance].card;
 }
 
 // eslint-disable-next-line react/display-name
@@ -35,19 +50,22 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     // Use theme-based values if not explicitly provided
     const actualRoundness = roundness || getDefaultCardRoundness();
     const actualPadding = padding || getDefaultCardPadding();
+    const actualBackground = getDefaultCardBackground();
+    const actualCardStyling = getDefaultCardStyling();
 
     return (
       <div
         ref={ref}
         className={clsx(
-          "bg-background-light-400 dark:bg-background-dark-500",
+          actualBackground,
+          actualCardStyling,
           actualPadding,
           {
             "rounded-none": actualRoundness === "rounded-none",
             "rounded-lg": actualRoundness === "rounded-lg",
             "rounded-3xl": actualRoundness === "rounded-3xl",
           },
-          className
+          className,
         )}
         {...props}
       >

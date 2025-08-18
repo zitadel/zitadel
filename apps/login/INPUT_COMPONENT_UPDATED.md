@@ -3,6 +3,7 @@
 ## **Input Component Changes**
 
 ### **Before** (useTheme hook approach)
+
 ```tsx
 import { useTheme } from "@/lib/useTheme";
 
@@ -14,6 +15,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(({ ... }, 
 ```
 
 ### **After** (Direct theme system approach)
+
 ```tsx
 import { getThemeConfig, ROUNDNESS_CLASSES } from "@/lib/theme";
 
@@ -33,18 +35,21 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(({ roundne
 ## **✅ All Components Now Consistent**
 
 ### **1. Button Component**
+
 ```tsx
 const actualRoundness = roundness || getDefaultButtonRoundness();
 // ✅ Uses ROUNDNESS_CLASSES[themeConfig.roundness].button
 ```
 
-### **2. SkeletonCard Component**  
+### **2. SkeletonCard Component**
+
 ```tsx
 const actualRoundness = roundness || getDefaultCardRoundness();
 // ✅ Uses ROUNDNESS_CLASSES[themeConfig.roundness].card
 ```
 
 ### **3. TextInput Component** ← **Just Updated**
+
 ```tsx
 const actualRoundness = roundness || getDefaultInputRoundness();
 // ✅ Uses ROUNDNESS_CLASSES[themeConfig.roundness].input
@@ -61,13 +66,15 @@ const actualRoundness = roundness || getDefaultInputRoundness();
 ## **🌟 Your Theme Settings Work Everywhere**
 
 With your `.env.local` settings:
+
 ```bash
 NEXT_PUBLIC_THEME_ROUNDNESS=full
 ```
 
 All components now correctly apply:
+
 - **Buttons**: `rounded-full` 🔘
-- **Inputs**: `rounded-full` 💊  
+- **Inputs**: `rounded-full` 💊
 - **Cards/SkeletonCards**: `rounded-3xl` 🔳
 
 **Yes, the input now respects the new approach!** 🎉
