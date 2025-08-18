@@ -17,6 +17,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
+	v2 "github.com/zitadel/zitadel/pkg/grpc/metadata/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
@@ -432,10 +434,10 @@ func createUserWithUserName(ctx context.Context, username string, orgID string, 
 }
 
 func TestServer_ListUsers(t *testing.T) {
-	defer func() {
+	t.Cleanup(func() {
 		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IamCTX, &feature.ResetInstanceFeaturesRequest{})
 		require.NoError(t, err)
-	}()
+	})
 
 	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	type args struct {
@@ -622,7 +624,7 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 		{
-			name: "list user by id multiple, ok",
+			name: "list user by id and meta key multiple, ok",
 			args: args{
 				IamCTX,
 				&user.ListUsersRequest{},
@@ -631,6 +633,12 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserIDsQuery(infos.userIDs()))
+
+					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta", "my value 1")
+					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value 2")
+					Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value 3")
+
+					request.Queries = append(request.Queries, MetakeyContainsQuery("my meta"))
 					return infos
 				},
 			},
@@ -639,7 +647,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_UNSPECIFIED,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -708,7 +716,7 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 		{
-			name: "list user by username, ok",
+			name: "list user by username and meta value, ok",
 			args: args{
 				IamCTX,
 				&user.ListUsersRequest{},
@@ -796,7 +804,7 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 		{
-			name: "list user in emails multiple, ok",
+			name: "list user by emails and meta value multiple, ok",
 			args: args{
 				IamCTX,
 				&user.ListUsersRequest{},
@@ -805,6 +813,13 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
+
+					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta", "my value")
+					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value")
+					Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value")
+
+					request.Queries = append(request.Queries, MetavalueQuery("my value"))
+
 					return infos
 				},
 			},
@@ -1318,6 +1333,27 @@ func OrganizationIdQuery(resourceowner string) *user.SearchQuery {
 		Query: &user.SearchQuery_OrganizationIdQuery{
 			OrganizationIdQuery: &user.OrganizationIdQuery{
 				OrganizationId: resourceowner,
+			},
+		},
+	}
+}
+
+func MetakeyContainsQuery(metaKey string) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_MetadataKeyFilter{
+			MetadataKeyFilter: &v2.MetadataKeyFilter{
+				Key:    metaKey,
+				Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_CONTAINS},
+		},
+	}
+}
+
+func MetavalueQuery(metaValue string) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_MetadataValueFilter{
+			MetadataValueFilter: &v2.MetadataValueFilter{
+				Value:  []byte(metaValue),
+				Method: filter.ByteFilterMethod_BYTE_FILTER_METHOD_EQUALS,
 			},
 		},
 	}
