@@ -38,6 +38,8 @@ type User struct {
 	PreferredLoginName string                     `json:"preferred_login_name,omitempty"`
 	Human              *Human                     `json:"human,omitempty"`
 	Machine            *Machine                   `json:"machine,omitempty"`
+	MetadataKey        string                     `json:"metadata_key,omitempty"`
+	MetadataValue      []byte                     `json:"metadata_value,omitempty"`
 }
 
 type Human struct {
@@ -1321,10 +1323,13 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			MachineDescriptionCol.identifier(),
 			MachineSecretCol.identifier(),
 			MachineAccessTokenTypeCol.identifier(),
+			UserMetadataKeyCol.identifier(),
+			UserMetadataValueCol.identifier(),
 			countColumn.identifier()).
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
+			LeftJoin(join(UserMetadataUserIDCol, UserIDCol)).
 			JoinClause(joinLoginNames).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Users, error) {
@@ -1369,6 +1374,9 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					&machine.description,
 					&machine.encodedSecret,
 					&machine.accessTokenType,
+
+					&u.MetadataKey,
+					&u.MetadataValue,
 
 					&count,
 				)

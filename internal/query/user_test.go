@@ -395,10 +395,13 @@ var (
 		` projections.users14_machines.description,` +
 		` projections.users14_machines.secret,` +
 		` projections.users14_machines.access_token_type,` +
+		` projections.user_metadata5.key, ` +
+		` projections.user_metadata5.value, ` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.users14` +
 		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
 		` LEFT JOIN projections.users14_machines ON projections.users14.id = projections.users14_machines.user_id AND projections.users14.instance_id = projections.users14_machines.instance_id` +
+		` LEFT JOIN projections.user_metadata5 ON projections.users14.id = projections.user_metadata5.user_id AND projections.users14.instance_id = projections.user_metadata5.instance_id` +
 		` LEFT JOIN LATERAL (SELECT ARRAY_AGG(ln.login_name ORDER BY ln.login_name) AS login_names, MAX(CASE WHEN ln.is_primary THEN ln.login_name ELSE NULL END) AS preferred_login_name FROM projections.login_names3 AS ln WHERE ln.user_id = projections.users14.id AND ln.instance_id = projections.users14.instance_id) AS login_names ON TRUE`
 	usersCols = []string{
 		"id",
@@ -432,6 +435,8 @@ var (
 		"description",
 		"secret",
 		"access_token_type",
+		"metadata_key",
+		"metadata_value",
 		"count",
 	}
 	countUsersQuery = "SELECT COUNT(*) OVER () FROM projections.users14"
@@ -998,6 +1003,9 @@ func Test_UserPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// Metas
+							"custom metadata",
+							[]byte("Helloooo"),
 						},
 					},
 				),
@@ -1033,6 +1041,8 @@ func Test_UserPrepares(t *testing.T) {
 							PasswordChangeRequired: true,
 							PasswordChanged:        testNow,
 						},
+						MetadataKey:   "custom metadata",
+						MetadataValue: []byte("Helloooo"),
 					},
 				},
 			},
@@ -1077,6 +1087,9 @@ func Test_UserPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// Metas
+							"custom metadata",
+							[]byte("Helloooo1"),
 						},
 						{
 							"id",
@@ -1110,6 +1123,9 @@ func Test_UserPrepares(t *testing.T) {
 							"description",
 							"secret",
 							domain.OIDCTokenTypeBearer,
+							// Metas
+							"custom metadata",
+							[]byte("Helloooo2"),
 						},
 					},
 				),
@@ -1145,6 +1161,8 @@ func Test_UserPrepares(t *testing.T) {
 							PasswordChangeRequired: true,
 							PasswordChanged:        testNow,
 						},
+						MetadataKey:   "custom metadata",
+						MetadataValue: []byte("Helloooo1"),
 					},
 					{
 						ID:                 "id",
@@ -1163,6 +1181,8 @@ func Test_UserPrepares(t *testing.T) {
 							EncodedSecret:   "secret",
 							AccessTokenType: domain.OIDCTokenTypeBearer,
 						},
+						MetadataKey:   "custom metadata",
+						MetadataValue: []byte("Helloooo2"),
 					},
 				},
 			},
