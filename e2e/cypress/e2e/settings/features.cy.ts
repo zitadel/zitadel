@@ -145,9 +145,6 @@ describe('features settings', () => {
               const targetButton = uncheckedButtons.first();
               cy.wrap(targetButton).click();
 
-              // Check for success toast since we made a real change
-              cy.shouldConfirmSuccess();
-
               // Verify the toggle reflected the new state
               cy.wrap(targetButton).should('have.class', 'mat-button-toggle-checked');
             } else {
@@ -155,14 +152,13 @@ describe('features settings', () => {
               const targetButton = $allButtons.first();
               cy.wrap(targetButton).click();
 
-              // Check for success toast since we made a real change
-              cy.shouldConfirmSuccess();
-
               // Verify the toggle reflected the new state (should be unchecked now)
               cy.wrap(targetButton).should('not.have.class', 'mat-button-toggle-checked');
             }
           });
         });
+      // Check for success toast since we made a real change
+      cy.shouldConfirmSuccess();
     });
 
     it('should handle loginV2 feature toggle', () => {
@@ -187,17 +183,16 @@ describe('features settings', () => {
               cy.wrap($buttons.first()).click();
             }
           });
-
-          // Check for success toast since we made a real change
-          cy.shouldConfirmSuccess();
-
-          // Check if a base URI input field appears after enabling loginV2
-          cy.get('cnsl-login-v2-feature-toggle').within(() => {
-            cy.get('input[cnslInput], input[data-e2e*="uri"], input[placeholder*="URI"], input[placeholder*="uri"]')
-              .should('be.visible')
-              .and('not.be.disabled');
-          });
         });
+      // Check if a base URI input field appears after enabling loginV2
+      cy.get('cnsl-login-v2-feature-toggle').within(() => {
+        cy.get('input[cnslInput], input[data-e2e*="uri"], input[placeholder*="URI"], input[placeholder*="uri"]')
+          .should('be.visible')
+          .and('not.be.disabled');
+      });
+
+      // Check for success toast since we made a real change
+      cy.shouldConfirmSuccess();
     });
 
     it('should reset features when reset button is clicked', () => {
@@ -213,20 +208,18 @@ describe('features settings', () => {
             if (uncheckedButtons.length > 0) {
               // Click an unchecked button to enable it
               cy.wrap(uncheckedButtons.first()).click();
-              // Check for success toast since we made a real change
-              cy.shouldConfirmSuccess();
               // Verify the change was applied
               cy.wrap(uncheckedButtons.first()).should('have.class', 'mat-button-toggle-checked');
             } else {
               // All buttons are checked, click the first one to uncheck it
               cy.wrap(checkedButton.first()).click();
-              // Check for success toast since we made a real change
-              cy.shouldConfirmSuccess();
               // Verify the change was applied
               cy.wrap(checkedButton.first()).should('not.have.class', 'mat-button-toggle-checked');
             }
           });
         });
+      // Check for success toast since we made a real change
+      cy.shouldConfirmSuccess();
 
       // Click the reset button (if available)
       cy.get('body')
