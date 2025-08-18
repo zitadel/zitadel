@@ -183,13 +183,10 @@ describe('features settings', () => {
               cy.wrap($buttons.first()).click();
             }
           });
+          cy.get('input[cnslInput], input[data-e2e*="uri"], input[placeholder*="URI"], input[placeholder*="uri"]')
+            .should('be.visible')
+            .and('not.be.disabled');
         });
-      // Check if a base URI input field appears after enabling loginV2
-      cy.get('cnsl-login-v2-feature-toggle').within(() => {
-        cy.get('input[cnslInput], input[data-e2e*="uri"], input[placeholder*="URI"], input[placeholder*="uri"]')
-          .should('be.visible')
-          .and('not.be.disabled');
-      });
 
       // Check for success toast since we made a real change
       cy.shouldConfirmSuccess();
