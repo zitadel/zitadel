@@ -1,12 +1,11 @@
 import { Avatar } from "@/components/avatar";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { getThemeConfig, ROUNDNESS_CLASSES } from "@/lib/theme";
+import { getThemeConfig, ROUNDNESS_CLASSES, getComponentRoundness } from "@/lib/theme";
 
 // Helper function to get user avatar container roundness from theme
 function getUserAvatarRoundness(): string {
-  const themeConfig = getThemeConfig();
-  return ROUNDNESS_CLASSES[themeConfig.roundness].avatarContainer;
+  return getComponentRoundness("avatarContainer");
 }
 
 type Props = {

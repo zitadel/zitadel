@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { HTMLAttributes, forwardRef, ReactNode } from "react";
-import { getThemeConfig, ROUNDNESS_CLASSES, APPEARANCE_STYLES, SPACING_STYLES } from "@/lib/theme";
+import { getThemeConfig, ROUNDNESS_CLASSES, APPEARANCE_STYLES, SPACING_STYLES, getComponentRoundness } from "@/lib/theme";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
@@ -10,8 +10,7 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 
 // Helper function to get default card roundness from theme
 function getDefaultCardRoundness(): string {
-  const themeConfig = getThemeConfig();
-  return ROUNDNESS_CLASSES[themeConfig.roundness].card;
+  return getComponentRoundness("card");
 }
 
 // Helper function to get default padding from centralized theme system
