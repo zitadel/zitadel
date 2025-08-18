@@ -31,7 +31,6 @@ You agree that we may delete any data on our systems or networks, if CAOS believ
 
 You agree to adhere to the following fair use limits:
 
-- [Actions minutes](../service-description/billing.md#action-minutes): A monthly limit of 1'000 Action minutes per instance
 - Usage limits that were agreed by both parties in advance for the duration of the term
 
 ## Violations of this policy
