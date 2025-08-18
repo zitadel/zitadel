@@ -3,6 +3,7 @@
 import { ColorShade, getColorHash } from "@/helpers/colors";
 import { useTheme } from "next-themes";
 import Image from "next/image";
+import { getThemeConfig, ROUNDNESS_CLASSES } from "@/lib/theme";
 
 interface AvatarProps {
   name: string | null | undefined;
@@ -17,8 +18,7 @@ export function getInitials(name: string, loginName: string) {
   if (name) {
     const split = name.split(" ");
     if (split) {
-      const initials =
-        split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
+      const initials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
       credentials = initials;
     } else {
       credentials = name.charAt(0);
@@ -40,15 +40,16 @@ export function getInitials(name: string, loginName: string) {
   return credentials;
 }
 
-export function Avatar({
-  size = "base",
-  name,
-  loginName,
-  imageUrl,
-  shadow,
-}: AvatarProps) {
+// Helper function to get avatar roundness from theme
+function getAvatarRoundness(): string {
+  const themeConfig = getThemeConfig();
+  return ROUNDNESS_CLASSES[themeConfig.roundness].avatar;
+}
+
+export function Avatar({ size = "base", name, loginName, imageUrl, shadow }: AvatarProps) {
   const { resolvedTheme } = useTheme();
   const credentials = getInitials(name ?? loginName, loginName);
+  const avatarRoundness = getAvatarRoundness();
 
   const color: ColorShade = getColorHash(loginName);
 
@@ -64,7 +65,7 @@ export function Avatar({
 
   return (
     <div
-      className={`dark:group-focus:ring-offset-blue dark:text-blue pointer-events-none flex h-full w-full flex-shrink-0 cursor-default items-center justify-center rounded-full bg-primary-light-500 text-primary-light-contrast-500 transition-colors duration-200 hover:bg-primary-light-400 group-focus:outline-none group-focus:ring-2 group-focus:ring-primary-light-200 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 hover:dark:bg-primary-dark-500 dark:group-focus:ring-primary-dark-400 ${
+      className={`dark:group-focus:ring-offset-blue dark:text-blue pointer-events-none flex h-full w-full flex-shrink-0 cursor-default items-center justify-center bg-primary-light-500 text-primary-light-contrast-500 transition-colors duration-200 hover:bg-primary-light-400 group-focus:outline-none group-focus:ring-2 group-focus:ring-primary-light-200 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 hover:dark:bg-primary-dark-500 dark:group-focus:ring-primary-dark-400 ${avatarRoundness} ${
         shadow ? "shadow" : ""
       } ${
         size === "large"
@@ -82,15 +83,11 @@ export function Avatar({
           height={48}
           width={48}
           alt="avatar"
-          className="h-full w-full rounded-full border border-divider-light dark:border-divider-dark"
+          className={`h-full w-full border border-divider-light dark:border-divider-dark ${avatarRoundness}`}
           src={imageUrl}
         />
       ) : (
-        <span
-          className={`uppercase ${size === "large" ? "text-xl" : "text-13px"}`}
-        >
-          {credentials}
-        </span>
+        <span className={`uppercase ${size === "large" ? "text-xl" : "text-13px"}`}>{credentials}</span>
       )}
     </div>
   );

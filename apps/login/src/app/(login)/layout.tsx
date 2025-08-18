@@ -3,23 +3,19 @@ import "@/styles/globals.scss";
 import { LanguageProvider } from "@/components/language-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Skeleton } from "@/components/skeleton";
-import { Theme } from "@/components/theme";
 import { ThemeProvider } from "@/components/theme-provider";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { Analytics } from "@vercel/analytics/react";
 import { Lato } from "next/font/google";
 import { ReactNode, Suspense } from "react";
+import ThemeSwitch from "@/components/theme-switch";
 
 const lato = Lato({
   weight: ["400", "700", "900"],
   subsets: ["latin"],
 });
 
-export default async function RootLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html className={`${lato.className}`} suppressHydrationWarning>
       <head />
@@ -36,7 +32,7 @@ export default async function RootLayout({
                       <div className="h-40"></div>
                     </Skeleton>
                     <div className="flex flex-row items-center justify-end space-x-4 py-4">
-                      <Theme />
+                      <ThemeSwitch />
                     </div>
                   </div>
                 </div>
@@ -50,7 +46,7 @@ export default async function RootLayout({
                     {children}
                     <div className="flex flex-row items-center justify-end space-x-4 py-4">
                       <LanguageSwitcher />
-                      <Theme />
+                      <ThemeSwitch />
                     </div>
                   </div>
                 </div>

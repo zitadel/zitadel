@@ -39,18 +39,24 @@ export const ROUNDNESS_CLASSES = {
     button: "rounded-none",
     input: "rounded-none",
     image: "rounded-none",
+    avatar: "rounded-none",
+    avatarContainer: "rounded-none",
   },
   mid: {
     card: "rounded-lg",
     button: "rounded-md",
     input: "rounded-md",
     image: "rounded-lg",
+    avatar: "rounded-lg",
+    avatarContainer: "rounded-[9px]",
   },
   full: {
     card: "rounded-3xl",
     button: "rounded-full",
     input: "rounded-full pl-4",
     image: "rounded-full",
+    avatar: "rounded-full",
+    avatarContainer: "rounded-full",
   },
 } as const;
 
