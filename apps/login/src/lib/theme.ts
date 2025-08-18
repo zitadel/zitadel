@@ -86,11 +86,13 @@ export const SPACING_STYLES = {
 export const APPEARANCE_STYLES = {
   flat: {
     card: "border border-opacity-20 border border-black/10 dark:border-white/10",
+    button: "border border-button-light-border dark:border-button-dark-border", // No shadows for flat design
     typography: "font-normal",
     background: "bg-background-light-500 dark:bg-background-dark-500", // Same as usual background
   },
   material: {
     card: "shadow-sm border-0",
+    button: "shadow hover:shadow-xl active:shadow-xl", // Material shadows for buttons
     typography: "font-medium",
     background: "bg-background-light-400 dark:bg-background-dark-500", // Current system (shade 400)
   },

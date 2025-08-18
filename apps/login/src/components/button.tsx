@@ -32,12 +32,13 @@ export const getButtonClasses = (
   color: ButtonColors,
   roundnessClasses: string = "rounded-md", // Default fallback
   typography: string = "font-medium", // Theme typography
+  appearance: string = "", // Theme appearance (shadows, borders, etc.)
   spacing: string = "space-y-2", // Theme spacing (if needed)
 ) =>
   clsx(
     {
       "box-border leading-36px text-14px inline-flex items-center focus:outline-none transition-colors transition-shadow duration-300": true,
-      "shadow hover:shadow-xl active:shadow-xl disabled:border-none disabled:bg-gray-300 disabled:text-gray-600 disabled:shadow-none disabled:cursor-not-allowed disabled:dark:bg-gray-800 disabled:dark:text-gray-900":
+      "disabled:border-none disabled:bg-gray-300 disabled:text-gray-600 disabled:shadow-none disabled:cursor-not-allowed disabled:dark:bg-gray-800 disabled:dark:text-gray-900":
         variant === ButtonVariants.Primary,
       "bg-primary-light-500 dark:bg-primary-dark-500 hover:bg-primary-light-400 hover:dark:bg-primary-dark-400 text-primary-light-contrast-500 dark:text-primary-dark-contrast-500":
         variant === ButtonVariants.Primary && color !== ButtonColors.Warn,
@@ -52,6 +53,7 @@ export const getButtonClasses = (
     },
     roundnessClasses, // Apply the full roundness classes directly
     getTypographyClasses(typography),
+    appearance, // Apply appearance-specific styling (shadows, borders, etc.)
   );
 
 // Helper function to get default button roundness from theme
@@ -64,6 +66,12 @@ function getDefaultButtonRoundness(): string {
 function getDefaultButtonTypography(): string {
   const themeConfig = getThemeConfig();
   return APPEARANCE_STYLES[themeConfig.appearance].typography;
+}
+
+// Helper function to get default button appearance from centralized theme system
+function getDefaultButtonAppearance(): string {
+  const themeConfig = getThemeConfig();
+  return APPEARANCE_STYLES[themeConfig.appearance].button;
 }
 
 // eslint-disable-next-line react/display-name
@@ -85,12 +93,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // Use theme-based values if not explicitly provided
     const actualRoundness = roundness || getDefaultButtonRoundness();
     const actualTypography = typography || getDefaultButtonTypography();
+    const actualAppearance = getDefaultButtonAppearance();
 
     return (
       <button
         type="button"
         ref={ref}
-        className={`${getButtonClasses(size, variant, color, actualRoundness, actualTypography, spacing)} ${className}`}
+        className={`${getButtonClasses(size, variant, color, actualRoundness, actualTypography, actualAppearance, spacing)} ${className}`}
         {...props}
       >
         {children}
