@@ -1,7 +1,7 @@
 ---
 
-title: Migrating Users from Keycloak to ZITADEL (Including Password Hashes)
-sidebar_label: Keycloak Migration Guide
+title: Migrate from Keycloak
+sidebar_label: From Keycloak
 ---
 
 ## 1. Introduction
