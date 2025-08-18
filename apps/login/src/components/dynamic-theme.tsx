@@ -75,7 +75,9 @@ export function DynamicTheme({
                         )}
 
                         {/* First child content (title, description) - only if we have left/right structure */}
-                        {hasLeftRightStructure && <div className="space-y-4">{leftContent}</div>}
+                        {hasLeftRightStructure && (
+                          <div className="space-y-4 text-left flex flex-col items-start">{leftContent}</div>
+                        )}
                       </div>
                     </div>
 
@@ -92,7 +94,7 @@ export function DynamicTheme({
           );
         })()
       ) : (
-        // Traditional top-to-bottom layout
+        // Traditional top-to-bottom layout - keep center alignment
         <div className="relative mx-auto w-full max-w-[440px] py-8">
           <Card>
             <div className="mx-auto flex flex-col items-center space-y-4">
@@ -111,7 +113,7 @@ export function DynamicTheme({
                 )}
               </div>
 
-              <div className="w-full">{actualChildren}</div>
+              <div className="w-full flex flex-col items-center text-center space-y-4">{actualChildren}</div>
               <div className="flex flex-row justify-between"></div>
             </div>
           </Card>
