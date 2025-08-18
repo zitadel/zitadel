@@ -1318,6 +1318,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			HumanIsPhoneVerifiedCol.identifier(),
 			HumanPasswordChangeRequiredCol.identifier(),
 			HumanPasswordChangedCol.identifier(),
+			HumanMFAInitSkippedCol.identifier(),
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
@@ -1368,6 +1369,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					&human.isPhoneVerified,
 					&human.passwordChangeRequired,
 					&human.passwordChanged,
+					&human.mfaInitSkipped,
 
 					&machine.machineID,
 					&machine.name,
@@ -1404,6 +1406,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 						IsPhoneVerified:        human.isPhoneVerified.Bool,
 						PasswordChangeRequired: human.passwordChangeRequired.Bool,
 						PasswordChanged:        human.passwordChanged.Time,
+						MFAInitSkipped:         human.mfaInitSkipped.Time,
 					}
 				} else if machine.machineID.Valid {
 					u.Machine = &Machine{

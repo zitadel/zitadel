@@ -390,6 +390,7 @@ var (
 		` projections.users14_humans.is_phone_verified,` +
 		` projections.users14_humans.password_change_required,` +
 		` projections.users14_humans.password_changed,` +
+		` projections.users14_humans.mfa_init_skipped,` +
 		` projections.users14_machines.user_id,` +
 		` projections.users14_machines.name,` +
 		` projections.users14_machines.description,` +
@@ -429,6 +430,7 @@ var (
 		"is_phone_verified",
 		"password_change_required",
 		"password_changed",
+		"mfa_init_skipped",
 		// machine
 		"user_id",
 		"name",
@@ -997,6 +999,7 @@ func Test_UserPrepares(t *testing.T) {
 							true,
 							true,
 							testNow,
+							testNow,
 							// machine
 							nil,
 							nil,
@@ -1040,6 +1043,7 @@ func Test_UserPrepares(t *testing.T) {
 							IsPhoneVerified:        true,
 							PasswordChangeRequired: true,
 							PasswordChanged:        testNow,
+							MFAInitSkipped:         testNow,
 						},
 						MetadataKey:   "custom metadata",
 						MetadataValue: []byte("Helloooo"),
@@ -1081,6 +1085,7 @@ func Test_UserPrepares(t *testing.T) {
 							true,
 							true,
 							testNow,
+							testNow,
 							// machine
 							nil,
 							nil,
@@ -1103,6 +1108,7 @@ func Test_UserPrepares(t *testing.T) {
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
 							// human
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1160,6 +1166,7 @@ func Test_UserPrepares(t *testing.T) {
 							IsPhoneVerified:        true,
 							PasswordChangeRequired: true,
 							PasswordChanged:        testNow,
+							MFAInitSkipped:         testNow,
 						},
 						MetadataKey:   "custom metadata",
 						MetadataValue: []byte("Helloooo1"),
