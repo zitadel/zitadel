@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { getCardRoundnessClasses, getRoundnessClasses, ThemeableProps } from "@/lib/themeUtils";
-import { getThemeConfig, ROUNDNESS_CLASSES } from "@/lib/theme";
+import { getThemeConfig, ROUNDNESS_CLASSES, PRESET_STYLES } from "@/lib/theme";
 
 interface SkeletonCardProps extends ThemeableProps {
   isLoading?: boolean;
@@ -12,25 +12,17 @@ function getDefaultCardRoundness(): string {
   return ROUNDNESS_CLASSES[themeConfig.roundness].card;
 }
 
-// Helper function to get default spacing from theme
+// Helper function to get default spacing from centralized theme system
 function getDefaultSpacing(): string {
-  return process.env.NEXT_PUBLIC_THEME_PRESET === "minimal"
-    ? "space-y-4"
-    : process.env.NEXT_PUBLIC_THEME_PRESET === "modern"
-      ? "space-y-8"
-      : "space-y-6";
+  const themeConfig = getThemeConfig();
+  return PRESET_STYLES[themeConfig.preset].spacing;
 }
 
-// Helper function to get default padding from theme
+// Helper function to get default padding from centralized theme system
 function getDefaultPadding(): string {
-  return process.env.NEXT_PUBLIC_THEME_PRESET === "minimal"
-    ? "p-4"
-    : process.env.NEXT_PUBLIC_THEME_PRESET === "modern"
-      ? "p-8"
-      : "p-6";
-}
-
-export const SkeletonCard = ({
+  const themeConfig = getThemeConfig();
+  return PRESET_STYLES[themeConfig.preset].padding;
+}export const SkeletonCard = ({
   isLoading,
   roundness, // Will use theme default if not provided
   spacing, // Will use theme default if not provided

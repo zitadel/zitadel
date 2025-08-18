@@ -3,7 +3,8 @@
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { clsx } from "clsx";
 import { ChangeEvent, DetailedHTMLProps, forwardRef, InputHTMLAttributes, ReactNode } from "react";
-import { getThemeConfig, ROUNDNESS_CLASSES } from "@/lib/theme";
+import { getThemeConfig, ROUNDNESS_CLASSES, PRESET_STYLES } from "@/lib/theme";
+import { getInputRoundnessClasses } from "@/lib/themeUtils";
 
 export type TextInputProps = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
   label: string;
@@ -19,19 +20,18 @@ export type TextInputProps = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElem
 };
 
 const styles = (error: boolean, disabled: boolean, roundness: string = "rounded-md") =>
-  clsx({
-    "h-[40px] mb-[2px] p-[7px] bg-input-light-background dark:bg-input-dark-background transition-colors duration-300 grow": true,
-    "border border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500": true,
-    "focus:outline-none focus:ring-0 text-base text-black dark:text-white placeholder:italic placeholder-gray-700 dark:placeholder-gray-700": true,
-    "border border-warn-light-500 dark:border-warn-dark-500 hover:border-warn-light-500 hover:dark:border-warn-dark-500 focus:border-warn-light-500 focus:dark:border-warn-dark-500":
-      error,
-    "pointer-events-none text-gray-500 dark:text-gray-800 border border-input-light-border dark:border-input-dark-border hover:border-light-hoverborder hover:dark:border-hoverborder cursor-default":
-      disabled,
-    // Roundness classes - only one will be true at a time
-    "rounded-none": roundness === "rounded-none",
-    "rounded-md": roundness === "rounded-md",
-    "rounded-full": roundness === "rounded-full",
-  });
+  clsx(
+    {
+      "h-[40px] mb-[2px] p-[7px] bg-input-light-background dark:bg-input-dark-background transition-colors duration-300 grow": true,
+      "border border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500": true,
+      "focus:outline-none focus:ring-0 text-base text-black dark:text-white placeholder:italic placeholder-gray-700 dark:placeholder-gray-700": true,
+      "border border-warn-light-500 dark:border-warn-dark-500 hover:border-warn-light-500 hover:dark:border-warn-dark-500 focus:border-warn-light-500 focus:dark:border-warn-dark-500":
+        error,
+      "pointer-events-none text-gray-500 dark:text-gray-800 border border-input-light-border dark:border-input-dark-border hover:border-light-hoverborder hover:dark:border-hoverborder cursor-default":
+        disabled,
+    },
+    getInputRoundnessClasses(roundness), // Use utility function instead of hardcoded classes
+  );
 
 // Helper function to get default input roundness from theme
 function getDefaultInputRoundness(): string {
@@ -71,11 +71,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           <span
             className={clsx(
               "absolute bottom-[22px] right-[3px] z-30 translate-y-1/2 transform bg-background-light-500 p-2 dark:bg-background-dark-500",
-              {
-                "rounded-none": actualRoundness === "rounded-none",
-                "rounded-md": actualRoundness === "rounded-md",
-                "rounded-full": actualRoundness === "rounded-full",
-              },
+              getInputRoundnessClasses(actualRoundness), // Use utility function instead of hardcoded classes
             )}
           >
             @{suffix}

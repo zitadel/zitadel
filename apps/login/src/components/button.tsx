@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from "react";
 import { getButtonRoundnessClasses, getTypographyClasses, ThemeableProps } from "@/lib/themeUtils";
-import { getThemeConfig, ROUNDNESS_CLASSES } from "@/lib/theme";
+import { getThemeConfig, ROUNDNESS_CLASSES, PRESET_STYLES } from "@/lib/theme";
 
 export enum ButtonSizes {
   Small = "Small",
@@ -60,6 +60,12 @@ function getDefaultButtonRoundness(): string {
   return ROUNDNESS_CLASSES[themeConfig.roundness].button;
 }
 
+// Helper function to get default typography from centralized theme system
+function getDefaultButtonTypography(): string {
+  const themeConfig = getThemeConfig();
+  return PRESET_STYLES[themeConfig.preset].typography;
+}
+
 // eslint-disable-next-line react/display-name
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -70,20 +76,21 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       size = ButtonSizes.Small,
       color = ButtonColors.Primary,
       roundness, // Will use theme default if not provided
-      typography = "font-medium", // Can be injected via props or theme context
-      spacing = "space-y-2", // Can be injected via props or theme context
+      typography, // Will use theme default if not provided
+      spacing = "space-y-2", // This is not used in button, kept for compatibility
       ...props
     },
     ref,
   ) => {
-    // Use theme-based roundness if not explicitly provided
+    // Use theme-based values if not explicitly provided
     const actualRoundness = roundness || getDefaultButtonRoundness();
+    const actualTypography = typography || getDefaultButtonTypography();
 
     return (
       <button
         type="button"
         ref={ref}
-        className={`${getButtonClasses(size, variant, color, actualRoundness, typography, spacing)} ${className}`}
+        className={`${getButtonClasses(size, variant, color, actualRoundness, actualTypography, spacing)} ${className}`}
         {...props}
       >
         {children}

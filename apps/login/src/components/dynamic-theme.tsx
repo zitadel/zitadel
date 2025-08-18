@@ -5,6 +5,7 @@ import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_se
 import { ReactNode } from "react";
 import { AppAvatar } from "./app-avatar";
 import { ThemeWrapper } from "./theme-wrapper";
+import { Card } from "./card";
 
 export function DynamicTheme({
   branding,
@@ -17,7 +18,7 @@ export function DynamicTheme({
 }) {
   return (
     <ThemeWrapper branding={branding}>
-      <div className="rounded-lg bg-background-light-400 px-8 py-12 dark:bg-background-dark-500">
+      <Card>
         <div className="mx-auto flex flex-col items-center space-y-4">
           <div className="relative flex flex-row items-center justify-center gap-8">
             {branding && (
@@ -37,7 +38,7 @@ export function DynamicTheme({
           <div className="w-full">{children}</div>
           <div className="flex flex-row justify-between"></div>
         </div>
-      </div>
+      </Card>
     </ThemeWrapper>
   );
 }
