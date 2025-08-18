@@ -1,5 +1,5 @@
 ---
-title: SCIM Provisioning from Okta into ZITADEL
+title: SCIM Provisioning from Okta
 ---
 
 This guide provides step-by-step instructions to configure SCIM provisioning from Okta into ZITADEL.
@@ -98,7 +98,6 @@ Review and adjust attribute mappings in Okta as needed:
 
 * Ensure standard attributes such as `userName`, `email`, `name.givenName`, and `name.familyName` are correctly mapped.
 
----
 
 ## Step 4: Verify SCIM Provisioning
 
