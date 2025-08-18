@@ -2350,9 +2350,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			// saml
 			assert.Equal(t, validSAMLMetadata2, updateSAML.Metadata)
 			assert.NotNil(t, updateSAML.Key)
-			// assert.NotEqual(t, saml.Key, updateSAML.Key) // https://github.com/zitadel/zitadel/issues/10414
 			assert.NotNil(t, updateSAML.Certificate)
-			// assert.NotEqual(t, saml.Certificate, updateSAML.Certificate) // https://github.com/zitadel/zitadel/issues/10414
 			assert.NotNil(t, updateSAML.Binding)
 			assert.NotEqual(t, saml.Binding, updateSAML.Binding)
 			assert.Equal(t, true, updateSAML.WithSignedRequest)
