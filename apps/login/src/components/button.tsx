@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from "react";
-import { getButtonRoundnessClasses, getTypographyClasses, ThemeableProps } from "@/lib/themeUtils";
+import { getTypographyClasses, ThemeableProps } from "@/lib/themeUtils";
 import { getThemeConfig, ROUNDNESS_CLASSES, APPEARANCE_STYLES } from "@/lib/theme";
 
 export enum ButtonSizes {
@@ -30,7 +30,7 @@ export const getButtonClasses = (
   size: ButtonSizes,
   variant: ButtonVariants,
   color: ButtonColors,
-  roundness: string = "rounded-md", // Default fallback
+  roundnessClasses: string = "rounded-md", // Default fallback
   typography: string = "font-medium", // Theme typography
   spacing: string = "space-y-2", // Theme spacing (if needed)
 ) =>
@@ -50,7 +50,7 @@ export const getButtonClasses = (
       "px-16 py-2": size === ButtonSizes.Large,
       "px-4 h-[36px]": size === ButtonSizes.Small,
     },
-    getButtonRoundnessClasses(roundness),
+    roundnessClasses, // Apply the full roundness classes directly
     getTypographyClasses(typography),
   );
 

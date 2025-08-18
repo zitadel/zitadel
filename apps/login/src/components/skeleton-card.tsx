@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { getCardRoundnessClasses, getRoundnessClasses, ThemeableProps } from "@/lib/themeUtils";
+import { ThemeableProps } from "@/lib/themeUtils";
 import { getThemeConfig, ROUNDNESS_CLASSES, SPACING_STYLES } from "@/lib/theme";
 
 interface SkeletonCardProps extends ThemeableProps {
@@ -43,13 +43,13 @@ export const SkeletonCard = ({
           "relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent":
             isLoading,
         },
-        getCardRoundnessClasses(actualRoundness),
+        actualRoundness, // Apply the full roundness classes directly
       )}
     >
       <div className={actualSpacing}>
-        <div className={clsx("h-14 bg-gray-700", getRoundnessClasses(actualRoundness, ""))} />
-        <div className={clsx("h-3 w-11/12 bg-gray-700", getRoundnessClasses(actualRoundness, ""))} />
-        <div className={clsx("h-3 w-8/12 bg-gray-700", getRoundnessClasses(actualRoundness, ""))} />
+        <div className={clsx("h-14 bg-gray-700", actualRoundness.split(" ")[0])} />
+        <div className={clsx("h-3 w-11/12 bg-gray-700", actualRoundness.split(" ")[0])} />
+        <div className={clsx("h-3 w-8/12 bg-gray-700", actualRoundness.split(" ")[0])} />
       </div>
     </div>
   );

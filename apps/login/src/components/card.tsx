@@ -60,11 +60,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
           actualBackground,
           actualCardStyling,
           actualPadding,
-          {
-            "rounded-none": actualRoundness === "rounded-none",
-            "rounded-lg": actualRoundness === "rounded-lg",
-            "rounded-3xl": actualRoundness === "rounded-3xl",
-          },
+          actualRoundness, // Apply the full roundness classes directly
           className,
         )}
         {...props}

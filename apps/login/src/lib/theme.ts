@@ -16,8 +16,8 @@ export interface ThemeConfig {
 // Default theme configuration
 export const DEFAULT_THEME: ThemeConfig = {
   roundness: "mid",
-  layout: "side-by-side",
-  appearance: "flat",
+  layout: "top-to-bottom",
+  appearance: "material",
   spacing: "regular",
 };
 
@@ -49,7 +49,7 @@ export const ROUNDNESS_CLASSES = {
   full: {
     card: "rounded-3xl",
     button: "rounded-full",
-    input: "rounded-full",
+    input: "rounded-full pl-4",
     image: "rounded-full",
   },
 } as const;
@@ -85,12 +85,12 @@ export const SPACING_STYLES = {
 // Appearance styling (complete design philosophies)
 export const APPEARANCE_STYLES = {
   flat: {
-    card: "shadow-sm border border-opacity-20",
+    card: "border border-opacity-20 border border-black/10 dark:border-white/10",
     typography: "font-normal",
     background: "bg-background-light-500 dark:bg-background-dark-500", // Same as usual background
   },
   material: {
-    card: "shadow-lg border-0",
+    card: "shadow-sm border-0",
     typography: "font-medium",
     background: "bg-background-light-400 dark:bg-background-dark-500", // Current system (shade 400)
   },
