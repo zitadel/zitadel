@@ -38,6 +38,7 @@ const (
 	PermissionOrgRead                  = "org.read"
 	PermissionIDPRead                  = "iam.idp.read"
 	PermissionOrgIDPRead               = "org.idp.read"
+	PermissionProjectCreate            = "project.create"
 	PermissionProjectWrite             = "project.write"
 	PermissionProjectRead              = "project.read"
 	PermissionProjectDelete            = "project.delete"
