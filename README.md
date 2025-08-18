@@ -65,7 +65,6 @@ Deploying ZITADEL locally takes less than 3 minutes. Go ahead and give it a try!
 * [Linux](https://zitadel.com/docs/self-hosting/deploy/linux)
 * [MacOS](https://zitadel.com/docs/self-hosting/deploy/macos)
 * [Docker compose](https://zitadel.com/docs/self-hosting/deploy/compose)
-* [Knative](https://zitadel.com/docs/self-hosting/deploy/knative)
 * [Kubernetes](https://zitadel.com/docs/self-hosting/deploy/kubernetes)
 
 See all guides [here](https://zitadel.com/docs/self-hosting/deploy/overview)
