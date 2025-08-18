@@ -60,7 +60,7 @@ func (c *Commands) AddProject(ctx context.Context, add *AddProject) (_ *domain.O
 	if isProjectStateExists(wm.State) {
 		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-opamwu", "Errors.Project.AlreadyExisting")
 	}
-	if err := c.checkPermissionUpdateProject(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+	if err := c.checkPermissionCreateProject(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
 		return nil, err
 	}
 
