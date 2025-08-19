@@ -300,8 +300,8 @@ importers:
         specifier: ^15.0.0
         version: 15.0.0(@angular/common@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2))(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2)
       '@tanstack/angular-query-experimental':
-        specifier: ^5.75.4
-        version: 5.83.0(@angular/common@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2))(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))
+        specifier: ^5.85.3
+        version: 5.85.3(@angular/common@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2))(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))
       '@zitadel/client':
         specifier: workspace:*
         version: link:../packages/zitadel-client
@@ -5009,17 +5009,17 @@ packages:
   '@tanem/svg-injector@10.1.68':
     resolution: {integrity: sha512-UkJajeR44u73ujtr5GVSbIlELDWD/mzjqWe54YMK61ljKxFcJoPd9RBSaO7xj02ISCWUqJW99GjrS+sVF0UnrA==}
 
-  '@tanstack/angular-query-experimental@5.83.0':
-    resolution: {integrity: sha512-MMB189P5EoJ9hKzn9dKdN3Auc531JPu/FWZZJk4qhkTDsuiyXh2BR0WRnD9PedLKn+bsL3rMyfzWUnbwGbhTIQ==}
+  '@tanstack/angular-query-experimental@5.85.3':
+    resolution: {integrity: sha512-U7Qb5gNlnLTfTTM6yM/3IZt0IqjU/kdswwlHbqF+YJ3P7P7DRbqlb1gymTewsODx3sV/nUaPdEiRSqwH+Tsr3g==}
     peerDependencies:
       '@angular/common': '>=16.0.0'
       '@angular/core': '>=16.0.0'
 
-  '@tanstack/query-core@5.83.0':
-    resolution: {integrity: sha512-0M8dA+amXUkyz5cVUm/B+zSk3xkQAcuXuz5/Q/LveT4ots2rBpPTZOzd7yJa2Utsf8D2Upl5KyjhHRY+9lB/XA==}
+  '@tanstack/query-core@5.85.3':
+    resolution: {integrity: sha512-9Ne4USX83nHmRuEYs78LW+3lFEEO2hBDHu7mrdIgAFx5Zcrs7ker3n/i8p4kf6OgKExmaDN5oR0efRD7i2J0DQ==}
 
-  '@tanstack/query-devtools@5.81.2':
-    resolution: {integrity: sha512-jCeJcDCwKfoyyBXjXe9+Lo8aTkavygHHsUHAlxQKKaDeyT0qyQNLKl7+UyqYH2dDF6UN/14873IPBHchcsU+Zg==}
+  '@tanstack/query-devtools@5.84.0':
+    resolution: {integrity: sha512-fbF3n+z1rqhvd9EoGp5knHkv3p5B2Zml1yNRjh7sNXklngYI5RVIWUrUjZ1RIcEoscarUb0+bOvIs5x9dwzOXQ==}
 
   '@tanstack/react-virtual@3.13.12':
     resolution: {integrity: sha512-Gd13QdxPSukP8ZrkbgS2RwoZseTTbQPLnQEn7HY/rqtM+8Zt95f7xKC7N0EsKs7aoz0WzZ+fditZux+F8EzYxA==}
@@ -20745,16 +20745,16 @@ snapshots:
       content-type: 1.0.5
       tslib: 2.8.1
 
-  '@tanstack/angular-query-experimental@5.83.0(@angular/common@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2))(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))':
+  '@tanstack/angular-query-experimental@5.85.3(@angular/common@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2))(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))':
     dependencies:
       '@angular/common': 16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2)
       '@angular/core': 16.2.12(rxjs@7.8.2)(zone.js@0.13.3)
-      '@tanstack/query-core': 5.83.0
-      '@tanstack/query-devtools': 5.81.2
+      '@tanstack/query-core': 5.85.3
+      '@tanstack/query-devtools': 5.84.0
 
-  '@tanstack/query-core@5.83.0': {}
+  '@tanstack/query-core@5.85.3': {}
 
-  '@tanstack/query-devtools@5.81.2': {}
+  '@tanstack/query-devtools@5.84.0': {}
 
   '@tanstack/react-virtual@3.13.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:

@@ -37,7 +37,7 @@
     "@ng-icons/core": "^25.0.0",
     "@ng-icons/heroicons": "^25.0.0",
     "@ngx-translate/core": "^15.0.0",
-    "@tanstack/angular-query-experimental": "^5.75.4",
+    "@tanstack/angular-query-experimental": "^5.85.3",
     "@zitadel/client": "workspace:*",
     "@zitadel/proto": "workspace:*",
     "angular-oauth2-oidc": "^15.0.1",
