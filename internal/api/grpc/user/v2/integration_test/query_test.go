@@ -1150,6 +1150,30 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "when no users matching meta key should return empty list",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					createUser(ctx, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, MetakeyContainsQuery("some non-existent meta"))
+
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					return []userAttr{}
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result:        []*user.User{},
+			},
+		},
 	}
 	for _, f := range permissionCheckV2Settings {
 		for _, tc := range tt {
