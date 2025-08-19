@@ -25,7 +25,7 @@ func TestServer_CreateTarget(t *testing.T) {
 		creationDate bool
 		signingKey   bool
 	}
-	alreadyExistingTargetName := gofakeit.AppName()
+	alreadyExistingTargetName := integration.TargetName()
 	instance.CreateTarget(isolatedIAMOwnerCTX, t, alreadyExistingTargetName, "https://example.com", domain.TargetTypeAsync, false)
 	tests := []struct {
 		name string
