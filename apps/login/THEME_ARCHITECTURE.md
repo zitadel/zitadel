@@ -1,160 +1,212 @@
-# Future-Proof Theme System Architecture
+# Current Theme System Architecture
 
-## 🎯 **Problem Solved**
+Our theme system provides a simple, environment variable-driven approach for consistent component styling and responsive layout switching.
 
-The new architecture allows multiple ways to inject theme configuration without modifying individual components:
+## 🏗️ **Current Implementation**
 
-## 🔧 **Three Flexible Approaches**
+### **Environment Variable Configuration**
 
-### 1. **Direct Props Injection** (Most Flexible)
-
-```tsx
-// Component accepts theme props directly
-<Button roundness="rounded-full" variant="primary">
-  Click me
-</Button>
-
-// Base component is theme-agnostic
-<Button variant="primary"> // Uses defaults
-  Click me
-</Button>
+```bash
+# .env.local
+NEXT_PUBLIC_THEME_ROUNDNESS=mid          # edgy | mid | full
+NEXT_PUBLIC_THEME_LAYOUT=side-by-side    # side-by-side | top-to-bottom
+NEXT_PUBLIC_THEME_APPEARANCE=material    # flat | material
+NEXT_PUBLIC_THEME_SPACING=regular        # regular | compact
 ```
 
-### 2. **Higher-Order Component** (Automatic Injection)
+### **Core Theme Functions**
 
 ```tsx
-// HOC automatically injects theme from environment/context
-<ThemedButton variant="primary">
-  Click me // Gets roundness from NEXT_PUBLIC_THEME_ROUNDNESS
-</ThemedButton>
+// Server-safe theme configuration
+import { getThemeConfig, getComponentRoundness } from "@/lib/theme";
 
-// Can still override via props
-<ThemedButton roundness="rounded-none" variant="primary">
-  Override theme
-</ThemedButton>
+// Get full theme configuration
+const themeConfig = getThemeConfig();
+// Returns: { roundness: 'mid', layout: 'side-by-side', appearance: 'material', ... }
+
+// Get component-specific styling
+const buttonRoundness = getComponentRoundness("button");
+// Returns: "rounded-md" (CSS class)
 ```
 
-### 3. **Context Provider** (Global Theme Management)
+### **Responsive Layout Hook**
 
 ```tsx
-// App-level theme injection
-<ThemeContextProvider customTheme={{ roundness: 'full', layout: 'top-to-bottom' }}>
-  <YourApp />
-</ThemeContextProvider>
+// Client-side responsive layout detection
+import { useResponsiveLayout } from "@/lib/theme-hooks";
 
-// Or with API-driven themes
-<ThemeContextProvider customTheme={apiThemeConfig}>
-  <YourApp />
-</ThemeContextProvider>
+function MyComponent() {
+  const { isSideBySide, isResponsiveOverride } = useResponsiveLayout();
+
+  return <div className={isSideBySide ? "flex" : "flex-col"}>{/* Layout adapts automatically */}</div>;
+}
 ```
 
-## 🚀 **Migration Paths**
+## 🎨 **Component Integration Patterns**
 
-### **Current State: Environment Variables**
-
-````tsx
-// No component changes needed
-### **Current State: Environment Variables**
-```tsx
-// Create themed component using HOC
-import { withTheme } from '@/lib/themeUtils';
-import { Button } from '@/components/button';
-const ThemedButton = withTheme(Button);
-
-// No component changes needed
-### **Current: Environment Variable HOC** (Recommended)
-```tsx
-import { withButtonTheme } from "@/lib/themeUtils";
-import { Button } from "@/components/button";
-
-const ThemedButton = withButtonTheme(Button);
-
-<ThemedButton variant="primary">
-  Gets theme from NEXT_PUBLIC_THEME_ROUNDNESS
-</ThemedButton>
-````
-
-```
-
-```
-
-### **Future: API/Database Themes**
+### **Pattern 1: Direct Function Calls** (Current Standard)
 
 ```tsx
-// Option 1: Context injection
-<ThemeContextProvider customTheme={userTheme}>
-  <Button variant="primary">
-    Gets theme from context
-  </Button>
-</ThemeContextProvider>
+import { getComponentRoundness } from "@/lib/theme";
 
-// Option 2: Direct injection
-<Button roundness={userTheme.roundness} variant="primary">
-  Gets theme from props
-</Button>
-
-// Option 3: HOC with custom logic
-const ApiThemedButton = withApiTheme(Button);
-<ApiThemedButton variant="primary">
-  Gets theme from API
-</ApiThemedButton>
-```
-
-### **Future: Runtime Theme Switching**
-
-```tsx
-function App() {
-  const [currentTheme, setCurrentTheme] = useState(defaultTheme);
+export function Button({ children, variant = "primary" }) {
+  const roundness = getComponentRoundness("button");
 
   return (
-    <ThemeContextProvider customTheme={currentTheme}>
-      <button onClick={() => setCurrentTheme(darkTheme)}>Switch to Dark</button>
-      <Button variant="primary">Theme updates automatically</Button>
-    </ThemeContextProvider>
+    <button className={`${roundness} px-4 py-2 ${variant === "primary" ? "bg-blue-500" : "bg-gray-500"}`}>{children}</button>
   );
 }
 ```
 
-## ⚡ **Key Benefits**
-
-1. **Zero Component Modifications**: Base components work with or without themes
-2. **Multiple Injection Methods**: Props, HOC, Context, or API-driven
-3. **Gradual Migration**: Can adopt new methods incrementally
-4. **Type Safety**: All theme props are properly typed
-5. **Performance**: No unnecessary re-renders or hooks in base components
-
-## 🔄 **Component Architecture**
-
-```
-BaseComponent (theme-agnostic)
-    ↓
-withTheme(BaseComponent) → ThemedComponent (env-aware)
-    ↓
-withApiTheme(BaseComponent) → ApiThemedComponent (api-aware)
-    ↓
-withContext(BaseComponent) → ContextThemedComponent (context-aware)
-```
-
-Each layer adds functionality without modifying the base component!
-
-## 📚 **Usage Examples**
+### **Pattern 2: Component-Specific Helper Functions**
 
 ```tsx
-// Immediate: Use themed version with env vars
-import { ThemedButton } from "@/components/ThemedButton";
+import { getComponentRoundness } from "@/lib/theme";
 
-// Future: Use base version with API props
-import { Button } from "@/components/button";
-<Button roundness={apiTheme.button.roundness} />;
+// Helper function for UserAvatar
+function getUserAvatarRoundness(): string {
+  return getComponentRoundness("avatarContainer");
+}
 
-// Future: Use context version
-import { Button } from "@/components/button";
-import { useTheme } from "@/lib/ThemeContext";
+export function UserAvatar({ loginName, displayName }) {
+  const roundness = getUserAvatarRoundness();
 
-function MyComponent() {
-  const { classes } = useTheme();
-  return <Button roundness={classes.roundness.button} />;
+  return <div className={`flex border p-1 ${roundness}`}>{/* Avatar content */}</div>;
 }
 ```
 
-This architecture scales from simple environment variables to complex multi-tenant theme systems without breaking changes!
+### **Pattern 3: Theme-Aware Layout Components**
+
+```tsx
+import { useResponsiveLayout } from "@/lib/theme-hooks";
+
+export function DynamicTheme({ children, branding }) {
+  const { isSideBySide } = useResponsiveLayout();
+
+  return (
+    <ThemeWrapper branding={branding}>
+      {isSideBySide ? (
+        // Side-by-side layout for desktop
+        <div className="flex max-w-[1200px]">
+          <div className="w-1/2">{/* Left content */}</div>
+          <div className="w-1/2">{/* Right content */}</div>
+        </div>
+      ) : (
+        // Top-to-bottom layout for mobile
+        <div className="flex-col max-w-[440px]">{children}</div>
+      )}
+    </ThemeWrapper>
+  );
+}
+```
+
+## 🎯 **Theme Configuration Structure**
+
+### **Component Roundness Mapping**
+
+```tsx
+export interface ComponentRoundnessConfig {
+  card: ThemeRoundness; // "rounded-lg" | "rounded-none" | "rounded-3xl"
+  button: ThemeRoundness; // "rounded-md" | "rounded-none" | "rounded-full"
+  input: ThemeRoundness; // "rounded-md" | "rounded-none" | "rounded-full pl-4"
+  image: ThemeRoundness; // "rounded-lg" | "rounded-none" | "rounded-full"
+  avatar: ThemeRoundness; // "rounded-lg" | "rounded-none" | "rounded-full"
+  avatarContainer: ThemeRoundness; // "rounded-md" | "rounded-none" | "rounded-full"
+  themeSwitch: ThemeRoundness; // "rounded-md" | "rounded-none" | "rounded-full"
+}
+```
+
+### **Responsive Layout Logic**
+
+```tsx
+// Automatic layout switching based on screen size
+const isSideBySide = themeConfig.layout === "side-by-side" && !isMdOrSmaller;
+
+// md breakpoint: 768px (Tailwind default)
+// Below 768px: Always use top-to-bottom layout
+// Above 768px: Use configured layout (side-by-side or top-to-bottom)
+```
+
+## � **File Structure**
+
+```
+src/lib/
+├── theme.ts           # Server-safe theme functions
+├── theme-hooks.ts     # Client-side responsive hooks
+└── themeUtils.tsx     # Legacy utility functions
+
+src/components/
+├── dynamic-theme.tsx  # Main responsive layout component
+├── theme-wrapper.tsx  # Theme application wrapper
+├── button.tsx         # Example themed component
+├── card.tsx          # Example themed component
+└── user-avatar.tsx   # Example themed component
+```
+
+## � **Usage Examples**
+
+### **Adding Theme Support to New Components**
+
+```tsx
+import { getComponentRoundness } from "@/lib/theme";
+
+export function NewComponent() {
+  // Get theme-appropriate styling
+  const roundness = getComponentRoundness("card");
+
+  return <div className={`p-4 ${roundness} bg-white`}>{/* Component content */}</div>;
+}
+```
+
+### **Using Responsive Layout**
+
+```tsx
+import { useResponsiveLayout } from "@/lib/theme-hooks";
+
+export function ResponsiveComponent() {
+  const { isSideBySide } = useResponsiveLayout();
+
+  return <div className={isSideBySide ? "text-left" : "text-center"}>Content adapts to layout</div>;
+}
+```
+
+### **Page Layout Integration**
+
+```tsx
+import { DynamicTheme } from "@/components/dynamic-theme";
+
+export default function LoginPage() {
+  return (
+    <DynamicTheme branding={branding}>
+      <div className="flex flex-col space-y-4">
+        <h1>Login Title</h1>
+        <p>Description text</p>
+      </div>
+
+      <div className="w-full">
+        <LoginForm />
+      </div>
+    </DynamicTheme>
+  );
+}
+```
+
+## ⚡ **Key Features**
+
+1. **Environment Variable Configuration**: Simple `.env.local` setup
+2. **Server-Safe Functions**: Work in both SSR and client components
+3. **Responsive Layout Switching**: Automatic mobile/desktop adaptation
+4. **Component-Specific Styling**: Different roundness per component type
+5. **Type Safety**: Full TypeScript support
+6. **Zero Runtime Dependencies**: No context providers or complex state
+7. **SSR Compatible**: No hydration mismatches
+
+## 🔄 **Architecture Benefits**
+
+- **Simple**: Environment variables → CSS classes
+- **Fast**: No runtime theme calculations or context switching
+- **Reliable**: Server-side rendering compatible
+- **Scalable**: Easy to add new theme properties
+- **Maintainable**: Clear separation between layout and styling concerns
+
+This architecture provides a solid foundation for environment-driven theming while keeping the implementation simple and performant!
