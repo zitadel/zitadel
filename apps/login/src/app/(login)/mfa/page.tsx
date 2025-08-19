@@ -7,16 +7,10 @@ import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import {
-  getBrandingSettings,
-  getSession,
-  listAuthenticationMethodTypes,
-} from "@/lib/zitadel";
+import { getBrandingSettings, getSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import { headers } from "next/headers";
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   const { loginName, requestId, organization, sessionId } = searchParams;
@@ -28,11 +22,7 @@ export default async function Page(props: {
     ? await loadSessionById(serviceUrl, sessionId, organization)
     : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
-  async function loadSessionByLoginname(
-    serviceUrl: string,
-    loginName?: string,
-    organization?: string,
-  ) {
+  async function loadSessionByLoginname(serviceUrl: string, loginName?: string, organization?: string) {
     return loadMostRecentSession({
       serviceUrl,
       sessionParams: {
@@ -54,11 +44,7 @@ export default async function Page(props: {
     });
   }
 
-  async function loadSessionById(
-    host: string,
-    sessionId: string,
-    organization?: string,
-  ) {
+  async function loadSessionById(host: string, sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
@@ -86,11 +72,10 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="verify.title" namespace="mfa" />
         </h1>
-
         <p className="ztdl-p">
           <Translated i18nKey="verify.description" namespace="mfa" />
         </p>
@@ -103,7 +88,9 @@ export default async function Page(props: {
             searchParams={searchParams}
           ></UserAvatar>
         )}
+      </div>
 
+      <div className="w-full">
         {!(loginName || sessionId) && (
           <Alert>
             <Translated i18nKey="unknownContext" namespace="error" />

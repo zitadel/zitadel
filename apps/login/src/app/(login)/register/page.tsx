@@ -16,9 +16,7 @@ import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { headers } from "next/headers";
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   let { firstname, lastname, email, organization, requestId } = searchParams;
@@ -66,7 +64,7 @@ export default async function Page(props: {
   if (!loginSettings?.allowRegister) {
     return (
       <DynamicTheme branding={branding}>
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col space-y-4">
           <h1>
             <Translated i18nKey="disabled.title" namespace="register" />
           </h1>
@@ -74,20 +72,23 @@ export default async function Page(props: {
             <Translated i18nKey="disabled.description" namespace="register" />
           </p>
         </div>
+        <div></div>
       </DynamicTheme>
     );
   }
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="title" namespace="register" />
         </h1>
         <p className="ztdl-p">
           <Translated i18nKey="description" namespace="register" />
         </p>
+      </div>
 
+      <div className="w-full">
         {!organization && (
           <Alert>
             <Translated i18nKey="unknownContext" namespace="error" />
@@ -97,12 +98,9 @@ export default async function Page(props: {
         {legal &&
           passwordComplexitySettings &&
           organization &&
-          (loginSettings.allowUsernamePassword ||
-            loginSettings.passkeysType == PasskeysType.ALLOWED) && (
+          (loginSettings.allowUsernamePassword || loginSettings.passkeysType == PasskeysType.ALLOWED) && (
             <RegisterForm
-              idpCount={
-                !loginSettings?.allowExternalIdp ? 0 : identityProviders.length
-              }
+              idpCount={!loginSettings?.allowExternalIdp ? 0 : identityProviders.length}
               legal={legal}
               organization={organization}
               firstname={firstname}

@@ -3,11 +3,7 @@ import { SessionsClearList } from "@/components/sessions-clear-list";
 import { Translated } from "@/components/translated";
 import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
-import {
-  getBrandingSettings,
-  getDefaultOrg,
-  listSessions,
-} from "@/lib/zitadel";
+import { getBrandingSettings, getDefaultOrg, listSessions } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { headers } from "next/headers";
 
@@ -26,9 +22,7 @@ async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
   }
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   const organization = searchParams?.organization;
@@ -65,14 +59,16 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="title" namespace="logout" />
         </h1>
-        <p className="ztdl-p mb-6 block">
+        <p className="ztdl-p">
           <Translated i18nKey="description" namespace="logout" />
         </p>
+      </div>
 
+      <div className="w-full">
         <div className="flex w-full flex-col space-y-2">
           <SessionsClearList
             sessions={sessions}

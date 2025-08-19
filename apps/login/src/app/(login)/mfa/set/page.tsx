@@ -24,9 +24,7 @@ function isSessionValid(session: Partial<Session>): {
 } {
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
-  const stillValid = session.expirationDate
-    ? timestampDate(session.expirationDate) > new Date()
-    : true;
+  const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
 
   const verifiedAt = validPassword || validPasskey;
   const valid = !!((validPassword || validPasskey) && stillValid);
@@ -34,13 +32,10 @@ function isSessionValid(session: Partial<Session>): {
   return { valid, verifiedAt };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
-  const { loginName, checkAfter, force, requestId, organization, sessionId } =
-    searchParams;
+  const { loginName, checkAfter, force, requestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -61,8 +56,7 @@ export default async function Page(props: {
       userId,
     }).then((methods) => {
       return getUserByID({ serviceUrl, userId }).then((user) => {
-        const humanUser =
-          user.user?.type.case === "human" ? user.user?.type.value : undefined;
+        const humanUser = user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
         return {
           id: session.id,
@@ -76,10 +70,7 @@ export default async function Page(props: {
     });
   }
 
-  async function loadSessionByLoginname(
-    loginName?: string,
-    organization?: string,
-  ) {
+  async function loadSessionByLoginname(loginName?: string, organization?: string) {
     return loadMostRecentSession({
       serviceUrl,
       sessionParams: {
@@ -115,7 +106,7 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="set.title" namespace="mfa" />
         </h1>
@@ -132,7 +123,9 @@ export default async function Page(props: {
             searchParams={searchParams}
           ></UserAvatar>
         )}
+      </div>
 
+      <div className="flex flex-col space-y-4">
         {!(loginName || sessionId) && (
           <Alert>
             <Translated i18nKey="unknownContext" namespace="error" />
@@ -145,24 +138,21 @@ export default async function Page(props: {
           </Alert>
         )}
 
-        {isSessionValid(sessionWithData).valid &&
-          loginSettings &&
-          sessionWithData &&
-          sessionWithData.factors?.user?.id && (
-            <ChooseSecondFactorToSetup
-              userId={sessionWithData.factors?.user?.id}
-              loginName={loginName}
-              sessionId={sessionWithData.id}
-              requestId={requestId}
-              organization={organization}
-              loginSettings={loginSettings}
-              userMethods={sessionWithData.authMethods ?? []}
-              phoneVerified={sessionWithData.phoneVerified ?? false}
-              emailVerified={sessionWithData.emailVerified ?? false}
-              checkAfter={checkAfter === "true"}
-              force={force === "true"}
-            ></ChooseSecondFactorToSetup>
-          )}
+        {isSessionValid(sessionWithData).valid && loginSettings && sessionWithData && sessionWithData.factors?.user?.id && (
+          <ChooseSecondFactorToSetup
+            userId={sessionWithData.factors?.user?.id}
+            loginName={loginName}
+            sessionId={sessionWithData.id}
+            requestId={requestId}
+            organization={organization}
+            loginSettings={loginSettings}
+            userMethods={sessionWithData.authMethods ?? []}
+            phoneVerified={sessionWithData.phoneVerified ?? false}
+            emailVerified={sessionWithData.emailVerified ?? false}
+            checkAfter={checkAfter === "true"}
+            force={force === "true"}
+          ></ChooseSecondFactorToSetup>
+        )}
 
         <div className="mt-8 flex w-full flex-row items-center">
           <BackButton />

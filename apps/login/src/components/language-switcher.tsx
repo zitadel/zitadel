@@ -48,7 +48,7 @@ export function LanguageSwitcher() {
           anchor="bottom"
           transition
           className={clsx(
-            `w-[var(--button-width)] border border-black/5 bg-background-light-500 p-1 [--anchor-gap:var(--spacing-1)] focus:outline-none dark:border-white/5 dark:bg-background-dark-500 ${switcherRoundness}`,
+            `w-[var(--button-width)] border border-black/5 bg-background-light-500 p-1 [--anchor-gap:var(--spacing-1)] focus:outline-none dark:border-white/5 dark:bg-background-dark-500 rounded-md`,
             "transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0",
           )}
         >

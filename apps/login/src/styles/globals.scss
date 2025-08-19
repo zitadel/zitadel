@@ -12,7 +12,7 @@
   }
 
   .ztdl-p {
-    @apply text-center text-sm text-text-light-secondary-500 dark:text-text-dark-secondary-500;
+    @apply text-sm text-text-light-secondary-500 dark:text-text-dark-secondary-500;
   }
 }
 
@@ -29,13 +29,7 @@ html {
   --accents-2: var(--theme-light-background-400);
   --accents-1: var(--theme-light-background-500);
 
-  background-image: linear-gradient(
-    270deg,
-    var(--accents-1),
-    var(--accents-2),
-    var(--accents-2),
-    var(--accents-1)
-  );
+  background-image: linear-gradient(270deg, var(--accents-1), var(--accents-2), var(--accents-2), var(--accents-1));
   background-size: 400% 100%;
   animation: skeleton_loading 8s ease-in-out infinite;
 }
@@ -44,13 +38,7 @@ html {
   --accents-2: var(--theme-dark-background-400);
   --accents-1: var(--theme-dark-background-500);
 
-  background-image: linear-gradient(
-    270deg,
-    var(--accents-1),
-    var(--accents-2),
-    var(--accents-2),
-    var(--accents-1)
-  );
+  background-image: linear-gradient(270deg, var(--accents-1), var(--accents-2), var(--accents-2), var(--accents-1));
   background-size: 400% 100%;
   animation: skeleton_loading 8s ease-in-out infinite;
 }

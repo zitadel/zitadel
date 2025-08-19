@@ -1,7 +1,4 @@
 // Theme configuration system for customizable login experience
-"use client";
-
-import { useState, useEffect } from "react";
 
 export type ThemeRoundness = "edgy" | "mid" | "full";
 export type ThemeLayout = "side-by-side" | "top-to-bottom";
@@ -75,53 +72,6 @@ export function getThemeConfig(): ThemeConfig {
   };
 }
 
-/**
- * Custom hook that returns the effective layout mode, taking into account
- * both the theme configuration and responsive breakpoints.
- *
- * On medium screens and below (md: max-width 767px), it will automatically
- * switch to top-to-bottom layout regardless of the theme setting.
- */
-export function useResponsiveLayout(): { isSideBySide: boolean; isResponsiveOverride: boolean } {
-  const themeConfig = getThemeConfig();
-  const [isMdOrSmaller, setIsMdOrSmaller] = useState(false);
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
-    // Mark as hydrated on client side
-    setIsHydrated(true);
-
-    // Check if we're in a browser environment
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const mediaQuery = window.matchMedia("(max-width: 767px)"); // md breakpoint is 768px in Tailwind
-
-    // Set initial value
-    setIsMdOrSmaller(mediaQuery.matches);
-
-    // Listen for changes
-    const handleChange = (e: MediaQueryListEvent) => {
-      setIsMdOrSmaller(e.matches);
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-
-    // Cleanup
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
-
-  const configuredSideBySide = themeConfig.layout === "side-by-side";
-
-  // During SSR or before hydration, assume desktop (side-by-side if configured)
-  // This prevents hydration mismatches
-  const isSideBySide = configuredSideBySide && (isHydrated ? !isMdOrSmaller : true);
-  const isResponsiveOverride = configuredSideBySide && isHydrated && isMdOrSmaller;
-
-  return { isSideBySide, isResponsiveOverride };
-}
-
 // Roundness CSS classes
 export const ROUNDNESS_CLASSES = {
   edgy: {
@@ -167,7 +117,7 @@ export function getComponentRoundness(componentType: keyof ComponentRoundnessCon
 export const SPACING_STYLES = {
   regular: {
     spacing: "space-y-6",
-    padding: "p-6",
+    padding: "p-6 py-8",
   },
   compact: {
     spacing: "space-y-4",
