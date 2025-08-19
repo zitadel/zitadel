@@ -1,5 +1,6 @@
 import "@/styles/globals.scss";
 
+import { BackgroundWrapper } from "@/components/background-wrapper";
 import { LanguageProvider } from "@/components/language-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Skeleton } from "@/components/skeleton";
@@ -24,7 +25,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <Tooltip.Provider>
             <Suspense
               fallback={
-                <div
+                <BackgroundWrapper
                   className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
                 >
                   <div className="relative mx-auto w-full max-w-[440px] py-8">
@@ -35,11 +36,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                       <ThemeSwitch />
                     </div>
                   </div>
-                </div>
+                </BackgroundWrapper>
               }
             >
               <LanguageProvider>
-                <div
+                <BackgroundWrapper
                   className={`relative flex min-h-screen flex-col justify-center bg-background-light-600 dark:bg-background-dark-600`}
                 >
                   <div className="relative mx-auto w-full max-w-[1100px] py-8">
@@ -49,7 +50,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                       <ThemeSwitch />
                     </div>
                   </div>
-                </div>
+                </BackgroundWrapper>
               </LanguageProvider>
             </Suspense>
           </Tooltip.Provider>
