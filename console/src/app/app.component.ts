@@ -23,6 +23,7 @@ import { fallbackLanguage, supportedLanguages, supportedLanguagesRegexp } from '
 import { PosthogService } from './services/posthog.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NewOrganizationService } from './services/new-organization.service';
+import { NewAuthService } from './services/new-auth.service';
 
 @Component({
   selector: 'cnsl-root',
@@ -50,6 +51,8 @@ export class AppComponent {
   public showProjectSection: boolean = false;
   public activeOrganizationQuery = this.newOrganizationService.activeOrganizationQuery();
 
+  private listMyZitadelPermissionsQuery = this.newAuthService.listMyZitadelPermissionsQuery();
+
   public language: string = 'en';
   public privacyPolicy!: PrivacyPolicy.AsObject;
   constructor(
@@ -72,6 +75,7 @@ export class AppComponent {
     private posthog: PosthogService,
     private readonly destroyRef: DestroyRef,
     private readonly newOrganizationService: NewOrganizationService,
+    private readonly newAuthService: NewAuthService,
   ) {
     console.log(
       '%cWait!',
@@ -215,6 +219,27 @@ export class AppComponent {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((orgId) => this.newOrganizationService.setOrgId(orgId));
+
+    effect(() => {
+      const permissions = this.listMyZitadelPermissionsQuery.data();
+      const error = this.listMyZitadelPermissionsQuery.error();
+
+      if (!permissions && !error) {
+        // not loaded yet
+        return;
+      }
+
+      // if we have an error this is gonna be false anyway as permissions will be undefined
+      if (permissions?.includes('org.read')) {
+        return;
+      }
+
+      if (error) {
+        console.error(error);
+      }
+
+      this.router.navigate(['/users/me']).then();
+    });
 
     this.isDarkTheme = this.themeService.isDarkTheme;
     this.isDarkTheme.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((dark) => {

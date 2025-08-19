@@ -1,18 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
-import {
-  BehaviorSubject,
-  combineLatestWith,
-  EMPTY,
-  identity,
-  mergeWith,
-  NEVER,
-  Observable,
-  of,
-  shareReplay,
-  Subject,
-} from 'rxjs';
+import { BehaviorSubject, combineLatestWith, EMPTY, identity, mergeWith, NEVER, Observable, of, shareReplay } from 'rxjs';
 import { catchError, distinctUntilChanged, filter, finalize, map, startWith, switchMap, tap, timeout } from 'rxjs/operators';
 
 import {
@@ -96,14 +85,12 @@ import {
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
-import { Org, OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
+import { OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from '../proto/generated/zitadel/policy_pb';
 import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 import { NewOrganizationService } from './new-organization.service';
 import { toObservable } from '@angular/core/rxjs-interop';
-
-const ORG_LIMIT = 10;
 
 @Injectable({
   providedIn: 'root',
