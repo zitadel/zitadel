@@ -296,8 +296,11 @@ func (i *Instance) CreateUserTypeHuman(ctx context.Context, email string) *user_
 }
 
 func (i *Instance) CreateUserTypeMachine(ctx context.Context, orgId string) *user_v2.CreateUserResponse {
+	if orgId == "" {
+		orgId = i.DefaultOrg.GetId()
+	}
 	resp, err := i.Client.UserV2.CreateUser(ctx, &user_v2.CreateUserRequest{
-		OrganizationId: i.DefaultOrg.GetId(),
+		OrganizationId: orgId,
 		UserType: &user_v2.CreateUserRequest_Machine_{
 			Machine: &user_v2.CreateUserRequest_Machine{
 				Name: "machine",

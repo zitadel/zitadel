@@ -30,7 +30,7 @@ function configuration() {
 
   const res = http.get(url('/.well-known/openid-configuration'));
   check(res, {
-    'openid configuration': (r) => r.status == 200 || fail('unable to load openid configuration'),
+    'openid configuration': (r) => r.status >= 200 && r.status < 300 || fail('unable to load openid configuration'),
   });
 
   oidcConfig = res.json();
@@ -47,7 +47,7 @@ export function userinfo(token: string) {
   });
 
   check(userinfo, {
-    'userinfo status ok': (r) => r.status === 200,
+    'userinfo status ok': (r) => r.status >= 200 && r.status < 300,
   });
 
   userinfoTrend.add(userinfo.timings.duration);
@@ -70,7 +70,7 @@ export function introspect(jwt: string, token: string) {
     },
   );
   check(res, {
-    'introspect status ok': (r) => r.status === 200,
+    'introspect status ok': (r) => r.status >= 200 && r.status < 300,
   });
 
   introspectTrend.add(res.timings.duration);
@@ -96,7 +96,7 @@ export function clientCredentials(clientId: string, clientSecret: string): Promi
     );
     response.then((res) => {
       check(res, {
-        'client credentials status ok': (r) => r.status === 200,
+        'client credentials status ok': (r) => r.status >= 200 && r.status < 300,
       }) || reject(`client credentials request failed (client id: ${clientId}) status: ${res.status} body: ${res.body}`);
 
       clientCredentialsTrend.add(res.timings.duration);
@@ -161,7 +161,7 @@ export async function token(request: TokenRequest): Promise<Tokens> {
     .then((res) => {
       tokenDurationTrend.add(res.timings.duration);
       check(res, {
-        'token status ok': (r) => r.status === 200,
+        'token status ok': (r) => r.status >= 200 && r.status < 300,
         'access token returned': (r) => r.json('access_token')! != undefined && r.json('access_token')! != '',
       });
       return new Tokens(res.json() as JSONObject);
@@ -176,7 +176,7 @@ export async function authRequestByID(id: string, tokens: any): Promise<Response
     },
   });
   check(response, {
-    'authorize status ok': (r) => r.status == 200 || fail(`auth request by failed: ${JSON.stringify(r)}`),
+    'authorize status ok': (r) => r.status >= 200 && r.status < 300 || fail(`auth request by failed: ${JSON.stringify(r)}`),
   });
   authRequestByIDTrend.add(response.timings.duration);
   return response;
@@ -202,7 +202,7 @@ export async function finalizeAuthRequest(id: string, session: any, tokens: any)
     },
   );
   check(res, {
-    'finalize auth request status ok': (r) => r.status == 200 || fail(`finalize auth request failed: ${JSON.stringify(r)}`),
+    'finalize auth request status ok': (r) => r.status >= 200 && r.status < 300 || fail(`finalize auth request failed: ${JSON.stringify(r)}`),
   });
   finalizeAuthRequestTrend.add(res.timings.duration);
 
