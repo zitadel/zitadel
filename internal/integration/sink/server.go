@@ -27,6 +27,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
@@ -55,6 +56,25 @@ func SuccessfulOAuthIntent(instanceID, idpID, idpUserID, userID string, expiry t
 		Scheme: "http",
 		Host:   host,
 		Path:   successfulIntentOAuthPath(),
+	}
+	resp, err := callIntent(u.String(), &SuccessfulIntentRequest{
+		InstanceID: instanceID,
+		IDPID:      idpID,
+		IDPUserID:  idpUserID,
+		UserID:     userID,
+		Expiry:     expiry,
+	})
+	if err != nil {
+		return "", "", time.Time{}, uint64(0), err
+	}
+	return resp.IntentID, resp.Token, resp.ChangeDate, resp.Sequence, nil
+}
+
+func SuccessfulAzureADIntent(instanceID, idpID, idpUserID, userID string, expiry time.Time) (string, string, time.Time, uint64, error) {
+	u := url.URL{
+		Scheme: "http",
+		Host:   host,
+		Path:   successfulIntentAzureADPath(),
 	}
 	resp, err := callIntent(u.String(), &SuccessfulIntentRequest{
 		InstanceID: instanceID,
@@ -163,6 +183,7 @@ func StartServer(commands *command.Commands) (close func()) {
 		router.HandleFunc(subscribePath(ch), fwd.subscriptionHandler)
 		router.HandleFunc(successfulIntentOAuthPath(), successfulIntentHandler(commands, createSuccessfulOAuthIntent))
 		router.HandleFunc(successfulIntentOIDCPath(), successfulIntentHandler(commands, createSuccessfulOIDCIntent))
+		router.HandleFunc(successfulIntentAzureADPath(), successfulIntentHandler(commands, createSuccessfulAzureADIntent))
 		router.HandleFunc(successfulIntentSAMLPath(), successfulIntentHandler(commands, createSuccessfulSAMLIntent))
 		router.HandleFunc(successfulIntentLDAPPath(), successfulIntentHandler(commands, createSuccessfulLDAPIntent))
 		router.HandleFunc(successfulIntentJWTPath(), successfulIntentHandler(commands, createSuccessfulJWTIntent))
@@ -202,6 +223,10 @@ func successfulIntentPath() string {
 
 func successfulIntentOAuthPath() string {
 	return path.Join(successfulIntentPath(), "/", "oauth")
+}
+
+func successfulIntentAzureADPath() string {
+	return path.Join(successfulIntentPath(), "/", "azuread")
 }
 
 func successfulIntentOIDCPath() string {
@@ -401,6 +426,40 @@ func createSuccessfulOAuthIntent(ctx context.Context, cmd *command.Commands, req
 	idpUser.RawInfo = map[string]interface{}{
 		idAttribute:          req.IDPUserID,
 		"preferred_username": "username",
+	}
+	idpSession := &oauth.Session{
+		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+			Token: &oauth2.Token{
+				AccessToken: "accessToken",
+				Expiry:      req.Expiry,
+			},
+			IDToken: "idToken",
+		},
+	}
+	token, err := cmd.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, req.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return &SuccessfulIntentResponse{
+		intentID,
+		token,
+		writeModel.ChangeDate,
+		writeModel.ProcessedSequence,
+	}, nil
+}
+
+func createSuccessfulAzureADIntent(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
+	intentID, err := createIntent(ctx, cmd, req.InstanceID, req.IDPID)
+	if err != nil {
+		return nil, err
+	}
+	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
+	if err != nil {
+		return nil, err
+	}
+	idpUser := &azuread.User{
+		ID:                req.IDPUserID,
+		UserPrincipalName: "username",
 	}
 	idpSession := &oauth.Session{
 		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{

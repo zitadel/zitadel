@@ -161,18 +161,18 @@ func (p *Provider) User() idp.User {
 // AzureAD does not return an `email_verified` claim.
 // The verification can be automatically activated on the provider ([WithEmailVerified])
 type User struct {
-	ID                string               `json:"id"`
-	BusinessPhones    []domain.PhoneNumber `json:"businessPhones"`
-	DisplayName       string               `json:"displayName"`
-	FirstName         string               `json:"givenName"`
-	JobTitle          string               `json:"jobTitle"`
-	Email             domain.EmailAddress  `json:"mail"`
-	MobilePhone       domain.PhoneNumber   `json:"mobilePhone"`
-	OfficeLocation    string               `json:"officeLocation"`
-	PreferredLanguage string               `json:"preferredLanguage"`
-	LastName          string               `json:"surname"`
-	UserPrincipalName string               `json:"userPrincipalName"`
-	isEmailVerified   bool
+	ID                string               `json:"id,omitempty"`
+	BusinessPhones    []domain.PhoneNumber `json:"businessPhones,omitempty"`
+	DisplayName       string               `json:"displayName,omitempty"`
+	FirstName         string               `json:"givenName,omitempty"`
+	JobTitle          string               `json:"jobTitle,omitempty"`
+	Email             domain.EmailAddress  `json:"mail,omitempty"`
+	MobilePhone       domain.PhoneNumber   `json:"mobilePhone,omitempty"`
+	OfficeLocation    string               `json:"officeLocation,omitempty"`
+	PreferredLanguage string               `json:"preferredLanguage,omitempty"`
+	LastName          string               `json:"surname,omitempty"`
+	UserPrincipalName string               `json:"userPrincipalName,omitempty"`
+	isEmailVerified   bool                 `json:"isEmailVerified,omitempty"`
 }
 
 // GetID is an implementation of the [idp.User] interface.
