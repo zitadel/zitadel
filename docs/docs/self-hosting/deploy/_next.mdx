@@ -1,9 +1,19 @@
 
 ## What's next
 
-For running a production grade ZITADEL instance in your environment, go on with the [configure ZITADEL](/self-hosting/manage/configure) section.
+This guide is for development / demonstration purpose only and does NOT reflect a production setup.
+To go from here to production, read the [Zitadel Production Setup Guide](/self-hosting/manage/production).
 
-:::caution
-
-<!-- TODO: Better mark the link in the UI -->
-The ZITADEL management console [requires end-to-end HTTP/2 support](/self-hosting/manage/http2)
+These are the most common steps forward:
+- **Read the comments in the docker-compose.yaml**: The comments give context to the used variables and show examples for commonly used configuration.
+- **Understand your configuration options**: Learn how to [configure your platform](/self-hosting/manage/configure)
+- **Serve the API and the UI together on the same port**: [Run and configure your favorite reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)
+- **Configure a different external domain or IP**: Beware that the login does not work with HTTP on non-localhost domains. [Run and configure your favorite reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)
+- **Encrypt Traffic**: [Run and configure your favorite reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)
+- **Enable end-to-end gRPC-web support**: [Run and configure your favorite reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)
+- **Enable the login v2 on existing installations**:
+  1. Read the login v2 related comments in the docker-compose.yaml. 
+  1. [Manually create a login client personal access token (PAT) for the now running v2 login](/self-hosting/manage/login-client#create-login-client).
+  1. Move the PAT to `./login-client.pat`
+  1. Restart the login process, for example `docker compose restart login`
+  1. [Enable the Login UI for all users](/self-hosting/manage/login-client#require-login-v2)
