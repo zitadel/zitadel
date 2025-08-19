@@ -172,7 +172,7 @@ type User struct {
 	PreferredLanguage string               `json:"preferredLanguage,omitempty"`
 	LastName          string               `json:"surname,omitempty"`
 	UserPrincipalName string               `json:"userPrincipalName,omitempty"`
-	isEmailVerified   bool                 `json:"isEmailVerified,omitempty"`
+	isEmailVerified   bool
 }
 
 // GetID is an implementation of the [idp.User] interface.
