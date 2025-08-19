@@ -33,17 +33,22 @@ docker compose pull
 docker compose up
 ```
 
-<DefaultUser components={props.components} />
 
-:::info
-If you ran these commands for an existing instance that still uses the login v1, [create a login client for it to the now running v2 login](/self-hosting/manage/login-client#create-login-client).
-Move the login client PAT to `./login-client.pat` and restart the login container.
-```bash
-docker compose restart login
-```
-Now, [enable the Login UI for all users](/self-hosting/manage/login-client#require-login-v2)
-:::
+## What's next
 
-<NoteInstanceNotFound/>
-<Next components={props.components} />
-<Disclaimer components={props.components} />
+This guide is for development / demonstration purpose only and does NOT reflect a production setup.
+To go from here to production, read the [Zitadel Production Setup Guide](/self-hosting/manage/production).
+
+These are the most common steps forward:
+- **Read the comments in the docker-compose.yaml**: The comments give context to the used variables and show examples for commonly used configuration.
+- **Understand your configuration options**: Learn how to [configure your platform](/self-hosting/manage/configure)
+- **Serve the API and the UI together on the same port**: [Run and configure your favorite reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)
+- **Configure a different external domain or IP**: Beware that the login does not work with HTTP on non-localhost domains. [Run and configure your favorite reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)
+- **Encrypt Traffic**: [Run and configure your favorite reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)
+- **Enable end-to-end gRPC-web support**: [Run and configure your favorite reverse proxy](/self-hosting/manage/reverseproxy/reverse_proxy)
+- **Enable the login v2 on existing installations**:
+  1. Read the login v2 related comments in the docker-compose.yaml. 
+  1. [Manually create a login client personal access token (PAT) for the now running v2 login](/self-hosting/manage/login-client#create-login-client).
+  1. Move the PAT to `./login-client.pat`
+  1. Restart the login process: `docker compose restart login`
+  1. [Enable the Login UI for all users](/self-hosting/manage/login-client#require-login-v2)
