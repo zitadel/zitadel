@@ -33,7 +33,7 @@ func TestCommands_asyncPush(t *testing.T) {
 	// make sure the test terminates on deadlock
 	background := context.Background()
 	agg := user.NewAggregate("userID", "orgID")
-	cmd := user.NewMachineSecretCheckFailedEvent(background, &agg.Aggregate)
+	cmd := user.NewMachineSecretHashUpdatedEvent(background, &agg.Aggregate, "updatedSecret")
 
 	tests := []struct {
 		name         string
