@@ -25,6 +25,7 @@ Create a new support request with the following information:
 - Ticket Category
 - Hosting
 - Affected Instance (Only for cloud instances)
+- Database Version (Only for self-hosted instances)
 
 ![Customer Portal Support](/img/manuals/portal/customer_portal_support.png)
 
