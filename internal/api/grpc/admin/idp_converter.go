@@ -3,6 +3,7 @@ package admin
 import (
 	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
+	dsig "github.com/russellhaering/goxmldsig"
 
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
@@ -486,6 +487,7 @@ func addSAMLProviderToCommand(req *admin_pb.AddSAMLProviderRequest) *command.SAM
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithmToCommand(*req.SignatureAlgorithm),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
@@ -504,6 +506,7 @@ func updateSAMLProviderToCommand(req *admin_pb.UpdateSAMLProviderRequest) *comma
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithmToCommand(*req.SignatureAlgorithm),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
@@ -521,6 +524,19 @@ func bindingToCommand(binding idp_pb.SAMLBinding) string {
 		return saml.HTTPRedirectBinding
 	case idp_pb.SAMLBinding_SAML_BINDING_ARTIFACT:
 		return saml.HTTPArtifactBinding
+	default:
+		return ""
+	}
+}
+
+func signatureAlgorithmToCommand(binding idp_pb.SAMLSignatureAlgorithm) string {
+	switch binding {
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1:
+		return dsig.RSASHA1SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256:
+		return dsig.RSASHA256SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512:
+		return dsig.RSASHA512SignatureMethod
 	default:
 		return ""
 	}

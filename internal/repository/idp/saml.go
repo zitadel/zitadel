@@ -16,6 +16,7 @@ type SAMLIDPAddedEvent struct {
 	Key                           *crypto.CryptoValue      `json:"key,omitempty"`
 	Certificate                   []byte                   `json:"certificate,omitempty"`
 	Binding                       string                   `json:"binding,omitempty"`
+	SignatureAlgorithm            string                   `json:"signature_algorithm,omitempty"`
 	WithSignedRequest             bool                     `json:"withSignedRequest,omitempty"`
 	NameIDFormat                  *domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"`
 	TransientMappingAttributeName string                   `json:"transientMappingAttributeName,omitempty"`
@@ -32,6 +33,7 @@ func NewSAMLIDPAddedEvent(
 	certificate []byte,
 	binding string,
 	withSignedRequest bool,
+	signatureAlgorithm string,
 	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
 	federatedLogoutEnabled bool,
@@ -46,6 +48,7 @@ func NewSAMLIDPAddedEvent(
 		Certificate:                   certificate,
 		Binding:                       binding,
 		WithSignedRequest:             withSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithm,
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: transientMappingAttributeName,
 		FederatedLogoutEnabled:        federatedLogoutEnabled,
@@ -84,6 +87,7 @@ type SAMLIDPChangedEvent struct {
 	Certificate                   []byte                   `json:"certificate,omitempty"`
 	Binding                       *string                  `json:"binding,omitempty"`
 	WithSignedRequest             *bool                    `json:"withSignedRequest,omitempty"`
+	SignatureAlgorithm            *string                  `json:"signature_algorithm,omitempty"`
 	NameIDFormat                  *domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"`
 	TransientMappingAttributeName *string                  `json:"transientMappingAttributeName,omitempty"`
 	FederatedLogoutEnabled        *bool                    `json:"federatedLogoutEnabled,omitempty"`
@@ -143,6 +147,12 @@ func ChangeSAMLBinding(binding string) func(*SAMLIDPChangedEvent) {
 func ChangeSAMLWithSignedRequest(withSignedRequest bool) func(*SAMLIDPChangedEvent) {
 	return func(e *SAMLIDPChangedEvent) {
 		e.WithSignedRequest = &withSignedRequest
+	}
+}
+
+func ChangeSAMLSignatureAlgorithm(signatureAlgorithm string) func(*SAMLIDPChangedEvent) {
+	return func(e *SAMLIDPChangedEvent) {
+		e.SignatureAlgorithm = &signatureAlgorithm
 	}
 }
 
