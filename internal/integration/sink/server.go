@@ -459,6 +459,10 @@ func createSuccessfulAzureADIntent(ctx context.Context, cmd *command.Commands, r
 	}
 	idpUser := &azuread.User{
 		ID:                req.IDPUserID,
+		DisplayName:       "displayname",
+		FirstName:         "firstname",
+		Email:             "email@email.com",
+		LastName:          "lastname",
 		UserPrincipalName: "username",
 	}
 	idpSession := &oauth.Session{

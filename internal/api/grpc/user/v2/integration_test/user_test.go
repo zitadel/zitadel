@@ -2408,6 +2408,10 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						s, err := structpb.NewStruct(map[string]interface{}{
 							"id":                "id",
 							"userPrincipalName": "username",
+							"displayName":       "displayname",
+							"givenName":         "firstname",
+							"surname":           "lastname",
+							"mail":              "email@email.com",
 						})
 						require.NoError(t, err)
 						return s
@@ -2417,12 +2421,15 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 					Username: gu.Ptr("username"),
 					Profile: &user.SetHumanProfile{
 						PreferredLanguage: gu.Ptr("und"),
+						GivenName:         "firstname",
+						FamilyName:        "lastname",
+						DisplayName:       gu.Ptr("displayname"),
 					},
 					IdpLinks: []*user.IDPLink{
 						{IdpId: azureIdpID, UserId: "id", UserName: "username"},
 					},
 					Email: &user.SetHumanEmail{
-						Email:        "username",
+						Email:        "email@email.com",
 						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
 					},
 				},
@@ -2459,6 +2466,10 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 						s, err := structpb.NewStruct(map[string]interface{}{
 							"id":                "id",
 							"userPrincipalName": "username",
+							"displayName":       "displayname",
+							"givenName":         "firstname",
+							"surname":           "lastname",
+							"mail":              "email@email.com",
 						})
 						require.NoError(t, err)
 						return s
