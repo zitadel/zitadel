@@ -771,7 +771,7 @@ const LoginNameQuery = (searchValue: string) =>
       case: "loginNameQuery",
       value: {
         loginName: searchValue,
-        method: TextQueryMethod.EQUALS,
+        method: TextQueryMethod.EQUALS_IGNORE_CASE,
       },
     },
   });
@@ -782,7 +782,7 @@ const EmailQuery = (searchValue: string) =>
       case: "emailQuery",
       value: {
         emailAddress: searchValue,
-        method: TextQueryMethod.EQUALS,
+        method: TextQueryMethod.EQUALS_IGNORE_CASE,
       },
     },
   });
