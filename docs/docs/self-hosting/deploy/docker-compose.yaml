@@ -4,6 +4,9 @@ services:
     image: ghcr.io/zitadel/zitadel:latest
     command: start-from-init --masterkey "MasterkeyNeedsToHave32Characters"
     environment:
+      # See "What's next" to learn about how to serve Zitadel on a different domain or IP.
+      ZITADEL_EXTERNALDOMAIN: localhost
+
       # See "What's next" to learn about how to enable TLS.
       ZITADEL_EXTERNALSECURE: false
       ZITADEL_TLS_ENABLED: false
