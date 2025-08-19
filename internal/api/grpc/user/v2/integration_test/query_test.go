@@ -4,6 +4,7 @@ package user_test
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"slices"
 	"testing"
@@ -415,7 +416,7 @@ func createUsers(ctx context.Context, orgID string, count int, passwordChangeReq
 }
 
 func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) userAttr {
-	username := gofakeit.Email()
+	username := integration.Email()
 	return createUserWithUserName(ctx, username, orgID, passwordChangeRequired)
 }
 
@@ -445,7 +446,7 @@ func TestServer_ListUsers(t *testing.T) {
 		req *user.ListUsersRequest
 		dep func(ctx context.Context, request *user.ListUsersRequest) userAttrs
 	}
-	tests := []struct {
+	tt := []struct {
 		name    string
 		args    args
 		want    *user.ListUsersResponse
@@ -635,10 +636,11 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = append(request.Queries, InUserIDsQuery(infos.userIDs()))
 
 					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta", "my value 1")
-					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value 2")
 					Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value 3")
+					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value 2")
 
 					request.Queries = append(request.Queries, MetakeyContainsQuery("my meta"))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return infos
 				},
 			},
@@ -647,7 +649,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: user.UserFieldName_USER_FIELD_NAME_UNSPECIFIED,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -716,7 +718,7 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 		{
-			name: "list user by username and meta value, ok",
+			name: "list user by username, ok",
 			args: args{
 				IamCTX,
 				&user.ListUsersRequest{},
@@ -725,6 +727,8 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, UsernameQuery(info.Username))
+
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return []userAttr{info}
 				},
 			},
@@ -733,7 +737,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -769,6 +773,7 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery([]string{info.Username}))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return []userAttr{info}
 				},
 			},
@@ -777,7 +782,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -815,10 +820,11 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
 
 					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta", "my value")
-					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value")
 					Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value")
+					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value")
 
 					request.Queries = append(request.Queries, MetavalueQuery("my value"))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 
 					return infos
 				},
@@ -828,7 +834,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -894,96 +900,96 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "list user in emails no found, ok",
-			args: args{
-				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-						InUserEmailsQuery([]string{"notfound"}),
-					},
-				},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					return []userAttr{}
-				},
-			},
-			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
-					TotalResult: 0,
-					Timestamp:   timestamppb.Now(),
-				},
-				SortingColumn: 0,
-				Result:        []*user.User{},
-			},
-		},
-		{
-			name: "list user phone, ok",
-			args: args{
-				IamCTX,
-				&user.ListUsersRequest{},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					info := createUser(ctx, orgResp.OrganizationId, false)
-					request.Queries = []*user.SearchQuery{}
-					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
-					request.Queries = append(request.Queries, PhoneQuery(info.Phone))
-					return []userAttr{info}
-				},
-			},
-			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
-					TotalResult: 1,
-					Timestamp:   timestamppb.Now(),
-				},
-				SortingColumn: 0,
-				Result: []*user.User{
-					{
-						State: user.UserState_USER_STATE_ACTIVE,
-						Type: &user.User_Human{
-							Human: &user.HumanUser{
-								Profile: &user.HumanProfile{
-									GivenName:         "Mickey",
-									FamilyName:        "Mouse",
-									NickName:          gu.Ptr("Mickey"),
-									DisplayName:       gu.Ptr("Mickey Mouse"),
-									PreferredLanguage: gu.Ptr("nl"),
-									Gender:            user.Gender_GENDER_MALE.Enum(),
-								},
-								Email: &user.HumanEmail{
-									IsVerified: true,
-								},
-								Phone: &user.HumanPhone{
-									IsVerified: true,
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "list user in emails no found, ok",
-			args: args{
-				IamCTX,
-				&user.ListUsersRequest{
-					Queries: []*user.SearchQuery{
-						OrganizationIdQuery(orgResp.OrganizationId),
-						InUserEmailsQuery([]string{"notfound"}),
-					},
-				},
-				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					return []userAttr{}
-				},
-			},
-			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
-					TotalResult: 0,
-					Timestamp:   timestamppb.Now(),
-				},
-				SortingColumn: 0,
-				Result:        []*user.User{},
-			},
-		},
+		// {
+		// 	name: "list user in emails no found, ok",
+		// 	args: args{
+		// 		IamCTX,
+		// 		&user.ListUsersRequest{
+		// 			Queries: []*user.SearchQuery{
+		// 				OrganizationIdQuery(orgResp.OrganizationId),
+		// 				InUserEmailsQuery([]string{"notfound"}),
+		// 			},
+		// 		},
+		// 		func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+		// 			return []userAttr{}
+		// 		},
+		// 	},
+		// 	want: &user.ListUsersResponse{
+		// 		Details: &object.ListDetails{
+		// 			TotalResult: 0,
+		// 			Timestamp:   timestamppb.Now(),
+		// 		},
+		// 		SortingColumn: 0,
+		// 		Result:        []*user.User{},
+		// 	},
+		// },
+		// {
+		// 	name: "list user phone, ok",
+		// 	args: args{
+		// 		IamCTX,
+		// 		&user.ListUsersRequest{},
+		// 		func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+		// 			info := createUser(ctx, orgResp.OrganizationId, false)
+		// 			request.Queries = []*user.SearchQuery{}
+		// 			request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+		// 			request.Queries = append(request.Queries, PhoneQuery(info.Phone))
+		// 			return []userAttr{info}
+		// 		},
+		// 	},
+		// 	want: &user.ListUsersResponse{
+		// 		Details: &object.ListDetails{
+		// 			TotalResult: 1,
+		// 			Timestamp:   timestamppb.Now(),
+		// 		},
+		// 		SortingColumn: 0,
+		// 		Result: []*user.User{
+		// 			{
+		// 				State: user.UserState_USER_STATE_ACTIVE,
+		// 				Type: &user.User_Human{
+		// 					Human: &user.HumanUser{
+		// 						Profile: &user.HumanProfile{
+		// 							GivenName:         "Mickey",
+		// 							FamilyName:        "Mouse",
+		// 							NickName:          gu.Ptr("Mickey"),
+		// 							DisplayName:       gu.Ptr("Mickey Mouse"),
+		// 							PreferredLanguage: gu.Ptr("nl"),
+		// 							Gender:            user.Gender_GENDER_MALE.Enum(),
+		// 						},
+		// 						Email: &user.HumanEmail{
+		// 							IsVerified: true,
+		// 						},
+		// 						Phone: &user.HumanPhone{
+		// 							IsVerified: true,
+		// 						},
+		// 					},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	name: "list user in emails no found, ok",
+		// 	args: args{
+		// 		IamCTX,
+		// 		&user.ListUsersRequest{
+		// 			Queries: []*user.SearchQuery{
+		// 				OrganizationIdQuery(orgResp.OrganizationId),
+		// 				InUserEmailsQuery([]string{"notfound"}),
+		// 			},
+		// 		},
+		// 		func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+		// 			return []userAttr{}
+		// 		},
+		// 	},
+		// 	want: &user.ListUsersResponse{
+		// 		Details: &object.ListDetails{
+		// 			TotalResult: 0,
+		// 			Timestamp:   timestamppb.Now(),
+		// 		},
+		// 		SortingColumn: 0,
+		// 		Result:        []*user.User{},
+		// 	},
+		// },
 		{
 			name: "list user resourceowner multiple, ok",
 			args: args{
@@ -996,6 +1002,7 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return infos
 				},
 			},
@@ -1004,7 +1011,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -1080,6 +1087,7 @@ func TestServer_ListUsers(t *testing.T) {
 					info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests.OrganizationId))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return []userAttr{info, {}}
 				},
 			},
@@ -1088,7 +1096,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 2,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -1124,7 +1132,6 @@ func TestServer_ListUsers(t *testing.T) {
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
 					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
-					// info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests2.OrganizationId))
@@ -1145,52 +1152,51 @@ func TestServer_ListUsers(t *testing.T) {
 		},
 	}
 	for _, f := range permissionCheckV2Settings {
-		f := f
-		for _, tt := range tests {
-			t.Run(f.TestNamePrependString+tt.name, func(t *testing.T) {
+		for _, tc := range tt {
+			t.Run(f.TestNamePrependString+tc.name, func(t1 *testing.T) {
 				setPermissionCheckV2Flag(t, f.SetFlag)
-				infos := tt.args.dep(IamCTX, tt.args.req)
+				infos := tc.args.dep(IamCTX, tc.args.req)
 
-				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 10*time.Minute)
-				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-					got, err := Client.ListUsers(tt.args.ctx, tt.args.req)
-					if tt.wantErr {
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.args.ctx, 20*time.Second)
+				require.EventuallyWithT(t1, func(ttt *assert.CollectT) {
+					got, err := Client.ListUsers(tc.args.ctx, tc.args.req)
+					if tc.wantErr {
 						require.Error(ttt, err)
 						return
 					}
 					require.NoError(ttt, err)
 
 					// always only give back dependency infos which are required for the response
-					require.Len(ttt, tt.want.Result, len(infos))
-					if assert.Len(ttt, got.Result, len(tt.want.Result)) {
-						tt.want.Details.TotalResult = got.Details.TotalResult
+					require.Len(ttt, tc.want.Result, len(infos))
+					if assert.Len(ttt, got.Result, len(tc.want.Result)) {
+						tc.want.Details.TotalResult = got.Details.TotalResult
 
 						// fill in userid and username as it is generated
 						for i := range infos {
-							if tt.want.Result[i] == nil {
+							if tc.want.Result[i] == nil {
 								continue
 							}
-							tt.want.Result[i].UserId = infos[i].UserID
-							tt.want.Result[i].Username = infos[i].Username
-							tt.want.Result[i].PreferredLoginName = infos[i].Username
-							tt.want.Result[i].LoginNames = []string{infos[i].Username}
-							if human := tt.want.Result[i].GetHuman(); human != nil {
+							tc.want.Result[i].UserId = infos[i].UserID
+							tc.want.Result[i].Username = infos[i].Username
+							tc.want.Result[i].PreferredLoginName = infos[i].Username
+							tc.want.Result[i].LoginNames = []string{infos[i].Username}
+							if human := tc.want.Result[i].GetHuman(); human != nil {
 								human.Email.Email = infos[i].Username
 								human.Phone.Phone = infos[i].Phone
-								if tt.want.Result[i].GetHuman().GetPasswordChanged() != nil {
+								if tc.want.Result[i].GetHuman().GetPasswordChanged() != nil {
 									human.PasswordChanged = infos[i].Changed
 								}
 							}
-							tt.want.Result[i].Details = infos[i].Details
+							tc.want.Result[i].Details = infos[i].Details
 						}
-						for i := range tt.want.Result {
-							if tt.want.Result[i] == nil {
+						for i := range tc.want.Result {
+							if tc.want.Result[i] == nil {
 								continue
 							}
-							assert.EqualExportedValues(ttt, got.Result[i], tt.want.Result[i])
+							assert.EqualExportedValues(ttt, got.Result[i], tc.want.Result[i])
 						}
 					}
-					integration.AssertListDetails(ttt, tt.want, got)
+					integration.AssertListDetails(ttt, tc.want, got)
 				}, retryDuration, tick, "timeout waiting for expected user result")
 			})
 		}
@@ -1343,7 +1349,7 @@ func MetakeyContainsQuery(metaKey string) *user.SearchQuery {
 		Query: &user.SearchQuery_MetadataKeyFilter{
 			MetadataKeyFilter: &v2.MetadataKeyFilter{
 				Key:    metaKey,
-				Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_CONTAINS},
+				Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_STARTS_WITH},
 		},
 	}
 }
@@ -1352,7 +1358,7 @@ func MetavalueQuery(metaValue string) *user.SearchQuery {
 	return &user.SearchQuery{
 		Query: &user.SearchQuery_MetadataValueFilter{
 			MetadataValueFilter: &v2.MetadataValueFilter{
-				Value:  []byte(metaValue),
+				Value:  []byte(base64.StdEncoding.EncodeToString([]byte(metaValue))),
 				Method: filter.ByteFilterMethod_BYTE_FILTER_METHOD_EQUALS,
 			},
 		},

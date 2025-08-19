@@ -1322,6 +1322,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 				preferredLoginName := sql.NullString{}
 
 				human, machine := sqlHuman{}, sqlMachine{}
+				metaKey := sql.NullString{}
 
 				err := rows.Scan(
 					&u.ID,
@@ -1357,7 +1358,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					&machine.encodedSecret,
 					&machine.accessTokenType,
 
-					&u.MetadataKey,
+					&metaKey,
 					&u.MetadataValue,
 
 					&count,
@@ -1369,6 +1370,10 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 				u.LoginNames = loginNames
 				if preferredLoginName.Valid {
 					u.PreferredLoginName = preferredLoginName.String
+				}
+
+				if metaKey.Valid {
+					u.MetadataKey = metaKey.String
 				}
 
 				if human.humanID.Valid {
