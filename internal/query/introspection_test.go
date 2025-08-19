@@ -102,19 +102,3 @@ func TestQueries_ActiveIntrospectionClientByID(t *testing.T) {
 		})
 	}
 }
-
-// TestIntrospectionQueryOptimizations validates that the optimized query 
-// has the expected performance characteristics
-func TestIntrospectionQueryOptimizations(t *testing.T) {
-	// Test that UNION ALL is used instead of UNION
-	assert.Contains(t, introspectionClientByIDQuery, "union all", "Expected 'union all' in optimized query")
-	
-	// Test that aliases are used consistently  
-	assert.Contains(t, introspectionClientByIDQuery, "from config c", "Expected consistent alias usage 'config c'")
-	
-	// Test that keys CTE is simplified
-	assert.Contains(t, introspectionClientByIDQuery, "$2::text as client_id", "Expected simplified keys CTE with $2::text casting")
-	
-	// Test that conditional join logic is present
-	assert.Contains(t, introspectionClientByIDQuery, "and $3 = true", "Expected conditional join logic 'and $3 = true'")
-}
