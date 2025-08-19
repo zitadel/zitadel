@@ -5,7 +5,7 @@ import { Config } from '../config';
 import { check } from 'k6';
 import encoding from 'k6/encoding';
 
-const userAmount = 2500;
+const userAmount = parseInt(__ENV.USER_AMOUNT) || 2500;
 
 export async function setup() {
   const tokens = loginByUsernamePassword(Config.admin as User);
