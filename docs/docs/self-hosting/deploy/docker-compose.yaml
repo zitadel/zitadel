@@ -48,7 +48,7 @@ services:
       # ZITADEL_FIRSTINSTANCE_PATPATH: /current-dir/admin.pat
       # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME: admin
       # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME: Automatically Initialized IAM_OWNER
-      # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE: '2029-01-01T00:00:00Z'      
+      # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE: '2029-01-01T00:00:00Z'
       
       # To change the initial human admin users username and password, uncomment the following lines.
       # The first login name is formatted like this: <username>@<org_name>.<external_domain>
@@ -127,7 +127,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - 'data:/var/lib/postgresql/data:rw'      
+      - 'data:/var/lib/postgresql/data:rw'
 
 networks:
   zitadel:
