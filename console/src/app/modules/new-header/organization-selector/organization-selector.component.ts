@@ -183,10 +183,9 @@ export class OrganizationSelectorComponent {
   private getOrganizationsQuery(nameQuery: Signal<NameQuery | undefined>) {
     return injectInfiniteQuery(() => {
       const query = nameQuery();
-      const exp = this.userService.exp();
-      const isExpired = exp ? exp <= new Date() : true;
+      const isExpired = this.userService.isExpired();
       return {
-        queryKey: ['organization', 'listOrganizationsInfinite', query],
+        queryKey: [this.userService.userId(), 'organization', 'listOrganizationsInfinite', query],
         queryFn: ({ pageParam, signal }) => this.newOrganizationService.listOrganizations(pageParam, signal),
         enabled: !isExpired,
         initialPageParam: {

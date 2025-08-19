@@ -11,6 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { lastValueFrom } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { StorageKey, StorageLocation, StorageService } from './storage.service';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +25,7 @@ export class NewOrganizationService {
     private readonly queryClient: QueryClient,
     private readonly translate: TranslateService,
     private readonly storage: StorageService,
+    private readonly userService: UserService,
   ) {}
 
   private readonly orgIdSignal = signal<string | undefined>(
@@ -73,7 +75,7 @@ export class NewOrganizationService {
     };
 
     return queryOptions({
-      queryKey: ['organization', 'listOrganizations', req],
+      queryKey: [this.userService.userId(), 'organization', 'listOrganizations', req],
       queryFn: organizationId
         ? () => this.listOrganizations(req).then((resp) => resp.result.find(Boolean) ?? null)
         : skipToken,
@@ -93,7 +95,7 @@ export class NewOrganizationService {
 
   public listOrganizationsQueryKey(req?: MessageInitShape<typeof ListOrganizationsRequestSchema>) {
     if (!req) {
-      return ['organization', 'listOrganizations'];
+      return [this.userService.userId(), 'organization', 'listOrganizations'];
     }
 
     // needed because angular query isn't able to serialize a bigint key
@@ -103,7 +105,7 @@ export class NewOrganizationService {
       ...(query ? { query } : {}),
     };
 
-    return ['organization', 'listOrganizations', queryKey];
+    return [this.userService.userId(), 'organization', 'listOrganizations', queryKey];
   }
 
   public listOrganizations(

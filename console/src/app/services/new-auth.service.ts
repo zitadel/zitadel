@@ -21,12 +21,16 @@ import {
   ListMyZitadelPermissionsResponse,
 } from '@zitadel/proto/zitadel/auth_pb';
 import { injectQuery } from '@tanstack/angular-query-experimental';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NewAuthService {
-  constructor(private readonly grpcService: GrpcService) {}
+  constructor(
+    private readonly grpcService: GrpcService,
+    private readonly userService: UserService,
+  ) {}
 
   public verifyMyPhone(code: string): Promise<VerifyMyPhoneResponse> {
     return this.grpcService.authNew.verifyMyPhone({ code });
@@ -74,7 +78,7 @@ export class NewAuthService {
 
   public listMyZitadelPermissionsQuery() {
     return injectQuery(() => ({
-      queryKey: ['auth', 'listMyZitadelPermissions'],
+      queryKey: [this.userService.userId(), 'auth', 'listMyZitadelPermissions'],
       queryFn: () => this.listMyZitadelPermissions().then(({ result }) => result),
     }));
   }

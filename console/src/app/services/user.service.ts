@@ -1,4 +1,4 @@
-import { computed, Injectable, Signal, signal } from '@angular/core';
+import { computed, Injectable, Signal } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import {
   AddHumanUserRequestSchema,
@@ -57,8 +57,8 @@ import { injectQuery, queryOptions, skipToken } from '@tanstack/angular-query-ex
 })
 export class UserService {
   private readonly payload: Signal<unknown | undefined>;
-  private readonly userId: Signal<string | undefined>;
-  public readonly exp: Signal<Date | undefined>;
+  public readonly userId: Signal<string | undefined>;
+  public readonly isExpired: Signal<boolean>;
 
   public userQuery() {
     return injectQuery(() => this.userQueryOptions());
@@ -67,7 +67,7 @@ export class UserService {
   public userQueryOptions() {
     const userId = this.userId();
     return queryOptions({
-      queryKey: ['user', userId],
+      queryKey: [userId, 'user'],
       queryFn: userId ? () => this.getUserById(userId).then((resp) => resp.user) : skipToken,
     });
   }
@@ -78,7 +78,7 @@ export class UserService {
   ) {
     this.payload = this.getPayload();
     this.userId = this.getUserId(this.payload);
-    this.exp = this.getExp(this.payload);
+    this.isExpired = this.getIsExpired(this.payload);
   }
 
   private getPayload() {
@@ -112,13 +112,18 @@ export class UserService {
     });
   }
 
-  private getExp(payloadSignal: Signal<unknown | undefined>) {
-    return computed(() => {
+  private getIsExpired(payloadSignal: Signal<unknown | undefined>) {
+    const expSignal = computed(() => {
       const payload = payloadSignal();
       if (payload && typeof payload === 'object' && 'exp' in payload && typeof payload.exp === 'number') {
         return new Date(payload.exp * 1000);
       }
       return undefined;
+    });
+
+    return computed(() => {
+      const exp = expSignal();
+      return exp ? exp <= new Date() : true;
     });
   }
 
