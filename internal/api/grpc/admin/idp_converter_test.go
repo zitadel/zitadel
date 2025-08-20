@@ -168,7 +168,7 @@ func Test_signatureAlgorithmToCommand(t *testing.T) {
 		wantSignatureAlgorithm string
 	}{
 		{
-			name:                   "signature algorithm  stnot set",
+			name:                   "signature algorithm not set",
 			signatureAlgorithm:     nil,
 			wantSignatureAlgorithm: "",
 		},

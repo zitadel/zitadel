@@ -1868,7 +1868,7 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 		changes = append(changes, idp.ChangeSAMLWithSignedRequest(withSignedRequest))
 	}
 	if wm.SignatureAlgorithm != signatureAlgorithm {
-		changes = append(changes, idp.ChangeSAMLSignatureAlgorithm(binding))
+		changes = append(changes, idp.ChangeSAMLSignatureAlgorithm(signatureAlgorithm))
 	}
 	if wm.NameIDFormat != nameIDFormat {
 		changes = append(changes, idp.ChangeSAMLNameIDFormat(nameIDFormat))
