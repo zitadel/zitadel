@@ -36,6 +36,11 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.IDMissing")
 	}
 
+	callersUserID := authz.GetCtxData(ctx).UserID
+	if callersUserID == userID {
+		return nil, zerrors.ThrowPermissionDenied(nil, "COMMAND-SHr8d2", "cannot change password without verification token or current password")
+	}
+
 	if orgID == "" {
 		user, err := c.userWriteModelByID(ctx, userID, "")
 		if err != nil {
@@ -43,8 +48,6 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 		}
 		orgID = user.ResourceOwner
 	}
-
-	callersUserID := authz.GetCtxData(ctx).UserID
 
 	wm, err := c.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
@@ -58,7 +61,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 		"", // current api implementations never provide an encoded password
 		"",
 		oneTime,
-		c.setPasswordWithPermission(callersUserID, orgID),
+		c.setPasswordWithPermission(userID, orgID),
 	)
 }
 
@@ -125,7 +128,7 @@ type setPasswordVerification func(ctx context.Context) (newEncodedPassword strin
 // setPasswordWithPermission returns a permission check as [setPasswordVerification] implementation
 func (c *Commands) setPasswordWithPermission(userID, orgID string) setPasswordVerification {
 	return func(ctx context.Context) (_ string, err error) {
-		return "", c.checkPermission(ctx, domain.PermissionOrgMemberWrite, orgID, userID)
+		return "", c.checkPermission(ctx, domain.PermissionUserWrite, orgID, userID)
 	}
 }
 

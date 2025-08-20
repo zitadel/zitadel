@@ -242,6 +242,21 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			},
 		},
 		{
+			name: "callers id same as user id",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx: func() context.Context {
+					return authz.SetCtxData(context.Background(), authz.CtxData{UserID: "callersUserID"})
+				}(),
+				userID: "callersUserID",
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
+		{
 			name: "change password no one time, no orgID passed",
 			fields: fields{
 				eventstore: expectEventstore(

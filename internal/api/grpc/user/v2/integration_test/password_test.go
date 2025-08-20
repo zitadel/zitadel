@@ -246,7 +246,7 @@ func TestServer_Deprecated_SetPassword(t *testing.T) {
 					},
 				},
 				wantErr: true,
-				err:     errors.New("membership not found (AUTHZ-cdgFk)"),
+				err:     errors.New("cannot change password without verification token or current password (COMMAND-SHr8d2)"),
 			}
 		}(),
 		{

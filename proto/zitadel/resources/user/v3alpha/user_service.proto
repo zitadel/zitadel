@@ -571,6 +571,8 @@ service ZITADELUsers {
   // Set a password
   //
   // Add, update or reset a user's password with either a verification code or the current password.
+  //
+  // Organization Admins can change passwords for their users without verification code or current password
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
       post: "/resources/v3alpha/users/{id}/password"
