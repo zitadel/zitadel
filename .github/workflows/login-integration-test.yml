@@ -15,6 +15,9 @@ jobs:
     name: login-integration-test
     runs-on: ubuntu-latest
     steps:
+      - name: Check if PR is from a fork
+        if: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+        run: echo "PR is from a fork. Exiting job. If login code is changed, ensure locally that the tests pass." && exit 0      
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Dev Container CLI
