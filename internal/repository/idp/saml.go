@@ -16,7 +16,7 @@ type SAMLIDPAddedEvent struct {
 	Key                           *crypto.CryptoValue      `json:"key,omitempty"`
 	Certificate                   []byte                   `json:"certificate,omitempty"`
 	Binding                       string                   `json:"binding,omitempty"`
-	SignatureAlgorithm            string                   `json:"signature_algorithm,omitempty"`
+	SignatureAlgorithm            string                   `json:"signatureAlgorithm,omitempty"`
 	WithSignedRequest             bool                     `json:"withSignedRequest,omitempty"`
 	NameIDFormat                  *domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"`
 	TransientMappingAttributeName string                   `json:"transientMappingAttributeName,omitempty"`
@@ -87,7 +87,7 @@ type SAMLIDPChangedEvent struct {
 	Certificate                   []byte                   `json:"certificate,omitempty"`
 	Binding                       *string                  `json:"binding,omitempty"`
 	WithSignedRequest             *bool                    `json:"withSignedRequest,omitempty"`
-	SignatureAlgorithm            *string                  `json:"signature_algorithm,omitempty"`
+	SignatureAlgorithm            *string                  `json:"signatureAlgorithm,omitempty"`
 	NameIDFormat                  *domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"`
 	TransientMappingAttributeName *string                  `json:"transientMappingAttributeName,omitempty"`
 	FederatedLogoutEnabled        *bool                    `json:"federatedLogoutEnabled,omitempty"`
