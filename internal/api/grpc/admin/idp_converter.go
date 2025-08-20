@@ -487,7 +487,7 @@ func addSAMLProviderToCommand(req *admin_pb.AddSAMLProviderRequest) *command.SAM
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
-		SignatureAlgorithm:            signatureAlgorithmToCommand(*req.SignatureAlgorithm),
+		SignatureAlgorithm:            signatureAlgorithmToCommand(req.SignatureAlgorithm),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
@@ -506,7 +506,7 @@ func updateSAMLProviderToCommand(req *admin_pb.UpdateSAMLProviderRequest) *comma
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
-		SignatureAlgorithm:            signatureAlgorithmToCommand(*req.SignatureAlgorithm),
+		SignatureAlgorithm:            signatureAlgorithmToCommand(req.SignatureAlgorithm),
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
@@ -529,8 +529,12 @@ func bindingToCommand(binding idp_pb.SAMLBinding) string {
 	}
 }
 
-func signatureAlgorithmToCommand(binding idp_pb.SAMLSignatureAlgorithm) string {
-	switch binding {
+func signatureAlgorithmToCommand(signatureAlgorithm *idp_pb.SAMLSignatureAlgorithm) string {
+	if signatureAlgorithm == nil {
+		return ""
+	}
+
+	switch *signatureAlgorithm {
 	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1:
 		return dsig.RSASHA1SignatureMethod
 	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256:
