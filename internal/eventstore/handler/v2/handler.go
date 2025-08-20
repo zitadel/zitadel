@@ -526,6 +526,21 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 	}()
 
+	if config.awaitRunning {
+		_, err = tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID())
+		if err != nil {
+			h.log().OnError(err).Warn("failed to acquire lock")
+			return false, err
+		}
+	} else {
+		var shouldContinue bool
+		err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&shouldContinue)
+		if err != nil || !shouldContinue {
+			h.log().OnError(err).Warn("failed to acquire lock")
+			return false, err
+		}
+	}
+
 	currentState, err := h.currentState(ctx, tx, config)
 	if err != nil {
 		if errors.Is(err, errJustUpdated) {
@@ -625,7 +640,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		h.log().WithField("statements_count", len(statements)).
 			WithField("position", currentState.position).
 			WithField("offset", currentState.offset).
-			Debug("all statements already processed")
+			Info("all statements already processed")
 
 		return nil, false, nil
 	}
@@ -636,11 +651,12 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 			WithField("total_statements", len(statements)+idx+1).
 			WithField("position", currentState.position).
 			WithField("offset", currentState.offset).
-			Debug("skipped previously processed statements")
+			Info("skipped previously processed statements")
 	}
 
 	additionalIteration = eventAmount == int(h.bulkLimit)
-	if len(statements) < len(events) {
+	if len(statements) < eventAmount {
+		h.log().WithField("statements_count", len(statements)).WithField("events_count", eventAmount).Info("events skipped")
 		// retry immediately if statements failed
 		additionalIteration = true
 	}

@@ -125,7 +125,26 @@ CREATE OR REPLACE FUNCTION eventstore.commands_to_events(stmt_timestamp TIMESTAM
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
-INSERT INTO eventstore.events2
-SELECT * FROM eventstore.commands_to_events(STATEMENT_TIMESTAMP(), commands)
-RETURNING *
-$$ LANGUAGE SQL;
+DECLARE
+    instance_ids TEXT[];
+    i INTEGER;
+BEGIN
+    -- Extract distinct instance_ids from commands
+    SELECT ARRAY_AGG(DISTINCT instance_id) 
+    INTO instance_ids
+    FROM UNNEST(commands);
+
+    -- Acquire advisory locks for each instance_id
+    FOR i IN 1..array_length(instance_ids, 1) LOOP
+        PERFORM pg_advisory_xact_lock_shared('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext(instance_ids[i]));
+    END LOOP;
+
+    -- Perform the insert and return results
+    RETURN QUERY
+    INSERT INTO eventstore.events2
+    SELECT * FROM eventstore.commands_to_events(STATEMENT_TIMESTAMP(), commands)
+    RETURNING *;
+
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;

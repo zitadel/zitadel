@@ -10,4 +10,4 @@ FROM
 WHERE
     instance_id = $1
     AND projection_name = $2
-FOR NO KEY UPDATE NOWAIT;
+FOR NO KEY UPDATE;

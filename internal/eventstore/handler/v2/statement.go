@@ -56,7 +56,7 @@ func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, curr
 		offset++
 		if !previousPosition.Equal(event.Position()) {
 			// offset is 1 because we want to skip this event
-			offset = 1
+			offset = 0
 		}
 		statement.offset = offset
 		statement.Position = event.Position()

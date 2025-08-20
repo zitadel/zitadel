@@ -32,6 +32,10 @@ func (es *Eventstore) Push(ctx context.Context, client database.ContextQueryExec
 }
 
 func (es *Eventstore) writeCommands(ctx context.Context, client database.ContextQueryExecuter, commands []eventstore.Command) (_ []eventstore.Event, err error) {
+	if len(commands) == 0 {
+		return nil, nil
+	}
+
 	var conn *sql.Conn
 	switch c := client.(type) {
 	case database.Client:

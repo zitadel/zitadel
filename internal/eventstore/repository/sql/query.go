@@ -12,6 +12,7 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -61,7 +62,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	}
 
 	query, rowScanner := prepareColumns(criteria, q.Columns, useV1)
-	where, values := prepareConditions(criteria, q, useV1)
+	where, values := prepareConditions(ctx, criteria, q, useV1)
 	if where == "" || query == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
@@ -98,18 +99,6 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	if q.Offset > 0 {
 		values = append(values, q.Offset)
 		query += " OFFSET ?"
-	}
-
-	if q.LockRows {
-		query += " FOR NO KEY UPDATE"
-		switch q.LockOption {
-		case eventstore.LockOptionWait: // default behavior
-		case eventstore.LockOptionNoWait:
-			query += " NOWAIT"
-		case eventstore.LockOptionSkipLocked:
-			query += " SKIP LOCKED"
-
-		}
 	}
 
 	query = criteria.placeholder(query)
@@ -232,7 +221,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 	}
 }
 
-func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bool) (_ string, args []any) {
+func prepareConditions(ctx context.Context, criteria querier, query *repository.SearchQuery, useV1 bool) (_ string, args []any) {
 	clauses, args := prepareQuery(criteria, useV1, query.InstanceID, query.InstanceIDs, query.ExcludedInstances)
 	if clauses != "" && len(query.SubQueries) > 0 {
 		clauses += " AND "
@@ -290,19 +279,13 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 	}
 
 	if query.AwaitOpenTransactions {
-		instanceIDs := make(database.TextArray[string], 0, 3)
+		instanceID := authz.GetInstance(ctx).InstanceID()
 		if query.InstanceID != nil {
-			instanceIDs = append(instanceIDs, query.InstanceID.Value.(string))
-		} else if query.InstanceIDs != nil {
-			instanceIDs = append(instanceIDs, query.InstanceIDs.Value.(database.TextArray[string])...)
-		}
-
-		for i := range instanceIDs {
-			instanceIDs[i] = "zitadel_es_pusher_" + instanceIDs[i]
+			instanceID = query.InstanceID.Value.(string)
 		}
 
 		clauses += awaitOpenTransactions(useV1)
-		args = append(args, instanceIDs)
+		args = append(args, instanceID, instanceID)
 	}
 
 	if clauses == "" {

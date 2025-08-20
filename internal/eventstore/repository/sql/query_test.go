@@ -468,7 +468,7 @@ func Test_prepareCondition(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotClause, gotValues := prepareConditions(NewPostgres(&database.DB{Database: new(postgres.Config)}), tt.args.query, tt.args.useV1)
+			gotClause, gotValues := prepareConditions(context.Background(), NewPostgres(&database.DB{Database: new(postgres.Config)}), tt.args.query, tt.args.useV1)
 			if gotClause != tt.res.clause {
 				t.Errorf("prepareCondition() gotClause = %v, want %v", gotClause, tt.res.clause)
 			}
@@ -742,72 +742,6 @@ func Test_query_events_mocked(t *testing.T) {
 				mock: newMockClient(t).expectQuery(
 					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence DESC LIMIT $3`),
 					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}, uint64(5)},
-				),
-			},
-			res: res{
-				wantErr: false,
-			},
-		},
-		{
-			name: "lock, wait",
-			args: args{
-				dest: &[]*repository.Event{},
-				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-					OrderDesc().
-					Limit(5).
-					AddQuery().
-					AggregateTypes("user").
-					Builder().LockRowsDuringTx(nil, eventstore.LockOptionWait),
-				useV1: true,
-			},
-			fields: fields{
-				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2 FOR UPDATE`),
-					[]driver.Value{eventstore.AggregateType("user"), uint64(5)},
-				),
-			},
-			res: res{
-				wantErr: false,
-			},
-		},
-		{
-			name: "lock, no wait",
-			args: args{
-				dest: &[]*repository.Event{},
-				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-					OrderDesc().
-					Limit(5).
-					AddQuery().
-					AggregateTypes("user").
-					Builder().LockRowsDuringTx(nil, eventstore.LockOptionNoWait),
-				useV1: true,
-			},
-			fields: fields{
-				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2 FOR UPDATE NOWAIT`),
-					[]driver.Value{eventstore.AggregateType("user"), uint64(5)},
-				),
-			},
-			res: res{
-				wantErr: false,
-			},
-		},
-		{
-			name: "lock, skip locked",
-			args: args{
-				dest: &[]*repository.Event{},
-				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-					OrderDesc().
-					Limit(5).
-					AddQuery().
-					AggregateTypes("user").
-					Builder().LockRowsDuringTx(nil, eventstore.LockOptionSkipLocked),
-				useV1: true,
-			},
-			fields: fields{
-				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2 FOR UPDATE SKIP LOCKED`),
-					[]driver.Value{eventstore.AggregateType("user"), uint64(5)},
 				),
 			},
 			res: res{
