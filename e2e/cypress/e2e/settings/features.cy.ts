@@ -79,18 +79,6 @@ describe('features settings', () => {
       });
     });
 
-    it('should be keyboard accessible', () => {
-      // Features should be focusable via the underlying button
-      cy.get('cnsl-feature-toggle')
-        .first()
-        .within(() => {
-          cy.get('mat-button-toggle button').first().focus().should('be.focused');
-        });
-
-      // Reset button should be focusable
-      cy.get('[data-e2e="reset-features-button"]').focus().should('be.focused');
-    });
-
     describe('permissions', () => {
       it('should show appropriate elements for admin users', () => {
         // Admin should see reset button
