@@ -63,7 +63,7 @@ machine_jwt_profile_grant_single_user: ensure_modules ensure_key_pair bundle
 
 .PHONY: verify_all_user_grants_exist
 verify_all_user_grants_exist: ensure_modules bundle
-	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/verify_all_user_grants_exist.js --iterations 100 --vus 100 
+	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/verify_all_user_grants_exist.js --duration ${DURATION} --vus ${VUS} 
 # 	--out csv=output/verify_all_user_grants_exist_${DATE}.csv
 
 

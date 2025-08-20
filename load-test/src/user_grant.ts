@@ -10,19 +10,29 @@ export type UserGrant = {
 };
 
 const addUserGrantTrend = new Trend('user_grant_add', true);
-export async function addUserGrant(org: Org, userId: string, project: Project, roles: string[], accessToken: string): Promise<UserGrant> {
+export async function addUserGrant(
+  org: Org,
+  userId: string,
+  project: Project,
+  roles: string[],
+  accessToken: string,
+): Promise<UserGrant> {
   return new Promise((resolve, reject) => {
-    let response = http.asyncRequest('POST', url(`/management/v1/users/${userId}/grants`), 
-    JSON.stringify({
-      projectId: project.id,
-      roleKeys: roles,
-    }), {
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'x-zitadel-orgid': org.organizationId,
+    let response = http.asyncRequest(
+      'POST',
+      url(`/management/v1/users/${userId}/grants`),
+      JSON.stringify({
+        projectId: project.id,
+        roleKeys: roles,
+      }),
+      {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'x-zitadel-orgid': org.organizationId,
+        },
       },
-    });
+    );
 
     response.then((res) => {
       check(res, {
@@ -32,6 +42,5 @@ export async function addUserGrant(org: Org, userId: string, project: Project, r
       addUserGrantTrend.add(res.timings.duration);
       resolve(res.json() as UserGrant);
     });
-
   });
 }

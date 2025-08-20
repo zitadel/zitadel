@@ -30,7 +30,7 @@ AS $$
     END;
 $$;
 
-CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[])
+CREATE OR REPLACE FUNCTION eventstore.commands_to_events(stmt_timestamp TIMESTAMPTZ, commands eventstore.command[])
     RETURNS SETOF eventstore.events2 
     LANGUAGE 'plpgsql'
     STABLE PARALLEL SAFE
@@ -67,12 +67,13 @@ BEGIN
             , c.command_type -- AS event_type
             , COALESCE(current_sequence, 0) + ROW_NUMBER() OVER () -- AS sequence
             , c.revision
-            , NOW() -- AS created_at
+            , stmt_timestamp -- AS created_at
             , c.payload
             , c.creator
             , COALESCE(current_owner, c.owner) -- AS owner
-            , EXTRACT(EPOCH FROM NOW()) -- AS position
-            , c.ordinality::{{ .InTxOrderType }} -- AS in_tx_order
+            , EXTRACT(EPOCH FROM stmt_timestamp) -- AS position
+            , c.ordinality::integer -- AS in_tx_order
+            , pg_current_xact_id()::text::numeric -- AS tx_id
         FROM
             UNNEST(commands) WITH ORDINALITY AS c
         WHERE
@@ -86,7 +87,7 @@ $$;
 
 CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
 INSERT INTO eventstore.events2
-SELECT * FROM eventstore.commands_to_events(commands)
+SELECT * FROM eventstore.commands_to_events(STATEMENT_TIMESTAMP(), commands)
 ORDER BY in_tx_order
 RETURNING *
 $$ LANGUAGE SQL;

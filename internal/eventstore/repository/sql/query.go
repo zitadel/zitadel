@@ -101,7 +101,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	}
 
 	if q.LockRows {
-		query += " FOR UPDATE"
+		query += " FOR NO KEY UPDATE"
 		switch q.LockOption {
 		case eventstore.LockOptionWait: // default behavior
 		case eventstore.LockOptionNoWait:

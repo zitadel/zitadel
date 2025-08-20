@@ -614,35 +614,18 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 
 	idx := skipPreviouslyReducedStatements(statements, currentState)
-
-	// Check if we're at the same position as before but haven't made progress
-	allStatementsAtSamePosition := len(statements) > 0 &&
-		statements[len(statements)-1].Position.Equal(currentState.position)
-
 	if idx+1 == len(statements) {
-		// All statements were already processed
-		if allStatementsAtSamePosition && currentState.offset == 0 {
-			// We're stuck at the same position with no offset - increment offset to make progress
-			// This handles the case where events are added between state read and query execution
-			currentState.offset = uint32(len(statements))
-			h.log().WithField("statements_count", len(statements)).
-				WithField("position", currentState.position).
-				WithField("new_offset", currentState.offset).
-				Debug("incrementing offset to handle race condition")
-		} else {
-			// Normal case - update state to the last statement
-			currentState.position = statements[len(statements)-1].Position
-			currentState.offset = statements[len(statements)-1].offset
-			currentState.aggregateID = statements[len(statements)-1].Aggregate.ID
-			currentState.aggregateType = statements[len(statements)-1].Aggregate.Type
-			currentState.sequence = statements[len(statements)-1].Sequence
-			currentState.eventTimestamp = statements[len(statements)-1].CreationDate
+		currentState.position = statements[len(statements)-1].Position
+		currentState.offset = statements[len(statements)-1].offset
+		currentState.aggregateID = statements[len(statements)-1].Aggregate.ID
+		currentState.aggregateType = statements[len(statements)-1].Aggregate.Type
+		currentState.sequence = statements[len(statements)-1].Sequence
+		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
 
-			h.log().WithField("statements_count", len(statements)).
-				WithField("position", currentState.position).
-				WithField("offset", currentState.offset).
-				Debug("all statements already processed")
-		}
+		h.log().WithField("statements_count", len(statements)).
+			WithField("position", currentState.position).
+			WithField("offset", currentState.offset).
+			Debug("all statements already processed")
 
 		return nil, false, nil
 	}
@@ -680,27 +663,7 @@ func skipPreviouslyReducedStatements(statements []*Statement, currentState *stat
 			return i
 		}
 	}
-
-	// If no exact match found, look for the last statement at a position less than current
-	// This handles edge cases where exact match isn't found due to race conditions
-	lastValidIndex := -1
-	for i, statement := range statements {
-		switch {
-		case statement.Position.LessThan(currentState.position):
-			lastValidIndex = i
-		case statement.Position.Equal(currentState.position):
-			// If we're at the same position but couldn't find exact match,
-			// skip based on offset to prevent infinite loops
-			if statement.offset <= currentState.offset {
-				lastValidIndex = i
-			}
-		default:
-			// Statements are ordered, so we can break when we exceed current position
-			return lastValidIndex
-		}
-	}
-
-	return lastValidIndex
+	return -1
 }
 
 func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, statements []*Statement) (lastProcessedIndex int, err error) {
