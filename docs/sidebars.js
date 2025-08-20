@@ -531,6 +531,12 @@ module.exports = {
             },
           ],
         },
+        {
+          type: "category",
+          label: "SCIM v2.0",
+          collapsed: true,
+          items: ["guides/integrate/scim-okta-guide"],
+        },
       ],
     },
     {
