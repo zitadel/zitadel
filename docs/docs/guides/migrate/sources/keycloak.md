@@ -1,305 +1,253 @@
 ---
+
 title: Migrate from Keycloak
 sidebar_label: From Keycloak
 ---
 
-## Migrating from Keycloak to ZITADEL
+## 1. Introduction
 
-This guide will use [Docker installation](https://www.docker.com/) to run Keycloak and ZITADEL. However, both Keycloak and ZITADEL offer different installation methods. As a result, this guide won't include any required production tuning or security hardening for either system. However, it's advised you follow [recommended guidelines](/docs/self-hosting/manage/production) before putting those systems into production. You can skip setting up Keycloak and ZITADEL if you already have running instances.  
+This guide will walk you through the steps to migrate users from **Keycloak** to **ZITADEL**, including password hashes, using the `zitadel-tools` CLI and the user import APIs.
 
-## Set up Keycloak
-### Run Keycloak
+**What you'll learn with this guide**
 
-To begin setting up Keycloak, you need to refer to the official [Keycloak Docker image](https://www.keycloak.org/getting-started/getting-started-docker). You'll use it to run a development version of the Keycloak server on your local machine:
+* How to export users from Keycloak
+* Use of the ZITADEL migration tooling
+* Performing the user import via ZITADEL's API
+* Troubleshooting and validating the migration
 
+---
 
-```bash
-docker run -d -p 8081:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:22.0.1 start-dev
-```
+## 2. Prerequisites
 
-In a few seconds, Keycloak will be available at [http://localhost:8081](http://localhost:8081). Access the **Administration Console** via the username `admin` and password `admin`:
+### 2.1. Install Go
 
-<img src="/docs/img/guides/migrate/keycloak-01.png" alt="Migrating users from Keycloak to ZITADEL"/>
+The migration tool is written in Go. Download and install the latest version of Go from the [official Go website](https://go.dev/doc/install).
 
-<img src="/docs/img/guides/migrate/keycloak-02.png" alt="Migrating users from Keycloak to ZITADEL"/>
+### 2.2. Create a ZITADEL Instance and Organization
 
+You'll need a target organization in ZITADEL to import your users. You can create a new organization or use an existing one.
 
-### Create a realm in Keycloak 
+If you don't have a ZITADEL instance, you can [sign up for free here](https://zitadel.com) to create a new one for you.
+See: [Managing Organizations in ZITADEL](https://zitadel.com/docs/guides/manage/console/organizations).
 
-In order to configure Keycloak as the identity provider for your application, you need to create a new realm. This will allow users and authentication resources to be isolated from any other Keycloak usage. Click on the sidebar drop-down menu and select **Create Realm**. Then input the desired realm name and click **Create**:
+> **Note:** Copy your Organization ID (Resource ID) since you will use the id in the later steps.
 
-<img src="/docs/img/guides/migrate/keycloak-03.png" alt="Migrating users from Keycloak to ZITADEL"/>
+---
 
-<img src="/docs/img/guides/migrate/keycloak-04.png" alt="Migrating users from Keycloak to ZITADEL"/>
+## 3. Exporting User Data from Keycloak
 
-<img src="/docs/img/guides/migrate/keycloak-05.png" alt="Migrating users from Keycloak to ZITADEL"/>
+### 3.1. Set up Keycloak Locally (Optional)
 
-
-### Create user in Keycloak
-
-The last thing you need to do in Keycloak is to create at least one new user. This user will be able to log into your application.
-
-On the menu on the left, select **Users**, and click **Add user**. Fill in the username, email, and first and last names, and mark the email as verified. Click on **Create** to create a new user:
-
-<img src="/docs/img/guides/migrate/keycloak-11.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-<img src="/docs/img/guides/migrate/keycloak-12.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-<img src="/docs/img/guides/migrate/keycloak-13.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Now you should attach a password to this user. Select the **Credentials** tab and click **Set password**.
-
-<img src="/docs/img/guides/migrate/keycloak-14.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
- On the new modal panel, input the desired password and select **Save**.
-
-<img src="/docs/img/guides/migrate/keycloak-15.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-<img src="/docs/img/guides/migrate/keycloak-16.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-### Export Keycloak users
-
-Keycloak provides an [export](https://www.keycloak.org/server/importExport) functionality that allows user information to be extracted into JSON files. While it's intended to be used in another Keycloak instance, you can manipulate it to export users to a different user management system.
-
-For example, in order to generate the export files with Keycloak, you will need to enter the Docker container, run the export command, and copy it outside the container:
+To run a local development Keycloak instance, use the official Docker image:
 
 ```bash
-# Recover the Container ID for Keycloak
-docker ps
-
-# Run the export command inside the Keycloak container
-# use the container ID of Keycloak
-docker exec  <keycloak container ID>  /opt/keycloak/bin/kc.sh export --dir /tmp
-
-# copy generated files from docker container to local machine
-docker cp <keycloak container ID>:/tmp/my-realm-users-0.json .
+docker run -d -p 8081:8080 \
+  -e KEYCLOAK_ADMIN=admin \
+  -e KEYCLOAK_ADMIN_PASSWORD=admin \
+  quay.io/keycloak/keycloak:22.0.1 start-dev
 ```
 
-## Set up ZITADEL
+### 3.2. Export Users from Keycloak
 
-After creating a sample application that connects to Keycloak, you need to set up ZITADEL in order to migrate the application and users from Keycloak to ZITADEL. For this, ZITADEL offers a [Docker Compose](/docs/self-hosting/deploy/compose) installation guide. Follow the instructions under the [Docker compose](/docs/self-hosting/deploy/compose#docker-compose) section to run a ZITADEL instance locally. 
-
-Next, the application will be available at [http://localhost:8080/ui/console/](http://localhost:8080/ui/console/).
-
-<img src="/docs/img/guides/migrate/keycloak-22.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Now you can access the console with the following default credentials:
-
-* **Username**: `zitadel-admin@zitadel.localhost`
-* **Password**: `Password1!`
-
-
-## Import Keycloak users into ZITADEL
-
-As explained in this [ZITADEL user migration guide](/docs/guides/migrate/users), you can import users individually or in bulk. Since we are looking at importing a single user from Keycloak, migrating that individual user to ZITADEL can be done with the [ImportHumanUser](/docs/apis/resources/mgmt/management-service-import-human-user) endpoint. 
-
-> With this endpoint, an email will only be sent to the user if the email is marked as not verified or if there's no password set.
-
-### Create a service user to consume ZITADEL API
-
-But first of all, in order to use this ZITADEL API, you need to create a [service user](/docs/guides/integrate/service-users/authenticate-service-users#exercise-create-a-service-user). 
-
-Go to the **Users** menu and select the **Service Users** tab. And click the **+ New** button. 
-
-<img src="/docs/img/guides/migrate/keycloak-39.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Fill in the details of the service user and click **Create**. 
-
-<img src="/docs/img/guides/migrate/keycloak-40.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Your service user is now created and listed. 
-
-<img src="/docs/img/guides/migrate/keycloak-41.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-### Provide 'Org Owner' permissions to the service user
-
-This service user needs to have elevated permissions in order to import users. For this example, you should make the service user an organization owner as explained in [this guide](/docs/guides/integrate/zitadel-apis/access-zitadel-apis#add-org_owner-to-service-user). 
-
-Let's change the permissions as follows: 
-
-Click on the button shown in the image below:
-
-<img src="/docs/img/guides/migrate/keycloak-42.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-Next, select your service user that you created and select the **Org Owner** checkbox to assign the permissions of an organization owner to the service user.  
-
-<img src="/docs/img/guides/migrate/keycloak-43.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-### Generate an access token for the service user
-
-In order for the service user to access the API, they must be able to authenticate themselves. To authenticate the user, you can use either [JWT with Private Key](/docs/guides/integrate/service-users/authenticate-service-users#authenticating-a-service-user) flow (recommended for production) or [Personal Access Tokens](/docs/guides/integrate/service-users/personal-access-token)(PAT). In this guide, we will choose the latter. 
-
-Go to **Users** -> **Service Users** again and click on the service user, then select **Personal Access Tokens** on the left and click the **+ New** button. Copy the generated personal access token to use it later.  Click **Close** after copying the PAT. 
-
-<img src="/docs/img/guides/migrate/keycloak-44.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-### Import user to ZITADEL via ZITADEL API
-
-if your Keycloak Realm has a single user, your `my-realm-users-0.json` file, into which you exported your Keycloak user previously, will look like this:
-
-```js
-{
-  "realm" : "my-realm",
-  "users" : [ {
-    "id" : "826731b2-bf17-4bd9-b45c-6a26c76ddaae",
-    "createdTimestamp" : 1693887631918,
-    "username" : "test-user",
-    "enabled" : true,
-    "totp" : false,
-    "emailVerified" : true,
-    "firstName" : "John",
-    "lastName" : "Doe",
-    "email" : "test-user@mail.com",
-    "credentials" : [ {
-      "id" : "c3f3759e-9d8a-4628-aad9-09e66f28a4e2",
-      "type" : "password",
-      "userLabel" : "My password",
-      "createdDate" : 1693888572700,
-      "secretData" : "{\"value\":\"ng6oDRung/pBLayd5ro7IU3mL/p86pg3WvQNQc+N1Eg=\",\"salt\":\"RaXjs4RiUKgJGkX6kp277w==\",\"additionalParameters\":{}}",
-      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
-    } ],
-    "disableableCredentialTypes" : [ ],
-    "requiredActions" : [ ],
-    "realmRoles" : [ "default-roles-my-realm" ],
-    "notBefore" : 0,
-    "groups" : [ ]
-  } ]
-}
-```
-
-Now, you need to transform the JSON to the ZITADEL data format by adhering to the ZITADEL API [specification](/docs/apis/resources/mgmt/management-service-import-human-user) to import a user. The minimal format would be as shown below: 
-
-```js 
-{
-    "userName": "test-user",
-    "profile": {
-        "firstName": "John",
-        "lastName": "Doe"
-    },
-    "email": {
-        "email": "test-user@mail.com",
-        "isEmailVerified": true
-    },
-    "hashedPassword": {
-        "value": "$pbkdf2-sha256$27500$RaXjs4RiUKgJGkX6kp277w==$ng6oDRung/pBLayd5ro7IU3mL/p86pg3WvQNQc+N1Eg="
-    }
-}
-     
-```
-
-Next, you must install [`zitadel-tools`](https://github.com/zitadel/zitadel-tools/tree/main), which is a utility toolset designed to facilitate various interactions with the ZITADEL platform, mainly with tasks related to authentication, authorization, and data migration. We will be using the `migrate` command:
-
-Purpose: Assists users in transforming exported data from other identity providers to be compatible with Zitadel's import schema.
-Supported Providers: Currently, migrations from Auth0 and Keycloak are supported.
-Usage: Users can get a list of available sub-commands and flags with the --help flag.
-
-Install `zitadel-tools` using the command below. Ensure you have Go already installed on your machine. 
+Run the following command inside the Keycloak container to export your realm and users:
 
 ```bash
-go install github.com/zitadel/zitadel-tools@main
+docker exec <container_name> \
+  /opt/keycloak/bin/kc.sh export \
+  --dir /tmp/export \
+  --realm <your_realm_name> \
+  --users realm_file
 ```
 
-Now you can run the migration tool for Keycloak as explained in this [guide](https://github.com/zitadel/zitadel-tools/blob/main/cmd/migration/keycloak/readme.md). Let's go through the steps: 
-
-The Keycloak migration tool facilitates the transfer of data to ZITADEL by creating a JSON file tailored to serve as the body for an import request to the ZITADEL API. Note that it's essential that an organization already exists within ZITADEL/
-
-To perform the migration, you'll need:
-
-- The organization ID (--org)
-- A realm.json file (in our case, `my-realm-users-0.json`) that houses your exported Keycloak realm with user details (--realm). 
-- Output path via --output (default: ./importBody.json)
-- Timeout duration for the data import request using --timeout (default: 30 minutes)
-- Pretty printing the output JSON with --multiline.
-
-Execute with: 
+Then copy the exported file to your host machine:
 
 ```bash
-zitadel-tools migrate keycloak --org=<organisation id> --realm=./realm.json --output=./importBody.json --timeout=1h --multiline
+docker cp <container_name>:/tmp/export/<your_realm_name>-realm.json .                                                                                                                       
 ```
 
-Example: 
+This creates a file such as:
+
+```
+<your_realm_name>-realm.json
+```
+
+---
+
+## 4. Running the ZITADEL Migration Tool
+
+### 4.1. Install the Migration Tool
+
+Follow the installation instructions to set up the ZITADEL migration tool from [ZITADEL Tools](https://github.com/zitadel/zitadel-tools?tab=readme-ov-file#installation).
+
+### 4.2. Generate Import JSON
+
+Use the migration tool to convert the Keycloak realm export into a ZITADEL-compatible JSON file:
 
 ```bash
-zitadel-tools migrate keycloak --org=233868910057750531 --realm=./my-realm-users-0.json --output=./importBody.json --timeout=1h --multiline
+zitadel-tools migrate keycloak \
+  --org=<ORG_ID> \
+  --realm=<your_realm_name>-realm.json \
+  --output=./importBody.json \
+  --timeout=5m0s \
+  --multiline
 ```
 
-Ensure `my-realm-users-0.json` is in the same directory for the tool to process it, or provide the path to the file. 
+The tool will generate `importBody.json`, which is ready for importing into ZITADEL.
 
-`importBody.json` will now contain the transformed data as shown below: 
+---
 
+## 5. Importing Users into ZITADEL
+
+### 5.1. Obtain Access Token (or PAT) for API Access
+
+To call the ZITADEL Management API, you need to authenticate using a **Service User** with the `IAM_OWNER` Manager permissions.
+
+There are two recommended authentication methods:
+
+* **Client Credentials Flow**
+  [Learn how to authenticate with client credentials.](https://zitadel.com/docs/guides/integrate/service-users/client-credentials)
+
+* **Personal Access Token (PAT)**
+  [Learn how to create and use a PAT.](https://zitadel.com/docs/guides/integrate/service-users/personal-access-token)
+
+**Reference:** [Service Users & API Authentication](https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users#authentication-methods)
+
+---
+
+### 5.2. Import Data with the ZITADEL API
+
+Use your **access token** or **PAT** to authenticate, then call the [Management API – Human User Import](https://zitadel.com/docs/apis/resources/admin/admin-service-import-data) endpoint.
+
+**Import Endpoint:**
+
+* `POST /admin/v1/import`
+* `Authorization: Bearer <token>`
+* **Body:** Generated in step 4.2
+
+#### Example cURL request
+
+```bash
+curl --request POST \
+  --url https://<instance-domain>/admin/v1/import \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer <token>' \
+  --data @importBody.json
+```
+
+Successful Response:
 ```bash
 {
-  "dataOrgs": {
+  "success": {
     "orgs": [
       {
-        "orgId": "233868910057750531",
-        "humanUsers": [
-          {
-            "userId": "826731b2-bf17-4bd9-b45c-6a26c76ddaae",
-            "user": {
-              "userName": "test-user",
-              "profile": {
-                "firstName": "John",
-                "lastName": "Doe"
-              },
-              "email": {
-                "email": "test-user@mail.com",
-                "isEmailVerified": true
-              },
-              "hashedPassword": {
-                "value": "$pbkdf2-sha256$27500$RaXjs4RiUKgJGkX6kp277w==$ng6oDRung/pBLayd5ro7IU3mL/p86pg3WvQNQc+N1Eg="
-              }
-            }
-          }
+        "orgId": "318900732864567390",
+        "humanUserIds": [
+          "da72ac13-6994-4498-8b27-3ff9555661b2",
+          "4e987a01-34db-4393-b61c-1ce753baf69c",
+          "1041d710-8a89-48f8-85b5-1ab9656190f3",
+          "7b23b799-4f0f-4964-bc6d-95c534787d2c",
+          "6f2f1b2f-b292-4431-932b-620124e065ec",
+          "2c65045a-9de8-4d28-b686-b27bf3a70fc3",
+          "aca2dd3e-689c-4ab6-b446-0990127b1e0d",
+          "18a23e01-f0fe-443f-9f1c-2a8135cd22c2",
+          "c49af4bf-0dbb-4994-b453-b8dd0d5006ea"
         ]
       }
     ]
   },
-  "timeout": "1h0m0s"
+  "errors": [
+    {
+      "type": "org",
+      "id": "318900732864567390",
+      "message": "ID=ORG-lapo2m Message=Errors.Org.AlreadyExisting"
+    }
+  ]
 }
 ```
 
-Now copy the following portion to a separate file and name the file `zitadel-users-file.json`.
+ℹ️ Note: The above response indicates that the organization already existed, and users were successfully added. This is not an error, and you can consider the import successful as long as the HTTP status code is **200**.
 
+---
+
+## 6. Testing the Migration
+
+### 6.1. Test User Login
+
+Use the **ZITADEL login page** or your integrated app to test logging in with one of the imported users.
+
+Confirm that the migrated password works as expected.
+
+---
+
+### 6.2. Troubleshooting
+
+**Common issues:**
+
+* Invalid Keycloak export format
+* Malformed JSON
+* Missing `orgId` or access token
+* Timeout exceeded during import
+
+The import API returns a detailed response with any errors encountered during the process.
+
+#### Where to check logs and get help
+
+You can verify that users were imported successfully by querying the **events API** and looking for the `user.human.added` event type.
+
+Use the following request:
+
+```bash
+curl --location 'https://<instance-domain>/admin/v1/events/_search' \
+--header 'Authorization: Bearer <token>' \
+--header 'Content-Type: application/json' \
+--data '{
+  "asc": true,
+  "limit": 1000,
+  "event_types": [
+    "user.human.added"
+  ]
+}'
+```
+
+This will return a list of user creation events including details such as email, username, and hashed password to help you confirm the imported data.
+ 
+Successful Response
 ```bash
 {
-  "userName": "test-user",
-  "profile": {
-    "firstName": "John",
-    "lastName": "Doe"
-  },
-  "email": {
-    "email": "test-user@mail.com",
-    "isEmailVerified": true
-  },
-  "hashedPassword": {
-    "value": "$pbkdf2-sha256$27500$RaXjs4RiUKgJGkX6kp277w==$ng6oDRung/pBLayd5ro7IU3mL/p86pg3WvQNQc+N1Eg="
-  }
+  "events": [
+    {
+      "type": {
+        "type": "user.human.added",
+        "localized": {
+          "key": "EventTypes.user.human.added",
+          "localizedMessage": "Person added"
+        }
+      },
+      "payload": {
+        "displayName": "test user",
+        "email": "testuser@gmail.com",
+        "userName": "testuser"
+      },
+      "aggregate": {
+        "id": "da72ac13-6994-4498-8b27-3ff9555661b2",
+        "resourceOwner": "318900732864567390"
+      },
+      "creationDate": "2025-07-22T15:16:06.364302Z"
+    }
+  ]
 }
 ```
 
-Now that we have the user details in the required JSON format, let’s call the ZITADEL API to add the user. 
+ℹ️ Note: If you see entries with "type": "user.human.added" and correct payload data, the import was successful.
 
-Run the following cURL command to invoke the API and don't forget to replace `<service user access token>` with the service user's personal access token: 
+---
 
-```bash
-curl --request POST \
- --url http://localhost:8080/management/v1/users/human/_import \
- --header 'Content-Type: application/json' \
- --header 'Authorization: Bearer <service user access token>' \
- --data @zitadel-users-file.json
-```
+## 7. Q&A and Further Resources
 
-A successful response would be as shown below: 
+### Real-World Scenarios & Common Questions
 
-<img src="/docs/img/guides/migrate/keycloak-46.png" alt="Migrating users from Keycloak to ZITADEL"/>
+**Q:** What is the maximum number of users that can be imported in a single batch?  
+**A:** There is no hard limit on the number of users. However, there is a **timeout**.  
+For **ZITADEL Cloud deployments**, the timeout is **5 minutes**, which typically allows for importing around **5,000 users per batch**.
 
-> Note that the previous request imports a single user. If you're using ZITADEL Cloud and have a large number of users, you may hit its rate limit or may need to pay the excess number of API requests. If you experience this, reach out to the [ZITADEL support team](https://zitadel.com/contact), as they can provide an alternative migration tools to move a large number of users.
-
-
-Now you have imported the Keycloak user into ZITADEL. To view your user go to [http://localhost:8080/ui/console/users](http://localhost:8080/ui/console/users) (or go to the **Users** tab to see the users). 
-
-<img src="/docs/img/guides/migrate/keycloak-47.png" alt="Migrating users from Keycloak to ZITADEL"/>
-
-
-You can now view the Keycloak user's details in ZITADEL. You can see that the password is available too. 
+---
