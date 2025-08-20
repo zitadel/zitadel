@@ -56,7 +56,7 @@ The comments give context to the used variables and show examples for commonly u
     <CodeBlock language="yaml">{DockerComposeSource}</CodeBlock>
 </details>
 
-Here are some natural steps forward to go from your current setup to production:
+Here are some natural steps forward to go from the current setup to production:
 
 - **Use a different master key**: Set up an instance from scratch and use a different master key. For example, generate one by running `tr -dc A-Za-z0-9 </dev/urandom | head -c 32`
 - **Use files for secrets instead of environment variables, and don't commit them to Git**: Learn how to [configure your platform](/docs/self-hosting/manage/configure)
