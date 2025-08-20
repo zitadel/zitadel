@@ -1633,8 +1633,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Ha a zászló engedélyezve van, képes leszel egyetlen munkamenetet megszüntetni a bejelentkezési UI-ben, ha egy id_tokent biztosítasz egy `sid` claim-mel mint id_token_hint az end_session végpontnál. Megjegyzendő, hogy jelenleg az összes munkamenet ugyanabból a felhasználói ügynökből (böngésző) leállításra kerül a bejelentkezési UI-ben. A Session API-val kezelt munkamenetek már lehetővé teszik egyes munkamenetek megszüntetését.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Ha a zászló engedélyezve van, az OIDC szülő hiba naplózva lesz a konzolban.",
-      "DISABLEUSERTOKENEVENT": "Felhasználói token esemény letiltása",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout engedélyezése",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "A Back-Channel Logout megvalósítja az OpenID Connect Back-Channel Logout 1.0-t, és használható az ügyfelek értesítésére a munkamenet befejezéséről az OpenID szolgáltatónál.",
       "PERMISSIONCHECKV2": "Engedély ellenőrzés V2",
