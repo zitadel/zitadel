@@ -29,7 +29,6 @@ func (s *Server) clientCredentialsAuth(ctx context.Context, clientID, clientSecr
 	updated, err := s.hasher.Verify(user.Machine.EncodedSecret, clientSecret)
 	spanPasswordComparison.EndWithError(err)
 	if err != nil {
-		s.command.MachineSecretCheckFailed(ctx, user.ID, user.ResourceOwner)
 		return nil, zerrors.ThrowInvalidArgument(err, "OIDC-VoXo6", "Errors.User.Machine.Secret.Invalid")
 	}
 

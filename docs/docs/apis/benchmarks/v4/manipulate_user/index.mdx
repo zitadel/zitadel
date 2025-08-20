@@ -1,0 +1,105 @@
+---
+title: manipulate user benchmark of zitadel v4
+sidebar_label: manipulate user
+---
+
+Benchmark results of v4 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value |
+|:--------------------------------------|:------|
+| Baseline                              | none  |
+| Purpose                               | Test current performance |
+| Test start                            | 15:07 UTC |
+| Test duration                         | 30min |
+| Executed test                         | manipulate\_user |
+| k6 version                            | v1.0.0-rc1 |
+| VUs                                   | 600 |
+| Client location                       | US1 |
+| ZITADEL location                      | US1 |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7 |
+| ZITADEL Version                       | v4.0.0-rc2 |
+| ZITADEL feature flags                 | webKey: true, improvedPerformance: \[\"IMPROVED\_PERFORMANCE\_ORG\_BY\_ID\", \"IMPROVED\_PERFORMANCE\_PROJECT\", \"IMPROVED\_PERFORMANCE\_USER\_GRANT\", \"IMPROVED\_PERFORMANCE\_ORG\_DOMAIN\_VERIFIED\", \"IMPROVED\_PERFORMANCE\_PROJECT\_GRANT\"\] |
+| Database                              | type: psql<br />version: v17.4 |
+| Database location                     | US1 |
+| Database specification                | vCPU: 8<br/> memory: 32Gib |
+| ZITADEL metrics during test           |  |
+| Observed errors                       |  |
+| Top 3 most expensive database queries | 1: query events by instance id, aggregate types, event types, position<br/>2: write events<br/>3: query user by id<br/> |
+| k6 Iterations per second              | 16 |
+| k6 output                             | [output](#k6-output) |
+| flowchart outcome                     |  |
+
+## Endpoint latencies
+
+Each iteration creates, updates and deletes a user.
+
+import OutputSource from "./output.json";
+
+import { BenchmarkChart } from '/src/components/benchmark_chart';
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output {#k6-output}
+
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......................: 199261 108.759178/s
+    checks_succeeded...................: 57.15% 113882 out of 199261
+    checks_failed......................: 42.84% 85379 out of 199261
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✗ create user is status ok
+      ↳  99% — ✓ 28528 / ✗ 4
+    ✗ update user is status ok
+      ↳  25% — ✓ 28469 / ✗ 85359
+    ✗ lock user is status ok
+      ↳  99% — ✓ 28460 / ✗ 8
+    ✗ delete user is status ok
+      ↳  99% — ✓ 28412 / ✗ 8
+    ✓ org removed
+
+    CUSTOM
+    delete_user_duration....................................................: min=109.24ms avg=3.48s    max=1m0s     p(50)=2s       p(95)=7.65s    p(99)=9.78s   
+    lock_user_duration......................................................: min=77.95ms  avg=2.7s     max=1m0s     p(50)=1.1s     p(95)=6.36s    p(99)=7.86s   
+    login_ui_enter_login_name_duration......................................: min=175.39ms avg=175.39ms max=175.39ms p(50)=175.39ms p(95)=175.39ms p(99)=175.39ms
+    login_ui_enter_password_duration........................................: min=34.12ms  avg=34.12ms  max=34.12ms  p(50)=34.12ms  p(95)=34.12ms  p(99)=34.12ms 
+    login_ui_init_login_duration............................................: min=100.5ms  avg=100.5ms  max=100.5ms  p(50)=100.5ms  p(95)=100.5ms  p(99)=100.5ms 
+    login_ui_token_duration.................................................: min=154.05ms avg=154.05ms max=154.05ms p(50)=154.05ms p(95)=154.05ms p(99)=154.05ms
+    org_create_org_duration.................................................: min=71.03ms  avg=71.03ms  max=71.03ms  p(50)=71.03ms  p(95)=71.03ms  p(99)=71.03ms 
+    update_human_duration...................................................: min=70.77ms  avg=2.43s    max=1m0s     p(50)=807.73ms p(95)=5.99s    p(99)=7.36s   
+    user_create_human_duration..............................................: min=503.01ms avg=3.69s    max=1m0s     p(50)=2.07s    p(95)=7.66s    p(99)=13.98s  
+
+    HTTP
+    http_req_duration.......................................................: min=34.12ms  avg=7.64s    max=1m0s     p(50)=4.07s    p(95)=32.29s   p(99)=41.1s   
+      { expected_response:true }............................................: min=34.12ms  avg=7.63s    max=54.32s   p(50)=4.07s    p(95)=32.26s   p(99)=41.03s  
+    http_req_failed.........................................................: 0.02%  31 out of 142384
+    http_reqs...............................................................: 142384 77.714991/s
+
+    EXECUTION
+    iteration_duration......................................................: min=17.1s    avg=38.22s   max=1m30s    p(50)=36.76s   p(95)=58.22s   p(99)=1m7s    
+    iterations..............................................................: 28434  15.519637/s
+    vus.....................................................................: 0      min=0            max=600
+    vus_max.................................................................: 600    min=600          max=600
+
+    NETWORK
+    data_received...........................................................: 82 MB  45 kB/s
+    data_sent...............................................................: 26 MB  14 kB/s
+
+running (30m32.1s), 000/600 VUs, 28434 complete and 98 interrupted iterations
+default ✓ [======================================] 600 VUs  30m0s
+```
+
