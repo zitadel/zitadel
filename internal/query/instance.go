@@ -626,7 +626,7 @@ func (c *Caches) registerInstanceInvalidation() {
 
 type instanceIndex int
 
-//go:generate enumer -type instanceIndex -linecomment
+//go:generate go tool github.com/dmarkham/enumer -type instanceIndex -linecomment
 const (
 	// Empty line comment ensures empty string for unspecified value
 	instanceIndexUnspecified instanceIndex = iota //

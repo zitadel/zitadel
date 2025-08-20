@@ -1,6 +1,6 @@
 package domain
 
-//go:generate enumer -type CountParentType -transform lower -trimprefix CountParentType -sql
+//go:generate go tool github.com/dmarkham/enumer -type CountParentType -transform lower -trimprefix CountParentType -sql
 type CountParentType int
 
 const (

@@ -1,6 +1,6 @@
 package domain
 
-//go:generate enumer -type SecretGeneratorType -transform snake -trimprefix SecretGeneratorType
+//go:generate go tool github.com/dmarkham/enumer -type SecretGeneratorType -transform snake -trimprefix SecretGeneratorType
 type SecretGeneratorType int32
 
 const (

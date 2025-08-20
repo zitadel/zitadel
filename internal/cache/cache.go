@@ -11,7 +11,7 @@ import (
 // Purpose describes which object types are stored by a cache.
 type Purpose int
 
-//go:generate enumer -type Purpose -transform snake -trimprefix Purpose
+//go:generate go tool github.com/dmarkham/enumer -type Purpose -transform snake -trimprefix Purpose
 const (
 	PurposeUnspecified Purpose = iota
 	PurposeAuthzInstance
