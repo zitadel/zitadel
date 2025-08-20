@@ -9,7 +9,7 @@ import (
 type Key int
 
 const (
-	// Reserved: 2, 3, 6, 8
+	// Reserved: 2, 3, 6, 8, 11
 
 	KeyUnspecified                    Key = 0
 	KeyLoginDefaultOrg                Key = 1
@@ -18,7 +18,6 @@ const (
 	KeyImprovedPerformance            Key = 7
 	KeyDebugOIDCParentError           Key = 9
 	KeyOIDCSingleV1SessionTermination Key = 10
-	KeyDisableUserTokenEvent          Key = 11
 	KeyEnableBackChannelLogout        Key = 12
 	KeyLoginV2                        Key = 13
 	KeyPermissionCheckV2              Key = 14
@@ -57,12 +56,13 @@ type Features struct {
 type ImprovedPerformanceType int32
 
 const (
-	ImprovedPerformanceTypeUnspecified ImprovedPerformanceType = iota
-	ImprovedPerformanceTypeOrgByID
-	ImprovedPerformanceTypeProjectGrant
-	ImprovedPerformanceTypeProject
-	ImprovedPerformanceTypeUserGrant
-	ImprovedPerformanceTypeOrgDomainVerified
+	// Reserved: 1
+
+	ImprovedPerformanceTypeUnspecified       ImprovedPerformanceType = 0
+	ImprovedPerformanceTypeProjectGrant      ImprovedPerformanceType = 2
+	ImprovedPerformanceTypeProject           ImprovedPerformanceType = 3
+	ImprovedPerformanceTypeUserGrant         ImprovedPerformanceType = 4
+	ImprovedPerformanceTypeOrgDomainVerified ImprovedPerformanceType = 5
 )
 
 func (f Features) ShouldUseImprovedPerformance(typ ImprovedPerformanceType) bool {

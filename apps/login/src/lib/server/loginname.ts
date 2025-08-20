@@ -201,35 +201,21 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     });
 
     // compare with the concatenated suffix when set
-    const concatLoginname = command.suffix
-      ? `${command.loginName}@${command.suffix}`
-      : command.loginName;
+    const concatLoginname = command.suffix ? `${command.loginName}@${command.suffix}` : command.loginName;
 
-    const humanUser =
-      potentialUsers[0].type.case === "human"
-        ? potentialUsers[0].type.value
-        : undefined;
+    const humanUser = potentialUsers[0].type.case === "human" ? potentialUsers[0].type.value : undefined;
 
     // recheck login settings after user discovery, as the search might have been done without org scope
-    if (
-      userLoginSettings?.disableLoginWithEmail &&
-      userLoginSettings?.disableLoginWithPhone
-    ) {
+    if (userLoginSettings?.disableLoginWithEmail && userLoginSettings?.disableLoginWithPhone) {
       if (user.preferredLoginName !== concatLoginname) {
         return { error: "User not found in the system!" };
       }
     } else if (userLoginSettings?.disableLoginWithEmail) {
-      if (
-        user.preferredLoginName !== concatLoginname ||
-        humanUser?.phone?.phone !== command.loginName
-      ) {
+      if (user.preferredLoginName !== concatLoginname || humanUser?.phone?.phone !== command.loginName) {
         return { error: "User not found in the system!" };
       }
     } else if (userLoginSettings?.disableLoginWithPhone) {
-      if (
-        user.preferredLoginName !== concatLoginname ||
-        humanUser?.email?.email !== command.loginName
-      ) {
+      if (user.preferredLoginName !== concatLoginname || humanUser?.email?.email !== command.loginName) {
         return { error: "User not found in the system!" };
       }
     }
@@ -270,11 +256,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
 
       if (command.organization || session.factors?.user?.organizationId) {
-        params.append(
-          "organization",
-          command.organization ??
-            (session.factors?.user?.organizationId as string),
-        );
+        params.append("organization", command.organization ?? (session.factors?.user?.organizationId as string));
       }
 
       return { redirect: `/verify?` + params };
@@ -286,8 +268,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         case AuthenticationMethodType.PASSWORD: // user has only password as auth method
           if (!userLoginSettings?.allowUsernamePassword) {
             return {
-              error:
-                "Username Password not allowed! Contact your administrator for more information.",
+              error: "Username Password not allowed! Contact your administrator for more information.",
             };
           }
 
@@ -298,10 +279,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           // TODO: does this have to be checked in loginSettings.allowDomainDiscovery
 
           if (command.organization || session.factors?.user?.organizationId) {
-            paramsPassword.append(
-              "organization",
-              command.organization ?? session.factors?.user?.organizationId,
-            );
+            paramsPassword.append("organization", command.organization ?? session.factors?.user?.organizationId);
           }
 
           if (command.requestId) {
@@ -315,8 +293,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
           if (userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED) {
             return {
-              error:
-                "Passkeys not allowed! Contact your administrator for more information.",
+              error: "Passkeys not allowed! Contact your administrator for more information.",
             };
           }
 
@@ -328,13 +305,19 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           }
 
           if (command.organization || session.factors?.user?.organizationId) {
-            paramsPasskey.append(
-              "organization",
-              command.organization ?? session.factors?.user?.organizationId,
-            );
+            paramsPasskey.append("organization", command.organization ?? session.factors?.user?.organizationId);
           }
 
           return { redirect: "/passkey?" + paramsPasskey };
+
+        case AuthenticationMethodType.IDP:
+          const resp = await redirectUserToIDP(userId);
+
+          if (resp?.error) {
+            return { error: resp.error };
+          }
+
+          return resp;
       }
     } else {
       // prefer passkey in favor of other methods
@@ -349,20 +332,13 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         }
 
         if (command.organization || session.factors?.user?.organizationId) {
-          passkeyParams.append(
-            "organization",
-            command.organization ?? session.factors?.user?.organizationId,
-          );
+          passkeyParams.append("organization", command.organization ?? session.factors?.user?.organizationId);
         }
 
         return { redirect: "/passkey?" + passkeyParams };
-      } else if (
-        methods.authMethodTypes.includes(AuthenticationMethodType.IDP)
-      ) {
+      } else if (methods.authMethodTypes.includes(AuthenticationMethodType.IDP)) {
         return redirectUserToIDP(userId);
-      } else if (
-        methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)
-      ) {
+      } else if (methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)) {
         // user has no passkey setup and login settings allow passkeys
         const paramsPasswordDefault = new URLSearchParams({
           loginName: session.factors?.user?.loginName,
@@ -373,10 +349,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         }
 
         if (command.organization || session.factors?.user?.organizationId) {
-          paramsPasswordDefault.append(
-            "organization",
-            command.organization ?? session.factors?.user?.organizationId,
-          );
+          paramsPasswordDefault.append("organization", command.organization ?? session.factors?.user?.organizationId);
         }
 
         return {
@@ -387,19 +360,13 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   }
 
   // user not found, check if register is enabled on instance / organization context
-  if (
-    loginSettingsByContext?.allowRegister &&
-    !loginSettingsByContext?.allowUsernamePassword
-  ) {
+  if (loginSettingsByContext?.allowRegister && !loginSettingsByContext?.allowUsernamePassword) {
     const resp = await redirectUserToSingleIDPIfAvailable();
     if (resp) {
       return resp;
     }
     return { error: "User not found in the system" };
-  } else if (
-    loginSettingsByContext?.allowRegister &&
-    loginSettingsByContext?.allowUsernamePassword
-  ) {
+  } else if (loginSettingsByContext?.allowRegister && loginSettingsByContext?.allowUsernamePassword) {
     let orgToRegisterOn: string | undefined = command.organization;
 
     if (
@@ -416,8 +383,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         serviceUrl,
         domain: suffix,
       });
-      const orgToCheckForDiscovery =
-        orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
+      const orgToCheckForDiscovery = orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
       const orgLoginSettings = await getLoginSettings({
         serviceUrl,
