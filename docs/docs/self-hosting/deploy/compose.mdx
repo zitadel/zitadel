@@ -25,13 +25,13 @@ The setup is likely to work with other software versions too, but it is tested a
 
 ## Docker compose
 
-By executing the commands below, you will download the following file:
+The following commands set up services for a PostgreSQL database, a Zitadel API and a Zitadel login:
 
 1. Download the `docker-compose.yaml` file from the Zitadel repository:
    ```shell
    curl -L https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose.yaml -o docker-compose.yaml
    ```
-2. Make sure you have the latest image versions.
+2. Make sure the containers use the latest image versions.
     ```shell
     docker compose pull
     ```
@@ -39,7 +39,7 @@ By executing the commands below, you will download the following file:
     ```shell
     docker compose up --detach --wait
     ```
-4. Verify your containers are running and healthy.
+4. Verify the containers are running and healthy.
     ```shell
     docker compose ps
     ```
@@ -48,7 +48,7 @@ By executing the commands below, you will download the following file:
 
 ## What's next{#next-steps}
 
-Before proceeding, review the `docker-compose.yaml` file you just downloaded:
+Before proceeding, review the downloaded `docker-compose.yaml` file:
 The comments give context to the used variables and show examples for commonly used configuration variants.
 
 <details>
@@ -59,24 +59,24 @@ The comments give context to the used variables and show examples for commonly u
 Here are some natural steps forward to go from the current setup to production:
 
 - **Use a different master key**: Set up an instance from scratch and use a different master key. For example, generate one by running `tr -dc A-Za-z0-9 </dev/urandom | head -c 32`
-- **Use files for secrets instead of environment variables, and don't commit them to Git**: Learn how to [configure your platform](/docs/self-hosting/manage/configure)
+- **Use files for secrets instead of environment variables, and don't commit them to Git**: Learn how to [configure the platform](/docs/self-hosting/manage/configure)
 - **Run the containers as non-root users**: Remove the `user: "0"` lines from the `docker-compose.yaml` file.
-- **Configure a different external domain or IP**: Beware that the login only works with HTTPS on non-localhost domains. [Run and configure your favorite reverse proxy](/docs/self-hosting/manage/reverseproxy/reverse_proxy)
-- **Serve the API and the UI together on the same port**: [Run and configure your favorite reverse proxy](/docs/self-hosting/manage/reverseproxy/reverse_proxy)
-- **Encrypt Traffic**: [Run and configure your favorite reverse proxy](/docs/self-hosting/manage/reverseproxy/reverse_proxy)
+- **Configure a different external domain or IP**: Beware that the login only works with HTTPS on non-localhost domains. [Run and configure a reverse proxy](/docs/self-hosting/manage/reverseproxy/reverse_proxy)
+- **Serve the API and the UI together on the same port**: [Run and configure a reverse proxy](/docs/self-hosting/manage/reverseproxy/reverse_proxy)
+- **Encrypt Traffic**: [Run and configure a reverse proxy](/docs/self-hosting/manage/reverseproxy/reverse_proxy)
 
 For more detailed recommendations, read the [Zitadel Production Setup Guide](/docs/self-hosting/manage/production).
 
 <details>
-    <summary>Read this if your environment uses the login v1</summary>
+    <summary>Read this if the environment uses the login v1</summary>
     <p>
         The login v2 is the next generation of the Zitadel login.
         Its code and deployment are easily customizable.
         Unlike the login v1, it runs in its own process.
         The login v2 is enabled by default in new installations.
-        But if you've updated your docker-compose.yaml by following this guide,
-        you now have a zitadel-login service running which is actually not doing anything, yet.
-        The following steps guide you to enable the login v2 in your environment.
+        But if an existing `docker-compose.yaml` file is updated by following this guide,
+        an additional `zitadel-login` service is now running which is actually not doing anything, yet.
+        The following steps give guidance on how to enable the login v2 in an environment.
     </p>
     <ol>
         <li>Read the login v2 related comments in the docker-compose.yaml.</li>
