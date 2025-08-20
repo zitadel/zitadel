@@ -200,7 +200,7 @@ func TestServer_AddProjectRole_Permission(t *testing.T) {
 		},
 		func() *test {
 			out := test{
-				name: "added project role as a project added admin, ok",
+				name: "add project role as a added project admin, ok",
 				req: &project.AddProjectRoleRequest{
 					RoleKey:     integration.RoleKey(),
 					DisplayName: integration.RoleDisplayName(),
@@ -510,7 +510,7 @@ func TestServer_UpdateProjectRole_Permission(t *testing.T) {
 		},
 		func() *test {
 			out := test{
-				name: "change project role as a project added admin, ok",
+				name: "change project role as a added project admin, ok",
 				args: args{
 					req: &project.UpdateProjectRoleRequest{
 						DisplayName: gu.Ptr(integration.RoleKey()),
@@ -757,7 +757,6 @@ func TestServer_DeleteProjectRole_Permission(t *testing.T) {
 				wantDeletionDate: true,
 			}
 
-			// out.prepare = func(t *testing.T, request *project.RemoveProjectRoleRequest) {
 			out.prepare = func(t *testing.T, request *project.RemoveProjectRoleRequest) (time.Time, time.Time) {
 				// create project
 				creationDate := time.Now().UTC()
