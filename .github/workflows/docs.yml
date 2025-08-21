@@ -32,8 +32,6 @@ jobs:
         id: cache
         with:
           key: docs-${{ hashFiles('docs', 'proto', '!docs/build', '!docs/node_modules', '!docs/protoc-gen-connect-openapi') }}
-          restore-keys: |
-            docs-
           path: ${{ env.cache_path }}
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         uses: bufbuild/buf-setup-action@v1

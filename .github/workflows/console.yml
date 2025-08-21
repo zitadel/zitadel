@@ -29,8 +29,6 @@ jobs:
         id: cache
         with:
           key: console-${{ hashFiles('console', 'proto', '!console/dist') }}
-          restore-keys: |
-            console-
           path: ${{ env.cache_path }}
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         uses: pnpm/action-setup@v4

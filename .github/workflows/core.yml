@@ -43,8 +43,6 @@ jobs:
           id: cache
           with:
             key: core-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'proto', 'internal') }}
-            restore-keys: |
-              core-
             path: ${{ env.cache_path }}
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
