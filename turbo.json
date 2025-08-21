@@ -1,7 +1,9 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
   "globalEnv": [
     "DEBUG",
     "VERCEL_URL",
@@ -36,6 +38,7 @@
     },
     "start": {},
     "test:unit": {},
+    "test:integration:login": {},
     "test:acceptance": {},
     "test:e2e": {},
     "lint": {},
