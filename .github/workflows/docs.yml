@@ -31,7 +31,7 @@ jobs:
         continue-on-error: true
         id: cache
         with:
-          key: docs-${{ hashFiles('docs', 'proto', '!docs/build', '!docs/node_modules', '!docs/protoc-gen-connect-openapi') }}
+          key: docs-${{ hashFiles('docs', 'proto', 'pnpm-lock.yaml', 'cmd/defaults.yaml', 'cmd/setup/steps.yaml', '!docs/build', '!docs/node_modules', '!docs/protoc-gen-connect-openapi') }}
           path: ${{ env.cache_path }}
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         uses: bufbuild/buf-setup-action@v1
