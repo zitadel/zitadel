@@ -332,12 +332,23 @@ func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *domain
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) SelectUser(ctx context.Context, authReqID, userID, userAgentID string) (err error) {
+func (repo *AuthRequestRepo) SelectUser(ctx context.Context, authReqID, userID, userAgentID string, enforceExistingSession bool) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
+	}
+	// Check if the session already exists in the same user agent, e.g. when selecting the user from the user selection page.
+	// This is to prevent username enumeration attacks by checking if the user exists in the system.
+	if enforceExistingSession {
+		userSession, err := userSessionByIDs(ctx, repo.UserSessionViewProvider, repo.UserEventProvider, request.AgentID, userID)
+		if err != nil {
+			return err
+		}
+		if userSession.Sequence == 0 {
+			return zerrors.ThrowNotFound(nil, "AUTH-2d3f4", "Errors.UserSession.NotFound")
+		}
 	}
 	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, userID, false)
 	if err != nil {
@@ -1059,7 +1070,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	if request.UserOrgID == "" {
 		request.UserOrgID = user.ResourceOwner
 	}
-	userSession, err := userSessionByIDs(ctx, repo.UserSessionViewProvider, repo.UserEventProvider, request.AgentID, user)
+	userSession, err := userSessionByIDs(ctx, repo.UserSessionViewProvider, repo.UserEventProvider, request.AgentID, user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -1639,27 +1650,27 @@ var (
 	}
 )
 
-func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID string, user *user_model.UserView) (*user_model.UserSessionView, error) {
+func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID, userID string) (*user_model.UserSessionView, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 
 	// always load the latest sequence first, so in case the session was not found by id,
 	// the sequence will be equal or lower than the actual projection and no events are lost
 	sequence, err := provider.GetLatestUserSessionSequence(ctx, instanceID)
-	logging.WithFields("instanceID", instanceID, "userID", user.ID).
+	logging.WithFields("instanceID", instanceID, "userID", userID).
 		OnError(err).
 		Errorf("could not get current sequence for userSessionByIDs")
 
-	session, err := provider.UserSessionByIDs(ctx, agentID, user.ID, instanceID)
+	session, err := provider.UserSessionByIDs(ctx, agentID, userID, instanceID)
 	if err != nil {
 		if !zerrors.IsNotFound(err) {
 			return nil, err
 		}
-		session = &user_view_model.UserSessionView{UserAgentID: agentID, UserID: user.ID}
+		session = &user_view_model.UserSessionView{UserAgentID: agentID, UserID: userID}
 		if sequence != nil {
 			session.ChangeDate = sequence.EventCreatedAt
 		}
 	}
-	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.ChangeDate, append(session.EventTypes(), userSessionEventTypes...))
+	events, err := eventProvider.UserEventsByID(ctx, userID, session.ChangeDate, append(session.EventTypes(), userSessionEventTypes...))
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserSessionToModel(session), nil
