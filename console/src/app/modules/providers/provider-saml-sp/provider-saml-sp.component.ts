@@ -6,6 +6,7 @@ import {
   Provider,
   SAMLBinding,
   SAMLNameIDFormat,
+  SAMLSignatureAlgorithm,
 } from '../../../proto/generated/zitadel/idp_pb';
 import { AbstractControl, FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
@@ -53,6 +54,7 @@ export class ProviderSamlSpComponent {
   private service!: ManagementService | AdminService;
   bindingValues: string[] = Object.keys(SAMLBinding);
   nameIDFormatValues: string[] = Object.keys(SAMLNameIDFormat);
+  signatureAlgorithmValues: string[] = Object.keys(SAMLSignatureAlgorithm);
 
   public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   public justActivated$ = new BehaviorSubject<boolean>(false);
@@ -125,6 +127,7 @@ export class ProviderSamlSpComponent {
         metadataUrl: new UntypedFormControl('', []),
         binding: new UntypedFormControl(this.bindingValues[0], [requiredValidator]),
         withSignedRequest: new UntypedFormControl(true, [requiredValidator]),
+        signatureAlgorithm: new UntypedFormControl(this.signatureAlgorithmValues[0], []),
         nameIdFormat: new UntypedFormControl(SAMLNameIDFormat.SAML_NAME_ID_FORMAT_PERSISTENT, []),
         transientMappingAttributeName: new UntypedFormControl('', []),
         federatedLogoutEnabled: new UntypedFormControl(false, []),
@@ -208,6 +211,8 @@ export class ProviderSamlSpComponent {
       req.setWithSignedRequest(this.withSignedRequest?.value);
       // @ts-ignore
       req.setBinding(SAMLBinding[this.binding?.value]);
+      // @ts-ignore
+      req.setSignatureAlgorithm(SAMLSignatureAlgorithm[this.signatureAlgorithm?.value]);
       // @ts-ignore
       req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat?.value]);
       req.setTransientMappingAttributeName(this.transientMapping?.value);
@@ -311,6 +316,13 @@ export class ProviderSamlSpComponent {
     return false;
   }
 
+  compareSignatureAlgorithm(value: string, index: number) {
+    if (value) {
+      return value === Object.keys(SAMLSignatureAlgorithm)[index];
+    }
+    return false;
+  }
+
   private get name(): AbstractControl | null {
     return this.form.get('name');
   }
@@ -329,6 +341,10 @@ export class ProviderSamlSpComponent {
 
   private get withSignedRequest(): AbstractControl | null {
     return this.form.get('withSignedRequest');
+  }
+
+  private get signatureAlgorithm(): AbstractControl | null {
+    return this.form.get('signatureAlgorithm');
   }
 
   private get nameIDFormat(): AbstractControl | null {
