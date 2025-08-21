@@ -1,18 +1,9 @@
-.actions-title-row {
-  display: flex;
-  align-items: center;
+h1 {
+  margin: 0;
+}
 
-  h1 {
-    margin: 0;
-  }
-
-  a {
-    .icon {
-      font-size: 1.2rem;
-      height: 1.2rem;
-      width: 1.2rem;
-    }
-  }
+.org-desc {
+  font-size: 14px;
 }
 
 @mixin actions-theme($theme) {

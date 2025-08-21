@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ThemeService } from 'src/app/services/theme.service';
@@ -21,14 +22,16 @@ export class HomeComponent {
 
   public dark: boolean = true;
 
+  protected readonly PolicyComponentServiceType = PolicyComponentServiceType;
+
   constructor(
     public authService: GrpcAuthService,
     breadcrumbService: BreadcrumbService,
     public themeService: ThemeService,
   ) {
     const bread: Breadcrumb = {
-      type: BreadcrumbType.ORG,
-      routerLink: ['/org'],
+      type: BreadcrumbType.INSTANCE,
+      routerLink: ['/'],
     };
 
     breadcrumbService.setBreadcrumb([bread]);

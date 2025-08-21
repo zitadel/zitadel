@@ -39,7 +39,7 @@ Generated files:
 To generate proto files:
 
 ```bash
-pnpm run generate
+pnpm turbo generate --filter=./console
 ```
 
 This automatically runs both generations in the correct order via Turbo dependencies.
@@ -49,7 +49,7 @@ This automatically runs both generations in the correct order via Turbo dependen
 To start the development server:
 
 ```bash
-pnpm start
+pnpm turbo start --filter=./console
 ```
 
 This will:
@@ -62,7 +62,7 @@ This will:
 To build for production:
 
 ```bash
-pnpm run build
+pnpm turbo build --filter=./console
 ```
 
 This will:
@@ -75,13 +75,13 @@ This will:
 To run linting and formatting checks:
 
 ```bash
-pnpm run lint
+pnpm turbo lint --filter=./console
 ```
 
 To auto-fix formatting issues:
 
 ```bash
-pnpm run lint:fix
+pnpm turbo lint:fix --filter=./console
 ```
 
 ## Project Structure
