@@ -19,7 +19,6 @@ const lato = Lato({
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("common");
-
   return { title: t('title')};
 }
 
