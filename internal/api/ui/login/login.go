@@ -52,8 +52,6 @@ type Config struct {
 	AssetCache         middleware.CacheConfig
 
 	// LoginV2
-	DefaultOTPEmailURLV2 string
-
 	DefaultBasePath string
 	DefaultPaths    *DefaultPaths
 }
