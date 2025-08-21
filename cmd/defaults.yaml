@@ -3,6 +3,8 @@ Log:
   Formatter:
     Format: text # ZITADEL_LOG_FORMATTER_FORMAT
 
+ThisIsIgnoredInDocs:
+
 # Exposes metrics on /debug/metrics
 Metrics:
   # Select type otel (OpenTelemetry) or none (disables collection and endpoint)
