@@ -81,9 +81,13 @@ export function login(
 
         cy.visit('/');
 
+        cy.wait(1000);
+
+        cy.screenshot()
         cy.get('[data-e2e=authenticated-welcome]', {
           timeout: 120_000,
         });
+        cy.screenshot()
       },
       {
         validate: () => {
