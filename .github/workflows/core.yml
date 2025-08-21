@@ -41,9 +41,7 @@ jobs:
           continue-on-error: true
           id: cache
           with:
-            key: core-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'proto', 'internal') }}
-            restore-keys: |
-              core-
+            key: core-${{ hashFiles('go.mod', 'go.sum', 'proto/**/*.proto', 'cmd/**/*.go', 'internal/**/*.go', 'openapi/**/*.yaml', 'internal/api/ui/console/static') }}
             path: ${{ env.cache_path }}
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}

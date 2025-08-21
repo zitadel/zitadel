@@ -33,7 +33,7 @@ jobs:
           continue-on-error: true
           id: cache
           with:
-            key: console-${{ hashFiles('console', 'proto', '!console/dist') }}-test
+            key: console-${{ hashFiles('console/src/**', 'console/package.json', 'console/yarn.lock', 'console/angular.json', 'proto/**/*.proto') }}
             path: ${{ env.cache_path }}
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
