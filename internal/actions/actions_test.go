@@ -13,6 +13,7 @@ import (
 )
 
 func TestRun(t *testing.T) {
+	// THIS DOES NOT INVALIDATE THE CACHE
 	SetLogstoreService(logstore.New[*record.ExecutionLog](nil, nil))
 	type args struct {
 		timeout time.Duration
