@@ -28,7 +28,7 @@ jobs:
         continue-on-error: true
         id: cache
         with:
-          key: console-${{ hashFiles('console', 'proto', '!console/dist', 'pnpm-lock.yaml') }}
+          key: console-${{ hashFiles('console', 'proto', '!console/dist') }}
           path: ${{ env.cache_path }}
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         uses: pnpm/action-setup@v4

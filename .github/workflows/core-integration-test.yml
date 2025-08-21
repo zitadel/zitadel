@@ -57,19 +57,14 @@ jobs:
         id: go-cache-path
         name: set cache path
         run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
-      - 
-        id: cache-key
-        name: set cache key
-        run: echo "cache_key=integration-test-core-${{ inputs.core_cache_key }}-${{ hashFiles('internal/**/integration_test/**', 'cmd/**/integration_test/**', 'internal/integration/**') }}" >> $GITHUB_OUTPUT
       -
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4
         id: cache
         timeout-minutes: 1
-        continue-on-error: true
-        name: restore previous results
+        name: restore go cache
         with:
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          # If we don't have an exact hit, we restore the cache from somewhere else and rely on go build to invalidate what it needs to invalidate to have a deterministic build
+          key: integration-test-core-${{ inputs.core_cache_key }}-${{ hashFiles('internal/**/integration_test/**', 'cmd/**/integration_test/**', 'internal/integration/**') }}
+          # If we don't have an exact hit, we restore the cache from somewhere else and rely on go build to invalidate what it needs to invalidate to have deterministic builds
           # Go's invalidation prevents cross-branch contamination
           restore-keys: |
             integration-test-core-${{ inputs.core_cache_key }}-
@@ -77,7 +72,7 @@ jobs:
           path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
       - 
         name: test
-        # We don't run the tests if we have an exact cache hit
+        # We don't run the tests if neither source nor test files changed
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         env:
           ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
@@ -99,10 +94,3 @@ jobs:
           name: core-integration-tests-postgres
           flags: core-integration-tests-postgres
           token: ${{ secrets.CODECOV_TOKEN }}
-      - 
-        uses: actions/cache/save@v4
-        name: cache results
-        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        with:
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
