@@ -46,8 +46,6 @@ jobs:
           uses: actions/setup-node@v4
           with:
             node-version: ${{ inputs.node_version }}
-            cache: 'yarn'
-            cache-dependency-path: console/yarn.lock
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           run: make console_build
