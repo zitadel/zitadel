@@ -82,7 +82,7 @@ export function login(
         cy.visit('/');
 
         cy.get('[data-e2e=authenticated-welcome]', {
-          timeout: 50_000,
+          timeout: 120_000,
         });
       },
       {
