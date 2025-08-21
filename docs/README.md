@@ -47,3 +47,5 @@ docker build -f docs/Dockerfile . -t zitadel-docs
 ```shell
 docker run -p 8080:8080 zitadel-docs
 ```
+
+dummy
