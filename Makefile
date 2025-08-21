@@ -116,7 +116,7 @@ core_integration_db_up:
 
 .PHONY: core_integration_db_down
 core_integration_db_down:
-	docker compose -f internal/integration/config/docker-compose.yaml down
+	docker compose -f internal/integration/config/docker-compose.yaml down -v
 
 .PHONY: core_integration_setup
 core_integration_setup:
