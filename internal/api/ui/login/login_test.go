@@ -79,47 +79,99 @@ func TestConfig_defaultBaseURL(t *testing.T) {
 func TestConfig_DefaultEmailCodeURLTemplate(t *testing.T) {
 	t.Parallel()
 
-	// Given
-	ctx := http.WithDomainContext(
-		authz.NewMockContext("instance1", "org1", "user1",
-			authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: true, BaseURI: &url.URL{}}}),
-		),
-		&http.DomainCtx{Protocol: "https", PublicHost: "origin"},
-	)
-	c := &Config{
-		DefaultBasePath: "/basepath",
-		DefaultPaths: &DefaultPaths{
-			EmailCodePath: "/email-code-path",
+	tt := []struct {
+		testName                 string
+		inputCtx                 context.Context
+		expectedEmailURLTemplate string
+	}{
+		{
+			testName: "when base path is empty should return empty email url template",
+			inputCtx: http.WithDomainContext(
+				authz.NewMockContext("instance1", "org1", "user1",
+					authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: false, BaseURI: &url.URL{}}}),
+				),
+				&http.DomainCtx{Protocol: "https", PublicHost: "origin"},
+			),
+			expectedEmailURLTemplate: "",
+		},
+		{
+			testName: "when base path is not empty should return expected url template",
+			inputCtx: http.WithDomainContext(
+				authz.NewMockContext("instance1", "org1", "user1",
+					authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: true, BaseURI: &url.URL{}}}),
+				),
+				&http.DomainCtx{Protocol: "https", PublicHost: "origin"},
+			),
+			expectedEmailURLTemplate: "https://origin/basepath/email-code-path",
 		},
 	}
 
-	// Test
-	res := c.DefaultEmailCodeURLTemplate(ctx)
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
 
-	// Verify
-	assert.Equal(t, "https://origin/basepath/email-code-path", res)
+			// Given
+			c := &Config{
+				DefaultBasePath: "/basepath",
+				DefaultPaths:    &DefaultPaths{EmailCodePath: "/email-code-path"},
+			}
+
+			// Test
+			res := c.DefaultEmailCodeURLTemplate(tc.inputCtx)
+
+			// Verify
+			assert.Equal(t, tc.expectedEmailURLTemplate, res)
+		})
+	}
 }
 
 func TestConfig_DefaultPasswordSetURLTemplate(t *testing.T) {
 	t.Parallel()
 
-	// Given
-	ctx := http.WithDomainContext(
-		authz.NewMockContext("instance1", "org1", "user1",
-			authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: true, BaseURI: &url.URL{}}}),
-		),
-		&http.DomainCtx{Protocol: "https", PublicHost: "origin"},
-	)
-	c := &Config{
-		DefaultBasePath: "/basepath",
-		DefaultPaths: &DefaultPaths{
-			PasswordSetPath: "/password-set-path",
+	tt := []struct {
+		testName                 string
+		inputCtx                 context.Context
+		expectedEmailURLTemplate string
+	}{
+		{
+			testName: "when base path is empty should return empty email url template",
+			inputCtx: http.WithDomainContext(
+				authz.NewMockContext("instance1", "org1", "user1",
+					authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: false, BaseURI: &url.URL{}}}),
+				),
+				&http.DomainCtx{Protocol: "https", PublicHost: "origin"},
+			),
+			expectedEmailURLTemplate: "",
+		},
+		{
+			testName: "when base path is not empty should return expected url template",
+			inputCtx: http.WithDomainContext(
+				authz.NewMockContext("instance1", "org1", "user1",
+					authz.WithMockFeatures(feature.Features{LoginV2: feature.LoginV2{Required: true, BaseURI: &url.URL{}}}),
+				),
+				&http.DomainCtx{Protocol: "https", PublicHost: "origin"},
+			),
+			expectedEmailURLTemplate: "https://origin/basepath/password-set-path",
 		},
 	}
 
-	// Test
-	res := c.DefaultPasswordSetURLTemplate(ctx)
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
 
-	// Verify
-	assert.Equal(t, "https://origin/basepath/password-set-path", res)
+			// Given
+			c := &Config{
+				DefaultBasePath: "/basepath",
+				DefaultPaths: &DefaultPaths{
+					PasswordSetPath: "/password-set-path",
+				},
+			}
+
+			// Test
+			res := c.DefaultPasswordSetURLTemplate(tc.inputCtx)
+
+			// Verify
+			assert.Equal(t, tc.expectedEmailURLTemplate, res)
+		})
+	}
 }

@@ -80,9 +80,17 @@ func (c *Config) defaultBaseURL(ctx context.Context) string {
 }
 
 func (c *Config) DefaultEmailCodeURLTemplate(ctx context.Context) string {
-	return c.defaultBaseURL(ctx) + c.DefaultPaths.EmailCodePath
+	basePath := c.defaultBaseURL(ctx)
+	if basePath == "" {
+		return ""
+	}
+	return basePath + c.DefaultPaths.EmailCodePath
 }
 func (c *Config) DefaultPasswordSetURLTemplate(ctx context.Context) string {
+	basePath := c.defaultBaseURL(ctx)
+	if basePath == "" {
+		return ""
+	}
 	return c.defaultBaseURL(ctx) + c.DefaultPaths.PasswordSetPath
 }
 
