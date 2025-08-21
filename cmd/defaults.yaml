@@ -571,9 +571,8 @@ Login:
     MaxAge: 12h # ZITADEL_LOGIN_CACHE_MAXAGE
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_LOGIN_CACHE_SHAREDMAXAGE
-  DefaultBasePath: "/ui/v2/login"
   DefaultPaths:
-    LoginPath: "/login"
+    BasePath: "/ui/v2/login"
     PasswordSetPath: "/password/set"
     EmailCodePath: "/verify"
     OTPEmailPath: /otp/verify?loginName={{.LoginName}}&code={{.Code}}

@@ -52,12 +52,11 @@ type Config struct {
 	AssetCache         middleware.CacheConfig
 
 	// LoginV2
-	DefaultBasePath string
-	DefaultPaths    *DefaultPaths
+	DefaultPaths *DefaultPaths
 }
 
 type DefaultPaths struct {
-	LoginPath       string
+	BasePath        string
 	PasswordSetPath string
 	EmailCodePath   string
 	OTPEmailPath    string
@@ -72,7 +71,7 @@ func (c *Config) defaultBaseURL(ctx context.Context) string {
 		if loginV2.BaseURI != nil && loginV2.BaseURI.String() != "" {
 			baseURI = loginV2.BaseURI.String()
 		}
-		return baseURI + c.DefaultBasePath
+		return baseURI + c.DefaultPaths.BasePath
 	}
 	return ""
 }

@@ -17,7 +17,7 @@ func TestConfig_defaultBaseURL(t *testing.T) {
 	t.Parallel()
 
 	config := &Config{
-		DefaultBasePath: "/basepath",
+		DefaultPaths: &DefaultPaths{BasePath: "/basepath"},
 	}
 
 	baseCustomURI, err := url.Parse("https://custom")
@@ -112,8 +112,9 @@ func TestConfig_DefaultEmailCodeURLTemplate(t *testing.T) {
 
 			// Given
 			c := &Config{
-				DefaultBasePath: "/basepath",
-				DefaultPaths:    &DefaultPaths{EmailCodePath: "/email-code-path"},
+				DefaultPaths: &DefaultPaths{
+					BasePath:      "/basepath",
+					EmailCodePath: "/email-code-path"},
 			}
 
 			// Test
@@ -161,8 +162,8 @@ func TestConfig_DefaultPasswordSetURLTemplate(t *testing.T) {
 
 			// Given
 			c := &Config{
-				DefaultBasePath: "/basepath",
 				DefaultPaths: &DefaultPaths{
+					BasePath:        "/basepath",
 					PasswordSetPath: "/password-set-path",
 				},
 			}
