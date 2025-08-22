@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
@@ -61,6 +62,29 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		return err
 	}
 
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	if q.InstanceID != nil {
+		instanceID = q.InstanceID.Value.(string)
+	}
+
+	if q.AwaitOpenTransactions {
+		var now time.Time
+		if err = criteria.Client().QueryRowContext(ctx,
+			func(row *sql.Row) error {
+				return row.Scan(&now)
+			},
+			"select now() from pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))", instanceID); err != nil {
+			return err
+		}
+		if q.CreatedBefore == nil {
+			q.CreatedBefore = &repository.Filter{
+				Field:     repository.FieldCreationDate,
+				Operation: repository.OperationLess,
+				Value:     now,
+			}
+		}
+	}
+
 	query, rowScanner := prepareColumns(criteria, q.Columns, useV1)
 	where, values := prepareConditions(ctx, criteria, q, useV1)
 	if where == "" || query == "" {
@@ -101,18 +125,6 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		query += " OFFSET ?"
 	}
 
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	if q.InstanceID != nil {
-		instanceID = q.InstanceID.Value.(string)
-	}
-
-	if q.AwaitOpenTransactions {
-		_, err := criteria.Client().ExecContext(ctx, "select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))", instanceID)
-		if err != nil {
-			return err
-		}
-	}
-
 	query = criteria.placeholder(query)
 
 	var contextQuerier interface {
@@ -133,13 +145,6 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 			}
 			return nil
 		}, query, values...)
-
-	if q.AwaitOpenTransactions {
-		_, err := criteria.Client().ExecContext(ctx, "select pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))", instanceID)
-		if err != nil {
-			return err
-		}
-	}
 	if err != nil {
 		logging.New().WithError(err).Info("query failed")
 		return zerrors.ThrowInternal(err, "SQL-KyeAx", "unable to filter events")
