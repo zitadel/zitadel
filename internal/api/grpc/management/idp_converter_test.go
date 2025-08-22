@@ -164,27 +164,27 @@ func Test_signatureAlgorithmToCommand(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name                   string
-		signatureAlgorithm     *idp.SAMLSignatureAlgorithm
+		signatureAlgorithm     idp.SAMLSignatureAlgorithm
 		wantSignatureAlgorithm string
 	}{
 		{
-			name:                   "signature algorithm not set",
-			signatureAlgorithm:     nil,
+			name:                   "signature algorithm default value",
+			signatureAlgorithm:     11,
 			wantSignatureAlgorithm: "",
 		},
 		{
 			name:                   "RSA_SHA1",
-			signatureAlgorithm:     idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1.Enum(),
+			signatureAlgorithm:     idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1,
 			wantSignatureAlgorithm: "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
 		},
 		{
 			name:                   "RSA_SHA256",
-			signatureAlgorithm:     idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256.Enum(),
+			signatureAlgorithm:     idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256,
 			wantSignatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
 		},
 		{
 			name:                   "RSA_SHA512",
-			signatureAlgorithm:     idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512.Enum(),
+			signatureAlgorithm:     idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512,
 			wantSignatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512",
 		},
 	}

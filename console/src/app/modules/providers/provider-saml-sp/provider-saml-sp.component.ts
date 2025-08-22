@@ -249,10 +249,8 @@ export class ProviderSamlSpComponent {
       req.setMetadataUrl(this.metadataUrl?.value);
     }
     req.setProviderOptions(this.options);
-    if (this.binding) {
-      // @ts-ignore
-      req.setBinding(SAMLBinding[this.binding?.value]);
-    }
+    // @ts-ignore
+    req.setBinding(SAMLBinding[this.binding?.value]);
     req.setWithSignedRequest(this.withSignedRequest?.value);
     if (this.signatureAlgorithm) {
       // @ts-ignore

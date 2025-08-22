@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -2835,7 +2837,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 								anyArg{},
 								"binding",
 								true,
-								"",
+								gu.Ptr(""),
 								"customAttribute",
 								true,
 								domain.SAMLNameIDFormatTransient,
@@ -2911,7 +2913,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 								anyArg{},
 								"binding",
 								true,
-								"http://www.w3.org/2001/04/xmldsig-more#rsa-sha512",
+								gu.Ptr("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"),
 								"customAttribute",
 								true,
 								domain.SAMLNameIDFormatTransient,
