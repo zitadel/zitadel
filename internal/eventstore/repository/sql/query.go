@@ -101,6 +101,18 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		query += " OFFSET ?"
 	}
 
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	if q.InstanceID != nil {
+		instanceID = q.InstanceID.Value.(string)
+	}
+
+	if q.AwaitOpenTransactions {
+		_, err := criteria.Client().ExecContext(ctx, "select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))", instanceID)
+		if err != nil {
+			return err
+		}
+	}
+
 	query = criteria.placeholder(query)
 
 	var contextQuerier interface {
@@ -121,6 +133,13 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 			}
 			return nil
 		}, query, values...)
+
+	if q.AwaitOpenTransactions {
+		_, err := criteria.Client().ExecContext(ctx, "select pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))", instanceID)
+		if err != nil {
+			return err
+		}
+	}
 	if err != nil {
 		logging.New().WithError(err).Info("query failed")
 		return zerrors.ThrowInternal(err, "SQL-KyeAx", "unable to filter events")
@@ -193,6 +212,8 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 				&event.AggregateType,
 				&event.AggregateID,
 				&event.Version,
+				&event.InTxOrd,
+				&event.Tx,
 			)
 		} else {
 			var revision uint8
@@ -208,6 +229,8 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 				&event.AggregateType,
 				&event.AggregateID,
 				&revision,
+				&event.InTxOrd,
+				&event.Tx,
 			)
 			event.Version = eventstore.Version("v" + strconv.Itoa(int(revision)))
 		}
@@ -279,13 +302,13 @@ func prepareConditions(ctx context.Context, criteria querier, query *repository.
 	}
 
 	if query.AwaitOpenTransactions {
-		instanceID := authz.GetInstance(ctx).InstanceID()
-		if query.InstanceID != nil {
-			instanceID = query.InstanceID.Value.(string)
-		}
+		// 	instanceID := authz.GetInstance(ctx).InstanceID()
+		// 	if query.InstanceID != nil {
+		// 		instanceID = query.InstanceID.Value.(string)
+		// 	}
 
 		clauses += awaitOpenTransactions(useV1)
-		args = append(args, instanceID, instanceID)
+		// 	// args = append(args, instanceID, instanceID)
 	}
 
 	if clauses == "" {

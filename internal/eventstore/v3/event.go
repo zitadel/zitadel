@@ -44,6 +44,8 @@ type event struct {
 	createdAt time.Time
 	sequence  uint64
 	position  decimal.Decimal
+	inTxOrder uint8
+	txID      uint64
 }
 
 // TODO: remove on v3
@@ -173,4 +175,12 @@ func (e *event) Unmarshal(ptr any) error {
 // DataAsBytes implements [eventstore.Event]
 func (e *event) DataAsBytes() []byte {
 	return e.command.Payload
+}
+
+func (e *event) InTxOrder() uint8 {
+	return e.inTxOrder
+}
+
+func (e *event) TxID() uint64 {
+	return e.txID
 }

@@ -4,11 +4,12 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
-	"fmt"
+	"slices"
+	"strconv"
+	"strings"
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -51,6 +52,16 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 		defer conn.Close()
 	}
 
+	instanceIDs := make([]any, 0, len(commands))
+	locks := make([]string, 0, len(commands))
+	for _, cmd := range commands {
+		if !slices.Contains(instanceIDs, any(cmd.Aggregate().InstanceID)) {
+			instanceIDs = append(instanceIDs, cmd.Aggregate().InstanceID)
+			locks = append(locks, "pg_advisory_xact_lock_shared('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($"+strconv.Itoa(len(instanceIDs))+"))")
+		}
+	}
+	lockStmt := "SELECT " + strings.Join(locks, ", ")
+
 	tx, close, err := es.pushTx(ctx, client)
 	if err != nil {
 		return nil, err
@@ -61,7 +72,12 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 		}()
 	}
 
-	_, err = tx.ExecContext(ctx, fmt.Sprintf("SET LOCAL application_name = '%s'", fmt.Sprintf("zitadel_es_pusher_%s", authz.GetInstance(ctx).InstanceID())))
+	_, err = tx.ExecContext(ctx, lockStmt, instanceIDs...)
+	if err != nil {
+		return nil, err
+	}
+
+	events, err := writeEvents(ctx, tx, commands)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +91,7 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 		return nil, err
 	}
 
-	return writeEvents(ctx, tx, commands)
+	return events, nil
 }
 
 func writeEvents(ctx context.Context, tx database.Tx, commands []eventstore.Command) (_ []eventstore.Event, err error) {

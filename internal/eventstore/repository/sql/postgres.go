@@ -18,7 +18,7 @@ import (
 // awaitOpenTransactions ensures event ordering, so we don't events younger that open transactions
 var (
 	awaitOpenTransactionsV1 = ` AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')`
-	awaitOpenTransactionsV2 = ` AND "position" < (select EXTRACT(EPOCH FROM now()) from pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext(?)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext(?)))`
+	awaitOpenTransactionsV2 = ` AND tx_id < (select pg_current_xact_id()::TEXT::NUMERIC)`
 )
 
 func awaitOpenTransactions(useV1 bool) string {
@@ -91,9 +91,9 @@ func (db *Postgres) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool
 	}
 
 	if desc {
-		return ` ORDER BY "position" DESC, in_tx_order DESC`
+		return ` ORDER BY tx_id DESC, in_tx_order DESC`
 	}
-	return ` ORDER BY "position", in_tx_order`
+	return ` ORDER BY tx_id, in_tx_order`
 }
 
 func (db *Postgres) eventQuery(useV1 bool) string {
@@ -123,6 +123,8 @@ func (db *Postgres) eventQuery(useV1 bool) string {
 		", aggregate_type" +
 		", aggregate_id" +
 		", revision" +
+		`, in_tx_order` +
+		", tx_id" +
 		" FROM eventstore.events2"
 }
 

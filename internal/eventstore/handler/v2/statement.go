@@ -46,6 +46,14 @@ func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, curr
 	offset := currentState.offset
 	for _, event := range events {
 		statement, err := h.reduce(event)
+		if h.ProjectionName() == "projections.users14" {
+			h.log().
+				WithField("position", event.Position()).
+				WithField("in_tx_order", event.InTxOrder()).
+				WithField("tx_id", event.TxID()).
+				WithError(err).
+				Info("processing event")
+		}
 		if err != nil {
 			h.logEvent(event).WithError(err).Error("reduce failed")
 			if shouldContinue := h.handleFailedStmt(tx, failureFromEvent(event, err)); shouldContinue {
@@ -58,6 +66,7 @@ func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, curr
 			// offset is 1 because we want to skip this event
 			offset = 0
 		}
+
 		statement.offset = offset
 		statement.Position = event.Position()
 		previousPosition = event.Position()
