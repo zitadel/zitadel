@@ -129,19 +129,18 @@ export class FeaturesComponent {
     );
   }
 
-  public async saveFeatures<TKey extends ToggleStateKeys, TValue extends ToggleStates[TKey]>(key: TKey, value: TValue) {
-    const toggleStates = { ...(await firstValueFrom(this.toggleStates$)), [key]: value };
+  public async saveFeature<TKey extends ToggleStateKeys, TValue extends ToggleStates[TKey]>(key: TKey, value: TValue) {
+    const req: MessageInitShape<typeof SetInstanceFeaturesRequestSchema> = {};
 
-    const req = FEATURE_KEYS.reduce<MessageInitShape<typeof SetInstanceFeaturesRequestSchema>>((acc, key) => {
-      acc[key] = toggleStates[key].enabled;
-      return acc;
-    }, {});
-
-    // to save special flags they have to be handled here
-    req['loginV2'] = {
-      required: toggleStates.loginV2.enabled,
-      baseUri: toggleStates.loginV2.baseUri,
-    };
+    // Set only the specific feature being updated
+    if (key === 'loginV2') {
+      req['loginV2'] = {
+        required: value.enabled,
+        baseUri: (value as ToggleStates['loginV2']).baseUri,
+      };
+    } else if (FEATURE_KEYS.includes(key)) {
+      req[key] = value.enabled;
+    }
 
     try {
       await this.featureService.setInstanceFeatures(req);
