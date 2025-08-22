@@ -58,9 +58,10 @@ jobs:
         name: set cache path
         run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
       -
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         id: cache
         timeout-minutes: 1
+        continue-on-error: true
         name: restore go cache
         with:
           key: integration-test-core-${{ inputs.core_cache_key }}-${{ hashFiles('internal/**/integration_test/**', 'cmd/**/integration_test/**', 'internal/integration/**') }}
@@ -94,3 +95,10 @@ jobs:
           name: core-integration-tests-postgres
           flags: core-integration-tests-postgres
           token: ${{ secrets.CODECOV_TOKEN }}
+      -
+        uses: actions/cache/save@v4
+        name: save go cache
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        with:
+          key: ${{ steps.cache.outputs.cache-primary-key }}
+          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
