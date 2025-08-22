@@ -526,6 +526,18 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 	}()
 
+	if config.awaitRunning {
+		if _, err := tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()); err != nil {
+			return false, err
+		}
+	} else {
+		var hasLocked bool
+		err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock (hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
+		if err != nil || !hasLocked {
+			return false, err
+		}
+	}
+
 	currentState, err := h.currentState(ctx, tx, config)
 	if err != nil {
 		if errors.Is(err, errJustUpdated) {
@@ -608,12 +620,23 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 	eventAmount := len(events)
 
+	positions := make([]decimal.Decimal, len(events))
+	for i, event := range events {
+		positions[i] = event.Position()
+	}
+	if h.ProjectionName() == "projections.users14" {
+		h.log().WithField("positions", positions).Info("fetched events")
+	}
+
 	statements, err := h.eventsToStatements(tx, events, currentState)
 	if err != nil || len(statements) == 0 {
 		return nil, false, err
 	}
 
 	idx := skipPreviouslyReducedStatements(statements, currentState)
+	if h.ProjectionName() == "projections.users14" {
+		h.log().WithField("positions", positions[idx+1:]).Info("events after skipping")
+	}
 	if idx+1 == len(statements) {
 		currentState.position = statements[len(statements)-1].Position
 		currentState.offset = statements[len(statements)-1].offset
