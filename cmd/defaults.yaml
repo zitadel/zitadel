@@ -573,9 +573,9 @@ Login:
     SharedMaxAge: 168h # ZITADEL_LOGIN_CACHE_SHAREDMAXAGE
   DefaultPaths:
     BasePath: "/ui/v2/login"
-    PasswordSetPath: "/password/set"
-    EmailCodePath: "/verify"
-    OTPEmailPath: /otp/verify?loginName={{.LoginName}}&code={{.Code}}
+    PasswordSetPath: "/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
+    EmailCodePath: "/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
+    OTPEmailPath: "/otp/verify?code={{.Code}}&userID={{.UserID}}&sessionId={{.SessionID}}"
 
 Console:
   ShortCache:
