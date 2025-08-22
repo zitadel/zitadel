@@ -1,6 +1,7 @@
 {
   "common": {
-    "back": "返回"
+    "back": "返回",
+    "title": "使用 Zitadel 登录"
   },
   "accounts": {
     "title": "账户",
