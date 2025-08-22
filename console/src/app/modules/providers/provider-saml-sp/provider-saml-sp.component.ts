@@ -127,7 +127,7 @@ export class ProviderSamlSpComponent {
         metadataUrl: new UntypedFormControl('', []),
         binding: new UntypedFormControl(this.bindingValues[0], [requiredValidator]),
         withSignedRequest: new UntypedFormControl(true, [requiredValidator]),
-        signatureAlgorithm: new UntypedFormControl(this.signatureAlgorithmValues[0], []),
+        signatureAlgorithm: new UntypedFormControl(SAMLSignatureAlgorithm.SAML_SIGNATURE_RSA_SHA1, []),
         nameIdFormat: new UntypedFormControl(SAMLNameIDFormat.SAML_NAME_ID_FORMAT_PERSISTENT, []),
         transientMappingAttributeName: new UntypedFormControl('', []),
         federatedLogoutEnabled: new UntypedFormControl(false, []),
@@ -249,9 +249,15 @@ export class ProviderSamlSpComponent {
       req.setMetadataUrl(this.metadataUrl?.value);
     }
     req.setProviderOptions(this.options);
-    // @ts-ignore
-    req.setBinding(SAMLBinding[this.binding?.value]);
+    if (this.binding) {
+      // @ts-ignore
+      req.setBinding(SAMLBinding[this.binding?.value]);
+    }
     req.setWithSignedRequest(this.withSignedRequest?.value);
+    if (this.signatureAlgorithm) {
+      // @ts-ignore
+      req.setSignatureAlgorithm(SAMLSignatureAlgorithm[this.signatureAlgorithm.value]);
+    }
     if (this.nameIDFormat) {
       // @ts-ignore
       req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value]);

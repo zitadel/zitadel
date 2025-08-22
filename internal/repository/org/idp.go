@@ -1023,7 +1023,7 @@ func NewSAMLIDPAddedEvent(
 	certificate []byte,
 	binding string,
 	withSignedRequest bool,
-	signatureAlgorithm string,
+	signatureAlgorithm *string,
 	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
 	federatedLogoutEnabled bool,

@@ -16,7 +16,7 @@ type SAMLIDPAddedEvent struct {
 	Key                           *crypto.CryptoValue      `json:"key,omitempty"`
 	Certificate                   []byte                   `json:"certificate,omitempty"`
 	Binding                       string                   `json:"binding,omitempty"`
-	SignatureAlgorithm            string                   `json:"signatureAlgorithm,omitempty"`
+	SignatureAlgorithm            *string                   `json:"signatureAlgorithm,omitempty"`
 	WithSignedRequest             bool                     `json:"withSignedRequest,omitempty"`
 	NameIDFormat                  *domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"`
 	TransientMappingAttributeName string                   `json:"transientMappingAttributeName,omitempty"`
@@ -33,7 +33,7 @@ func NewSAMLIDPAddedEvent(
 	certificate []byte,
 	binding string,
 	withSignedRequest bool,
-	signatureAlgorithm string,
+	signatureAlgorithm *string,
 	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
 	federatedLogoutEnabled bool,
@@ -150,9 +150,9 @@ func ChangeSAMLWithSignedRequest(withSignedRequest bool) func(*SAMLIDPChangedEve
 	}
 }
 
-func ChangeSAMLSignatureAlgorithm(signatureAlgorithm string) func(*SAMLIDPChangedEvent) {
+func ChangeSAMLSignatureAlgorithm(signatureAlgorithm *string) func(*SAMLIDPChangedEvent) {
 	return func(e *SAMLIDPChangedEvent) {
-		e.SignatureAlgorithm = &signatureAlgorithm
+		e.SignatureAlgorithm = signatureAlgorithm
 	}
 }
 
