@@ -131,37 +131,6 @@ describe('features settings', () => {
       cy.shouldConfirmSuccess();
     });
 
-    // it('should handle loginV2 feature toggle', () => {
-    //   // Check if loginV2 feature toggle exists
-    //   cy.get('cnsl-login-v2-feature-toggle')
-    //     .should('be.visible')
-    //     .within(() => {
-    //       // Should have a feature toggle (with button toggles)
-    //       cy.get('cnsl-feature-toggle').should('be.visible');
-    //       cy.get('mat-button-toggle').should('be.visible');
-
-    //       // Actually toggle the loginV2 feature to test functionality
-    //       // Check current state and click the opposite to ensure we trigger a change
-    //       cy.get('mat-button-toggle').then(($buttons) => {
-    //         const uncheckedButtons = $buttons.not('.mat-button-toggle-checked');
-
-    //         if (uncheckedButtons.length > 0) {
-    //           // Click an unchecked button to enable it
-    //           cy.wrap(uncheckedButtons.first()).click();
-    //         } else {
-    //           // All buttons are checked, click the first one to toggle it
-    //           cy.wrap($buttons.first()).click();
-    //         }
-    //       });
-    //       cy.get('input[cnslInput], input[data-e2e*="uri"], input[placeholder*="URI"], input[placeholder*="uri"]')
-    //         .should('be.visible')
-    //         .and('not.be.disabled');
-    //     });
-
-    //   // Check for success toast since we made a real change
-    //   cy.shouldConfirmSuccess();
-    // });
-
     it('should reset features when reset button is clicked', () => {
       // Change a feature first to have something to reset
       cy.get('cnsl-feature-toggle')
