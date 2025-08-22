@@ -104,9 +104,18 @@ export async function isSessionValid({ serviceUrl, session }: { serviceUrl: stri
       "Session is expired",
       session.expirationDate ? timestampDate(session.expirationDate).toDateString() : "no expiration date",
     );
+    return false;
   }
 
   const validChecks = !!(validPassword || validPasskey || validIDP);
+
+  if (!validChecks) {
+    return false;
+  }
+
+  if (!mfaValid) {
+    return false;
+  }
 
   // Check email verification if EMAIL_VERIFICATION environment variable is enabled
   if (process.env.EMAIL_VERIFICATION === "true") {
@@ -123,7 +132,7 @@ export async function isSessionValid({ serviceUrl, session }: { serviceUrl: stri
     }
   }
 
-  return stillValid && validChecks && mfaValid;
+  return true;
 }
 
 export async function findValidSession({
