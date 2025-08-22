@@ -73,7 +73,7 @@ jobs:
       - 
         name: test
         # We don't run the tests if neither source nor test files changed
-        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        if: ${{ steps.restore-core.outputs.cache-primary-key != steps.restore-core.outputs.cache-matched-key }}
         env:
           ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
         run: make core_integration_test
