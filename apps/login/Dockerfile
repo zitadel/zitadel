@@ -28,7 +28,7 @@ RUN mkdir -p /.env-file && touch /.env-file/.env && chown -R nextjs:nodejs /.env
 COPY --chown=nextjs:nodejs ./scripts/ ./
 COPY --chown=nextjs:nodejs --from=build-out / ./
 USER nextjs
-ENV HOSTNAME="0.0.0.0" \
+ENV HOSTNAME="::" \
     NEXT_PUBLIC_BASE_PATH="/ui/v2/login" \
     PORT=3000
 # TODO: Check healthy, not ready
