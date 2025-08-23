@@ -33,8 +33,6 @@ var (
 	updateStateStmt string
 	//go:embed state_lock.sql
 	lockStateStmt string
-
-	errJustUpdated = errors.New("projection was just updated")
 )
 
 func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerConfig) (currentState *state, err error) {

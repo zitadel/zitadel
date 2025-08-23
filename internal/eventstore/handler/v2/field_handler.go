@@ -121,9 +121,6 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 	config.awaitRunning = true
 	currentState, err := h.currentState(ctx, tx, config)
 	if err != nil {
-		if errors.Is(err, errJustUpdated) {
-			return false, nil
-		}
 		return additionalIteration, err
 	}
 	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
