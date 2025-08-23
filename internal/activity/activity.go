@@ -90,19 +90,19 @@ func TriggerGRPCWithContext(ctx context.Context, trigger TriggerMethod) {
 }
 
 func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod, method, path, requestMethod, grpcStatus, httpStatus string, isSystemUser bool) {
-	// logging.WithFields(
-	// 	"instance", instanceID,
-	// 	"org", orgID,
-	// 	"user", userID,
-	// 	"domain", domain,
-	// 	"trigger", trigger.String(),
-	// 	"method", method,
-	// 	"path", path,
-	// 	"grpcStatus", grpcStatus,
-	// 	"httpStatus", httpStatus,
-	// 	"requestMethod", requestMethod,
-	// 	"isSystemUser", isSystemUser,
-	// ).Info(Activity)
+	logging.WithFields(
+		"instance", instanceID,
+		"org", orgID,
+		"user", userID,
+		"domain", domain,
+		"trigger", trigger.String(),
+		"method", method,
+		"path", path,
+		"grpcStatus", grpcStatus,
+		"httpStatus", httpStatus,
+		"requestMethod", requestMethod,
+		"isSystemUser", isSystemUser,
+	).Info(Activity)
 }
 
 func getOrgOfUser(ctx context.Context, userID string, reducer func(ctx context.Context, r eventstore.QueryReducer) error) string {

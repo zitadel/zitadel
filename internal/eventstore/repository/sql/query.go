@@ -72,20 +72,15 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 			instanceID = q.InstanceID.Value.(string)
 		}
 
-		var latestPosition decimal.Decimal
-		err = criteria.Client().QueryRow(
-			func(r *sql.Row) error {
-				return r.Scan(&latestPosition)
-			},
-			"select extract(epoch from now()) from pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))",
+		_, err = criteria.Client().ExecContext(ctx,
+			"select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))",
 			instanceID,
 		)
 		if err != nil {
 			return err
 		}
 
-		values = append(values, latestPosition)
-		where += " AND events2.position <= ?"
+		where += " AND events2.position <= EXTRACT(EPOCH FROM NOW())"
 	}
 	query += where
 
@@ -121,18 +116,6 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		values = append(values, q.Offset)
 		query += " OFFSET ?"
 	}
-
-	// if q.LockRows {
-	// 	query += " FOR UPDATE"
-	// 	switch q.LockOption {
-	// 	case eventstore.LockOptionWait: // default behavior
-	// 	case eventstore.LockOptionNoWait:
-	// 		query += " NOWAIT"
-	// 	case eventstore.LockOptionSkipLocked:
-	// 		query += " SKIP LOCKED"
-
-	// 	}
-	// }
 
 	query = criteria.placeholder(query)
 
@@ -310,22 +293,6 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		}
 		args = append(args, excludeAggregateIDsArgs...)
 	}
-
-	// if query.AwaitOpenTransactions {
-	// 	instanceIDs := make(database.TextArray[string], 0, 3)
-	// 	if query.InstanceID != nil {
-	// 		instanceIDs = append(instanceIDs, query.InstanceID.Value.(string))
-	// 	} else if query.InstanceIDs != nil {
-	// 		instanceIDs = append(instanceIDs, query.InstanceIDs.Value.(database.TextArray[string])...)
-	// 	}
-
-	// 	for i := range instanceIDs {
-	// 		instanceIDs[i] = "zitadel_es_pusher_" + instanceIDs[i]
-	// 	}
-
-	// 	clauses += awaitOpenTransactions(useV1)
-	// 	args = append(args, instanceIDs)
-	// }
 
 	if clauses == "" {
 		return "", nil

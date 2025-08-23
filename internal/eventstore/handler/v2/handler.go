@@ -620,23 +620,12 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 	eventAmount := len(events)
 
-	positions := make([]decimal.Decimal, len(events))
-	for i, event := range events {
-		positions[i] = event.Position()
-	}
-	if h.ProjectionName() == "projections.users14" {
-		h.log().WithField("positions", positions).Info("fetched events")
-	}
-
 	statements, err := h.eventsToStatements(tx, events, currentState)
 	if err != nil || len(statements) == 0 {
 		return nil, false, err
 	}
 
 	idx := skipPreviouslyReducedStatements(statements, currentState)
-	if h.ProjectionName() == "projections.users14" {
-		h.log().WithField("positions", positions[idx+1:]).Info("events after skipping")
-	}
 	if idx+1 == len(statements) {
 		currentState.position = statements[len(statements)-1].Position
 		currentState.offset = statements[len(statements)-1].offset
