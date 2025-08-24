@@ -121,6 +121,11 @@ func (c *Client) AccessTokenType() op.AccessTokenType {
 }
 
 func (c *Client) IsScopeAllowed(scope string) bool {
+	if slices.ContainsFunc(c.client.AllowedScopePrefixes, func(el string) bool {
+		return strings.HasPrefix(scope, el)
+	}) {
+		return true
+	}
 	return isScopeAllowed(scope, c.allowedScopes...)
 }
 

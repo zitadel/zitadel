@@ -64,6 +64,7 @@ type OIDCApp struct {
 	BackChannelLogoutURI     string
 	LoginVersion             domain.LoginVersion
 	LoginBaseURI             *string
+	AllowedScopePrefixes     database.TextArray[string]
 }
 
 type SAMLApp struct {
@@ -276,6 +277,10 @@ var (
 	}
 	AppOIDCConfigColumnLoginBaseURI = Column{
 		name:  projection.AppOIDCConfigColumnLoginBaseURI,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnAllowedScopePrefixes = Column{
+		name:  projection.AppOIDCConfigColumnAllowedScopePrefixes,
 		table: appOIDCConfigsTable,
 	}
 )
@@ -705,6 +710,7 @@ func prepareAppQuery(activeOnly bool) (sq.SelectBuilder, func(*sql.Row) (*App, e
 		AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 		AppOIDCConfigColumnLoginVersion.identifier(),
 		AppOIDCConfigColumnLoginBaseURI.identifier(),
+		AppOIDCConfigColumnAllowedScopePrefixes.identifier(),
 
 		AppSAMLConfigColumnAppID.identifier(),
 		AppSAMLConfigColumnEntityID.identifier(),
@@ -774,6 +780,7 @@ func scanApp(row *sql.Row) (*App, error) {
 		&oidcConfig.backChannelLogoutURI,
 		&oidcConfig.loginVersion,
 		&oidcConfig.loginBaseURI,
+		&oidcConfig.allowedScopePrefixes,
 
 		&samlConfig.appID,
 		&samlConfig.entityID,
@@ -828,6 +835,7 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 			AppOIDCConfigColumnLoginVersion.identifier(),
 			AppOIDCConfigColumnLoginBaseURI.identifier(),
+			AppOIDCConfigColumnAllowedScopePrefixes.identifier(),
 		).From(appsTable.identifier()).
 			Join(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
@@ -867,6 +875,7 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 				&oidcConfig.backChannelLogoutURI,
 				&oidcConfig.loginVersion,
 				&oidcConfig.loginBaseURI,
+				&oidcConfig.allowedScopePrefixes,
 			)
 
 			if err != nil {
@@ -984,6 +993,7 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 			AppOIDCConfigColumnLoginVersion.identifier(),
 			AppOIDCConfigColumnLoginBaseURI.identifier(),
+			AppOIDCConfigColumnAllowedScopePrefixes.identifier(),
 
 			AppSAMLConfigColumnAppID.identifier(),
 			AppSAMLConfigColumnEntityID.identifier(),
@@ -1041,6 +1051,7 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 					&oidcConfig.backChannelLogoutURI,
 					&oidcConfig.loginVersion,
 					&oidcConfig.loginBaseURI,
+					&oidcConfig.allowedScopePrefixes,
 
 					&samlConfig.appID,
 					&samlConfig.entityID,
@@ -1148,6 +1159,7 @@ type sqlOIDCConfig struct {
 	backChannelLogoutURI     sql.NullString
 	loginVersion             sql.NullInt16
 	loginBaseURI             sql.NullString
+	allowedScopePrefixes     database.TextArray[string]
 }
 
 func (c sqlOIDCConfig) set(app *App) {
@@ -1173,6 +1185,7 @@ func (c sqlOIDCConfig) set(app *App) {
 		SkipNativeAppSuccessPage: c.skipNativeAppSuccessPage.Bool,
 		BackChannelLogoutURI:     c.backChannelLogoutURI.String,
 		LoginVersion:             domain.LoginVersion(c.loginVersion.Int16),
+		AllowedScopePrefixes:     c.allowedScopePrefixes,
 	}
 	if c.loginBaseURI.Valid {
 		app.OIDCConfig.LoginBaseURI = &c.loginBaseURI.String
