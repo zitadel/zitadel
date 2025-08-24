@@ -9,17 +9,34 @@
             "addAnother": "Ein weiteres Konto hinzufügen",
             "noResults": "Keine Konten gefunden"
         },
+        "logout": {
+            "title": "Logout",
+            "description": "Wählen Sie den Account aus, das Sie entfernen möchten",
+            "noResults": "Keine Konten gefunden",
+            "clear": "Session beenden",
+            "verifiedAt": "Zuletzt aktiv: {time}",
+            "success": {
+            "title": "Logout erfolgreich",
+            "description": "Sie haben sich erfolgreich abgemeldet."
+            }
+        },
         "loginname": {
             "title": "Willkommen zurück!",
             "description": "Geben Sie Ihre Anmeldedaten ein.",
-            "register": "Neuen Benutzer registrieren"
+            "register": "Neuen Benutzer registrieren",
+            "submit": "Weiter",
+            "loginname": "Loginname",
+            "username": "Benutzername",
+            "usernameOrPhoneNumber": "Benutzername oder Telefonnummer",
+            "usernameOrEmail": "Benutzername oder E-Mail"
         },
         "password": {
             "verify": {
             "title": "Passwort",
             "description": "Geben Sie Ihr Passwort ein.",
             "resetPassword": "Passwort zurücksetzen",
-            "submit": "Weiter"
+            "submit": "Weiter",
+            "password": "Passwort"
             },
             "set": {
             "title": "Passwort festlegen",
@@ -27,17 +44,23 @@
             "codeSent": "Ein Code wurde an Ihre E-Mail-Adresse gesendet.",
             "noCodeReceived": "Keinen Code erhalten?",
             "resend": "Erneut senden",
-            "submit": "Weiter"
+            "submit": "Weiter",
+            "code": "Code",
+            "newPassword": "Neues Passwort",
+            "confirmPassword": "Neues Passwort wiederholen"
             },
             "change": {
             "title": "Passwort ändern",
             "description": "Legen Sie das Passwort für Ihr Konto fest",
-            "submit": "Weiter"
+            "submit": "Weiter",
+            "newPassword": "Neues Passwort",
+            "confirmPassword": "Neues Passwort wiederholen"
             }
         },
         "idp": {
             "title": "Mit SSO anmelden",
             "description": "Wählen Sie einen der folgenden Anbieter, um sich anzumelden",
+            "orSignInWith": "oder melden Sie sich an mit",
             "signInWithApple": "Mit Apple anmelden",
             "signInWithGoogle": "Mit Google anmelden",
             "signInWithAzureAD": "Mit AzureAD anmelden",
@@ -62,7 +85,18 @@
             "linkingError": {
             "title": "Konto-Verknüpfung fehlgeschlagen",
             "description": "Beim Verknüpfen Ihres Kontos ist ein Fehler aufgetreten."
+            },
+            "completeRegister": {
+            "title": "Registrierung abschließen",
+            "description": "Bitte vervollständige die Registrierung, um dein Konto zu erstellen."
             }
+        },
+        "ldap": {
+            "title": "LDAP Login",
+            "description": "Geben Sie Ihre LDAP-Anmeldedaten ein.",
+            "username": "Benutzername",
+            "password": "Passwort",
+            "submit": "Weiter"
         },
         "mfa": {
             "verify": {
@@ -84,7 +118,8 @@
             "emailDescription": "Geben Sie den Code ein, den Sie per E-Mail erhalten haben.",
             "noCodeReceived": "Keinen Code erhalten?",
             "resendCode": "Code erneut senden",
-            "submit": "Weiter"
+            "submit": "Weiter",
+            "code": "Code"
             },
             "set": {
             "title": "2-Faktor einrichten",
@@ -92,7 +127,8 @@
             "smsDescription": "Geben Sie Ihre Telefonnummer ein, um einen Code per SMS zu erhalten.",
             "emailDescription": "Geben Sie Ihre E-Mail-Adresse ein, um einen Code per E-Mail zu erhalten.",
             "totpRegisterDescription": "Scannen Sie den QR-Code oder navigieren Sie manuell zur URL.",
-            "submit": "Weiter"
+            "submit": "Weiter",
+            "code": "Code"
             }
         },
         "passkey": {
@@ -127,7 +163,7 @@
         "register": {
             "methods": {
             "passkey": "Passkey",
-            "password": "Password"
+            "password": "Passwort"
             },
             "disabled": {
             "title": "Registrierung deaktiviert",
@@ -139,16 +175,23 @@
             },
             "title": "Registrieren",
             "description": "Erstellen Sie Ihr ZITADEL-Konto.",
+            "noMethodAvailableWarning": "Keine Authentifizierungsmethode verfügbar. Bitte wenden Sie sich an den Administrator.",
             "selectMethod": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten",
             "agreeTo": "Um sich zu registrieren, müssen Sie den Nutzungsbedingungen zustimmen",
             "termsOfService": "Nutzungsbedingungen",
             "privacyPolicy": "Datenschutzrichtlinie",
             "submit": "Weiter",
+            "orUseIDP": "oder verwenden Sie einen Identitätsanbieter",
             "password": {
             "title": "Passwort festlegen",
             "description": "Legen Sie das Passwort für Ihr Konto fest",
-            "submit": "Weiter"
-            }
+            "submit": "Weiter",
+            "password": "Passwort",
+            "confirmPassword": "Neues Passwort wiederholen"
+            },
+            "firstname": "Vorname",
+            "lastname": "Nachname",
+            "email": "E-Mail"
         },
         "invite": {
             "title": "Benutzer einladen",
@@ -175,14 +218,17 @@
         },
         "verify": {
             "userIdMissing": "Keine Benutzer-ID angegeben!",
-            "success": "Erfolgreich verifiziert",
+            "successTitle": "Benutzer verifiziert",
+            "successDescription": "Der Benutzer wurde erfolgreich verifiziert.",
             "setupAuthenticator": "Authentifikator einrichten",
             "verify": {
             "title": "Benutzer verifizieren",
             "description": "Geben Sie den Code ein, der in der Bestätigungs-E-Mail angegeben ist.",
             "noCodeReceived": "Keinen Code erhalten?",
             "resendCode": "Code erneut senden",
-            "submit": "Weiter"
+            "codeSent": "Ein Code wurde gerade an Ihre E-Mail-Adresse gesendet.",
+            "submit": "Weiter",
+            "code": "Code"
             }
         },
         "authenticator": {
@@ -196,7 +242,8 @@
             "usercode": {
             "title": "Gerätecode",
             "description": "Geben Sie den Code ein.",
-            "submit": "Weiter"
+            "submit": "Weiter",
+            "code": "Code"
             },
             "request": {
             "title": "{appName} möchte eine Verbindung herstellen:",
@@ -231,17 +278,34 @@
             "addAnother": "Add another account",
             "noResults": "No accounts found"
         },
+        "logout": {
+            "title": "Logout",
+            "description": "Click an account to end the session",
+            "noResults": "No accounts found",
+            "clear": "End Session",
+            "verifiedAt": "Last active: {time}",
+            "success": {
+            "title": "Logout successful",
+            "description": "You have successfully logged out."
+            }
+        },
         "loginname": {
             "title": "Welcome back!",
             "description": "Enter your login data.",
-            "register": "Register new user"
+            "register": "Register new user",
+            "submit": "Continue",
+            "loginname": "Loginname",
+            "username": "Username",
+            "usernameOrPhoneNumber": "Username or phone number",
+            "usernameOrEmail": "Username or email"
         },
         "password": {
             "verify": {
             "title": "Password",
             "description": "Enter your password.",
             "resetPassword": "Reset Password",
-            "submit": "Continue"
+            "submit": "Continue",
+            "password": "Password"
             },
             "set": {
             "title": "Set Password",
@@ -249,17 +313,23 @@
             "codeSent": "A code has been sent to your email address.",
             "noCodeReceived": "Didn't receive a code?",
             "resend": "Resend code",
-            "submit": "Continue"
+            "submit": "Continue",
+            "code": "Code",
+            "newPassword": "New Password",
+            "confirmPassword": "Confirm Password"
             },
             "change": {
             "title": "Change Password",
             "description": "Set the password for your account",
-            "submit": "Continue"
+            "submit": "Continue",
+            "newPassword": "New Password",
+            "confirmPassword": "Confirm Password"
             }
         },
         "idp": {
             "title": "Sign in with SSO",
             "description": "Select one of the following providers to sign in",
+            "orSignInWith": "or sign in with",
             "signInWithApple": "Sign in with Apple",
             "signInWithGoogle": "Sign in with Google",
             "signInWithAzureAD": "Sign in with AzureAD",
@@ -284,7 +354,18 @@
             "linkingError": {
             "title": "Account linking failed",
             "description": "An error occurred while trying to link your account."
+            },
+            "completeRegister": {
+            "title": "Complete your data",
+            "description": "You need to complete your registration by providing your email address and name."
             }
+        },
+        "ldap": {
+            "title": "LDAP Login",
+            "description": "Enter your LDAP credentials.",
+            "username": "Username",
+            "password": "Password",
+            "submit": "Continue"
         },
         "mfa": {
             "verify": {
@@ -306,7 +387,8 @@
             "emailDescription": "Enter the code you received via email.",
             "noCodeReceived": "Didn't receive a code?",
             "resendCode": "Resend code",
-            "submit": "Continue"
+            "submit": "Continue",
+            "code": "Code"
             },
             "set": {
             "title": "Set up 2-Factor",
@@ -314,7 +396,8 @@
             "smsDescription": "Enter your phone number to receive a code via SMS.",
             "emailDescription": "Enter your email address to receive a code via email.",
             "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
-            "submit": "Continue"
+            "submit": "Continue",
+            "code": "Code"
             }
         },
         "passkey": {
@@ -361,16 +444,23 @@
             },
             "title": "Register",
             "description": "Create your ZITADEL account.",
+            "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
             "selectMethod": "Select the method you would like to authenticate",
             "agreeTo": "To register you must agree to the terms and conditions",
             "termsOfService": "Terms of Service",
             "privacyPolicy": "Privacy Policy",
             "submit": "Continue",
+            "orUseIDP": "or use an Identity Provider",
             "password": {
             "title": "Set Password",
             "description": "Set the password for your account",
-            "submit": "Continue"
-            }
+            "submit": "Continue",
+            "password": "Password",
+            "confirmPassword": "Confirm Password"
+            },
+            "firstname": "First name",
+            "lastname": "Last name",
+            "email": "E-mail"
         },
         "invite": {
             "title": "Invite User",
@@ -397,14 +487,17 @@
         },
         "verify": {
             "userIdMissing": "No userId provided!",
-            "success": "The user has been verified successfully.",
+            "successTitle": "User verified",
+            "successDescription": "The user has been verified successfully.",
             "setupAuthenticator": "Setup authenticator",
             "verify": {
             "title": "Verify user",
             "description": "Enter the Code provided in the verification email.",
             "noCodeReceived": "Didn't receive a code?",
             "resendCode": "Resend code",
-            "submit": "Continue"
+            "codeSent": "A code has just been sent to your email address.",
+            "submit": "Continue",
+            "code": "Code"
             }
         },
         "authenticator": {
@@ -418,7 +511,8 @@
             "usercode": {
             "title": "Device code",
             "description": "Enter the code displayed on your app or device.",
-            "submit": "Continue"
+            "submit": "Continue",
+            "code": "Code"
             },
             "request": {
             "title": "{appName} would like to connect",
@@ -453,17 +547,34 @@
             "addAnother": "Agregar otra cuenta",
             "noResults": "No se encontraron cuentas"
         },
+        "logout": {
+            "title": "Cerrar sesión",
+            "description": "Selecciona la cuenta que deseas eliminar",
+            "noResults": "No se encontraron cuentas",
+            "clear": "Eliminar sesión",
+            "verifiedAt": "Última actividad: {time}",
+            "success": {
+            "title": "Cierre de sesión exitoso",
+            "description": "Has cerrado sesión correctamente."
+            }
+        },
         "loginname": {
             "title": "¡Bienvenido de nuevo!",
             "description": "Introduce tus datos de acceso.",
-            "register": "Registrar nuevo usuario"
+            "register": "Registrar nuevo usuario",
+            "submit": "Continuar",
+            "loginname": "Nombre de inicio de sesión",
+            "username": "Nombre de usuario",
+            "usernameOrPhoneNumber": "Nombre de usuario o número de teléfono",
+            "usernameOrEmail": "Nombre de usuario o correo electrónico"
         },
         "password": {
             "verify": {
             "title": "Contraseña",
             "description": "Introduce tu contraseña.",
             "resetPassword": "Restablecer contraseña",
-            "submit": "Continuar"
+            "submit": "Continuar",
+            "password": "Contraseña"
             },
             "set": {
             "title": "Establecer Contraseña",
@@ -471,17 +582,23 @@
             "codeSent": "Se ha enviado un código a su correo electrónico.",
             "noCodeReceived": "¿No recibiste un código?",
             "resend": "Reenviar código",
-            "submit": "Continuar"
+            "submit": "Continuar",
+            "code": "Código",
+            "newPassword": "Nueva contraseña",
+            "confirmPassword": "Confirmar contraseña"
             },
             "change": {
             "title": "Cambiar Contraseña",
             "description": "Establece la contraseña para tu cuenta",
-            "submit": "Continuar"
+            "submit": "Continuar",
+            "newPassword": "Nueva contraseña",
+            "confirmPassword": "Confirmar contraseña"
             }
         },
         "idp": {
             "title": "Iniciar sesión con SSO",
             "description": "Selecciona uno de los siguientes proveedores para iniciar sesión",
+            "orSignInWith": "o iniciar sesión con",
             "signInWithApple": "Iniciar sesión con Apple",
             "signInWithGoogle": "Iniciar sesión con Google",
             "signInWithAzureAD": "Iniciar sesión con AzureAD",
@@ -506,7 +623,18 @@
             "linkingError": {
             "title": "Error al vincular la cuenta",
             "description": "Ocurrió un error al intentar vincular tu cuenta."
+            },
+            "completeRegister": {
+            "title": "Completar registro",
+            "description": "Para completar el registro, debes establecer una contraseña."
             }
+        },
+        "ldap": {
+            "title": "Iniciar sesión con LDAP",
+            "description": "Introduce tus credenciales LDAP.",
+            "username": "Nombre de usuario",
+            "password": "Contraseña",
+            "submit": "Continuar"
         },
         "mfa": {
             "verify": {
@@ -528,7 +656,8 @@
             "emailDescription": "Introduce el código que recibiste por correo electrónico.",
             "noCodeReceived": "¿No recibiste un código?",
             "resendCode": "Reenviar código",
-            "submit": "Continuar"
+            "submit": "Continuar",
+            "code": "Código"
             },
             "set": {
             "title": "Configurar autenticación de 2 factores",
@@ -536,7 +665,8 @@
             "smsDescription": "Introduce tu número de teléfono para recibir un código por SMS.",
             "emailDescription": "Introduce tu dirección de correo electrónico para recibir un código por correo electrónico.",
             "totpRegisterDescription": "Escanea el código QR o navega manualmente a la URL.",
-            "submit": "Continuar"
+            "submit": "Continuar",
+            "code": "Código"
             }
         },
         "passkey": {
@@ -583,16 +713,23 @@
             },
             "title": "Registrarse",
             "description": "Crea tu cuenta ZITADEL.",
+            "noMethodAvailableWarning": "No hay métodos de autenticación disponibles. Por favor, contacta a tu administrador.",
             "selectMethod": "Selecciona el método con el que deseas autenticarte",
             "agreeTo": "Para registrarte debes aceptar los términos y condiciones",
             "termsOfService": "Términos de Servicio",
             "privacyPolicy": "Política de Privacidad",
             "submit": "Continuar",
+            "orUseIDP": "o usa un Proveedor de Identidad",
             "password": {
             "title": "Establecer Contraseña",
             "description": "Establece la contraseña para tu cuenta",
-            "submit": "Continuar"
-            }
+            "submit": "Continuar",
+            "password": "Contraseña",
+            "confirmPassword": "Confirmar contraseña"
+            },
+            "firstname": "Nombre",
+            "lastname": "Apellidos",
+            "email": "Correo electrónico"
         },
         "invite": {
             "title": "Invitar usuario",
@@ -619,14 +756,17 @@
         },
         "verify": {
             "userIdMissing": "¡No se proporcionó userId!",
-            "success": "¡Verificación exitosa!",
+            "successTitle": "Usuario verificado",
+            "successDescription": "El usuario ha sido verificado con éxito.",
             "setupAuthenticator": "Configurar autenticador",
             "verify": {
             "title": "Verificar usuario",
             "description": "Introduce el código proporcionado en el correo electrónico de verificación.",
             "noCodeReceived": "¿No recibiste un código?",
             "resendCode": "Reenviar código",
-            "submit": "Continuar"
+            "codeSent": "Se ha enviado un código a tu dirección de correo electrónico.",
+            "submit": "Continuar",
+            "code": "Código"
             }
         },
         "authenticator": {
@@ -640,7 +780,8 @@
             "usercode": {
             "title": "Código del dispositivo",
             "description": "Introduce el código.",
-            "submit": "Continuar"
+            "submit": "Continuar",
+            "code": "Código"
             },
             "request": {
             "title": "{appName} desea conectarse:",
@@ -675,17 +816,34 @@
             "addAnother": "Aggiungi un altro account",
             "noResults": "Nessun account trovato"
         },
+        "logout": {
+            "title": "Esci",
+            "description": "Seleziona l'account che desideri uscire",
+            "noResults": "Nessun account trovato",
+            "clear": "Elimina sessione",
+            "verifiedAt": "Ultima attività: {time}",
+            "success": {
+            "title": "Uscita riuscita",
+            "description": "Hai effettuato l'uscita con successo."
+            }
+        },
         "loginname": {
             "title": "Bentornato!",
             "description": "Inserisci i tuoi dati di accesso.",
-            "register": "Registrati come nuovo utente"
+            "register": "Registrati come nuovo utente",
+            "submit": "Continua",
+            "loginname": "Nome di accesso",
+            "username": "Nome utente",
+            "usernameOrPhoneNumber": "Nome utente o numero di telefono",
+            "usernameOrEmail": "Nome utente o e-mail"
         },
         "password": {
             "verify": {
             "title": "Password",
             "description": "Inserisci la tua password.",
             "resetPassword": "Reimposta Password",
-            "submit": "Continua"
+            "submit": "Continua",
+            "password": "Password"
             },
             "set": {
             "title": "Imposta Password",
@@ -693,17 +851,23 @@
             "codeSent": "Un codice è stato inviato al tuo indirizzo email.",
             "noCodeReceived": "Non hai ricevuto un codice?",
             "resend": "Invia di nuovo",
-            "submit": "Continua"
+            "submit": "Continua",
+            "code": "Codice",
+            "newPassword": "Nuova password",
+            "confirmPassword": "Conferma password"
             },
             "change": {
             "title": "Cambia Password",
             "description": "Imposta la password per il tuo account",
-            "submit": "Continua"
+            "submit": "Continua",
+            "newPassword": "Nuova password",
+            "confirmPassword": "Conferma password"
             }
         },
         "idp": {
             "title": "Accedi con SSO",
             "description": "Seleziona uno dei seguenti provider per accedere",
+            "orSignInWith": "o accedi con",
             "signInWithApple": "Accedi con Apple",
             "signInWithGoogle": "Accedi con Google",
             "signInWithAzureAD": "Accedi con AzureAD",
@@ -728,7 +892,18 @@
             "linkingError": {
             "title": "Collegamento account fallito",
             "description": "Si è verificato un errore durante il tentativo di collegare il tuo account."
+            },
+            "completeRegister": {
+            "title": "Completa la registrazione",
+            "description": "Completa la registrazione del tuo account."
             }
+        },
+        "ldap": {
+            "title": "Accedi con LDAP",
+            "description": "Inserisci le tue credenziali LDAP.",
+            "username": "Nome utente",
+            "password": "Password",
+            "submit": "Continua"
         },
         "mfa": {
             "verify": {
@@ -750,7 +925,8 @@
             "emailDescription": "Inserisci il codice ricevuto via email.",
             "noCodeReceived": "Non hai ricevuto un codice?",
             "resendCode": "Invia di nuovo il codice",
-            "submit": "Continua"
+            "submit": "Continua",
+            "code": "Codice"
             },
             "set": {
             "title": "Configura l'autenticazione a 2 fattori",
@@ -758,7 +934,8 @@
             "smsDescription": "Inserisci il tuo numero di telefono per ricevere un codice via SMS.",
             "emailDescription": "Inserisci il tuo indirizzo email per ricevere un codice via email.",
             "totpRegisterDescription": "Scansiona il codice QR o naviga manualmente all'URL.",
-            "submit": "Continua"
+            "submit": "Continua",
+            "code": "Codice"
             }
         },
         "passkey": {
@@ -805,16 +982,23 @@
             },
             "title": "Registrati",
             "description": "Crea il tuo account ZITADEL.",
+            "noMethodAvailableWarning": "Nessun metodo di autenticazione disponibile. Contatta l'amministratore di sistema per assistenza.",
             "selectMethod": "Seleziona il metodo con cui desideri autenticarti",
             "agreeTo": "Per registrarti devi accettare i termini e le condizioni",
             "termsOfService": "Termini di Servizio",
             "privacyPolicy": "Informativa sulla Privacy",
             "submit": "Continua",
+            "orUseIDP": "o usa un Identity Provider",
             "password": {
             "title": "Imposta Password",
             "description": "Imposta la password per il tuo account",
-            "submit": "Continua"
-            }
+            "submit": "Continua",
+            "password": "Password",
+            "confirmPassword": "Conferma password"
+            },
+            "firstname": "Nome",
+            "lastname": "Cognome",
+            "email": "E-mail"
         },
         "invite": {
             "title": "Invita Utente",
@@ -841,14 +1025,17 @@
         },
         "verify": {
             "userIdMissing": "Nessun userId fornito!",
-            "success": "Verifica effettuata con successo!",
+            "successTitle": "Utente verificato",
+            "successDescription": "L'utente è stato verificato con successo.",
             "setupAuthenticator": "Configura autenticatore",
             "verify": {
             "title": "Verifica utente",
             "description": "Inserisci il codice fornito nell'email di verifica.",
             "noCodeReceived": "Non hai ricevuto un codice?",
             "resendCode": "Invia di nuovo il codice",
-            "submit": "Continua"
+            "codeSent": "Un codice è stato appena inviato al tuo indirizzo email.",
+            "submit": "Continua",
+            "code": "Codice"
             }
         },
         "authenticator": {
@@ -862,7 +1049,8 @@
             "usercode": {
             "title": "Codice dispositivo",
             "description": "Inserisci il codice.",
-            "submit": "Continua"
+            "submit": "Continua",
+            "code": "Codice"
             },
             "request": {
             "title": "{appName} desidera connettersi:",
@@ -886,7 +1074,6 @@
             "failedLoading": "Impossibile caricare i dati. Riprova.",
             "tryagain": "Riprova"
         }
-
     },
     "pl":{
         "common": {
@@ -898,17 +1085,34 @@
             "addAnother": "Dodaj kolejne konto",
             "noResults": "Nie znaleziono kont"
         },
+        "logout": {
+            "title": "Wyloguj się",
+            "description": "Wybierz konto, które chcesz usunąć",
+            "noResults": "Nie znaleziono kont",
+            "clear": "Usuń sesję",
+            "verifiedAt": "Ostatnia aktywność: {time}",
+            "success": {
+            "title": "Wylogowanie udane",
+            "description": "Pomyślnie się wylogowałeś."
+            }
+        },
         "loginname": {
             "title": "Witamy ponownie!",
             "description": "Wprowadź dane logowania.",
-            "register": "Zarejestruj nowego użytkownika"
+            "register": "Zarejestruj nowego użytkownika",
+            "submit": "Kontynuuj",
+            "loginname": "Login",
+            "username": "Nazwa użytkownika",
+            "usernameOrPhoneNumber": "Nazwa użytkownika lub numer telefonu",
+            "usernameOrEmail": "Nazwa użytkownika lub e-mail"
         },
         "password": {
             "verify": {
             "title": "Hasło",
             "description": "Wprowadź swoje hasło.",
             "resetPassword": "Zresetuj hasło",
-            "submit": "Kontynuuj"
+            "submit": "Kontynuuj",
+            "password": "Hasło"
             },
             "set": {
             "title": "Ustaw hasło",
@@ -916,17 +1120,23 @@
             "codeSent": "Kod został wysłany na twój adres e-mail.",
             "noCodeReceived": "Nie otrzymałeś kodu?",
             "resend": "Wyślij kod ponownie",
-            "submit": "Kontynuuj"
+            "submit": "Kontynuuj",
+            "code": "Kod",
+            "newPassword": "Nowe hasło",
+            "confirmPassword": "Potwierdź nowe hasło"
             },
             "change": {
             "title": "Zmień hasło",
             "description": "Ustaw nowe hasło dla swojego konta",
-            "submit": "Kontynuuj"
+            "submit": "Kontynuuj",
+            "newPassword": "Nowe hasło",
+            "confirmPassword": "Potwierdź nowe hasło"
             }
         },
         "idp": {
             "title": "Zaloguj się za pomocą SSO",
             "description": "Wybierz jednego z poniższych dostawców, aby się zalogować",
+            "orSignInWith": "lub zaloguj się przez",
             "signInWithApple": "Zaloguj się przez Apple",
             "signInWithGoogle": "Zaloguj się przez Google",
             "signInWithAzureAD": "Zaloguj się przez AzureAD",
@@ -951,7 +1161,18 @@
             "linkingError": {
             "title": "Powiązanie konta nie powiodło się",
             "description": "Wystąpił błąd podczas próby powiązania konta."
+            },
+            "completeRegister": {
+            "title": "Ukończ rejestrację",
+            "description": "Ukończ rejestrację swojego konta."
             }
+        },
+        "ldap": {
+            "title": "Zaloguj się przez LDAP",
+            "description": "Wprowadź swoje dane logowania LDAP.",
+            "username": "Nazwa użytkownika",
+            "password": "Hasło",
+            "submit": "Kontynuuj"
         },
         "mfa": {
             "verify": {
@@ -973,7 +1194,8 @@
             "emailDescription": "Wprowadź kod otrzymany e-mailem.",
             "noCodeReceived": "Nie otrzymałeś kodu?",
             "resendCode": "Wyślij kod ponownie",
-            "submit": "Kontynuuj"
+            "submit": "Kontynuuj",
+            "code": "Kod"
             },
             "set": {
             "title": "Skonfiguruj uwierzytelnianie dwuskładnikowe",
@@ -981,7 +1203,8 @@
             "smsDescription": "Wprowadź swój numer telefonu, aby otrzymać kod SMS-em.",
             "emailDescription": "Wprowadź swój adres e-mail, aby otrzymać kod e-mailem.",
             "totpRegisterDescription": "Zeskanuj kod QR lub otwórz adres URL ręcznie.",
-            "submit": "Kontynuuj"
+            "submit": "Kontynuuj",
+            "code": "Kod"
             }
         },
         "passkey": {
@@ -1028,16 +1251,23 @@
             },
             "title": "Rejestracja",
             "description": "Utwórz konto ZITADEL.",
+            "noMethodAvailableWarning": "Brak dostępnych metod uwierzytelniania. Skontaktuj się z administratorem.",
             "selectMethod": "Wybierz metodę uwierzytelniania, której chcesz użyć",
             "agreeTo": "Aby się zarejestrować, musisz zaakceptować warunki korzystania",
             "termsOfService": "Regulamin",
             "privacyPolicy": "Polityka prywatności",
             "submit": "Kontynuuj",
+            "orUseIDP": "lub użyj dostawcy tożsamości",
             "password": {
             "title": "Ustaw hasło",
             "description": "Ustaw hasło dla swojego konta",
-            "submit": "Kontynuuj"
-            }
+            "submit": "Kontynuuj",
+            "password": "Hasło",
+            "confirmPassword": "Potwierdź hasło"
+            },
+            "firstname": "Imię",
+            "lastname": "Nazwisko",
+            "email": "E-mail"
         },
         "invite": {
             "title": "Zaproś użytkownika",
@@ -1064,14 +1294,17 @@
         },
         "verify": {
             "userIdMissing": "Nie podano identyfikatora użytkownika!",
-            "success": "Użytkownik został pomyślnie zweryfikowany.",
+            "successTitle": "Weryfikacja zakończona",
+            "successDescription": "Użytkownik został pomyślnie zweryfikowany.",
             "setupAuthenticator": "Skonfiguruj uwierzytelnianie",
             "verify": {
             "title": "Zweryfikuj użytkownika",
             "description": "Wprowadź kod z wiadomości weryfikacyjnej.",
             "noCodeReceived": "Nie otrzymałeś kodu?",
             "resendCode": "Wyślij kod ponownie",
-            "submit": "Kontynuuj"
+            "codeSent": "Kod został właśnie wysłany na twój adres e-mail.",
+            "submit": "Kontynuuj",
+            "code": "Kod"
             }
         },
         "authenticator": {
@@ -1085,7 +1318,8 @@
             "usercode": {
             "title": "Kod urządzenia",
             "description": "Wprowadź kod.",
-            "submit": "Kontynuuj"
+            "submit": "Kontynuuj",
+            "code": "Kod"
             },
             "request": {
             "title": "{appName} chce się połączyć:",
@@ -1120,17 +1354,34 @@
             "addAnother": "Добавить другой аккаунт",
             "noResults": "Аккаунты не найдены"
         },
+        "logout": {
+            "title": "Выход",
+            "description": "Выберите аккаунт, который хотите удалить",
+            "noResults": "Аккаунты не найдены",
+            "clear": "Удалить сессию",
+            "verifiedAt": "Последняя активность: {time}",
+            "success": {
+            "title": "Выход выполнен успешно",
+            "description": "Вы успешно вышли из системы."
+            }
+        },
         "loginname": {
             "title": "С возвращением!",
             "description": "Введите свои данные для входа.",
-            "register": "Зарегистрировать нового пользователя"
+            "register": "Зарегистрировать нового пользователя",
+            "submit": "Продолжить",
+            "loginname": "Логин",
+            "username": "Имя пользователя",
+            "usernameOrPhoneNumber": "Имя пользователя или номер телефона",
+            "usernameOrEmail": "Имя пользователя или электронная почта"
         },
         "password": {
             "verify": {
             "title": "Пароль",
             "description": "Введите ваш пароль.",
             "resetPassword": "Сбросить пароль",
-            "submit": "Продолжить"
+            "submit": "Продолжить",
+            "password": "Пароль"
             },
             "set": {
             "title": "Установить пароль",
@@ -1138,17 +1389,23 @@
             "codeSent": "Код отправлен на ваш адрес электронной почты.",
             "noCodeReceived": "Не получили код?",
             "resend": "Отправить код повторно",
-            "submit": "Продолжить"
+            "submit": "Продолжить",
+            "code": "Код",
+            "newPassword": "Новый пароль",
+            "confirmPassword": "Подтвердите пароль"
             },
             "change": {
             "title": "Изменить пароль",
             "description": "Установите пароль для вашего аккаунта",
-            "submit": "Продолжить"
+            "submit": "Продолжить",
+            "newPassword": "Новый пароль",
+            "confirmPassword": "Подтвердите пароль"
             }
         },
         "idp": {
             "title": "Войти через SSO",
             "description": "Выберите одного из провайдеров для входа",
+            "orSignInWith": "или войти через",
             "signInWithApple": "Войти через Apple",
             "signInWithGoogle": "Войти через Google",
             "signInWithAzureAD": "Войти через AzureAD",
@@ -1173,7 +1430,18 @@
             "linkingError": {
             "title": "Ошибка привязки аккаунта",
             "description": "Произошла ошибка при попытке привязать аккаунт."
+            },
+            "completeRegister": {
+            "title": "Завершите регистрацию",
+            "description": "Завершите регистрацию вашего аккаунта."
             }
+        },
+        "ldap": {
+            "title": "Войти через LDAP",
+            "description": "Введите ваши учетные данные LDAP.",
+            "username": "Имя пользователя",
+            "password": "Пароль",
+            "submit": "Продолжить"
         },
         "mfa": {
             "verify": {
@@ -1195,7 +1463,8 @@
             "emailDescription": "Введите код, полученный по email.",
             "noCodeReceived": "Не получили код?",
             "resendCode": "Отправить код повторно",
-            "submit": "Продолжить"
+            "submit": "Продолжить",
+            "code": "Код"
             },
             "set": {
             "title": "Настройка двухфакторной аутентификации",
@@ -1203,7 +1472,8 @@
             "smsDescription": "Введите номер телефона для получения кода по SMS.",
             "emailDescription": "Введите email для получения кода.",
             "totpRegisterDescription": "Отсканируйте QR-код или перейдите по ссылке вручную.",
-            "submit": "Продолжить"
+            "submit": "Продолжить",
+            "code": "Код"
             }
         },
         "passkey": {
@@ -1250,16 +1520,23 @@
             },
             "title": "Регистрация",
             "description": "Создайте свой аккаунт ZITADEL.",
+            "noMethodAvailableWarning": "Нет доступных методов аутентификации. Обратитесь к администратору.",
             "selectMethod": "Выберите метод аутентификации",
             "agreeTo": "Для регистрации необходимо принять условия:",
             "termsOfService": "Условия использования",
             "privacyPolicy": "Политика конфиденциальности",
             "submit": "Продолжить",
+            "orUseIDP": "или используйте Identity Provider",
             "password": {
             "title": "Установить пароль",
             "description": "Установите пароль для вашего аккаунта",
-            "submit": "Продолжить"
-            }
+            "submit": "Продолжить",
+            "password": "Пароль",
+            "confirmPassword": "Подтвердите пароль"
+            },
+            "firstname": "Имя",
+            "lastname": "Фамилия",
+            "email": "Электронная почта"
         },
         "invite": {
             "title": "Пригласить пользователя",
@@ -1286,14 +1563,17 @@
         },
         "verify": {
             "userIdMissing": "Не указан userId!",
-            "success": "Пользователь успешно подтверждён.",
+            "successTitle": "Пользователь подтверждён",
+            "successDescription": "Пользователь успешно подтверждён.",
             "setupAuthenticator": "Настроить аутентификатор",
             "verify": {
             "title": "Подтверждение пользователя",
             "description": "Введите код из письма подтверждения.",
             "noCodeReceived": "Не получили код?",
             "resendCode": "Отправить код повторно",
-            "submit": "Продолжить"
+            "codeSent": "Код отправлен на ваш email.",
+            "submit": "Продолжить",
+            "code": "Код"
             }
         },
         "authenticator": {
@@ -1307,7 +1587,8 @@
             "usercode": {
             "title": "Код устройства",
             "description": "Введите код.",
-            "submit": "Продолжить"
+            "submit": "Продолжить",
+            "code": "Код"
             },
             "request": {
             "title": "{appName} хочет подключиться:",
@@ -1342,17 +1623,34 @@
             "addAnother": "添加另一个账户",
             "noResults": "未找到账户"
         },
+        "logout": {
+            "title": "注销",
+            "description": "选择您想注销的账户",
+            "noResults": "未找到账户",
+            "clear": "注销会话",
+            "verifiedAt": "最后活动时间：{time}",
+            "success": {
+            "title": "注销成功",
+            "description": "您已成功注销。"
+            }
+        },
         "loginname": {
             "title": "欢迎回来！",
             "description": "请输入您的登录信息。",
-            "register": "注册新用户"
+            "register": "注册新用户",
+            "submit": "继续",
+            "loginname": "登录名",
+            "username": "用户名",
+            "usernameOrPhoneNumber": "用户名或电话号码",
+            "usernameOrEmail": "用户名或电子邮箱"
         },
         "password": {
             "verify": {
             "title": "密码",
             "description": "请输入您的密码。",
             "resetPassword": "重置密码",
-            "submit": "继续"
+            "submit": "继续",
+            "password": "密码"
             },
             "set": {
             "title": "设置密码",
@@ -1360,17 +1658,23 @@
             "codeSent": "验证码已发送到您的邮箱。",
             "noCodeReceived": "没有收到验证码？",
             "resend": "重发验证码",
-            "submit": "继续"
+            "submit": "继续",
+            "code": "验证码",
+            "newPassword": "新密码",
+            "confirmPassword": "确认密码"
             },
             "change": {
             "title": "更改密码",
             "description": "为您的账户设置密码",
-            "submit": "继续"
+            "submit": "继续",
+            "newPassword": "新密码",
+            "confirmPassword": "确认密码"
             }
         },
         "idp": {
             "title": "使用 SSO 登录",
             "description": "选择以下提供商中的一个进行登录",
+            "orSignInWith": "或使用以下方式登录",
             "signInWithApple": "用 Apple 登录",
             "signInWithGoogle": "用 Google 登录",
             "signInWithAzureAD": "用 AzureAD 登录",
@@ -1395,7 +1699,18 @@
             "linkingError": {
             "title": "账户链接失败",
             "description": "链接账户时发生错误。"
+            },
+            "completeRegister": {
+            "title": "完成注册",
+            "description": "完成您的账户注册。"
             }
+        },
+        "ldap": {
+            "title": "使用 LDAP 登录",
+            "description": "请输入您的 LDAP 凭据。",
+            "username": "用户名",
+            "password": "密码",
+            "submit": "继续"
         },
         "mfa": {
             "verify": {
@@ -1417,7 +1732,8 @@
             "emailDescription": "输入通过电子邮件收到的验证码。",
             "noCodeReceived": "没有收到验证码？",
             "resendCode": "重发验证码",
-            "submit": "继续"
+            "submit": "继续",
+            "code": "验证码"
             },
             "set": {
             "title": "设置双因素认证",
@@ -1425,7 +1741,8 @@
             "smsDescription": "输入您的电话号码以接收短信验证码。",
             "emailDescription": "输入您的电子邮箱地址以接收电子邮件验证码。",
             "totpRegisterDescription": "扫描二维码或手动导航到URL。",
-            "submit": "继续"
+            "submit": "继续",
+            "code": "验证码"
             }
         },
         "passkey": {
@@ -1472,16 +1789,23 @@
             },
             "title": "注册",
             "description": "创建您的 ZITADEL 账户。",
+            "noMethodAvailableWarning": "没有可用的认证方法。请联系您的系统管理员。",
             "selectMethod": "选择您想使用的认证方法",
             "agreeTo": "注册即表示您同意条款和条件",
             "termsOfService": "服务条款",
             "privacyPolicy": "隐私政策",
             "submit": "继续",
+            "orUseIDP": "或使用身份提供者",
             "password": {
             "title": "设置密码",
             "description": "为您的账户设置密码",
-            "submit": "继续"
-            }
+            "submit": "继续",
+            "password": "密码",
+            "confirmPassword": "确认密码"
+            },
+            "firstname": "名字",
+            "lastname": "姓氏",
+            "email": "电子邮箱"
         },
         "invite": {
             "title": "邀请用户",
@@ -1508,14 +1832,17 @@
         },
         "verify": {
             "userIdMissing": "未提供用户 ID！",
-            "success": "用户验证成功。",
+            "successTitle": "用户已验证",
+            "successDescription": "用户已成功验证。",
             "setupAuthenticator": "设置认证器",
             "verify": {
             "title": "验证用户",
             "description": "输入验证邮件中的验证码。",
             "noCodeReceived": "没有收到验证码？",
             "resendCode": "重发验证码",
-            "submit": "继续"
+            "codeSent": "刚刚发送了一封包含验证码的电子邮件。",
+            "submit": "继续",
+            "code": "验证码"
             }
         },
         "authenticator": {
@@ -1529,7 +1856,8 @@
             "usercode": {
             "title": "设备代码",
             "description": "输入代码。",
-            "submit": "继续"
+            "submit": "继续",
+            "code": "验证码"
             },
             "request": {
             "title": "{appName} 想要连接：",
