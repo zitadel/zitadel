@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"errors"
-	"fmt"
 	"regexp"
 	"testing"
 
@@ -60,7 +59,7 @@ func Test_database_ReadKeys(t *testing.T) {
 					})),
 				masterKey: "wrong key",
 				decrypt: func(encryptedKey, masterKey string) (key string, err error) {
-					return "", fmt.Errorf("wrong masterkey")
+					return "", errors.New("wrong masterkey")
 				},
 			},
 			res{
@@ -207,7 +206,7 @@ func Test_database_ReadKey(t *testing.T) {
 				)),
 				masterKey: "wrong key",
 				decrypt: func(encryptedKey, masterKey string) (key string, err error) {
-					return "", fmt.Errorf("wrong masterkey")
+					return "", errors.New("wrong masterkey")
 				},
 			},
 			args{
@@ -293,7 +292,7 @@ func Test_database_CreateKeys(t *testing.T) {
 				client:    dbMock(t),
 				masterKey: "",
 				encrypt: func(key, masterKey string) (encryptedKey string, err error) {
-					return "", fmt.Errorf("encryption failed")
+					return "", errors.New("encryption failed")
 				},
 			},
 			args{

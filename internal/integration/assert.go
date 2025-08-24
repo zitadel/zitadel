@@ -152,12 +152,12 @@ func AssertGrpcStatus(t assert.TestingT, expected codes.Code, err error) {
 // Expected messages are usually with a vanilla state, eg only exported fields contain data.
 // Actual messages obtained from the gRPC client had unexported fields with data.
 // This makes them hard to compare.
-func EqualProto(t testing.TB, expected, actual proto.Message) bool {
-	t.Helper()
+func EqualProto(tb testing.TB, expected, actual proto.Message) bool {
+	tb.Helper()
 	if proto.Equal(expected, actual) {
 		return true
 	}
-	t.Errorf("Proto messages not equal: %s", diffProto(expected, actual))
+	tb.Errorf("Proto messages not equal: %s", diffProto(expected, actual))
 	return false
 }
 

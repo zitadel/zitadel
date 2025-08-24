@@ -25,6 +25,8 @@ type expect func(mockRepository *mock.MockRepository)
 
 // Deprecated: use expectEventstore
 func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
+	t.Helper()
+
 	m := mock.NewRepo(t)
 	for _, e := range expects {
 		e(m)
@@ -43,6 +45,8 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 // of the Test function being run.
 func expectEventstore(expects ...expect) func(*testing.T) *eventstore.Eventstore {
 	return func(t *testing.T) *eventstore.Eventstore {
+		t.Helper()
+
 		return eventstoreExpect(t, expects...)
 	}
 }
@@ -163,6 +167,8 @@ func eventFromEventPusherWithCreationDateNow(event eventstore.Command) *reposito
 }
 
 func GetMockSecretGenerator(t *testing.T) crypto.Generator {
+	t.Helper()
+
 	ctrl := gomock.NewController(t)
 	alg := crypto.CreateMockEncryptionAlg(ctrl)
 	generator := crypto.NewMockGenerator(ctrl)

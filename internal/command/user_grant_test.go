@@ -465,6 +465,8 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
+					t.Helper()
+
 					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
 				},
 			},
@@ -538,6 +540,8 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
+					t.Helper()
+
 					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
 				},
 			},
@@ -616,6 +620,8 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
+					t.Helper()
+
 					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
 				},
 			},
@@ -699,6 +705,8 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					),
 				),
 				idGenerator: func(t *testing.T) id.Generator {
+					t.Helper()
+
 					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
 				},
 			},
@@ -2833,7 +2841,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 			},
 		},
 		{
-			name: "no permissions, permisison denied error",
+			name: "no permissions, permission denied error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,

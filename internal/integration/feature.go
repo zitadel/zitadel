@@ -12,6 +12,8 @@ import (
 )
 
 func EnsureInstanceFeature(t *testing.T, ctx context.Context, instance *Instance, features *feature.SetInstanceFeaturesRequest, assertFeatures func(t *assert.CollectT, got *feature.GetInstanceFeaturesResponse)) {
+	t.Helper()
+
 	ctx = instance.WithAuthorizationToken(ctx, UserTypeIAMOwner)
 	_, err := instance.Client.FeatureV2.SetInstanceFeatures(ctx, features)
 	require.NoError(t, err)

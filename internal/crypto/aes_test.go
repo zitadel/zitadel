@@ -31,14 +31,16 @@ func (*mockKeyStorage) CreateKeys(context.Context, ...*Key) error {
 	return errors.New("mockKeyStorage.CreateKeys not implemented")
 }
 
-func newTestAESCrypto(t testing.TB) *AESCrypto {
+func newTestAESCrypto(tb testing.TB) *AESCrypto {
+	tb.Helper()
+
 	keyConfig := &KeyConfig{
 		EncryptionKeyID:  "keyID",
 		DecryptionKeyIDs: []string{"keyID"},
 	}
 	keys := Keys{"keyID": "ThisKeyNeedsToHave32Characters!!"}
 	aesCrypto, err := NewAESCrypto(keyConfig, &mockKeyStorage{keys: keys})
-	require.NoError(t, err)
+	require.NoError(tb, err)
 	return aesCrypto
 }
 

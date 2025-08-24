@@ -8,7 +8,6 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"errors"
-	"fmt"
 	"math/big"
 	"time"
 )
@@ -85,7 +84,7 @@ func generateCertificate(bits int, caPrivateKey *rsa.PrivateKey, ca []byte, info
 		return nil, nil, nil, err
 	}
 
-	certBytes := make([]byte, 0)
+	var certBytes []byte
 	if ca == nil {
 		cert.IsCA = true
 		cert.BasicConstraintsValid = true
@@ -211,7 +210,7 @@ func CertificateToBytes(cert *x509.Certificate) ([]byte, error) {
 func BytesToCertificate(data []byte) ([]byte, error) {
 	block, _ := pem.Decode(data)
 	if block == nil || block.Type != "CERTIFICATE" {
-		return nil, fmt.Errorf("failed to decode PEM block containing public key")
+		return nil, errors.New("failed to decode PEM block containing public key")
 	}
 	return block.Bytes, nil
 }

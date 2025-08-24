@@ -46,6 +46,8 @@ Log:
   Level: info
 `},
 		want: func(t *testing.T, config *Config) {
+			t.Helper()
+
 			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
 				&actions.HostChecker{Domain: "localhost"},
 				&actions.HostChecker{IP: net.ParseIP("127.0.0.1")},
@@ -62,6 +64,8 @@ Log:
   Level: info
 `},
 		want: func(t *testing.T, config *Config) {
+			t.Helper()
+
 			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
 				&actions.HostChecker{Domain: "localhost"},
 				&actions.HostChecker{IP: net.ParseIP("127.0.0.1")},
@@ -81,6 +85,8 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
+			t.Helper()
+
 			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceFeatures{
 				LoginDefaultOrg: gu.Ptr(true),
 				UserSchema:      gu.Ptr(true),
@@ -102,6 +108,8 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
+			t.Helper()
+
 			assert.Equal(t, config.SystemAPIUsers, map[string]*authz.SystemAPIUser{
 				"superuser": {
 					Memberships: authz.Memberships{{
@@ -126,6 +134,8 @@ Actions:
     DenyList: []
 `, encodedKey)},
 		want: func(t *testing.T, config *Config) {
+			t.Helper()
+
 			assert.Equal(t, config.SystemAPIUsers, map[string]*authz.SystemAPIUser{
 				"systemuser": {
 					Path: "/path/to/superuser/key.pem",
@@ -151,6 +161,8 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
+			t.Helper()
+
 			assert.Equal(t, config.Telemetry.Headers, http.Header{
 				"single-value": []string{"single-value"},
 				"multi-value":  []string{"multi-value1", "multi-value2"},
@@ -169,6 +181,8 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
+			t.Helper()
+
 			assert.Equal(t, config.Telemetry.Headers, http.Header{
 				"single-value": []string{"single-value"},
 				"multi-value":  []string{"multi-value1", "multi-value2"},
@@ -190,6 +204,8 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
+			t.Helper()
+
 			assert.Equal(t, config.DefaultInstance.MessageTexts, []*domain.CustomMessageText{{
 				MessageTextType: "InitCode",
 				Title:           "foo",
@@ -211,6 +227,8 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
+			t.Helper()
+
 			assert.Equal(t, config.DefaultInstance.MessageTexts, []*domain.CustomMessageText{{
 				MessageTextType: "InitCode",
 				Title:           "foo",
@@ -238,6 +256,8 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
+			t.Helper()
+
 			assert.Equal(t, config.InternalAuthZ, authz.Config{
 				RolePermissionMappings: []authz.RoleMapping{
 					{Role: "IAM_OWNER", Permissions: []string{"iam.write"}},
@@ -258,6 +278,8 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
+			t.Helper()
+
 			assert.Equal(t, config.InternalAuthZ, authz.Config{
 				RolePermissionMappings: []authz.RoleMapping{
 					{Role: "IAM_OWNER", Permissions: []string{"iam.write"}},

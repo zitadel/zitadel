@@ -31,6 +31,8 @@ func TestQueryJSONObject(t *testing.T) {
 		{
 			name: "tx error",
 			mock: func(t *testing.T) *mock.SQLMock {
+				t.Helper()
+
 				return mock.NewSQLMock(t, mock.ExpectQuery("select $1;", mock.WithQueryErr(sql.ErrConnDone)))
 			},
 			wantErr: zerrors.ThrowInternal(sql.ErrConnDone, "DATAB-Oath6", "Errors.Internal"),
@@ -38,6 +40,8 @@ func TestQueryJSONObject(t *testing.T) {
 		{
 			name: "no rows",
 			mock: func(t *testing.T) *mock.SQLMock {
+				t.Helper()
+
 				return mock.NewSQLMock(t,
 					mock.ExpectQuery(query,
 						mock.WithQueryArgs(arg),
@@ -50,6 +54,8 @@ func TestQueryJSONObject(t *testing.T) {
 		{
 			name: "unmarshal error",
 			mock: func(t *testing.T) *mock.SQLMock {
+				t.Helper()
+
 				return mock.NewSQLMock(t,
 					mock.ExpectQuery(query,
 						mock.WithQueryArgs(arg),
@@ -62,6 +68,8 @@ func TestQueryJSONObject(t *testing.T) {
 		{
 			name: "success",
 			mock: func(t *testing.T) *mock.SQLMock {
+				t.Helper()
+
 				return mock.NewSQLMock(t,
 					mock.ExpectQuery(query,
 						mock.WithQueryArgs(arg),

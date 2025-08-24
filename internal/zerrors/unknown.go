@@ -1,6 +1,7 @@
 package zerrors
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -29,8 +30,8 @@ func ThrowUnknownf(parent error, id, format string, a ...interface{}) error {
 func (err *UnknownError) IsUnknown() {}
 
 func IsUnknown(err error) bool {
-	_, ok := err.(Unknown)
-	return ok
+	var tmp Unknown
+	return errors.As(err, &tmp)
 }
 
 func (err *UnknownError) Is(target error) bool {

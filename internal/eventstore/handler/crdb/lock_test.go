@@ -22,7 +22,7 @@ const (
 )
 
 var (
-	renewNoRowsAffectedErr = zerrors.ThrowAlreadyExists(nil, "CRDB-mmi4J", "projection already locked")
+	errRenewNoRowsAffected = zerrors.ThrowAlreadyExists(nil, "CRDB-mmi4J", "projection already locked")
 	errLock                = errors.New("lock err")
 )
 
@@ -169,7 +169,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 					expectLockNoRows(lockTable, workerName, 2*time.Second, "instanceID"),
 				},
 				isErr: func(err error) bool {
-					return errors.Is(err, renewNoRowsAffectedErr)
+					return errors.Is(err, errRenewNoRowsAffected)
 				},
 			},
 			args: args{
@@ -321,6 +321,8 @@ type errsMock struct {
 }
 
 func (m *errsMock) handleErrs(t *testing.T, cancel func()) {
+	t.Helper()
+
 	for i := 0; i < m.successfulIters; i++ {
 		if err := <-m.errs; err != nil {
 			t.Errorf("unexpected err in iteration %d: %v", i, err)

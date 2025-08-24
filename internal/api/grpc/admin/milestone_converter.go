@@ -14,6 +14,10 @@ import (
 func listMilestonesToModel(instanceID string, req *admin_pb.ListMilestonesRequest) (*query.MilestonesSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := milestoneQueriesToModel(req.GetQueries())
+	if err != nil {
+		return nil, err
+	}
+
 	instanceIDQuery, err := query.NewTextQuery(query.MilestoneInstanceIDColID, instanceID, query.TextEquals)
 	if err != nil {
 		return nil, err
