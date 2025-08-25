@@ -38,8 +38,6 @@ type User struct {
 	PreferredLoginName string                     `json:"preferred_login_name,omitempty"`
 	Human              *Human                     `json:"human,omitempty"`
 	Machine            *Machine                   `json:"machine,omitempty"`
-	MetadataKey        string                     `json:"metadata_key,omitempty"`
-	MetadataValue      []byte                     `json:"metadata_value,omitempty"`
 }
 
 type Human struct {
@@ -1304,9 +1302,8 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			MachineDescriptionCol.identifier(),
 			MachineSecretCol.identifier(),
 			MachineAccessTokenTypeCol.identifier(),
-			UserMetadataKeyCol.identifier(),
-			UserMetadataValueCol.identifier(),
 			countColumn.identifier()).
+			Distinct().
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
@@ -1322,7 +1319,6 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 				preferredLoginName := sql.NullString{}
 
 				human, machine := sqlHuman{}, sqlMachine{}
-				metaKey := sql.NullString{}
 
 				err := rows.Scan(
 					&u.ID,
@@ -1358,9 +1354,6 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					&machine.encodedSecret,
 					&machine.accessTokenType,
 
-					&metaKey,
-					&u.MetadataValue,
-
 					&count,
 				)
 				if err != nil {
@@ -1370,10 +1363,6 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 				u.LoginNames = loginNames
 				if preferredLoginName.Valid {
 					u.PreferredLoginName = preferredLoginName.String
-				}
-
-				if metaKey.Valid {
-					u.MetadataKey = metaKey.String
 				}
 
 				if human.humanID.Valid {

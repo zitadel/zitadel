@@ -819,7 +819,8 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
 
-					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta", "my value")
+					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta 1", "my value")
+					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta 2", "my value")
 					Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value")
 					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value")
 
@@ -900,96 +901,96 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 		},
-		// {
-		// 	name: "list user in emails no found, ok",
-		// 	args: args{
-		// 		IamCTX,
-		// 		&user.ListUsersRequest{
-		// 			Queries: []*user.SearchQuery{
-		// 				OrganizationIdQuery(orgResp.OrganizationId),
-		// 				InUserEmailsQuery([]string{"notfound"}),
-		// 			},
-		// 		},
-		// 		func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-		// 			return []userAttr{}
-		// 		},
-		// 	},
-		// 	want: &user.ListUsersResponse{
-		// 		Details: &object.ListDetails{
-		// 			TotalResult: 0,
-		// 			Timestamp:   timestamppb.Now(),
-		// 		},
-		// 		SortingColumn: 0,
-		// 		Result:        []*user.User{},
-		// 	},
-		// },
-		// {
-		// 	name: "list user phone, ok",
-		// 	args: args{
-		// 		IamCTX,
-		// 		&user.ListUsersRequest{},
-		// 		func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-		// 			info := createUser(ctx, orgResp.OrganizationId, false)
-		// 			request.Queries = []*user.SearchQuery{}
-		// 			request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
-		// 			request.Queries = append(request.Queries, PhoneQuery(info.Phone))
-		// 			return []userAttr{info}
-		// 		},
-		// 	},
-		// 	want: &user.ListUsersResponse{
-		// 		Details: &object.ListDetails{
-		// 			TotalResult: 1,
-		// 			Timestamp:   timestamppb.Now(),
-		// 		},
-		// 		SortingColumn: 0,
-		// 		Result: []*user.User{
-		// 			{
-		// 				State: user.UserState_USER_STATE_ACTIVE,
-		// 				Type: &user.User_Human{
-		// 					Human: &user.HumanUser{
-		// 						Profile: &user.HumanProfile{
-		// 							GivenName:         "Mickey",
-		// 							FamilyName:        "Mouse",
-		// 							NickName:          gu.Ptr("Mickey"),
-		// 							DisplayName:       gu.Ptr("Mickey Mouse"),
-		// 							PreferredLanguage: gu.Ptr("nl"),
-		// 							Gender:            user.Gender_GENDER_MALE.Enum(),
-		// 						},
-		// 						Email: &user.HumanEmail{
-		// 							IsVerified: true,
-		// 						},
-		// 						Phone: &user.HumanPhone{
-		// 							IsVerified: true,
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	name: "list user in emails no found, ok",
-		// 	args: args{
-		// 		IamCTX,
-		// 		&user.ListUsersRequest{
-		// 			Queries: []*user.SearchQuery{
-		// 				OrganizationIdQuery(orgResp.OrganizationId),
-		// 				InUserEmailsQuery([]string{"notfound"}),
-		// 			},
-		// 		},
-		// 		func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-		// 			return []userAttr{}
-		// 		},
-		// 	},
-		// 	want: &user.ListUsersResponse{
-		// 		Details: &object.ListDetails{
-		// 			TotalResult: 0,
-		// 			Timestamp:   timestamppb.Now(),
-		// 		},
-		// 		SortingColumn: 0,
-		// 		Result:        []*user.User{},
-		// 	},
-		// },
+		{
+			name: "list user in emails no found, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{
+					Queries: []*user.SearchQuery{
+						OrganizationIdQuery(orgResp.OrganizationId),
+						InUserEmailsQuery([]string{"notfound"}),
+					},
+				},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					return []userAttr{}
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result:        []*user.User{},
+			},
+		},
+		{
+			name: "list user phone, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					info := createUser(ctx, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, PhoneQuery(info.Phone))
+					return []userAttr{info}
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									IsVerified: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "list user in emails no found, ok",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{
+					Queries: []*user.SearchQuery{
+						OrganizationIdQuery(orgResp.OrganizationId),
+						InUserEmailsQuery([]string{"notfound"}),
+					},
+				},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					return []userAttr{}
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result:        []*user.User{},
+			},
+		},
 		{
 			name: "list user resourceowner multiple, ok",
 			args: args{
@@ -1368,12 +1369,32 @@ func OrganizationIdQuery(resourceowner string) *user.SearchQuery {
 	}
 }
 
+func OrQuery(queries []*user.SearchQuery) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_OrQuery{
+			OrQuery: &user.OrQuery{
+				Queries: queries,
+			},
+		},
+	}
+}
+
 func MetakeyContainsQuery(metaKey string) *user.SearchQuery {
 	return &user.SearchQuery{
 		Query: &user.SearchQuery_MetadataKeyFilter{
 			MetadataKeyFilter: &v2.MetadataKeyFilter{
 				Key:    metaKey,
 				Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_STARTS_WITH},
+		},
+	}
+}
+
+func MetakeyEqualsQuery(metaKey string) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_MetadataKeyFilter{
+			MetadataKeyFilter: &v2.MetadataKeyFilter{
+				Key:    metaKey,
+				Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS},
 		},
 	}
 }
