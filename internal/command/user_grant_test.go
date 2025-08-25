@@ -493,6 +493,175 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 			},
 		},
 		{
+			name: "usergrant for project, and removed project grant on same resourceowner, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey1",
+								"rolekey",
+								"",
+							),
+						),
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org1",
+								[]string{"rolekey1"},
+							),
+						),
+						eventFromEventPusher(
+							project.NewGrantRemovedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org1",
+							),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantAddedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"",
+							[]string{"rolekey1"},
+						),
+					),
+				),
+				idGenerator: func(t *testing.T) id.Generator {
+					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
+				},
+			},
+			args: args{
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				userGrant: &domain.UserGrant{
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1"},
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+				},
+			},
+			res: res{
+				want: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
+					},
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1"},
+					State:     domain.UserGrantStateActive,
+				},
+			},
+		},
+		{
+			name: "usergrant for project, and project grant on same resourceowner, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1", true, true, true,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							project.NewRoleAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"rolekey1",
+								"rolekey",
+								"",
+							),
+						),
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectgrant1",
+								"org1",
+								[]string{"rolekey1"},
+							),
+						),
+					),
+					expectPush(
+						usergrant.NewUserGrantAddedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"",
+							[]string{"rolekey1"},
+						),
+					),
+				),
+				idGenerator: func(t *testing.T) id.Generator {
+					return id_mock.NewIDGeneratorExpectIDs(t, "usergrant1")
+				},
+			},
+			args: args{
+				ctx: authz.NewMockContextWithPermissions("", "", "", []string{domain.RoleProjectOwner}),
+				userGrant: &domain.UserGrant{
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1"},
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+				},
+			},
+			res: res{
+				want: &domain.UserGrant{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "usergrant1",
+						ResourceOwner: "org1",
+					},
+					UserID:    "user1",
+					ProjectID: "project1",
+					RoleKeys:  []string{"rolekey1"},
+					State:     domain.UserGrantStateActive,
+				},
+			},
+		},
+		{
 			name: "usergrant without resource owner on project, ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -683,14 +852,14 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							project.NewGrantAddedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"projectgrant1",
-								"org1",
+								"org2",
 								[]string{"rolekey1"},
 							),
 						),
 					),
 					expectPush(
 						usergrant.NewUserGrantAddedEvent(context.Background(),
-							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							&usergrant.NewAggregate("usergrant1", "org2").Aggregate,
 							"user1",
 							"project1",
 							"projectgrant1",
@@ -709,7 +878,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 					ProjectID: "project1",
 					RoleKeys:  []string{"rolekey1"},
 					ObjectRoot: models.ObjectRoot{
-						ResourceOwner: "org1",
+						ResourceOwner: "org2",
 					},
 				},
 			},
@@ -717,7 +886,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				want: &domain.UserGrant{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "usergrant1",
-						ResourceOwner: "org1",
+						ResourceOwner: "org2",
 					},
 					UserID:         "user1",
 					ProjectID:      "project1",

@@ -87,23 +87,27 @@ func UserGrantAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Agg
 type UserGrantPreConditionReadModel struct {
 	eventstore.WriteModel
 
-	UserID               string
-	ProjectID            string
-	ProjectResourceOwner string
-	ProjectGrantID       string
-	ResourceOwner        string
-	UserExists           bool
-	ProjectExists        bool
-	ProjectGrantExists   bool
-	ExistingRoleKeys     []string
+	UserID                  string
+	ProjectID               string
+	ProjectResourceOwner    string
+	ProjectGrantID          string
+	GrantID                 string
+	ResourceOwner           string
+	UserExists              bool
+	ProjectExists           bool
+	ProjectGrantExists      bool
+	ExistingRoleKeysProject []string
+	ExistingRoleKeysGrant   []string
 }
 
 func NewUserGrantPreConditionReadModel(userID, projectID, projectGrantID string, resourceOwner string) *UserGrantPreConditionReadModel {
 	return &UserGrantPreConditionReadModel{
-		UserID:         userID,
-		ProjectID:      projectID,
+		UserID:    userID,
+		ProjectID: projectID,
+		// ProjectGrantID can be empty, if grantedOrgID is in the resourceowner
 		ProjectGrantID: projectGrantID,
-		ResourceOwner:  resourceOwner,
+		// resourceowner has to be either empty, resourceowner of the project or grantedOrdID of the projectgrant
+		ResourceOwner: resourceOwner,
 	}
 }
 
@@ -124,38 +128,51 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 			}
 			wm.ProjectResourceOwner = e.Aggregate().ResourceOwner
 		case *project.ProjectRemovedEvent:
-			wm.ProjectExists = false
+			// only necessary if project existing
+			if wm.ProjectResourceOwner == e.Aggregate().ResourceOwner {
+				wm.ProjectExists = false
+			}
 		case *project.GrantAddedEvent:
-			if (wm.ProjectGrantID == e.GrantID || wm.ProjectGrantID == "") && wm.ResourceOwner != "" && wm.ResourceOwner == e.GrantedOrgID {
+			// grantID can be empty or provided and equal
+			// and resourceowner has to be provided and equal to an organization the project is granted to, and not own resourceowner
+			if (wm.ProjectGrantID == "" || wm.ProjectGrantID == e.GrantID) &&
+				wm.ResourceOwner != "" && wm.ResourceOwner == e.GrantedOrgID && e.GrantedOrgID != e.Aggregate().ResourceOwner {
 				wm.ProjectGrantExists = true
-				wm.ExistingRoleKeys = e.RoleKeys
-				if wm.ProjectGrantID == "" {
-					wm.ProjectGrantID = e.GrantID
-				}
+				wm.ExistingRoleKeysGrant = e.RoleKeys
+				// persist grantID without changing the original
+				wm.GrantID = e.GrantID
 			}
 		case *project.GrantChangedEvent:
-			if wm.ProjectGrantID == e.GrantID {
-				wm.ExistingRoleKeys = e.RoleKeys
+			// grantID is filled by grant added event, and guarantees that project exists
+			// only applicable if change for the same projectgrant
+			if wm.GrantID != "" && wm.GrantID == e.GrantID {
+				wm.ExistingRoleKeysGrant = e.RoleKeys
 			}
 		case *project.GrantRemovedEvent:
-			if wm.ProjectGrantID == e.GrantID {
+			// grantID is filled by grant added event, and guarantees that project exists
+			// only applicable if change for the same projectgrant
+			if wm.GrantID != "" && wm.GrantID == e.GrantID {
 				wm.ProjectGrantExists = false
-				wm.ExistingRoleKeys = []string{}
+				wm.ExistingRoleKeysGrant = []string{}
+				// remove grantID as not longer necessary
+				wm.GrantID = ""
 			}
 		case *project.RoleAddedEvent:
-			if wm.ProjectGrantID != "" {
+			// ignore if project grant is requested or resourceowner is not equal to the resourceowner of the project
+			if wm.ProjectGrantID != "" || (wm.ResourceOwner != "" && wm.ResourceOwner != e.Aggregate().ResourceOwner) {
 				continue
 			}
-			wm.ExistingRoleKeys = append(wm.ExistingRoleKeys, e.Key)
+			wm.ExistingRoleKeysProject = append(wm.ExistingRoleKeysProject, e.Key)
 		case *project.RoleRemovedEvent:
-			if wm.ProjectGrantID != "" {
+			// ignore if project grant is requested or resourceowner is not equal to the resourceowner of the project
+			if wm.ProjectGrantID != "" || (wm.ResourceOwner != "" && wm.ResourceOwner != e.Aggregate().ResourceOwner) {
 				continue
 			}
-			for i, key := range wm.ExistingRoleKeys {
+			for i, key := range wm.ExistingRoleKeysProject {
 				if key == e.Key {
-					copy(wm.ExistingRoleKeys[i:], wm.ExistingRoleKeys[i+1:])
-					wm.ExistingRoleKeys[len(wm.ExistingRoleKeys)-1] = ""
-					wm.ExistingRoleKeys = wm.ExistingRoleKeys[:len(wm.ExistingRoleKeys)-1]
+					copy(wm.ExistingRoleKeysProject[i:], wm.ExistingRoleKeysProject[i+1:])
+					wm.ExistingRoleKeysProject[len(wm.ExistingRoleKeysProject)-1] = ""
+					wm.ExistingRoleKeysProject = wm.ExistingRoleKeysProject[:len(wm.ExistingRoleKeysProject)-1]
 					continue
 				}
 			}
