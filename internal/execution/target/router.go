@@ -15,7 +15,7 @@ type Router []element2
 func NewRouter(targets []Target) Router {
 	m := make(map[string][]Target)
 	for _, t := range targets {
-		m[t.ExecutionID] = append(m[t.ExecutionID], t)
+		m[t.GetExecutionID()] = append(m[t.GetExecutionID()], t)
 	}
 
 	router := make(Router, 0, len(m))

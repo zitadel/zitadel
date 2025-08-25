@@ -16,10 +16,12 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/execution/target"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -220,7 +222,7 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 	if ok {
 		return instance, instance.checkDomain(instanceDomain, publicDomain)
 	}
-	instance, scan := scanAuthzInstance()
+	instance, scan := scanAuthzInstance(q.targetEncryptionAlgorithm)
 	if err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, instanceDomain); err != nil {
 		return nil, err
 	}
@@ -244,9 +246,10 @@ func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance
 		return instance, nil
 	}
 
-	instance, scan := scanAuthzInstance()
+	instance, scan := scanAuthzInstance(q.targetEncryptionAlgorithm)
 	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, id)
 	logging.OnError(err).WithField("instance_id", id).Warn("instance by ID")
+
 	if err == nil {
 		q.caches.instance.Set(ctx, instance)
 	}
@@ -474,7 +477,7 @@ type authzInstance struct {
 	Feature          feature.Features           `json:"feature,omitempty"`
 	ExternalDomains  database.TextArray[string] `json:"external_domains,omitempty"`
 	TrustedDomains   database.TextArray[string] `json:"trusted_domains,omitempty"`
-	ExecutionTargets target.Router              `json:"execution_targets,omitempty"`
+	ExecutionTargets []target_domain.Target     `json:"execution_targets,omitempty"`
 }
 
 type csp struct {
@@ -530,7 +533,7 @@ func (i *authzInstance) Features() feature.Features {
 }
 
 func (i *authzInstance) ExecutionRouter() target.Router {
-	return i.ExecutionTargets
+	return target.NewRouter(i.ExecutionTargets)
 }
 
 var errPublicDomain = "public domain %q not trusted"
@@ -558,7 +561,7 @@ func (i *authzInstance) Keys(index instanceIndex) []string {
 	return nil
 }
 
-func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
+func scanAuthzInstance(alg crypto.EncryptionAlgorithm) (*authzInstance, func(row *sql.Row) error) {
 	instance := &authzInstance{}
 	return instance, func(row *sql.Row) error {
 		var (
@@ -568,6 +571,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			auditLogRetention     database.NullDuration
 			block                 sql.NullBool
 			features              []byte
+			executionTargetsBytes []byte
 		)
 		err := row.Scan(
 			&instance.ID,
@@ -584,6 +588,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			&features,
 			&instance.ExternalDomains,
 			&instance.TrustedDomains,
+			&executionTargetsBytes,
 		)
 		if errors.Is(err, sql.ErrNoRows) {
 			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
@@ -605,6 +610,17 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 		}
 		if err = json.Unmarshal(features, &instance.Feature); err != nil {
 			return zerrors.ThrowInternal(err, "QUERY-Po8ki", "Errors.Internal")
+		}
+		var executionTargets []*ExecutionTarget
+		if err := json.Unmarshal(executionTargetsBytes, executionTargets); err != nil {
+			return zerrors.ThrowInternal(err, "QUERY-Po7si", "Errors.Internal")
+		}
+		instance.ExecutionTargets = make([]target_domain.Target, 0, len(executionTargets))
+		for i := range executionTargets {
+			if err := executionTargets[i].decryptSigningKey(alg); err != nil {
+				return zerrors.ThrowInternal(err, "QUERY-Prasi", "Errors.Internal")
+			}
+			instance.ExecutionTargets[i] = executionTargets[i]
 		}
 		return nil
 	}

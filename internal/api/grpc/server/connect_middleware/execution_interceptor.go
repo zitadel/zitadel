@@ -10,16 +10,14 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/execution"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func ExecutionHandler(queries *query.Queries) connect.UnaryInterceptorFunc {
+func ExecutionHandler() connect.UnaryInterceptorFunc {
 	return func(handler connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (_ connect.AnyResponse, err error) {
-			requestTargets, responseTargets := execution.QueryExecutionTargetsForRequestAndResponse(ctx, queries, req.Spec().Procedure)
 
-			// call targets otherwise return req
+			requestTargets := execution.QueryExecutionTargetsForRequest(ctx, req.Spec().Procedure)
 			handledReq, err := executeTargetsForRequest(ctx, requestTargets, req.Spec().Procedure, req)
 			if err != nil {
 				return nil, err
@@ -30,6 +28,7 @@ func ExecutionHandler(queries *query.Queries) connect.UnaryInterceptorFunc {
 				return nil, err
 			}
 
+			responseTargets := execution.QueryExecutionTargetsForRequest(ctx, req.Spec().Procedure)
 			return executeTargetsForResponse(ctx, responseTargets, req.Spec().Procedure, handledReq, response)
 		}
 	}

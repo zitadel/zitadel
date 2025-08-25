@@ -1,7 +1,9 @@
-package target
+package execution
 
 import (
 	"time"
+
+	"github.com/zitadel/zitadel/internal/execution/target"
 )
 
 type TargetType uint
@@ -17,7 +19,7 @@ type Target interface {
 	GetTargetID() string
 	IsInterruptOnError() bool
 	GetEndpoint() string
-	GetTargetType() TargetType
+	GetTargetType() target.TargetType
 	GetTimeout() time.Duration
 	GetSigningKey() string
 }

@@ -33,13 +33,14 @@ type InstanceVerifier interface {
 }
 
 type instance struct {
-	id              string
-	projectID       string
-	appID           string
-	clientID        string
-	orgID           string
-	defaultLanguage language.Tag
-	features        feature.Features
+	id               string
+	projectID        string
+	appID            string
+	clientID         string
+	orgID            string
+	defaultLanguage  language.Tag
+	features         feature.Features
+	executionTargets []target.Target
 }
 
 func (i *instance) Block() *bool {
@@ -87,7 +88,7 @@ func (i *instance) Features() feature.Features {
 }
 
 func (i *instance) ExecutionRouter() target.Router {
-	return target.NewRouter(nil)
+	return target.NewRouter(i.executionTargets)
 }
 
 func GetInstance(ctx context.Context) Instance {

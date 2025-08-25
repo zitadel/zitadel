@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	exec "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -363,7 +364,7 @@ type ExecutionTarget struct {
 	InstanceID       string
 	ExecutionID      string
 	TargetID         string
-	TargetType       domain.TargetType
+	TargetType       target_domain.TargetType
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
@@ -383,7 +384,7 @@ func (e *ExecutionTarget) IsInterruptOnError() bool {
 func (e *ExecutionTarget) GetEndpoint() string {
 	return e.Endpoint
 }
-func (e *ExecutionTarget) GetTargetType() domain.TargetType {
+func (e *ExecutionTarget) GetTargetType() target_domain.TargetType {
 	return e.TargetType
 }
 func (e *ExecutionTarget) GetTimeout() time.Duration {
@@ -439,7 +440,7 @@ func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
 		target.InstanceID = instanceID.String
 		target.ExecutionID = executionID.String
 		target.TargetID = targetID.String
-		target.TargetType = domain.TargetType(targetType.Int32)
+		target.TargetType = target_domain.TargetType(targetType.Int32)
 		target.Endpoint = endpoint.String
 		target.Timeout = time.Duration(timeout.Int64)
 		target.InterruptOnError = interruptOnError.Bool

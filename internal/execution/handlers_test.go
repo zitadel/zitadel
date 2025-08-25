@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/execution/mock"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	execution_rp "github.com/zitadel/zitadel/internal/repository/execution"
@@ -58,7 +58,7 @@ func Test_EventExecution(t *testing.T) {
 					InstanceID:       instanceID,
 					ExecutionID:      "executionID",
 					TargetID:         "targetID",
-					TargetType:       domain.TargetTypeWebhook,
+					TargetType:       target_domain.TargetTypeWebhook,
 					Endpoint:         "endpoint",
 					Timeout:          time.Minute,
 					InterruptOnError: true,
@@ -71,7 +71,7 @@ func Test_EventExecution(t *testing.T) {
 						InstanceID:       instanceID,
 						ExecutionID:      "executionID",
 						TargetID:         "targetID",
-						TargetType:       domain.TargetTypeWebhook,
+						TargetType:       target_domain.TargetTypeWebhook,
 						Endpoint:         "endpoint",
 						Timeout:          time.Minute,
 						InterruptOnError: true,
@@ -455,7 +455,7 @@ func mockTarget() *query.ExecutionTarget {
 		InstanceID:       "instanceID",
 		ExecutionID:      "executionID",
 		TargetID:         "targetID",
-		TargetType:       domain.TargetTypeWebhook,
+		TargetType:       target_domain.TargetTypeWebhook,
 		Endpoint:         "endpoint",
 		Timeout:          time.Minute,
 		InterruptOnError: true,

@@ -16,8 +16,8 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/execution"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/actions"
 )
@@ -176,7 +176,7 @@ func Test_CallTarget(t *testing.T) {
 					statusCode:  http.StatusInternalServerError,
 				},
 				target: &mockTarget{
-					TargetType: domain.TargetTypeWebhook,
+					TargetType: target_domain.TargetTypeWebhook,
 					Timeout:    time.Minute,
 				},
 			},
@@ -197,7 +197,7 @@ func Test_CallTarget(t *testing.T) {
 					statusCode:  http.StatusOK,
 				},
 				target: &mockTarget{
-					TargetType: domain.TargetTypeWebhook,
+					TargetType: target_domain.TargetTypeWebhook,
 					Timeout:    time.Minute,
 				},
 			},
@@ -219,7 +219,7 @@ func Test_CallTarget(t *testing.T) {
 					signingKey:  "signingkey",
 				},
 				target: &mockTarget{
-					TargetType: domain.TargetTypeWebhook,
+					TargetType: target_domain.TargetTypeWebhook,
 					Timeout:    time.Minute,
 					SigningKey: "signingkey",
 				},
@@ -241,7 +241,7 @@ func Test_CallTarget(t *testing.T) {
 					statusCode:  http.StatusInternalServerError,
 				},
 				target: &mockTarget{
-					TargetType: domain.TargetTypeCall,
+					TargetType: target_domain.TargetTypeCall,
 					Timeout:    time.Minute,
 				},
 			},
@@ -262,7 +262,7 @@ func Test_CallTarget(t *testing.T) {
 					statusCode:  http.StatusOK,
 				},
 				target: &mockTarget{
-					TargetType: domain.TargetTypeCall,
+					TargetType: target_domain.TargetTypeCall,
 					Timeout:    time.Minute,
 				},
 			},
@@ -284,7 +284,7 @@ func Test_CallTarget(t *testing.T) {
 					signingKey:  "signingkey",
 				},
 				target: &mockTarget{
-					TargetType: domain.TargetTypeCall,
+					TargetType: target_domain.TargetTypeCall,
 					Timeout:    time.Minute,
 					SigningKey: "signingkey",
 				},
@@ -453,7 +453,7 @@ type mockTarget struct {
 	InstanceID       string
 	ExecutionID      string
 	TargetID         string
-	TargetType       domain.TargetType
+	TargetType       target_domain.TargetType
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
@@ -469,7 +469,7 @@ func (e *mockTarget) IsInterruptOnError() bool {
 func (e *mockTarget) GetEndpoint() string {
 	return e.Endpoint
 }
-func (e *mockTarget) GetTargetType() domain.TargetType {
+func (e *mockTarget) GetTargetType() target_domain.TargetType {
 	return e.TargetType
 }
 func (e *mockTarget) GetTimeout() time.Duration {
