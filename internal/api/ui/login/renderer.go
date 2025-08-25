@@ -234,6 +234,9 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		"hasRegistration": func() bool {
 			return true
 		},
+		"hasCaptcha": func() bool {
+			return false
+		},
 		"idpProviderClass": func(idpType domain.IDPType) string {
 			return idpType.GetCSSClass()
 		},
@@ -404,6 +407,8 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, transl
 		AuthReqID:              getRequestID(authReq, r),
 		CSRF:                   csrf.TemplateField(r),
 		Nonce:                  http_mw.GetNonce(r),
+		CaptchaSiteKey:         l.getCaptchaSiteKey(authReq),
+		CaptchaSecretKey:       l.getCaptchaSecretKey(authReq),
 	}
 	var privacyPolicy *domain.PrivacyPolicy
 	if authReq != nil {
@@ -589,6 +594,20 @@ func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 	return authReq.LabelPolicy != nil && !authReq.LabelPolicy.HideLoginNameSuffix
 }
 
+func (l *Login) getCaptchaSiteKey(authReq *domain.AuthRequest) string {
+	if authReq == nil {
+		return ""
+	}
+	return authReq.LoginPolicy.CaptchaSiteKey
+}
+
+func (l *Login) getCaptchaSecretKey(authReq *domain.AuthRequest) string {
+	if authReq == nil {
+		return ""
+	}
+	return authReq.LoginPolicy.CaptchaSecretKey
+}
+
 func (l *Login) addLoginTranslations(translator *i18n.Translator, customTexts []*domain.CustomText) {
 	for _, text := range customTexts {
 		msg := i18n.Message{
@@ -660,6 +679,8 @@ type baseData struct {
 	AuthReqID              string
 	CSRF                   template.HTML
 	Nonce                  string
+	CaptchaSiteKey         string
+	CaptchaSecretKey       string
 	LoginPolicy            *domain.LoginPolicy
 	IDPProviders           []*domain.IDPProvider
 	LabelPolicy            *domain.LabelPolicy
