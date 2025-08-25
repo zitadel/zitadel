@@ -1,0 +1,216 @@
+---
+title: Node.js Client
+sidebar_label: 'Node.js Client'
+---
+
+<table>
+	<tr>
+		<td width="100px">
+			<img width="100px" src="/docs/img/tech/nodejs.svg" alt="node.js logo"/>
+		</td>
+		<td>
+			This guide covers the official Zitadel Management API Client for Node.js (20+), which allows you to programmatically manage resources in your Zitadel instance.
+		</td>
+	</tr>
+</table>
+
+:::info
+**This is a Management API Client, not an Authentication SDK.**
+
+This library is designed for server-to-server communication to manage your Zitadel instance (e.g., creating users, managing projects, and updating settings). It is **not** intended for handling end-user login flows in your web application. For user authentication, you should use a standard OIDC library with your Node.js framework of choice.
+:::
+
+The Zitadel Node.js Client provides an idiomatic way to access the full gamut of Zitadel's v2 Management APIs from your Node.js backend.
+
+> Please be aware that this client library is currently in an **incubating stage**.
+While it is available for use, the API and its functionality may evolve, potentially introducing
+breaking changes in future updates. We advise caution when considering it for production environments.
+
+### Installation
+
+This package is **published on GitHub Packages**, not on the public npm registry. Create or update a `.npmrc`
+file in your project root with:
+
+```ini
+@zitadel:registry=https://npm.pkg.github.com
+```
+
+You can add the client library to your project using npm, pnpm, or yarn:
+
+```bash
+npm install @zitadel/zitadel-node
+# or
+pnpm add @zitadel/zitadel-node
+# or
+yarn add @zitadel/zitadel-node
+```
+
+### Using the SDK
+
+Your SDK offers three ways to authenticate with Zitadel. Each method has its
+own benefits—choose the one that fits your situation best.
+
+#### 1. Private Key JWT Authentication
+
+**What is it?**
+You use a JSON Web Token (JWT) that you sign with a private key stored in a
+JSON file. This process creates a secure token.
+
+**When should you use it?**
+
+- **Best for production:** It offers strong security.
+- **Advanced control:** You can adjust token settings like expiration.
+
+**How do you use it?**
+
+1. Save your private key in a JSON file.
+2. Use the provided method to create an authenticator.
+
+**Example:**
+
+```ts
+import Zitadel, { ApiException } from '@zitadel/zitadel-node';
+
+const client = await Zitadel.withPrivateKey(
+  "https://example.us1.zitadel.cloud",
+  "path/to/jwt-key.json",
+);
+
+try {
+  const response = await client.users.addHumanUser({
+    userServiceAddHumanUserRequest: {
+      username: "john.doe",
+      profile: { givenName: "John", familyName: "Doe" },
+      email: { email: "john.doe@example.com" },
+    },
+  });
+  console.log("User created:", response);
+} catch (e) {
+  if (e instanceof ApiException) console.error("Error:", e.message);
+}
+```
+
+#### 2. Client Credentials Grant
+
+**What is it?**
+This method uses a client ID and client secret to get a secure access token,
+which is then used to authenticate.
+
+**When should you use it?**
+
+- **Simple and straightforward:** Good for server-to-server communication.
+- **Trusted environments:** Use it when both servers are owned or trusted.
+
+**How do you use it?**
+
+1. Provide your client ID and client secret.
+2. Use the provided method to create an authenticator.
+
+**Example:**
+
+```ts
+import Zitadel, { ApiException } from '@zitadel/zitadel-node';
+
+const client = await Zitadel.withClientCredentials(
+  "https://example.us1.zitadel.cloud",
+  process.env.ZITADEL_CLIENT_ID!,
+  process.env.ZITADEL_CLIENT_SECRET!,
+);
+
+try {
+  const response = await client.users.addHumanUser({
+    userServiceAddHumanUserRequest: {
+      username: "john.doe",
+      profile: { givenName: "John", familyName: "Doe" },
+      email: { email: "john.doe@example.com" },
+    },
+  });
+  console.log("User created:", response);
+} catch (e) {
+  if (e instanceof ApiException) console.error("Error:", e.message);
+}
+```
+
+#### 3. Personal Access Tokens (PATs)
+
+**What is it?**
+A Personal Access Token (PAT) is a pre-generated token that you can use to
+authenticate without exchanging credentials every time.
+
+**When should you use it?**
+
+- **Easy to use:** Great for development or testing scenarios.
+- **Quick setup:** No need for dynamic token generation.
+
+**How do you use it?**
+
+1. Obtain a valid personal access token from your account.
+2. Use the provided method to create an authenticator.
+
+**Example:**
+
+```ts
+import Zitadel, { ApiException } from '@zitadel/zitadel-node';
+
+const client = await Zitadel.withAccessToken(
+  "https://example.us1.zitadel.cloud",
+  process.env.ZITADEL_TOKEN!,
+);
+
+try {
+  const response = await client.users.addHumanUser({
+    userServiceAddHumanUserRequest: {
+      username: "john.doe",
+      profile: { givenName: "John", familyName: "Doe" },
+      email: { email: "john.doe@example.com" },
+    },
+  });
+  console.log("User created:", response);
+} catch (e) {
+  if (e instanceof ApiException) console.error("Error:", e.message);
+}
+```
+
+### Error Handling
+
+All API failures throw an `ApiException` with a human-readable message.
+Network/transport issues throw native errors.
+
+```ts
+try {
+  await client.projects.listProjects({});
+} catch (e) {
+  if (e instanceof ApiException) {
+    console.error(e.statusCode, e.message, e.body);
+  } else {
+    console.error("Unexpected error", e);
+  }
+}
+```
+
+### Versioning
+
+The SDK’s **major** version tracks the ZITADEL core **major** to signal
+compatibility. See the repo’s `VERSIONING.md` for policy and cadence.
+
+### Contributing
+
+This repository is autogenerated. Please open issues for bugs/feature requests.
+
+### Reporting Issues
+
+Open an issue in the [issue tracker](https://github.com/zitadel/client-nodejs/issues). Include:
+
+- A detailed description of the problem or feature request
+- Steps to reproduce the issue (if applicable)
+- Any relevant error messages or logs
+- Environment details (e.g., OS version, relevant configurations)
+
+### Support
+
+- Community: [ZITADEL Discord](https://zitadel.com/chat)
+- Cloud & Enterprise: see support channels in the service description
+
+### License
+
+Apache-2.0

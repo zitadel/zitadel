@@ -32,10 +32,16 @@
 		"id": "client-python",
 		"title": "Python",
 		"imgSrcDark": "/docs/img/tech/python.svg",
-		"docsLink": "/docs/sdk-examples/client-libraries/python",
+
 		"client": true
 	},
-
+	{
+		"id": "client-node",
+		"title": "Node.js",
+		"imgSrcDark": "/docs/img/tech/nodejs.svg",
+		"docsLink": "/docs/sdk-examples/client-libraries/node",
+		"client": true
+	},
 	{
 		"id": "angular",
 		"title": "Angular",
@@ -131,13 +137,6 @@
 		"imgSrcLight": "/docs/img/tech/nextjslight.svg",
 		"docsLink": "https://next-auth.js.org/providers/zitadel",
 		"external": true
-	},
-	{
-		"title": "Node.js",
-		"imgSrcDark": "/docs/img/tech/nodejs.svg",
-		"docsLink": "https://www.npmjs.com/package/@zitadel/node",
-		"external": true,
-		"client": true
 	},
 	{
 		"title": ".Net",
