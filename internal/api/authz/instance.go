@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 )
 
@@ -23,6 +24,7 @@ type Instance interface {
 	Block() *bool
 	AuditLogRetention() *time.Duration
 	Features() feature.Features
+	ExecutionRouter() target.Router
 }
 
 type InstanceVerifier interface {
@@ -82,6 +84,10 @@ func (i *instance) EnableImpersonation() bool {
 
 func (i *instance) Features() feature.Features {
 	return i.features
+}
+
+func (i *instance) ExecutionRouter() target.Router {
+	return target.NewRouter(nil)
 }
 
 func GetInstance(ctx context.Context) Instance {
