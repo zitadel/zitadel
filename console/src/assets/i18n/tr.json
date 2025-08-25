@@ -2373,6 +2373,7 @@
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
       "SIGNEDREQUEST": "İmzalı İstek",
+      "SIGNATUREALGORITHM": "İmza algoritması",
       "NAMEIDFORMAT": "NameID Formatı",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Özel Eşleme Özellik Adı",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "`nameid-format` `transient` döndürülmesi durumunda kullanıcıyı eşlemek için alternatif özellik adı, örn. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"

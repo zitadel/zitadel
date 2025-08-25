@@ -218,6 +218,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s57CreateResourceCounts = &CreateResourceCounts{dbClient: dbClient}
 	steps.s58ReplaceLoginNames3View = &ReplaceLoginNames3View{dbClient: dbClient}
 	steps.s60GenerateSystemID = &GenerateSystemID{eventstore: eventstoreClient}
+	steps.s61IDPTemplate6SAMLSignatureAlgorithm = &IDPTemplate6SAMLSignatureAlgorithm{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -266,6 +267,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s57CreateResourceCounts,
 		steps.s58ReplaceLoginNames3View,
 		steps.s60GenerateSystemID,
+		steps.s61IDPTemplate6SAMLSignatureAlgorithm,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {

@@ -3,6 +3,7 @@ package admin
 import (
 	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
+	dsig "github.com/russellhaering/goxmldsig"
 
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
@@ -480,12 +481,19 @@ func addSAMLProviderToCommand(req *admin_pb.AddSAMLProviderRequest) *command.SAM
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
+
+	var signatureAlgorithm *string
+	if req.SignatureAlgorithm != nil {
+		signatureAlgorithm = gu.Ptr(signatureAlgorithmToCommand(gu.Value(req.SignatureAlgorithm)))
+	}
+
 	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithm,
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
@@ -498,12 +506,19 @@ func updateSAMLProviderToCommand(req *admin_pb.UpdateSAMLProviderRequest) *comma
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
+
+	var signatureAlgorithm *string
+	if req.SignatureAlgorithm != nil {
+		signatureAlgorithm = gu.Ptr(signatureAlgorithmToCommand(gu.Value(req.SignatureAlgorithm)))
+	}
+
 	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
 		Binding:                       bindingToCommand(req.Binding),
 		WithSignedRequest:             req.WithSignedRequest,
+		SignatureAlgorithm:            signatureAlgorithm,
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		FederatedLogoutEnabled:        req.GetFederatedLogoutEnabled(),
@@ -521,6 +536,19 @@ func bindingToCommand(binding idp_pb.SAMLBinding) string {
 		return saml.HTTPRedirectBinding
 	case idp_pb.SAMLBinding_SAML_BINDING_ARTIFACT:
 		return saml.HTTPArtifactBinding
+	default:
+		return ""
+	}
+}
+
+func signatureAlgorithmToCommand(signatureAlgorithm idp_pb.SAMLSignatureAlgorithm) string {
+	switch signatureAlgorithm {
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1:
+		return dsig.RSASHA1SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256:
+		return dsig.RSASHA256SignatureMethod
+	case idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512:
+		return dsig.RSASHA512SignatureMethod
 	default:
 		return ""
 	}

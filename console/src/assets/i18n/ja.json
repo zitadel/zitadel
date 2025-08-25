@@ -2370,6 +2370,7 @@
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
       "SIGNEDREQUEST": "署名付きリクエスト",
+      "SIGNATUREALGORITHM": "署名アルゴリズム",
       "NAMEIDFORMAT": "NameIDフォーマット",
       "TRANSIENTMAPPINGATTRIBUTENAME": "カスタム属性名",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "NameIDフォーマットが`transient`の場合にユーザーをマッピングするためのカスタム属性名 (例: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`)"

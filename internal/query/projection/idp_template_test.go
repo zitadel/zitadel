@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -2789,6 +2791,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 	"nameIDFormat": 3,
 	"transientMappingAttributeName": "customAttribute",
 	"withSignedRequest": true,
+	"signatureAlgorithm": "",
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -2825,7 +2828,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, transient_mapping_attribute_name, federated_logout_enabled, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, signature_algorithm, transient_mapping_attribute_name, federated_logout_enabled, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -2834,6 +2837,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 								anyArg{},
 								"binding",
 								true,
+								gu.Ptr(""),
 								"customAttribute",
 								true,
 								domain.SAMLNameIDFormatTransient,
@@ -2863,6 +2867,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 	"nameIDFormat": 3,
 	"transientMappingAttributeName": "customAttribute",
 	"withSignedRequest": true,
+	"signatureAlgorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512",
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -2899,7 +2904,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, transient_mapping_attribute_name, federated_logout_enabled, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, signature_algorithm, transient_mapping_attribute_name, federated_logout_enabled, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -2908,6 +2913,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 								anyArg{},
 								"binding",
 								true,
+								gu.Ptr("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"),
 								"customAttribute",
 								true,
 								domain.SAMLNameIDFormatTransient,
@@ -2959,6 +2965,47 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 			},
 		},
 		{
+			name: "instance reduceSAMLIDPChanged - signature algorithm",
+			args: args{
+				event: getEvent(testEvent(
+					instance.SAMLIDPChangedEventType,
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"name": "custom-zitadel-instance",
+	"signatureAlgorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+}`),
+				), instance.SAMLIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceSAMLIDPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates6 SET (name, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								"custom-zitadel-instance",
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates6_saml SET signature_algorithm = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "instance reduceSAMLIDPChanged",
 			args: args{
 				event: getEvent(testEvent(
@@ -2976,6 +3023,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 	"certificate": `+stringToJSONByte("certificate")+`,
 	"binding": "binding",
 	"withSignedRequest": true,
+	"signatureAlgorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512",
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
@@ -3007,13 +3055,14 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.idp_templates6_saml SET (metadata, key, certificate, binding, with_signed_request, federated_logout_enabled) = ($1, $2, $3, $4, $5, $6) WHERE (idp_id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.idp_templates6_saml SET (metadata, key, certificate, binding, with_signed_request, signature_algorithm, federated_logout_enabled) = ($1, $2, $3, $4, $5, $6, $7) WHERE (idp_id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								[]byte("metadata"),
 								anyArg{},
 								anyArg{},
 								"binding",
 								true,
+								"http://www.w3.org/2001/04/xmldsig-more#rsa-sha512",
 								true,
 								"idp-id",
 								"instance-id",

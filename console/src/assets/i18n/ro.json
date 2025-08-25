@@ -2368,6 +2368,7 @@
       "METADATAURL": "URL metadata",
       "BINDING": "Legare",
       "SIGNEDREQUEST": "Solicitare semnată",
+      "SIGNATUREALGORITHM": "Algoritm de semnătură",
       "NAMEIDFORMAT": "Format ID nume",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Nume atribut mapare personalizat",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Nume alternativ de atribut pentru a mapa utilizatorul în cazul în care nameid-format returnat este tranzitoriu, de exemplu, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
