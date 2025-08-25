@@ -527,6 +527,9 @@ func startCommandsQueries(
 		config.OIDC.DefaultRefreshTokenExpiration,
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
+
+		nil,
+		nil,
 	)
 	logging.OnError(err).Fatal("unable to start commands")
 
@@ -549,7 +552,7 @@ func startCommandsQueries(
 		commands,
 		queries,
 		eventstoreClient,
-		config.Login.DefaultOTPEmailURLV2,
+		config.Login.DefaultPaths.OTPEmailPath,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
 		keys.SMTP,

@@ -62,6 +62,9 @@ func (c *Commands) requestPasswordReset(ctx context.Context, userID string, retu
 	if err != nil {
 		return nil, nil, err
 	}
+	if urlTmpl == "" {
+		urlTmpl = c.defaultPasswordSetURLTemplate(ctx)
+	}
 	cmd := user.NewHumanPasswordCodeAddedEventV2(ctx, UserAggregateFromWriteModelCtx(ctx, &model.WriteModel), passwordCode.CryptedCode(), passwordCode.CodeExpiry(), notificationType, urlTmpl, returnCode, generatorID)
 
 	if returnCode {

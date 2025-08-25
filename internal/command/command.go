@@ -99,6 +99,9 @@ type Commands struct {
 	// These instance's milestones never need to be invalidated,
 	// so the query and cache overhead can completely eliminated.
 	milestonesCompleted sync.Map
+
+	defaultEmailCodeURLTemplate   func(ctx context.Context) string
+	defaultPasswordSetURLTemplate func(ctx context.Context) string
 }
 
 func StartCommands(
@@ -120,6 +123,8 @@ func StartCommands(
 	defaultRefreshTokenLifetime,
 	defaultRefreshTokenIdleLifetime time.Duration,
 	defaultSecretGenerators *SecretGenerators,
+	defaultEmailCodeURLTemplate func(ctx context.Context) string,
+	defaultPasswordSetURLTemplate func(ctx context.Context) string,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
@@ -199,8 +204,10 @@ func StartCommands(
 				Issuer:    defaults.Multifactors.OTP.Issuer,
 			},
 		},
-		GenerateDomain: domain.NewGeneratedInstanceDomain,
-		caches:         caches,
+		GenerateDomain:                domain.NewGeneratedInstanceDomain,
+		caches:                        caches,
+		defaultEmailCodeURLTemplate:   defaultEmailCodeURLTemplate,
+		defaultPasswordSetURLTemplate: defaultPasswordSetURLTemplate,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
