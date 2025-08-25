@@ -639,7 +639,7 @@ func TestServer_ListUsers(t *testing.T) {
 					Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value 3")
 					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value 2")
 
-					request.Queries = append(request.Queries, MetakeyContainsQuery("my meta"))
+					request.Queries = append(request.Queries, MetadataKeyContainsQuery("my meta"))
 					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return infos
 				},
@@ -824,7 +824,7 @@ func TestServer_ListUsers(t *testing.T) {
 					Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value")
 					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value")
 
-					request.Queries = append(request.Queries, MetavalueQuery("my value"))
+					request.Queries = append(request.Queries, MetadataValueQuery("my value"))
 					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 
 					return infos
@@ -1160,7 +1160,7 @@ func TestServer_ListUsers(t *testing.T) {
 					createUser(ctx, orgResp.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
-					request.Queries = append(request.Queries, MetakeyContainsQuery("some non-existent meta"))
+					request.Queries = append(request.Queries, MetadataKeyContainsQuery("some non-existent meta"))
 
 					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return []userAttr{}
@@ -1379,11 +1379,11 @@ func OrQuery(queries []*user.SearchQuery) *user.SearchQuery {
 	}
 }
 
-func MetakeyContainsQuery(metaKey string) *user.SearchQuery {
+func MetadataKeyContainsQuery(metadataKey string) *user.SearchQuery {
 	return &user.SearchQuery{
 		Query: &user.SearchQuery_MetadataKeyFilter{
 			MetadataKeyFilter: &v2.MetadataKeyFilter{
-				Key:    metaKey,
+				Key:    metadataKey,
 				Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_STARTS_WITH},
 		},
 	}
@@ -1399,7 +1399,7 @@ func MetakeyEqualsQuery(metaKey string) *user.SearchQuery {
 	}
 }
 
-func MetavalueQuery(metaValue string) *user.SearchQuery {
+func MetadataValueQuery(metaValue string) *user.SearchQuery {
 	return &user.SearchQuery{
 		Query: &user.SearchQuery_MetadataValueFilter{
 			MetadataValueFilter: &v2.MetadataValueFilter{
