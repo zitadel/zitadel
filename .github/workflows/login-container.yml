@@ -59,7 +59,7 @@ jobs:
           NODE_VERSION: ${{ inputs.node_version }}
         with:
           source: .
-          push: true
+          push: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
           provenance: true
           targets: login-standalone
           files: |
