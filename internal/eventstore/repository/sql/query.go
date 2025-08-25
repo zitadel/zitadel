@@ -80,7 +80,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 			return err
 		}
 
-		where += " AND events2.position <= EXTRACT(EPOCH FROM NOW())"
+		where += awaitOpenTransactions(useV1)
 	}
 	query += where
 
