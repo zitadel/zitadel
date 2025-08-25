@@ -15,8 +15,15 @@ import {
   getLoginSettings,
   getSession,
 } from "@/lib/zitadel";
+import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("signedin");
+  return { title: t('title', { user: '' })};
+}
 
 async function loadSessionById(
   serviceUrl: string,
