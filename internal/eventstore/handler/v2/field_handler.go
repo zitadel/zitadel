@@ -10,7 +10,9 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/shopspring/decimal"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type FieldHandler struct {
@@ -101,7 +103,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		defer cancel()
 	}
 
-	tx, err := h.client.BeginTx(txCtx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
+	tx, err := h.client.BeginTx(txCtx, nil)
 	if err != nil {
 		return false, err
 	}
@@ -117,9 +119,24 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		}
 	}()
 
+	if config.awaitRunning {
+		if _, err := tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()); err != nil {
+			return false, err
+		}
+	} else {
+		var hasLocked bool
+		err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock (hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
+		if err != nil {
+			return false, err
+		}
+		if !hasLocked {
+			return false, zerrors.ThrowInternal(err, "V2-QOPG6", "projection already locked")
+		}
+	}
+
 	// always await currently running transactions
 	config.awaitRunning = true
-	currentState, err := h.currentState(ctx, tx, config)
+	currentState, err := h.currentState(ctx, tx)
 	if err != nil {
 		return additionalIteration, err
 	}

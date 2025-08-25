@@ -542,7 +542,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 	}
 
-	currentState, err := h.currentState(ctx, tx, config)
+	currentState, err := h.currentState(ctx, tx)
 	if err != nil {
 		return additionalIteration, err
 	}
