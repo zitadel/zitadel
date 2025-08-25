@@ -24,6 +24,10 @@ type Event struct {
 	Seq uint64
 	// Pos is the global sequence of the event multiple events can have the same sequence
 	Pos decimal.Decimal
+	// InTxOrd is the order of the event within the transaction
+	InTxOrd uint8
+	// Tx is the ID of the transaction the event belongs to
+	Tx uint64
 
 	//CreationDate is the time the event is created
 	// it's used for human readability.
@@ -130,4 +134,12 @@ func (e *Event) UniqueConstraints() []*eventstore.UniqueConstraint {
 
 func (e *Event) Fields() []*eventstore.FieldOperation {
 	return nil
+}
+
+func (e *Event) InTxOrder() uint8 {
+	return e.InTxOrd
+}
+
+func (e *Event) TxID() uint64 {
+	return e.Tx
 }

@@ -82,7 +82,7 @@ func (es *Eventstore) writeEventsOld(ctx context.Context, tx database.Tx, sequen
 	defer rows.Close()
 
 	for i := 0; rows.Next(); i++ {
-		err = rows.Scan(&events[i].(*event).createdAt, &events[i].(*event).position)
+		err = rows.Scan(&events[i].(*event).createdAt, &events[i].(*event).position, &events[i].(*event).inTxOrder, &events[i].(*event).txID)
 		if err != nil {
 			logging.WithError(err).Warn("failed to scan events")
 			return nil, err

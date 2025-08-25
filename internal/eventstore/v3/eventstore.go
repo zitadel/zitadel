@@ -192,8 +192,8 @@ func (es *Eventstore) pushTx(ctx context.Context, client database.ContextQueryEx
 	}
 
 	tx, err = beginner.BeginTx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelReadCommitted,
-		ReadOnly:  false,
+		// Isolation: sql.LevelReadCommitted,
+		ReadOnly: false,
 	})
 	if err != nil {
 		return nil, nil, err

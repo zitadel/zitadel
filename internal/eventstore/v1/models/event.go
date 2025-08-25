@@ -96,6 +96,14 @@ func (e *Event) Revision() uint16 {
 	return 0
 }
 
+func (e *Event) InTxOrder() uint8 {
+	return 0
+}
+
+func (e *Event) TxID() uint64 {
+	return 0
+}
+
 func eventData(i interface{}) ([]byte, error) {
 	switch v := i.(type) {
 	case []byte:

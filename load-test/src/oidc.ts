@@ -30,7 +30,7 @@ function configuration() {
 
   const res = http.get(url('/.well-known/openid-configuration'));
   check(res, {
-    'openid configuration': (r) => r.status >= 200 && r.status < 300 || fail('unable to load openid configuration'),
+    'openid configuration': (r) => (r.status >= 200 && r.status < 300) || fail('unable to load openid configuration'),
   });
 
   oidcConfig = res.json();
@@ -176,7 +176,8 @@ export async function authRequestByID(id: string, tokens: any): Promise<Response
     },
   });
   check(response, {
-    'authorize status ok': (r) => r.status >= 200 && r.status < 300 || fail(`auth request by failed: ${JSON.stringify(r)}`),
+    'authorize status ok': (r) =>
+      (r.status >= 200 && r.status < 300) || fail(`auth request by failed: ${JSON.stringify(r)}`),
   });
   authRequestByIDTrend.add(response.timings.duration);
   return response;
@@ -202,7 +203,8 @@ export async function finalizeAuthRequest(id: string, session: any, tokens: any)
     },
   );
   check(res, {
-    'finalize auth request status ok': (r) => r.status >= 200 && r.status < 300 || fail(`finalize auth request failed: ${JSON.stringify(r)}`),
+    'finalize auth request status ok': (r) =>
+      (r.status >= 200 && r.status < 300) || fail(`finalize auth request failed: ${JSON.stringify(r)}`),
   });
   finalizeAuthRequestTrend.add(res.timings.duration);
 
