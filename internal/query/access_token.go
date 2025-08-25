@@ -68,6 +68,7 @@ func (wm *OIDCSessionAccessTokenReadModel) Query() *eventstore.SearchQueryBuilde
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			oidcsession.AddedType,
+			oidcsession.TerminatedType,
 			oidcsession.AccessTokenAddedType,
 			oidcsession.AccessTokenRevokedType,
 			oidcsession.RefreshTokenRevokedType,
