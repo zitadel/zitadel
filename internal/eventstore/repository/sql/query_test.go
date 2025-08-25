@@ -405,8 +405,8 @@ func Test_prepareCondition(t *testing.T) {
 				useV1: true,
 			},
 			res: res{
-				clause: " WHERE aggregate_type = ANY(?) AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')",
-				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, database.TextArray[string]{}},
+				clause: " WHERE aggregate_type = ANY(?)",
+				values: []interface{}{[]eventstore.AggregateType{"user", "org"}},
 			},
 		},
 		{
@@ -422,8 +422,8 @@ func Test_prepareCondition(t *testing.T) {
 				},
 			},
 			res: res{
-				clause: ` WHERE aggregate_type = ANY(?) AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')`,
-				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, database.TextArray[string]{}},
+				clause: ` WHERE aggregate_type = ANY(?)`,
+				values: []interface{}{[]eventstore.AggregateType{"user", "org"}},
 			},
 		},
 		{
@@ -442,8 +442,8 @@ func Test_prepareCondition(t *testing.T) {
 				useV1: true,
 			},
 			res: res{
-				clause: " WHERE aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')",
-				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, "1234", []eventstore.EventType{"user.created", "org.created"}, database.TextArray[string]{}},
+				clause: " WHERE aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?)",
+				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, "1234", []eventstore.EventType{"user.created", "org.created"}},
 			},
 		},
 		{
@@ -461,8 +461,8 @@ func Test_prepareCondition(t *testing.T) {
 				},
 			},
 			res: res{
-				clause: ` WHERE aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')`,
-				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, "1234", []eventstore.EventType{"user.created", "org.created"}, database.TextArray[string]{}},
+				clause: ` WHERE aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?)`,
+				values: []interface{}{[]eventstore.AggregateType{"user", "org"}, "1234", []eventstore.EventType{"user.created", "org.created"}},
 			},
 		},
 	}
@@ -693,10 +693,14 @@ func Test_query_events_mocked(t *testing.T) {
 				useV1: true,
 			},
 			fields: fields{
-				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence DESC`),
-					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}},
-				),
+				mock: newMockClient(t).
+					expectExec(regexp.QuoteMeta(
+						`select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))`),
+						[]driver.Value{""}).
+					expectQuery(
+						regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND created_at <= now() ORDER BY event_sequence DESC`),
+						[]driver.Value{eventstore.AggregateType("user")},
+					),
 			},
 			res: res{
 				wantErr: false,
@@ -716,10 +720,14 @@ func Test_query_events_mocked(t *testing.T) {
 				useV1: true,
 			},
 			fields: fields{
-				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence LIMIT $3`),
-					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}, uint64(5)},
-				),
+				mock: newMockClient(t).
+					expectExec(regexp.QuoteMeta(
+						`select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))`),
+						[]driver.Value{""}).
+					expectQuery(
+						regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND created_at <= now() ORDER BY event_sequence LIMIT $2`),
+						[]driver.Value{eventstore.AggregateType("user"), uint64(5)},
+					),
 			},
 			res: res{
 				wantErr: false,
@@ -739,76 +747,14 @@ func Test_query_events_mocked(t *testing.T) {
 				useV1: true,
 			},
 			fields: fields{
-				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence DESC LIMIT $3`),
-					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}, uint64(5)},
-				),
-			},
-			res: res{
-				wantErr: false,
-			},
-		},
-		{
-			name: "lock, wait",
-			args: args{
-				dest: &[]*repository.Event{},
-				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-					OrderDesc().
-					Limit(5).
-					AddQuery().
-					AggregateTypes("user").
-					Builder().LockRowsDuringTx(nil, eventstore.LockOptionWait),
-				useV1: true,
-			},
-			fields: fields{
-				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2 FOR UPDATE`),
-					[]driver.Value{eventstore.AggregateType("user"), uint64(5)},
-				),
-			},
-			res: res{
-				wantErr: false,
-			},
-		},
-		{
-			name: "lock, no wait",
-			args: args{
-				dest: &[]*repository.Event{},
-				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-					OrderDesc().
-					Limit(5).
-					AddQuery().
-					AggregateTypes("user").
-					Builder().LockRowsDuringTx(nil, eventstore.LockOptionNoWait),
-				useV1: true,
-			},
-			fields: fields{
-				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2 FOR UPDATE NOWAIT`),
-					[]driver.Value{eventstore.AggregateType("user"), uint64(5)},
-				),
-			},
-			res: res{
-				wantErr: false,
-			},
-		},
-		{
-			name: "lock, skip locked",
-			args: args{
-				dest: &[]*repository.Event{},
-				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-					OrderDesc().
-					Limit(5).
-					AddQuery().
-					AggregateTypes("user").
-					Builder().LockRowsDuringTx(nil, eventstore.LockOptionSkipLocked),
-				useV1: true,
-			},
-			fields: fields{
-				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2 FOR UPDATE SKIP LOCKED`),
-					[]driver.Value{eventstore.AggregateType("user"), uint64(5)},
-				),
+				mock: newMockClient(t).
+					expectExec(regexp.QuoteMeta(
+						`select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))`),
+						[]driver.Value{""}).
+					expectQuery(
+						regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND created_at <= now() ORDER BY event_sequence DESC LIMIT $2`),
+						[]driver.Value{eventstore.AggregateType("user"), uint64(5)},
+					),
 			},
 			res: res{
 				wantErr: false,
@@ -828,10 +774,14 @@ func Test_query_events_mocked(t *testing.T) {
 				useV1: true,
 			},
 			fields: fields{
-				mock: newMockClient(t).expectQueryErr(
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence DESC`),
-					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}},
-					sql.ErrConnDone),
+				mock: newMockClient(t).
+					expectExec(regexp.QuoteMeta(
+						`select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))`),
+						[]driver.Value{""}).
+					expectQueryErr(
+						regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND created_at <= now() ORDER BY event_sequence DESC`),
+						[]driver.Value{eventstore.AggregateType("user")},
+						sql.ErrConnDone),
 			},
 			res: res{
 				wantErr: true,
@@ -851,10 +801,14 @@ func Test_query_events_mocked(t *testing.T) {
 				useV1: true,
 			},
 			fields: fields{
-				mock: newMockClient(t).expectQueryScanErr(
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($2) AND state <> 'idle') ORDER BY event_sequence DESC`),
-					[]driver.Value{eventstore.AggregateType("user"), database.TextArray[string]{}},
-					&repository.Event{Seq: 100}),
+				mock: newMockClient(t).
+					expectExec(regexp.QuoteMeta(
+						`select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))`),
+						[]driver.Value{""}).
+					expectQueryScanErr(
+						regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 AND created_at <= now() ORDER BY event_sequence DESC`),
+						[]driver.Value{eventstore.AggregateType("user")},
+						&repository.Event{Seq: 100}),
 			},
 			res: res{
 				wantErr: true,
@@ -886,10 +840,14 @@ func Test_query_events_mocked(t *testing.T) {
 				useV1: true,
 			},
 			fields: fields{
-				mock: newMockClient(t).expectQuery(
-					regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE (aggregate_type = $1 OR (aggregate_type = $2 AND aggregate_id = $3)) AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY($4) AND state <> 'idle') ORDER BY event_sequence DESC LIMIT $5`),
-					[]driver.Value{eventstore.AggregateType("user"), eventstore.AggregateType("org"), "asdf42", database.TextArray[string]{}, uint64(5)},
-				),
+				mock: newMockClient(t).
+					expectExec(regexp.QuoteMeta(
+						`select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))`),
+						[]driver.Value{""}).
+					expectQuery(
+						regexp.QuoteMeta(`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE (aggregate_type = $1 OR (aggregate_type = $2 AND aggregate_id = $3)) AND created_at <= now() ORDER BY event_sequence DESC LIMIT $4`),
+						[]driver.Value{eventstore.AggregateType("user"), eventstore.AggregateType("org"), "asdf42", uint64(5)},
+					),
 			},
 			res: res{
 				wantErr: false,
@@ -1037,6 +995,11 @@ func (m *dbMock) expectQueryScanErr(expectedQuery string, args []driver.Value, e
 
 func (m *dbMock) expectQueryErr(expectedQuery string, args []driver.Value, err error) *dbMock {
 	m.mock.ExpectQuery(expectedQuery).WithArgs(args...).WillReturnError(err)
+	return m
+}
+
+func (m *dbMock) expectExec(expectedQuery string, args []driver.Value) *dbMock {
+	m.mock.ExpectExec(expectedQuery).WithArgs(args...).WillReturnResult(sqlmock.NewResult(1, 1))
 	return m
 }
 

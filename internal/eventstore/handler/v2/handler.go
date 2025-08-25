@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/migration"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type EventStore interface {
@@ -526,11 +527,23 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 	}()
 
-	currentState, err := h.currentState(ctx, tx, config)
-	if err != nil {
-		if errors.Is(err, errJustUpdated) {
-			return false, nil
+	if config.awaitRunning {
+		if _, err := tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()); err != nil {
+			return false, err
 		}
+	} else {
+		var hasLocked bool
+		err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock (hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
+		if err != nil {
+			return false, err
+		}
+		if !hasLocked {
+			return false, zerrors.ThrowInternal(err, "V2-lpiK0", "projection already locked")
+		}
+	}
+
+	currentState, err := h.currentState(ctx, tx)
+	if err != nil {
 		return additionalIteration, err
 	}
 	// stop execution if currentState.position >= config.maxPosition
