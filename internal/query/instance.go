@@ -19,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -460,19 +461,20 @@ func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance,
 }
 
 type authzInstance struct {
-	ID              string                     `json:"id,omitempty"`
-	IAMProjectID    string                     `json:"iam_project_id,omitempty"`
-	ConsoleID       string                     `json:"console_id,omitempty"`
-	ConsoleAppID    string                     `json:"console_app_id,omitempty"`
-	DefaultLang     language.Tag               `json:"default_lang,omitempty"`
-	DefaultOrgID    string                     `json:"default_org_id,omitempty"`
-	CSP             csp                        `json:"csp,omitempty"`
-	Impersonation   bool                       `json:"impersonation,omitempty"`
-	IsBlocked       *bool                      `json:"is_blocked,omitempty"`
-	LogRetention    *time.Duration             `json:"log_retention,omitempty"`
-	Feature         feature.Features           `json:"feature,omitempty"`
-	ExternalDomains database.TextArray[string] `json:"external_domains,omitempty"`
-	TrustedDomains  database.TextArray[string] `json:"trusted_domains,omitempty"`
+	ID               string                     `json:"id,omitempty"`
+	IAMProjectID     string                     `json:"iam_project_id,omitempty"`
+	ConsoleID        string                     `json:"console_id,omitempty"`
+	ConsoleAppID     string                     `json:"console_app_id,omitempty"`
+	DefaultLang      language.Tag               `json:"default_lang,omitempty"`
+	DefaultOrgID     string                     `json:"default_org_id,omitempty"`
+	CSP              csp                        `json:"csp,omitempty"`
+	Impersonation    bool                       `json:"impersonation,omitempty"`
+	IsBlocked        *bool                      `json:"is_blocked,omitempty"`
+	LogRetention     *time.Duration             `json:"log_retention,omitempty"`
+	Feature          feature.Features           `json:"feature,omitempty"`
+	ExternalDomains  database.TextArray[string] `json:"external_domains,omitempty"`
+	TrustedDomains   database.TextArray[string] `json:"trusted_domains,omitempty"`
+	ExecutionTargets target.Router              `json:"execution_targets,omitempty"`
 }
 
 type csp struct {
@@ -525,6 +527,10 @@ func (i *authzInstance) AuditLogRetention() *time.Duration {
 
 func (i *authzInstance) Features() feature.Features {
 	return i.Feature
+}
+
+func (i *authzInstance) ExecutionRouter() target.Router {
+	return i.ExecutionTargets
 }
 
 var errPublicDomain = "public domain %q not trusted"
