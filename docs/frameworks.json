@@ -32,7 +32,7 @@
 		"id": "client-python",
 		"title": "Python",
 		"imgSrcDark": "/docs/img/tech/python.svg",
-
+		"docsLink": "/docs/sdk-examples/client-libraries/python",
 		"client": true
 	},
 	{
