@@ -638,6 +638,8 @@ func (c *Caches) registerInstanceInvalidation() {
 	invalidate = cacheInvalidationFunc(c.instance, instanceIndexByID, getResourceOwner)
 	projection.LimitsProjection.RegisterCacheInvalidation(invalidate)
 	projection.RestrictionsProjection.RegisterCacheInvalidation(invalidate)
+	projection.ExecutionProjection.RegisterCacheInvalidation(invalidate)
+	projection.TargetProjection.RegisterCacheInvalidation(invalidate)
 
 	// System feature update should invalidate all instances, so Truncate the cache.
 	projection.SystemFeatureProjection.RegisterCacheInvalidation(func(ctx context.Context, _ []*eventstore.Aggregate) {
