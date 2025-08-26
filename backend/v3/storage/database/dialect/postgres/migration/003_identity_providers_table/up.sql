@@ -4,15 +4,25 @@ CREATE TYPE zitadel.idp_state AS ENUM (
 );
 
 CREATE TYPE zitadel.idp_type AS ENUM (
+    'unspecified',
     'oidc',
     'jwt',
     'oauth',
     'saml',
     'ldap',
     'github',
+    'githubenterprise',
+    'gitlab',
+    'gitlabselfhosted',
+    'azure',
     'google',
-    'microsoft',
     'apple'
+);
+
+CREATE TYPE zitadel.idp_auto_linking_option AS ENUM (
+    'unspecified',
+    'username',
+    'email'
 );
 
 CREATE TABLE zitadel.identity_providers (
@@ -27,7 +37,7 @@ CREATE TABLE zitadel.identity_providers (
     , allow_auto_creation BOOLEAN NOT NULL DEFAULT TRUE
     , allow_auto_update BOOLEAN NOT NULL DEFAULT TRUE
     , allow_linking BOOLEAN NOT NULL DEFAULT TRUE
-    , allow_auto_linking BOOLEAN NOT NULL DEFAULT TRUE
+    , allow_auto_linking zitadel.idp_auto_linking_option NOT NULL DEFAULT 'unspecified'
     , styling_type SMALLINT
     , payload JSONB
     
@@ -53,3 +63,4 @@ BEFORE UPDATE ON zitadel.identity_providers
 FOR EACH ROW
 WHEN (OLD.updated_at IS NOT DISTINCT FROM NEW.updated_at)
 EXECUTE FUNCTION zitadel.set_updated_at();
+

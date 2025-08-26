@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -22,8 +23,8 @@ func IDProviderRepository(client database.QueryExecutor) domain.IDProviderReposi
 	}
 }
 
-const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, allow_creation, allow_auto_creation,` +
-	` allow_auto_update, allow_linking, styling_type, payload, created_at, updated_at` +
+const queryIDProviderStmt = `SELECT instance_id, org_id, id, state, name, type, auto_register, allow_creation, allow_auto_creation,` +
+	` allow_auto_update, allow_linking, allow_auto_linking, styling_type, payload, created_at, updated_at` +
 	` FROM zitadel.identity_providers`
 
 func (i *idProvider) Get(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IdentityProvider, error) {
@@ -118,6 +119,258 @@ func (i *idProvider) Delete(ctx context.Context, id domain.IDPIdentifierConditio
 	return i.client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
+func (i *idProvider) GetOIDC(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPOIDC, error) {
+	idpOIDC := &domain.IDPOIDC{}
+	var err error
+
+	idpOIDC.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpOIDC.Type != domain.IDPTypeOIDC.String() {
+		return nil, domain.NewWrongTypeError(domain.IDPTypeOIDC, idpOIDC.Type)
+	}
+
+	err = json.Unmarshal(idpOIDC.Payload, idpOIDC)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpOIDC, nil
+}
+
+func (i *idProvider) GetJWT(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPJWT, error) {
+	idpJWT := &domain.IDPJWT{}
+	var err error
+
+	idpJWT.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpJWT.Type != domain.IDPTypeJWT.String() {
+		return nil, domain.NewWrongTypeError(domain.IDPTypeJWT, idpJWT.Type)
+	}
+
+	err = json.Unmarshal(idpJWT.Payload, idpJWT)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpJWT, nil
+}
+
+func (i *idProvider) GetOAuth(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPOAuth, error) {
+	idpOAuth := &domain.IDPOAuth{}
+	var err error
+
+	idpOAuth.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpOAuth.Type != domain.IDPTypeOAuth.String() {
+		return nil, domain.NewWrongTypeError(domain.IDPTypeOAuth, idpOAuth.Type)
+	}
+
+	err = json.Unmarshal(idpOAuth.Payload, idpOAuth)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpOAuth, nil
+}
+
+func (i *idProvider) GetOAzureAD(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPOAzureAD, error) {
+	idpAzure := &domain.IDPOAzureAD{}
+	var err error
+
+	idpAzure.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpAzure.Type != domain.IDPTypeAzure.String() {
+		return nil, domain.NewWrongTypeError(domain.IDPTypeAzure, idpAzure.Type)
+	}
+
+	err = json.Unmarshal(idpAzure.Payload, idpAzure)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpAzure, nil
+}
+
+func (i *idProvider) GetGoogle(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGoogle, error) {
+	idpGoogle := &domain.IDPGoogle{}
+	var err error
+
+	idpGoogle.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpGoogle.Type != domain.IDPTypeGoogle.String() {
+		return nil, domain.NewWrongTypeError(domain.IDPTypeGoogle, idpGoogle.Type)
+	}
+
+	err = json.Unmarshal(idpGoogle.Payload, idpGoogle)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpGoogle, nil
+}
+
+func (i *idProvider) GetGithub(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGithub, error) {
+	idpGithub := &domain.IDPGithub{}
+	var err error
+
+	idpGithub.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpGithub.Type != domain.IDPTypeGitHub.String() {
+		return nil, domain.NewWrongTypeError(domain.IDPTypeGitHub, idpGithub.Type)
+	}
+
+	err = json.Unmarshal(idpGithub.Payload, idpGithub)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpGithub, nil
+}
+
+func (i *idProvider) GetGithubEnterprise(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGithubEnterprise, error) {
+	idpGithubEnterprise := &domain.IDPGithubEnterprise{}
+	var err error
+
+	idpGithubEnterprise.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpGithubEnterprise.Type != domain.IDPTypeGitHubEnterprise.String() {
+		return nil, domain.NewWrongTypeError(domain.IDPTypeGitHubEnterprise, idpGithubEnterprise.Type)
+	}
+
+	err = json.Unmarshal(idpGithubEnterprise.Payload, idpGithubEnterprise)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpGithubEnterprise, nil
+}
+
+func (i *idProvider) GetGitlab(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGitlab, error) {
+	idpGitlab := &domain.IDPGitlab{}
+	var err error
+
+	idpGitlab.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpGitlab.Type != domain.IDPTypeGitLab.String() {
+		return nil, domain.NewWrongTypeError(domain.IDPTypeGitLab, idpGitlab.Type)
+	}
+
+	err = json.Unmarshal(idpGitlab.Payload, idpGitlab)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpGitlab, nil
+}
+
+func (i *idProvider) GetGitlabSelfHosting(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGitlabSelfHosting, error) {
+	idpGitlabSelfHosting := &domain.IDPGitlabSelfHosting{}
+	var err error
+
+	idpGitlabSelfHosting.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if idpGitlabSelfHosting.Type != domain.IDPTypeGitLabSelfHosted.String() {
+		return nil, domain.NewWrongTypeError(domain.IDPTypeGitLabSelfHosted, idpGitlabSelfHosting.Type)
+	}
+
+	err = json.Unmarshal(idpGitlabSelfHosting.Payload, idpGitlabSelfHosting)
+	if err != nil {
+		return nil, err
+	}
+
+	return idpGitlabSelfHosting, nil
+}
+
+func (i *idProvider) GetLDAP(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPLDAP, error) {
+	ldap := &domain.IDPLDAP{}
+	var err error
+
+	ldap.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if ldap.Type != domain.IDPTypeLDAP.String() {
+		return nil, domain.NewWrongTypeError(domain.IDPTypeLDAP, ldap.Type)
+	}
+
+	err = json.Unmarshal(ldap.Payload, ldap)
+	if err != nil {
+		return nil, err
+	}
+
+	return ldap, nil
+}
+
+func (i *idProvider) GetApple(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPApple, error) {
+	apple := &domain.IDPApple{}
+	var err error
+
+	apple.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if apple.Type != domain.IDPTypeApple.String() {
+		return nil, domain.NewWrongTypeError(domain.IDPTypeApple, apple.Type)
+	}
+
+	err = json.Unmarshal(apple.Payload, apple)
+	if err != nil {
+		return nil, err
+	}
+
+	return apple, nil
+}
+
+func (i *idProvider) GetSAML(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPSAML, error) {
+	saml := &domain.IDPSAML{}
+	var err error
+
+	saml.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	if saml.Type != domain.IDPTypeSAML.String() {
+		return nil, domain.NewWrongTypeError(domain.IDPTypeSAML, saml.Type)
+	}
+
+	err = json.Unmarshal(saml.Payload, saml)
+	if err != nil {
+		return nil, err
+	}
+
+	return saml, nil
+}
+
 // -------------------------------------------------------------
 // columns
 // -------------------------------------------------------------
@@ -196,7 +449,7 @@ func (i idProvider) InstanceIDCondition(id string) database.Condition {
 
 func (i idProvider) OrgIDCondition(id *string) database.Condition {
 	if id == nil {
-		return nil
+		return database.IsNull(i.OrgIDColumn())
 	}
 	return database.NewTextCondition(i.OrgIDColumn(), database.TextOperationEqual, *id)
 }
@@ -237,8 +490,8 @@ func (i idProvider) AllowLinkingCondition(allow bool) database.Condition {
 	return database.NewBooleanCondition(i.AllowLinkingColumn(), allow)
 }
 
-func (i idProvider) AllowAutoLinkingCondition(allow bool) database.Condition {
-	return database.NewBooleanCondition(i.AllowAutoLinkingColumn(), allow)
+func (i idProvider) AllowAutoLinkingCondition(linkingType domain.IDPAutoLinkingOption) database.Condition {
+	return database.NewTextCondition(i.AllowAutoLinkingColumn(), database.TextOperationEqual, linkingType.String())
 }
 
 func (i idProvider) StylingTypeCondition(style int16) database.Condition {
@@ -295,31 +548,18 @@ func (i idProvider) SetPayload(payload string) database.Change {
 
 func scanIDProvider(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.IdentityProvider, error) {
 	idp := &domain.IdentityProvider{}
-
-	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	err := scan(ctx, querier, builder, idp)
 	if err != nil {
 		return nil, err
 	}
-
-	err = rows.(database.CollectableRows).CollectExactlyOneRow(idp)
-	if err != nil {
-		return nil, err
-	}
-
-	return idp, nil
+	return idp, err
 }
 
 func scanIDProviders(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.IdentityProvider, error) {
 	idps := []*domain.IdentityProvider{}
-	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
+	err := scanMultiple(ctx, querier, builder, &idps)
 	if err != nil {
 		return nil, err
 	}
-
-	err = rows.(database.CollectableRows).Collect(&idps)
-	if err != nil {
-		return nil, err
-	}
-
 	return idps, nil
 }
