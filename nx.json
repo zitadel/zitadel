@@ -1,0 +1,98 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "sharedGlobals": [
+      "{workspaceRoot}/**/.env.*local",
+      {
+        "env": "DEBUG"
+      },
+      {
+        "env": "VERCEL_URL"
+      },
+      {
+        "env": "EMAIL_VERIFICATION"
+      },
+      {
+        "env": "AUDIENCE"
+      },
+      {
+        "env": "SYSTEM_USER_ID"
+      },
+      {
+        "env": "SYSTEM_USER_PRIVATE_KEY"
+      },
+      {
+        "env": "ZITADEL_API_URL"
+      },
+      {
+        "env": "ZITADEL_SERVICE_USER_TOKEN"
+      },
+      {
+        "env": "NEXT_PUBLIC_BASE_PATH"
+      },
+      {
+        "env": "CUSTOM_REQUEST_HEADERS"
+      },
+      {
+        "env": "NODE_ENV"
+      },
+      {
+        "env": "PORT"
+      },
+      {
+        "env": "INKEEP_API_KEY"
+      },
+      {
+        "env": "DISPLAY"
+      },
+      {
+        "env": "CYPRESS_DISPLAY"
+      }
+    ],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ]
+  },
+  "targetDefaults": {
+    "generate": {
+      "cache": true
+    },
+    "build": {
+      "cache": true
+    },
+    "build:login:standalone": {
+      "cache": true
+    },
+    "quality": {
+      "cache": true
+    },
+    "start": {
+      "cache": true
+    },
+    "test:unit": {
+      "cache": true
+    },
+    "test:integration:login": {
+      "cache": true
+    },
+    "test:acceptance": {
+      "cache": true
+    },
+    "test:e2e": {
+      "cache": true
+    },
+    "lint": {
+      "cache": true
+    },
+    "lint:fix": {
+      "cache": true
+    },
+    "dev": {
+      "cache": false
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}
