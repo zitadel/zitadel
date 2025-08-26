@@ -252,7 +252,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test idp oidc addded reduces", func(t *testing.T) {
+	t.Run("test idp oidc added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
@@ -373,7 +373,7 @@ func TestServer_TestIDProviderReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test idp jwt addded reduces", func(t *testing.T) {
+	t.Run("test idp jwt added reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt

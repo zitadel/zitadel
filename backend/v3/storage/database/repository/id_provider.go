@@ -73,7 +73,7 @@ func (i *idProvider) Create(ctx context.Context, idp *domain.IdentityProvider) e
 		idp.AllowAutoUpdate,
 		idp.AllowLinking,
 		idp.StylingType,
-		idp.Payload)
+		string(idp.Payload))
 	builder.WriteString(createIDProviderStmt)
 
 	err := i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&idp.CreatedAt, &idp.UpdatedAt)
@@ -83,7 +83,7 @@ func (i *idProvider) Create(ctx context.Context, idp *domain.IdentityProvider) e
 	return nil
 }
 
-func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string, changes ...database.Change) (int64, error) {
+func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string, changes ...database.Change) (int64, error) {
 	if changes == nil {
 		return 0, errors.New("Update must contain at least one change")
 	}
@@ -92,7 +92,7 @@ func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierConditio
 
 	conditions := []database.Condition{
 		id,
-		i.InstanceIDCondition(instnaceID),
+		i.InstanceIDCondition(instanceID),
 		i.OrgIDCondition(orgID),
 	}
 	database.Changes(changes).Write(&builder)
@@ -103,14 +103,14 @@ func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierConditio
 	return i.client.Exec(ctx, stmt, builder.Args()...)
 }
 
-func (i *idProvider) Delete(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (int64, error) {
+func (i *idProvider) Delete(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (int64, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(`DELETE FROM zitadel.identity_providers`)
 
 	conditions := []database.Condition{
 		id,
-		i.InstanceIDCondition(instnaceID),
+		i.InstanceIDCondition(instanceID),
 		i.OrgIDCondition(orgID),
 	}
 	writeCondition(&builder, database.And(conditions...))
@@ -213,8 +213,8 @@ func (i idProvider) NameCondition(name string) domain.IDPIdentifierCondition {
 	return database.NewTextCondition(i.NameColumn(), database.TextOperationEqual, name)
 }
 
-func (i idProvider) TypeCondition(typee domain.IDPType) database.Condition {
-	return database.NewTextCondition(i.TypeColumn(), database.TextOperationEqual, typee.String())
+func (i idProvider) TypeCondition(typ domain.IDPType) database.Condition {
+	return database.NewTextCondition(i.TypeColumn(), database.TextOperationEqual, typ.String())
 }
 
 func (i idProvider) AutoRegisterCondition(allow bool) database.Condition {
@@ -295,18 +295,31 @@ func (i idProvider) SetPayload(payload string) database.Change {
 
 func scanIDProvider(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.IdentityProvider, error) {
 	idp := &domain.IdentityProvider{}
-	err := scanRow(ctx, querier, builder, idp)
+
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
+
+	err = rows.(database.CollectableRows).CollectExactlyOneRow(idp)
+	if err != nil {
+		return nil, err
+	}
+
 	return idp, nil
 }
 
 func scanIDProviders(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.IdentityProvider, error) {
 	idps := []*domain.IdentityProvider{}
-	err := scanRows(ctx, querier, builder, &idps)
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
+
+	err = rows.(database.CollectableRows).Collect(&idps)
+	if err != nil {
+		return nil, err
+	}
+
 	return idps, nil
 }

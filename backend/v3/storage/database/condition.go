@@ -18,9 +18,9 @@ func (a *and) Write(builder *StatementBuilder) {
 	}
 	firstCondition := true
 	for _, condition := range a.conditions {
-		if condition == nil {
-			continue
-		}
+		// if condition == nil {
+		// 	continue
+		// }
 		if !firstCondition {
 			builder.WriteString(" AND ")
 		}

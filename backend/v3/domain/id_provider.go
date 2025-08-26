@@ -2,13 +2,14 @@ package domain
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/crypto"
 )
 
-//go:generate enumer -type IDPType -transform lower -trimprefix IDPType
+//go:generate enumer -type IDPType -transform lower -trimprefix IDPType -sql
 type IDPType uint8
 
 const (
@@ -27,7 +28,9 @@ const (
 	IDPTypeSAML
 )
 
-//go:generate enumer -type IDPState -transform lower -trimprefix IDPState
+// TODO come back to this
+//
+//go:generate enumer -type IDPState -transform lower -trimprefix IDPState -sql
 type IDPState uint8
 
 const (
@@ -47,34 +50,35 @@ const (
 )
 
 type IdentityProvider struct {
-	InstanceID        string    `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID             *string   `json:"orgId,omitempty" db:"org_id"`
-	ID                string    `json:"id,omitempty" db:"id"`
-	State             string    `json:"state,omitempty" db:"state"`
-	Name              string    `json:"name,omitempty" db:"name"`
-	Type              string    `json:"type,omitempty" db:"type"`
-	AllowCreation     bool      `json:"allowCreation,omitempty" db:"allow_creation"`
-	AutoRegister      bool      `json:"autoRegister,omitempty" db:"auto_register"`
-	AllowAutoCreation bool      `json:"allowAutoCreation,omitempty" db:"allow_auto_creation"`
-	AllowAutoUpdate   bool      `json:"allowAutoUpdate,omitempty" db:"allow_auto_update"`
-	AllowLinking      bool      `json:"allowLinking,omitempty" db:"allow_linking"`
-	AllowAutoLinking  bool      `json:"allowAutoLinking,omitempty" db:"allow_auto_linking"`
-	StylingType       int16     `json:"stylingType,omitempty" db:"styling_type"`
-	Payload           *string   `json:"payload,omitempty" db:"payload"`
-	CreatedAt         time.Time `json:"createdAt,omitempty" db:"created_at"`
-	UpdatedAt         time.Time `json:"updatedAt,omitempty" db:"updated_at"`
+	InstanceID        string  `json:"instanceId,omitempty" db:"instance_id"`
+	OrgID             *string `json:"orgId,omitempty" db:"org_id"`
+	ID                string  `json:"id,omitempty" db:"id"`
+	State             string  `json:"state,omitempty" db:"state"`
+	Name              string  `json:"name,omitempty" db:"name"`
+	Type              string  `json:"type,omitempty" db:"type"`
+	AllowCreation     bool    `json:"allowCreation,omitempty" db:"allow_creation"`
+	AutoRegister      bool    `json:"autoRegister,omitempty" db:"auto_register"`
+	AllowAutoCreation bool    `json:"allowAutoCreation,omitempty" db:"allow_auto_creation"`
+	AllowAutoUpdate   bool    `json:"allowAutoUpdate,omitempty" db:"allow_auto_update"`
+	AllowLinking      bool    `json:"allowLinking,omitempty" db:"allow_linking"`
+	AllowAutoLinking  bool    `json:"allowAutoLinking,omitempty" db:"allow_auto_linking"`
+	StylingType       int16   `json:"stylingType,omitempty" db:"styling_type"`
+	// Payload           *string   `json:"payload,omitempty" db:"payload"`
+	Payload   json.RawMessage `json:"payload,omitempty" db:"payload"`
+	CreatedAt time.Time       `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt time.Time       `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
 type OIDC struct {
-	IDPConfigID           string             `json:"idpConfigId"`
-	ClientID              string             `json:"clientId,omitempty"`
-	ClientSecret          crypto.CryptoValue `json:"clientSecret,omitempty"`
-	Issuer                string             `json:"issuer,omitempty"`
-	AuthorizationEndpoint string             `json:"authorizationEndpoint,omitempty"`
-	TokenEndpoint         string             `json:"tokenEndpoint,omitempty"`
-	Scopes                []string           `json:"scopes,omitempty"`
-	IDPDisplayNameMapping OIDCMappingField   `json:"IDPDisplayNameMapping,omitempty"`
-	UserNameMapping       OIDCMappingField   `json:"usernameMapping,omitempty"`
+	IDPConfigID           string              `json:"idpConfigId"`
+	ClientID              string              `json:"clientId,omitempty"`
+	ClientSecret          *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	Issuer                string              `json:"issuer,omitempty"`
+	AuthorizationEndpoint string              `json:"authorizationEndpoint,omitempty"`
+	TokenEndpoint         string              `json:"tokenEndpoint,omitempty"`
+	Scopes                []string            `json:"scopes,omitempty"`
+	IDPDisplayNameMapping OIDCMappingField    `json:"IDPDisplayNameMapping,omitempty"`
+	UserNameMapping       OIDCMappingField    `json:"usernameMapping,omitempty"`
 }
 
 type IDPOIDC struct {

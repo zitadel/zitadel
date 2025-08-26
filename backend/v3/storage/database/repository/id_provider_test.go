@@ -66,7 +66,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           gu.Ptr("{}"),
+				Payload:           []byte("{}"),
 			},
 		},
 		{
@@ -83,7 +83,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           gu.Ptr("{}"),
+				Payload:           []byte("{}"),
 			},
 			err: new(database.CheckError),
 		},
@@ -104,7 +104,7 @@ func TestCreateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -132,7 +132,7 @@ func TestCreateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -189,7 +189,7 @@ func TestCreateIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 
 					err = idpRepo.Create(ctx, &idp)
@@ -213,7 +213,7 @@ func TestCreateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				},
 			}
 		}(),
@@ -231,7 +231,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           gu.Ptr("{}"),
+				Payload:           []byte("{}"),
 			},
 			err: new(database.CheckError),
 		},
@@ -249,7 +249,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           gu.Ptr("{}"),
+				Payload:           []byte("{}"),
 			},
 			err: new(database.CheckError),
 		},
@@ -266,7 +266,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           gu.Ptr("{}"),
+				Payload:           []byte("{}"),
 			},
 			err: new(database.IntegrityViolationError),
 		},
@@ -284,7 +284,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           gu.Ptr("{}"),
+				Payload:           []byte("{}"),
 			},
 			err: new(database.ForeignKeyError),
 		},
@@ -302,7 +302,7 @@ func TestCreateIDProvider(t *testing.T) {
 				AllowAutoUpdate:   true,
 				AllowLinking:      true,
 				StylingType:       1,
-				Payload:           gu.Ptr("{}"),
+				Payload:           []byte("{}"),
 			},
 			err: new(database.ForeignKeyError),
 		},
@@ -405,7 +405,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -431,7 +431,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -457,7 +457,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -483,7 +483,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -509,7 +509,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -535,7 +535,7 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -561,12 +561,12 @@ func TestUpdateIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
-				idp.Payload = gu.Ptr(`{"json": {}}`)
+				idp.Payload = []byte(`{"json": {}}`)
 				return &idp
 			},
 			// update:       []database.Change{idpRepo.SetPayload("{{}}")},
@@ -690,7 +690,7 @@ func TestGetIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -717,7 +717,7 @@ func TestGetIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -742,7 +742,7 @@ func TestGetIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -767,7 +767,7 @@ func TestGetIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 
 				err := idpRepo.Create(ctx, &idp)
@@ -777,7 +777,6 @@ func TestGetIDProvider(t *testing.T) {
 			idpIdentifierCondition: idpRepo.NameCondition("non-existent-name"),
 			err:                    new(database.NoRowFoundError),
 		},
-		////////
 		func() test {
 			id := gofakeit.Name()
 			return test{
@@ -795,7 +794,7 @@ func TestGetIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -824,12 +823,12 @@ func TestGetIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
 					require.NoError(t, err)
-					idp.InstanceID = "non-existent-instnaceID"
+					idp.InstanceID = "non-existent-instanceID"
 					return &idp
 				},
 				idpIdentifierCondition: idpRepo.NameCondition(name),
@@ -963,7 +962,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -984,7 +983,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1027,7 +1026,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1048,7 +1047,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1080,7 +1079,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1111,7 +1110,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1143,7 +1142,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 					err := idpRepo.Create(ctx, &idp)
 					require.NoError(t, err)
@@ -1164,7 +1163,7 @@ func TestListIDProvider(t *testing.T) {
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
 							StylingType:       1,
-							Payload:           gu.Ptr("{}"),
+							Payload:           []byte("{}"),
 						}
 
 						err := idpRepo.Create(ctx, &idp)
@@ -1197,7 +1196,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1219,7 +1218,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1252,7 +1251,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 					err := idpRepo.Create(ctx, &idp)
 					require.NoError(t, err)
@@ -1273,7 +1272,7 @@ func TestListIDProvider(t *testing.T) {
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
 							StylingType:       1,
-							Payload:           gu.Ptr("{}"),
+							Payload:           []byte("{}"),
 						}
 
 						err := idpRepo.Create(ctx, &idp)
@@ -1305,7 +1304,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1327,7 +1326,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1358,7 +1357,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1380,7 +1379,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1411,7 +1410,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1433,7 +1432,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1465,7 +1464,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1487,7 +1486,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate: false,
 						AllowLinking:    true,
 						StylingType:     1,
-						Payload:         gu.Ptr("{}"),
+						Payload:         []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1519,7 +1518,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1541,7 +1540,7 @@ func TestListIDProvider(t *testing.T) {
 						// AllowLinking set to false
 						AllowLinking: false,
 						StylingType:  1,
-						Payload:      gu.Ptr("{}"),
+						Payload:      []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1572,7 +1571,7 @@ func TestListIDProvider(t *testing.T) {
 					AllowAutoUpdate:   true,
 					AllowLinking:      true,
 					StylingType:       1,
-					Payload:           gu.Ptr("{}"),
+					Payload:           []byte("{}"),
 				}
 				err := idpRepo.Create(ctx, &idp)
 				require.NoError(t, err)
@@ -1594,7 +1593,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowLinking:      true,
 						// StylingType set to 4
 						StylingType: 4,
-						Payload:     gu.Ptr("{}"),
+						Payload:     []byte("{}"),
 					}
 
 					err := idpRepo.Create(ctx, &idp)
@@ -1608,7 +1607,7 @@ func TestListIDProvider(t *testing.T) {
 			conditionClauses: []database.Condition{idpRepo.StylingTypeCondition(4)},
 		},
 		func() test {
-			payload := `{"json": {}}`
+			payload := []byte(`{"json": {}}`)
 			return test{
 				name: "multiple idps filter on Payload",
 				testFunc: func(ctx context.Context, t *testing.T) []*domain.IdentityProvider {
@@ -1627,7 +1626,7 @@ func TestListIDProvider(t *testing.T) {
 						AllowAutoUpdate:   true,
 						AllowLinking:      true,
 						StylingType:       1,
-						Payload:           gu.Ptr("{}"),
+						Payload:           []byte("{}"),
 					}
 					err := idpRepo.Create(ctx, &idp)
 					require.NoError(t, err)
@@ -1648,7 +1647,7 @@ func TestListIDProvider(t *testing.T) {
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
 							StylingType:       1,
-							Payload:           &payload,
+							Payload:           payload,
 						}
 
 						err := idpRepo.Create(ctx, &idp)
@@ -1659,7 +1658,7 @@ func TestListIDProvider(t *testing.T) {
 
 					return idps
 				},
-				conditionClauses: []database.Condition{idpRepo.PayloadCondition(payload)},
+				conditionClauses: []database.Condition{idpRepo.PayloadCondition(string(payload))},
 			}
 		}(),
 	}
@@ -1760,7 +1759,7 @@ func TestDeleteIDProvider(t *testing.T) {
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
 							StylingType:       1,
-							Payload:           gu.Ptr("{}"),
+							Payload:           []byte("{}"),
 						}
 
 						err := idpRepo.Create(ctx, &idp)
@@ -1790,7 +1789,7 @@ func TestDeleteIDProvider(t *testing.T) {
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
 							StylingType:       1,
-							Payload:           gu.Ptr("{}"),
+							Payload:           []byte("{}"),
 						}
 
 						err := idpRepo.Create(ctx, &idp)
@@ -1825,7 +1824,7 @@ func TestDeleteIDProvider(t *testing.T) {
 							AllowAutoUpdate:   true,
 							AllowLinking:      true,
 							StylingType:       1,
-							Payload:           gu.Ptr("{}"),
+							Payload:           []byte("{}"),
 						}
 
 						err := idpRepo.Create(ctx, &idp)
