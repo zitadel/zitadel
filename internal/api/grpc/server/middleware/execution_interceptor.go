@@ -9,17 +9,17 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/execution"
-	"github.com/zitadel/zitadel/internal/query"
+	domain_target "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
+func ExecutionHandler(alg crypto.EncryptionAlgorithm) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		requestTargets, responseTargets := execution.QueryExecutionTargetsForRequestAndResponse(ctx, queries, info.FullMethod)
-
+		requestTargets := execution.QueryExecutionTargetsForRequest(ctx, info.FullMethod)
 		// call targets otherwise return req
-		handledReq, err := executeTargetsForRequest(ctx, requestTargets, info.FullMethod, req)
+		handledReq, err := executeTargetsForRequest(ctx, requestTargets, info.FullMethod, req, alg)
 		if err != nil {
 			return nil, err
 		}
@@ -29,11 +29,12 @@ func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 			return nil, err
 		}
 
-		return executeTargetsForResponse(ctx, responseTargets, info.FullMethod, handledReq, response)
+		responseTargets := execution.QueryExecutionTargetsForResponse(ctx, info.FullMethod)
+		return executeTargetsForResponse(ctx, responseTargets, info.FullMethod, handledReq, response, alg)
 	}
 }
 
-func executeTargetsForRequest(ctx context.Context, targets []execution.Target, fullMethod string, req interface{}) (_ interface{}, err error) {
+func executeTargetsForRequest(ctx context.Context, targets []domain_target.Target, fullMethod string, req interface{}, alg crypto.EncryptionAlgorithm) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -52,10 +53,10 @@ func executeTargetsForRequest(ctx context.Context, targets []execution.Target, f
 		Request:    Message{req.(proto.Message)},
 	}
 
-	return execution.CallTargets(ctx, targets, info)
+	return execution.CallTargets(ctx, targets, info, alg)
 }
 
-func executeTargetsForResponse(ctx context.Context, targets []execution.Target, fullMethod string, req, resp interface{}) (_ interface{}, err error) {
+func executeTargetsForResponse(ctx context.Context, targets []domain_target.Target, fullMethod string, req, resp interface{}, alg crypto.EncryptionAlgorithm) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -75,7 +76,7 @@ func executeTargetsForResponse(ctx context.Context, targets []execution.Target, 
 		Response:   Message{resp.(proto.Message)},
 	}
 
-	return execution.CallTargets(ctx, targets, info)
+	return execution.CallTargets(ctx, targets, info, alg)
 }
 
 var _ execution.ContextInfo = &ContextInfoRequest{}

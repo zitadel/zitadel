@@ -12,9 +12,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	zhttp "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -30,15 +30,16 @@ type ContextInfo interface {
 // CallTargets call a list of targets in order with handling of error and responses
 func CallTargets(
 	ctx context.Context,
-	targets []Target,
+	targets []target_domain.Target,
 	info ContextInfo,
+	alg crypto.EncryptionAlgorithm,
 ) (_ interface{}, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	for _, target := range targets {
 		// call the type of target
-		resp, err := CallTarget(ctx, target, info)
+		resp, err := CallTarget(ctx, target, info, alg)
 		// handle error if interrupt is set
 		if err != nil && target.IsInterruptOnError() {
 			return nil, err
@@ -60,8 +61,9 @@ type ContextInfoRequest interface {
 // CallTarget call the desired type of target with handling of responses
 func CallTarget(
 	ctx context.Context,
-	target Target,
+	target target_domain.Target,
 	info ContextInfoRequest,
+	alg crypto.EncryptionAlgorithm,
 ) (res []byte, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -69,13 +71,13 @@ func CallTarget(
 	switch target.GetTargetType() {
 	// get request, ignore response and return request and error for handling in list of targets
 	case target_domain.TargetTypeWebhook:
-		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey())
+		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey(alg))
 	// get request, return response and error
 	case target_domain.TargetTypeCall:
-		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey())
+		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey(alg))
 	case target_domain.TargetTypeAsync:
-		go func(ctx context.Context, target Target, info []byte) {
-			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info, target.GetSigningKey()); err != nil {
+		go func(ctx context.Context, target target_domain.Target, info []byte) {
+			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info, target.GetSigningKey(alg)); err != nil {
 				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 			}
 		}(context.WithoutCancel(ctx), target, info.GetHTTPRequestBody())
@@ -147,11 +149,6 @@ func HandleResponse(resp *http.Response) ([]byte, error) {
 type ErrorBody struct {
 	ForwardedStatusCode   int    `json:"forwardedStatusCode,omitempty"`
 	ForwardedErrorMessage string `json:"forwardedErrorMessage,omitempty"`
-}
-
-type ExecutionTargetsQueries interface {
-	TargetsByExecutionID(ctx context.Context, ids []string) (execution []*query.ExecutionTarget, err error)
-	TargetsByExecutionIDs(ctx context.Context, ids1, ids2 []string) (execution []*query.ExecutionTarget, err error)
 }
 
 func QueryExecutionTargetsForRequest(

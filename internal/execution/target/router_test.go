@@ -4,8 +4,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/zitadel/zitadel/internal/domain"
 )
 
 var (

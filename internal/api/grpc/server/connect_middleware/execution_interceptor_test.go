@@ -20,44 +20,6 @@ import (
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 )
 
-var _ execution.Target = &mockExecutionTarget{}
-
-type mockExecutionTarget struct {
-	InstanceID       string
-	ExecutionID      string
-	TargetID         string
-	TargetType       target_domain.TargetType
-	Endpoint         string
-	Timeout          time.Duration
-	InterruptOnError bool
-	SigningKey       string
-}
-
-func (e *mockExecutionTarget) SetEndpoint(endpoint string) {
-	e.Endpoint = endpoint
-}
-func (e *mockExecutionTarget) IsInterruptOnError() bool {
-	return e.InterruptOnError
-}
-func (e *mockExecutionTarget) GetEndpoint() string {
-	return e.Endpoint
-}
-func (e *mockExecutionTarget) GetTargetType() target_domain.TargetType {
-	return e.TargetType
-}
-func (e *mockExecutionTarget) GetTimeout() time.Duration {
-	return e.Timeout
-}
-func (e *mockExecutionTarget) GetTargetID() string {
-	return e.TargetID
-}
-func (e *mockExecutionTarget) GetExecutionID() string {
-	return e.ExecutionID
-}
-func (e *mockExecutionTarget) GetSigningKey() string {
-	return e.SigningKey
-}
-
 func newMockContentRequest(content string) *connect.Request[structpb.Struct] {
 	return connect.NewRequest(&structpb.Struct{
 		Fields: map[string]*structpb.Value{
@@ -103,7 +65,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 	type args struct {
 		ctx context.Context
 
-		executionTargets []execution.Target
+		executionTargets []target_domain.Target
 		targets          []target
 		fullMethod       string
 		req              connect.AnyRequest
@@ -134,7 +96,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:              context.Background(),
 				fullMethod:       "/service/method",
-				executionTargets: []execution.Target{},
+				executionTargets: []target_domain.Target{},
 				req:              newMockContentRequest("request"),
 			},
 			res{
@@ -146,8 +108,8 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
+				executionTargets: []target_domain.Target{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
@@ -168,14 +130,14 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:  "instance",
-						ExecutionID: "request./zitadel.session.v2.SessionService/SetSession",
-						TargetID:    "target",
-						TargetType:  target_domain.TargetTypeCall,
-						Timeout:     time.Minute,
-						SigningKey:  "signingkey",
+				executionTargets: []target_domain.Target{
+					{
+						InstanceID:    "instance",
+						ExecutionID:   "request./zitadel.session.v2.SessionService/SetSession",
+						TargetID:      "target",
+						TargetType:    target_domain.TargetTypeCall,
+						Timeout:       time.Minute,
+						SigningKeyDec: "signingkey",
 					},
 				},
 				targets: []target{
@@ -197,15 +159,15 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
+				executionTargets: []target_domain.Target{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
 				},
 
@@ -228,15 +190,15 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
+				executionTargets: []target_domain.Target{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
 				},
 				targets: []target{
@@ -258,15 +220,15 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
+				executionTargets: []target_domain.Target{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
 				},
 				targets: []target{
@@ -283,15 +245,15 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
+				executionTargets: []target_domain.Target{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
 				},
 				targets: []target{
@@ -313,14 +275,14 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:  "instance",
-						ExecutionID: "request./zitadel.session.v2.SessionService/SetSession",
-						TargetID:    "target",
-						TargetType:  target_domain.TargetTypeAsync,
-						Timeout:     time.Second,
-						SigningKey:  "signingkey",
+				executionTargets: []target_domain.Target{
+					{
+						InstanceID:    "instance",
+						ExecutionID:   "request./zitadel.session.v2.SessionService/SetSession",
+						TargetID:      "target",
+						TargetType:    target_domain.TargetTypeAsync,
+						Timeout:       time.Second,
+						SigningKeyDec: "signingkey",
 					},
 				},
 				targets: []target{
@@ -342,14 +304,14 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
-						InstanceID:  "instance",
-						ExecutionID: "request./zitadel.session.v2.SessionService/SetSession",
-						TargetID:    "target",
-						TargetType:  target_domain.TargetTypeAsync,
-						Timeout:     time.Minute,
-						SigningKey:  "signingkey",
+				executionTargets: []target_domain.Target{
+					{
+						InstanceID:    "instance",
+						ExecutionID:   "request./zitadel.session.v2.SessionService/SetSession",
+						TargetID:      "target",
+						TargetType:    target_domain.TargetTypeAsync,
+						Timeout:       time.Minute,
+						SigningKeyDec: "signingkey",
 					},
 				},
 				targets: []target{
@@ -371,15 +333,15 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
+				executionTargets: []target_domain.Target{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeWebhook,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
 				},
 				targets: []target{
@@ -400,15 +362,15 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
+				executionTargets: []target_domain.Target{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeWebhook,
 						Timeout:          time.Second,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
 				},
 				targets: []target{
@@ -430,15 +392,15 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
+				executionTargets: []target_domain.Target{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeWebhook,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
 				},
 				targets: []target{
@@ -460,33 +422,33 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
+				executionTargets: []target_domain.Target{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target1",
 						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
-					&mockExecutionTarget{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target2",
 						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
-					&mockExecutionTarget{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target3",
 						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
 				},
 
@@ -521,33 +483,33 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
+				executionTargets: []target_domain.Target{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target1",
 						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
-					&mockExecutionTarget{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target2",
 						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
-					&mockExecutionTarget{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target3",
 						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
 				},
 				targets: []target{
@@ -588,8 +550,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					target.respBody,
 				)
 
-				et := tt.args.executionTargets[i].(*mockExecutionTarget)
-				et.SetEndpoint(url)
+				tt.args.executionTargets[i].Endpoint = url
 				closeFuncs[i] = closeF
 			}
 
@@ -598,6 +559,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				tt.args.executionTargets,
 				tt.args.fullMethod,
 				tt.args.req,
+				nil,
 			)
 
 			if tt.res.wantErr {
@@ -672,7 +634,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 	type args struct {
 		ctx context.Context
 
-		executionTargets []execution.Target
+		executionTargets []target_domain.Target
 		targets          []target
 		fullMethod       string
 		req              connect.AnyRequest
@@ -705,7 +667,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 			args{
 				ctx:              context.Background(),
 				fullMethod:       "/service/method",
-				executionTargets: []execution.Target{},
+				executionTargets: []target_domain.Target{},
 				req:              newMockContentRequest("request"),
 				resp:             newMockContentResponse("response"),
 			},
@@ -718,15 +680,15 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
+				executionTargets: []target_domain.Target{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
 				},
 				targets: []target{
@@ -749,15 +711,15 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				executionTargets: []execution.Target{
-					&mockExecutionTarget{
+				executionTargets: []target_domain.Target{
+					{
 						InstanceID:       "instance",
 						ExecutionID:      "response./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
-						SigningKey:       "signingkey",
+						SigningKeyDec:    "signingkey",
 					},
 				},
 				targets: []target{
@@ -787,8 +749,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 					target.respBody,
 				)
 
-				et := tt.args.executionTargets[i].(*mockExecutionTarget)
-				et.SetEndpoint(url)
+				tt.args.executionTargets[i].Endpoint = url
 				closeFuncs[i] = closeF
 			}
 
@@ -798,6 +759,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				tt.args.fullMethod,
 				tt.args.req,
 				tt.args.resp,
+				nil,
 			)
 
 			if tt.res.wantErr {

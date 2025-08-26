@@ -16,7 +16,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -222,7 +221,7 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 	if ok {
 		return instance, instance.checkDomain(instanceDomain, publicDomain)
 	}
-	instance, scan := scanAuthzInstance(q.targetEncryptionAlgorithm)
+	instance, scan := scanAuthzInstance()
 	if err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, instanceDomain); err != nil {
 		return nil, err
 	}
@@ -246,7 +245,7 @@ func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance
 		return instance, nil
 	}
 
-	instance, scan := scanAuthzInstance(q.targetEncryptionAlgorithm)
+	instance, scan := scanAuthzInstance()
 	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, id)
 	logging.OnError(err).WithField("instance_id", id).Warn("instance by ID")
 
@@ -561,7 +560,7 @@ func (i *authzInstance) Keys(index instanceIndex) []string {
 	return nil
 }
 
-func scanAuthzInstance(alg crypto.EncryptionAlgorithm) (*authzInstance, func(row *sql.Row) error) {
+func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 	instance := &authzInstance{}
 	return instance, func(row *sql.Row) error {
 		var (
@@ -611,16 +610,8 @@ func scanAuthzInstance(alg crypto.EncryptionAlgorithm) (*authzInstance, func(row
 		if err = json.Unmarshal(features, &instance.Feature); err != nil {
 			return zerrors.ThrowInternal(err, "QUERY-Po8ki", "Errors.Internal")
 		}
-		var executionTargets []*ExecutionTarget
-		if err := json.Unmarshal(executionTargetsBytes, executionTargets); err != nil {
+		if err := json.Unmarshal(executionTargetsBytes, &instance.ExecutionTargets); err != nil {
 			return zerrors.ThrowInternal(err, "QUERY-Po7si", "Errors.Internal")
-		}
-		instance.ExecutionTargets = make([]target_domain.Target, 0, len(executionTargets))
-		for i := range executionTargets {
-			if err := executionTargets[i].decryptSigningKey(alg); err != nil {
-				return zerrors.ThrowInternal(err, "QUERY-Prasi", "Errors.Internal")
-			}
-			instance.ExecutionTargets[i] = executionTargets[i]
 		}
 		return nil
 	}
