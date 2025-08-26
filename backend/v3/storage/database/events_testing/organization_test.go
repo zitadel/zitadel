@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
@@ -208,7 +209,7 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 				orgRepo.NameCondition(orgName),
 				instanceID,
 			)
-			require.Equal(t, repository.ErrResourceDoesNotExist, err)
+			require.ErrorIs(t, &database.NoRowFoundError{}, err)
 
 			// event org.remove
 			assert.Nil(t, organization)

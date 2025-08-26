@@ -172,26 +172,31 @@ func (instance) UpdatedAtColumn() database.Column {
 }
 
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
+	instance := &domain.Instance{}
+
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
-	instance := new(domain.Instance)
-	if err := rows.(database.CollectableRows).CollectExactlyOneRow(instance); err != nil {
+	err = rows.(database.CollectableRows).CollectExactlyOneRow(instance)
+	if err != nil {
 		return nil, err
 	}
 
 	return instance, nil
 }
 
-func scanInstances(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (instances []*domain.Instance, err error) {
+func scanInstances(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Instance, error) {
+	instances := []*domain.Instance{}
+
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := rows.(database.CollectableRows).Collect(&instances); err != nil {
+	err = rows.(database.CollectableRows).Collect(&instances)
+	if err != nil {
 		return nil, err
 	}
 

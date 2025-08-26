@@ -217,13 +217,14 @@ func (org) UpdatedAtColumn() database.Column {
 }
 
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
+	organization := &domain.Organization{}
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
-	organization := &domain.Organization{}
-	if err := rows.(database.CollectableRows).CollectExactlyOneRow(organization); err != nil {
+	err = rows.(database.CollectableRows).CollectExactlyOneRow(organization)
+	if err != nil {
 		return nil, err
 	}
 
@@ -231,14 +232,17 @@ func scanOrganization(ctx context.Context, querier database.Querier, builder *da
 }
 
 func scanOrganizations(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Organization, error) {
+	organizations := []*domain.Organization{}
+
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
-	organizations := []*domain.Organization{}
-	if err := rows.(database.CollectableRows).Collect(&organizations); err != nil {
+	err = rows.(database.CollectableRows).Collect(&organizations)
+	if err != nil {
 		return nil, err
 	}
+
 	return organizations, nil
 }
