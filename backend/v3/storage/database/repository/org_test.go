@@ -831,7 +831,7 @@ func TestListOrganization(t *testing.T) {
 			// check organization values
 			returnedOrgs, err := organizationRepo.List(ctx,
 				database.WithCondition(condition),
-				database.WithOrderBy(organizationRepo.CreatedAtColumn()),
+				database.WithOrderByAscending(organizationRepo.CreatedAtColumn()),
 			)
 			require.NoError(t, err)
 			if tt.noOrganizationReturned {

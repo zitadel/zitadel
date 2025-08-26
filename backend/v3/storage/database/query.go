@@ -10,10 +10,19 @@ func WithCondition(condition Condition) QueryOption {
 }
 
 // WithOrderBy sets the columns to order the results by.
-func WithOrderBy(orderBy ...Column) QueryOption {
+func WithOrderBy(ordering OrderDirection, orderBy ...Column) QueryOption {
 	return func(opts *QueryOpts) {
 		opts.OrderBy = orderBy
+		opts.Ordering = ordering
 	}
+}
+
+func WithOrderByAscending(columns ...Column) QueryOption {
+	return WithOrderBy(OrderDirectionAsc, columns...)
+}
+
+func WithOrderByDescending(columns ...Column) QueryOption {
+	return WithOrderBy(OrderDirectionDesc, columns...)
 }
 
 // WithLimit sets the maximum number of results to return.
@@ -60,6 +69,13 @@ type join struct {
 	columns Condition
 }
 
+type OrderDirection uint8
+
+const (
+	OrderDirectionAsc OrderDirection = iota
+	OrderDirectionDesc
+)
+
 // QueryOpts holds the options for a query.
 // It is used to build the SQL SELECT statement.
 type QueryOpts struct {
@@ -69,6 +85,9 @@ type QueryOpts struct {
 	// OrderBy is the columns to order the results by.
 	// It is used to build the ORDER BY clause of the SQL statement.
 	OrderBy Columns
+	// Ordering defines if the columns should be ordered ascending or descending.
+	// Default is ascending.
+	Ordering OrderDirection
 	// Limit is the maximum number of results to return.
 	// It is used to build the LIMIT clause of the SQL statement.
 	Limit uint32
@@ -105,7 +124,15 @@ func (opts *QueryOpts) WriteOrderBy(builder *StatementBuilder) {
 		return
 	}
 	builder.WriteString(" ORDER BY ")
-	opts.OrderBy.WriteQualified(builder)
+	for i, col := range opts.OrderBy {
+		if i > 0 {
+			builder.WriteString(", ")
+		}
+		col.WriteQualified(builder)
+		if opts.Ordering == OrderDirectionDesc {
+			builder.WriteString(" DESC")
+		}
+	}
 }
 
 func (opts *QueryOpts) WriteLimit(builder *StatementBuilder) {
