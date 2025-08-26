@@ -9,7 +9,6 @@ import (
 
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -166,7 +165,7 @@ func TestProvider_Options(t *testing.T) {
 		nameIDFormat                  saml.NameIDFormat
 		transientMappingAttributeName string
 		withSignedRequest             bool
-		signatureAlgorithm            *string
+		signatureAlgorithm            string
 		requesttracker                samlsp.RequestTracker
 		entityID                      string
 	}
@@ -259,7 +258,7 @@ func TestProvider_Options(t *testing.T) {
 					WithAutoUpdate(),
 					WithBinding("binding"),
 					WithSignedRequest(),
-					WithSignatureAlgorithm(gu.Ptr("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512")),
+					WithSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"),
 					WithCustomRequestTracker(&requesttracker.RequestTracker{}),
 					WithEntityID("entityID"),
 					WithNameIDFormat(domain.SAMLNameIDFormatTransient),
@@ -277,7 +276,7 @@ func TestProvider_Options(t *testing.T) {
 				nameIDFormat:                  saml.TransientNameIDFormat,
 				transientMappingAttributeName: "attribute",
 				withSignedRequest:             true,
-				signatureAlgorithm:            gu.Ptr("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"),
+				signatureAlgorithm:            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512",
 				requesttracker:                &requesttracker.RequestTracker{},
 			},
 		},
