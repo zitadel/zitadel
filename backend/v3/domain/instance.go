@@ -103,7 +103,7 @@ type InstanceRepository interface {
 
 	// Domains returns the domain sub repository for the instance.
 	// If shouldLoad is true, the domains will be loaded from the database and written to the [Instance].Domains field.
-	// If shouldLoad is set to true once, the Domains field will be set event if shouldLoad is false in the future.
+	// If shouldLoad is set to true once, the Domains field will be set even if shouldLoad is false in the future.
 	Domains(shouldLoad bool) InstanceDomainRepository
 }
 
