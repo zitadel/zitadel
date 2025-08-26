@@ -52,7 +52,43 @@ type Config struct {
 	AssetCache         middleware.CacheConfig
 
 	// LoginV2
-	DefaultOTPEmailURLV2 string
+	DefaultPaths *DefaultPaths
+}
+
+type DefaultPaths struct {
+	BasePath        string
+	PasswordSetPath string
+	EmailCodePath   string
+	OTPEmailPath    string
+}
+
+func (c *Config) defaultBaseURL(ctx context.Context) string {
+	loginV2 := authz.GetInstance(ctx).Features().LoginV2
+	if loginV2.Required {
+		// use the origin as default
+		baseURI := http_utils.DomainContext(ctx).Origin()
+		// use custom base URI if defined
+		if loginV2.BaseURI != nil && loginV2.BaseURI.String() != "" {
+			baseURI = loginV2.BaseURI.String()
+		}
+		return baseURI + c.DefaultPaths.BasePath
+	}
+	return ""
+}
+
+func (c *Config) DefaultEmailCodeURLTemplate(ctx context.Context) string {
+	basePath := c.defaultBaseURL(ctx)
+	if basePath == "" {
+		return ""
+	}
+	return basePath + c.DefaultPaths.EmailCodePath
+}
+func (c *Config) DefaultPasswordSetURLTemplate(ctx context.Context) string {
+	basePath := c.defaultBaseURL(ctx)
+	if basePath == "" {
+		return ""
+	}
+	return c.defaultBaseURL(ctx) + c.DefaultPaths.PasswordSetPath
 }
 
 const (
