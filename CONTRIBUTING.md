@@ -543,23 +543,6 @@ pnpm nx run console:lint
 pnpm nx run console:lint:fix
 ```
 
-More tasks that are runnable on-demand.
-Some tasks have variants like `pnpm test:e2e:angulargolang`,
-others support arguments and flags like `pnpm test:integration run --spec apps/login/integration/integration/login.cy.ts`.
-For the Nx commands, check your options with `pnpm nx --help`
-
-| Command                   | Description                                              | Example                                                                                                                                                    |
-| ------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm turbo run generate` | Generate stubs from Proto files                          | Generate API docs: `pnpm turbo run generate --filter docs`                                                                                         |
-| `pnpm turbo build`        | Build runnable JavaScript code                           | Regenerate the proto stubs and build the @zitadel/client package: `pnpm turbo build --filter @zitadel/client`                                              |
-| `pnpm turbo quality`      | Reproduce the pipeline quality checks                    | Run login-related quality checks `pnpm turbo quality --filter './apps/login/*' --filter './packages/*'`                                                    |
-| `pnpm turbo lint`         | Check linting issues                                     | Check login-related linting issues for differences with main `pnpm turbo lint --filter=[main...HEAD] --filter .'/apps/login/**/*' --filter './packages/*'` |
-| `pnpm turbo lint:fix`     | Fix linting issues                                       | Fix console-relevant linting issues `pnpm turbo lint:fix --filter console --filter './packages/*' --filter zitadel-e2e`                                    |
-| `pnpm turbo test:unit`    | Run unit tests. Rerun on file changes                    | Run unit tests in all packages in and watch for file changes `pnpm turbo watch test:unit`                                                                  |
-| `pnpm turbo test:e2e`     | Run the Cypress CLI for console e2e tests                | Test interactively against the console in a local dev server and Zitadel in a container: `pnpm turbo test:e2e:angular open`                                |
-| `pnpm turbo down`         | Remove containers and volumes                            | Shut down containers from the integration test setup `pnpm turbo down`                                                                                     |
-| `pnpm turbo clean`        | Remove downloaded dependencies and other generated files | Remove generated docs  `pnpm turbo clean --filter docs`                                                                                            |
-
 ## <a name="dev-containers"></>Developing Zitadel with Dev Containers
 
 You can use dev containers if you'd like to make sure you have the same development environment like the corresponding GitHub PR checks use.
