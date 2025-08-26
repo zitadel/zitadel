@@ -58,7 +58,7 @@ func (s *Session) FetchUser(ctx context.Context) (_ idp.User, err error) {
 			return nil, err
 		}
 	}
-	req, err := http.NewRequest("GET", s.Provider.userEndpoint, nil)
+	req, err := http.NewRequest(http.MethodGet, s.Provider.userEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}

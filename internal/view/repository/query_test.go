@@ -443,6 +443,8 @@ func TestSetQuery(t *testing.T) {
 	for _, tt := range tests {
 		if tt.want.isErr == nil {
 			tt.want.isErr = func(t *testing.T, got error) {
+				t.Helper()
+
 				if got == nil {
 					return
 				}

@@ -99,7 +99,7 @@ const (
 )
 
 func (key TestSearchKey) ToColumnName() string {
-	switch TestSearchKey(key) {
+	switch key {
 	case TestSearchKey_TEST:
 		return "test"
 	case TestSearchKey_ID:
@@ -130,6 +130,8 @@ func (db *dbMock) close() {
 }
 
 func mockDB(t *testing.T) *dbMock {
+	t.Helper()
+
 	mockDB := dbMock{}
 	db, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 	if err != nil {

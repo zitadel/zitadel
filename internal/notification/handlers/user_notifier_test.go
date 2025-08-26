@@ -938,7 +938,7 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 						UserID:                        userID,
 						UserResourceOwner:             orgID,
 						TriggeredAtOrigin:             eventOrigin,
-						URLTemplate:                   fmt.Sprintf("%s/ui/console?login_hint={{.PreferredLoginName}}", eventOrigin),
+						URLTemplate:                   eventOrigin + "/ui/console?login_hint={{.PreferredLoginName}}",
 						Code:                          nil,
 						CodeExpiry:                    0,
 						EventType:                     user.HumanPasswordChangedType,
@@ -1104,7 +1104,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 						UserID:                        userID,
 						UserResourceOwner:             orgID,
 						TriggeredAtOrigin:             eventOrigin,
-						URLTemplate:                   fmt.Sprintf("%s/otp/verify?loginName={{.LoginName}}&code={{.Code}}", eventOrigin),
+						URLTemplate:                   eventOrigin + "/otp/verify?loginName={{.LoginName}}&code={{.Code}}",
 						Code:                          code,
 						CodeExpiry:                    time.Hour,
 						EventType:                     session.OTPEmailChallengedType,
@@ -1921,6 +1921,8 @@ type wantWorker struct {
 }
 
 func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fields) *userNotifier {
+	t.Helper()
+
 	queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
 	return &userNotifier{
@@ -2016,6 +2018,8 @@ func expectTemplateWithNotifyUserQueriesSMS(queries *mock.MockQueries) {
 }
 
 func cryptoValue(t *testing.T, ctrl *gomock.Controller, value string) (*crypto.MockEncryptionAlgorithm, *crypto.CryptoValue) {
+	t.Helper()
+
 	encAlg := crypto.NewMockEncryptionAlgorithm(ctrl)
 	encAlg.EXPECT().Algorithm().AnyTimes().Return("enc")
 	encAlg.EXPECT().EncryptionKeyID().AnyTimes().Return("id")

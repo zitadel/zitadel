@@ -200,6 +200,8 @@ func TestService(t *testing.T) {
 }
 
 func runTest(t *testing.T, name string, args args, want want) bool {
+	t.Helper()
+
 	return t.Run("Given over a minute, each second a log record is emitted", func(tt *testing.T) {
 		tt.Run(name, func(t *testing.T) {
 			ctx, clock, mainStorage, secondaryStorage, svc := given(t, args, want)
@@ -210,6 +212,8 @@ func runTest(t *testing.T, name string, args args, want want) bool {
 }
 
 func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *emittermock.InmemLogStorage, *emittermock.InmemLogStorage, *logstore.Service[*emittermock.Record]) {
+	t.Helper()
+
 	ctx := context.Background()
 	clock := clock.NewMock()
 
@@ -250,6 +254,8 @@ func when(svc *logstore.Service[*emittermock.Record], ctx context.Context, clock
 }
 
 func then(t *testing.T, mainStorage, secondaryStorage *emittermock.InmemLogStorage, remaining *uint64, want want) {
+	t.Helper()
+
 	mainBulks := mainStorage.Bulks()
 	if !reflect.DeepEqual(want.mainSink.bulks, mainBulks) {
 		t.Errorf("wanted main storage to have bulks %v, but got %v", want.mainSink.bulks, mainBulks)

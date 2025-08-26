@@ -123,6 +123,8 @@ func mustNewHostChecker(t *testing.T, ip string) AddressChecker {
 }
 
 func mustNewURL(t *testing.T, raw string) *url.URL {
+	t.Helper()
+
 	u, err := url.Parse(raw)
 	if err != nil {
 		t.Errorf("unable to parse address of %q because: %v", raw, err)

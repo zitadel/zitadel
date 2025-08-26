@@ -493,6 +493,8 @@ func testServers(
 	c []*callTestServer,
 	call func([]string) (interface{}, error),
 ) (interface{}, error) {
+	t.Helper()
+
 	urls := make([]string, len(c))
 	for i := range c {
 		url, close := listen(t, c[i])
@@ -507,6 +509,8 @@ func testServer(
 	c *callTestServer,
 	call func(string) ([]byte, error),
 ) ([]byte, error) {
+	t.Helper()
+
 	url, close := listen(t, c)
 	defer close()
 	return call(url)
@@ -516,6 +520,8 @@ func listen(
 	t *testing.T,
 	c *callTestServer,
 ) (url string, close func()) {
+	t.Helper()
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		checkRequest(t, r, c.method, c.expectBody, c.signingKey)
 
@@ -537,6 +543,8 @@ func listen(
 }
 
 func checkRequest(t *testing.T, sent *http.Request, method string, expectedBody []byte, signingKey string) {
+	t.Helper()
+
 	sentBody, err := io.ReadAll(sent.Body)
 	require.NoError(t, err)
 	require.Equal(t, expectedBody, sentBody)
@@ -589,9 +597,15 @@ type request struct {
 	Request string `json:"request"`
 }
 
-func testErrorBody(code int, message string) []byte {
+func testErrorBody(t *testing.T, code int, message string) []byte {
+	t.Helper()
+
 	body := &execution.ErrorBody{ForwardedStatusCode: code, ForwardedErrorMessage: message}
-	data, _ := json.Marshal(body)
+	data, err := json.Marshal(body)
+	if err != nil {
+		t.Fatalf("json.Marshal: %v", err)
+	}
+
 	return data
 }
 
@@ -680,7 +694,7 @@ func Test_handleResponse(t *testing.T) {
 			args{
 				resp: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       io.NopCloser(bytes.NewReader(testErrorBody(http.StatusForbidden, "forbidden"))),
+					Body:       io.NopCloser(bytes.NewReader(testErrorBody(t, http.StatusForbidden, "forbidden"))),
 				},
 			},
 			res{
@@ -694,7 +708,7 @@ func Test_handleResponse(t *testing.T) {
 			args{
 				resp: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       io.NopCloser(bytes.NewReader(testErrorBody(http.StatusInternalServerError, "internal"))),
+					Body:       io.NopCloser(bytes.NewReader(testErrorBody(t, http.StatusInternalServerError, "internal"))),
 				},
 			},
 			res{
@@ -708,7 +722,7 @@ func Test_handleResponse(t *testing.T) {
 			args{
 				resp: &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       io.NopCloser(bytes.NewReader(testErrorBody(http.StatusPermanentRedirect, "redirect"))),
+					Body:       io.NopCloser(bytes.NewReader(testErrorBody(t, http.StatusPermanentRedirect, "redirect"))),
 				},
 			},
 			res{

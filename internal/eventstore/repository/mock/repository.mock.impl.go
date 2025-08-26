@@ -22,6 +22,8 @@ type MockRepository struct {
 }
 
 func NewRepo(t *testing.T) *MockRepository {
+	t.Helper()
+
 	controller := gomock.NewController(t)
 	return &MockRepository{
 		MockPusher:  NewMockPusher(controller),

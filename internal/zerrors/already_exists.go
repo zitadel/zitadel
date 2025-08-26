@@ -1,6 +1,9 @@
 package zerrors
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 var (
 	_ AlreadyExists = (*AlreadyExistsError)(nil)
@@ -35,8 +38,8 @@ func (err *AlreadyExistsError) Is(target error) bool {
 }
 
 func IsErrorAlreadyExists(err error) bool {
-	_, ok := err.(AlreadyExists)
-	return ok
+	var tmp AlreadyExists
+	return errors.As(err, &tmp)
 }
 
 func (err *AlreadyExistsError) Unwrap() error {

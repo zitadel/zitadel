@@ -66,7 +66,7 @@ func Test_getErrorInfo(t *testing.T) {
 			name:   "parent error nil not commandErrors.WrongPasswordError{}, return message.ErrorDetail{}",
 			id:     "id",
 			key:    "key",
-			err:    fmt.Errorf("normal error not commandErrors.WrongPasswordError{}"),
+			err:    errors.New("normal error not commandErrors.WrongPasswordError{}"),
 			result: &message.ErrorDetail{Id: "id", Message: "key"},
 		},
 		{
@@ -81,7 +81,7 @@ func Test_getErrorInfo(t *testing.T) {
 			id:   "id",
 			key:  "key",
 			err: func() error {
-				err := fmt.Errorf("normal error")
+				err := errors.New("normal error")
 				wpa := &commandErrors.WrongPasswordError{FailedAttempts: 26}
 				return fmt.Errorf("%w: %w", err, wpa)
 			}(),

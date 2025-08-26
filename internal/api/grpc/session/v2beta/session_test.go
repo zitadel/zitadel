@@ -297,21 +297,27 @@ func Test_userAgentToPb(t *testing.T) {
 	}
 }
 
-func mustNewTextQuery(t testing.TB, column query.Column, value string, compare query.TextComparison) query.SearchQuery {
+func mustNewTextQuery(tb testing.TB, column query.Column, value string, compare query.TextComparison) query.SearchQuery {
+	tb.Helper()
+
 	q, err := query.NewTextQuery(column, value, compare)
-	require.NoError(t, err)
+	require.NoError(tb, err)
 	return q
 }
 
-func mustNewListQuery(t testing.TB, column query.Column, list []any, compare query.ListComparison) query.SearchQuery {
+func mustNewListQuery(tb testing.TB, column query.Column, list []any, compare query.ListComparison) query.SearchQuery {
+	tb.Helper()
+
 	q, err := query.NewListQuery(query.SessionColumnID, list, compare)
-	require.NoError(t, err)
+	require.NoError(tb, err)
 	return q
 }
 
-func mustNewTimestampQuery(t testing.TB, column query.Column, ts time.Time, compare query.TimestampComparison) query.SearchQuery {
+func mustNewTimestampQuery(tb testing.TB, column query.Column, ts time.Time, compare query.TimestampComparison) query.SearchQuery {
+	tb.Helper()
+
 	q, err := query.NewTimestampQuery(column, ts, compare)
-	require.NoError(t, err)
+	require.NoError(tb, err)
 	return q
 }
 

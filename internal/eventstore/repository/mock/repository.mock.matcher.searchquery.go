@@ -10,7 +10,7 @@ import (
 type filterQueryMatcher repository.SearchQuery
 
 func (f *filterQueryMatcher) String() string {
-	var filterLists []string
+	var filterLists = make([]string, 0, len(f.SubQueries))
 	for _, filterSlice := range f.SubQueries {
 		var str string
 		for _, filter := range filterSlice {
@@ -19,7 +19,7 @@ func (f *filterQueryMatcher) String() string {
 		filterLists = append(filterLists, fmt.Sprintf("[%s]", strings.TrimPrefix(str, ",")))
 
 	}
-	return fmt.Sprintf("Filters: %s", strings.Join(filterLists, " "))
+	return "Filters: " + strings.Join(filterLists, " ")
 }
 
 func (f *filterQueryMatcher) Matches(x interface{}) bool {

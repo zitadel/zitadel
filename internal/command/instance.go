@@ -877,6 +877,9 @@ func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLangu
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel, err := getInstanceWriteModel(ctx, filter)
+			if err != nil {
+				return nil, zerrors.ThrowNotFound(err, "COMMA-3O2luu", "Errors.Instance.NotFound")
+			}
 			if writeModel.DefaultLanguage == defaultLanguage {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "INST-DS3rq", "Errors.Instance.NotChanged")
 			}
