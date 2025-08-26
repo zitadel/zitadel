@@ -109,9 +109,9 @@ clean:
 	$(RM) $(gen_authopt_path)
 	$(RM) $(gen_zitadel_path)
 	$(RM) -r tmp/
-	find docs/apis/assets -type f ! -name 'assets.md' -delete 
-	find openapi/ -type f ! -name 'handler.go' -delete 
-	find . -name 'statik.go' -delete
+	git clean -fdx -e 'assets.md' docs/apis/assets
+	git clean -fdx -e 'handler.go' openapi/
+	git clean -fdx */**/statik.go
 	$(RM) -r console/dist
 	git clean -fdx -e '.gitkeep' internal/api/ui/console/static
 	$(RM) zitadel
