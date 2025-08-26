@@ -1758,7 +1758,7 @@ type SAMLIDPWriteModel struct {
 	Certificate                   []byte
 	Binding                       string
 	WithSignedRequest             bool
-	SignatureAlgorithm            *string
+	SignatureAlgorithm            string
 	NameIDFormat                  *domain.SAMLNameIDFormat
 	TransientMappingAttributeName string
 	FederatedLogoutEnabled        bool
@@ -1816,7 +1816,7 @@ func (wm *SAMLIDPWriteModel) reduceChangedEvent(e *idp.SAMLIDPChangedEvent) {
 		wm.WithSignedRequest = *e.WithSignedRequest
 	}
 	if e.SignatureAlgorithm != nil {
-		wm.SignatureAlgorithm = e.SignatureAlgorithm
+		wm.SignatureAlgorithm = *e.SignatureAlgorithm
 	}
 	if e.NameIDFormat != nil {
 		wm.NameIDFormat = e.NameIDFormat
@@ -1838,7 +1838,7 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	secretCrypto crypto.EncryptionAlgorithm,
 	binding string,
 	withSignedRequest bool,
-	signatureAlgorithm *string,
+	signatureAlgorithm string,
 	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
 	federatedLogoutEnabled bool,
@@ -1911,7 +1911,7 @@ func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	if wm.Binding != "" {
 		opts = append(opts, saml2.WithBinding(wm.Binding))
 	}
-	if wm.WithSignedRequest && wm.SignatureAlgorithm != nil {
+	if wm.WithSignedRequest && wm.SignatureAlgorithm != "" {
 		opts = append(opts, saml2.WithSignatureAlgorithm(wm.SignatureAlgorithm))
 	}
 	if wm.NameIDFormat != nil {

@@ -120,7 +120,7 @@ type SAMLProvider struct {
 	MetadataURL                   string
 	Binding                       string
 	WithSignedRequest             bool
-	SignatureAlgorithm            *string
+	SignatureAlgorithm            string
 	NameIDFormat                  *domain.SAMLNameIDFormat
 	TransientMappingAttributeName string
 	FederatedLogoutEnabled        bool

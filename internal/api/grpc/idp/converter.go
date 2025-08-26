@@ -715,6 +715,6 @@ func signatureAlgorithmToPb(signatureAlgorithm string) idp_pb.SAMLSignatureAlgor
 	case dsig.RSASHA512SignatureMethod:
 		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512
 	default:
-		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_UNSPECIFIED
 	}
 }

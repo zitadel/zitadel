@@ -921,7 +921,7 @@ func (wm *InstanceSAMLIDPWriteModel) NewChangedEvent(
 	secretCrypto crypto.EncryptionAlgorithm,
 	binding string,
 	withSignedRequest bool,
-	signatureAlgorithm *string,
+	signatureAlgorithm string,
 	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
 	federatedLogoutEnabled bool,

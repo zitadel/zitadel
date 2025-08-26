@@ -336,7 +336,7 @@ func samlConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.SAMLIDPTemplate
 			MetadataXml:                   template.Metadata,
 			Binding:                       bindingToPb(template.Binding),
 			WithSignedRequest:             template.WithSignedRequest,
-			SignatureAlgorithm:            gu.Ptr(signatureAlgorithmToPb(template.SignatureAlgorithm)),
+			SignatureAlgorithm:            signatureAlgorithmToPb(template.SignatureAlgorithm),
 			NameIdFormat:                  nameIDFormat,
 			TransientMappingAttributeName: gu.Ptr(template.TransientMappingAttributeName),
 			FederatedLogoutEnabled:        gu.Ptr(template.FederatedLogoutEnabled),
@@ -383,6 +383,6 @@ func signatureAlgorithmToPb(signatureAlgorithm string) idp_pb.SAMLSignatureAlgor
 	case dsig.RSASHA512SignatureMethod:
 		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512
 	default:
-		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_UNSPECIFIED
 	}
 }

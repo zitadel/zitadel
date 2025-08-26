@@ -32,7 +32,7 @@ type Provider struct {
 	spOptions *samlsp.Options
 
 	binding                       string
-	signatureAlgorithm            *string
+	signatureAlgorithm            string
 	nameIDFormat                  saml.NameIDFormat
 	transientMappingAttributeName string
 
@@ -85,7 +85,7 @@ func WithBinding(binding string) ProviderOpts {
 	}
 }
 
-func WithSignatureAlgorithm(signatureAlgorithm *string) ProviderOpts {
+func WithSignatureAlgorithm(signatureAlgorithm string) ProviderOpts {
 	return func(p *Provider) {
 		p.signatureAlgorithm = signatureAlgorithm
 	}
@@ -226,8 +226,8 @@ func (p *Provider) GetSP() (*samlsp.Middleware, error) {
 	if p.binding != "" {
 		sp.Binding = p.binding
 	}
-	if p.signatureAlgorithm != nil {
-		sp.ServiceProvider.SignatureMethod = *p.signatureAlgorithm
+	if p.signatureAlgorithm != "" {
+		sp.ServiceProvider.SignatureMethod = p.signatureAlgorithm
 	}
 	sp.ServiceProvider.MetadataValidDuration = time.Until(sp.ServiceProvider.Certificate.NotAfter)
 	return sp, nil
