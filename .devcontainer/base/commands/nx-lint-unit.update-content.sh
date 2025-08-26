@@ -5,7 +5,8 @@ if [ "$FAIL_COMMANDS_ON_ERRORS" == "true" ]; then
 fi
 
 pnpm install --frozen-lockfile --recursive
-pnpm nx run-many lint test:unit
+pnpm nx run-many -t lint
+pnpm nx run-many -t test:unit
 
 if [ "$FAIL_COMMANDS_ON_ERRORS" != "true" ]; then
     exit 0

@@ -16,7 +16,6 @@ services:
 
   login-integration:
     container_name: login-integration
-    image: "${LOGIN_TAG:-ghcr.io/zitadel/zitadel-login:latest}"
     build:
       context: ../..
       dockerfile: build/login/Dockerfile
