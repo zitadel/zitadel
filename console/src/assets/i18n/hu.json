@@ -1545,7 +1545,8 @@
         "id": "Indonéz",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1622,12 +1623,8 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Alapértelmezett Org bejelentkezés",
       "LOGINDEFAULTORG_DESCRIPTION": "A bejelentkezési felület az alapértelmezett org beállításait fogja használni (és nem az instance-tól), ha nincs megadva szervezeti kontextus",
-      "OIDCLEGACYINTROSPECTION": "OIDC régi introspekció",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Nemrég refaktoráltuk az introspekciós végpontot a teljesítmény javítása érdekében. Ezt a funkciót használhatod a régi implementációra való visszaállításhoz, ha váratlan hibák lépnének fel.",
       "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Engedélyezd a kísérleti urn:ietf:params:oauth:grant-type:token-exchange támogatását az OIDC token végpont számára. A token csere használható kisebb hatókörű tokenek kérésére vagy más felhasználók megszemélyesítésére. Tekintsd meg a biztonsági irányelvet az impersonáció engedélyezéséhez egy példányon.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Introspekciós Projekciók Indítása",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Engedélyezd a projekciós indítókat az introspekciós kérés során. Ez lehet egy megoldás, ha észrevehető konzisztenciaproblémák vannak az introspekciós válaszban, de hatással lehet a teljesítményre. Tervezzük, hogy a jövőben eltávolítjuk a triggereket az introspekciós kérésből.",
       "USERSCHEMA": "Felhasználói Séma",
       "USERSCHEMA_DESCRIPTION": "A Felhasználói Sémák lehetővé teszik a felhasználói adat sémák kezelését. Ha az opció engedélyezve van, használhatod az új API-t és annak funkcióit.",
       "ACTIONS": "Műveletek",
@@ -1636,14 +1633,10 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Ha a zászló engedélyezve van, képes leszel egyetlen munkamenetet megszüntetni a bejelentkezési UI-ben, ha egy id_tokent biztosítasz egy `sid` claim-mel mint id_token_hint az end_session végpontnál. Megjegyzendő, hogy jelenleg az összes munkamenet ugyanabból a felhasználói ügynökből (böngésző) leállításra kerül a bejelentkezési UI-ben. A Session API-val kezelt munkamenetek már lehetővé teszik egyes munkamenetek megszüntetését.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Ha a zászló engedélyezve van, az OIDC szülő hiba naplózva lesz a konzolban.",
-      "DISABLEUSERTOKENEVENT": "Felhasználói token esemény letiltása",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout engedélyezése",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "A Back-Channel Logout megvalósítja az OpenID Connect Back-Channel Logout 1.0-t, és használható az ügyfelek értesítésére a munkamenet befejezéséről az OpenID szolgáltatónál.",
       "PERMISSIONCHECKV2": "Engedély ellenőrzés V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Ha a zászló engedélyezve van, használhatja az új API-t és annak funkcióit.",
-      "WEBKEY": "Webkulcs",
-      "WEBKEY_DESCRIPTION": "Ha a zászló engedélyezve van, használhatja az új API-t és annak funkcióit.",
       "STATES": {
         "INHERITED": "Örököl",
         "ENABLED": "Engedélyezve",
@@ -1798,7 +1791,8 @@
         "id": "Indonéz",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail ellenőrzés kész",
@@ -2777,7 +2771,8 @@
     "id": "Indonéz",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Hozzáadás egy menedzsert",

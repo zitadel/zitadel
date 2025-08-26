@@ -5,11 +5,13 @@ package integration_test
 import (
 	"context"
 	_ "embed"
+	"fmt"
 	"net/http"
 	"path"
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -20,12 +22,14 @@ import (
 	"github.com/zitadel/zitadel/internal/integration/scim"
 	"github.com/zitadel/zitadel/internal/test"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 var (
 	//go:embed testdata/users_replace_test_minimal_with_external_id.json
 	minimalUserWithExternalIDJson []byte
+
+	//go:embed testdata/users_replace_test_minimal_with_email_type.json
+	minimalUserWithEmailTypeReplaceJson []byte
 
 	//go:embed testdata/users_replace_test_minimal.json
 	minimalUserReplaceJson []byte
@@ -196,28 +200,28 @@ func TestReplaceUser(t *testing.T) {
 		},
 		{
 			name:        "not authenticated",
-			body:        minimalUserJson,
+			body:        withUsername(minimalUserJson, gofakeit.Username()),
 			ctx:         context.Background(),
 			wantErr:     true,
 			errorStatus: http.StatusUnauthorized,
 		},
 		{
 			name:        "no permissions",
-			body:        minimalUserJson,
+			body:        withUsername(minimalUserJson, gofakeit.Username()),
 			ctx:         Instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			wantErr:     true,
 			errorStatus: http.StatusNotFound,
 		},
 		{
 			name:             "another org",
-			body:             minimalUserJson,
+			body:             withUsername(minimalUserJson, gofakeit.Username()),
 			replaceUserOrgID: SecondaryOrganization.OrganizationId,
 			wantErr:          true,
 			errorStatus:      http.StatusNotFound,
 		},
 		{
 			name:             "another org with permissions",
-			body:             minimalUserJson,
+			body:             withUsername(minimalUserJson, gofakeit.Username()),
 			replaceUserOrgID: SecondaryOrganization.OrganizationId,
 			ctx:              Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner),
 			wantErr:          true,
@@ -227,13 +231,8 @@ func TestReplaceUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// use iam owner => we don't want to test permissions of the create endpoint.
-			createdUser, err := Instance.Client.SCIM.Users.Create(Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner), Instance.DefaultOrg.Id, fullUserJson)
+			createdUser, err := Instance.Client.SCIM.Users.Create(Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner), Instance.DefaultOrg.Id, withUsername(fullUserJson, gofakeit.Username()))
 			require.NoError(t, err)
-
-			defer func() {
-				_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
-				assert.NoError(t, err)
-			}()
 
 			ctx := tt.ctx
 			if ctx == nil {
@@ -291,10 +290,11 @@ func TestReplaceUser(t *testing.T) {
 
 func TestReplaceUser_removeOldMetadata(t *testing.T) {
 	// ensure old metadata is removed correctly
-	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, fullUserJson)
+	username := gofakeit.Username()
+	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 	require.NoError(t, err)
 
-	_, err = Instance.Client.SCIM.Users.Replace(CTX, Instance.DefaultOrg.Id, createdUser.ID, minimalUserJson)
+	_, err = Instance.Client.SCIM.Users.Replace(CTX, Instance.DefaultOrg.Id, createdUser.ID, withUsername(minimalUserJson, username))
 	require.NoError(t, err)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
@@ -303,28 +303,58 @@ func TestReplaceUser_removeOldMetadata(t *testing.T) {
 			Id: createdUser.ID,
 		})
 		require.NoError(tt, err)
-		require.Equal(tt, 0, len(md.Result))
-	}, retryDuration, tick)
+		require.Equal(tt, 1, len(md.Result))
 
-	_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
-	require.NoError(t, err)
+		mdMap := make(map[string]string)
+		for i := range md.Result {
+			mdMap[md.Result[i].Key] = string(md.Result[i].Value)
+		}
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:emails", fmt.Sprintf("[{\"value\":\"%s@example.com\",\"primary\":true}]", username))
+	}, retryDuration, tick)
 }
 
-func TestReplaceUser_scopedExternalID(t *testing.T) {
-	// create user without provisioning domain set
-	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, fullUserJson)
+func TestReplaceUser_emailType(t *testing.T) {
+	// ensure old metadata is removed correctly
+	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, gofakeit.Username()))
 	require.NoError(t, err)
 
-	// set provisioning domain of service user
-	setProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID, "fooBazz")
-
-	// replace the user with provisioning domain set
-	_, err = Instance.Client.SCIM.Users.Replace(CTX, Instance.DefaultOrg.Id, createdUser.ID, minimalUserWithExternalIDJson)
+	replacedUsername := gofakeit.Username()
+	_, err = Instance.Client.SCIM.Users.Replace(CTX, Instance.DefaultOrg.Id, createdUser.ID, withUsername(minimalUserWithEmailTypeReplaceJson, replacedUsername))
 	require.NoError(t, err)
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	require.EventuallyWithT(t, func(tt *assert.CollectT) {
 		md, err := Instance.Client.Mgmt.ListUserMetadata(CTX, &management.ListUserMetadataRequest{
+			Id: createdUser.ID,
+		})
+		require.NoError(tt, err)
+		require.Equal(tt, 1, len(md.Result))
+
+		mdMap := make(map[string]string)
+		for i := range md.Result {
+			mdMap[md.Result[i].Key] = string(md.Result[i].Value)
+		}
+
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:emails", fmt.Sprintf("[{\"value\":\"%s@example.com\",\"primary\":true,\"type\":\"work\"}]", replacedUsername))
+	}, retryDuration, tick)
+}
+
+func TestReplaceUser_scopedExternalID(t *testing.T) {
+	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, gofakeit.Username()))
+	require.NoError(t, err)
+	callingUserId, callingUserPat, err := Instance.CreateMachineUserPATWithMembership(CTX, "ORG_OWNER")
+	require.NoError(t, err)
+	ctx := integration.WithAuthorizationToken(CTX, callingUserPat)
+	// set provisioning domain of service user
+	setProvisioningDomain(t, callingUserId, "fooBazz")
+
+	// replace the user with provisioning domain set
+	_, err = Instance.Client.SCIM.Users.Replace(ctx, Instance.DefaultOrg.Id, createdUser.ID, minimalUserWithExternalIDJson)
+	require.NoError(t, err)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		md, err := Instance.Client.Mgmt.ListUserMetadata(ctx, &management.ListUserMetadataRequest{
 			Id: createdUser.ID,
 		})
 		require.NoError(tt, err)
@@ -338,9 +368,4 @@ func TestReplaceUser_scopedExternalID(t *testing.T) {
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:externalId", "701984")
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:fooBazz:externalId", "replaced-external-id")
 	}, retryDuration, tick)
-
-	_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
-	require.NoError(t, err)
-
-	removeProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID)
 }

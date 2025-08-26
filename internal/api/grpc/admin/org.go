@@ -9,7 +9,6 @@ import (
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -39,7 +38,7 @@ func (s *Server) RemoveOrg(ctx context.Context, req *admin_pb.RemoveOrgRequest) 
 }
 
 func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgRequest) (*admin_pb.GetDefaultOrgResponse, error) {
-	org, err := s.query.OrgByID(ctx, true, authz.GetInstance(ctx).DefaultOrganisationID())
+	org, err := s.query.OrgByID(ctx, authz.GetInstance(ctx).DefaultOrganisationID())
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +46,7 @@ func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgReq
 }
 
 func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest) (*admin_pb.GetOrgByIDResponse, error) {
-	org, err := s.query.OrgByID(ctx, true, req.Id)
+	org, err := s.query.OrgByID(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -104,17 +103,5 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 }
 
 func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain string) ([]string, error) {
-	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
-	if err != nil {
-		return nil, err
-	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}}, nil)
-	if err != nil {
-		return nil, err
-	}
-	userIDs := make([]string, len(users.Users))
-	for i, user := range users.Users {
-		userIDs[i] = user.ID
-	}
-	return userIDs, nil
+	return s.query.SearchClaimedUserIDsOfOrgDomain(ctx, orgDomain, "")
 }

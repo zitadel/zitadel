@@ -63,15 +63,11 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v1.DefaultLoginInstanceEventType,
 			feature_v2.InstanceResetEventType,
 			feature_v2.InstanceLoginDefaultOrgEventType,
-			feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
-			feature_v2.InstanceLegacyIntrospectionEventType,
 			feature_v2.InstanceUserSchemaEventType,
 			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceImprovedPerformanceEventType,
-			feature_v2.InstanceWebKeyEventType,
 			feature_v2.InstanceDebugOIDCParentErrorEventType,
 			feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
-			feature_v2.InstanceDisableUserTokenEvent,
 			feature_v2.InstanceEnableBackChannelLogout,
 			feature_v2.InstanceLoginVersion,
 			feature_v2.InstancePermissionCheckV2,
@@ -93,13 +89,10 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 		return false
 	}
 	m.instance.LoginDefaultOrg = m.system.LoginDefaultOrg
-	m.instance.TriggerIntrospectionProjections = m.system.TriggerIntrospectionProjections
-	m.instance.LegacyIntrospection = m.system.LegacyIntrospection
 	m.instance.UserSchema = m.system.UserSchema
 	m.instance.TokenExchange = m.system.TokenExchange
 	m.instance.ImprovedPerformance = m.system.ImprovedPerformance
 	m.instance.OIDCSingleV1SessionTermination = m.system.OIDCSingleV1SessionTermination
-	m.instance.DisableUserTokenEvent = m.system.DisableUserTokenEvent
 	m.instance.EnableBackChannelLogout = m.system.EnableBackChannelLogout
 	m.instance.LoginV2 = m.system.LoginV2
 	return true
@@ -111,29 +104,20 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		return err
 	}
 	switch key {
-	case feature.KeyUnspecified,
-		feature.KeyActionsDeprecated:
+	case feature.KeyUnspecified:
 		return nil
 	case feature.KeyLoginDefaultOrg:
 		features.LoginDefaultOrg.set(level, event.Value)
-	case feature.KeyTriggerIntrospectionProjections:
-		features.TriggerIntrospectionProjections.set(level, event.Value)
-	case feature.KeyLegacyIntrospection:
-		features.LegacyIntrospection.set(level, event.Value)
 	case feature.KeyUserSchema:
 		features.UserSchema.set(level, event.Value)
 	case feature.KeyTokenExchange:
 		features.TokenExchange.set(level, event.Value)
 	case feature.KeyImprovedPerformance:
 		features.ImprovedPerformance.set(level, event.Value)
-	case feature.KeyWebKey:
-		features.WebKey.set(level, event.Value)
 	case feature.KeyDebugOIDCParentError:
 		features.DebugOIDCParentError.set(level, event.Value)
 	case feature.KeyOIDCSingleV1SessionTermination:
 		features.OIDCSingleV1SessionTermination.set(level, event.Value)
-	case feature.KeyDisableUserTokenEvent:
-		features.DisableUserTokenEvent.set(level, event.Value)
 	case feature.KeyEnableBackChannelLogout:
 		features.EnableBackChannelLogout.set(level, event.Value)
 	case feature.KeyLoginV2:

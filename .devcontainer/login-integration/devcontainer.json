@@ -1,0 +1,26 @@
+{
+	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
+	"name": "Login Integration",
+	"dockerComposeFile": [
+		"./docker-compose.yaml"
+	],
+	"service": "login-integration-dev",
+	"runServices": [
+		"login-integration"
+	],
+	"workspaceFolder": "/workspaces/apps/login",
+	"forwardPorts": [
+		22220,
+		22222,
+		3001
+	],
+	"remoteEnv": {
+		"FAIL_COMMANDS_ON_ERRORS": "${localEnv:FAIL_COMMANDS_ON_ERRORS}",
+		"DISPLAY": ""
+	},
+	"updateContentCommand": "/commands/login-integration.update-content.sh",
+	"postAttachCommand": "/commands/login-integration.post-attach.sh",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-outside-of-docker": {}
+	}
+}

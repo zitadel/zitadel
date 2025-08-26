@@ -3,6 +3,7 @@ package project
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
@@ -13,18 +14,18 @@ import (
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 )
 
-func (s *Server) GetProject(ctx context.Context, req *project_pb.GetProjectRequest) (*project_pb.GetProjectResponse, error) {
-	project, err := s.query.GetProjectByIDWithPermission(ctx, true, req.Id, s.checkPermission)
+func (s *Server) GetProject(ctx context.Context, req *connect.Request[project_pb.GetProjectRequest]) (*connect.Response[project_pb.GetProjectResponse], error) {
+	project, err := s.query.GetProjectByIDWithPermission(ctx, true, req.Msg.GetId(), s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	return &project_pb.GetProjectResponse{
+	return connect.NewResponse(&project_pb.GetProjectResponse{
 		Project: projectToPb(project),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListProjects(ctx context.Context, req *project_pb.ListProjectsRequest) (*project_pb.ListProjectsResponse, error) {
-	queries, err := s.listProjectRequestToModel(req)
+func (s *Server) ListProjects(ctx context.Context, req *connect.Request[project_pb.ListProjectsRequest]) (*connect.Response[project_pb.ListProjectsResponse], error) {
+	queries, err := s.listProjectRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -32,10 +33,10 @@ func (s *Server) ListProjects(ctx context.Context, req *project_pb.ListProjectsR
 	if err != nil {
 		return nil, err
 	}
-	return &project_pb.ListProjectsResponse{
+	return connect.NewResponse(&project_pb.ListProjectsResponse{
 		Projects:   grantedProjectsToPb(resp.GrantedProjects),
 		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
-	}, nil
+	}), nil
 }
 
 func (s *Server) listProjectRequestToModel(req *project_pb.ListProjectsRequest) (*query.ProjectAndGrantedProjectSearchQueries, error) {
@@ -213,8 +214,8 @@ func privateLabelingSettingToPb(setting domain.PrivateLabelingSetting) project_p
 	}
 }
 
-func (s *Server) ListProjectGrants(ctx context.Context, req *project_pb.ListProjectGrantsRequest) (*project_pb.ListProjectGrantsResponse, error) {
-	queries, err := s.listProjectGrantsRequestToModel(req)
+func (s *Server) ListProjectGrants(ctx context.Context, req *connect.Request[project_pb.ListProjectGrantsRequest]) (*connect.Response[project_pb.ListProjectGrantsResponse], error) {
+	queries, err := s.listProjectGrantsRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -222,10 +223,10 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *project_pb.ListProj
 	if err != nil {
 		return nil, err
 	}
-	return &project_pb.ListProjectGrantsResponse{
+	return connect.NewResponse(&project_pb.ListProjectGrantsResponse{
 		ProjectGrants: projectGrantsToPb(resp.ProjectGrants),
 		Pagination:    filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
-	}, nil
+	}), nil
 }
 
 func (s *Server) listProjectGrantsRequestToModel(req *project_pb.ListProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
@@ -329,12 +330,12 @@ func projectGrantStateToPb(state domain.ProjectGrantState) project_pb.ProjectGra
 	}
 }
 
-func (s *Server) ListProjectRoles(ctx context.Context, req *project_pb.ListProjectRolesRequest) (*project_pb.ListProjectRolesResponse, error) {
-	queries, err := s.listProjectRolesRequestToModel(req)
+func (s *Server) ListProjectRoles(ctx context.Context, req *connect.Request[project_pb.ListProjectRolesRequest]) (*connect.Response[project_pb.ListProjectRolesResponse], error) {
+	queries, err := s.listProjectRolesRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
-	err = queries.AppendProjectIDQuery(req.ProjectId)
+	err = queries.AppendProjectIDQuery(req.Msg.GetProjectId())
 	if err != nil {
 		return nil, err
 	}
@@ -342,10 +343,10 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *project_pb.ListProje
 	if err != nil {
 		return nil, err
 	}
-	return &project_pb.ListProjectRolesResponse{
+	return connect.NewResponse(&project_pb.ListProjectRolesResponse{
 		ProjectRoles: roleViewsToPb(roles.ProjectRoles),
 		Pagination:   filter.QueryToPaginationPb(queries.SearchRequest, roles.SearchResponse),
-	}, nil
+	}), nil
 }
 
 func (s *Server) listProjectRolesRequestToModel(req *project_pb.ListProjectRolesRequest) (*query.ProjectRoleSearchQueries, error) {

@@ -81,7 +81,7 @@ func UserMetadataListFromSlice(c *actions.FieldConfig, metadata []query.UserMeta
 func GetOrganizationMetadata(ctx context.Context, queries *query.Queries, c *actions.FieldConfig, organizationID string) goja.Value {
 	metadata, err := queries.SearchOrgMetadata(
 		ctx,
-		true,
+		false,
 		organizationID,
 		&query.OrgMetadataSearchQueries{},
 		false,

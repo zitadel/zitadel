@@ -67,15 +67,11 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v1.DefaultLoginInstanceEventType,
 			feature_v2.InstanceResetEventType,
 			feature_v2.InstanceLoginDefaultOrgEventType,
-			feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
-			feature_v2.InstanceLegacyIntrospectionEventType,
 			feature_v2.InstanceUserSchemaEventType,
 			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceImprovedPerformanceEventType,
-			feature_v2.InstanceWebKeyEventType,
 			feature_v2.InstanceDebugOIDCParentErrorEventType,
 			feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
-			feature_v2.InstanceDisableUserTokenEvent,
 			feature_v2.InstanceEnableBackChannelLogout,
 			feature_v2.InstanceLoginVersion,
 			feature_v2.InstancePermissionCheckV2,
@@ -95,12 +91,6 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyLoginDefaultOrg:
 		v := value.(bool)
 		features.LoginDefaultOrg = &v
-	case feature.KeyTriggerIntrospectionProjections:
-		v := value.(bool)
-		features.TriggerIntrospectionProjections = &v
-	case feature.KeyLegacyIntrospection:
-		v := value.(bool)
-		features.LegacyIntrospection = &v
 	case feature.KeyTokenExchange:
 		v := value.(bool)
 		features.TokenExchange = &v
@@ -110,18 +100,12 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyImprovedPerformance:
 		v := value.([]feature.ImprovedPerformanceType)
 		features.ImprovedPerformance = v
-	case feature.KeyWebKey:
-		v := value.(bool)
-		features.WebKey = &v
 	case feature.KeyDebugOIDCParentError:
 		v := value.(bool)
 		features.DebugOIDCParentError = &v
 	case feature.KeyOIDCSingleV1SessionTermination:
 		v := value.(bool)
 		features.OIDCSingleV1SessionTermination = &v
-	case feature.KeyDisableUserTokenEvent:
-		v := value.(bool)
-		features.DisableUserTokenEvent = &v
 	case feature.KeyEnableBackChannelLogout:
 		v := value.(bool)
 		features.EnableBackChannelLogout = &v
@@ -140,15 +124,11 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	aggregate := feature_v2.NewAggregate(wm.AggregateID, wm.ResourceOwner)
 	cmds := make([]eventstore.Command, 0, len(feature.KeyValues())-1)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginDefaultOrg, f.LoginDefaultOrg, feature_v2.InstanceLoginDefaultOrgEventType)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TriggerIntrospectionProjections, f.TriggerIntrospectionProjections, feature_v2.InstanceTriggerIntrospectionProjectionsEventType)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LegacyIntrospection, f.LegacyIntrospection, feature_v2.InstanceLegacyIntrospectionEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TokenExchange, f.TokenExchange, feature_v2.InstanceTokenExchangeEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.InstanceUserSchemaEventType)
 	cmds = appendFeatureSliceUpdate(ctx, cmds, aggregate, wm.ImprovedPerformance, f.ImprovedPerformance, feature_v2.InstanceImprovedPerformanceEventType)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.WebKey, f.WebKey, feature_v2.InstanceWebKeyEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.DebugOIDCParentError, f.DebugOIDCParentError, feature_v2.InstanceDebugOIDCParentErrorEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.OIDCSingleV1SessionTermination, f.OIDCSingleV1SessionTermination, feature_v2.InstanceOIDCSingleV1SessionTerminationEventType)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.DisableUserTokenEvent, f.DisableUserTokenEvent, feature_v2.InstanceDisableUserTokenEvent)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableBackChannelLogout, f.EnableBackChannelLogout, feature_v2.InstanceEnableBackChannelLogout)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginV2, f.LoginV2, feature_v2.InstanceLoginVersion)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.PermissionCheckV2, f.PermissionCheckV2, feature_v2.InstancePermissionCheckV2)

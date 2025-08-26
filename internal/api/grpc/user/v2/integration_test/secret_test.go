@@ -4,7 +4,6 @@ package user_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -43,7 +43,7 @@ func TestServer_AddSecret(t *testing.T) {
 				CTX,
 				&user.AddSecretRequest{},
 				func(request *user.AddSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX)
+					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
 					return nil
 				},
@@ -55,7 +55,7 @@ func TestServer_AddSecret(t *testing.T) {
 				CTX,
 				&user.AddSecretRequest{},
 				func(request *user.AddSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX)
+					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
 					return nil
 				},
@@ -67,7 +67,7 @@ func TestServer_AddSecret(t *testing.T) {
 				CTX,
 				&user.AddSecretRequest{},
 				func(request *user.AddSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX)
+					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
 					_, err := Client.AddSecret(CTX, &user.AddSecretRequest{
 						UserId: resp.GetId(),
@@ -97,7 +97,7 @@ func TestServer_AddSecret(t *testing.T) {
 }
 
 func TestServer_AddSecret_Permission(t *testing.T) {
-	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddSecret-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
@@ -202,7 +202,7 @@ func TestServer_RemoveSecret(t *testing.T) {
 				CTX,
 				&user.RemoveSecretRequest{},
 				func(request *user.RemoveSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX)
+					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
 					return nil
 				},
@@ -215,7 +215,7 @@ func TestServer_RemoveSecret(t *testing.T) {
 				CTX,
 				&user.RemoveSecretRequest{},
 				func(request *user.RemoveSecretRequest) error {
-					resp := Instance.CreateUserTypeMachine(CTX)
+					resp := Instance.CreateUserTypeMachine(CTX, Instance.DefaultOrg.Id)
 					request.UserId = resp.GetId()
 					_, err := Instance.Client.UserV2.AddSecret(CTX, &user.AddSecretRequest{
 						UserId: resp.GetId(),
@@ -244,7 +244,7 @@ func TestServer_RemoveSecret(t *testing.T) {
 }
 
 func TestServer_RemoveSecret_Permission(t *testing.T) {
-	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("RemoveSecret-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	otherOrgUser, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{

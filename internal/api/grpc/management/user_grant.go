@@ -33,7 +33,7 @@ func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantR
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.UserGrants(ctx, queries, false)
+	res, err := s.query.UserGrants(ctx, queries, false, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -44,11 +44,11 @@ func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantR
 }
 
 func (s *Server) AddUserGrant(ctx context.Context, req *mgmt_pb.AddUserGrantRequest) (*mgmt_pb.AddUserGrantResponse, error) {
-	grant := AddUserGrantRequestToDomain(req)
+	grant := AddUserGrantRequestToDomain(req, authz.GetCtxData(ctx).OrgID)
 	if err := checkExplicitProjectPermission(ctx, grant.ProjectGrantID, grant.ProjectID); err != nil {
 		return nil, err
 	}
-	grant, err := s.command.AddUserGrant(ctx, grant, authz.GetCtxData(ctx).OrgID)
+	grant, err := s.command.AddUserGrant(ctx, grant, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (s *Server) AddUserGrant(ctx context.Context, req *mgmt_pb.AddUserGrantRequ
 }
 
 func (s *Server) UpdateUserGrant(ctx context.Context, req *mgmt_pb.UpdateUserGrantRequest) (*mgmt_pb.UpdateUserGrantResponse, error) {
-	grant, err := s.command.ChangeUserGrant(ctx, UpdateUserGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	grant, err := s.command.ChangeUserGrant(ctx, UpdateUserGrantRequestToDomain(req, authz.GetCtxData(ctx).OrgID), false, false, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (s *Server) UpdateUserGrant(ctx context.Context, req *mgmt_pb.UpdateUserGra
 }
 
 func (s *Server) DeactivateUserGrant(ctx context.Context, req *mgmt_pb.DeactivateUserGrantRequest) (*mgmt_pb.DeactivateUserGrantResponse, error) {
-	objectDetails, err := s.command.DeactivateUserGrant(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.DeactivateUserGrant(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (s *Server) DeactivateUserGrant(ctx context.Context, req *mgmt_pb.Deactivat
 }
 
 func (s *Server) ReactivateUserGrant(ctx context.Context, req *mgmt_pb.ReactivateUserGrantRequest) (*mgmt_pb.ReactivateUserGrantResponse, error) {
-	objectDetails, err := s.command.ReactivateUserGrant(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.ReactivateUserGrant(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (s *Server) ReactivateUserGrant(ctx context.Context, req *mgmt_pb.Reactivat
 }
 
 func (s *Server) RemoveUserGrant(ctx context.Context, req *mgmt_pb.RemoveUserGrantRequest) (*mgmt_pb.RemoveUserGrantResponse, error) {
-	objectDetails, err := s.command.RemoveUserGrant(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.RemoveUserGrant(ctx, req.GrantId, authz.GetCtxData(ctx).OrgID, false, nil)
 	if err != nil {
 		return nil, err
 	}

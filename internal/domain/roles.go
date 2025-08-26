@@ -14,6 +14,7 @@ const (
 	RoleOrgOwner             = "ORG_OWNER"
 	RoleOrgProjectCreator    = "ORG_PROJECT_CREATOR"
 	RoleIAMOwner             = "IAM_OWNER"
+	RoleIAMLoginClient       = "IAM_LOGIN_CLIENT"
 	RoleProjectOwner         = "PROJECT_OWNER"
 	RoleProjectOwnerGlobal   = "PROJECT_OWNER_GLOBAL"
 	RoleProjectGrantOwner    = "PROJECT_GRANT_OWNER"

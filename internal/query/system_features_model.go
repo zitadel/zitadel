@@ -56,13 +56,10 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			feature_v2.SystemResetEventType,
 			feature_v2.SystemLoginDefaultOrgEventType,
-			feature_v2.SystemTriggerIntrospectionProjectionsEventType,
-			feature_v2.SystemLegacyIntrospectionEventType,
 			feature_v2.SystemUserSchemaEventType,
 			feature_v2.SystemTokenExchangeEventType,
 			feature_v2.SystemImprovedPerformanceEventType,
 			feature_v2.SystemOIDCSingleV1SessionTerminationEventType,
-			feature_v2.SystemDisableUserTokenEvent,
 			feature_v2.SystemEnableBackChannelLogout,
 			feature_v2.SystemLoginVersion,
 			feature_v2.SystemPermissionCheckV2,
@@ -81,15 +78,10 @@ func reduceSystemFeatureSet[T any](features *SystemFeatures, event *feature_v2.S
 		return err
 	}
 	switch key {
-	case feature.KeyUnspecified,
-		feature.KeyActionsDeprecated:
+	case feature.KeyUnspecified:
 		return nil
 	case feature.KeyLoginDefaultOrg:
 		features.LoginDefaultOrg.set(level, event.Value)
-	case feature.KeyTriggerIntrospectionProjections:
-		features.TriggerIntrospectionProjections.set(level, event.Value)
-	case feature.KeyLegacyIntrospection:
-		features.LegacyIntrospection.set(level, event.Value)
 	case feature.KeyUserSchema:
 		features.UserSchema.set(level, event.Value)
 	case feature.KeyTokenExchange:
@@ -98,8 +90,6 @@ func reduceSystemFeatureSet[T any](features *SystemFeatures, event *feature_v2.S
 		features.ImprovedPerformance.set(level, event.Value)
 	case feature.KeyOIDCSingleV1SessionTermination:
 		features.OIDCSingleV1SessionTermination.set(level, event.Value)
-	case feature.KeyDisableUserTokenEvent:
-		features.DisableUserTokenEvent.set(level, event.Value)
 	case feature.KeyEnableBackChannelLogout:
 		features.EnableBackChannelLogout.set(level, event.Value)
 	case feature.KeyLoginV2:

@@ -1,0 +1,11 @@
+packages:
+  - "console"
+  - "docs"
+  - "e2e"
+  - "packages/*"
+  - "apps/*"
+
+overrides:
+  "@typescript-eslint/parser": "^8.35.1"
+  "@zitadel/client": "workspace:*"
+  "@zitadel/proto": "workspace:*"

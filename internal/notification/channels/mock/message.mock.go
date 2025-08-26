@@ -54,16 +54,16 @@ func (mr *MockMessageMockRecorder) GetContent() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContent", reflect.TypeOf((*MockMessage)(nil).GetContent))
 }
 
-// GetTriggeringEvent mocks base method.
-func (m *MockMessage) GetTriggeringEvent() eventstore.Event {
+// GetTriggeringEventType mocks base method.
+func (m *MockMessage) GetTriggeringEventType() eventstore.EventType {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetTriggeringEvent")
-	ret0, _ := ret[0].(eventstore.Event)
+	ret := m.ctrl.Call(m, "GetTriggeringEventType")
+	ret0, _ := ret[0].(eventstore.EventType)
 	return ret0
 }
 
-// GetTriggeringEvent indicates an expected call of GetTriggeringEvent.
-func (mr *MockMessageMockRecorder) GetTriggeringEvent() *gomock.Call {
+// GetTriggeringEventType indicates an expected call of GetTriggeringEventType.
+func (mr *MockMessageMockRecorder) GetTriggeringEventType() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTriggeringEvent", reflect.TypeOf((*MockMessage)(nil).GetTriggeringEvent))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTriggeringEventType", reflect.TypeOf((*MockMessage)(nil).GetTriggeringEventType))
 }
