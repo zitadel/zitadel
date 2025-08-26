@@ -106,7 +106,7 @@ export function RegisterFormIDPIncomplete({
             autoComplete="firstname"
             required
             {...register("firstname", { required: t("required.firstname") })}
-            label={t("firstname")}
+            label={t("labels.firstname")}
             error={errors.firstname?.message as string}
             data-testid="firstname-text-input"
           />
@@ -117,7 +117,7 @@ export function RegisterFormIDPIncomplete({
             autoComplete="lastname"
             required
             {...register("lastname", { required: t("required.lastname") })}
-            label={t("lastname")}
+            label={t("labels.lastname")}
             error={errors.lastname?.message as string}
             data-testid="lastname-text-input"
           />
@@ -128,7 +128,7 @@ export function RegisterFormIDPIncomplete({
             autoComplete="email"
             required
             {...register("email", { required: t("required.email") })}
-            label={t("email")}
+            label={t("labels.email")}
             error={errors.email?.message as string}
             data-testid="email-text-input"
           />

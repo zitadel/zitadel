@@ -66,7 +66,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
             type="text"
             autoComplete="one-time-code"
             {...register("userCode", { required: t("usercode.required.code") })}
-            label={t("usercode.code")}
+            label={t("usercode.labels.code")}
             data-testid="code-text-input"
           />
         </div>

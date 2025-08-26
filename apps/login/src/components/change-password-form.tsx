@@ -161,7 +161,7 @@ export function ChangePasswordForm({
             {...register("password", {
               required: t("change.required.newPassword"),
             })}
-            label={t("change.newPassword")}
+            label={t("change.labels.newPassword")}
             error={errors.password?.message as string}
             data-testid="password-change-text-input"
           />
@@ -174,7 +174,7 @@ export function ChangePasswordForm({
             {...register("confirmPassword", {
               required: t("change.required.confirmPassword"),
             })}
-            label={t("change.confirmPassword")}
+            label={t("change.labels.confirmPassword")}
             error={errors.confirmPassword?.message as string}
             data-testid="password-change-confirm-text-input"
           />

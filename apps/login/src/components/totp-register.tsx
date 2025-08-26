@@ -126,7 +126,7 @@ export function TotpRegister({
               <TextInput
                 type="text"
                 {...register("code", { required: t("set.required.code") })}
-                label={t("set.code")}
+                label={t("set.labels.code")}
                 data-testid="code-text-input"
               />
             </div>

@@ -221,7 +221,7 @@ export function SetPasswordForm({
               {...register("code", {
                 required: t("set.required.code"),
               })}
-              label={t("set.code")}
+              label={t("set.labels.code")}
               autoComplete="one-time-code"
               error={errors.code?.message as string}
               data-testid="code-text-input"
@@ -236,7 +236,7 @@ export function SetPasswordForm({
             {...register("password", {
               required: t("set.required.newPassword"),
             })}
-            label={t("set.newPassword")}
+            label={t("set.labels.newPassword")}
             error={errors.password?.message as string}
             data-testid="password-set-text-input"
           />
@@ -249,7 +249,7 @@ export function SetPasswordForm({
             {...register("confirmPassword", {
               required: t("set.required.confirmPassword"),
             })}
-            label={t("set.confirmPassword")}
+            label={t("set.labels.confirmPassword")}
             error={errors.confirmPassword?.message as string}
             data-testid="password-set-confirm-text-input"
           />
