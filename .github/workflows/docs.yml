@@ -52,8 +52,8 @@ jobs:
         name: Install dependencies
         run: pnpm install
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        name: Build docs with Turbo
-        run: pnpm turbo build --filter=./docs
+        name: Build docs with Nx
+        run: pnpm nx run docs:build
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:

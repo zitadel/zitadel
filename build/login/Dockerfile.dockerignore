@@ -12,23 +12,23 @@
 !apps/login/postcss.config.cjs
 !apps/login/tsconfig.json
 !apps/login/package.json
-!apps/login/turbo.json
+!apps/login/project.json
 
 !package.json
 !pnpm-lock.yaml
 !pnpm-workspace.yaml
-!turbo.json
+!nx.json
 
 !packages/zitadel-proto/package.json
 !packages/zitadel-proto/buf.gen.yaml
-!packages/zitadel-proto/turbo.json
+!packages/zitadel-proto/project.json
 
 !packages/zitadel-client/package.json
 !packages/zitadel-client/**/package.json
 !packages/zitadel-client/src
 !packages/zitadel-client/tsconfig.json
 !packages/zitadel-client/tsup.config.ts
-!packages/zitadel-client/turbo.json
+!packages/zitadel-client/project.json
 
 !proto
 

@@ -1,0 +1,23 @@
+{
+    "$schema": "../node_modules/nx/schemas/project-schema.json",
+    "targets": {
+        "generate": {
+            "dependsOn": ["^generate"],
+            "outputs": ["{projectRoot}/src/app/proto/generated/**/*"]
+        },
+        "build": {
+            "dependsOn": ["generate", "^build"],
+            "outputs": ["{projectRoot}/dist/**/*"]
+        },
+        "dev": {
+            "dependsOn": ["generate", "^build"],
+            "cache": false,
+            "continuous": true  
+        },
+        "start": {
+            "dependsOn": ["generate", "^build"],
+            "cache": false,
+            "persistent": true
+        }
+    }   
+}

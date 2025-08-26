@@ -17,12 +17,12 @@ pnpm install
 
 ### Proto Generation
 
-The Console app uses **dual proto generation** with Turbo dependency management:
+The Console app uses **dual proto generation** with Nx build orchestration:
 
 1. **`@zitadel/proto` generation**: Modern ES modules with `@bufbuild/protobuf` for v2 APIs
 2. **Local `buf.gen.yaml` generation**: Traditional protobuf JavaScript classes for v1 APIs
 
-The Console app's `turbo.json` ensures that `@zitadel/proto#generate` runs before the Console's own generation, providing both:
+The Console app's `project.json` ensures that `@zitadel/proto:generate` runs before the Console's own generation, providing both:
 
 - Modern schemas from `@zitadel/proto` (e.g., `UserSchema`, `DetailsSchema`)
 - Legacy classes from `src/app/proto/generated` (e.g., `User`, `Project`)
@@ -39,17 +39,17 @@ Generated files:
 To generate proto files:
 
 ```bash
-pnpm run generate
+pnpm nx run console:generate
 ```
 
-This automatically runs both generations in the correct order via Turbo dependencies.
+This automatically runs both generations in the correct order via Nx build orchestration.
 
 ### Development Server
 
 To start the development server:
 
 ```bash
-pnpm start
+pnpm nx run console:start
 ```
 
 This will:
@@ -62,7 +62,7 @@ This will:
 To build for production:
 
 ```bash
-pnpm run build
+pnpm nx run console:build
 ```
 
 This will:
@@ -75,29 +75,29 @@ This will:
 To run linting and formatting checks:
 
 ```bash
-pnpm run lint
+pnpm nx run console:lint
 ```
 
 To auto-fix formatting issues:
 
 ```bash
-pnpm run lint:fix
+pnpm nx run console:lint:fix
 ```
 
 ## Project Structure
 
 - `src/app/proto/generated/` - Generated proto files (Angular-specific format)
 - `buf.gen.yaml` - Local proto generation configuration
-- `turbo.json` - Turbo dependency configuration for proto generation
+- `project.json` - Nx build orchestration configuration for proto generation
 - `prebuild.development.js` - Development environment configuration script
 
 ## Proto Generation Details
 
-The Console app uses **dual proto generation** managed by Turbo dependencies:
+The Console app uses **dual proto generation** managed by Nx build orchestration:
 
 ### Dependency Chain
 
-The Console app has the following build dependencies managed by Turbo:
+The Console app has the following build dependencies managed by Nx:
 
 1. `@zitadel/proto#generate` - Generates modern protobuf files
 2. `@zitadel/client#build` - Builds the TypeScript gRPC client library
@@ -124,7 +124,7 @@ This ensures that the Console always has access to the latest client library and
 
 ### Dependency Management
 
-The Console's `turbo.json` ensures proper execution order:
+The Console's `project.json` ensures proper execution order:
 
 1. `@zitadel/proto#generate` runs first (modern ES modules)
 2. Console's local generation runs second (traditional protobuf)

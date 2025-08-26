@@ -260,7 +260,7 @@ export Zitadel_IMAGE=zitadel:local GOOS=linux
 make docker_image
 
 # If you made changes in the e2e directory, make sure you reformat the files
-pnpm turbo lint:fix --filter=e2e
+pnpm nx run e2e:lint:fix
 
 # Run the tests
 docker compose --file ./e2e/docker-compose.yaml run --service-ports e2e
@@ -297,7 +297,7 @@ docker compose --file ./e2e/docker-compose.yaml down
 
 ## Contribute Frontend Code
 
-This repository uses **pnpm** as package manager and **Turbo** for build orchestration.
+This repository uses **pnpm** as package manager and **Nx** for build orchestration.
 All frontend packages are managed as a monorepo with shared dependencies and optimized builds:
 
 - [apps/login](contribute-login) (depends on packages/zitadel-client and packages/zitadel-proto)
@@ -310,14 +310,14 @@ All frontend packages are managed as a monorepo with shared dependencies and opt
 
 ### <a name="frontend-dev-requirements"></a>Frontend Development Requirements
 
-The frontend components are run in a [Node](https://nodejs.org/en/about/) environment and are managed using the pnpm package manager and the Turborepo orchestrator.
+The frontend components are run in a [Node](https://nodejs.org/en/about/) environment and are managed using the pnpm package manager and the Nx orchestrator.
 
 > [!INFO]
 > Some [dev containers are available](dev-containers) for remote development with docker and pipeline debugging in isolated environments.
 > If you don't want to use one of the dev containers, you can develop the frontend components directly on your local machine.
 > To do so, proceed with installing the necessary dependencies.
 
-We use **pnpm** as package manager and **Turbo** for build orchestration. Use angular-eslint/Prettier for linting/formatting.
+We use **pnpm** as package manager and **Nx** for build orchestration. Use angular-eslint/Prettier for linting/formatting.
 VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues during development.
 
 The commands in this section are tested against the following software versions:
@@ -341,7 +341,7 @@ To run tests with Cypress, ensure you have installed the required [Cypress runti
 ### <a name="contribute-login"></a>Contribute to Login
 
 The Login UI is a Next.js application that provides the user interface for authentication flows.
-It's located in the `apps/login` directory and uses pnpm and Turbo for development.
+It's located in the `apps/login` directory and uses pnpm and Nx for development.
 
 To start developing the login, make sure your system has the [required system dependencies](frontend-dev-requirements) installed.
 
@@ -355,11 +355,11 @@ docker compose --file ./apps/login/acceptance/docker-compose.yaml up --detach zi
 # Install dependencies
 pnpm install
 
-# Option 1: Run login development server with Turbo (recommended)
-pnpm turbo dev --filter=@zitadel/login
+# Option 1: Run login development server with Nx (recommended)
+pnpm nx run @zitadel/login:dev
 
 # Option 2: Build and serve login (production build)
-pnpm turbo build --filter=@zitadel/login
+pnpm nx @zitadel/login:build
 cd ./login && pnpm start
 ```
 
@@ -373,7 +373,7 @@ The login application consists of multiple packages:
 - `@zitadel/client` - TypeScript client library for Zitadel APIs
 - `@zitadel/proto` - Protocol buffer definitions and generated code
 
-The build process uses Turbo to orchestrate dependencies:
+The build process uses Nx to orchestrate dependencies:
 
 1. Proto generation (`@zitadel/proto#generate`)
 2. Client library build (`@zitadel/client#build`)
@@ -384,7 +384,9 @@ The build process uses Turbo to orchestrate dependencies:
 Reproduce the pipelines linting and testing for the login.
 
 ```bash
-pnpm turbo quality --filter=./apps/login/* --filter=./packages/*
+pnpm nx run @zitadel/login:lint
+pnpm nx run @zitadel/login:test:unit
+pnpm devcontainer:integration:login
 ```
 
 Fix the [quality checks](troubleshoot-frontend), add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
@@ -398,7 +400,7 @@ Then, you need to decide which Zitadel instance you would like to target.
 
 #### <a name="console-dev-existing-zitadel"></a>Develop against an already running Zitadel instance
 
-By default, `pnpm dev --filter=console` targets a Zitadel API running at http://localhost:8080.
+By default, `pnpm nx console:dev` targets a Zitadel API running at http://localhost:8080.
 To change this, export the link to your environment.json in your environment variables.
 
 ```bash
@@ -446,11 +448,11 @@ Run the local console development server.
 pnpm install
 
 # Option 1: Run console development server with live reloading and dependency rebuilds
-pnpm turbo dev --filter=console
+pnpm nx run console:dev
 
 # Option 2: Build and serve console (production build)
-pnpm turbo build --filter=console
-pnpm turbo serve --filter=console
+pnpm nx run console:build
+pnpm nx run console:serve
 ```
 
 Navigate to http://localhost:4200/.
@@ -461,14 +463,15 @@ Make some changes to the source code and see how the browser is automatically up
 Reproduce the pipelines linting and testing for the console.
 
 ```bash
-pnpm turbo quality --filter=console --filter=e2e
+pnpm nx run console:lint
+pnpm nx run e2e:lint
 ```
 
 Fix the [quality checks](troubleshoot-frontend), add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
 ### <a name="contribute-docs"></a>Contribute to Docs
 
-Project documentation is made with Docusaurus and is located under [./docs](./docs). The documentation uses **pnpm** and **Turbo** for development and build processes.
+Project documentation is made with Docusaurus and is located under [./docs](./docs). The documentation uses **pnpm** and **Nx** for development and build processes.
 
 #### Local Development
 
@@ -476,11 +479,11 @@ Project documentation is made with Docusaurus and is located under [./docs](./do
 # Install dependencies (from repository root)
 pnpm install
 
-# Option 1: Run docs development server with Turbo (recommended)
-pnpm turbo dev --filter=zitadel-docs
+# Option 1: Run docs development server with Nx (recommended)
+pnpm nx run docs:dev
 
 # Option 2: Build and serve docs (production build)
-pnpm turbo build --filter=zitadel-docs
+pnpm nx run docs:build
 cd ./docs && pnpm serve
 ```
 
@@ -522,7 +525,7 @@ Scope can be left empty (omit the brackets) or refer to the top navigation secti
 Reproduce the pipelines linting checks for the docs.
 
 ```bash
-pnpm turbo quality --filter=docs
+pnpm nx run docs:lint
 ```
 
 Fix the [quality checks](troubleshoot-frontend), add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
@@ -535,19 +538,19 @@ We recommend to use [one of the dev containers](dev-containers) to reproduce pip
 
 ```bash
 # to reproduce linting error in the console:
-pnpm lint --filter=console
+pnpm nx run console:lint
 # To fix them:
-pnpm lint:fix --filter=console
+pnpm nx run console:lint:fix
 ```
 
 More tasks that are runnable on-demand.
 Some tasks have variants like `pnpm test:e2e:angulargolang`,
 others support arguments and flags like `pnpm test:integration run --spec apps/login/integration/integration/login.cy.ts`.
-For the turbo commands, check your options with `pnpm turbo --help`
+For the Nx commands, check your options with `pnpm nx --help`
 
 | Command                   | Description                                              | Example                                                                                                                                                    |
 | ------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm turbo run generate` | Generate stubs from Proto files                          | Generate API docs: `pnpm turbo run generate --filter zitadel-docs`                                                                                         |
+| `pnpm turbo run generate` | Generate stubs from Proto files                          | Generate API docs: `pnpm turbo run generate --filter docs`                                                                                         |
 | `pnpm turbo build`        | Build runnable JavaScript code                           | Regenerate the proto stubs and build the @zitadel/client package: `pnpm turbo build --filter @zitadel/client`                                              |
 | `pnpm turbo quality`      | Reproduce the pipeline quality checks                    | Run login-related quality checks `pnpm turbo quality --filter './apps/login/*' --filter './packages/*'`                                                    |
 | `pnpm turbo lint`         | Check linting issues                                     | Check login-related linting issues for differences with main `pnpm turbo lint --filter=[main...HEAD] --filter .'/apps/login/**/*' --filter './packages/*'` |
@@ -555,7 +558,7 @@ For the turbo commands, check your options with `pnpm turbo --help`
 | `pnpm turbo test:unit`    | Run unit tests. Rerun on file changes                    | Run unit tests in all packages in and watch for file changes `pnpm turbo watch test:unit`                                                                  |
 | `pnpm turbo test:e2e`     | Run the Cypress CLI for console e2e tests                | Test interactively against the console in a local dev server and Zitadel in a container: `pnpm turbo test:e2e:angular open`                                |
 | `pnpm turbo down`         | Remove containers and volumes                            | Shut down containers from the integration test setup `pnpm turbo down`                                                                                     |
-| `pnpm turbo clean`        | Remove downloaded dependencies and other generated files | Remove generated docs  `pnpm turbo clean --filter zitadel-docs`                                                                                            |
+| `pnpm turbo clean`        | Remove downloaded dependencies and other generated files | Remove generated docs  `pnpm turbo clean --filter docs`                                                                                            |
 
 ## <a name="dev-containers"></>Developing Zitadel with Dev Containers
 
@@ -563,8 +566,8 @@ You can use dev containers if you'd like to make sure you have the same developm
 The following dev containers are available:
 
 - **.devcontainer/base/devcontainer.json**: Contains everything you need to run whatever you want.
-- **.devcontainer/turbo-lint-unit/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests and then exits. This is useful to reproduce the corresponding GitHub PR check. 
-- **.devcontainer/turbo-lint-unit-debug/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests in watch mode. You can fix the errors right away and have immediate feedback.
+- **.devcontainer/nx-lint-unit/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests and then exits. This is useful to reproduce the corresponding GitHub PR check. 
+- **.devcontainer/nx-lint-unit-debug/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests in watch mode. You can fix the errors right away and have immediate feedback.
 - **.devcontainer/login-integration/devcontainer.json**: Runs a dev container that executes login integration tests and then exits. This is useful to reproduce the corresponding GitHub PR check.
 - **.devcontainer/login-integration-debug/devcontainer.json**: Runs a dev container that spins up the login in a hot-reloading dev server and executes login integration tests interactively. You can fix the errors right away and have immediate feedback.
 

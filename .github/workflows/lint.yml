@@ -46,9 +46,9 @@ jobs:
         with:
           against: "https://github.com/${{ github.repository }}.git#branch=${{ github.base_ref }}"
 
-  turbo-lint-unit:
+  nx-lint-unit:
     if: ${{ github.event_name == 'pull_request' }}
-    name: turbo-lint-unit
+    name: nx-lint-unit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -65,8 +65,8 @@ jobs:
           echo "Reproduce this check locally:"
           echo "npm run devcontainer:lint-unit"
           echo "If you have pnpm installed, most linting errors can be fixed automatically:"
-          echo "pnpm turbo lint:fix"
-          echo "In other cases, you can open the dev container called \"Turbo Lint and Unit Tests\"."
+          echo "pnpm nx run lint:fix"
+          echo "In other cases, you can open the dev container called \"Nx Lint and Unit Tests\"."
           echo "You will have the same environment as the pipeline check as well as some guidance on how to fix the errors."
 
   core:

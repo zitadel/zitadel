@@ -1,6 +1,6 @@
 {
 	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
-	"name": "Turbo Lint and Unit Tests",
+	"name": "Nx Lint and Unit Tests",
 	"dockerComposeFile": [
 		"../base/docker-compose.yaml"
 	],
@@ -15,6 +15,6 @@
 	"remoteEnv": {
 		"FAIL_COMMANDS_ON_ERRORS": "${localEnv:FAIL_COMMANDS_ON_ERRORS}"
 	},
-	"updateContentCommand": "/commands/turbo-lint-unit.update-content.sh",
-	"postAttachCommand": "/commands/turbo-lint-unit.post-attach.sh"
+	"updateContentCommand": "/commands/nx-lint-unit.update-content.sh",
+	"postAttachCommand": "/commands/nx-lint-unit.post-attach.sh"
 }

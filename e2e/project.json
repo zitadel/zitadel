@@ -1,7 +1,6 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "extends": ["//"],
-  "tasks": {
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "targets": {
     "e2e": {
       "cache": false,
       "persistent": false

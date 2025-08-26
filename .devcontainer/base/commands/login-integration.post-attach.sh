@@ -25,7 +25,7 @@ echo "pnpm cypress open"
 echo
 echo "If you want to change the login code, you can replace the login container by a hot reloading dev server."
 echo "docker stop login-integration"
-echo "pnpm turbo dev"
+echo "pnpm nx run-many -t dev"
 echo "Navigate to the page you want to fix, for example:"
 echo "http://localhost:3001/ui/v2/login/verify?userId=221394658884845598&code=abc"
 echo "Change some code and reload the page for instant feedback."

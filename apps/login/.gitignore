@@ -6,7 +6,6 @@ cypress
 
 .DS_Store
 node_modules
-.turbo
 *.log
 .next
 dist

@@ -5,22 +5,12 @@ RUN apk add --no-cache libc6-compat
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@10.13.1 --activate
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm add -g turbo@2.5.5
-
-FROM pnpm-base AS pruner
-WORKDIR /prune
-COPY . .
-RUN pnpm turbo prune @zitadel/login @zitadel/client @zitadel/proto --docker
-
-FROM pnpm-base AS installer
 WORKDIR /install
-COPY --from=pruner /prune/out/pnpm-lock.yaml ./
+COPY pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm fetch --frozen-lockfile
-COPY --from=pruner /prune/out/json/ .
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile --ignore-scripts
+    pnpm install -r --frozen-lockfile --ignore-scripts
 
 FROM pnpm-base AS builder
 WORKDIR /build
@@ -28,9 +18,9 @@ COPY --from=installer /install/ .
 COPY --from=pruner /prune/out/full/ .
 COPY proto ./proto
 ENV CI=true
-RUN --mount=type=cache,id=turbo,target=/build/.turbo/cache \
+RUN --mount=type=cache,id=nx,target=/build/.nx/cache \
     --mount=type=cache,id=next,target=/build/apps/login/.next/cache \
-    pnpm turbo build:login:standalone --cache-dir=/build/.turbo/cache
+    pnpm run @zitadel/login:build:login:standalone --cache-dir=/build/.nx/cache
 
 FROM scratch AS build-out
 COPY /apps/login/public ./apps/login/public

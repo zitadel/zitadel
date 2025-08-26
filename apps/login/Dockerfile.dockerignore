@@ -17,6 +17,6 @@
 **/*.md
 **/*.png
 **/node_modules
-**/.turbo
+**/.nx
 **/*.test.ts
 **/*.test.tsx

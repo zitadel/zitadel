@@ -11,7 +11,7 @@
     "lint:check:prettier": "prettier --check src",
     "lint:fix": "prettier --write src",
     "generate": "pnpm exec buf generate ../proto --include-imports --include-wkt",
-    "clean": "rm -rf dist .angular .turbo node_modules src/app/proto/generated"
+    "clean": "rm -rf dist .angular .nx node_modules src/app/proto/generated"
   },
   "private": true,
   "dependencies": {
@@ -35,8 +35,6 @@
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@ngx-translate/core": "^15.0.0",
-    "@zitadel/client": "workspace:*",
-    "@zitadel/proto": "workspace:*",
     "angular-oauth2-oidc": "^15.0.1",
     "angularx-qrcode": "^16.0.2",
     "buffer": "^6.0.3",
@@ -59,6 +57,8 @@
     "zone.js": "~0.13.3"
   },
   "devDependencies": {
+    "@zitadel/client": "workspace:*",
+    "@zitadel/proto": "workspace:*",
     "@angular-devkit/build-angular": "^16.2.2",
     "@angular-eslint/builder": "18.3.0",
     "@angular-eslint/eslint-plugin": "18.0.0",

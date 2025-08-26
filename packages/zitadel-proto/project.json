@@ -1,0 +1,12 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "generate": {
+      "outputs": [
+        "{projectRoot}/cjs/**/*",
+        "{projectRoot}/es/**/*",
+        "{projectRoot}/types/**/*"
+      ]
+    }
+  }
+}

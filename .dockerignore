@@ -7,7 +7,7 @@
 **/Dockerfile
 **/node_modules
 **/.pnpm-store
-**/.turbo
+**/.nx
 **/.next
 /console/src/app/proto/generated/
 /console/.angular
