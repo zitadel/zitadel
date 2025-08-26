@@ -95,7 +95,7 @@ func (h *Handler) Execute(ctx context.Context, startedEvent eventstore.Event) er
 	}
 
 	// default amount of workers is 10
-	workerCount := 10
+	workerCount := 5
 
 	if h.client.DB.Stats().MaxOpenConnections > 0 {
 		workerCount = h.client.DB.Stats().MaxOpenConnections / 4
