@@ -1,6 +1,7 @@
 {
   "common": {
-    "back": "Powrót"
+    "back": "Powrót",
+    "title": "Zaloguj się za pomocą Zitadel"
   },
   "accounts": {
     "title": "Konta",

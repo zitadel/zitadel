@@ -1,6 +1,7 @@
 {
   "common": {
-    "back": "Назад"
+    "back": "Назад",
+    "title": "Войти с Zitadel"
   },
   "accounts": {
     "title": "Аккаунты",

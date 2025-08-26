@@ -1,6 +1,7 @@
 {
   "common": {
-    "back": "Back"
+    "back": "Back",
+    "title": "Login with Zitadel"
   },
   "accounts": {
     "title": "Accounts",
