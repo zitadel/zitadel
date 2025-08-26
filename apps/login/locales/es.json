@@ -118,6 +118,7 @@
       "couldNotCreateSessionForUser": "No se pudo crear la sesión para el usuario",
       "couldNotVerifyPassword": "No se pudo verificar la contraseña",
       "failedToAuthenticate": "Error al autenticar. Tuvo {failedAttempts} de {maxPasswordAttempts} intentos de contraseña.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Error al autenticar.",
       "accountLockedContactAdmin": " Comuníquese con su administrador para desbloquear su cuenta",
       "userNotFound": "Usuario no encontrado en el sistema",
       "initialUserNotSupported": "Usuario inicial no compatible",

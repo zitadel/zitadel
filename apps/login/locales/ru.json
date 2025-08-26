@@ -118,6 +118,7 @@
       "couldNotCreateSessionForUser": "Не удалось создать сессию для пользователя",
       "couldNotVerifyPassword": "Не удалось проверить пароль",
       "failedToAuthenticate": "Не удалось пройти аутентификацию. У вас было {failedAttempts} из {maxPasswordAttempts} попыток ввода пароля.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Не удалось пройти аутентификацию.",
       "accountLockedContactAdmin": " Свяжитесь с администратором, чтобы разблокировать вашу учетную запись",
       "userNotFound": "Пользователь не найден в системе",
       "initialUserNotSupported": "Первичный пользователь не поддерживается",

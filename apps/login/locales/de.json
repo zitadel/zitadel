@@ -118,6 +118,7 @@
       "couldNotCreateSessionForUser": "Sitzung für Benutzer konnte nicht erstellt werden",
       "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
       "failedToAuthenticate": "Authentifizierung fehlgeschlagen. Sie haben {failedAttempts} von {maxPasswordAttempts} Passwortversuchen.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Authentifizierung fehlgeschlagen.",
       "accountLockedContactAdmin": " Kontaktieren Sie Ihren Administrator, um Ihr Konto zu entsperren",
       "userNotFound": "Benutzer nicht im System gefunden",
       "initialUserNotSupported": "Initialbenutzer wird nicht unterstützt",

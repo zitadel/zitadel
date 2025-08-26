@@ -118,6 +118,7 @@
       "couldNotCreateSessionForUser": "Impossibile creare una sessione per l'utente",
       "couldNotVerifyPassword": "Impossibile verificare la password",
       "failedToAuthenticate": "Autenticazione non riuscita. Hai effettuato {failedAttempts} di {maxPasswordAttempts} tentativi di password.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Autenticazione non riuscita.",
       "accountLockedContactAdmin": " Contatta l'amministratore per sbloccare il tuo account",
       "userNotFound": "Utente non trovato nel sistema",
       "initialUserNotSupported": "Utente iniziale non supportato",

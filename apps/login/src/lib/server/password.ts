@@ -139,17 +139,18 @@ export async function sendPassword(command: UpdateSessionCommand) {
             orgId: command.organization,
           });
 
+          const hasLimit = lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
+          const locked = hasLimit && error.failedAttempts >= (lockoutSettings?.maxPasswordAttempts);
+          const messageKey = hasLimit
+            ? "errors.failedToAuthenticate"
+            : "errors.failedToAuthenticateNoLimit";
+
           return {
-            error:
-              t("errors.failedToAuthenticate", {
-                failedAttempts: error.failedAttempts,
-                maxPasswordAttempts: lockoutSettings?.maxPasswordAttempts ?? "?",
-                lockoutMessage:
-                  lockoutSettings?.maxPasswordAttempts &&
-                  error.failedAttempts >= lockoutSettings?.maxPasswordAttempts
-                    ? t("errors.accountLockedContactAdmin")
-                    : "",
-              }),
+            error: t(messageKey, {
+              failedAttempts: error.failedAttempts,
+              maxPasswordAttempts: hasLimit ? (lockoutSettings?.maxPasswordAttempts).toString() : "?",
+              lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
+            }),
           };
         }
         return { error: t("errors.couldNotCreateSessionForUser") };
@@ -192,17 +193,18 @@ export async function sendPassword(command: UpdateSessionCommand) {
           orgId: command.organization,
         });
 
+        const hasLimit = lockoutSettings?.maxPasswordAttempts !== undefined && lockoutSettings?.maxPasswordAttempts > BigInt(0);
+        const locked = hasLimit && error.failedAttempts >= (lockoutSettings?.maxPasswordAttempts);
+        const messageKey = hasLimit
+          ? "errors.failedToAuthenticate"
+          : "errors.failedToAuthenticateNoLimit";
+
         return {
-          error:
-            t("errors.failedToAuthenticate", {
-              failedAttempts: error.failedAttempts,
-              maxPasswordAttempts: lockoutSettings?.maxPasswordAttempts ?? "?",
-              lockoutMessage:
-                lockoutSettings?.maxPasswordAttempts &&
-                error.failedAttempts >= lockoutSettings?.maxPasswordAttempts
-                  ? t("errors.accountLockedContactAdmin")
-                  : "",
-            }),
+          error: t(messageKey, {
+            failedAttempts: error.failedAttempts,
+            maxPasswordAttempts: hasLimit ? (lockoutSettings?.maxPasswordAttempts).toString() : "?",
+            lockoutMessage: locked ? t("errors.accountLockedContactAdmin") : "",
+          }),
         };
       }
       throw error;

@@ -118,6 +118,7 @@
       "couldNotCreateSessionForUser": "无法为用户创建会话",
       "couldNotVerifyPassword": "无法验证密码",
       "failedToAuthenticate": "身份验证失败。您已尝试输入密码 {failedAttempts} 次，共允许 {maxPasswordAttempts} 次。{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "身份验证失败。",
       "accountLockedContactAdmin": " 请联系管理员以解锁您的账户",
       "userNotFound": "系统中未找到用户",
       "initialUserNotSupported": "不支持初始用户",

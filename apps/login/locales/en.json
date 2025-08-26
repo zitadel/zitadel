@@ -118,6 +118,7 @@
       "couldNotCreateSessionForUser": "Could not create session for user",
       "couldNotVerifyPassword": "Could not verify password",
       "failedToAuthenticate": "Failed to authenticate. You had {failedAttempts} of {maxPasswordAttempts} password attempts.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Failed to authenticate.",
       "accountLockedContactAdmin": " Contact your administrator to unlock your account",
       "userNotFound": "User not found in the system",
       "initialUserNotSupported": "Initial User not supported",
