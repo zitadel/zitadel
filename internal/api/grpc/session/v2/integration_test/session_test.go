@@ -264,10 +264,7 @@ func TestServer_CreateSession(t *testing.T) {
 
 func TestServer_CreateSession_lock_user(t *testing.T) {
 	// create a separate org so we don't interfere with any other test
-	org := Instance.CreateOrganization(IAMOwnerCTX,
-		fmt.Sprintf("TestServer_CreateSession_lock_user_%s", gofakeit.AppName()),
-		gofakeit.Email(),
-	)
+	org := Instance.CreateOrganization(IAMOwnerCTX, integration.OrganizationName(), gofakeit.Email())
 	userID := org.CreatedAdmins[0].GetUserId()
 	Instance.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword, false)
 
@@ -341,7 +338,7 @@ func TestServer_CreateSession_webauthn(t *testing.T) {
 }
 
 func TestServer_CreateSession_successfulIntent(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, integration.IDPName()).GetId()
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -370,7 +367,7 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 }
 
 func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, integration.IDPName()).GetId()
 
 	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", User.GetUserId(), time.Now().Add(time.Hour))
 	require.NoError(t, err)
@@ -392,7 +389,7 @@ func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
 }
 
 func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, integration.IDPName()).GetId()
 
 	// successful intent without known / linked user
 	idpUserID := "id"
@@ -420,7 +417,7 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 }
 
 func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, integration.IDPName()).GetId()
 
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
@@ -448,7 +445,7 @@ func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
 }
 
 func TestServer_CreateSession_reuseIntent(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, integration.IDPName()).GetId()
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -490,7 +487,7 @@ func TestServer_CreateSession_reuseIntent(t *testing.T) {
 }
 
 func TestServer_CreateSession_expiredIntent(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
+	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, integration.IDPName()).GetId()
 	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -928,6 +925,27 @@ func TestServer_DeleteSession_with_permission(t *testing.T) {
 		SessionId: createResp.GetSessionId(),
 	})
 	require.NoError(t, err)
+}
+
+func TestServer_DeleteSession_expired(t *testing.T) {
+	createResp, err := Client.CreateSession(LoginCTX, &session.CreateSessionRequest{
+		Lifetime: durationpb.New(5 * time.Second),
+	})
+	require.NoError(t, err)
+
+	// wait until the token expires
+	time.Sleep(10 * time.Second)
+	_, err = Client.DeleteSession(Instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: gu.Ptr(createResp.GetSessionToken()),
+	})
+	require.NoError(t, err)
+
+	// get session should return an error
+	sessionResp, err := Client.GetSession(Instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
+		&session.GetSessionRequest{SessionId: createResp.GetSessionId()})
+	require.Error(t, err)
+	require.Nil(t, sessionResp)
 }
 
 func Test_ZITADEL_API_missing_authentication(t *testing.T) {

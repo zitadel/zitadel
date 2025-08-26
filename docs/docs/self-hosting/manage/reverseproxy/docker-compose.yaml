@@ -3,23 +3,14 @@ services:
   zitadel-disabled-tls:
     extends:
       service: zitadel-init
-    command: 'start-from-setup --init-projections --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters"'
     environment:
       ZITADEL_EXTERNALPORT: 80
       ZITADEL_EXTERNALSECURE: false
       ZITADEL_TLS_ENABLED: false
-      # database configuration
-      ZITADEL_DATABASE_POSTGRES_HOST: db
-      ZITADEL_DATABASE_POSTGRES_PORT: 5432
-      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel_user
-      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel_pw
-      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
     networks:
-      - 'zitadel'
+      - app
+      - db
     depends_on:
       zitadel-init:
         condition: 'service_completed_successfully'
@@ -29,23 +20,14 @@ services:
   zitadel-external-tls:
     extends:
       service: zitadel-init
-    command: 'start-from-setup --init-projections --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters"'
     environment:
       ZITADEL_EXTERNALPORT: 443
       ZITADEL_EXTERNALSECURE: true
       ZITADEL_TLS_ENABLED: false
-      # database configuration
-      ZITADEL_DATABASE_POSTGRES_HOST: db
-      ZITADEL_DATABASE_POSTGRES_PORT: 5432
-      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel_user
-      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel_pw
-      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
     networks:
-      - 'zitadel'
+      - app
+      - db
     depends_on:
       db:
         condition: 'service_healthy'
@@ -55,28 +37,19 @@ services:
   zitadel-enabled-tls:
     extends:
       service: zitadel-init
-    command: 'start-from-setup --init-projections --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters"'
     environment:
       ZITADEL_EXTERNALPORT: 443
       ZITADEL_EXTERNALSECURE: true
       ZITADEL_TLS_ENABLED: true
       ZITADEL_TLS_CERTPATH: /etc/certs/selfsigned.crt
       ZITADEL_TLS_KEYPATH: /etc/certs/selfsigned.key
-      # database configuration
-      ZITADEL_DATABASE_POSTGRES_HOST: db
-      ZITADEL_DATABASE_POSTGRES_PORT: 5432
-      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel_user
-      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel_pw
-      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
     volumes:
       - ./selfsigned.crt:/etc/certs/selfsigned.crt
       - ./selfsigned.key:/etc/certs/selfsigned.key
     networks:
-      - 'zitadel'
+      - app
+      - db
     depends_on:
       zitadel-init:
         condition: 'service_completed_successfully'
@@ -84,15 +57,14 @@ services:
         condition: 'service_healthy'
 
   zitadel-init:
-    user: '$UID'
     image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
-    command: 'init --config /zitadel.yaml'
+    command: 'init'
     depends_on:
       db:
         condition: 'service_healthy'
     environment:
       # Using an external domain other than localhost proofs, that the proxy configuration works.
-      # If ZITADEL can't resolve a requests original host to this domain,
+      # If Zitadel can't resolve a requests original host to this domain,
       # it will return a 404 Instance not found error.
       ZITADEL_EXTERNALDOMAIN: 127.0.0.1.sslip.io
       # In case something doesn't work as expected,
@@ -102,22 +74,23 @@ services:
       ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
       # database configuration
       ZITADEL_DATABASE_POSTGRES_HOST: db
-      ZITADEL_DATABASE_POSTGRES_PORT: 5432
-      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel_user
       ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel_pw
-      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
+      # Set up a service account with IAM_LOGIN_CLIENT role and write the PAT to the file ./login-client.pat
+      ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /current-dir/login-client.pat
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME: login-client
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME: Automatically Initialized IAM Login Client
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE: '2029-01-01T00:00:00Z'
+      # The master key is used to
     networks:
-      - 'zitadel'
+      - db
     healthcheck:
-      test: ["CMD", "/app/zitadel", "ready"]
+      test: [ "CMD", "/app/zitadel", "ready" ]
       interval: '10s'
       timeout: '5s'
       retries: 5
       start_period: '10s'
+    volumes:
+      - '.:/current-dir:rw'
 
   db:
     restart: 'always'
@@ -125,18 +98,69 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: [ "CMD-SHELL", "pg_isready" ]
       interval: 5s
       timeout: 60s
       retries: 10
       start_period: 5s
     networks:
-      - 'zitadel'
+      - db
     volumes:
       - 'data:/var/lib/postgresql/data:rw'
 
+  login-disabled-tls:
+    restart: 'unless-stopped'
+    image: 'ghcr.io/zitadel/zitadel-login:latest'
+    environment:
+      - ZITADEL_API_URL=http://zitadel-disabled-tls:8080
+      - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
+      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
+      - CUSTOM_REQUEST_HEADERS=Host:127.0.0.1.sslip.io
+      - NODE_ENV=test
+    volumes:
+      - '.:/current-dir:ro'
+    networks:
+      - app      
+    depends_on:
+      zitadel-disabled-tls:
+        condition: 'service_healthy'
+
+  login-external-tls:
+    restart: 'unless-stopped'
+    image: 'ghcr.io/zitadel/zitadel-login:latest'
+    environment:
+      - ZITADEL_API_URL=http://zitadel-external-tls:8080
+      - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
+      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
+      - CUSTOM_REQUEST_HEADERS=Host:127.0.0.1.sslip.io
+    volumes:
+      - '.:/current-dir:ro'
+    networks:
+      - app      
+    depends_on:
+      zitadel-external-tls:
+        condition: 'service_healthy'
+
+  login-enabled-tls:
+    restart: 'unless-stopped'
+    image: 'ghcr.io/zitadel/zitadel-login:latest'
+    environment:
+      - ZITADEL_API_URL=https://zitadel-enabled-tls:8080
+      - NEXT_PUBLIC_BASE_PATH=/ui/v2/login
+      - ZITADEL_SERVICE_USER_TOKEN_FILE=/current-dir/login-client.pat
+      - CUSTOM_REQUEST_HEADERS=Host:127.0.0.1.sslip.io
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+    volumes:
+      - '.:/current-dir:ro'
+    networks:
+      - app
+    depends_on:
+      zitadel-enabled-tls:
+        condition: 'service_healthy'
+
 networks:
-  zitadel:
+  app:
+  db:
 
 volumes:
   data:

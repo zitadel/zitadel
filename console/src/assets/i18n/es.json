@@ -1546,7 +1546,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1635,8 +1636,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si la bandera está habilitada, podrá terminar una sesión única desde la interfaz de usuario de inicio de sesión proporcionando un id_token con una reclamación `sid` como id_token_hint en el punto final de end_session. Tenga en cuenta que actualmente se terminan todas las sesiones del mismo agente de usuario (navegador) en la interfaz de usuario de inicio de sesión. Las sesiones administradas a través de la API de sesión ya permiten la terminación de sesiones individuales.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si la bandera está habilitada, el error del padre OIDC se registrará en la consola.",
-      "DISABLEUSERTOKENEVENT": "Desactivar evento de token de usuario",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Habilitar Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "El Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 y se puede usar para notificar a los clientes sobre la terminación de la sesión en el proveedor de OpenID.",
       "PERMISSIONCHECKV2": "Verificación de permisos V2",
@@ -1795,7 +1794,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificación de email realizada",
@@ -2745,7 +2745,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Añadir un Mánager",

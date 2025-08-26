@@ -1,0 +1,20 @@
+{
+	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
+	"name": "Turbo Lint and Unit Tests",
+	"dockerComposeFile": [
+		"../base/docker-compose.yaml"
+	],
+	"service": "devcontainer",
+	"runServices": [
+		"devcontainer"
+	],
+	"workspaceFolder": "/workspaces",
+	"forwardPorts": [
+		3001
+	],
+	"remoteEnv": {
+		"FAIL_COMMANDS_ON_ERRORS": "${localEnv:FAIL_COMMANDS_ON_ERRORS}"
+	},
+	"updateContentCommand": "/commands/turbo-lint-unit.update-content.sh",
+	"postAttachCommand": "/commands/turbo-lint-unit.post-attach.sh"
+}

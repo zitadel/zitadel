@@ -4,7 +4,6 @@ import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
 import ThemedImage from "@theme/ThemedImage";
 import clsx from "clsx";
-import React from "react";
 
 import Column from "../components/column";
 import {

@@ -1545,7 +1545,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1634,8 +1635,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "フラグが有効になっている場合、id_token を `sid` クレームと共に id_token_hint として end_session エンドポイントに提供することで、ログイン UI から単一のセッションを終了できるようになります。 現在、同じユーザー エージェント (ブラウザ) からのすべてのセッションがログイン UI で終了することに注意してください。 セッション API を通じて管理されるセッションは、すでに単一のセッションの終了を許可しています。",
       "DEBUGOIDCPARENTERROR": "デバッグ OIDC 親エラー",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "フラグが有効になっている場合、OIDC 親エラーはコンソールに記録されます。",
-      "DISABLEUSERTOKENEVENT": "ユーザートークンイベントを無効にする",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "バックチャネルログアウトを有効にする",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "バックチャネルログアウトは OpenID Connect バックチャネルログアウト 1.0 を実装し、OpenID プロバイダーでのセッション終了についてクライアントに通知するために使用できます。",
       "PERMISSIONCHECKV2": "権限チェック V2",
@@ -1794,7 +1793,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -2773,7 +2773,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

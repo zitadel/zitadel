@@ -1548,7 +1548,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1637,8 +1638,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "If the flag is enabled, the OIDC parent error will be logged in the console.",
-      "DISABLEUSERTOKENEVENT": "Disable User Token Event",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Enable Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify clients about session termination at the OpenID Provider.",
       "PERMISSIONCHECKV2": "Permission Check V2",
@@ -1797,7 +1796,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -2776,7 +2776,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

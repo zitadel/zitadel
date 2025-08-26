@@ -266,6 +266,7 @@ RegistrationUser:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
   GenderLabel: 성별
   Female: 여성
   Male: 남성
@@ -310,6 +311,7 @@ ExternalRegistrationUserOverview:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
   TosAndPrivacyLabel: 동의사항
   TosConfirm: 이용 약관에 동의합니다.
   TosLinkText: 이용 약관
@@ -388,6 +390,7 @@ ExternalNotFound:
   Hungarian: Magyar
   Korean: 한국어
   Romanian: Română
+  Turkish: Türkçe
 DeviceAuth:
   Title: 기기 인증
   UserCode:
