@@ -4,12 +4,12 @@ declare namespace NodeJS {
     [key: `${string}_AUDIENCE`]: string; // The system api url
     [key: `${string}_SYSTEM_USER_ID`]: string; // The service user id
     [key: `${string}_SYSTEM_USER_PRIVATE_KEY`]: string; // The service user private key
-    [key: `${string}_SYSTEM_USER_PRIVATE_KEY_FILE`]: string; // The service user private key
+    [key: `${string}_SYSTEM_USER_PRIVATE_KEY_FILE`]: string; // The service user private key file path
 
     AUDIENCE: string; // The fallback system api url
     SYSTEM_USER_ID: string; // The fallback service user id
     SYSTEM_USER_PRIVATE_KEY: string; // The fallback service user private key
-    SYSTEM_USER_PRIVATE_KEY_FILE: string; // The fallback service user private key
+    SYSTEM_USER_PRIVATE_KEY_FILE: string; // The fallback service user private key file path
 
     /**
      * The Zitadel API url
