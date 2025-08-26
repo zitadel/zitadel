@@ -218,7 +218,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     });
 
     if (!userResponse.user) {
-      return { error: t("errors.couldNotSendResetLink") };
+      return { error: t("errors.userNotFound") };
     }
 
     user = userResponse.user;
@@ -233,7 +233,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
   }
 
   if (!session?.factors?.user?.id || !sessionCookie) {
-    return { error: t("errors.couldNotCreateSession") };
+    return { error: t("errors.couldNotCreateSessionForUser") };
   }
 
   const humanUser = user.type.case === "human" ? user.type.value : undefined;

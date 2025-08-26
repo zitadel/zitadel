@@ -119,6 +119,7 @@
       "couldNotVerifyPassword": "Impossibile verificare la password",
       "failedToAuthenticate": "Autenticazione non riuscita. Hai effettuato {failedAttempts} di {maxPasswordAttempts} tentativi di password.{lockoutMessage}",
       "accountLockedContactAdmin": " Contatta l'amministratore per sbloccare il tuo account",
+      "userNotFound": "Utente non trovato nel sistema",
       "initialUserNotSupported": "Utente iniziale non supportato",
       "userInitialStateNotSupported": "Lo stato iniziale dell'utente non è supportato",
       "codeOrVerificationRequired": "Devi fornire un codice o avere una verifica utente valida",

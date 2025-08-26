@@ -119,6 +119,7 @@
       "couldNotVerifyPassword": "Could not verify password",
       "failedToAuthenticate": "Failed to authenticate. You had {failedAttempts} of {maxPasswordAttempts} password attempts.{lockoutMessage}",
       "accountLockedContactAdmin": " Contact your administrator to unlock your account",
+      "userNotFound": "User not found in the system",
       "initialUserNotSupported": "Initial User not supported",
       "userInitialStateNotSupported": "User Initial State is not supported",
       "codeOrVerificationRequired": "You have to provide a code or have a valid User Verification Check",
