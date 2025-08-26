@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/execution"
-	domain_target "github.com/zitadel/zitadel/internal/execution/target"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -36,7 +36,7 @@ func ExecutionHandler(alg crypto.EncryptionAlgorithm) connect.UnaryInterceptorFu
 	}
 }
 
-func executeTargetsForRequest(ctx context.Context, targets []domain_target.Target, fullMethod string, req connect.AnyRequest, alg crypto.EncryptionAlgorithm) (_ connect.AnyRequest, err error) {
+func executeTargetsForRequest(ctx context.Context, targets []target_domain.Target, fullMethod string, req connect.AnyRequest, alg crypto.EncryptionAlgorithm) (_ connect.AnyRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -62,7 +62,7 @@ func executeTargetsForRequest(ctx context.Context, targets []domain_target.Targe
 	return req, nil
 }
 
-func executeTargetsForResponse(ctx context.Context, targets []domain_target.Target, fullMethod string, req connect.AnyRequest, resp connect.AnyResponse, alg crypto.EncryptionAlgorithm) (_ connect.AnyResponse, err error) {
+func executeTargetsForResponse(ctx context.Context, targets []target_domain.Target, fullMethod string, req connect.AnyRequest, resp connect.AnyResponse, alg crypto.EncryptionAlgorithm) (_ connect.AnyResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

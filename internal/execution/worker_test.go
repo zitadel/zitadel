@@ -275,7 +275,6 @@ func Test_handleEventExecution(t *testing.T) {
 
 func mockTarget() target_domain.Target {
 	return target_domain.Target{
-		InstanceID:       "instanceID",
 		ExecutionID:      "executionID",
 		TargetID:         "targetID",
 		TargetType:       target_domain.TargetTypeWebhook,

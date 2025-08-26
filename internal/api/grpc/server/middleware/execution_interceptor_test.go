@@ -99,7 +99,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeCall,
@@ -121,7 +120,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:    "instance",
 						ExecutionID:   "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:      "target",
 						TargetType:    target_domain.TargetTypeCall,
@@ -150,7 +148,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeCall,
@@ -181,7 +178,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeCall,
@@ -211,7 +207,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeCall,
@@ -236,7 +231,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeCall,
@@ -266,7 +260,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:    "instance",
 						ExecutionID:   "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:      "target",
 						TargetType:    target_domain.TargetTypeAsync,
@@ -295,7 +288,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:    "instance",
 						ExecutionID:   "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:      "target",
 						TargetType:    target_domain.TargetTypeAsync,
@@ -324,7 +316,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeWebhook,
@@ -353,7 +344,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeWebhook,
@@ -383,7 +373,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeWebhook,
@@ -413,7 +402,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target1",
 						TargetType:       target_domain.TargetTypeCall,
@@ -422,7 +410,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						SigningKeyDec:    "signingkey",
 					},
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target2",
 						TargetType:       target_domain.TargetTypeCall,
@@ -431,7 +418,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						SigningKeyDec:    "signingkey",
 					},
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target3",
 						TargetType:       target_domain.TargetTypeCall,
@@ -474,7 +460,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target1",
 						TargetType:       target_domain.TargetTypeCall,
@@ -483,7 +468,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						SigningKeyDec:    "signingkey",
 					},
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target2",
 						TargetType:       target_domain.TargetTypeCall,
@@ -492,7 +476,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						SigningKeyDec:    "signingkey",
 					},
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target3",
 						TargetType:       target_domain.TargetTypeCall,
@@ -671,7 +654,6 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeCall,
@@ -702,7 +684,6 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				fullMethod: "/service/method",
 				executionTargets: []target_domain.Target{
 					{
-						InstanceID:       "instance",
 						ExecutionID:      "response./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       target_domain.TargetTypeCall,

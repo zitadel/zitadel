@@ -16,14 +16,13 @@ const (
 )
 
 type Target struct {
-	InstanceID       string
-	ExecutionID      string
-	TargetID         string
-	TargetType       TargetType
-	Endpoint         string
-	Timeout          time.Duration
-	InterruptOnError bool
-	SigningKey       *crypto.CryptoValue
+	ExecutionID      string              `json:"execution_id"`
+	TargetID         string              `json:"target_id"`
+	TargetType       TargetType          `json:"target_type"`
+	Endpoint         string              `json:"endpoint"`
+	Timeout          time.Duration       `json:"timeout"`
+	InterruptOnError bool                `json:"interrupt_on_error"`
+	SigningKey       *crypto.CryptoValue `json:"signing_key"`
 	SigningKeyDec    string
 }
 

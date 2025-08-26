@@ -612,8 +612,10 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 		if err = json.Unmarshal(features, &instance.Feature); err != nil {
 			return zerrors.ThrowInternal(err, "QUERY-Po8ki", "Errors.Internal")
 		}
-		if err := json.Unmarshal(executionTargetsBytes, &instance.ExecutionTargets); err != nil {
-			return zerrors.ThrowInternal(err, "QUERY-Po7si", "Errors.Internal")
+		if len(executionTargetsBytes) > 0 {
+			if err := json.Unmarshal(executionTargetsBytes, &instance.ExecutionTargets); err != nil {
+				return zerrors.ThrowInternal(err, "QUERY-Po7si", "Errors.Internal")
+			}
 		}
 		return nil
 	}
