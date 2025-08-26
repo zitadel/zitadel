@@ -256,6 +256,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.OIDC.DefaultRefreshTokenExpiration,
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
+		config.Login.DefaultEmailCodeURLTemplate,
+		config.Login.DefaultPasswordSetURLTemplate,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -301,7 +303,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		commands,
 		queries,
 		eventstoreClient,
-		config.Login.DefaultOTPEmailURLV2,
+		config.Login.DefaultPaths.OTPEmailPath,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
 		keys.SMTP,
