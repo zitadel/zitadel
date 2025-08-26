@@ -29,7 +29,7 @@ func NewChangePtr[V Value](col Column, value *V) Change {
 
 // Write implements [Change].
 func (c change[V]) Write(builder *StatementBuilder) {
-	c.column.Write(builder)
+	c.column.WriteUnqualified(builder)
 	builder.WriteString(" = ")
 	builder.WriteArg(c.value)
 }

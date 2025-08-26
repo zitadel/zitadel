@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-//go:generate enumer -type OrgState -transform lower -trimprefix OrgState
+//go:generate enumer -type OrgState -transform lower -trimprefix OrgState -sql
 type OrgState uint8
 
 const (
@@ -19,14 +19,16 @@ type Organization struct {
 	ID         string    `json:"id,omitempty" db:"id"`
 	Name       string    `json:"name,omitempty" db:"name"`
 	InstanceID string    `json:"instanceId,omitempty" db:"instance_id"`
-	State      string    `json:"state,omitempty" db:"state"`
-	CreatedAt  time.Time `json:"createdAt,omitempty" db:"created_at"`
-	UpdatedAt  time.Time `json:"updatedAt,omitempty" db:"updated_at"`
+	State      OrgState  `json:"state,omitempty" db:"state"`
+	CreatedAt  time.Time `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt  time.Time `json:"updatedAt,omitzero" db:"updated_at"`
+
+	Domains []*OrganizationDomain `json:"domains,omitempty" db:"-"` // domains need to be handled separately
 }
 
 // OrgIdentifierCondition is used to help specify a single Organization,
 // it will either be used as the organization ID or organization name,
-// as organizations can be identified either using (instnaceID + ID) OR (instanceID + name)
+// as organizations can be identified either using (instanceID + ID) OR (instanceID + name)
 type OrgIdentifierCondition interface {
 	database.Condition
 }
@@ -73,12 +75,17 @@ type OrganizationRepository interface {
 	organizationConditions
 	organizationChanges
 
-	Get(ctx context.Context, id OrgIdentifierCondition, instance_id string, opts ...database.Condition) (*Organization, error)
-	List(ctx context.Context, conditions ...database.Condition) ([]*Organization, error)
+	Get(ctx context.Context, opts ...database.QueryOption) (*Organization, error)
+	List(ctx context.Context, opts ...database.QueryOption) ([]*Organization, error)
 
 	Create(ctx context.Context, instance *Organization) error
 	Update(ctx context.Context, id OrgIdentifierCondition, instance_id string, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, id OrgIdentifierCondition, instance_id string) (int64, error)
+
+	// Domains returns the domain sub repository for the organization.
+	// If shouldLoad is true, the domains will be loaded from the database and written to the [Instance].Domains field.
+	// If shouldLoad is set to true once, the Domains field will be set event if shouldLoad is false in the future.
+	Domains(shouldLoad bool) OrganizationDomainRepository
 }
 
 type CreateOrganization struct {
@@ -90,11 +97,4 @@ type MemberRepository interface {
 	AddMember(ctx context.Context, orgID, userID string, roles []string) error
 	SetMemberRoles(ctx context.Context, orgID, userID string, roles []string) error
 	RemoveMember(ctx context.Context, orgID, userID string) error
-}
-
-// DomainRepository is a sub repository of the org repository and maybe the instance repository.
-type DomainRepository interface {
-	AddDomain(ctx context.Context, domain string) error
-	SetDomainVerified(ctx context.Context, domain string) error
-	RemoveDomain(ctx context.Context, domain string) error
 }

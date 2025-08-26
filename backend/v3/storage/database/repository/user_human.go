@@ -163,32 +163,32 @@ func (h userHuman) PhoneVerifiedAtCondition(op database.NumberOperation, verifie
 
 // FirstNameColumn implements [domain.humanColumns].
 func (h userHuman) FirstNameColumn() database.Column {
-	return database.NewColumn("first_name")
+	return database.NewColumn("user_humans", "first_name")
 }
 
 // LastNameColumn implements [domain.humanColumns].
 func (h userHuman) LastNameColumn() database.Column {
-	return database.NewColumn("last_name")
+	return database.NewColumn("user_humans", "last_name")
 }
 
 // EmailAddressColumn implements [domain.humanColumns].
 func (h userHuman) EmailAddressColumn() database.Column {
-	return database.NewIgnoreCaseColumn("email_address", "_lower")
+	return database.NewColumn("user_humans", "email_address")
 }
 
 // EmailVerifiedAtColumn implements [domain.humanColumns].
 func (h userHuman) EmailVerifiedAtColumn() database.Column {
-	return database.NewColumn("email_verified_at")
+	return database.NewColumn("user_humans", "email_verified_at")
 }
 
 // PhoneNumberColumn implements [domain.humanColumns].
 func (h userHuman) PhoneNumberColumn() database.Column {
-	return database.NewColumn("phone_number")
+	return database.NewColumn("user_humans", "phone_number")
 }
 
 // PhoneVerifiedAtColumn implements [domain.humanColumns].
 func (h userHuman) PhoneVerifiedAtColumn() database.Column {
-	return database.NewColumn("phone_verified_at")
+	return database.NewColumn("user_humans", "phone_verified_at")
 }
 
 // func (h userHuman) columns() database.Columns {

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -171,7 +172,9 @@ func TestCreateInstance(t *testing.T) {
 
 			// check instance values
 			instance, err = instanceRepo.Get(ctx,
-				instance.ID,
+				database.WithCondition(
+					instanceRepo.IDCondition(instance.ID),
+				),
 			)
 			require.NoError(t, err)
 
@@ -290,7 +293,9 @@ func TestUpdateInstance(t *testing.T) {
 
 			// check instance values
 			instance, err = instanceRepo.Get(ctx,
-				instance.ID,
+				database.WithCondition(
+					instanceRepo.IDCondition(instance.ID),
+				),
 			)
 			require.Equal(t, tt.getErr, err)
 
@@ -334,6 +339,51 @@ func TestGetInstance(t *testing.T) {
 			}
 		}(),
 		{
+			name: "happy path including domains",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
+				instanceRepo := repository.InstanceRepository(pool)
+				instanceId := gofakeit.Name()
+				instanceName := gofakeit.Name()
+
+				inst := domain.Instance{
+					ID:              instanceId,
+					Name:            instanceName,
+					DefaultOrgID:    "defaultOrgId",
+					IAMProjectID:    "iamProject",
+					ConsoleClientID: "consoleCLient",
+					ConsoleAppID:    "consoleApp",
+					DefaultLanguage: "defaultLanguage",
+				}
+
+				// create instance
+				err := instanceRepo.Create(ctx, &inst)
+				require.NoError(t, err)
+
+				domainRepo := instanceRepo.Domains(false)
+				d := &domain.AddInstanceDomain{
+					InstanceID:  inst.ID,
+					Domain:      gofakeit.DomainName(),
+					IsPrimary:   gu.Ptr(true),
+					IsGenerated: gu.Ptr(false),
+					Type:        domain.DomainTypeCustom,
+				}
+				err = domainRepo.Add(ctx, d)
+				require.NoError(t, err)
+
+				inst.Domains = append(inst.Domains, &domain.InstanceDomain{
+					InstanceID:  d.InstanceID,
+					Domain:      d.Domain,
+					IsPrimary:   d.IsPrimary,
+					IsGenerated: d.IsGenerated,
+					Type:        d.Type,
+					CreatedAt:   d.CreatedAt,
+					UpdatedAt:   d.UpdatedAt,
+				})
+
+				return &inst
+			},
+		},
+		{
 			name: "get non existent instance",
 			testFunc: func(ctx context.Context, t *testing.T) *domain.Instance {
 				inst := domain.Instance{
@@ -356,7 +406,9 @@ func TestGetInstance(t *testing.T) {
 
 			// check instance values
 			returnedInstance, err := instanceRepo.Get(ctx,
-				instance.ID,
+				database.WithCondition(
+					instanceRepo.IDCondition(instance.ID),
+				),
 			)
 			if tt.err != nil {
 				require.ErrorIs(t, err, tt.err)
@@ -524,9 +576,15 @@ func TestListInstance(t *testing.T) {
 
 			instanceRepo := repository.InstanceRepository(pool)
 
+			var condition database.Condition
+			if len(tt.conditionClauses) > 0 {
+				condition = database.And(tt.conditionClauses...)
+			}
+
 			// check instance values
 			returnedInstances, err := instanceRepo.List(ctx,
-				tt.conditionClauses...,
+				database.WithCondition(condition),
+				database.WithOrderByAscending(instanceRepo.CreatedAtColumn()),
 			)
 			require.NoError(t, err)
 			if tt.noInstanceReturned {
@@ -652,7 +710,9 @@ func TestDeleteInstance(t *testing.T) {
 
 			// check instance was deleted
 			instance, err := instanceRepo.Get(ctx,
-				tt.instanceID,
+				database.WithCondition(
+					instanceRepo.IDCondition(tt.instanceID),
+				),
 			)
 			require.ErrorIs(t, err, new(database.NoRowFoundError))
 			assert.Nil(t, instance)
