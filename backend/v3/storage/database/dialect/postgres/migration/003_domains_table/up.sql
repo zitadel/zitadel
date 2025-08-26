@@ -1,6 +1,6 @@
 CREATE TYPE zitadel.domain_validation_type AS ENUM (
-    'http'
-    , 'dns'
+    'dns'
+    , 'http'
 );
 
 CREATE TYPE zitadel.domain_type AS ENUM (
