@@ -127,7 +127,7 @@ export class ProviderSamlSpComponent {
         metadataUrl: new UntypedFormControl('', []),
         binding: new UntypedFormControl(this.bindingValues[0], [requiredValidator]),
         withSignedRequest: new UntypedFormControl(true, [requiredValidator]),
-        signatureAlgorithm: new UntypedFormControl(SAMLSignatureAlgorithm.SAML_SIGNATURE_RSA_SHA1, []),
+        signatureAlgorithm: new UntypedFormControl(this.signatureAlgorithmValues[0], []),
         nameIdFormat: new UntypedFormControl(SAMLNameIDFormat.SAML_NAME_ID_FORMAT_PERSISTENT, []),
         transientMappingAttributeName: new UntypedFormControl('', []),
         federatedLogoutEnabled: new UntypedFormControl(false, []),
