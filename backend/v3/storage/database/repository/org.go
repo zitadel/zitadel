@@ -36,7 +36,7 @@ const queryOrganizationStmt = `SELECT organizations.id, organizations.name, orga
 func (o *org) Get(ctx context.Context, opts ...database.QueryOption) (*domain.Organization, error) {
 	opts = append(opts,
 		o.joinDomains(),
-		database.WithGroupBy(o.InstanceIDColumn(true), o.IDColumn(true)),
+		database.WithGroupBy(o.InstanceIDColumn(), o.IDColumn()),
 	)
 
 	options := new(database.QueryOpts)
@@ -55,7 +55,7 @@ func (o *org) Get(ctx context.Context, opts ...database.QueryOption) (*domain.Or
 func (o *org) List(ctx context.Context, opts ...database.QueryOption) ([]*domain.Organization, error) {
 	opts = append(opts,
 		o.joinDomains(),
-		database.WithGroupBy(o.InstanceIDColumn(true), o.IDColumn(true)),
+		database.WithGroupBy(o.InstanceIDColumn(), o.IDColumn()),
 	)
 
 	options := new(database.QueryOpts)
@@ -73,14 +73,14 @@ func (o *org) List(ctx context.Context, opts ...database.QueryOption) ([]*domain
 func (o *org) joinDomains() database.QueryOption {
 	columns := make([]database.Condition, 0, 3)
 	columns = append(columns,
-		database.NewColumnCondition(o.InstanceIDColumn(true), o.Domains(false).InstanceIDColumn(true)),
-		database.NewColumnCondition(o.IDColumn(true), o.Domains(false).OrgIDColumn(true)),
+		database.NewColumnCondition(o.InstanceIDColumn(), o.Domains(false).InstanceIDColumn()),
+		database.NewColumnCondition(o.IDColumn(), o.Domains(false).OrgIDColumn()),
 	)
 
 	// If domains should not be joined, we make sure to return null for the domain columns
 	// the query optimizer of the dialect should optimize this away if no domains are requested
 	if !o.shouldLoadDomains {
-		columns = append(columns, database.IsNull(o.domainRepo.OrgIDColumn(true)))
+		columns = append(columns, database.IsNull(o.domainRepo.OrgIDColumn()))
 	}
 
 	return database.WithLeftJoin(
@@ -142,12 +142,12 @@ func (o *org) Delete(ctx context.Context, id domain.OrgIdentifierCondition, inst
 
 // SetName implements [domain.organizationChanges].
 func (o org) SetName(name string) database.Change {
-	return database.NewChange(o.NameColumn(false), name)
+	return database.NewChange(o.NameColumn(), name)
 }
 
 // SetState implements [domain.organizationChanges].
 func (o org) SetState(state domain.OrgState) database.Change {
-	return database.NewChange(o.StateColumn(false), state)
+	return database.NewChange(o.StateColumn(), state)
 }
 
 // -------------------------------------------------------------
@@ -156,22 +156,22 @@ func (o org) SetState(state domain.OrgState) database.Change {
 
 // IDCondition implements [domain.organizationConditions].
 func (o org) IDCondition(id string) domain.OrgIdentifierCondition {
-	return database.NewTextCondition(o.IDColumn(true), database.TextOperationEqual, id)
+	return database.NewTextCondition(o.IDColumn(), database.TextOperationEqual, id)
 }
 
 // NameCondition implements [domain.organizationConditions].
 func (o org) NameCondition(name string) domain.OrgIdentifierCondition {
-	return database.NewTextCondition(o.NameColumn(true), database.TextOperationEqual, name)
+	return database.NewTextCondition(o.NameColumn(), database.TextOperationEqual, name)
 }
 
 // InstanceIDCondition implements [domain.organizationConditions].
 func (o org) InstanceIDCondition(instanceID string) database.Condition {
-	return database.NewTextCondition(o.InstanceIDColumn(true), database.TextOperationEqual, instanceID)
+	return database.NewTextCondition(o.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
 // StateCondition implements [domain.organizationConditions].
 func (o org) StateCondition(state domain.OrgState) database.Condition {
-	return database.NewTextCondition(o.StateColumn(true), database.TextOperationEqual, state.String())
+	return database.NewTextCondition(o.StateColumn(), database.TextOperationEqual, state.String())
 }
 
 // -------------------------------------------------------------
@@ -179,51 +179,33 @@ func (o org) StateCondition(state domain.OrgState) database.Condition {
 // -------------------------------------------------------------
 
 // IDColumn implements [domain.organizationColumns].
-func (org) IDColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("organizations.id")
-	}
-	return database.NewColumn("id")
+func (org) IDColumn() database.Column {
+	return database.NewColumn("organizations", "id")
 }
 
 // NameColumn implements [domain.organizationColumns].
-func (org) NameColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("organizations.name")
-	}
-	return database.NewColumn("name")
+func (org) NameColumn() database.Column {
+	return database.NewColumn("organizations", "name")
 }
 
 // InstanceIDColumn implements [domain.organizationColumns].
-func (org) InstanceIDColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("organizations.instance_id")
-	}
-	return database.NewColumn("instance_id")
+func (org) InstanceIDColumn() database.Column {
+	return database.NewColumn("organizations", "instance_id")
 }
 
 // StateColumn implements [domain.organizationColumns].
-func (org) StateColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("organizations.state")
-	}
-	return database.NewColumn("state")
+func (org) StateColumn() database.Column {
+	return database.NewColumn("organizations", "state")
 }
 
 // CreatedAtColumn implements [domain.organizationColumns].
-func (org) CreatedAtColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("organizations.created_at")
-	}
-	return database.NewColumn("created_at")
+func (org) CreatedAtColumn() database.Column {
+	return database.NewColumn("organizations", "created_at")
 }
 
 // UpdatedAtColumn implements [domain.organizationColumns].
-func (org) UpdatedAtColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("organizations.updated_at")
-	}
-	return database.NewColumn("updated_at")
+func (org) UpdatedAtColumn() database.Column {
+	return database.NewColumn("organizations", "updated_at")
 }
 
 // -------------------------------------------------------------

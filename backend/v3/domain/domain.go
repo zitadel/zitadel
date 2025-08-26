@@ -24,20 +24,15 @@ const (
 
 type domainColumns interface {
 	// InstanceIDColumn returns the column for the instance id field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	InstanceIDColumn(qualified bool) database.Column
+	InstanceIDColumn() database.Column
 	// DomainColumn returns the column for the domain field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	DomainColumn(qualified bool) database.Column
+	DomainColumn() database.Column
 	// IsPrimaryColumn returns the column for the is primary field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	IsPrimaryColumn(qualified bool) database.Column
+	IsPrimaryColumn() database.Column
 	// CreatedAtColumn returns the column for the created at field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	CreatedAtColumn(qualified bool) database.Column
+	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	UpdatedAtColumn(qualified bool) database.Column
+	UpdatedAtColumn() database.Column
 }
 
 type domainConditions interface {

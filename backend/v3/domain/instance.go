@@ -19,7 +19,7 @@ type Instance struct {
 	CreatedAt       time.Time `json:"createdAt" db:"created_at"`
 	UpdatedAt       time.Time `json:"updatedAt" db:"updated_at"`
 
-	Domains []*InstanceDomain `json:"domains,omitempty" db:"-"` // domains need to be handled separately
+	Domains []*InstanceDomain `json:"domains,omitempty" db:"-"`
 }
 
 type instanceCacheIndex uint8
@@ -42,32 +42,23 @@ var _ cache.Entry[instanceCacheIndex, string] = (*Instance)(nil)
 // instanceColumns define all the columns of the instance table.
 type instanceColumns interface {
 	// IDColumn returns the column for the id field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	IDColumn(qualified bool) database.Column
+	IDColumn() database.Column
 	// NameColumn returns the column for the name field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	NameColumn(qualified bool) database.Column
+	NameColumn() database.Column
 	// DefaultOrgIDColumn returns the column for the default org id field
-	// `qualified` indicates if the column should be qualified with the table name.
-	DefaultOrgIDColumn(qualified bool) database.Column
+	DefaultOrgIDColumn() database.Column
 	// IAMProjectIDColumn returns the column for the default IAM org id field
-	// `qualified` indicates if the column should be qualified with the table name.
-	IAMProjectIDColumn(qualified bool) database.Column
+	IAMProjectIDColumn() database.Column
 	// ConsoleClientIDColumn returns the column for the default IAM org id field
-	// `qualified` indicates if the column should be qualified with the table name.
-	ConsoleClientIDColumn(qualified bool) database.Column
+	ConsoleClientIDColumn() database.Column
 	// ConsoleAppIDColumn returns the column for the console client id field
-	// `qualified` indicates if the column should be qualified with the table name.
-	ConsoleAppIDColumn(qualified bool) database.Column
+	ConsoleAppIDColumn() database.Column
 	// DefaultLanguageColumn returns the column for the default language field
-	// `qualified` indicates if the column should be qualified with the table name.
-	DefaultLanguageColumn(qualified bool) database.Column
+	DefaultLanguageColumn() database.Column
 	// CreatedAtColumn returns the column for the created at field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	CreatedAtColumn(qualified bool) database.Column
+	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	UpdatedAtColumn(qualified bool) database.Column
+	UpdatedAtColumn() database.Column
 }
 
 // instanceConditions define all the conditions for the instance table.

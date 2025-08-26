@@ -104,17 +104,17 @@ func (i *instanceDomain) Remove(ctx context.Context, condition database.Conditio
 
 // SetPrimary implements [domain.InstanceDomainRepository].
 func (i instanceDomain) SetPrimary() database.Change {
-	return database.NewChange(i.IsPrimaryColumn(false), true)
+	return database.NewChange(i.IsPrimaryColumn(), true)
 }
 
 // SetUpdatedAt implements [domain.OrganizationDomainRepository].
 func (i instanceDomain) SetUpdatedAt(updatedAt time.Time) database.Change {
-	return database.NewChange(i.UpdatedAtColumn(false), updatedAt)
+	return database.NewChange(i.UpdatedAtColumn(), updatedAt)
 }
 
 // SetType implements [domain.InstanceDomainRepository].
 func (i instanceDomain) SetType(typ domain.DomainType) database.Change {
-	return database.NewChange(i.TypeColumn(false), typ)
+	return database.NewChange(i.TypeColumn(), typ)
 }
 
 // -------------------------------------------------------------
@@ -123,22 +123,22 @@ func (i instanceDomain) SetType(typ domain.DomainType) database.Change {
 
 // DomainCondition implements [domain.InstanceDomainRepository].
 func (i instanceDomain) DomainCondition(op database.TextOperation, domain string) database.Condition {
-	return database.NewTextCondition(i.DomainColumn(true), op, domain)
+	return database.NewTextCondition(i.DomainColumn(), op, domain)
 }
 
 // InstanceIDCondition implements [domain.InstanceDomainRepository].
 func (i instanceDomain) InstanceIDCondition(instanceID string) database.Condition {
-	return database.NewTextCondition(i.InstanceIDColumn(true), database.TextOperationEqual, instanceID)
+	return database.NewTextCondition(i.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
 // IsPrimaryCondition implements [domain.InstanceDomainRepository].
 func (i instanceDomain) IsPrimaryCondition(isPrimary bool) database.Condition {
-	return database.NewBooleanCondition(i.IsPrimaryColumn(true), isPrimary)
+	return database.NewBooleanCondition(i.IsPrimaryColumn(), isPrimary)
 }
 
 // TypeCondition implements [domain.InstanceDomainRepository].
 func (i instanceDomain) TypeCondition(typ domain.DomainType) database.Condition {
-	return database.NewTextCondition(i.TypeColumn(true), database.TextOperationEqual, typ.String())
+	return database.NewTextCondition(i.TypeColumn(), database.TextOperationEqual, typ.String())
 }
 
 // -------------------------------------------------------------
@@ -147,60 +147,39 @@ func (i instanceDomain) TypeCondition(typ domain.DomainType) database.Condition 
 
 // CreatedAtColumn implements [domain.InstanceDomainRepository].
 // Subtle: this method shadows the method ([domain.InstanceRepository]).CreatedAtColumn of instanceDomain.instance.
-func (instanceDomain) CreatedAtColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instance_domains.created_at")
-	}
-	return database.NewColumn("created_at")
+func (instanceDomain) CreatedAtColumn() database.Column {
+	return database.NewColumn("instance_domains", "created_at")
 }
 
 // DomainColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) DomainColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instance_domains.domain")
-	}
-	return database.NewColumn("domain")
+func (instanceDomain) DomainColumn() database.Column {
+	return database.NewColumn("instance_domains", "domain")
 }
 
 // InstanceIDColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) InstanceIDColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instance_domains.instance_id")
-	}
-	return database.NewColumn("instance_id")
+func (instanceDomain) InstanceIDColumn() database.Column {
+	return database.NewColumn("instance_domains", "instance_id")
 }
 
 // IsPrimaryColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) IsPrimaryColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instance_domains.is_primary")
-	}
-	return database.NewColumn("is_primary")
+func (instanceDomain) IsPrimaryColumn() database.Column {
+	return database.NewColumn("instance_domains", "is_primary")
 }
 
 // UpdatedAtColumn implements [domain.InstanceDomainRepository].
 // Subtle: this method shadows the method ([domain.InstanceRepository]).UpdatedAtColumn of instanceDomain.instance.
-func (instanceDomain) UpdatedAtColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instance_domains.updated_at")
-	}
-	return database.NewColumn("updated_at")
+func (instanceDomain) UpdatedAtColumn() database.Column {
+	return database.NewColumn("instance_domains", "updated_at")
 }
 
 // IsGeneratedColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) IsGeneratedColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instance_domains.is_generated")
-	}
-	return database.NewColumn("is_generated")
+func (instanceDomain) IsGeneratedColumn() database.Column {
+	return database.NewColumn("instance_domains", "is_generated")
 }
 
 // TypeColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) TypeColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instance_domains.type")
-	}
-	return database.NewColumn("type")
+func (instanceDomain) TypeColumn() database.Column {
+	return database.NewColumn("instance_domains", "type")
 }
 
 // -------------------------------------------------------------

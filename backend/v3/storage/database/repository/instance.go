@@ -38,7 +38,7 @@ const (
 func (i *instance) Get(ctx context.Context, opts ...database.QueryOption) (*domain.Instance, error) {
 	opts = append(opts,
 		i.joinDomains(),
-		database.WithGroupBy(i.IDColumn(true)),
+		database.WithGroupBy(i.IDColumn()),
 	)
 
 	options := new(database.QueryOpts)
@@ -57,7 +57,7 @@ func (i *instance) Get(ctx context.Context, opts ...database.QueryOption) (*doma
 func (i *instance) List(ctx context.Context, opts ...database.QueryOption) ([]*domain.Instance, error) {
 	opts = append(opts,
 		i.joinDomains(),
-		database.WithGroupBy(i.IDColumn(true)),
+		database.WithGroupBy(i.IDColumn()),
 	)
 
 	options := new(database.QueryOpts)
@@ -74,12 +74,12 @@ func (i *instance) List(ctx context.Context, opts ...database.QueryOption) ([]*d
 
 func (i *instance) joinDomains() database.QueryOption {
 	columns := make([]database.Condition, 0, 2)
-	columns = append(columns, database.NewColumnCondition(i.IDColumn(true), i.Domains(false).InstanceIDColumn(true)))
+	columns = append(columns, database.NewColumnCondition(i.IDColumn(), i.Domains(false).InstanceIDColumn()))
 
 	// If domains should not be joined, we make sure to return null for the domain columns
 	// the query optimizer of the dialect should optimize this away if no domains are requested
 	if !i.shouldLoadDomains {
-		columns = append(columns, database.IsNull(i.Domains(false).InstanceIDColumn(true)))
+		columns = append(columns, database.IsNull(i.Domains(false).InstanceIDColumn()))
 	}
 
 	return database.WithLeftJoin(
@@ -139,7 +139,7 @@ func (i instance) Delete(ctx context.Context, id string) (int64, error) {
 
 // SetName implements [domain.instanceChanges].
 func (i instance) SetName(name string) database.Change {
-	return database.NewChange(i.NameColumn(false), name)
+	return database.NewChange(i.NameColumn(), name)
 }
 
 // -------------------------------------------------------------
@@ -148,12 +148,12 @@ func (i instance) SetName(name string) database.Change {
 
 // IDCondition implements [domain.instanceConditions].
 func (i instance) IDCondition(id string) database.Condition {
-	return database.NewTextCondition(i.IDColumn(true), database.TextOperationEqual, id)
+	return database.NewTextCondition(i.IDColumn(), database.TextOperationEqual, id)
 }
 
 // NameCondition implements [domain.instanceConditions].
 func (i instance) NameCondition(op database.TextOperation, name string) database.Condition {
-	return database.NewTextCondition(i.NameColumn(true), op, name)
+	return database.NewTextCondition(i.NameColumn(), op, name)
 }
 
 // -------------------------------------------------------------
@@ -161,75 +161,48 @@ func (i instance) NameCondition(op database.TextOperation, name string) database
 // -------------------------------------------------------------
 
 // IDColumn implements [domain.instanceColumns].
-func (instance) IDColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instances.id")
-	}
-	return database.NewColumn("id")
+func (instance) IDColumn() database.Column {
+	return database.NewColumn("instances", "id")
 }
 
 // NameColumn implements [domain.instanceColumns].
-func (instance) NameColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instances.name")
-	}
-	return database.NewColumn("name")
+func (instance) NameColumn() database.Column {
+	return database.NewColumn("instances", "name")
 }
 
 // CreatedAtColumn implements [domain.instanceColumns].
-func (instance) CreatedAtColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instances.created_at")
-	}
-	return database.NewColumn("created_at")
+func (instance) CreatedAtColumn() database.Column {
+	return database.NewColumn("instances", "created_at")
 }
 
 // DefaultOrgIdColumn implements [domain.instanceColumns].
-func (instance) DefaultOrgIDColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instances.default_org_id")
-	}
-	return database.NewColumn("default_org_id")
+func (instance) DefaultOrgIDColumn() database.Column {
+	return database.NewColumn("instances", "default_org_id")
 }
 
 // IAMProjectIDColumn implements [domain.instanceColumns].
-func (instance) IAMProjectIDColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instances.iam_project_id")
-	}
-	return database.NewColumn("iam_project_id")
+func (instance) IAMProjectIDColumn() database.Column {
+	return database.NewColumn("instances", "iam_project_id")
 }
 
 // ConsoleClientIDColumn implements [domain.instanceColumns].
-func (instance) ConsoleClientIDColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instances.console_client_id")
-	}
-	return database.NewColumn("console_client_id")
+func (instance) ConsoleClientIDColumn() database.Column {
+	return database.NewColumn("instances", "console_client_id")
 }
 
 // ConsoleAppIDColumn implements [domain.instanceColumns].
-func (instance) ConsoleAppIDColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instances.console_app_id")
-	}
-	return database.NewColumn("console_app_id")
+func (instance) ConsoleAppIDColumn() database.Column {
+	return database.NewColumn("instances", "console_app_id")
 }
 
 // DefaultLanguageColumn implements [domain.instanceColumns].
-func (instance) DefaultLanguageColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instances.default_language")
-	}
-	return database.NewColumn("default_language")
+func (instance) DefaultLanguageColumn() database.Column {
+	return database.NewColumn("instances", "default_language")
 }
 
 // UpdatedAtColumn implements [domain.instanceColumns].
-func (instance) UpdatedAtColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("instances.updated_at")
-	}
-	return database.NewColumn("updated_at")
+func (instance) UpdatedAtColumn() database.Column {
+	return database.NewColumn("instances", "updated_at")
 }
 
 type rawInstance struct {

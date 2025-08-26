@@ -36,23 +36,17 @@ type OrgIdentifierCondition interface {
 // organizationColumns define all the columns of the instance table.
 type organizationColumns interface {
 	// IDColumn returns the column for the id field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	IDColumn(qualified bool) database.Column
+	IDColumn() database.Column
 	// NameColumn returns the column for the name field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	NameColumn(qualified bool) database.Column
+	NameColumn() database.Column
 	// InstanceIDColumn returns the column for the default org id field
-	// `qualified` indicates if the column should be qualified with the table name.
-	InstanceIDColumn(qualified bool) database.Column
+	InstanceIDColumn() database.Column
 	// StateColumn returns the column for the name field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	StateColumn(qualified bool) database.Column
+	StateColumn() database.Column
 	// CreatedAtColumn returns the column for the created at field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	CreatedAtColumn(qualified bool) database.Column
+	CreatedAtColumn() database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	UpdatedAtColumn(qualified bool) database.Column
+	UpdatedAtColumn() database.Column
 }
 
 // organizationConditions define all the conditions for the instance table.

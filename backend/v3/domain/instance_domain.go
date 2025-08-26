@@ -40,11 +40,9 @@ type AddInstanceDomain struct {
 type instanceDomainColumns interface {
 	domainColumns
 	// IsGeneratedColumn returns the column for the is generated field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	IsGeneratedColumn(qualified bool) database.Column
+	IsGeneratedColumn() database.Column
 	// TypeColumn returns the column for the type field.
-	// `qualified` indicates if the column should be qualified with the table name.
-	TypeColumn(qualified bool) database.Column
+	TypeColumn() database.Column
 }
 
 type instanceDomainConditions interface {

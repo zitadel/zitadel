@@ -48,34 +48,28 @@ var textOperations = map[TextOperation]string{
 func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOperation, value T) {
 	switch op {
 	case TextOperationEqual, TextOperationNotEqual:
-		col.Write(builder)
+		col.WriteQualified(builder)
 		builder.WriteString(textOperations[op])
 		builder.WriteArg(value)
 	case TextOperationEqualIgnoreCase, TextOperationNotEqualIgnoreCase:
-		if ignoreCaseCol, ok := col.(ignoreCaseColumn); ok {
-			ignoreCaseCol.WriteIgnoreCase(builder)
-		} else {
-			builder.WriteString("LOWER(")
-			col.Write(builder)
-			builder.WriteString(")")
-		}
+		builder.WriteString("LOWER(")
+		col.WriteQualified(builder)
+		builder.WriteString(")")
+
 		builder.WriteString(textOperations[op])
 		builder.WriteString("LOWER(")
 		builder.WriteArg(value)
 		builder.WriteString(")")
 	case TextOperationStartsWith:
-		col.Write(builder)
+		col.WriteQualified(builder)
 		builder.WriteString(textOperations[op])
 		builder.WriteArg(value)
 		builder.WriteString(" || '%'")
 	case TextOperationStartsWithIgnoreCase:
-		if ignoreCaseCol, ok := col.(ignoreCaseColumn); ok {
-			ignoreCaseCol.WriteIgnoreCase(builder)
-		} else {
-			builder.WriteString("LOWER(")
-			col.Write(builder)
-			builder.WriteString(")")
-		}
+		builder.WriteString("LOWER(")
+		col.WriteQualified(builder)
+		builder.WriteString(")")
+
 		builder.WriteString(textOperations[op])
 		builder.WriteString("LOWER(")
 		builder.WriteArg(value)
@@ -118,7 +112,7 @@ var numberOperations = map[NumberOperation]string{
 }
 
 func writeNumberOperation[T Number](builder *StatementBuilder, col Column, op NumberOperation, value T) {
-	col.Write(builder)
+	col.WriteQualified(builder)
 	builder.WriteString(numberOperations[op])
 	builder.WriteArg(value)
 }
@@ -136,7 +130,7 @@ const (
 )
 
 func writeBooleanOperation[T Boolean](builder *StatementBuilder, col Column, value T) {
-	col.Write(builder)
+	col.WriteQualified(builder)
 	builder.WriteString(" = ")
 	builder.WriteArg(value)
 }

@@ -862,97 +862,97 @@ func TestOrganizationDomainColumns(t *testing.T) {
 	}{
 		{
 			name:      "instance id column qualified",
-			column:    domainRepo.InstanceIDColumn(true),
+			column:    domainRepo.InstanceIDColumn(),
 			qualified: true,
 			expected:  "org_domains.instance_id",
 		},
 		{
 			name:      "instance id column unqualified",
-			column:    domainRepo.InstanceIDColumn(false),
+			column:    domainRepo.InstanceIDColumn(),
 			qualified: false,
 			expected:  "instance_id",
 		},
 		{
 			name:      "org id column qualified",
-			column:    domainRepo.OrgIDColumn(true),
+			column:    domainRepo.OrgIDColumn(),
 			qualified: true,
 			expected:  "org_domains.org_id",
 		},
 		{
 			name:      "org id column unqualified",
-			column:    domainRepo.OrgIDColumn(false),
+			column:    domainRepo.OrgIDColumn(),
 			qualified: false,
 			expected:  "org_id",
 		},
 		{
 			name:      "domain column qualified",
-			column:    domainRepo.DomainColumn(true),
+			column:    domainRepo.DomainColumn(),
 			qualified: true,
 			expected:  "org_domains.domain",
 		},
 		{
 			name:      "domain column unqualified",
-			column:    domainRepo.DomainColumn(false),
+			column:    domainRepo.DomainColumn(),
 			qualified: false,
 			expected:  "domain",
 		},
 		{
 			name:      "is verified column qualified",
-			column:    domainRepo.IsVerifiedColumn(true),
+			column:    domainRepo.IsVerifiedColumn(),
 			qualified: true,
 			expected:  "org_domains.is_verified",
 		},
 		{
 			name:      "is verified column unqualified",
-			column:    domainRepo.IsVerifiedColumn(false),
+			column:    domainRepo.IsVerifiedColumn(),
 			qualified: false,
 			expected:  "is_verified",
 		},
 		{
 			name:      "is primary column qualified",
-			column:    domainRepo.IsPrimaryColumn(true),
+			column:    domainRepo.IsPrimaryColumn(),
 			qualified: true,
 			expected:  "org_domains.is_primary",
 		},
 		{
 			name:      "is primary column unqualified",
-			column:    domainRepo.IsPrimaryColumn(false),
+			column:    domainRepo.IsPrimaryColumn(),
 			qualified: false,
 			expected:  "is_primary",
 		},
 		{
 			name:      "validation type column qualified",
-			column:    domainRepo.ValidationTypeColumn(true),
+			column:    domainRepo.ValidationTypeColumn(),
 			qualified: true,
 			expected:  "org_domains.validation_type",
 		},
 		{
 			name:      "validation type column unqualified",
-			column:    domainRepo.ValidationTypeColumn(false),
+			column:    domainRepo.ValidationTypeColumn(),
 			qualified: false,
 			expected:  "validation_type",
 		},
 		{
 			name:      "created at column qualified",
-			column:    domainRepo.CreatedAtColumn(true),
+			column:    domainRepo.CreatedAtColumn(),
 			qualified: true,
 			expected:  "org_domains.created_at",
 		},
 		{
 			name:      "created at column unqualified",
-			column:    domainRepo.CreatedAtColumn(false),
+			column:    domainRepo.CreatedAtColumn(),
 			qualified: false,
 			expected:  "created_at",
 		},
 		{
 			name:      "updated at column qualified",
-			column:    domainRepo.UpdatedAtColumn(true),
+			column:    domainRepo.UpdatedAtColumn(),
 			qualified: true,
 			expected:  "org_domains.updated_at",
 		},
 		{
 			name:      "updated at column unqualified",
-			column:    domainRepo.UpdatedAtColumn(false),
+			column:    domainRepo.UpdatedAtColumn(),
 			qualified: false,
 			expected:  "updated_at",
 		},
@@ -961,7 +961,11 @@ func TestOrganizationDomainColumns(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var builder database.StatementBuilder
-			test.column.Write(&builder)
+			if test.qualified {
+				test.column.WriteQualified(&builder)
+			} else {
+				test.column.WriteUnqualified(&builder)
+			}
 			assert.Equal(t, test.expected, builder.String())
 		})
 	}

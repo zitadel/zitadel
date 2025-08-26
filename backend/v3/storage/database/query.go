@@ -105,7 +105,7 @@ func (opts *QueryOpts) WriteOrderBy(builder *StatementBuilder) {
 		return
 	}
 	builder.WriteString(" ORDER BY ")
-	opts.OrderBy.Write(builder)
+	opts.OrderBy.WriteQualified(builder)
 }
 
 func (opts *QueryOpts) WriteLimit(builder *StatementBuilder) {
@@ -129,7 +129,7 @@ func (opts *QueryOpts) WriteGroupBy(builder *StatementBuilder) {
 		return
 	}
 	builder.WriteString(" GROUP BY ")
-	opts.GroupBy.Write(builder)
+	opts.GroupBy.WriteQualified(builder)
 }
 
 func (opts *QueryOpts) WriteLeftJoins(builder *StatementBuilder) {

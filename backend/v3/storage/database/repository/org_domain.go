@@ -104,22 +104,22 @@ func (o *orgDomain) Remove(ctx context.Context, condition database.Condition) (i
 
 // SetPrimary implements [domain.OrganizationDomainRepository].
 func (o orgDomain) SetPrimary() database.Change {
-	return database.NewChange(o.IsPrimaryColumn(false), true)
+	return database.NewChange(o.IsPrimaryColumn(), true)
 }
 
 // SetValidationType implements [domain.OrganizationDomainRepository].
 func (o orgDomain) SetValidationType(verificationType domain.DomainValidationType) database.Change {
-	return database.NewChange(o.ValidationTypeColumn(false), verificationType)
+	return database.NewChange(o.ValidationTypeColumn(), verificationType)
 }
 
 // SetVerified implements [domain.OrganizationDomainRepository].
 func (o orgDomain) SetVerified() database.Change {
-	return database.NewChange(o.IsVerifiedColumn(false), true)
+	return database.NewChange(o.IsVerifiedColumn(), true)
 }
 
 // SetUpdatedAt implements [domain.OrganizationDomainRepository].
 func (o orgDomain) SetUpdatedAt(updatedAt time.Time) database.Change {
-	return database.NewChange(o.UpdatedAtColumn(false), updatedAt)
+	return database.NewChange(o.UpdatedAtColumn(), updatedAt)
 }
 
 // -------------------------------------------------------------
@@ -128,28 +128,28 @@ func (o orgDomain) SetUpdatedAt(updatedAt time.Time) database.Change {
 
 // DomainCondition implements [domain.OrganizationDomainRepository].
 func (o orgDomain) DomainCondition(op database.TextOperation, domain string) database.Condition {
-	return database.NewTextCondition(o.DomainColumn(true), op, domain)
+	return database.NewTextCondition(o.DomainColumn(), op, domain)
 }
 
 // InstanceIDCondition implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).InstanceIDCondition of orgDomain.org.
 func (o orgDomain) InstanceIDCondition(instanceID string) database.Condition {
-	return database.NewTextCondition(o.InstanceIDColumn(true), database.TextOperationEqual, instanceID)
+	return database.NewTextCondition(o.InstanceIDColumn(), database.TextOperationEqual, instanceID)
 }
 
 // IsPrimaryCondition implements [domain.OrganizationDomainRepository].
 func (o orgDomain) IsPrimaryCondition(isPrimary bool) database.Condition {
-	return database.NewBooleanCondition(o.IsPrimaryColumn(true), isPrimary)
+	return database.NewBooleanCondition(o.IsPrimaryColumn(), isPrimary)
 }
 
 // IsVerifiedCondition implements [domain.OrganizationDomainRepository].
 func (o orgDomain) IsVerifiedCondition(isVerified bool) database.Condition {
-	return database.NewBooleanCondition(o.IsVerifiedColumn(true), isVerified)
+	return database.NewBooleanCondition(o.IsVerifiedColumn(), isVerified)
 }
 
 // OrgIDCondition implements [domain.OrganizationDomainRepository].
 func (o orgDomain) OrgIDCondition(orgID string) database.Condition {
-	return database.NewTextCondition(o.OrgIDColumn(true), database.TextOperationEqual, orgID)
+	return database.NewTextCondition(o.OrgIDColumn(), database.TextOperationEqual, orgID)
 }
 
 // -------------------------------------------------------------
@@ -158,69 +158,45 @@ func (o orgDomain) OrgIDCondition(orgID string) database.Condition {
 
 // CreatedAtColumn implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).CreatedAtColumn of orgDomain.org.
-func (orgDomain) CreatedAtColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("org_domains.created_at")
-	}
-	return database.NewColumn("created_at")
+func (orgDomain) CreatedAtColumn() database.Column {
+	return database.NewColumn("org_domains", "created_at")
 }
 
 // DomainColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) DomainColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("org_domains.domain")
-	}
-	return database.NewColumn("domain")
+func (orgDomain) DomainColumn() database.Column {
+	return database.NewColumn("org_domains", "domain")
 }
 
 // InstanceIDColumn implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).InstanceIDColumn of orgDomain.org.
-func (orgDomain) InstanceIDColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("org_domains.instance_id")
-	}
-	return database.NewColumn("instance_id")
+func (orgDomain) InstanceIDColumn() database.Column {
+	return database.NewColumn("org_domains", "instance_id")
 }
 
 // IsPrimaryColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) IsPrimaryColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("org_domains.is_primary")
-	}
-	return database.NewColumn("is_primary")
+func (orgDomain) IsPrimaryColumn() database.Column {
+	return database.NewColumn("org_domains", "is_primary")
 }
 
 // IsVerifiedColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) IsVerifiedColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("org_domains.is_verified")
-	}
-	return database.NewColumn("is_verified")
+func (orgDomain) IsVerifiedColumn() database.Column {
+	return database.NewColumn("org_domains", "is_verified")
 }
 
 // OrgIDColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) OrgIDColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("org_domains.org_id")
-	}
-	return database.NewColumn("org_id")
+func (orgDomain) OrgIDColumn() database.Column {
+	return database.NewColumn("org_domains", "org_id")
 }
 
 // UpdatedAtColumn implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).UpdatedAtColumn of orgDomain.org.
-func (orgDomain) UpdatedAtColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("org_domains.updated_at")
-	}
-	return database.NewColumn("updated_at")
+func (orgDomain) UpdatedAtColumn() database.Column {
+	return database.NewColumn("org_domains", "updated_at")
 }
 
 // ValidationTypeColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) ValidationTypeColumn(qualified bool) database.Column {
-	if qualified {
-		return database.NewColumn("org_domains.validation_type")
-	}
-	return database.NewColumn("validation_type")
+func (orgDomain) ValidationTypeColumn() database.Column {
+	return database.NewColumn("org_domains", "validation_type")
 }
 
 // -------------------------------------------------------------
