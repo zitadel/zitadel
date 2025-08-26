@@ -113,7 +113,7 @@ clean:
 	find openapi/ -type f ! -name 'handler.go' -delete 
 	find . -name 'statik.go' -delete
 	$(RM) -r console/dist
-	find internal/api/ui/console/static -type f ! -name 'gitkeep' -delete
+	git clean -fdx -e '.gitkeep' internal/api/ui/console/static
 	$(RM) zitadel
 
 .PHONY: core_unit_test
