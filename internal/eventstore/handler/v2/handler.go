@@ -424,6 +424,24 @@ func WithMinPosition(position decimal.Decimal) TriggerOpt {
 	}
 }
 
+var queue chan func()
+
+const workers = 5
+
+func init() {
+	queue = make(chan func())
+	for i := 1; i <= workers; i++ {
+		go worker()
+	}
+}
+
+func worker() {
+	for {
+		processEvents := <-queue
+		processEvents()
+	}
+}
+
 func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Context, err error) {
 	if slices.Contains(h.skipInstanceIDs, authz.GetInstance(ctx).InstanceID()) {
 		return call.ResetTimestamp(ctx), nil
@@ -440,7 +458,14 @@ func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Co
 	defer cancel()
 
 	for i := 0; ; i++ {
-		additionalIteration, err := h.processEvents(ctx, config)
+		var additionalIteration bool
+		var wg sync.WaitGroup
+		wg.Add(1)
+		queue <- func() {
+			additionalIteration, err = h.processEvents(ctx, config)
+			wg.Done()
+		}
+		wg.Wait()
 		h.log().OnError(err).Info("process events failed")
 		h.log().WithField("iteration", i).Debug("trigger iteration")
 		if !additionalIteration || err != nil {
@@ -527,20 +552,20 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 	}()
 
-	if config.awaitRunning {
-		if _, err := tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()); err != nil {
-			return false, err
-		}
-	} else {
-		var hasLocked bool
-		err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock (hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
-		if err != nil {
-			return false, err
-		}
-		if !hasLocked {
-			return false, zerrors.ThrowInternal(err, "V2-lpiK0", "projection already locked")
-		}
+	// if config.awaitRunning {
+	// 	if _, err := tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()); err != nil {
+	// 		return false, err
+	// 	}
+	// } else {
+	var hasLocked bool
+	err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock (hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
+	if err != nil {
+		return false, err
 	}
+	if !hasLocked {
+		return false, zerrors.ThrowInternal(err, "V2-lpiK0", "projection already locked")
+	}
+	// }
 
 	currentState, err := h.currentState(ctx, tx)
 	if err != nil {
