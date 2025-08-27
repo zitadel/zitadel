@@ -102,7 +102,7 @@ export class GrpcService {
         this.userNew = createUserServiceClient(transport);
         this.session = createSessionServiceClient(transport);
         this.mgmtNew = createManagementServiceClient(transportOldAPIs);
-        this.authNew = createAuthServiceClient(transport);
+        this.authNew = createAuthServiceClient(transportOldAPIs);
         this.featureNew = createFeatureServiceClient(transport);
         this.actionNew = createActionServiceClient(transport);
         this.webKey = createWebKeyServiceClient(transport);
