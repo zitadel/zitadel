@@ -1,0 +1,101 @@
+---
+title: introspection benchmark of zitadel v4
+sidebar_label: introspection
+---
+
+Benchmark results of v4 release of Zitadel.
+
+## Performance test results
+
+| Metric                                | Value |
+|:--------------------------------------|:------|
+| Baseline                              | none  |
+| Purpose                               | Test current performance |
+| Test start                            | 13:33 UTC |
+| Test duration                         | 30min |
+| Executed test                         | introspect |
+| k6 version                            | v1.0.0-rc1 |
+| VUs                                   | 600 |
+| Client location                       | US1 |
+| ZITADEL location                      | US1 |
+| ZITADEL container specification       | vCPU: 6<br/> Memory: 6 Gi <br/>Container min scale: 2<br/>Container max scale: 7 |
+| ZITADEL Version                       | v4.0.0-rc2 |
+| ZITADEL feature flags                 | webKey: true, improvedPerformance: \[\"IMPROVED\_PERFORMANCE\_ORG\_BY\_ID\", \"IMPROVED\_PERFORMANCE\_PROJECT\", \"IMPROVED\_PERFORMANCE\_USER\_GRANT\", \"IMPROVED\_PERFORMANCE\_ORG\_DOMAIN\_VERIFIED\", \"IMPROVED\_PERFORMANCE\_PROJECT\_GRANT\"\] |
+| Database                              | type: psql<br />version: v17.4 |
+| Database location                     | US1 |
+| Database specification                | vCPU: 8<br/> memory: 32Gib |
+| ZITADEL metrics during test           |  |
+| Observed errors                       | A lot of over fetching on the database |
+| Top 3 most expensive database queries | 1: get app<br/>2: Query events by instance id, aggregate types, event types, position<br/>3: Query executions<br/> |
+| k6 Iterations per second              | 18 |
+| k6 output                             | [output](#k6-output) |
+| flowchart outcome                     |  |
+
+## Endpoint latencies
+
+import OutputSource from "./output.json";
+
+import { BenchmarkChart } from '/src/components/benchmark_chart';
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output {#k6-output}
+
+```bash
+  █ TOTAL RESULTS 
+
+    checks_total.......................: 36207  19.664102/s
+    checks_succeeded...................: 99.99% 36205 out of 36207
+    checks_failed......................: 0.00%  2 out of 36207
+
+    ✓ user defined
+    ✓ authorize status ok
+    ✓ login name status ok
+    ✓ login shows password page
+    ✓ password status ok
+    ✓ password callback
+    ✓ code set
+    ✓ token status ok
+    ✓ access token created
+    ✓ id token created
+    ✓ info created
+    ✓ org created
+    ✓ add project status ok
+    ✓ add api status ok
+    ✓ add app key status ok
+    ✓ openid configuration
+    ✗ introspect status ok
+      ↳  99% — ✓ 33792 / ✗ 2
+    ✓ org removed
+
+    CUSTOM
+    app_add_app_duration....................................................: min=32.73ms  avg=779.27ms max=1.11s    p(50)=771.76ms p(95)=1.08s    p(99)=1.1s    
+    app_add_app_key_duration................................................: min=340.78ms avg=12.14s   max=17.19s   p(50)=13.51s   p(95)=16.78s   p(99)=16.93s  
+    login_ui_enter_login_name_duration......................................: min=212.91ms avg=212.91ms max=212.91ms p(50)=212.91ms p(95)=212.91ms p(99)=212.91ms
+    login_ui_enter_password_duration........................................: min=29.53ms  avg=29.53ms  max=29.53ms  p(50)=29.53ms  p(95)=29.53ms  p(99)=29.53ms 
+    login_ui_init_login_duration............................................: min=65.24ms  avg=65.24ms  max=65.24ms  p(50)=65.24ms  p(95)=65.24ms  p(99)=65.24ms 
+    login_ui_token_duration.................................................: min=98.54ms  avg=98.54ms  max=98.54ms  p(50)=98.54ms  p(95)=98.54ms  p(99)=98.54ms 
+    oidc_introspect_duration................................................: min=731.31µs avg=32.04s   max=50.94s   p(50)=28.25s   p(95)=47.83s   p(99)=49.39s  
+    org_create_org_duration.................................................: min=51.76ms  avg=51.76ms  max=51.76ms  p(50)=51.76ms  p(95)=51.76ms  p(99)=51.76ms 
+    project_add_project_duration............................................: min=52.11ms  avg=754.58ms max=1.2s     p(50)=778.66ms p(95)=1.14s    p(99)=1.19s   
+
+    HTTP
+    http_req_duration.......................................................: min=731.31µs avg=30.22s   max=50.94s   p(50)=26.12s   p(95)=47.74s   p(99)=49.35s  
+      { expected_response:true }............................................: min=13.11ms  avg=30.22s   max=50.94s   p(50)=26.12s   p(95)=47.74s   p(99)=49.35s  
+    http_req_failed.........................................................: 0.00% 2 out of 36204
+    http_reqs...............................................................: 36204 19.662473/s
+
+    EXECUTION
+    iteration_duration......................................................: min=1.53ms   avg=32.14s   max=50.94s   p(50)=28.25s   p(95)=47.83s   p(99)=49.39s  
+    iterations..............................................................: 33794 18.353597/s
+    vus.....................................................................: 0     min=0          max=600
+    vus_max.................................................................: 600   min=600        max=600
+
+    NETWORK
+    data_received...........................................................: 25 MB 14 kB/s
+    data_sent...............................................................: 33 MB 18 kB/s
+
+running (30m41.3s), 000/600 VUs, 33794 complete and 0 interrupted iterations
+default ✓ [======================================] 600 VUs  30m0s
+```
+

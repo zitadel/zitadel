@@ -1,6 +1,7 @@
 {
   "common": {
-    "back": "Indietro"
+    "back": "Indietro",
+    "title": "Accedi con Zitadel"
   },
   "accounts": {
     "title": "Account",

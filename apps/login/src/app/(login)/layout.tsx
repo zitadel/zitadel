@@ -9,17 +9,25 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 import { Analytics } from "@vercel/analytics/react";
 import { Lato } from "next/font/google";
 import { ReactNode, Suspense } from "react";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 const lato = Lato({
   weight: ["400", "700", "900"],
   subsets: ["latin"],
 });
 
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("common");
+  return { title: t('title')};
+}
+
 export default async function RootLayout({
   children,
 }: {
   children: ReactNode;
 }) {
+  
   return (
     <html className={`${lato.className}`} suppressHydrationWarning>
       <head />
