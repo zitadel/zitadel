@@ -26,10 +26,7 @@
         [toggleState]="toggleStates[key]"
         (toggleChange)="saveFeature(key, $event)"
       ></cnsl-feature-toggle>
-      <cnsl-login-v2-feature-toggle
-        [toggleState]="toggleStates.loginV2"
-        (toggleChanged)="saveFeature('loginV2', $event)"
-      />
+      <cnsl-login-v2-feature-toggle [toggleState]="toggleStates.loginV2" (toggleChanged)="saveFeature('loginV2', $event)" />
     </div>
   </cnsl-card>
 </div>

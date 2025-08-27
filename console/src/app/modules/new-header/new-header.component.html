@@ -31,7 +31,9 @@
       ></cnsl-organization-selector>
     </cnsl-header-dropdown>
   </ng-container>
-  <ng-container *ngIf="(['org.read'] | hasRole | async) === true && (!myInstanceQuery.data()?.instance || !onInstanceLevel())">
+  <ng-container
+    *ngIf="(['org.read'] | hasRole | async) === true && (!myInstanceQuery.data()?.instance || !onInstanceLevel())"
+  >
     <ng-container *ngTemplateOutlet="slash"></ng-container>
     <a
       *ngIf="activeOrganizationQuery.data() as org"
