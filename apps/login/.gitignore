@@ -13,3 +13,4 @@ dist-ssr
 *.local
 .vscode
 /blob-report/
+.docker-dist

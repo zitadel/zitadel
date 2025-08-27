@@ -4,7 +4,9 @@ packages:
   - "e2e"
   - "packages/*"
   - "apps/*"
+  - "apps/login/.docker-dist"
 
+inject-workspace-packages: true
 overrides:
   "@typescript-eslint/parser": "^8.35.1"
   "@zitadel/client": "workspace:*"
