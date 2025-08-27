@@ -32,23 +32,21 @@
     </cnsl-header-dropdown>
   </ng-container>
   <ng-container
-    *ngIf="(['org.read'] | hasRole | async) === true && (!myInstanceQuery.data()?.instance || !onInstanceLevel())"
+    *ngIf="
+      (['org.read'] | hasRole | async) === true &&
+      (!myInstanceQuery.data()?.instance || !onInstanceLevel()) &&
+      activeOrganizationQuery.data() as org
+    "
   >
     <ng-container *ngTemplateOutlet="slash"></ng-container>
-    <a
-      *ngIf="activeOrganizationQuery.data() as org"
-      class="new-header-breadcrumb"
-      matRipple
-      [matRippleUnbounded]="false"
-      [routerLink]="['/org']"
-    >
+    <a class="new-header-breadcrumb" matRipple [matRippleUnbounded]="false" [routerLink]="['/org']">
       {{ org.name }}
     </a>
     <cnsl-header-button
       cdkOverlayOrigin
       #orgTrigger="cdkOverlayOrigin"
       (click)="isOrgDropdownOpen.set(!isOrgDropdownOpen())"
-      ariaLabel="{{ activeOrganizationQuery.data()?.name }}"
+      ariaLabel="{{ org.name }}"
     >
     </cnsl-header-button>
     <cnsl-header-dropdown [trigger]="orgTrigger" [isOpen]="isOrgDropdownOpen()" (closed)="isOrgDropdownOpen.set(false)">
