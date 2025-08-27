@@ -55,3 +55,19 @@ message MetadataKeyFilter {
     }
   ];
 }
+
+message MetadataValueFilter {
+  bytes value = 1 [
+    (validate.rules).bytes = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"bXkgdmFsdWU=\""
+      description: "A base64 encoded value"
+    }
+  ];
+  zitadel.filter.v2.ByteFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which bytes equality method is used";
+    }
+  ];
+}
