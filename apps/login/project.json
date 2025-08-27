@@ -9,7 +9,7 @@
         "^build"
       ]
     },
-    "build:login:standalone": {
+    "standalone": {
       "outputs": [
         "{projectRoot}/.next/**",
         "!{projectRoot}/.next/cache/**"
