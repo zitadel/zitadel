@@ -39,6 +39,7 @@ interface SAMLProviderForm {
   metadataUrl: FormControl<string>;
   binding: FormControl<string>;
   withSignedRequest: FormControl<boolean>;
+  signatureAlgorithm: FormControl<string>;
   nameIdFormat: FormControl<string>;
   transientMappingAttributeName: FormControl<string>;
   federatedLogoutEnabled: FormControl<boolean>;
@@ -133,6 +134,7 @@ export class ProviderSamlSpComponent {
 
   private _initializeForm(): void {
     const defaultBinding = getEnumKeyFromValue(SAMLBinding, SAMLBinding.SAML_BINDING_POST) || this.bindingValues[0];
+    const defaultSignatureAlgorithm = getEnumKeyFromValue(SAMLSignatureAlgorithm, SAMLSignatureAlgorithm.SAML_SIGNATURE_UNSPECIFIED) || this.signatureAlgorithmValues[0];
     const defaultNameIdFormat =
       getEnumKeyFromValue(SAMLNameIDFormat, SAMLNameIDFormat.SAML_NAME_ID_FORMAT_PERSISTENT) || this.nameIDFormatValues[0];
 
@@ -143,7 +145,7 @@ export class ProviderSamlSpComponent {
         metadataUrl: new FormControl('', { nonNullable: true }),
         binding: new FormControl(defaultBinding, { nonNullable: true, validators: [requiredValidator] }),
         withSignedRequest: new FormControl(true, { nonNullable: true, validators: [requiredValidator] }),
-        signatureAlgorithm: new UntypedFormControl(this.signatureAlgorithmValues[0], []),
+        signatureAlgorithm: new FormControl(defaultSignatureAlgorithm, { nonNullable: true}),
         nameIdFormat: new FormControl(defaultNameIdFormat, { nonNullable: true }),
         transientMappingAttributeName: new FormControl('', { nonNullable: true }),
         federatedLogoutEnabled: new FormControl(false, { nonNullable: true }),
@@ -226,7 +228,7 @@ export class ProviderSamlSpComponent {
       }
       req.setWithSignedRequest(this.withSignedRequest.value);
       req.setBinding(SAMLBinding[this.binding.value as keyof typeof SAMLBinding]);
-      req.setSignatureAlgorithm(SAMLSignatureAlgorithm[this.signatureAlgorithm?.value]);
+      req.setSignatureAlgorithm(SAMLSignatureAlgorithm[this.signatureAlgorithm.value as keyof typeof SAMLSignatureAlgorithm]);
       // @ts-ignore
       req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value as keyof typeof SAMLNameIDFormat]);
       req.setTransientMappingAttributeName(this.transientMapping.value);
@@ -267,7 +269,7 @@ export class ProviderSamlSpComponent {
     req.setWithSignedRequest(this.withSignedRequest.value);
     if (this.signatureAlgorithm) {
       // @ts-ignore
-      req.setSignatureAlgorithm(SAMLSignatureAlgorithm[this.signatureAlgorithm.value]);
+      req.setSignatureAlgorithm(SAMLSignatureAlgorithm[this.signatureAlgorithm.value as keyof typeof SAMLSignatureAlgorithm]);
     }
     if (this.nameIDFormat) {
       req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value as keyof typeof SAMLNameIDFormat]);
@@ -332,13 +334,6 @@ export class ProviderSamlSpComponent {
     return this.form.controls.name;
   }
 
-  compareSignatureAlgorithm(value: string, index: number) {
-    if (value) {
-      return value === Object.keys(SAMLSignatureAlgorithm)[index];
-    }
-    return false;
-  }
-
   private get metadataXml(): FormControl<string> {
     return this.form.controls.metadataXml;
   }
@@ -359,8 +354,8 @@ export class ProviderSamlSpComponent {
     return this.form.controls.nameIdFormat;
   }
 
-  private get signatureAlgorithm(): AbstractControl | null {
-    return this.form.get('signatureAlgorithm');
+  private get signatureAlgorithm(): FormControl<string> {
+    return this.form.controls.signatureAlgorithm;
   }
 
   private get transientMapping(): FormControl<string> {
