@@ -121,9 +121,18 @@ export class OrganizationSelectorComponent {
     effect(() => {
       const orgId = newOrganizationService.orgId();
       const orgs = this.organizationsQuery.data()?.orgs;
-      if (orgId || !orgs || orgs.length === 0) {
+
+      // orgs not yet loaded or user has no orgs
+      if (!orgs || orgs.length === 0) {
         return;
       }
+
+      // use has a selected org and it was found
+      if (orgId && orgs.some((org) => org.id === orgId)) {
+        return;
+      }
+
+      // user has no org selected or the selected org is not in the org list
       const _ = newOrganizationService.setOrgId(orgs[0].id);
     });
 

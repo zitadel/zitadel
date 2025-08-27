@@ -154,7 +154,6 @@
 <ng-template #shortcutKeyRef>
   <ng-container *ngIf="(isHandset$ | async) === false">
     <ng-template cnslHasRole [hasRole]="['iam.read']">
-      <span class="fill-space"></span>
       <ng-container *ngIf="!adminService.hideOnboarding && (adminService.progressAllDone | async) === false">
         <div
           cdkOverlayOrigin
@@ -194,6 +193,7 @@
       </ng-container>
     </ng-template>
 
+    <span class="fill-space"></span>
     <div
       (click)="openHelp()"
       class="nav-shortcut-action-key"
