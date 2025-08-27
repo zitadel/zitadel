@@ -7,7 +7,7 @@ import {
   SAMLBinding,
   SAMLNameIDFormat,
 } from '../../../proto/generated/zitadel/idp_pb';
-import { AbstractControl, FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 import { ManagementService } from '../../../services/mgmt.service';
 import { AdminService } from '../../../services/admin.service';
@@ -30,6 +30,18 @@ import {
 import { Environment, EnvironmentService } from '../../../services/environment.service';
 import { filter, map } from 'rxjs/operators';
 import { ProviderNextService } from '../provider-next/provider-next.service';
+import { getEnumKeys, getEnumKeyFromValue, convertEnumValuesToKeys } from '../../../utils/enum.utils';
+
+interface SAMLProviderForm {
+  name: FormControl<string>;
+  metadataXml: FormControl<string>;
+  metadataUrl: FormControl<string>;
+  binding: FormControl<string>;
+  withSignedRequest: FormControl<boolean>;
+  nameIdFormat: FormControl<string>;
+  transientMappingAttributeName: FormControl<string>;
+  federatedLogoutEnabled: FormControl<boolean>;
+}
 
 @Component({
   selector: 'cnsl-provider-saml-sp',
@@ -41,7 +53,7 @@ export class ProviderSamlSpComponent {
   public id: string | null = '';
   public loading: boolean = false;
   public provider?: Provider.AsObject;
-  public form!: FormGroup;
+  public form!: FormGroup<SAMLProviderForm>;
   public showOptional: boolean = false;
   public options: Options = new Options()
     .setIsCreationAllowed(true)
@@ -51,8 +63,8 @@ export class ProviderSamlSpComponent {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
-  bindingValues: string[] = Object.keys(SAMLBinding);
-  nameIDFormatValues: string[] = Object.keys(SAMLNameIDFormat);
+  bindingValues: string[] = getEnumKeys(SAMLBinding);
+  nameIDFormatValues: string[] = getEnumKeys(SAMLNameIDFormat);
 
   public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   public justActivated$ = new BehaviorSubject<boolean>(false);
@@ -118,16 +130,20 @@ export class ProviderSamlSpComponent {
   }
 
   private _initializeForm(): void {
-    this.form = new UntypedFormGroup(
+    const defaultBinding = getEnumKeyFromValue(SAMLBinding, SAMLBinding.SAML_BINDING_POST) || this.bindingValues[0];
+    const defaultNameIdFormat =
+      getEnumKeyFromValue(SAMLNameIDFormat, SAMLNameIDFormat.SAML_NAME_ID_FORMAT_PERSISTENT) || this.nameIDFormatValues[0];
+
+    this.form = new FormGroup<SAMLProviderForm>(
       {
-        name: new UntypedFormControl('', [requiredValidator]),
-        metadataXml: new UntypedFormControl('', []),
-        metadataUrl: new UntypedFormControl('', []),
-        binding: new UntypedFormControl(this.bindingValues[0], [requiredValidator]),
-        withSignedRequest: new UntypedFormControl(true, [requiredValidator]),
-        nameIdFormat: new UntypedFormControl(SAMLNameIDFormat.SAML_NAME_ID_FORMAT_PERSISTENT, []),
-        transientMappingAttributeName: new UntypedFormControl('', []),
-        federatedLogoutEnabled: new UntypedFormControl(false, []),
+        name: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+        metadataXml: new FormControl('', { nonNullable: true }),
+        metadataUrl: new FormControl('', { nonNullable: true }),
+        binding: new FormControl(defaultBinding, { nonNullable: true, validators: [requiredValidator] }),
+        withSignedRequest: new FormControl(true, { nonNullable: true, validators: [requiredValidator] }),
+        nameIdFormat: new FormControl(defaultNameIdFormat, { nonNullable: true }),
+        transientMappingAttributeName: new FormControl('', { nonNullable: true }),
+        federatedLogoutEnabled: new FormControl(false, { nonNullable: true }),
       },
       atLeastOneIsFilled('metadataXml', 'metadataUrl'),
     );
@@ -197,21 +213,19 @@ export class ProviderSamlSpComponent {
           : new AdminUpdateSAMLProviderRequest();
 
       req.setId(this.provider?.id || this.justCreated$.value);
-      req.setName(this.name?.value);
-      if (this.metadataXml?.value) {
+      req.setName(this.name.value);
+      if (this.metadataXml.value) {
         req.setMetadataUrl('');
-        req.setMetadataXml(this.metadataXml?.value);
+        req.setMetadataXml(this.metadataXml.value);
       } else {
         req.setMetadataXml('');
-        req.setMetadataUrl(this.metadataUrl?.value);
+        req.setMetadataUrl(this.metadataUrl.value);
       }
-      req.setWithSignedRequest(this.withSignedRequest?.value);
-      // @ts-ignore
-      req.setBinding(SAMLBinding[this.binding?.value]);
-      // @ts-ignore
-      req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat?.value]);
-      req.setTransientMappingAttributeName(this.transientMapping?.value);
-      req.setFederatedLogoutEnabled(this.federatedLogoutEnabled?.value);
+      req.setWithSignedRequest(this.withSignedRequest.value);
+      req.setBinding(SAMLBinding[this.binding.value as keyof typeof SAMLBinding]);
+      req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value as keyof typeof SAMLNameIDFormat]);
+      req.setTransientMappingAttributeName(this.transientMapping.value);
+      req.setFederatedLogoutEnabled(this.federatedLogoutEnabled.value);
       req.setProviderOptions(this.options);
 
       this.loading = true;
@@ -235,24 +249,22 @@ export class ProviderSamlSpComponent {
       this.serviceType === PolicyComponentServiceType.MGMT
         ? new MgmtAddSAMLProviderRequest()
         : new AdminAddSAMLProviderRequest();
-    req.setName(this.name?.value);
-    if (this.metadataXml?.value) {
+    req.setName(this.name.value);
+    if (this.metadataXml.value) {
       req.setMetadataUrl('');
-      req.setMetadataXml(this.metadataXml?.value);
+      req.setMetadataXml(this.metadataXml.value);
     } else {
       req.setMetadataXml('');
-      req.setMetadataUrl(this.metadataUrl?.value);
+      req.setMetadataUrl(this.metadataUrl.value);
     }
     req.setProviderOptions(this.options);
-    // @ts-ignore
-    req.setBinding(SAMLBinding[this.binding?.value]);
-    req.setWithSignedRequest(this.withSignedRequest?.value);
+    req.setBinding(SAMLBinding[this.binding.value as keyof typeof SAMLBinding]);
+    req.setWithSignedRequest(this.withSignedRequest.value);
     if (this.nameIDFormat) {
-      // @ts-ignore
-      req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value]);
+      req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value as keyof typeof SAMLNameIDFormat]);
     }
-    req.setTransientMappingAttributeName(this.transientMapping?.value);
-    req.setFederatedLogoutEnabled(this.federatedLogoutEnabled?.value);
+    req.setTransientMappingAttributeName(this.transientMapping.value);
+    req.setFederatedLogoutEnabled(this.federatedLogoutEnabled.value);
     this.loading = true;
     this.service
       .addSAMLProvider(req)
@@ -281,9 +293,20 @@ export class ProviderSamlSpComponent {
       .then((resp) => {
         this.provider = resp.idp;
         this.loading = false;
-        this.name?.setValue(this.provider?.name);
+        this.name.setValue(this.provider?.name || '');
         if (this.provider?.config?.saml) {
-          this.form.patchValue(this.provider.config.saml);
+          const samlConfig = this.provider.config.saml;
+          const bindingKey = getEnumKeyFromValue(SAMLBinding, samlConfig.binding) || '';
+          const nameIdFormatKey = getEnumKeyFromValue(SAMLNameIDFormat, samlConfig.nameIdFormat) || '';
+
+          this.form.patchValue({
+            metadataXml: typeof samlConfig.metadataXml === 'string' ? samlConfig.metadataXml : '',
+            binding: bindingKey,
+            withSignedRequest: samlConfig.withSignedRequest,
+            nameIdFormat: nameIdFormatKey,
+            transientMappingAttributeName: samlConfig.transientMappingAttributeName || '',
+            federatedLogoutEnabled: samlConfig.federatedLogoutEnabled || false,
+          });
         }
       })
       .catch((error) => {
@@ -296,50 +319,35 @@ export class ProviderSamlSpComponent {
     this._location.back();
   }
 
-  compareBinding(value: string, index: number) {
-    if (value) {
-      return value === Object.keys(SAMLBinding)[index];
-    }
-    return false;
+  private get name(): FormControl<string> {
+    return this.form.controls.name;
   }
 
-  compareNameIDFormat(value: string, index: number) {
-    console.log(value, index);
-    if (value) {
-      return value === Object.keys(SAMLNameIDFormat)[index];
-    }
-    return false;
+  private get metadataXml(): FormControl<string> {
+    return this.form.controls.metadataXml;
   }
 
-  private get name(): AbstractControl | null {
-    return this.form.get('name');
+  private get metadataUrl(): FormControl<string> {
+    return this.form.controls.metadataUrl;
   }
 
-  private get metadataXml(): AbstractControl | null {
-    return this.form.get('metadataXml');
+  private get binding(): FormControl<string> {
+    return this.form.controls.binding;
   }
 
-  private get metadataUrl(): AbstractControl | null {
-    return this.form.get('metadataUrl');
+  private get withSignedRequest(): FormControl<boolean> {
+    return this.form.controls.withSignedRequest;
   }
 
-  private get binding(): AbstractControl | null {
-    return this.form.get('binding');
+  private get nameIDFormat(): FormControl<string> {
+    return this.form.controls.nameIdFormat;
   }
 
-  private get withSignedRequest(): AbstractControl | null {
-    return this.form.get('withSignedRequest');
+  private get transientMapping(): FormControl<string> {
+    return this.form.controls.transientMappingAttributeName;
   }
 
-  private get nameIDFormat(): AbstractControl | null {
-    return this.form.get('nameIdFormat');
-  }
-
-  private get transientMapping(): AbstractControl | null {
-    return this.form.get('transientMappingAttributeName');
-  }
-
-  private get federatedLogoutEnabled(): AbstractControl | null {
-    return this.form.get('federatedLogoutEnabled');
+  private get federatedLogoutEnabled(): FormControl<boolean> {
+    return this.form.controls.federatedLogoutEnabled;
   }
 }
