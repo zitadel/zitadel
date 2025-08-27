@@ -5,7 +5,6 @@
 .gitignore
 .dockerignore
 **/Dockerfile
-**/node_modules
 **/.pnpm-store
 **/.nx
 **/.next

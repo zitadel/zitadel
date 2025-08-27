@@ -1,0 +1,7 @@
+*
+
+!apps/login/scripts
+!apps/login/public
+!apps/login/.next/standalone
+!apps/login/.next/static
+!node_modules

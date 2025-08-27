@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "standalone": "NEXT_PUBLIC_BASE_PATH=/ui/v2/login NEXT_OUTPUT_MODE=standalone next build && pnpm symlink-resolver build ./.next/standalone/node_modules && rm -rf .docker-dist && mkdir -p .docker-dist/.next && cp -r .next/standalone/* scripts/* .docker-dist && cp -r .next/static .docker-dist/.next/static && cp -r public .docker-dist/public",
+    "standalone": "NEXT_PUBLIC_BASE_PATH=/ui/v2/login NEXT_OUTPUT_MODE=standalone next build",
     "start": "next start",
     "lint": "pnpm run '/^lint:check:.*$/'",
     "lint:check:next": "next lint",
@@ -54,8 +54,6 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@zitadel/client": "workspace:*",
-    "@zitadel/proto": "workspace:*",
     "@babel/eslint-parser": "^7.23.0",
     "@bufbuild/buf": "^1.53.0",
     "@faker-js/faker": "^9.7.0",
@@ -75,6 +73,8 @@
     "@typescript-eslint/parser": "^7.0.0",
     "@vercel/git-hooks": "1.0.0",
     "@vitejs/plugin-react": "^4.4.1",
+    "@zitadel/client": "workspace:*",
+    "@zitadel/proto": "workspace:*",
     "autoprefixer": "10.4.21",
     "concurrently": "^9.1.2",
     "cypress": "^14.5.2",
@@ -95,7 +95,6 @@
     "prettier-plugin-tailwindcss": "0.6.11",
     "sass": "^1.87.0",
     "start-server-and-test": "^2.0.11",
-    "symlink-resolver": "^0.2.1",
     "tailwindcss": "3.4.14",
     "ts-proto": "^2.7.0",
     "typescript": "^5.8.3",
