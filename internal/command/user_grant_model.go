@@ -91,7 +91,7 @@ type UserGrantPreConditionReadModel struct {
 	ProjectID               string
 	ProjectResourceOwner    string
 	ProjectGrantID          string
-	GrantID                 string
+	FoundGrantID            string
 	ResourceOwner           string
 	UserExists              bool
 	ProjectExists           bool
@@ -106,8 +106,12 @@ func NewUserGrantPreConditionReadModel(userID, projectID, projectGrantID string,
 		ProjectID: projectID,
 		// ProjectGrantID can be empty, if grantedOrgID is in the resourceowner
 		ProjectGrantID: projectGrantID,
-		// resourceowner has to be either empty, resourceowner of the project or grantedOrdID of the projectgrant
-		ResourceOwner: resourceOwner,
+		// resourceowner is either empty to use the project organization
+		// or filled with the project organization
+		// or filled with the organization the project is granted to
+		ResourceOwner:           resourceOwner,
+		ExistingRoleKeysGrant:   make([]string, 0),
+		ExistingRoleKeysProject: make([]string, 0),
 	}
 }
 
@@ -123,62 +127,90 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 		case *user.UserRemovedEvent:
 			wm.UserExists = false
 		case *project.ProjectAddedEvent:
-			if wm.ResourceOwner == "" || wm.ResourceOwner == e.Aggregate().ResourceOwner {
+			if checkIfProjectNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner) {
 				wm.ProjectExists = true
 			}
 			wm.ProjectResourceOwner = e.Aggregate().ResourceOwner
 		case *project.ProjectRemovedEvent:
-			// only necessary if project existing
-			if wm.ProjectResourceOwner == e.Aggregate().ResourceOwner {
+			if checkIfProjectNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner) {
 				wm.ProjectExists = false
 			}
 		case *project.GrantAddedEvent:
-			// grantID can be empty or provided and equal
-			// and resourceowner has to be provided and equal to an organization the project is granted to, and not own resourceowner
-			if (wm.ProjectGrantID == "" || wm.ProjectGrantID == e.GrantID) &&
-				wm.ResourceOwner != "" && wm.ResourceOwner == e.GrantedOrgID && e.GrantedOrgID != e.Aggregate().ResourceOwner {
+			// grantID is empty to search for a granted project or provided AND has to be equal to the grantID of the granted project
+			// AND there has to be an organization the project is granted to AND it can not be the organization belong to itself
+			if checkIfProjectGrantNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner, e.GrantedOrgID, wm.ProjectGrantID, e.GrantID) {
 				wm.ProjectGrantExists = true
 				wm.ExistingRoleKeysGrant = e.RoleKeys
 				// persist grantID without changing the original
-				wm.GrantID = e.GrantID
+				wm.FoundGrantID = e.GrantID
 			}
 		case *project.GrantChangedEvent:
-			// grantID is filled by grant added event, and guarantees that project exists
-			// only applicable if change for the same projectgrant
-			if wm.GrantID != "" && wm.GrantID == e.GrantID {
+			// grantedOrgID is empty as grantID is always set
+			if checkIfProjectGrantNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner, "", wm.FoundGrantID, e.GrantID) {
 				wm.ExistingRoleKeysGrant = e.RoleKeys
 			}
 		case *project.GrantRemovedEvent:
-			// grantID is filled by grant added event, and guarantees that project exists
-			// only applicable if change for the same projectgrant
-			if wm.GrantID != "" && wm.GrantID == e.GrantID {
+			// grantedOrgID is empty as grantID is always set
+			if checkIfProjectGrantNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner, "", wm.FoundGrantID, e.GrantID) {
 				wm.ProjectGrantExists = false
 				wm.ExistingRoleKeysGrant = []string{}
-				// remove grantID as not longer necessary
-				wm.GrantID = ""
 			}
 		case *project.RoleAddedEvent:
-			// ignore if project grant is requested or resourceowner is not equal to the resourceowner of the project
-			if wm.ProjectGrantID != "" || (wm.ResourceOwner != "" && wm.ResourceOwner != e.Aggregate().ResourceOwner) {
-				continue
+			if checkIfProjectRoleNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner) {
+				wm.ExistingRoleKeysProject = append(wm.ExistingRoleKeysProject, e.Key)
 			}
-			wm.ExistingRoleKeysProject = append(wm.ExistingRoleKeysProject, e.Key)
 		case *project.RoleRemovedEvent:
-			// ignore if project grant is requested or resourceowner is not equal to the resourceowner of the project
-			if wm.ProjectGrantID != "" || (wm.ResourceOwner != "" && wm.ResourceOwner != e.Aggregate().ResourceOwner) {
-				continue
-			}
-			for i, key := range wm.ExistingRoleKeysProject {
-				if key == e.Key {
-					copy(wm.ExistingRoleKeysProject[i:], wm.ExistingRoleKeysProject[i+1:])
-					wm.ExistingRoleKeysProject[len(wm.ExistingRoleKeysProject)-1] = ""
-					wm.ExistingRoleKeysProject = wm.ExistingRoleKeysProject[:len(wm.ExistingRoleKeysProject)-1]
-					continue
+			if checkIfProjectRoleNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner) {
+				for i, key := range wm.ExistingRoleKeysProject {
+					if key == e.Key {
+						copy(wm.ExistingRoleKeysProject[i:], wm.ExistingRoleKeysProject[i+1:])
+						wm.ExistingRoleKeysProject[len(wm.ExistingRoleKeysProject)-1] = ""
+						wm.ExistingRoleKeysProject = wm.ExistingRoleKeysProject[:len(wm.ExistingRoleKeysProject)-1]
+						continue
+					}
 				}
 			}
 		}
 	}
 	return wm.WriteModel.Reduce()
+}
+
+func checkIfProjectNecessary(providedResourceOwner, projectResourceOwner string) bool {
+	// organization of the project is used OR provided is organization of the project
+	if providedResourceOwner == "" || providedResourceOwner == projectResourceOwner {
+		return true
+	}
+	return false
+}
+
+func checkIfProjectGrantNecessary(providedResourceOwner, projectResourceOwner, grantedOrgID, providedProjectGrantID, projectGrantID string) bool {
+	// grantID is empty to search for a granted project or provided AND has to be equal to the grantID of the granted project
+	// AND there has to be an organization the project is granted to AND it can not be the organization belong to itself
+	if (providedProjectGrantID == "" || providedProjectGrantID == projectGrantID) &&
+		(providedResourceOwner != "" && providedResourceOwner == grantedOrgID && grantedOrgID != projectResourceOwner) {
+		return true
+	}
+	return false
+}
+
+func checkIfProjectRoleNecessary(providedResourceOwner, projectResourceOwner string) bool {
+	// organization of the project is used OR provided is organization of project
+	if providedResourceOwner == "" || providedResourceOwner == projectResourceOwner {
+		return true
+	}
+	return false
+}
+
+func (wm *UserGrantPreConditionReadModel) existingRoles(projectID, projectGrantID string) []string {
+	// not the requested project or not found project grant
+	if wm.ProjectID != projectID || wm.FoundGrantID != projectGrantID {
+		return nil
+	}
+	// requested project
+	if projectGrantID == "" {
+		return wm.ExistingRoleKeysProject
+	}
+	return wm.ExistingRoleKeysGrant
 }
 
 func (wm *UserGrantPreConditionReadModel) Query() *eventstore.SearchQueryBuilder {
