@@ -7087,6 +7087,9 @@ message AddSAMLProviderRequest {
     // Optionally enable federated logout. If enabled, ZITADEL will send a logout request to the identity provider,
     // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
     optional bool federated_logout_enabled = 9;
+    // Specify a Signature Algorithm that should be used to sign SAML requests and responses.
+    // Can be used only if the `with_signed_request` option is set to true.
+    zitadel.idp.v1.SAMLSignatureAlgorithm signature_algorithm = 10;
 }
 
 message AddSAMLProviderResponse {
@@ -7124,6 +7127,9 @@ message UpdateSAMLProviderRequest {
     // Optionally enable federated logout. If enabled, ZITADEL will send a logout request to the identity provider,
     // if the user terminates the session in ZITADEL. Be sure to provide a SLO endpoint as part of the metadata.
     optional bool federated_logout_enabled = 10;
+    // Specify a Signature Algorithm that should be used to sign SAML requests and responses.
+    // Can be used only if the `with_signed_request` option is set to true.
+    zitadel.idp.v1.SAMLSignatureAlgorithm signature_algorithm = 11;
 }
 
 message UpdateSAMLProviderResponse {
