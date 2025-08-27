@@ -6,6 +6,7 @@ import {
   Provider,
   SAMLBinding,
   SAMLNameIDFormat,
+  SAMLSignatureAlgorithm,
 } from '../../../proto/generated/zitadel/idp_pb';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
@@ -38,6 +39,7 @@ interface SAMLProviderForm {
   metadataUrl: FormControl<string>;
   binding: FormControl<string>;
   withSignedRequest: FormControl<boolean>;
+  signatureAlgorithm: FormControl<string>;
   nameIdFormat: FormControl<string>;
   transientMappingAttributeName: FormControl<string>;
   federatedLogoutEnabled: FormControl<boolean>;
@@ -65,6 +67,7 @@ export class ProviderSamlSpComponent {
   private service!: ManagementService | AdminService;
   bindingValues: string[] = getEnumKeys(SAMLBinding);
   nameIDFormatValues: string[] = getEnumKeys(SAMLNameIDFormat);
+  signatureAlgorithmValues: string[] = Object.keys(SAMLSignatureAlgorithm);
 
   public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   public justActivated$ = new BehaviorSubject<boolean>(false);
@@ -131,6 +134,9 @@ export class ProviderSamlSpComponent {
 
   private _initializeForm(): void {
     const defaultBinding = getEnumKeyFromValue(SAMLBinding, SAMLBinding.SAML_BINDING_POST) || this.bindingValues[0];
+    const defaultSignatureAlgorithm =
+      getEnumKeyFromValue(SAMLSignatureAlgorithm, SAMLSignatureAlgorithm.SAML_SIGNATURE_UNSPECIFIED) ||
+      this.signatureAlgorithmValues[0];
     const defaultNameIdFormat =
       getEnumKeyFromValue(SAMLNameIDFormat, SAMLNameIDFormat.SAML_NAME_ID_FORMAT_PERSISTENT) || this.nameIDFormatValues[0];
 
@@ -141,6 +147,7 @@ export class ProviderSamlSpComponent {
         metadataUrl: new FormControl('', { nonNullable: true }),
         binding: new FormControl(defaultBinding, { nonNullable: true, validators: [requiredValidator] }),
         withSignedRequest: new FormControl(true, { nonNullable: true, validators: [requiredValidator] }),
+        signatureAlgorithm: new FormControl(defaultSignatureAlgorithm, { nonNullable: true }),
         nameIdFormat: new FormControl(defaultNameIdFormat, { nonNullable: true }),
         transientMappingAttributeName: new FormControl('', { nonNullable: true }),
         federatedLogoutEnabled: new FormControl(false, { nonNullable: true }),
@@ -223,6 +230,10 @@ export class ProviderSamlSpComponent {
       }
       req.setWithSignedRequest(this.withSignedRequest.value);
       req.setBinding(SAMLBinding[this.binding.value as keyof typeof SAMLBinding]);
+      req.setSignatureAlgorithm(
+        SAMLSignatureAlgorithm[this.signatureAlgorithm.value as keyof typeof SAMLSignatureAlgorithm],
+      );
+      // @ts-ignore
       req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value as keyof typeof SAMLNameIDFormat]);
       req.setTransientMappingAttributeName(this.transientMapping.value);
       req.setFederatedLogoutEnabled(this.federatedLogoutEnabled.value);
@@ -260,6 +271,12 @@ export class ProviderSamlSpComponent {
     req.setProviderOptions(this.options);
     req.setBinding(SAMLBinding[this.binding.value as keyof typeof SAMLBinding]);
     req.setWithSignedRequest(this.withSignedRequest.value);
+    if (this.signatureAlgorithm) {
+      // @ts-ignore
+      req.setSignatureAlgorithm(
+        SAMLSignatureAlgorithm[this.signatureAlgorithm.value as keyof typeof SAMLSignatureAlgorithm],
+      );
+    }
     if (this.nameIDFormat) {
       req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value as keyof typeof SAMLNameIDFormat]);
     }
@@ -341,6 +358,10 @@ export class ProviderSamlSpComponent {
 
   private get nameIDFormat(): FormControl<string> {
     return this.form.controls.nameIdFormat;
+  }
+
+  private get signatureAlgorithm(): FormControl<string> {
+    return this.form.controls.signatureAlgorithm;
   }
 
   private get transientMapping(): FormControl<string> {
