@@ -32,15 +32,16 @@
     </cnsl-header-dropdown>
   </ng-container>
   <ng-container
-    *ngIf="
-      (['org.read'] | hasRole | async) === true &&
-      (!myInstanceQuery.data()?.instance || !onInstanceLevel())
-    "
+    *ngIf="(['org.read'] | hasRole | async) === true && (!myInstanceQuery.data()?.instance || !onInstanceLevel())"
   >
     <ng-container *ngTemplateOutlet="slash"></ng-container>
     <a
       *ngIf="activeOrganizationQuery.data() as org"
-      class="new-header-breadcrumb" matRipple [matRippleUnbounded]="false" [routerLink]="['/org']">
+      class="new-header-breadcrumb"
+      matRipple
+      [matRippleUnbounded]="false"
+      [routerLink]="['/org']"
+    >
       {{ org.name }}
     </a>
     <cnsl-header-button
