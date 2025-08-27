@@ -131,8 +131,9 @@ export class ProviderSamlSpComponent {
 
   private _initializeForm(): void {
     const defaultBinding = getEnumKeyFromValue(SAMLBinding, SAMLBinding.SAML_BINDING_POST) || this.bindingValues[0];
-    const defaultNameIdFormat = getEnumKeyFromValue(SAMLNameIDFormat, SAMLNameIDFormat.SAML_NAME_ID_FORMAT_PERSISTENT) || this.nameIDFormatValues[0];
-    
+    const defaultNameIdFormat =
+      getEnumKeyFromValue(SAMLNameIDFormat, SAMLNameIDFormat.SAML_NAME_ID_FORMAT_PERSISTENT) || this.nameIDFormatValues[0];
+
     this.form = new FormGroup<SAMLProviderForm>(
       {
         name: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
@@ -297,7 +298,7 @@ export class ProviderSamlSpComponent {
           const samlConfig = this.provider.config.saml;
           const bindingKey = getEnumKeyFromValue(SAMLBinding, samlConfig.binding) || '';
           const nameIdFormatKey = getEnumKeyFromValue(SAMLNameIDFormat, samlConfig.nameIdFormat) || '';
-          
+
           this.form.patchValue({
             metadataXml: typeof samlConfig.metadataXml === 'string' ? samlConfig.metadataXml : '',
             binding: bindingKey,

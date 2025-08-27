@@ -1,17 +1,17 @@
 /**
  * Utility functions for working with TypeScript enums in Angular forms
- * 
+ *
  * Example usage:
  * ```typescript
  * // Get dropdown options
  * const bindingOptions = getEnumKeys(SAMLBinding);
- * 
+ *
  * // Convert backend enum values to form-friendly string keys
  * const formConfig = convertEnumValuesToKeys(backendConfig, {
  *   binding: SAMLBinding,
  *   nameIdFormat: SAMLNameIDFormat
  * });
- * 
+ *
  * // Find specific enum key
  * const defaultBinding = getEnumKeyFromValue(SAMLBinding, SAMLBinding.SAML_BINDING_POST);
  * ```
@@ -31,7 +31,7 @@ type NumericEnum = Record<string, string | number> & Record<number, string>;
  * ```
  */
 export function getEnumKeys<T extends NumericEnum>(enumObject: T): string[] {
-  return Object.keys(enumObject).filter(key => isNaN(Number(key)));
+  return Object.keys(enumObject).filter((key) => isNaN(Number(key)));
 }
 
 /**
@@ -45,11 +45,8 @@ export function getEnumKeys<T extends NumericEnum>(enumObject: T): string[] {
  * // Returns: 'SAML_BINDING_POST'
  * ```
  */
-export function getEnumKeyFromValue<T extends NumericEnum>(
-  enumObject: T, 
-  value: number
-): string | undefined {
-  return Object.keys(enumObject).find(key => enumObject[key] === value && isNaN(Number(key)));
+export function getEnumKeyFromValue<T extends NumericEnum>(enumObject: T, value: number): string | undefined {
+  return Object.keys(enumObject).find((key) => enumObject[key] === value && isNaN(Number(key)));
 }
 
 /**
@@ -63,16 +60,16 @@ export function getEnumKeyFromValue<T extends NumericEnum>(
  *   binding: SAMLBinding,
  *   nameIdFormat: SAMLNameIDFormat
  * });
- * // Converts: { binding: 1, nameIdFormat: 2 } 
+ * // Converts: { binding: 1, nameIdFormat: 2 }
  * // To: { binding: 'SAML_BINDING_POST', nameIdFormat: 'SAML_NAME_ID_FORMAT_PERSISTENT' }
  * ```
  */
 export function convertEnumValuesToKeys<T extends Record<string, unknown>>(
-  config: T, 
-  enumMappings: { [K in keyof Partial<T>]: NumericEnum }
+  config: T,
+  enumMappings: { [K in keyof Partial<T>]: NumericEnum },
 ): T {
   const converted = { ...config };
-  
+
   for (const [propertyName, enumObject] of Object.entries(enumMappings)) {
     const typedPropertyName = propertyName as keyof T;
     if (converted[typedPropertyName] !== undefined && typeof converted[typedPropertyName] === 'number') {
@@ -82,6 +79,6 @@ export function convertEnumValuesToKeys<T extends Record<string, unknown>>(
       }
     }
   }
-  
+
   return converted;
 }
