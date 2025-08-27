@@ -1,5 +1,5 @@
 {
-  "name": "zitadel-e2e",
+  "name": "@zitadel/e2e",
   "version": "0.0.0",
   "scripts": {
     "open": "pnpm exec cypress open",

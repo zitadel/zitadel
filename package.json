@@ -1,7 +1,7 @@
 {
   "packageManager": "pnpm@10.13.1",
   "private": true,
-  "name": "zitadel-monorepo",
+  "name": "@zitadel/zitadel",
   "scripts": {
     "generate": "nx run-many -t generate",
     "changeset": "changeset",
