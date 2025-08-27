@@ -14,12 +14,12 @@
   </div>
 
   <div class="table-wrapper">
-    <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
+    <table *ngIf="displayedColumns$ | async as displayedColumns" mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
       <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
           <div class="selection">
             <mat-checkbox
-              [disabled]="!canWrite"
+              [disabled]="(canWrite$ | async) === false"
               color="primary"
               (change)="$event ? masterToggle() : null"
               [checked]="selection.hasValue() && isAllSelected()"
@@ -31,7 +31,7 @@
         <td mat-cell *matCellDef="let row">
           <div class="selection">
             <mat-checkbox
-              [disabled]="!canWrite"
+              [disabled]="(canWrite$ | async) === false"
               color="primary"
               (click)="$event.stopPropagation()"
               (change)="$event ? selection.toggle(row) : null"
@@ -95,7 +95,7 @@
               color="warn"
               (click)="$event.stopPropagation(); triggerDeleteMember(member)"
               mat-icon-button
-              [disabled]="canDelete === false"
+              [disabled]="(canDelete$ | async) === false"
               data-e2e="remove-member-button"
             >
               <i class="las la-trash"></i>
@@ -116,14 +116,14 @@
               [selectable]="false"
               class="cnsl-chip"
               *ngFor="let role of member.rolesList"
-              [removable]="canWrite"
+              [removable]="canWrite$ | async"
               (removed)="removeRole(member, role)"
               data-e2e="role"
             >
               <div class="cnsl-chip-content">
                 <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
                 <span>{{ role | roletransform }}</span>
-                <button *ngIf="canWrite" matChipRemove data-e2e="remove-role-button">
+                <button *ngIf="canWrite$ | async" matChipRemove data-e2e="remove-role-button">
                   <mat-icon>cancel</mat-icon>
                 </button>
               </div>
@@ -135,8 +135,8 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr
         class="highlight"
-        [ngClass]="{ pointer: canWrite }"
-        (click)="canWrite ? addRole(member) : null"
+        [ngClass]="{ pointer: canWrite$ | async }"
+        (click)="addRole(member)"
         mat-row
         *matRowDef="let member; columns: displayedColumns"
       ></tr>

@@ -3,6 +3,7 @@ import { delay, Observable } from 'rxjs';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { NewAuthService } from '../../services/new-auth.service';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs/operators';
 
 @Pipe({
   name: 'hasRole',
@@ -17,10 +18,19 @@ export class HasRolePipe implements PipeTransform {
   ) {}
 
   public transform(values: string[], requiresAll: boolean = false): Observable<boolean> {
-    const signal = computed(() => this.authService.hasRoles(this.permissions.data() ?? [], values, requiresAll));
+    const signal = computed(() => {
+      const permissions = this.permissions.data();
+      if (!permissions) {
+        return undefined;
+      }
+      return this.authService.hasRoles(permissions, values, requiresAll);
+    });
 
     return toObservable(signal, {
       injector: this.injector,
-    }).pipe(delay(0));
+    }).pipe(
+      filter((hasRole): hasRole is Exclude<typeof hasRole, undefined> => hasRole !== undefined),
+      delay(0),
+    );
   }
 }
