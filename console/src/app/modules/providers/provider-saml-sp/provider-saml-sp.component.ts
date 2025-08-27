@@ -134,7 +134,9 @@ export class ProviderSamlSpComponent {
 
   private _initializeForm(): void {
     const defaultBinding = getEnumKeyFromValue(SAMLBinding, SAMLBinding.SAML_BINDING_POST) || this.bindingValues[0];
-    const defaultSignatureAlgorithm = getEnumKeyFromValue(SAMLSignatureAlgorithm, SAMLSignatureAlgorithm.SAML_SIGNATURE_UNSPECIFIED) || this.signatureAlgorithmValues[0];
+    const defaultSignatureAlgorithm =
+      getEnumKeyFromValue(SAMLSignatureAlgorithm, SAMLSignatureAlgorithm.SAML_SIGNATURE_UNSPECIFIED) ||
+      this.signatureAlgorithmValues[0];
     const defaultNameIdFormat =
       getEnumKeyFromValue(SAMLNameIDFormat, SAMLNameIDFormat.SAML_NAME_ID_FORMAT_PERSISTENT) || this.nameIDFormatValues[0];
 
@@ -145,7 +147,7 @@ export class ProviderSamlSpComponent {
         metadataUrl: new FormControl('', { nonNullable: true }),
         binding: new FormControl(defaultBinding, { nonNullable: true, validators: [requiredValidator] }),
         withSignedRequest: new FormControl(true, { nonNullable: true, validators: [requiredValidator] }),
-        signatureAlgorithm: new FormControl(defaultSignatureAlgorithm, { nonNullable: true}),
+        signatureAlgorithm: new FormControl(defaultSignatureAlgorithm, { nonNullable: true }),
         nameIdFormat: new FormControl(defaultNameIdFormat, { nonNullable: true }),
         transientMappingAttributeName: new FormControl('', { nonNullable: true }),
         federatedLogoutEnabled: new FormControl(false, { nonNullable: true }),
@@ -228,7 +230,9 @@ export class ProviderSamlSpComponent {
       }
       req.setWithSignedRequest(this.withSignedRequest.value);
       req.setBinding(SAMLBinding[this.binding.value as keyof typeof SAMLBinding]);
-      req.setSignatureAlgorithm(SAMLSignatureAlgorithm[this.signatureAlgorithm.value as keyof typeof SAMLSignatureAlgorithm]);
+      req.setSignatureAlgorithm(
+        SAMLSignatureAlgorithm[this.signatureAlgorithm.value as keyof typeof SAMLSignatureAlgorithm],
+      );
       // @ts-ignore
       req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value as keyof typeof SAMLNameIDFormat]);
       req.setTransientMappingAttributeName(this.transientMapping.value);
@@ -269,7 +273,9 @@ export class ProviderSamlSpComponent {
     req.setWithSignedRequest(this.withSignedRequest.value);
     if (this.signatureAlgorithm) {
       // @ts-ignore
-      req.setSignatureAlgorithm(SAMLSignatureAlgorithm[this.signatureAlgorithm.value as keyof typeof SAMLSignatureAlgorithm]);
+      req.setSignatureAlgorithm(
+        SAMLSignatureAlgorithm[this.signatureAlgorithm.value as keyof typeof SAMLSignatureAlgorithm],
+      );
     }
     if (this.nameIDFormat) {
       req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value as keyof typeof SAMLNameIDFormat]);
