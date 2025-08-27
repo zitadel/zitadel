@@ -14,7 +14,13 @@
   </div>
 
   <div class="table-wrapper">
-    <table *ngIf="displayedColumns$ | async as displayedColumns" mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
+    <table
+      *ngIf="displayedColumns$ | async as displayedColumns"
+      mat-table
+      class="table"
+      aria-label="Elements"
+      [dataSource]="dataSource"
+    >
       <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
           <div class="selection">
