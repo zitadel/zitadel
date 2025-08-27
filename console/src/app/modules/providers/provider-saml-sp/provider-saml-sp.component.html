@@ -72,6 +72,15 @@
       <div *ngIf="showOptional">
         <div class="transient-info">
           <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'IDP.SAML.SIGNATUREALGORITHM' | translate }}</cnsl-label>
+            <mat-select formControlName="signatureAlgorithm">
+              <mat-option *ngFor="let signatureAlgorithm of signatureAlgorithmValues" [value]="signatureAlgorithm">{{
+                signatureAlgorithm
+              }}</mat-option>
+            </mat-select>
+          </cnsl-form-field>
+
+          <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'IDP.SAML.NAMEIDFORMAT' | translate }}</cnsl-label>
             <mat-select formControlName="nameIdFormat">
               <mat-option *ngFor="let nameIdFormat of nameIDFormatValues" [value]="nameIdFormat">{{
