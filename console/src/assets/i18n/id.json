@@ -2150,6 +2150,7 @@
       "METADATAURL": "URL metadata",
       "BINDING": "Mengikat",
       "SIGNEDREQUEST": "Permintaan yang Ditandatangani",
+      "SIGNATUREALGORITHM": "Algoritma tanda tangan",
       "NAMEIDFORMAT": "Format ID Nama",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Nama Atribut Pemetaan Khusus",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Nama atribut alternatif untuk memetakan pengguna jika `format nameid` yang dikembalikan adalah `sementara`, mis. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
