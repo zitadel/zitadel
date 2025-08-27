@@ -709,7 +709,7 @@
     "SIDEWIDE": "Site-wide shortcuts",
     "SHORTCUTS": {
       "HOME": "<strong>G</strong>o to <strong>H</strong>ome",
-      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>instance",
+      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>nstance",
       "ORG": "<strong>G</strong>o to <strong>O</strong>rganization",
       "ORGSETTINGS": "<strong>G</strong>o to Organization <strong>S</strong>ettings",
       "ORGSWITCHER": "Change Organization",
