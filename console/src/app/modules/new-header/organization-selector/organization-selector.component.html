@@ -39,7 +39,8 @@
           (click)="organizationsQuery.fetchNextPage()"
           [disabled]="!organizationsQuery.hasNextPage() || organizationsQuery.isFetchingNextPage()"
         >
-          ...{{ totalResult - data.orgs.length }} {{ 'PAGINATOR.MORE' | translate }}
+          <ng-container *ngIf="['iam.read'] | hasRole | async">...{{ totalResult - data.orgs.length }} </ng-container>
+          {{ 'PAGINATOR.MORE' | translate }}
         </button>
       </ng-container>
     </ng-container>

@@ -4,7 +4,11 @@
       <mat-spinner [diameter]="20"></mat-spinner>
     </div>
     <ng-template #logo>
-      <a class="title custom" [routerLink]="['/']" *ngIf="authService.labelpolicy$ | async as lP; else defaultHome">
+      <a
+        class="title custom"
+        [routerLink]="(['iam.read', 'iam.policy.read'] | hasRole | async) ? ['/'] : ['/org']"
+        *ngIf="authService.labelpolicy$ | async as lP; else defaultHome"
+      >
         <img
           class="logo"
           alt="home logo"

@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import { injectInfiniteQuery, injectMutation, keepPreviousData } from '@tanstack/angular-query-experimental';
 import { NewOrganizationService } from 'src/app/services/new-organization.service';
-import { NgForOf, NgIf } from '@angular/common';
+import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
 import { ToastService } from 'src/app/services/toast.service';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ListOrganizationsRequestSchema, ListOrganizationsResponse } from '@zitadel/proto/zitadel/org/v2/org_service_pb';
@@ -33,7 +33,9 @@ import { Router } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { heroCheck, heroMagnifyingGlass } from '@ng-icons/heroicons/outline';
 import { heroArrowLeftCircleSolid } from '@ng-icons/heroicons/solid';
-import { UserService } from '../../../services/user.service';
+import { UserService } from 'src/app/services/user.service';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
+import { NewAuthService } from 'src/app/services/new-auth.service';
 
 type NameQuery = Extract<
   NonNullable<MessageInitShape<typeof ListOrganizationsRequestSchema>['queries']>[number]['query'],
@@ -59,6 +61,8 @@ const QUERY_LIMIT = 20;
     InputModule,
     MatOptionModule,
     NgIconComponent,
+    HasRolePipeModule,
+    AsyncPipe,
   ],
   providers: [provideIcons({ heroCheck, heroMagnifyingGlass, heroArrowLeftCircleSolid })],
 })
@@ -86,8 +90,9 @@ export class OrganizationSelectorComponent {
   protected readonly form: ReturnType<typeof this.buildForm>;
   private readonly nameQuery: Signal<NameQuery | undefined>;
   protected readonly organizationsQuery: ReturnType<typeof this.getOrganizationsQuery>;
-  protected activeOrg = this.newOrganizationService.activeOrganizationQuery();
-  protected activeOrgIfSearchMatches: Signal<Organization | undefined>;
+  protected readonly activeOrg = this.newOrganizationService.activeOrganizationQuery();
+  protected readonly activeOrgIfSearchMatches: Signal<Organization | undefined>;
+  private readonly listMyZitadelPermissionsQuery = this.newAuthService.listMyZitadelPermissionsQuery();
 
   constructor(
     private readonly newOrganizationService: NewOrganizationService,
@@ -95,6 +100,7 @@ export class OrganizationSelectorComponent {
     private readonly router: Router,
     private readonly destroyRef: DestroyRef,
     private readonly userService: UserService,
+    private readonly newAuthService: NewAuthService,
     toast: ToastService,
   ) {
     this.form = this.buildForm();
@@ -133,7 +139,7 @@ export class OrganizationSelectorComponent {
       }
 
       // user has no org selected or the selected org is not in the org list
-      const _ = newOrganizationService.setOrgId(orgs[0].id);
+      newOrganizationService.setOrgId(orgs[0].id).then();
     });
 
     this.infiniteScrollLoading();
@@ -152,7 +158,14 @@ export class OrganizationSelectorComponent {
 
     effect((onCleanup) => {
       const moreButton = this.moreButtonSignal()?.nativeElement;
-      if (!moreButton) {
+      const permissions = this.listMyZitadelPermissionsQuery.data();
+
+      if (!moreButton || !permissions) {
+        return;
+      }
+
+      // only do infinite scrolling when user has access to all orgs
+      if (!permissions.includes('iam.read')) {
         return;
       }
 

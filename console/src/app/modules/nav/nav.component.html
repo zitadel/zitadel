@@ -50,7 +50,7 @@
                     [routerLinkActive]="['active']"
                     [routerLinkActiveOptions]="{ exact: false }"
                     [routerLink]="['/instance']"
-                    *ngIf="['policy.read'] | hasRole | async"
+                    *ngIf="['iam.policy.read'] | hasRole | async"
                   >
                     <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
                   </a>
