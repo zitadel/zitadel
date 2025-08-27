@@ -1,6 +1,7 @@
 {
   "common": {
-    "back": "Atrás"
+    "back": "Atrás",
+    "title": "Iniciar sesión con Zitadel"
   },
   "accounts": {
     "title": "Cuentas",
