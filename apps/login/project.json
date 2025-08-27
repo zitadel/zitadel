@@ -3,42 +3,52 @@
   "targets": {
     "build": {
       "outputs": [
-        "{projectRoot}/dist/**",
-        "{projectRoot}/.next/**",
-        "!{projectRoot}/.next/cache/**"
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
       ],
       "dependsOn": [
-        "^build"
+        "@zitadel/client#build"
+      ]
+    },
+    "build:login:standalone": {
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
+      ],
+      "dependsOn": [
+        "@zitadel/client#build"
       ]
     },
     "dev": {
       "persistent": true,
       "cache": false,
       "dependsOn": [
-        "^build"
+        "@zitadel/client#build"
       ]
     },
     "test": {
       "dependsOn": [
-        "^build"
+        "@zitadel/client#build"
       ]
     },
     "test:unit": {
       "dependsOn": [
-        "^build"
+        "@zitadel/client#build"
       ]
     },
     "test:integration:login": {
       "inputs": [
-        "{projectRoot}/.next/**",
-        "!{projectRoot}/.next/cache/**",
-        "{projectRoot}/integration/integration/**",
-        "{projectRoot}/integration/support/**",
-        "{projectRoot}/cypress.config.ts"
+        ".next/**",
+        "!.next/cache/**",
+        "integration/integration/**",
+        "integration/support/**",
+        "cypress.config.ts"
       ],
       "outputs": [
-        "{projectRoot}/cypress/videos/**",
-        "{projectRoot}/cypress/screenshots/**"
+        "cypress/videos/**",
+        "cypress/screenshots/**"
       ]
     }
   }
