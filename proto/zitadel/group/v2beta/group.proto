@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+package zitadel.group.v2beta;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/group/v2beta;group";
+
+message Group {
+  // Unique identifier of the user group.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+
+  // Name of the user group.
+  string name = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Support Group\"";
+    }
+  ];
+
+  // Timestamp when the group was last changed.
+  google.protobuf.Timestamp change_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+
+  // Timestamp when the user group was created
+  google.protobuf.Timestamp creation_date = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2025-01-23T10:34:18.051Z\"";
+    }
+  ];
+
+  // TODO: state of the group: active? inactive?
+}
+
+// TODO: refine query
+message Query {
+  oneof query {
+    option (validate.required) = true;
+
+    IDsQuery ids_query = 1;
+    NamesQuery names_query = 2;
+  }
+}
+
+message IDsQuery {
+  repeated string ids = 1;
+}
+
+message NamesQuery {
+  repeated string names = 1;
+}
+
+enum FieldName {
+  FIELD_NAME_UNSPECIFIED = 0;
+  FIELD_NAME_ID = 1;
+  FIELD_NAME_NAME = 2;
+  FIELD_NAME_CREATION_DATE = 3;
+}
