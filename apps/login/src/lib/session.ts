@@ -5,11 +5,7 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getMostRecentCookieWithLoginname } from "./cookies";
-import {
-  getLoginSettings,
-  getSession,
-  listAuthenticationMethodTypes,
-} from "./zitadel";
+import { getLoginSettings, getSession, getUserByID, listAuthenticationMethodTypes } from "./zitadel";
 
 type LoadMostRecentSessionParams = {
   serviceUrl: string;
@@ -39,13 +35,7 @@ export async function loadMostRecentSession({
  * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
  * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
  **/
-export async function isSessionValid({
-  serviceUrl,
-  session,
-}: {
-  serviceUrl: string;
-  session: Session;
-}): Promise<boolean> {
+export async function isSessionValid({ serviceUrl, session }: { serviceUrl: string; session: Session }): Promise<boolean> {
   // session can't be checked without user
   if (!session.factors?.user) {
     console.warn("Session has no user");
@@ -63,43 +53,22 @@ export async function isSessionValid({
   if (authMethods && authMethods.includes(AuthenticationMethodType.TOTP)) {
     mfaValid = !!session.factors.totp?.verifiedAt;
     if (!mfaValid) {
-      console.warn(
-        "Session has no valid totpEmail factor",
-        session.factors.totp?.verifiedAt,
-      );
+      console.warn("Session has no valid totpEmail factor", session.factors.totp?.verifiedAt);
     }
-  } else if (
-    authMethods &&
-    authMethods.includes(AuthenticationMethodType.OTP_EMAIL)
-  ) {
+  } else if (authMethods && authMethods.includes(AuthenticationMethodType.OTP_EMAIL)) {
     mfaValid = !!session.factors.otpEmail?.verifiedAt;
     if (!mfaValid) {
-      console.warn(
-        "Session has no valid otpEmail factor",
-        session.factors.otpEmail?.verifiedAt,
-      );
+      console.warn("Session has no valid otpEmail factor", session.factors.otpEmail?.verifiedAt);
     }
-  } else if (
-    authMethods &&
-    authMethods.includes(AuthenticationMethodType.OTP_SMS)
-  ) {
+  } else if (authMethods && authMethods.includes(AuthenticationMethodType.OTP_SMS)) {
     mfaValid = !!session.factors.otpSms?.verifiedAt;
     if (!mfaValid) {
-      console.warn(
-        "Session has no valid otpSms factor",
-        session.factors.otpSms?.verifiedAt,
-      );
+      console.warn("Session has no valid otpSms factor", session.factors.otpSms?.verifiedAt);
     }
-  } else if (
-    authMethods &&
-    authMethods.includes(AuthenticationMethodType.U2F)
-  ) {
+  } else if (authMethods && authMethods.includes(AuthenticationMethodType.U2F)) {
     mfaValid = !!session.factors.webAuthN?.verifiedAt;
     if (!mfaValid) {
-      console.warn(
-        "Session has no valid u2f factor",
-        session.factors.webAuthN?.verifiedAt,
-      );
+      console.warn("Session has no valid u2f factor", session.factors.webAuthN?.verifiedAt);
     }
   } else {
     // only check settings if no auth methods are available, as this would require a setup
@@ -128,22 +97,42 @@ export async function isSessionValid({
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
   const validIDP = session?.factors?.intent?.verifiedAt;
 
-  const stillValid = session.expirationDate
-    ? timestampDate(session.expirationDate).getTime() > new Date().getTime()
-    : true;
+  const stillValid = session.expirationDate ? timestampDate(session.expirationDate).getTime() > new Date().getTime() : true;
 
   if (!stillValid) {
     console.warn(
       "Session is expired",
-      session.expirationDate
-        ? timestampDate(session.expirationDate).toDateString()
-        : "no expiration date",
+      session.expirationDate ? timestampDate(session.expirationDate).toDateString() : "no expiration date",
     );
+    return false;
   }
 
   const validChecks = !!(validPassword || validPasskey || validIDP);
 
-  return stillValid && validChecks && mfaValid;
+  if (!validChecks) {
+    return false;
+  }
+
+  if (!mfaValid) {
+    return false;
+  }
+
+  // Check email verification if EMAIL_VERIFICATION environment variable is enabled
+  if (process.env.EMAIL_VERIFICATION === "true") {
+    const userResponse = await getUserByID({
+      serviceUrl,
+      userId: session.factors.user.id,
+    });
+
+    const humanUser = userResponse?.user?.type.case === "human" ? userResponse?.user.type.value : undefined;
+
+    if (humanUser && !humanUser.email?.isVerified) {
+      console.warn("Session invalid: Email not verified and EMAIL_VERIFICATION is enabled", session.factors.user.id);
+      return false;
+    }
+  }
+
+  return true;
 }
 
 export async function findValidSession({
