@@ -318,7 +318,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 			},
 		},
 		{
-			name: "project, missing admin user, ok",
+			name: "project, admin user not found",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),
