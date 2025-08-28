@@ -53,7 +53,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					),
@@ -70,7 +70,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			name: "set LoginDefaultOrg, update from v1",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v1.NewSetEvent[feature_v1.Boolean](
+					eventFromEventPusher(feature_v1.NewSetEvent(
 						ctx, &eventstore.Aggregate{
 							ID:            "instance1",
 							ResourceOwner: "instance1",
@@ -82,7 +82,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 					)),
 				),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					),
@@ -100,7 +100,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, true,
 					),
@@ -118,7 +118,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPushFailed(io.ErrClosedPipe,
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceConsoleUseV2UserApi, true,
 					),
@@ -134,15 +134,15 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceOIDCSingleV1SessionTerminationEventType, true,
 					),
@@ -162,7 +162,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				// throw in some set events, reset and set again.
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					)),
@@ -170,17 +170,17 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 						ctx, aggregate,
 						feature_v2.InstanceResetEventType,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, false,
 					)),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.InstanceOIDCSingleV1SessionTerminationEventType, false,
 					),
 				),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					),
@@ -227,7 +227,7 @@ func TestCommands_ResetInstanceFeatures(t *testing.T) {
 			name: "push error",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					)),
@@ -242,7 +242,7 @@ func TestCommands_ResetInstanceFeatures(t *testing.T) {
 			name: "success",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					)),
@@ -259,7 +259,7 @@ func TestCommands_ResetInstanceFeatures(t *testing.T) {
 			name: "no change after previous reset",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					)),
