@@ -2,21 +2,22 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "build": {
-      "outputs": [
-        "{projectRoot}/dist/**"
-      ],
       "dependsOn": [
         "^build"
-      ]
-    },
-    "standalone": {
-      "outputs": [
-        "{projectRoot}/.next/**",
-        "!{projectRoot}/.next/cache/**"
       ],
-      "dependsOn": [
-        "^build"
-      ]
+      "outputs": [
+        "{projectRoot}/.next/**/*",
+        "!{projectRoot}/.next/cache/**/*",
+        "!{projectRoot}/.next/standalone/**/*"
+      ],
+      "configurations": {
+        "standalone": {
+          "outputs": [
+            "{projectRoot}/.next/standalone/**/*",
+            "{projectRoot}/.next/static/**/*"
+          ]
+        }
+      }
     },
     "dev": {
       "persistent": true,
