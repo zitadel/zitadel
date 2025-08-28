@@ -53,6 +53,7 @@ Errors:
     NotFound: 未找到 SMS 配置
     AlreadyActive: SMS 配置已启用
     AlreadyDeactivated: SMS 配置已停用
+    NotExternalVerification: SMS 配置不支持验证码
   SMTP:
     NotEmailMessage: 消息不是电子邮件消息
     RequiredAttributes: 必须设置主题、收件人和内容，但部分或全部为空
@@ -659,6 +660,7 @@ EventTypes:
     token:
       added: 已创建访问令牌
       v2.added: 已创建访问令牌
+      removed: 已删除访问令牌
     impersonated: 用户冒充
     username:
       reserved: 保留用户名
@@ -1136,7 +1138,7 @@ EventTypes:
       jwt:
         config:
           added: 添加了身份提供者的 JWT 配置
-          changed: 身份提供商的 JWT 配置已删除
+          changed: 身份提供者的 JWT 配置已删除
     customtext:
       set: 设置文本
       removed: 删除文本
@@ -1291,10 +1293,10 @@ EventTypes:
         added: 添加了登录策略
         changed: 登录政策已更改
         idpprovider:
-          added: 身份提供商已添加到登录策略中
+          added: 身份提供者已添加到登录策略中
           cascade:
             removed: 身份提供者级联从登录策略中删除
-          removed: 身份提供商已从登录策略中删除
+          removed: 身份提供者已从登录策略中删除
         multifactor:
           added: 登录策略中添加了多因素
           removed: 从登录策略中删除了多因素
