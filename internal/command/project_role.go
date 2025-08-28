@@ -36,7 +36,7 @@ func (c *Commands) AddProjectRole(ctx context.Context, projectRole *AddProjectRo
 	if projectRole.ResourceOwner == "" {
 		projectRole.ResourceOwner = projectResourceOwner
 	}
-	if err := c.checkPermissionWriteProjectRole(ctx, projectRole.ResourceOwner, projectRole.Key); err != nil {
+	if err := c.checkPermissionWriteProjectRole(ctx, projectRole.ResourceOwner, projectRole.AggregateID); err != nil {
 		return nil, err
 	}
 
@@ -61,8 +61,8 @@ func (c *Commands) AddProjectRole(ctx context.Context, projectRole *AddProjectRo
 	return writeModelToObjectDetails(&roleWriteModel.WriteModel), nil
 }
 
-func (c *Commands) checkPermissionWriteProjectRole(ctx context.Context, resourceOwner, roleKey string) error {
-	return c.checkPermission(ctx, domain.PermissionProjectRoleWrite, resourceOwner, roleKey)
+func (c *Commands) checkPermissionWriteProjectRole(ctx context.Context, orgID, projectID string) error {
+	return c.checkPermission(ctx, domain.PermissionProjectRoleWrite, orgID, projectID)
 }
 
 func (c *Commands) BulkAddProjectRole(ctx context.Context, projectID, resourceOwner string, projectRoles []*AddProjectRole) (details *domain.ObjectDetails, err error) {
@@ -74,7 +74,7 @@ func (c *Commands) BulkAddProjectRole(ctx context.Context, projectID, resourceOw
 		if projectRole.ResourceOwner == "" {
 			projectRole.ResourceOwner = projectResourceOwner
 		}
-		if err := c.checkPermissionWriteProjectRole(ctx, projectRole.ResourceOwner, projectRole.Key); err != nil {
+		if err := c.checkPermissionWriteProjectRole(ctx, projectRole.ResourceOwner, projectID); err != nil {
 			return nil, err
 		}
 		if projectRole.ResourceOwner != projectResourceOwner {
@@ -135,7 +135,7 @@ func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *ChangePro
 	if projectRole.ResourceOwner == "" {
 		projectRole.ResourceOwner = projectResourceOwner
 	}
-	if err := c.checkPermissionWriteProjectRole(ctx, projectRole.ResourceOwner, projectRole.Key); err != nil {
+	if err := c.checkPermissionWriteProjectRole(ctx, projectRole.ResourceOwner, projectRole.AggregateID); err != nil {
 		return nil, err
 	}
 
@@ -175,7 +175,7 @@ func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resour
 	if !existingRole.State.Exists() {
 		return writeModelToObjectDetails(&existingRole.WriteModel), nil
 	}
-	if err := c.checkPermissionDeleteProjectRole(ctx, existingRole.ResourceOwner, existingRole.Key); err != nil {
+	if err := c.checkPermissionDeleteProjectRole(ctx, existingRole.ResourceOwner, projectID); err != nil {
 		return nil, err
 	}
 	projectAgg := ProjectAggregateFromWriteModelWithCTX(ctx, &existingRole.WriteModel)
@@ -204,8 +204,8 @@ func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resour
 	return c.pushAppendAndReduceDetails(ctx, existingRole, events...)
 }
 
-func (c *Commands) checkPermissionDeleteProjectRole(ctx context.Context, resourceOwner, roleKey string) error {
-	return c.checkPermission(ctx, domain.PermissionProjectRoleDelete, resourceOwner, roleKey)
+func (c *Commands) checkPermissionDeleteProjectRole(ctx context.Context, orgID, projectID string) error {
+	return c.checkPermission(ctx, domain.PermissionProjectRoleDelete, orgID, projectID)
 }
 
 func (c *Commands) getProjectRoleWriteModelByID(ctx context.Context, key, projectID, resourceOwner string) (*ProjectRoleWriteModel, error) {

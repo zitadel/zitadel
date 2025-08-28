@@ -675,7 +675,7 @@ message SetExecutionRequest {
   // Ordered list of targets called during the execution.
   repeated string targets = 2;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    example: "{\"condition\":{\"request\":{\"method\":\"zitadel.session.v2.SessionService/ListSessions\"}},\"targets\":[{\"target\":\"69629026806489455\"}]}";
+    example: "{\"condition\":{\"request\":{\"method\":\"zitadel.session.v2.SessionService/ListSessions\"}},\"targets\":[\"69629026806489455\"]}";
   };
 }
 

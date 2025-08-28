@@ -533,7 +533,7 @@
     "BETA_NOTE": "You are currently using the new Actions V2, which is in beta. The previous Version 1 is still available but will be discontinued in the future. Please report any issues or feedback.",
     "EXECUTION": {
       "TITLE": "Actions",
-      "DESCRIPTION": "Actions let you run custom code in response to API requests, events or specific functions. Use them to extend Zitadel, automate workflows, and itegrate with other systems.",
+      "DESCRIPTION": "Actions let you run custom code in response to API requests, events or specific functions. Use them to extend Zitadel, automate workflows, and integrate with other systems.",
       "TYPES": {
         "request": "Request",
         "response": "Response",
@@ -709,7 +709,7 @@
     "SIDEWIDE": "Site-wide shortcuts",
     "SHORTCUTS": {
       "HOME": "<strong>G</strong>o to <strong>H</strong>ome",
-      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>instance",
+      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>nstance",
       "ORG": "<strong>G</strong>o to <strong>O</strong>rganization",
       "ORGSETTINGS": "<strong>G</strong>o to Organization <strong>S</strong>ettings",
       "ORGSWITCHER": "Change Organization",
@@ -1638,8 +1638,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "If the flag is enabled, the OIDC parent error will be logged in the console.",
-      "DISABLEUSERTOKENEVENT": "Disable User Token Event",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Enable Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify clients about session termination at the OpenID Provider.",
       "PERMISSIONCHECKV2": "Permission Check V2",
@@ -2375,6 +2373,7 @@
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
       "SIGNEDREQUEST": "Signed Request",
+      "SIGNATUREALGORITHM": "Signature Algorithm",
       "NAMEIDFORMAT": "NameID Format",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
