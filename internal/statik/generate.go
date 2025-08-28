@@ -1,3 +1,3 @@
 package statik
 
-//go:generate statik -f -src=../static -dest=.. -ns=zitadel
+//go:generate go run github.com/rakyll/statik -f -src=../static -dest=.. -ns=zitadel

@@ -1,6 +1,10 @@
-go_bin := "$$(go env GOPATH)/bin"
-gen_authopt_path := "$(go_bin)/protoc-gen-authoption"
-gen_zitadel_path := "$(go_bin)/protoc-gen-zitadel"
+go_bin := $(shell go env GOPATH)/bin
+gen_authopt_path := $(go_bin)/protoc-gen-authoption
+gen_zitadel_path := $(go_bin)/protoc-gen-zitadel
+
+.PHONY: hodor
+hodor: 
+	echo $(gen_authopt_path)
 
 now := $(shell date '+%Y-%m-%dT%T%z' | sed -E 's/.([0-9]{2})([0-9]{2})$$/-\1:\2/')
 VERSION ?= development-$(now)
@@ -17,7 +21,7 @@ LOGIN_REMOTE_URL ?= https://github.com/zitadel/typescript.git
 LOGIN_REMOTE_BRANCH ?= main
 
 .PHONY: compile
-compile: core_build console_build compile_pipeline
+compile: core_build console_move compile_pipeline
 
 .PHONY: docker_image
 docker_image:
@@ -31,7 +35,7 @@ docker_image:
 
 .PHONY: compile_pipeline
 compile_pipeline: console_move
-	CGO_ENABLED=0 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=$(COMMIT_SHA)' -X 'github.com/zitadel/zitadel/cmd/build.date=$(now)' -X 'github.com/zitadel/zitadel/cmd/build.version=$(VERSION)' "
+	CGO_ENABLED=0 go build -o apps/api/zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=$(COMMIT_SHA)' -X 'github.com/zitadel/zitadel/cmd/build.date=$(now)' -X 'github.com/zitadel/zitadel/cmd/build.version=$(VERSION)' "
 	chmod +x zitadel
 
 .PHONY: core_dependencies
@@ -82,7 +86,7 @@ core_grpc_dependencies:
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
-	buf generate
+	PATH="$(go_bin):$(PATH)" npx buf generate
 	mkdir -p pkg/grpc
 	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/
 	mkdir -p openapi/v2/zitadel
@@ -93,7 +97,7 @@ core_build: core_dependencies core_api core_static core_assets
 
 .PHONY: console_move
 console_move:
-	cp -r console/dist/console/* internal/api/ui/console/static
+	cp -r apps/console/dist/console/* internal/api/ui/console/static
 
 .PHONY: console_dependencies
 console_dependencies:
@@ -101,7 +105,7 @@ console_dependencies:
 
 .PHONY: console_build
 console_build: console_dependencies
-	npx pnpm turbo build --filter=./console
+	npx nx run console:build
 
 .PHONY: clean
 clean:
@@ -156,10 +160,6 @@ core_integration_reports:
 
 .PHONY: core_integration_test
 core_integration_test: core_integration_server_start core_integration_test_packages core_integration_server_stop core_integration_reports
-
-.PHONY: console_lint
-console_lint:
-	npx pnpm turbo lint --filter=./console
 
 .PHONY: core_lint
 core_lint:
