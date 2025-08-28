@@ -20,7 +20,6 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/execution/target"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -533,7 +532,7 @@ func (i *authzInstance) Features() feature.Features {
 	return i.Feature
 }
 
-func (i *authzInstance) ExecutionRouter() target.Router {
+func (i *authzInstance) ExecutionRouter() target_domain.Router {
 	return i.ExecutionTargets
 }
 
@@ -617,7 +616,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			if err := json.Unmarshal(executionTargetsBytes, &targets); err != nil {
 				return zerrors.ThrowInternal(err, "QUERY-aeKa2", "Errors.Internal")
 			}
-			instance.ExecutionTargets = target.NewRouter(targets)
+			instance.ExecutionTargets = target_domain.NewRouter(targets)
 		}
 		return nil
 	}

@@ -294,8 +294,3 @@ func mockTargets(count int) []target_domain.Target {
 	}
 	return targets
 }
-
-func mockTargetsToBytes(targets []target_domain.Target) []byte {
-	data, _ := json.Marshal(targets)
-	return data
-}
