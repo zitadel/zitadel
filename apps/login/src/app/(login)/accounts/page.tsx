@@ -14,7 +14,7 @@ import Link from "next/link";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("accounts");
-  return { title: t('title')};
+  return { title: t("title") };
 }
 
 async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
