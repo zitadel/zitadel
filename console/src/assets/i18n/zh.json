@@ -92,28 +92,28 @@
         "DESCRIPTION": "解锁您的实例的功能。"
       },
       "IDPS": {
-        "TITLE": "身份提供商",
-        "DESCRIPTION": "创建并激活外部身份提供商。选择一个知名提供商或根据您的选择配置任何其他兼容OIDC、OAuth或SAML的提供商。您甚至可以通过配置JWT身份提供商，使用您现有的JWT令牌作为联合身份。",
+        "TITLE": "身份提供者",
+        "DESCRIPTION": "创建并激活外部身份提供者。选择一个知名提供者或根据您的选择配置任何其他兼容OIDC、OAuth或SAML的提供者。您甚至可以通过配置JWT身份提供者，使用您现有的JWT令牌作为联合身份。",
         "NEXT": "下一步？",
         "SAML": {
-          "TITLE": "配置你的SAML身份提供商",
-          "DESCRIPTION": "ZITADEL已配置。现在需要配置你的SAML身份提供商。大多数提供商允许你直接上传整个ZITADEL元数据XML。其他提供商可能仅要求你提供一些特定的URL，例如实体ID（元数据URL）、断言消费服务（ACS）URL或单点登出URL。"
+          "TITLE": "配置你的SAML身份提供者",
+          "DESCRIPTION": "ZITADEL已配置。现在需要配置你的SAML身份提供者。大多数提供者允许你直接上传整个ZITADEL元数据XML。其他提供者可能仅要求你提供一些特定的URL，例如实体ID（元数据URL）、断言消费服务（ACS）URL或单点登出URL。"
         },
         "CALLBACK": {
-          "TITLE": "配置你的{{ provider }}身份提供商",
-          "DESCRIPTION": "在你能配置ZITADEL之前，将这个URL传递给你的身份提供商，以便在认证后启用浏览器重定向回到ZITADEL。"
+          "TITLE": "配置你的{{ provider }}身份提供者",
+          "DESCRIPTION": "在你能配置ZITADEL之前，将这个URL传递给你的身份提供者，以便在认证后启用浏览器重定向回到ZITADEL。"
         },
         "JWT": {
           "TITLE": "将JWT用作联合身份",
-          "DESCRIPTION": "JWT身份提供商使你能够将现有的JWT令牌用作联合身份。如果你已经有一个JWT发行者，这个功能非常有用。使用JWT IdP，你可以利用这些JWT即时创建和更新ZITADEL中的用户。"
+          "DESCRIPTION": "JWT身份提供者使你能够将现有的JWT令牌用作联合身份。如果你已经有一个JWT发行者，这个功能非常有用。使用JWT IdP，你可以利用这些JWT即时创建和更新ZITADEL中的用户。"
         },
         "LDAP": {
-          "TITLE": "配置ZITADEL以连接到你的LDAP身份提供商",
+          "TITLE": "配置ZITADEL以连接到你的LDAP身份提供者",
           "DESCRIPTION": "提供你的LDAP服务器的连接细节，并配置你的LDAP属性到ZITADEL属性的映射。"
         },
         "AUTOFILL": {
           "TITLE": "自动填充用户数据",
-          "DESCRIPTION": "使用一个操作来改善用户体验。你可以使用身份提供商的值预填充ZITADEL的注册表单。"
+          "DESCRIPTION": "使用一个操作来改善用户体验。你可以使用身份提供者的值预填充ZITADEL的注册表单。"
         },
         "ACTIVATE": {
           "TITLE": "激活IdP",
@@ -1502,7 +1502,9 @@
       "SECURITY": "安全设置",
       "EVENTS": "活动",
       "FAILEDEVENTS": "失败事件",
-      "VIEWS": "数据表"
+      "VIEWS": "数据表",
+      "ACTIONS": "Actions",
+      "TARGETS": "Targets"
     },
     "GROUPS": {
       "GENERAL": "通用",
@@ -1512,7 +1514,8 @@
       "TEXTS": "文本和语言",
       "APPEARANCE": "外观",
       "OTHER": "其他",
-      "STORAGE": "贮存"
+      "STORAGE": "贮存",
+      "ACTIONS": "Actions"
     },
     "BETA": "测试版"
   },
@@ -1700,6 +1703,7 @@
       "MAXSIZE": "图片最大支持 524kB",
       "EMAILNOSVG": "电子邮件不支持 SVG 文件格式。因此建议以 PNG 或其他支持的格式上传您的 Logo。",
       "MAXSIZEEXCEEDED": "文件大小超过了 524kB。",
+      "NOSVGSUPPORTED": "不支持 SVG 格式！",
       "FONTINLOGINONLY": "该字体仅在当前登录界面中显示。",
       "BACKGROUNDCOLOR": "背景颜色",
       "PRIMARYCOLOR": "原色",
@@ -1743,7 +1747,7 @@
       "DESCRIPTIONCREATEMGMT": "用户可以从以下可用的身份提供者中进行选择。注意：您可为系统设置提供者也可以仅为您的组织单独设置提供者。",
       "LIFETIME_INVALID": "表单包含无效值。",
       "SAVED": "保存成功！",
-      "PROVIDER_ADDED": "身份提供商已激活。"
+      "PROVIDER_ADDED": "身份提供者已激活。"
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "设置您的隐私政策和服务条款链接",
@@ -2185,53 +2189,61 @@
       "ACTIVETITLE": "启用的身份提供者"
     },
     "CREATE": {
-      "TITLE": "创建供应商",
-      "DESCRIPTION": "选择以下一个或多个供应商。",
-      "STEPPERTITLE": "创建供应商",
+      "TITLE": "创建身份提供者",
+      "DESCRIPTION": "选择以下一个或多个身份提供者。",
+      "STEPPERTITLE": "创建身份提供者",
       "OIDC": {
-        "TITLE": "OIDC供应商",
-        "DESCRIPTION": "输入你的OIDC供应商的必要数据。"
+        "TITLE": "OIDC 身份提供者",
+        "DESCRIPTION": "输入你的 OIDC 供应商的必要数据。"
       },
       "OAUTH": {
-        "TITLE": "OAuth供应商",
-        "DESCRIPTION": "输入你的OAuth供应商的必要数据。"
+        "TITLE": "OAuth 身份提供者",
+        "DESCRIPTION": "输入你的 OAuth 供应商的必要数据。"
       },
       "JWT": {
-        "TITLE": "JWT供应商",
-        "DESCRIPTION": "输入你的JWT供应商所需的数据。"
+        "TITLE": "JWT 身份提供者",
+        "DESCRIPTION": "输入你的 JWT 供应商所需的数据。"
       },
       "GOOGLE": {
         "TITLE": "Google 身份提供者",
-        "DESCRIPTION": "输入您的 Google 身份提供商的凭据"
+        "DESCRIPTION": "输入您的 Google 身份提供者的凭据"
       },
       "GITLAB": {
-        "TITLE": "Gitlab身份提供商",
-        "DESCRIPTION": "输入您的Gitlab身份提供者的凭据"
+        "TITLE": "Gitlab 身份提供者",
+        "DESCRIPTION": "输入您的 Gitlab 身份提供者的凭据"
       },
       "GITLABSELFHOSTED": {
-        "TITLE": "Gitlab自我托管供应商",
-        "DESCRIPTION": "输入您的Gitlab自我托管身份提供商的凭据"
+        "TITLE": "Gitlab 自我托管身份提供者",
+        "DESCRIPTION": "输入您的 Gitlab 自我托管身份提供者的凭据"
       },
       "GITHUBES": {
         "TITLE": "Github Enterprise Server 身份提供者",
-        "DESCRIPTION": "输入您的GitHubEnterpriseServer身份提供者的凭据"
+        "DESCRIPTION": "输入您的 GitHub Enterprise Server 身份提供者的凭据"
       },
       "GITHUB": {
         "TITLE": "Github 身份提供者",
-        "DESCRIPTION": "输入您的 Github 身份提供商的凭据"
+        "DESCRIPTION": "输入您的 Github 身份提供者的凭据"
       },
       "AZUREAD": {
         "TITLE": "Microsoft 身份提供者",
-        "DESCRIPTION": "输入您的 Microsoft 身份提供商的凭据"
+        "DESCRIPTION": "输入您的 Microsoft 身份提供者的凭据"
       },
       "LDAP": {
-        "TITLE": "LDAP 身份提供者",
-        "DESCRIPTION": "输入您的 LDAP 身份提供商的凭据"
+        "TITLE": "域控服务 / LDAP 身份提供者",
+        "DESCRIPTION": "输入您的 LDAP 身份提供者的凭据"
+      },
+      "APPLE": {
+        "TITLE": "Apple 身份提供者",
+        "DESCRIPTION": "输入您的 Apple 身份提供者的凭据"
+      },
+      "SAML": {
+        "TITLE": "SAML 身份提供者",
+        "DESCRIPTION": "输入您的 SAML 身份提供者的凭据"
       }
     },
     "DETAIL": {
       "TITLE": "身份提供者",
-      "DESCRIPTION": "更新你的供应商配置",
+      "DESCRIPTION": "更新你的身份提供者配置",
       "DATECREATED": "已创建",
       "DATECHANGED": "已更新"
     },
@@ -2353,6 +2365,23 @@
       "JWTENDPOINT": "JWT 端点",
       "JWTKEYSENDPOINT": "JWT Keys 端点"
     },
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "私钥",
+      "UPDATEPRIVATEKEY": "更新私钥",
+      "UPLOADPRIVATEKEY": "上传私钥",
+      "KEYMAXSIZEEXCEEDED": "达到了最大 5kB 的上限。"
+    },
+    "SAML": {
+      "METADATAXML": "元数据 Xml",
+      "METADATAURL": "元数据 URL",
+      "BINDING": "绑定",
+      "SIGNEDREQUEST": "登录请求",
+      "NAMEIDFORMAT": "名字 ID 格式",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "自定义映射属性名称",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "如果返回的 `nameid-format` 是 `transient` ，则映射用户的备用属性名称，参考 `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    },
     "TOAST": {
       "SAVED": "成功保存。",
       "REACTIVATED": "IDP 已重新启用.",
@@ -2439,7 +2468,11 @@
         "DELETE_TITLE": "删除 SMTP 配置",
         "DELETE_DESCRIPTION": "您将要删除一个配置。输入发件人姓名确认此操作",
         "DELETED": "SMTP 配置已被删除",
-        "SENDER": "输入 {{ value }}，删除此 SMTP 配置。"
+        "SENDER": "输入 {{ value }}，删除此 SMTP 配置。",
+        "TEST_TITLE": "测试你的 SMTP 配置",
+        "TEST_DESCRIPTION": "指定一个电子邮件地址来测试此提供商的 SMTP 配置",
+        "TEST_EMAIL": "邮件地址",
+        "TEST_RESULT": "测试结果"
       }
     },
     "CREATE": {
