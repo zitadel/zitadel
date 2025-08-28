@@ -45,6 +45,7 @@ type Config struct {
 	ActiveInstancer interface {
 		ActiveInstances() []string
 	}
+	SkipInstanceIDs []string
 }
 
 type Handler struct {
@@ -70,6 +71,8 @@ type Handler struct {
 	queryInstances func() ([]string, error)
 
 	metrics *ProjectionMetrics
+
+	skipInstanceIDs []string
 }
 
 var _ migration.Migration = (*Handler)(nil)
@@ -188,7 +191,8 @@ func NewHandler(
 			}
 			return nil, nil
 		},
-		metrics: metrics,
+		metrics:         metrics,
+		skipInstanceIDs: config.SkipInstanceIDs,
 	}
 
 	if _, ok := projection.(GlobalProjection); ok {
@@ -420,6 +424,9 @@ func WithMinPosition(position decimal.Decimal) TriggerOpt {
 }
 
 func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Context, err error) {
+	if slices.Contains(h.skipInstanceIDs, authz.GetInstance(ctx).InstanceID()) {
+		return call.ResetTimestamp(ctx), nil
+	}
 	config := new(triggerConfig)
 	for _, opt := range opts {
 		opt(config)
@@ -646,7 +653,7 @@ func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, statements 
 	for i, statement := range statements {
 		select {
 		case <-ctx.Done():
-			break
+			return lastProcessedIndex, ctx.Err()
 		default:
 			err := h.executeStatement(ctx, tx, statement)
 			if err != nil {
@@ -669,7 +676,7 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 		return err
 	}
 
-	if err = statement.Execute(tx, h.projection.Name()); err != nil {
+	if err = statement.Execute(ctx, tx, h.projection.Name()); err != nil {
 		h.log().WithError(err).Error("statement execution failed")
 
 		_, rollbackErr := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT exec_stmt")

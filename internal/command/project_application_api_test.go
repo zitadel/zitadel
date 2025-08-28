@@ -2,16 +2,11 @@ package command
 
 import (
 	"context"
-	"io"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/zitadel/passwap"
-	"github.com/zitadel/passwap/bcrypt"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -147,6 +142,7 @@ func TestAddAPIConfig(t *testing.T) {
 }
 
 func TestCommandSide_AddAPIApplication(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
@@ -243,6 +239,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -297,6 +294,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -351,6 +349,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 								domain.PrivateLabelingSettingUnspecified),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						project.NewApplicationAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -395,6 +394,8 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			r := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				idGenerator:     tt.fields.idGenerator,
@@ -402,6 +403,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 				defaultSecretGenerators: &SecretGenerators{
 					ClientSecret: emptyConfig,
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
 			got, err := r.AddAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -418,6 +420,8 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 }
 
 func TestCommandSide_ChangeAPIApplication(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
@@ -521,6 +525,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 								domain.APIAuthMethodTypePrivateKeyJWT),
 						),
 					),
+					expectFilter(),
 				),
 			},
 			args: args{
@@ -560,6 +565,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 								domain.APIAuthMethodTypeBasic),
 						),
 					),
+					expectFilter(),
 					expectPush(
 						newAPIAppChangedEvent(context.Background(),
 							"app1",
@@ -598,14 +604,17 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			r := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				newHashedSecret: mockHashedSecret("secret"),
 				defaultSecretGenerators: &SecretGenerators{
 					ClientSecret: emptyConfig,
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
-			got, err := r.ChangeAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
+			got, err := r.UpdateAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -620,6 +629,8 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 }
 
 func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
@@ -739,12 +750,15 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			r := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				newHashedSecret: mockHashedSecret("secret"),
 				defaultSecretGenerators: &SecretGenerators{
 					ClientSecret: emptyConfig,
 				},
+				checkPermission: newMockPermissionCheckAllowed(),
 			}
 			got, err := r.ChangeAPIApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -770,100 +784,4 @@ func newAPIAppChangedEvent(ctx context.Context, appID, projectID, resourceOwner 
 		changes,
 	)
 	return event
-}
-
-func TestCommands_VerifyAPIClientSecret(t *testing.T) {
-	hasher := &crypto.Hasher{
-		Swapper: passwap.NewSwapper(bcrypt.New(bcrypt.MinCost)),
-	}
-	hashedSecret, err := hasher.Hash("secret")
-	require.NoError(t, err)
-	agg := project.NewAggregate("projectID", "orgID")
-
-	tests := []struct {
-		name       string
-		secret     string
-		eventstore func(*testing.T) *eventstore.Eventstore
-		wantErr    error
-	}{
-		{
-			name: "filter error",
-			eventstore: expectEventstore(
-				expectFilterError(io.ErrClosedPipe),
-			),
-			wantErr: io.ErrClosedPipe,
-		},
-		{
-			name: "app not exists",
-			eventstore: expectEventstore(
-				expectFilter(),
-			),
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-DFnbf", "Errors.Project.App.NotExisting"),
-		},
-		{
-			name: "wrong app type",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(
-						project.NewApplicationAddedEvent(context.Background(), &agg.Aggregate, "appID", "appName"),
-					),
-				),
-			),
-			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-Bf3fw", "Errors.Project.App.IsNotAPI"),
-		},
-		{
-			name: "no secret set",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(
-						project.NewApplicationAddedEvent(context.Background(), &agg.Aggregate, "appID", "appName"),
-					),
-					eventFromEventPusher(
-						project.NewAPIConfigAddedEvent(context.Background(), &agg.Aggregate, "appID", "clientID", "", domain.APIAuthMethodTypePrivateKeyJWT),
-					),
-				),
-			),
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-D3t5g", "Errors.Project.App.APIConfigInvalid"),
-		},
-		{
-			name:   "check succeeded",
-			secret: "secret",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(
-						project.NewApplicationAddedEvent(context.Background(), &agg.Aggregate, "appID", "appName"),
-					),
-					eventFromEventPusher(
-						project.NewAPIConfigAddedEvent(context.Background(), &agg.Aggregate, "appID", "clientID", hashedSecret, domain.APIAuthMethodTypePrivateKeyJWT),
-					),
-				),
-			),
-		},
-		{
-			name:   "check failed",
-			secret: "wrong!",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(
-						project.NewApplicationAddedEvent(context.Background(), &agg.Aggregate, "appID", "appName"),
-					),
-					eventFromEventPusher(
-						project.NewAPIConfigAddedEvent(context.Background(), &agg.Aggregate, "appID", "clientID", hashedSecret, domain.APIAuthMethodTypePrivateKeyJWT),
-					),
-				),
-			),
-			wantErr: zerrors.ThrowInvalidArgument(err, "COMMAND-SADfg", "Errors.Project.App.ClientSecretInvalid"),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{
-				eventstore:   tt.eventstore(t),
-				secretHasher: hasher,
-			}
-			err := c.VerifyAPIClientSecret(context.Background(), "projectID", "appID", tt.secret)
-			c.jobs.Wait()
-			require.ErrorIs(t, err, tt.wantErr)
-		})
-	}
 }

@@ -195,7 +195,7 @@ Errors:
     AlreadyExists: Instance already exists
     NotChanged: Instance not changed
   Org:
-    AlreadyExists: Organisation's name already taken
+    AlreadyExists: Organisation's name or id already taken
     Invalid: Organisation is invalid
     AlreadyDeactivated: Organisation is already deactivated
     AlreadyActive: Organisation is already active
@@ -437,8 +437,6 @@ Errors:
     Invalid: User grant is invalid
     NotChanged: User grant has not been changed
     IDMissing: Id missing
-    NotActive: User grant is not active
-    NotInactive: User grant is not deactivated
     NoPermissionForProject: User has no permissions on this project
     RoleKeyNotFound: Role not found
   Member:

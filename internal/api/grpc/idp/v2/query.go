@@ -3,8 +3,10 @@ package idp
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
+	dsig "github.com/russellhaering/goxmldsig"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
@@ -15,12 +17,12 @@ import (
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 )
 
-func (s *Server) GetIDPByID(ctx context.Context, req *idp_pb.GetIDPByIDRequest) (*idp_pb.GetIDPByIDResponse, error) {
-	idp, err := s.query.IDPTemplateByID(ctx, true, req.Id, false, s.checkPermission)
+func (s *Server) GetIDPByID(ctx context.Context, req *connect.Request[idp_pb.GetIDPByIDRequest]) (*connect.Response[idp_pb.GetIDPByIDResponse], error) {
+	idp, err := s.query.IDPTemplateByID(ctx, true, req.Msg.GetId(), false, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	return &idp_pb.GetIDPByIDResponse{Idp: idpToPb(idp)}, nil
+	return connect.NewResponse(&idp_pb.GetIDPByIDResponse{Idp: idpToPb(idp)}), nil
 }
 
 func idpToPb(idp *query.IDPTemplate) *idp_pb.IDP {
@@ -334,6 +336,7 @@ func samlConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.SAMLIDPTemplate
 			MetadataXml:                   template.Metadata,
 			Binding:                       bindingToPb(template.Binding),
 			WithSignedRequest:             template.WithSignedRequest,
+			SignatureAlgorithm:            signatureAlgorithmToPb(template.SignatureAlgorithm),
 			NameIdFormat:                  nameIDFormat,
 			TransientMappingAttributeName: gu.Ptr(template.TransientMappingAttributeName),
 			FederatedLogoutEnabled:        gu.Ptr(template.FederatedLogoutEnabled),
@@ -368,5 +371,18 @@ func nameIDToPb(format domain.SAMLNameIDFormat) idp_pb.SAMLNameIDFormat {
 		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_TRANSIENT
 	default:
 		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_UNSPECIFIED
+	}
+}
+
+func signatureAlgorithmToPb(signatureAlgorithm string) idp_pb.SAMLSignatureAlgorithm {
+	switch signatureAlgorithm {
+	case dsig.RSASHA1SignatureMethod:
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1
+	case dsig.RSASHA256SignatureMethod:
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256
+	case dsig.RSASHA512SignatureMethod:
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA512
+	default:
+		return idp_pb.SAMLSignatureAlgorithm_SAML_SIGNATURE_UNSPECIFIED
 	}
 }

@@ -1544,7 +1544,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1623,12 +1624,8 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Domyślna Organizacja Logowania",
       "LOGINDEFAULTORG_DESCRIPTION": "Jeśli nie ustawiono kontekstu organizacji, interfejs logowania będzie używać ustawień domyślnej organizacji (a nie instancji)",
-      "OIDCLEGACYINTROSPECTION": "Starsza Introspekcja OIDC",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Ostatnio przeprojektowaliśmy punkt końcowy introspekcji ze względów wydajnościowych. Ta funkcja może być używana do cofnięcia do starszej implementacji, jeśli wystąpią nieoczekiwane błędy.",
       "OIDCTOKENEXCHANGE": "Wymiana Tokenów OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Włącz eksperymentalny typ grantu urn:ietf:params:oauth:grant-type:token-exchange dla punktu końcowego tokena OIDC. Wymiana tokenów może być używana do żądania tokenów o mniejszym zakresie lub podszywania się za innych użytkowników. Aby zezwolić na podszywanie się na instancji, zapoznaj się z polityką bezpieczeństwa.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Projekcje Introspekcji Wyzwalane przez OIDC",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Włącz wyzwalacze projekcji podczas żądania introspekcji. Może to stanowić obejście, jeśli w odpowiedzi introspekcji występują zauważalne problemy z spójnością, ale może mieć wpływ na wydajność. Planujemy w przyszłości usunąć wyzwalacze dla żądań introspekcji.",
       "USERSCHEMA": "Schemat Użytkownika",
       "USERSCHEMA_DESCRIPTION": "Schematy użytkowników umożliwiają zarządzanie schematami danych użytkowników. Jeśli flaga jest włączona, będziesz mógł korzystać z nowego interfejsu API i jego funkcji.",
       "ACTIONS": "Akcje",
@@ -1637,14 +1634,10 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Jeśli flaga jest włączona, będziesz mógł zakończyć pojedynczą sesję z interfejsu użytkownika logowania, podając id_token z roszczeniem `sid` jako id_token_hint w punkcie końcowym end_session. Należy pamiętać, że obecnie wszystkie sesje z tego samego agenta użytkownika (przeglądarki) są kończone w interfejsie użytkownika logowania. Sesje zarządzane za pomocą interfejsu API sesji już pozwalają na zakończenie pojedynczych sesji.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Błąd nadrzędny",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Jeśli flaga jest włączona, błąd nadrzędny OIDC zostanie zarejestrowany w konsoli.",
-      "DISABLEUSERTOKENEVENT": "Wyłącz zdarzenie tokena użytkownika",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Włącz Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 i może być używany do powiadamiania klientów o zakończeniu sesji u dostawcy OpenID.",
       "PERMISSIONCHECKV2": "Sprawdzanie uprawnień V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Jeśli flaga jest włączona, będziesz mógł korzystać z nowego API i jego funkcji.",
-      "WEBKEY": "Klucz Web",
-      "WEBKEY_DESCRIPTION": "Jeśli flaga jest włączona, będziesz mógł korzystać z nowego API i jego funkcji.",
       "STATES": {
         "INHERITED": "Dziedziczony",
         "ENABLED": "Włączony",
@@ -1799,7 +1792,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "Weryfikacja adresu e-mail zakończona",
@@ -2754,7 +2748,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Dodaj managera",

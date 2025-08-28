@@ -9,6 +9,7 @@ import (
 	"github.com/riverqueue/river/riverdriver/riverpgxv5"
 	"github.com/riverqueue/river/rivertype"
 	"github.com/riverqueue/rivercontrib/otelriver"
+	"github.com/robfig/cron/v3"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -40,6 +41,7 @@ func NewQueue(config *Config) (_ *Queue, err error) {
 			Queues:     make(map[string]river.QueueConfig),
 			JobTimeout: -1,
 			Middleware: middleware,
+			Schema:     schema,
 		},
 	}, nil
 }
@@ -55,7 +57,6 @@ func (q *Queue) Start(ctx context.Context) (err error) {
 	if q == nil || !q.shouldStart {
 		return nil
 	}
-	ctx = WithQueue(ctx)
 
 	q.client, err = river.NewClient(q.driver, q.config)
 	if err != nil {
@@ -75,6 +76,26 @@ func (q *Queue) AddWorkers(w ...Worker) {
 	}
 }
 
+func (q *Queue) AddPeriodicJob(schedule cron.Schedule, jobArgs river.JobArgs, opts ...InsertOpt) (handle rivertype.PeriodicJobHandle) {
+	if q == nil {
+		logging.Info("skip adding periodic job because queue is not set")
+		return
+	}
+	options := new(river.InsertOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+	return q.client.PeriodicJobs().Add(
+		river.NewPeriodicJob(
+			schedule,
+			func() (river.JobArgs, *river.InsertOpts) {
+				return jobArgs, options
+			},
+			nil,
+		),
+	)
+}
+
 type InsertOpt func(*river.InsertOpts)
 
 func WithMaxAttempts(maxAttempts uint8) InsertOpt {
@@ -91,7 +112,6 @@ func WithQueueName(name string) InsertOpt {
 
 func (q *Queue) Insert(ctx context.Context, args river.JobArgs, opts ...InsertOpt) error {
 	options := new(river.InsertOpts)
-	ctx = WithQueue(ctx)
 	for _, opt := range opts {
 		opt(options)
 	}

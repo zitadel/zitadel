@@ -60,13 +60,10 @@ func (m *SystemFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			feature_v2.SystemResetEventType,
 			feature_v2.SystemLoginDefaultOrgEventType,
-			feature_v2.SystemTriggerIntrospectionProjectionsEventType,
-			feature_v2.SystemLegacyIntrospectionEventType,
 			feature_v2.SystemUserSchemaEventType,
 			feature_v2.SystemTokenExchangeEventType,
 			feature_v2.SystemImprovedPerformanceEventType,
 			feature_v2.SystemOIDCSingleV1SessionTerminationEventType,
-			feature_v2.SystemDisableUserTokenEvent,
 			feature_v2.SystemEnableBackChannelLogout,
 			feature_v2.SystemLoginVersion,
 			feature_v2.SystemPermissionCheckV2,
@@ -85,12 +82,6 @@ func reduceSystemFeature(features *SystemFeatures, key feature.Key, value any) {
 	case feature.KeyLoginDefaultOrg:
 		v := value.(bool)
 		features.LoginDefaultOrg = &v
-	case feature.KeyTriggerIntrospectionProjections:
-		v := value.(bool)
-		features.TriggerIntrospectionProjections = &v
-	case feature.KeyLegacyIntrospection:
-		v := value.(bool)
-		features.LegacyIntrospection = &v
 	case feature.KeyUserSchema:
 		v := value.(bool)
 		features.UserSchema = &v
@@ -102,9 +93,6 @@ func reduceSystemFeature(features *SystemFeatures, key feature.Key, value any) {
 	case feature.KeyOIDCSingleV1SessionTermination:
 		v := value.(bool)
 		features.OIDCSingleV1SessionTermination = &v
-	case feature.KeyDisableUserTokenEvent:
-		v := value.(bool)
-		features.DisableUserTokenEvent = &v
 	case feature.KeyEnableBackChannelLogout:
 		v := value.(bool)
 		features.EnableBackChannelLogout = &v
@@ -120,13 +108,10 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 	aggregate := feature_v2.NewAggregate(wm.AggregateID, wm.ResourceOwner)
 	cmds := make([]eventstore.Command, 0, len(feature.KeyValues())-1)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginDefaultOrg, f.LoginDefaultOrg, feature_v2.SystemLoginDefaultOrgEventType)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TriggerIntrospectionProjections, f.TriggerIntrospectionProjections, feature_v2.SystemTriggerIntrospectionProjectionsEventType)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LegacyIntrospection, f.LegacyIntrospection, feature_v2.SystemLegacyIntrospectionEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.SystemUserSchemaEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TokenExchange, f.TokenExchange, feature_v2.SystemTokenExchangeEventType)
 	cmds = appendFeatureSliceUpdate(ctx, cmds, aggregate, wm.ImprovedPerformance, f.ImprovedPerformance, feature_v2.SystemImprovedPerformanceEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.OIDCSingleV1SessionTermination, f.OIDCSingleV1SessionTermination, feature_v2.SystemOIDCSingleV1SessionTerminationEventType)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.DisableUserTokenEvent, f.DisableUserTokenEvent, feature_v2.SystemDisableUserTokenEvent)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableBackChannelLogout, f.EnableBackChannelLogout, feature_v2.SystemEnableBackChannelLogout)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginV2, f.LoginV2, feature_v2.SystemLoginVersion)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.PermissionCheckV2, f.PermissionCheckV2, feature_v2.SystemPermissionCheckV2)

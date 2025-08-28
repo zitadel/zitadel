@@ -21,7 +21,7 @@ import {
 } from '@zitadel/proto/zitadel/feature/v2/instance_pb';
 import { Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { firstValueFrom, Observable, ReplaySubject, shareReplay, switchMap } from 'rxjs';
+import { Observable, ReplaySubject, shareReplay, switchMap } from 'rxjs';
 import { filter, map, startWith } from 'rxjs/operators';
 import { LoginV2FeatureToggleComponent } from '../feature-toggle/login-v2-feature-toggle/login-v2-feature-toggle.component';
 
@@ -29,17 +29,13 @@ import { LoginV2FeatureToggleComponent } from '../feature-toggle/login-v2-featur
 const FEATURE_KEYS = [
   'consoleUseV2UserApi',
   'debugOidcParentError',
-  'disableUserTokenEvent',
   'enableBackChannelLogout',
   // 'improvedPerformance',
   'loginDefaultOrg',
-  'oidcLegacyIntrospection',
   'oidcSingleV1SessionTermination',
   'oidcTokenExchange',
-  'oidcTriggerIntrospectionProjections',
   'permissionCheckV2',
   'userSchema',
-  'webKey',
 ] as const;
 
 export type ToggleState = { source: Source; enabled: boolean };
@@ -133,19 +129,18 @@ export class FeaturesComponent {
     );
   }
 
-  public async saveFeatures<TKey extends ToggleStateKeys, TValue extends ToggleStates[TKey]>(key: TKey, value: TValue) {
-    const toggleStates = { ...(await firstValueFrom(this.toggleStates$)), [key]: value };
+  public async saveFeature<TKey extends ToggleStateKeys, TValue extends ToggleStates[TKey]>(key: TKey, value: TValue) {
+    const req: MessageInitShape<typeof SetInstanceFeaturesRequestSchema> = {};
 
-    const req = FEATURE_KEYS.reduce<MessageInitShape<typeof SetInstanceFeaturesRequestSchema>>((acc, key) => {
-      acc[key] = toggleStates[key].enabled;
-      return acc;
-    }, {});
-
-    // to save special flags they have to be handled here
-    req.loginV2 = {
-      required: toggleStates.loginV2.enabled,
-      baseUri: toggleStates.loginV2.baseUri,
-    };
+    // Set only the specific feature being updated
+    if (key === 'loginV2') {
+      req['loginV2'] = {
+        required: value.enabled,
+        baseUri: (value as ToggleStates['loginV2']).baseUri,
+      };
+    } else if (FEATURE_KEYS.includes(key)) {
+      req[key] = value.enabled;
+    }
 
     try {
       await this.featureService.setInstanceFeatures(req);

@@ -12,7 +12,6 @@ package mock
 import (
 	context "context"
 	reflect "reflect"
-	time "time"
 
 	jose "github.com/go-jose/go-jose/v4"
 	authz "github.com/zitadel/zitadel/internal/api/authz"
@@ -72,21 +71,6 @@ func (m *MockQueries) ActiveLabelPolicyByOrg(arg0 context.Context, arg1 string, 
 func (mr *MockQueriesMockRecorder) ActiveLabelPolicyByOrg(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ActiveLabelPolicyByOrg", reflect.TypeOf((*MockQueries)(nil).ActiveLabelPolicyByOrg), arg0, arg1, arg2)
-}
-
-// ActivePrivateSigningKey mocks base method.
-func (m *MockQueries) ActivePrivateSigningKey(arg0 context.Context, arg1 time.Time) (*query.PrivateKeys, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ActivePrivateSigningKey", arg0, arg1)
-	ret0, _ := ret[0].(*query.PrivateKeys)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ActivePrivateSigningKey indicates an expected call of ActivePrivateSigningKey.
-func (mr *MockQueriesMockRecorder) ActivePrivateSigningKey(arg0, arg1 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ActivePrivateSigningKey", reflect.TypeOf((*MockQueries)(nil).ActivePrivateSigningKey), arg0, arg1)
 }
 
 // CustomTextListByTemplate mocks base method.

@@ -1545,7 +1545,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1624,12 +1625,8 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "ログイン時の既定組織",
       "LOGINDEFAULTORG_DESCRIPTION": "組織コンテキストが設定されていない場合、ログイン UI は既定の組織の設定を使用します (インスタンスの設定ではなく)",
-      "OIDCLEGACYINTROSPECTION": "OIDC レガシーイントロスペクション",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "パフォーマンス上の理由から最近イントロスペクション エンドポイントをリファクタリングしました。この機能は、予期しないバグが発生した場合にレガシー実装にロールバックするために使用できます。",
       "OIDCTOKENEXCHANGE": "OIDC トークン交換",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "OIDC トークン エンドポイント用に実験的な urn:ietf:params:oauth:grant-type:token-exchange 付与タイプを有効にします。トークン交換は、より少ないスコープを持つトークンを要求するか、他のユーザーになりすますために使用できます。インスタンスでのなりすましを許可するには、セキュリティポリシーを参照してください。",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC トリガーイントロスペクションプロジェクション",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "イントロスペクション要求中にプロジェクショントリガーを有効にします。これは、イントロスペクションレスポンスに顕著な整合性問題がある場合の回避策として機能しますが、パフォーマンスに影響を与える可能性があります。今後、イントロスペクション要求のトリガーを削除する予定です。",
       "USERSCHEMA": "ユーザー スキーマ",
       "USERSCHEMA_DESCRIPTION": "ユーザー スキーマを使用すると、ユーザーのデータスキーマを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
       "ACTIONS": "アクション",
@@ -1638,14 +1635,10 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "フラグが有効になっている場合、id_token を `sid` クレームと共に id_token_hint として end_session エンドポイントに提供することで、ログイン UI から単一のセッションを終了できるようになります。 現在、同じユーザー エージェント (ブラウザ) からのすべてのセッションがログイン UI で終了することに注意してください。 セッション API を通じて管理されるセッションは、すでに単一のセッションの終了を許可しています。",
       "DEBUGOIDCPARENTERROR": "デバッグ OIDC 親エラー",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "フラグが有効になっている場合、OIDC 親エラーはコンソールに記録されます。",
-      "DISABLEUSERTOKENEVENT": "ユーザートークンイベントを無効にする",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "バックチャネルログアウトを有効にする",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "バックチャネルログアウトは OpenID Connect バックチャネルログアウト 1.0 を実装し、OpenID プロバイダーでのセッション終了についてクライアントに通知するために使用できます。",
       "PERMISSIONCHECKV2": "権限チェック V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "フラグが有効になっている場合、新しい API とその機能を使用できます。",
-      "WEBKEY": "ウェブキー",
-      "WEBKEY_DESCRIPTION": "フラグが有効になっている場合、新しい API とその機能を使用できます。",
       "STATES": {
         "INHERITED": "継承",
         "ENABLED": "有効",
@@ -1800,7 +1793,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -2376,6 +2370,7 @@
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
       "SIGNEDREQUEST": "署名付きリクエスト",
+      "SIGNATUREALGORITHM": "署名アルゴリズム",
       "NAMEIDFORMAT": "NameIDフォーマット",
       "TRANSIENTMAPPINGATTRIBUTENAME": "カスタム属性名",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "NameIDフォーマットが`transient`の場合にユーザーをマッピングするためのカスタム属性名 (例: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`)"
@@ -2779,7 +2774,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

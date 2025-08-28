@@ -697,6 +697,35 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 	return isUnique, err
 }
 
+//go:embed user_claimed_user_ids.sql
+var userClaimedUserIDOfOrgDomain string
+
+func (q *Queries) SearchClaimedUserIDsOfOrgDomain(ctx context.Context, domain, orgID string) (userIDs []string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	err = q.client.QueryContext(ctx,
+		func(rows *sql.Rows) error {
+			userIDs = make([]string, 0)
+			for rows.Next() {
+				var userID string
+				err := rows.Scan(&userID)
+				if err != nil {
+					return err
+				}
+				userIDs = append(userIDs, userID)
+			}
+			return nil
+		},
+		userClaimedUserIDOfOrgDomain,
+		authz.GetInstance(ctx).InstanceID(),
+		"%@"+domain,
+		orgID,
+	)
+
+	return userIDs, err
+}
+
 func (q *UserSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {

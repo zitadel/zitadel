@@ -9,17 +9,26 @@ We describe our [support services](/docs/legal/service-description/support-servi
 
 ## General
 
-We always recommend first having a look at our [documentation](/docs), [discord chat](https://zitadel.com/chat) and [GitHub repository](https://github.com/zitadel/zitadel)
+We always recommend first having a look at our [documentation](/docs), [discord chat](https://zitadel.com/chat) and [GitHub repository](https://github.com/zitadel/zitadel). You can also ask our AI assistant for help before contacting Support. 
 
 ![Customer Portal General Support](/img/manuals/portal/customer_portal_general_support.png)
+
+![Customer Portal Inkeep Support](/img/manuals/portal/customer_portal_general_support_inkeep.png)
 
 ## Support Request
 
 Create a new support request with the following information:
 - Subject
-- Message
-- Affected instance
-
-This form will generate a prefilled E-Mail you can send directly to our support address.
+- Detailed description
+- Attachments (Optional)
+- Ticket Priority
+- Ticket Category
+- Hosting
+- Affected Instance (Only for cloud instances)
+- Database Version (Only for self-hosted instances)
 
 ![Customer Portal Support](/img/manuals/portal/customer_portal_support.png)
+
+![Customer Portal Support](/img/manuals/portal/customer_portal_support_2.png)
+
+After submitting the form, you will receive a confirmation email, and our team will be in touch with you shortly.

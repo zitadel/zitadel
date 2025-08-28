@@ -3,17 +3,22 @@
 package integration_test
 
 import (
+	"bytes"
 	"context"
 	_ "embed"
+	"fmt"
 	"net/http"
 	"path"
 	"testing"
+	"text/template"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/api/scim/resources"
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
@@ -157,7 +162,18 @@ var (
 	}
 )
 
+func withUsername(fixture []byte, username string) []byte {
+	buf := new(bytes.Buffer)
+	template.Must(template.New("").Parse(string(fixture))).Execute(buf, &struct {
+		Username string
+	}{
+		Username: username,
+	})
+	return buf.Bytes()
+}
+
 func TestCreateUser(t *testing.T) {
+	minimalUsername := gofakeit.Username()
 	tests := []struct {
 		name          string
 		body          []byte
@@ -171,16 +187,16 @@ func TestCreateUser(t *testing.T) {
 	}{
 		{
 			name: "minimal user",
-			body: minimalUserJson,
+			body: withUsername(minimalUserJson, minimalUsername),
 			want: &resources.ScimUser{
-				UserName: "acmeUser1",
+				UserName: minimalUsername,
 				Name: &resources.ScimUserName{
 					FamilyName: "Ross",
 					GivenName:  "Bethany",
 				},
 				Emails: []*resources.ScimEmail{
 					{
-						Value:   "user1@example.com",
+						Value:   minimalUsername + "@example.com",
 						Primary: true,
 					},
 				},
@@ -195,7 +211,7 @@ func TestCreateUser(t *testing.T) {
 		},
 		{
 			name: "full user",
-			body: fullUserJson,
+			body: withUsername(fullUserJson, "bjensen"),
 			want: fullUser,
 		},
 		{
@@ -204,7 +220,7 @@ func TestCreateUser(t *testing.T) {
 			want: &resources.ScimUser{
 				Emails: []*resources.ScimEmail{
 					{
-						Value:   "user1@example.com",
+						Value:   "user1-no-primary-email-phone@example.com",
 						Primary: true,
 					},
 				},
@@ -262,21 +278,21 @@ func TestCreateUser(t *testing.T) {
 		},
 		{
 			name:        "not authenticated",
-			body:        minimalUserJson,
+			body:        withUsername(minimalUserJson, gofakeit.Username()),
 			ctx:         context.Background(),
 			wantErr:     true,
 			errorStatus: http.StatusUnauthorized,
 		},
 		{
 			name:        "no permissions",
-			body:        minimalUserJson,
+			body:        withUsername(minimalUserJson, gofakeit.Username()),
 			ctx:         Instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			wantErr:     true,
 			errorStatus: http.StatusNotFound,
 		},
 		{
 			name:        "another org",
-			body:        minimalUserJson,
+			body:        withUsername(minimalUserJson, gofakeit.Username()),
 			orgID:       SecondaryOrganization.OrganizationId,
 			wantErr:     true,
 			errorStatus: http.StatusNotFound,
@@ -315,11 +331,6 @@ func TestCreateUser(t *testing.T) {
 			}
 
 			assert.NotEmpty(t, createdUser.ID)
-			defer func() {
-				_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
-				assert.NoError(t, err)
-			}()
-
 			assert.EqualValues(t, []schemas.ScimSchemaType{"urn:ietf:params:scim:schemas:core:2.0:User"}, createdUser.Resource.Schemas)
 			assert.Equal(t, schemas.ScimResourceTypeSingular("User"), createdUser.Resource.Meta.ResourceType)
 			assert.Equal(t, "http://"+Instance.Host()+path.Join(schemas.HandlerPrefix, orgID, "Users", createdUser.ID), createdUser.Resource.Meta.Location)
@@ -345,10 +356,11 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestCreateUser_duplicate(t *testing.T) {
-	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, minimalUserJson)
+	parsedMinimalUserJson := withUsername(minimalUserJson, gofakeit.Username())
+	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, parsedMinimalUserJson)
 	require.NoError(t, err)
 
-	_, err = Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, minimalUserJson)
+	_, err = Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, parsedMinimalUserJson)
 	scimErr := scim.RequireScimError(t, http.StatusConflict, err)
 	assert.Equal(t, "User already exists", scimErr.Error.Detail)
 	assert.Equal(t, "uniqueness", scimErr.Error.ScimType)
@@ -358,13 +370,9 @@ func TestCreateUser_duplicate(t *testing.T) {
 }
 
 func TestCreateUser_metadata(t *testing.T) {
-	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, fullUserJson)
+	username := gofakeit.Username()
+	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, withUsername(fullUserJson, username))
 	require.NoError(t, err)
-
-	defer func() {
-		_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
-		require.NoError(t, err)
-	}()
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	require.EventuallyWithT(t, func(tt *assert.CollectT) {
@@ -391,37 +399,111 @@ func TestCreateUser_metadata(t *testing.T) {
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:locale", "en-US")
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:ims", `[{"value":"someaimhandle","type":"aim"},{"value":"twitterhandle","type":"X"}]`)
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:roles", `[{"value":"my-role-1","display":"Rolle 1","type":"main-role","primary":true},{"value":"my-role-2","display":"Rolle 2","type":"secondary-role"}]`)
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:emails", fmt.Sprintf(`[{"value":"%s@example.com","primary":true,"type":"work"},{"value":"%s+1@example.com","primary":false,"type":"home"}]`, username, username))
 	}, retryDuration, tick)
 }
 
 func TestCreateUser_scopedExternalID(t *testing.T) {
-	setProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID, "fooBar")
-
-	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, fullUserJson)
+	callingUserId, callingUserPat, err := Instance.CreateMachineUserPATWithMembership(CTX, "ORG_OWNER")
 	require.NoError(t, err)
-
-	defer func() {
-		_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
-		require.NoError(t, err)
-
-		removeProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID)
-	}()
-
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	ctx := integration.WithAuthorizationToken(CTX, callingUserPat)
+	setProvisioningDomain(t, callingUserId, "fooBar")
+	createdUser, err := Instance.Client.SCIM.Users.Create(ctx, Instance.DefaultOrg.Id, withUsername(fullUserJson, gofakeit.Username()))
+	require.NoError(t, err)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(tt *assert.CollectT) {
 		// unscoped externalID should not exist
-		_, err = Instance.Client.Mgmt.GetUserMetadata(CTX, &management.GetUserMetadataRequest{
+		unscoped, err := Instance.Client.Mgmt.GetUserMetadata(ctx, &management.GetUserMetadataRequest{
 			Id:  createdUser.ID,
 			Key: "urn:zitadel:scim:externalId",
 		})
 		integration.AssertGrpcStatus(tt, codes.NotFound, err)
+		unscoped = unscoped
 
 		// scoped externalID should exist
-		md, err := Instance.Client.Mgmt.GetUserMetadata(CTX, &management.GetUserMetadataRequest{
+		md, err := Instance.Client.Mgmt.GetUserMetadata(ctx, &management.GetUserMetadataRequest{
 			Id:  createdUser.ID,
 			Key: "urn:zitadel:scim:fooBar:externalId",
 		})
-		require.NoError(tt, err)
+		if !assert.NoError(tt, err) {
+			require.Equal(tt, status.Code(err), codes.NotFound)
+			return
+		}
 		assert.Equal(tt, "701984", string(md.Metadata.Value))
 	}, retryDuration, tick)
+}
+
+func TestCreateUser_ignorePasswordOnCreate(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name            string
+		ignorePassword  string
+		scimErrorType   string
+		scimErrorDetail string
+		wantUser        *resources.ScimUser
+		wantErr         bool
+	}{
+		{
+			name:            "ignorePasswordOnCreate set to false",
+			ignorePassword:  "false",
+			wantErr:         true,
+			scimErrorType:   "invalidValue",
+			scimErrorDetail: "Password is too short",
+		},
+		{
+			name:            "ignorePasswordOnCreate set to an invalid value",
+			ignorePassword:  "random",
+			wantErr:         true,
+			scimErrorType:   "invalidValue",
+			scimErrorDetail: "Invalid value for metadata key urn:zitadel:scim:ignorePasswordOnCreate: random",
+		},
+		{
+			name:           "ignorePasswordOnCreate set to true",
+			ignorePassword: "true",
+			wantUser: &resources.ScimUser{
+				UserName: "acmeUser1",
+				Name: &resources.ScimUserName{
+					FamilyName: "Ross",
+					GivenName:  "Bethany",
+				},
+				Emails: []*resources.ScimEmail{
+					{
+						Value:   "user1@example.com",
+						Primary: true,
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// create a machine user
+			callingUserId, callingUserPat, err := Instance.CreateMachineUserPATWithMembership(CTX, "ORG_OWNER")
+			require.NoError(t, err)
+			ctx := integration.WithAuthorizationToken(CTX, callingUserPat)
+
+			// set urn:zitadel:scim:ignorePasswordOnCreate metadata for the machine user
+			setAndEnsureMetadata(t, callingUserId, "urn:zitadel:scim:ignorePasswordOnCreate", tt.ignorePassword)
+
+			// create a user with an invalid password
+			createdUser, err := Instance.Client.SCIM.Users.Create(ctx, Instance.DefaultOrg.Id, withUsername(invalidPasswordUserJson, "acmeUser1"))
+			require.Equal(t, tt.wantErr, err != nil)
+			if err != nil {
+				scimErr := scim.RequireScimError(t, http.StatusBadRequest, err)
+				assert.Equal(t, tt.scimErrorType, scimErr.Error.ScimType)
+				assert.Equal(t, tt.scimErrorDetail, scimErr.Error.Detail)
+				return
+			}
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				// ensure the user is really stored and not just returned to the caller
+				fetchedUser, err := Instance.Client.SCIM.Users.Get(CTX, Instance.DefaultOrg.Id, createdUser.ID)
+				require.NoError(ttt, err)
+				assert.True(ttt, test.PartiallyDeepEqual(tt.wantUser, fetchedUser))
+			}, retryDuration, tick)
+		})
+	}
 }

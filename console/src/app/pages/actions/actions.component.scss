@@ -1,18 +1,9 @@
-.actions-title-row {
-  display: flex;
-  align-items: center;
+h1 {
+  margin: 0;
+}
 
-  h1 {
-    margin: 0;
-  }
-
-  a {
-    .icon {
-      font-size: 1.2rem;
-      height: 1.2rem;
-      width: 1.2rem;
-    }
-  }
+.org-desc {
+  font-size: 14px;
 }
 
 @mixin actions-theme($theme) {
@@ -66,17 +57,23 @@
 
         .type-icon {
           color: $primary-color;
-        }
-
-        .type-button-icon,
-        .type-icon,
-        span {
           margin-right: 1rem;
         }
 
-        .type-icon,
         .type-button-icon {
           position: relative;
+        }
+
+        > span {
+          margin-right: 1rem;
+        }
+
+        button[mat-icon-button] {
+          margin-right: 0;
+
+          .type-button-icon {
+            margin-right: 0;
+          }
         }
       }
 
