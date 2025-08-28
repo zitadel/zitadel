@@ -1635,8 +1635,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Als het vlagje is ingeschakeld, kunt u een enkele sessie beëindigen via de login-gebruikersinterface door een id_token met een `sid`-claim als id_token_hint op het eindpunt end_session te verstrekken. Houd er rekening mee dat momenteel alle sessies van dezelfde gebruikersagent (browser) worden beëindigd in de login-gebruikersinterface. Sessies die worden beheerd via de Session API staan al toe om individuele sessies te beëindigen.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Ouderfout",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Als de vlag is ingeschakeld, wordt de OIDC-ouderfout in de console geregistreerd.",
-      "DISABLEUSERTOKENEVENT": "Gebruikerstokengebeurtenis uitschakelen",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout inschakelen",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om clients te informeren over het beëindigen van de sessie bij de OpenID-provider.",
       "PERMISSIONCHECKV2": "Permissiecontrole V2",
@@ -2371,7 +2369,8 @@
       "METADATAXML": "Metadata Xml",
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
-      "SIGNEDREQUEST": "Ondertekend Verzoek"
+      "SIGNEDREQUEST": "Ondertekend Verzoek",
+      "SIGNATUREALGORITHM": "Handtekeningalgoritme"
     },
     "TOAST": {
       "SAVED": "Succesvol opgeslagen.",

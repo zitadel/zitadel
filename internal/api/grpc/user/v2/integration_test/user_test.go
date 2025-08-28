@@ -688,7 +688,7 @@ func TestServer_Deprecated_AddHumanUser(t *testing.T) {
 
 func TestServer_Deprecated_AddHumanUser_Permission(t *testing.T) {
 	newOrgOwnerEmail := gofakeit.Email()
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -1242,7 +1242,7 @@ func TestServer_Deprecated_UpdateHumanUser(t *testing.T) {
 
 func TestServer_Deprecated_UpdateHumanUser_Permission(t *testing.T) {
 	newOrgOwnerEmail := gofakeit.Email()
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
@@ -1756,7 +1756,7 @@ func TestServer_ReactivateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	projectResp := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
+	projectResp := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
 
 	type args struct {
 		req     *user.DeleteUserRequest
@@ -2182,6 +2182,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	oauthIdpID := Instance.AddGenericOAuthProvider(IamCTX, gofakeit.AppName()).GetId()
+	azureIdpID := Instance.AddAzureADProvider(IamCTX, gofakeit.AppName()).GetId()
 	oidcIdpID := Instance.AddGenericOIDCProvider(IamCTX, gofakeit.AppName()).GetId()
 	samlIdpID := Instance.AddSAMLPostProvider(IamCTX)
 	ldapIdpID := Instance.AddLDAPProvider(IamCTX)
@@ -2208,22 +2209,32 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	require.NoError(t, err)
 	// make sure the intent is consumed
 	Instance.CreateIntentSession(t, IamCTX, intentUser.GetUserId(), successfulConsumedID, consumedToken)
+
+	azureADSuccessful, azureADToken, azureADChangeDate, azureADSequence, err := sink.SuccessfulAzureADIntent(Instance.ID(), azureIdpID, "id", "", expiry)
+	require.NoError(t, err)
+	azureADSuccessfulWithUserID, azureADWithUserIDToken, azureADWithUserIDChangeDate, azureADWithUserIDSequence, err := sink.SuccessfulAzureADIntent(Instance.ID(), azureIdpID, "id", "user", expiry)
+	require.NoError(t, err)
+
 	oidcSuccessful, oidcToken, oidcChangeDate, oidcSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "", expiry)
 	require.NoError(t, err)
 	oidcSuccessfulWithUserID, oidcWithUserIDToken, oidcWithUserIDChangeDate, oidcWithUserIDSequence, err := sink.SuccessfulOIDCIntent(Instance.ID(), oidcIdpID, "id", "user", expiry)
 	require.NoError(t, err)
+
 	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), ldapIdpID, "id", "")
 	require.NoError(t, err)
 	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), ldapIdpID, "id", "user")
 	require.NoError(t, err)
+
 	samlSuccessfulID, samlToken, samlChangeDate, samlSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "", expiry)
 	require.NoError(t, err)
 	samlSuccessfulWithUserID, samlWithUserToken, samlWithUserChangeDate, samlWithUserSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), samlIdpID, "id", "user", expiry)
 	require.NoError(t, err)
+
 	jwtSuccessfulID, jwtToken, jwtChangeDate, jwtSequence, err := sink.SuccessfulJWTIntent(Instance.ID(), jwtIdPID, "id", "", expiry)
 	require.NoError(t, err)
 	jwtSuccessfulWithUserID, jwtWithUserToken, jwtWithUserChangeDate, jwtWithUserSequence, err := sink.SuccessfulJWTIntent(Instance.ID(), jwtIdPID, "id", "user", expiry)
 	require.NoError(t, err)
+
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderIntentRequest
@@ -2367,6 +2378,105 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				},
 			},
 			wantErr: true,
+		},
+		{
+			name: "retrieve successful azure AD intent",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    azureADSuccessful,
+					IdpIntentToken: azureADToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(azureADChangeDate),
+					ResourceOwner: Instance.ID(),
+					Sequence:      azureADSequence,
+				},
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							AccessToken: "accessToken",
+							IdToken:     gu.Ptr("idToken"),
+						},
+					},
+					IdpId:    azureIdpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"id":                "id",
+							"userPrincipalName": "username",
+							"displayName":       "displayname",
+							"givenName":         "firstname",
+							"surname":           "lastname",
+							"mail":              "email@email.com",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+				AddHumanUser: &user.AddHumanUserRequest{
+					Username: gu.Ptr("username"),
+					Profile: &user.SetHumanProfile{
+						PreferredLanguage: gu.Ptr("und"),
+						GivenName:         "firstname",
+						FamilyName:        "lastname",
+						DisplayName:       gu.Ptr("displayname"),
+					},
+					IdpLinks: []*user.IDPLink{
+						{IdpId: azureIdpID, UserId: "id", UserName: "username"},
+					},
+					Email: &user.SetHumanEmail{
+						Email:        "email@email.com",
+						Verification: &user.SetHumanEmail_SendCode{SendCode: &user.SendEmailVerificationCode{}},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "retrieve successful azure AD intent with user ID",
+			args: args{
+				CTX,
+				&user.RetrieveIdentityProviderIntentRequest{
+					IdpIntentId:    azureADSuccessfulWithUserID,
+					IdpIntentToken: azureADWithUserIDToken,
+				},
+			},
+			want: &user.RetrieveIdentityProviderIntentResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(azureADWithUserIDChangeDate),
+					ResourceOwner: Instance.ID(),
+					Sequence:      azureADWithUserIDSequence,
+				},
+				UserId: "user",
+				IdpInformation: &user.IDPInformation{
+					Access: &user.IDPInformation_Oauth{
+						Oauth: &user.IDPOAuthAccessInformation{
+							AccessToken: "accessToken",
+							IdToken:     gu.Ptr("idToken"),
+						},
+					},
+					IdpId:    azureIdpID,
+					UserId:   "id",
+					UserName: "username",
+					RawInformation: func() *structpb.Struct {
+						s, err := structpb.NewStruct(map[string]interface{}{
+							"id":                "id",
+							"userPrincipalName": "username",
+							"displayName":       "displayname",
+							"givenName":         "firstname",
+							"surname":           "lastname",
+							"mail":              "email@email.com",
+						})
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: false,
 		},
 		{
 			name: "retrieve successful oidc intent",

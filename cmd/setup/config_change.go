@@ -58,6 +58,8 @@ func (mig *externalConfigChange) Execute(ctx context.Context, _ eventstore.Event
 		0,
 		0,
 		nil,
+		nil,
+		nil,
 	)
 
 	if err != nil {

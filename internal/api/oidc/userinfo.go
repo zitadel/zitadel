@@ -292,6 +292,8 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	userCtx := authz.SetCtxData(ctx, authz.CtxData{UserID: userInfo.Subject, ResourceOwner: qu.User.ResourceOwner})
+
 	queriedActions, err := s.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, triggerType, qu.User.ResourceOwner)
 	if err != nil {
 		return err
@@ -386,7 +388,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 							Key:   key,
 							Value: value,
 						}
-						if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner); err != nil {
+						if _, err = s.command.SetUserMetadata(userCtx, metadata, userInfo.Subject, qu.User.ResourceOwner); err != nil {
 							logging.WithError(err).Info("unable to set md in action")
 							panic(err)
 						}
@@ -451,7 +453,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 	}
 	claimLogs := make([]string, 0)
 	for _, metadata := range contextInfoResponse.SetUserMetadata {
-		if _, err = s.command.SetUserMetadata(ctx, metadata, userInfo.Subject, qu.User.ResourceOwner); err != nil {
+		if _, err = s.command.SetUserMetadata(userCtx, metadata, userInfo.Subject, qu.User.ResourceOwner); err != nil {
 			claimLogs = append(claimLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
 		}
 	}

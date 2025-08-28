@@ -1638,8 +1638,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "如果启用了标志，您可以通过在 end_session 端点上提供带有 `sid` 声明的 id_token 作为 id_token_hint 来从登录 UI 终止单个会话。 请注意，目前所有来自同一用户代理（浏览器）的会话都在登录 UI 中终止。 通过会话 API 管理的会话已经允许终止单个会话。",
       "DEBUGOIDCPARENTERROR": "调试 OIDC 父错误",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "如果启用该标志，OIDC 父错误将记录在控制台中。",
-      "DISABLEUSERTOKENEVENT": "禁用用户令牌事件",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "启用 Backchannel 注销",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel 注销实现了 OpenID Connect Back-Channel Logout 1.0，可用于通知客户端在 OpenID 提供商处终止会话。",
       "PERMISSIONCHECKV2": "权限检查 V2",
