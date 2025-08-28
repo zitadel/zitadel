@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
 	feature_v1 "github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -291,6 +292,74 @@ func TestCommands_ResetInstanceFeatures(t *testing.T) {
 			got, err := c.ResetInstanceFeatures(ctx)
 			require.ErrorIs(t, err, tt.wantErr)
 			assertObjectDetails(t, tt.want, got)
+		})
+	}
+}
+
+func TestInstanceFeatures_isEmpty(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		name     string
+		features *InstanceFeatures
+		want     bool
+	}{
+		{
+			name:     "nil features",
+			features: nil,
+			want:     true,
+		},
+		{
+			name:     "empty features",
+			features: &InstanceFeatures{},
+			want:     true,
+		},
+		{
+			name: "LoginDefaultOrg set",
+			features: &InstanceFeatures{
+				LoginDefaultOrg: gu.Ptr(true),
+			},
+			want: false,
+		},
+		{
+			name: "UserSchema set",
+			features: &InstanceFeatures{
+				UserSchema: gu.Ptr(true),
+			},
+			want: false,
+		},
+		{
+			name: "TokenExchange set",
+			features: &InstanceFeatures{
+				TokenExchange: gu.Ptr(true),
+			},
+			want: false,
+		},
+		{
+			name: "ImprovedPerformance set",
+			features: &InstanceFeatures{
+				ImprovedPerformance: []feature.ImprovedPerformanceType{},
+			},
+			want: false,
+		},
+		{
+			name: "multiple fields set",
+			features: &InstanceFeatures{
+				LoginDefaultOrg:        gu.Ptr(true),
+				UserSchema:             gu.Ptr(false),
+				PermissionCheckV2:      gu.Ptr(true),
+				EnableRelationalTables: gu.Ptr(true),
+			},
+			want: false,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := tc.features.isEmpty()
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }

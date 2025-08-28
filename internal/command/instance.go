@@ -141,6 +141,7 @@ type InstanceSetupFeatures struct {
 	LoginV2                        *InstanceSetupFeatureLoginV2
 	PermissionCheckV2              *bool
 	ConsoleUseV2UserApi            *bool
+	EnableRelationalTables         *bool
 }
 
 type InstanceSetupFeatureLoginV2 struct {
@@ -174,6 +175,7 @@ func (f *InstanceSetupFeatures) ToInstanceFeatures() (_ *InstanceFeatures, err e
 		LoginV2:                        loginV2,
 		PermissionCheckV2:              f.PermissionCheckV2,
 		ConsoleUseV2UserApi:            f.ConsoleUseV2UserApi,
+		EnableRelationalTables:         f.EnableRelationalTables,
 	}, nil
 }
 
