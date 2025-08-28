@@ -80,7 +80,7 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Default Settings",
+        "TITLE": "Instance Settings",
         "DESCRIPTION": "Default settings for all organizations. With the right permissions, some of them are overridable in organization settings."
       },
       "ORG": {
@@ -431,6 +431,7 @@
     "SHOWORGS": "Show All Organizations",
     "GRANTS": "Authorizations",
     "ACTIONS": "Actions",
+    "TARGETS": "Targets",
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
     "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboard shortcuts",
@@ -709,7 +710,7 @@
     "SIDEWIDE": "Site-wide shortcuts",
     "SHORTCUTS": {
       "HOME": "<strong>G</strong>o to <strong>H</strong>ome",
-      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>instance",
+      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>nstance",
       "ORG": "<strong>G</strong>o to <strong>O</strong>rganization",
       "ORGSETTINGS": "<strong>G</strong>o to Organization <strong>S</strong>ettings",
       "ORGSWITCHER": "Change Organization",
