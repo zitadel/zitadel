@@ -57,7 +57,7 @@
       ]
     },
     "build:standalone": {
-      "cache": true,
+      "cache": false,
       "dependsOn": [
         "^build"
       ],
@@ -100,6 +100,13 @@
         "command": "docker buildx bake --file docker-bake.hcl --file docker-bake-release.hcl"
       }
     },
+    "start:integration": {
+      "continuous": true,
+      "cache": false,
+      "dependsOn": [
+        "build:standalone"
+      ]
+    },
     "start:docker": {
       "continuous": true,
       "options": {
@@ -131,7 +138,8 @@
     "test:integration": {
       "cache": true,
       "dependsOn": [
-        "@zitadel/core-mock:start:docker"
+        "@zitadel/core-mock:start:docker",
+        "start:integration"
       ],
       "inputs": [
         "{projectRoot}/integration/integration/**",
@@ -139,17 +147,8 @@
         "{projectRoot}/cypress.config.ts"
       ],
       "outputs": [
-        "{projectRoot}/cypress/videos/**",
-        "{projectRoot}/cypress/screenshots/**"
-      ],
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{projectRoot}",
-        "commands": [
-          "pnpm env-cmd -f .env.integration -- pnpm nx start",
-          "pnpm run test:integration"
-        ]
-      }
+        "{projectRoot}/cypress/**/*"
+      ]
     }
   }
 }
