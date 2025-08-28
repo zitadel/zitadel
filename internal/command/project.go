@@ -27,6 +27,12 @@ type AddProject struct {
 	ProjectRoleCheck       bool
 	HasProjectCheck        bool
 	PrivateLabelingSetting domain.PrivateLabelingSetting
+	Admins                 []*AddProjectAdmin
+}
+
+type AddProjectAdmin struct {
+	ID    string
+	Roles []string
 }
 
 func (p *AddProject) IsValid() error {
@@ -74,6 +80,12 @@ func (c *Commands) AddProject(ctx context.Context, add *AddProject) (_ *domain.O
 			add.HasProjectCheck,
 			add.PrivateLabelingSetting),
 	}
+	projectMemberEvents, err := c.addProjectMemberEvents(ctx, add.ResourceOwner, add.AggregateID, add.Admins)
+	if err != nil {
+		return nil, err
+	}
+	events = append(events, projectMemberEvents...)
+
 	postCommit, err := c.projectCreatedMilestone(ctx, &events)
 	if err != nil {
 		return nil, err
@@ -185,6 +197,29 @@ func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOw
 		return "", zerrors.ThrowPreconditionFailed(err, "COMMA-VCnwD", "Errors.Project.NotFound")
 	}
 	return agg.ResourceOwner, nil
+}
+
+func (c *Commands) addProjectMemberEvents(ctx context.Context, resourceOwner, projectID string, admins []*AddProjectAdmin) ([]eventstore.Command, error) {
+	events := make([]eventstore.Command, 0)
+	for _, admin := range admins {
+		_, err := c.checkUserExists(ctx, admin.ID, resourceOwner)
+		if err != nil {
+			return nil, err
+		}
+
+		roles := admin.Roles
+		if len(roles) == 0 {
+			roles = append(roles, domain.RoleProjectOwner)
+		}
+
+		projectMemberWriteModel := NewProjectMemberWriteModel(projectID, admin.ID, resourceOwner)
+		events = append(events, project.NewProjectMemberAddedEvent(ctx,
+			ProjectAggregateFromWriteModelWithCTX(ctx, &projectMemberWriteModel.WriteModel),
+			admin.ID,
+			roles...,
+		))
+	}
+	return events, nil
 }
 
 type ChangeProject struct {
