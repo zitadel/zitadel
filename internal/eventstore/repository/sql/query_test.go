@@ -644,7 +644,7 @@ func Test_query_events_with_postgres(t *testing.T) {
 				DB: dbClient,
 			}
 
-			pusher := new_es.NewEventstore(dbClient)
+			pusher := new_es.NewEventstore(dbClient, eventstore.NoopExecutionQueue())
 			// setup initial data for query
 			if _, err := pusher.Push(context.Background(), dbClient.DB, tt.fields.existingEvents...); err != nil {
 				t.Errorf("error in setup = %v", err)

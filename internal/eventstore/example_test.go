@@ -290,7 +290,7 @@ func TestUserReadModel(t *testing.T) {
 	es := eventstore.NewEventstore(
 		&eventstore.Config{
 			Querier: query_repo.NewPostgres(testClient),
-			Pusher:  v3.NewEventstore(testClient),
+			Pusher:  v3.NewEventstore(testClient, eventstore.NoopExecutionQueue()),
 		},
 	)
 

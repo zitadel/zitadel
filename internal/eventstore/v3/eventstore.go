@@ -33,6 +33,7 @@ var (
 
 type Eventstore struct {
 	client *database.DB
+	queue  eventstore.ExecutionQueue
 }
 
 var (
@@ -157,8 +158,11 @@ func (es *Eventstore) Client() *database.DB {
 	return es.client
 }
 
-func NewEventstore(client *database.DB) *Eventstore {
-	return &Eventstore{client: client}
+func NewEventstore(client *database.DB, queue eventstore.ExecutionQueue) *Eventstore {
+	return &Eventstore{
+		client: client,
+		queue:  queue,
+	}
 }
 
 func (es *Eventstore) Health(ctx context.Context) error {

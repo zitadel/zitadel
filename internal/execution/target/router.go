@@ -5,27 +5,26 @@ import (
 	"strings"
 )
 
-type element2 struct {
+type element struct {
 	ID      string   `json:"id"`
 	Targets []Target `json:"targets,omitempty"`
 }
 
-type Router []element2
+type Router []element
 
 func NewRouter(targets []Target) Router {
 	m := make(map[string][]Target)
 	for _, t := range targets {
 		m[t.GetExecutionID()] = append(m[t.GetExecutionID()], t)
 	}
-
 	router := make(Router, 0, len(m))
 	for id, targets := range m {
-		router = append(router, element2{
+		router = append(router, element{
 			ID:      id,
 			Targets: targets,
 		})
 	}
-	slices.SortFunc(router, func(a, b element2) int {
+	slices.SortFunc(router, func(a, b element) int {
 		return strings.Compare(a.ID, b.ID)
 	})
 	return router
@@ -33,7 +32,7 @@ func NewRouter(targets []Target) Router {
 
 // Get execution targets by exact match of the executionID
 func (r Router) Get(executionID string) ([]Target, bool) {
-	i, ok := slices.BinarySearchFunc(r, executionID, func(a element2, b string) int {
+	i, ok := slices.BinarySearchFunc(r, executionID, func(a element, b string) int {
 		return strings.Compare(a.ID, b)
 	})
 	if ok {
@@ -52,15 +51,19 @@ func (r Router) GetEventBestMatch(executionID string) ([]Target, bool) {
 	if ok {
 		return t, true
 	}
-	var bestMatch element2
+	var bestMatch element
 	for _, e := range r {
 		if e.ID == "event" && strings.HasPrefix(executionID, e.ID) {
 			bestMatch, ok = e, true
 		}
-		cut, ok := strings.CutSuffix(e.ID, ".*")
-		if ok && strings.HasPrefix(executionID, cut) {
+		cut, has := strings.CutSuffix(e.ID, ".*")
+		if has && strings.HasPrefix(executionID, cut) {
 			bestMatch, ok = e, true
 		}
 	}
 	return bestMatch.Targets, ok
+}
+
+func (r Router) IsZero() bool {
+	return len(r) == 0
 }

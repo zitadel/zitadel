@@ -477,7 +477,7 @@ type authzInstance struct {
 	Feature          feature.Features           `json:"feature,omitempty"`
 	ExternalDomains  database.TextArray[string] `json:"external_domains,omitempty"`
 	TrustedDomains   database.TextArray[string] `json:"trusted_domains,omitempty"`
-	ExecutionTargets []target_domain.Target     `json:"execution_targets,omitempty"`
+	ExecutionTargets target_domain.Router       `json:"execution_targets,omitzero"`
 	ZitadelVersion   string                     `json:"zitadel_version,omitempty"`
 }
 
@@ -534,7 +534,7 @@ func (i *authzInstance) Features() feature.Features {
 }
 
 func (i *authzInstance) ExecutionRouter() target.Router {
-	return target.NewRouter(i.ExecutionTargets)
+	return i.ExecutionTargets
 }
 
 var errPublicDomain = "public domain %q not trusted"
@@ -613,9 +613,11 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			return zerrors.ThrowInternal(err, "QUERY-Po8ki", "Errors.Internal")
 		}
 		if len(executionTargetsBytes) > 0 {
-			if err := json.Unmarshal(executionTargetsBytes, &instance.ExecutionTargets); err != nil {
-				return zerrors.ThrowInternal(err, "QUERY-Po7si", "Errors.Internal")
+			var targets []target_domain.Target
+			if err := json.Unmarshal(executionTargetsBytes, &targets); err != nil {
+				return zerrors.ThrowInternal(err, "QUERY-aeKa2", "Errors.Internal")
 			}
+			instance.ExecutionTargets = target.NewRouter(targets)
 		}
 		return nil
 	}

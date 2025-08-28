@@ -40,7 +40,7 @@ type instance struct {
 	orgID            string
 	defaultLanguage  language.Tag
 	features         feature.Features
-	executionTargets []target.Target
+	executionTargets target.Router
 }
 
 func (i *instance) Block() *bool {
@@ -88,7 +88,7 @@ func (i *instance) Features() feature.Features {
 }
 
 func (i *instance) ExecutionRouter() target.Router {
-	return target.NewRouter(i.executionTargets)
+	return i.executionTargets
 }
 
 func GetInstance(ctx context.Context) Instance {
@@ -147,5 +147,14 @@ func WithFeatures(ctx context.Context, f feature.Features) context.Context {
 		i = new(instance)
 	}
 	i.features = f
+	return context.WithValue(ctx, instanceKey, i)
+}
+
+func WithExecutionRouter(ctx context.Context, router target.Router) context.Context {
+	i, ok := ctx.Value(instanceKey).(*instance)
+	if !ok {
+		i = new(instance)
+	}
+	i.executionTargets = router
 	return context.WithValue(ctx, instanceKey, i)
 }

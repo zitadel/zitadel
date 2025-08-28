@@ -70,18 +70,20 @@ func TestBinarySearchRouter_Get(t *testing.T) {
 }
 
 func TestBinarySearchRouter_GetEventBestMatch(t *testing.T) {
-	r := NewRouter(testTargets)
 	type args struct {
 		id string
 	}
 	tests := []struct {
 		name        string
+		targets     []Target
 		args        args
 		wantTargets []Target
 		wantOk      bool
 	}{
+
 		{
-			name: "event global match",
+			name:    "event global match",
+			targets: testTargets,
 			args: args{
 				id: "event/bar.foo",
 			},
@@ -89,7 +91,8 @@ func TestBinarySearchRouter_GetEventBestMatch(t *testing.T) {
 			wantOk:      true,
 		},
 		{
-			name: "event group match",
+			name:    "event group match",
+			targets: testTargets[1:],
 			args: args{
 				id: "event/foo.bar.baz",
 			},
@@ -97,7 +100,8 @@ func TestBinarySearchRouter_GetEventBestMatch(t *testing.T) {
 			wantOk:      true,
 		},
 		{
-			name: "event match",
+			name:    "event match",
+			targets: testTargets,
 			args: args{
 				id: "event/foo.bar",
 			},
@@ -105,7 +109,8 @@ func TestBinarySearchRouter_GetEventBestMatch(t *testing.T) {
 			wantOk:      true,
 		},
 		{
-			name: "function match",
+			name:    "function match",
+			targets: testTargets,
 			args: args{
 				id: "function/Call",
 			},
@@ -115,6 +120,7 @@ func TestBinarySearchRouter_GetEventBestMatch(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			r := NewRouter(tt.targets)
 			got, ok := r.GetEventBestMatch(tt.args.id)
 			assert.Equal(t, tt.wantTargets, got)
 			assert.Equal(t, tt.wantOk, ok)

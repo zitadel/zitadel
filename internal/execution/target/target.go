@@ -16,14 +16,14 @@ const (
 )
 
 type Target struct {
-	ExecutionID      string              `json:"execution_id"`
-	TargetID         string              `json:"target_id"`
-	TargetType       TargetType          `json:"target_type"`
-	Endpoint         string              `json:"endpoint"`
-	Timeout          time.Duration       `json:"timeout"`
-	InterruptOnError bool                `json:"interrupt_on_error"`
-	SigningKey       *crypto.CryptoValue `json:"signing_key"`
-	SigningKeyDec    string
+	ExecutionID      string              `json:"execution_id,omitempty"`
+	TargetID         string              `json:"target_id,omitempty"`
+	TargetType       TargetType          `json:"target_type,omitempty"`
+	Endpoint         string              `json:"endpoint,omitempty"`
+	Timeout          time.Duration       `json:"timeout,omitempty"`
+	InterruptOnError bool                `json:"interrupt_on_error,omitempty"`
+	SigningKey       *crypto.CryptoValue `json:"signing_key,omitempty"`
+	SigningKeyDec    string              `json:"signing_key_dec,omitempty"`
 }
 
 func (e *Target) GetExecutionID() string {

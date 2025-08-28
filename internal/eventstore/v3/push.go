@@ -6,11 +6,14 @@ import (
 	_ "embed"
 	"fmt"
 
+	"github.com/riverqueue/river"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/queue"
+	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -76,6 +79,11 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 		return nil, err
 	}
 
+	err = es.queueExecutions(ctx, tx, events)
+	if err != nil {
+		return nil, err
+	}
+
 	return events, nil
 }
 
@@ -105,4 +113,51 @@ func writeEvents(ctx context.Context, tx database.Tx, commands []eventstore.Comm
 		return nil, err
 	}
 	return events, nil
+}
+
+func (es *Eventstore) queueExecutions(ctx context.Context, tx database.Tx, events []eventstore.Event) error {
+	sqlTx, ok := tx.(*sql.Tx)
+	if !ok {
+		types := make([]string, len(events))
+		for i, event := range events {
+			types[i] = string(event.Type())
+		}
+		logging.WithFields("event_types", types).Warningf("event executions skipped: wrong type of transaction %T", tx)
+		return nil
+	}
+	jobArgs, err := eventsToJobArgs(ctx, events)
+	if err != nil {
+		return err
+	}
+	if len(jobArgs) == 0 {
+		return nil
+	}
+	return es.queue.InsertManyFastTx(
+		ctx, sqlTx, jobArgs,
+		queue.WithQueueName(exec_repo.QueueName),
+	)
+}
+
+func eventsToJobArgs(ctx context.Context, events []eventstore.Event) ([]river.JobArgs, error) {
+	if len(events) == 0 {
+		return nil, nil
+	}
+	router := authz.GetInstance(ctx).ExecutionRouter()
+	if router.IsZero() {
+		return nil, nil
+	}
+
+	jobArgs := make([]river.JobArgs, 0, len(events))
+	for _, event := range events {
+		targets, ok := router.GetEventBestMatch(fmt.Sprintf("event/%s", event.Type()))
+		if !ok {
+			continue
+		}
+		req, err := exec_repo.NewRequest(event, targets)
+		if err != nil {
+			return nil, err
+		}
+		jobArgs = append(jobArgs, req)
+	}
+	return jobArgs, nil
 }

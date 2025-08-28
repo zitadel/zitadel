@@ -170,9 +170,15 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return err
 	}
+	q, err := queue.NewQueue(&queue.Config{
+		Client: dbClient,
+	})
+	if err != nil {
+		return err
+	}
 
-	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
-	config.Eventstore.Searcher = new_es.NewEventstore(dbClient)
+	config.Eventstore.Pusher = new_es.NewEventstore(dbClient, q)
+	config.Eventstore.Searcher = new_es.NewEventstore(dbClient, q)
 	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(dbClient, &es_v4_pg.Config{
@@ -279,13 +285,6 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
-
-	q, err := queue.NewQueue(&queue.Config{
-		Client: dbClient,
-	})
-	if err != nil {
-		return err
-	}
 
 	notification.Register(
 		ctx,

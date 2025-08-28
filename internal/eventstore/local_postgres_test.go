@@ -56,14 +56,14 @@ func TestMain(m *testing.M) {
 		queriers["v2(inmemory)"] = v2
 		clients["v2(inmemory)"] = testClient
 
-		pushers["v3(inmemory)"] = new_es.NewEventstore(testClient)
+		pushers["v3(inmemory)"] = new_es.NewEventstore(testClient, eventstore.NoopExecutionQueue())
 		clients["v3(inmemory)"] = testClient
 
 		if localDB, err := connectLocalhost(); err == nil {
 			err = initDB(context.Background(), localDB)
 			logging.OnError(err).Fatal("migrations failed")
 
-			pushers["v3(singlenode)"] = new_es.NewEventstore(localDB)
+			pushers["v3(singlenode)"] = new_es.NewEventstore(localDB, eventstore.NoopExecutionQueue())
 			clients["v3(singlenode)"] = localDB
 		}
 

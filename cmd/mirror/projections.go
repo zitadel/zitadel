@@ -120,7 +120,7 @@ func projections(
 	staticStorage, err := config.AssetStorage.NewStorage(client.DB)
 	logging.OnError(err).Fatal("unable create static storage")
 
-	newEventstore := new_es.NewEventstore(client)
+	newEventstore := new_es.NewEventstore(client, eventstore.NoopExecutionQueue())
 	config.Eventstore.Querier = old_es.NewPostgres(client)
 	config.Eventstore.Pusher = newEventstore
 	config.Eventstore.Searcher = newEventstore
