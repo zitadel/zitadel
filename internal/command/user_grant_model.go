@@ -152,7 +152,7 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 		case *project.RoleAddedEvent:
 			wm.ExistingRoleKeysProject = append(wm.ExistingRoleKeysProject, e.Key)
 		case *project.RoleRemovedEvent:
-			slices.DeleteFunc(wm.ExistingRoleKeysProject, func(key string) bool {
+			wm.ExistingRoleKeysProject = slices.DeleteFunc(wm.ExistingRoleKeysProject, func(key string) bool {
 				return key == e.Key
 			})
 		}
