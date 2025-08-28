@@ -1,6 +1,8 @@
 package command
 
 import (
+	"slices"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -95,7 +97,6 @@ type UserGrantPreConditionReadModel struct {
 	ResourceOwner           string
 	UserExists              bool
 	ProjectExists           bool
-	ProjectGrantExists      bool
 	ExistingRoleKeysProject []string
 	ExistingRoleKeysGrant   []string
 }
@@ -127,90 +128,58 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 		case *user.UserRemovedEvent:
 			wm.UserExists = false
 		case *project.ProjectAddedEvent:
-			if checkIfProjectNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner) {
+			if projectExistsOnOrganization(wm.ResourceOwner, e.Aggregate().ResourceOwner) {
 				wm.ProjectExists = true
 			}
+			// We store the organization of the project for later checks, e.g. in case of a project grant
 			wm.ProjectResourceOwner = e.Aggregate().ResourceOwner
 		case *project.ProjectRemovedEvent:
-			if checkIfProjectNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner) {
-				wm.ProjectExists = false
-			}
+			wm.ProjectExists = false
 		case *project.GrantAddedEvent:
-			// grantID is empty to search for a granted project or provided AND has to be equal to the grantID of the granted project
-			// AND there has to be an organization the project is granted to AND it can not be the organization belong to itself
-			if checkIfProjectGrantNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner, e.GrantedOrgID, wm.ProjectGrantID, e.GrantID) {
-				wm.ProjectGrantExists = true
+			if projectGrantExistsOnOrganization(wm.ProjectGrantID, wm.ResourceOwner, e.GrantID, e.GrantedOrgID) {
 				wm.ExistingRoleKeysGrant = e.RoleKeys
-				// persist grantID without changing the original
 				wm.FoundGrantID = e.GrantID
 			}
 		case *project.GrantChangedEvent:
-			// grantedOrgID is empty as grantID is always set
-			if checkIfProjectGrantNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner, "", wm.FoundGrantID, e.GrantID) {
+			if wm.FoundGrantID == e.GrantID {
 				wm.ExistingRoleKeysGrant = e.RoleKeys
 			}
 		case *project.GrantRemovedEvent:
-			// grantedOrgID is empty as grantID is always set
-			if checkIfProjectGrantNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner, "", wm.FoundGrantID, e.GrantID) {
-				wm.ProjectGrantExists = false
+			if wm.FoundGrantID == e.GrantID {
 				wm.ExistingRoleKeysGrant = []string{}
+				wm.FoundGrantID = ""
 			}
 		case *project.RoleAddedEvent:
-			if checkIfProjectRoleNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner) {
-				wm.ExistingRoleKeysProject = append(wm.ExistingRoleKeysProject, e.Key)
-			}
+			wm.ExistingRoleKeysProject = append(wm.ExistingRoleKeysProject, e.Key)
 		case *project.RoleRemovedEvent:
-			if checkIfProjectRoleNecessary(wm.ResourceOwner, e.Aggregate().ResourceOwner) {
-				for i, key := range wm.ExistingRoleKeysProject {
-					if key == e.Key {
-						copy(wm.ExistingRoleKeysProject[i:], wm.ExistingRoleKeysProject[i+1:])
-						wm.ExistingRoleKeysProject[len(wm.ExistingRoleKeysProject)-1] = ""
-						wm.ExistingRoleKeysProject = wm.ExistingRoleKeysProject[:len(wm.ExistingRoleKeysProject)-1]
-						continue
-					}
-				}
-			}
+			wm.ExistingRoleKeysProject = slices.DeleteFunc(wm.ExistingRoleKeysProject, func(key string) bool {
+				return key == e.Key
+			})
 		}
 	}
 	return wm.WriteModel.Reduce()
 }
 
-func checkIfProjectNecessary(providedResourceOwner, projectResourceOwner string) bool {
-	// organization of the project is used OR provided is organization of the project
-	if providedResourceOwner == "" || providedResourceOwner == projectResourceOwner {
-		return true
-	}
-	return false
+func projectExistsOnOrganization(requiredOrganization, projectResourceOwner string) bool {
+	// Depending on the API, a request can either require a project to be part of a specific organization
+	// or not. In the former case, the project must belong to the required organization.
+	// In the latter case, it is sufficient that the project exists at all, since the user will be granted
+	// automatically in the organization the project belongs to.
+	return requiredOrganization == "" || requiredOrganization == projectResourceOwner
 }
 
-func checkIfProjectGrantNecessary(providedResourceOwner, projectResourceOwner, grantedOrgID, providedProjectGrantID, projectGrantID string) bool {
-	// grantID is empty to search for a granted project or provided AND has to be equal to the grantID of the granted project
-	// AND there has to be an organization the project is granted to AND it can not be the organization belong to itself
-	if (providedProjectGrantID == "" || providedProjectGrantID == projectGrantID) &&
-		(providedResourceOwner != "" && providedResourceOwner == grantedOrgID && grantedOrgID != projectResourceOwner) {
-		return true
-	}
-	return false
+func projectGrantExistsOnOrganization(requiredGrantID, requiredOrganization, projectGrantID, grantedOrganization string) bool {
+	// Depending on the API, a request can either require a project grant (ID) and/or an organization (ID),
+	// where the project must be granted to.
+	return (requiredGrantID == "" || requiredGrantID == projectGrantID) &&
+		(requiredOrganization == "" || requiredOrganization == grantedOrganization)
 }
 
-func checkIfProjectRoleNecessary(providedResourceOwner, projectResourceOwner string) bool {
-	// organization of the project is used OR provided is organization of project
-	if providedResourceOwner == "" || providedResourceOwner == projectResourceOwner {
-		return true
+func (wm *UserGrantPreConditionReadModel) existingRoles() []string {
+	if wm.FoundGrantID != "" {
+		return wm.ExistingRoleKeysGrant
 	}
-	return false
-}
-
-func (wm *UserGrantPreConditionReadModel) existingRoles(projectID, projectGrantID string) []string {
-	// not the requested project or not found project grant
-	if wm.ProjectID != projectID || wm.FoundGrantID != projectGrantID {
-		return nil
-	}
-	// requested project
-	if projectGrantID == "" {
-		return wm.ExistingRoleKeysProject
-	}
-	return wm.ExistingRoleKeysGrant
+	return wm.ExistingRoleKeysProject
 }
 
 func (wm *UserGrantPreConditionReadModel) Query() *eventstore.SearchQueryBuilder {
