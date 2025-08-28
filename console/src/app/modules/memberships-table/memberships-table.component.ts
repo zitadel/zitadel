@@ -4,19 +4,19 @@ import { MatTable } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { Membership } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { OverlayWorkflowService } from 'src/app/services/overlay/overlay-workflow.service';
 import { OrgContextChangedWorkflowOverlays } from 'src/app/services/overlay/workflows';
-import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { getMembershipColor } from 'src/app/utils/color';
 
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { MembershipsDataSource } from './memberships-datasource';
+import { NewOrganizationService } from '../../services/new-organization.service';
+import { Organization } from '@zitadel/proto/zitadel/org/v2/org_pb';
 
 @Component({
   selector: 'cnsl-memberships-table',
@@ -49,7 +49,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private router: Router,
     private workflowService: OverlayWorkflowService,
-    private storageService: StorageService,
+    private readonly newOrganizationService: NewOrganizationService,
   ) {
     this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe((_) => {
       this.changedSelection.emit(this.selection.selected);
@@ -116,53 +116,44 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  public goto(membership: Membership.AsObject): void {
-    const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+  public async goto(membership: Membership.AsObject) {
+    const orgId = this.newOrganizationService.orgId();
 
     if (membership.orgId && !membership.projectId && !membership.projectGrantId) {
       // only shown on auth user, or if currentOrg === resourceOwner
-      this.authService
-        .getActiveOrg(membership.orgId)
-        .then((membershipOrg) => {
-          this.router.navigate(['/org/members']).then(() => {
-            this.startOrgContextWorkflow(membershipOrg, org);
-          });
-        })
-        .catch(() => {
-          this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
-        });
+      try {
+        const membershipOrg = await this.newOrganizationService.setOrgId(membership.orgId);
+        await this.router.navigate(['/org/members']);
+        this.startOrgContextWorkflow(membershipOrg, orgId);
+      } catch (error) {
+        this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
+      }
     } else if (membership.projectGrantId && membership.details?.resourceOwner) {
       // only shown on auth user
-      this.authService
-        .getActiveOrg(membership.details?.resourceOwner)
-        .then((membershipOrg) => {
-          this.router.navigate(['/granted-projects', membership.projectId, 'grants', membership.projectGrantId]).then(() => {
-            this.startOrgContextWorkflow(membershipOrg, org);
-          });
-        })
-        .catch(() => {
-          this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
-        });
+      try {
+        const membershipOrg = await this.newOrganizationService.setOrgId(membership.details?.resourceOwner);
+        await this.router.navigate(['/granted-projects', membership.projectId, 'grants', membership.projectGrantId]);
+        this.startOrgContextWorkflow(membershipOrg, orgId);
+      } catch (error) {
+        this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
+      }
     } else if (membership.projectId && membership.details?.resourceOwner) {
       // only shown on auth user, or if currentOrg === resourceOwner
-      this.authService
-        .getActiveOrg(membership.details?.resourceOwner)
-        .then((membershipOrg) => {
-          this.router.navigate(['/projects', membership.projectId, 'members']).then(() => {
-            this.startOrgContextWorkflow(membershipOrg, org);
-          });
-        })
-        .catch(() => {
-          this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
-        });
+      try {
+        const membershipOrg = await this.newOrganizationService.setOrgId(membership.details?.resourceOwner);
+        await this.router.navigate(['/projects', membership.projectId, 'members']);
+        this.startOrgContextWorkflow(membershipOrg, orgId);
+      } catch (error) {
+        this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
+      }
     } else if (membership.iam) {
       // only shown on auth user
-      this.router.navigate(['/instance/members']);
+      await this.router.navigate(['/instance/members']);
     }
   }
 
-  private startOrgContextWorkflow(membershipOrg: Org.AsObject, currentOrg?: Org.AsObject | null): void {
-    if (!currentOrg || (membershipOrg.id && currentOrg.id && currentOrg.id !== membershipOrg.id)) {
+  private startOrgContextWorkflow(membershipOrg: Organization, currentOrgId?: string | null): void {
+    if (!currentOrgId || (membershipOrg.id && currentOrgId && currentOrgId !== membershipOrg.id)) {
       setTimeout(() => {
         this.workflowService.startWorkflow(OrgContextChangedWorkflowOverlays, null);
       }, 1000);

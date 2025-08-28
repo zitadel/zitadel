@@ -7,16 +7,16 @@ import {
   SAMLBinding,
   SAMLNameIDFormat,
   SAMLSignatureAlgorithm,
-} from '../../../proto/generated/zitadel/idp_pb';
-import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
+} from 'src/app/proto/generated/zitadel/idp_pb';
+import { FormControl, FormGroup } from '@angular/forms';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { ManagementService } from '../../../services/mgmt.service';
-import { AdminService } from '../../../services/admin.service';
-import { ToastService } from '../../../services/toast.service';
-import { GrpcAuthService } from '../../../services/grpc-auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { AdminService } from 'src/app/services/admin.service';
+import { ToastService } from 'src/app/services/toast.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { BehaviorSubject, shareReplay, switchMap, take } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from '../../../services/breadcrumb.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { atLeastOneIsFilled, requiredValidator } from '../../form-field/validators/validators';
 import {
   AddSAMLProviderRequest as AdminAddSAMLProviderRequest,
@@ -28,10 +28,10 @@ import {
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
   UpdateSAMLProviderRequest as MgmtUpdateSAMLProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { Environment, EnvironmentService } from '../../../services/environment.service';
+import { Environment, EnvironmentService } from 'src/app/services/environment.service';
 import { filter, map } from 'rxjs/operators';
 import { ProviderNextService } from '../provider-next/provider-next.service';
-import { getEnumKeys, getEnumKeyFromValue, convertEnumValuesToKeys } from '../../../utils/enum.utils';
+import { getEnumKeys, getEnumKeyFromValue } from 'src/app/utils/enum.utils';
 
 interface SAMLProviderForm {
   name: FormControl<string>;
