@@ -53,4 +53,13 @@ jobs:
       - name: Set up Docker Buildx
         id: setup-buildx
         uses: docker/setup-buildx-action@v3
-      - run: nx build:bake login --file cwd://${{ steps.login-meta.outputs.bake-file }} --push
+      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        uses: pnpm/action-setup@v4
+      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm dlx nx build:bake login --file cwd://${{ steps.login-meta.outputs.bake-file }} --push

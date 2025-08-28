@@ -2,11 +2,11 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "build": {
-      "inputs": [
-        "default"
-      ],
       "dependsOn": [
         "^build"
+      ],
+      "inputs": [
+        "default"
       ],
       "outputs": [
         "{projectRoot}/.next/**/*",
@@ -15,11 +15,11 @@
       ]
     },
     "build:standalone": {
-      "inputs": [
-        "default"
-      ],
       "dependsOn": [
         "^build"
+      ],
+      "inputs": [
+        "default"
       ],
       "outputs": [
         "{projectRoot}/.next/standalone/**/*",
@@ -27,16 +27,19 @@
       ]
     },
     "build:docker": {
+      "dependsOn": [
+        "build:standalone"
+      ],
       "inputs": [
         "docker",
         "{projectRoot}/public/**/*",
         "{projectRoot}/scripts/**/*"
-      ],
-      "dependsOn": [
-        "build:standalone"
       ]
     },
     "build:bake": {
+      "dependsOn": [
+        "build:standalone"
+      ],
       "inputs": [
         "docker",
         "{projectRoot}/public/**/*",

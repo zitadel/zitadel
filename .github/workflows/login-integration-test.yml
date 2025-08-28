@@ -25,7 +25,16 @@ jobs:
         run: docker compose --file .devcontainer/login-integration/docker-compose.yaml pull
         env:
           LOGIN_TAG: ${{ inputs.login_build_image }}
-      - run: nx build:docker login
+      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        uses: pnpm/action-setup@v4
+      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm dlx nx build:docker login
       - name: Run Integration Tests against the Login and a Mocked Zitadel API
         run: LOGIN_TAG=zitadel-login:local npm run devcontainer:integration:login
         env:
