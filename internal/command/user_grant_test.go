@@ -898,55 +898,32 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 			},
 		},
 	}
-	t.Run("without permission check", func(t *testing.T) {
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				r := &Commands{
-					eventstore: tt.fields.eventstore(t),
-				}
-				if tt.fields.idGenerator != nil {
-					r.idGenerator = tt.fields.idGenerator(t)
-				}
-				got, err := r.AddUserGrant(tt.args.ctx, tt.args.userGrant, nil)
-				if tt.res.err == nil {
-					assert.NoError(t, err)
-				}
-				if tt.res.err != nil && !tt.res.err(err) {
-					t.Errorf("got wrong err: %v ", err)
-				}
-				if tt.res.err == nil {
-					assert.Equal(t, tt.res.want, got)
-				}
-			})
-		}
-	})
-	t.Run("with succeeding permission check", func(t *testing.T) {
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				r := &Commands{
-					eventstore: tt.fields.eventstore(t),
-				}
-				if tt.fields.idGenerator != nil {
-					r.idGenerator = tt.fields.idGenerator(t)
-				}
-				// we use an empty context and only rely on the permission check implementation
-				got, err := r.AddUserGrant(context.Background(), tt.args.userGrant, succeedingUserGrantPermissionCheck)
-				if tt.res.err == nil {
-					assert.NoError(t, err)
-				}
-				if tt.res.err != nil && !tt.res.err(err) {
-					t.Errorf("got wrong err: %v ", err)
-				}
-				if tt.res.err == nil {
-					assert.Equal(t, tt.res.want, got)
-				}
-			})
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			if tt.fields.idGenerator != nil {
+				r.idGenerator = tt.fields.idGenerator(t)
+			}
+			got, err := r.AddUserGrant(tt.args.ctx, tt.args.userGrant, succeedingUserGrantPermissionCheck)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_AddUserGrant_permission_failed(t *testing.T) {
 	t.Run("with failing permission check", func(t *testing.T) {
 		r := &Commands{
-			eventstore: eventstoreExpect(
-				t,
+			eventstore: expectEventstore(
 				expectFilter(
 					eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -978,7 +955,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						),
 					),
 				),
-			),
+			)(t),
 		}
 		// we use an empty context and only rely on the permission check implementation
 		_, err := r.AddUserGrant(context.Background(), &domain.UserGrant{
