@@ -7,7 +7,6 @@ import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
 import { UserGrant as AuthUserGrant } from 'src/app/proto/generated/zitadel/auth_pb';
-import { Role } from 'src/app/proto/generated/zitadel/project_pb';
 import {
   Type,
   UserGrant as MgmtUserGrant,
@@ -24,7 +23,9 @@ import { PageEvent, PaginatorComponent } from '../paginator/paginator.component'
 import { UserGrantRoleDialogComponent } from '../user-grant-role-dialog/user-grant-role-dialog.component';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
-import { Org, OrgIDQuery, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
+import { QueryClient } from '@tanstack/angular-query-experimental';
+import { NewOrganizationService } from '../../services/new-organization.service';
 
 export enum UserGrantListSearchKey {
   DISPLAY_NAME,
@@ -43,7 +44,6 @@ type UserGrantAsObject = AuthUserGrant.AsObject | MgmtUserGrant.AsObject;
 })
 export class UserGrantsComponent implements OnInit, AfterViewInit {
   public userGrantListSearchKey: UserGrantListSearchKey | undefined = undefined;
-  public UserGrantListSearchKey: any = UserGrantListSearchKey;
 
   public INITIAL_PAGE_SIZE: number = 50;
   @Input() context: UserGrantContext = UserGrantContext.NONE;
@@ -62,27 +62,24 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   @Input() grantId: string = '';
   @ViewChild('input') public filter!: MatInput;
 
-  public projectRoleOptions: Role.AsObject[] = [];
   public routerLink: any = undefined;
 
-  public loadedId: string = '';
-  public loadedProjectId: string = '';
-  public grantToEdit: string = '';
-
-  public UserGrantContext: any = UserGrantContext;
-  public Type: any = Type;
-  public ActionKeysType: any = ActionKeysType;
-  public UserGrantState: any = UserGrantState;
+  public UserGrantContext = UserGrantContext;
+  public Type = Type;
+  public ActionKeysType = ActionKeysType;
+  public UserGrantState = UserGrantState;
   @Input() public type: Type | undefined = undefined;
 
   public filterOpen: boolean = false;
   public myOrgs: Array<Org.AsObject> = [];
   constructor(
-    private authService: GrpcAuthService,
-    private userService: ManagementService,
-    private toast: ToastService,
-    private dialog: MatDialog,
-    private router: Router,
+    private readonly authService: GrpcAuthService,
+    private readonly userService: ManagementService,
+    private readonly toast: ToastService,
+    private readonly dialog: MatDialog,
+    private readonly queryClient: QueryClient,
+    protected readonly router: Router,
+    private readonly newOrganizationService: NewOrganizationService,
   ) {}
 
   @Input() public displayedColumns: string[] = [
@@ -147,10 +144,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     } else {
       return '';
     }
-  }
-
-  public gotoCreateLink(rL: any): void {
-    this.router.navigate(rL);
   }
 
   private loadGrantsPage(type: Type | undefined, searchQueries?: UserGrantQuery[]): void {
@@ -315,15 +308,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   }
 
   public async showUser(grant: UserGrant.AsObject) {
-    const orgQuery = new OrgQuery();
-    const orgIdQuery = new OrgIDQuery();
-    orgIdQuery.setId(grant.grantedOrgId);
-    orgQuery.setIdQuery(orgIdQuery);
-
-    const orgs = (await this.authService.listMyProjectOrgs(1, 0, [orgQuery])).resultList;
-    if (orgs.length === 1) {
-      this.authService.setActiveOrg(orgs[0]);
-      this.router.navigate(['/users', grant.userId]);
+    const org = await this.queryClient.fetchQuery(
+      this.newOrganizationService.organizationByIdQueryOptions(grant.grantedOrgId),
+    );
+    if (org) {
+      this.newOrganizationService.setOrgId(grant.grantedOrgId);
+      await this.router.navigate(['/users', grant.userId]);
     } else {
       this.toast.showInfo('GRANTS.TOAST.CANTSHOWINFO', true);
     }
