@@ -25,13 +25,14 @@ function getDefaultCardBackground(): string {
   const appearance = APPEARANCE_STYLES[themeConfig.appearance];
 
   // Use appearance-specific background if defined, otherwise fallback to material design (current system)
-  return (appearance as any).background || "bg-background-light-400 dark:bg-background-dark-500";
+  return appearance?.background || "bg-background-light-400 dark:bg-background-dark-500";
 }
 
 // Helper function to get default card styling from centralized theme system
 function getDefaultCardStyling(): string {
   const themeConfig = getThemeConfig();
-  return APPEARANCE_STYLES[themeConfig.appearance].card;
+  const appearance = APPEARANCE_STYLES[themeConfig.appearance];
+  return appearance?.card || "shadow-sm border-0"; // Fallback to material design
 }
 
 // eslint-disable-next-line react/display-name

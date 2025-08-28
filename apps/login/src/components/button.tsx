@@ -64,7 +64,8 @@ function getDefaultButtonRoundness(): string {
 // Helper function to get default button appearance from centralized theme system
 function getDefaultButtonAppearance(): string {
   const themeConfig = getThemeConfig();
-  return APPEARANCE_STYLES[themeConfig.appearance].button;
+  const appearance = APPEARANCE_STYLES[themeConfig.appearance];
+  return appearance?.button || "border border-button-light-border dark:border-button-dark-border"; // Fallback to flat design
 }
 
 // eslint-disable-next-line react/display-name
