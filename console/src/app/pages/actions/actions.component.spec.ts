@@ -1,19 +1,19 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { ActionsComponent } from './actions.component';
+import { OrgListComponent } from './actions.component';
 
-describe('ActionsComponent', () => {
-  let component: ActionsComponent;
-  let fixture: ComponentFixture<ActionsComponent>;
+describe('OrgListComponent', () => {
+  let component: OrgListComponent;
+  let fixture: ComponentFixture<OrgListComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ActionsComponent],
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [OrgListComponent],
     }).compileComponents();
-  });
+  }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ActionsComponent);
+    fixture = TestBed.createComponent(OrgListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
