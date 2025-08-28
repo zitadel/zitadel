@@ -36,6 +36,9 @@
         "build:standalone"
       ]
     },
+    "start:docker": {
+      "continuous": true
+    },
     "dev": {
       "persistent": true,
       "cache": false,
