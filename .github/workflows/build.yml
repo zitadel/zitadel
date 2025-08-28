@@ -105,7 +105,6 @@ jobs:
 
   login-integration-test:
     uses: ./.github/workflows/login-integration-test.yml
-    needs: [login-container]
     with:
       login_build_image: ${{ needs.login-container.outputs.login_build_image }}
 
