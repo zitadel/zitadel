@@ -61,12 +61,6 @@ function getDefaultButtonRoundness(): string {
   return getComponentRoundness("button");
 }
 
-// Helper function to get default typography from centralized theme system
-function getDefaultButtonTypography(): string {
-  const themeConfig = getThemeConfig();
-  return APPEARANCE_STYLES[themeConfig.appearance].typography;
-}
-
 // Helper function to get default button appearance from centralized theme system
 function getDefaultButtonAppearance(): string {
   const themeConfig = getThemeConfig();
@@ -91,14 +85,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     // Use theme-based values if not explicitly provided
     const actualRoundness = roundness || getDefaultButtonRoundness();
-    const actualTypography = typography || getDefaultButtonTypography();
     const actualAppearance = getDefaultButtonAppearance();
 
     return (
       <button
         type="button"
         ref={ref}
-        className={`${getButtonClasses(size, variant, color, actualRoundness, actualTypography, actualAppearance, spacing)} ${className}`}
+        className={`${getButtonClasses(size, variant, color, actualRoundness, actualAppearance, spacing)} ${className}`}
         {...props}
       >
         {children}
