@@ -25,8 +25,9 @@ jobs:
         run: docker compose --file .devcontainer/login-integration/docker-compose.yaml pull
         env:
           LOGIN_TAG: ${{ inputs.login_build_image }}
+      - run: nx build:docker login
       - name: Run Integration Tests against the Login and a Mocked Zitadel API
-        run: npm run devcontainer:integration:login
+        run: LOGIN_TAG=zitadel-login:local npm run devcontainer:integration:login
         env:
           LOGIN_TAG: ${{ inputs.login_build_image }}
           DOCKER_BUILDKIT: 1

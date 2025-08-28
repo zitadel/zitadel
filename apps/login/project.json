@@ -36,6 +36,24 @@
         "build:standalone"
       ]
     },
+    "build:bake": {
+      "inputs": [
+        "docker",
+        "{projectRoot}/public/**/*",
+        "{projectRoot}/scripts/**/*",
+        "{projectRoot}/docker-bake.hcl",
+        "{projectRoot}/docker-bake-release.hcl",
+        "{workspaceRoot}/docker-bake.hcl",
+        {
+          "env": "META_ACTION_BAKE_FILE"
+        }
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "docker buildx bake --file docker-bake.hcl --file docker-bake-release.hcl"
+      }
+    },
     "start:docker": {
       "continuous": true
     },

@@ -53,17 +53,4 @@ jobs:
       - name: Set up Docker Buildx
         id: setup-buildx
         uses: docker/setup-buildx-action@v3
-      - name: Bake login multi-arch
-        uses: docker/bake-action@v6
-        env:
-          NODE_VERSION: ${{ inputs.node_version }}
-        with:
-          source: .
-          push: true
-          provenance: true
-          targets: login-standalone
-          files: |
-            ./apps/login/docker-bake.hcl
-            ${{ github.event_name == 'workflow_dispatch' && './apps/login/docker-bake-release.hcl' || '' }}
-            ./docker-bake.hcl
-            cwd://${{ steps.login-meta.outputs.bake-file }}
+      - run: nx build:bake login --file cwd://${{ steps.login-meta.outputs.bake-file }} --push
