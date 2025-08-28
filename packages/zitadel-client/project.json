@@ -2,6 +2,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "build": {
+      "inputs": ["default"],
       "outputs": ["{projectRoot}/dist/**"],
       "dependsOn": ["^generate"]
     }

@@ -2,6 +2,10 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "generate": {
+      "inputs": [
+        "default",
+        "{workspaceRoot}/proto/**/*"
+      ],
       "outputs": [
         "{projectRoot}/cjs/**/*",
         "{projectRoot}/es/**/*",

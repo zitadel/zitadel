@@ -19,6 +19,9 @@ importers:
       '@devcontainers/cli':
         specifier: ^0.80.0
         version: 0.80.0
+      '@nx/docker':
+        specifier: 21.4.1
+        version: 21.4.1(nx@21.4.1(@swc/core@1.13.4(@swc/helpers@0.5.17)))
       nx:
         specifier: 21.4.1
         version: 21.4.1(@swc/core@1.13.4(@swc/helpers@0.5.17))
@@ -3566,6 +3569,14 @@ packages:
     resolution: {integrity: sha512-T1acZrVVmJw/sJ4PIGidCBYBiBqlg/jT9e8nIGXLSDS20xcLvfo4zBQf8UZLrmHglnwwpDpOWuVJCp2rYA5aDg==}
     peerDependencies:
       nx: '>= 15 <= 17'
+
+  '@nx/devkit@21.4.1':
+    resolution: {integrity: sha512-rWgMNG2e0tSG5L3vffuMH/aRkn+i9vYHelWkgVAslGBOaqriEg1dCSL/W9I3Fd5lnucHy3DrG1f19uDjv7Dm0A==}
+    peerDependencies:
+      nx: '>= 20 <= 22'
+
+  '@nx/docker@21.4.1':
+    resolution: {integrity: sha512-1wPjsxadE1Wy5QaXRX8rSWrp9fbm8STV2MYzLSkXbwlrusvYQETP/MKGsqT5fZZTrN9NrQ+HTLa/7vW5vU8fkA==}
 
   '@nx/nx-darwin-arm64@16.5.1':
     resolution: {integrity: sha512-q98TFI4B/9N9PmKUr1jcbtD4yAFs1HfYd9jUXXTQOlfO9SbDjnrYJgZ4Fp9rMNfrBhgIQ4x1qx0AukZccKmH9Q==}
@@ -19449,6 +19460,26 @@ snapshots:
       semver: 7.5.3
       tmp: 0.2.5
       tslib: 2.8.1
+
+  '@nx/devkit@21.4.1(nx@21.4.1(@swc/core@1.13.4(@swc/helpers@0.5.17)))':
+    dependencies:
+      ejs: 3.1.10
+      enquirer: 2.3.6
+      ignore: 5.3.2
+      minimatch: 9.0.3
+      nx: 21.4.1(@swc/core@1.13.4(@swc/helpers@0.5.17))
+      semver: 7.7.2
+      tmp: 0.2.5
+      tslib: 2.8.1
+      yargs-parser: 21.1.1
+
+  '@nx/docker@21.4.1(nx@21.4.1(@swc/core@1.13.4(@swc/helpers@0.5.17)))':
+    dependencies:
+      '@nx/devkit': 21.4.1(nx@21.4.1(@swc/core@1.13.4(@swc/helpers@0.5.17)))
+      enquirer: 2.3.6
+      tslib: 2.8.1
+    transitivePeerDependencies:
+      - nx
 
   '@nx/nx-darwin-arm64@16.5.1':
     optional: true

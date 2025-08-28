@@ -2,6 +2,9 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "build": {
+      "inputs": [
+        "default"
+      ],
       "dependsOn": [
         "^build"
       ],
@@ -9,15 +12,29 @@
         "{projectRoot}/.next/**/*",
         "!{projectRoot}/.next/cache/**/*",
         "!{projectRoot}/.next/standalone/**/*"
+      ]
+    },
+    "build:standalone": {
+      "inputs": [
+        "default"
       ],
-      "configurations": {
-        "standalone": {
-          "outputs": [
-            "{projectRoot}/.next/standalone/**/*",
-            "{projectRoot}/.next/static/**/*"
-          ]
-        }
-      }
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "{projectRoot}/.next/standalone/**/*",
+        "{projectRoot}/.next/static/**/*"
+      ]
+    },
+    "build:docker": {
+      "inputs": [
+        "docker",
+        "{projectRoot}/public/**/*",
+        "{projectRoot}/scripts/**/*"
+      ],
+      "dependsOn": [
+        "build:standalone"
+      ]
     },
     "dev": {
       "persistent": true,

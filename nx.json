@@ -51,7 +51,12 @@
     ],
     "default": [
       "{projectRoot}/**/*",
-      "sharedGlobals"
+      "!{projectRoot}/Dockerfile",
+      "!{projectRoot}/.dockerignore"
+    ],
+    "docker": [
+      "{projectRoot}/Dockerfile",
+      "{projectRoot}/.dockerignore"
     ]
   },
   "targetDefaults": {
@@ -94,5 +99,19 @@
     "clean": {
       "cache": false
     }
-  }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/docker",
+      "options": {
+        "buildTarget": "build:docker",
+        "runTarget": "start:docker"
+      },
+      "exclude": [
+        ".devcontainer/base/**/*",
+        "apps/login/integration/core-mock/**/*",
+        "build/zitadel/**/*"
+      ]
+    }
+  ]
 }
