@@ -2,7 +2,7 @@
 
 import { setLanguageCookie } from "@/lib/cookies";
 import { Lang, LANGS } from "@/lib/i18n";
-import { getThemeConfig, ROUNDNESS_CLASSES, getComponentRoundness } from "@/lib/theme";
+import { getThemeConfig, ROUNDNESS_CLASSES, getComponentRoundness, APPEARANCE_STYLES } from "@/lib/theme";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
@@ -15,9 +15,17 @@ function getLanguageSwitcherRoundness(): string {
   return getComponentRoundness("button");
 }
 
+// Helper function to get card appearance styles for the language switcher
+function getLanguageSwitcherCardAppearance(): string {
+  const themeConfig = getThemeConfig();
+  const appearance = APPEARANCE_STYLES[themeConfig.appearance];
+  return appearance?.card || "bg-black/5 dark:bg-white/5"; // Fallback to current styling
+}
+
 export function LanguageSwitcher() {
   const currentLocale = useLocale();
   const switcherRoundness = getLanguageSwitcherRoundness();
+  const cardAppearance = getLanguageSwitcherCardAppearance();
 
   const [selected, setSelected] = useState(LANGS.find((l) => l.code === currentLocale) || LANGS[0]);
 
@@ -37,7 +45,8 @@ export function LanguageSwitcher() {
       <Listbox value={selected} onChange={handleChange}>
         <ListboxButton
           className={clsx(
-            `relative block w-full bg-black/5 py-1.5 pl-3 pr-8 text-left text-sm/6 text-black dark:bg-white/5 dark:text-white ${switcherRoundness}`,
+            `relative block w-full py-1.5 pl-3 pr-8 text-left text-sm/6 text-black dark:text-white ${switcherRoundness}`,
+            cardAppearance,
             "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
           )}
         >
