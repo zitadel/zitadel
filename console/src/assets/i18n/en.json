@@ -534,7 +534,7 @@
     "BETA_NOTE": "You are currently using the new Actions V2, which is in beta. The previous Version 1 is still available but will be discontinued in the future. Please report any issues or feedback.",
     "EXECUTION": {
       "TITLE": "Actions",
-      "DESCRIPTION": "Actions let you run custom code in response to API requests, events or specific functions. Use them to extend Zitadel, automate workflows, and itegrate with other systems.",
+      "DESCRIPTION": "Actions let you run custom code in response to API requests, events or specific functions. Use them to extend Zitadel, automate workflows, and integrate with other systems.",
       "TYPES": {
         "request": "Request",
         "response": "Response",
