@@ -77,7 +77,7 @@ jobs:
     needs: [core, console]
     uses: ./.github/workflows/lint.yml
     with:
-      node_version: "18"
+      node_version: "22"
       buf_version: "latest"
       go_lint_version: "latest"
       core_cache_key: ${{ needs.core.outputs.cache_key }}
@@ -97,16 +97,16 @@ jobs:
     uses: ./.github/workflows/login-container.yml
     permissions:
       packages: write
-      id-token: write
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
       login_build_image_name: "ghcr.io/zitadel/zitadel-login-build"
-      node_version: "20"
+      node_version: "22"
 
   login-integration-test:
     uses: ./.github/workflows/login-integration-test.yml
     with:
       login_build_image: ${{ needs.login-container.outputs.login_build_image }}
+      node_version: "22"
 
   e2e:
     uses: ./.github/workflows/e2e.yml
