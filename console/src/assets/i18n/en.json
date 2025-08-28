@@ -80,7 +80,7 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Default Settings",
+        "TITLE": "Instance Settings",
         "DESCRIPTION": "Default settings for all organizations. With the right permissions, some of them are overridable in organization settings."
       },
       "ORG": {
@@ -431,6 +431,7 @@
     "SHOWORGS": "Show All Organizations",
     "GRANTS": "Authorizations",
     "ACTIONS": "Actions",
+    "TARGETS": "Targets",
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
     "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboard shortcuts",
