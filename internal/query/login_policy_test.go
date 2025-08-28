@@ -38,7 +38,12 @@ var (
 		` projections.login_policies5.external_login_check_lifetime,` +
 		` projections.login_policies5.mfa_init_skip_lifetime,` +
 		` projections.login_policies5.second_factor_check_lifetime,` +
-		` projections.login_policies5.multi_factor_check_lifetime` +
+		` projections.login_policies5.multi_factor_check_lifetime,` +
+		` projections.login_policies5.enable_registration_captcha,` +
+		` projections.login_policies5.enable_login_captcha,` +
+		` projections.login_policies5.captcha_type,` +
+		` projections.login_policies5.captcha_site_key,` +
+		` projections.login_policies5.captcha_secret_key` +
 		` FROM projections.login_policies5`
 	loginPolicyCols = []string{
 		"aggregate_id",
@@ -65,6 +70,11 @@ var (
 		"mfa_init_skip_lifetime",
 		"second_factor_check_lifetime",
 		"multi_factor_check_lifetime",
+		"enable_registration_captcha",
+		"enable_login_captcha",
+		"captcha_type",
+		"captcha_site_key",
+		"captcha_secret_key",
 	}
 
 	prepareLoginPolicy2FAsStmt = `SELECT projections.login_policies5.second_factors` +
@@ -142,6 +152,11 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						&duration,
 						&duration,
 						&duration,
+						false,
+						false,
+						domain.CaptchaTypeDisabled,
+						"",
+						"",
 					},
 				),
 			},
@@ -170,6 +185,11 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				MFAInitSkipLifetime:        database.Duration(duration),
 				SecondFactorCheckLifetime:  database.Duration(duration),
 				MultiFactorCheckLifetime:   database.Duration(duration),
+				EnableRegistrationCaptcha:  false,
+				EnableLoginCaptcha:         false,
+				CaptchaType:                domain.CaptchaTypeDisabled,
+				CaptchaSiteKey:             "",
+				CaptchaSecretKey:           "",
 			},
 		},
 		{

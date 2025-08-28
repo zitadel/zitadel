@@ -610,6 +610,12 @@ Errors:
     FeatureDisabled: Fonctionnalité de clé Web désactivée
     NoActive: Aucune clé Web active trouvée
     NotFound: Clé Web introuvable
+  Captcha:
+    InitializationFailed: Échec de l’initialisation du Captcha
+    InvalidCaptcha: Échec de la vérification du Captcha. Le jeton est invalide ou expiré
+    MissingToken: Jeton Captcha manquant
+    UnexpectedType: Type de Captcha inattendu dans la configuration
+    ValidationFailed: Une erreur est survenue lors de la validation du jeton Captcha
 
 AggregateTypes:
   action: Action
@@ -1344,7 +1350,7 @@ EventTypes:
       updated: Utilisateur mis à jour
       deleted: Utilisateur supprimé
       email:
-        updated:  Adresse e-mail modifiée
+        updated: Adresse e-mail modifiée
         verified: Adresse e-mail vérifiée
         verification:
           failed: Échec de la vérification de l'adresse e-mail
