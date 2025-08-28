@@ -898,9 +898,9 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 			},
 		},
 	}
-	t.Run("without permission check", func(ttt *testing.T) {
+	t.Run("without permission check", func(t *testing.T) {
 		for _, tt := range tests {
-			ttt.Run(tt.name, func(t *testing.T) {
+			t.Run(tt.name, func(t *testing.T) {
 				r := &Commands{
 					eventstore: tt.fields.eventstore(t),
 				}
