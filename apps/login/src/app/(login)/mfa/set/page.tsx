@@ -16,7 +16,14 @@ import {
 } from "@/lib/zitadel";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("mfa");
+  return { title: t('set.title')};
+}
 
 function isSessionValid(session: Partial<Session>): {
   valid: boolean;

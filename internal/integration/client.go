@@ -632,6 +632,34 @@ func (i *Instance) AddProviderToDefaultLoginPolicy(ctx context.Context, id strin
 	logging.OnError(err).Panic("add provider to default login policy")
 }
 
+func (i *Instance) AddAzureADProvider(ctx context.Context, name string) *admin.AddAzureADProviderResponse {
+	resp, err := i.Client.Admin.AddAzureADProvider(ctx, &admin.AddAzureADProviderRequest{
+		Name:          name,
+		ClientId:      "clientID",
+		ClientSecret:  "clientSecret",
+		Tenant:        nil,
+		EmailVerified: false,
+		Scopes:        []string{"openid", "profile", "email"},
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+		},
+	})
+	logging.OnError(err).Panic("create Azure AD idp")
+
+	mustAwait(func() error {
+		_, err := i.Client.Admin.GetProviderByID(ctx, &admin.GetProviderByIDRequest{
+			Id: resp.GetId(),
+		})
+		return err
+	})
+
+	return resp
+}
+
 func (i *Instance) AddGenericOAuthProvider(ctx context.Context, name string) *admin.AddGenericOAuthProviderResponse {
 	return i.AddGenericOAuthProviderWithOptions(ctx, name, true, true, true, idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME)
 }

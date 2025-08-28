@@ -33,45 +33,6 @@ const secureHeaders = [
   { key: "X-Frame-Options", value: "deny" },
 ];
 
-const imageRemotePatterns = [
-  {
-    protocol: "http",
-    hostname: "localhost",
-    port: "8080",
-    pathname: "/**",
-  },
-  {
-    protocol: "https",
-    hostname: "*.zitadel.*",
-    port: "",
-    pathname: "/**",
-  },
-];
-
-if (process.env.ZITADEL_API_URL) {
-  imageRemotePatterns.push({
-    protocol: "https",
-    hostname: process.env.ZITADEL_API_URL?.replace("https://", "") || "",
-    port: "",
-    pathname: "/**",
-  });
-}
-
-// Add support for custom theme background images from external URLs
-if (process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE && process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE.startsWith('http')) {
-  try {
-    const bgUrl = new URL(process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE);
-    imageRemotePatterns.push({
-      protocol: bgUrl.protocol.replace(':', ''),
-      hostname: bgUrl.hostname,
-      port: bgUrl.port || "",
-      pathname: "/**",
-    });
-  } catch (error) {
-    console.warn('Invalid NEXT_PUBLIC_THEME_BACKGROUND_IMAGE URL:', process.env.NEXT_PUBLIC_THEME_BACKGROUND_IMAGE);
-  }
-}
-
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   output: process.env.NEXT_OUTPUT_MODE || undefined,
@@ -80,7 +41,7 @@ const nextConfig = {
     dynamicIO: true,
   },
   images: {
-    remotePatterns: imageRemotePatterns,
+    unoptimized: true
   },
   eslint: {
     ignoreDuringBuilds: true,

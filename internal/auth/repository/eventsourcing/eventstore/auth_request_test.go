@@ -2796,7 +2796,7 @@ func Test_userSessionByIDs(t *testing.T) {
 		userProvider  userSessionViewProvider
 		eventProvider userEventProvider
 		agentID       string
-		user          *user_model.UserView
+		userID        string
 	}
 	tests := []struct {
 		name    string
@@ -2809,7 +2809,7 @@ func Test_userSessionByIDs(t *testing.T) {
 			args{
 				userProvider:  &mockViewNoUserSession{},
 				eventProvider: &mockEventErrUser{},
-				user:          &user_model.UserView{ID: "id"},
+				userID:        "id",
 			},
 			&user_model.UserSessionView{UserID: "id"},
 			nil,
@@ -2818,7 +2818,7 @@ func Test_userSessionByIDs(t *testing.T) {
 			"internal error, internal error",
 			args{
 				userProvider: &mockViewErrUserSession{},
-				user:         &user_model.UserView{ID: "id"},
+				userID:       "id",
 			},
 			nil,
 			zerrors.IsInternal,
@@ -2829,7 +2829,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				userProvider: &mockViewUserSession{
 					PasswordVerification: testNow,
 				},
-				user:          &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
+				userID:        "id",
 				eventProvider: &mockEventErrUser{},
 			},
 			&user_model.UserSessionView{
@@ -2846,7 +2846,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
+				userID:  "id",
 				eventProvider: &mockEventUser{
 					Events: []eventstore.Event{
 						&es_models.Event{
@@ -2871,7 +2871,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id"},
+				userID:  "id",
 				eventProvider: &mockEventUser{
 					Events: []eventstore.Event{
 						&es_models.Event{
@@ -2900,7 +2900,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
+				userID:  "id",
 				eventProvider: &mockEventUser{
 					Events: []eventstore.Event{
 						&es_models.Event{
@@ -2929,7 +2929,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id"},
+				userID:  "id",
 				eventProvider: &mockEventUser{
 					Events: []eventstore.Event{
 						&es_models.Event{
@@ -2953,7 +2953,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
-				user:    &user_model.UserView{ID: "id"},
+				userID:  "id",
 				eventProvider: &mockEventUser{
 					Events: []eventstore.Event{
 						&es_models.Event{
@@ -2986,7 +2986,7 @@ func Test_userSessionByIDs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := userSessionByIDs(context.Background(), tt.args.userProvider, tt.args.eventProvider, tt.args.agentID, tt.args.user)
+			got, err := userSessionByIDs(context.Background(), tt.args.userProvider, tt.args.eventProvider, tt.args.agentID, tt.args.userID)
 			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {
 				t.Errorf("nextSteps() wrong error = %v", err)
 				return
