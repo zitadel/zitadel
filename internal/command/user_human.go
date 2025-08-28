@@ -304,6 +304,11 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 		if human.Email.ReturnCode {
 			human.EmailCode = &emailCode.Plain
 		}
+
+		if human.Email.URLTemplate == "" {
+			human.Email.URLTemplate = c.defaultEmailCodeURLTemplate(ctx)
+		}
+
 		return append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &a.Aggregate, emailCode.Crypted, emailCode.Expiry, human.Email.URLTemplate, human.Email.ReturnCode, human.AuthRequestID)), nil
 	}
 	return cmds, nil
