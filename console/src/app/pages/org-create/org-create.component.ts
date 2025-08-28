@@ -5,17 +5,17 @@ import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { Router } from '@angular/router';
 import { passwordConfirmValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
-import { SetUpOrgRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
-import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { LanguagesService } from 'src/app/services/languages.service';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { PasswordComplexityPolicy } from '@zitadel/proto/zitadel/policy_pb';
 import { NewMgmtService } from 'src/app/services/new-mgmt.service';
 import { PasswordComplexityValidatorFactoryService } from 'src/app/services/password-complexity-validator-factory.service';
+import { injectMutation } from '@tanstack/angular-query-experimental';
+import { NewOrganizationService } from '../../services/new-organization.service';
+import { MessageInitShape } from '@bufbuild/protobuf';
+import { SetUpOrgRequestSchema } from '@zitadel/proto/zitadel/admin_pb';
 
 @Component({
   selector: 'cnsl-org-create',
@@ -32,32 +32,33 @@ import { PasswordComplexityValidatorFactoryService } from 'src/app/services/pass
   ],
 })
 export class OrgCreateComponent {
-  public orgForm: UntypedFormGroup = this.fb.group({
+  protected orgForm = this.fb.group({
     name: ['', [requiredValidator]],
     domain: [''],
   });
 
-  public userForm?: UntypedFormGroup;
-  public pwdForm?: UntypedFormGroup;
+  protected userForm?: UntypedFormGroup;
+  protected pwdForm?: UntypedFormGroup;
 
-  public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
+  protected readonly genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
 
-  public policy?: PasswordComplexityPolicy;
-  public usePassword: boolean = false;
+  protected policy?: PasswordComplexityPolicy;
+  protected usePassword: boolean = false;
 
-  public forSelf: boolean = true;
+  protected forSelf: boolean = true;
+
+  protected readonly setupOrgMutation = injectMutation(this.newOrganizationService.setupOrgMutationOptions);
+  protected readonly addOrgMutation = injectMutation(this.newOrganizationService.addOrgMutationOptions);
 
   constructor(
     private readonly router: Router,
     private readonly toast: ToastService,
-    private readonly adminService: AdminService,
-    private readonly _location: Location,
+    private readonly location: Location,
     private readonly fb: UntypedFormBuilder,
-    private readonly mgmtService: ManagementService,
     private readonly newMgmtService: NewMgmtService,
-    private readonly authService: GrpcAuthService,
     private readonly passwordComplexityValidatorFactory: PasswordComplexityValidatorFactoryService,
     public readonly langSvc: LanguagesService,
+    private readonly newOrganizationService: NewOrganizationService,
     breadcrumbService: BreadcrumbService,
   ) {
     const instanceBread = new Breadcrumb({
@@ -73,38 +74,38 @@ export class OrgCreateComponent {
   public createSteps: number = 2;
   public currentCreateStep: number = 1;
 
-  public finish(): void {
-    const createOrgRequest: SetUpOrgRequest.Org = new SetUpOrgRequest.Org();
-    createOrgRequest.setName(this.name?.value);
-    createOrgRequest.setDomain(this.domain?.value);
+  public async finish(): Promise<void> {
+    const req: MessageInitShape<typeof SetUpOrgRequestSchema> = {
+      org: {
+        name: this.name?.value,
+        domain: this.domain?.value,
+      },
+      user: {
+        case: 'human',
+        value: {
+          email: {
+            email: this.email?.value,
+            isEmailVerified: this.isVerified?.value,
+          },
+          userName: this.userName?.value,
+          profile: {
+            firstName: this.firstName?.value,
+            lastName: this.lastName?.value,
+            nickName: this.nickName?.value,
+            gender: this.gender?.value,
+            preferredLanguage: this.preferredLanguage?.value,
+          },
+          password: this.usePassword && this.password ? this.password.value : undefined,
+        },
+      },
+    };
 
-    const humanRequest: SetUpOrgRequest.Human = new SetUpOrgRequest.Human();
-    humanRequest.setEmail(
-      new SetUpOrgRequest.Human.Email().setEmail(this.email?.value).setIsEmailVerified(this.isVerified?.value),
-    );
-    humanRequest.setUserName(this.userName?.value);
-
-    const profile: SetUpOrgRequest.Human.Profile = new SetUpOrgRequest.Human.Profile();
-    profile.setFirstName(this.firstName?.value);
-    profile.setLastName(this.lastName?.value);
-    profile.setNickName(this.nickName?.value);
-    profile.setGender(this.gender?.value);
-    profile.setPreferredLanguage(this.preferredLanguage?.value);
-
-    humanRequest.setProfile(profile);
-    if (this.usePassword && this.password) {
-      humanRequest.setPassword(this.password?.value);
+    try {
+      await this.setupOrgMutation.mutateAsync(req);
+      await this.router.navigate(['/orgs']);
+    } catch (error) {
+      this.toast.showError(error);
     }
-
-    this.adminService
-      .SetUpOrg(createOrgRequest, humanRequest)
-      .then(() => {
-        this.authService.revalidateOrgs().then();
-        this.router.navigate(['/orgs']).then();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
   }
 
   public next(): void {
@@ -161,17 +162,15 @@ export class OrgCreateComponent {
     }
   }
 
-  public createOrgForSelf(): void {
-    if (this.name && this.name.value) {
-      this.mgmtService
-        .addOrg(this.name.value)
-        .then(() => {
-          this.authService.revalidateOrgs().then();
-          this.router.navigate(['/orgs']).then();
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
+  public async createOrgForSelf() {
+    if (!this.name?.value) {
+      return;
+    }
+    try {
+      await this.addOrgMutation.mutateAsync(this.name.value);
+      await this.router.navigate(['/orgs']);
+    } catch (error) {
+      this.toast.showError(error);
     }
   }
 
@@ -224,6 +223,6 @@ export class OrgCreateComponent {
   }
 
   public close(): void {
-    this._location.back();
+    this.location.back();
   }
 }
