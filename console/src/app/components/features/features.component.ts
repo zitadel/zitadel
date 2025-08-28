@@ -21,7 +21,7 @@ import {
 } from '@zitadel/proto/zitadel/feature/v2/instance_pb';
 import { Source } from '@zitadel/proto/zitadel/feature/v2/feature_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
-import { firstValueFrom, Observable, ReplaySubject, shareReplay, switchMap } from 'rxjs';
+import { Observable, ReplaySubject, shareReplay, switchMap } from 'rxjs';
 import { filter, map, startWith } from 'rxjs/operators';
 import { LoginV2FeatureToggleComponent } from '../feature-toggle/login-v2-feature-toggle/login-v2-feature-toggle.component';
 
