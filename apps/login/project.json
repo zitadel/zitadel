@@ -1,12 +1,54 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "namedInputs": {
+    "envVars": [
+      {
+        "env": "DEBUG"
+      },
+      {
+        "env": "EMAIL_VERIFICATION"
+      },
+      {
+        "env": "AUDIENCE"
+      },
+      {
+        "env": "SYSTEM_USER_ID"
+      },
+      {
+        "env": "SYSTEM_USER_PRIVATE_KEY"
+      },
+      {
+        "env": "ZITADEL_API_URL"
+      },
+      {
+        "env": "ZITADEL_SERVICE_USER_TOKEN"
+      },
+      {
+        "env": "NEXT_PUBLIC_BASE_PATH"
+      },
+      {
+        "env": "CUSTOM_REQUEST_HEADERS"
+      },
+      {
+        "env": "NODE_ENV"
+      },
+      {
+        "env": "PORT"
+      },
+      {
+        "env": "INKEEP_API_KEY"
+      }
+    ]    
+  },  
   "targets": {
     "build": {
+      "cache": true,
       "dependsOn": [
         "^build"
       ],
       "inputs": [
-        "default"
+        "default",
+        "envVars"
       ],
       "outputs": [
         "{projectRoot}/.next/**/*",
@@ -15,11 +57,13 @@
       ]
     },
     "build:standalone": {
+      "cache": true,
       "dependsOn": [
         "^build"
       ],
       "inputs": [
-        "default"
+        "default",
+        "envVars"
       ],
       "outputs": [
         "{projectRoot}/.next/standalone/**/*",
@@ -28,7 +72,6 @@
     },
     "build:docker": {
       "dependsOn": [
-        "build:standalone"
       ],
       "inputs": [
         "docker",
@@ -58,7 +101,13 @@
       }
     },
     "start:docker": {
-      "continuous": true
+      "continuous": true,
+      "options": {
+        "args": [
+          "--publish",
+          "3000:3000"
+        ]
+      }
     },
     "dev": {
       "persistent": true,
@@ -69,18 +118,22 @@
     },
     "test": {
       "dependsOn": [
-        "^build"
+        "test:unit",
+        "test:integration"
       ]
     },
     "test:unit": {
+      "cache": true,
       "dependsOn": [
         "^build"
       ]
     },
-    "test:integration:login": {
+    "test:integration": {
+      "cache": true,
+      "dependsOn": [
+        "@zitadel/core-mock:start:docker"
+      ],
       "inputs": [
-        "{projectRoot}/.next/**",
-        "!{projectRoot}/.next/cache/**",
         "{projectRoot}/integration/integration/**",
         "{projectRoot}/integration/support/**",
         "{projectRoot}/cypress.config.ts"
@@ -88,7 +141,15 @@
       "outputs": [
         "{projectRoot}/cypress/videos/**",
         "{projectRoot}/cypress/screenshots/**"
-      ]
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "pnpm env-cmd -f .env.integration -- pnpm nx start",
+          "pnpm run test:integration"
+        ]
+      }
     }
   }
 }

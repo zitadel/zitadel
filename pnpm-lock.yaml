@@ -168,7 +168,7 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0
       env-cmd:
-        specifier: ^10.0.0
+        specifier: ^10.1.0
         version: 10.1.0
       eslint:
         specifier: ^8.57.0

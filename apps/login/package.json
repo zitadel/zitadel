@@ -15,7 +15,7 @@
     "test:unit": "vitest --run",
     "lint-staged": "lint-staged",
     "clean": "rm -rf .nx && rm -rf node_modules && rm -rf .next",
-    "test:integration:login": "wait-on --simultaneous 1 http://localhost:3001/ui/v2/login/verify?userId=221394658884845598&code=abc && cypress run",
+    "test:integration": "wait-on --simultaneous 1 http://localhost:3001/ui/v2/login/verify?userId=221394658884845598&code=abc && cypress run",
     "test:acceptance": "dotenv -e ../login/.env.test.local playwright",
     "test:acceptance:setup": "cd ../.. && make login_test_acceptance_setup_env && NODE_ENV=test pnpm run test:acceptance:setup:dev",
     "test:acceptance:setup:dev": "cd ../.. && make login_test_acceptance_setup_dev"
@@ -79,7 +79,7 @@
     "concurrently": "^9.1.2",
     "cypress": "^14.5.2",
     "dotenv-cli": "^8.0.0",
-    "env-cmd": "^10.0.0",
+    "env-cmd": "^10.1.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "15.4.0-canary.86",
     "eslint-config-prettier": "^9.1.0",
