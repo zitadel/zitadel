@@ -53,21 +53,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install Dev Container CLI
-        run: npm install -g @devcontainers/cli@0.80.0
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
       - name: Lint and Unit Test All JavaScript Code
-        run: npm run devcontainer:lint-unit
-      - name: Fix Failures
-        if: failure()
-        run: |
-          echo "Reproduce this check locally:"
-          echo "npm run devcontainer:lint-unit"
-          echo "If you have pnpm installed, most linting errors can be fixed automatically:"
-          echo "pnpm nx run lint:fix"
-          echo "In other cases, you can open the dev container called \"Nx Lint and Unit Tests\"."
-          echo "You will have the same environment as the pipeline check as well as some guidance on how to fix the errors."
+        run: pnpm nx run-many --targets lint,test:unit
 
   core:
     name: core
