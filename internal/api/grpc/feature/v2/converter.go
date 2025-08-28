@@ -59,6 +59,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) (*com
 		LoginV2:                        loginV2,
 		PermissionCheckV2:              req.PermissionCheckV2,
 		ConsoleUseV2UserApi:            req.ConsoleUseV2UserApi,
+		EnableRelationalTables:         req.EnableRelationalTables,
 	}, nil
 }
 

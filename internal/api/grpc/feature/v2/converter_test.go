@@ -133,6 +133,8 @@ func Test_systemFeaturesToPb(t *testing.T) {
 }
 
 func Test_instanceFeaturesToCommand(t *testing.T) {
+	t.Parallel()
+	// Given
 	arg := &feature_pb.SetInstanceFeaturesRequest{
 		LoginDefaultOrg:                gu.Ptr(true),
 		UserSchema:                     gu.Ptr(true),
@@ -145,7 +147,9 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 			Required: true,
 			BaseUri:  gu.Ptr("https://login.com"),
 		},
-		ConsoleUseV2UserApi: gu.Ptr(true),
+		ConsoleUseV2UserApi:    gu.Ptr(true),
+		PermissionCheckV2:      gu.Ptr(false),
+		EnableRelationalTables: gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                gu.Ptr(true),
@@ -159,9 +163,15 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 			Required: true,
 			BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
 		},
-		ConsoleUseV2UserApi: gu.Ptr(true),
+		ConsoleUseV2UserApi:    gu.Ptr(true),
+		PermissionCheckV2:      gu.Ptr(false),
+		EnableRelationalTables: gu.Ptr(true),
 	}
+
+	// Test
 	got, err := instanceFeaturesToCommand(arg)
+
+	// Verify
 	assert.Equal(t, want, got)
 	assert.NoError(t, err)
 }

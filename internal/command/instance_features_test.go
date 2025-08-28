@@ -19,6 +19,8 @@ import (
 )
 
 func TestCommands_SetInstanceFeatures(t *testing.T) {
+	t.Parallel()
+
 	ctx := authz.WithInstanceID(context.Background(), "instance1")
 	aggregate := feature_v2.NewAggregate("instance1", "instance1")
 
@@ -147,12 +149,15 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 						ctx, aggregate,
 						feature_v2.InstanceOIDCSingleV1SessionTerminationEventType, true,
 					),
+					feature_v2.NewSetEvent(ctx, aggregate,
+						feature_v2.InstanceEnableRelationalTables, true),
 				),
 			),
 			args: args{ctx, &InstanceFeatures{
 				LoginDefaultOrg:                gu.Ptr(true),
 				UserSchema:                     gu.Ptr(true),
 				OIDCSingleV1SessionTermination: gu.Ptr(true),
+				EnableRelationalTables:         gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
@@ -198,6 +203,8 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			c := &Commands{
 				eventstore: tt.eventstore(t),
 			}

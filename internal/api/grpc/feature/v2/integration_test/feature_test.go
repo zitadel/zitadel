@@ -247,7 +247,8 @@ func TestServer_SetInstanceFeatures(t *testing.T) {
 			args: args{
 				ctx: IamCTX,
 				req: &feature.SetInstanceFeaturesRequest{
-					LoginDefaultOrg: gu.Ptr(true),
+					LoginDefaultOrg:        gu.Ptr(true),
+					EnableRelationalTables: gu.Ptr(true),
 				},
 			},
 			want: &feature.SetInstanceFeaturesResponse{
