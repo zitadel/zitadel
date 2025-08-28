@@ -293,9 +293,18 @@ importers:
       '@fortawesome/free-brands-svg-icons':
         specifier: ^6.7.2
         version: 6.7.2
+      '@ng-icons/core':
+        specifier: ^25.0.0
+        version: 25.6.1
+      '@ng-icons/heroicons':
+        specifier: ^25.0.0
+        version: 25.6.1
       '@ngx-translate/core':
         specifier: ^15.0.0
         version: 15.0.0(@angular/common@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2))(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2)
+      '@tanstack/angular-query-experimental':
+        specifier: ^5.85.5
+        version: 5.85.5(@angular/common@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2))(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))
       angular-oauth2-oidc:
         specifier: ^15.0.1
         version: 15.0.1(@angular/common@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2))(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))
@@ -3489,6 +3498,12 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@ng-icons/core@25.6.1':
+    resolution: {integrity: sha512-o6vCttlzXvDZRYiOKOULr7fsX8gY/DwwxzBSrBQzwa/at+pC0xRoe6uczJ9Ato+y1EDWP/PlrEMAQfvokBA6tQ==}
+
+  '@ng-icons/heroicons@25.6.1':
+    resolution: {integrity: sha512-QGTIIl+S6/w2vQvYGP1zNLbNvJLLRS+1evlOPWZZzWow+77qRxs0E96CukSsjItBFUnLKvzuOfMBBcNtb2SIHQ==}
+
   '@ngtools/webpack@16.2.16':
     resolution: {integrity: sha512-4gm2allK0Pjy/Lxb9IGRnhEZNEOJSOTWwy09VOdHouV2ODRK7Tto2LgteaFJUUSLkuvWRsI7pfuA6yrz8KDfHw==}
     engines: {node: ^16.14.0 || >=18.10.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
@@ -5128,6 +5143,18 @@ packages:
 
   '@tanem/svg-injector@10.1.68':
     resolution: {integrity: sha512-UkJajeR44u73ujtr5GVSbIlELDWD/mzjqWe54YMK61ljKxFcJoPd9RBSaO7xj02ISCWUqJW99GjrS+sVF0UnrA==}
+
+  '@tanstack/angular-query-experimental@5.85.5':
+    resolution: {integrity: sha512-IhjAOcmrLK49P0w6dszIdfRlEmZkI+fuC+OvlhOT6Y0o6khWL0b3hEUTPFtFqzRes6WQMfUNfVDzEhTcHxLVRQ==}
+    peerDependencies:
+      '@angular/common': '>=16.0.0'
+      '@angular/core': '>=16.0.0'
+
+  '@tanstack/query-core@5.85.5':
+    resolution: {integrity: sha512-KO0WTob4JEApv69iYp1eGvfMSUkgw//IpMnq+//cORBzXf0smyRwPLrUvEe5qtAEGjwZTXrjxg+oJNP/C00t6w==}
+
+  '@tanstack/query-devtools@5.84.0':
+    resolution: {integrity: sha512-fbF3n+z1rqhvd9EoGp5knHkv3p5B2Zml1yNRjh7sNXklngYI5RVIWUrUjZ1RIcEoscarUb0+bOvIs5x9dwzOXQ==}
 
   '@tanstack/react-virtual@3.13.12':
     resolution: {integrity: sha512-Gd13QdxPSukP8ZrkbgS2RwoZseTTbQPLnQEn7HY/rqtM+8Zt95f7xKC7N0EsKs7aoz0WzZ+fditZux+F8EzYxA==}
@@ -19358,6 +19385,14 @@ snapshots:
   '@next/swc-win32-x64-msvc@15.4.0-canary.86':
     optional: true
 
+  '@ng-icons/core@25.6.1':
+    dependencies:
+      tslib: 2.8.1
+
+  '@ng-icons/heroicons@25.6.1':
+    dependencies:
+      tslib: 2.8.1
+
   '@ngtools/webpack@16.2.16(@angular/compiler-cli@16.2.12(@angular/compiler@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3)))(typescript@5.1.6))(typescript@5.1.6)(webpack@5.94.0(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.18.17))':
     dependencies:
       '@angular/compiler-cli': 16.2.12(@angular/compiler@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3)))(typescript@5.1.6)
@@ -20972,6 +21007,17 @@ snapshots:
       '@babel/runtime': 7.28.3
       content-type: 1.0.5
       tslib: 2.8.1
+
+  '@tanstack/angular-query-experimental@5.85.5(@angular/common@16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2))(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))':
+    dependencies:
+      '@angular/common': 16.2.12(@angular/core@16.2.12(rxjs@7.8.2)(zone.js@0.13.3))(rxjs@7.8.2)
+      '@angular/core': 16.2.12(rxjs@7.8.2)(zone.js@0.13.3)
+      '@tanstack/query-core': 5.85.5
+      '@tanstack/query-devtools': 5.84.0
+
+  '@tanstack/query-core@5.85.5': {}
+
+  '@tanstack/query-devtools@5.84.0': {}
 
   '@tanstack/react-virtual@3.13.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
