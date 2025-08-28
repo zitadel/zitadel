@@ -13,9 +13,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/execution"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -219,9 +221,13 @@ func Test_CallTarget(t *testing.T) {
 					signingKey:  "signingkey",
 				},
 				target: target_domain.Target{
-					TargetType:    target_domain.TargetTypeWebhook,
-					Timeout:       time.Minute,
-					SigningKeyDec: "signingkey",
+					TargetType: target_domain.TargetTypeWebhook,
+					Timeout:    time.Minute,
+					SigningKey: &crypto.CryptoValue{
+						Algorithm: "enc",
+						KeyID:     "id",
+						Crypted:   []byte("signingkey"),
+					},
 				},
 			},
 			res{
@@ -284,9 +290,13 @@ func Test_CallTarget(t *testing.T) {
 					signingKey:  "signingkey",
 				},
 				target: target_domain.Target{
-					TargetType:    target_domain.TargetTypeCall,
-					Timeout:       time.Minute,
-					SigningKeyDec: "signingkey",
+					TargetType: target_domain.TargetTypeCall,
+					Timeout:    time.Minute,
+					SigningKey: &crypto.CryptoValue{
+						Algorithm: "enc",
+						KeyID:     "id",
+						Crypted:   []byte("signingkey"),
+					},
 				},
 			},
 			res{
@@ -296,7 +306,7 @@ func Test_CallTarget(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			respBody, err := testServer(t, tt.args.server, testCallTarget(tt.args.ctx, tt.args.info, tt.args.target))
+			respBody, err := testServer(t, tt.args.server, testCallTarget(tt.args.ctx, tt.args.info, tt.args.target, crypto.CreateMockEncryptionAlg(gomock.NewController(t))))
 			if tt.res.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -435,7 +445,7 @@ func Test_CallTargets(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			respBody, err := testServers(t,
 				tt.args.servers,
-				testCallTargets(tt.args.ctx, tt.args.info, tt.args.targets),
+				testCallTargets(tt.args.ctx, tt.args.info, tt.args.targets, crypto.CreateMockEncryptionAlg(gomock.NewController(t))),
 			)
 			if tt.res.wantErr {
 				assert.Error(t, err)
@@ -495,7 +505,7 @@ func listen(
 		time.Sleep(c.timeout)
 
 		w.Header().Set("Content-Type", "application/json")
-		if _, err := io.WriteString(w, string(c.respondBody)); err != nil {
+		if _, err := w.Write(c.respondBody); err != nil {
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
@@ -523,16 +533,18 @@ func testCall(ctx context.Context, timeout time.Duration, body []byte, signingKe
 func testCallTarget(ctx context.Context,
 	info *middleware.ContextInfoRequest,
 	target target_domain.Target,
+	alg crypto.EncryptionAlgorithm,
 ) func(string) ([]byte, error) {
 	return func(url string) (r []byte, err error) {
 		target.Endpoint = url
-		return execution.CallTarget(ctx, target, info, nil)
+		return execution.CallTarget(ctx, target, info, alg)
 	}
 }
 
 func testCallTargets(ctx context.Context,
 	info *middleware.ContextInfoRequest,
 	target []target_domain.Target,
+	alg crypto.EncryptionAlgorithm,
 ) func([]string) (interface{}, error) {
 	return func(urls []string) (interface{}, error) {
 		targets := make([]target_domain.Target, len(target))
@@ -540,7 +552,7 @@ func testCallTargets(ctx context.Context,
 			t.Endpoint = urls[i]
 			targets[i] = t
 		}
-		return execution.CallTargets(ctx, targets, info, nil)
+		return execution.CallTargets(ctx, targets, info, alg)
 	}
 }
 

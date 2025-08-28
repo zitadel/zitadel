@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type TargetType uint
@@ -23,7 +22,6 @@ type Target struct {
 	Timeout          time.Duration       `json:"timeout,omitempty"`
 	InterruptOnError bool                `json:"interrupt_on_error,omitempty"`
 	SigningKey       *crypto.CryptoValue `json:"signing_key,omitempty"`
-	SigningKeyDec    string              `json:"signing_key_dec,omitempty"`
 }
 
 func (e *Target) GetExecutionID() string {
@@ -44,21 +42,9 @@ func (e *Target) GetTargetType() TargetType {
 func (e *Target) GetTimeout() time.Duration {
 	return e.Timeout
 }
-func (e *Target) GetSigningKey(alg crypto.EncryptionAlgorithm) string {
-	if e.SigningKeyDec == "" && e.SigningKey != nil {
-		e.decryptSigningKey(alg)
+func (e *Target) GetSigningKey(alg crypto.EncryptionAlgorithm) (string, error) {
+	if e.SigningKey == nil {
+		return "", nil
 	}
-	return e.SigningKeyDec
-}
-
-func (t *Target) decryptSigningKey(alg crypto.EncryptionAlgorithm) error {
-	if t.SigningKey == nil {
-		return nil
-	}
-	keyValue, err := crypto.DecryptString(t.SigningKey, alg)
-	if err != nil {
-		return zerrors.ThrowInternal(err, "QUERY-bxevy3YXwy", "Errors.Internal")
-	}
-	t.SigningKeyDec = keyValue
-	return nil
+	return crypto.DecryptString(e.SigningKey, alg)
 }

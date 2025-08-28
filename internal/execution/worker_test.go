@@ -281,7 +281,6 @@ func mockTarget() target_domain.Target {
 		Endpoint:         "endpoint",
 		Timeout:          time.Minute,
 		InterruptOnError: true,
-		SigningKeyDec:    "key",
 	}
 }
 

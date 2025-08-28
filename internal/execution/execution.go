@@ -68,16 +68,21 @@ func CallTarget(
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	signingKey, err := target.GetSigningKey(alg)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "EXEC-thiiCh5b", "Errors.Internal")
+	}
+
 	switch target.GetTargetType() {
 	// get request, ignore response and return request and error for handling in list of targets
 	case target_domain.TargetTypeWebhook:
-		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey(alg))
+		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), signingKey)
 	// get request, return response and error
 	case target_domain.TargetTypeCall:
-		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey(alg))
+		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), signingKey)
 	case target_domain.TargetTypeAsync:
 		go func(ctx context.Context, target target_domain.Target, info []byte) {
-			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info, target.GetSigningKey(alg)); err != nil {
+			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info, signingKey); err != nil {
 				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 			}
 		}(context.WithoutCancel(ctx), target, info.GetHTTPRequestBody())

@@ -83,13 +83,9 @@ func (w *Worker) Register(workers *river.Workers, queues map[string]river.QueueC
 }
 
 func TargetsFromRequest(e *exec_repo.Request) ([]target_domain.Target, error) {
-	var execTargets []target_domain.Target
-	if err := json.Unmarshal(e.TargetsData, &execTargets); err != nil {
+	var targets []target_domain.Target
+	if err := json.Unmarshal(e.TargetsData, &targets); err != nil {
 		return nil, err
-	}
-	targets := make([]target_domain.Target, len(execTargets))
-	for i, target := range execTargets {
-		targets[i] = target
 	}
 	return targets, nil
 }
