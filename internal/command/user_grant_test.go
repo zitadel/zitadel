@@ -628,7 +628,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
 							"user1",
 							"project1",
-							"",
+							"projectgrant1",
 							[]string{"rolekey1"},
 						),
 					),
@@ -654,10 +654,11 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						AggregateID:   "usergrant1",
 						ResourceOwner: "org1",
 					},
-					UserID:    "user1",
-					ProjectID: "project1",
-					RoleKeys:  []string{"rolekey1"},
-					State:     domain.UserGrantStateActive,
+					UserID:         "user1",
+					ProjectID:      "project1",
+					ProjectGrantID: "projectgrant1",
+					RoleKeys:       []string{"rolekey1"},
+					State:          domain.UserGrantStateActive,
 				},
 			},
 		},
@@ -897,9 +898,9 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 			},
 		},
 	}
-	t.Run("without permission check", func(t *testing.T) {
+	t.Run("without permission check", func(ttt *testing.T) {
 		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
+			ttt.Run(tt.name, func(t *testing.T) {
 				r := &Commands{
 					eventstore: tt.fields.eventstore(t),
 				}
