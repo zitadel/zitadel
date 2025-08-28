@@ -938,14 +938,14 @@ func TestServer_DeleteSession_expired(t *testing.T) {
 
 	// wait until the token expires
 	time.Sleep(10 * time.Second)
-	_, err = Client.DeleteSession(Instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
+	_, err = Client.DeleteSession(Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: gu.Ptr(createResp.GetSessionToken()),
 	})
 	require.NoError(t, err)
 
 	// get session should return an error
-	sessionResp, err := Client.GetSession(Instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
+	sessionResp, err := Client.GetSession(Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 		&session.GetSessionRequest{SessionId: createResp.GetSessionId()})
 	require.Error(t, err)
 	require.Nil(t, sessionResp)
