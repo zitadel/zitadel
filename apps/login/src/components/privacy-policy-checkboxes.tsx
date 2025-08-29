@@ -27,7 +27,12 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
     const hasPrivacyLink = !!legal?.privacyPolicyLink;
 
     // If both links exist, both must be accepted
-    if (hasTosLink && hasPrivacyLink) {
+    if (hasTosLink && !newState.tosAccepted) {
+      return false
+    }
+    if (hasPrivacyLink && !newState.privacyPolicyAccepted) {
+      return false
+    }
       return newState.tosAccepted && newState.privacyPolicyAccepted;
     }
 
