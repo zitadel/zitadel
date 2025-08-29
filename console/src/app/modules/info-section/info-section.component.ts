@@ -1,8 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 export enum InfoSectionType {
   INFO = 'INFO',
-  SUCCESS = 'SUCCESS',
   WARN = 'WARN',
   ALERT = 'ALERT',
 }
@@ -11,8 +10,11 @@ export enum InfoSectionType {
   selector: 'cnsl-info-section',
   templateUrl: './info-section.component.html',
   styleUrls: ['./info-section.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InfoSectionComponent {
   @Input() type: InfoSectionType = InfoSectionType.INFO;
   @Input() fitWidth: boolean = false;
+
+  protected readonly infoSectionType = InfoSectionType;
 }
