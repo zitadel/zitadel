@@ -124,7 +124,9 @@ export function RegisterForm({
 
   const { errors } = formState;
 
-  const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
+  let acceptanceRequired = legal.tosLink || legal.privacyPolicyLink;
+  
+  const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(!acceptanceRequired);
   return (
     <form className="w-full">
       <div className="mb-4 grid grid-cols-2 gap-4">
