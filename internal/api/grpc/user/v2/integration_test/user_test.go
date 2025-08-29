@@ -1884,7 +1884,7 @@ func TestServer_DeleteUser(t *testing.T) {
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	orgIdpResp := Instance.AddOrgGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	notDefaultOrgIdpResp := Instance.AddOrgGenericOAuthProvider(IamCTX, orgResp.OrganizationId)
 	samlIdpID := Instance.AddSAMLProvider(IamCTX)
 	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(IamCTX, "")
@@ -4631,7 +4631,7 @@ func TestServer_CreateUser_And_Compare(t *testing.T) {
 
 func TestServer_CreateUser_Permission(t *testing.T) {
 	newOrgOwnerEmail := gofakeit.Email()
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	type args struct {
 		ctx context.Context
 		req *user.CreateUserRequest
@@ -5302,7 +5302,7 @@ func TestServer_UpdateUser_And_Compare(t *testing.T) {
 
 func TestServer_UpdateUser_Permission(t *testing.T) {
 	newOrgOwnerEmail := gofakeit.Email()
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	newHumanUserID := newOrg.CreatedAdmins[0].GetUserId()
 	machineUserResp, err := Instance.Client.UserV2.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: newOrg.OrganizationId,
