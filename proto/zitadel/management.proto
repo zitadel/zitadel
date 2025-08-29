@@ -9850,6 +9850,12 @@ message ListProjectChangesResponse {
 }
 
 message AddProjectRequest {
+    message Admin {
+        string user_id = 1;
+        // specify the Project Member Roles for the provided user (default is PROJECT_OWNER if roles are empty
+        repeated string roles = 3;
+    }
+
     string name = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (google.api.field_behavior) = REQUIRED,
@@ -9880,6 +9886,8 @@ message AddProjectRequest {
             description: "Define which private labeling/branding should trigger when getting to a login of this project.";
         }
     ];
+    // List of users and Project Member roles (PROJECT_OWNER, by default) to be assigned to those users.
+    repeated Admin admins = 6;
 }
 
 message AddProjectResponse {
