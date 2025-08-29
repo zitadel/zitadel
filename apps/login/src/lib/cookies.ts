@@ -1,7 +1,7 @@
 "use server";
 
 import { timestampDate, timestampFromMs } from "@zitadel/client";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { LANGUAGE_COOKIE_NAME } from "./i18n";
 
 // TODO: improve this to handle overflow
@@ -22,16 +22,21 @@ type SessionCookie<T> = Cookie & T;
 
 async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameEnabled: boolean = false) {
   const cookiesList = await cookies();
+  const headersList = await headers();
+  const host = headersList.get("host") || "";
+
+  // Check if we're running on localhost
+  const isLocalhost = host.includes("localhost") || host.includes("127.0.0.1");
 
   // Safari is stricter about SameSite cookies, especially during local development
-  // Use "lax" for development to ensure compatibility across all browsers
+  // Use "lax" for development, localhost, and iframe compatibility
   let resolvedSameSite: "lax" | "strict" | "none";
 
   if (iFrameEnabled) {
     // When embedded in iframe, must use "none" with secure flag
     resolvedSameSite = "none";
-  } else if (process.env.NODE_ENV === "development") {
-    // Development: use "lax" to ensure Safari compatibility
+  } else if (process.env.NODE_ENV === "development" || isLocalhost) {
+    // Development or localhost: use "lax" to ensure Safari compatibility
     resolvedSameSite = "lax";
   } else {
     // Production and other environments: use strict for better security
