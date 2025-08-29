@@ -222,7 +222,6 @@
     "termsOfService": "Termini di Servizio",
     "privacyPolicy": "Informativa sulla Privacy",
     "submit": "Continua",
-    "orUseIDP": "o usa un Identity Provider",
     "password": {
       "title": "Imposta Password",
       "description": "Imposta la password per il tuo account",
