@@ -139,7 +139,7 @@ export function VerifyForm({
             type="text"
             autoComplete="one-time-code"
             {...register("code", { required: t("verify.required.code") })}
-            label="Code"
+            label={t("verify.labels.code")}
             data-testid="code-text-input"
           />
         </div>
