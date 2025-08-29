@@ -86,16 +86,16 @@ export function UsernameForm({
     }
   }, []);
 
-  let inputLabel = "Loginname";
+  let inputLabel = t("labels.loginname");
   if (
     loginSettings?.disableLoginWithEmail &&
     loginSettings?.disableLoginWithPhone
   ) {
-    inputLabel = "Username";
+    inputLabel = t("labels.username");
   } else if (loginSettings?.disableLoginWithEmail) {
-    inputLabel = "Username or phone number";
+    inputLabel = t("labels.usernameOrPhoneNumber");
   } else if (loginSettings?.disableLoginWithPhone) {
-    inputLabel = "Username or email";
+    inputLabel = t("labels.usernameOrEmail");
   }
 
   return (

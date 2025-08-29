@@ -27,6 +27,12 @@
     "description": "请输入您的登录信息。",
     "register": "注册新用户",
     "submit": "继续",
+    "labels": {
+      "loginname": "登录名",
+      "username": "用户名",
+      "usernameOrPhoneNumber": "用户名或电话号码",
+      "usernameOrEmail": "用户名或电子邮箱"
+    },
     "required": {
       "loginName": "此字段为必填项"
     }
@@ -37,6 +43,9 @@
       "description": "请输入您的密码。",
       "resetPassword": "重置密码",
       "submit": "继续",
+      "labels": {
+        "password": "密码"
+      },
       "required": {
         "password": "此字段为必填项"
       }
@@ -48,6 +57,11 @@
       "noCodeReceived": "没有收到验证码？",
       "resend": "重发验证码",
       "submit": "继续",
+      "labels": {
+        "code": "验证码",
+        "newPassword": "新密码",
+        "confirmPassword": "确认密码"
+      },
       "required": {
         "code": "此字段为必填项",
         "newPassword": "必须提供密码！",
@@ -58,6 +72,10 @@
       "title": "更改密码",
       "description": "为您的账户设置密码",
       "submit": "继续",
+      "labels": {
+        "newPassword": "新密码",
+        "confirmPassword": "确认密码"
+      },
       "required": {
         "newPassword": "必须提供新密码！",
         "confirmPassword": "此字段为必填项"
@@ -101,9 +119,11 @@
   "ldap": {
     "title": "使用 LDAP 登录",
     "description": "请输入您的 LDAP 凭据。",
-    "username": "用户名",
-    "password": "密码",
     "submit": "继续",
+    "labels": {
+      "username": "用户名",
+      "password": "密码"
+    },
     "required": {
       "username": "此字段为必填项",
       "password": "此字段为必填项"
@@ -130,6 +150,9 @@
       "noCodeReceived": "没有收到验证码？",
       "resendCode": "重发验证码",
       "submit": "继续",
+      "labels": {
+        "code": "验证码"
+      },
       "required": {
         "code": "此字段为必填项"
       }
@@ -141,6 +164,9 @@
       "emailDescription": "输入您的电子邮箱地址以接收电子邮件验证码。",
       "totpRegisterDescription": "扫描二维码或手动导航到URL。",
       "submit": "继续",
+      "labels": {
+        "code": "验证码"
+      },
       "required": {
         "code": "此字段为必填项"
       }
@@ -201,10 +227,19 @@
       "title": "设置密码",
       "description": "为您的账户设置密码",
       "submit": "继续",
+      "labels": {
+        "password": "密码",
+        "confirmPassword": "确认密码"
+      },
       "required": {
         "password": "必须提供密码！",
         "confirmPassword": "此字段为必填项"
       }
+    },
+    "labels": {
+      "firstname": "名字",
+      "lastname": "姓氏",
+      "email": "电子邮箱"
     },
     "required": {
       "firstname": "此字段为必填项",
@@ -247,6 +282,9 @@
       "resendCode": "重发验证码",
       "codeSent": "刚刚发送了一封包含验证码的电子邮件。",
       "submit": "继续",
+      "labels": {
+        "code": "验证码"
+      },
       "required": {
         "code": "此字段为必填项"
       }
@@ -264,6 +302,9 @@
       "title": "设备代码",
       "description": "输入代码。",
       "submit": "继续",
+      "labels": {
+        "code": "验证码"
+      },
       "required": {
         "code": "此字段为必填项"
       }
