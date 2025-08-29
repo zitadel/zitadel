@@ -27,25 +27,28 @@ with domain as (
 	join projections.instance_trusted_domains td on d.instance_id = td.instance_id
 	group by td.instance_id
 ), execution_targets as (
-	select e.instance_id, json_arrayagg(json_object(
-		'execution_id' : et.execution_id,
-		'target_id' : t.id,
-		'target_type' : t.target_type,
-		'endpoint' : t.endpoint,
-		'timeout' : t.timeout,
-		'interrupt_on_error' : t.interrupt_on_error,
-		'signing_key' : t.signing_key
-	)) as execution_targets
-	from domain d
-	join projections.executions1 e
-		on d.instance_id = e.instance_id
-	join projections.executions1_targets et
-		on e.instance_id = et.instance_id
-		and e.id = et.execution_id
-	join projections.targets2 t
-		on et.instance_id = t.instance_id
-		and et.target_id = t.id
-	group by e.instance_id
+	select instance_id, json_arrayagg(execution_targets) as execution_targets from (
+		select e.instance_id, json_object(
+			'execution_id' : et.execution_id,
+			'target_id' : t.id,
+			'target_type' : t.target_type,
+			'endpoint' : t.endpoint,
+			'timeout' : t.timeout,
+			'interrupt_on_error' : t.interrupt_on_error,
+			'signing_key' : t.signing_key
+		) as execution_targets
+		from domain d
+		join projections.executions1 e
+			on d.instance_id = e.instance_id
+		join projections.executions1_targets et
+			on e.instance_id = et.instance_id
+			and e.id = et.execution_id
+		join projections.targets2 t
+			on et.instance_id = t.instance_id
+			and et.target_id = t.id
+		order by et.position asc
+	)
+	group by instance_id
 )
 select
     i.id,
