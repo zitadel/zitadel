@@ -311,7 +311,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 					Queries: []*org.SearchQuery{},
 				},
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
-					name := gofakeit.Name()
+					name := integration.FakeOrgName()
 					orgResp := createOrganization(ctx, name)
 					deactivateOrgResp := Instance.DeactivateOrganization(ctx, orgResp.ID)
 					request.Queries = []*org.SearchQuery{

@@ -27,7 +27,7 @@ var totalCountOfHumanUsers = 13
 		// these should never be modified.
 		// This allows testing list requests without filters.
 		iamOwnerCtx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-		secondaryOrg := Instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
+		secondaryOrg := Instance.CreateOrganization(iamOwnerCtx, integration.FakeOrgName(), gofakeit.Email())
 		secondaryOrgCreatedUserIDs := createUsers(t, iamOwnerCtx, secondaryOrg.OrganizationId)
 
 		testsInitializedUtc := time.Now().UTC()
@@ -348,7 +348,7 @@ var totalCountOfHumanUsers = 13
 				name: "do not count user of other org",
 				prepare: func(t require.TestingT) *scim.ListRequest {
 					iamOwnerCtx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-					org := Instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
+					org := Instance.CreateOrganization(iamOwnerCtx, integration.FakeOrgName(), gofakeit.Email())
 					resp := createHumanUser(t, iamOwnerCtx, org.OrganizationId, 102)
 
 					return &scim.ListRequest{

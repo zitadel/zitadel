@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -1066,7 +1067,7 @@ func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Contex
 
 func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
 	if name == "" {
-		name = gofakeit.Name()
+		name = FakeOrgName()
 	}
 	req := &action.CreateTargetRequest{
 		Name:     name,
@@ -1259,4 +1260,16 @@ func (i *Instance) ActivateSchemaUser(ctx context.Context, orgID string, userID 
 	})
 	logging.OnError(err).Fatal("reactivate user")
 	return user
+}
+
+// FakeOrgName generates a fake organization name.
+// It has higher entropy than regular [gofakeit.Name()],
+// to prevent org naming conflicts.
+func FakeOrgName() string {
+	return strings.Join([]string{
+		strings.ToTitle(gofakeit.AdjectivePossessive()),
+		strings.ToTitle(gofakeit.Noun()),
+		strings.ToTitle(gofakeit.Animal()),
+	}, "")
+
 }

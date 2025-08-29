@@ -49,7 +49,7 @@ func TestServer_CreateUser(t *testing.T) {
 		}
 	}`)
 	permissionSchemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, permissionSchema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.FakeOrgName(), gofakeit.Email())
 
 	type res struct {
 		want            *resource_object.Details
@@ -257,7 +257,7 @@ func TestServer_PatchUser(t *testing.T) {
 		}
 	}`)
 	permissionSchemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, permissionSchema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.FakeOrgName(), gofakeit.Email())
 
 	type res struct {
 		want            *resource_object.Details
@@ -662,7 +662,7 @@ func TestServer_DeleteUser(t *testing.T) {
 		}
 	}`)
 	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.FakeOrgName(), gofakeit.Email())
 
 	tests := []struct {
 		name    string
@@ -878,7 +878,7 @@ func TestServer_LockUser(t *testing.T) {
 		}
 	}`)
 	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.FakeOrgName(), gofakeit.Email())
 
 	tests := []struct {
 		name    string
@@ -1079,7 +1079,7 @@ func TestServer_UnlockUser(t *testing.T) {
 		}
 	}`)
 	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.FakeOrgName(), gofakeit.Email())
 
 	tests := []struct {
 		name    string
@@ -1261,7 +1261,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 		}
 	}`)
 	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.FakeOrgName(), gofakeit.Email())
 
 	tests := []struct {
 		name    string
@@ -1462,7 +1462,7 @@ func TestServer_ActivateUser(t *testing.T) {
 		}
 	}`)
 	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.FakeOrgName(), gofakeit.Email())
 
 	tests := []struct {
 		name    string

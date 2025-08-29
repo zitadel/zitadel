@@ -77,7 +77,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 			wantErr: true,
 		},
 		func() test {
-			orgName := gofakeit.Name()
+			orgName := integration.FakeOrgName()
 			return test{
 				name: "adding org with same name twice",
 				ctx:  CTX,
@@ -235,20 +235,20 @@ func TestServer_CreateOrganization(t *testing.T) {
 			},
 		},
 		func() test {
-			orgID := gofakeit.Name()
+			orgID := integration.FakeOrgName()
 			return test{
 				name: "adding org with same ID twice",
 				ctx:  CTX,
 				req: &v2beta_org.CreateOrganizationRequest{
 					Id:     &orgID,
-					Name:   gofakeit.Name(),
+					Name:   integration.FakeOrgName(),
 					Admins: nil,
 				},
 				testFunc: func(ctx context.Context, t *testing.T) {
 					// create org initially
 					_, err := Client.CreateOrganization(ctx, &v2beta_org.CreateOrganizationRequest{
 						Id:   &orgID,
-						Name: gofakeit.Name(),
+						Name: integration.FakeOrgName(),
 					})
 					require.NoError(t, err)
 				},
@@ -2074,7 +2074,7 @@ func createOrgs(ctx context.Context, client v2beta_org.OrganizationServiceClient
 	orgsName := make([]string, noOfOrgs)
 
 	for i := range noOfOrgs {
-		orgName := gofakeit.Name()
+		orgName := integration.FakeOrgName()
 		orgsName[i] = orgName
 		orgs[i], err = client.CreateOrganization(ctx,
 			&v2beta_org.CreateOrganizationRequest{

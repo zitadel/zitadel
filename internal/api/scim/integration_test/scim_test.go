@@ -35,7 +35,7 @@ func TestMain(m *testing.M) {
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 
 		iamOwnerCtx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-		SecondaryOrganization = Instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
+		SecondaryOrganization = Instance.CreateOrganization(iamOwnerCtx, integration.FakeOrgName(), gofakeit.Email())
 
 		return m.Run()
 	}())
