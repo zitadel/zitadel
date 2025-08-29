@@ -140,7 +140,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	logging.OnError(err).Fatal("unable to connect to database")
 
 	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
-	esV3 := new_es.NewEventstore(dbClient, eventstore.NoopExecutionQueue())
+	esV3 := new_es.NewEventstore(dbClient)
 	config.Eventstore.Pusher = esV3
 	config.Eventstore.Searcher = esV3
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)

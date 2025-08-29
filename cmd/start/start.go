@@ -177,8 +177,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		return err
 	}
 
-	config.Eventstore.Pusher = new_es.NewEventstore(dbClient, q)
-	config.Eventstore.Searcher = new_es.NewEventstore(dbClient, q)
+	config.Eventstore.Pusher = new_es.NewEventstore(dbClient, new_es.WithExecutionQueueOption(q))
+	config.Eventstore.Searcher = new_es.NewEventstore(dbClient, new_es.WithExecutionQueueOption(q))
 	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(dbClient, &es_v4_pg.Config{

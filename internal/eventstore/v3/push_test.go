@@ -244,7 +244,7 @@ func Test_mapCommands(t *testing.T) {
 			}
 		}
 		// is used to set the the [pushPlaceholderFmt]
-		NewEventstore(&database.DB{Database: new(postgres.Config)}, eventstore.NoopExecutionQueue())
+		NewEventstore(&database.DB{Database: new(postgres.Config)})
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
 				cause := recover()

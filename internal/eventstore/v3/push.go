@@ -116,6 +116,10 @@ func writeEvents(ctx context.Context, tx database.Tx, commands []eventstore.Comm
 }
 
 func (es *Eventstore) queueExecutions(ctx context.Context, tx database.Tx, events []eventstore.Event) error {
+	if es.queue == nil {
+		return nil
+	}
+
 	sqlTx, ok := tx.(*sql.Tx)
 	if !ok {
 		types := make([]string, len(events))
