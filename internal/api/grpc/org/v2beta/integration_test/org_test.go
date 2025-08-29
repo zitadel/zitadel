@@ -1148,12 +1148,12 @@ func TestServer_AddOrganizationDomain_ClaimDomain(t *testing.T) {
 
 		for _, u := range users.GetResult() {
 			if u.GetUserId() == ownUser.GetUserId() {
-				assert.Equal(t, username, u.GetPreferredLoginName())
+				assert.Equal(collect, username, u.GetPreferredLoginName())
 				continue
 			}
 			if u.GetUserId() == otherUser.GetUserId() {
-				assert.NotEqual(t, otherUsername, u.GetPreferredLoginName())
-				assert.Contains(t, u.GetPreferredLoginName(), "@temporary.")
+				assert.NotEqual(collect, otherUsername, u.GetPreferredLoginName())
+				assert.Contains(collect, u.GetPreferredLoginName(), "@temporary.")
 			}
 		}
 	}, 5*time.Second, time.Second, "user not updated in time")
