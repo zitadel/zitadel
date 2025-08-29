@@ -21,6 +21,30 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
     privacyPolicyAccepted: false,
   });
 
+  // Helper function to check if all required checkboxes are accepted
+  const checkAllAccepted = (newState: AcceptanceState) => {
+    const hasTosLink = !!legal?.tosLink;
+    const hasPrivacyLink = !!legal?.privacyPolicyLink;
+
+    // If both links exist, both must be accepted
+    if (hasTosLink && hasPrivacyLink) {
+      return newState.tosAccepted && newState.privacyPolicyAccepted;
+    }
+
+    // If only ToS link exists, only ToS must be accepted
+    if (hasTosLink && !hasPrivacyLink) {
+      return newState.tosAccepted;
+    }
+
+    // If only Privacy Policy link exists, only Privacy Policy must be accepted
+    if (!hasTosLink && hasPrivacyLink) {
+      return newState.privacyPolicyAccepted;
+    }
+
+    // If no links exist, consider it accepted
+    return true;
+  };
+
   return (
     <>
       <p className="mt-4 flex flex-row items-center text-sm text-text-light-secondary-500 dark:text-text-dark-secondary-500">
@@ -50,16 +74,17 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
         <div className="mt-4 flex items-center">
           <Checkbox
             className="mr-4"
-            checked={false}
-            value={"privacypolicy"}
+            checked={acceptanceState.tosAccepted}
+            value={"tos"}
             onChangeVal={(checked: boolean) => {
-              setAcceptanceState({
+              const newState = {
                 ...acceptanceState,
                 tosAccepted: checked,
-              });
-              onChange(checked && acceptanceState.privacyPolicyAccepted);
+              };
+              setAcceptanceState(newState);
+              onChange(checkAllAccepted(newState));
             }}
-            data-testid="privacy-policy-checkbox"
+            data-testid="tos-checkbox"
           />
 
           <div className="mr-4 w-[28rem]">
@@ -75,25 +100,22 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
         <div className="mt-4 flex items-center">
           <Checkbox
             className="mr-4"
-            checked={false}
-            value={"tos"}
+            checked={acceptanceState.privacyPolicyAccepted}
+            value={"privacypolicy"}
             onChangeVal={(checked: boolean) => {
-              setAcceptanceState({
+              const newState = {
                 ...acceptanceState,
                 privacyPolicyAccepted: checked,
-              });
-              onChange(checked && acceptanceState.tosAccepted);
+              };
+              setAcceptanceState(newState);
+              onChange(checkAllAccepted(newState));
             }}
-            data-testid="tos-checkbox"
+            data-testid="privacy-policy-checkbox"
           />
 
           <div className="mr-4 w-[28rem]">
             <p className="text-sm text-text-light-500 dark:text-text-dark-500">
-              <Link
-                href={legal.privacyPolicyLink}
-                className="underline"
-                target="_blank"
-              >
+              <Link href={legal.privacyPolicyLink} className="underline" target="_blank">
                 <Translated i18nKey="privacyPolicy" namespace="register" />
               </Link>
             </p>
