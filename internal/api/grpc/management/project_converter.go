@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+
 	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
