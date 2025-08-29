@@ -18,15 +18,15 @@ with features as (
     where instance_id = $1
 	group by instance_id
 ), execution_targets as (
-	select instance_id, json_arrayagg(execution_targets) as execution_targets from (
-		select e.instance_id, json_object(
-			'execution_id' : et.execution_id,
-			'target_id' : t.id,
-			'target_type' : t.target_type,
-			'endpoint' : t.endpoint,
-			'timeout' : t.timeout,
-			'interrupt_on_error' : t.interrupt_on_error,
-			'signing_key' : t.signing_key
+	select instance_id, json_agg(x.execution_targets) as execution_targets from (
+		select e.instance_id, json_build_object(
+			'execution_id', et.execution_id,
+			'target_id', t.id,
+			'target_type', t.target_type,
+			'endpoint', t.endpoint,
+			'timeout', t.timeout,
+			'interrupt_on_error', t.interrupt_on_error,
+			'signing_key', t.signing_key
 		) as execution_targets
 		from projections.executions1 e
 		join projections.executions1_targets et
@@ -37,7 +37,7 @@ with features as (
 			and et.target_id = t.id
 		where e.instance_id = $1
 		order by et.position asc
-	)
+	) as x
 	group by instance_id
 )
 select
