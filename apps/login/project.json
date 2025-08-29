@@ -48,30 +48,17 @@
       ],
       "inputs": [
         "default",
-        "envVars"
-      ],
-      "outputs": [
-        "{projectRoot}/.next/**/*",
+        "envVars",
         "!{projectRoot}/.next/cache/**/*",
-        "!{projectRoot}/.next/standalone/**/*"
-      ]
-    },
-    "build:standalone": {
-      "cache": false,
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "default",
-        "envVars"
+        "!{projectRoot}/.next/cache"
       ],
       "outputs": [
-        "{projectRoot}/.next/standalone/**/*",
-        "{projectRoot}/.next/static/**/*"
+        "{projectRoot}/dist/**/*"
       ]
     },
     "build:docker": {
       "dependsOn": [
+        "build"
       ],
       "inputs": [
         "docker",
@@ -81,7 +68,7 @@
     },
     "build:bake": {
       "dependsOn": [
-        "build:standalone"
+        "build"
       ],
       "inputs": [
         "docker",
@@ -104,7 +91,7 @@
       "continuous": true,
       "cache": false,
       "dependsOn": [
-        "build:standalone"
+        "build"
       ]
     },
     "start:docker": {
@@ -139,6 +126,7 @@
       "cache": true,
       "dependsOn": [
         "@zitadel/core-mock:start:docker",
+        "build",
         "start:integration"
       ],
       "inputs": [

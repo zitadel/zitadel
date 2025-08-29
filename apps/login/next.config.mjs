@@ -40,8 +40,8 @@ const secureHeaders = [
 ];
 
 const nextConfig = {
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH,
-  output: process.env.NEXT_OUTPUT_MODE || undefined,
+  basePath: "/ui/v2/login",
+  output: "standalone",
   outputFileTracingRoot: path.join(__dirname, "../../"),
   reactStrictMode: true, // Recommended for the `pages` directory, default in `app`.
   experimental: {
