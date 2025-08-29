@@ -12,6 +12,7 @@ import Login from "./_login.md";
 import CodeBlock from "@theme/CodeBlock";
 import DefaultsYamlSource from "!!raw-loader!./defaults.yaml";
 import StepsYamlSource from "!!raw-loader!./steps.yaml";
+import DockerComposeSecrets from "!!raw-loader!./docker-compose-secrets.yaml";
 
 This guide assumes you are familiar with [running ZITADEL using the least amount of configuration possible](/docs/self-hosting/deploy/overview).
 
@@ -87,24 +88,10 @@ ZITADEL_DATABASE_POSTGRES_USER_PASSWORD_FILE=/run/secrets/db_password
 ```
 
 **Docker Compose with secrets:**
-```yaml
-version: '3.8'
-services:
-  zitadel:
-    image: zitadel/zitadel:latest
-    environment:
-      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD_FILE=/run/secrets/db_password
-      - ZITADEL_MASTERKEY_FILE=/run/secrets/masterkey
-    secrets:
-      - db_password
-      - masterkey
-
-secrets:
-  db_password:
-    file: ./secrets/db_password.txt
-  masterkey:
-    file: ./secrets/masterkey.txt
-```
+<details>
+  <summary>docker-compose-secrets.yaml</summary>
+  <CodeBlock language="yaml">{DockerComposeSecrets}</CodeBlock>
+</details>
 
 **Security benefits:**
 - Secrets are read directly into memory and never exposed as environment variables
