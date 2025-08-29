@@ -253,7 +253,7 @@ export function LoginOTP({
         <TextInput
           type="text"
           {...register("code", { required: t("verify.required.code") })}
-          label="Code"
+          label={t("verify.labels.code")}
           autoComplete="one-time-code"
           data-testid="code-text-input"
         />
