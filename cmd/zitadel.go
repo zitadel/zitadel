@@ -39,6 +39,9 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 		Version: build.Version(),
 	}
 
+	// Load secrets from files before setting up Viper environment variables
+	LoadSecretsFromFiles(viper.GetViper())
+
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix("ZITADEL")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
