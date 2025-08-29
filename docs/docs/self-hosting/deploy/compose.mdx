@@ -59,7 +59,7 @@ The comments give context to the used variables and show examples for commonly u
 Here are some natural steps forward to go from the current setup to production:
 
 - **Use a different master key**: Set up an instance from scratch and use a different master key. For example, generate one by running `tr -dc A-Za-z0-9 </dev/urandom | head -c 32`
-- **Use files for secrets instead of environment variables, and don't commit them to Git**: Learn how to [configure the platform](/docs/self-hosting/manage/configure)
+- **Use files for secrets instead of environment variables, and don't commit them to Git**: Learn how to [configure the platform](/docs/self-hosting/manage/configure). For containerized deployments, consider using [Docker secrets support](/docs/self-hosting/manage/configure/configure#docker-secrets-support) for enhanced security.
 - **Run the containers as non-root users**: Remove the `user: "0"` lines from the `docker-compose.yaml` file.
 - **Configure a different external domain or IP**: Beware that the login only works with HTTPS on non-localhost domains. [Run and configure a reverse proxy](/docs/self-hosting/manage/reverseproxy/reverse_proxy)
 - **Serve the API and the UI together on the same port**: [Run and configure a reverse proxy](/docs/self-hosting/manage/reverseproxy/reverse_proxy)

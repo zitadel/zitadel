@@ -68,6 +68,59 @@ These environment variables are used as a proxy URL.
 To exclude specific hosts from proxying, set the `NO_PROXY` environment variable: The value is interpreted as a comma-separated string.
 For more information on the `NO_PROXY` environment variable, read the [`httpproxy` Go doc](https://pkg.go.dev/golang.org/x/net/http/httpproxy#Config).
 
+### Docker secrets support
+
+ZITADEL supports Docker secrets and other file-based secret management systems through the `_FILE` environment variable pattern.
+This allows you to store sensitive configuration values in files instead of directly in environment variables, which is more secure for containerized deployments.
+
+For any configuration value that you would normally set as an environment variable, you can instead set a corresponding `_FILE` environment variable that points to a file containing the secret value.
+
+**Example:**
+Instead of setting the database password directly:
+```bash
+ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=mysecretpassword
+```
+
+You can use a file-based approach:
+```bash
+ZITADEL_DATABASE_POSTGRES_USER_PASSWORD_FILE=/run/secrets/db_password
+```
+
+**Docker Compose with secrets:**
+```yaml
+version: '3.8'
+services:
+  zitadel:
+    image: zitadel/zitadel:latest
+    environment:
+      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD_FILE=/run/secrets/db_password
+      - ZITADEL_MASTERKEY_FILE=/run/secrets/masterkey
+    secrets:
+      - db_password
+      - masterkey
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  masterkey:
+    file: ./secrets/masterkey.txt
+```
+
+**Security benefits:**
+- Secrets are read directly into memory and never exposed as environment variables
+- Works seamlessly with Docker secrets, Kubernetes secrets, and other orchestration platforms
+- Prevents sensitive data from appearing in process lists or environment dumps
+- Supports any ZITADEL configuration value that contains sensitive information
+
+**Supported configurations:**
+Common use cases include:
+- `ZITADEL_DATABASE_POSTGRES_USER_PASSWORD_FILE`
+- `ZITADEL_DATABASE_COCKROACH_USER_PASSWORD_FILE` 
+- `ZITADEL_MASTERKEY_FILE`
+- Any other sensitive configuration value
+
+Files should contain only the secret value, with optional trailing newlines that will be automatically trimmed.
+
 ## Masterkey
 
 The masterkey is used to AES256-encrypt other generated encryption keys.

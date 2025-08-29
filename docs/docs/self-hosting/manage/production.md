@@ -26,6 +26,9 @@ Prefer passing .yaml files to the ZITADEL binary instead of environment variable
 Restricting access to these files to avoid leaking sensitive information is easier than restricting access to environment variables.
 Also, not all configuration options are available as environment variables.
 
+For containerized deployments, consider using [Docker secrets support](/docs/self-hosting/manage/configure/configure#docker-secrets-support) to manage sensitive configuration values like database passwords and encryption keys.
+This approach keeps secrets in memory only and prevents them from appearing in environment variables or process lists.
+
 ## Networking
 
 - To make ZITADEL available at the domain of your choice, [you need to configure the ExternalDomain property](/docs/self-hosting/manage/custom-domain).
