@@ -366,7 +366,7 @@ var (
 		"password_set",
 		"count",
 	}
-	usersQuery = `SELECT projections.users14.id,` +
+	usersQuery = `SELECT DISTINCT projections.users14.id,` +
 		` projections.users14.creation_date,` +
 		` projections.users14.change_date,` +
 		` projections.users14.resource_owner,` +
@@ -390,6 +390,7 @@ var (
 		` projections.users14_humans.is_phone_verified,` +
 		` projections.users14_humans.password_change_required,` +
 		` projections.users14_humans.password_changed,` +
+		` projections.users14_humans.mfa_init_skipped,` +
 		` projections.users14_machines.user_id,` +
 		` projections.users14_machines.name,` +
 		` projections.users14_machines.description,` +
@@ -399,6 +400,7 @@ var (
 		` FROM projections.users14` +
 		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
 		` LEFT JOIN projections.users14_machines ON projections.users14.id = projections.users14_machines.user_id AND projections.users14.instance_id = projections.users14_machines.instance_id` +
+		` LEFT JOIN projections.user_metadata5 ON projections.users14.id = projections.user_metadata5.user_id AND projections.users14.instance_id = projections.user_metadata5.instance_id` +
 		` LEFT JOIN LATERAL (SELECT ARRAY_AGG(ln.login_name ORDER BY ln.login_name) AS login_names, MAX(CASE WHEN ln.is_primary THEN ln.login_name ELSE NULL END) AS preferred_login_name FROM projections.login_names3 AS ln WHERE ln.user_id = projections.users14.id AND ln.instance_id = projections.users14.instance_id) AS login_names ON TRUE`
 	usersCols = []string{
 		"id",
@@ -426,6 +428,7 @@ var (
 		"is_phone_verified",
 		"password_change_required",
 		"password_changed",
+		"mfa_init_skipped",
 		// machine
 		"user_id",
 		"name",
@@ -992,6 +995,7 @@ func Test_UserPrepares(t *testing.T) {
 							true,
 							true,
 							testNow,
+							testNow,
 							// machine
 							nil,
 							nil,
@@ -1032,6 +1036,7 @@ func Test_UserPrepares(t *testing.T) {
 							IsPhoneVerified:        true,
 							PasswordChangeRequired: true,
 							PasswordChanged:        testNow,
+							MFAInitSkipped:         testNow,
 						},
 					},
 				},
@@ -1071,6 +1076,7 @@ func Test_UserPrepares(t *testing.T) {
 							true,
 							true,
 							testNow,
+							testNow,
 							// machine
 							nil,
 							nil,
@@ -1090,6 +1096,7 @@ func Test_UserPrepares(t *testing.T) {
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
 							// human
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1144,6 +1151,7 @@ func Test_UserPrepares(t *testing.T) {
 							IsPhoneVerified:        true,
 							PasswordChangeRequired: true,
 							PasswordChanged:        testNow,
+							MFAInitSkipped:         testNow,
 						},
 					},
 					{

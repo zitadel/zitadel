@@ -11,6 +11,10 @@ func OrganizationName() string {
 	return company()
 }
 
+func Email() string {
+	return RandString(5) + gofakeit.Email()
+}
+
 // appName private function to add a random string to the gofakeit.AppName function
 func appName() string {
 	return gofakeit.AppName() + "-" + RandString(5)
