@@ -250,6 +250,7 @@ func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance
 	logging.OnError(err).WithField("instance_id", id).Warn("instance by ID")
 
 	if err == nil {
+		instance.ZitadelVersion = build.Version()
 		q.caches.instance.Set(ctx, instance)
 	}
 	return instance, err
