@@ -27,6 +27,12 @@
     "description": "Wprowadź dane logowania.",
     "register": "Zarejestruj nowego użytkownika",
     "submit": "Kontynuuj",
+    "labels": {
+      "loginname": "Login",
+      "username": "Nazwa użytkownika",
+      "usernameOrPhoneNumber": "Nazwa użytkownika lub numer telefonu",
+      "usernameOrEmail": "Nazwa użytkownika lub e-mail"
+    },
     "required": {
       "loginName": "To pole jest wymagane"
     }
@@ -37,6 +43,9 @@
       "description": "Wprowadź swoje hasło.",
       "resetPassword": "Zresetuj hasło",
       "submit": "Kontynuuj",
+      "labels": {
+        "password": "Hasło"
+      },
       "required": {
         "password": "To pole jest wymagane"
       }
@@ -48,6 +57,11 @@
       "noCodeReceived": "Nie otrzymałeś kodu?",
       "resend": "Wyślij kod ponownie",
       "submit": "Kontynuuj",
+      "labels": {
+        "code": "Kod",
+        "newPassword": "Nowe hasło",
+        "confirmPassword": "Potwierdź nowe hasło"
+      },
       "required": {
         "code": "To pole jest wymagane",
         "newPassword": "Musisz podać hasło!",
@@ -58,6 +72,10 @@
       "title": "Zmień hasło",
       "description": "Ustaw nowe hasło dla swojego konta",
       "submit": "Kontynuuj",
+      "labels": {
+        "newPassword": "Nowe hasło",
+        "confirmPassword": "Potwierdź nowe hasło"
+      },
       "required": {
         "newPassword": "Musisz podać nowe hasło!",
         "confirmPassword": "To pole jest wymagane"
@@ -101,9 +119,11 @@
   "ldap": {
     "title": "Zaloguj się przez LDAP",
     "description": "Wprowadź swoje dane logowania LDAP.",
-    "username": "Nazwa użytkownika",
-    "password": "Hasło",
     "submit": "Kontynuuj",
+    "labels": {
+      "username": "Nazwa użytkownika",
+      "password": "Hasło"
+    },
     "required": {
       "username": "To pole jest wymagane",
       "password": "To pole jest wymagane"
@@ -130,6 +150,9 @@
       "noCodeReceived": "Nie otrzymałeś kodu?",
       "resendCode": "Wyślij kod ponownie",
       "submit": "Kontynuuj",
+      "labels": {
+        "code": "Kod"
+      },
       "required": {
         "code": "To pole jest wymagane"
       }
@@ -141,6 +164,9 @@
       "emailDescription": "Wprowadź swój adres e-mail, aby otrzymać kod e-mailem.",
       "totpRegisterDescription": "Zeskanuj kod QR lub otwórz adres URL ręcznie.",
       "submit": "Kontynuuj",
+      "labels": {
+        "code": "Kod"
+      },
       "required": {
         "code": "To pole jest wymagane"
       }
@@ -201,10 +227,19 @@
       "title": "Ustaw hasło",
       "description": "Ustaw hasło dla swojego konta",
       "submit": "Kontynuuj",
+      "labels": {
+        "password": "Hasło",
+        "confirmPassword": "Potwierdź hasło"
+      },
       "required": {
         "password": "Musisz podać hasło!",
         "confirmPassword": "To pole jest wymagane"
       }
+    },
+    "labels": {
+      "firstname": "Imię",
+      "lastname": "Nazwisko",
+      "email": "E-mail"
     },
     "required": {
       "firstname": "To pole jest wymagane",
@@ -247,6 +282,9 @@
       "resendCode": "Wyślij kod ponownie",
       "codeSent": "Kod został właśnie wysłany na twój adres e-mail.",
       "submit": "Kontynuuj",
+      "labels": {
+        "code": "Kod"
+      },
       "required": {
         "code": "To pole jest wymagane"
       }
@@ -264,6 +302,9 @@
       "title": "Kod urządzenia",
       "description": "Wprowadź kod.",
       "submit": "Kontynuuj",
+      "labels": {
+        "code": "Kod"
+      },
       "required": {
         "code": "To pole jest wymagane"
       }

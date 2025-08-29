@@ -122,7 +122,7 @@ export function PasswordForm({
           type="password"
           autoComplete="password"
           {...register("password", { required: t("verify.required.password") })}
-          label="Password"
+          label={t("verify.labels.password")}
           data-testid="password-text-input"
         />
         {!loginSettings?.hidePasswordReset && (
