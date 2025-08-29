@@ -7,6 +7,7 @@ const (
 	OrgDomainPrimaryClaim = "urn:zitadel:iam:org:domain:primary"
 	OrgIDClaim            = "urn:zitadel:iam:org:id"
 	ProjectIDScope        = "urn:zitadel:iam:org:project:id:"
+	ProjectsIDScope       = "urn:zitadel:iam:org:projects:roles"
 	ProjectIDScopeZITADEL = "zitadel"
 	AudSuffix             = ":aud"
 	ProjectScopeZITADEL   = ProjectIDScope + ProjectIDScopeZITADEL + AudSuffix
