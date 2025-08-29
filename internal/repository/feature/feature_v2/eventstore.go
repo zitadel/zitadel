@@ -27,4 +27,5 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceLoginVersion, eventstore.GenericEventMapper[SetEvent[*feature.LoginV2]])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstancePermissionCheckV2, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceConsoleUseV2UserApi, eventstore.GenericEventMapper[SetEvent[bool]])
+	eventstore.RegisterFilterEventMapper(AggregateType, InstanceEnableRelationalTables, eventstore.GenericEventMapper[SetEvent[bool]])
 }

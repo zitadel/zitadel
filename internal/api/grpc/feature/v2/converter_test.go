@@ -177,6 +177,8 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 }
 
 func Test_instanceFeaturesToPb(t *testing.T) {
+	t.Parallel()
+
 	arg := &query.InstanceFeatures{
 		Details: &domain.ObjectDetails{
 			Sequence:      22,
@@ -219,6 +221,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Value: true,
 		},
 		ConsoleUseV2UserApi: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
+		EnableRelationalTables: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
 			Value: true,
 		},
@@ -267,6 +273,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 		ConsoleUseV2UserApi: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		EnableRelationalTables: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},

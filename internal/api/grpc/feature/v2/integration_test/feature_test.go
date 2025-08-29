@@ -364,14 +364,19 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
+				EnableRelationalTables: &feature.FeatureFlag{
+					Enabled: false,
+					Source:  feature.Source_SOURCE_UNSPECIFIED,
+				},
 			},
 		},
 		{
 			name: "some features, no inheritance",
 			prepare: func(t *testing.T) {
 				_, err := Client.SetInstanceFeatures(IamCTX, &feature.SetInstanceFeaturesRequest{
-					LoginDefaultOrg: gu.Ptr(true),
-					UserSchema:      gu.Ptr(true),
+					LoginDefaultOrg:        gu.Ptr(true),
+					UserSchema:             gu.Ptr(true),
+					EnableRelationalTables: gu.Ptr(true),
 				})
 				require.NoError(t, err)
 			},
@@ -385,6 +390,10 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Source:  feature.Source_SOURCE_INSTANCE,
 				},
 				UserSchema: &feature.FeatureFlag{
+					Enabled: true,
+					Source:  feature.Source_SOURCE_INSTANCE,
+				},
+				EnableRelationalTables: &feature.FeatureFlag{
 					Enabled: true,
 					Source:  feature.Source_SOURCE_INSTANCE,
 				},
@@ -413,6 +422,10 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Enabled: false,
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
+				EnableRelationalTables: &feature.FeatureFlag{
+					Enabled: false,
+					Source:  feature.Source_SOURCE_UNSPECIFIED,
+				},
 			},
 		},
 	}
@@ -434,6 +447,7 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 			require.NoError(t, err)
 			assertFeatureFlag(t, tt.want.LoginDefaultOrg, got.LoginDefaultOrg)
 			assertFeatureFlag(t, tt.want.UserSchema, got.UserSchema)
+			assertFeatureFlag(t, tt.want.EnableRelationalTables, got.EnableRelationalTables)
 		})
 	}
 }
