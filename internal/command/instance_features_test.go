@@ -12,12 +12,15 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
 	feature_v1 "github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_SetInstanceFeatures(t *testing.T) {
+	t.Parallel()
+
 	ctx := authz.WithInstanceID(context.Background(), "instance1")
 	aggregate := feature_v2.NewAggregate("instance1", "instance1")
 
@@ -53,7 +56,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					),
@@ -70,7 +73,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			name: "set LoginDefaultOrg, update from v1",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v1.NewSetEvent[feature_v1.Boolean](
+					eventFromEventPusher(feature_v1.NewSetEvent(
 						ctx, &eventstore.Aggregate{
 							ID:            "instance1",
 							ResourceOwner: "instance1",
@@ -82,7 +85,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 					)),
 				),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					),
@@ -100,7 +103,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, true,
 					),
@@ -118,7 +121,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPushFailed(io.ErrClosedPipe,
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceConsoleUseV2UserApi, true,
 					),
@@ -134,24 +137,27 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceOIDCSingleV1SessionTerminationEventType, true,
 					),
+					feature_v2.NewSetEvent(ctx, aggregate,
+						feature_v2.InstanceEnableRelationalTables, true),
 				),
 			),
 			args: args{ctx, &InstanceFeatures{
 				LoginDefaultOrg:                gu.Ptr(true),
 				UserSchema:                     gu.Ptr(true),
 				OIDCSingleV1SessionTermination: gu.Ptr(true),
+				EnableRelationalTables:         gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
@@ -162,7 +168,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				// throw in some set events, reset and set again.
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					)),
@@ -170,17 +176,17 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 						ctx, aggregate,
 						feature_v2.InstanceResetEventType,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, false,
 					)),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.InstanceOIDCSingleV1SessionTerminationEventType, false,
 					),
 				),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					),
@@ -197,6 +203,8 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			c := &Commands{
 				eventstore: tt.eventstore(t),
 			}
@@ -227,7 +235,7 @@ func TestCommands_ResetInstanceFeatures(t *testing.T) {
 			name: "push error",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					)),
@@ -242,7 +250,7 @@ func TestCommands_ResetInstanceFeatures(t *testing.T) {
 			name: "success",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					)),
@@ -259,7 +267,7 @@ func TestCommands_ResetInstanceFeatures(t *testing.T) {
 			name: "no change after previous reset",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						ctx, aggregate,
 						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					)),
@@ -291,6 +299,74 @@ func TestCommands_ResetInstanceFeatures(t *testing.T) {
 			got, err := c.ResetInstanceFeatures(ctx)
 			require.ErrorIs(t, err, tt.wantErr)
 			assertObjectDetails(t, tt.want, got)
+		})
+	}
+}
+
+func TestInstanceFeatures_isEmpty(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		name     string
+		features *InstanceFeatures
+		want     bool
+	}{
+		{
+			name:     "nil features",
+			features: nil,
+			want:     true,
+		},
+		{
+			name:     "empty features",
+			features: &InstanceFeatures{},
+			want:     true,
+		},
+		{
+			name: "LoginDefaultOrg set",
+			features: &InstanceFeatures{
+				LoginDefaultOrg: gu.Ptr(true),
+			},
+			want: false,
+		},
+		{
+			name: "UserSchema set",
+			features: &InstanceFeatures{
+				UserSchema: gu.Ptr(true),
+			},
+			want: false,
+		},
+		{
+			name: "TokenExchange set",
+			features: &InstanceFeatures{
+				TokenExchange: gu.Ptr(true),
+			},
+			want: false,
+		},
+		{
+			name: "ImprovedPerformance set",
+			features: &InstanceFeatures{
+				ImprovedPerformance: []feature.ImprovedPerformanceType{},
+			},
+			want: false,
+		},
+		{
+			name: "multiple fields set",
+			features: &InstanceFeatures{
+				LoginDefaultOrg:        gu.Ptr(true),
+				UserSchema:             gu.Ptr(false),
+				PermissionCheckV2:      gu.Ptr(true),
+				EnableRelationalTables: gu.Ptr(true),
+			},
+			want: false,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := tc.features.isEmpty()
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }

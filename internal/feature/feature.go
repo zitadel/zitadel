@@ -22,6 +22,7 @@ const (
 	KeyLoginV2                        Key = 13
 	KeyPermissionCheckV2              Key = 14
 	KeyConsoleUseV2UserApi            Key = 15
+	KeyEnableRelationalTables         Key = 16
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -49,6 +50,7 @@ type Features struct {
 	LoginV2                        LoginV2                   `json:"login_v2,omitempty"`
 	PermissionCheckV2              bool                      `json:"permission_check_v2,omitempty"`
 	ConsoleUseV2UserApi            bool                      `json:"console_use_v2_user_api,omitempty"`
+	EnableRelationalTables         bool                      `json:"enable_relation_tables,omitempty"`
 }
 
 /* Note: do not generate the stringer or enumer for this type, is it breaks existing events */

@@ -76,6 +76,7 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceLoginVersion,
 			feature_v2.InstancePermissionCheckV2,
 			feature_v2.InstanceConsoleUseV2UserApi,
+			feature_v2.InstanceEnableRelationalTables,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -117,6 +118,9 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyConsoleUseV2UserApi:
 		v := value.(bool)
 		features.ConsoleUseV2UserApi = &v
+	case feature.KeyEnableRelationalTables:
+		v := value.(bool)
+		features.EnableRelationalTables = &v
 	}
 }
 
@@ -133,5 +137,6 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginV2, f.LoginV2, feature_v2.InstanceLoginVersion)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.PermissionCheckV2, f.PermissionCheckV2, feature_v2.InstancePermissionCheckV2)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.ConsoleUseV2UserApi, f.ConsoleUseV2UserApi, feature_v2.InstanceConsoleUseV2UserApi)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableRelationalTables, f.EnableRelationalTables, feature_v2.InstanceEnableRelationalTables)
 	return cmds
 }

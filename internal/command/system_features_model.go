@@ -120,18 +120,18 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 
 func appendFeatureUpdate[T comparable](ctx context.Context, cmds []eventstore.Command, aggregate *feature_v2.Aggregate, oldValue, newValue *T, eventType eventstore.EventType) []eventstore.Command {
 	if newValue != nil && (oldValue == nil || *oldValue != *newValue) {
-		cmds = append(cmds, feature_v2.NewSetEvent[T](ctx, aggregate, eventType, *newValue))
+		cmds = append(cmds, feature_v2.NewSetEvent(ctx, aggregate, eventType, *newValue))
 	}
 	return cmds
 }
 
 func appendFeatureSliceUpdate[T comparable](ctx context.Context, cmds []eventstore.Command, aggregate *feature_v2.Aggregate, oldValues, newValues []T, eventType eventstore.EventType) []eventstore.Command {
 	if len(newValues) != len(oldValues) {
-		return append(cmds, feature_v2.NewSetEvent[[]T](ctx, aggregate, eventType, newValues))
+		return append(cmds, feature_v2.NewSetEvent(ctx, aggregate, eventType, newValues))
 	}
 	for i, oldValue := range oldValues {
 		if oldValue != newValues[i] {
-			return append(cmds, feature_v2.NewSetEvent[[]T](ctx, aggregate, eventType, newValues))
+			return append(cmds, feature_v2.NewSetEvent(ctx, aggregate, eventType, newValues))
 		}
 	}
 	return cmds
