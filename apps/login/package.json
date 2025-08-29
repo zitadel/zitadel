@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/ && cp -r scripts/* .next/standalone/",
     "start": "node .next/standalone/apps/login/server.js",
     "start:integration": "ZITADEL_API_URL=http://localhost:22222 ZITADEL_SERVICE_USER_TOKEN=none pnpm start",
     "lint": "pnpm run '/^lint:check:.*$/'",

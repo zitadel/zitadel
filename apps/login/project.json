@@ -42,18 +42,18 @@
   },  
   "targets": {
     "build": {
-      "cache": true,
+      "cache": false,
       "dependsOn": [
         "^build"
       ],
       "inputs": [
         "default",
         "envVars",
-        "!{projectRoot}/.next/cache/**/*",
-        "!{projectRoot}/.next/cache"
+        "!{projectRoot}/.next/**/*",
+        "!{projectRoot}/.next"
       ],
       "outputs": [
-        "{projectRoot}/dist/**/*"
+        "{projectRoot}/.next/standalone/**/*"
       ]
     },
     "build:docker": {
