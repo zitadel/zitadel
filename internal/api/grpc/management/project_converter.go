@@ -2,7 +2,6 @@ package management
 
 import (
 	"context"
-
 	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -18,6 +17,7 @@ import (
 )
 
 func ProjectCreateToCommand(req *mgmt_pb.AddProjectRequest, projectID string, resourceOwner string) *command.AddProject {
+	admins := projectCreateAdminsToCommand(req.GetAdmins())
 	return &command.AddProject{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:   projectID,
@@ -28,6 +28,7 @@ func ProjectCreateToCommand(req *mgmt_pb.AddProjectRequest, projectID string, re
 		ProjectRoleCheck:       req.ProjectRoleCheck,
 		HasProjectCheck:        req.HasProjectCheck,
 		PrivateLabelingSetting: privateLabelingSettingToDomain(req.PrivateLabelingSetting),
+		Admins:                 admins,
 	}
 }
 
@@ -54,6 +55,17 @@ func privateLabelingSettingToDomain(setting proj_pb.PrivateLabelingSetting) doma
 	default:
 		return domain.PrivateLabelingSettingUnspecified
 	}
+}
+
+func projectCreateAdminsToCommand(requestAdmins []*mgmt_pb.AddProjectRequest_Admin) []*command.AddProjectAdmin {
+	admins := make([]*command.AddProjectAdmin, len(requestAdmins))
+	for i, admin := range requestAdmins {
+		admins[i] = &command.AddProjectAdmin{
+			ID:    admin.GetUserId(),
+			Roles: admin.GetRoles(),
+		}
+	}
+	return admins
 }
 
 func AddProjectRoleRequestToCommand(req *mgmt_pb.AddProjectRoleRequest, resourceOwner string) *command.AddProjectRole {
