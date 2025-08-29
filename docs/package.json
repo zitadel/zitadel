@@ -4,22 +4,26 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
+    "dev": "docusaurus start",
     "start": "docusaurus start",
-    "start:api": "yarn run generate && docusaurus start",
-    "build": "yarn run generate && docusaurus build",
+    "start:api": "pnpm run generate && docusaurus start",
+    "build": "pnpm run ensure-plugins && pnpm run generate && docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "generate": "yarn run generate:grpc && yarn run generate:apidocs && yarn run generate:configdocs",
-    "generate:grpc": "buf generate ../proto",
+    "ensure-plugins": "if [ ! -f \"protoc-gen-connect-openapi/protoc-gen-connect-openapi\" ]; then sh ./plugin-download.sh; fi",
+    "debug-plugins": "echo \"PWD: $(pwd)\" && echo \"Plugin file exists: $(test -f protoc-gen-connect-openapi/protoc-gen-connect-openapi && echo 'yes' || echo 'no')\" && echo \"Plugin executable: $(test -x protoc-gen-connect-openapi/protoc-gen-connect-openapi && echo 'yes' || echo 'no')\" && ls -la protoc-gen-connect-openapi/ || echo 'Plugin directory not found'",
+    "generate": "pnpm run generate:grpc && pnpm run generate:apidocs && pnpm run generate:configdocs",
+    "generate:grpc": "pnpm run ensure-plugins && buf generate ../proto",
     "generate:apidocs": "docusaurus gen-api-docs all",
     "generate:configdocs": "cp -r ../cmd/defaults.yaml ./docs/self-hosting/manage/configure/ && cp -r ../cmd/setup/steps.yaml ./docs/self-hosting/manage/configure/",
-    "generate:re-gen": "yarn generate:clean-all && yarn generate",
+    "generate:re-gen": "yarn generate:clean-all && pnpm generate",
     "generate:clean-all": "docusaurus clean-api-docs all",
-    "postinstall": "sh ./plugin-download.sh"
+    "postinstall": "sh ./plugin-download.sh",
+    "clean": "rm -rf node_modules .artifacts .docusaurus .turbo protoc-gen-connect-openapi docs/apis/resources"
   },
   "dependencies": {
     "@bufbuild/buf": "^1.14.0",
@@ -63,6 +67,5 @@
     "@docusaurus/module-type-aliases": "^3.8.1",
     "@docusaurus/types": "^3.8.1",
     "tailwindcss": "^3.2.4"
-  },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  }
 }

@@ -195,7 +195,7 @@ Errors:
     AlreadyExists: Instance already exists
     NotChanged: Instance not changed
   Org:
-    AlreadyExists: Organisation's name already taken
+    AlreadyExists: Organisation's name or id already taken
     Invalid: Organisation is invalid
     AlreadyDeactivated: Organisation is already deactivated
     AlreadyActive: Organisation is already active
@@ -1365,8 +1365,6 @@ EventTypes:
         code:
           added: Phone number verification code generated
           sent: Phone number verification code sent
-
-
   web_key:
     added: Web Key added
     activated: Web Key activated

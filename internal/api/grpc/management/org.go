@@ -21,7 +21,7 @@ import (
 )
 
 func (s *Server) GetMyOrg(ctx context.Context, req *mgmt_pb.GetMyOrgRequest) (*mgmt_pb.GetMyOrgResponse, error) {
-	org, err := s.query.OrgByID(ctx, true, authz.GetCtxData(ctx).OrgID)
+	org, err := s.query.OrgByID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -316,28 +316,7 @@ func (s *Server) RemoveOrgMember(ctx context.Context, req *mgmt_pb.RemoveOrgMemb
 }
 
 func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, orgID string) ([]string, error) {
-	queries := make([]query.SearchQuery, 0, 2)
-	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
-	if err != nil {
-		return nil, err
-	}
-	queries = append(queries, loginName)
-	if orgID != "" {
-		owner, err := query.NewUserResourceOwnerSearchQuery(orgID, query.TextNotEquals)
-		if err != nil {
-			return nil, err
-		}
-		queries = append(queries, owner)
-	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: queries}, nil)
-	if err != nil {
-		return nil, err
-	}
-	userIDs := make([]string, len(users.Users))
-	for i, user := range users.Users {
-		userIDs[i] = user.ID
-	}
-	return userIDs, nil
+	return s.query.SearchClaimedUserIDsOfOrgDomain(ctx, orgDomain, orgID)
 }
 
 func (s *Server) ListOrgMetadata(ctx context.Context, req *mgmt_pb.ListOrgMetadataRequest) (*mgmt_pb.ListOrgMetadataResponse, error) {

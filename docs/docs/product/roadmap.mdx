@@ -293,7 +293,7 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 
 ### v4.x
 
-**Current State**: Implementation
+**Current State**: General Availability / Stable
 
 
 <details>
@@ -311,9 +311,13 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
         This change, along with standardized naming and improved documentation, will simplify integration, accelerate development, and create a more intuitive experience for our customers and community.
 
         Resources integrated in this release:
-        - Instances
+        - Applications (in beta)
+        - Authorizations (in beta)
+        - Instances (in beta)
         - Organizations
-        - Projects
+        - Permissions (in beta)
+        - Projects (in beta)
+        - Settings (beta) now includes 3 new endpoints: `ListOrganizationSettings()`, `SetOrganizationSettings()` and `DeleteOrganizationSettings()`
         - Users
 
         For more details read the [Github Issue](https://github.com/zitadel/zitadel/issues/6305)
@@ -369,40 +373,123 @@ Excitingly, v3 introduces the foundational elements for Actions V2, opening up a
 
         We're officially moving our new Login UI v2 from beta to General Availability.
         Starting now, it will be the default login experience for all new customers.
-        With this release, 8.0we are also focused on implementing previously missing features, such as device authorization and LDAP IDP support, to make the new UI fully feature-complete.
+        With this release, 8.0 we are also focused on implementing previously missing features, such as device authorization and LDAP IDP support, to make the new UI fully feature-complete.
 
-        - [Hosted Login V2](http://localhost:3000/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta)
+        - [Hosted Login V2](../guides/integrate/login/hosted-login#hosted-login-version-2-beta)
     </details>
 
     <details>
-        <summary>Web Keys</summary>
+        <summary>Actions v2</summary>
 
-        Web Keys in ZITADEL are used to sign and verify JSON Web Tokens (JWT).
-        ID tokens are created, signed and returned by ZITADEL when a OpenID connect (OIDC) or OAuth2 authorization flow completes and a user is authenticated.
-        Based on customer and community feedback, we've updated our key management system. You now have full manual control over key generation and rotation, instead of the previous automatic process.
+        This API enables you to manage custom executions and targets—formerly known as actions—across your entire ZITADEL instance.
+        With Actions V2, you gain significantly more flexibility to tailor ZITADEL’s behavior compared to previous versions.
+        Actions are now available instance-wide, eliminating the need to configure them for each organization individually.
+        ZITADEL no longer restricts the implementation language, tooling, or runtime for action executions.
+        Instead, you define external endpoints that are called by ZITADEL and maintained by you. 
 
-        Read the full description about Web Keys in our [Documentation](https://zitadel.com/docs/guides/integrate/login/oidc/webkeys).
+        - [Actions V2](../apis/resources/action_service_v2)
+    </details>
+</details>
+
+<details>
+    <summary>Deprecated endpoints</summary>
+
+    <Deprecated/>
+
+    <details>
+        <summary>Organization Objects V1 > Users V1</summary>
+
+            - `AddMachineKey()`
+            - `AddMachineUser()`
+            - `AddPersonalAccessToken()`
+            - `BulkRemoveUserMetadata()`
+            - `BulkSetUserMetadata()`
+            - `GenerateMachineSecret()`
+            - `GetMachineKeyByIDs()`
+            - `GetOrgByDomainGlobal()`
+            - `GetPersonalAccessTokenByIDs()`
+            - `GetUserMetadata()`
+            - `ListAppKeys()`
+            - `ListMachineKeys()`
+            - `ListPersonalAccessTokens()`
+            - `ListUserMetadata()`
+            - `RemoveMachineKey()`
+            - `RemoveMachineSecret()`
+            - `RemovePersonalAccessToken()`
+            - `RemoveUserMetadata()`
+            - `SetUserMetadata()`
+            - `UpdateHumanPhone()`
+            - `UpdateMachine()`
+            - `UpdateUserName()`
     </details>
 
     <details>
-        <summary>SCIM 2.0 Server - User Resource</summary>
+        <summary>Projects V1</summary>
 
-        The Zitadel SCIM v2 service provider interface enables seamless integration of identity and access management (IAM) systems with Zitadel, following the System for Cross-domain Identity Management (SCIM) v2.0 specification.
-        This interface allows standardized management of IAM resources, making it easier to automate user provisioning and deprovisioning.
-
-        - [SCIM 2.0 API](https://zitadel.com/docs/apis/scim2)
-        - [Manage Users Guide](https://zitadel.com/docs/guides/manage/user/scim2)
+            - `AddProject()`
+            - `AddProjectGrant()`
+            - `AddProjectRole()`
+            - `BulkAddProjectRoles()`
+            - `DeactivateProject()`
+            - `DeactivateProjectGrant()`
+            - `GetGrantedProjectByID()`
+            - `GetProjectByID()`
+            - `GetProjectGrantByID()`
+            - `ListAllProjectGrants()`
+            - `ListGrantedProjectRoles()`
+            - `ListGrantedProjects()`
+            - `ListProjectGrants()`
+            - `ListProjectRoles()`
+            - `ListProjects()`
+            - `ReactivateProject()`
+            - `ReactivateProjectGrant()`
+            - `RemoveProject()`
+            - `RemoveProjectGrant()`
+            - `RemoveProjectRole()`
+            - `UpdateProject()`
+            - `UpdateProjectGrant()`
+            - `UpdateProjectRole()`
     </details>
 
     <details>
-        <summary>Caches</summary>
+        <summary>Members V1</summary>
 
-        ZITADEL supports the use of a caches to speed up the lookup of frequently needed objects.
-        As opposed to HTTP caches which might reside between ZITADEL and end-user applications, the cache build into ZITADEL uses active invalidation when an object gets updated.
-        Another difference is that HTTP caches only cache the result of a complete request and the built-in cache stores objects needed for the internal business logic.
-        For example, each request made to ZITADEL needs to retrieve and set instance information in middleware.
+            - `AddIAMMember()`
+            - `AddOrgMember()`
+            - `AddProjectGrantMember()`
+            - `AddProjectMember()`
+            - `ListIAMMembers()`
+            - `ListOrgMembers()`
+            - `ListProjectGrantMembers()`
+            - `ListProjectMembers()`
+            - `ListUserMemberships()`
+            - `RemoveIAMMember()`
+            - `RemoveOrgMember()`
+            - `RemoveProjectGrantMember()`
+            - `RemoveProjectMember()`
+            - `UpdateIAMMember()`
+            - `UpdateOrgMember()`
+            - `UpdateProjectGrantMember()`
+            - `UpdateProjectMember()`
+    </details>
 
-        Read more about Zitadel Caches [here](https://zitadel.com/docs/self-hosting/manage/cache)
+    <details>
+        <summary>Instance Lifecycle V1 > System Service V1</summary>
+
+            - `AddInstanceTrustedDomain()`
+            - `GetMyInstance()`
+            - `ListInstanceDomains()`
+            - `ListInstanceTrustedDomains()`
+            - `RemoveInstanceTrustedDomain()`
+
+    </details>
+
+    <details>
+        <summary>Instance Objects V1 > Organizations V1 </summary>
+
+            - `GetDefaultOrg()`
+            - `GetOrgByID()`
+            - `IsOrgUnique()`
     </details>
 </details>
 

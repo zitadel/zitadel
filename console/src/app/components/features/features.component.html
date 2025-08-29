@@ -13,7 +13,7 @@
   <p class="events-desc cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.FEATURES.DESCRIPTION' | translate }}</p>
 
   <ng-template cnslHasRole [hasRole]="['iam.restrictions.write']">
-    <button color="warn" (click)="resetFeatures()" mat-stroked-button>
+    <button color="warn" (click)="resetFeatures()" mat-stroked-button data-e2e="reset-features-button">
       {{ 'SETTING.FEATURES.RESET' | translate }}
     </button>
   </ng-template>
@@ -24,9 +24,9 @@
         *ngFor="let key of FEATURE_KEYS"
         [toggleStateKey]="key"
         [toggleState]="toggleStates[key]"
-        (toggleChange)="saveFeatures(key, $event)"
+        (toggleChange)="saveFeature(key, $event)"
       ></cnsl-feature-toggle>
-      <cnsl-login-v2-feature-toggle [toggleState]="toggleStates.loginV2" (toggleChanged)="saveFeatures('loginV2', $event)" />
+      <cnsl-login-v2-feature-toggle [toggleState]="toggleStates.loginV2" (toggleChanged)="saveFeature('loginV2', $event)" />
     </div>
   </cnsl-card>
 </div>

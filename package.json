@@ -1,0 +1,19 @@
+{
+  "packageManager": "pnpm@10.13.1",
+  "private": true,
+  "name": "zitadel-monorepo",
+  "scripts": {
+    "generate": "turbo run generate",
+    "changeset": "changeset",
+    "devcontainer:lint-unit": "FAIL_COMMANDS_ON_ERRORS=true devcontainer up --prebuild --config .devcontainer/turbo-lint-unit/devcontainer.json --workspace-folder .",
+    "devcontainer:integration:login": "FAIL_COMMANDS_ON_ERRORS=true devcontainer up --prebuild --config .devcontainer/login-integration/devcontainer.json --workspace-folder .",
+    "clean": "turbo run clean",
+    "clean:all": "pnpm run clean && rm -rf .turbo node_modules"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.5",
+    "@devcontainers/cli": "^0.80.0",
+    "sass": "^1.64.1",
+    "turbo": "2.5.5"
+  }
+}

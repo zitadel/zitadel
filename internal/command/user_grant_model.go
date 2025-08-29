@@ -1,6 +1,8 @@
 package command
 
 import (
+	"slices"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -87,23 +89,30 @@ func UserGrantAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Agg
 type UserGrantPreConditionReadModel struct {
 	eventstore.WriteModel
 
-	UserID               string
-	ProjectID            string
-	ProjectResourceOwner string
-	ProjectGrantID       string
-	ResourceOwner        string
-	UserExists           bool
-	ProjectExists        bool
-	ProjectGrantExists   bool
-	ExistingRoleKeys     []string
+	UserID                  string
+	ProjectID               string
+	ProjectResourceOwner    string
+	ProjectGrantID          string
+	FoundGrantID            string
+	ResourceOwner           string
+	UserExists              bool
+	ProjectExists           bool
+	ExistingRoleKeysProject []string
+	ExistingRoleKeysGrant   []string
 }
 
 func NewUserGrantPreConditionReadModel(userID, projectID, projectGrantID string, resourceOwner string) *UserGrantPreConditionReadModel {
 	return &UserGrantPreConditionReadModel{
-		UserID:         userID,
-		ProjectID:      projectID,
+		UserID:    userID,
+		ProjectID: projectID,
+		// ProjectGrantID can be empty, if grantedOrgID is in the resourceowner
 		ProjectGrantID: projectGrantID,
-		ResourceOwner:  resourceOwner,
+		// resourceowner is either empty to use the project organization
+		// or filled with the project organization
+		// or filled with the organization the project is granted to
+		ResourceOwner:           resourceOwner,
+		ExistingRoleKeysGrant:   make([]string, 0),
+		ExistingRoleKeysProject: make([]string, 0),
 	}
 }
 
@@ -119,49 +128,58 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 		case *user.UserRemovedEvent:
 			wm.UserExists = false
 		case *project.ProjectAddedEvent:
-			if wm.ResourceOwner == "" || wm.ResourceOwner == e.Aggregate().ResourceOwner {
+			if projectExistsOnOrganization(wm.ResourceOwner, e.Aggregate().ResourceOwner) {
 				wm.ProjectExists = true
 			}
+			// We store the organization of the project for later checks, e.g. in case of a project grant
 			wm.ProjectResourceOwner = e.Aggregate().ResourceOwner
 		case *project.ProjectRemovedEvent:
 			wm.ProjectExists = false
 		case *project.GrantAddedEvent:
-			if (wm.ProjectGrantID == e.GrantID || wm.ProjectGrantID == "") && wm.ResourceOwner != "" && wm.ResourceOwner == e.GrantedOrgID {
-				wm.ProjectGrantExists = true
-				wm.ExistingRoleKeys = e.RoleKeys
-				if wm.ProjectGrantID == "" {
-					wm.ProjectGrantID = e.GrantID
-				}
+			if projectGrantExistsOnOrganization(wm.ProjectGrantID, wm.ResourceOwner, e.GrantID, e.GrantedOrgID) {
+				wm.ExistingRoleKeysGrant = e.RoleKeys
+				wm.FoundGrantID = e.GrantID
 			}
 		case *project.GrantChangedEvent:
-			if wm.ProjectGrantID == e.GrantID {
-				wm.ExistingRoleKeys = e.RoleKeys
+			if wm.FoundGrantID == e.GrantID {
+				wm.ExistingRoleKeysGrant = e.RoleKeys
 			}
 		case *project.GrantRemovedEvent:
-			if wm.ProjectGrantID == e.GrantID {
-				wm.ProjectGrantExists = false
-				wm.ExistingRoleKeys = []string{}
+			if wm.FoundGrantID == e.GrantID {
+				wm.ExistingRoleKeysGrant = []string{}
+				wm.FoundGrantID = ""
 			}
 		case *project.RoleAddedEvent:
-			if wm.ProjectGrantID != "" {
-				continue
-			}
-			wm.ExistingRoleKeys = append(wm.ExistingRoleKeys, e.Key)
+			wm.ExistingRoleKeysProject = append(wm.ExistingRoleKeysProject, e.Key)
 		case *project.RoleRemovedEvent:
-			if wm.ProjectGrantID != "" {
-				continue
-			}
-			for i, key := range wm.ExistingRoleKeys {
-				if key == e.Key {
-					copy(wm.ExistingRoleKeys[i:], wm.ExistingRoleKeys[i+1:])
-					wm.ExistingRoleKeys[len(wm.ExistingRoleKeys)-1] = ""
-					wm.ExistingRoleKeys = wm.ExistingRoleKeys[:len(wm.ExistingRoleKeys)-1]
-					continue
-				}
-			}
+			wm.ExistingRoleKeysProject = slices.DeleteFunc(wm.ExistingRoleKeysProject, func(key string) bool {
+				return key == e.Key
+			})
 		}
 	}
 	return wm.WriteModel.Reduce()
+}
+
+func projectExistsOnOrganization(requiredOrganization, projectResourceOwner string) bool {
+	// Depending on the API, a request can either require a project to be part of a specific organization
+	// or not. In the former case, the project must belong to the required organization.
+	// In the latter case, it is sufficient that the project exists at all, since the user will be granted
+	// automatically in the organization the project belongs to.
+	return requiredOrganization == "" || requiredOrganization == projectResourceOwner
+}
+
+func projectGrantExistsOnOrganization(requiredGrantID, requiredOrganization, projectGrantID, grantedOrganization string) bool {
+	// Depending on the API, a request can either require a project grant (ID) and/or an organization (ID),
+	// where the project must be granted to.
+	return (requiredGrantID == "" || requiredGrantID == projectGrantID) &&
+		(requiredOrganization == "" || requiredOrganization == grantedOrganization)
+}
+
+func (wm *UserGrantPreConditionReadModel) existingRoles() []string {
+	if wm.FoundGrantID != "" {
+		return wm.ExistingRoleKeysGrant
+	}
+	return wm.ExistingRoleKeysProject
 }
 
 func (wm *UserGrantPreConditionReadModel) Query() *eventstore.SearchQueryBuilder {

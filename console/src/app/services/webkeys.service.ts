@@ -16,18 +16,18 @@ export class WebKeysService {
   constructor(private readonly grpcService: GrpcService) {}
 
   public ListWebKeys(): Promise<ListWebKeysResponse> {
-    return this.grpcService.webKey.listWebKeys({});
+    return this.grpcService.webKey['listWebKeys']({});
   }
 
   public DeleteWebKey(id: string): Promise<DeleteWebKeyResponse> {
-    return this.grpcService.webKey.deleteWebKey({ id });
+    return this.grpcService.webKey['deleteWebKey']({ id });
   }
 
   public CreateWebKey(req: MessageInitShape<typeof CreateWebKeyRequestSchema>): Promise<CreateWebKeyResponse> {
-    return this.grpcService.webKey.createWebKey(req);
+    return this.grpcService.webKey['createWebKey'](req);
   }
 
   public ActivateWebKey(id: string): Promise<ActivateWebKeyResponse> {
-    return this.grpcService.webKey.activateWebKey({ id });
+    return this.grpcService.webKey['activateWebKey']({ id });
   }
 }

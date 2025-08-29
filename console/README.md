@@ -1,27 +1,137 @@
-# Console
+# Console Angular App
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.20.
+This is the ZITADEL Console Angular application.
 
-## Development server
+## Development
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+### Prerequisites
 
-## Code scaffolding
+- Node.js 18 or later
+- pnpm (latest)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Installation
 
-## Build
+```bash
+pnpm install
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+### Proto Generation
 
-## Running unit tests
+The Console app uses **dual proto generation** with Turbo dependency management:
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+1. **`@zitadel/proto` generation**: Modern ES modules with `@bufbuild/protobuf` for v2 APIs
+2. **Local `buf.gen.yaml` generation**: Traditional protobuf JavaScript classes for v1 APIs
 
-## Running end-to-end tests
+The Console app's `turbo.json` ensures that `@zitadel/proto#generate` runs before the Console's own generation, providing both:
 
-Please refer to the [contributing guide](../CONTRIBUTING.md#console)
+- Modern schemas from `@zitadel/proto` (e.g., `UserSchema`, `DetailsSchema`)
+- Legacy classes from `src/app/proto/generated` (e.g., `User`, `Project`)
 
-## Further help
+Generated files:
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+- **`@zitadel/proto`**: Modern ES modules in `login/packages/zitadel-proto/`
+- **Local generation**: Traditional protobuf files in `src/app/proto/generated/`
+  - TypeScript definition files (`.d.ts`)
+  - JavaScript files (`.js`)
+  - gRPC client files (`*ServiceClientPb.ts`)
+  - OpenAPI/Swagger JSON files (`.swagger.json`)
+
+To generate proto files:
+
+```bash
+pnpm turbo generate --filter=./console
+```
+
+This automatically runs both generations in the correct order via Turbo dependencies.
+
+### Development Server
+
+To start the development server:
+
+```bash
+pnpm turbo start --filter=./console
+```
+
+This will:
+
+1. Fetch the environment configuration from the server
+2. Serve the app on the default port
+
+### Building
+
+To build for production:
+
+```bash
+pnpm turbo build --filter=./console
+```
+
+This will:
+
+1. Generate proto files (via `prebuild` script)
+2. Build the Angular app with production optimizations
+
+### Linting
+
+To run linting and formatting checks:
+
+```bash
+pnpm turbo lint --filter=./console
+```
+
+To auto-fix formatting issues:
+
+```bash
+pnpm turbo lint:fix --filter=./console
+```
+
+## Project Structure
+
+- `src/app/proto/generated/` - Generated proto files (Angular-specific format)
+- `buf.gen.yaml` - Local proto generation configuration
+- `turbo.json` - Turbo dependency configuration for proto generation
+- `prebuild.development.js` - Development environment configuration script
+
+## Proto Generation Details
+
+The Console app uses **dual proto generation** managed by Turbo dependencies:
+
+### Dependency Chain
+
+The Console app has the following build dependencies managed by Turbo:
+
+1. `@zitadel/proto#generate` - Generates modern protobuf files
+2. `@zitadel/client#build` - Builds the TypeScript gRPC client library
+3. `console#generate` - Generates Console-specific protobuf files
+4. `console#build` - Builds the Angular application
+
+This ensures that the Console always has access to the latest client library and protobuf definitions.
+
+### Legacy v1 API (Traditional Protobuf)
+
+- Uses local `buf.gen.yaml` configuration
+- Generates traditional Google protobuf JavaScript classes extending `jspb.Message`
+- Uses plugins: `protocolbuffers/js`, `grpc/web`, `grpc-ecosystem/openapiv2`
+- Output: `src/app/proto/generated/`
+- Used for: Most existing Console functionality
+
+### Modern v2 API (ES Modules)
+
+- Uses `@zitadel/proto` package generation
+- Generates modern ES modules with `@bufbuild/protobuf`
+- Uses plugin: `@bufbuild/es` with ES modules and JSON types
+- Output: `login/packages/zitadel-proto/`
+- Used for: New user v2 API and services
+
+### Dependency Management
+
+The Console's `turbo.json` ensures proper execution order:
+
+1. `@zitadel/proto#generate` runs first (modern ES modules)
+2. Console's local generation runs second (traditional protobuf)
+3. Build/lint/start tasks depend on both generations being complete
+
+This approach allows the Console app to use both v1 and v2 APIs while maintaining proper build dependencies.
+
+## Legacy Information
+
+This project was originally generated with Angular CLI version 8.3.20 and has been updated over time.

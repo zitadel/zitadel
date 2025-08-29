@@ -1544,7 +1544,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1633,8 +1634,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Ако флагът е активиран, ще можете да прекратите единична сесия от UI за вход, като предоставите id_token с `sid` претенция като id_token_hint на крайната точка на end_session. Имайте предвид, че в момента всички сесии от същия потребителски агент (браузър) се прекратяват в UI за вход. Сесиите, управлявани чрез API на сесията, вече позволяват прекратяването на единични сесии.",
       "DEBUGOIDCPARENTERROR": "Отстраняване на грешки на OIDC родителя",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Ако флагът е активиран, грешката на OIDC родителя ще бъде записана в конзолата.",
-      "DISABLEUSERTOKENEVENT": "Деактивиране на събитие за потребителски токен",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Активиране на Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout имплементира OpenID Connect Back-Channel Logout 1.0 и може да се използва за уведомяване на клиентите за прекратяване на сесията при OpenID доставчика.",
       "PERMISSIONCHECKV2": "Проверка на разрешения V2",
@@ -1793,7 +1792,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "Проверката на имейл е извършена",
@@ -2743,7 +2743,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Добавяне на мениджър",
