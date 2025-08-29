@@ -1,11 +1,10 @@
-import { MediaMatcher } from '@angular/cdk/layout';
-import { Component, DestroyRef, EventEmitter, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, OnInit, signal } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
-import { defer, EMPTY, mergeWith, Observable, of, shareReplay, Subject, switchMap, take } from 'rxjs';
+import { defer, EMPTY, Observable, of, shareReplay, Subject, switchMap, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoDialogComponent } from 'src/app/modules/info-dialog/info-dialog.component';
@@ -34,8 +33,7 @@ import { Metadata } from '@zitadel/proto/zitadel/metadata_pb';
 import { UserService } from 'src/app/services/user.service';
 import { LoginPolicy } from '@zitadel/proto/zitadel/policy_pb';
 import { query } from '@angular/animations';
-
-type UserQuery = { state: 'success'; value: User } | { state: 'error'; error: any } | { state: 'loading'; value?: User };
+import { QueryClient } from '@tanstack/angular-query-experimental';
 
 type MetadataQuery =
   | { state: 'success'; value: Metadata[] }
@@ -57,7 +55,6 @@ export class AuthUserDetailComponent implements OnInit {
   protected readonly UserState = UserState;
 
   protected USERGRANTCONTEXT: UserGrantContext = UserGrantContext.AUTHUSER;
-  protected readonly refreshChanges$: EventEmitter<void> = new EventEmitter();
   protected readonly refreshMetadata$ = new Subject<true>();
 
   protected readonly settingsList: SidenavSetting[] = [
@@ -72,12 +69,25 @@ export class AuthUserDetailComponent implements OnInit {
       requiredRoles: { [PolicyComponentServiceType.MGMT]: ['user.read'] },
     },
   ];
-  protected readonly user$: Observable<UserQuery>;
   protected readonly metadata$: Observable<MetadataQuery>;
-  private readonly savedLanguage$: Observable<string>;
   protected readonly currentSetting$ = signal<SidenavSetting>(this.settingsList[0]);
   protected readonly loginPolicy$: Observable<LoginPolicy>;
-  protected readonly userName$: Observable<string>;
+  protected readonly user = this.userService.userQuery();
+  protected readonly refreshChanges$ = new Subject<void>();
+
+  protected readonly userName = computed(() => {
+    const user = this.user.data();
+    if (!user) {
+      return '';
+    }
+    if (user.type.case === 'human') {
+      return user.type.value.profile?.displayName ?? '';
+    }
+    if (user.type.case === 'machine') {
+      return user.type.value.name;
+    }
+    return '';
+  });
 
   constructor(
     private translate: TranslateService,
@@ -92,11 +102,8 @@ export class AuthUserDetailComponent implements OnInit {
     private readonly newMgmtService: NewMgmtService,
     private readonly userService: UserService,
     private readonly destroyRef: DestroyRef,
-    private readonly router: Router,
+    private readonly queryClient: QueryClient,
   ) {
-    this.user$ = this.getUser$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.userName$ = this.getUserName(this.user$);
-    this.savedLanguage$ = this.getSavedLanguage$(this.user$);
     this.metadata$ = this.getMetadata$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
 
     this.loginPolicy$ = defer(() => this.newMgmtService.getLoginPolicy()).pipe(
@@ -104,60 +111,39 @@ export class AuthUserDetailComponent implements OnInit {
       map(({ policy }) => policy),
       filter(Boolean),
     );
-  }
 
-  getUserName(user$: Observable<UserQuery>) {
-    return user$.pipe(
-      map((query) => {
-        const user = this.user(query);
-        if (!user) {
-          return '';
+    effect(
+      () => {
+        const user = this.user.data();
+        if (!user || user.type.case !== 'human') {
+          return;
         }
-        if (user.type.case === 'human') {
-          return user.type.value.profile?.displayName ?? '';
-        }
-        if (user.type.case === 'machine') {
-          return user.type.value.name;
-        }
-        return '';
-      }),
-    );
-  }
 
-  getSavedLanguage$(user$: Observable<UserQuery>) {
-    return user$.pipe(
-      switchMap((query) => {
-        if (query.state !== 'success' || query.value.type.case !== 'human') {
-          return EMPTY;
-        }
-        return query.value.type.value.profile?.preferredLanguage ?? EMPTY;
-      }),
-      startWith(this.translate.defaultLang),
-    );
-  }
-
-  ngOnInit(): void {
-    this.user$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((query) => {
-      if ((query.state === 'loading' || query.state === 'success') && query.value?.type.case === 'human') {
         this.breadcrumbService.setBreadcrumb([
           new Breadcrumb({
             type: BreadcrumbType.AUTHUSER,
-            name: query.value.type.value.profile?.displayName,
+            name: user.type.value.profile?.displayName,
             routerLink: ['/users', 'me'],
           }),
         ]);
+      },
+      { allowSignalWrites: true },
+    );
+
+    effect(() => {
+      const error = this.user.error();
+      if (error) {
+        this.toast.showError(error);
       }
     });
+  }
 
-    this.user$.pipe(mergeWith(this.metadata$), takeUntilDestroyed(this.destroyRef)).subscribe((query) => {
+  ngOnInit(): void {
+    this.metadata$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((query) => {
       if (query.state == 'error') {
         this.toast.showError(query.error);
       }
     });
-
-    this.savedLanguage$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((savedLanguage) => this.translate.use(savedLanguage));
 
     const param = this.route.snapshot.queryParamMap.get('id');
     if (!param) {
@@ -168,28 +154,6 @@ export class AuthUserDetailComponent implements OnInit {
       return;
     }
     this.currentSetting$.set(setting);
-  }
-
-  private getUser$(): Observable<UserQuery> {
-    return this.refreshChanges$.pipe(
-      startWith(true),
-      switchMap(() => this.getMyUser()),
-      pairwiseStartWith(undefined),
-      map(([prev, curr]) => {
-        if (prev?.state === 'success' && curr.state === 'loading') {
-          return { state: 'loading', value: prev.value } as const;
-        }
-        return curr;
-      }),
-    );
-  }
-
-  private getMyUser(): Observable<UserQuery> {
-    return this.userService.user$.pipe(
-      map((user) => ({ state: 'success' as const, value: user })),
-      catchError((error) => of({ state: 'error', error } as const)),
-      startWith({ state: 'loading' } as const),
-    );
   }
 
   getMetadata$(): Observable<MetadataQuery> {
@@ -214,7 +178,14 @@ export class AuthUserDetailComponent implements OnInit {
     );
   }
 
-  public changeUsername(user: User): void {
+  protected invalidateUser() {
+    this.refreshChanges$.next();
+    return this.queryClient.invalidateQueries({
+      queryKey: this.userService.userQueryOptions().queryKey,
+    });
+  }
+
+  protected changeUsername(user: User): void {
     const data = {
       confirmKey: 'ACTIONS.CHANGE' as const,
       cancelKey: 'ACTIONS.CANCEL' as const,
@@ -239,7 +210,7 @@ export class AuthUserDetailComponent implements OnInit {
       .subscribe({
         next: () => {
           this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
-          this.refreshChanges$.emit();
+          this.invalidateUser().then();
         },
         error: (error) => {
           this.toast.showError(error);
@@ -262,7 +233,7 @@ export class AuthUserDetailComponent implements OnInit {
       })
       .then(() => {
         this.toast.showInfo('USER.TOAST.SAVED', true);
-        this.refreshChanges$.emit();
+        this.invalidateUser().then();
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -274,7 +245,7 @@ export class AuthUserDetailComponent implements OnInit {
       .verifyMyPhone(code)
       .then(() => {
         this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-        this.refreshChanges$.emit();
+        this.invalidateUser().then();
         this.promptSetupforSMSOTP();
       })
       .catch((error) => {
@@ -315,7 +286,7 @@ export class AuthUserDetailComponent implements OnInit {
       .resendHumanEmailVerification(user.userId)
       .then(() => {
         this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
-        this.refreshChanges$.emit();
+        this.invalidateUser().then();
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -327,7 +298,7 @@ export class AuthUserDetailComponent implements OnInit {
       .resendHumanPhoneVerification(user.userId)
       .then(() => {
         this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
-        this.refreshChanges$.emit();
+        this.invalidateUser().then();
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -339,7 +310,7 @@ export class AuthUserDetailComponent implements OnInit {
       .removePhone(user.userId)
       .then(() => {
         this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
-        this.refreshChanges$.emit();
+        this.invalidateUser().then();
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -388,7 +359,7 @@ export class AuthUserDetailComponent implements OnInit {
       .subscribe({
         next: () => {
           this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
-          this.refreshChanges$.emit();
+          this.invalidateUser().then();
         },
         error: (error) => this.toast.showError(error),
       });
@@ -420,7 +391,7 @@ export class AuthUserDetailComponent implements OnInit {
       .subscribe({
         next: () => {
           this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-          this.refreshChanges$.emit();
+          this.invalidateUser().then();
         },
         error: (error) => {
           this.toast.showError(error);
@@ -482,24 +453,7 @@ export class AuthUserDetailComponent implements OnInit {
 
   protected readonly query = query;
 
-  protected user(user: UserQuery): User | undefined {
-    if (user.state === 'success' || user.state === 'loading') {
-      return user.value;
-    }
-    return;
-  }
-
-  public async goToSetting(setting: string) {
-    await this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { id: setting },
-      queryParamsHandling: 'merge',
-      skipLocationChange: true,
-    });
-  }
-
-  public humanUser(userQuery: UserQuery): UserWithHumanType | undefined {
-    const user = this.user(userQuery);
+  public humanUser(user: User | undefined): UserWithHumanType | undefined {
     if (user?.type.case === 'human') {
       return { ...user, type: user.type };
     }
