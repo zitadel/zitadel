@@ -4,12 +4,12 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { AuthFactorState } from 'src/app/proto/generated/zitadel/user_pb';
 import { NewAuthService } from 'src/app/services/new-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { AddAuthFactorDialogData, AuthFactorDialogComponent } from '../auth-factor-dialog/auth-factor-dialog.component';
-import { AuthFactor } from '@zitadel/proto/zitadel/user_pb';
+import { AuthFactor, AuthFactorState } from '@zitadel/proto/zitadel/user_pb';
 import { SecondFactorType } from '@zitadel/proto/zitadel/policy_pb';
+
 export interface WebAuthNOptions {
   challenge: string;
   rp: { name: string; id: string };
@@ -33,8 +33,8 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   @ViewChild(MatTable) public table!: MatTable<AuthFactor>;
   @ViewChild(MatSort) public sort!: MatSort;
   @Input() public phoneVerified: boolean = false;
-  public AuthFactorState: any = AuthFactorState;
-  public dataSource: MatTableDataSource<AuthFactor> = new MatTableDataSource<AuthFactor>([]);
+  protected readonly AuthFactorState = AuthFactorState;
+  protected dataSource: MatTableDataSource<AuthFactor> = new MatTableDataSource<AuthFactor>([]);
 
   protected error: string = '';
 
@@ -193,5 +193,12 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     subject: BehaviorSubject<boolean>,
   ): void {
     subject.next(factors.some((f) => f === factor));
+  }
+
+  protected mfaName(factor: AuthFactor): string | undefined {
+    if (factor.type.value && 'name' in factor.type.value) {
+      return factor.type.value.name;
+    }
+    return undefined;
   }
 }
