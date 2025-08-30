@@ -42,17 +42,15 @@
   },  
   "targets": {
     "build": {
-      "cache": true,
+      "cache": false,
       "dependsOn": [
         "^build"
       ],
       "inputs": [
         "default",
-        "!{projectRoot}/.next/cache/**/*"
+        "!{projectRoot}/.next/**/*"
       ],
       "outputs": [
-        "{projectRoot}/.next/**/*",
-        "!{projectRoot}/.next/cache/**/*",
         "{projectRoot}/dist/**/*"
       ]
     },
