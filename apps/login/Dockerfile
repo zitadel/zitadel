@@ -5,9 +5,7 @@ RUN addgroup --system --gid 1001 nodejs && \
 # If /.env-file/.env is mounted into the container, its variables are made available to the server before it starts up.
 RUN mkdir -p /.env-file && touch /.env-file/.env && chown -R nextjs:nodejs /.env-file
 
-COPY --chown=nextjs:nodejs .next/standalone scripts ./
-COPY --chown=nextjs:nodejs .next/static ./.next/static
-COPY --chown=nextjs:nodejs public ./public
+COPY --chown=nextjs:nodejs dist ./
 
 # Debug the final structure
 USER nextjs

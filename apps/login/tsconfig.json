@@ -38,6 +38,7 @@
   "exclude": [
     "node_modules",
     "integration",
-    "acceptance"
+    "acceptance",
+    "dist"
   ]
 }
