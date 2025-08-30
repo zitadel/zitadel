@@ -42,18 +42,18 @@
   },  
   "targets": {
     "build": {
-      "cache": false,
+      "cache": true,
       "dependsOn": [
         "^build"
       ],
       "inputs": [
         "default",
-        "envVars",
-        "!{projectRoot}/.next/**/*",
-        "!{projectRoot}/.next"
+        "!{projectRoot}/.next/cache/**/*"
       ],
       "outputs": [
-        "{projectRoot}/.next/standalone/**/*"
+        "{projectRoot}/.next/**/*",
+        "!{projectRoot}/.next/cache/**/*",
+        "{projectRoot}/dist/**/*"
       ]
     },
     "build:docker": {
@@ -61,9 +61,7 @@
         "build"
       ],
       "inputs": [
-        "docker",
-        "{projectRoot}/public/**/*",
-        "{projectRoot}/scripts/**/*"
+        "docker"
       ]
     },
     "build:bake": {
