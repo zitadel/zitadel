@@ -62,27 +62,6 @@
         "docker"
       ]
     },
-    "build:bake": {
-      "dependsOn": [
-        "build"
-      ],
-      "inputs": [
-        "docker",
-        "{projectRoot}/public/**/*",
-        "{projectRoot}/scripts/**/*",
-        "{projectRoot}/docker-bake.hcl",
-        "{projectRoot}/docker-bake-release.hcl",
-        "{workspaceRoot}/docker-bake.hcl",
-        {
-          "env": "META_ACTION_BAKE_FILE"
-        }
-      ],
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{projectRoot}",
-        "command": "docker buildx bake --file docker-bake.hcl --file docker-bake-release.hcl"
-      }
-    },
     "start:integration": {
       "continuous": true,
       "cache": false,
@@ -134,5 +113,11 @@
         "{projectRoot}/cypress/**/*"
       ]
     }
-  }
+  },
+  "release": {
+    "docker": {
+      "preVersionCommand": "nx build:docker login",
+      "repositoryName": "login"
+    }
+  }  
 }

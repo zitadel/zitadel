@@ -69,4 +69,5 @@ jobs:
           # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
-      - run: pnpm nx build:bake login --file cwd://${{ steps.login-meta.outputs.bake-file }} --push
+      - run: pnpm add -g nx
+      - run: nx release build:bake login --file cwd://${{ steps.login-meta.outputs.bake-file }} --push
