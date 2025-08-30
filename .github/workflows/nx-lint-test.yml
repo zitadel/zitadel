@@ -7,9 +7,6 @@ on:
         required: true
         type: string
 
-permissions:
-  packages: write
-
 jobs:
   nx-lint-test:
     name: nx-lint-test

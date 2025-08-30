@@ -95,8 +95,8 @@ jobs:
       build_image_name_core: "ghcr.io/zitadel/zitadel-build"
       build_image_name_login: "ghcr.io/zitadel/zitadel-login-build"
 
-  login-integration-test:
-    uses: ./.github/workflows/login-integration-test.yml
+  nx-lint-test:
+    uses: ./.github/workflows/nx-lint-test.yml
     with:
       node_version: "22"
 
@@ -117,8 +117,8 @@ jobs:
         core-unit-test,
         core-integration-test,
         lint,
+        nx-lint-test,
         container,
-        login-integration-test,
         e2e,
       ]
     if: ${{ github.event_name == 'workflow_dispatch' }}
