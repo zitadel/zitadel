@@ -1,0 +1,10 @@
+{
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "name": "@zitadel/core",
+    "release": {
+        "docker": {
+            "preVersionCommand": "nx build:docker core",
+            "repositoryName": "core"
+        }
+    }
+}

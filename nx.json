@@ -1,0 +1,80 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "default": [
+      "{workspaceRoot}/pnpm-lock.yaml",
+      "{projectRoot}/**/*",
+      "!{projectRoot}/node_modules/**/*",
+      "!{projectRoot}/Dockerfile",
+      "!{projectRoot}/.dockerignore"
+    ],
+    "docker": [
+      "{projectRoot}/Dockerfile",
+      "{projectRoot}/.dockerignore"
+    ]
+  },
+  "targetDefaults": {
+    "generate": {
+      "cache": true
+    },
+    "build": {
+      "cache": true,
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
+    },
+    "start": {
+      "cache": false,
+      "continuous": true,
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "dev": {
+      "cache": false
+    },
+    "lint": {
+      "cache": true
+    },
+    "lint:fix": {
+      "cache": true
+    },
+    "test": {
+      "cache": true
+    },
+    "clean": {
+      "cache": false
+    }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/docker",
+      "options": {
+        "buildTarget": "build:docker",
+        "runTarget": "start:docker"
+      }
+    }
+  ],
+  "release": {
+    "releaseTagPattern": "release/{projectName}/{version}",
+    "docker": {
+      "skipVersionActions": true,
+      "registryUrl": "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
+    },
+    "groups": {
+      "qa": {
+        "projects": ["@zitadel/login", "@zitadel/core"],
+        "projectsRelationship": "fixed",
+        "changelog": {
+          "projectChangelogs": true
+        },
+        "docker": {
+          "versionSchemes": {
+            "qa": "{currentDate|YYMM.DD}-qa.{shortCommitSha}"
+          }                
+        }
+      } 
+    }
+  }
+}

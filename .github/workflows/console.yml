@@ -44,8 +44,8 @@ jobs:
         name: Install dependencies
         run: pnpm install --frozen-lockfile
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        name: Build console with Turbo
-        run: pnpm turbo build --filter=./console
+        name: Build console with Nx
+        run: pnpm nx run console:build
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:

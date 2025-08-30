@@ -1,29 +1,28 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "extends": ["//"],
-  "tasks": {
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "targets": {
     "generate": {
       "dependsOn": ["^generate"],
-      "outputs": ["docs/api/**", "docs/self-hosting/manage/configure/*.yaml"],
+      "outputs": ["{projectRoot}/docs/api/**/*", "{projectRoot}/docs/self-hosting/manage/configure/*.yaml"],
       "cache": true
     },
     "generate:grpc": {
       "dependsOn": ["^generate"],
-      "outputs": ["docs/api/**"],
+      "outputs": ["{projectRoot}/docs/api/**/*"],
       "cache": true
     },
     "generate:apidocs": {
       "dependsOn": ["generate:grpc"],
-      "outputs": ["docs/api/**"],
+      "outputs": ["{projectRoot}/docs/api/**/*"],
       "cache": true
     },
     "generate:configdocs": {
-      "outputs": ["docs/self-hosting/manage/configure/*.yaml"],
+      "outputs": ["{projectRoot}/docs/self-hosting/manage/configure/*.yaml"],
       "cache": true
     },
     "build": {
       "dependsOn": ["generate"],
-      "outputs": ["build/**"],
+      "outputs": ["{projectRoot}/build/**/*"],
       "cache": true
     },
     "dev": {

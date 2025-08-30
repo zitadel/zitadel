@@ -1,0 +1,123 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "namedInputs": {
+    "envVars": [
+      {
+        "env": "DEBUG"
+      },
+      {
+        "env": "EMAIL_VERIFICATION"
+      },
+      {
+        "env": "AUDIENCE"
+      },
+      {
+        "env": "SYSTEM_USER_ID"
+      },
+      {
+        "env": "SYSTEM_USER_PRIVATE_KEY"
+      },
+      {
+        "env": "ZITADEL_API_URL"
+      },
+      {
+        "env": "ZITADEL_SERVICE_USER_TOKEN"
+      },
+      {
+        "env": "NEXT_PUBLIC_BASE_PATH"
+      },
+      {
+        "env": "CUSTOM_REQUEST_HEADERS"
+      },
+      {
+        "env": "NODE_ENV"
+      },
+      {
+        "env": "PORT"
+      },
+      {
+        "env": "INKEEP_API_KEY"
+      }
+    ]    
+  },  
+  "targets": {
+    "build": {
+      "cache": false,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "!{projectRoot}/.next/**/*"
+      ],
+      "outputs": [
+        "{projectRoot}/dist/**/*"
+      ]
+    },
+    "build:docker": {
+      "dependsOn": [
+        "build"
+      ],
+      "inputs": [
+        "docker"
+      ]
+    },
+    "start:integration": {
+      "continuous": true,
+      "cache": false,
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "start:docker": {
+      "continuous": true,
+      "options": {
+        "args": [
+          "--publish",
+          "3000:3000"
+        ]
+      }
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false,
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "test": {
+      "dependsOn": [
+        "test:unit",
+        "test:integration"
+      ]
+    },
+    "test:unit": {
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "test:integration": {
+      "cache": true,
+      "dependsOn": [
+        "@zitadel/core-mock:start:docker",
+        "build",
+        "start:integration"
+      ],
+      "inputs": [
+        "{projectRoot}/integration/integration/**",
+        "{projectRoot}/integration/support/**",
+        "{projectRoot}/cypress.config.ts"
+      ],
+      "outputs": [
+        "{projectRoot}/cypress/**/*"
+      ]
+    }
+  },
+  "release": {
+    "docker": {
+      "preVersionCommand": "nx build:docker login",
+      "repositoryName": "login"
+    }
+  }  
+}

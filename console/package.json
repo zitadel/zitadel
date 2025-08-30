@@ -1,5 +1,5 @@
 {
-  "name": "console",
+  "name": "@zitadel/console",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -11,7 +11,7 @@
     "lint:check:prettier": "prettier --check src",
     "lint:fix": "prettier --write src",
     "generate": "pnpm exec buf generate ../proto --include-imports --include-wkt",
-    "clean": "rm -rf dist .angular .turbo node_modules src/app/proto/generated"
+    "clean": "rm -rf dist .angular .nx node_modules src/app/proto/generated"
   },
   "private": true,
   "dependencies": {
@@ -38,8 +38,6 @@
     "@ng-icons/heroicons": "^25.0.0",
     "@ngx-translate/core": "^15.0.0",
     "@tanstack/angular-query-experimental": "^5.85.5",
-    "@zitadel/client": "workspace:*",
-    "@zitadel/proto": "workspace:*",
     "angular-oauth2-oidc": "^15.0.1",
     "angularx-qrcode": "^16.0.2",
     "buffer": "^6.0.3",
@@ -62,6 +60,8 @@
     "zone.js": "~0.13.3"
   },
   "devDependencies": {
+    "@zitadel/client": "workspace:*",
+    "@zitadel/proto": "workspace:*",
     "@angular-devkit/build-angular": "^16.2.2",
     "@angular-eslint/builder": "18.3.0",
     "@angular-eslint/eslint-plugin": "18.0.0",

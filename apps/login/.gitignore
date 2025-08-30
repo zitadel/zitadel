@@ -6,7 +6,6 @@ cypress
 
 .DS_Store
 node_modules
-.turbo
 *.log
 .next
 dist
@@ -14,3 +13,4 @@ dist-ssr
 *.local
 .vscode
 /blob-report/
+.docker-dist

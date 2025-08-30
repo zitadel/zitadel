@@ -2,7 +2,7 @@
 
 This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.
 
-The documentation is part of the ZITADEL monorepo and uses **pnpm** and **Turbo** for development and build processes.
+The documentation is part of the ZITADEL monorepo and uses **pnpm** and **Nx** for development and build processes.
 
 ## Quick Start
 
@@ -10,8 +10,8 @@ The documentation is part of the ZITADEL monorepo and uses **pnpm** and **Turbo*
 # From the repository root
 pnpm install
 
-# Start development server (with Turbo)
-pnpm turbo dev --filter=zitadel-docs
+# Start development server (with Nx)
+pnpm nx run docs:dev
 
 # Or start directly from docs directory
 cd docs && pnpm start
@@ -21,20 +21,20 @@ The site will be available at http://localhost:3000
 
 ## Available Scripts
 
-All scripts can be run from the repository root using Turbo:
+All scripts can be run from the repository root using Nx:
 
 ```bash
 # Development server with live reload
-pnpm turbo dev --filter=zitadel-docs
+pnpm nx run docs:dev
 
 # Build for production
-pnpm turbo build --filter=zitadel-docs
+pnpm nx run docs:build
 
 # Generate API documentation and configuration docs
-pnpm turbo generate --filter=zitadel-docs
+pnpm nx run docs:generate
 
 # Lint and fix code
-pnpm turbo lint --filter=zitadel-docs
+pnpm nx run docs:lint
 
 # Serve production build locally
 cd docs && pnpm serve
