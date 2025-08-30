@@ -3,12 +3,20 @@ name: Container
 on:
   workflow_call:
     inputs:
-      build_image_name:
+      build_image_name_core:
         required: true
         type: string
+      build_image_name_login:
+        required: true
+        type: string
+      node_version:
+        required: true
+        type: string        
     outputs:
-      build_image:
-        value: '${{ inputs.build_image_name }}:${{ github.sha }}'
+      build_image_core:
+        value: '${{ inputs.build_image_name_core }}:${{ github.sha }}'
+      build_image_login:
+        value: '${{ inputs.build_image_name_login }}:${{ github.sha }}'
 
 permissions:
   packages: write
@@ -34,7 +42,7 @@ jobs:
         id: scratch-meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ inputs.build_image_name }}
+          images: ${{ inputs.build_image_name_core }}
           labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=,format=long
@@ -43,10 +51,19 @@ jobs:
         id: debug-meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ inputs.build_image_name }}
+          images: ${{ inputs.build_image_name_core }}
           labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=-debug,format=long
+      -
+        name: Debug meta
+        id: login-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ inputs.build_image_name_login }}
+          labels: ${{ env.default_labels}}
+          tags: |
+            type=sha,prefix=,suffix=,format=long
       - 
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -70,6 +87,31 @@ jobs:
         run: |
           tar -xvf .artifacts/zitadel-linux-${{ matrix.arch }}.tar.gz
           mv zitadel-linux-${{ matrix.arch }}/zitadel ./zitadel
+      - 
+        name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - 
+        name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: "pnpm"
+      - 
+        name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - 
+        name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/apps/login/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('apps/login/**/*.js', 'apps/login/**/*.jsx', 'apps/login/**/*.ts', 'apps/login/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
+      - 
+        name: Build Login
+        run: nx build login
       - 
         name: Debug
         id: build-debug
@@ -100,6 +142,19 @@ jobs:
           push: true
           labels: ${{ steps.scratch-meta.outputs.labels }}
           outputs: type=image,name=${{ inputs.build_image_name }},push-by-digest=true,name-canonical=true,push=true
+      - 
+        name: Login
+        id: build-login
+        uses: docker/build-push-action@v6
+        timeout-minutes: 3
+        with:
+          context: apps/login
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/${{ matrix.arch }}
+          push: true
+          labels: ${{ steps.login-meta.outputs.labels }}
+          outputs: type=image,name=${{ inputs.build_image_name_login }},push-by-digest=true,name-canonical=true,push=true
       -
         name: Export debug digest
         run: |
@@ -112,6 +167,12 @@ jobs:
           mkdir -p /tmp/digests/scratch
           digest="${{ steps.build-scratch.outputs.digest }}"
           touch "/tmp/digests/scratch/${digest#sha256:}"
+      -
+        name: Export login digest
+        run: |
+          mkdir -p /tmp/digests/login
+          digest="${{ steps.build-login.outputs.digest }}"
+          touch "/tmp/digests/login/${digest#sha256:}"
       -
         name: Upload digest
         uses: actions/upload-artifact@v4
@@ -128,12 +189,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [scratch, debug]
+        image: [scratch, debug, login]
         include:
           - image: scratch
             suffix: ''
+            build_image_name: ${{ inputs.build_image_name_core }}
           - image: debug
             suffix: '-debug'
+            build_image_name: ${{ inputs.build_image_name_core }}
+          - image: login
+            suffix: ''
+            build_image_name: ${{ inputs.build_image_name_login }}
     steps:
       -
         name: Download digests
@@ -157,7 +223,7 @@ jobs:
         id: build-meta
         uses: docker/metadata-action@v5
         with:
-          images: '${{ inputs.build_image_name }}'
+          images: '${{ matrix.build_image_name }}'
           tags: |
             type=sha,prefix=,suffix=${{ matrix.suffix }},format=long
       -
@@ -165,9 +231,9 @@ jobs:
         working-directory: /tmp/digests/${{ matrix.image }}
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< '${{ steps.build-meta.outputs.json }}') \
-            $(printf '${{ inputs.build_image_name }}@sha256:%s ' *)
+            $(printf '${{ matrix.build_image_name }}@sha256:%s ' *)
       -
         name: Inspect build image
         run: |
-          docker buildx imagetools inspect ${{ inputs.build_image_name }}:${{ github.sha }}${{ matrix.suffix }}
+          docker buildx imagetools inspect ${{ matrix.build_image_name }}:${{ github.sha }}${{ matrix.suffix }}
 

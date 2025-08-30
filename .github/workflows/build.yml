@@ -91,21 +91,13 @@ jobs:
       packages: write
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
-      build_image_name: "ghcr.io/zitadel/zitadel-build"
-
-  login-container:
-    uses: ./.github/workflows/login-container.yml
-    permissions:
-      packages: write
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    with:
-      login_build_image_name: "ghcr.io/zitadel/zitadel-login-build"
       node_version: "22"
+      build_image_name_core: "ghcr.io/zitadel/zitadel-build"
+      build_image_name_login: "ghcr.io/zitadel/zitadel-login-build"
 
   login-integration-test:
     uses: ./.github/workflows/login-integration-test.yml
     with:
-      login_build_image: ${{ needs.login-container.outputs.login_build_image }}
       node_version: "22"
 
   e2e:
@@ -126,7 +118,6 @@ jobs:
         core-integration-test,
         lint,
         container,
-        login-container,
         login-integration-test,
         e2e,
       ]
@@ -136,10 +127,10 @@ jobs:
       APP_ID: ${{ secrets.APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
     with:
-      build_image_name: ${{ needs.container.outputs.build_image }}
+      build_image_name: ${{ needs.container.outputs.build_image_core }}
       semantic_version: "23.0.7"
       image_name: "ghcr.io/zitadel/zitadel"
       google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      build_image_name_login: ${{ needs.login-container.outputs.login_build_image }}
+      build_image_name_login: ${{ needs.container.outputs.build_image_login }}
       image_name_login: "ghcr.io/zitadel/zitadel-login"
       google_image_name_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"

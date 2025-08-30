@@ -113,11 +113,5 @@
         "{projectRoot}/cypress/**/*"
       ]
     }
-  },
-  "release": {
-    "docker": {
-      "preVersionCommand": "nx build:docker login",
-      "repositoryName": "login"
-    }
   }  
 }

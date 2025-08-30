@@ -55,26 +55,5 @@
         "runTarget": "start:docker"
       }
     }
-  ],
-  "release": {
-    "releaseTagPattern": "release/{projectName}/{version}",
-    "docker": {
-      "skipVersionActions": true,
-      "registryUrl": "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-    },
-    "groups": {
-      "qa": {
-        "projects": ["@zitadel/login", "@zitadel/core"],
-        "projectsRelationship": "fixed",
-        "changelog": {
-          "projectChangelogs": true
-        },
-        "docker": {
-          "versionSchemes": {
-            "qa": "{currentDate|YYMM.DD}-qa.{shortCommitSha}"
-          }                
-        }
-      } 
-    }
-  }
+  ]
 }
