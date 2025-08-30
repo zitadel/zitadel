@@ -11,12 +11,15 @@ permissions:
   packages: write
 
 jobs:
-  login-integration-test:
-    name: login-integration-test
+  nx-lint-test:
+    name: nx-lint-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          filter: tree:0
+          fetch-depth: 0
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -38,5 +41,6 @@ jobs:
       - name: Install Cypress binary
         run: pnpm cypress install
         working-directory: apps/login
-      - name: Run Integration Tests against the Login and a Mocked Zitadel API
-        run: pnpm nx test:integration login
+      - uses: nrwl/nx-set-shas@v4
+      - name: Lint and Unit Test All JavaScript Code
+        run: "pnpm nx affected --targets ${{ github.event_name == 'pull_request' && 'lint' }} test"
