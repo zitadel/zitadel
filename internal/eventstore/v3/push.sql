@@ -15,4 +15,4 @@ INSERT INTO eventstore.events2 (
     , in_tx_order
 ) VALUES
     %s
-RETURNING created_at, "position";
+RETURNING created_at, "position", in_tx_order, tx_id;

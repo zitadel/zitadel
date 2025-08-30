@@ -27,6 +27,8 @@ type BaseEvent struct {
 
 	Seq                           uint64
 	Pos                           decimal.Decimal
+	TxOrder                       uint8  `json:"-"`
+	Tx                            uint64 `json:"-"`
 	Creation                      time.Time
 	previousAggregateSequence     uint64
 	previousAggregateTypeSequence uint64
@@ -116,6 +118,8 @@ func BaseEventFromRepo(event Event) *BaseEvent {
 		User:      event.Creator(),
 		Data:      event.DataAsBytes(),
 		Pos:       event.Position(),
+		TxOrder:   event.InTxOrder(),
+		Tx:        event.TxID(),
 	}
 }
 
@@ -133,4 +137,12 @@ func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventTyp
 
 func (*BaseEvent) Fields() []*FieldOperation {
 	return nil
+}
+
+func (e *BaseEvent) InTxOrder() uint8 {
+	return e.TxOrder
+}
+
+func (e *BaseEvent) TxID() uint64 {
+	return e.Tx
 }

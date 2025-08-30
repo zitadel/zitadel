@@ -526,15 +526,36 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 	}()
 
+	if config.awaitRunning {
+		_, err = tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID())
+		if err != nil {
+			h.log().OnError(err).Warn("failed to acquire lock")
+			return false, err
+		}
+	} else {
+		var shouldContinue bool
+		err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&shouldContinue)
+		if err != nil || !shouldContinue {
+			h.log().OnError(err).Warn("failed to acquire lock")
+			return false, err
+		}
+	}
+
 	currentState, err := h.currentState(ctx, tx, config)
 	if err != nil {
 		if errors.Is(err, errJustUpdated) {
 			return false, nil
 		}
-		return additionalIteration, err
+		return false, err
+	}
+	if h.ProjectionName() == "projections.users14" {
+		h.log().
+			WithField("position", currentState.position).
+			WithField("offset", currentState.offset).
+			Info("current state")
 	}
 	// stop execution if currentState.position >= config.maxPosition
-	if !config.maxPosition.Equal(decimal.Decimal{}) && currentState.position.GreaterThanOrEqual(config.maxPosition) {
+	if !config.maxPosition.IsZero() && currentState.position.GreaterThanOrEqual(config.maxPosition) {
 		return false, nil
 	}
 
@@ -567,6 +588,9 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	}()
 
 	if len(statements) == 0 {
+		if h.ProjectionName() == "projections.users14" {
+			h.log().Info("no statements generated")
+		}
 		err = h.setState(tx, currentState)
 		return additionalIteration, err
 	}
@@ -583,6 +607,13 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	currentState.aggregateType = statements[lastProcessedIndex].Aggregate.Type
 	currentState.sequence = statements[lastProcessedIndex].Sequence
 	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
+
+	if h.ProjectionName() == "projections.users14" {
+		h.log().
+			WithField("position", currentState.position).
+			WithField("offset", currentState.offset).
+			Info("update current state")
+	}
 
 	setStateErr := h.setState(tx, currentState)
 	if setStateErr != nil {
@@ -608,12 +639,23 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 	eventAmount := len(events)
 
+	txIDs := make([]uint64, len(events))
+	if h.ProjectionName() == "projections.users14" && len(events) > 0 {
+		for i, event := range events {
+			txIDs[i] = event.TxID()
+		}
+		h.log().
+			WithField("tx_ids", txIDs).
+			Info("filtered events")
+	}
+
 	statements, err := h.eventsToStatements(tx, events, currentState)
 	if err != nil || len(statements) == 0 {
-		return nil, false, err
+		return nil, eventAmount == int(h.bulkLimit), err
 	}
 
 	idx := skipPreviouslyReducedStatements(statements, currentState)
+	// all statements are already processed
 	if idx+1 == len(statements) {
 		currentState.position = statements[len(statements)-1].Position
 		currentState.offset = statements[len(statements)-1].offset
@@ -622,12 +664,27 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		currentState.sequence = statements[len(statements)-1].Sequence
 		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
 
+		h.log().WithField("statements_count", len(statements)).
+			WithField("position", currentState.position).
+			WithField("offset", currentState.offset).
+			Info("all statements already processed")
+
 		return nil, false, nil
 	}
 	statements = statements[idx+1:]
 
+	if idx >= 0 {
+		h.log().WithField("skipped_statements", idx+1).
+			WithField("total_statements", len(statements)+idx+1).
+			WithField("tx_ids", txIDs[idx+1:]).
+			WithField("position", currentState.position).
+			WithField("offset", currentState.offset).
+			Info("skipped previously processed statements")
+	}
+
 	additionalIteration = eventAmount == int(h.bulkLimit)
-	if len(statements) < len(events) {
+	if len(statements) < eventAmount {
+		h.log().WithField("statements_count", len(statements)).WithField("events_count", eventAmount).Info("events skipped")
 		// retry immediately if statements failed
 		additionalIteration = true
 	}
@@ -636,6 +693,9 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 }
 
 func skipPreviouslyReducedStatements(statements []*Statement, currentState *state) int {
+	if len(statements) == 0 || currentState.position.IsZero() {
+		return -1
+	}
 	for i, statement := range statements {
 		if statement.Position.Equal(currentState.position) &&
 			statement.Aggregate.ID == currentState.aggregateID &&
@@ -702,6 +762,8 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 
 	if currentState.position.GreaterThan(decimal.Decimal{}) {
 		builder = builder.PositionAtLeast(currentState.position)
+		// Use offset only when we have processed some events at the current position
+		// This prevents getting stuck when a single position has more than bulkLimit events
 		if currentState.offset > 0 {
 			builder = builder.Offset(currentState.offset)
 		}
