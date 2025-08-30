@@ -23,13 +23,21 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           run_install: false
-      - name: Setup Node.js without caching
+      - name: Setup Node.js with caching
         uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node_version }}
-      - name: Install and cache dependencies including Cypress binaries
-        uses: cypress-io/github-action@v6
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
         with:
-          runTests: false
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            cypress-${{ runner.os }}-
+      - name: Install Cypress binary
+        run: npx cypress install
       - name: Run Integration Tests against the Login and a Mocked Zitadel API
         run: pnpm nx test:integration login
