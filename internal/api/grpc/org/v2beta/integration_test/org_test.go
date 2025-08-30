@@ -1132,29 +1132,31 @@ func TestServer_AddOrganizationDomain_ClaimDomain(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	// check both users: the first one must be untouched, the second one must be updated
-	users, err := Instance.Client.UserV2.ListUsers(CTX, &user.ListUsersRequest{
-		Queries: []*user.SearchQuery{
-			{
-				Query: &user.SearchQuery_InUserIdsQuery{
-					InUserIdsQuery: &user.InUserIDQuery{UserIds: []string{ownUser.GetUserId(), otherUser.GetUserId()}},
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		// check both users: the first one must be untouched, the second one must be updated
+		users, err := Instance.Client.UserV2.ListUsers(CTX, &user.ListUsersRequest{
+			Queries: []*user.SearchQuery{
+				{
+					Query: &user.SearchQuery_InUserIdsQuery{
+						InUserIdsQuery: &user.InUserIDQuery{UserIds: []string{ownUser.GetUserId(), otherUser.GetUserId()}},
+					},
 				},
 			},
-		},
-	})
-	require.NoError(t, err)
-	require.Len(t, users.GetResult(), 2)
+		})
+		require.NoError(t, err)
+		require.Len(t, users.GetResult(), 2)
 
-	for _, u := range users.GetResult() {
-		if u.GetUserId() == ownUser.GetUserId() {
-			assert.Equal(t, username, u.GetPreferredLoginName())
-			continue
+		for _, u := range users.GetResult() {
+			if u.GetUserId() == ownUser.GetUserId() {
+				assert.Equal(collect, username, u.GetPreferredLoginName())
+				continue
+			}
+			if u.GetUserId() == otherUser.GetUserId() {
+				assert.NotEqual(collect, otherUsername, u.GetPreferredLoginName())
+				assert.Contains(collect, u.GetPreferredLoginName(), "@temporary.")
+			}
 		}
-		if u.GetUserId() == otherUser.GetUserId() {
-			assert.NotEqual(t, otherUsername, u.GetPreferredLoginName())
-			assert.Contains(t, u.GetPreferredLoginName(), "@temporary.")
-		}
-	}
+	}, 5*time.Second, time.Second, "user not updated in time")
 }
 
 func TestServer_ListOrganizationDomains(t *testing.T) {
