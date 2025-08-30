@@ -47,6 +47,10 @@ func (e *mockCommand) Fields() []*eventstore.FieldOperation {
 }
 
 func mockEvent(aggregate *eventstore.Aggregate, sequence uint64, payload Payload) eventstore.Event {
+	return mockEventType(aggregate, sequence, payload, "event.type")
+}
+
+func mockEventType(aggregate *eventstore.Aggregate, sequence uint64, payload Payload, typ string) eventstore.Event {
 	return &event{
 		command: &command{
 			InstanceID:    aggregate.InstanceID,
@@ -55,7 +59,7 @@ func mockEvent(aggregate *eventstore.Aggregate, sequence uint64, payload Payload
 			Owner:         aggregate.ResourceOwner,
 			Creator:       "creator",
 			Revision:      1,
-			CommandType:   "event.type",
+			CommandType:   typ,
 			Payload:       payload,
 		},
 		sequence: sequence,

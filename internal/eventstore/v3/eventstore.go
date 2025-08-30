@@ -33,6 +33,7 @@ var (
 
 type Eventstore struct {
 	client *database.DB
+	queue  eventstore.ExecutionQueue
 }
 
 var (
@@ -157,8 +158,14 @@ func (es *Eventstore) Client() *database.DB {
 	return es.client
 }
 
-func NewEventstore(client *database.DB) *Eventstore {
-	return &Eventstore{client: client}
+func NewEventstore(client *database.DB, opts ...EventstoreOption) *Eventstore {
+	es := &Eventstore{
+		client: client,
+	}
+	for _, opt := range opts {
+		opt(es)
+	}
+	return es
 }
 
 func (es *Eventstore) Health(ctx context.Context) error {
@@ -199,4 +206,12 @@ func (es *Eventstore) pushTx(ctx context.Context, client database.ContextQueryEx
 		return nil, nil, err
 	}
 	return tx, func(err error) error { return database.CloseTransaction(tx, err) }, nil
+}
+
+type EventstoreOption func(*Eventstore)
+
+func WithExecutionQueueOption(queue eventstore.ExecutionQueue) EventstoreOption {
+	return func(es *Eventstore) {
+		es.queue = queue
+	}
 }

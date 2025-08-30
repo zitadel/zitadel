@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/execution/target"
 )
 
 const (
@@ -19,6 +20,26 @@ type Request struct {
 	UserID      string                `json:"userID"`
 	EventData   []byte                `json:"eventData"`
 	TargetsData []byte                `json:"targetsData"`
+}
+
+func NewRequest(e eventstore.Event, targets []target.Target) (*Request, error) {
+	targetsData, err := json.Marshal(targets)
+	if err != nil {
+		return nil, err
+	}
+	eventData, err := json.Marshal(e)
+	if err != nil {
+		return nil, err
+	}
+	return &Request{
+		Aggregate:   e.Aggregate(),
+		Sequence:    e.Sequence(),
+		EventType:   e.Type(),
+		CreatedAt:   e.CreatedAt(),
+		UserID:      e.Creator(),
+		EventData:   eventData,
+		TargetsData: targetsData,
+	}, nil
 }
 
 func (e *Request) Kind() string {

@@ -1,10 +1,10 @@
 SELECT et.instance_id,
        et.execution_id,
        JSONB_AGG(
-               JSON_OBJECT(
-                       'position' : et.position,
-                       'include' : et.include,
-                       'target' : et.target_id
+               JSON_BUILD_OBJECT(
+                       'position', et.position,
+                       'include', et.include,
+                       'target', et.target_id
                )
        ) as targets
 FROM projections.executions1_targets AS et

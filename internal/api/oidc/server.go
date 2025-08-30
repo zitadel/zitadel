@@ -36,11 +36,12 @@ type Server struct {
 	defaultIdTokenLifetime     time.Duration
 	jwksCacheControlMaxAge     time.Duration
 
-	fallbackLogger      *slog.Logger
-	hasher              *crypto.Hasher
-	signingKeyAlgorithm string
-	encAlg              crypto.EncryptionAlgorithm
-	opCrypto            op.Crypto
+	fallbackLogger            *slog.Logger
+	hasher                    *crypto.Hasher
+	signingKeyAlgorithm       string
+	encAlg                    crypto.EncryptionAlgorithm
+	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
+	opCrypto                  op.Crypto
 
 	assetAPIPrefix func(ctx context.Context) string
 }

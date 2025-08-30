@@ -1,13 +1,5 @@
 package domain
 
-type TargetType uint
-
-const (
-	TargetTypeWebhook TargetType = iota
-	TargetTypeCall
-	TargetTypeAsync
-)
-
 type TargetState int32
 
 const (

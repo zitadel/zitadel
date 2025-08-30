@@ -26,6 +26,29 @@ with domain as (
 	from domain d
 	join projections.instance_trusted_domains td on d.instance_id = td.instance_id
 	group by td.instance_id
+), execution_targets as (
+	select instance_id, json_agg(x.execution_targets) as execution_targets from (
+		select e.instance_id, json_build_object(
+			'execution_id', et.execution_id,
+			'target_id', t.id,
+			'target_type', t.target_type,
+			'endpoint', t.endpoint,
+			'timeout', t.timeout,
+			'interrupt_on_error', t.interrupt_on_error,
+			'signing_key', t.signing_key
+		) as execution_targets
+		from domain d
+		join projections.executions1 e
+			on d.instance_id = e.instance_id
+		join projections.executions1_targets et
+			on e.instance_id = et.instance_id
+			and e.id = et.execution_id
+		join projections.targets2 t
+			on et.instance_id = t.instance_id
+			and et.target_id = t.id
+		order by et.position asc
+	) as x
+	group by instance_id
 )
 select
     i.id,
@@ -41,11 +64,13 @@ select
     l.block,
 	f.features,
 	ed.domains as external_domains,
-	td.domains as trusted_domains
+	td.domains as trusted_domains,
+	et.execution_targets
 from domain d
 join projections.instances i on i.id = d.instance_id
 left join projections.security_policies2 s on i.id = s.instance_id
 left join projections.limits l on i.id = l.instance_id
 left join features f on i.id = f.instance_id
 left join external_domains ed on i.id = ed.instance_id
-left join trusted_domains td on i.id = td.instance_id;
+left join trusted_domains td on i.id = td.instance_id
+left join execution_targets et on i.id = et.instance_id;

@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/filter/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
@@ -89,11 +90,11 @@ func targetToPb(t *query.Target) *action.Target {
 		SigningKey: t.SigningKey,
 	}
 	switch t.TargetType {
-	case domain.TargetTypeWebhook:
+	case target_domain.TargetTypeWebhook:
 		target.TargetType = &action.Target_RestWebhook{RestWebhook: &action.RESTWebhook{InterruptOnError: t.InterruptOnError}}
-	case domain.TargetTypeCall:
+	case target_domain.TargetTypeCall:
 		target.TargetType = &action.Target_RestCall{RestCall: &action.RESTCall{InterruptOnError: t.InterruptOnError}}
-	case domain.TargetTypeAsync:
+	case target_domain.TargetTypeAsync:
 		target.TargetType = &action.Target_RestAsync{RestAsync: &action.RESTAsync{}}
 	default:
 		target.TargetType = nil

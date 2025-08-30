@@ -56,6 +56,7 @@ type Storage struct {
 	certificateAlgorithm string
 	encAlg               crypto.EncryptionAlgorithm
 	certEncAlg           crypto.EncryptionAlgorithm
+	targetEncAlg         crypto.EncryptionAlgorithm
 
 	eventstore *eventstore.Eventstore
 	repo       repository.Repository
@@ -390,10 +391,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 	}
 
 	function := exec_repo.ID(domain.ExecutionTypeFunction, domain.ActionFunctionPreSAMLResponse.LocalizationKey())
-	executionTargets, err := execution.QueryExecutionTargetsForFunction(ctx, p.query, function)
-	if err != nil {
-		return nil, err
-	}
+	executionTargets := execution.QueryExecutionTargetsForFunction(ctx, function)
 
 	// correct time for utc
 	user.CreationDate = user.CreationDate.UTC()
@@ -405,7 +403,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 		UserGrants: userGrants.UserGrants,
 	}
 
-	resp, err := execution.CallTargets(ctx, executionTargets, info)
+	resp, err := execution.CallTargets(ctx, executionTargets, info, p.targetEncAlg)
 	if err != nil {
 		return nil, err
 	}
