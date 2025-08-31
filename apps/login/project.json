@@ -80,10 +80,7 @@
     },
     "dev": {
       "persistent": true,
-      "cache": false,
-      "dependsOn": [
-        "^build"
-      ]
+      "cache": false
     },
     "test": {
       "dependsOn": [
@@ -101,13 +98,14 @@
       "cache": true,
       "dependsOn": [
         "@zitadel/core-mock:start:docker",
-        "build",
         "start:integration"
       ],
       "inputs": [
         "{projectRoot}/integration/integration/**",
         "{projectRoot}/integration/support/**",
-        "{projectRoot}/cypress.config.ts"
+        "{projectRoot}/cypress.config.ts",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "{projectRoot}/package.json"
       ],
       "outputs": [
         "{projectRoot}/cypress/**/*"
