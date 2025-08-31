@@ -29,6 +29,6 @@
         "bundle": "webpack",
         "lint": "prettier --check src/**",
         "lint:fix": "prettier --write src",
-        "clean": "rm -rf dist .nx node_modules"
+        "clean": "rm -rf dist node_modules"
     }
 }

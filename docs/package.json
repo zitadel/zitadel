@@ -23,7 +23,7 @@
     "generate:re-gen": "yarn generate:clean-all && pnpm generate",
     "generate:clean-all": "docusaurus clean-api-docs all",
     "postinstall": "sh ./plugin-download.sh",
-    "clean": "rm -rf node_modules .artifacts .docusaurus .nx protoc-gen-connect-openapi docs/apis/resources"
+    "clean": "rm -rf node_modules .artifacts .docusaurus protoc-gen-connect-openapi docs/apis/resources"
   },
   "dependencies": {
     "@bufbuild/buf": "^1.14.0",

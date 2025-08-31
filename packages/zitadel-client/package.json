@@ -71,7 +71,7 @@
     "lint:check:eslint": "eslint 'src/**/*.ts*'",
     "lint:check:knip": "knip",
     "test:unit": "vitest --run",
-    "clean": "rm -rf .nx && rm -rf node_modules && rm -rf dist"
+    "clean": "rm -rf node_modules dist"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.2",

@@ -79,7 +79,7 @@
   "sideEffects": false,
   "scripts": {
     "generate": "buf generate ../../proto",
-    "clean": "rm -rf zitadel .nx node_modules google protoc-gen-openapiv2 validate cjs types es"
+    "clean": "rm -rf zitadel node_modules google protoc-gen-openapiv2 validate cjs types es"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.6.1"

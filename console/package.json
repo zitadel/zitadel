@@ -11,7 +11,7 @@
     "lint:check:prettier": "prettier --check src",
     "lint:fix": "prettier --write src",
     "generate": "pnpm exec buf generate ../proto --include-imports --include-wkt",
-    "clean": "rm -rf dist .angular .nx node_modules src/app/proto/generated"
+    "clean": "rm -rf dist .angular node_modules src/app/proto/generated"
   },
   "private": true,
   "dependencies": {
