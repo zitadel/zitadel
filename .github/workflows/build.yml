@@ -77,7 +77,6 @@ jobs:
     needs: [core, console]
     uses: ./.github/workflows/lint.yml
     with:
-      node_version: "22"
       buf_version: "latest"
       go_lint_version: "latest"
       core_cache_key: ${{ needs.core.outputs.cache_key }}
