@@ -54,7 +54,7 @@
         "{projectRoot}/dist/**/*"
       ]
     },
-    "build:docker": {
+    "build-docker": {
       "dependsOn": [
         "build"
       ],
@@ -62,14 +62,14 @@
         "docker"
       ]
     },
-    "start:integration": {
+    "start-integration": {
       "continuous": true,
       "cache": false,
       "dependsOn": [
         "build"
       ]
     },
-    "start:docker": {
+    "start-docker": {
       "continuous": true,
       "options": {
         "args": [
@@ -79,15 +79,15 @@
       }
     },
     "check": {},
-    "test:unit": {
+    "test-unit": {
       "dependsOn": [
         "^build"
       ]
     },
-    "test:integration": {
+    "test-integration": {
       "dependsOn": [
-        "@zitadel/core-mock:start:docker",
-        "start:integration"
+        "@zitadel/core-mock:start-docker",
+        "start-integration"
       ],
       "inputs": [
         "{projectRoot}/integration/integration/**",

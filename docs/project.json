@@ -11,7 +11,7 @@
       ],
       "cache": true
     },
-    "generate:grpc": {
+    "generate-grpc": {
       "dependsOn": [
         "ensure-plugins"
       ],
@@ -21,29 +21,30 @@
       ],
       "cache": true
     },
-    "generate:apidocs": {
+    "generate-apidocs": {
       "dependsOn": [
-        "generate:grpc"
+        "generate-grpc"
       ],
       "outputs": [
         "{projectRoot}/docs/api/**/*"
       ],
       "cache": true
     },
-    "generate:configdocs": {
+    "generate-configdocs": {
       "inputs": [
         "{workspaceRoot}/cmd/defaults.yaml",
         "{workspaceRoot}/cmd/setup/steps.yaml"
       ],
       "outputs": [
-        "{projectRoot}/docs/self-hosting/manage/configure/*.yaml"
+        "{projectRoot}/docs/self-hosting/manage/configure/defaultsyaml",
+        "{projectRoot}/docs/self-hosting/manage/configure/steps.yaml"
       ],
       "cache": true
     },
     "generate": {
       "dependsOn": [
-        "generate:apidocs",
-        "generate:configdocs"
+        "generate-apidocs",
+        "generate-configdocs"
       ]
     },
     "build": {

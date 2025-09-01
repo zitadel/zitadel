@@ -260,7 +260,7 @@ export Zitadel_IMAGE=zitadel:local GOOS=linux
 make docker_image
 
 # If you made changes in the e2e directory, make sure you reformat the files
-nx lint:fix e2e
+nx run @zitadel/e2e:lint-fix
 
 # Run the tests
 docker compose --file ./e2e/docker-compose.yaml run --service-ports e2e
@@ -310,7 +310,11 @@ All dependencies and tools are already installed
 ```bash
 pnpm install
 pnpm add -g nx
-nx dev login  # or dev console, dev docs
+```
+
+**Start developing***
+```bash
+nx run @zitadel/login:dev # or console:dev or docs:dev
 ```
 
 ### Project Overview
@@ -326,14 +330,14 @@ Choose your contribution area:
 
 | Task | Command | Notes |
 |------|---------|--------|
-| **Develop** | `nx dev PROJECT` | Hot reload development server |
-| **Build** | `nx build PROJECT` | Production build |
-| **Test Unit** | `nx test:unit PROJECT` | Unit tests |
-| **Test Integration** | `nx test:integration PROJECT` | End-to-end tests |
-| **Lint** | `nx lint PROJECT` | Check code style |
-| **Lint Fix** | `nx lint:fix PROJECT` | Auto-fix style issues |
+| **Develop** | `nx run PROJECT:dev` | Hot reload development server |
+| **Build** | `nx run PROJECT:build` | Production build |
+| **Test Unit** | `nx run PROJECT:test-unit` | Unit tests |
+| **Test Integration** | `nx run PROJECT:test-integration ` | End-to-end tests |
+| **Lint** | `nx run PROJECT:lint` | Check code style |
+| **Lint Fix** | `nx run PROJECT:lint-fix` | Auto-fix style issues |
 
-Replace `PROJECT` with: `@zitadel/login`, `console`, `docs`, `@zitadel/client`, `@zitadel/proto`, etc.
+Replace `PROJECT` with: `@zitadel/login`, `@zitadel/console`, `@zitadel/docs`, `@zitadel/client`, `@zitadel/proto`, etc.
 
 ### Project Dependencies
 
@@ -354,15 +358,14 @@ nx run @zitadel/proto:generate  # Regenerate after proto changes
 
 **`@zitadel/client`**: High-level TypeScript client library with utilities for API interaction.
 ```bash
-nx build @zitadel/client  # Build after changes
+nx run @zitadel/client:build  # Build after changes
 ```
 
 ### <a name="frontend-dev-requirements"></a>Frontend Development Requirements
 **Recommended: Use Dev Container** (everything pre-configured)
-```bash
-# Open in VS Code with Dev Container extension
-# All dependencies and tools are already installed
-```
+
+Open in VS Code with Dev Container extension.
+All dependencies and tools are already installed
 
 **For local development, install:**
 
@@ -377,7 +380,7 @@ pnpm install
 pnpm add -g nx
 
 # Test a project
-nx dev login  # Should start dev server at http://localhost:3000/ui/v2/login/loginname
+nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui/v2/login/loginname
 ```
 
 **Additional requirements for testing:**
@@ -414,10 +417,10 @@ To start developing the login, make sure your system has the [required system de
 docker compose --file ./apps/login/acceptance/docker-compose.yaml up --detach zitadel
 
 # Start development server (recommended)
-nx dev @zitadel/login
+nx run @zitadel/login:dev
 
 # Or start standalone production server
-nx start @zitadel/login
+nx run @zitadel/login:start
 ```
 
 Visit http://localhost:3000/ui/v2/login/loginname
@@ -451,7 +454,7 @@ Then, you need to decide which Zitadel instance you would like to target.
 
 #### <a name="console-dev-existing-zitadel"></a>Develop against an already running Zitadel instance
 
-By default, `nx dev console` targets a Zitadel API running at http://localhost:8080.
+By default, `nx run console:dev` targets a Zitadel API running at http://localhost:8080.
 To change this, export the link to your environment.json in your environment variables.
 
 ```bash
@@ -496,7 +499,7 @@ Run the local console development server.
 
 ```bash
 # Start development server
-nx dev console
+nx run @zitadel/console:dev
 ```
 
 Navigate to http://localhost:4200/.
@@ -522,10 +525,10 @@ To start developing the docs, make sure your system has the [required system dep
 
 ```bash
 # Start development server (recommended)
-nx dev docs
+nx run @zitadel/docs:dev
 
 # Or start production server
-nx start docs
+nx run @zitadel/docs:start
 ```
 
 The docs build process automatically:

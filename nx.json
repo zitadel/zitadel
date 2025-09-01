@@ -38,18 +38,18 @@
     "lint": {
       "cache": true
     },
-    "test:unit": {
+    "test-unit": {
       "cache": true
     },
-    "test:integration": {
+    "test-integration": {
       "cache": true
     },
     "check": {
       "dependsOn": [
         "build",
         "lint",
-        "test:unit",
-        "test:integration"
+        "test-unit",
+        "test-integration"
       ]
     }
   },
@@ -57,8 +57,8 @@
     {
       "plugin": "@nx/docker",
       "options": {
-        "buildTarget": "build:docker",
-        "runTarget": "start:docker"
+        "buildTarget": "build-docker",
+        "runTarget": "start-docker"
       }
     }
   ]

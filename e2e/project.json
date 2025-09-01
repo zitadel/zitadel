@@ -17,9 +17,6 @@
     "e2e:angular": {
       "cache": false,
       "persistent": false
-    },
-    "lint": {
-      "outputs": []
     }
   }
 }

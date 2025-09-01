@@ -13,7 +13,7 @@
     "test:open:angular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 CYPRESS_WEBHOOK_HANDLER_HOST=host.docker.internal pnpm run open --",
     "test:e2e:angular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 CYPRESS_WEBHOOK_HANDLER_HOST=host.docker.internal pnpm run test:e2e --",
     "lint": "prettier --check cypress",
-    "lint:fix": "prettier --write cypress",
+    "lint-fix": "prettier --write cypress",
     "clean": "rm -rf node_modules"
   },
   "private": true,
