@@ -567,7 +567,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return false, err
 	}
 	if !hasLocked {
-		return false, zerrors.ThrowInternal(err, "V2-lpiK0", "projection already locked")
+		return false, zerrors.ThrowInternal(nil, "V2-lpiK0", "projection already locked")
 	}
 
 	currentState, err := h.currentState(ctx, tx)

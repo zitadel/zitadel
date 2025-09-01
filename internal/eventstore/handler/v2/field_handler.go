@@ -132,7 +132,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		return false, err
 	}
 	if !hasLocked {
-		return false, zerrors.ThrowInternal(err, "V2-xRffO", "projection already locked")
+		return false, zerrors.ThrowInternal(nil, "V2-xRffO", "projection already locked")
 	}
 
 	// always await currently running transactions
