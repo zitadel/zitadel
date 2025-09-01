@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import {
   AddOrgResponse,
+  AddProjectRequestSchema,
+  AddProjectResponse,
   DeactivateOrgResponse,
   GenerateMachineSecretRequestSchema,
   GenerateMachineSecretResponse,
@@ -123,5 +125,9 @@ export class NewMgmtService {
 
   public addOrg(name: string): Promise<AddOrgResponse> {
     return this.grpcService.mgmtNew.addOrg({ name });
+  }
+
+  public addProject(req: MessageInitShape<typeof AddProjectRequestSchema>): Promise<AddProjectResponse> {
+    return this.grpcService.mgmtNew.addProject(req);
   }
 }

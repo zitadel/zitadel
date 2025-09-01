@@ -1,10 +1,12 @@
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AddProjectRequest, AddProjectResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { MessageInitShape } from '@bufbuild/protobuf';
+import { AddProjectRequestSchema } from '@zitadel/proto/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { NewMgmtService } from 'src/app/services/new-mgmt.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'cnsl-project-create',
@@ -12,13 +14,21 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./project-create.component.scss'],
 })
 export class ProjectCreateComponent {
-  public project: AddProjectRequest.AsObject = new AddProjectRequest().toObject();
+  protected readonly project: MessageInitShape<typeof AddProjectRequestSchema> = {
+    name: '',
+    admins: [
+      {
+        userId: this.userService.userId(),
+      },
+    ],
+  };
 
   constructor(
-    private router: Router,
-    private toast: ToastService,
-    private mgmtService: ManagementService,
-    private _location: Location,
+    private readonly router: Router,
+    private readonly toast: ToastService,
+    private readonly newMgmtService: NewMgmtService,
+    private readonly _location: Location,
+    private readonly userService: UserService,
     breadcrumbService: BreadcrumbService,
   ) {
     const bread: Breadcrumb = {
@@ -29,11 +39,11 @@ export class ProjectCreateComponent {
   }
 
   public saveProject(): void {
-    this.mgmtService
+    this.newMgmtService
       .addProject(this.project)
-      .then((resp: AddProjectResponse.AsObject) => {
+      .then((resp) => {
         this.toast.showInfo('PROJECT.TOAST.CREATED', true);
-        this.router.navigate(['projects', resp.id], { queryParams: { new: true } });
+        return this.router.navigate(['projects', resp.id], { queryParams: { new: true } });
       })
       .catch((error) => {
         this.toast.showError(error);
