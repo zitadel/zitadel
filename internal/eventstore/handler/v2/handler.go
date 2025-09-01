@@ -95,7 +95,7 @@ func (h *Handler) Execute(ctx context.Context, startedEvent eventstore.Event) er
 	}
 
 	// default amount of workers is 10
-	workerCount := 5
+	workerCount := 10
 
 	if h.client.DB.Stats().MaxOpenConnections > 0 {
 		workerCount = h.client.DB.Stats().MaxOpenConnections / 4
@@ -426,19 +426,21 @@ func WithMinPosition(position decimal.Decimal) TriggerOpt {
 
 var queue chan func()
 
-const workers = 3
-
-func init() {
+func StartWorkerPool(ctx context.Context, count uint16) {
 	queue = make(chan func())
-	for i := 1; i <= workers; i++ {
-		go worker()
+	for range count {
+		go worker(ctx)
 	}
 }
 
-func worker() {
+func worker(ctx context.Context) {
 	for {
-		processEvents := <-queue
-		processEvents()
+		select {
+		case f := <-queue:
+			f()
+		case <-ctx.Done():
+			return
+		}
 	}
 }
 
@@ -458,8 +460,10 @@ func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Co
 	defer cancel()
 
 	for i := 0; ; i++ {
-		var additionalIteration bool
-		var wg sync.WaitGroup
+		var (
+			additionalIteration bool
+			wg                  sync.WaitGroup
+		)
 		wg.Add(1)
 		queue <- func() {
 			additionalIteration, err = h.processEvents(ctx, config)

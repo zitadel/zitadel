@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"fmt"
 
 	"github.com/riverqueue/river"
 	"github.com/zitadel/logging"
@@ -15,11 +16,6 @@ import (
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
-
-var pushTxOpts = &sql.TxOptions{
-	Isolation: sql.LevelReadCommitted,
-	ReadOnly:  false,
-}
 
 func (es *Eventstore) Push(ctx context.Context, client database.ContextQueryExecuter, commands ...eventstore.Command) (events []eventstore.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
