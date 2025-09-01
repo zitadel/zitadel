@@ -1636,8 +1636,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Se a bandeira estiver habilitada, você poderá encerrar uma sessão única da interface do usuário de login fornecendo um id_token com uma reivindicação `sid como id_token_hint no ponto final de end_session. Observe que atualmente todas as sessões do mesmo agente de usuário (navegador) são encerradas na interface do usuário de login. As sessões gerenciadas por meio da API de sessão já permitem o encerramento de sessões individuais.",
       "DEBUGOIDCPARENTERROR": "Erro de Depuração do Pai OIDC",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Se a bandeira estiver ativada, o erro do pai OIDC será registrado no console.",
-      "DISABLEUSERTOKENEVENT": "Desativar Evento de Token de Usuário",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Ativar Logout de Backchannel",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "O Logout de Back-Channel implementa o OpenID Connect Back-Channel Logout 1.0 e pode ser usado para notificar os clientes sobre a terminação da sessão no Provedor de OpenID.",
       "PERMISSIONCHECKV2": "Verificação de Permissão V2",

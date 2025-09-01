@@ -17,11 +17,11 @@ import (
 )
 
 func TestServer_ListAdministrators(t *testing.T) {
-	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 	projectName := gofakeit.AppName()
 	projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), projectName, false, false)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 	instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 	userProjectResp := instance.CreateMachineUser(iamOwnerCtx)
@@ -66,7 +66,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 		{
 			name: "list by id, no permission",
 			args: args{
-				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 				dep: func(request *internal_permission.ListAdministratorsRequest, response *internal_permission.ListAdministratorsResponse) {
 					admin := createInstanceAdministrator(iamOwnerCtx, instance, t)
 					request.Filters[0].Filter = &internal_permission.AdministratorSearchFilter_InUserIdsFilter{
@@ -90,7 +90,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 		{
 			name: "list by id, missing permission",
 			args: args{
-				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *internal_permission.ListAdministratorsRequest, response *internal_permission.ListAdministratorsResponse) {
 					admin := createInstanceAdministrator(iamOwnerCtx, instance, t)
 					request.Filters[0].Filter = &internal_permission.AdministratorSearchFilter_InUserIdsFilter{
@@ -427,7 +427,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 		{
 			name: "list multiple id, org owner",
 			args: args{
-				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *internal_permission.ListAdministratorsRequest, response *internal_permission.ListAdministratorsResponse) {
 					admin1 := createInstanceAdministrator(iamOwnerCtx, instance, t)
 					admin2 := createOrganizationAdministrator(iamOwnerCtx, instance, t)
@@ -644,12 +644,13 @@ func createProjectGrantAdministrator(ctx context.Context, instance *integration.
 }
 
 func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
-	ensureFeaturePermissionV2Enabled(t, instancePermissionV2)
-	iamOwnerCtx := instancePermissionV2.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	// removed as permission v2 is not implemented yet for project grant level permissions
+	// ensureFeaturePermissionV2Enabled(t, instancePermissionV2)
+	iamOwnerCtx := instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
-	projectName := gofakeit.AppName()
+	projectName := integration.ProjectName()
 	projectResp := instancePermissionV2.CreateProject(iamOwnerCtx, t, instancePermissionV2.DefaultOrg.GetId(), projectName, false, false)
-	orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+	orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 	instancePermissionV2.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 	userProjectResp := instancePermissionV2.CreateMachineUser(iamOwnerCtx)
@@ -694,7 +695,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 		{
 			name: "list by id, no permission",
 			args: args{
-				ctx: instancePermissionV2.WithAuthorization(CTX, integration.UserTypeNoPermission),
+				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 				dep: func(request *internal_permission.ListAdministratorsRequest, response *internal_permission.ListAdministratorsResponse) {
 					admin := createInstanceAdministrator(iamOwnerCtx, instancePermissionV2, t)
 					request.Filters[0].Filter = &internal_permission.AdministratorSearchFilter_InUserIdsFilter{
@@ -709,7 +710,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 			},
 			want: &internal_permission.ListAdministratorsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  0,
+					TotalResult:  1,
 					AppliedLimit: 100,
 				},
 				Administrators: []*internal_permission.Administrator{},
@@ -718,7 +719,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 		{
 			name: "list by id, missing permission",
 			args: args{
-				ctx: instancePermissionV2.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *internal_permission.ListAdministratorsRequest, response *internal_permission.ListAdministratorsResponse) {
 					admin := createInstanceAdministrator(iamOwnerCtx, instancePermissionV2, t)
 					request.Filters[0].Filter = &internal_permission.AdministratorSearchFilter_InUserIdsFilter{
@@ -733,7 +734,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 			},
 			want: &internal_permission.ListAdministratorsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  0,
+					TotalResult:  1,
 					AppliedLimit: 100,
 				},
 				Administrators: []*internal_permission.Administrator{},
@@ -1055,7 +1056,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 		{
 			name: "list multiple id, org owner",
 			args: args{
-				ctx: instancePermissionV2.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *internal_permission.ListAdministratorsRequest, response *internal_permission.ListAdministratorsResponse) {
 					admin1 := createInstanceAdministrator(iamOwnerCtx, instancePermissionV2, t)
 					admin2 := createOrganizationAdministrator(iamOwnerCtx, instancePermissionV2, t)
@@ -1076,7 +1077,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 			},
 			want: &internal_permission.ListAdministratorsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  3,
+					TotalResult:  4,
 					AppliedLimit: 100,
 				},
 				Administrators: []*internal_permission.Administrator{
@@ -1107,7 +1108,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 			},
 			want: &internal_permission.ListAdministratorsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  2,
+					TotalResult:  4,
 					AppliedLimit: 100,
 				},
 				Administrators: []*internal_permission.Administrator{
@@ -1115,7 +1116,6 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 				},
 			},
 		},
-		// TODO: correct when permission check is added for project grants https://github.com/zitadel/zitadel/issues/9972
 		{
 			name: "list multiple id, project grant owner",
 			args: args{
@@ -1130,7 +1130,7 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 							Ids: []string{admin1.GetUser().GetId(), admin2.GetUser().GetId(), admin3.GetUser().GetId(), admin4.GetUser().GetId()},
 						},
 					}
-					// response.Administrators[0] = admin4
+					response.Administrators[0] = admin4
 				},
 				req: &internal_permission.ListAdministratorsRequest{
 					Filters: []*internal_permission.AdministratorSearchFilter{{}},
@@ -1138,10 +1138,10 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 			},
 			want: &internal_permission.ListAdministratorsResponse{
 				Pagination: &filter.PaginationResponse{
-					TotalResult:  0,
+					TotalResult:  4,
 					AppliedLimit: 100,
 				},
-				Administrators: []*internal_permission.Administrator{},
+				Administrators: []*internal_permission.Administrator{{}},
 			},
 		},
 	}

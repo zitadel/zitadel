@@ -74,12 +74,12 @@ jobs:
         name: Debug
         id: build-debug
         uses: docker/build-push-action@v6
-        timeout-minutes: 3
+        timeout-minutes: 5
         with:
           context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          file: build/Dockerfile
+          file: build/zitadel/Dockerfile
           target: artifact
           platforms: linux/${{ matrix.arch }}
           push: true
@@ -94,7 +94,7 @@ jobs:
           context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          file: build/Dockerfile
+          file: build/zitadel/Dockerfile
           target: final
           platforms: linux/${{ matrix.arch }}
           push: true

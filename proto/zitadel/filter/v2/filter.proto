@@ -31,6 +31,11 @@ enum TimestampFilterMethod {
   TIMESTAMP_FILTER_METHOD_BEFORE_OR_EQUALS = 4;
 }
 
+enum ByteFilterMethod {
+  BYTE_FILTER_METHOD_EQUALS = 0;
+  BYTE_FILTER_METHOD_NOT_EQUALS = 1;
+}
+
 message PaginationRequest {
   // Starting point for retrieval, in combination of offset used to query a set list of objects.
   uint64 offset = 1 [
@@ -92,5 +97,25 @@ message TimestampFilter {
   // Defines the condition (e.g., equals, before, after) that the timestamp of the retrieved resources should match.
   TimestampFilterMethod method = 2 [
     (validate.rules).enum.defined_only = true
+  ];
+}
+
+message InIDsFilter {
+  // Defines the ids to query for.
+  repeated string ids = 1 [
+    (validate.rules).repeated = {
+      unique: true
+      items: {
+        string: {
+          min_len: 1
+          max_len: 200
+        }
+      }
+    },
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "[\"69629023906488334\",\"69622366012355662\"]";
+    }
   ];
 }

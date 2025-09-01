@@ -4,7 +4,6 @@ package user_test
 
 import (
 	"context"
-	"fmt"
 	"slices"
 	"testing"
 	"time"
@@ -158,7 +157,7 @@ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
 
 func TestServer_AddKey_Permission(t *testing.T) {
 	OrgCTX := CTX
-	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddKey-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	otherOrgUser, err := Client.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
@@ -298,7 +297,7 @@ func TestServer_RemoveKey(t *testing.T) {
 
 func TestServer_RemoveKey_Permission(t *testing.T) {
 	OrgCTX := CTX
-	otherOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("RemoveKey-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	otherOrgUser, err := Client.CreateUser(IamCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{
@@ -377,7 +376,7 @@ func TestServer_ListKeys(t *testing.T) {
 		want *user.ListKeysResponse
 	}
 	OrgCTX := CTX
-	otherOrg := Instance.CreateOrganization(SystemCTX, fmt.Sprintf("ListKeys-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(SystemCTX, integration.OrganizationName(), gofakeit.Email())
 	otherOrgUser, err := Client.CreateUser(SystemCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{

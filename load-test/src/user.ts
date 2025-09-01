@@ -50,7 +50,7 @@ export function createHuman(username: string, org: Org, accessToken: string): Pr
     response
       .then((res) => {
         check(res, {
-          'create user is status ok': (r) => r.status === 200,
+          'create user is status ok': (r) => r.status >= 200 && r.status < 300,
         }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
         createHumanTrend.add(res.timings.duration);
 
@@ -79,7 +79,7 @@ export async function setEmailOTPOnHuman(user: User, org: Org, accessToken: stri
     },
   });
   check(response, {
-    'set email otp status ok': (r) => r.status === 200,
+    'set email otp status ok': (r) => r.status >= 200 && r.status < 300,
   });
   setEmailOTPOnHumanTrend.add(response.timings.duration);
 
@@ -144,7 +144,7 @@ export function createMachine(username: string, org: Org, accessToken: string): 
     response
       .then((res) => {
         check(res, {
-          'create user is status ok': (r) => r.status === 200,
+          'create user is status ok': (r) => r.status >= 200 && r.status < 300,
         }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
         createMachineTrend.add(res.timings.duration);
 
@@ -179,7 +179,7 @@ export function addMachinePat(userId: string, org: Org, accessToken: string): Pr
     });
     response.then((res) => {
       check(res, {
-        'add pat status ok': (r) => r.status === 200,
+        'add pat status ok': (r) => r.status >= 200 && r.status < 300,
       }) || reject(`unable to add pat (user id: ${userId}) status: ${res.status} body: ${res.body}`);
 
       addMachinePatTrend.add(res.timings.duration);
@@ -205,7 +205,7 @@ export function addMachineSecret(userId: string, org: Org, accessToken: string):
     });
     response.then((res) => {
       check(res, {
-        'generate machine secret status ok': (r) => r.status === 200,
+        'generate machine secret status ok': (r) => r.status >= 200 && r.status < 300,
       }) || reject(`unable to generate machine secret (user id: ${userId}) status: ${res.status} body: ${res.body}`);
 
       addMachineSecretTrend.add(res.timings.duration);
@@ -240,7 +240,7 @@ export function addMachineKey(userId: string, org: Org, accessToken: string, pub
     );
     response.then((res) => {
       check(res, {
-        'generate machine key status ok': (r) => r.status === 200,
+        'generate machine key status ok': (r) => r.status >= 200 && r.status < 300,
       }) || reject(`unable to generate machine Key (user id: ${userId}) status: ${res.status} body: ${res.body}`);
 
       addMachineKeyTrend.add(res.timings.duration);
@@ -263,7 +263,7 @@ export function lockUser(userId: string, org: Org, accessToken: string): Promise
     response
       .then((res) => {
         check(res, {
-          'update user is status ok': (r) => r.status === 201,
+          'update user is status ok': (r) => r.status >= 200 && r.status < 300,
         });
         lockUserTrend.add(res.timings.duration);
         resolve(res);

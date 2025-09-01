@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/integration"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 	filter "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
@@ -21,7 +21,7 @@ import (
 
 func TestServer_GetTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	type args struct {
 		ctx context.Context
 		dep func(context.Context, *action.GetTargetRequest, *action.GetTargetResponse) error
@@ -36,7 +36,7 @@ func TestServer_GetTarget(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.GetTargetRequest{},
 			},
 			wantErr: true,
@@ -55,7 +55,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := gofakeit.Name()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, false)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -82,7 +82,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := gofakeit.Name()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeAsync, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeAsync, false)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -109,7 +109,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := gofakeit.Name()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, true)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, true)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -138,7 +138,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := gofakeit.Name()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeCall, false)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -167,7 +167,7 @@ func TestServer_GetTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := gofakeit.Name()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, true)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeCall, true)
 					request.Id = resp.GetId()
 					response.Target.Id = resp.GetId()
 					response.Target.Name = name
@@ -206,14 +206,14 @@ func TestServer_GetTarget(t *testing.T) {
 				}
 				assert.NoError(ttt, err)
 				assert.EqualExportedValues(ttt, tt.want, got)
-			}, retryDuration, tick, "timeout waiting for expected target result")
+			}, retryDuration, tick, "timeout waiting for expected target Executions")
 		})
 	}
 }
 
 func TestServer_ListTargets(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	type args struct {
 		ctx context.Context
 		dep func(context.Context, *action.ListTargetsRequest, *action.ListTargetsResponse)
@@ -228,7 +228,7 @@ func TestServer_ListTargets(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.ListTargetsRequest{},
 			},
 			wantErr: true,
@@ -253,7 +253,7 @@ func TestServer_ListTargets(t *testing.T) {
 					TotalResult:  0,
 					AppliedLimit: 100,
 				},
-				Result: []*action.Target{},
+				Targets: []*action.Target{},
 			},
 		},
 		{
@@ -262,18 +262,18 @@ func TestServer_ListTargets(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListTargetsRequest, response *action.ListTargetsResponse) {
 					name := gofakeit.Name()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, false)
 					request.Filters[0].Filter = &action.TargetSearchFilter_InTargetIdsFilter{
 						InTargetIdsFilter: &action.InTargetIDsFilter{
 							TargetIds: []string{resp.GetId()},
 						},
 					}
 
-					response.Result[0].Id = resp.GetId()
-					response.Result[0].Name = name
-					response.Result[0].CreationDate = resp.GetCreationDate()
-					response.Result[0].ChangeDate = resp.GetCreationDate()
-					response.Result[0].SigningKey = resp.GetSigningKey()
+					response.Targets[0].Id = resp.GetId()
+					response.Targets[0].Name = name
+					response.Targets[0].CreationDate = resp.GetCreationDate()
+					response.Targets[0].ChangeDate = resp.GetCreationDate()
+					response.Targets[0].SigningKey = resp.GetSigningKey()
 				},
 				req: &action.ListTargetsRequest{
 					Filters: []*action.TargetSearchFilter{{}},
@@ -284,7 +284,7 @@ func TestServer_ListTargets(t *testing.T) {
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
-				Result: []*action.Target{
+				Targets: []*action.Target{
 					{
 						Endpoint: "https://example.com",
 						TargetType: &action.Target_RestWebhook{
@@ -302,18 +302,18 @@ func TestServer_ListTargets(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListTargetsRequest, response *action.ListTargetsResponse) {
 					name := gofakeit.Name()
-					resp := instance.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
+					resp := instance.CreateTarget(ctx, t, name, "https://example.com", target_domain.TargetTypeWebhook, false)
 					request.Filters[0].Filter = &action.TargetSearchFilter_TargetNameFilter{
 						TargetNameFilter: &action.TargetNameFilter{
 							TargetName: name,
 						},
 					}
 
-					response.Result[0].Id = resp.GetId()
-					response.Result[0].Name = name
-					response.Result[0].CreationDate = resp.GetCreationDate()
-					response.Result[0].ChangeDate = resp.GetCreationDate()
-					response.Result[0].SigningKey = resp.GetSigningKey()
+					response.Targets[0].Id = resp.GetId()
+					response.Targets[0].Name = name
+					response.Targets[0].CreationDate = resp.GetCreationDate()
+					response.Targets[0].ChangeDate = resp.GetCreationDate()
+					response.Targets[0].SigningKey = resp.GetSigningKey()
 				},
 				req: &action.ListTargetsRequest{
 					Filters: []*action.TargetSearchFilter{{}},
@@ -324,7 +324,7 @@ func TestServer_ListTargets(t *testing.T) {
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
-				Result: []*action.Target{
+				Targets: []*action.Target{
 					{
 						Endpoint: "https://example.com",
 						TargetType: &action.Target_RestWebhook{
@@ -345,32 +345,32 @@ func TestServer_ListTargets(t *testing.T) {
 					name1 := gofakeit.Name()
 					name2 := gofakeit.Name()
 					name3 := gofakeit.Name()
-					resp1 := instance.CreateTarget(ctx, t, name1, "https://example.com", domain.TargetTypeWebhook, false)
-					resp2 := instance.CreateTarget(ctx, t, name2, "https://example.com", domain.TargetTypeCall, true)
-					resp3 := instance.CreateTarget(ctx, t, name3, "https://example.com", domain.TargetTypeAsync, false)
+					resp1 := instance.CreateTarget(ctx, t, name1, "https://example.com", target_domain.TargetTypeWebhook, false)
+					resp2 := instance.CreateTarget(ctx, t, name2, "https://example.com", target_domain.TargetTypeCall, true)
+					resp3 := instance.CreateTarget(ctx, t, name3, "https://example.com", target_domain.TargetTypeAsync, false)
 					request.Filters[0].Filter = &action.TargetSearchFilter_InTargetIdsFilter{
 						InTargetIdsFilter: &action.InTargetIDsFilter{
 							TargetIds: []string{resp1.GetId(), resp2.GetId(), resp3.GetId()},
 						},
 					}
 
-					response.Result[2].Id = resp1.GetId()
-					response.Result[2].Name = name1
-					response.Result[2].CreationDate = resp1.GetCreationDate()
-					response.Result[2].ChangeDate = resp1.GetCreationDate()
-					response.Result[2].SigningKey = resp1.GetSigningKey()
+					response.Targets[2].Id = resp1.GetId()
+					response.Targets[2].Name = name1
+					response.Targets[2].CreationDate = resp1.GetCreationDate()
+					response.Targets[2].ChangeDate = resp1.GetCreationDate()
+					response.Targets[2].SigningKey = resp1.GetSigningKey()
 
-					response.Result[1].Id = resp2.GetId()
-					response.Result[1].Name = name2
-					response.Result[1].CreationDate = resp2.GetCreationDate()
-					response.Result[1].ChangeDate = resp2.GetCreationDate()
-					response.Result[1].SigningKey = resp2.GetSigningKey()
+					response.Targets[1].Id = resp2.GetId()
+					response.Targets[1].Name = name2
+					response.Targets[1].CreationDate = resp2.GetCreationDate()
+					response.Targets[1].ChangeDate = resp2.GetCreationDate()
+					response.Targets[1].SigningKey = resp2.GetSigningKey()
 
-					response.Result[0].Id = resp3.GetId()
-					response.Result[0].Name = name3
-					response.Result[0].CreationDate = resp3.GetCreationDate()
-					response.Result[0].ChangeDate = resp3.GetCreationDate()
-					response.Result[0].SigningKey = resp3.GetSigningKey()
+					response.Targets[0].Id = resp3.GetId()
+					response.Targets[0].Name = name3
+					response.Targets[0].CreationDate = resp3.GetCreationDate()
+					response.Targets[0].ChangeDate = resp3.GetCreationDate()
+					response.Targets[0].SigningKey = resp3.GetSigningKey()
 				},
 				req: &action.ListTargetsRequest{
 					Filters: []*action.TargetSearchFilter{{}},
@@ -381,7 +381,7 @@ func TestServer_ListTargets(t *testing.T) {
 					TotalResult:  3,
 					AppliedLimit: 100,
 				},
-				Result: []*action.Target{
+				Targets: []*action.Target{
 					{
 						Endpoint: "https://example.com",
 						TargetType: &action.Target_RestAsync{
@@ -427,13 +427,13 @@ func TestServer_ListTargets(t *testing.T) {
 				require.NoError(ttt, listErr)
 
 				// always first check length, otherwise its failed anyway
-				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
-					for i := range tt.want.Result {
-						assert.EqualExportedValues(ttt, tt.want.Result[i], got.Result[i])
+				if assert.Len(ttt, got.Targets, len(tt.want.Targets)) {
+					for i := range tt.want.Targets {
+						assert.EqualExportedValues(ttt, tt.want.Targets[i], got.Targets[i])
 					}
 				}
 				assertPaginationResponse(ttt, tt.want.Pagination, got.Pagination)
-			}, retryDuration, tick, "timeout waiting for expected execution result")
+			}, retryDuration, tick, "timeout waiting for expected execution Executions")
 		})
 	}
 }
@@ -445,8 +445,8 @@ func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationRes
 
 func TestServer_ListExecutions(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false)
 
 	type args struct {
 		ctx context.Context
@@ -462,7 +462,7 @@ func TestServer_ListExecutions(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.ListExecutionsRequest{},
 			},
 			wantErr: true,
@@ -473,12 +473,12 @@ func TestServer_ListExecutions(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) {
 					cond := request.Filters[0].GetInConditionsFilter().GetConditions()[0]
-					resp := instance.SetExecution(ctx, t, cond, []string{targetResp.GetId()})
+					resp := setExecution(ctx, t, instance, cond, []string{targetResp.GetId()})
 
 					// Set expected response with used values for SetExecution
-					response.Result[0].CreationDate = resp.GetSetDate()
-					response.Result[0].ChangeDate = resp.GetSetDate()
-					response.Result[0].Condition = cond
+					response.Executions[0].CreationDate = resp.GetSetDate()
+					response.Executions[0].ChangeDate = resp.GetSetDate()
+					response.Executions[0].Condition = cond
 				},
 				req: &action.ListExecutionsRequest{
 					Filters: []*action.ExecutionSearchFilter{{
@@ -503,7 +503,7 @@ func TestServer_ListExecutions(t *testing.T) {
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
-				Result: []*action.Execution{
+				Executions: []*action.Execution{
 					{
 						Condition: &action.Condition{
 							ConditionType: &action.Condition_Request{
@@ -524,7 +524,7 @@ func TestServer_ListExecutions(t *testing.T) {
 			args: args{
 				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) {
-					target := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
+					target := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", target_domain.TargetTypeWebhook, false)
 					// add target as Filter to the request
 					request.Filters[0] = &action.ExecutionSearchFilter{
 						Filter: &action.ExecutionSearchFilter_TargetFilter{
@@ -542,12 +542,12 @@ func TestServer_ListExecutions(t *testing.T) {
 							},
 						},
 					}
-					resp := instance.SetExecution(ctx, t, cond, []string{target.GetId()})
+					resp := setExecution(ctx, t, instance, cond, []string{target.GetId()})
 
-					response.Result[0].CreationDate = resp.GetSetDate()
-					response.Result[0].ChangeDate = resp.GetSetDate()
-					response.Result[0].Condition = cond
-					response.Result[0].Targets = []string{target.GetId()}
+					response.Executions[0].CreationDate = resp.GetSetDate()
+					response.Executions[0].ChangeDate = resp.GetSetDate()
+					response.Executions[0].Condition = cond
+					response.Executions[0].Targets = []string{target.GetId()}
 				},
 				req: &action.ListExecutionsRequest{
 					Filters: []*action.ExecutionSearchFilter{{}},
@@ -558,7 +558,7 @@ func TestServer_ListExecutions(t *testing.T) {
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
-				Result: []*action.Execution{
+				Executions: []*action.Execution{
 					{
 						Condition: &action.Condition{},
 						Targets:   []string{""},
@@ -603,8 +603,8 @@ func TestServer_ListExecutions(t *testing.T) {
 					}
 
 					cond1 := request.Filters[0].GetInConditionsFilter().GetConditions()[0]
-					resp1 := instance.SetExecution(ctx, t, cond1, []string{targetResp.GetId()})
-					response.Result[2] = &action.Execution{
+					resp1 := setExecution(ctx, t, instance, cond1, []string{targetResp.GetId()})
+					response.Executions[2] = &action.Execution{
 						CreationDate: resp1.GetSetDate(),
 						ChangeDate:   resp1.GetSetDate(),
 						Condition:    cond1,
@@ -612,8 +612,8 @@ func TestServer_ListExecutions(t *testing.T) {
 					}
 
 					cond2 := request.Filters[0].GetInConditionsFilter().GetConditions()[1]
-					resp2 := instance.SetExecution(ctx, t, cond2, []string{targetResp.GetId()})
-					response.Result[1] = &action.Execution{
+					resp2 := setExecution(ctx, t, instance, cond2, []string{targetResp.GetId()})
+					response.Executions[1] = &action.Execution{
 						CreationDate: resp2.GetSetDate(),
 						ChangeDate:   resp2.GetSetDate(),
 						Condition:    cond2,
@@ -621,8 +621,8 @@ func TestServer_ListExecutions(t *testing.T) {
 					}
 
 					cond3 := request.Filters[0].GetInConditionsFilter().GetConditions()[2]
-					resp3 := instance.SetExecution(ctx, t, cond3, []string{targetResp.GetId()})
-					response.Result[0] = &action.Execution{
+					resp3 := setExecution(ctx, t, instance, cond3, []string{targetResp.GetId()})
+					response.Executions[0] = &action.Execution{
 						CreationDate: resp3.GetSetDate(),
 						ChangeDate:   resp3.GetSetDate(),
 						Condition:    cond3,
@@ -640,7 +640,7 @@ func TestServer_ListExecutions(t *testing.T) {
 					TotalResult:  3,
 					AppliedLimit: 100,
 				},
-				Result: []*action.Execution{
+				Executions: []*action.Execution{
 					{}, {}, {},
 				},
 			},
@@ -652,8 +652,8 @@ func TestServer_ListExecutions(t *testing.T) {
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) {
 					conditions := request.Filters[0].GetInConditionsFilter().GetConditions()
 					for i, cond := range conditions {
-						resp := instance.SetExecution(ctx, t, cond, []string{targetResp.GetId()})
-						response.Result[(len(conditions)-1)-i] = &action.Execution{
+						resp := setExecution(ctx, t, instance, cond, []string{targetResp.GetId()})
+						response.Executions[(len(conditions)-1)-i] = &action.Execution{
 							CreationDate: resp.GetSetDate(),
 							ChangeDate:   resp.GetSetDate(),
 							Condition:    cond,
@@ -687,7 +687,7 @@ func TestServer_ListExecutions(t *testing.T) {
 					TotalResult:  10,
 					AppliedLimit: 100,
 				},
-				Result: []*action.Execution{
+				Executions: []*action.Execution{
 					{},
 					{},
 					{},
@@ -708,8 +708,8 @@ func TestServer_ListExecutions(t *testing.T) {
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) {
 					conditions := request.Filters[0].GetInConditionsFilter().GetConditions()
 					for i, cond := range conditions {
-						resp := instance.SetExecution(ctx, t, cond, []string{targetResp.GetId()})
-						response.Result[i] = &action.Execution{
+						resp := setExecution(ctx, t, instance, cond, []string{targetResp.GetId()})
+						response.Executions[i] = &action.Execution{
 							CreationDate: resp.GetSetDate(),
 							ChangeDate:   resp.GetSetDate(),
 							Condition:    cond,
@@ -744,7 +744,7 @@ func TestServer_ListExecutions(t *testing.T) {
 					TotalResult:  10,
 					AppliedLimit: 100,
 				},
-				Result: []*action.Execution{
+				Executions: []*action.Execution{
 					{},
 					{},
 					{},
@@ -774,11 +774,11 @@ func TestServer_ListExecutions(t *testing.T) {
 				}
 				require.NoError(ttt, listErr)
 				// always first check length, otherwise its failed anyway
-				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
-					assert.EqualExportedValues(ttt, got.Result, tt.want.Result)
+				if assert.Len(ttt, got.Executions, len(tt.want.Executions)) {
+					assert.EqualExportedValues(ttt, got.Executions, tt.want.Executions)
 				}
 				assertPaginationResponse(ttt, tt.want.Pagination, got.Pagination)
-			}, retryDuration, tick, "timeout waiting for expected execution result")
+			}, retryDuration, tick, "timeout waiting for expected execution Executions")
 		})
 	}
 }

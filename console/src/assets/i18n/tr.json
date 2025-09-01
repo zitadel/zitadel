@@ -1638,8 +1638,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Bayrak etkinleştirilirse, end_session uç noktasında id_token_hint olarak `sid` iddiası olan bir id_token sağlayarak giriş UI'ından tek bir oturumu sonlandırabileceksiniz. Şu anda giriş UI'ında aynı kullanıcı aracısından (tarayıcı) tüm oturumların sonlandırıldığını unutmayın. Oturum API'si aracılığıyla yönetilen oturumlar zaten tek oturumların sonlandırılmasına izin veriyor.",
       "DEBUGOIDCPARENTERROR": "OIDC Üst Hatayı Hata Ayıkla",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Bayrak etkinleştirilirse, OIDC üst hatası konsolda günlüğe kaydedilecektir.",
-      "DISABLEUSERTOKENEVENT": "Kullanıcı Token Olayını Devre Dışı Bırak",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Arka Kanal Çıkışını Etkinleştir",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Arka Kanal Çıkışı OpenID Connect Arka Kanal Çıkışı 1.0'ı uygular ve OpenID Sağlayıcısında oturum sonlandırma hakkında istemcileri bilgilendirmek için kullanılabilir.",
       "PERMISSIONCHECKV2": "İzin Kontrolü V2",
@@ -2375,6 +2373,7 @@
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
       "SIGNEDREQUEST": "İmzalı İstek",
+      "SIGNATUREALGORITHM": "İmza algoritması",
       "NAMEIDFORMAT": "NameID Formatı",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Özel Eşleme Özellik Adı",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "`nameid-format` `transient` döndürülmesi durumunda kullanıcıyı eşlemek için alternatif özellik adı, örn. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"

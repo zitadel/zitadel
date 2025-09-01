@@ -3,10 +3,8 @@ package execution
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/queue"
 )
 
@@ -15,18 +13,12 @@ var (
 )
 
 func Register(
-	ctx context.Context,
-	executionsCustomConfig projection.CustomConfig,
 	workerConfig WorkerConfig,
-	queries *query.Queries,
-	eventTypes []string,
 	queue *queue.Queue,
+	targetEncAlg crypto.EncryptionAlgorithm,
 ) {
 	queue.ShouldStart()
-	projections = []*handler.Handler{
-		NewEventHandler(ctx, projection.ApplyCustomConfig(executionsCustomConfig), eventTypes, eventstore.AggregateTypeFromEventType, queries, queue),
-	}
-	queue.AddWorkers(NewWorker(workerConfig))
+	queue.AddWorkers(NewWorker(workerConfig, targetEncAlg))
 }
 
 func Start(ctx context.Context) {

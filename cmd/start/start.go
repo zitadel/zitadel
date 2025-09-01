@@ -34,6 +34,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api"
 	"github.com/zitadel/zitadel/internal/api/assets"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	action_v2 "github.com/zitadel/zitadel/internal/api/grpc/action/v2"
 	action_v2_beta "github.com/zitadel/zitadel/internal/api/grpc/action/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/admin"
 	app "github.com/zitadel/zitadel/internal/api/grpc/app/v2beta"
@@ -169,9 +170,15 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return err
 	}
+	q, err := queue.NewQueue(&queue.Config{
+		Client: dbClient,
+	})
+	if err != nil {
+		return err
+	}
 
-	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
-	config.Eventstore.Searcher = new_es.NewEventstore(dbClient)
+	config.Eventstore.Pusher = new_es.NewEventstore(dbClient, new_es.WithExecutionQueueOption(q))
+	config.Eventstore.Searcher = new_es.NewEventstore(dbClient, new_es.WithExecutionQueueOption(q))
 	config.Eventstore.Querier = old_es.NewPostgres(dbClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(dbClient, &es_v4_pg.Config{
@@ -255,6 +262,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.OIDC.DefaultRefreshTokenExpiration,
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
+		config.Login.DefaultEmailCodeURLTemplate,
+		config.Login.DefaultPasswordSetURLTemplate,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -279,13 +288,6 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	q, err := queue.NewQueue(&queue.Config{
-		Client: dbClient,
-	})
-	if err != nil {
-		return err
-	}
-
 	notification.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],
@@ -300,7 +302,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		commands,
 		queries,
 		eventstoreClient,
-		config.Login.DefaultOTPEmailURLV2,
+		config.Login.DefaultPaths.OTPEmailPath,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
 		keys.SMTP,
@@ -312,12 +314,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	notification.Start(ctx)
 
 	execution.Register(
-		ctx,
-		config.Projections.Customizations["execution_handler"],
 		config.Executions,
-		queries,
-		eventstoreClient.EventTypes(),
 		q,
+		keys.Target,
 	)
 	execution.Start(ctx)
 
@@ -437,7 +436,7 @@ func startAPIs(
 		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
 	)
 	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, &config.Quotas.Access.AccessConfig)
-	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.SystemAuthZ, config.InternalAuthZ, tlsConfig, config.ExternalDomain, append(config.InstanceHostHeaders, config.PublicHostHeaders...), limitingAccessInterceptor)
+	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.SystemAuthZ, config.InternalAuthZ, tlsConfig, config.ExternalDomain, append(config.InstanceHostHeaders, config.PublicHostHeaders...), limitingAccessInterceptor, keys.Target)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
 	}
@@ -482,7 +481,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, session_v2beta.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, settings_v2beta.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, settings_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, org_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
@@ -507,6 +506,9 @@ func startAPIs(
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, action_v2_beta.CreateServer(config.SystemDefaults, commands, queries, domain.AllActionFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, action_v2.CreateServer(config.SystemDefaults, commands, queries, domain.AllActionFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, project_v2beta.CreateServer(config.SystemDefaults, commands, queries, permissionCheck)); err != nil {
@@ -576,6 +578,7 @@ func startAPIs(
 		queries,
 		authRepo,
 		keys.OIDC,
+		keys.Target,
 		keys.OIDCKey,
 		eventstore,
 		userAgentInterceptor,
@@ -590,7 +593,7 @@ func startAPIs(
 	}
 	apis.RegisterHandlerPrefixes(oidcServer, oidcPrefixes...)
 
-	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, limitingAccessInterceptor)
+	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, keys.Target, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, limitingAccessInterceptor)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start saml provider: %w", err)
 	}

@@ -121,6 +121,54 @@ func TestCommandSide_AddMachine(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
+					expectPush(
+						user.NewMachineAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"name",
+							"description",
+							true,
+							domain.OIDCTokenTypeBearer,
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Description: "description",
+					Name:        "name",
+					Username:    "username",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "add machine, orgScopedUsername, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								false,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilterOrganizationSettings("org1", true, true),
 					expectPush(
 						user.NewMachineAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -167,6 +215,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewMachineAddedEvent(context.Background(),
 							&user.NewAggregate("optionalID1", "org1").Aggregate,
@@ -214,6 +263,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewMachineAddedEvent(context.Background(),
 							&user.NewAggregate("aggregateID", "org1").Aggregate,
@@ -264,6 +314,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewMachineAddedEvent(context.Background(),
 							&user.NewAggregate("aggregateID", "org1").Aggregate,
@@ -312,6 +363,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewMachineAddedEvent(context.Background(),
 							&user.NewAggregate("aggregateID", "org1").Aggregate,
@@ -361,6 +413,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewMachineAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -436,6 +489,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewMachineAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -489,6 +543,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewMachineAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,

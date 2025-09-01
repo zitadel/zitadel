@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"reflect"
@@ -197,7 +198,7 @@ func TestNewCreateStatement(t *testing.T) {
 			tt.want.executer.t = t
 			stmt := NewCreateStatement(tt.args.event, tt.args.values)
 
-			err := stmt.Execute(tt.want.executer, tt.args.table)
+			err := stmt.Execute(t.Context(), tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -506,7 +507,7 @@ func TestNewUpsertStatement(t *testing.T) {
 			tt.want.executer.t = t
 			stmt := NewUpsertStatement(tt.args.event, tt.args.conflictCols, tt.args.values)
 
-			err := stmt.Execute(tt.want.executer, tt.args.table)
+			err := stmt.Execute(t.Context(), tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -710,7 +711,7 @@ func TestNewUpdateStatement(t *testing.T) {
 			tt.want.executer.t = t
 			stmt := NewUpdateStatement(tt.args.event, tt.args.values, tt.args.conditions)
 
-			err := stmt.Execute(tt.want.executer, tt.args.table)
+			err := stmt.Execute(t.Context(), tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -827,7 +828,7 @@ func TestNewDeleteStatement(t *testing.T) {
 			tt.want.executer.t = t
 			stmt := NewDeleteStatement(tt.args.event, tt.args.conditions)
 
-			err := stmt.Execute(tt.want.executer, tt.args.table)
+			err := stmt.Execute(t.Context(), tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -878,7 +879,7 @@ func TestNewNoOpStatement(t *testing.T) {
 				return
 			}
 			tt.want.executer.t = t
-			err := stmt.Execute(tt.want.executer, tt.args.table)
+			err := stmt.Execute(t.Context(), tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -1054,7 +1055,7 @@ func TestNewMultiStatement(t *testing.T) {
 				return
 			}
 			tt.want.executer.t = t
-			err := stmt.Execute(tt.want.executer, tt.args.table)
+			err := stmt.Execute(t.Context(), tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -1338,7 +1339,7 @@ func TestNewCopyStatement(t *testing.T) {
 			tt.want.executer.t = t
 			stmt := NewCopyStatement(tt.args.event, tt.args.conflictingCols, tt.args.from, tt.args.to, tt.args.conds)
 
-			err := stmt.Execute(tt.want.executer, tt.args.table)
+			err := stmt.Execute(t.Context(), tt.want.executer, tt.args.table)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -1349,7 +1350,7 @@ func TestNewCopyStatement(t *testing.T) {
 
 func TestStatement_Execute(t *testing.T) {
 	type fields struct {
-		execute func(ex Executer, projectionName string) error
+		execute func(ctx context.Context, ex Executer, projectionName string) error
 	}
 	type want struct {
 		isErr func(error) bool
@@ -1366,7 +1367,7 @@ func TestStatement_Execute(t *testing.T) {
 		{
 			name: "execute returns no error",
 			fields: fields{
-				execute: func(ex Executer, projectionName string) error { return nil },
+				execute: func(ctx context.Context, ex Executer, projectionName string) error { return nil },
 			},
 			args: args{
 				projectionName: "my_projection",
@@ -1383,7 +1384,7 @@ func TestStatement_Execute(t *testing.T) {
 				projectionName: "my_projection",
 			},
 			fields: fields{
-				execute: func(ex Executer, projectionName string) error { return errTest },
+				execute: func(ctx context.Context, ex Executer, projectionName string) error { return errTest },
 			},
 			want: want{
 				isErr: func(err error) bool {
@@ -1397,7 +1398,7 @@ func TestStatement_Execute(t *testing.T) {
 			stmt := &Statement{
 				Execute: tt.fields.execute,
 			}
-			if err := stmt.Execute(nil, tt.args.projectionName); !tt.want.isErr(err) {
+			if err := stmt.Execute(t.Context(), nil, tt.args.projectionName); !tt.want.isErr(err) {
 				t.Errorf("unexpected error: %v", err)
 			}
 		})

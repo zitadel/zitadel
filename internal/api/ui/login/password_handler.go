@@ -43,7 +43,7 @@ func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 
 	metadata, actionErr := l.runPostInternalAuthenticationActions(authReq, r, authMethodPassword, err)
 	if err == nil && actionErr == nil && len(metadata) > 0 {
-		_, err = l.command.BulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata...)
+		err = l.bulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata)
 	} else if actionErr != nil && err == nil {
 		err = actionErr
 	}

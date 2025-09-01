@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/beevik/etree"
@@ -75,21 +76,31 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		return nil, zerrors.ThrowInvalidArgument(err, "SAML-nuo0vphhh9", "Errors.Intent.ResponseInvalid")
 	}
 
+	userMapper := NewUser()
 	// nameID is required, but at least in ADFS it will not be sent unless explicitly configured
 	if s.Assertion.Subject == nil || s.Assertion.Subject.NameID == nil {
-		return nil, zerrors.ThrowInvalidArgument(err, "SAML-EFG32", "Errors.Intent.ResponseInvalid")
-	}
-	nameID := s.Assertion.Subject.NameID
-	userMapper := NewUser()
-	// use the nameID as default mapping id
-	userMapper.SetID(nameID.Value)
-	if nameID.Format == string(saml.TransientNameIDFormat) {
+		if strings.TrimSpace(s.TransientMappingAttributeName) == "" {
+			return nil, zerrors.ThrowInvalidArgument(err, "SAML-EFG32", "Errors.Intent.MissingTransientMappingAttributeName")
+		}
+		// workaround to use the transient mapping attribute when the subject / nameID are missing (e.g. in ADFS, Shibboleth)
 		mappingID, err := s.transientMappingID()
 		if err != nil {
 			return nil, err
 		}
 		userMapper.SetID(mappingID)
+	} else {
+		nameID := s.Assertion.Subject.NameID
+		// use the nameID as default mapping id
+		userMapper.SetID(nameID.Value)
+		if nameID.Format == string(saml.TransientNameIDFormat) {
+			mappingID, err := s.transientMappingID()
+			if err != nil {
+				return nil, err
+			}
+			userMapper.SetID(mappingID)
+		}
 	}
+
 	for _, statement := range s.Assertion.AttributeStatements {
 		for _, attribute := range statement.Attributes {
 			values := make([]string, len(attribute.Values))
