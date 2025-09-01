@@ -67,6 +67,7 @@ func (m *SystemFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemEnableBackChannelLogout,
 			feature_v2.SystemLoginVersion,
 			feature_v2.SystemPermissionCheckV2,
+			feature_v2.SystemEnableRelationalTables,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -101,6 +102,9 @@ func reduceSystemFeature(features *SystemFeatures, key feature.Key, value any) {
 	case feature.KeyPermissionCheckV2:
 		v := value.(bool)
 		features.PermissionCheckV2 = &v
+	case feature.KeyEnableRelationalTables:
+		v := value.(bool)
+		features.EnableRelationalTables = &v
 	}
 }
 
@@ -115,6 +119,7 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableBackChannelLogout, f.EnableBackChannelLogout, feature_v2.SystemEnableBackChannelLogout)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginV2, f.LoginV2, feature_v2.SystemLoginVersion)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.PermissionCheckV2, f.PermissionCheckV2, feature_v2.SystemPermissionCheckV2)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableRelationalTables, f.EnableRelationalTables, feature_v2.SystemEnableRelationalTables)
 	return cmds
 }
 

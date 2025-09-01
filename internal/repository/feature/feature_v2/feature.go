@@ -20,6 +20,7 @@ var (
 	SystemEnableBackChannelLogout                 = setEventTypeFromFeature(feature.LevelSystem, feature.KeyEnableBackChannelLogout)
 	SystemLoginVersion                            = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLoginV2)
 	SystemPermissionCheckV2                       = setEventTypeFromFeature(feature.LevelSystem, feature.KeyPermissionCheckV2)
+	SystemEnableRelationalTables                  = setEventTypeFromFeature(feature.LevelSystem, feature.KeyEnableRelationalTables)
 
 	InstanceResetEventType                          = resetEventTypeFromFeature(feature.LevelInstance)
 	InstanceLoginDefaultOrgEventType                = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginDefaultOrg)

@@ -76,7 +76,8 @@ func TestServer_SetSystemFeatures(t *testing.T) {
 			args: args{
 				ctx: SystemCTX,
 				req: &feature.SetSystemFeaturesRequest{
-					LoginDefaultOrg: gu.Ptr(true),
+					LoginDefaultOrg:        gu.Ptr(true),
+					EnableRelationalTables: gu.Ptr(true),
 				},
 			},
 			want: &feature.SetSystemFeaturesResponse{

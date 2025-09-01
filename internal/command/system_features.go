@@ -22,7 +22,7 @@ type SystemFeatures struct {
 }
 
 func (m *SystemFeatures) isEmpty() bool {
-	return m.LoginDefaultOrg == nil &&
+	return m == nil || (m.LoginDefaultOrg == nil &&
 		m.UserSchema == nil &&
 		m.TokenExchange == nil &&
 		// nil check to allow unset improvements
@@ -30,7 +30,8 @@ func (m *SystemFeatures) isEmpty() bool {
 		m.OIDCSingleV1SessionTermination == nil &&
 		m.EnableBackChannelLogout == nil &&
 		m.LoginV2 == nil &&
-		m.PermissionCheckV2 == nil
+		m.PermissionCheckV2 == nil &&
+		m.EnableRelationalTables == nil)
 }
 
 func (c *Commands) SetSystemFeatures(ctx context.Context, f *SystemFeatures) (*domain.ObjectDetails, error) {
