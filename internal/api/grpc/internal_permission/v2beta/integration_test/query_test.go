@@ -21,7 +21,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 
 	projectName := gofakeit.AppName()
 	projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), projectName, false, false)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 	instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 	userProjectResp := instance.CreateMachineUser(iamOwnerCtx)

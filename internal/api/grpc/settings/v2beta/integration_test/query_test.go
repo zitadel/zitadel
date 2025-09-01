@@ -36,7 +36,7 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				dep: func(request *settings.ListOrganizationSettingsRequest, response *settings.ListOrganizationSettingsResponse) {
-					orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 					instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp.GetOrganizationId(), true)
 
 					request.Filters[0].Filter = &settings.OrganizationSettingsSearchFilter_InOrganizationIdsFilter{
@@ -56,7 +56,7 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 				dep: func(request *settings.ListOrganizationSettingsRequest, response *settings.ListOrganizationSettingsResponse) {
-					orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 					instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp.GetOrganizationId(), true)
 
 					request.Filters[0].Filter = &settings.OrganizationSettingsSearchFilter_InOrganizationIdsFilter{
@@ -82,7 +82,7 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *settings.ListOrganizationSettingsRequest, response *settings.ListOrganizationSettingsResponse) {
-					orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 					instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp.GetOrganizationId(), true)
 
 					request.Filters[0].Filter = &settings.OrganizationSettingsSearchFilter_InOrganizationIdsFilter{
@@ -131,7 +131,7 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *settings.ListOrganizationSettingsRequest, response *settings.ListOrganizationSettingsResponse) {
-					orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 					settingsResp := instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp.GetOrganizationId(), true)
 
 					request.Filters[0].Filter = &settings.OrganizationSettingsSearchFilter_InOrganizationIdsFilter{
@@ -163,11 +163,11 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *settings.ListOrganizationSettingsRequest, response *settings.ListOrganizationSettingsResponse) {
-					orgResp1 := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp1 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 					settingsResp1 := instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp1.GetOrganizationId(), true)
-					orgResp2 := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp2 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 					settingsResp2 := instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp2.GetOrganizationId(), true)
-					orgResp3 := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp3 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 					settingsResp3 := instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp3.GetOrganizationId(), true)
 
 					request.Filters[0].Filter = &settings.OrganizationSettingsSearchFilter_InOrganizationIdsFilter{
@@ -211,11 +211,11 @@ func TestServer_ListOrganizationSettings(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *settings.ListOrganizationSettingsRequest, response *settings.ListOrganizationSettingsResponse) {
-					orgResp1 := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp1 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 					instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp1.GetOrganizationId(), false)
-					orgResp2 := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp2 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 					settingsResp2 := instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp2.GetOrganizationId(), true)
-					orgResp3 := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+					orgResp3 := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 					instance.SetOrganizationSettings(iamOwnerCtx, t, orgResp3.GetOrganizationId(), false)
 
 					request.Filters[0].Filter = &settings.OrganizationSettingsSearchFilter_InOrganizationIdsFilter{

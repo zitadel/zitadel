@@ -54,7 +54,7 @@
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.SAML.BINDING' | translate }}</cnsl-label>
-          <mat-select formControlName="binding" [compareWith]="compareBinding">
+          <mat-select formControlName="binding">
             <mat-option *ngFor="let binding of bindingValues" [value]="binding">{{ binding }}</mat-option>
           </mat-select>
         </cnsl-form-field>
@@ -72,8 +72,17 @@
       <div *ngIf="showOptional">
         <div class="transient-info">
           <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'IDP.SAML.SIGNATUREALGORITHM' | translate }}</cnsl-label>
+            <mat-select formControlName="signatureAlgorithm">
+              <mat-option *ngFor="let signatureAlgorithm of signatureAlgorithmValues" [value]="signatureAlgorithm">{{
+                signatureAlgorithm
+              }}</mat-option>
+            </mat-select>
+          </cnsl-form-field>
+
+          <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'IDP.SAML.NAMEIDFORMAT' | translate }}</cnsl-label>
-            <mat-select formControlName="nameIdFormat" [compareWith]="compareNameIDFormat">
+            <mat-select formControlName="nameIdFormat">
               <mat-option *ngFor="let nameIdFormat of nameIDFormatValues" [value]="nameIdFormat">{{
                 nameIdFormat
               }}</mat-option>
