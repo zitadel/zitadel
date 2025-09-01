@@ -18,6 +18,7 @@ type SystemFeatures struct {
 	EnableBackChannelLogout        *bool
 	LoginV2                        *feature.LoginV2
 	PermissionCheckV2              *bool
+	EnableRelationalTables         *bool
 }
 
 func (m *SystemFeatures) isEmpty() bool {
