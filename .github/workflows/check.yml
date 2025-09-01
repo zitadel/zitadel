@@ -39,5 +39,5 @@ jobs:
         run: pnpm cypress install
         working-directory: apps/login
       - uses: nrwl/nx-set-shas@v4
-      - name: Lint and Unit Test All JavaScript Code
-        run: "pnpm nx affected --target check"
+      - name: Run all TypeScript related checks
+        run: "pnpm nx affected --target check --nxBail"
