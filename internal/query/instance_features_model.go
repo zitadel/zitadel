@@ -78,6 +78,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 func (m *InstanceFeaturesReadModel) reduceReset() {
+	m.instance.EnableRelationalTables = FeatureSource[bool]{}
 	if m.populateFromSystem() {
 		return
 	}
