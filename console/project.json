@@ -3,22 +3,20 @@
     "targets": {
         "check": {},
         "generate": {
-            "dependsOn": ["^generate"],
+            "inputs": [
+                "{workspaceRoot}/proto/**/*",
+                "{projectRoot}/buf.gen.yaml",
+                "{projectRoot}/package.json",
+                "{workspaceRoot}/pnpm-lock.yaml"
+            ],
             "outputs": ["{projectRoot}/src/app/proto/generated/**/*"]
         },
         "build": {
-            "dependsOn": ["generate", "^build"],
+            "inputs": [
+                "default",
+                "!{projectRoot}/.angular*"
+            ],
             "outputs": ["{projectRoot}/dist/**/*"]
-        },
-        "dev": {
-            "dependsOn": ["generate", "^build"],
-            "cache": false,
-            "continuous": true  
-        },
-        "start": {
-            "dependsOn": ["generate", "^build"],
-            "cache": false,
-            "persistent": true
         }
     }   
 }

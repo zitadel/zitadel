@@ -13,6 +13,7 @@ This is the ZITADEL Console Angular application.
 
 ```bash
 pnpm install
+pnpm add -g nx
 ```
 
 ### Proto Generation
@@ -39,7 +40,7 @@ Generated files:
 To generate proto files:
 
 ```bash
-pnpm nx run console:generate
+nx run console:generate
 ```
 
 This automatically runs both generations in the correct order via Nx build orchestration.
@@ -49,7 +50,7 @@ This automatically runs both generations in the correct order via Nx build orche
 To start the development server:
 
 ```bash
-pnpm nx run console:start
+nx run console:start
 ```
 
 This will:
@@ -62,7 +63,7 @@ This will:
 To build for production:
 
 ```bash
-pnpm nx run console:build
+nx build console
 ```
 
 This will:
@@ -75,13 +76,13 @@ This will:
 To run linting and formatting checks:
 
 ```bash
-pnpm nx run console:lint
+nx lint console
 ```
 
 To auto-fix formatting issues:
 
 ```bash
-pnpm nx run console:lint:fix
+nx lint:fix console
 ```
 
 ## Project Structure
@@ -99,10 +100,10 @@ The Console app uses **dual proto generation** managed by Nx build orchestration
 
 The Console app has the following build dependencies managed by Nx:
 
-1. `@zitadel/proto#generate` - Generates modern protobuf files
-2. `@zitadel/client#build` - Builds the TypeScript gRPC client library
-3. `console#generate` - Generates Console-specific protobuf files
-4. `console#build` - Builds the Angular application
+1. `@zitadel/proto:generate` - Generates modern protobuf files
+2. `@zitadel/client:build` - Builds the TypeScript gRPC client library
+3. `console:generate` - Generates Console-specific protobuf files
+4. `console:build` - Builds the Angular application
 
 This ensures that the Console always has access to the latest client library and protobuf definitions.
 
@@ -126,7 +127,7 @@ This ensures that the Console always has access to the latest client library and
 
 The Console's `project.json` ensures proper execution order:
 
-1. `@zitadel/proto#generate` runs first (modern ES modules)
+1. `@zitadel/proto:generate` runs first (modern ES modules)
 2. Console's local generation runs second (traditional protobuf)
 3. Build/lint/start tasks depend on both generations being complete
 

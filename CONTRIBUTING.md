@@ -434,10 +434,10 @@ The build process uses Nx and PNPM to orchestrate dependencies:
 
 #### Pass Quality Checks
 
-Reproduce the pipelines linting and testing for the code you changed.
+Reproduce the pipeline quality checks for the code you changed.
 
 ```bash
-nx affected --targets lint test
+nx affected --target check
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
@@ -495,11 +495,8 @@ To allow console access via http://localhost:4200, you have to configure the Zit
 Run the local console development server.
 
 ```bash
-# Start development server (recommended)
+# Start development server
 nx dev console
-
-# Or start in Angular production mode
-nx start console
 ```
 
 Navigate to http://localhost:4200/.
@@ -507,10 +504,10 @@ Make some changes to the source code and see how the browser is automatically up
 
 #### Pass Quality Checks
 
-Reproduce the pipelines linting and testing for the code you changed.
+Reproduce the pipeline quality checks for the code you changed.
 
 ```bash
-nx affected --targets lint test
+nx affected --target check
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
@@ -566,10 +563,10 @@ Scope can be left empty (omit the brackets) or refer to the top navigation secti
 
 #### Pass Quality Checks
 
-Reproduce the pipelines linting and testing for the code you changed.
+Reproduce the pipeline quality checks for the code you changed.
 
 ```bash
-nx affected --targets lint test
+nx affected --target check
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
