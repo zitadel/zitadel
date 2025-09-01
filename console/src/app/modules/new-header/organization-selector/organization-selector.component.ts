@@ -134,11 +134,19 @@ export class OrganizationSelectorComponent {
         return;
       }
 
-      // user has a selected org and it was found
-      if (orgId && orgs.some((org) => org.id === orgId)) {
+      // no orgId set so we set it to the first org
+      if (!orgId) {
+        newOrganizationService.setOrgId(orgs[0].id).then();
         return;
       }
 
+      // user has a selected org and it was found
+      if (orgs.some((org) => org.id === orgId)) {
+        return;
+      }
+
+      // maybe the org is not yet loaded in the org selector so we try to fetch it
+      // if the user has permission to the org this will succeed and we do nothing
       this.queryClient
         .fetchQuery(this.newOrganizationService.organizationByIdQueryOptions(orgId))
         .then((org) => {
