@@ -8,17 +8,13 @@ import (
 	"encoding/json"
 	"errors"
 	"slices"
-	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	exec "github.com/zitadel/zitadel/internal/repository/execution"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -65,10 +61,6 @@ var (
 var (
 	//go:embed execution_targets.sql
 	executionTargetsQuery string
-	//go:embed targets_by_execution_id.sql
-	TargetsByExecutionIDQuery string
-	//go:embed targets_by_execution_ids.sql
-	TargetsByExecutionIDsQuery string
 )
 
 type Executions struct {
@@ -154,71 +146,6 @@ func targetItemJSONB(t domain.ExecutionTargetType, targetItem string) ([]byte, e
 		return nil, nil
 	}
 	return json.Marshal([]*executionTarget{target})
-}
-
-// TargetsByExecutionID query list of targets for best match of a list of IDs,  for example:
-// [ "request/zitadel.action.v3alpha.ActionService/GetTargetByID",
-// "request/zitadel.action.v3alpha.ActionService",
-// "request" ]
-func (q *Queries) TargetsByExecutionID(ctx context.Context, ids []string) (execution []*ExecutionTarget, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.End() }()
-
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	if instanceID == "" {
-		return nil, nil
-	}
-
-	err = q.client.QueryContext(ctx,
-		func(rows *sql.Rows) error {
-			execution, err = scanExecutionTargets(rows)
-			return err
-		},
-		TargetsByExecutionIDQuery,
-		instanceID,
-		database.TextArray[string](ids),
-	)
-	for i := range execution {
-		if err := execution[i].decryptSigningKey(q.targetEncryptionAlgorithm); err != nil {
-			return nil, err
-		}
-	}
-	return execution, err
-}
-
-// TargetsByExecutionIDs query list of targets for best matches of 2 separate lists of IDs, combined for performance, for example:
-// [ "request/zitadel.action.v3alpha.ActionService/GetTargetByID",
-// "request/zitadel.action.v3alpha.ActionService",
-// "request" ]
-// and
-// [ "response/zitadel.action.v3alpha.ActionService/GetTargetByID",
-// "response/zitadel.action.v3alpha.ActionService",
-// "response" ]
-func (q *Queries) TargetsByExecutionIDs(ctx context.Context, ids1, ids2 []string) (execution []*ExecutionTarget, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.End() }()
-
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	if instanceID == "" {
-		return nil, nil
-	}
-
-	err = q.client.QueryContext(ctx,
-		func(rows *sql.Rows) error {
-			execution, err = scanExecutionTargets(rows)
-			return err
-		},
-		TargetsByExecutionIDsQuery,
-		instanceID,
-		database.TextArray[string](ids1),
-		database.TextArray[string](ids2),
-	)
-	for i := range execution {
-		if err := execution[i].decryptSigningKey(q.targetEncryptionAlgorithm); err != nil {
-			return nil, err
-		}
-	}
-	return execution, err
 }
 
 func prepareExecutionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Execution, error)) {
@@ -357,100 +284,4 @@ func scanExecutions(rows *sql.Rows) (*Executions, error) {
 			Count: count,
 		},
 	}, nil
-}
-
-type ExecutionTarget struct {
-	InstanceID       string
-	ExecutionID      string
-	TargetID         string
-	TargetType       domain.TargetType
-	Endpoint         string
-	Timeout          time.Duration
-	InterruptOnError bool
-	signingKey       *crypto.CryptoValue
-	SigningKey       string
-}
-
-func (e *ExecutionTarget) GetExecutionID() string {
-	return e.ExecutionID
-}
-func (e *ExecutionTarget) GetTargetID() string {
-	return e.TargetID
-}
-func (e *ExecutionTarget) IsInterruptOnError() bool {
-	return e.InterruptOnError
-}
-func (e *ExecutionTarget) GetEndpoint() string {
-	return e.Endpoint
-}
-func (e *ExecutionTarget) GetTargetType() domain.TargetType {
-	return e.TargetType
-}
-func (e *ExecutionTarget) GetTimeout() time.Duration {
-	return e.Timeout
-}
-func (e *ExecutionTarget) GetSigningKey() string {
-	return e.SigningKey
-}
-
-func (t *ExecutionTarget) decryptSigningKey(alg crypto.EncryptionAlgorithm) error {
-	if t.signingKey == nil {
-		return nil
-	}
-	keyValue, err := crypto.DecryptString(t.signingKey, alg)
-	if err != nil {
-		return zerrors.ThrowInternal(err, "QUERY-bxevy3YXwy", "Errors.Internal")
-	}
-	t.SigningKey = keyValue
-	return nil
-}
-
-func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
-	targets := make([]*ExecutionTarget, 0)
-	for rows.Next() {
-		target := new(ExecutionTarget)
-
-		var (
-			instanceID       = &sql.NullString{}
-			executionID      = &sql.NullString{}
-			targetID         = &sql.NullString{}
-			targetType       = &sql.NullInt32{}
-			endpoint         = &sql.NullString{}
-			timeout          = &sql.NullInt64{}
-			interruptOnError = &sql.NullBool{}
-			signingKey       = &crypto.CryptoValue{}
-		)
-
-		err := rows.Scan(
-			executionID,
-			instanceID,
-			targetID,
-			targetType,
-			endpoint,
-			timeout,
-			interruptOnError,
-			signingKey,
-		)
-
-		if err != nil {
-			return nil, err
-		}
-
-		target.InstanceID = instanceID.String
-		target.ExecutionID = executionID.String
-		target.TargetID = targetID.String
-		target.TargetType = domain.TargetType(targetType.Int32)
-		target.Endpoint = endpoint.String
-		target.Timeout = time.Duration(timeout.Int64)
-		target.InterruptOnError = interruptOnError.Bool
-		target.signingKey = signingKey
-
-		targets = append(targets, target)
-	}
-
-	if err := rows.Close(); err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-37ardr0pki", "Errors.Query.CloseRows")
-	}
-
-	return targets, nil
 }

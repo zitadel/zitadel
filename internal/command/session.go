@@ -346,7 +346,9 @@ func (c *Commands) terminateSession(ctx context.Context, sessionID, sessionToken
 			return nil, err
 		}
 	}
-	if sessionWriteModel.CheckIsActive() != nil {
+
+	// exclude expiration check as expired tokens can be deleted
+	if sessionWriteModel.State == domain.SessionStateUnspecified || sessionWriteModel.State == domain.SessionStateTerminated {
 		return writeModelToObjectDetails(&sessionWriteModel.WriteModel), nil
 	}
 	terminate := session.NewTerminateEvent(ctx, &session.NewAggregate(sessionWriteModel.AggregateID, sessionWriteModel.ResourceOwner).Aggregate)

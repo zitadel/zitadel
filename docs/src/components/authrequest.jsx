@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { AuthRequestContext } from "../utils/authrequest";
 import { Listbox } from "@headlessui/react";
 import { Transition } from "@headlessui/react";
@@ -111,9 +111,17 @@ export function SetAuthRequest() {
     "urn:zitadel:iam:org:project:id:zitadel:aud",
     "urn:zitadel:iam:user:metadata",
     `urn:zitadel:iam:org:id:${
-      organizationId ? organizationId : "[organizationId]"
+      organizationId ? organizationId : "[Organization ID]"
     }`,
   ];
+
+  const scopeExplanations = new Map([
+    ['urn:zitadel:iam:org:project:id:zitadel:aud', 'Requested projectid will be added to the audience of the access token.'],
+    ['urn:zitadel:iam:user:metadata', 'Metadata of the user will be included in the token. The values are base64 encoded.'],
+    [`urn:zitadel:iam:org:id:${
+      organizationId ? organizationId : "[organizationId]"
+    }`, 'Enforce that the user is a member of the selected organization.']
+  ]);
 
   const [scopeState, setScopeState] = useState(
     [true, true, true, false, false, false, false, false]
@@ -161,8 +169,13 @@ export function SetAuthRequest() {
     return input;
   };
 
-  useEffect(async () => {
-    setCodeChallenge(await encodeCodeChallenge(codeVerifier));
+  useEffect(() => {
+    const updateCodeChallange = async () => {
+      const newCodeChallange = await encodeCodeChallenge(codeVerifier)
+      setCodeChallenge(newCodeChallange);
+    }
+
+    updateCodeChallange();
   }, [codeVerifier]);
 
   useEffect(() => {
@@ -525,7 +538,7 @@ export function SetAuthRequest() {
               const value = event.target.value;
               setOrganizationId(value);
               allScopes[7] = `urn:zitadel:iam:org:id:${
-                value ? value : "[organizationId]"
+                value ? value : "[Organization ID]"
               }`;
               toggleScope(8, true);
               setScope(
@@ -559,6 +572,7 @@ export function SetAuthRequest() {
                 name="scopes"
                 value={`${scope}`}
                 checked={scopeState[scopeIndex]}
+                disabled={scope === 'openid'}
                 onChange={() => {
                   toggleScope(scopeIndex);
                 }}
@@ -571,6 +585,11 @@ export function SetAuthRequest() {
                   </strong>
                 ) : null}
               </label>
+              {scopeExplanations.has(scope) && (
+                <span className={clsx(hintClasses, 'ml-1')}>
+                  {scopeExplanations.get(scope)}
+                </span>
+              )}
             </div>
           );
         })}

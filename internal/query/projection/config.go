@@ -26,4 +26,5 @@ type CustomConfig struct {
 	ConcurrentInstances *uint
 	BulkLimit           *uint16
 	TransactionDuration *time.Duration
+	SkipInstanceIDs     []string
 }
