@@ -1,12 +1,13 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { BehaviorSubject, catchError, debounceTime, finalize, from, map, Observable, of, pipe, scan, take, tap } from 'rxjs';
+import { BehaviorSubject, catchError, debounceTime, from, map, Observable, of, pipe, take, tap } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { Org, OrgFieldName, OrgNameQuery, OrgQuery, OrgState, OrgStateQuery } from 'src/app/proto/generated/zitadel/org_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { Organization } from '@zitadel/proto/zitadel/org/v2/org_pb';
 
 const ORG_QUERY_LIMIT = 100;
 
@@ -44,7 +45,7 @@ export class OrgContextComponent implements OnInit {
   );
 
   public filterControl: UntypedFormControl = new UntypedFormControl('');
-  @Input() public org!: Org.AsObject;
+  @Input({ required: true }) public org!: Organization;
   @ViewChild('input', { static: false }) input!: ElementRef;
   @Output() public closedCard: EventEmitter<void> = new EventEmitter();
   @Output() public setOrg: EventEmitter<Org.AsObject> = new EventEmitter();

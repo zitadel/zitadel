@@ -19,7 +19,7 @@ import (
 )
 
 func TestServer_SetUserMetadata(t *testing.T) {
-	iamOwnerCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCTX := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 	tests := []struct {
 		name    string
@@ -31,7 +31,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
+			ctx:  Instance.WithAuthorizationToken(context.Background(), integration.UserTypeNoPermission),
 			dep: func(req *user.SetUserMetadataRequest) {
 				req.UserId = Instance.CreateUserTypeHuman(CTX, gofakeit.Email()).GetId()
 			},
@@ -77,7 +77,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 		},
 		{
 			name: "update user metadata",
-			ctx:  Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner),
+			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			dep: func(req *user.SetUserMetadataRequest) {
 				req.UserId = Instance.CreateUserTypeHuman(iamOwnerCTX, gofakeit.Email()).GetId()
 				Instance.SetUserMetadata(iamOwnerCTX, req.UserId, "key1", "value1")
@@ -89,7 +89,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 		},
 		{
 			name: "update user metadata with same value",
-			ctx:  Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner),
+			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			dep: func(req *user.SetUserMetadataRequest) {
 				req.UserId = Instance.CreateUserTypeHuman(iamOwnerCTX, gofakeit.Email()).GetId()
 				Instance.SetUserMetadata(iamOwnerCTX, req.UserId, "key1", "value1")
@@ -132,7 +132,7 @@ func assertSetUserMetadataResponse(t *testing.T, creationDate, changeDate time.T
 }
 
 func TestServer_ListUserMetadata(t *testing.T) {
-	iamOwnerCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCTX := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 	type args struct {
 		ctx context.Context
@@ -149,7 +149,7 @@ func TestServer_ListUserMetadata(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: Instance.WithAuthorization(context.Background(), integration.UserTypeNoPermission),
+				ctx: Instance.WithAuthorizationToken(context.Background(), integration.UserTypeNoPermission),
 				dep: func(ctx context.Context, request *user.ListUserMetadataRequest, response *user.ListUserMetadataResponse) {
 					userID := Instance.CreateUserTypeHuman(iamOwnerCTX, gofakeit.Email()).GetId()
 					request.UserId = userID
@@ -281,7 +281,7 @@ func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationRes
 }
 
 func TestServer_DeleteUserMetadata(t *testing.T) {
-	iamOwnerCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCTX := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 	tests := []struct {
 		name             string

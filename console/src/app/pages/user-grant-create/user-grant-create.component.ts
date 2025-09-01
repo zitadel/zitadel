@@ -1,17 +1,16 @@
 import { Location } from '@angular/common';
-import { Component, OnDestroy } from '@angular/core';
+import { Component, effect, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 import { UserTarget } from 'src/app/modules/search-user-autocomplete/search-user-autocomplete.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { NewOrganizationService } from '../../services/new-organization.service';
 
 @Component({
   selector: 'cnsl-user-grant-create',
@@ -21,7 +20,7 @@ import { ToastService } from 'src/app/services/toast.service';
 export class UserGrantCreateComponent implements OnDestroy {
   public context!: UserGrantContext;
 
-  public org?: Org.AsObject;
+  public activateOrganizationQuery = this.newOrganizationService.activeOrganizationQuery();
   public userIds: string[] = [];
 
   public project?: Project.AsObject;
@@ -37,16 +36,15 @@ export class UserGrantCreateComponent implements OnDestroy {
   public user?: User.AsObject;
   public UserTarget: any = UserTarget;
 
-  public editState: boolean = false;
   private destroy$: Subject<void> = new Subject();
 
   constructor(
-    private userService: ManagementService,
-    private toast: ToastService,
-    private _location: Location,
-    private route: ActivatedRoute,
-    private mgmtService: ManagementService,
-    private storage: StorageService,
+    private readonly userService: ManagementService,
+    private readonly toast: ToastService,
+    private readonly _location: Location,
+    private readonly route: ActivatedRoute,
+    private readonly mgmtService: ManagementService,
+    private readonly newOrganizationService: NewOrganizationService,
     breadcrumbService: BreadcrumbService,
   ) {
     breadcrumbService.setBreadcrumb([
@@ -101,10 +99,11 @@ export class UserGrantCreateComponent implements OnDestroy {
       }
     });
 
-    const temporg = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.session);
-    if (temporg) {
-      this.org = temporg;
-    }
+    effect(() => {
+      if (this.activateOrganizationQuery.isError()) {
+        this.toast.showError(this.activateOrganizationQuery.error());
+      }
+    });
   }
 
   public close(): void {

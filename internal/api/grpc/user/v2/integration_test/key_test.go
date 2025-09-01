@@ -4,7 +4,6 @@ package user_test
 
 import (
 	"context"
-	"fmt"
 	"slices"
 	"testing"
 	"time"
@@ -377,7 +376,7 @@ func TestServer_ListKeys(t *testing.T) {
 		want *user.ListKeysResponse
 	}
 	OrgCTX := CTX
-	otherOrg := Instance.CreateOrganization(SystemCTX, fmt.Sprintf("ListKeys-%s", gofakeit.AppName()), gofakeit.Email())
+	otherOrg := Instance.CreateOrganization(SystemCTX, integration.OrganizationName(), gofakeit.Email())
 	otherOrgUser, err := Client.CreateUser(SystemCTX, &user.CreateUserRequest{
 		OrganizationId: otherOrg.OrganizationId,
 		UserType: &user.CreateUserRequest_Machine_{

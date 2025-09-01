@@ -56,8 +56,8 @@
       *ngIf="instance?.state"
       class="state"
       [ngClass]="{
-        active: instance.state === State.INSTANCE_STATE_RUNNING,
-        inactive: instance.state === State.INSTANCE_STATE_STOPPED || instance.state === State.INSTANCE_STATE_STOPPING,
+        active: instance.state === State.STATE_RUNNING,
+        inactive: instance.state === State.STATE_STOPPED || instance.state === State.STATE_STOPPING,
       }"
     >
       {{ 'IAM.STATE.' + instance.state | translate }}
