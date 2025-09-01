@@ -32,6 +32,7 @@ type Config struct {
 func NewQueue(config *Config) (_ *Queue, err error) {
 	middleware := []rivertype.Middleware{otelriver.NewMiddleware(&otelriver.MiddlewareConfig{
 		MeterProvider: metrics.GetMetricsProvider(),
+		DurationUnit:  "ms",
 	})}
 	return &Queue{
 		driver: riverdatabasesql.New(config.Client.DB),
