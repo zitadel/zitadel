@@ -40,4 +40,4 @@ jobs:
         working-directory: apps/login
       - uses: nrwl/nx-set-shas@v4
       - name: Run all TypeScript related checks
-        run: "pnpm nx affected --target check --nxBail"
+        run: "pnpm nx affected --target check --nxBail --exclude @zitadel/docs,@zitadel/console"

@@ -1,6 +1,7 @@
 {
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "targets": {
+    "check": {},
     "ensure-plugins": {
       "inputs": [
         "{projectRoot}/plugin-download.sh"
