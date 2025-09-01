@@ -2370,6 +2370,7 @@
       "METADATAURL": "메타데이터 URL",
       "BINDING": "바인딩",
       "SIGNEDREQUEST": "서명된 요청",
+      "SIGNATUREALGORITHM": "서명 알고리즘",
       "NAMEIDFORMAT": "NameID 형식",
       "TRANSIENTMAPPINGATTRIBUTENAME": "사용자 매핑 속성 이름",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "`nameid-format`이 `transient`인 경우 사용자 매핑에 사용할 대체 속성 이름, 예: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"

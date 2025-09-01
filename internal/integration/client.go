@@ -20,6 +20,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/integration/scim"
 	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 	action_v2beta "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
@@ -1064,7 +1065,7 @@ func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Contex
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
+func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty target_domain.TargetType, interrupt bool) *action.CreateTargetResponse {
 	if name == "" {
 		name = gofakeit.Name()
 	}
@@ -1074,19 +1075,19 @@ func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoin
 		Timeout:  durationpb.New(5 * time.Second),
 	}
 	switch ty {
-	case domain.TargetTypeWebhook:
+	case target_domain.TargetTypeWebhook:
 		req.TargetType = &action.CreateTargetRequest_RestWebhook{
 			RestWebhook: &action.RESTWebhook{
 				InterruptOnError: interrupt,
 			},
 		}
-	case domain.TargetTypeCall:
+	case target_domain.TargetTypeCall:
 		req.TargetType = &action.CreateTargetRequest_RestCall{
 			RestCall: &action.RESTCall{
 				InterruptOnError: interrupt,
 			},
 		}
-	case domain.TargetTypeAsync:
+	case target_domain.TargetTypeAsync:
 		req.TargetType = &action.CreateTargetRequest_RestAsync{
 			RestAsync: &action.RESTAsync{},
 		}
