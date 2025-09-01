@@ -265,7 +265,6 @@ export class OrganizationSelectorComponent {
   private getActiveOrgIfSearchMatches(nameQuery: Signal<NameQuery | undefined>) {
     return computed(() => {
       const activeOrg = this.activeOrg.data() ?? undefined;
-      console.log('activeorg', activeOrg);
       const query = nameQuery();
       if (!activeOrg || !query?.value?.name) {
         return activeOrg;
