@@ -349,7 +349,7 @@ docs → (independent)
 
 **`@zitadel/proto`**: Protocol buffer definitions and generated TypeScript/JavaScript clients.
 ```bash
-nx generate @zitadel/proto  # Regenerate after proto changes
+nx run @zitadel/proto:generate  # Regenerate after proto changes
 ```
 
 **`@zitadel/client`**: High-level TypeScript client library with utilities for API interaction.
@@ -377,7 +377,7 @@ pnpm install
 pnpm add -g nx
 
 # Test a project
-nx dev login  # Should start dev server at http://localhost:3000
+nx dev login  # Should start dev server at http://localhost:3000/ui/v2/login/loginname
 ```
 
 **Additional requirements for testing:**
