@@ -27,6 +27,12 @@
     "description": "Enter your login data.",
     "register": "Register new user",
     "submit": "Continue",
+    "labels": {
+      "loginname": "Loginname",
+      "username": "Username",
+      "usernameOrPhoneNumber": "Username or phone number",
+      "usernameOrEmail": "Username or email"
+    },
     "required": {
       "loginName": "This field is required"
     }
@@ -37,6 +43,9 @@
       "description": "Enter your password.",
       "resetPassword": "Reset Password",
       "submit": "Continue",
+      "labels": {
+        "password": "Password"
+      },
       "required": {
         "password": "This field is required"
       }
@@ -48,6 +57,11 @@
       "noCodeReceived": "Didn't receive a code?",
       "resend": "Resend code",
       "submit": "Continue",
+      "labels": {
+        "code": "Code",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password"
+      },
       "required": {
         "code": "This field is required",
         "newPassword": "You have to provide a password!",
@@ -58,6 +72,10 @@
       "title": "Change Password",
       "description": "Set the password for your account",
       "submit": "Continue",
+      "labels": {
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password"
+      },
       "required": {
         "newPassword": "You have to provide a new password!",
         "confirmPassword": "This field is required"
@@ -101,9 +119,11 @@
   "ldap": {
     "title": "LDAP Login",
     "description": "Enter your LDAP credentials.",
-    "username": "Username",
-    "password": "Password",
     "submit": "Continue",
+    "labels": {
+      "username": "Username",
+      "password": "Password"
+    },
     "required": {
       "username": "This field is required",
       "password": "This field is required"
@@ -130,6 +150,9 @@
       "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
       "submit": "Continue",
+      "labels": {
+        "code": "Code"
+      },
       "required": {
         "code": "This field is required"
       }
@@ -141,6 +164,9 @@
       "emailDescription": "Enter your email address to receive a code via email.",
       "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
       "submit": "Continue",
+      "labels": {
+        "code": "Code"
+      },
       "required": {
         "code": "This field is required"
       }
@@ -201,10 +227,19 @@
       "title": "Set Password",
       "description": "Set the password for your account",
       "submit": "Continue",
+      "labels": {
+        "password": "Password",
+        "confirmPassword": "Confirm Password"
+      },
       "required": {
         "password": "You have to provide a password!",
         "confirmPassword": "This field is required"
       }
+    },
+    "labels": {
+      "firstname": "First name",
+      "lastname": "Last name",
+      "email": "E-mail"
     },
     "required": {
       "firstname": "This field is required",
@@ -247,6 +282,9 @@
       "resendCode": "Resend code",
       "codeSent": "A code has just been sent to your email address.",
       "submit": "Continue",
+      "labels": {
+        "code": "Code"
+      },
       "required": {
         "code": "This field is required"
       }
@@ -264,6 +302,9 @@
       "title": "Device code",
       "description": "Enter the code displayed on your app or device.",
       "submit": "Continue",
+      "labels": {
+        "code": "Code"
+      },
       "required": {
         "code": "This field is required"
       }
