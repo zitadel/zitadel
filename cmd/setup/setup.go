@@ -275,7 +275,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		}
 	}
 
-	commands, queries, _, _ := startCommandsQueries(ctx, eventstoreClient, eventstoreV4, dbClient, masterKey, config)
+	commands, _, _, _ := startCommandsQueries(ctx, eventstoreClient, eventstoreV4, dbClient, masterKey, config)
 	steps.s59SetupWebkeys = &SetupWebkeys{eventstore: eventstoreClient, commands: commands}
 
 	repeatableSteps := []migration.RepeatableMigration{
