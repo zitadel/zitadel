@@ -428,6 +428,7 @@ var queue chan func()
 
 func StartWorkerPool(ctx context.Context, count uint16) {
 	queue = make(chan func())
+
 	for range count {
 		go worker(ctx)
 	}
@@ -436,12 +437,19 @@ func StartWorkerPool(ctx context.Context, count uint16) {
 func worker(ctx context.Context) {
 	for {
 		select {
-		case f := <-queue:
+		case f, ok := <-queue:
+			if !ok {
+				return
+			}
 			f()
 		case <-ctx.Done():
 			return
 		}
 	}
+}
+
+func Close() {
+	close(queue)
 }
 
 func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Context, err error) {

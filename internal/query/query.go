@@ -115,6 +115,10 @@ func (q *Queries) Health(ctx context.Context) error {
 	return q.client.Ping()
 }
 
+func (q *Queries) Close() {
+	handler.Close()
+}
+
 // cleanStaticQueries removes whitespaces,
 // such as ` `, \t, \n, from queries to improve
 // readability in logs and errors.

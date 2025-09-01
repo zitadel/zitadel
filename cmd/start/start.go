@@ -219,6 +219,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
+	defer queries.Close()
 
 	authZRepo, err := authz.Start(queries, eventstoreClient, dbClient, keys.OIDC, config.ExternalSecure)
 	if err != nil {
