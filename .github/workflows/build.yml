@@ -94,8 +94,8 @@ jobs:
       build_image_name_core: "ghcr.io/zitadel/zitadel-build"
       build_image_name_login: "ghcr.io/zitadel/zitadel-login-build"
 
-  nx-lint-test:
-    uses: ./.github/workflows/nx-lint-test.yml
+  check:
+    uses: ./.github/workflows/check.yml
     with:
       node_version: "22"
 
@@ -116,7 +116,7 @@ jobs:
         core-unit-test,
         core-integration-test,
         lint,
-        nx-lint-test,
+        check,
         container,
         e2e,
       ]
