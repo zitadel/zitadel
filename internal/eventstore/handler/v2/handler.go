@@ -424,14 +424,19 @@ func WithMinPosition(position decimal.Decimal) TriggerOpt {
 	}
 }
 
-var queue chan func()
+var (
+	queue      chan func()
+	queueStart sync.Once
+)
 
 func StartWorkerPool(ctx context.Context, count uint16) {
-	queue = make(chan func())
+	queueStart.Do(func() {
+		queue = make(chan func(), count)
 
-	for range count {
-		go worker(ctx)
-	}
+		for range count {
+			go worker(ctx)
+		}
+	})
 }
 
 func worker(ctx context.Context) {
@@ -449,7 +454,7 @@ func worker(ctx context.Context) {
 }
 
 func Close() {
-	close(queue)
+	// close(queue)
 }
 
 func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Context, err error) {
