@@ -37,7 +37,7 @@
 @import 'src/app/pages/users/user-list/user-table/user-table.component';
 @import 'src/app/pages/users/user-detail/contact/contact.component';
 @import 'src/app/pages/projects/project-grid/project-grid.component';
-@import 'src/app/pages/actions/actions.component';
+@import 'src/app/pages/org-actions/actions.component';
 @import 'src/app/app.component.scss';
 @import './styles/color.scss';
 @import 'src/app/pages/instance/instance.component.scss';
@@ -78,6 +78,11 @@
 @import './styles/codemirror.scss';
 @import 'src/app/components/copy-row/copy-row.component.scss';
 @import 'src/app/modules/providers/provider-next/provider-next.component.scss';
+@import 'src/app/modules/new-header/organization-selector/organization-selector.component.scss';
+@import 'src/app/modules/new-header/instance-selector/instance-selector.component.scss';
+@import 'src/app/modules/new-header/header-dropdown/header-dropdown.component.scss';
+@import 'src/app/modules/new-header/new-header.component.scss';
+@import 'src/app/modules/new-header/header-button/header-button.component.scss';
 
 @mixin component-themes($theme) {
   @include cnsl-color-theme($theme);
@@ -159,4 +164,9 @@
   @include copy-row-theme($theme);
   @include provider-next-theme($theme);
   @include smtp-settings-theme($theme);
+  @include organization-selector-theme($theme);
+  @include instance-selector-theme($theme);
+  @include header-dropdown-theme($theme);
+  @include new-header-theme($theme);
+  @include header-button-theme($theme);
 }
