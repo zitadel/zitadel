@@ -343,11 +343,10 @@ func checkAdditionalEvents(eventQueue chan eventstore.Event, event eventstore.Ev
 	events := make([]eventstore.Event, 1)
 	events[0] = event
 	for {
-		wait := time.NewTimer(50 * time.Millisecond)
+		wait := time.NewTimer(1 * time.Millisecond)
 		select {
 		case event := <-eventQueue:
 			events = append(events, event)
-			wait.Reset(50 * time.Millisecond)
 		case <-wait.C:
 			return events
 		}
@@ -563,7 +562,12 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	}()
 
 	var hasLocked bool
-	err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
+	if config.awaitRunning {
+		_, err = tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID())
+		hasLocked = true
+	} else {
+		err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
+	}
 	if err != nil {
 		return false, err
 	}
