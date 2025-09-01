@@ -32,6 +32,8 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 	}
 
 	userAgg := user.NewAggregate("user1", "org1")
+	orgAgg := org.NewAggregate("org1")
+
 	userAddedEvent := user.NewMachineAddedEvent(context.Background(),
 		&userAgg.Aggregate,
 		"username",
@@ -101,18 +103,64 @@ func TestCommandSide_ChangeUserMachine(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
-								&userAgg.Aggregate,
+								&orgAgg.Aggregate,
 								true,
 								true,
 								true,
 							),
 						),
 					),
+					expectFilterOrganizationSettings("org1", false, false),
 					expectPush(
 						user.NewUsernameChangedEvent(context.Background(),
 							&userAgg.Aggregate,
 							"username",
 							"changed",
+							true,
+							false,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				machine: &ChangeMachine{
+					Username: gu.Ptr("changed"),
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
+				},
+			},
+		}, {
+			name: "change machine username, orgScopedUsername, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(userAddedEvent),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&orgAgg.Aggregate,
+								false,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilterOrganizationSettings("org1", true, true),
+					expectPush(
+						user.NewUsernameChangedEvent(context.Background(),
+							&userAgg.Aggregate,
+							"username",
+							"changed",
+							false,
 							true,
 						),
 					),

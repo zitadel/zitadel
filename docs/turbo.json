@@ -1,0 +1,45 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "generate": {
+      "dependsOn": ["^generate"],
+      "outputs": ["docs/api/**", "docs/self-hosting/manage/configure/*.yaml"],
+      "cache": true
+    },
+    "generate:grpc": {
+      "dependsOn": ["^generate"],
+      "outputs": ["docs/api/**"],
+      "cache": true
+    },
+    "generate:apidocs": {
+      "dependsOn": ["generate:grpc"],
+      "outputs": ["docs/api/**"],
+      "cache": true
+    },
+    "generate:configdocs": {
+      "outputs": ["docs/self-hosting/manage/configure/*.yaml"],
+      "cache": true
+    },
+    "build": {
+      "dependsOn": ["generate"],
+      "outputs": ["build/**"],
+      "cache": true
+    },
+    "dev": {
+      "dependsOn": ["generate"],
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "dependsOn": ["generate"],
+      "cache": false,
+      "persistent": true
+    },
+    "start:api": {
+      "dependsOn": ["generate"],
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

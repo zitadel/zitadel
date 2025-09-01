@@ -1,0 +1,68 @@
+InitCode:
+  Title: Kullanıcıyı Başlat
+  PreHeader: Kullanıcıyı Başlat
+  Subject: Kullanıcıyı Başlat
+  Greeting: Merhaba {{.DisplayName}},
+  Text: Bu kullanıcı oluşturuldu. Giriş yapmak için {{.PreferredLoginName}} kullanıcı adını kullanın. Başlatma işlemini tamamlamak için lütfen aşağıdaki düğmeye tıklayın. (Kod {{.Code}}) Bu e-postayı siz istemediyseniz, lütfen görmezden gelin.
+  ButtonText: Başlatmayı tamamla
+PasswordReset:
+  Title: Şifre sıfırla
+  PreHeader: Şifre sıfırla
+  Subject: Şifre sıfırla
+  Greeting: Merhaba {{.DisplayName}},
+  Text: Şifre sıfırlama isteği aldık. Şifrenizi sıfırlamak için lütfen aşağıdaki düğmeyi kullanın. (Kod {{.Code}}) Bu e-postayı siz istemediyseniz, lütfen görmezden gelin.
+  ButtonText: Şifreyi sıfırla
+VerifyEmail:
+  Title: E-postayı doğrula
+  PreHeader: E-postayı doğrula
+  Subject: E-postayı doğrula
+  Greeting: Merhaba {{.DisplayName}},
+  Text: Yeni bir e-posta adresi eklendi. E-posta adresinizi doğrulamak için lütfen aşağıdaki düğmeyi kullanın. (Kod {{.Code}}) Yeni bir e-posta eklemediyseniz, lütfen bu e-postayı görmezden gelin.
+  ButtonText: E-postayı doğrula
+VerifyPhone:
+  Title: Telefonu doğrula
+  PreHeader: Telefonu doğrula
+  Subject: Telefonu doğrula
+  Greeting: Merhaba {{.DisplayName}},
+  Text: Yeni bir telefon numarası eklendi. Doğrulamak için lütfen şu kodu kullanın {{.Code}}
+  ButtonText: Telefonu doğrula
+VerifyEmailOTP:
+  Title: Tek Kullanımlık Şifreyi Doğrula
+  PreHeader: Tek Kullanımlık Şifreyi Doğrula
+  Subject: Tek Kullanımlık Şifreyi Doğrula
+  Greeting: Merhaba {{.DisplayName}},
+  Text: Önümüzdeki beş dakika içinde kimlik doğrulaması yapmak için {{.OTP}} tek kullanımlık şifreyi kullanın veya "Kimlik Doğrula" düğmesine tıklayın.
+  ButtonText: Kimlik Doğrula
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}}, {{ .Domain }} için tek kullanımlık şifrenizdir. Önümüzdeki {{.Expiry}} içinde kullanın.
+    
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: Domain talep edildi
+  PreHeader: E-posta / kullanıcı adını değiştir
+  Subject: Domain talep edildi
+  Greeting: Merhaba {{.DisplayName}},
+  Text: "{{.Domain}} domaini bir organizasyon tarafından talep edildi. Mevcut kullanıcınız {{.Username}} bu organizasyonun parçası değil. Bu nedenle giriş yaparken e-postanızı değiştirmeniz gerekecek. Bu giriş için geçici bir kullanıcı adı ({{.TempUsername}}) oluşturduk."
+  ButtonText: Giriş Yap
+PasswordlessRegistration:
+  Title: Şifresiz Giriş Ekle
+  PreHeader: Şifresiz Giriş Ekle
+  Subject: Şifresiz Giriş Ekle
+  Greeting: Merhaba {{.DisplayName}},
+  Text: Şifresiz giriş için token ekleme isteği aldık. Şifresiz giriş için token'ınızı veya cihazınızı eklemek için lütfen aşağıdaki düğmeyi kullanın.
+  ButtonText: Şifresiz Giriş Ekle
+PasswordChange:
+  Title: Kullanıcının şifresi değişti
+  PreHeader: Şifre değiştir
+  Subject: Kullanıcının şifresi değişti
+  Greeting: Merhaba {{.DisplayName}},
+  Text: Kullanıcınızın şifresi değişti. Bu değişikliği siz yapmadıysanız, lütfen derhal şifrenizi sıfırlamanız önerilir.
+  ButtonText: Giriş Yap
+InviteUser:
+  Title: "{{.ApplicationName}} için davet"
+  PreHeader: "{{.ApplicationName}} için davet"
+  Subject: "{{.ApplicationName}} için davet"
+  Greeting: Merhaba {{.DisplayName}},
+  Text: "Kullanıcınız {{.ApplicationName}} uygulamasına davet edildi. Davet işlemini tamamlamak için lütfen aşağıdaki düğmeye tıklayın. Bu e-postayı siz istemediyseniz, lütfen görmezden gelin."
+  ButtonText: Daveti kabul et

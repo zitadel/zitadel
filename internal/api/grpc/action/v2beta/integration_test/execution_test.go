@@ -10,15 +10,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/integration"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 )
 
 func TestServer_SetExecution_Request(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", target_domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name        string
@@ -29,7 +29,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Request{
@@ -155,7 +155,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			assertSetExecutionResponse(t, creationDate, setDate, tt.wantSetDate, got)
 
 			// cleanup to not impact other requests
-			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			deleteExecution(tt.ctx, t, instance, tt.req.GetCondition())
 		})
 	}
 }
@@ -174,8 +174,8 @@ func assertSetExecutionResponse(t *testing.T, creationDate, setDate time.Time, e
 
 func TestServer_SetExecution_Response(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", target_domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name        string
@@ -186,7 +186,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -311,15 +311,15 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			assertSetExecutionResponse(t, creationDate, setDate, tt.wantSetDate, got)
 
 			// cleanup to not impact other requests
-			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			deleteExecution(tt.ctx, t, instance, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_SetExecution_Event(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", target_domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name        string
@@ -330,7 +330,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Event{
@@ -474,15 +474,15 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			assertSetExecutionResponse(t, creationDate, setDate, tt.wantSetDate, got)
 
 			// cleanup to not impact other requests
-			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			deleteExecution(tt.ctx, t, instance, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_SetExecution_Function(t *testing.T) {
 	instance := integration.NewInstance(CTX)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	isolatedIAMOwnerCTX := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", target_domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name        string
@@ -493,7 +493,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorizationToken(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -559,7 +559,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			assertSetExecutionResponse(t, creationDate, setDate, tt.wantSetDate, got)
 
 			// cleanup to not impact other requests
-			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			deleteExecution(tt.ctx, t, instance, tt.req.GetCondition())
 		})
 	}
 }

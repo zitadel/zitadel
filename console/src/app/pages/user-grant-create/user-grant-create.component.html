@@ -1,4 +1,5 @@
 <cnsl-create-layout
+  *ngIf="activateOrganizationQuery.data() as org"
   title="{{ 'GRANTS.CREATE.TITLE' | translate }}"
   [createSteps]="createSteps"
   [currentCreateStep]="currentCreateStep"

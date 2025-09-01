@@ -165,6 +165,11 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		return err
 	}
 
+	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, resourceOwner)
+	if err != nil {
+		return err
+	}
+
 	var createCmd humanCreationCommand
 	if human.Register {
 		createCmd = user.NewHumanRegisteredEvent(
@@ -178,7 +183,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			human.PreferredLanguage,
 			human.Gender,
 			human.Email.Address,
-			domainPolicy.UserLoginMustBeDomain,
+			domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
 			human.UserAgentID,
 		)
 	} else {
@@ -193,7 +198,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			human.PreferredLanguage,
 			human.Gender,
 			human.Email.Address,
-			domainPolicy.UserLoginMustBeDomain,
+			domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
 		)
 	}
 
@@ -406,6 +411,10 @@ func (c *Commands) changeUserEmail(ctx context.Context, cmds []eventstore.Comman
 			if err != nil {
 				return cmds, code, err
 			}
+			if email.URLTemplate == "" {
+				email.URLTemplate = c.defaultEmailCodeURLTemplate(ctx)
+			}
+
 			cmds = append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &wm.Aggregate().Aggregate, cryptoCode.Crypted, cryptoCode.Expiry, email.URLTemplate, email.ReturnCode, ""))
 			if email.ReturnCode {
 				code = &cryptoCode.Plain

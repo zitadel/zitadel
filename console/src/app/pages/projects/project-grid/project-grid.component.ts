@@ -220,13 +220,13 @@ export class ProjectGridComponent implements OnInit, OnDestroy {
   }
 
   private async getPrefixedItem(key: string): Promise<string | null> {
-    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.session) as Org.AsObject;
-    return localStorage.getItem(`${org?.id}:${key}`);
+    const org = this.storage.getItem(StorageKey.organizationId, StorageLocation.session);
+    return localStorage.getItem(`${org}:${key}`);
   }
 
   private async setPrefixedItem(key: string, value: any): Promise<void> {
-    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.session) as Org.AsObject;
-    return localStorage.setItem(`${org.id}:${key}`, value);
+    const org = this.storage.getItem(StorageKey.organizationId, StorageLocation.session);
+    return localStorage.setItem(`${org}:${key}`, value);
   }
 
   public navigateToProject(type: ProjectType, item: Project.AsObject | GrantedProject.AsObject, event: any): void {

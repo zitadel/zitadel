@@ -1423,7 +1423,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1505,8 +1506,6 @@
       "ACTIONS": "Tindakan",
       "ACTIONS_DESCRIPTION": "Tindakan v2 memungkinkan untuk mengelola eksekusi dan target data. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "If the flag is enabled, the OIDC parent error will be logged in the console.",
-      "DISABLEUSERTOKENEVENT": "Disable User Token Event",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Enable Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify clients about session termination at the OpenID Provider.",
       "PERMISSIONCHECKV2": "Permission Check V2",
@@ -1658,7 +1657,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifikasi email selesai",
@@ -2150,6 +2150,7 @@
       "METADATAURL": "URL metadata",
       "BINDING": "Mengikat",
       "SIGNEDREQUEST": "Permintaan yang Ditandatangani",
+      "SIGNATUREALGORITHM": "Algoritma tanda tangan",
       "NAMEIDFORMAT": "Format ID Nama",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Nama Atribut Pemetaan Khusus",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Nama atribut alternatif untuk memetakan pengguna jika `format nameid` yang dikembalikan adalah `sementara`, mis. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
@@ -2456,7 +2457,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Tambahkan Manajer",

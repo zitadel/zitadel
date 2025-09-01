@@ -529,7 +529,7 @@ OIDC:
     PollInterval: 5s # ZITADEL_OIDC_DEVICEAUTH_POLLINTERVAL
     UserCode:
       CharSet: "BCDFGHJKLMNPQRSTVWXZ" # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARSET
-      CharAmount: 8 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARARMOUNT
+      CharAmount: 8 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARAMOUNT
       DashInterval: 4 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_DASHINTERVAL
   DefaultLoginURLV2: "/ui/v2/login/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/ui/v2/login/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
@@ -576,7 +576,11 @@ Login:
     MaxAge: 12h # ZITADEL_LOGIN_CACHE_MAXAGE
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_LOGIN_CACHE_SHAREDMAXAGE
-  DefaultOTPEmailURLV2: "/otp/verify?loginName={{.LoginName}}&code={{.Code}}" # ZITADEL_LOGIN_CACHE_DEFAULTOTPEMAILURLV2
+  DefaultPaths:
+    BasePath: "/ui/v2/login"
+    PasswordSetPath: "/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
+    EmailCodePath: "/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}"
+    OTPEmailPath: "/otp/verify?code={{.Code}}&userID={{.UserID}}&sessionId={{.SessionID}}"
 
 Console:
   ShortCache:
@@ -1141,7 +1145,6 @@ DefaultInstance:
     # WebKey: false # ZITADEL_DEFAULTINSTANCE_FEATURES_WEBKEY
     # DebugOIDCParentError: false # ZITADEL_DEFAULTINSTANCE_FEATURES_DEBUGOIDCPARENTERROR
     # OIDCSingleV1SessionTermination: false # ZITADEL_DEFAULTINSTANCE_FEATURES_OIDCSINGLEV1SESSIONTERMINATION
-    # DisableUserTokenEvent: false # ZITADEL_DEFAULTINSTANCE_FEATURES_DISABLEUSERTOKENEVENT
     # EnableBackChannelLogout: false # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLEBACKCHANNELLOGOUT
     LoginV2:
       Required: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED
@@ -1363,6 +1366,7 @@ InternalAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.read"
+        - "session.write"
         - "session.delete"
         - "action.target.read"
         - "action.target.write"
@@ -1372,8 +1376,6 @@ InternalAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
-        - "session.read"
-        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1467,6 +1469,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
@@ -1494,6 +1497,7 @@ InternalAuthZ:
         - "project.grant.write"
         - "project.grant.delete"
         - "project.grant.member.read"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
@@ -1557,6 +1561,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_LOGIN_CLIENT"
       Permissions:
@@ -1592,6 +1597,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "session.read"
+        - "session.write"
         - "session.link"
         - "session.delete"
         - "userschema.read"
@@ -1612,6 +1618,7 @@ InternalAuthZ:
         - "policy.read"
         - "project.read"
         - "project.role.read"
+        - "session.read"
         - "session.delete"
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
@@ -1919,6 +1926,7 @@ SystemAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.read"
+        - "session.write"
         - "session.delete"
         - "action.target.read"
         - "action.target.write"
@@ -1928,8 +1936,6 @@ SystemAuthZ:
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
-        - "session.read"
-        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -2023,6 +2029,7 @@ SystemAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
@@ -2050,6 +2057,7 @@ SystemAuthZ:
         - "project.grant.write"
         - "project.grant.delete"
         - "project.grant.member.read"
+        - "session.read"
         - "session.delete"
     - Role: "IAM_ADMIN_IMPERSONATOR"
       Permissions:
@@ -2092,6 +2100,7 @@ SystemAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "session.read"
+        - "session.write"
         - "session.link"
         - "session.delete"
         - "userschema.read"

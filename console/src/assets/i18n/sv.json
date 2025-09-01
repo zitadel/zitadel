@@ -1549,7 +1549,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1638,8 +1639,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
       "DEBUGOIDCPARENTERROR": "Debugga OIDC Föräldrafel",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Om flaggan är aktiverad kommer OIDC-föräldrafel att loggas i konsolen.",
-      "DISABLEUSERTOKENEVENT": "Inaktivera Användartokenhändelse",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Aktivera Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementerar OpenID Connect Back-Channel Logout 1.0 och kan användas för att meddela klienter om sessionens avslutning hos OpenID-leverantören.",
       "PERMISSIONCHECKV2": "Behörighetskontroll V2",
@@ -1798,7 +1797,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-postverifiering klar",
@@ -2777,7 +2777,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Lägg till en administratör",
