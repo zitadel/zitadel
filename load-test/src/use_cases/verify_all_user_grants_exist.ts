@@ -5,7 +5,7 @@ import { Config, MaxVUs } from '../config';
 import { createProject, Project } from '../project';
 import { addUserGrant } from '../user_grant';
 
-export async function setup() { 
+export async function setup() {
   const tokens = loginByUsernamePassword(Config.admin as User);
   console.info('setup: admin signed in');
 

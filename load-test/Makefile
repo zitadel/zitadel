@@ -63,8 +63,16 @@ machine_jwt_profile_grant_single_user: ensure_modules ensure_key_pair bundle
 
 .PHONY: verify_all_user_grants_exist
 verify_all_user_grants_exist: ensure_modules bundle
-	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/verify_all_user_grants_exist.js --duration ${DURATION} --vus ${VUS} 
+	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/verify_all_user_grants_exist.js --vus ${VUS} --duration ${DURATION}
 # 	--out csv=output/verify_all_user_grants_exist_${DATE}.csv
+
+.PHONY: users_by_metadata_key
+users_by_metadata_key: ensure_modules bundle
+	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/users_by_metadata_key.js --vus ${VUS} --duration ${DURATION} --out csv=output/users_by_metadata_${DATE}.csv
+
+.PHONY: users_by_metadata_value
+users_by_metadata_value: ensure_modules bundle
+	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/users_by_metadata_value.js --vus ${VUS} --duration ${DURATION} --out csv=output/users_by_metadata_${DATE}.csv
 
 .PHONY: lint
 lint:
