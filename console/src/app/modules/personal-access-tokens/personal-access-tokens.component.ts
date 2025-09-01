@@ -6,7 +6,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Moment } from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Key } from 'src/app/proto/generated/zitadel/auth_n_key_pb';
 import { ListPersonalAccessTokensResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { PersonalAccessToken } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -52,7 +51,7 @@ export class PersonalAccessTokensComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.getData(10, 0);
+    this.getData(10, 0).then();
   }
 
   public isAllSelected(): boolean {
@@ -69,7 +68,7 @@ export class PersonalAccessTokensComponent implements OnInit {
     this.getData(event.pageSize, event.pageIndex * event.pageSize);
   }
 
-  public deleteKey(key: Key.AsObject): void {
+  public deleteKey(key: PersonalAccessToken.AsObject): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.DELETE',
@@ -86,7 +85,7 @@ export class PersonalAccessTokensComponent implements OnInit {
           .then(() => {
             this.selection.clear();
             this.toast.showInfo('USER.PERSONALACCESSTOKEN.DELETED', true);
-            this.getData(10, 0);
+            this.getData(10, 0).then();
           })
           .catch((error) => {
             this.toast.showError(error);
