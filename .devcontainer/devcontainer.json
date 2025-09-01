@@ -5,15 +5,13 @@
 		"dockerfile": "Dockerfile"
 	},
 	"workspaceFolder": "/workspaces",
-	"remoteEnv": {
-		"DISPLAY": ""
-	},
 	"forwardPorts": [
+		5432,
 		3000,
 		4200,
 		8080
 	],
-	"onCreateCommand": "cd zitadel && pnpm install && pnpm add -g nx && go mod download",
+	"updateContentCommand": "cd zitadel && pnpm install && pnpm add -g nx && go mod download",
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {
 			"version": "1.24"

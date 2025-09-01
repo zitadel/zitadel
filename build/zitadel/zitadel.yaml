@@ -1,0 +1,11 @@
+ExternalSecure: false
+TLS.Enabled: false
+FirstInstance:
+  LoginClientPatPath: login-client.pat
+  Org:
+    LoginClient:
+      Machine:
+        Username: login-client
+        Name: Automatically Initialized IAM Login Client
+      Pat:
+        ExpirationDate: '2029-01-01T00:00:00Z'

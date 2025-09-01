@@ -21,6 +21,34 @@
             "dependsOn": [
                 "@zitadel/console:build"
             ]
+        },
+        "start-db": {
+            "sourceRoot": ".",
+            "command": "docker run --name zitadel-postgres --rm -p 5432:5432 --env-file {projectRoot}/postgres.env -v ./{projectRoot}/postgresql.conf:/etc/postgresql/postgresql.conf -v zitadel-postgres-data:/var/lib/postgresql/data postgres:latest postgres -c config_file=/etc/postgresql/postgresql.conf",
+            "cache": false,
+            "continuous": true
+        },
+        "wait-for-db": {
+            "dependsOn": [
+                "start-db"
+            ],
+            "command": "until docker exec zitadel-postgres pg_isready -U zitadel; do echo 'Waiting for PostgreSQL...'; sleep 2; done",
+            "cache": false
+        },
+        "start-zitadel": {
+            "dependsOn": [
+                "build",
+                "wait-for-db"
+            ],
+            "command": "./zitadel start-from-init --config ./zitadel.yaml --steps ./zitadel.yaml --masterkey MasterkeyNeedsToHave32Characters!",
+            "cache": false,
+            "continuous": true
+        },
+        "start": {
+            "dependsOn": [
+                "start-db",
+                "start-zitadel"
+            ]
         }
     }
 }
