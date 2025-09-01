@@ -37,7 +37,7 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	}, "wait for added event assertions to pass")
 	_, err := integration.SystemClient().SetLimits(CTX, &system.SetLimitsRequest{
 		InstanceId:        isoInstance.ID(),
-		AuditLogRetention: durationpb.New(time.Now().Sub(beforeTime)),
+		AuditLogRetention: durationpb.New(time.Since(beforeTime)),
 	})
 	require.NoError(t, err)
 	var limitedCounts *eventCounts
