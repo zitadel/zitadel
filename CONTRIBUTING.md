@@ -260,7 +260,7 @@ export Zitadel_IMAGE=zitadel:local GOOS=linux
 make docker_image
 
 # If you made changes in the e2e directory, make sure you reformat the files
-pnpm nx run e2e:lint:fix
+nx lint:fix e2e
 
 # Run the tests
 docker compose --file ./e2e/docker-compose.yaml run --service-ports e2e
@@ -298,72 +298,129 @@ docker compose --file ./e2e/docker-compose.yaml down
 ## Contribute Frontend Code
 
 This repository uses **pnpm** as package manager and **Nx** for build orchestration.
-All frontend packages are managed as a monorepo with shared dependencies and optimized builds:
 
-- [apps/login](contribute-login) (depends on packages/zitadel-client and packages/zitadel-proto)
-- apps/login/integration
-- apps/login/acceptance
-- [console](contribute-console) (depends on packages/zitadel-client)
-- packages/zitadel-client
-- packages/zitadel-proto
-- [docs](contribute-docs)
+### Quick Start (Recommended)
+
+**Use Dev Container** (everything pre-configured):
+
+Open in VS Code with Dev Container extension
+All dependencies and tools are already installed
+
+**Or install locally** ([requirements](#frontend-dev-requirements)):
+```bash
+pnpm install
+pnpm add -g nx
+nx dev login  # or dev console, dev docs
+```
+
+### Project Overview
+
+Choose your contribution area:
+
+- **[Login App](#contribute-login)** (Next.js/React) - Modern authentication flows
+- **[Console](#contribute-console)** (Angular) - Admin dashboard and user management  
+- **[Docs](#contribute-docs)** (Docusaurus) - Project documentation
+- **[Packages](#frontend-packages)** - Shared libraries for API communication
+
+### Essential Nx Commands
+
+| Task | Command | Notes |
+|------|---------|--------|
+| **Develop** | `nx dev PROJECT` | Hot reload development server |
+| **Build** | `nx build PROJECT` | Production build |
+| **Test Unit** | `nx test:unit PROJECT` | Unit tests |
+| **Test Integration** | `nx test:integration PROJECT` | End-to-end tests |
+| **Lint** | `nx lint PROJECT` | Check code style |
+| **Lint Fix** | `nx lint:fix PROJECT` | Auto-fix style issues |
+
+Replace `PROJECT` with: `@zitadel/login`, `console`, `docs`, `@zitadel/client`, `@zitadel/proto`, etc.
+
+### Project Dependencies
+
+```
+apps/login → packages/zitadel-client → packages/zitadel-proto
+console → packages/zitadel-client → packages/zitadel-proto  
+docs → (independent)
+```
+
+**Nx handles this automatically** - when you change `zitadel-proto`, Nx rebuilds dependent projects.
+
+### <a name="frontend-packages"></a>Frontend Packages
+
+**`@zitadel/proto`**: Protocol buffer definitions and generated TypeScript/JavaScript clients.
+```bash
+nx generate @zitadel/proto  # Regenerate after proto changes
+```
+
+**`@zitadel/client`**: High-level TypeScript client library with utilities for API interaction.
+```bash
+nx build @zitadel/client  # Build after changes
+```
 
 ### <a name="frontend-dev-requirements"></a>Frontend Development Requirements
+**Recommended: Use Dev Container** (everything pre-configured)
+```bash
+# Open in VS Code with Dev Container extension
+# All dependencies and tools are already installed
+```
 
-The frontend components are run in a [Node](https://nodejs.org/en/about/) environment and are managed using the pnpm package manager and the Nx orchestrator.
+**For local development, install:**
 
-> [!INFO]
-> Some [dev containers are available](dev-containers) for remote development with docker and pipeline debugging in isolated environments.
-> If you don't want to use one of the dev containers, you can develop the frontend components directly on your local machine.
-> To do so, proceed with installing the necessary dependencies.
+- **[Node.js v22.x](https://nodejs.org/en/download/)** - JavaScript runtime
+- **[pnpm 10.x](https://pnpm.io/installation)** - Package manager
+- **[Docker](https://docs.docker.com/engine/install/)** - For backend services
 
-We use **pnpm** as package manager and **Nx** for build orchestration. Use angular-eslint/Prettier for linting/formatting.
-VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues during development.
+**Install Node Modules:**
+```bash
+# Install dependencies
+pnpm install
+pnpm add -g nx
 
-The commands in this section are tested against the following software versions:
+# Test a project
+nx dev login  # Should start dev server at http://localhost:3000
+```
 
-- [Docker version 20.10.17](https://docs.docker.com/engine/install/)
-- [Node version v20.x](https://nodejs.org/en/download/)
-- [pnpm version 9.x](https://pnpm.io/installation)
-
-To run tests with Cypress, ensure you have installed the required [Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)
+**Additional requirements for testing:**
+- **[Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)** - For integration tests
 
 <details>
-  <summary>Note for WSL2 on Windows 10</summary>
-  Following the suggestions <a href="https://stackoverflow.com/questions/62641553/setup-cypress-on-wsl-ubuntu-for-windows-10">here </a> subsequently <a href="https://github.com/microsoft/WSL/issues/4106">here </a> may  need to XLaunch and configure your DISPLAY variable. Use at your own risk.
+  <summary>WSL2 on Windows 10 users (click to expand)</summary>
+  
+  For Cypress tests on WSL2, you may need to configure X11 forwarding. Following suggestions [here](https://stackoverflow.com/questions/62641553/setup-cypress-on-wsl-ubuntu-for-windows-10) and [here](https://github.com/microsoft/WSL/issues/4106). Use at your own risk.
 
-1. Install `VcXsrv Windows X Server`
-2. Set the target of your shortcut to `"C:\Program Files\VcXsrv\xlaunch.exe" -ac`
-3. In WSL2 run `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0` to set your DISPLAY variable
-4. When starting XLaunch, make sure to disable access control
+  1. Install `VcXsrv Windows X Server`
+  2. Set shortcut target to `"C:\Program Files\VcXsrv\xlaunch.exe" -ac`
+  3. In WSL2: `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0`
+  4. Disable access control when starting XLaunch
 </details>
+
+**Recommended VS Code extensions:**
+- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Code linting
+- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
+- [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For console development
+- [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner UI
 
 ### <a name="contribute-login"></a>Contribute to Login
 
 The Login UI is a Next.js application that provides the user interface for authentication flows.
 It's located in the `apps/login` directory and uses pnpm and Nx for development.
 
-To start developing the login, make sure your system has the [required system dependencies](frontend-dev-requirements) installed.
+To start developing the login, make sure your system has the [required system dependencies](#frontend-dev-requirements) installed.
 
-#### Development Setup
+#### Quick Start
 
 ```bash
-# Start from the root of the repository
-# Start the database and Zitadel backend
+# Start backend services
 docker compose --file ./apps/login/acceptance/docker-compose.yaml up --detach zitadel
 
-# Install dependencies
-pnpm install
+# Start development server (recommended)
+nx dev @zitadel/login
 
-# Option 1: Run login development server with Nx (recommended)
-pnpm nx run @zitadel/login:dev
-
-# Option 2: Build and serve login (production build)
-pnpm nx @zitadel/login:build
-cd ./login && pnpm start
+# Or start standalone production server
+nx start @zitadel/login
 ```
 
-The login UI is available at http://localhost:3000.
+Visit http://localhost:3000/ui/v2/login/loginname
 
 #### Login Architecture
 
@@ -373,34 +430,28 @@ The login application consists of multiple packages:
 - `@zitadel/client` - TypeScript client library for Zitadel APIs
 - `@zitadel/proto` - Protocol buffer definitions and generated code
 
-The build process uses Nx to orchestrate dependencies:
-
-1. Proto generation (`@zitadel/proto#generate`)
-2. Client library build (`@zitadel/client#build`)
-3. Login application build (`@zitadel/login#build`)
+The build process uses Nx and PNPM to orchestrate dependencies:
 
 #### Pass Quality Checks
 
-Reproduce the pipelines linting and testing for the login.
+Reproduce the pipelines linting and testing for the code you changed.
 
 ```bash
-pnpm nx run @zitadel/login:lint
-pnpm nx run @zitadel/login:test:unit
-pnpm devcontainer:integration:login
+nx affected --targets lint test
 ```
 
-Fix the [quality checks](troubleshoot-frontend), add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
+Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
 ### <a name="contribute-console"></a>Contribute to Console
 
-To start developing the console, make sure your system has the [required system dependencies](frontend-dev-requirements) installed.
+To start developing the console, make sure your system has the [required system dependencies](#frontend-dev-requirements) installed.
 Then, you need to decide which Zitadel instance you would like to target.
 - The easiest starting point is to [configure your environment](console-dev-existing-zitadel) to use a [Zitadel cloud](https://zitadel.com) instance.
 - Alternatively, you can [start a local Zitadel instance from scratch and develop against it](console-dev-local-zitadel).
 
 #### <a name="console-dev-existing-zitadel"></a>Develop against an already running Zitadel instance
 
-By default, `pnpm nx console:dev` targets a Zitadel API running at http://localhost:8080.
+By default, `nx dev console` targets a Zitadel API running at http://localhost:8080.
 To change this, export the link to your environment.json in your environment variables.
 
 ```bash
@@ -444,15 +495,11 @@ To allow console access via http://localhost:4200, you have to configure the Zit
 Run the local console development server.
 
 ```bash
-# Install dependencies (from repository root)
-pnpm install
+# Start development server (recommended)
+nx dev console
 
-# Option 1: Run console development server with live reloading and dependency rebuilds
-pnpm nx run console:dev
-
-# Option 2: Build and serve console (production build)
-pnpm nx run console:build
-pnpm nx run console:serve
+# Or start in Angular production mode
+nx start console
 ```
 
 Navigate to http://localhost:4200/.
@@ -460,31 +507,28 @@ Make some changes to the source code and see how the browser is automatically up
 
 #### Pass Quality Checks
 
-Reproduce the pipelines linting and testing for the console.
+Reproduce the pipelines linting and testing for the code you changed.
 
 ```bash
-pnpm nx run console:lint
-pnpm nx run e2e:lint
+nx affected --targets lint test
 ```
 
-Fix the [quality checks](troubleshoot-frontend), add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
+Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
 ### <a name="contribute-docs"></a>Contribute to Docs
 
 Project documentation is made with Docusaurus and is located under [./docs](./docs). The documentation uses **pnpm** and **Nx** for development and build processes.
 
+To start developing the docs, make sure your system has the [required system dependencies](#frontend-dev-requirements) installed.
+
 #### Local Development
 
 ```bash
-# Install dependencies (from repository root)
-pnpm install
+# Start development server (recommended)
+nx dev docs
 
-# Option 1: Run docs development server with Nx (recommended)
-pnpm nx run docs:dev
-
-# Option 2: Build and serve docs (production build)
-pnpm nx run docs:build
-cd ./docs && pnpm serve
+# Or start production server
+nx start docs
 ```
 
 The docs build process automatically:
@@ -522,68 +566,13 @@ Scope can be left empty (omit the brackets) or refer to the top navigation secti
 
 #### Pass Quality Checks
 
-Reproduce the pipelines linting checks for the docs.
+Reproduce the pipelines linting and testing for the code you changed.
 
 ```bash
-pnpm nx run docs:lint
+nx affected --targets lint test
 ```
 
-Fix the [quality checks](troubleshoot-frontend), add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
-
-### <a name="troubleshoot-frontend"></a>Troubleshoot Frontend Quality Checks
-
-To debug and fix failing tasks, execute them individually using the `--filter` flag.
-
-We recommend to use [one of the dev containers](dev-containers) to reproduce pipeline issues.
-
-```bash
-# to reproduce linting error in the console:
-pnpm nx run console:lint
-# To fix them:
-pnpm nx run console:lint:fix
-```
-
-## <a name="dev-containers"></>Developing Zitadel with Dev Containers
-
-You can use dev containers if you'd like to make sure you have the same development environment like the corresponding GitHub PR checks use.
-The following dev containers are available:
-
-- **.devcontainer/base/devcontainer.json**: Contains everything you need to run whatever you want.
-- **.devcontainer/nx-lint-unit/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests and then exits. This is useful to reproduce the corresponding GitHub PR check. 
-- **.devcontainer/nx-lint-unit-debug/devcontainer.json**: Runs a dev container that executes frontent linting and unit tests in watch mode. You can fix the errors right away and have immediate feedback.
-- **.devcontainer/login-integration/devcontainer.json**: Runs a dev container that executes login integration tests and then exits. This is useful to reproduce the corresponding GitHub PR check.
-- **.devcontainer/login-integration-debug/devcontainer.json**: Runs a dev container that spins up the login in a hot-reloading dev server and executes login integration tests interactively. You can fix the errors right away and have immediate feedback.
-
-You can also run the GitHub PR checks locally in dev containers without having to connect to a dev container.
- 
-
-The following pnpm commands use the [devcontainer CLI](https://github.com/devcontainers/cli/) and exit when the checks are done.
-The minimal system requirements are having Docker and the devcontainers CLI installed.
-If you don't have the node_modules installed already, you need to install the devcontainers CLI manually. Run `npm i -g @devcontainers/cli@0.80.0`. Alternatively, the [official Microsoft VS Code extension for Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) offers a command `Dev Containers: Install devcontainer CLI`
-
-
-```bash
-npm run devcontainer:lint-unit
-npm run devcontainer:integration:login
-```
-
-If you don't have NPM installed, copy and execute the scripts from the package.json directly.
-
-To connect to a dev container to have full IDE support, follow the instructions provided by your code editor/IDE to initiate the dev container.
-This typically involves opening the "Command Palette" or similar functionality and searching for commands related to "Dev Containers" or "Remote Containers".
-The quick start guide for VS Code can found [here](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)
-
-For example, to build and run the Zitadel binary in a dev container, connect your IDE to the dev container described in .devcontainer/base/devcontainer.json.
-Run the following commands inside the container to start Zitadel.
-
-```bash
-make compile && ./zitadel start-from-init --masterkey MasterkeyNeedsToHave32Characters --tlsMode disabled
-```
-
-Zitadel serves traffic as soon as you can see the following log line:
-
-`INFO[0001] server is listening on [::]:8080`
-
+Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
 ## <a name="contribute-translations"></a>Contribute Translations
 
