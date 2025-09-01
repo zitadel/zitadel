@@ -1,4 +1,4 @@
-name: Integration test core
+name: Check
 
 on: 
   workflow_call: 
@@ -8,8 +8,8 @@ on:
         type: string
 
 jobs:
-  nx-lint-test:
-    name: nx-lint-test
+  check:
+    name: check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,4 +40,4 @@ jobs:
         working-directory: apps/login
       - uses: nrwl/nx-set-shas@v4
       - name: Lint and Unit Test All JavaScript Code
-        run: "pnpm nx affected --targets ${{ github.event_name == 'pull_request' && 'lint' }} test"
+        run: "pnpm nx affected --target check"
