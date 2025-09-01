@@ -28,7 +28,7 @@
       "cache": false,
       "continuous": true,
       "dependsOn": [
-        "^build"
+        "build"
       ]
     },
     "dev": {
@@ -46,6 +46,7 @@
     },
     "check": {
       "dependsOn": [
+        "build",
         "lint",
         "test:unit",
         "test:integration"
