@@ -296,7 +296,7 @@ func addProjectRolesGrants(t *testing.T, userID, projectID string, roles ...stri
 // addProjectOrgGrant adds a new organization which will be granted on the projectID with the specified roles.
 // The userID will be granted in the new organization to the project with the same roles.
 func addProjectOrgGrant(t *testing.T, userID, projectID string, roles ...string) (grantedOrgID string) {
-	grantedOrg := Instance.CreateOrganization(CTXIAM, fmt.Sprintf("ZITADEL_GRANTED_%s", gofakeit.AppName()), gofakeit.Email())
+	grantedOrg := Instance.CreateOrganization(CTXIAM, integration.OrganizationName(), gofakeit.Email())
 	projectGrant, err := Instance.Client.Mgmt.AddProjectGrant(CTX, &management.AddProjectGrantRequest{
 		ProjectId:    projectID,
 		GrantedOrgId: grantedOrg.GetOrganizationId(),
