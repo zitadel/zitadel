@@ -243,3 +243,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	nhooyr.io/websocket v1.8.11 // indirect
 )
+	replace nhooyr.io/websocket => github.com/coder/websocket v1.8.17
+
