@@ -15,6 +15,7 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, SystemEnableBackChannelLogout, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, SystemLoginVersion, eventstore.GenericEventMapper[SetEvent[*feature.LoginV2]])
 	eventstore.RegisterFilterEventMapper(AggregateType, SystemPermissionCheckV2, eventstore.GenericEventMapper[SetEvent[bool]])
+	eventstore.RegisterFilterEventMapper(AggregateType, SystemEnableRelationalTables, eventstore.GenericEventMapper[SetEvent[bool]])
 
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceResetEventType, eventstore.GenericEventMapper[ResetEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceLoginDefaultOrgEventType, eventstore.GenericEventMapper[SetEvent[bool]])

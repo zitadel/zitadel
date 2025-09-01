@@ -171,8 +171,9 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 			name: "some features",
 			prepare: func(t *testing.T) {
 				_, err := Client.SetSystemFeatures(SystemCTX, &feature.SetSystemFeaturesRequest{
-					LoginDefaultOrg: gu.Ptr(true),
-					UserSchema:      gu.Ptr(false),
+					LoginDefaultOrg:        gu.Ptr(true),
+					UserSchema:             gu.Ptr(false),
+					EnableRelationalTables: gu.Ptr(true),
 				})
 				require.NoError(t, err)
 			},
@@ -187,6 +188,10 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 				},
 				UserSchema: &feature.FeatureFlag{
 					Enabled: false,
+					Source:  feature.Source_SOURCE_SYSTEM,
+				},
+				EnableRelationalTables: &feature.FeatureFlag{
+					Enabled: true,
 					Source:  feature.Source_SOURCE_SYSTEM,
 				},
 			},
@@ -210,6 +215,7 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 			require.NoError(t, err)
 			assertFeatureFlag(t, tt.want.LoginDefaultOrg, got.LoginDefaultOrg)
 			assertFeatureFlag(t, tt.want.UserSchema, got.UserSchema)
+			assertFeatureFlag(t, tt.want.EnableRelationalTables, got.EnableRelationalTables)
 		})
 	}
 }
