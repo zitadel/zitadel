@@ -21,6 +21,12 @@ permissions:
   actions: write
 
 jobs:
+
+  check:
+    uses: ./.github/workflows/check.yml
+    with:
+      node_version: "22"
+
   core:
     uses: ./.github/workflows/core.yml
     with:
@@ -31,12 +37,6 @@ jobs:
     uses: ./.github/workflows/console.yml
     with:
       node_version: "20"
-
-  docs:
-    uses: ./.github/workflows/docs.yml
-    with:
-      node_version: "20"
-      buf_version: "latest"
 
   version:
     uses: ./.github/workflows/version.yml
@@ -74,7 +74,7 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   lint:
-    needs: [core, console]
+    needs: [core]
     uses: ./.github/workflows/lint.yml
     with:
       buf_version: "latest"
@@ -93,11 +93,6 @@ jobs:
       node_version: "22"
       build_image_name_core: "ghcr.io/zitadel/zitadel-build"
       build_image_name_login: "ghcr.io/zitadel/zitadel-login-build"
-
-  check:
-    uses: ./.github/workflows/check.yml
-    with:
-      node_version: "22"
 
   e2e:
     uses: ./.github/workflows/e2e.yml
