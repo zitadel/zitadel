@@ -72,7 +72,7 @@ func TestCreateIDProvider(t *testing.T) {
 			},
 		},
 		{
-			name: "create organization without name",
+			name: "create idp without name",
 			idp: domain.IdentityProvider{
 				InstanceID: instanceId,
 				OrgID:      &orgId,
@@ -90,7 +90,7 @@ func TestCreateIDProvider(t *testing.T) {
 			err: new(database.CheckError),
 		},
 		{
-			name: "adding org with same id twice",
+			name: "adding idp with same id twice",
 			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 				idpRepo := repository.IDProviderRepository(pool)
 
@@ -118,7 +118,7 @@ func TestCreateIDProvider(t *testing.T) {
 			err: new(database.UniqueError),
 		},
 		{
-			name: "adding org with same name twice",
+			name: "adding idp with same name twice",
 			testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 				idpRepo := repository.IDProviderRepository(pool)
 
@@ -149,7 +149,7 @@ func TestCreateIDProvider(t *testing.T) {
 			id := gofakeit.Name()
 			name := gofakeit.Name()
 			return test{
-				name: "adding org with same name, id, different instance",
+				name: "adding idp with same name, id, different instance",
 				testFunc: func(ctx context.Context, t *testing.T) *domain.IdentityProvider {
 					// create instance
 					newInstId := gofakeit.Name()
@@ -273,7 +273,7 @@ func TestCreateIDProvider(t *testing.T) {
 			err: new(database.IntegrityViolationError),
 		},
 		{
-			name: "adding organization with non existent instance id",
+			name: "adding idp with non existent instance id",
 			idp: domain.IdentityProvider{
 				InstanceID:        gofakeit.Name(),
 				OrgID:             &orgId,
@@ -291,7 +291,7 @@ func TestCreateIDProvider(t *testing.T) {
 			err: new(database.ForeignKeyError),
 		},
 		{
-			name: "adding organization with non existent org id",
+			name: "adding idp with non existent org id",
 			idp: domain.IdentityProvider{
 				InstanceID:        instanceId,
 				OrgID:             gu.Ptr(gofakeit.Name()),
