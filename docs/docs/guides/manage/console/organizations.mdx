@@ -42,7 +42,7 @@ At the moment the username only allows e-mail formatted input. (This will be cha
 If this behavior is not suitable for you, ZITADEL has the option to suffix the usernames with the organization domain.
 This setting is called **User Loginname must contain orgdomain** and is part of your [Domain settings](./default-settings#domain-settings).
 
-Those loginnames consist of the format `{username}@{domainname}.{zitadeldomain}`.
+Those loginnames consist of the format `{username}@{domainname}.${CUSTOM_DOMAIN}`.
 If your user had the username `john.doe`, the generated loginname would be `john.doe@acme.zitadel.cloud`.
 This also means that only one user with the username `john.doe` can exist in your organization called `ACME`.
 
@@ -135,7 +135,7 @@ Read more about the [scopes](/docs/apis/openidoauth/scopes#reserved-scopes) or t
 
 ## Default organization
 
-On the Default settings page (${CUSTOM_DOMAIN}//ui/console/orgs) you can set an organization as default organization.
+On the Default settings page (`${CUSTOM_DOMAIN}`/ui/console/orgs) you can set an organization as default organization.
 Click the "..." on the right hand side of the table and select "Set as default organization".
 
 The current default organization is marked by a label "Default".

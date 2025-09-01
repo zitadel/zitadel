@@ -46,12 +46,12 @@ Use the following configuration
 | Setting | Value |
 | --- | --- |
 | Set up SSO with third-party identity provider | Enable (check) |
-| Sign-in page URL | ${CUSTOM_DOMAIN}/saml/v2/SSO |
-| Sign-out page URL | ${CUSTOM_DOMAIN}/saml/v2/SLO |
+| Sign-in page URL | `${CUSTOM_DOMAIN}`/saml/v2/SSO |
+| Sign-out page URL | `${CUSTOM_DOMAIN}`/saml/v2/SLO |
 | Verification Certificate | Upload the certificate (idp.crt) |
 | Use a domain-specific issuer | Enable (check) |
 | Network masks | Leave blank|
-| Change password URL | ${CUSTOM_DOMAIN}/ui/console/users/me?id=security |
+| Change password URL | `${CUSTOM_DOMAIN}`/ui/console/users/me?id=security |
 
 ### Create a SAML application in ZITADEL
 
