@@ -44,11 +44,11 @@ func TestMain(m *testing.M) {
 
 		Instance = integration.NewInstance(ctx)
 
-		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
-		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		LoginCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
+		UserCTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeNoPermission)
+		IamCTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeIAMOwner)
+		LoginCTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeLogin)
 		SystemCTX = integration.WithSystemAuthorization(ctx)
-		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
+		CTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeOrgOwner)
 		Client = Instance.Client.UserV2beta
 		return m.Run()
 	}())

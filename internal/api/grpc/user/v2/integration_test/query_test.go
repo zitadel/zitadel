@@ -4,6 +4,7 @@ package user_test
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"slices"
 	"testing"
@@ -16,6 +17,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
+	v2 "github.com/zitadel/zitadel/pkg/grpc/metadata/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
@@ -630,6 +633,13 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserIDsQuery(infos.userIDs()))
+
+					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta", "my value 1")
+					Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value 3")
+					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value 2")
+
+					request.Queries = append(request.Queries, MetadataKeyContainsQuery("my meta"))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return infos
 				},
 			},
@@ -807,6 +817,15 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
+
+					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta 1", "my value")
+					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta 2", "my value")
+					Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value")
+					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value")
+
+					request.Queries = append(request.Queries, MetadataValueQuery("my value"))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+
 					return infos
 				},
 			},
@@ -1131,6 +1150,30 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "when no users matching meta key should return empty list",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					createUser(ctx, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, MetadataKeyContainsQuery("some non-existent meta"))
+
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					return []userAttr{}
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result:        []*user.User{},
+			},
+		},
 	}
 	for _, f := range permissionCheckV2Settings {
 		for _, tc := range tt {
@@ -1320,6 +1363,47 @@ func OrganizationIdQuery(resourceowner string) *user.SearchQuery {
 		Query: &user.SearchQuery_OrganizationIdQuery{
 			OrganizationIdQuery: &user.OrganizationIdQuery{
 				OrganizationId: resourceowner,
+			},
+		},
+	}
+}
+
+func OrQuery(queries []*user.SearchQuery) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_OrQuery{
+			OrQuery: &user.OrQuery{
+				Queries: queries,
+			},
+		},
+	}
+}
+
+func MetadataKeyContainsQuery(metadataKey string) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_MetadataKeyFilter{
+			MetadataKeyFilter: &v2.MetadataKeyFilter{
+				Key:    metadataKey,
+				Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_STARTS_WITH},
+		},
+	}
+}
+
+func MetakeyEqualsQuery(metaKey string) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_MetadataKeyFilter{
+			MetadataKeyFilter: &v2.MetadataKeyFilter{
+				Key:    metaKey,
+				Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS},
+		},
+	}
+}
+
+func MetadataValueQuery(metaValue string) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_MetadataValueFilter{
+			MetadataValueFilter: &v2.MetadataValueFilter{
+				Value:  []byte(base64.StdEncoding.EncodeToString([]byte(metaValue))),
+				Method: filter.ByteFilterMethod_BYTE_FILTER_METHOD_EQUALS,
 			},
 		},
 	}
