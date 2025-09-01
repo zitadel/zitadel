@@ -149,7 +149,7 @@ export class OrganizationSelectorComponent {
         })
         .catch((_) => {
           // user has no org selected or no permission for said org so we default to first org
-          newOrganizationService.setOrgId(orgs[0].id).then();
+          return newOrganizationService.setOrgId(orgs[0].id);
         });
     });
 

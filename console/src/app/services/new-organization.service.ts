@@ -76,9 +76,8 @@ export class NewOrganizationService {
 
     return queryOptions({
       queryKey: [this.userService.userId(), 'organization', 'listOrganizations', req],
-      queryFn: organizationId
-        ? () => this.listOrganizations(req).then((resp) => resp.result.find(Boolean) ?? null)
-        : skipToken,
+      queryFn: () => this.listOrganizations(req).then((resp) => resp.result.find(Boolean) ?? null),
+      enabled: !!organizationId,
     });
   }
 
