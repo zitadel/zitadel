@@ -53,7 +53,7 @@ func (m userMachine) DescriptionCondition(op database.TextOperation, description
 
 // DescriptionColumn implements [domain.machineColumns].
 func (m userMachine) DescriptionColumn() database.Column {
-	return database.NewColumn("description")
+	return database.NewColumn("user_machines", "description")
 }
 
 func (m userMachine) columns() database.Columns {
@@ -63,5 +63,5 @@ func (m userMachine) columns() database.Columns {
 func (m *userMachine) writeReturning() {
 	builder := database.StatementBuilder{}
 	builder.WriteString(" RETURNING ")
-	m.columns().Write(&builder)
+	m.columns().WriteQualified(&builder)
 }
