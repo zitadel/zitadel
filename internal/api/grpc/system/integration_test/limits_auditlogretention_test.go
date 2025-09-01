@@ -35,6 +35,7 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	addedCount := requireEventually(t, iamOwnerCtx, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(c, "added events are > seeded events", assert.Greater, seededCount)
 	}, "wait for added event assertions to pass")
+	time.Sleep(time.Second)
 	_, err := integration.SystemClient().SetLimits(CTX, &system.SetLimitsRequest{
 		InstanceId:        isoInstance.ID(),
 		AuditLogRetention: durationpb.New(time.Since(beforeTime)),
