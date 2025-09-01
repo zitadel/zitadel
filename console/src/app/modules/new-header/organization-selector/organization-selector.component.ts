@@ -12,7 +12,7 @@ import {
   Signal,
   ViewChild,
 } from '@angular/core';
-import { injectInfiniteQuery, injectMutation, keepPreviousData } from '@tanstack/angular-query-experimental';
+import { injectInfiniteQuery, injectMutation, keepPreviousData, QueryClient } from '@tanstack/angular-query-experimental';
 import { NewOrganizationService } from 'src/app/services/new-organization.service';
 import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
 import { ToastService } from 'src/app/services/toast.service';
@@ -101,6 +101,7 @@ export class OrganizationSelectorComponent {
     private readonly destroyRef: DestroyRef,
     private readonly userService: UserService,
     private readonly newAuthService: NewAuthService,
+    private readonly queryClient: QueryClient,
     toast: ToastService,
   ) {
     this.form = this.buildForm();
@@ -133,13 +134,23 @@ export class OrganizationSelectorComponent {
         return;
       }
 
-      // use has a selected org and it was found
+      // user has a selected org and it was found
       if (orgId && orgs.some((org) => org.id === orgId)) {
         return;
       }
 
-      // user has no org selected or the selected org is not in the org list
-      newOrganizationService.setOrgId(orgs[0].id).then();
+      this.queryClient
+        .fetchQuery(this.newOrganizationService.organizationByIdQueryOptions(orgId))
+        .then((org) => {
+          if (org) {
+            return;
+          }
+          throw new Error('org not found');
+        })
+        .catch((_) => {
+          // user has no org selected or no permission for said org so we default to first org
+          newOrganizationService.setOrgId(orgs[0].id).then();
+        });
     });
 
     this.infiniteScrollLoading();
@@ -246,6 +257,7 @@ export class OrganizationSelectorComponent {
   private getActiveOrgIfSearchMatches(nameQuery: Signal<NameQuery | undefined>) {
     return computed(() => {
       const activeOrg = this.activeOrg.data() ?? undefined;
+      console.log('activeorg', activeOrg);
       const query = nameQuery();
       if (!activeOrg || !query?.value?.name) {
         return activeOrg;
