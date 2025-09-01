@@ -29,7 +29,7 @@
           >
           </mat-checkbox>
         </th>
-        <td mat-cell *matCellDef="let key">
+        <td mat-cell *cnslCellDef="let key; dataSource: dataSource">
           <mat-checkbox
             color="primary"
             (click)="$event.stopPropagation()"
@@ -42,26 +42,26 @@
 
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.PERSONALACCESSTOKEN.ID' | translate }}</th>
-        <td mat-cell *matCellDef="let key">{{ key?.id }}</td>
+        <td mat-cell *cnslCellDef="let key; dataSource: dataSource">{{ key?.id }}</td>
       </ng-container>
 
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.MACHINE.CREATIONDATE' | translate }}</th>
-        <td mat-cell *matCellDef="let key">
+        <td mat-cell *cnslCellDef="let key; dataSource: dataSource">
           {{ key.details?.creationDate | timestampToDate | localizedDate: 'fromNow' }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="expirationDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.MACHINE.EXPIRATIONDATE' | translate }}</th>
-        <td mat-cell *matCellDef="let key">
+        <td mat-cell *cnslCellDef="let key; dataSource: dataSource">
           {{ key.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM yyyy, HH:mm' }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="actions" stickyEnd>
         <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let key">
+        <td mat-cell *cnslCellDef="let key; dataSource: dataSource">
           <cnsl-table-actions>
             <button
               actions
