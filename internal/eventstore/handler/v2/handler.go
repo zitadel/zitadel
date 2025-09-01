@@ -343,10 +343,11 @@ func checkAdditionalEvents(eventQueue chan eventstore.Event, event eventstore.Ev
 	events := make([]eventstore.Event, 1)
 	events[0] = event
 	for {
-		wait := time.NewTimer(1 * time.Millisecond)
+		wait := time.NewTimer(50 * time.Millisecond)
 		select {
 		case event := <-eventQueue:
 			events = append(events, event)
+			wait.Reset(50 * time.Millisecond)
 		case <-wait.C:
 			return events
 		}
