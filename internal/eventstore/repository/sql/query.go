@@ -66,13 +66,23 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	if where == "" || query == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
+
+	var contextQuerier interface {
+		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
+		ExecContext(context.Context, string, ...any) (sql.Result, error)
+	}
+	contextQuerier = criteria.Client()
+	if q.Tx != nil {
+		contextQuerier = &tx{Tx: q.Tx}
+	}
+
 	if q.AwaitOpenTransactions && q.Columns == eventstore.ColumnsEvent {
 		instanceID := authz.GetInstance(ctx).InstanceID()
 		if q.InstanceID != nil {
 			instanceID = q.InstanceID.Value.(string)
 		}
 
-		_, err = criteria.Client().ExecContext(ctx,
+		_, err = contextQuerier.ExecContext(ctx,
 			"select pg_advisory_lock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1)), pg_advisory_unlock('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))",
 			instanceID,
 		)
@@ -118,14 +128,6 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	}
 
 	query = criteria.placeholder(query)
-
-	var contextQuerier interface {
-		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
-	}
-	contextQuerier = criteria.Client()
-	if q.Tx != nil {
-		contextQuerier = &tx{Tx: q.Tx}
-	}
 
 	err = contextQuerier.QueryContext(ctx,
 		func(rows *sql.Rows) error {

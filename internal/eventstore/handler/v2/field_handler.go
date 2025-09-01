@@ -71,7 +71,14 @@ func (h *FieldHandler) Trigger(ctx context.Context, opts ...TriggerOpt) (err err
 	defer cancel()
 
 	for i := 0; ; i++ {
-		additionalIteration, err := h.processEvents(ctx, config)
+		var additionalIteration bool
+		var wg sync.WaitGroup
+		wg.Add(1)
+		queue <- func() {
+			additionalIteration, err = h.processEvents(ctx, config)
+			wg.Done()
+		}
+		wg.Wait()
 		h.log().OnError(err).Info("process events failed")
 		h.log().WithField("iteration", i).Debug("trigger iteration")
 		if !additionalIteration || err != nil {
@@ -119,19 +126,13 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		}
 	}()
 
-	if config.awaitRunning {
-		if _, err := tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()); err != nil {
-			return false, err
-		}
-	} else {
-		var hasLocked bool
-		err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock (hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
-		if err != nil {
-			return false, err
-		}
-		if !hasLocked {
-			return false, zerrors.ThrowInternal(err, "V2-QOPG6", "projection already locked")
-		}
+	var hasLocked bool
+	err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
+	if err != nil {
+		return false, err
+	}
+	if !hasLocked {
+		return false, zerrors.ThrowInternal(err, "V2-xRffO", "projection already locked")
 	}
 
 	// always await currently running transactions

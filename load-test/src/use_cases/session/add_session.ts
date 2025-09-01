@@ -1,6 +1,6 @@
 import { loginByUsernamePassword } from '../../login_ui';
 import { createOrg, removeOrg } from '../../org';
-import { User, createHuman } from '../../user';
+import { User, createHuman, createMachine } from '../../user';
 import { Trend } from 'k6/metrics';
 import { Config, MaxVUs } from '../../config';
 import { createSession } from '../../session';
@@ -27,6 +27,7 @@ export async function setup() {
 const addSessionTrend = new Trend('add_session_duration', true);
 export default async function (data: any) {
   const start = new Date();
+  await createMachine(`zitachine-${__VU}-${__ITER}`, data.org, data.tokens.accessToken!);
   const session = await createSession(data.org, data.tokens.accessToken, {
     user: {
       userId: data.users[__VU - 1].userId,
@@ -41,5 +42,5 @@ export default async function (data: any) {
 }
 
 export function teardown(data: any) {
-  removeOrg(data.org, data.tokens.accessToken);
+  // removeOrg(data.org, data.tokens.accessToken);
 }
