@@ -53,7 +53,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					),
@@ -71,7 +71,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, true,
 					),
@@ -89,7 +89,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPushFailed(io.ErrClosedPipe,
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemEnableBackChannelLogout, true,
 					),
@@ -105,19 +105,19 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemOIDCSingleV1SessionTerminationEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemEnableRelationalTables, true,
 					),
@@ -138,7 +138,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				// throw in some set events, reset and set again.
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					)),
@@ -146,21 +146,21 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 						context.Background(), aggregate,
 						feature_v2.SystemResetEventType,
 					)),
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, false,
 					)),
 				),
 				expectPush(
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, true,
 					),
-					feature_v2.NewSetEvent[bool](
+					feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemOIDCSingleV1SessionTerminationEventType, false,
 					),
@@ -209,7 +209,7 @@ func TestCommands_ResetSystemFeatures(t *testing.T) {
 			name: "push error",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					)),
@@ -224,7 +224,7 @@ func TestCommands_ResetSystemFeatures(t *testing.T) {
 			name: "success",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					)),
@@ -241,7 +241,7 @@ func TestCommands_ResetSystemFeatures(t *testing.T) {
 			name: "no change after previous reset",
 			eventstore: expectEventstore(
 				expectFilter(
-					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+					eventFromEventPusher(feature_v2.NewSetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemLoginDefaultOrgEventType, true,
 					)),
