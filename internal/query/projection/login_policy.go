@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	LoginPolicyTable = "projections.login_policies5"
+	LoginPolicyTable = "projections.login_policies6"
 
 	LoginPolicyIDCol                    = "aggregate_id"
 	LoginPolicyInstanceIDCol            = "instance_id"

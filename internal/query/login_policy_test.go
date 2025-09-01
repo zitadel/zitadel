@@ -15,36 +15,36 @@ import (
 )
 
 var (
-	loginPolicyQuery = `SELECT projections.login_policies5.aggregate_id,` +
-		` projections.login_policies5.creation_date,` +
-		` projections.login_policies5.change_date,` +
-		` projections.login_policies5.sequence,` +
-		` projections.login_policies5.allow_register,` +
-		` projections.login_policies5.allow_username_password,` +
-		` projections.login_policies5.allow_external_idps,` +
-		` projections.login_policies5.force_mfa,` +
-		` projections.login_policies5.force_mfa_local_only,` +
-		` projections.login_policies5.second_factors,` +
-		` projections.login_policies5.multi_factors,` +
-		` projections.login_policies5.passwordless_type,` +
-		` projections.login_policies5.is_default,` +
-		` projections.login_policies5.hide_password_reset,` +
-		` projections.login_policies5.ignore_unknown_usernames,` +
-		` projections.login_policies5.allow_domain_discovery,` +
-		` projections.login_policies5.disable_login_with_email,` +
-		` projections.login_policies5.disable_login_with_phone,` +
-		` projections.login_policies5.default_redirect_uri,` +
-		` projections.login_policies5.password_check_lifetime,` +
-		` projections.login_policies5.external_login_check_lifetime,` +
-		` projections.login_policies5.mfa_init_skip_lifetime,` +
-		` projections.login_policies5.second_factor_check_lifetime,` +
-		` projections.login_policies5.multi_factor_check_lifetime,` +
-		` projections.login_policies5.enable_registration_captcha,` +
-		` projections.login_policies5.enable_login_captcha,` +
-		` projections.login_policies5.captcha_type,` +
-		` projections.login_policies5.captcha_site_key,` +
-		` projections.login_policies5.captcha_secret_key` +
-		` FROM projections.login_policies5`
+	loginPolicyQuery = `SELECT projections.login_policies6.aggregate_id,` +
+		` projections.login_policies6.creation_date,` +
+		` projections.login_policies6.change_date,` +
+		` projections.login_policies6.sequence,` +
+		` projections.login_policies6.allow_register,` +
+		` projections.login_policies6.allow_username_password,` +
+		` projections.login_policies6.allow_external_idps,` +
+		` projections.login_policies6.force_mfa,` +
+		` projections.login_policies6.force_mfa_local_only,` +
+		` projections.login_policies6.second_factors,` +
+		` projections.login_policies6.multi_factors,` +
+		` projections.login_policies6.passwordless_type,` +
+		` projections.login_policies6.is_default,` +
+		` projections.login_policies6.hide_password_reset,` +
+		` projections.login_policies6.ignore_unknown_usernames,` +
+		` projections.login_policies6.allow_domain_discovery,` +
+		` projections.login_policies6.disable_login_with_email,` +
+		` projections.login_policies6.disable_login_with_phone,` +
+		` projections.login_policies6.default_redirect_uri,` +
+		` projections.login_policies6.password_check_lifetime,` +
+		` projections.login_policies6.external_login_check_lifetime,` +
+		` projections.login_policies6.mfa_init_skip_lifetime,` +
+		` projections.login_policies6.second_factor_check_lifetime,` +
+		` projections.login_policies6.multi_factor_check_lifetime,` +
+		` projections.login_policies6.enable_registration_captcha,` +
+		` projections.login_policies6.enable_login_captcha,` +
+		` projections.login_policies6.captcha_type,` +
+		` projections.login_policies6.captcha_site_key,` +
+		` projections.login_policies6.captcha_secret_key` +
+		` FROM projections.login_policies6`
 	loginPolicyCols = []string{
 		"aggregate_id",
 		"creation_date",
@@ -77,14 +77,14 @@ var (
 		"captcha_secret_key",
 	}
 
-	prepareLoginPolicy2FAsStmt = `SELECT projections.login_policies5.second_factors` +
-		` FROM projections.login_policies5`
+	prepareLoginPolicy2FAsStmt = `SELECT projections.login_policies6.second_factors` +
+		` FROM projections.login_policies6`
 	prepareLoginPolicy2FAsCols = []string{
 		"second_factors",
 	}
 
-	prepareLoginPolicyMFAsStmt = `SELECT projections.login_policies5.multi_factors` +
-		` FROM projections.login_policies5`
+	prepareLoginPolicyMFAsStmt = `SELECT projections.login_policies6.multi_factors` +
+		` FROM projections.login_policies6`
 	prepareLoginPolicyMFAsCols = []string{
 		"multi_factors",
 	}
