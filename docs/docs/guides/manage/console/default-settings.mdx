@@ -149,7 +149,7 @@ The Login Policy defines how the login process should look like and which authen
 The Default Redirect URI will be used, if a user calls the login page directly.
 More specifically, typically a client will initiate login with an auth request.
 The auth request contains a client-id and a redirect uri, that must match the configuration in ZITADEL.
-If there is no [auth request](https://zitadel.com/playgrounds/oidc), users will be redirected to the Default Redirect URI, which is by default `https://<custom_domain>/ui/console/`
+If there is no [auth request](https://zitadel.com/playgrounds/oidc), users will be redirected to the Default Redirect URI, which is by default `https://${CUSTOM_DOMAIN}/ui/console/`
 
 Reasons why ZITADEL doesn't have a redirect URI:
 
@@ -158,7 +158,7 @@ Reasons why ZITADEL doesn't have a redirect URI:
 
 We recommend setting your own default redirect URI, if you do not want end users to access ZITADEL console.
 
-Change default redirect url of instance: `https://<custom_domain>/ui/console/settings?id=login`
+Change default redirect url of instance: `https://${CUSTOM_DOMAIN}/ui/console/settings?id=login`
 
 <img
   src="/docs//img/guides/solution-scenarios/console-default-redirect.png"

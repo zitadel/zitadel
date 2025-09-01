@@ -226,7 +226,7 @@ Your contributions will play a crucial role in shaping the future of our login s
 As this feature is currently in Beta, please be aware of some potential workarounds and important considerations before implementation.
 
 - **Create Users:** The new typescript login is built with the session and the user V2 API, the users V2 API does have some differences to the v1 API, so make sure you create users through the new API.
-- **External IDPs:** If you want to use external identity provider login, such as Login with Google or Apple. You can follow our existing setup guides, just make sure to use the following redirect url: `$CUSTOM_DOMAIN/idps/callback`
+- **External IDPs:** If you want to use external identity provider login, such as Login with Google or Apple. You can follow our existing setup guides, just make sure to use the following redirect url: `${CUSTOM_DOMAIN}/idps/callback`
 - **Passkey/U2F:** Those authentication methods are bound to a domain. As your new login runs on a different domain than the previous login, existing passwordless authentication and u2f (fingerprint, face id, etc.) can’t be used. Also when they are managed through the management console of ZITADEL, they are added on a different domain.
   <br />
   *Note: If you run the login on a subdomain of your current instance, this problem

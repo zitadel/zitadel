@@ -87,7 +87,7 @@ The authentication API (aka Auth API) is used for all operations on the currentl
 #### GRPC
 
 Endpoint:
-$CUSTOM_DOMAIN/zitadel.auth.v1.AuthService/
+${CUSTOM_DOMAIN}/zitadel.auth.v1.AuthService/
 
 Definition:
 [Auth Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/auth.proto)
@@ -95,7 +95,7 @@ Definition:
 #### REST
 
 Endpoint:
-$CUSTOM_DOMAIN/auth/v1/
+${CUSTOM_DOMAIN}/auth/v1/
 
 API Reference:
 [OpenAPI Docs](/apis/resources/auth)
@@ -120,7 +120,7 @@ To identify the current organization you can send a header `x-zitadel-orgid` or 
 #### GRPC
 
 Endpoint:
-$CUSTOM_DOMAIN/zitadel.management.v1.ManagementService/
+${CUSTOM_DOMAIN}/zitadel.management.v1.ManagementService/
 
 Definition:
 [Management Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/management.proto)
@@ -128,7 +128,7 @@ Definition:
 #### REST
 
 Endpoint:
-$CUSTOM_DOMAIN/management/v1/
+${CUSTOM_DOMAIN}/management/v1/
 
 API Reference:
 [OpenAPI Docs](/apis/resources/mgmt)
@@ -151,7 +151,7 @@ This API is intended to configure and manage one ZITADEL instance itself.
 #### GRPC
 
 Endpoint:
-$CUSTOM_DOMAIN/zitadel.admin.v1.AdminService/
+${CUSTOM_DOMAIN}/zitadel.admin.v1.AdminService/
 
 Definition:
 [Admin Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/admin.proto)
@@ -159,7 +159,7 @@ Definition:
 #### REST
 
 Endpoint:
-$CUSTOM_DOMAIN/admin/v1/
+${CUSTOM_DOMAIN}/admin/v1/
 
 API Reference:
 [OpenAPI Docs](/apis/resources/admin)
@@ -184,7 +184,7 @@ Checkout the guide how to [access the ZITADEL System API](/docs/guides/integrate
 #### GRPC
 
 Endpoint:
-$CUSTOM_DOMAIN/zitadel.system.v1.SystemService/
+${CUSTOM_DOMAIN}/zitadel.system.v1.SystemService/
 
 Definition:
 [System Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/system.proto)
@@ -192,7 +192,7 @@ Definition:
 #### REST
 
 Endpoint:
-$CUSTOM_DOMAIN/system/v1/
+${CUSTOM_DOMAIN}/system/v1/
 
 API Reference:
 [OpenAPI Docs](/apis/resources/system)
@@ -215,7 +215,7 @@ The Assets API allows you to up- and download all kinds of assets. This can be f
 #### REST
 
 Endpoint:
-$CUSTOM_DOMAIN/assets/v1/
+${CUSTOM_DOMAIN}/assets/v1/
 
 Definition:
 [Assets](./assets/assets.md)
@@ -271,14 +271,14 @@ In the table below you can see the URI of those calls.
 
 | Service | URI                                                   |
 | :------ | :---------------------------------------------------- |
-| REST    | $CUSTOM_DOMAIN/auth/v1/users/me                      |
-| GRPC    | $CUSTOM_DOMAIN/zitadel.auth.v1.AuthService/GetMyUser |
+| REST    | ${CUSTOM_DOMAIN}/auth/v1/users/me                      |
+| GRPC    | ${CUSTOM_DOMAIN}/zitadel.auth.v1.AuthService/GetMyUser |
 
 ## Domains
 
-ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or your custom domain `$CUSTOM_DOMAIN`
+ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or your custom domain `${CUSTOM_DOMAIN}`
 
-The domain is used as the OIDC issuer and as the base url for the gRPC and REST APIs, the Login and Console UI, which you'll find under `{custom_domain}/ui/console/`.
+The domain is used as the OIDC issuer and as the base url for the gRPC and REST APIs, the Login and Console UI, which you'll find under `${CUSTOM_DOMAIN}/ui/console/`.
 
 Are you self-hosting and having troubles with _Instance not found_ errors? [Check out this page](/docs/self-hosting/manage/custom-domain).
 
