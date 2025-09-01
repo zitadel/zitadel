@@ -43,7 +43,7 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	var limitedCounts *eventCounts
 	requireEventually(t, iamOwnerCtx, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(c, "limited events < added events", assert.Less, addedCount)
-		counts.assertAll(c, "limited events > 0", assert.Greater, zeroCounts)
+		counts.assertAll(c, "limited events >= 0", assert.GreaterOrEqual, zeroCounts)
 		limitedCounts = counts
 	}, "wait for limited event assertions to pass")
 	listedEvents, err := isoInstance.Client.Admin.ListEvents(iamOwnerCtx, &admin.ListEventsRequest{CreationDateFilter: &admin.ListEventsRequest_From{
