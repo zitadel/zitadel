@@ -548,18 +548,31 @@ func (i idProvider) SetPayload(payload string) database.Change {
 
 func scanIDProvider(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.IdentityProvider, error) {
 	idp := &domain.IdentityProvider{}
-	err := scan(ctx, querier, builder, idp)
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
+
+	err = rows.(database.CollectableRows).CollectExactlyOneRow(idp)
+	if err != nil {
+		return nil, err
+	}
+
 	return idp, err
 }
 
 func scanIDProviders(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.IdentityProvider, error) {
 	idps := []*domain.IdentityProvider{}
-	err := scanMultiple(ctx, querier, builder, &idps)
+
+	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
+
+	err = rows.(database.CollectableRows).Collect(&idps)
+	if err != nil {
+		return nil, err
+	}
+
 	return idps, nil
 }
