@@ -78,24 +78,13 @@
         ]
       }
     },
-    "dev": {
-      "persistent": true,
-      "cache": false
-    },
-    "test": {
-      "dependsOn": [
-        "test:unit",
-        "test:integration"
-      ]
-    },
+    "check": {},
     "test:unit": {
-      "cache": true,
       "dependsOn": [
         "^build"
       ]
     },
     "test:integration": {
-      "cache": true,
       "dependsOn": [
         "@zitadel/core-mock:start:docker",
         "start:integration"

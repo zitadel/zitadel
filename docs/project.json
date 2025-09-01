@@ -1,6 +1,7 @@
 {
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "targets": {
+    "check": {},
     "generate": {
       "dependsOn": ["^generate"],
       "outputs": ["{projectRoot}/docs/api/**/*", "{projectRoot}/docs/self-hosting/manage/configure/*.yaml"],
@@ -28,17 +29,17 @@
     "dev": {
       "dependsOn": ["generate"],
       "cache": false,
-      "persistent": true
+      "continuous": true
     },
     "start": {
       "dependsOn": ["generate"],
       "cache": false,
-      "persistent": true
+      "continuous": true
     },
     "start:api": {
       "dependsOn": ["generate"],
       "cache": false,
-      "persistent": true
+      "continuous": true
     }
   }
 }

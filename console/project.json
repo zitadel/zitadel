@@ -1,6 +1,7 @@
 {
     "$schema": "../node_modules/nx/schemas/project-schema.json",
     "targets": {
+        "check": {},
         "generate": {
             "dependsOn": ["^generate"],
             "outputs": ["{projectRoot}/src/app/proto/generated/**/*"]

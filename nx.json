@@ -32,19 +32,24 @@
       ]
     },
     "dev": {
-      "cache": false
+      "cache": false,
+      "continuous": true
     },
     "lint": {
       "cache": true
     },
-    "lint:fix": {
+    "test:unit": {
       "cache": true
     },
-    "test": {
+    "test:integration": {
       "cache": true
     },
-    "clean": {
-      "cache": false
+    "check": {
+      "dependsOn": [
+        "lint",
+        "test:unit",
+        "test:integration"
+      ]
     }
   },
   "plugins": [
