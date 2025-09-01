@@ -13,6 +13,7 @@
 		4200,
 		8080
 	],
+	"onCreateCommand": "cd zitadel && pnpm install && pnpm add -g nx && go mod download",
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {
 			"version": "1.24"
@@ -20,9 +21,6 @@
 		"ghcr.io/guiyomh/features/golangci-lint:0": {},
 		"ghcr.io/jungaretti/features/make:1": {},
 		"ghcr.io/devcontainers/features/docker-outside-of-docker": {},
-		"ghcr.io/devcontainers-extra/features/nx-npm:1": {
-			"version": "v21.4.1"
-		},
 		"ghcr.io/devcontainers-extra/features/pnpm:2": {
 			"version": "10.13.1"
 		}

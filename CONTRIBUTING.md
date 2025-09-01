@@ -303,7 +303,7 @@ This repository uses **pnpm** as package manager and **Nx** for build orchestrat
 
 **Use Dev Container** (everything pre-configured):
 
-Open in VS Code with Dev Container extension
+Open in VS Code with Dev Container extension or use GitHub Codespaces.
 All dependencies and tools are already installed
 
 **Or install locally** ([requirements](#frontend-dev-requirements)):
@@ -330,10 +330,9 @@ Choose your contribution area:
 
 | Task | Command | Notes |
 |------|---------|--------|
+| **Start** | `nx run PROJECT:start` | Production server |
 | **Develop** | `nx run PROJECT:dev` | Hot reload development server |
-| **Build** | `nx run PROJECT:build` | Production build |
-| **Test Unit** | `nx run PROJECT:test-unit` | Unit tests |
-| **Test Integration** | `nx run PROJECT:test-integration ` | End-to-end tests |
+| **Test** | `nx run PROJECT:test` | Run all tests |
 | **Lint** | `nx run PROJECT:lint` | Check code style |
 | **Lint Fix** | `nx run PROJECT:lint-fix` | Auto-fix style issues |
 

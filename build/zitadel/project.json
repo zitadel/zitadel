@@ -1,4 +1,26 @@
 {
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
-    "name": "@zitadel/core"
+    "name": "@zitadel/core",
+    "sourceRoot": ".",
+    "projectType": "application",
+    "targets": {
+        "build": {
+            "command": "make core_build compile_pipeline",
+            "inputs": [
+                "{workspaceRoot}/cmd/**/*",
+                "{workspaceRoot}/internal/**/*",
+                "{workspaceRoot}/pkg/**/*",
+                "{workspaceRoot}/Makefile",
+                "{workspaceRoot}/go.mod",
+                "{workspaceRoot}/go.sum",
+                "{workspaceRoot}/main.go"
+            ],
+            "outputs": [
+                "{workspaceRoot}/zitadel"
+            ],
+            "dependsOn": [
+                "@zitadel/console:build"
+            ]
+        }
+    }
 }

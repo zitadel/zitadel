@@ -33,7 +33,11 @@
     },
     "dev": {
       "cache": false,
-      "continuous": true
+      "continuous": true,
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
     },
     "lint": {
       "cache": true
