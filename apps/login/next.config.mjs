@@ -36,9 +36,11 @@ const secureHeaders = [
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   output: process.env.NEXT_OUTPUT_MODE || undefined,
-  reactStrictMode: true, // Recommended for the `pages` directory, default in `app`.
+  reactStrictMode: true,
   experimental: {
     dynamicIO: true,
+    // Add React 19 compatibility optimizations
+    optimizePackageImports: ['@radix-ui/react-tooltip', '@heroicons/react'],
   },
   images: {
     unoptimized: true
@@ -46,6 +48,13 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Improve SSR stability - not actually needed for React 19 SSR issues
+  // onDemandEntries: {
+  //   maxInactiveAge: 25 * 1000,
+  //   pagesBufferLength: 2,
+  // },
+  // Better error handling for production builds
+  poweredByHeader: false,
   async headers() {
     return [
       {
