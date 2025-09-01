@@ -161,7 +161,6 @@ func projections(
 		false,
 	)
 	logging.OnError(err).Fatal("unable to start queries")
-	defer queries.Close()
 
 	authZRepo, err := authz.Start(queries, es, client, keys.OIDC, config.ExternalSecure)
 	logging.OnError(err).Fatal("unable to start authz repo")

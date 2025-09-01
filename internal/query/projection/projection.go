@@ -127,7 +127,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	if sqlClient.Pool.Config().MaxConns <= int32(config.MaxParallelTriggers) {
 		logging.WithFields("database.MaxOpenConnections", sqlClient.Pool.Config().MaxConns, "projections.MaxParallelTriggers", config.MaxParallelTriggers).Fatal("Number of max parallel triggers must be lower than max open connections")
 	}
-	handler.StartWorkerPool(ctx, config.MaxParallelTriggers)
+	handler.StartWorkerPool(config.MaxParallelTriggers)
 
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	OrgMetadataProjection = newOrgMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_metadata"]))

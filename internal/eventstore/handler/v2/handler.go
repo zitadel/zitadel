@@ -429,32 +429,24 @@ var (
 	queueStart sync.Once
 )
 
-func StartWorkerPool(ctx context.Context, count uint16) {
+func StartWorkerPool(count uint16) {
 	queueStart.Do(func() {
-		queue = make(chan func(), count)
+		queue = make(chan func())
 
 		for range count {
-			go worker(ctx)
+			go worker()
 		}
 	})
 }
 
-func worker(ctx context.Context) {
+func worker() {
 	for {
-		select {
-		case f, ok := <-queue:
-			if !ok {
-				return
-			}
-			f()
-		case <-ctx.Done():
+		processEvents, ok := <-queue
+		if !ok {
 			return
 		}
+		processEvents()
 	}
-}
-
-func Close() {
-	// close(queue)
 }
 
 func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Context, err error) {
