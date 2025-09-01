@@ -12,6 +12,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 	object_v3 "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 )
@@ -294,4 +295,8 @@ func (m *mockInstance) EnableImpersonation() bool {
 
 func (m *mockInstance) Features() feature.Features {
 	return feature.Features{}
+}
+
+func (m *mockInstance) ExecutionRouter() target.Router {
+	return target.NewRouter(nil)
 }

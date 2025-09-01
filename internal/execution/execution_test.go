@@ -13,11 +13,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/execution"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/actions"
 )
@@ -132,7 +134,7 @@ func Test_CallTarget(t *testing.T) {
 		ctx    context.Context
 		info   *middleware.ContextInfoRequest
 		server *callTestServer
-		target *mockTarget
+		target target_domain.Target
 	}
 	type res struct {
 		body    []byte
@@ -155,7 +157,7 @@ func Test_CallTarget(t *testing.T) {
 					timeout:     time.Second,
 					statusCode:  http.StatusInternalServerError,
 				},
-				target: &mockTarget{
+				target: target_domain.Target{
 					TargetType: 4,
 				},
 			},
@@ -175,8 +177,8 @@ func Test_CallTarget(t *testing.T) {
 					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusInternalServerError,
 				},
-				target: &mockTarget{
-					TargetType: domain.TargetTypeWebhook,
+				target: target_domain.Target{
+					TargetType: target_domain.TargetTypeWebhook,
 					Timeout:    time.Minute,
 				},
 			},
@@ -196,8 +198,8 @@ func Test_CallTarget(t *testing.T) {
 					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusOK,
 				},
-				target: &mockTarget{
-					TargetType: domain.TargetTypeWebhook,
+				target: target_domain.Target{
+					TargetType: target_domain.TargetTypeWebhook,
 					Timeout:    time.Minute,
 				},
 			},
@@ -218,10 +220,14 @@ func Test_CallTarget(t *testing.T) {
 					statusCode:  http.StatusOK,
 					signingKey:  "signingkey",
 				},
-				target: &mockTarget{
-					TargetType: domain.TargetTypeWebhook,
+				target: target_domain.Target{
+					TargetType: target_domain.TargetTypeWebhook,
 					Timeout:    time.Minute,
-					SigningKey: "signingkey",
+					SigningKey: &crypto.CryptoValue{
+						Algorithm: "enc",
+						KeyID:     "id",
+						Crypted:   []byte("signingkey"),
+					},
 				},
 			},
 			res{
@@ -240,8 +246,8 @@ func Test_CallTarget(t *testing.T) {
 					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusInternalServerError,
 				},
-				target: &mockTarget{
-					TargetType: domain.TargetTypeCall,
+				target: target_domain.Target{
+					TargetType: target_domain.TargetTypeCall,
 					Timeout:    time.Minute,
 				},
 			},
@@ -261,8 +267,8 @@ func Test_CallTarget(t *testing.T) {
 					respondBody: []byte("{\"content\":\"request2\"}"),
 					statusCode:  http.StatusOK,
 				},
-				target: &mockTarget{
-					TargetType: domain.TargetTypeCall,
+				target: target_domain.Target{
+					TargetType: target_domain.TargetTypeCall,
 					Timeout:    time.Minute,
 				},
 			},
@@ -283,10 +289,14 @@ func Test_CallTarget(t *testing.T) {
 					statusCode:  http.StatusOK,
 					signingKey:  "signingkey",
 				},
-				target: &mockTarget{
-					TargetType: domain.TargetTypeCall,
+				target: target_domain.Target{
+					TargetType: target_domain.TargetTypeCall,
 					Timeout:    time.Minute,
-					SigningKey: "signingkey",
+					SigningKey: &crypto.CryptoValue{
+						Algorithm: "enc",
+						KeyID:     "id",
+						Crypted:   []byte("signingkey"),
+					},
 				},
 			},
 			res{
@@ -296,7 +306,7 @@ func Test_CallTarget(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			respBody, err := testServer(t, tt.args.server, testCallTarget(tt.args.ctx, tt.args.info, tt.args.target))
+			respBody, err := testServer(t, tt.args.server, testCallTarget(tt.args.ctx, tt.args.info, tt.args.target, crypto.CreateMockEncryptionAlg(gomock.NewController(t))))
 			if tt.res.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -312,7 +322,7 @@ func Test_CallTargets(t *testing.T) {
 		ctx     context.Context
 		info    *middleware.ContextInfoRequest
 		servers []*callTestServer
-		targets []*mockTarget
+		targets []target_domain.Target
 	}
 	type res struct {
 		ret     interface{}
@@ -341,7 +351,7 @@ func Test_CallTargets(t *testing.T) {
 					respondBody: requestContextInfoBody2,
 					statusCode:  http.StatusInternalServerError,
 				}},
-				targets: []*mockTarget{
+				targets: []target_domain.Target{
 					{InterruptOnError: false},
 					{InterruptOnError: true},
 				},
@@ -368,7 +378,7 @@ func Test_CallTargets(t *testing.T) {
 					respondBody: requestContextInfoBody2,
 					statusCode:  http.StatusInternalServerError,
 				}},
-				targets: []*mockTarget{
+				targets: []target_domain.Target{
 					{InterruptOnError: false},
 					{InterruptOnError: false},
 				},
@@ -395,7 +405,7 @@ func Test_CallTargets(t *testing.T) {
 					respondBody: []byte("just a string, not json"),
 					statusCode:  http.StatusOK,
 				}},
-				targets: []*mockTarget{
+				targets: []target_domain.Target{
 					{InterruptOnError: false},
 					{InterruptOnError: true},
 				},
@@ -422,7 +432,7 @@ func Test_CallTargets(t *testing.T) {
 					respondBody: []byte("just a string, not json"),
 					statusCode:  http.StatusOK,
 				}},
-				targets: []*mockTarget{
+				targets: []target_domain.Target{
 					{InterruptOnError: false},
 					{InterruptOnError: false},
 				}},
@@ -435,7 +445,7 @@ func Test_CallTargets(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			respBody, err := testServers(t,
 				tt.args.servers,
-				testCallTargets(tt.args.ctx, tt.args.info, tt.args.targets),
+				testCallTargets(tt.args.ctx, tt.args.info, tt.args.targets, crypto.CreateMockEncryptionAlg(gomock.NewController(t))),
 			)
 			if tt.res.wantErr {
 				assert.Error(t, err)
@@ -445,38 +455,6 @@ func Test_CallTargets(t *testing.T) {
 			assert.Equal(t, tt.res.ret, respBody)
 		})
 	}
-}
-
-var _ execution.Target = &mockTarget{}
-
-type mockTarget struct {
-	InstanceID       string
-	ExecutionID      string
-	TargetID         string
-	TargetType       domain.TargetType
-	Endpoint         string
-	Timeout          time.Duration
-	InterruptOnError bool
-	SigningKey       string
-}
-
-func (e *mockTarget) GetTargetID() string {
-	return e.TargetID
-}
-func (e *mockTarget) IsInterruptOnError() bool {
-	return e.InterruptOnError
-}
-func (e *mockTarget) GetEndpoint() string {
-	return e.Endpoint
-}
-func (e *mockTarget) GetTargetType() domain.TargetType {
-	return e.TargetType
-}
-func (e *mockTarget) GetTimeout() time.Duration {
-	return e.Timeout
-}
-func (e *mockTarget) GetSigningKey() string {
-	return e.SigningKey
 }
 
 type callTestServer struct {
@@ -527,7 +505,7 @@ func listen(
 		time.Sleep(c.timeout)
 
 		w.Header().Set("Content-Type", "application/json")
-		if _, err := io.WriteString(w, string(c.respondBody)); err != nil {
+		if _, err := w.Write(c.respondBody); err != nil {
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
@@ -554,25 +532,27 @@ func testCall(ctx context.Context, timeout time.Duration, body []byte, signingKe
 
 func testCallTarget(ctx context.Context,
 	info *middleware.ContextInfoRequest,
-	target *mockTarget,
+	target target_domain.Target,
+	alg crypto.EncryptionAlgorithm,
 ) func(string) ([]byte, error) {
 	return func(url string) (r []byte, err error) {
 		target.Endpoint = url
-		return execution.CallTarget(ctx, target, info)
+		return execution.CallTarget(ctx, target, info, alg)
 	}
 }
 
 func testCallTargets(ctx context.Context,
 	info *middleware.ContextInfoRequest,
-	target []*mockTarget,
+	target []target_domain.Target,
+	alg crypto.EncryptionAlgorithm,
 ) func([]string) (interface{}, error) {
 	return func(urls []string) (interface{}, error) {
-		targets := make([]execution.Target, len(target))
+		targets := make([]target_domain.Target, len(target))
 		for i, t := range target {
 			t.Endpoint = urls[i]
 			targets[i] = t
 		}
-		return execution.CallTargets(ctx, targets, info)
+		return execution.CallTargets(ctx, targets, info, alg)
 	}
 }
 

@@ -641,7 +641,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 }
 
 func TestServer_AddHumanUser_Permission(t *testing.T) {
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), gofakeit.Email())
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -1194,7 +1194,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 }
 
 func TestServer_UpdateHumanUser_Permission(t *testing.T) {
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman-%s", gofakeit.AppName()), gofakeit.Email())
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
@@ -1885,7 +1885,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	orgIdpID := Instance.AddOrgGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	notDefaultOrgIdpID := Instance.AddOrgGenericOAuthProvider(IamCTX, orgResp.OrganizationId)
 	samlIdpID := Instance.AddSAMLProvider(IamCTX)
 	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(IamCTX, "")

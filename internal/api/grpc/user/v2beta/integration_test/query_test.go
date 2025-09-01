@@ -82,7 +82,7 @@ func setPermissionCheckV2Flag(t *testing.T, setFlag bool) {
 }
 
 func TestServer_GetUserByID(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	type args struct {
 		ctx context.Context
 		req *user_v2beta.GetUserByIDRequest
@@ -246,7 +246,7 @@ func TestServer_GetUserByID(t *testing.T) {
 func TestServer_GetUserByID_Permission(t *testing.T) {
 	timeNow := time.Now().UTC()
 	newOrgOwnerEmail := gofakeit.Email()
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
@@ -438,7 +438,7 @@ func TestServer_ListUsers(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	type args struct {
 		ctx context.Context
 		req *user_v2beta.ListUsersRequest
