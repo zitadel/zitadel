@@ -32,7 +32,7 @@ func TestServer_SetContactPhone(t *testing.T) {
 		}
 	}`)
 	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), gofakeit.Email())
 
 	type res struct {
 		want       *resource_object.Details
@@ -305,7 +305,7 @@ func TestServer_VerifyContactPhone(t *testing.T) {
 		}
 	}`)
 	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), gofakeit.Email())
 
 	type res struct {
 		want            *resource_object.Details
@@ -496,7 +496,7 @@ func TestServer_ResendContactPhoneCode(t *testing.T) {
 		}
 	}`)
 	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, integration.OrganizationName(), gofakeit.Email())
 
 	type res struct {
 		want       *resource_object.Details

@@ -5,61 +5,85 @@ sidebar_label: Docker Compose
 
 import CodeBlock from '@theme/CodeBlock';
 import DockerComposeSource from '!!raw-loader!./docker-compose.yaml'
-import ExampleZitadelConfigSource from '!!raw-loader!./example-zitadel-config.yaml'
-import ExampleZitadelSecretsSource from '!!raw-loader!./example-zitadel-secrets.yaml'
-import ExampleZitadelInitStepsSource from '!!raw-loader!./example-zitadel-init-steps.yaml'
+import Disclaimer from './_disclaimer.mdx'
+import DefaultUser from './_defaultuser.mdx'
+import Next from './_next.mdx'
+import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
 
-The stack consists of four long-running containers and a couple of short-lived containers:
-- A [Traefik](https://doc.traefik.io/traefik/) reverse proxy container with upstream HTTP/2 enabled, issuing a self-signed TLS certificate.
-- A Login container that is accessible via Traefik at `/ui/v2/login`
-- A Zitadel container that is accessible via Traefik at all other paths than `/ui/v2/login`.
-- An insecure [PostgreSQL](https://www.postgresql.org/docs/current/index.html).
+This guide is the entrypoint for running the Zitadel platform locally for the first time. 
+It is for demonstration and development purposes only and does not set up a production-ready and security hardened instance of Zitadel.
+Once Zitadel up is and running, learn more about a production setup in the [What's Next section](#next-steps).
 
-The Traefik container and the login container call the Zitadel container via the internal Docker network at `h2c://zitadel:8080`
+## Prerequisites
 
-The setup is tested against Docker version 28.3.2 and Docker Compose version v2.38.2
+The setup is likely to work with other software versions too, but it is tested against the following environment:
 
-By executing the commands below, you will download the following files:
+- Ubuntu 24.04.1
+- Docker 28.3.2
+- Docker Compose v2.38.2
+- curl 8.5.0
+
+## Docker compose
+
+The following commands set up services for a PostgreSQL database, a Zitadel API and a Zitadel login:
+
+1. Download the `docker-compose.yaml` file from the Zitadel repository:
+   ```shell
+   curl -L https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose.yaml -o docker-compose.yaml
+   ```
+2. Make sure the containers use the latest image versions.
+    ```shell
+    docker compose pull
+    ```
+3. Run the PostgreSQL database, the Zitadel API, and the Zitadel login.
+    ```shell
+    docker compose up --detach --wait
+    ```
+4. Verify the containers are running and healthy.
+    ```shell
+    docker compose ps
+    ```
+
+<DefaultUser/>
+
+## What's next{#next-steps}
+
+Before proceeding, review the downloaded `docker-compose.yaml` file:
+The comments give context to the used variables and show examples for commonly used configuration variants.
 
 <details>
     <summary>docker-compose.yaml</summary>
     <CodeBlock language="yaml">{DockerComposeSource}</CodeBlock>
 </details>
+
+Here are some natural steps forward to go from the current setup to production:
+
+- **Use a different master key**: Set up an instance from scratch and use a different master key. For example, generate one by running `tr -dc A-Za-z0-9 </dev/urandom | head -c 32`
+- **Use files for secrets instead of environment variables, and don't commit them to Git**: Learn how to [configure the platform](/docs/self-hosting/manage/configure)
+- **Run the containers as non-root users**: Remove the `user: "0"` lines from the `docker-compose.yaml` file.
+- **Configure a different external domain or IP**: Beware that the login only works with HTTPS on non-localhost domains. [Run and configure a reverse proxy](/docs/self-hosting/manage/reverseproxy/reverse_proxy)
+- **Serve the API and the UI together on the same port**: [Run and configure a reverse proxy](/docs/self-hosting/manage/reverseproxy/reverse_proxy)
+- **Encrypt Traffic**: [Run and configure a reverse proxy](/docs/self-hosting/manage/reverseproxy/reverse_proxy)
+
+For more detailed recommendations, read the [Zitadel Production Setup Guide](/docs/self-hosting/manage/production).
+
 <details>
-    <summary>example-zitadel-config.yaml</summary>
-    <CodeBlock language="yaml">{ExampleZitadelConfigSource}</CodeBlock>
+    <summary>Read this if the environment uses the login v1</summary>
+    <p>
+        The login v2 is the next generation of the Zitadel login.
+        Its code and deployment are easily customizable.
+        Unlike the login v1, it runs in its own process.
+        The login v2 is enabled by default in new installations.
+        But if an existing `docker-compose.yaml` file is updated by following this guide,
+        an additional `zitadel-login` service is now running which is actually not doing anything, yet.
+        The following steps give guidance on how to enable the login v2 in an environment.
+    </p>
+    <ol>
+        <li>Read the login v2 related comments in the docker-compose.yaml.</li>
+        <li><a href="/docs/self-hosting/manage/login-client#create-login-client">Manually create a login client personal access token (PAT) for the now running v2 login</a>.</li>
+        <li>Move the PAT to `./login-client.pat`</li>
+        <li>Restart the login process: `docker compose restart login`</li>
+        <li><a href="/docs/self-hosting/manage/login-client#require-login-v2">Enable the Login UI for all users</a></li>
+    </ol>
 </details>
-<details>
-    <summary>example-zitadel-secrets.yaml</summary>
-    <CodeBlock language="yaml">{ExampleZitadelSecretsSource}</CodeBlock>
-</details>
-<details>
-    <summary>example-zitadel-init-steps.yaml</summary>
-    <CodeBlock language="yaml">{ExampleZitadelInitStepsSource}</CodeBlock>
-</details>
 
-```bash
-# Download the docker compose example configuration.
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose.yaml
-
-# Download and adjust the example configuration file containing standard configuration.
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/example-zitadel-config.yaml
-
-# Download and adjust the example configuration file containing secret configuration.
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/example-zitadel-secrets.yaml
-
-# Download and adjust the example configuration file containing database initialization configuration.
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/example-zitadel-init-steps.yaml
-
-# Make sure you have the latest version of the images
-docker compose pull
-
-# Run the containers
-docker compose up
-```
-
-Open your favorite internet browser at https://localhost/ui/console?login_hint=zitadel-admin@zitadel.localhost.
-Your browser warns you about the insecure self-signed TLS certificate. As localhost resolves to your local machine, you can safely proceed.
-Use the password *Password1!* to log in.
-
-Read more about [the login process](/guides/integrate/login/oidc/login-users).

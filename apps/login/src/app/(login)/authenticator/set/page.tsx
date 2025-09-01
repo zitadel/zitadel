@@ -19,8 +19,15 @@ import {
 } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 // import { getLocale } from "next-intl/server";
+import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("authenticator");
+  return { title: t('title')};
+}
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;

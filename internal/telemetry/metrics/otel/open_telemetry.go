@@ -32,7 +32,7 @@ func NewMetrics(meterName string) (metrics.Metrics, error) {
 	if err != nil {
 		return nil, err
 	}
-	exporter, err := prometheus.New()
+	exporter, err := prometheus.New(prometheus.WithoutScopeInfo())
 	if err != nil {
 		return &Metrics{}, err
 	}

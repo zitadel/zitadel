@@ -862,7 +862,7 @@ func TestNewTextQuery(t *testing.T) {
 			},
 			want: &textQuery{
 				Column:  testCol,
-				Text:    "hu\\%rst",
+				Text:    "hu%rst",
 				Compare: TextEqualsIgnoreCase,
 			},
 		},
@@ -875,7 +875,7 @@ func TestNewTextQuery(t *testing.T) {
 			},
 			want: &textQuery{
 				Column:  testCol,
-				Text:    "hu\\_rst",
+				Text:    "hu_rst",
 				Compare: TextEqualsIgnoreCase,
 			},
 		},
@@ -888,7 +888,7 @@ func TestNewTextQuery(t *testing.T) {
 			},
 			want: &textQuery{
 				Column:  testCol,
-				Text:    "h\\_urst\\%",
+				Text:    "h_urst%",
 				Compare: TextEqualsIgnoreCase,
 			},
 		},
@@ -914,7 +914,7 @@ func TestNewTextQuery(t *testing.T) {
 			},
 			want: &textQuery{
 				Column:  testCol,
-				Text:    "h\\_urst\\%",
+				Text:    "h_urst%",
 				Compare: TextNotEqualsIgnoreCase,
 			},
 		},
@@ -1204,7 +1204,7 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextEqualsIgnoreCase,
 			},
 			want: want{
-				query: sq.Like{"LOWER(test_table.test_col)": "hurst"},
+				query: sq.Eq{"LOWER(test_table.test_col)": "hurst"},
 			},
 		},
 		{
@@ -1226,7 +1226,7 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextNotEqualsIgnoreCase,
 			},
 			want: want{
-				query: sq.NotLike{"LOWER(test_table.test_col)": "hurst"},
+				query: sq.NotEq{"LOWER(test_table.test_col)": "hurst"},
 			},
 		},
 		{
@@ -1237,7 +1237,18 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextEqualsIgnoreCase,
 			},
 			want: want{
-				query: sq.Like{"LOWER(test_table.test_col)": "hu\\%\\%rst"},
+				query: sq.Eq{"LOWER(test_table.test_col)": "hu%%rst"},
+			},
+		},
+		{
+			name: "equals ignore case backslash",
+			fields: fields{
+				Column:  testCol,
+				Text:    "AD\\Hurst",
+				Compare: TextEqualsIgnoreCase,
+			},
+			want: want{
+				query: sq.Eq{"LOWER(test_table.test_col)": "ad\\hurst"},
 			},
 		},
 		{
@@ -1255,11 +1266,11 @@ func TestTextQuery_comp(t *testing.T) {
 			name: "starts with wildcards",
 			fields: fields{
 				Column:  testCol,
-				Text:    "_Hurst%",
+				Text:    "_Hur\\st%",
 				Compare: TextStartsWith,
 			},
 			want: want{
-				query: sq.Like{"test_table.test_col": "\\_Hurst\\%%"},
+				query: sq.Like{"test_table.test_col": "\\_Hur\\\\st\\%%"},
 			},
 		},
 		{

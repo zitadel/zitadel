@@ -22,22 +22,22 @@ describe("verify invite", () => {
         user: {
           userId: "221394658884845598",
           state: 1,
-          username: "john@zitadel.com",
-          loginNames: ["john@zitadel.com"],
-          preferredLoginName: "john@zitadel.com",
+          username: "john@example.com",
+          loginNames: ["john@example.com"],
+          preferredLoginName: "john@example.com",
           human: {
             userId: "221394658884845598",
             state: 1,
-            username: "john@zitadel.com",
-            loginNames: ["john@zitadel.com"],
-            preferredLoginName: "john@zitadel.com",
+            username: "john@example.com",
+            loginNames: ["john@example.com"],
+            preferredLoginName: "john@example.com",
             profile: {
               givenName: "John",
               familyName: "Doe",
-              avatarUrl: "https://zitadel.com/avatar.jpg",
+              avatarUrl: "https://example.com/avatar.jpg",
             },
             email: {
-              email: "john@zitadel.com",
+              email: "john@example.com",
               isVerified: false,
             },
           },
@@ -68,7 +68,7 @@ describe("verify invite", () => {
           factors: {
             user: {
               id: "221394658884845598",
-              loginName: "john@zitadel.com",
+              loginName: "john@example.com",
             },
             password: undefined,
             webAuthN: undefined,
@@ -89,11 +89,11 @@ describe("verify invite", () => {
     });
   });
 
-  it.only("shows authenticators after successful invite verification", () => {
+  it("shows authenticators after successful invite verification", () => {
     stub("zitadel.user.v2.UserService", "VerifyInviteCode");
 
     cy.visit("/verify?userId=221394658884845598&code=abc&invite=true");
-    cy.url({ timeout: 10_000 }).should("include", Cypress.config().baseUrl + "/authenticator/set");
+    cy.url().should("include", Cypress.config().baseUrl + "/authenticator/set");
   });
 
   it("shows an error if invite code validation failed", () => {

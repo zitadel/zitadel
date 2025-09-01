@@ -13,7 +13,14 @@ import {
 } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("password");
+  return { title: t('set.title')};
+}
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
