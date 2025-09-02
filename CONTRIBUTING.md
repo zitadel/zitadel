@@ -31,9 +31,9 @@ Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
 [Contribute](#how-to-contribute)
 
-- [Contribute code](#contribute)
-- If you found a mistake on our [docs page](https://zitadel.com/docs) or something is missing please read [the docs section](contribute-docs)
-- [Translate](#contribute-internationalization) and improve texts
+- [Contribute code](#backend)
+- If you found a mistake on our [docs page](https://zitadel.com/docs) or something is missing please read [the docs section](#contribute-docs)
+- [Translate](#contribute-translations) and improve texts
 
 ## How to contribute
 
@@ -49,14 +49,14 @@ Go through the following checklist before you submit the final pull request:
 
 The code consists of the following parts:
 
-| name            | description                                        | language                                                                                                  | where to find                                       | Development Guide                                  |
-| --------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------- |
-| backend         | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to Backend](contribute-backend)        |
-| API definitions | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to Backend](contribute-backend)        |
-| console         | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](contribute-frontend)      |
-| login           | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./login](./login)                                  | [Contribute to Frontend](contribute-frontend)      |
-| docs            | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](contribute-frontend)      |
-| translations    | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](contribute-translations) |
+| name            | description                                        | language                                                                                                  | where to find                                       | Development Guide                                   |
+| --------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
+| backend         | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to Backend](#backend)                   |
+| API definitions | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to Backend](#backend)                   |
+| console         | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#contribute-frontend-code) |
+| login           | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#contribute-frontend-code) |
+| docs            | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#contribute-frontend-code) |
+| translations    | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#contribute-translations) |
 
 Please follow the guides to validate and test the code before you contribute.
 
@@ -67,7 +67,7 @@ Please follow the guides to validate and test the code before you contribute.
 
    `git checkout -b my-fix-branch main`
 
-3. Make your changes following the [guidelines](#contribute) in this guide. Make sure that all tests pass.
+3. Make your changes following the [guidelines](#how-to-contribute) in this guide. Make sure that all tests pass.
 
 4. Commit the changes on the new branch
 
@@ -91,7 +91,7 @@ If we ask you for changes in the code, you can follow the [GitHub Guide](https:/
 <!-- TODO: how to do this via git -->
 <!-- TODO: change commit message via git -->
 
-### Commit messages
+### <a name="commit-messages"></a>Commit messages
 
 Make sure you use [semantic release messages format](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type).
 
@@ -274,7 +274,7 @@ docker compose --file ./e2e/docker-compose.yaml down
 
 ### Run Local End-to-End Tests Against Your Dev Server Console
 
-If you also make [changes to the console](#console), you can run the test suite against your locally built backend code and frontend server.
+If you also make [changes to the console](#contribute-console), you can run the test suite against your locally built backend code and frontend server.
 
 ```bash
 # Install dependencies (from repository root)
@@ -294,7 +294,7 @@ When you are happy with your changes, you can cleanup your environment.
 docker compose --file ./e2e/docker-compose.yaml down
 ```
 
-## Contribute Frontend Code
+## <a name="contribute-frontend-code"></a>Contribute Frontend Code
 
 This repository uses **pnpm** as package manager and **Nx** for build orchestration.
 
