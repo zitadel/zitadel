@@ -412,9 +412,6 @@ To start developing the login, make sure your system has the [required system de
 #### Quick Start
 
 ```bash
-# Start backend services
-docker compose --file ./apps/login/acceptance/docker-compose.yaml up --detach zitadel
-
 # Start development server (recommended)
 nx run @zitadel/login:dev
 
@@ -447,52 +444,8 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 ### <a name="contribute-console"></a>Contribute to Console
 
 To start developing the console, make sure your system has the [required system dependencies](#frontend-dev-requirements) installed.
-Then, you need to decide which Zitadel instance you would like to target.
-- The easiest starting point is to [configure your environment](console-dev-existing-zitadel) to use a [Zitadel cloud](https://zitadel.com) instance.
-- Alternatively, you can [start a local Zitadel instance from scratch and develop against it](console-dev-local-zitadel).
 
-#### <a name="console-dev-existing-zitadel"></a>Develop against an already running Zitadel instance
-
-By default, `nx run console:dev` targets a Zitadel API running at http://localhost:8080.
-To change this, export the link to your environment.json in your environment variables.
-
-```bash
-export ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.us1.zitadel.cloud/ui/console/assets/environment.json
-```
-
-Proceed [with configuring your console redirect URIs](console-redirect).
-
-#### <a name="console-dev-local-zitadel"></a>Develop against a local Zitadel instance from scratch
-
-By executing the commands from this section, you run everything you need to develop the console locally.
-Using [Docker Compose](https://docs.docker.com/compose/), you run [PostgreSQL](https://www.postgresql.org/download/) and the [latest release of Zitadel](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
-You use the Zitadel container as backend for your console.
-
-Run the database and the latest backend locally.
-
-```bash
-# Start from the root of the repository
-# You just need the db and the zitadel services to develop the console against.
-docker compose --file ./e2e/docker-compose.yaml up --detach zitadel
-```
-
-When Zitadel accepts traffic, navigate to http://localhost:8080/ui/console/projects?login_hint=zitadel-admin@zitadel.localhost and log in with  _Password1!_.
-
-Proceed [with configuring your console redirect URIs](console-redirect).
-
-#### <a name="console-redirect"></a> Configure Console redirect URI
-
-To allow console access via http://localhost:4200, you have to configure the Zitadel backend.
-
-1. Navigate to /ui/console/projects in your target Zitadel instance.
-3. Select the _Zitadel_ project.
-4. Select the _Console_ application.
-5. Select _Redirect Settings_
-6. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
-7. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
-8. Select the _Save_ button
-
-#### Develop
+#### Quick Start
 
 Run the local console development server.
 
@@ -500,6 +453,16 @@ Run the local console development server.
 # Start development server
 nx run @zitadel/console:dev
 ```
+
+To allow console access via http://localhost:4200, you have to configure the Zitadel backend.
+
+1. Navigate to /ui/console/projects in your target Zitadel instance.
+3. Select the _ZITADEL_ project.
+4. Select the _Console_ application.
+5. Select _Redirect Settings_
+6. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
+7. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
+8. Select the _Save_ button
 
 Navigate to http://localhost:4200/.
 Make some changes to the source code and see how the browser is automatically updated.
