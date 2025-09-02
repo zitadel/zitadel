@@ -1654,7 +1654,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wanneer deze vlag is ingeschakeld, gebruikt de console de V2 User API om nieuwe gebruikers aan te maken. Met de V2 API beginnen nieuw aangemaakte gebruikers zonder een initiële status.",
       "LOGINV2": "Inloggen V2",
       "LOGINV2_DESCRIPTION": "Door dit in te schakelen wordt de nieuwe TypeScript-gebaseerde login-UI geactiveerd met verbeterde beveiliging, prestaties en aanpasbaarheid.",
-      "LOGINV2_BASEURI": "Basis-URI"
+      "LOGINV2_BASEURI": "Basis-URI",
+      "ENABLERELATIONALTABLES": "Relationele tabellen",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Schakel dit in om relationele tabellen te gebruiken in plaats van projecties voor het opslaan van gegevens. Momenteel doet deze schakelaar niets."
     },
     "DIALOG": {
       "RESET": {
