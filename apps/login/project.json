@@ -49,7 +49,7 @@
       ],
       "outputs": [
         "{projectRoot}/.env.local",
-        "{projectRoot}/dist/.env.local"
+        "{projectRoot}/dist/apps/login/.env.local"
       ],
       "dependsOn": [
         "@zitadel/core:start-setup"
@@ -58,8 +58,8 @@
       "options": {
         "cwd": "{projectRoot}",
         "commands": [
-          "mkdir -p dist",
-          "TOKEN=$(cat ../../login-client.pat) && echo \"ZITADEL_SERVICE_USER_TOKEN=$TOKEN\" | tee .env.local dist/.env.local > /dev/null"
+          "mkdir -p dist/apps/login",
+          "TOKEN=$(cat ../../login-client.pat) && echo \"ZITADEL_SERVICE_USER_TOKEN=$TOKEN\" | tee .env.local dist/apps/login/.env.local > /dev/null"
         ]
       }
     },
@@ -75,7 +75,7 @@
       ],
       "outputs": [
         "{projectRoot}/dist/**/*",
-        "!{projectRoot}/dist/.env.*local"
+        "!{projectRoot}/dist/apps/login/.env.*local"
       ]
     },
     "dev": {
@@ -89,7 +89,8 @@
       "description": "Start the standalone production build",
       "dependsOn": [
         "env-local",
-        "@zitadel/core:start"
+        "@zitadel/core:start",
+        "build"
       ]
     },
     "build-docker": {
