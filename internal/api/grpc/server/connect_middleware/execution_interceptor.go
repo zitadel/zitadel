@@ -3,6 +3,8 @@ package connect_middleware
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+	"strings"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -53,6 +55,7 @@ func executeTargetsForRequest(ctx context.Context, targets []target_domain.Targe
 		OrgID:      ctxData.OrgID,
 		UserID:     ctxData.UserID,
 		Request:    Message{req.Any().(proto.Message)},
+		Headers:    setRequestHeaders(req.Header()),
 	}
 
 	_, err = execution.CallTargets(ctx, targets, info, alg)
@@ -80,6 +83,7 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 		UserID:     ctxData.UserID,
 		Request:    Message{req.Any().(proto.Message)},
 		Response:   Message{resp.Any().(proto.Message)},
+		Headers:    setRequestHeaders(req.Header()),
 	}
 
 	_, err = execution.CallTargets(ctx, targets, info, alg)
@@ -92,12 +96,13 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 var _ execution.ContextInfo = &ContextInfoRequest{}
 
 type ContextInfoRequest struct {
-	FullMethod string  `json:"fullMethod,omitempty"`
-	InstanceID string  `json:"instanceID,omitempty"`
-	OrgID      string  `json:"orgID,omitempty"`
-	ProjectID  string  `json:"projectID,omitempty"`
-	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
+	FullMethod string      `json:"fullMethod,omitempty"`
+	InstanceID string      `json:"instanceID,omitempty"`
+	OrgID      string      `json:"orgID,omitempty"`
+	ProjectID  string      `json:"projectID,omitempty"`
+	UserID     string      `json:"userID,omitempty"`
+	Request    Message     `json:"request,omitempty"`
+	Headers    http.Header `json:"headers,omitempty"`
 }
 
 type Message struct {
@@ -135,13 +140,14 @@ func (c *ContextInfoRequest) GetContent() interface{} {
 var _ execution.ContextInfo = &ContextInfoResponse{}
 
 type ContextInfoResponse struct {
-	FullMethod string  `json:"fullMethod,omitempty"`
-	InstanceID string  `json:"instanceID,omitempty"`
-	OrgID      string  `json:"orgID,omitempty"`
-	ProjectID  string  `json:"projectID,omitempty"`
-	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
-	Response   Message `json:"response,omitempty"`
+	FullMethod string      `json:"fullMethod,omitempty"`
+	InstanceID string      `json:"instanceID,omitempty"`
+	OrgID      string      `json:"orgID,omitempty"`
+	ProjectID  string      `json:"projectID,omitempty"`
+	UserID     string      `json:"userID,omitempty"`
+	Request    Message     `json:"request,omitempty"`
+	Response   Message     `json:"response,omitempty"`
+	Headers    http.Header `json:"headers,omitempty"`
 }
 
 func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
@@ -158,4 +164,15 @@ func (c *ContextInfoResponse) SetHTTPResponseBody(resp []byte) error {
 
 func (c *ContextInfoResponse) GetContent() interface{} {
 	return c.Response.Message
+}
+
+func setRequestHeaders(inHeaders http.Header) http.Header {
+	headers := make(map[string][]string)
+	for k, v := range inHeaders {
+		if strings.ToLower(k) == "authorization" || strings.ToLower(k) == "grpcgateway-authorization" {
+			continue
+		}
+		headers[k] = v
+	}
+	return headers
 }
