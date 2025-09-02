@@ -20,7 +20,8 @@
         "commands": [
           "mkdir -p dist/apps/login",
           "TOKEN=$(cat ../../login-client.pat) && echo \"ZITADEL_SERVICE_USER_TOKEN=$TOKEN\" | tee .env.local dist/apps/login/.env.local > /dev/null"
-        ]
+        ],
+        "parallel": false
       }
     },
     "build": {
