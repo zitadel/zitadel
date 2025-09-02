@@ -58,7 +58,7 @@ func triggerSteps(db *database.DB) []migration.RepeatableMigration {
 			domain.CountParentTypeOrganization,
 			projection.UserInstanceIDCol,
 			projection.UserResourceOwnerCol,
-			serviceping.ResourceCountServiceUser,
+			serviceping.ResourceCountUserMachine,
 			false, // the user type cannot change, so we do not need to track updates
 			&migration.TriggerCondition{
 				Column: projection.UserTypeCol,

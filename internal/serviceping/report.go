@@ -22,7 +22,7 @@ const (
 	ResourceCountOrganization               = "organization"
 	ResourceCountProject                    = "project"
 	ResourceCountUser                       = "user"
-	ResourceCountServiceUser                = "service_user"
+	ResourceCountUserMachine                = "user_machine"
 	ResourceCountIAMAdmin                   = "iam_admin"
 	ResourceCountIdentityProvider           = "identity_provider"
 	ResourceCountIdentityProviderLDAP       = "identity_provider_ldap"
