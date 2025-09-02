@@ -104,6 +104,8 @@ jobs:
         name: Install dependencies
         run: pnpm install --frozen-lockfile
       - 
+        # The login standalone build fails when Nx caching is enabled. This is a [know issue](https://github.com/nrwl/nx/issues/27724).
+        # As a workaround, we restore the NextJS cache folder in the pipeline to speed up login builds.
         name: Cache Next.js build
         uses: actions/cache@v4
         with:

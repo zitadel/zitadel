@@ -4,14 +4,14 @@
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
-	"workspaceFolder": "/workspaces",
+	"workspaceFolder": "/workspaces/zitadel",
 	"forwardPorts": [
 		5432,
 		3000,
 		4200,
 		8080
 	],
-	"updateContentCommand": "cd zitadel && pnpm install && pnpm add -g nx && go mod download",
+	"updateContentCommand": "pnpm install && pnpm add -g nx && go mod download",
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {
 			"version": "1.24"
