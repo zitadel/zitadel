@@ -40,6 +40,7 @@ const (
 	SMTPConfigHTTPColumnInstanceID = "instance_id"
 	SMTPConfigHTTPColumnID         = "id"
 	SMTPConfigHTTPColumnEndpoint   = "endpoint"
+	SMTPConfigHTTPColumnSigningKey = "signing_key"
 )
 
 type smtpConfigProjection struct{}
@@ -86,6 +87,7 @@ func (*smtpConfigProjection) Init() *old_handler.Check {
 			handler.NewColumn(SMTPConfigHTTPColumnID, handler.ColumnTypeText),
 			handler.NewColumn(SMTPConfigHTTPColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(SMTPConfigHTTPColumnEndpoint, handler.ColumnTypeText),
+			handler.NewColumn(SMTPConfigHTTPColumnSigningKey, handler.ColumnTypeJSONB, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(SMTPConfigHTTPColumnInstanceID, SMTPConfigHTTPColumnID),
 			smtpConfigHTTPTableSuffix,
@@ -211,6 +213,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigHTTPAdded(event eventstore.Event)
 				handler.NewCol(SMTPConfigHTTPColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(SMTPConfigHTTPColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 				handler.NewCol(SMTPConfigHTTPColumnEndpoint, e.Endpoint),
+				handler.NewCol(SMTPConfigHTTPColumnSigningKey, e.SigningKey),
 			},
 			handler.WithTableSuffix(smtpConfigHTTPTableSuffix),
 		),
@@ -231,19 +234,20 @@ func (p *smtpConfigProjection) reduceSMTPConfigHTTPChanged(event eventstore.Even
 	if e.Description != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnDescription, *e.Description))
 	}
-	if len(columns) > 0 {
-		stmts = append(stmts, handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(SMTPConfigColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
-				handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
-			},
-		))
-	}
+	stmts = append(stmts, handler.AddUpdateStatement(
+		columns,
+		[]handler.Condition{
+			handler.NewCond(SMTPConfigColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
+			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	))
 
 	smtpColumns := make([]handler.Column, 0, 1)
 	if e.Endpoint != nil {
 		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigHTTPColumnEndpoint, *e.Endpoint))
+	}
+	if e.SigningKey != nil {
+		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigHTTPColumnSigningKey, e.SigningKey))
 	}
 	if len(smtpColumns) > 0 {
 		stmts = append(stmts, handler.AddUpdateStatement(
