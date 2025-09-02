@@ -2,9 +2,7 @@ package repository
 
 import (
 	"context"
-	"errors"
-
-	"github.com/jackc/pgx/v5/pgconn"
+	"encoding/json"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -18,6 +16,8 @@ var _ domain.OrganizationRepository = (*org)(nil)
 
 type org struct {
 	repository
+	shouldLoadDomains bool
+	domainRepo        domain.OrganizationDomainRepository
 }
 
 func OrganizationRepository(client database.QueryExecutor) domain.OrganizationRepository {
@@ -28,37 +28,65 @@ func OrganizationRepository(client database.QueryExecutor) domain.OrganizationRe
 	}
 }
 
-const queryOrganizationStmt = `SELECT id, name, instance_id, state, created_at, updated_at` +
+const queryOrganizationStmt = `SELECT organizations.id, organizations.name, organizations.instance_id, organizations.state, organizations.created_at, organizations.updated_at` +
+	` , CASE WHEN count(org_domains.domain) > 0 THEN jsonb_agg(json_build_object('domain', org_domains.domain, 'isVerified', org_domains.is_verified, 'isPrimary', org_domains.is_primary, 'validationType', org_domains.validation_type, 'createdAt', org_domains.created_at, 'updatedAt', org_domains.updated_at)) ELSE NULL::JSONB END domains` +
 	` FROM zitadel.organizations`
 
 // Get implements [domain.OrganizationRepository].
-func (o *org) Get(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, conditions ...database.Condition) (*domain.Organization, error) {
-	builder := database.StatementBuilder{}
+func (o *org) Get(ctx context.Context, opts ...database.QueryOption) (*domain.Organization, error) {
+	opts = append(opts,
+		o.joinDomains(),
+		database.WithGroupBy(o.InstanceIDColumn(), o.IDColumn()),
+	)
 
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	var builder database.StatementBuilder
 	builder.WriteString(queryOrganizationStmt)
-
-	instanceIDCondition := o.InstanceIDCondition(instanceID)
-
-	conditions = append(conditions, id, instanceIDCondition)
-	writeCondition(&builder, database.And(conditions...))
+	options.Write(&builder)
 
 	return scanOrganization(ctx, o.client, &builder)
 }
 
 // List implements [domain.OrganizationRepository].
-func (o *org) List(ctx context.Context, conditions ...database.Condition) ([]*domain.Organization, error) {
-	builder := database.StatementBuilder{}
+func (o *org) List(ctx context.Context, opts ...database.QueryOption) ([]*domain.Organization, error) {
+	opts = append(opts,
+		o.joinDomains(),
+		database.WithGroupBy(o.InstanceIDColumn(), o.IDColumn()),
+	)
 
-	builder.WriteString(queryOrganizationStmt)
-
-	if conditions != nil {
-		writeCondition(&builder, database.And(conditions...))
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
 	}
 
-	orderBy := database.OrderBy(o.CreatedAtColumn())
-	orderBy.Write(&builder)
+	var builder database.StatementBuilder
+	builder.WriteString(queryOrganizationStmt)
+	options.Write(&builder)
 
 	return scanOrganizations(ctx, o.client, &builder)
+}
+
+func (o *org) joinDomains() database.QueryOption {
+	columns := make([]database.Condition, 0, 3)
+	columns = append(columns,
+		database.NewColumnCondition(o.InstanceIDColumn(), o.Domains(false).InstanceIDColumn()),
+		database.NewColumnCondition(o.IDColumn(), o.Domains(false).OrgIDColumn()),
+	)
+
+	// If domains should not be joined, we make sure to return null for the domain columns
+	// the query optimizer of the dialect should optimize this away if no domains are requested
+	if !o.shouldLoadDomains {
+		columns = append(columns, database.IsNull(o.domainRepo.OrgIDColumn()))
+	}
+
+	return database.WithLeftJoin(
+		"zitadel.org_domains",
+		database.And(columns...),
+	)
 }
 
 const createOrganizationStmt = `INSERT INTO zitadel.organizations (id, name, instance_id, state)` +
@@ -71,49 +99,13 @@ func (o *org) Create(ctx context.Context, organization *domain.Organization) err
 	builder.AppendArgs(organization.ID, organization.Name, organization.InstanceID, organization.State)
 	builder.WriteString(createOrganizationStmt)
 
-	err := o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
-	if err != nil {
-		return checkCreateOrgErr(err)
-	}
-	return nil
-}
-
-func checkCreateOrgErr(err error) error {
-	var pgErr *pgconn.PgError
-	if !errors.As(err, &pgErr) {
-		return err
-	}
-	// constraint violation
-	if pgErr.Code == "23514" {
-		if pgErr.ConstraintName == "organizations_name_check" {
-			return errors.New("organization name not provided")
-		}
-		if pgErr.ConstraintName == "organizations_id_check" {
-			return errors.New("organization id not provided")
-		}
-	}
-	// duplicate
-	if pgErr.Code == "23505" {
-		if pgErr.ConstraintName == "organizations_pkey" {
-			return errors.New("organization id already exists")
-		}
-		if pgErr.ConstraintName == "org_unique_instance_id_name_idx" {
-			return errors.New("organization name already exists for instance")
-		}
-	}
-	// invalid instance id
-	if pgErr.Code == "23503" {
-		if pgErr.ConstraintName == "organizations_instance_id_fkey" {
-			return errors.New("invalid instance id")
-		}
-	}
-	return err
+	return o.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&organization.CreatedAt, &organization.UpdatedAt)
 }
 
 // Update implements [domain.OrganizationRepository].
-func (o org) Update(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, changes ...database.Change) (int64, error) {
-	if changes == nil {
-		return 0, errors.New("Update must contain a condition") // (otherwise ALL organizations will be updated)
+func (o *org) Update(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string, changes ...database.Change) (int64, error) {
+	if len(changes) == 0 {
+		return 0, database.ErrNoChanges
 	}
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.organizations SET `)
@@ -131,7 +123,7 @@ func (o org) Update(ctx context.Context, id domain.OrgIdentifierCondition, insta
 }
 
 // Delete implements [domain.OrganizationRepository].
-func (o org) Delete(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string) (int64, error) {
+func (o *org) Delete(ctx context.Context, id domain.OrgIdentifierCondition, instanceID string) (int64, error) {
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(`DELETE FROM zitadel.organizations`)
@@ -188,32 +180,41 @@ func (o org) StateCondition(state domain.OrgState) database.Condition {
 
 // IDColumn implements [domain.organizationColumns].
 func (org) IDColumn() database.Column {
-	return database.NewColumn("id")
+	return database.NewColumn("organizations", "id")
 }
 
 // NameColumn implements [domain.organizationColumns].
 func (org) NameColumn() database.Column {
-	return database.NewColumn("name")
+	return database.NewColumn("organizations", "name")
 }
 
 // InstanceIDColumn implements [domain.organizationColumns].
 func (org) InstanceIDColumn() database.Column {
-	return database.NewColumn("instance_id")
+	return database.NewColumn("organizations", "instance_id")
 }
 
 // StateColumn implements [domain.organizationColumns].
 func (org) StateColumn() database.Column {
-	return database.NewColumn("state")
+	return database.NewColumn("organizations", "state")
 }
 
 // CreatedAtColumn implements [domain.organizationColumns].
 func (org) CreatedAtColumn() database.Column {
-	return database.NewColumn("created_at")
+	return database.NewColumn("organizations", "created_at")
 }
 
 // UpdatedAtColumn implements [domain.organizationColumns].
 func (org) UpdatedAtColumn() database.Column {
-	return database.NewColumn("updated_at")
+	return database.NewColumn("organizations", "updated_at")
+}
+
+// -------------------------------------------------------------
+// scanners
+// -------------------------------------------------------------
+
+type rawOrganization struct {
+	*domain.Organization
+	RawDomains json.RawMessage `json:"domains,omitempty" db:"domains"`
 }
 
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
@@ -222,12 +223,17 @@ func scanOrganization(ctx context.Context, querier database.Querier, builder *da
 		return nil, err
 	}
 
-	organization := &domain.Organization{}
-	if err := rows.(database.CollectableRows).CollectExactlyOneRow(organization); err != nil {
+	var org rawOrganization
+	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&org); err != nil {
 		return nil, err
 	}
+	if len(org.RawDomains) > 0 {
+		if err := json.Unmarshal(org.RawDomains, &org.Domains); err != nil {
+			return nil, err
+		}
+	}
 
-	return organization, nil
+	return org.Organization, nil
 }
 
 func scanOrganizations(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Organization, error) {
@@ -236,9 +242,41 @@ func scanOrganizations(ctx context.Context, querier database.Querier, builder *d
 		return nil, err
 	}
 
-	organizations := []*domain.Organization{}
-	if err := rows.(database.CollectableRows).Collect(&organizations); err != nil {
+	var rawOrgs []*rawOrganization
+	if err := rows.(database.CollectableRows).Collect(&rawOrgs); err != nil {
 		return nil, err
 	}
+
+	organizations := make([]*domain.Organization, len(rawOrgs))
+	for i, org := range rawOrgs {
+		if len(org.RawDomains) > 0 {
+			if err := json.Unmarshal(org.RawDomains, &org.Domains); err != nil {
+				return nil, err
+			}
+		}
+		organizations[i] = org.Organization
+	}
 	return organizations, nil
+}
+
+// -------------------------------------------------------------
+// sub repositories
+// -------------------------------------------------------------
+
+// Domains implements [domain.OrganizationRepository].
+func (o *org) Domains(shouldLoad bool) domain.OrganizationDomainRepository {
+	if !o.shouldLoadDomains {
+		o.shouldLoadDomains = shouldLoad
+	}
+
+	if o.domainRepo != nil {
+		return o.domainRepo
+	}
+
+	o.domainRepo = &orgDomain{
+		repository: o.repository,
+		org:        o,
+	}
+
+	return o.domainRepo
 }

@@ -171,47 +171,48 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	// t.Run("test org remove reduces", func(t *testing.T) {
-	// 	orgName := gofakeit.Name()
+	t.Run("test org remove reduces", func(t *testing.T) {
+		orgName := gofakeit.Name()
 
-	// 	// 1. create org
-	// 	organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
-	// 		Name: orgName,
-	// 	})
-	// 	require.NoError(t, err)
+		// 1. create org
+		organization, err := OrgClient.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
+			Name: orgName,
+		})
+		require.NoError(t, err)
 
-	// 	// 2. check org retrivable
-	// 	orgRepo := repository.OrganizationRepository(pool)
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		organization, err := orgRepo.Get(CTX,
-	// 			orgRepo.NameCondition(orgName),
-	// 			instanceID,
-	// 		)
-	// 		require.NoError(t, err)
+		// 2. check org retrivable
+		orgRepo := repository.OrganizationRepository(pool)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			organization, err := orgRepo.Get(CTX,
+				orgRepo.NameCondition(orgName),
+				instanceID,
+			)
+			require.NoError(t, err)
 
-	// 		if organization == nil {
-	// 			assert.Fail(t, "this error is here because of a race condition")
-	// 		}
-	// 		assert.Equal(t, orgName, organization.Name)
-	// 	}, retryDuration, tick)
+			if organization == nil {
+				assert.Fail(t, "this error is here because of a race condition")
+			}
+			assert.Equal(t, orgName, organization.Name)
+		}, retryDuration, tick)
 
-	// 	// 3. delete org
-	// 	_, err = OrgClient.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{
-	// 		Id: organization.Id,
-	// 	})
-	// 	require.NoError(t, err)
+		// 3. delete org
+		_, err = OrgClient.DeleteOrganization(CTX, &v2beta_org.DeleteOrganizationRequest{
+			Id: organization.Id,
+		})
+		require.NoError(t, err)
 
-	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		organization, err := orgRepo.Get(CTX,
-	// 			orgRepo.NameCondition(orgName),
-	// 			instanceID,
-	// 		)
-	// 		require.Equal(t, repository.ErrResourceDoesNotExist, err)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			organization, err := orgRepo.Get(CTX,
+				orgRepo.NameCondition(orgName),
+				instanceID,
+			)
+			require.Equal(t, repository.ErrResourceDoesNotExist, err)
 
-	// 		// event org.remove
-	// 		assert.Nil(t, organization)
-	// 	}, retryDuration, tick)
-	// })
+			// event org.remove
+			assert.Nil(t, organization)
+		}, retryDuration, tick)
+	})
 }
+

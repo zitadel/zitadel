@@ -10,7 +10,7 @@ import (
 
 const queryUserStmt = `SELECT instance_id, org_id, id, username, type, created_at, updated_at, deleted_at,` +
 	` first_name, last_name, email_address, email_verified_at, phone_number, phone_verified_at, description` +
-	` FROM users_view`
+	` FROM users_view users`
 
 type user struct {
 	repository
@@ -190,37 +190,37 @@ func (u user) DeletedAtCondition(op database.NumberOperation, deletedAt time.Tim
 
 // InstanceIDColumn implements [domain.userColumns].
 func (user) InstanceIDColumn() database.Column {
-	return database.NewColumn("instance_id")
+	return database.NewColumn("users", "instance_id")
 }
 
 // OrgIDColumn implements [domain.userColumns].
 func (user) OrgIDColumn() database.Column {
-	return database.NewColumn("org_id")
+	return database.NewColumn("users", "org_id")
 }
 
 // IDColumn implements [domain.userColumns].
 func (user) IDColumn() database.Column {
-	return database.NewColumn("id")
+	return database.NewColumn("users", "id")
 }
 
 // UsernameColumn implements [domain.userColumns].
 func (user) UsernameColumn() database.Column {
-	return database.NewIgnoreCaseColumn("username", "_lower")
+	return database.NewColumn("users", "username")
 }
 
 // FirstNameColumn implements [domain.userColumns].
 func (user) CreatedAtColumn() database.Column {
-	return database.NewColumn("created_at")
+	return database.NewColumn("users", "created_at")
 }
 
 // UpdatedAtColumn implements [domain.userColumns].
 func (user) UpdatedAtColumn() database.Column {
-	return database.NewColumn("updated_at")
+	return database.NewColumn("users", "updated_at")
 }
 
 // DeletedAtColumn implements [domain.userColumns].
 func (user) DeletedAtColumn() database.Column {
-	return database.NewColumn("deleted_at")
+	return database.NewColumn("users", "deleted_at")
 }
 
 func (u user) columns() database.Columns {
