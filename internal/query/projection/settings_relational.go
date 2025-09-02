@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
@@ -149,6 +150,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("[DEBUGPRINT] [settings_relational.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>> REEEDUCE")
 
 	return handler.NewCreateStatement(&policyEvent, []handler.Column{
 		handler.NewCol(SettingsIDCol, policyEvent.Aggregate().ID),

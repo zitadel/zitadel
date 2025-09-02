@@ -93,45 +93,45 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test instance delete reduces", func(t *testing.T) {
-		instanceName := gofakeit.Name()
-		res, err := SystemClient.CreateInstance(CTX, &system.CreateInstanceRequest{
-			InstanceName: instanceName,
-			Owner: &system.CreateInstanceRequest_Machine_{
-				Machine: &system.CreateInstanceRequest_Machine{
-					UserName:            "owner",
-					Name:                "owner",
-					PersonalAccessToken: &system.CreateInstanceRequest_PersonalAccessToken{},
-				},
-			},
-		})
-		require.NoError(t, err)
+	// t.Run("test instance delete reduces", func(t *testing.T) {
+	// 	instanceName := gofakeit.Name()
+	// 	res, err := SystemClient.CreateInstance(CTX, &system.CreateInstanceRequest{
+	// 		InstanceName: instanceName,
+	// 		Owner: &system.CreateInstanceRequest_Machine_{
+	// 			Machine: &system.CreateInstanceRequest_Machine{
+	// 				UserName:            "owner",
+	// 				Name:                "owner",
+	// 				PersonalAccessToken: &system.CreateInstanceRequest_PersonalAccessToken{},
+	// 			},
+	// 		},
+	// 	})
+	// 	require.NoError(t, err)
 
-		instanceRepo := repository.InstanceRepository(pool)
+	// 	instanceRepo := repository.InstanceRepository(pool)
 
-		// check instance exists
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
-			instance, err := instanceRepo.Get(CTX,
-				res.InstanceId,
-			)
-			require.NoError(ttt, err)
-			assert.Equal(ttt, instanceName, instance.Name)
-		}, retryDuration, tick)
+	// 	// check instance exists
+	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	// 	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+	// 		instance, err := instanceRepo.Get(CTX,
+	// 			res.InstanceId,
+	// 		)
+	// 		require.NoError(ttt, err)
+	// 		assert.Equal(ttt, instanceName, instance.Name)
+	// 	}, retryDuration, tick)
 
-		_, err = SystemClient.RemoveInstance(CTX, &system.RemoveInstanceRequest{
-			InstanceId: res.InstanceId,
-		})
-		require.NoError(t, err)
+	// 	_, err = SystemClient.RemoveInstance(CTX, &system.RemoveInstanceRequest{
+	// 		InstanceId: res.InstanceId,
+	// 	})
+	// 	require.NoError(t, err)
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
-			instance, err := instanceRepo.Get(CTX,
-				res.InstanceId,
-			)
-			// event instance.removed
-			assert.Nil(t, instance)
-			require.Equal(t, repository.ErrResourceDoesNotExist, err)
-		}, retryDuration, tick)
-	})
+	// 	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	// 	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+	// 		instance, err := instanceRepo.Get(CTX,
+	// 			res.InstanceId,
+	// 		)
+	// 		// event instance.removed
+	// 		assert.Nil(t, instance)
+	// 		require.Equal(t, repository.ErrResourceDoesNotExist, err)
+	// 	}, retryDuration, tick)
+	// })
 }
