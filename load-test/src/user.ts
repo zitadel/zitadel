@@ -3,6 +3,7 @@ import { Org } from './org';
 import http, { RefinedResponse } from 'k6/http';
 import url from './url';
 import { check } from 'k6';
+import { Metadata } from './metadata';
 
 export type User = {
   userId: string;
@@ -292,6 +293,73 @@ export function deleteUser(userId: string, org: Org, accessToken: string): Promi
         });
         deleteUserTrend.add(res.timings.duration);
         resolve(res);
+      })
+      .catch((reason) => {
+        reject(reason);
+      });
+  });
+}
+
+const setUserMetadataTrend = new Trend('set_user_metadata_duration', true);
+export function setUserMetadata(metadata: Metadata[], userId: string, accessToken: string): Promise<RefinedResponse<any>> {
+  return new Promise((resolve, reject) => {
+    let response = http.asyncRequest('POST', url(`/v2/users/${userId}/metadata`), JSON.stringify({ metadata: metadata }), {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    response
+      .then((res) => {
+        check(res, {
+          'set user metadata is status ok': (r) => r.status >= 200 && r.status < 300,
+        }) || console.log(`unable to set user metadata (user id: ${userId}) status: ${res.status} body: ${res.body}`);
+        setUserMetadataTrend.add(res.timings.duration);
+        resolve(res);
+      })
+      .catch((reason) => {
+        reject(reason);
+      });
+  });
+}
+
+export type ListUsersRequest = {
+  queries: {
+    metadataKeyFilter?: {
+      key: string;
+      method: 'TEXT_FILTER_METHOD_EQUALS' | 'TEXT_FILTER_METHOD_CONTAINS' | 'TEXT_FILTER_METHOD_CONTAINS_IGNORE_CASE';
+    };
+    metadataValueFilter?: {
+      value: string;
+      method: 'BYTE_FILTER_METHOD_EQUALS' | 'BYTE_FILTER_METHOD_NOT_EQUALS';
+    };
+  }[];
+};
+
+export type ListUsersResult = {
+  details: {
+    totalResult: number;
+  };
+};
+
+const listUsersTrend = new Trend('list_users_duration', true);
+export function listUsers(body: ListUsersRequest, accessToken: string): Promise<ListUsersResult> {
+  return new Promise((resolve, reject) => {
+    let response = http.asyncRequest('POST', url(`/v2/users`), JSON.stringify(body), {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    response
+      .then((res) => {
+        check(res, {
+          'list users is status ok': (r) => r.status >= 200 && r.status < 300,
+        }) || console.log(`unable to list users status: ${res.status} body: ${res.body}`);
+        listUsersTrend.add(res.timings.duration);
+        resolve(res.json()! as ListUsersResult);
       })
       .catch((reason) => {
         reject(reason);
