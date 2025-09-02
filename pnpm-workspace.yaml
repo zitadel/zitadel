@@ -11,6 +11,6 @@ onlyBuiltDependencies:
   - cypress
 
 overrides:
-  '@typescript-eslint/parser': ^8.35.1
+  '@typescript-eslint/parser': '^8.35.1'
 
 sideEffectsCache: false

@@ -2,7 +2,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "env-local": {
-      "description": "Crete environment files with ZITADEL service user token",
+      "description": "Create environment files with ZITADEL service user token",
       "cache": true,
       "inputs": [
         "{workspaceRoot}/login-client.pat"
