@@ -12,7 +12,7 @@ import {
   Signal,
   ViewChild,
 } from '@angular/core';
-import { injectInfiniteQuery, injectMutation, keepPreviousData } from '@tanstack/angular-query-experimental';
+import { injectInfiniteQuery, injectMutation, keepPreviousData, QueryClient } from '@tanstack/angular-query-experimental';
 import { NewOrganizationService } from 'src/app/services/new-organization.service';
 import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
 import { ToastService } from 'src/app/services/toast.service';
@@ -101,6 +101,7 @@ export class OrganizationSelectorComponent {
     private readonly destroyRef: DestroyRef,
     private readonly userService: UserService,
     private readonly newAuthService: NewAuthService,
+    private readonly queryClient: QueryClient,
     toast: ToastService,
   ) {
     this.form = this.buildForm();
@@ -133,13 +134,31 @@ export class OrganizationSelectorComponent {
         return;
       }
 
-      // use has a selected org and it was found
-      if (orgId && orgs.some((org) => org.id === orgId)) {
+      // no orgId set so we set it to the first org
+      if (!orgId) {
+        newOrganizationService.setOrgId(orgs[0].id).then();
         return;
       }
 
-      // user has no org selected or the selected org is not in the org list
-      newOrganizationService.setOrgId(orgs[0].id).then();
+      // user has a selected org and it was found
+      if (orgs.some((org) => org.id === orgId)) {
+        return;
+      }
+
+      // maybe the org is not yet loaded in the org selector so we try to fetch it
+      // if the user has permission to the org this will succeed and we do nothing
+      this.queryClient
+        .fetchQuery(this.newOrganizationService.organizationByIdQueryOptions(orgId))
+        .then((org) => {
+          if (org) {
+            return;
+          }
+          throw new Error('org not found');
+        })
+        .catch((_) => {
+          // user has no org selected or no permission for said org so we default to first org
+          return newOrganizationService.setOrgId(orgs[0].id);
+        });
     });
 
     this.infiniteScrollLoading();

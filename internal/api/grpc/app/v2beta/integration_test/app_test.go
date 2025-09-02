@@ -422,7 +422,7 @@ func TestCreateApplication_WithDifferentPermissions(t *testing.T) {
 }
 
 func TestUpdateApplication(t *testing.T) {
-	orgNotInCtx := instance.CreateOrganization(IAMOwnerCtx, integration.ProjectName(), gofakeit.Email())
+	orgNotInCtx := instance.CreateOrganization(IAMOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 	pNotInCtx := instance.CreateProject(IAMOwnerCtx, t, orgNotInCtx.GetOrganizationId(), gofakeit.AppName(), false, false)
 
 	p := instance.CreateProject(IAMOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
