@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
+	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -218,6 +219,10 @@ func (m *mockInstance) EnableImpersonation() bool {
 
 func (m *mockInstance) Features() feature.Features {
 	return feature.Features{}
+}
+
+func (m *mockInstance) ExecutionRouter() target.Router {
+	return target.NewRouter(nil)
 }
 
 func newMockPermissionCheckAllowed() domain.PermissionCheck {

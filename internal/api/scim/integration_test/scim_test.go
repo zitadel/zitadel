@@ -32,10 +32,10 @@ func TestMain(m *testing.M) {
 
 		Instance = integration.NewInstance(ctx)
 
-		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
+		CTX = Instance.WithAuthorizationToken(ctx, integration.UserTypeOrgOwner)
 
-		iamOwnerCtx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-		SecondaryOrganization = Instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
+		iamOwnerCtx := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+		SecondaryOrganization = Instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 
 		return m.Run()
 	}())

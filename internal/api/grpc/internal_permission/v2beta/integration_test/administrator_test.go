@@ -256,7 +256,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
 				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 				request.UserId = userResp.GetId()
@@ -282,7 +282,7 @@ func TestServer_CreateAdministrator(t *testing.T) {
 			prepare: func(request *internal_permission.CreateAdministratorRequest) {
 				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 				request.UserId = userResp.GetId()
@@ -862,7 +862,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
 				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 				request.UserId = userResp.GetId()
@@ -886,7 +886,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
 				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 
@@ -914,7 +914,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
 				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 
@@ -942,7 +942,7 @@ func TestServer_UpdateAdministrator(t *testing.T) {
 			prepare: func(request *internal_permission.UpdateAdministratorRequest) {
 				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 				request.UserId = userResp.GetId()
@@ -1480,7 +1480,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 				creationDate := time.Now().UTC()
 				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 				request.UserId = userResp.GetId()
@@ -1504,7 +1504,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 				creationDate := time.Now().UTC()
 				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 
@@ -1529,7 +1529,7 @@ func TestServer_DeleteAdministrator(t *testing.T) {
 				creationDate := time.Now().UTC()
 				userResp := instance.CreateUserTypeHuman(iamOwnerCtx, gofakeit.Email())
 				projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), integration.ProjectName(), false, false)
-				orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 				instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 				instance.CreateProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
 				instance.DeleteProjectGrantMembership(t, iamOwnerCtx, projectResp.GetId(), orgResp.GetOrganizationId(), userResp.GetId())
