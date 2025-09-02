@@ -116,7 +116,7 @@ type TriggerCondition struct {
 // e.g. col='value' vs col<>'value'
 func (t TriggerCondition) ToSQL(table string, conditionsMet bool) string {
 	value := fmt.Sprintf("%v", t.Value)
-	if _, ok := t.Value.(string); ok {
+	if reflect.TypeOf(t.Value).Kind() == reflect.String {
 		value = fmt.Sprintf("'%s'", t.Value)
 	}
 
