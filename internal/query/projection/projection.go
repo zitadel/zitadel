@@ -62,6 +62,7 @@ var (
 	InstanceProjection                  *handler.Handler
 	InstanceRelationalProjection        *handler.Handler
 	OrganizationRelationalProjection    *handler.Handler
+	SettingsRelationalProjection        *handler.Handler
 	SecretGeneratorProjection           *handler.Handler
 	SMTPConfigProjection                *handler.Handler
 	SMSConfigProjection                 *handler.Handler
@@ -162,6 +163,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	InstanceProjection = newInstanceProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances"]))
 	InstanceRelationalProjection = newInstanceRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organizations_relational"]))
 	OrganizationRelationalProjection = newOrgRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances_relational"]))
+	SettingsRelationalProjection = newSettingsRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["settings_relational"]))
 	SecretGeneratorProjection = newSecretGeneratorProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["secret_generators"]))
 	SMTPConfigProjection = newSMTPConfigProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["smtp_configs"]))
 	SMSConfigProjection = newSMSConfigProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sms_config"]))
@@ -344,6 +346,7 @@ func newProjectionsList() {
 		InstanceProjection,
 		InstanceRelationalProjection,
 		OrganizationRelationalProjection,
+		SettingsRelationalProjection,
 		SecretGeneratorProjection,
 		SMTPConfigProjection,
 		SMSConfigProjection,

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -64,6 +65,7 @@ func (i *instance) Create(ctx context.Context, instance *domain.Instance) error 
 
 	builder.AppendArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleAppID, instance.DefaultLanguage)
 	builder.WriteString(createInstanceStmt)
+	fmt.Println("[DEBUGPRINT] [settings.go:1] BEFORE")
 
 	return i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&instance.CreatedAt, &instance.UpdatedAt)
 }
