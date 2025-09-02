@@ -151,55 +151,54 @@ Please check out the dedicated [API guidelines](./API_DESIGN.md) page when contr
 
 ## <a name="backend"></a>Contribute Backend Code
 
+To start developing the Zitadel core Go application, make sure your system has the [required system dependencies](#dev-requirements) installed.
 
+#### Quick Start
 
-### <a name="backend-requirements"></a> Backend Requirements
-
-By executing the commands from this section, you run everything you need to develop the Zitadel backend locally.
-
-> [!INFO]
-> Some [dev containers are available](dev-containers) for remote development with docker and pipeline debugging in isolated environments.
-> If you don't want to use one of the dev containers, you can develop the backend components directly on your local machine.
-> To do so, proceed with installing the necessary dependencies.
-
-Using [Docker Compose](https://docs.docker.com/compose/), you run a [PostgreSQL](https://www.postgresql.org/download/) on your local machine.
-With [make](https://www.gnu.org/software/make/), you build a debuggable Zitadel binary and run it using [delve](https://github.com/go-delve/delve).
-Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
-Once you are happy with your changes, you run end-to-end tests and tear everything down.
-
-Zitadel uses [golangci-lint v2](https://golangci-lint.run) for code quality checks. Please use [this configuration](.golangci.yaml) when running `golangci-lint`. We recommend to set golangci-lint as linter in your IDE.
-
-The commands in this section are tested against the following software versions:
-
-- [Docker version 20.10.17](https://docs.docker.com/engine/install/)
-- [Go version 1.22](https://go.dev/doc/install)
-- [Delve 1.9.1](https://github.com/go-delve/delve/tree/v1.9.1/Documentation/installation)
-
-### <a name="build-and-run-zitadel"></a>Build and Run Zitadel
-
-Make some changes to the source code, then run the database locally.
+**Run Zitadel:**
 
 ```bash
-# You just need the db service to develop the backend against.
-docker compose --file ./e2e/docker-compose.yaml up --detach db
+nx run @zitadel/zitadel:start
 ```
 
-Build the binary. This takes some minutes, but you can speed up rebuilds.
+**Develop the Zitadel Core Application:**
+
+Set up zitadel without starting it
 
 ```bash
-make compile
+nx run @zitadel/core:dev
 ```
 
-> Note: With this command, several steps are executed.
-> For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.  
-> Generating gRPC stubs: `make core_api`  
-> Running unit tests: `make core_unit_test`  
-> Generating the console: `make console_build console_move`  
-> Build the binary: `make compile`
+Then open your IDE and and start the application. Make sure you pass the same arguments like the `@zitadel/core:start` target:
+```bash
+nx show project core --json | jq '.targets.start.options'
+```
 
-You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
-You can test if Zitadel does what you expect by using the UI at http://localhost:8080/ui/console.
-Also, you can verify the data by running `psql "host=localhost dbname=zitadel sslmode=disable"` and running SQL queries.
+For example, In VSCode, use a `launch.json` config like this:
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Zitadel",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "main.go",
+            "args": [
+                 "start",
+                 "--config", "build/zitadel/zitadel.yaml",
+                 "--masterkey", "MasterkeyNeedsToHave32Characters"
+            ]
+        }
+    ]
+}
+```
+
+Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+
+To connect to the database and explore Zitadel data, run `psql "host=localhost dbname=zitadel sslmode=disable"`.
 
 ### Run Local Unit Tests
 
@@ -306,7 +305,7 @@ This repository uses **pnpm** as package manager and **Nx** for build orchestrat
 Open in VS Code with Dev Container extension or use GitHub Codespaces.
 All dependencies and tools are already installed
 
-**Or install locally** ([requirements](#frontend-dev-requirements)):
+**Or install locally** ([requirements](#dev-requirements)):
 ```bash
 pnpm install
 pnpm add -g nx
@@ -337,6 +336,8 @@ Choose your contribution area:
 | **Lint Fix** | `nx run PROJECT:lint-fix` | Auto-fix style issues |
 
 Replace `PROJECT` with: `@zitadel/login`, `@zitadel/console`, `@zitadel/docs`, `@zitadel/client`, `@zitadel/proto`, etc.
+Instead of the project names, you can also use their directory names for `PROJECT`, like `nx run login:start`.
+Alternatively, you can use the infix-notation, like `nx start @zitadel/login` or `nx start login`.
 
 ### Project Dependencies
 
@@ -360,54 +361,12 @@ nx run @zitadel/proto:generate  # Regenerate after proto changes
 nx run @zitadel/client:build  # Build after changes
 ```
 
-### <a name="frontend-dev-requirements"></a>Frontend Development Requirements
-**Recommended: Use Dev Container** (everything pre-configured)
-
-Open in VS Code with Dev Container extension.
-All dependencies and tools are already installed
-
-**For local development, install:**
-
-- **[Node.js v22.x](https://nodejs.org/en/download/)** - JavaScript runtime
-- **[pnpm 10.x](https://pnpm.io/installation)** - Package manager
-- **[Docker](https://docs.docker.com/engine/install/)** - For backend services
-
-**Install Node Modules:**
-```bash
-# Install dependencies
-pnpm install
-pnpm add -g nx
-
-# Test a project
-nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui/v2/login/loginname
-```
-
-**Additional requirements for testing:**
-- **[Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)** - For integration tests
-
-<details>
-  <summary>WSL2 on Windows 10 users (click to expand)</summary>
-  
-  For Cypress tests on WSL2, you may need to configure X11 forwarding. Following suggestions [here](https://stackoverflow.com/questions/62641553/setup-cypress-on-wsl-ubuntu-for-windows-10) and [here](https://github.com/microsoft/WSL/issues/4106). Use at your own risk.
-
-  1. Install `VcXsrv Windows X Server`
-  2. Set shortcut target to `"C:\Program Files\VcXsrv\xlaunch.exe" -ac`
-  3. In WSL2: `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0`
-  4. Disable access control when starting XLaunch
-</details>
-
-**Recommended VS Code extensions:**
-- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Code linting
-- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
-- [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For console development
-- [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner UI
-
 ### <a name="contribute-login"></a>Contribute to Login
 
 The Login UI is a Next.js application that provides the user interface for authentication flows.
 It's located in the `apps/login` directory and uses pnpm and Nx for development.
 
-To start developing the login, make sure your system has the [required system dependencies](#frontend-dev-requirements) installed.
+To start developing the login, make sure your system has the [required system dependencies](#dev-requirements) installed.
 
 #### Quick Start
 
@@ -419,7 +378,7 @@ nx run @zitadel/login:dev
 nx run @zitadel/login:start
 ```
 
-Visit http://localhost:3000/ui/v2/login/loginname
+Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 
 #### Login Architecture
 
@@ -443,7 +402,7 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 
 ### <a name="contribute-console"></a>Contribute to Console
 
-To start developing the console, make sure your system has the [required system dependencies](#frontend-dev-requirements) installed.
+To start developing the console, make sure your system has the [required system dependencies](#dev-requirements) installed.
 
 #### Quick Start
 
@@ -464,7 +423,8 @@ To allow console access via http://localhost:4200, you have to configure the Zit
 7. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
 8. Select the _Save_ button
 
-Navigate to http://localhost:4200/.
+Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+
 Make some changes to the source code and see how the browser is automatically updated.
 
 #### Pass Quality Checks
@@ -481,7 +441,7 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 
 Project documentation is made with Docusaurus and is located under [./docs](./docs). The documentation uses **pnpm** and **Nx** for development and build processes.
 
-To start developing the docs, make sure your system has the [required system dependencies](#frontend-dev-requirements) installed.
+To start developing the docs, make sure your system has the [required system dependencies](#dev-requirements) installed.
 
 #### Local Development
 
@@ -535,6 +495,54 @@ nx affected --target check
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
+
+## <a name="dev-requirements"></a>Development Requirements
+**Recommended: Use Dev Container** (everything pre-configured)
+
+Open in VS Code with Dev Container extension.
+All dependencies and tools are already installed
+
+**For local development, install:**
+
+- **[Node.js v22.x](https://nodejs.org/en/download/)** - JavaScript runtime
+- **[pnpm 10.x](https://pnpm.io/installation)** - Package manager
+- **[Docker](https://docs.docker.com/engine/install/)** - For supporting services
+
+**For developing the core backend, additionally install:**
+
+- **[Go 1.24.x](https://go.dev/doc/install)**
+- **[golangci-lint v2](https://golangci-lint.run)** - Please use [this configuration](.golangci.yaml) when running `golangci-lint`
+
+**Install Node Modules:**
+```bash
+# Install dependencies
+pnpm install
+pnpm add -g nx
+
+# Test a project
+nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui/v2/login/loginname
+```
+
+**Additional requirements for testing:**
+- **[Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)** - For integration tests
+
+<details>
+  <summary>WSL2 on Windows 10 users (click to expand)</summary>
+  
+  For Cypress tests on WSL2, you may need to configure X11 forwarding. Following suggestions [here](https://stackoverflow.com/questions/62641553/setup-cypress-on-wsl-ubuntu-for-windows-10) and [here](https://github.com/microsoft/WSL/issues/4106). Use at your own risk.
+
+  1. Install `VcXsrv Windows X Server`
+  2. Set shortcut target to `"C:\Program Files\VcXsrv\xlaunch.exe" -ac`
+  3. In WSL2: `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0`
+  4. Disable access control when starting XLaunch
+</details>
+
+**Recommended VS Code extensions:**
+- [Go](https://marketplace.visualstudio.com/items?itemName=golang.Go) - For core development. Use golangci-lint v2 as linter.
+- [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For console development
+- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Code linting
+- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
+- [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner UI
 
 ## <a name="contribute-translations"></a>Contribute Translations
 

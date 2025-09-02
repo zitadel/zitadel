@@ -32,7 +32,7 @@
             "dependsOn": [
                 "start-db"
             ],
-            "command": "until docker exec zitadel-postgres pg_isready -U postgres; do echo 'Waiting for PostgreSQL...'; sleep 2; done",
+            "command": "until docker exec zitadel-postgres pg_isready -U postgres; do echo 'Waiting for PostgreSQL...'; sleep 2; done"
         },
         "start-init": {
             "dependsOn": [
@@ -71,6 +71,11 @@
             },
             "continuous": true,
             "command": "./zitadel start --config ${CONFIG_FILE} --masterkey \"MasterkeyNeedsToHave32Characters\""
+        },
+        "dev": {
+            "dependsOn": [
+                "@zitadel/login:start-login-only"
+            ]
         }
     }
 }

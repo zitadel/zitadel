@@ -145,6 +145,19 @@
       "dependsOn": [
         "build"
       ]
+    },
+    "start-login-only": {
+      "description": "Start the standalone production build without starting the core service",
+      "continuous": true,
+      "cache": false,
+      "dependsOn": [
+        "env-local",
+        "build"
+      ],
+      "executor": "nx:run-script",
+      "options": {
+        "script": "start"
+      }
     }
   }
 }
