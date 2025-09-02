@@ -335,7 +335,7 @@ Choose your contribution area:
 | **Lint** | `nx run PROJECT:lint` | Check code style |
 | **Lint Fix** | `nx run PROJECT:lint-fix` | Auto-fix style issues |
 
-Replace `PROJECT` with: `@zitadel/login`, `@zitadel/console`, `@zitadel/docs`, `@zitadel/client`, `@zitadel/proto`, etc.
+Replace `PROJECT` with: `@zitadel/zitadel`, `@zitadel/core`, `@zitadel/login`, `@zitadel/console`, `@zitadel/docs`, `@zitadel/client` or `@zitadel/proto`
 Instead of the project names, you can also use their directory names for `PROJECT`, like `nx run login:start`.
 Alternatively, you can use the infix-notation, like `nx start @zitadel/login` or `nx start login`.
 

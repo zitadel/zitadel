@@ -9,6 +9,7 @@
             "inputs": [
                 "{workspaceRoot}/cmd/**/*",
                 "{workspaceRoot}/internal/**/*",
+                "{workspaceRoot}/proto/**/*",
                 "{workspaceRoot}/pkg/**/*",
                 "{workspaceRoot}/Makefile",
                 "{workspaceRoot}/go.mod",
