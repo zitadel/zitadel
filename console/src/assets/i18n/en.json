@@ -1658,7 +1658,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "When this flag is enabled, the console uses the V2 User API to create new users. With the V2 API, newly created users start without an initial state.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Enabling this activates the new TypeScript-based login UI with improved security, performance, and customization.",
-      "LOGINV2_BASEURI": "Base URI"
+      "LOGINV2_BASEURI": "Base URI",
+      "ENABLERELATIONALTABLES": "Relational Tables",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Enable this to use relational tables instead of projections for storing data. Currently this toggle does nothing."
     },
     "DIALOG": {
       "RESET": {
