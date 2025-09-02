@@ -5,8 +5,6 @@
   "scripts": {
     "generate": "nx run-many -t generate",
     "changeset": "changeset",
-    "devcontainer:lint-unit": "FAIL_COMMANDS_ON_ERRORS=true devcontainer up --prebuild --config .devcontainer/nx-lint-unit/devcontainer.json --workspace-folder .",
-    "devcontainer:integration:login": "FAIL_COMMANDS_ON_ERRORS=true devcontainer up --prebuild --config .devcontainer/login-integration/devcontainer.json --workspace-folder .",
     "clean": "nx run-many -t clean",
     "clean:all": "pnpm run clean && rm -rf .nx node_modules"
   },

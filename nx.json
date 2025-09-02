@@ -4,10 +4,8 @@
     "default": [
       "{workspaceRoot}/pnpm-lock.yaml",
       "{projectRoot}/**/*",
-      "!{projectRoot}/node_modules/**/*",
       "!{projectRoot}/Dockerfile",
-      "!{projectRoot}/.dockerignore",
-      "!{projectRoot}/.env*local"
+      "!{projectRoot}/.dockerignore"
     ],
     "docker": [
       "{projectRoot}/Dockerfile",
@@ -16,10 +14,16 @@
   },
   "targetDefaults": {
     "generate": {
-      "cache": true
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
     },
     "build": {
       "cache": true,
+      "inputs": [
+        "default"
+      ],
       "dependsOn": [
         "^build",
         "generate"
@@ -41,12 +45,21 @@
       ]
     },
     "lint": {
+      "inputs": [
+        "default"
+      ],
       "cache": true
     },
     "test-unit": {
+      "inputs": [
+        "default"
+      ],
       "cache": true
     },
     "test-integration": {
+      "inputs": [
+        "default"
+      ],
       "cache": true
     },
     "check": {
@@ -55,6 +68,12 @@
         "lint",
         "test-unit",
         "test-integration"
+      ]
+    },
+    "build-docker": {
+      "inputs": [
+        "default",
+        "docker"
       ]
     }
   },

@@ -16,10 +16,6 @@
         },
         "build": {
             "description": "Generate code from protobuf definitions",
-            "inputs": [
-                "default",
-                "!{projectRoot}/.angular*"
-            ],
             "outputs": ["{projectRoot}/dist/**/*"]
         },
         "start": {

@@ -3,7 +3,6 @@
   "targets": {
     "check": {},
     "build": {
-      "inputs": ["default"],
       "outputs": ["{projectRoot}/dist/**"],
       "dependsOn": ["^generate"]
     }

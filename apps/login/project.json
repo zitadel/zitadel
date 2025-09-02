@@ -4,9 +4,6 @@
     "env-local": {
       "description": "Crete environment files with ZITADEL service user token",
       "cache": true,
-      "inputs": [
-        "{workspaceRoot}/login-client.pat"
-      ],
       "outputs": [
         "{projectRoot}/.env.local",
         "{projectRoot}/dist/apps/login/.env.local"
@@ -30,10 +27,6 @@
       "dependsOn": [
         "^build"
       ],
-      "inputs": [
-        "default",
-        "!{projectRoot}/.next/**/*"
-      ],
       "outputs": [
         "{projectRoot}/dist/**/*",
         "!{projectRoot}/dist/apps/login/.env.*local"
@@ -56,11 +49,11 @@
     },
     "build-docker": {
       "description": "Build Docker image for the login application",
-      "dependsOn": [
-        "build"
-      ],
       "inputs": [
         "docker"
+      ],
+      "dependsOn": [
+        "build"
       ]
     },
     "start-docker": {
@@ -85,8 +78,9 @@
     "test-integration": {
       "description": "Run integration tests with Cypress",
       "dependsOn": [
-        "@zitadel/core-mock:start-docker",
-        "start-integration"
+        "@zitadel/login/core-mock:start-docker",
+        "start-integration",
+        "build"
       ],
       "inputs": [
         "{projectRoot}/integration/integration/**",

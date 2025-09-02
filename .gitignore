@@ -33,7 +33,6 @@ google-credentials
 key.json
 .keys/*
 load-test/.keys
-login-client.pat
 
 # dumps
 .backups
@@ -80,13 +79,14 @@ build/local/*.env
 /zitadel
 node_modules/
 .kreya
+login-client.pat
+.env.*local
 
 go.work
 go.work.sum
 # Local Netlify folder
 .netlify
 
-load-test/node_modules
 load-test/pnpm-debug.log
 load-test/dist
 load-test/output/*
