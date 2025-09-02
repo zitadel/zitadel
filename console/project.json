@@ -2,7 +2,7 @@
     "$schema": "../node_modules/nx/schemas/project-schema.json",
     "targets": {
         "check": {
-            "description": "Check linting and formatting",
+            "description": "Check linting and formatting"
         },
         "generate": {
             "description": "Generate code from protobuf definitions",
