@@ -2,7 +2,7 @@
     "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
     "name": "@zitadel/core-mock",
     "targets": {
-        "build:docker": {
+        "build-docker": {
             "inputs": [
                 "default",
                 "docker"
@@ -11,7 +11,7 @@
                 "build-context": "zitadel-protos=../../../../proto"
             }
         },
-        "start:docker": {
+        "start-docker": {
             "continuous": true,
             "options": {
                 "args": [
