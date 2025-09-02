@@ -10,3 +10,4 @@ FirstInstance:
       Pat:
         ExpirationDate: '2029-01-01T00:00:00Z'
 Database.Postgres.User.Password: zitadel
+DefaultInstance.Features.LoginV2.BaseURI: http://localhost:3000/ui/v2/login

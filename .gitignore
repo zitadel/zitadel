@@ -33,6 +33,7 @@ google-credentials
 key.json
 .keys/*
 load-test/.keys
+login-client.pat
 
 # dumps
 .backups

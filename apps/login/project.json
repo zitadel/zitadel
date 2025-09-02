@@ -38,10 +38,33 @@
       {
         "env": "INKEEP_API_KEY"
       }
-    ]    
-  },  
+    ]
+  },
   "targets": {
+    "env-local": {
+      "description": "Generate environment files with ZITADEL service user token",
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/login-client.pat"
+      ],
+      "outputs": [
+        "{projectRoot}/.env.local",
+        "{projectRoot}/dist/.env.local"
+      ],
+      "dependsOn": [
+        "@zitadel/core:start-setup"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "mkdir -p dist",
+          "TOKEN=$(cat ../../login-client.pat) && echo \"ZITADEL_SERVICE_USER_TOKEN=$TOKEN\" | tee .env.local dist/.env.local > /dev/null"
+        ]
+      }
+    },
     "build": {
+      "description": "Build the Next.js application for production",
       "cache": false,
       "dependsOn": [
         "^build"
@@ -51,10 +74,26 @@
         "!{projectRoot}/.next/**/*"
       ],
       "outputs": [
-        "{projectRoot}/dist/**/*"
+        "{projectRoot}/dist/**/*",
+        "!{projectRoot}/dist/.env.*local"
+      ]
+    },
+    "dev": {
+      "description": "Start the Next.js development server with ZITADEL backend",
+      "dependsOn": [
+        "env-local",
+        "@zitadel/core:start"
+      ]
+    },
+    "start": {
+      "description": "Start the standalone production build",
+      "dependsOn": [
+        "env-local",
+        "@zitadel/core:start"
       ]
     },
     "build-docker": {
+      "description": "Build Docker image for the login application",
       "dependsOn": [
         "build"
       ],
@@ -62,14 +101,8 @@
         "docker"
       ]
     },
-    "start-integration": {
-      "continuous": true,
-      "cache": false,
-      "dependsOn": [
-        "build"
-      ]
-    },
     "start-docker": {
+      "description": "Start the application in Docker container",
       "continuous": true,
       "options": {
         "args": [
@@ -78,13 +111,17 @@
         ]
       }
     },
-    "check": {},
+    "check": {
+      "description": "Run code quality checks (linting, formatting, etc.)"
+    },
     "test-unit": {
+      "description": "Run unit tests",
       "dependsOn": [
         "^build"
       ]
     },
     "test-integration": {
+      "description": "Run integration tests with Cypress",
       "dependsOn": [
         "@zitadel/core-mock:start-docker",
         "start-integration"
@@ -99,6 +136,14 @@
       "outputs": [
         "{projectRoot}/cypress/**/*"
       ]
+    },
+    "start-integration": {
+      "description": "Start the application for integration testing",
+      "continuous": true,
+      "cache": false,
+      "dependsOn": [
+        "build"
+      ]
     }
-  }  
+  }
 }

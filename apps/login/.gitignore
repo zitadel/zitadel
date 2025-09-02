@@ -8,7 +8,6 @@ cypress
 node_modules
 *.log
 .next
-dist
 dist-ssr
 *.local
 .vscode

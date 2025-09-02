@@ -17,6 +17,16 @@
                 "!{projectRoot}/.angular*"
             ],
             "outputs": ["{projectRoot}/dist/**/*"]
+        },
+        "start": {
+            "dependsOn": [
+                "@zitadel/login:start"
+            ]
+        },
+        "dev": {
+            "dependsOn": [
+                "@zitadel/login:start"
+            ]
         }
     }   
 }

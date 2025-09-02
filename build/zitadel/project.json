@@ -34,10 +34,9 @@
             ],
             "command": "until docker exec zitadel-postgres pg_isready -U postgres; do echo 'Waiting for PostgreSQL...'; sleep 2; done",
         },
-        "start-zitadel": {
+        "start-init": {
             "dependsOn": [
                 "build",
-                "start-db",
                 "wait-for-db"
             ],
             "options": {
@@ -45,24 +44,33 @@
                     "CONFIG_FILE": "{projectRoot}/zitadel.yaml"
                 }
             },
-            "continuous": true,
-            "command": "./zitadel start-from-init --config ${CONFIG_FILE} --steps ${CONFIG_FILE} --masterkey \"MasterkeyNeedsToHave32Characters\""
+            "command": "./zitadel init --config ${CONFIG_FILE}"
         },
-        "wait-for-zitadel": {
+        "start-setup": {
             "dependsOn": [
-                "start-zitadel"
+                "start-init"
             ],
             "options": {
                 "env": {
                     "CONFIG_FILE": "{projectRoot}/zitadel.yaml"
                 }
             },
-            "command": "until ./zitadel ready --config ${CONFIG_FILE}; do echo 'Waiting for ZITADEL...'; sleep 2; done",
+            "outputs": [
+                "{workspaceRoot}/login-client.pat"
+            ],
+            "command": "./zitadel setup --config ${CONFIG_FILE} --steps ${CONFIG_FILE} --masterkey \"MasterkeyNeedsToHave32Characters\""
         },
         "start": {
             "dependsOn": [
-                "wait-for-zitadel" 
-            ]
+                "start-setup"
+            ],
+            "options": {
+                "env": {
+                    "CONFIG_FILE": "{projectRoot}/zitadel.yaml"
+                }
+            },
+            "continuous": true,
+            "command": "./zitadel start --config ${CONFIG_FILE} --masterkey \"MasterkeyNeedsToHave32Characters\""
         }
     }
 }

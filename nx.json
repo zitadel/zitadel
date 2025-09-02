@@ -6,7 +6,8 @@
       "{projectRoot}/**/*",
       "!{projectRoot}/node_modules/**/*",
       "!{projectRoot}/Dockerfile",
-      "!{projectRoot}/.dockerignore"
+      "!{projectRoot}/.dockerignore",
+      "!{projectRoot}/.env*local"
     ],
     "docker": [
       "{projectRoot}/Dockerfile",
