@@ -1146,6 +1146,7 @@ DefaultInstance:
     #  BaseURI: "" # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI
     # PermissionCheckV2: false # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
     # ConsoleUseV2UserApi: false # ZITADEL_DEFAULTINSTANCE_FEATURES_CONSOLEUSEV2USERAPI
+    # EnableRelationalTables: false # ZITADEL_DEFAULTINSTANCE_FEATURES_ENABLERELATIONALTABLES
 
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.

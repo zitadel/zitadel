@@ -1657,7 +1657,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。",
       "LOGINV2": "登录 V2",
       "LOGINV2_DESCRIPTION": "启用此选项将激活基于 TypeScript 的新登录界面，具有更高的安全性、性能和可定制性。",
-      "LOGINV2_BASEURI": "基础 URI"
+      "LOGINV2_BASEURI": "基础 URI",
+      "ENABLERELATIONALTABLES": "关系表",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "启用此功能以使用关系表而不是投影来存储数据。目前此切换没有任何作用。"
     },
     "DIALOG": {
       "RESET": {
