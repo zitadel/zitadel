@@ -1657,7 +1657,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Bu bayrak etkinleştirildiğinde, konsol yeni kullanıcılar oluşturmak için V2 Kullanıcı API'sini kullanır. V2 API ile yeni oluşturulan kullanıcılar başlangıç durumu olmadan başlar.",
       "LOGINV2": "Giriş V2",
       "LOGINV2_DESCRIPTION": "Bunu etkinleştirmek, gelişmiş güvenlik, performans ve özelleştirme ile yeni TypeScript tabanlı giriş UI'ını etkinleştirir.",
-      "LOGINV2_BASEURI": "Temel URI"
+      "LOGINV2_BASEURI": "Temel URI",
+      "ENABLERELATIONALTABLES": "İlişkisel Tablolar",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Veri depolamak için projeksiyonlar yerine ilişkisel tabloları kullanmak için bunu etkinleştirin. Şu anda bu anahtar hiçbir şey yapmıyor."
     },
     "DIALOG": {
       "RESET": {
