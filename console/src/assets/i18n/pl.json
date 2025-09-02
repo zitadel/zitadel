@@ -1653,7 +1653,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Gdy ta flaga jest włączona, konsola używa API V2 User do tworzenia nowych użytkowników. W przypadku API V2 nowo utworzeni użytkownicy rozpoczynają bez stanu początkowego.",
       "LOGINV2": "Logowanie V2",
       "LOGINV2_DESCRIPTION": "Włączenie tej opcji aktywuje nowy interfejs logowania oparty na TypeScript z ulepszonym bezpieczeństwem, wydajnością i możliwością dostosowania.",
-      "LOGINV2_BASEURI": "Podstawowy URI"
+      "LOGINV2_BASEURI": "Podstawowy URI",
+      "ENABLERELATIONALTABLES": "Tabele relacyjne",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Włącz to, aby używać tabel relacyjnych zamiast projekcji do przechowywania danych. Obecnie ten przełącznik nic nie robi."
     },
     "DIALOG": {
       "RESET": {
