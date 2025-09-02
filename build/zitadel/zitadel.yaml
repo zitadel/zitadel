@@ -9,3 +9,4 @@ FirstInstance:
         Name: Automatically Initialized IAM Login Client
       Pat:
         ExpirationDate: '2029-01-01T00:00:00Z'
+Database.Postgres.User.Password: zitadel
