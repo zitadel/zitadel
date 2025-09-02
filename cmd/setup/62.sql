@@ -11,7 +11,7 @@ ALTER TABLE projections.resource_counts
 -- 2. The column name of the instance id
 -- 3. The column name of the owner id
 -- 4. The name of the resource
--- 5. (optional) 'ADD' or 'SUB' to indicate if an UPDATE should add or subtract from the count.
+-- 5. (optional) 'UP' or 'DOWN' to indicate if an UPDATE should count up or down.
 CREATE OR REPLACE FUNCTION projections.count_resource()
     RETURNS trigger
     LANGUAGE 'plpgsql' VOLATILE
