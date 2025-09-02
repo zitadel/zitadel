@@ -1,8 +1,11 @@
 {
     "$schema": "../node_modules/nx/schemas/project-schema.json",
     "targets": {
-        "check": {},
+        "check": {
+            "description": "Check linting and formatting",
+        },
         "generate": {
+            "description": "Generate code from protobuf definitions",
             "inputs": [
                 "{workspaceRoot}/proto/**/*",
                 "{projectRoot}/buf.gen.yaml",
@@ -12,6 +15,7 @@
             "outputs": ["{projectRoot}/src/app/proto/generated/**/*"]
         },
         "build": {
+            "description": "Generate code from protobuf definitions",
             "inputs": [
                 "default",
                 "!{projectRoot}/.angular*"
@@ -19,11 +23,13 @@
             "outputs": ["{projectRoot}/dist/**/*"]
         },
         "start": {
+            "description": "Start the Zitadel platform (core, login and console) in production mode.",
             "dependsOn": [
                 "@zitadel/login:start"
             ]
         },
         "dev": {
+            "description": "Like `start`, but with a console running in dev mode on port 4200.",
             "dependsOn": [
                 "@zitadel/login:start"
             ]

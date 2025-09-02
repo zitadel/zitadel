@@ -153,7 +153,7 @@ Please check out the dedicated [API guidelines](./API_DESIGN.md) page when contr
 
 To start developing the Zitadel core Go application, make sure your system has the [required system dependencies](#dev-requirements) installed.
 
-#### Quick Start
+### Quick Start
 
 **Run Zitadel:**
 
@@ -329,7 +329,7 @@ Choose your contribution area:
 
 | Task | Command | Notes |
 |------|---------|--------|
-| **Start** | `nx run PROJECT:start` | Production server |
+| **Run** | `nx run PROJECT:start` | Production server |
 | **Develop** | `nx run PROJECT:dev` | Hot reload development server |
 | **Test** | `nx run PROJECT:test` | Run all tests |
 | **Lint** | `nx run PROJECT:lint` | Check code style |

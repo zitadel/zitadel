@@ -4,7 +4,6 @@
   "scripts": {
     "ng": "ng",
     "dev": "node prebuild.development.js && ng serve",
-    "start": "node prebuild.development.js && ng serve",
     "build": "ng build --configuration production --base-href=/ui/console/",
     "lint": "pnpm run '/^lint-check:.*$/'",
     "lint-check:ng": "ng lint",

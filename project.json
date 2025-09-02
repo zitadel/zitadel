@@ -3,6 +3,7 @@
   "projectType": "application",
   "targets": {
     "start": {
+      "description": "Build and start the Zitadel platform (core, login and console) in production mode",
       "dependsOn": [
         "@zitadel/login:start"
       ]

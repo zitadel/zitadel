@@ -56,12 +56,14 @@ jobs:
           tags: |
             type=sha,prefix=,suffix=-debug,format=long
       -
-        name: Debug meta
+        name: Login meta
         id: login-meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ inputs.build_image_name_login }}
-          labels: ${{ env.default_labels}}
+          labels: |
+            org.opencontainers.image.licenses=MIT
+            ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=,format=long
       - 
@@ -111,7 +113,7 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
       - 
         name: Build Login
-        run: nx build login
+        run: pnpm nx build login
       - 
         name: Debug
         id: build-debug
@@ -126,7 +128,7 @@ jobs:
           platforms: linux/${{ matrix.arch }}
           push: true
           labels: ${{ steps.debug-meta.outputs.labels }}
-          outputs: type=image,name=${{ inputs.build_image_name }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ inputs.build_image_name_core }},push-by-digest=true,name-canonical=true,push=true
       - 
         name: Scratch
         id: build-scratch
@@ -141,7 +143,7 @@ jobs:
           platforms: linux/${{ matrix.arch }}
           push: true
           labels: ${{ steps.scratch-meta.outputs.labels }}
-          outputs: type=image,name=${{ inputs.build_image_name }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ inputs.build_image_name_core }},push-by-digest=true,name-canonical=true,push=true
       - 
         name: Login
         id: build-login

@@ -4,6 +4,7 @@
     "projectType": "application",
     "targets": {
         "build": {
+            "description": "Build the Zitadel core application",
             "command": "make core_build compile_pipeline",
             "inputs": [
                 "{workspaceRoot}/cmd/**/*",
@@ -22,6 +23,7 @@
             ]
         },
         "start-db": {
+            "description": "Run the PostgreSQL database container",
             "command": "docker rm -f zitadel-postgres || true; docker run --name zitadel-postgres --rm -p 5432:5432 --env-file ./postgres.env -v ./postgresql.conf:/etc/postgresql/postgresql.conf -v zitadel-postgres-data:/var/lib/postgresql/data postgres:latest postgres -c config_file=/etc/postgresql/postgresql.conf",
             "options": {
                 "cwd": "{projectRoot}"
@@ -29,12 +31,14 @@
             "continuous": true
         },
         "wait-for-db": {
+            "description": "Wait until the PostgreSQL database is ready to accept connections",
             "dependsOn": [
                 "start-db"
             ],
             "command": "until docker exec zitadel-postgres pg_isready -U postgres; do echo 'Waiting for PostgreSQL...'; sleep 2; done"
         },
         "start-init": {
+            "description": "Initialize the Zitadel core application",
             "dependsOn": [
                 "build",
                 "wait-for-db"
@@ -47,6 +51,7 @@
             "command": "./zitadel init --config ${CONFIG_FILE}"
         },
         "start-setup": {
+            "description": "Setup the Zitadel core application. This also writes the login-client.pat if run against a database from scratch",
             "dependsOn": [
                 "start-init"
             ],
@@ -61,6 +66,7 @@
             "command": "./zitadel setup --config ${CONFIG_FILE} --steps ${CONFIG_FILE} --masterkey \"MasterkeyNeedsToHave32Characters\""
         },
         "start": {
+            "description": "Start the Zitadel core application",
             "dependsOn": [
                 "start-setup"
             ],
@@ -73,6 +79,7 @@
             "command": "./zitadel start --config ${CONFIG_FILE} --masterkey \"MasterkeyNeedsToHave32Characters\""
         },
         "dev": {
+            "description": "Develop the Zitadel core application. Like the `start` target, but can start the application yourself in debug mode using your IDE. Run `nx show project core --json | jq '.targets.start.options'` to see how to configure your IDE",
             "dependsOn": [
                 "@zitadel/login:start-login-only"
             ]

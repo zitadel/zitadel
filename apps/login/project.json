@@ -1,48 +1,8 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "namedInputs": {
-    "envVars": [
-      {
-        "env": "DEBUG"
-      },
-      {
-        "env": "EMAIL_VERIFICATION"
-      },
-      {
-        "env": "AUDIENCE"
-      },
-      {
-        "env": "SYSTEM_USER_ID"
-      },
-      {
-        "env": "SYSTEM_USER_PRIVATE_KEY"
-      },
-      {
-        "env": "ZITADEL_API_URL"
-      },
-      {
-        "env": "ZITADEL_SERVICE_USER_TOKEN"
-      },
-      {
-        "env": "NEXT_PUBLIC_BASE_PATH"
-      },
-      {
-        "env": "CUSTOM_REQUEST_HEADERS"
-      },
-      {
-        "env": "NODE_ENV"
-      },
-      {
-        "env": "PORT"
-      },
-      {
-        "env": "INKEEP_API_KEY"
-      }
-    ]
-  },
   "targets": {
     "env-local": {
-      "description": "Generate environment files with ZITADEL service user token",
+      "description": "Crete environment files with ZITADEL service user token",
       "cache": true,
       "inputs": [
         "{workspaceRoot}/login-client.pat"
@@ -64,7 +24,7 @@
       }
     },
     "build": {
-      "description": "Build the Next.js application for production",
+      "description": "Build the Next.js application in standalone mode for production. (Cache is disabled because it doesn't work https://github.com/nrwl/nx/issues/27724)",
       "cache": false,
       "dependsOn": [
         "^build"
@@ -79,7 +39,7 @@
       ]
     },
     "dev": {
-      "description": "Start the Next.js development server with ZITADEL backend",
+      "description": "Start the Next.js development server with Zitadel core backend",
       "dependsOn": [
         "env-local",
         "@zitadel/core:start"
@@ -113,7 +73,7 @@
       }
     },
     "check": {
-      "description": "Run code quality checks (linting, formatting, etc.)"
+      "description": "Run code quality checks (linting, formatting, testing and building)"
     },
     "test-unit": {
       "description": "Run unit tests",

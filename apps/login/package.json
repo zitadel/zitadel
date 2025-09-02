@@ -15,10 +15,7 @@
     "test-unit": "vitest --run",
     "lint-staged": "lint-staged",
     "clean": "rm -rf node_modules .next cypress",
-    "test-integration": "wait-on --simultaneous 1 http://localhost:3001/ui/v2/login/verify?userId=221394658884845598&code=abc && cypress run",
-    "test-acceptance": "dotenv -e ../login/.env.test.local playwright",
-    "test-acceptance:setup": "cd ../.. && make login_test_acceptance_setup_env && NODE_ENV=test pnpm run test:acceptance:setup:dev",
-    "test-acceptance:setup:dev": "cd ../.. && make login_test_acceptance_setup_dev"
+    "test-integration": "wait-on --simultaneous 1 http://localhost:3001/ui/v2/login/verify?userId=221394658884845598&code=abc && cypress run"
   },
   "pnpm": {
     "overrides": {
