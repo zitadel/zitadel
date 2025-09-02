@@ -17,6 +17,8 @@ jobs:
         with:
           filter: tree:0
           fetch-depth: 0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
