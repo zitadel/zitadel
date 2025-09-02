@@ -50,7 +50,7 @@ type Features struct {
 	LoginV2                        LoginV2                   `json:"login_v2,omitempty"`
 	PermissionCheckV2              bool                      `json:"permission_check_v2,omitempty"`
 	ConsoleUseV2UserApi            bool                      `json:"console_use_v2_user_api,omitempty"`
-	EnableRelationalTables         bool                      `json:"enable_relation_tables,omitempty"`
+	EnableRelationalTables         bool                      `json:"enable_relational_tables,omitempty"`
 }
 
 /* Note: do not generate the stringer or enumer for this type, is it breaks existing events */
