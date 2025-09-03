@@ -5,8 +5,7 @@
       "description": "Create environment files with ZITADEL service user token",
       "cache": true,
       "outputs": [
-        "{projectRoot}/.env.local",
-        "{projectRoot}/dist/apps/login/.env.local"
+        "{projectRoot}/.env.local"
       ],
       "dependsOn": [
         "@zitadel/core:start-setup"
@@ -15,21 +14,20 @@
       "options": {
         "cwd": "{projectRoot}",
         "commands": [
-          "mkdir -p dist/apps/login",
-          "TOKEN=$(cat ../../login-client.pat) && echo \"ZITADEL_SERVICE_USER_TOKEN=$TOKEN\" | tee .env.local dist/apps/login/.env.local > /dev/null"
+          "TOKEN=$(cat ../../login-client.pat) && echo \"ZITADEL_SERVICE_USER_TOKEN=$TOKEN\" > .env.local"
         ],
         "parallel": false
       }
     },
     "build": {
       "description": "Build the Next.js application in standalone mode for production. (Cache is disabled because it doesn't work https://github.com/nrwl/nx/issues/27724)",
-      "cache": false,
+      "cache": true,
       "dependsOn": [
+        "env-local",
         "^build"
       ],
       "outputs": [
-        "{projectRoot}/dist/**/*",
-        "!{projectRoot}/dist/apps/login/.env.*local"
+        "{projectRoot}/.next/standalone"
       ]
     },
     "dev": {
