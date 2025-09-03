@@ -562,12 +562,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	}()
 
 	var hasLocked bool
-	if config.awaitRunning {
-		_, err = tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID())
-		hasLocked = true
-	} else {
-		err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
-	}
+	err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
 	if err != nil {
 		return false, err
 	}

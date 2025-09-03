@@ -46,5 +46,32 @@ export default async function (data: any) {
 
 export function teardown(data: any) {
   // removeOrg(data.org, data.tokens.accessToken);
-  console.info('teardown: org removed');
+  console.info('teardown: org is not removed to verify correctness of projections, do not forget to remove the org afterwards');
 }
+
+/** 
+ * To verify the correctness of the projections you can use the following statements:
+ * 
+ * set the owner of the events:
+ * 
+ * set my.owner = '<org id of the created org>';
+ * 
+ * check if the amount of events is the same as amount of objects
+ * 
+ *  select * from (
+    select 'projections.user_grants5', count(*) from projections.user_grants5 where resource_owner = (select current_setting('my.owner'))
+    union all
+    select 'projections.users14', count(*) from projections.users14 where resource_owner = (select current_setting('my.owner'))
+    union all
+    select 'projections.sessions8', count(*) from projections.sessions8 where user_resource_owner = (select current_setting('my.owner'))
+    union all
+    select aggregate_type, count(*) from eventstore.events2
+    where
+        aggregate_type in ('user', 'usergrant', 'session')
+        and event_type in ('user.machine.added', 'user.human.added', 'user.grant.added', 'session.user.checked')
+        and (owner = (select current_setting('my.owner'))
+            OR payload->>'userResourceOwner' = (select current_setting('my.owner'))
+        )
+        group by aggregate_type
+) order by 2;
+ */
