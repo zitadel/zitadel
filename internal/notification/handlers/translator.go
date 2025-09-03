@@ -15,7 +15,7 @@ func (n *NotificationQueries) GetTranslatorWithOrgTexts(ctx context.Context, org
 		return nil, err
 	}
 	translator := i18n.NewNotificationTranslator(n.GetDefaultLanguage(ctx), restrictions.AllowedLanguages)
-	
+
 	allCustomTexts, err := n.CustomTextListByTemplate(ctx, authz.GetInstance(ctx).InstanceID(), textType, false)
 	if err != nil {
 		return translator, nil
