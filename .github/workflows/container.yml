@@ -28,7 +28,7 @@ jobs:
         arch: [amd64,arm64]
     steps:
       - 
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       -
         name: Scratch meta
         id: scratch-meta
@@ -61,7 +61,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - 
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: .artifacts
           name: zitadel-linux-${{ matrix.arch }}
@@ -137,7 +137,7 @@ jobs:
     steps:
       -
         name: Download digests
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           pattern: digests-*
           path: /tmp/digests
