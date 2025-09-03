@@ -138,7 +138,7 @@ core_integration_server_start: core_integration_setup
 
 .PHONY: core_integration_test_packages
 core_integration_test_packages:
-	go test -race -count 1 -tags integration -timeout 30m $$(go list -tags integration ./... | grep -e "integration_test" -e "events_testing")
+	go test -race -count 1 -tags integration -timeout 60m -parallel 1 $$(go list -tags integration ./... | grep -e "integration_test" -e "events_testing")
 
 .PHONY: core_integration_server_stop
 core_integration_server_stop:
