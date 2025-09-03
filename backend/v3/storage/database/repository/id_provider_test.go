@@ -38,7 +38,7 @@ func TestCreateSetting(t *testing.T) {
 		ID:         orgId,
 		Name:       gofakeit.Name(),
 		InstanceID: instanceId,
-		State:      domain.OrgStateActive.String(),
+		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository(pool)
 	err = organizationRepo.Create(t.Context(), &org)
@@ -981,7 +981,7 @@ func TestDeleteSetting(t *testing.T) {
 			// delete setting
 			noOfDeletedRows, err := settingRepo.Delete(ctx,
 				tt.
-				instanceId,
+					instanceId,
 				&orgId,
 			)
 			require.NoError(t, err)

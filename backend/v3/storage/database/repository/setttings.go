@@ -27,31 +27,31 @@ var _ domain.SettingsRepository = (*settings)(nil)
 // -------------------------------------------------------------
 
 func (settings) IDColumn() database.Column {
-	return database.NewColumn("id")
+	return database.NewColumn("settings", "id")
 }
 
 func (settings) InstanceIDColumn() database.Column {
-	return database.NewColumn("instance_id")
+	return database.NewColumn("settings", "instance_id")
 }
 
 func (settings) OrgIDColumn() database.Column {
-	return database.NewColumn("org_id")
+	return database.NewColumn("settings", "org_id")
 }
 
 func (settings) TypeColumn() database.Column {
-	return database.NewColumn("type")
+	return database.NewColumn("settings", "type")
 }
 
 func (settings) SettingsColumn() database.Column {
-	return database.NewColumn("settings")
+	return database.NewColumn("settings", "settings")
 }
 
 func (settings) CreatedAtColumn() database.Column {
-	return database.NewColumn("created_at")
+	return database.NewColumn("settings", "created_at")
 }
 
 func (settings) UpdatedAtColumn() database.Column {
-	return database.NewColumn("updated_at")
+	return database.NewColumn("settings", "updated_at")
 }
 
 // // -------------------------------------------------------------
@@ -135,11 +135,7 @@ func (s *settings) Create(ctx context.Context, setting *domain.Setting) error {
 		string(setting.Settings))
 	builder.WriteString(createSettingStmt)
 
-	err := s.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.CreatedAt, &setting.UpdatedAt)
-	if err != nil {
-		return checkCreateOrgErr(err)
-	}
-	return nil
+	return s.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.CreatedAt, &setting.UpdatedAt)
 }
 
 func (s *settings) Update(ctx context.Context, id string, instanceID string, orgID *string, changes ...database.Change) (int64, error) {
