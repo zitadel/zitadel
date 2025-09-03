@@ -27,7 +27,7 @@ In the response, you will get an authentication URL of the provider you like.
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2/idp_intents \
+  --url https://${CUSTOM_DOMAIN}/v2/idp_intents \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -49,7 +49,7 @@ curl --request POST \
 		"changeDate": "2023-06-14T12:51:29.654819Z",
 		"resourceOwner": "163840776835432705"
 	},
-	"authUrl": "https://accounts.google.com/o/oauth2/v2/auth?client_id=Test&prompt=select_account&redirect_uri=https%3A%2F%2F$ZITADEL_DOMAIN%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=218525066445455617"
+	"authUrl": "https://accounts.google.com/o/oauth2/v2/auth?client_id=Test&prompt=select_account&redirect_uri=https%3A%2F%2F${CUSTOM_DOMAIN}%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=218525066445455617"
 }
 ```
 
@@ -59,13 +59,13 @@ The next step is to call the auth URL you got in the response from the previous 
 This will open up the login page of the given provider. In this guide, it is Google Login.
 
 ```bash
-https://accounts.google.com/o/oauth2/v2/auth?client_id=Test&prompt=select_account&redirect_uri=https%3A%2F%2F$ZITADEL_DOMAIN%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=218525066445455617
+https://accounts.google.com/o/oauth2/v2/auth?client_id=Test&prompt=select_account&redirect_uri=https%3A%2F%2F${CUSTOM_DOMAIN}%2Fidps%2Fcallback&response_type=code&scope=openid+profile+email&state=218525066445455617
 ```
 
 After the user has successfully authenticated, a redirect to the ZITADEL backend /idps/callback will automatically be performed.
 
 :::warning
-Note that the redirect URL is `https://{YOUR-DOMAIN}/idps/callback` when using the new V2 hosted login compared to the V1 hosted login, which was `https://{YOUR-DOMAIN}/ui/login/login/externalidp/callback`.
+Note that the redirect URL is `https://${CUSTOM_DOMAIN}/idps/callback` when using the new V2 hosted login compared to the V1 hosted login, which was `https://${CUSTOM_DOMAIN}/ui/login/login/externalidp/callback`.
 :::
 
 ## Get Provider Information
@@ -79,7 +79,7 @@ To get the information of the provider, make a request to ZITADEL.
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2/idp_intents/$INTENT_ID \
+  --url https://${CUSTOM_DOMAIN}/v2/idp_intents/$INTENT_ID \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -138,7 +138,7 @@ This check requires that the previous step ended on the successful page and didn
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2/sessions \
+  --url https://${CUSTOM_DOMAIN}/v2/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
 
@@ -170,7 +170,7 @@ The display name is used to list the linkings on the users.
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2/users/human \
+  --url https://${CUSTOM_DOMAIN}/v2/users/human \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -209,7 +209,7 @@ If you want to link/connect to an existing account you can perform the add ident
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2/users/users/218385419895570689/links \
+  --url https://${CUSTOM_DOMAIN}/v2/users/users/218385419895570689/links \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
