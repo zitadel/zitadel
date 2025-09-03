@@ -406,6 +406,9 @@ type triggerConfig struct {
 
 type TriggerOpt func(conf *triggerConfig)
 
+// WithAwaitRunning instructs the projection to wait until previous triggers within the same container are finished
+// If multiple containers are involved, we do not await them to finish. If another container is currently projecting the trigger is skipped.
+// The reason is that we do not want to cause potential database connection exhaustion.
 func WithAwaitRunning() TriggerOpt {
 	return func(conf *triggerConfig) {
 		conf.awaitRunning = true
