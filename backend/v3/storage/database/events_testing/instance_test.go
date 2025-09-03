@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/integration"
+	instance "github.com/zitadel/zitadel/pkg/grpc/instance/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
@@ -91,7 +92,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 
 		instanceName += "new"
 		beforeUpdate := time.Now()
-		_, err = SystemClient.UpdateInstance(CTX, &system.UpdateInstanceRequest{
+		Instance.Client.InstanceV2Beta.UpdateInstance(CTX, &instance.UpdateInstanceRequest{
 			InstanceId:   res.InstanceId,
 			InstanceName: instanceName,
 		})
@@ -134,7 +135,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			assert.Equal(ttt, instanceName, instance.Name)
 		}, retryDuration, tick)
 
-		_, err = SystemClient.RemoveInstance(CTX, &system.RemoveInstanceRequest{
+		_, err = Instance.Client.InstanceV2Beta.DeleteInstance(CTX, &instance.DeleteInstanceRequest{
 			InstanceId: res.InstanceId,
 		})
 		require.NoError(t, err)
