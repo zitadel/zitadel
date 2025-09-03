@@ -55,10 +55,6 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 		}()
 	}
 
-	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
-		return nil, err
-	}
-
 	// lock the instance for reading events if await events is set for the duration of the transaction.
 	_, err = tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock_shared('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))", authz.GetInstance(ctx).InstanceID())
 	if err != nil {
@@ -67,6 +63,9 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 
 	events, err := writeEvents(ctx, tx, commands)
 	if err != nil {
+		return nil, err
+	}
+	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
 		return nil, err
 	}
 
