@@ -1654,7 +1654,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Lorsque ce drapeau est activé, la console utilise l'API V2 User pour créer de nouveaux utilisateurs. Avec l'API V2, les nouveaux utilisateurs commencent sans état initial.",
       "LOGINV2": "Connexion V2",
       "LOGINV2_DESCRIPTION": "L’activation de cette option lance la nouvelle interface de connexion basée sur TypeScript, avec une sécurité, des performances et une personnalisation améliorées.",
-      "LOGINV2_BASEURI": "URI de base"
+      "LOGINV2_BASEURI": "URI de base",
+      "ENABLERELATIONALTABLES": "Tables relationnelles",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Activez ceci pour utiliser des tables relationnelles au lieu de projections pour stocker des données. Actuellement, ce commutateur ne fait rien."
     },
     "DIALOG": {
       "RESET": {
