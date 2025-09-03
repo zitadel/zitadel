@@ -99,7 +99,7 @@ func (wm *DomainPolicyOrgsWriteModel) Reduce() error {
 		switch e := event.(type) {
 		// organization irrelevant if removed or with custom policy
 		case *org.OrgRemovedEvent, *org.DomainPolicyAddedEvent:
-			slices.DeleteFunc(wm.OrgIDs, func(orgID string) bool { return orgID == e.Aggregate().ID })
+			wm.OrgIDs = slices.DeleteFunc(wm.OrgIDs, func(orgID string) bool { return orgID == e.Aggregate().ID })
 		// organization relevant if added without custom policy or custom policy is removed
 		case *org.OrgAddedEvent, *org.DomainPolicyRemovedEvent:
 			wm.OrgIDs = append(wm.OrgIDs, e.Aggregate().ID)
