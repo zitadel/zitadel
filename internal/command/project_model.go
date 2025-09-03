@@ -69,6 +69,9 @@ func (wm *ProjectWriteModel) Reduce() error {
 		case *project.ProjectRemovedEvent:
 			wm.State = domain.ProjectStateRemoved
 		case *org.OrgRemovedEvent:
+			if event.Aggregate().ID != wm.ResourceOwner {
+				continue
+			}
 			*wm = ProjectWriteModel{
 				WriteModel: wm.WriteModel,
 			}
