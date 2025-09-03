@@ -24,6 +24,7 @@ import (
 	"github.com/zitadel/saml/pkg/provider"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/encryption"
@@ -436,7 +437,25 @@ func startAPIs(
 		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
 	)
 	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, &config.Quotas.Access.AccessConfig)
-	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.SystemAuthZ, config.InternalAuthZ, tlsConfig, config.ExternalDomain, append(config.InstanceHostHeaders, config.PublicHostHeaders...), limitingAccessInterceptor, keys.Target)
+	translator, err := i18n.NewZitadelTranslator(language.English)
+	if err != nil {
+		return nil, err
+	}
+	apis, err := api.New(
+		ctx,
+		config.Port,
+		router,
+		queries,
+		verifier,
+		config.SystemAuthZ,
+		config.InternalAuthZ,
+		tlsConfig,
+		config.ExternalDomain,
+		append(config.InstanceHostHeaders, config.PublicHostHeaders...),
+		limitingAccessInterceptor,
+		keys.Target,
+		translator,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
 	}
@@ -539,9 +558,22 @@ func startAPIs(
 		return nil, err
 	}
 
-	instanceInterceptor := middleware.InstanceInterceptor(queries, config.ExternalDomain, login.IgnoreInstanceEndpoints...)
+	instanceInterceptor := middleware.InstanceInterceptor(queries, config.ExternalDomain, translator, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
-	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.SystemAuthZ, config.InternalAuthZ, id.SonyFlakeGenerator(), store, queries, middleware.CallDurationHandler, instanceInterceptor.Handler, assetsCache.Handler, limitingAccessInterceptor.Handle))
+	apis.RegisterHandlerOnPrefix(assets.HandlerPrefix, assets.NewHandler(
+		commands,
+		verifier,
+		config.SystemAuthZ,
+		config.InternalAuthZ,
+		id.SonyFlakeGenerator(),
+		store,
+		queries,
+		middleware.CallDurationHandler,
+		instanceInterceptor.Handler,
+		assetsCache.Handler,
+		limitingAccessInterceptor.Handle,
+		translator,
+	))
 
 	federatedLogoutsCache, err := connector.StartCache[federatedlogout.Index, string, *federatedlogout.FederatedLogout](ctx, []federatedlogout.Index{federatedlogout.IndexRequestID}, cache.PurposeFederatedLogout, cacheConnectors.Config.FederatedLogouts, cacheConnectors)
 	if err != nil {

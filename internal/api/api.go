@@ -23,6 +23,7 @@ import (
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -51,6 +52,7 @@ type API struct {
 	connectServices   map[string][]string
 
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
+	translator                *i18n.Translator
 }
 
 func (a *API) ListGrpcServices() []string {
@@ -103,6 +105,7 @@ func New(
 	hostHeaders []string,
 	accessInterceptor *http_mw.AccessInterceptor,
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
+	translator *i18n.Translator,
 ) (_ *API, err error) {
 	api := &API{
 		port:                      port,
@@ -117,9 +120,10 @@ func New(
 		systemAuthZ:               systemAuthz,
 		connectServices:           make(map[string][]string),
 		targetEncryptionAlgorithm: targetEncryptionAlgorithm,
+		translator:                translator,
 	}
 
-	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService(), targetEncryptionAlgorithm)
+	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService(), targetEncryptionAlgorithm, api.translator)
 	api.grpcGateway, err = server.CreateGateway(ctx, port, hostHeaders, accessInterceptor, tlsConfig)
 	if err != nil {
 		return nil, err
@@ -188,7 +192,7 @@ func (a *API) registerConnectServer(service server.ConnectServer) {
 		connect_middleware.CallDurationHandler(),
 		connect_middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 		connect_middleware.NoCacheInterceptor(),
-		connect_middleware.InstanceInterceptor(a.queries, a.externalDomain, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
+		connect_middleware.InstanceInterceptor(a.queries, a.externalDomain, a.translator, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
 		connect_middleware.AccessStorageInterceptor(a.accessInterceptor.AccessService()),
 		connect_middleware.ErrorHandler(),
 		connect_middleware.LimitsInterceptor(system_pb.SystemService_ServiceDesc.ServiceName),
