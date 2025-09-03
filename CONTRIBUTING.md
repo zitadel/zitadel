@@ -31,9 +31,10 @@ Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
 [Contribute](#how-to-contribute)
 
-- [Contribute code](#backend)
-- If you found a mistake on our [docs page](https://zitadel.com/docs) or something is missing please read [the docs section](#contribute-docs)
-- [Translate](#contribute-translations) and improve texts
+- [Contribute backend code](#backend)
+- [Contribute frontend code](#frontend)
+- If you found a mistake on our [docs page](https://zitadel.com/docs) or something is missing please read [the docs section](#docs)
+- [Translate](#translations) and improve texts
 
 ## How to contribute
 
@@ -53,10 +54,10 @@ The code consists of the following parts:
 | --------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
 | backend         | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to Backend](#backend)                   |
 | API definitions | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to Backend](#backend)                   |
-| console         | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#contribute-frontend-code) |
-| login           | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#contribute-frontend-code) |
-| docs            | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#contribute-frontend-code) |
-| translations    | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#contribute-translations) |
+| console         | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#frontend) |
+| login           | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#frontend) |
+| docs            | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#frontend) |
+| translations    | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#translations) |
 
 Please follow the guides to validate and test the code before you contribute.
 
@@ -274,7 +275,7 @@ docker compose --file ./e2e/docker-compose.yaml down
 
 ### Run Local End-to-End Tests Against Your Dev Server Console
 
-If you also make [changes to the console](#contribute-console), you can run the test suite against your locally built backend code and frontend server.
+If you also make [changes to the console](#console), you can run the test suite against your locally built backend code and frontend server.
 
 ```bash
 # Install dependencies (from repository root)
@@ -294,7 +295,7 @@ When you are happy with your changes, you can cleanup your environment.
 docker compose --file ./e2e/docker-compose.yaml down
 ```
 
-## <a name="contribute-frontend-code"></a>Contribute Frontend Code
+## <a name="frontend"></a>Contribute Frontend Code
 
 This repository uses **pnpm** as package manager and **Nx** for build orchestration.
 
@@ -320,10 +321,10 @@ nx run @zitadel/login:dev # or console:dev or docs:dev
 
 Choose your contribution area:
 
-- **[Login App](#contribute-login)** (Next.js/React) - Modern authentication flows
-- **[Console](#contribute-console)** (Angular) - Admin dashboard and user management  
-- **[Docs](#contribute-docs)** (Docusaurus) - Project documentation
-- **[Packages](#frontend-packages)** - Shared libraries for API communication
+- **[Login App](#login)** (Next.js/React) - Modern authentication flows
+- **[Console](#console)** (Angular) - Admin dashboard and user management  
+- **[Docs](#docs)** (Docusaurus) - Project documentation
+- **[Client Packages](#client-packages)** - Shared libraries for API communication
 
 ### Essential Nx Commands
 
@@ -349,7 +350,7 @@ docs → (independent)
 
 **Nx handles this automatically** - when you change `zitadel-proto`, Nx rebuilds dependent projects.
 
-### <a name="frontend-packages"></a>Frontend Packages
+### <a name="client-packages"></a>Client Packages
 
 **`@zitadel/proto`**: Protocol buffer definitions and generated TypeScript/JavaScript clients.
 ```bash
@@ -361,7 +362,7 @@ nx run @zitadel/proto:generate  # Regenerate after proto changes
 nx run @zitadel/client:build  # Build after changes
 ```
 
-### <a name="contribute-login"></a>Contribute to Login
+### <a name="login"></a>Contribute to Login
 
 The Login UI is a Next.js application that provides the user interface for authentication flows.
 It's located in the `apps/login` directory and uses pnpm and Nx for development.
@@ -400,7 +401,7 @@ nx affected --target check
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
-### <a name="contribute-console"></a>Contribute to Console
+### <a name="console"></a>Contribute to Console
 
 To start developing the console, make sure your system has the [required system dependencies](#dev-requirements) installed.
 
@@ -437,7 +438,7 @@ nx affected --target check
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
-### <a name="contribute-docs"></a>Contribute to Docs
+### <a name="docs"></a>Contribute to Docs
 
 Project documentation is made with Docusaurus and is located under [./docs](./docs). The documentation uses **pnpm** and **Nx** for development and build processes.
 
@@ -544,7 +545,7 @@ nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
 - [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner UI
 
-## <a name="contribute-translations"></a>Contribute Translations
+## <a name="translations"></a>Contribute Translations
 
 Zitadel loads translations from four files:
 
