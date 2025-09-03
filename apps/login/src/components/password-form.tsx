@@ -38,7 +38,6 @@ export function PasswordForm({
   
   const t = useTranslations("password");
 
-  const t = useTranslations("password");
 
   const [info, setInfo] = useState<string>("");
   const [error, setError] = useState<string>("");
