@@ -437,10 +437,7 @@ func startAPIs(
 		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
 	)
 	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, &config.Quotas.Access.AccessConfig)
-	translator, err := i18n.NewZitadelTranslator(language.English)
-	if err != nil {
-		return nil, err
-	}
+	translator := i18n.NewZitadelTranslator(language.English)
 	apis, err := api.New(
 		ctx,
 		config.Port,
@@ -639,6 +636,7 @@ func startAPIs(
 			verifier,
 			keys.User,
 			&config.SCIM,
+			translator,
 			instanceInterceptor.HandlerFuncWithError,
 			middleware.AuthorizationInterceptor(verifier, config.SystemAuthZ, config.InternalAuthZ).HandlerFuncWithError))
 
