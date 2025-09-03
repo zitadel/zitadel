@@ -69,6 +69,21 @@
     "check": {
       "description": "Run code quality checks (linting, formatting, testing and building)"
     },
+    "lint": {
+      "description": "Run all linters",
+      "dependsOn": [
+        "lint-check-*"
+      ]
+    },
+    "lint-check-prettier": {
+        "inputs": [
+          "prettier",
+          "{projectRoot}/constants/**/*",
+          "{projectRoot}/src/**/*",
+          "{projectRoot}/locales/**/*",
+          "{projectRoot}/scripts/healthcheck.js"
+        ]
+    },
     "test-unit": {
       "description": "Run unit tests",
       "dependsOn": [
@@ -78,7 +93,7 @@
     "test-integration": {
       "description": "Run integration tests with Cypress",
       "dependsOn": [
-        "@zitadel/login/core-mock:start-docker",
+        "@zitadel/login-core-mock:start-docker",
         "start-integration",
         "build"
       ],

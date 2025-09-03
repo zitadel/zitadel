@@ -67,9 +67,8 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
-    "lint": "pnpm run '/^lint-.*$/'",
-    "lint-eslint": "eslint 'src/**/*.ts*'",
-    "lint-knip": "knip",
+    "lint-check-eslint": "eslint 'src/**/*.ts*'",
+    "lint-check-knip": "knip",
     "test-unit": "vitest --run",
     "clean": "rm -rf node_modules dist"
   },

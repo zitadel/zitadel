@@ -2,6 +2,11 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "check": {},
+    "lint": {
+      "dependsOn": [
+        "lint-check-*"
+      ]
+    },
     "build": {
       "outputs": ["{projectRoot}/dist/**"],
       "dependsOn": ["^generate"]

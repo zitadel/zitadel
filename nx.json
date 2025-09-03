@@ -3,26 +3,33 @@
   "namedInputs": {
     "default": [
       "{workspaceRoot}/pnpm-lock.yaml",
-      "{projectRoot}/**/*",
-      "!{projectRoot}/Dockerfile",
-      "!{projectRoot}/.dockerignore"
+      "{projectRoot}/**/*"
     ],
     "docker": [
       "{projectRoot}/Dockerfile",
       "{projectRoot}/.dockerignore"
+    ],
+    "prettier": [
+        ".prettierignore",
+        ".prettierrc",
+        "prettier.config.mjs"
     ]
   },
   "targetDefaults": {
     "generate": {
       "cache": true,
       "inputs": [
-        "default"
+        "default",
+        "!docker",
+        "!prettier"
       ]
     },
     "build": {
       "cache": true,
       "inputs": [
-        "default"
+        "default",
+        "!docker",
+        "!prettier"
       ],
       "dependsOn": [
         "^build",
@@ -52,13 +59,17 @@
     },
     "test-unit": {
       "inputs": [
-        "default"
+        "default",
+        "!docker",
+        "!prettier"
       ],
       "cache": true
     },
     "test-integration": {
       "inputs": [
-        "default"
+        "default",
+        "!docker",
+        "!prettier"
       ],
       "cache": true
     },

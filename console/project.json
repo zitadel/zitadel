@@ -4,6 +4,18 @@
         "check": {
             "description": "Check linting and formatting"
         },
+        "lint": {
+            "description": "Run all lint checks",
+            "dependsOn": [
+                "lint-check-*"
+            ]
+        },
+        "lint-check-prettier": {
+            "inputs": [
+                "default",
+                "prettier"
+            ]
+        },
         "generate": {
             "description": "Generate code from protobuf definitions",
             "inputs": [

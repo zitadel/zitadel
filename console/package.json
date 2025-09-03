@@ -5,9 +5,8 @@
     "ng": "ng",
     "dev": "node prebuild.development.js && ng serve",
     "build": "ng build --configuration production --base-href=/ui/console/",
-    "lint": "pnpm run '/^lint-check:.*$/'",
-    "lint-check:ng": "ng lint",
-    "lint-check:prettier": "prettier --check src",
+    "lint-check-ng": "ng lint",
+    "lint-check-prettier": "prettier --check src",
     "lint-fix": "prettier --write src",
     "generate": "pnpm exec buf generate ../proto --include-imports --include-wkt",
     "clean": "rm -rf dist .angular node_modules src/app/proto/generated"
