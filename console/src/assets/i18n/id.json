@@ -1521,7 +1521,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ketika flag ini diaktifkan, konsol menggunakan API Pengguna V2 untuk membuat pengguna baru. Dengan API V2, pengguna yang baru dibuat dimulai tanpa keadaan awal.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Mengaktifkan ini akan mengaktifkan antarmuka login baru berbasis TypeScript dengan keamanan, performa, dan kustomisasi yang lebih baik.",
-      "LOGINV2_BASEURI": "URI dasar"
+      "LOGINV2_BASEURI": "URI dasar",
+      "ENABLERELATIONALTABLES": "Tabel Relasional",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktifkan ini untuk menggunakan tabel relasional alih-alih proyeksi untuk menyimpan data. Saat ini, toggle ini tidak berfungsi."
     },
     "DIALOG": {
       "RESET": {
