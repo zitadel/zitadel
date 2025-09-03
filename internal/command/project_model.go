@@ -73,7 +73,12 @@ func (wm *ProjectWriteModel) Reduce() error {
 				continue
 			}
 			*wm = ProjectWriteModel{
-				WriteModel: wm.WriteModel,
+				WriteModel: eventstore.WriteModel{
+					AggregateID:       wm.AggregateID,
+					ProcessedSequence: wm.ProcessedSequence,
+					Events:            wm.Events,
+					InstanceID:        wm.InstanceID,
+				},
 			}
 		}
 	}
