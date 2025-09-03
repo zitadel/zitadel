@@ -25,10 +25,10 @@ type SystemFeatures struct {
 	TokenExchange                  FeatureSource[bool]
 	ImprovedPerformance            FeatureSource[[]feature.ImprovedPerformanceType]
 	OIDCSingleV1SessionTermination FeatureSource[bool]
-	DisableUserTokenEvent          FeatureSource[bool]
 	EnableBackChannelLogout        FeatureSource[bool]
 	LoginV2                        FeatureSource[*feature.LoginV2]
 	PermissionCheckV2              FeatureSource[bool]
+	EnableRelationalTables         FeatureSource[bool]
 }
 
 func (q *Queries) GetSystemFeatures(ctx context.Context) (_ *SystemFeatures, err error) {

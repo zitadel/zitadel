@@ -4,8 +4,8 @@ package user_test
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
-	"fmt"
 	"slices"
 	"testing"
 	"time"
@@ -18,6 +18,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/filter/v2"
+	v2 "github.com/zitadel/zitadel/pkg/grpc/metadata/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
@@ -73,7 +75,7 @@ func setPermissionCheckV2Flag(t *testing.T, setFlag bool) {
 }
 
 func TestServer_GetUserByID(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	type args struct {
 		ctx context.Context
 		req *user.GetUserByIDRequest
@@ -238,7 +240,7 @@ func TestServer_GetUserByID(t *testing.T) {
 
 func TestServer_GetUserByID_Permission(t *testing.T) {
 	newOrgOwnerEmail := gofakeit.Email()
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
+	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
@@ -414,7 +416,7 @@ func createUsers(ctx context.Context, orgID string, count int, passwordChangeReq
 }
 
 func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) userAttr {
-	username := gofakeit.Email()
+	username := integration.Email()
 	return createUserWithUserName(ctx, username, orgID, passwordChangeRequired)
 }
 
@@ -433,18 +435,18 @@ func createUserWithUserName(ctx context.Context, username string, orgID string, 
 }
 
 func TestServer_ListUsers(t *testing.T) {
-	defer func() {
+	t.Cleanup(func() {
 		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(IamCTX, &feature.ResetInstanceFeaturesRequest{})
 		require.NoError(t, err)
-	}()
+	})
 
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	type args struct {
 		ctx context.Context
 		req *user.ListUsersRequest
 		dep func(ctx context.Context, request *user.ListUsersRequest) userAttrs
 	}
-	tests := []struct {
+	tt := []struct {
 		name    string
 		args    args
 		want    *user.ListUsersResponse
@@ -623,7 +625,7 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 		{
-			name: "list user by id multiple, ok",
+			name: "list user by id and meta key multiple, ok",
 			args: args{
 				IamCTX,
 				&user.ListUsersRequest{},
@@ -632,6 +634,13 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserIDsQuery(infos.userIDs()))
+
+					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta", "my value 1")
+					Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value 3")
+					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value 2")
+
+					request.Queries = append(request.Queries, MetadataKeyContainsQuery("my meta"))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return infos
 				},
 			},
@@ -640,7 +649,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -718,6 +727,8 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, UsernameQuery(info.Username))
+
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return []userAttr{info}
 				},
 			},
@@ -726,7 +737,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -762,6 +773,7 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery([]string{info.Username}))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return []userAttr{info}
 				},
 			},
@@ -770,7 +782,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -797,7 +809,7 @@ func TestServer_ListUsers(t *testing.T) {
 			},
 		},
 		{
-			name: "list user in emails multiple, ok",
+			name: "list user by emails and meta value multiple, ok",
 			args: args{
 				IamCTX,
 				&user.ListUsersRequest{},
@@ -806,6 +818,15 @@ func TestServer_ListUsers(t *testing.T) {
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
+
+					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta 1", "my value")
+					Instance.SetUserMetadata(ctx, infos[0].UserID, "my meta 2", "my value")
+					Instance.SetUserMetadata(ctx, infos[1].UserID, "my meta 2", "my value")
+					Instance.SetUserMetadata(ctx, infos[2].UserID, "my meta", "my value")
+
+					request.Queries = append(request.Queries, MetadataValueQuery("my value"))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+
 					return infos
 				},
 			},
@@ -814,7 +835,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -976,12 +997,13 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					orgResp := Instance.CreateOrganization(ctx, fmt.Sprintf("ListUsersResourceowner-%s", gofakeit.AppName()), gofakeit.Email())
+					orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
 
 					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery(infos.emails()))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return infos
 				},
 			},
@@ -990,7 +1012,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -1062,10 +1084,11 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
+					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 					info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests.OrganizationId))
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
 					return []userAttr{info, {}}
 				},
 			},
@@ -1074,7 +1097,7 @@ func TestServer_ListUsers(t *testing.T) {
 					TotalResult: 2,
 					Timestamp:   timestamppb.Now(),
 				},
-				SortingColumn: 0,
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
 				Result: []*user.User{
 					{
 						State: user.UserState_USER_STATE_ACTIVE,
@@ -1108,9 +1131,8 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
-					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
-					// info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
+					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 					createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests2.OrganizationId))
@@ -1129,54 +1151,77 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "when no users matching meta key should return empty list",
+			args: args{
+				IamCTX,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
+					createUser(ctx, orgResp.OrganizationId, false)
+					request.Queries = []*user.SearchQuery{}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, MetadataKeyContainsQuery("some non-existent meta"))
+
+					request.SortingColumn = user.UserFieldName_USER_FIELD_NAME_CREATION_DATE
+					return []userAttr{}
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: user.UserFieldName_USER_FIELD_NAME_CREATION_DATE,
+				Result:        []*user.User{},
+			},
+		},
 	}
 	for _, f := range permissionCheckV2Settings {
-		f := f
-		for _, tt := range tests {
-			t.Run(f.TestNamePrependString+tt.name, func(t *testing.T) {
+		for _, tc := range tt {
+			t.Run(f.TestNamePrependString+tc.name, func(t1 *testing.T) {
 				setPermissionCheckV2Flag(t, f.SetFlag)
-				infos := tt.args.dep(IamCTX, tt.args.req)
+				infos := tc.args.dep(IamCTX, tc.args.req)
 
-				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 10*time.Minute)
-				require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-					got, err := Client.ListUsers(tt.args.ctx, tt.args.req)
-					if tt.wantErr {
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tc.args.ctx, 20*time.Second)
+				require.EventuallyWithT(t1, func(ttt *assert.CollectT) {
+					got, err := Client.ListUsers(tc.args.ctx, tc.args.req)
+					if tc.wantErr {
 						require.Error(ttt, err)
 						return
 					}
 					require.NoError(ttt, err)
 
 					// always only give back dependency infos which are required for the response
-					require.Len(ttt, tt.want.Result, len(infos))
-					if assert.Len(ttt, got.Result, len(tt.want.Result)) {
-						tt.want.Details.TotalResult = got.Details.TotalResult
+					require.Len(ttt, tc.want.Result, len(infos))
+					if assert.Len(ttt, got.Result, len(tc.want.Result)) {
+						tc.want.Details.TotalResult = got.Details.TotalResult
 
 						// fill in userid and username as it is generated
 						for i := range infos {
-							if tt.want.Result[i] == nil {
+							if tc.want.Result[i] == nil {
 								continue
 							}
-							tt.want.Result[i].UserId = infos[i].UserID
-							tt.want.Result[i].Username = infos[i].Username
-							tt.want.Result[i].PreferredLoginName = infos[i].Username
-							tt.want.Result[i].LoginNames = []string{infos[i].Username}
-							if human := tt.want.Result[i].GetHuman(); human != nil {
+							tc.want.Result[i].UserId = infos[i].UserID
+							tc.want.Result[i].Username = infos[i].Username
+							tc.want.Result[i].PreferredLoginName = infos[i].Username
+							tc.want.Result[i].LoginNames = []string{infos[i].Username}
+							if human := tc.want.Result[i].GetHuman(); human != nil {
 								human.Email.Email = infos[i].Username
 								human.Phone.Phone = infos[i].Phone
-								if tt.want.Result[i].GetHuman().GetPasswordChanged() != nil {
+								if tc.want.Result[i].GetHuman().GetPasswordChanged() != nil {
 									human.PasswordChanged = infos[i].Changed
 								}
 							}
-							tt.want.Result[i].Details = infos[i].Details
+							tc.want.Result[i].Details = infos[i].Details
 						}
-						for i := range tt.want.Result {
-							if tt.want.Result[i] == nil {
+						for i := range tc.want.Result {
+							if tc.want.Result[i] == nil {
 								continue
 							}
-							assert.EqualExportedValues(ttt, got.Result[i], tt.want.Result[i])
+							assert.EqualExportedValues(ttt, got.Result[i], tc.want.Result[i])
 						}
 					}
-					integration.AssertListDetails(ttt, tt.want, got)
+					integration.AssertListDetails(ttt, tc.want, got)
 				}, retryDuration, tick, "timeout waiting for expected user result")
 			})
 		}
@@ -1189,9 +1234,9 @@ func TestServer_SystemUsers_ListUsers(t *testing.T) {
 		require.NoError(t, err)
 	}()
 
-	org1 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
-	org2 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), "org2@zitadel.com")
-	org3 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	org1 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	org2 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), "org2@zitadel.com")
+	org3 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
 	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser1@zitadel.com", org1.OrganizationId, false)
 	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser2@zitadel.com", org2.OrganizationId, false)
 	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser3@zitadel.com", org3.OrganizationId, false)
@@ -1319,6 +1364,47 @@ func OrganizationIdQuery(resourceowner string) *user.SearchQuery {
 		Query: &user.SearchQuery_OrganizationIdQuery{
 			OrganizationIdQuery: &user.OrganizationIdQuery{
 				OrganizationId: resourceowner,
+			},
+		},
+	}
+}
+
+func OrQuery(queries []*user.SearchQuery) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_OrQuery{
+			OrQuery: &user.OrQuery{
+				Queries: queries,
+			},
+		},
+	}
+}
+
+func MetadataKeyContainsQuery(metadataKey string) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_MetadataKeyFilter{
+			MetadataKeyFilter: &v2.MetadataKeyFilter{
+				Key:    metadataKey,
+				Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_STARTS_WITH},
+		},
+	}
+}
+
+func MetakeyEqualsQuery(metaKey string) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_MetadataKeyFilter{
+			MetadataKeyFilter: &v2.MetadataKeyFilter{
+				Key:    metaKey,
+				Method: filter.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS},
+		},
+	}
+}
+
+func MetadataValueQuery(metaValue string) *user.SearchQuery {
+	return &user.SearchQuery{
+		Query: &user.SearchQuery_MetadataValueFilter{
+			MetadataValueFilter: &v2.MetadataValueFilter{
+				Value:  []byte(base64.StdEncoding.EncodeToString([]byte(metaValue))),
+				Method: filter.ByteFilterMethod_BYTE_FILTER_METHOD_EQUALS,
 			},
 		},
 	}

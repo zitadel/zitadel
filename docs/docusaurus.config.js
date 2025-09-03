@@ -174,7 +174,7 @@ module.exports = {
             },
             {
               label: "Status",
-              href: "https://status.zitadel.com/",
+              href: "https://zitadelstatus.com",
             },
           ],
         },

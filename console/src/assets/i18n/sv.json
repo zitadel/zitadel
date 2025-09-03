@@ -1639,8 +1639,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
       "DEBUGOIDCPARENTERROR": "Debugga OIDC Föräldrafel",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Om flaggan är aktiverad kommer OIDC-föräldrafel att loggas i konsolen.",
-      "DISABLEUSERTOKENEVENT": "Inaktivera Användartokenhändelse",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Aktivera Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementerar OpenID Connect Back-Channel Logout 1.0 och kan användas för att meddela klienter om sessionens avslutning hos OpenID-leverantören.",
       "PERMISSIONCHECKV2": "Behörighetskontroll V2",
@@ -1660,7 +1658,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "När denna flagga är aktiverad använder konsolen V2 User API för att skapa nya användare. Med V2 API startar nyligen skapade användare utan ett initialt tillstånd.",
       "LOGINV2": "Inloggning V2",
       "LOGINV2_DESCRIPTION": "Att aktivera detta startar det nya inloggningsgränssnittet baserat på TypeScript med förbättrad säkerhet, prestanda och anpassning.",
-      "LOGINV2_BASEURI": "Bas-URI"
+      "LOGINV2_BASEURI": "Bas-URI",
+      "ENABLERELATIONALTABLES": "Relationella tabeller",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktivera detta för att använda relationella tabeller istället för projektioner för att lagra data. För närvarande gör denna växel ingenting."
     },
     "DIALOG": {
       "RESET": {

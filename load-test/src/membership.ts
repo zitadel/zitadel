@@ -19,7 +19,8 @@ export async function addIAMMember(userId: string, roles: string[], accessToken:
     },
   );
   check(res, {
-    'member added successful': (r) => r.status == 200 || fail(`unable add member: ${JSON.stringify(res)}`),
+    'member added successful': (r) =>
+      (r.status >= 200 && r.status < 300) || fail(`unable add member: ${JSON.stringify(res)}`),
   });
   addIAMMemberTrend.add(res.timings.duration);
 }

@@ -10,7 +10,14 @@ import {
   getLoginSettings,
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("loginname");
+  return { title: t('title')};
+}
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -78,7 +85,7 @@ export default async function Page(props: {
           allowRegister={!!loginSettings?.allowRegister}
         ></UsernameForm>
 
-        {identityProviders && loginSettings?.allowExternalIdp && (
+        {loginSettings?.allowExternalIdp && !!identityProviders?.length && (
           <div className="w-full pb-4 pt-6">
             <SignInWithIdp
               identityProviders={identityProviders}

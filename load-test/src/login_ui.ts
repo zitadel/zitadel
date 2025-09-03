@@ -57,7 +57,7 @@ function enterLoginName(page: Response, user: User): Response {
   });
 
   check(response, {
-    'login name status ok': (r) => (r && r.status == 200) || fail('enter login name failed'),
+    'login name status ok': (r) => (r && r.status >= 200 && r.status < 300) || fail('enter login name failed'),
     'login shows password page': (r) => r && r.body !== null && r.body.toString().includes('password'),
     // 'login has no error': (r) => r && r.body != null && r.body.toString().includes('error') || fail(`error in enter login name ${r.body}`)
   });
@@ -86,7 +86,7 @@ function enterPassword(page: Response, user: User): Response {
   }
 
   check(response, {
-    'password status ok': (r) => r.status == 200 || fail('enter password failed'),
+    'password status ok': (r) => (r.status >= 200 && r.status < 300) || fail('enter password failed'),
     'password callback': (r) =>
       r.url.startsWith(url('/ui/console/auth/callback?code=')) || fail(`wrong password callback: ${r.url}`),
   });
@@ -117,7 +117,8 @@ function token(code = '') {
 
   tokenTrend.add(response.timings.duration);
   check(response, {
-    'token status ok': (r) => r.status == 200 || fail(`invalid token response status: ${r.status} body: ${r.body}`),
+    'token status ok': (r) =>
+      (r.status >= 200 && r.status < 300) || fail(`invalid token response status: ${r.status} body: ${r.body}`),
   });
   const token = new Tokens(response.json() as JSONObject);
   check(token, {
