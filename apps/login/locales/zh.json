@@ -49,7 +49,8 @@
       "initialUserNotSupported": "不支持初始用户",
       "usernamePasswordNotAllowed": "不允许使用用户名和密码！请联系管理员了解更多信息。",
       "passkeysNotAllowed": "不允许使用 Passkey！请联系管理员了解更多信息。",
-      "couldNotFindIdentityProvider": "找不到身份提供者。"
+      "couldNotFindIdentityProvider": "找不到身份提供者。",
+      "userNotActive": "用户未激活。请联系管理员了解更多信息。"
     }
   },
   "zitadel": {

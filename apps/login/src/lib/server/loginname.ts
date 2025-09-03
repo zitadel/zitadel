@@ -227,10 +227,21 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       user: { search: { case: "userId", value: userId } },
     });
 
-    const session = await createSessionAndUpdateCookie({
+    const sessionOrError = await createSessionAndUpdateCookie({
       checks,
       requestId: command.requestId,
+    }).catch((error) => {
+      if (error?.rawMessage === "Errors.User.NotActive (SESSION-Gj4ko)") {
+        return { error: t("errors.userNotActive") };
+      }
+      throw error;
     });
+
+    if ("error" in sessionOrError) {
+      return sessionOrError;
+    }
+
+    const session = sessionOrError;
 
     if (!session.factors?.user?.id) {
       return { error: t("errors.couldNotCreateSession") };

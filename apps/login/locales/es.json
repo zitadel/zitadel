@@ -49,7 +49,8 @@
       "initialUserNotSupported": "Usuario inicial no admitido",
       "usernamePasswordNotAllowed": "El inicio de sesión con usuario y contraseña no está permitido. Contacte con su administrador para más información.",
       "passkeysNotAllowed": "Las passkeys no están permitidas. Contacte con su administrador para más información.",
-      "couldNotFindIdentityProvider": "No se pudo encontrar el proveedor de identidad."
+      "couldNotFindIdentityProvider": "No se pudo encontrar el proveedor de identidad.",
+      "userNotActive": "El usuario no está activo. Contacte con su administrador para más información."
     }
   },
   "zitadel": {
