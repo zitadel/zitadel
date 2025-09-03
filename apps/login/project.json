@@ -103,7 +103,7 @@
         "{projectRoot}/package.json"
       ],
       "outputs": [
-        "{projectRoot}/cypress/**/*"
+        "{projectRoot}/cypress"
       ]
     },
     "start-integration": {

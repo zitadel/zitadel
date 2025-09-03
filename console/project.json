@@ -24,11 +24,15 @@
                 "{projectRoot}/package.json",
                 "{workspaceRoot}/pnpm-lock.yaml"
             ],
-            "outputs": ["{projectRoot}/src/app/proto/generated/**/*"]
+            "outputs": [
+                "{projectRoot}/src/app/proto/generated"
+            ]
         },
         "build": {
             "description": "Generate code from protobuf definitions",
-            "outputs": ["{projectRoot}/dist/**/*"]
+            "outputs": [
+                "{projectRoot}/dist"
+            ]
         },
         "start": {
             "description": "Start the Zitadel platform (core, login and console) in production mode.",

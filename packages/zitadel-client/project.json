@@ -8,7 +8,7 @@
       ]
     },
     "build": {
-      "outputs": ["{projectRoot}/dist/**"],
+      "outputs": ["{projectRoot}/dist"],
       "dependsOn": ["^generate"]
     }
   }

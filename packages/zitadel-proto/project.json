@@ -7,9 +7,9 @@
         "{workspaceRoot}/proto/**/*"
       ],
       "outputs": [
-        "{projectRoot}/cjs/**/*",
-        "{projectRoot}/es/**/*",
-        "{projectRoot}/types/**/*"
+        "{projectRoot}/cjs",
+        "{projectRoot}/es",
+        "{projectRoot}/types"
       ]
     }
   }
