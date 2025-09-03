@@ -468,6 +468,8 @@ func startCommandsQueries(
 		keys.OIDC,
 		keys.SAML,
 		keys.Target,
+		keys.SMS,
+		keys.SMTP,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
