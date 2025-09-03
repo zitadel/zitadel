@@ -59,7 +59,7 @@ LogStore:
 
 Projections:
   HandleActiveInstances: 30m
-  RequeueEvery: 5s
+  RequeueEvery: 20s
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
