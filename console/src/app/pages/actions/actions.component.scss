@@ -66,17 +66,23 @@
 
         .type-icon {
           color: $primary-color;
-        }
-
-        .type-button-icon,
-        .type-icon,
-        span {
           margin-right: 1rem;
         }
 
-        .type-icon,
         .type-button-icon {
           position: relative;
+        }
+
+        > span {
+          margin-right: 1rem;
+        }
+
+        button[mat-icon-button] {
+          margin-right: 0;
+
+          .type-button-icon {
+            margin-right: 0;
+          }
         }
       }
 

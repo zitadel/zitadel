@@ -17,6 +17,8 @@ import (
 )
 
 func TestServer_TestInstanceReduces(t *testing.T) {
+	instanceRepo := repository.InstanceRepository(pool)
+
 	t.Run("test instance add reduces", func(t *testing.T) {
 		instanceName := gofakeit.Name()
 		beforeCreate := time.Now()
@@ -33,12 +35,19 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		afterCreate := time.Now()
 
 		require.NoError(t, err)
+		t.Cleanup(func() {
+			_, err = SystemClient.RemoveInstance(CTX, &system.RemoveInstanceRequest{
+				InstanceId: instance.GetInstanceId(),
+			})
+			if err != nil {
+				t.Logf("Failed to delete instance on cleanup: %v", err)
+			}
+		})
 
-		instanceRepo := repository.InstanceRepository(pool)
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
-				instance.GetInstanceId(),
+				database.WithCondition(instanceRepo.IDCondition(instance.GetInstanceId())),
 			)
 			require.NoError(ttt, err)
 			// event instance.added
@@ -71,6 +80,14 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
+		t.Cleanup(func() {
+			_, err = SystemClient.RemoveInstance(CTX, &system.RemoveInstanceRequest{
+				InstanceId: res.GetInstanceId(),
+			})
+			if err != nil {
+				t.Logf("Failed to delete instance on cleanup: %v", err)
+			}
+		})
 
 		instanceName += "new"
 		beforeUpdate := time.Now()
@@ -78,14 +95,13 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			InstanceId:   res.InstanceId,
 			InstanceName: instanceName,
 		})
-		require.NoError(t, err)
 		afterUpdate := time.Now()
+		require.NoError(t, err)
 
-		instanceRepo := repository.InstanceRepository(pool)
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
-				res.InstanceId,
+				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
 			require.NoError(ttt, err)
 			// event instance.changed
@@ -108,13 +124,11 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		instanceRepo := repository.InstanceRepository(pool)
-
 		// check instance exists
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
-				res.InstanceId,
+				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
 			require.NoError(ttt, err)
 			assert.Equal(ttt, instanceName, instance.Name)
@@ -128,11 +142,12 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
-				res.InstanceId,
+				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
 			// event instance.removed
 			assert.Nil(t, instance)
-			require.ErrorIs(t, &database.NoRowFoundError{}, err)
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
 		}, retryDuration, tick)
 	})
 }
+

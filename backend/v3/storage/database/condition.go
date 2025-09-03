@@ -64,7 +64,7 @@ type isNull struct {
 
 // Write implements [Condition].
 func (i *isNull) Write(builder *StatementBuilder) {
-	i.column.Write(builder)
+	i.column.WriteQualified(builder)
 	builder.WriteString(" IS NULL")
 }
 
@@ -81,7 +81,7 @@ type isNotNull struct {
 
 // Write implements [Condition].
 func (i *isNotNull) Write(builder *StatementBuilder) {
-	i.column.Write(builder)
+	i.column.WriteQualified(builder)
 	builder.WriteString(" IS NOT NULL")
 }
 
@@ -112,6 +112,15 @@ func NewNumberCondition[V Number](col Column, op NumberOperation, value V) Condi
 func NewBooleanCondition[V Boolean](col Column, value V) Condition {
 	return valueCondition(func(builder *StatementBuilder) {
 		writeBooleanOperation(builder, col, value)
+	})
+}
+
+// NewColumnCondition creates a condition that compares two columns on equality.
+func NewColumnCondition(col1, col2 Column) Condition {
+	return valueCondition(func(builder *StatementBuilder) {
+		col1.WriteQualified(builder)
+		builder.WriteString(" = ")
+		col2.WriteQualified(builder)
 	})
 }
 

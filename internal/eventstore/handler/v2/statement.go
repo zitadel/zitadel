@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -91,7 +92,7 @@ type Statement struct {
 	Execute Exec
 }
 
-type Exec func(ex Executer, projectionName string) error
+type Exec func(ctx context.Context, ex Executer, projectionName string) error
 
 func WithTableSuffix(name string) func(*execConfig) {
 	return func(o *execConfig) {
@@ -675,7 +676,7 @@ type (
 type query func(config execConfig) string
 
 func exec(config execConfig, q query, opts []execOption) Exec {
-	return func(ex Executer, projectionName string) (err error) {
+	return func(ctx context.Context, ex Executer, projectionName string) (err error) {
 		if projectionName == "" {
 			return ErrNoProjection
 		}
@@ -699,12 +700,12 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 }
 
 func multiExec(execList []Exec) Exec {
-	return func(ex Executer, projectionName string) error {
+	return func(ctx context.Context, ex Executer, projectionName string) error {
 		for _, exec := range execList {
 			if exec == nil {
 				continue
 			}
-			if err := exec(ex, projectionName); err != nil {
+			if err := exec(ctx, ex, projectionName); err != nil {
 				return err
 			}
 		}

@@ -77,11 +77,7 @@ func (i *idProvider) Create(ctx context.Context, idp *domain.IdentityProvider) e
 		string(idp.Payload))
 	builder.WriteString(createIDProviderStmt)
 
-	err := i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&idp.CreatedAt, &idp.UpdatedAt)
-	if err != nil {
-		return checkCreateOrgErr(err)
-	}
-	return nil
+	return i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&idp.CreatedAt, &idp.UpdatedAt)
 }
 
 func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string, changes ...database.Change) (int64, error) {
@@ -128,7 +124,7 @@ func (i *idProvider) GetOIDC(ctx context.Context, id domain.IDPIdentifierConditi
 		return nil, err
 	}
 
-	if idpOIDC.Type != domain.IDPTypeOIDC.String() {
+	if idpOIDC.Type != domain.IDPTypeOIDC {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeOIDC, idpOIDC.Type)
 	}
 
@@ -149,7 +145,7 @@ func (i *idProvider) GetJWT(ctx context.Context, id domain.IDPIdentifierConditio
 		return nil, err
 	}
 
-	if idpJWT.Type != domain.IDPTypeJWT.String() {
+	if idpJWT.Type != domain.IDPTypeJWT {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeJWT, idpJWT.Type)
 	}
 
@@ -170,7 +166,7 @@ func (i *idProvider) GetOAuth(ctx context.Context, id domain.IDPIdentifierCondit
 		return nil, err
 	}
 
-	if idpOAuth.Type != domain.IDPTypeOAuth.String() {
+	if idpOAuth.Type != domain.IDPTypeOAuth {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeOAuth, idpOAuth.Type)
 	}
 
@@ -191,7 +187,7 @@ func (i *idProvider) GetOAzureAD(ctx context.Context, id domain.IDPIdentifierCon
 		return nil, err
 	}
 
-	if idpAzure.Type != domain.IDPTypeAzure.String() {
+	if idpAzure.Type != domain.IDPTypeAzure {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeAzure, idpAzure.Type)
 	}
 
@@ -212,7 +208,7 @@ func (i *idProvider) GetGoogle(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	if idpGoogle.Type != domain.IDPTypeGoogle.String() {
+	if idpGoogle.Type != domain.IDPTypeGoogle {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeGoogle, idpGoogle.Type)
 	}
 
@@ -233,7 +229,7 @@ func (i *idProvider) GetGithub(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	if idpGithub.Type != domain.IDPTypeGitHub.String() {
+	if idpGithub.Type != domain.IDPTypeGitHub {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeGitHub, idpGithub.Type)
 	}
 
@@ -254,7 +250,7 @@ func (i *idProvider) GetGithubEnterprise(ctx context.Context, id domain.IDPIdent
 		return nil, err
 	}
 
-	if idpGithubEnterprise.Type != domain.IDPTypeGitHubEnterprise.String() {
+	if idpGithubEnterprise.Type != domain.IDPTypeGitHubEnterprise {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeGitHubEnterprise, idpGithubEnterprise.Type)
 	}
 
@@ -275,7 +271,7 @@ func (i *idProvider) GetGitlab(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	if idpGitlab.Type != domain.IDPTypeGitLab.String() {
+	if idpGitlab.Type != domain.IDPTypeGitLab {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeGitLab, idpGitlab.Type)
 	}
 
@@ -296,7 +292,7 @@ func (i *idProvider) GetGitlabSelfHosting(ctx context.Context, id domain.IDPIden
 		return nil, err
 	}
 
-	if idpGitlabSelfHosting.Type != domain.IDPTypeGitLabSelfHosted.String() {
+	if idpGitlabSelfHosting.Type != domain.IDPTypeGitLabSelfHosted {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeGitLabSelfHosted, idpGitlabSelfHosting.Type)
 	}
 
@@ -317,7 +313,7 @@ func (i *idProvider) GetLDAP(ctx context.Context, id domain.IDPIdentifierConditi
 		return nil, err
 	}
 
-	if ldap.Type != domain.IDPTypeLDAP.String() {
+	if ldap.Type != domain.IDPTypeLDAP {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeLDAP, ldap.Type)
 	}
 
@@ -338,7 +334,7 @@ func (i *idProvider) GetApple(ctx context.Context, id domain.IDPIdentifierCondit
 		return nil, err
 	}
 
-	if apple.Type != domain.IDPTypeApple.String() {
+	if apple.Type != domain.IDPTypeApple {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeApple, apple.Type)
 	}
 
@@ -359,7 +355,7 @@ func (i *idProvider) GetSAML(ctx context.Context, id domain.IDPIdentifierConditi
 		return nil, err
 	}
 
-	if saml.Type != domain.IDPTypeSAML.String() {
+	if saml.Type != domain.IDPTypeSAML {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeSAML, saml.Type)
 	}
 
@@ -376,67 +372,67 @@ func (i *idProvider) GetSAML(ctx context.Context, id domain.IDPIdentifierConditi
 // -------------------------------------------------------------
 
 func (idProvider) InstanceIDColumn() database.Column {
-	return database.NewColumn("instance_id")
+	return database.NewColumn("identity_providers", "instance_id")
 }
 
 func (idProvider) OrgIDColumn() database.Column {
-	return database.NewColumn("org_id")
+	return database.NewColumn("identity_providers", "org_id")
 }
 
 func (idProvider) IDColumn() database.Column {
-	return database.NewColumn("id")
+	return database.NewColumn("identity_providers", "id")
 }
 
 func (idProvider) StateColumn() database.Column {
-	return database.NewColumn("state")
+	return database.NewColumn("identity_providers", "state")
 }
 
 func (idProvider) NameColumn() database.Column {
-	return database.NewColumn("name")
+	return database.NewColumn("identity_providers", "name")
 }
 
 func (idProvider) TypeColumn() database.Column {
-	return database.NewColumn("type")
+	return database.NewColumn("identity_providers", "type")
 }
 
 func (idProvider) AutoRegisterColumn() database.Column {
-	return database.NewColumn("auto_register")
+	return database.NewColumn("identity_providers", "auto_register")
 }
 
 func (idProvider) AllowCreationColumn() database.Column {
-	return database.NewColumn("allow_creation")
+	return database.NewColumn("identity_providers", "allow_creation")
 }
 
 func (idProvider) AllowAutoCreationColumn() database.Column {
-	return database.NewColumn("allow_auto_creation")
+	return database.NewColumn("identity_providers", "allow_auto_creation")
 }
 
 func (idProvider) AllowAutoUpdateColumn() database.Column {
-	return database.NewColumn("allow_auto_update")
+	return database.NewColumn("identity_providers", "allow_auto_update")
 }
 
 func (idProvider) AllowLinkingColumn() database.Column {
-	return database.NewColumn("allow_linking")
+	return database.NewColumn("identity_providers", "allow_linking")
 }
 
 func (idProvider) AllowAutoLinkingColumn() database.Column {
-	return database.NewColumn("allow_auto_linking")
+	return database.NewColumn("identity_providers", "allow_auto_linking")
 }
 
 func (idProvider) StylingTypeColumn() database.Column {
-	return database.NewColumn("styling_type")
+	return database.NewColumn("identity_providers", "styling_type")
 }
 
 func (idProvider) PayloadColumn() database.Column {
-	return database.NewColumn("payload")
+	return database.NewColumn("identity_providers", "payload")
 }
 
 func (idProvider) CreatedAtColumn() database.Column {
-	return database.NewColumn("created_at")
+	return database.NewColumn("identity_providers", "created_at")
 }
 
 func (idProvider) UpdatedAtColumn() database.Column {
-	return database.NewColumn("updated_at")
+	return database.NewColumn("identity_providers", "updated_at")
 }
 
 // -------------------------------------------------------------

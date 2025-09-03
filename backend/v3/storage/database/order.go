@@ -17,5 +17,5 @@ func OrderBy(column Column) Order {
 // Write implements [Order].
 func (o *orderBy) Write(builder *StatementBuilder) {
 	builder.WriteString(" ORDER BY ")
-	o.column.Write(builder)
+	o.column.WriteQualified(builder)
 }

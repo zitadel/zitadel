@@ -898,11 +898,16 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
 	}
 
+	azureTenant, err := domain.AzureTenantTypeString(idpEvent.Tenant)
+	if err != nil {
+		return nil, err
+	}
+
 	azure := domain.Azure{
 		ClientID:        idpEvent.ClientID,
 		ClientSecret:    idpEvent.ClientSecret,
 		Scopes:          idpEvent.Scopes,
-		Tenant:          idpEvent.Tenant,
+		Tenant:          azureTenant,
 		IsEmailVerified: idpEvent.IsEmailVerified,
 	}
 
@@ -1095,11 +1100,16 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event 
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPAddedEventType, instance.AzureADIDPAddedEventType})
 	}
 
+	azureTenant, err := domain.AzureTenantTypeString(idpEvent.Tenant)
+	if err != nil {
+		return nil, err
+	}
+
 	azure := domain.Azure{
 		ClientID:        idpEvent.ClientID,
 		ClientSecret:    idpEvent.ClientSecret,
 		Scopes:          idpEvent.Scopes,
-		Tenant:          idpEvent.Tenant,
+		Tenant:          azureTenant,
 		IsEmailVerified: idpEvent.IsEmailVerified,
 	}
 
@@ -1160,7 +1170,11 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(even
 	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
 
 	payload := &oauth.Azure
-	payloadChanged := reduceAzureADIDPRelationalChangedColumns(payload, &idpEvent)
+	payloadChanged, err := reduceAzureADIDPRelationalChangedColumns(payload, &idpEvent)
+	if err != nil {
+		return nil, err
+	}
+
 	if payloadChanged {
 		payload, err := json.Marshal(payload)
 		if err != nil {
@@ -2115,7 +2129,7 @@ func reduceJWTIDPRelationalChangedColumns(payload *domain.JWT, idpEvent *idp.JWT
 	return payloadChange
 }
 
-func reduceAzureADIDPRelationalChangedColumns(payload *domain.Azure, idpEvent *idp.AzureADIDPChangedEvent) bool {
+func reduceAzureADIDPRelationalChangedColumns(payload *domain.Azure, idpEvent *idp.AzureADIDPChangedEvent) (bool, error) {
 	payloadChange := false
 	if idpEvent.ClientID != nil {
 		payloadChange = true
@@ -2131,13 +2145,19 @@ func reduceAzureADIDPRelationalChangedColumns(payload *domain.Azure, idpEvent *i
 	}
 	if idpEvent.Tenant != nil {
 		payloadChange = true
-		payload.Tenant = *idpEvent.Tenant
+
+		azureTenant, err := domain.AzureTenantTypeString(*idpEvent.Tenant)
+		if err != nil {
+			return false, err
+		}
+
+		payload.Tenant = azureTenant
 	}
 	if idpEvent.IsEmailVerified != nil {
 		payloadChange = true
 		payload.IsEmailVerified = *idpEvent.IsEmailVerified
 	}
-	return payloadChange
+	return payloadChange, nil
 }
 
 func reduceGitHubIDPRelationalChangedColumns(payload *domain.Github, idpEvent *idp.GitHubIDPChangedEvent) bool {

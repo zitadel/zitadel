@@ -8,8 +8,9 @@ import (
 type Instruction string
 
 const (
-	NowInstruction  Instruction = "NOW()"
-	NullInstruction Instruction = "NULL"
+	DefaultInstruction Instruction = "DEFAULT"
+	NowInstruction     Instruction = "NOW()"
+	NullInstruction    Instruction = "NULL"
 )
 
 // StatementBuilder is a helper to build SQL statement.
@@ -24,7 +25,18 @@ func (b *StatementBuilder) WriteArg(arg any) {
 	b.WriteString(b.AppendArg(arg))
 }
 
-// AppebdArg adds the argument to the statement and returns the placeholder.
+// WriteArgs adds the arguments to the statement and writes the placeholders to the query.
+// The placeholders are comma separated.
+func (b *StatementBuilder) WriteArgs(args ...any) {
+	for i, arg := range args {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		b.WriteArg(arg)
+	}
+}
+
+// AppendArg adds the argument to the statement and returns the placeholder.
 func (b *StatementBuilder) AppendArg(arg any) (placeholder string) {
 	if b.existingArgs == nil {
 		b.existingArgs = make(map[any]string)
@@ -41,6 +53,7 @@ func (b *StatementBuilder) AppendArg(arg any) (placeholder string) {
 }
 
 // AppendArgs adds the arguments to the statement and doesn't return the placeholders.
+// If an argument is already added, it will not be added again.
 func (b *StatementBuilder) AppendArgs(args ...any) {
 	for _, arg := range args {
 		b.AppendArg(arg)

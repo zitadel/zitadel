@@ -18,6 +18,8 @@ type Instance struct {
 	DefaultLanguage string    `json:"defaultLanguage,omitempty" db:"default_language"`
 	CreatedAt       time.Time `json:"createdAt" db:"created_at"`
 	UpdatedAt       time.Time `json:"updatedAt" db:"updated_at"`
+
+	Domains []*InstanceDomain `json:"domains,omitempty" db:"-"`
 }
 
 type instanceCacheIndex uint8
@@ -83,14 +85,20 @@ type InstanceRepository interface {
 	// Member returns the member repository which is a sub repository of the instance repository.
 	// Member() MemberRepository
 
-	Get(ctx context.Context, id string) (*Instance, error)
-	List(ctx context.Context, conditions ...database.Condition) ([]*Instance, error)
+	Get(ctx context.Context, opts ...database.QueryOption) (*Instance, error)
+	List(ctx context.Context, opts ...database.QueryOption) ([]*Instance, error)
 
 	Create(ctx context.Context, instance *Instance) error
 	Update(ctx context.Context, id string, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, id string) (int64, error)
+
+	// Domains returns the domain sub repository for the instance.
+	// If shouldLoad is true, the domains will be loaded from the database and written to the [Instance].Domains field.
+	// If shouldLoad is set to true once, the Domains field will be set even if shouldLoad is false in the future.
+	Domains(shouldLoad bool) InstanceDomainRepository
 }
 
 type CreateInstance struct {
 	Name string `json:"name"`
 }
+

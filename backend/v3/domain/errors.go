@@ -12,10 +12,10 @@ type wrongIDPTypeError struct {
 	got      string
 }
 
-func NewWrongTypeError(expected IDPType, got string) error {
+func NewWrongTypeError(expected IDPType, got fmt.Stringer) error {
 	return &wrongIDPTypeError{
 		expected: expected,
-		got:      got,
+		got:      got.String(),
 	}
 }
 

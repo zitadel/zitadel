@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -12,6 +12,8 @@ var _ domain.InstanceRepository = (*instance)(nil)
 
 type instance struct {
 	repository
+	shouldLoadDomains bool
+	domainRepo        *instanceDomain
 }
 
 func InstanceRepository(client database.QueryExecutor) domain.InstanceRepository {
@@ -26,32 +28,64 @@ func InstanceRepository(client database.QueryExecutor) domain.InstanceRepository
 // repository
 // -------------------------------------------------------------
 
-const queryInstanceStmt = `SELECT id, name, default_org_id, iam_project_id, console_client_id, console_app_id, default_language, created_at, updated_at` +
-	` FROM zitadel.instances`
+const (
+	queryInstanceStmt = `SELECT instances.id, instances.name, instances.default_org_id, instances.iam_project_id, instances.console_client_id, instances.console_app_id, instances.default_language, instances.created_at, instances.updated_at` +
+		` , CASE WHEN count(instance_domains.domain) > 0 THEN jsonb_agg(json_build_object('domain', instance_domains.domain, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at)) ELSE NULL::JSONB END domains` +
+		` FROM zitadel.instances`
+)
 
 // Get implements [domain.InstanceRepository].
-func (i *instance) Get(ctx context.Context, id string) (*domain.Instance, error) {
+func (i *instance) Get(ctx context.Context, opts ...database.QueryOption) (*domain.Instance, error) {
+	opts = append(opts,
+		i.joinDomains(),
+		database.WithGroupBy(i.IDColumn()),
+	)
+
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
+	}
+
 	var builder database.StatementBuilder
-
 	builder.WriteString(queryInstanceStmt)
-
-	idCondition := i.IDCondition(id)
-	writeCondition(&builder, idCondition)
+	options.Write(&builder)
 
 	return scanInstance(ctx, i.client, &builder)
 }
 
 // List implements [domain.InstanceRepository].
-func (i *instance) List(ctx context.Context, conditions ...database.Condition) ([]*domain.Instance, error) {
-	var builder database.StatementBuilder
+func (i *instance) List(ctx context.Context, opts ...database.QueryOption) ([]*domain.Instance, error) {
+	opts = append(opts,
+		i.joinDomains(),
+		database.WithGroupBy(i.IDColumn()),
+	)
 
-	builder.WriteString(queryInstanceStmt)
-
-	if conditions != nil {
-		writeCondition(&builder, database.And(conditions...))
+	options := new(database.QueryOpts)
+	for _, opt := range opts {
+		opt(options)
 	}
 
+	var builder database.StatementBuilder
+	builder.WriteString(queryInstanceStmt)
+	options.Write(&builder)
+
 	return scanInstances(ctx, i.client, &builder)
+}
+
+func (i *instance) joinDomains() database.QueryOption {
+	columns := make([]database.Condition, 0, 2)
+	columns = append(columns, database.NewColumnCondition(i.IDColumn(), i.Domains(false).InstanceIDColumn()))
+
+	// If domains should not be joined, we make sure to return null for the domain columns
+	// the query optimizer of the dialect should optimize this away if no domains are requested
+	if !i.shouldLoadDomains {
+		columns = append(columns, database.IsNull(i.Domains(false).InstanceIDColumn()))
+	}
+
+	return database.WithLeftJoin(
+		"zitadel.instance_domains",
+		database.And(columns...),
+	)
 }
 
 const createInstanceStmt = `INSERT INTO zitadel.instances (id, name, default_org_id, iam_project_id, console_client_id, console_app_id, default_language)` +
@@ -70,8 +104,8 @@ func (i *instance) Create(ctx context.Context, instance *domain.Instance) error 
 
 // Update implements [domain.InstanceRepository].
 func (i instance) Update(ctx context.Context, id string, changes ...database.Change) (int64, error) {
-	if changes == nil {
-		return 0, errors.New("Update must contain a change")
+	if len(changes) == 0 {
+		return 0, database.ErrNoChanges
 	}
 	var builder database.StatementBuilder
 
@@ -128,77 +162,115 @@ func (i instance) NameCondition(op database.TextOperation, name string) database
 
 // IDColumn implements [domain.instanceColumns].
 func (instance) IDColumn() database.Column {
-	return database.NewColumn("id")
+	return database.NewColumn("instances", "id")
 }
 
 // NameColumn implements [domain.instanceColumns].
 func (instance) NameColumn() database.Column {
-	return database.NewColumn("name")
+	return database.NewColumn("instances", "name")
 }
 
 // CreatedAtColumn implements [domain.instanceColumns].
 func (instance) CreatedAtColumn() database.Column {
-	return database.NewColumn("created_at")
+	return database.NewColumn("instances", "created_at")
 }
 
 // DefaultOrgIdColumn implements [domain.instanceColumns].
 func (instance) DefaultOrgIDColumn() database.Column {
-	return database.NewColumn("default_org_id")
+	return database.NewColumn("instances", "default_org_id")
 }
 
 // IAMProjectIDColumn implements [domain.instanceColumns].
 func (instance) IAMProjectIDColumn() database.Column {
-	return database.NewColumn("iam_project_id")
+	return database.NewColumn("instances", "iam_project_id")
 }
 
 // ConsoleClientIDColumn implements [domain.instanceColumns].
 func (instance) ConsoleClientIDColumn() database.Column {
-	return database.NewColumn("console_client_id")
+	return database.NewColumn("instances", "console_client_id")
 }
 
 // ConsoleAppIDColumn implements [domain.instanceColumns].
 func (instance) ConsoleAppIDColumn() database.Column {
-	return database.NewColumn("console_app_id")
+	return database.NewColumn("instances", "console_app_id")
 }
 
 // DefaultLanguageColumn implements [domain.instanceColumns].
 func (instance) DefaultLanguageColumn() database.Column {
-	return database.NewColumn("default_language")
+	return database.NewColumn("instances", "default_language")
 }
 
 // UpdatedAtColumn implements [domain.instanceColumns].
 func (instance) UpdatedAtColumn() database.Column {
-	return database.NewColumn("updated_at")
+	return database.NewColumn("instances", "updated_at")
+}
+
+type rawInstance struct {
+	*domain.Instance
+	RawDomains json.RawMessage `json:"domains,omitempty" db:"domains"`
 }
 
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
-	instance := &domain.Instance{}
-
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
-	err = rows.(database.CollectableRows).CollectExactlyOneRow(instance)
-	if err != nil {
+	var instance rawInstance
+	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&instance); err != nil {
 		return nil, err
 	}
 
-	return instance, nil
+	if len(instance.RawDomains) > 0 {
+		if err := json.Unmarshal(instance.RawDomains, &instance.Domains); err != nil {
+			return nil, err
+		}
+	}
+
+	return instance.Instance, nil
 }
 
 func scanInstances(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Instance, error) {
-	instances := []*domain.Instance{}
-
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
-	err = rows.(database.CollectableRows).Collect(&instances)
-	if err != nil {
+	var rawInstances []*rawInstance
+	if err := rows.(database.CollectableRows).Collect(&rawInstances); err != nil {
 		return nil, err
 	}
 
+	instances := make([]*domain.Instance, len(rawInstances))
+	for i, instance := range rawInstances {
+		if len(instance.RawDomains) > 0 {
+			if err := json.Unmarshal(instance.RawDomains, &instance.Domains); err != nil {
+				return nil, err
+			}
+		}
+		instances[i] = instance.Instance
+	}
 	return instances, nil
 }
+
+// -------------------------------------------------------------
+// sub repositories
+// -------------------------------------------------------------
+
+// Domains implements [domain.InstanceRepository].
+func (i *instance) Domains(shouldLoad bool) domain.InstanceDomainRepository {
+	if !i.shouldLoadDomains {
+		i.shouldLoadDomains = shouldLoad
+	}
+
+	if i.domainRepo != nil {
+		return i.domainRepo
+	}
+
+	i.domainRepo = &instanceDomain{
+		repository: i.repository,
+		instance:   i,
+	}
+	return i.domainRepo
+}
+
