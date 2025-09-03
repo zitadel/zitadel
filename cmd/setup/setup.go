@@ -561,8 +561,6 @@ func initProjections(
 	ctx context.Context,
 	eventstoreClient *eventstore.Eventstore,
 ) error {
-	logging.Info("init-projections is currently in beta")
-
 	for _, p := range projection.Projections() {
 		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
 			logging.WithFields("name", p.String()).OnError(err).Error("projection migration failed")
