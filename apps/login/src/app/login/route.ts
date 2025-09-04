@@ -2,8 +2,7 @@ import { getAllSessions } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { 
   validateAuthRequest, 
-  isRSCRequest, 
-  completeAuthFlow 
+  isRSCRequest
 } from "@/lib/server/auth-flow";
 import { 
   handleOIDCFlowInitiation, 
@@ -33,7 +32,6 @@ export async function GET(request: NextRequest) {
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const searchParams = request.nextUrl.searchParams;
-  const sessionId = searchParams.get("sessionId");
 
   // Defensive check: block RSC requests early
   if (isRSCRequest(searchParams)) {
@@ -56,19 +54,6 @@ export async function GET(request: NextRequest) {
     sessions = await loadSessions({ serviceUrl, ids });
   }
 
-  // Complete flow if session and request id are provided
-  if (sessionId) {
-    try {
-      return await completeAuthFlow({ sessionId, requestId }, request);
-    } catch (error) {
-      console.error("Failed to complete auth flow:", error);
-      return NextResponse.json(
-        { error: "Authentication flow completion failed" },
-        { status: 500 }
-      );
-    }
-  }
-
   // Flow initiation - delegate to appropriate handler
   const flowParams: FlowInitiationParams = {
     serviceUrl,
@@ -82,6 +67,12 @@ export async function GET(request: NextRequest) {
     return handleOIDCFlowInitiation(flowParams);
   } else if (requestId.startsWith("saml_")) {
     return handleSAMLFlowInitiation(flowParams);
+  } else if (requestId.startsWith("device_")) {
+    // Device Authorization does not need to start here as it is handled on the /device endpoint
+    return NextResponse.json(
+      { error: "Device authorization should use /device endpoint" },
+      { status: 400 }
+    );
   } else {
     return NextResponse.json(
       { error: "Invalid request ID format" },

@@ -29,8 +29,8 @@ async function loadSessions({ serviceUrl, ids }: { serviceUrl: string; ids: stri
  * Complete OIDC/SAML authentication flow with session
  * This is the shared logic for flow completion
  */
-export async function completeAuthFlow(params: AuthFlowParams, request?: NextRequest): Promise<string> {
-  const { sessionId, requestId, organization } = params;
+export async function completeAuthFlow(params: AuthFlowParams, request?: NextRequest) {
+  const { sessionId, requestId } = params;
   
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -45,28 +45,18 @@ export async function completeAuthFlow(params: AuthFlowParams, request?: NextReq
 
   if (requestId.startsWith("oidc_")) {
     // Complete OIDC flow
-    const result = await loginWithOIDCAndSession({
+    return await loginWithOIDCAndSession({
       serviceUrl,
       authRequest: requestId.replace("oidc_", ""),
       sessionId,
       sessions,
       sessionCookies,
-      request: request as NextRequest, // Type assertion for now
+      request: request as NextRequest,
     });
-
-    // Extract redirect URL from the response
-    if (result && result.status === 302) {
-      const location = result.headers.get('location');
-      if (location) {
-        return location;
-      }
-    }
-    
-    throw new Error('OIDC flow completion failed');
     
   } else if (requestId.startsWith("saml_")) {
     // Complete SAML flow
-    const result = await loginWithSAMLAndSession({
+    return await loginWithSAMLAndSession({
       serviceUrl,
       samlRequest: requestId.replace("saml_", ""),
       sessionId,
@@ -74,16 +64,6 @@ export async function completeAuthFlow(params: AuthFlowParams, request?: NextReq
       sessionCookies,
       request: request as NextRequest,
     });
-
-    // Extract redirect URL from the response  
-    if (result && result.status === 302) {
-      const location = result.headers.get('location');
-      if (location) {
-        return location;
-      }
-    }
-    
-    throw new Error('SAML flow completion failed');
   }
 
   throw new Error('Invalid request ID format');
@@ -94,8 +74,19 @@ export async function completeAuthFlow(params: AuthFlowParams, request?: NextReq
  * This replaces client-side navigation to /login
  */
 export async function completeAuthFlowAction(params: AuthFlowParams) {
-  const redirectUrl = await completeAuthFlow(params);
-  redirect(redirectUrl);
+  // For server actions, we need to extract the redirect URL and call redirect()
+  const result = await completeAuthFlow(params);
+  
+  // Extract redirect URL from the response
+  if (result && result.status === 302) {
+    const location = result.headers.get('location');
+    if (location) {
+      redirect(location);
+      return;
+    }
+  }
+  
+  throw new Error('Authentication flow completion failed');
 }
 
 /**
