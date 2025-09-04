@@ -20,7 +20,7 @@ func NewWrongTypeError(expected IDPType, got fmt.Stringer) error {
 }
 
 func (e *wrongIDPTypeError) Error() string {
-	return fmt.Sprintf("wrong idp type returned, expecgted: %v, got: %v", e.expected, e.got)
+	return fmt.Sprintf("wrong idp type returned, expected: %v, got: %v", e.expected, e.got)
 }
 
 func (e *wrongIDPTypeError) Is(target error) bool {

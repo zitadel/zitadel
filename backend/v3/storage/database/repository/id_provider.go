@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"encoding/json"
-	"errors"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -82,7 +81,7 @@ func (i *idProvider) Create(ctx context.Context, idp *domain.IdentityProvider) e
 
 func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string, changes ...database.Change) (int64, error) {
 	if changes == nil {
-		return 0, errors.New("Update must contain at least one change")
+		return 0, database.ErrNoChanges
 	}
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.identity_providers SET `)
@@ -115,11 +114,11 @@ func (i *idProvider) Delete(ctx context.Context, id domain.IDPIdentifierConditio
 	return i.client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
-func (i *idProvider) GetOIDC(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPOIDC, error) {
+func (i *idProvider) GetOIDC(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPOIDC, error) {
 	idpOIDC := &domain.IDPOIDC{}
 	var err error
 
-	idpOIDC.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	idpOIDC.IdentityProvider, err = i.Get(ctx, id, instanceID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -136,11 +135,11 @@ func (i *idProvider) GetOIDC(ctx context.Context, id domain.IDPIdentifierConditi
 	return idpOIDC, nil
 }
 
-func (i *idProvider) GetJWT(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPJWT, error) {
+func (i *idProvider) GetJWT(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPJWT, error) {
 	idpJWT := &domain.IDPJWT{}
 	var err error
 
-	idpJWT.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	idpJWT.IdentityProvider, err = i.Get(ctx, id, instanceID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -157,11 +156,11 @@ func (i *idProvider) GetJWT(ctx context.Context, id domain.IDPIdentifierConditio
 	return idpJWT, nil
 }
 
-func (i *idProvider) GetOAuth(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPOAuth, error) {
+func (i *idProvider) GetOAuth(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPOAuth, error) {
 	idpOAuth := &domain.IDPOAuth{}
 	var err error
 
-	idpOAuth.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	idpOAuth.IdentityProvider, err = i.Get(ctx, id, instanceID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -178,11 +177,11 @@ func (i *idProvider) GetOAuth(ctx context.Context, id domain.IDPIdentifierCondit
 	return idpOAuth, nil
 }
 
-func (i *idProvider) GetOAzureAD(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPOAzureAD, error) {
+func (i *idProvider) GetOAzureAD(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPOAzureAD, error) {
 	idpAzure := &domain.IDPOAzureAD{}
 	var err error
 
-	idpAzure.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	idpAzure.IdentityProvider, err = i.Get(ctx, id, instanceID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -199,11 +198,11 @@ func (i *idProvider) GetOAzureAD(ctx context.Context, id domain.IDPIdentifierCon
 	return idpAzure, nil
 }
 
-func (i *idProvider) GetGoogle(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGoogle, error) {
+func (i *idProvider) GetGoogle(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPGoogle, error) {
 	idpGoogle := &domain.IDPGoogle{}
 	var err error
 
-	idpGoogle.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	idpGoogle.IdentityProvider, err = i.Get(ctx, id, instanceID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -220,11 +219,11 @@ func (i *idProvider) GetGoogle(ctx context.Context, id domain.IDPIdentifierCondi
 	return idpGoogle, nil
 }
 
-func (i *idProvider) GetGithub(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGithub, error) {
+func (i *idProvider) GetGithub(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPGithub, error) {
 	idpGithub := &domain.IDPGithub{}
 	var err error
 
-	idpGithub.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	idpGithub.IdentityProvider, err = i.Get(ctx, id, instanceID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -241,11 +240,11 @@ func (i *idProvider) GetGithub(ctx context.Context, id domain.IDPIdentifierCondi
 	return idpGithub, nil
 }
 
-func (i *idProvider) GetGithubEnterprise(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGithubEnterprise, error) {
+func (i *idProvider) GetGithubEnterprise(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPGithubEnterprise, error) {
 	idpGithubEnterprise := &domain.IDPGithubEnterprise{}
 	var err error
 
-	idpGithubEnterprise.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	idpGithubEnterprise.IdentityProvider, err = i.Get(ctx, id, instanceID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -262,11 +261,11 @@ func (i *idProvider) GetGithubEnterprise(ctx context.Context, id domain.IDPIdent
 	return idpGithubEnterprise, nil
 }
 
-func (i *idProvider) GetGitlab(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGitlab, error) {
+func (i *idProvider) GetGitlab(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPGitlab, error) {
 	idpGitlab := &domain.IDPGitlab{}
 	var err error
 
-	idpGitlab.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	idpGitlab.IdentityProvider, err = i.Get(ctx, id, instanceID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -283,11 +282,11 @@ func (i *idProvider) GetGitlab(ctx context.Context, id domain.IDPIdentifierCondi
 	return idpGitlab, nil
 }
 
-func (i *idProvider) GetGitlabSelfHosting(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPGitlabSelfHosting, error) {
+func (i *idProvider) GetGitlabSelfHosting(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPGitlabSelfHosting, error) {
 	idpGitlabSelfHosting := &domain.IDPGitlabSelfHosting{}
 	var err error
 
-	idpGitlabSelfHosting.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	idpGitlabSelfHosting.IdentityProvider, err = i.Get(ctx, id, instanceID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -304,11 +303,11 @@ func (i *idProvider) GetGitlabSelfHosting(ctx context.Context, id domain.IDPIden
 	return idpGitlabSelfHosting, nil
 }
 
-func (i *idProvider) GetLDAP(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPLDAP, error) {
+func (i *idProvider) GetLDAP(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPLDAP, error) {
 	ldap := &domain.IDPLDAP{}
 	var err error
 
-	ldap.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	ldap.IdentityProvider, err = i.Get(ctx, id, instanceID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -325,11 +324,11 @@ func (i *idProvider) GetLDAP(ctx context.Context, id domain.IDPIdentifierConditi
 	return ldap, nil
 }
 
-func (i *idProvider) GetApple(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPApple, error) {
+func (i *idProvider) GetApple(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPApple, error) {
 	apple := &domain.IDPApple{}
 	var err error
 
-	apple.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	apple.IdentityProvider, err = i.Get(ctx, id, instanceID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -346,11 +345,11 @@ func (i *idProvider) GetApple(ctx context.Context, id domain.IDPIdentifierCondit
 	return apple, nil
 }
 
-func (i *idProvider) GetSAML(ctx context.Context, id domain.IDPIdentifierCondition, instnaceID string, orgID *string) (*domain.IDPSAML, error) {
+func (i *idProvider) GetSAML(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string) (*domain.IDPSAML, error) {
 	saml := &domain.IDPSAML{}
 	var err error
 
-	saml.IdentityProvider, err = i.Get(ctx, id, instnaceID, orgID)
+	saml.IdentityProvider, err = i.Get(ctx, id, instanceID, orgID)
 	if err != nil {
 		return nil, err
 	}

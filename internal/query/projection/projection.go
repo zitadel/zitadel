@@ -379,7 +379,7 @@ func newProjectionsList() {
 
 		InstanceRelationalProjection,
 		OrganizationRelationalProjection,
-		InstanceDomainRelationalProjection,
-		OrganizationDomainRelationalProjection,
+		// InstanceDomainRelationalProjection,
+		// OrganizationDomainRelationalProjection,
 	}
 }

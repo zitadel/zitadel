@@ -426,9 +426,10 @@ func NewArrayRemoveCol(column string, value interface{}) Column {
 func NewArrayIntersectCol(column string, value interface{}) Column {
 	var arrayType string
 	switch value.(type) {
+
 	case []string, database.TextArray[string]:
 		arrayType = "TEXT"
-		// TODO: handle more types if necessary
+		//TODO: handle more types if necessary
 	}
 	return Column{
 		Name:  column,
@@ -598,10 +599,6 @@ type NamespacedCondition func(namespace string) Condition
 
 func NewCond(name string, value interface{}) Condition {
 	return func(param string) (string, []any) {
-		nilStrPtr, ok := value.(*string)
-		if ok && nilStrPtr == nil {
-			return name + " IS NULL", nil
-		}
 		return name + " = " + param, []any{value}
 	}
 }
@@ -663,15 +660,13 @@ type Executer interface {
 	Exec(string, ...interface{}) (sql.Result, error)
 }
 
-type (
-	execOption func(*execConfig)
-	execConfig struct {
-		tableName string
+type execOption func(*execConfig)
+type execConfig struct {
+	tableName string
 
-		args []interface{}
-		err  error
-	}
-)
+	args []interface{}
+	err  error
+}
 
 type query func(config execConfig) string
 

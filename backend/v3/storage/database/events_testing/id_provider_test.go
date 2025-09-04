@@ -145,7 +145,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		beforeCreate := time.Now()
-		addOIDC, err := AdminClient.AddOIDCIDP(CTX, &admin.AddOIDCIDPRequest{
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, &admin.AddOIDCIDPRequest{
 			Name:               name,
 			StylingType:        idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
 			ClientId:           "clientID",
@@ -161,9 +161,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository(pool)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			idp, err := idpRepo.Get(CTX,
+			idp, err := idpRepo.Get(IAMCTX,
 				idpRepo.NameCondition(name),
 				instanceID,
 				nil,
@@ -190,7 +190,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 	t.Run("test iam idp update reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
-		addOIDC, err := AdminClient.AddOIDCIDP(CTX, &admin.AddOIDCIDPRequest{
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, &admin.AddOIDCIDPRequest{
 			Name:               name,
 			StylingType:        idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
 			ClientId:           "clientID",
@@ -206,7 +206,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name = "new_" + name
 
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateIDP(CTX, &admin.UpdateIDPRequest{
+		_, err = AdminClient.UpdateIDP(IAMCTX, &admin.UpdateIDPRequest{
 			IdpId:        addOIDC.IdpId,
 			Name:         name,
 			StylingType:  idp_grpc.IDPStylingType_STYLING_TYPE_UNSPECIFIED,
@@ -217,9 +217,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository(pool)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			idp, err := idpRepo.Get(CTX,
+			idp, err := idpRepo.Get(IAMCTX,
 				idpRepo.NameCondition(name),
 				instanceID,
 				nil,
@@ -238,7 +238,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 	t.Run("test iam idp deactivate reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
-		addOIDC, err := AdminClient.AddOIDCIDP(CTX, &admin.AddOIDCIDPRequest{
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, &admin.AddOIDCIDPRequest{
 			Name:               name,
 			StylingType:        idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
 			ClientId:           "clientID",
@@ -253,7 +253,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// deactivate idp
 		beforeCreate := time.Now()
-		_, err = AdminClient.DeactivateIDP(CTX, &admin.DeactivateIDPRequest{
+		_, err = AdminClient.DeactivateIDP(IAMCTX, &admin.DeactivateIDPRequest{
 			IdpId: addOIDC.IdpId,
 		})
 		afterCreate := time.Now()
@@ -261,9 +261,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository(pool)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			idp, err := idpRepo.Get(CTX,
+			idp, err := idpRepo.Get(IAMCTX,
 				idpRepo.IDCondition(addOIDC.IdpId),
 				instanceID,
 				nil,
@@ -280,7 +280,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 	t.Run("test iam idp config reactivate reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
-		addOIDC, err := AdminClient.AddOIDCIDP(CTX, &admin.AddOIDCIDPRequest{
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, &admin.AddOIDCIDPRequest{
 			Name:               name,
 			StylingType:        idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
 			ClientId:           "clientID",
@@ -296,14 +296,14 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		// deactivate idp
-		_, err = AdminClient.DeactivateIDP(CTX, &admin.DeactivateIDPRequest{
+		_, err = AdminClient.DeactivateIDP(IAMCTX, &admin.DeactivateIDPRequest{
 			IdpId: addOIDC.IdpId,
 		})
 		require.NoError(t, err)
 		// wait for idp to be deactivated
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			idp, err := idpRepo.Get(CTX,
+			idp, err := idpRepo.Get(IAMCTX,
 				idpRepo.IDCondition(addOIDC.IdpId),
 				instanceID,
 				nil,
@@ -316,15 +316,15 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// reactivate idp
 		beforeCreate := time.Now()
-		_, err = AdminClient.ReactivateIDP(CTX, &admin.ReactivateIDPRequest{
+		_, err = AdminClient.ReactivateIDP(IAMCTX, &admin.ReactivateIDPRequest{
 			IdpId: addOIDC.IdpId,
 		})
 		afterCreate := time.Now()
 		require.NoError(t, err)
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			idp, err := idpRepo.Get(CTX,
+			idp, err := idpRepo.Get(IAMCTX,
 				idpRepo.IDCondition(addOIDC.IdpId),
 				instanceID,
 				nil,
@@ -342,7 +342,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add idp
-		addOIDC, err := AdminClient.AddOIDCIDP(CTX, &admin.AddOIDCIDPRequest{
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, &admin.AddOIDCIDPRequest{
 			Name:               name,
 			StylingType:        idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
 			ClientId:           "clientID",
@@ -358,14 +358,14 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		// remove idp
-		_, err = AdminClient.RemoveIDP(CTX, &admin.RemoveIDPRequest{
+		_, err = AdminClient.RemoveIDP(IAMCTX, &admin.RemoveIDPRequest{
 			IdpId: addOIDC.IdpId,
 		})
 		require.NoError(t, err)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*20)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*20)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			_, err := idpRepo.Get(CTX,
+			_, err := idpRepo.Get(IAMCTX,
 				idpRepo.IDCondition(addOIDC.IdpId),
 				instanceID,
 				nil,
@@ -380,7 +380,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
-		addOIDC, err := AdminClient.AddOIDCIDP(CTX, &admin.AddOIDCIDPRequest{
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, &admin.AddOIDCIDPRequest{
 			Name:               name,
 			StylingType:        idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
 			ClientId:           "clientID",
@@ -395,9 +395,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository(pool)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			oidc, err := idpRepo.GetOIDC(CTX,
+			oidc, err := idpRepo.GetOIDC(IAMCTX,
 				idpRepo.IDCondition(addOIDC.IdpId),
 				instanceID,
 				nil,
@@ -427,7 +427,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
-		addOIDC, err := AdminClient.AddOIDCIDP(CTX, &admin.AddOIDCIDPRequest{
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, &admin.AddOIDCIDPRequest{
 			Name:               name,
 			StylingType:        idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
 			ClientId:           "clientID",
@@ -444,15 +444,15 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// check original values for OCID
 		var oidc *domain.IDPOIDC
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			oidc, err = idpRepo.GetOIDC(CTX, idpRepo.IDCondition(addOIDC.IdpId), instanceID, nil)
+			oidc, err = idpRepo.GetOIDC(IAMCTX, idpRepo.IDCondition(addOIDC.IdpId), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, addOIDC.IdpId, oidc.ID)
 		}, retryDuration, tick)
 
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateIDPOIDCConfig(CTX, &admin.UpdateIDPOIDCConfigRequest{
+		_, err = AdminClient.UpdateIDPOIDCConfig(IAMCTX, &admin.UpdateIDPOIDCConfigRequest{
 			IdpId:              addOIDC.IdpId,
 			ClientId:           "new_clientID",
 			ClientSecret:       "new_clientSecret",
@@ -464,9 +464,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		afterCreate := time.Now()
 		require.NoError(t, err)
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateOIDC, err := idpRepo.GetOIDC(CTX,
+			updateOIDC, err := idpRepo.GetOIDC(IAMCTX,
 				idpRepo.IDCondition(addOIDC.IdpId),
 				instanceID,
 				nil,
@@ -499,7 +499,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
-		addJWT, err := AdminClient.AddJWTIDP(CTX, &admin.AddJWTIDPRequest{
+		addJWT, err := AdminClient.AddJWTIDP(IAMCTX, &admin.AddJWTIDPRequest{
 			Name:         name,
 			StylingType:  idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
 			JwtEndpoint:  "jwtEndpoint",
@@ -512,9 +512,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository(pool)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			jwt, err := idpRepo.GetJWT(CTX,
+			jwt, err := idpRepo.GetJWT(IAMCTX,
 				idpRepo.IDCondition(addJWT.IdpId),
 				instanceID,
 				nil,
@@ -542,7 +542,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
-		addJWT, err := AdminClient.AddJWTIDP(CTX, &admin.AddJWTIDPRequest{
+		addJWT, err := AdminClient.AddJWTIDP(IAMCTX, &admin.AddJWTIDPRequest{
 			Name:         name,
 			StylingType:  idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
 			JwtEndpoint:  "jwtEndpoint",
@@ -556,7 +556,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateIDPJWTConfig(CTX, &admin.UpdateIDPJWTConfigRequest{
+		_, err = AdminClient.UpdateIDPJWTConfig(IAMCTX, &admin.UpdateIDPJWTConfigRequest{
 			IdpId:        addJWT.IdpId,
 			JwtEndpoint:  "new_jwtEndpoint",
 			Issuer:       "new_issuer",
@@ -566,9 +566,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		afterCreate := time.Now()
 		require.NoError(t, err)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateJWT, err := idpRepo.GetJWT(CTX,
+			updateJWT, err := idpRepo.GetJWT(IAMCTX,
 				idpRepo.IDCondition(addJWT.IdpId),
 				instanceID,
 				nil,
@@ -594,7 +594,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// add oauth
 		beforeCreate := time.Now()
-		addOAuth, err := AdminClient.AddGenericOAuthProvider(CTX, &admin.AddGenericOAuthProviderRequest{
+		addOAuth, err := AdminClient.AddGenericOAuthProvider(IAMCTX, &admin.AddGenericOAuthProviderRequest{
 			Name:                  name,
 			ClientId:              "clientId",
 			ClientSecret:          "clientSecret",
@@ -619,9 +619,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// check values for oauth
 		var oauth *domain.IDPOAuth
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			oauth, err = idpRepo.GetOAuth(CTX, idpRepo.IDCondition(addOAuth.Id), instanceID, nil)
+			oauth, err = idpRepo.GetOAuth(IAMCTX, idpRepo.IDCondition(addOAuth.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.oauth.added
@@ -654,7 +654,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oauth
-		addOAuth, err := AdminClient.AddGenericOAuthProvider(CTX, &admin.AddGenericOAuthProviderRequest{
+		addOAuth, err := AdminClient.AddGenericOAuthProvider(IAMCTX, &admin.AddGenericOAuthProviderRequest{
 			Name:                  name,
 			ClientId:              "clientId",
 			ClientSecret:          "clientSecret",
@@ -678,16 +678,16 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// check values for oauth
 		var oauth *domain.IDPOAuth
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			oauth, err = idpRepo.GetOAuth(CTX, idpRepo.IDCondition(addOAuth.Id), instanceID, nil)
+			oauth, err = idpRepo.GetOAuth(IAMCTX, idpRepo.IDCondition(addOAuth.Id), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, addOAuth.Id, oauth.ID)
 		}, retryDuration, tick)
 
 		name = "new_" + name
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateGenericOAuthProvider(CTX, &admin.UpdateGenericOAuthProviderRequest{
+		_, err = AdminClient.UpdateGenericOAuthProvider(IAMCTX, &admin.UpdateGenericOAuthProviderRequest{
 			Id:                    addOAuth.Id,
 			Name:                  name,
 			ClientId:              "new_clientId",
@@ -709,9 +709,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		afterCreate := time.Now()
 		require.NoError(t, err)
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateOauth, err := idpRepo.GetOAuth(CTX,
+			updateOauth, err := idpRepo.GetOAuth(IAMCTX,
 				idpRepo.IDCondition(addOAuth.Id),
 				instanceID,
 				nil,
@@ -747,7 +747,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// add oidc
 		beforeCreate := time.Now()
-		addOIDC, err := AdminClient.AddGenericOIDCProvider(CTX, &admin.AddGenericOIDCProviderRequest{
+		addOIDC, err := AdminClient.AddGenericOIDCProvider(IAMCTX, &admin.AddGenericOIDCProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -769,9 +769,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		// check values for oidc
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			oidc, err := idpRepo.GetOIDC(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
+			oidc, err := idpRepo.GetOIDC(IAMCTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.oidc added
@@ -802,7 +802,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 	t.Run("test instanceidp oidc changed reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
-		addOIDC, err := AdminClient.AddGenericOIDCProvider(CTX, &admin.AddGenericOIDCProviderRequest{
+		addOIDC, err := AdminClient.AddGenericOIDCProvider(IAMCTX, &admin.AddGenericOIDCProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -824,15 +824,15 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// check values for oidc
 		var oidc *domain.IDPOIDC
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			oidc, err = idpRepo.GetOIDC(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
+			oidc, err = idpRepo.GetOIDC(IAMCTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
 			require.NoError(t, err)
 		}, retryDuration, tick)
 
 		name = "new_" + name
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateGenericOIDCProvider(CTX, &admin.UpdateGenericOIDCProviderRequest{
+		_, err = AdminClient.UpdateGenericOIDCProvider(IAMCTX, &admin.UpdateGenericOIDCProviderRequest{
 			Id:           addOIDC.Id,
 			Name:         name,
 			Issuer:       "new_issuer",
@@ -852,9 +852,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		afterCreate := time.Now()
 		require.NoError(t, err)
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateOIDC, err := idpRepo.GetOIDC(CTX,
+			updateOIDC, err := idpRepo.GetOIDC(IAMCTX,
 				idpRepo.IDCondition(addOIDC.Id),
 				instanceID,
 				nil,
@@ -888,7 +888,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// create OIDC
-		addOIDC, err := AdminClient.AddGenericOIDCProvider(CTX, &admin.AddGenericOIDCProviderRequest{
+		addOIDC, err := AdminClient.AddGenericOIDCProvider(IAMCTX, &admin.AddGenericOIDCProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -909,15 +909,15 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		var oidc *domain.IDPOIDC
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			oidc, err = idpRepo.GetOIDC(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
+			oidc, err = idpRepo.GetOIDC(IAMCTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, domain.IDPTypeOIDC, oidc.Type)
 		}, retryDuration, tick)
 
 		beforeCreate := time.Now()
-		_, err = AdminClient.MigrateGenericOIDCProvider(CTX, &admin.MigrateGenericOIDCProviderRequest{
+		_, err = AdminClient.MigrateGenericOIDCProvider(IAMCTX, &admin.MigrateGenericOIDCProviderRequest{
 			Id: addOIDC.Id,
 			Template: &admin.MigrateGenericOIDCProviderRequest_Azure{
 				Azure: &admin.AddAzureADProviderRequest{
@@ -944,9 +944,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		afterCreate := time.Now()
 		require.NoError(t, err)
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			azure, err := idpRepo.GetOAzureAD(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
+			azure, err := idpRepo.GetOAzureAD(IAMCTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.oidc.migrated.azure
@@ -976,7 +976,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// create OIDC
-		addOIDC, err := AdminClient.AddGenericOIDCProvider(CTX, &admin.AddGenericOIDCProviderRequest{
+		addOIDC, err := AdminClient.AddGenericOIDCProvider(IAMCTX, &admin.AddGenericOIDCProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -997,15 +997,15 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		var oidc *domain.IDPOIDC
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			oidc, err = idpRepo.GetOIDC(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
+			oidc, err = idpRepo.GetOIDC(IAMCTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, domain.IDPTypeOIDC, oidc.Type)
 		}, retryDuration, tick)
 
 		beforeCreate := time.Now()
-		_, err = AdminClient.MigrateGenericOIDCProvider(CTX, &admin.MigrateGenericOIDCProviderRequest{
+		_, err = AdminClient.MigrateGenericOIDCProvider(IAMCTX, &admin.MigrateGenericOIDCProviderRequest{
 			Id: addOIDC.Id,
 			Template: &admin.MigrateGenericOIDCProviderRequest_Google{
 				Google: &admin.AddGoogleProviderRequest{
@@ -1026,9 +1026,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		afterCreate := time.Now()
 		require.NoError(t, err)
 
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			google, err := idpRepo.GetGoogle(CTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
+			google, err := idpRepo.GetGoogle(IAMCTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.oidc.migrated.google
@@ -1057,7 +1057,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// add jwt
 		beforeCreate := time.Now()
-		addJWT, err := AdminClient.AddJWTProvider(CTX, &admin.AddJWTProviderRequest{
+		addJWT, err := AdminClient.AddJWTProvider(IAMCTX, &admin.AddJWTProviderRequest{
 			Name:         name,
 			Issuer:       "issuer",
 			JwtEndpoint:  "jwtEndpoint",
@@ -1077,9 +1077,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		// check values for jwt
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			jwt, err := idpRepo.GetJWT(CTX, idpRepo.IDCondition(addJWT.Id), instanceID, nil)
+			jwt, err := idpRepo.GetJWT(IAMCTX, idpRepo.IDCondition(addJWT.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.jwt.added
@@ -1108,7 +1108,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
-		addJWT, err := AdminClient.AddJWTProvider(CTX, &admin.AddJWTProviderRequest{
+		addJWT, err := AdminClient.AddJWTProvider(IAMCTX, &admin.AddJWTProviderRequest{
 			Name:         name,
 			Issuer:       "issuer",
 			JwtEndpoint:  "jwtEndpoint",
@@ -1127,7 +1127,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name = "new_" + name
 		// change jwt
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateJWTProvider(CTX, &admin.UpdateJWTProviderRequest{
+		_, err = AdminClient.UpdateJWTProvider(IAMCTX, &admin.UpdateJWTProviderRequest{
 			Id:           addJWT.Id,
 			Name:         name,
 			Issuer:       "new_issuer",
@@ -1148,9 +1148,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		// check values for jwt
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			jwt, err := idpRepo.GetJWT(CTX, idpRepo.IDCondition(addJWT.Id), instanceID, nil)
+			jwt, err := idpRepo.GetJWT(IAMCTX, idpRepo.IDCondition(addJWT.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.jwt.added
@@ -1179,7 +1179,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// add azure
 		beforeCreate := time.Now()
-		addAzure, err := AdminClient.AddAzureADProvider(CTX, &admin.AddAzureADProviderRequest{
+		addAzure, err := AdminClient.AddAzureADProvider(IAMCTX, &admin.AddAzureADProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -1204,9 +1204,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		// check values for azure
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			azure, err := idpRepo.GetOAzureAD(CTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
+			azure, err := idpRepo.GetOAzureAD(IAMCTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.azure.added
@@ -1235,7 +1235,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add azure
-		addAzure, err := AdminClient.AddAzureADProvider(CTX, &admin.AddAzureADProviderRequest{
+		addAzure, err := AdminClient.AddAzureADProvider(IAMCTX, &admin.AddAzureADProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -1259,9 +1259,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		var azure *domain.IDPOAzureAD
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			azure, err = idpRepo.GetOAzureAD(CTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
+			azure, err = idpRepo.GetOAzureAD(IAMCTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, addAzure.Id, azure.ID)
 		}, retryDuration, tick)
@@ -1269,7 +1269,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name = "new_" + name
 		// change azure
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateAzureADProvider(CTX, &admin.UpdateAzureADProviderRequest{
+		_, err = AdminClient.UpdateAzureADProvider(IAMCTX, &admin.UpdateAzureADProviderRequest{
 			Id:           addAzure.Id,
 			Name:         name,
 			ClientId:     "new_clientId",
@@ -1293,9 +1293,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check values for azure
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateAzure, err := idpRepo.GetOAzureAD(CTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
+			updateAzure, err := idpRepo.GetOAzureAD(IAMCTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.azure.changed
@@ -1325,7 +1325,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// add github
 		beforeCreate := time.Now()
-		addGithub, err := AdminClient.AddGitHubProvider(CTX, &admin.AddGitHubProviderRequest{
+		addGithub, err := AdminClient.AddGitHubProvider(IAMCTX, &admin.AddGitHubProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -1344,9 +1344,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		// check values for github
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			github, err := idpRepo.GetGithub(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
+			github, err := idpRepo.GetGithub(IAMCTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.github.added
@@ -1372,7 +1372,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add github
-		addGithub, err := AdminClient.AddGitHubProvider(CTX, &admin.AddGitHubProviderRequest{
+		addGithub, err := AdminClient.AddGitHubProvider(IAMCTX, &admin.AddGitHubProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -1390,9 +1390,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		var github *domain.IDPGithub
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			github, err = idpRepo.GetGithub(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
+			github, err = idpRepo.GetGithub(IAMCTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, addGithub.Id, github.ID)
 		}, retryDuration, tick)
@@ -1400,7 +1400,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name = "new_" + name
 		// change github
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateGitHubProvider(CTX, &admin.UpdateGitHubProviderRequest{
+		_, err = AdminClient.UpdateGitHubProvider(IAMCTX, &admin.UpdateGitHubProviderRequest{
 			Id:           addGithub.Id,
 			Name:         name,
 			ClientId:     "new_clientId",
@@ -1418,9 +1418,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check values for azure
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateGithub, err := idpRepo.GetGithub(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
+			updateGithub, err := idpRepo.GetGithub(IAMCTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.github.changed
@@ -1448,7 +1448,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// add github enterprise
 		beforeCreate := time.Now()
-		addGithubEnterprise, err := AdminClient.AddGitHubEnterpriseServerProvider(CTX, &admin.AddGitHubEnterpriseServerProviderRequest{
+		addGithubEnterprise, err := AdminClient.AddGitHubEnterpriseServerProvider(IAMCTX, &admin.AddGitHubEnterpriseServerProviderRequest{
 			Name:                  name,
 			ClientId:              "clientId",
 			ClientSecret:          "clientSecret",
@@ -1470,9 +1470,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		// check values for github enterprise
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			githubEnterprise, err := idpRepo.GetGithubEnterprise(CTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, nil)
+			githubEnterprise, err := idpRepo.GetGithubEnterprise(IAMCTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.github_enterprise.added
@@ -1503,7 +1503,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add github enterprise
-		addGithubEnterprise, err := AdminClient.AddGitHubEnterpriseServerProvider(CTX, &admin.AddGitHubEnterpriseServerProviderRequest{
+		addGithubEnterprise, err := AdminClient.AddGitHubEnterpriseServerProvider(IAMCTX, &admin.AddGitHubEnterpriseServerProviderRequest{
 			Name:                  name,
 			ClientId:              "clientId",
 			ClientSecret:          "clientSecret",
@@ -1524,9 +1524,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		var githubEnterprise *domain.IDPGithubEnterprise
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			githubEnterprise, err = idpRepo.GetGithubEnterprise(CTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, nil)
+			githubEnterprise, err = idpRepo.GetGithubEnterprise(IAMCTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, addGithubEnterprise.Id, githubEnterprise.ID)
 		}, retryDuration, tick)
@@ -1534,7 +1534,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name = "new_" + name
 		// change github enterprise
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateGitHubEnterpriseServerProvider(CTX, &admin.UpdateGitHubEnterpriseServerProviderRequest{
+		_, err = AdminClient.UpdateGitHubEnterpriseServerProvider(IAMCTX, &admin.UpdateGitHubEnterpriseServerProviderRequest{
 			Id:                    addGithubEnterprise.Id,
 			Name:                  name,
 			ClientId:              "new_clientId",
@@ -1555,9 +1555,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check values for azure
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateGithubEnterprise, err := idpRepo.GetGithubEnterprise(CTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, nil)
+			updateGithubEnterprise, err := idpRepo.GetGithubEnterprise(IAMCTX, idpRepo.IDCondition(addGithubEnterprise.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.github_enterprise.changed
@@ -1588,7 +1588,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// add gitlab
 		beforeCreate := time.Now()
-		addGithub, err := AdminClient.AddGitLabProvider(CTX, &admin.AddGitLabProviderRequest{
+		addGithub, err := AdminClient.AddGitLabProvider(IAMCTX, &admin.AddGitLabProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -1607,9 +1607,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		// check values for gitlab
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			gitlab, err := idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
+			gitlab, err := idpRepo.GetGitlab(IAMCTX, idpRepo.IDCondition(addGithub.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.gitlab.added
@@ -1637,7 +1637,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add gitlab
-		addGitlab, err := AdminClient.AddGitLabProvider(CTX, &admin.AddGitLabProviderRequest{
+		addGitlab, err := AdminClient.AddGitLabProvider(IAMCTX, &admin.AddGitLabProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -1655,9 +1655,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		var githlab *domain.IDPGitlab
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			githlab, err = idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGitlab.Id), instanceID, nil)
+			githlab, err = idpRepo.GetGitlab(IAMCTX, idpRepo.IDCondition(addGitlab.Id), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, addGitlab.Id, githlab.ID)
 		}, retryDuration, tick)
@@ -1665,7 +1665,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name = "new_" + name
 		// change gitlab
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateGitLabProvider(CTX, &admin.UpdateGitLabProviderRequest{
+		_, err = AdminClient.UpdateGitLabProvider(IAMCTX, &admin.UpdateGitLabProviderRequest{
 			Id:           addGitlab.Id,
 			Name:         name,
 			ClientId:     "new_clientId",
@@ -1683,9 +1683,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check values for gitlab
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateGithlab, err := idpRepo.GetGitlab(CTX, idpRepo.IDCondition(addGitlab.Id), instanceID, nil)
+			updateGithlab, err := idpRepo.GetGitlab(IAMCTX, idpRepo.IDCondition(addGitlab.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.gitlab.changed
@@ -1713,7 +1713,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// add gitlab self hosted
 		beforeCreate := time.Now()
-		addGitlabSelfHosted, err := AdminClient.AddGitLabSelfHostedProvider(CTX, &admin.AddGitLabSelfHostedProviderRequest{
+		addGitlabSelfHosted, err := AdminClient.AddGitLabSelfHostedProvider(IAMCTX, &admin.AddGitLabSelfHostedProviderRequest{
 			Name:         name,
 			Issuer:       "issuer",
 			ClientId:     "clientId",
@@ -1733,9 +1733,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		// check values for gitlab self hosted
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			gitlabSelfHosted, err := idpRepo.GetGitlabSelfHosting(CTX, idpRepo.IDCondition(addGitlabSelfHosted.Id), instanceID, nil)
+			gitlabSelfHosted, err := idpRepo.GetGitlabSelfHosting(IAMCTX, idpRepo.IDCondition(addGitlabSelfHosted.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.gitlab_self_hosted.added
@@ -1764,7 +1764,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add gitlab self hosted
-		addGitlabSelfHosted, err := AdminClient.AddGitLabSelfHostedProvider(CTX, &admin.AddGitLabSelfHostedProviderRequest{
+		addGitlabSelfHosted, err := AdminClient.AddGitLabSelfHostedProvider(IAMCTX, &admin.AddGitLabSelfHostedProviderRequest{
 			Name:         name,
 			Issuer:       "issuer",
 			ClientId:     "clientId",
@@ -1783,9 +1783,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		var githlabSelfHosted *domain.IDPGitlabSelfHosting
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			githlabSelfHosted, err = idpRepo.GetGitlabSelfHosting(CTX, idpRepo.IDCondition(addGitlabSelfHosted.Id), instanceID, nil)
+			githlabSelfHosted, err = idpRepo.GetGitlabSelfHosting(IAMCTX, idpRepo.IDCondition(addGitlabSelfHosted.Id), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, addGitlabSelfHosted.Id, githlabSelfHosted.ID)
 		}, retryDuration, tick)
@@ -1793,7 +1793,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name = "new_" + name
 		// change gitlab self hosted
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateGitLabSelfHostedProvider(CTX, &admin.UpdateGitLabSelfHostedProviderRequest{
+		_, err = AdminClient.UpdateGitLabSelfHostedProvider(IAMCTX, &admin.UpdateGitLabSelfHostedProviderRequest{
 			Id:           addGitlabSelfHosted.Id,
 			Name:         name,
 			ClientId:     "new_clientId",
@@ -1812,9 +1812,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check values for gitlab self hosted
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateGithlabSelfHosted, err := idpRepo.GetGitlabSelfHosting(CTX, idpRepo.IDCondition(addGitlabSelfHosted.Id), instanceID, nil)
+			updateGithlabSelfHosted, err := idpRepo.GetGitlabSelfHosting(IAMCTX, idpRepo.IDCondition(addGitlabSelfHosted.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.gitlab_self_hosted.changed
@@ -1843,7 +1843,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// add google
 		beforeCreate := time.Now()
-		addGoogle, err := AdminClient.AddGoogleProvider(CTX, &admin.AddGoogleProviderRequest{
+		addGoogle, err := AdminClient.AddGoogleProvider(IAMCTX, &admin.AddGoogleProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -1862,9 +1862,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		// check values for google
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			google, err := idpRepo.GetGoogle(CTX, idpRepo.IDCondition(addGoogle.Id), instanceID, nil)
+			google, err := idpRepo.GetGoogle(IAMCTX, idpRepo.IDCondition(addGoogle.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.google.added
@@ -1892,7 +1892,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add google
-		addGoogle, err := AdminClient.AddGoogleProvider(CTX, &admin.AddGoogleProviderRequest{
+		addGoogle, err := AdminClient.AddGoogleProvider(IAMCTX, &admin.AddGoogleProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
 			ClientSecret: "clientSecret",
@@ -1910,9 +1910,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		var google *domain.IDPGoogle
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			google, err = idpRepo.GetGoogle(CTX, idpRepo.IDCondition(addGoogle.Id), instanceID, nil)
+			google, err = idpRepo.GetGoogle(IAMCTX, idpRepo.IDCondition(addGoogle.Id), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, addGoogle.Id, google.ID)
 		}, retryDuration, tick)
@@ -1920,7 +1920,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name = "new_" + name
 		// change google
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateGoogleProvider(CTX, &admin.UpdateGoogleProviderRequest{
+		_, err = AdminClient.UpdateGoogleProvider(IAMCTX, &admin.UpdateGoogleProviderRequest{
 			Id:           addGoogle.Id,
 			Name:         name,
 			ClientId:     "new_clientId",
@@ -1938,9 +1938,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check values for google
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateGoogle, err := idpRepo.GetGoogle(CTX, idpRepo.IDCondition(addGoogle.Id), instanceID, nil)
+			updateGoogle, err := idpRepo.GetGoogle(IAMCTX, idpRepo.IDCondition(addGoogle.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.google.changed
@@ -1968,7 +1968,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// add ldap
 		beforeCreate := time.Now()
-		addLdap, err := AdminClient.AddLDAPProvider(CTX, &admin.AddLDAPProviderRequest{
+		addLdap, err := AdminClient.AddLDAPProvider(IAMCTX, &admin.AddLDAPProviderRequest{
 			Name:              name,
 			Servers:           []string{"servers"},
 			StartTls:          true,
@@ -2007,9 +2007,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository(pool)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			ldap, err := idpRepo.GetLDAP(CTX, idpRepo.IDCondition(addLdap.Id), instanceID, nil)
+			ldap, err := idpRepo.GetLDAP(IAMCTX, idpRepo.IDCondition(addLdap.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.ldap.v2.added
@@ -2056,7 +2056,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add ldap
-		addLdap, err := AdminClient.AddLDAPProvider(CTX, &admin.AddLDAPProviderRequest{
+		addLdap, err := AdminClient.AddLDAPProvider(IAMCTX, &admin.AddLDAPProviderRequest{
 			Name:              name,
 			Servers:           []string{"servers"},
 			StartTls:          true,
@@ -2095,9 +2095,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		var ldap *domain.IDPLDAP
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			ldap, err = idpRepo.GetLDAP(CTX, idpRepo.IDCondition(addLdap.Id), instanceID, nil)
+			ldap, err = idpRepo.GetLDAP(IAMCTX, idpRepo.IDCondition(addLdap.Id), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, addLdap.Id, ldap.ID)
 		}, retryDuration, tick)
@@ -2105,7 +2105,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name = "new_" + name
 		// change ldap
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateLDAPProvider(CTX, &admin.UpdateLDAPProviderRequest{
+		_, err = AdminClient.UpdateLDAPProvider(IAMCTX, &admin.UpdateLDAPProviderRequest{
 			Id:                addLdap.Id,
 			Name:              name,
 			Servers:           []string{"new_servers"},
@@ -2144,9 +2144,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check values for ldap
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateLdap, err := idpRepo.GetLDAP(CTX, idpRepo.IDCondition(addLdap.Id), instanceID, nil)
+			updateLdap, err := idpRepo.GetLDAP(IAMCTX, idpRepo.IDCondition(addLdap.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.ldap.v2.changed
@@ -2193,7 +2193,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// add apple
 		beforeCreate := time.Now()
-		addApple, err := AdminClient.AddAppleProvider(CTX, &admin.AddAppleProviderRequest{
+		addApple, err := AdminClient.AddAppleProvider(IAMCTX, &admin.AddAppleProviderRequest{
 			Name:       name,
 			ClientId:   "clientID",
 			TeamId:     "teamIDteam",
@@ -2213,9 +2213,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository(pool)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			apple, err := idpRepo.GetApple(CTX, idpRepo.IDCondition(addApple.Id), instanceID, nil)
+			apple, err := idpRepo.GetApple(IAMCTX, idpRepo.IDCondition(addApple.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.apple.added
@@ -2245,7 +2245,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add apple
-		addApple, err := AdminClient.AddAppleProvider(CTX, &admin.AddAppleProviderRequest{
+		addApple, err := AdminClient.AddAppleProvider(IAMCTX, &admin.AddAppleProviderRequest{
 			Name:       name,
 			ClientId:   "clientID",
 			TeamId:     "teamIDteam",
@@ -2265,9 +2265,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		var apple *domain.IDPApple
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			apple, err = idpRepo.GetApple(CTX, idpRepo.IDCondition(addApple.Id), instanceID, nil)
+			apple, err = idpRepo.GetApple(IAMCTX, idpRepo.IDCondition(addApple.Id), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, addApple.Id, apple.ID)
 		}, retryDuration, tick)
@@ -2275,7 +2275,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name = "new_" + name
 		// change apple
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateAppleProvider(CTX, &admin.UpdateAppleProviderRequest{
+		_, err = AdminClient.UpdateAppleProvider(IAMCTX, &admin.UpdateAppleProviderRequest{
 			Id:         addApple.Id,
 			Name:       name,
 			ClientId:   "new_clientID",
@@ -2295,9 +2295,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check values for apple
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateApple, err := idpRepo.GetApple(CTX, idpRepo.IDCondition(addApple.Id), instanceID, nil)
+			updateApple, err := idpRepo.GetApple(IAMCTX, idpRepo.IDCondition(addApple.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event nstance.idp.apple.changed
@@ -2328,7 +2328,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		// add saml
 		beforeCreate := time.Now()
-		addSAML, err := AdminClient.AddSAMLProvider(CTX, &admin.AddSAMLProviderRequest{
+		addSAML, err := AdminClient.AddSAMLProvider(IAMCTX, &admin.AddSAMLProviderRequest{
 			Name: name,
 			Metadata: &admin.AddSAMLProviderRequest_MetadataXml{
 				MetadataXml: validSAMLMetadata1,
@@ -2351,9 +2351,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository(pool)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			saml, err := idpRepo.GetSAML(CTX, idpRepo.IDCondition(addSAML.Id), instanceID, nil)
+			saml, err := idpRepo.GetSAML(IAMCTX, idpRepo.IDCondition(addSAML.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.saml.added
@@ -2387,7 +2387,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		federatedLogoutEnabled := false
 
 		// add saml
-		addSAML, err := AdminClient.AddSAMLProvider(CTX, &admin.AddSAMLProviderRequest{
+		addSAML, err := AdminClient.AddSAMLProvider(IAMCTX, &admin.AddSAMLProviderRequest{
 			Name: name,
 			Metadata: &admin.AddSAMLProviderRequest_MetadataXml{
 				MetadataXml: validSAMLMetadata1,
@@ -2410,9 +2410,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		var saml *domain.IDPSAML
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			saml, err = idpRepo.GetSAML(CTX, idpRepo.IDCondition(addSAML.Id), instanceID, nil)
+			saml, err = idpRepo.GetSAML(IAMCTX, idpRepo.IDCondition(addSAML.Id), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, addSAML.Id, saml.ID)
 		}, retryDuration, tick)
@@ -2421,7 +2421,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		federatedLogoutEnabled = true
 		// change saml
 		beforeCreate := time.Now()
-		_, err = AdminClient.UpdateSAMLProvider(CTX, &admin.UpdateSAMLProviderRequest{
+		_, err = AdminClient.UpdateSAMLProvider(IAMCTX, &admin.UpdateSAMLProviderRequest{
 			Id:   addSAML.Id,
 			Name: name,
 			Metadata: &admin.UpdateSAMLProviderRequest_MetadataXml{
@@ -2444,9 +2444,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// check values for apple
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateSAML, err := idpRepo.GetSAML(CTX, idpRepo.IDCondition(addSAML.Id), instanceID, nil)
+			updateSAML, err := idpRepo.GetSAML(IAMCTX, idpRepo.IDCondition(addSAML.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.saml.changed
@@ -2479,7 +2479,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add idp
-		addOIDC, err := AdminClient.AddOIDCIDP(CTX, &admin.AddOIDCIDPRequest{
+		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, &admin.AddOIDCIDPRequest{
 			Name:               name,
 			StylingType:        idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
 			ClientId:           "clientID",
@@ -2495,9 +2495,9 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		idpRepo := repository.IDProviderRepository(pool)
 
 		// check idp exists
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			_, err := idpRepo.Get(CTX,
+			_, err := idpRepo.Get(IAMCTX,
 				idpRepo.IDCondition(addOIDC.IdpId),
 				instanceID,
 				nil,
@@ -2506,15 +2506,15 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// remove idp
-		_, err = AdminClient.DeleteProvider(CTX, &admin.DeleteProviderRequest{
+		_, err = AdminClient.DeleteProvider(IAMCTX, &admin.DeleteProviderRequest{
 			Id: addOIDC.IdpId,
 		})
 		require.NoError(t, err)
 
 		// check idp is removed
-		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			_, err := idpRepo.Get(CTX,
+			_, err := idpRepo.Get(IAMCTX,
 				idpRepo.IDCondition(addOIDC.IdpId),
 				instanceID,
 				nil,
@@ -2523,4 +2523,3 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 }
-

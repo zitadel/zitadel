@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
@@ -385,20 +386,25 @@ func (p *idpTemplateRelationalProjection) reduceIDPRelationalAdded(event eventst
 }
 
 func (p *idpTemplateRelationalProjection) reduceIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
 	var idpEvent idpconfig.IDPConfigChangedEvent
 	switch e := event.(type) {
 	case *org.IDPConfigChangedEvent:
 		idpEvent = e.IDPConfigChangedEvent
+		orgCond = handler.NewCond(IDPRelationalOrgId, idpEvent.Aggregate().ResourceOwner)
 	case *instance.IDPConfigChangedEvent:
 		idpEvent = e.IDPConfigChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YVvJD", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType})
 	}
 
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
-	}
+	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+
+	// var orgId *string
+	// if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
+	// 	orgId = &idpEvent.Aggregate().ResourceOwner
+	// }
 
 	cols := make([]handler.Column, 0, 5)
 	if idpEvent.Name != nil {
@@ -420,7 +426,8 @@ func (p *idpTemplateRelationalProjection) reduceIDPRelationalChanged(event event
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
 			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCond(IDPRelationalOrgId, orgId),
+			// handler.NewCond(IDPRelationalOrgId, orgId),
+			orgCond,
 		},
 	), nil
 }
@@ -441,10 +448,15 @@ func (p *idpTemplateRelationalProjection) reduceIDRelationalPDeactivated(event e
 		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
+	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INACTIATE")
+	fmt.Printf("[DEBUGPRINT] [:1] idpEvent.ConfigID = %+v\n", idpEvent.ConfigID)
+	fmt.Printf("[DEBUGPRINT] [:1] idpEvent.Aggregate().ID = %+v\n", idpEvent.Aggregate().ID)
 	return handler.NewUpdateStatement(
 		&idpEvent,
 		[]handler.Column{
-			handler.NewCol(IDPStateCol, domain.IDPStateInactive.String()),
+			// handler.NewCol(IDPStateCol, domain.IDPStateInactive.String()),
+			handler.NewCol(IDPNameCol, "new_name"),
+			// handler.NewCol(IDPStateCol, domain.IDPStateInactive),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),

@@ -1539,12 +1539,12 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository(pool)
 
-		var githlab *domain.IDPGitlab
+		var gitlab *domain.IDPGitlab
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			githlab, err = idpRepo.GetGitlab(IAMCTX, idpRepo.IDCondition(addGitlab.Id), instanceID, &orgID)
+			gitlab, err = idpRepo.GetGitlab(IAMCTX, idpRepo.IDCondition(addGitlab.Id), instanceID, &orgID)
 			require.NoError(t, err)
-			assert.Equal(t, addGitlab.Id, githlab.ID)
+			assert.Equal(t, addGitlab.Id, gitlab.ID)
 		}, retryDuration, tick)
 
 		name = "new_" + name
@@ -1587,7 +1587,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 
 			// gitlab
 			assert.Equal(t, "new_clientId", updateGithlab.ClientID)
-			assert.NotEqual(t, githlab.ClientSecret, updateGithlab.ClientSecret)
+			assert.NotEqual(t, gitlab.ClientSecret, updateGithlab.ClientSecret)
 			assert.Equal(t, domain.IDPTypeGitLab, updateGithlab.Type)
 			assert.Equal(t, []string{"new_scope"}, updateGithlab.Scopes)
 		}, retryDuration, tick)
