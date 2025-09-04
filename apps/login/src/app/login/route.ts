@@ -32,7 +32,7 @@ import { DEFAULT_CSP } from "../../../constants/csp";
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
-// Add this to prevent RSC requests
+
 export const runtime = 'nodejs';
 
 const gotoAccounts = ({
