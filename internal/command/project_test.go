@@ -20,7 +20,6 @@ import (
 )
 
 func TestCommandSide_AddProject(t *testing.T) {
-	t.Parallel()
 	type fields struct {
 		eventstore      func(t *testing.T) *eventstore.Eventstore
 		idGenerator     id.Generator
@@ -350,7 +349,6 @@ func TestCommandSide_AddProject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			c := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				idGenerator:     tt.fields.idGenerator,

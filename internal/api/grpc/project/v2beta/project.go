@@ -51,6 +51,9 @@ func projectCreateToCommand(req *project_pb.CreateProjectRequest) *command.AddPr
 }
 
 func projectCreateAdminsToCommand(requestAdmins []*project_pb.CreateProjectRequest_Admin) []*command.AddProjectAdmin {
+	if len(requestAdmins) == 0 {
+		return nil
+	}
 	admins := make([]*command.AddProjectAdmin, len(requestAdmins))
 	for i, admin := range requestAdmins {
 		admins[i] = &command.AddProjectAdmin{
