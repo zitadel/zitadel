@@ -115,6 +115,8 @@ func TestCreateInstance(t *testing.T) {
 
 					// change the id
 					inst.ID = instanceId
+					inst.CreatedAt = time.Time{}
+					inst.UpdatedAt = time.Time{}
 					return &inst
 				},
 				instance: domain.Instance{
