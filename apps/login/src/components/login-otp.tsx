@@ -1,6 +1,7 @@
 "use client";
 
 import { getNextUrl } from "@/lib/client";
+import { redirectToUrl } from "@/lib/server/auth";
 import { updateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
@@ -212,7 +213,8 @@ export function LoginOTP({
 
         setLoading(false);
         if (url) {
-          router.push(url);
+          // Use Server Action for server-side redirect to avoid RSC requests
+          redirectToUrl(url);
         }
       }
     });

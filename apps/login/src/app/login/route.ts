@@ -18,10 +18,7 @@ import {
 } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
-import {
-  CreateCallbackRequestSchema,
-  SessionSchema,
-} from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { CreateCallbackRequestSchema, SessionSchema } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
@@ -32,8 +29,6 @@ import { DEFAULT_CSP } from "../../../constants/csp";
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
-
-export const runtime = 'nodejs';
 
 const gotoAccounts = ({
   request,
@@ -56,13 +51,7 @@ const gotoAccounts = ({
   return NextResponse.redirect(accountsUrl);
 };
 
-async function loadSessions({
-  serviceUrl,
-  ids,
-}: {
-  serviceUrl: string;
-  ids: string[];
-}): Promise<Session[]> {
+async function loadSessions({ serviceUrl, ids }: { serviceUrl: string; ids: string[] }): Promise<Session[]> {
   const response = await listSessions({
     serviceUrl,
     ids: ids.filter((id: string | undefined) => !!id),
@@ -87,13 +76,22 @@ export async function GET(request: NextRequest) {
   // internal request id which combines authRequest and samlRequest with the prefix oidc_ or saml_
   let requestId =
     searchParams.get("requestId") ??
-    (oidcRequestId
-      ? `oidc_${oidcRequestId}`
-      : samlRequestId
-        ? `saml_${samlRequestId}`
-        : undefined);
+    (oidcRequestId ? `oidc_${oidcRequestId}` : samlRequestId ? `saml_${samlRequestId}` : undefined);
 
   const sessionId = searchParams.get("sessionId");
+
+  // Defensive check: block RSC requests early
+  if (searchParams.has("_rsc")) {
+    return NextResponse.json({ error: "RSC requests not supported" }, { status: 400 });
+  }
+
+  // Early validation: if no valid request parameters, return error immediately
+  if (!requestId) {
+    return NextResponse.json(
+      { error: "No valid authentication request found" }, // More accurate message
+      { status: 400 },
+    );
+  }
 
   const sessionCookies = await getAllSessions();
   const ids = sessionCookies.map((s) => s.id);
@@ -103,7 +101,7 @@ export async function GET(request: NextRequest) {
   }
 
   // complete flow if session and request id are provided
-  if (requestId && sessionId) {
+  if (sessionId) {
     if (requestId.startsWith("oidc_")) {
       // this finishes the login process for OIDC
       return loginWithOIDCAndSession({
@@ -128,7 +126,7 @@ export async function GET(request: NextRequest) {
   }
 
   // continue with OIDC
-  if (requestId && requestId.startsWith("oidc_")) {
+  if (requestId.startsWith("oidc_")) {
     const { authRequest } = await getAuthRequest({
       serviceUrl,
       authRequestId: requestId.replace("oidc_", ""),
@@ -139,21 +137,15 @@ export async function GET(request: NextRequest) {
     let idpId = "";
 
     if (authRequest?.scope) {
-      const orgScope = authRequest.scope.find((s: string) =>
-        ORG_SCOPE_REGEX.test(s),
-      );
+      const orgScope = authRequest.scope.find((s: string) => ORG_SCOPE_REGEX.test(s));
 
-      const idpScope = authRequest.scope.find((s: string) =>
-        IDP_SCOPE_REGEX.test(s),
-      );
+      const idpScope = authRequest.scope.find((s: string) => IDP_SCOPE_REGEX.test(s));
 
       if (orgScope) {
         const matched = ORG_SCOPE_REGEX.exec(orgScope);
         organization = matched?.[1] ?? "";
       } else {
-        const orgDomainScope = authRequest.scope.find((s: string) =>
-          ORG_DOMAIN_SCOPE_REGEX.test(s),
-        );
+        const orgDomainScope = authRequest.scope.find((s: string) => ORG_DOMAIN_SCOPE_REGEX.test(s));
 
         if (orgDomainScope) {
           const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
@@ -203,11 +195,9 @@ export async function GET(request: NextRequest) {
 
           let provider = idpTypeToSlug(identityProviderType);
 
-          const params = new URLSearchParams();
-
-          if (requestId) {
-            params.set("requestId", requestId);
-          }
+          const params = new URLSearchParams({
+            requestId: requestId,
+          });
 
           if (organization) {
             params.set("organization", organization);
@@ -217,20 +207,13 @@ export async function GET(request: NextRequest) {
             serviceUrl,
             idpId,
             urls: {
-              successUrl:
-                `${origin}/idp/${provider}/success?` +
-                new URLSearchParams(params),
-              failureUrl:
-                `${origin}/idp/${provider}/failure?` +
-                new URLSearchParams(params),
+              successUrl: `${origin}/idp/${provider}/success?` + new URLSearchParams(params),
+              failureUrl: `${origin}/idp/${provider}/failure?` + new URLSearchParams(params),
             },
           });
 
           if (!url) {
-            return NextResponse.json(
-              { error: "Could not start IDP flow" },
-              { status: 500 },
-            );
+            return NextResponse.json({ error: "Could not start IDP flow" }, { status: 500 });
           }
 
           if (url.startsWith("/")) {
@@ -245,9 +228,9 @@ export async function GET(request: NextRequest) {
 
     if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
       const registerUrl = constructUrl(request, "/register");
-      if (authRequest.id) {
-        registerUrl.searchParams.set("requestId", `oidc_${authRequest.id}`);
-      }
+
+      registerUrl.searchParams.set("requestId", requestId);
+
       if (organization) {
         registerUrl.searchParams.set("organization", organization);
       }
@@ -293,9 +276,9 @@ export async function GET(request: NextRequest) {
         }
 
         const loginNameUrl = constructUrl(request, "/loginname");
-        if (authRequest.id) {
-          loginNameUrl.searchParams.set("requestId", `oidc_${authRequest.id}`);
-        }
+
+        loginNameUrl.searchParams.set("requestId", requestId);
+
         if (authRequest.loginHint) {
           loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
         }
@@ -322,10 +305,7 @@ export async function GET(request: NextRequest) {
           authRequest,
         });
 
-        const noSessionResponse = NextResponse.json(
-          { error: "No active session found" },
-          { status: 400 },
-        );
+        const noSessionResponse = NextResponse.json({ error: "No active session found" }, { status: 400 });
 
         if (securitySettings?.embeddedIframe?.enabled) {
           securitySettings.embeddedIframe.allowedOrigins;
@@ -340,9 +320,7 @@ export async function GET(request: NextRequest) {
           return noSessionResponse;
         }
 
-        const cookie = sessionCookies.find(
-          (cookie) => cookie.id === selectedSession.id,
-        );
+        const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession.id);
 
         if (!cookie || !cookie.id || !cookie.token) {
           return noSessionResponse;
@@ -392,9 +370,7 @@ export async function GET(request: NextRequest) {
           });
         }
 
-        const cookie = sessionCookies.find(
-          (cookie) => cookie.id === selectedSession.id,
-        );
+        const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession.id);
 
         if (!cookie || !cookie.id || !cookie.token) {
           return gotoAccounts({
@@ -423,20 +399,18 @@ export async function GET(request: NextRequest) {
           if (callbackUrl) {
             return NextResponse.redirect(callbackUrl);
           } else {
-            console.log(
-              "could not create callback, redirect user to choose other account",
-            );
+            console.log("could not create callback, redirect user to choose other account");
             return gotoAccounts({
               request,
               organization,
-              requestId: `oidc_${authRequest.id}`,
+              requestId,
             });
           }
         } catch (error) {
           console.error(error);
           return gotoAccounts({
             request,
-            requestId: `oidc_${authRequest.id}`,
+            requestId,
             organization,
           });
         }
@@ -445,6 +419,7 @@ export async function GET(request: NextRequest) {
       const loginNameUrl = constructUrl(request, "/loginname");
 
       loginNameUrl.searchParams.set("requestId", requestId);
+
       if (authRequest?.loginHint) {
         loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
         loginNameUrl.searchParams.set("submit", "true"); // autosubmit
@@ -459,17 +434,14 @@ export async function GET(request: NextRequest) {
     }
   }
   // continue with SAML
-  else if (requestId && requestId.startsWith("saml_")) {
+  else if (requestId.startsWith("saml_")) {
     const { samlRequest } = await getSAMLRequest({
       serviceUrl,
       samlRequestId: requestId.replace("saml_", ""),
     });
 
     if (!samlRequest) {
-      return NextResponse.json(
-        { error: "No samlRequest found" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "No samlRequest found" }, { status: 400 });
     }
 
     let selectedSession = await findValidSession({
@@ -481,18 +453,16 @@ export async function GET(request: NextRequest) {
     if (!selectedSession || !selectedSession.id) {
       return gotoAccounts({
         request,
-        requestId: `saml_${samlRequest.id}`,
+        requestId,
       });
     }
 
-    const cookie = sessionCookies.find(
-      (cookie) => cookie.id === selectedSession.id,
-    );
+    const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession.id);
 
     if (!cookie || !cookie.id || !cookie.token) {
       return gotoAccounts({
         request,
-        requestId: `saml_${samlRequest.id}`,
+        requestId,
         // organization,
       });
     }
@@ -535,27 +505,22 @@ export async function GET(request: NextRequest) {
           headers: { "Content-Type": "text/html" },
         });
       } else {
-        console.log(
-          "could not create response, redirect user to choose other account",
-        );
+        console.log("could not create response, redirect user to choose other account");
         return gotoAccounts({
           request,
-          requestId: `saml_${samlRequest.id}`,
+          requestId,
         });
       }
     } catch (error) {
       console.error(error);
       return gotoAccounts({
         request,
-        requestId: `saml_${samlRequest.id}`,
+        requestId,
       });
     }
   }
   // Device Authorization does not need to start here as it is handled on the /device endpoint
   else {
-    return NextResponse.json(
-      { error: "No authRequest nor samlRequest provided" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "No authRequest nor samlRequest provided" }, { status: 500 });
   }
 }
