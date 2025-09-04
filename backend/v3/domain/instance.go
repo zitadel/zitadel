@@ -101,4 +101,3 @@ type InstanceRepository interface {
 type CreateInstance struct {
 	Name string `json:"name"`
 }
-

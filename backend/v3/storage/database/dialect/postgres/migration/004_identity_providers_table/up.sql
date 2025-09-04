@@ -8,6 +8,7 @@ CREATE TABLE zitadel.idp_type (
   name TEXT NOT NULL CHECK (name <> '')
 );
 
+-- NOTE: If any new idp_type/s are added IDPType (backend/v3/domain/id_provider.go ) must be updated
 INSERT INTO zitadel.idp_type(name) VALUES
   ('oidc'),
   ('jwt'),
