@@ -59,6 +59,9 @@ func privateLabelingSettingToDomain(setting proj_pb.PrivateLabelingSetting) doma
 }
 
 func projectCreateAdminsToCommand(requestAdmins []*mgmt_pb.AddProjectRequest_Admin) []*command.AddProjectAdmin {
+	if len(requestAdmins) == 0 {
+		return nil
+	}
 	admins := make([]*command.AddProjectAdmin, len(requestAdmins))
 	for i, admin := range requestAdmins {
 		admins[i] = &command.AddProjectAdmin{
