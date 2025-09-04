@@ -1958,6 +1958,7 @@
       "CREATE_DESC": "Introduceți numele proiectului dvs.",
       "ROLE": "Rol",
       "NOITEMS": "Niciun proiect",
+      "USERSELFACCOUNT": "Utilizați contul personal ca proprietar al proiectului.",
       "ZITADELPROJECT": "Acesta aparține proiectului ZITADEL. Atenție: Dacă faceți modificări, ZITADEL ar putea să nu se comporte conform intențiilor.",
       "TYPE": {
         "OWNED": "Proiecte deținute",
