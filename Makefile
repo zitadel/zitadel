@@ -101,7 +101,7 @@ console_dependencies:
 
 .PHONY: console_build
 console_build: console_dependencies
-	npx pnpm nx run console:build
+	nx run @zitadel/console:build
 
 .PHONY: clean
 clean:
@@ -159,7 +159,7 @@ core_integration_test: core_integration_server_start core_integration_test_packa
 
 .PHONY: console_lint
 console_lint:
-	npx pnpm nx run console:lint
+	npx pnpm nx run @zitadel/console:lint
 
 .PHONY: core_lint
 core_lint:
