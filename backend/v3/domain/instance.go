@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/backend/v3/storage/cache"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
@@ -73,6 +75,18 @@ type instanceConditions interface {
 type instanceChanges interface {
 	// SetName sets the name column.
 	SetName(name string) database.Change
+	// SetUpdatedAt sets the updated at column.
+	SetUpdatedAt(time time.Time) database.Change
+	// SetIAMProject sets the iam project column.
+	SetIAMProject(id string) database.Change
+	// SetDefaultOrg sets the default org column.
+	SetDefaultOrg(id string) database.Change
+	// SetDefaultLanguage sets the default language column.
+	SetDefaultLanguage(language language.Tag) database.Change
+	// SetConsoleClientID sets the console client id column.
+	SetConsoleClientID(id string) database.Change
+	// SetConsoleAppID sets the console app id column.
+	SetConsoleAppID(id string) database.Change
 }
 
 // InstanceRepository is the interface for the instance repository.
