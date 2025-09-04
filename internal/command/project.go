@@ -200,6 +200,9 @@ func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOw
 }
 
 func (c *Commands) addProjectMemberEvents(ctx context.Context, resourceOwner, projectID string, admins []*AddProjectAdmin) ([]eventstore.Command, error) {
+	if len(admins) == 0 {
+		return nil, nil
+	}
 	events := make([]eventstore.Command, 0)
 	for _, admin := range admins {
 		_, err := c.checkUserExists(ctx, admin.ID, "")
