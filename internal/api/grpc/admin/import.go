@@ -540,7 +540,7 @@ func importUserMetadata(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 	}
 	for _, userMetadata := range org.GetUserMetadata() {
 		logging.Debugf("import usermetadata: %s", userMetadata.GetId()+"_"+userMetadata.GetKey())
-		_, err := s.command.SetUserMetadata(ctx, &domain.Metadata{Key: userMetadata.GetKey(), Value: userMetadata.GetValue()}, userMetadata.GetId(), org.GetOrgId())
+		_, err := s.command.SetUserMetadata(ctx, &domain.Metadata{Key: userMetadata.GetKey(), Value: userMetadata.GetValue()}, userMetadata.GetId(), org.GetOrgId(), nil)
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "user_metadata", Id: userMetadata.GetId() + "_" + userMetadata.GetKey(), Message: err.Error()})
 			if isCtxTimeout(ctx) {
