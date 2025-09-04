@@ -166,7 +166,7 @@ export async function createNewSessionFromIdpIntent(
   //   return mfaFactorCheck;
   // }
 
-  await completeFlowOrGetUrl(
+  const nextUrl = await completeFlowOrGetUrl(
     command.requestId && session.id
       ? {
           sessionId: session.id,
@@ -179,6 +179,11 @@ export async function createNewSessionFromIdpIntent(
         },
     loginSettings?.defaultRedirectUri,
   );
+
+  // For regular flows (non-OIDC/SAML), return URL for client-side navigation
+  if (nextUrl) {
+    return { redirect: nextUrl };
+  }
 }
 
 type createNewSessionForLDAPCommand = {

@@ -247,16 +247,21 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       },
       loginSettings?.defaultRedirectUri,
     );
-    return;
+    return; // OIDC/SAML flow completed via server action
   }
 
-  await completeFlowOrGetUrl(
+  // Regular flow - return URL for client-side navigation
+  const nextUrl = await completeFlowOrGetUrl(
     {
       loginName: session.factors.user.loginName,
       organization: session.factors?.user?.organizationId,
     },
     loginSettings?.defaultRedirectUri,
   );
+
+  if (nextUrl) {
+    return { redirect: nextUrl };
+  }
 }
 
 type resendVerifyEmailCommand = {

@@ -124,7 +124,7 @@ export async function registerUser(command: RegisterUserCommand) {
       return emailVerificationCheck;
     }
 
-    await completeFlowOrGetUrl(
+    const nextUrl = await completeFlowOrGetUrl(
       command.requestId && session.id
         ? {
             sessionId: session.id,
@@ -137,6 +137,11 @@ export async function registerUser(command: RegisterUserCommand) {
           },
       loginSettings?.defaultRedirectUri,
     );
+
+    // For regular flows (non-OIDC/SAML), return URL for client-side navigation
+    if (nextUrl) {
+      return { redirect: nextUrl };
+    }
   }
 }
 
@@ -213,7 +218,7 @@ export async function registerUserAndLinkToIDP(
     return { error: "Could not create session" };
   }
 
-  await completeFlowOrGetUrl(
+  const nextUrl = await completeFlowOrGetUrl(
     command.requestId && session.id
       ? {
           sessionId: session.id,
@@ -226,4 +231,9 @@ export async function registerUserAndLinkToIDP(
         },
     loginSettings?.defaultRedirectUri,
   );
+
+  // For regular flows (non-OIDC/SAML), return URL for client-side navigation
+  if (nextUrl) {
+    return { redirect: nextUrl };
+  }
 }

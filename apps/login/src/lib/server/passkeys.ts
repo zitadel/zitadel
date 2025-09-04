@@ -271,13 +271,19 @@ export async function sendPasskey(command: SendPasskeyCommand) {
       },
       loginSettings?.defaultRedirectUri,
     );
+    return; // OIDC/SAML flow completed via server action
   } else if (session?.factors?.user?.loginName) {
-    await completeFlowOrGetUrl(
+    const nextUrl = await completeFlowOrGetUrl(
       {
         loginName: session.factors.user.loginName,
         organization: organization,
       },
       loginSettings?.defaultRedirectUri,
     );
+    
+    // For regular flows, return URL for client-side navigation
+    if (nextUrl) {
+      return { redirect: nextUrl };
+    }
   }
 }

@@ -96,13 +96,18 @@ export function ChooseSecondFactorToSetup({
         <button
           className="text-sm transition-all hover:text-primary-light-500 dark:hover:text-primary-dark-500"
           onClick={async () => {
-            await skipMFAAndContinueWithNextUrl({
+            const url = await skipMFAAndContinueWithNextUrl({
               userId,
               loginName,
               sessionId,
               organization,
               requestId,
             });
+            // If url is returned, navigate client-side
+            // If no url (void/null), the function handled the redirect server-side
+            if (url) {
+              router.push(url);
+            }
           }}
           type="button"
           data-testid="reset-button"

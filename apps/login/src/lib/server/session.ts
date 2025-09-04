@@ -13,7 +13,7 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
-import { completeFlowOrGetUrl } from "../client";
+import { completeFlowOrGetUrl, getNextUrl } from "../client";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
@@ -34,7 +34,7 @@ export async function skipMFAAndContinueWithNextUrl({
   sessionId?: string;
   requestId?: string;
   organization?: string;
-}) {
+}): Promise<string | null> {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -46,7 +46,7 @@ export async function skipMFAAndContinueWithNextUrl({
   await humanMFAInitSkipped({ serviceUrl, userId });
 
   if (requestId && sessionId) {
-    await completeFlowOrGetUrl(
+    const result = await completeFlowOrGetUrl(
       {
         sessionId: sessionId,
         requestId: requestId,
@@ -54,8 +54,10 @@ export async function skipMFAAndContinueWithNextUrl({
       },
       loginSettings?.defaultRedirectUri,
     );
+    return result || null;
   } else if (loginName) {
-    await completeFlowOrGetUrl(
+    // For regular flows, always return URL for client-side navigation
+    return await getNextUrl(
       {
         loginName: loginName,
         organization: organization,
@@ -63,6 +65,8 @@ export async function skipMFAAndContinueWithNextUrl({
       loginSettings?.defaultRedirectUri,
     );
   }
+  
+  return null;
 }
 
 export async function continueWithSession({
@@ -86,14 +90,20 @@ export async function continueWithSession({
       },
       loginSettings?.defaultRedirectUri,
     );
+    return; // OIDC/SAML flow completed via server action
   } else if (session.factors?.user) {
-    await completeFlowOrGetUrl(
+    const nextUrl = await completeFlowOrGetUrl(
       {
         loginName: session.factors.user.loginName,
         organization: session.factors.user.organizationId,
       },
       loginSettings?.defaultRedirectUri,
     );
+    
+    // For regular flows, return URL for client-side navigation
+    if (nextUrl) {
+      return { redirect: nextUrl };
+    }
   }
 }
 
