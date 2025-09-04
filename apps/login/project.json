@@ -26,6 +26,14 @@
         "env-local",
         "^build"
       ],
+      "inputs": [
+        "default",
+        "!{projectRoot}/integration/integration/**",
+        "!{projectRoot}/integration/support/**",
+        "!{projectRoot}/cypress.config.ts",
+        "!{projectRoot}/package.json"
+
+      ],
       "outputs": [
         "{projectRoot}/.next/standalone"
       ]

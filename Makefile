@@ -159,7 +159,7 @@ core_integration_test: core_integration_server_start core_integration_test_packa
 
 .PHONY: console_lint
 console_lint:
-	npx pnpm nx run @zitadel/console:lint
+	nx run @zitadel/console:lint
 
 .PHONY: core_lint
 core_lint:
