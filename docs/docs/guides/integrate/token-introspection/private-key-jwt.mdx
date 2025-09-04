@@ -135,7 +135,7 @@ Payload:
 {
    "iss": "78366401571920522@acme", (clientId from your key file)
    "sub": "78366401571920522@acme", (clientId from your key file)
-   "aud": "https://{your_domain}", (your ZITADEL domain/issuer URL)
+   "aud": "https://${CUSTOM_DOMAIN}", (your ZITADEL domain/issuer URL)
    "exp": 1605183582, (Unix timestamp of the expiry)
    "iat": 1605179982   (Unix timestamp of the creation signing time of the JWT, MUST NOT be older than 1h)
 }
@@ -146,7 +146,7 @@ Create the JSON Web Token with the above header and payload, and sign it with th
 The request from the API to the introspection endpoint should be in the following format:
 ```bash
 curl --request POST \
- --url {your_domain}/oauth/v2/introspect \
+ --url ${CUSTOM_DOMAIN}/oauth/v2/introspect \
  --header 'Content-Type: application/x-www-form-urlencoded' \
  --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
  --data client_assertion=eyJhbGciOiJSUzI1Ni... \
@@ -161,7 +161,7 @@ def introspect_token(self, token_string):
     payload = {
         "iss": API_PRIVATE_KEY_FILE["client_id"],
         "sub": API_PRIVATE_KEY_FILE["client_id"],
-        "aud": ZITADEL_DOMAIN,
+        "aud": CUSTOM_DOMAIN,
         "exp": int(time.time()) + 60 * 60,  # Expires in 1 hour
         "iat": int(time.time())
     }
