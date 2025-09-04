@@ -2,11 +2,12 @@ package projection
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
-	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
+	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/policy"
@@ -142,21 +143,30 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 		orgId = &policyEvent.Aggregate().ResourceOwner
 	}
 
-	loginSettings := loginSettings{
-		LoginPolicyAddedEvent: policyEvent,
-		IsDefault:             &isDefault,
-	}
-	settings, err := json.Marshal(loginSettings)
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println("[DEBUGPRINT] [settings_relational.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>> REEEDUCE")
+	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		loginSettings := loginSettings{
+			LoginPolicyAddedEvent: policyEvent,
+			IsDefault:             &isDefault,
+		}
+		settings, err := json.Marshal(loginSettings)
+		if err != nil {
+			return err
+		}
 
-	return handler.NewCreateStatement(&policyEvent, []handler.Column{
-		handler.NewCol(SettingsIDCol, policyEvent.Aggregate().ID),
-		handler.NewCol(SettingInstanceIDCol, policyEvent.Aggregate().InstanceID),
-		handler.NewCol(SettingsOrgIDCol, orgId),
-		handler.NewCol(SettingsTypeCol, domain.SettingTypeLogin.String()),
-		handler.NewCol(SettingsSettingsCol, settings),
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5LOhE", "reduce.wrong.db.pool %T", ex)
+		}
+		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		setting := domain.Setting{
+			ID:         policyEvent.Aggregate().ID,
+			InstanceID: policyEvent.Aggregate().InstanceID,
+			OrgID:      orgId,
+			Type:       domain.SettingTypeLogin,
+			Settings:   settings,
+		}
+		// return settingsRepo.Create(ctx, &setting)
+		err = settingsRepo.Create(ctx, &setting)
+		return err
 	}), nil
 }

@@ -29,7 +29,7 @@ type Setting struct {
 	ID         string          `json:"id,omitempty" db:"id"`
 	InstanceID string          `json:"instanceId,omitempty" db:"instance_id"`
 	OrgID      *string         `json:"orgId,omitempty" db:"org_id"`
-	Type       string          `json:"type,omitempty" db:"type"`
+	Type       SettingType     `json:"type,omitempty" db:"type"`
 	Settings   json.RawMessage `json:"settings,omitempty" db:"settings"`
 	CreatedAt  time.Time       `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt  time.Time       `json:"updatedAt,omitzero" db:"updated_at"`
