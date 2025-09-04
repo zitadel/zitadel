@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
@@ -399,13 +398,6 @@ func (p *idpTemplateRelationalProjection) reduceIDPRelationalChanged(event event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YVvJD", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType})
 	}
 
-	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-
-	// var orgId *string
-	// if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-	// 	orgId = &idpEvent.Aggregate().ResourceOwner
-	// }
-
 	cols := make([]handler.Column, 0, 5)
 	if idpEvent.Name != nil {
 		cols = append(cols, handler.NewCol(IDPNameCol, *idpEvent.Name))
@@ -426,60 +418,50 @@ func (p *idpTemplateRelationalProjection) reduceIDPRelationalChanged(event event
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
 			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			// handler.NewCond(IDPRelationalOrgId, orgId),
 			orgCond,
 		},
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceIDRelationalPDeactivated(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
 	var idpEvent idpconfig.IDPConfigDeactivatedEvent
 	switch e := event.(type) {
 	case *org.IDPConfigDeactivatedEvent:
 		idpEvent = e.IDPConfigDeactivatedEvent
+		orgCond = handler.NewCond(IDPRelationalOrgId, idpEvent.Aggregate().ResourceOwner)
 	case *instance.IDPConfigDeactivatedEvent:
 		idpEvent = e.IDPConfigDeactivatedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y4O5l", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigDeactivatedEventType, instance.IDPConfigDeactivatedEventType})
 	}
 
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
-	}
-
-	fmt.Println("[DEBUGPRINT] [:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INACTIATE")
-	fmt.Printf("[DEBUGPRINT] [:1] idpEvent.ConfigID = %+v\n", idpEvent.ConfigID)
-	fmt.Printf("[DEBUGPRINT] [:1] idpEvent.Aggregate().ID = %+v\n", idpEvent.Aggregate().ID)
 	return handler.NewUpdateStatement(
 		&idpEvent,
 		[]handler.Column{
-			// handler.NewCol(IDPStateCol, domain.IDPStateInactive.String()),
-			handler.NewCol(IDPNameCol, "new_name"),
-			// handler.NewCol(IDPStateCol, domain.IDPStateInactive),
+			handler.NewCol(IDPStateCol, domain.IDPStateInactive),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
 			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCond(IDPRelationalOrgId, orgId),
+			orgCond,
 		},
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceIDPRelationalReactivated(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
 	var idpEvent idpconfig.IDPConfigReactivatedEvent
 	switch e := event.(type) {
 	case *org.IDPConfigReactivatedEvent:
 		idpEvent = e.IDPConfigReactivatedEvent
+		orgCond = handler.NewCond(IDPRelationalOrgId, idpEvent.Aggregate().ResourceOwner)
 	case *instance.IDPConfigReactivatedEvent:
 		idpEvent = e.IDPConfigReactivatedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y8QyS", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigReactivatedEventType, instance.IDPConfigReactivatedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewUpdateStatement(
@@ -490,24 +472,23 @@ func (p *idpTemplateRelationalProjection) reduceIDPRelationalReactivated(event e
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
 			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCond(IDPRelationalOrgId, orgId),
+			orgCond,
 		},
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceIDPRelationalRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
 	var idpEvent idpconfig.IDPConfigRemovedEvent
 	switch e := event.(type) {
 	case *org.IDPConfigRemovedEvent:
 		idpEvent = e.IDPConfigRemovedEvent
+		orgCond = handler.NewCond(IDPRelationalOrgId, idpEvent.Aggregate().ResourceOwner)
 	case *instance.IDPConfigRemovedEvent:
 		idpEvent = e.IDPConfigRemovedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y4zy8", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
-	}
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewDeleteStatement(
@@ -515,18 +496,21 @@ func (p *idpTemplateRelationalProjection) reduceIDPRelationalRemoved(event event
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
 			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCond(IDPRelationalOrgId, orgId),
+			orgCond,
 		},
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
 	var idpEvent idpconfig.OIDCConfigAddedEvent
 	switch e := event.(type) {
 	case *org.IDPOIDCConfigAddedEvent:
 		idpEvent = e.OIDCConfigAddedEvent
+		orgCond = handler.NewCond(IDPRelationalOrgId, idpEvent.Aggregate().ResourceOwner)
 	case *instance.IDPOIDCConfigAddedEvent:
 		idpEvent = e.OIDCConfigAddedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YFuAA", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType})
 	}
@@ -534,11 +518,6 @@ func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigAdded(event 
 	payload, err := json.Marshal(idpEvent)
 	if err != nil {
 		return nil, err
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewUpdateStatement(
@@ -550,25 +529,25 @@ func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigAdded(event 
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
 			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCond(IDPRelationalOrgId, orgId),
+			orgCond,
 		},
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idpconfig.OIDCConfigChangedEvent
 	switch e := event.(type) {
 	case *org.IDPOIDCConfigChangedEvent:
 		idpEvent = e.OIDCConfigChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.IDPOIDCConfigChangedEvent:
 		idpEvent = e.OIDCConfigChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigChangedEventType, instance.IDPOIDCConfigChangedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	oidc, err := p.idpRepo.GetOIDC(context.Background(), p.idpRepo.IDCondition(idpEvent.IDPConfigID), idpEvent.Agg.InstanceID, orgId)
@@ -615,18 +594,21 @@ func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigChanged(even
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
 			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCond(IDPRelationalOrgId, orgId),
+			orgCond,
 		},
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
 	var idpEvent idpconfig.JWTConfigAddedEvent
 	switch e := event.(type) {
 	case *org.IDPJWTConfigAddedEvent:
 		idpEvent = e.JWTConfigAddedEvent
+		orgCond = handler.NewCond(IDPRelationalOrgId, idpEvent.Aggregate().ResourceOwner)
 	case *instance.IDPJWTConfigAddedEvent:
 		idpEvent = e.JWTConfigAddedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YvPdb", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType})
 	}
@@ -634,11 +616,6 @@ func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigAdded(event e
 	payload, err := json.Marshal(idpEvent)
 	if err != nil {
 		return nil, err
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewUpdateStatement(
@@ -650,25 +627,25 @@ func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigAdded(event e
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
 			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCond(IDPRelationalOrgId, orgId),
+			orgCond,
 		},
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idpconfig.JWTConfigChangedEvent
 	switch e := event.(type) {
 	case *org.IDPJWTConfigChangedEvent:
 		idpEvent = e.JWTConfigChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.IDPJWTConfigChangedEvent:
 		idpEvent = e.JWTConfigChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y2IVI", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigChangedEventType, instance.IDPJWTConfigChangedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	jwt, err := p.idpRepo.GetJWT(context.Background(), p.idpRepo.IDCondition(idpEvent.IDPConfigID), idpEvent.Agg.InstanceID, orgId)
@@ -703,16 +680,18 @@ func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigChanged(event
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
 			handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCond(IDPRelationalOrgId, orgId),
+			orgCond,
 		},
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
 	var idpEvent idp.OAuthIDPAddedEvent
 	switch e := event.(type) {
 	case *org.OAuthIDPAddedEvent:
 		idpEvent = e.OAuthIDPAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	case *instance.OAuthIDPAddedEvent:
 		idpEvent = e.OAuthIDPAddedEvent
 	default:
@@ -733,11 +712,6 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event ev
 	payload, err := json.Marshal(oauth)
 	if err != nil {
 		return nil, err
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewMultiStatement(
@@ -763,19 +737,19 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event ev
 }
 
 func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idp.OAuthIDPChangedEvent
 	switch e := event.(type) {
 	case *org.OAuthIDPChangedEvent:
 		idpEvent = e.OAuthIDPChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.OAuthIDPChangedEvent:
 		idpEvent = e.OAuthIDPChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	oauth, err := p.idpRepo.GetOAuth(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -803,17 +777,19 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalChanged(event 
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
 	var idpEvent idp.OIDCIDPAddedEvent
 	switch e := event.(type) {
 	case *org.OIDCIDPAddedEvent:
 		idpEvent = e.OIDCIDPAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	case *instance.OIDCIDPAddedEvent:
 		idpEvent = e.OIDCIDPAddedEvent
 	default:
@@ -823,11 +799,6 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eve
 	payload, err := json.Marshal(idpEvent)
 	if err != nil {
 		return nil, err
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewMultiStatement(
@@ -853,19 +824,19 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eve
 }
 
 func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idp.OIDCIDPChangedEvent
 	switch e := event.(type) {
 	case *org.OIDCIDPChangedEvent:
 		idpEvent = e.OIDCIDPChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.OIDCIDPChangedEvent:
 		idpEvent = e.OIDCIDPChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	oidc, err := p.idpRepo.GetOIDC(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -893,19 +864,22 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event e
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
 	var idpEvent idp.OIDCIDPMigratedAzureADEvent
 	switch e := event.(type) {
 	case *org.OIDCIDPMigratedAzureADEvent:
 		idpEvent = e.OIDCIDPMigratedAzureADEvent
+		orgCond = handler.NewCond(IDPRelationalOrgId, idpEvent.Aggregate().ResourceOwner)
 	case *instance.OIDCIDPMigratedAzureADEvent:
 		idpEvent = e.OIDCIDPMigratedAzureADEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
 	}
@@ -928,11 +902,6 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 		return nil, err
 	}
 
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
-	}
-
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddUpdateStatement(
@@ -949,19 +918,22 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
 	var idpEvent idp.OIDCIDPMigratedGoogleEvent
 	switch e := event.(type) {
 	case *org.OIDCIDPMigratedGoogleEvent:
 		idpEvent = e.OIDCIDPMigratedGoogleEvent
+		orgCond = handler.NewCond(IDPRelationalOrgId, idpEvent.Aggregate().ResourceOwner)
 	case *instance.OIDCIDPMigratedGoogleEvent:
 		idpEvent = e.OIDCIDPMigratedGoogleEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
 	}
@@ -975,11 +947,6 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 	payload, err := json.Marshal(google)
 	if err != nil {
 		return nil, err
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewMultiStatement(
@@ -998,17 +965,19 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
 	var idpEvent idp.JWTIDPAddedEvent
 	switch e := event.(type) {
 	case *org.JWTIDPAddedEvent:
 		idpEvent = e.JWTIDPAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	case *instance.JWTIDPAddedEvent:
 		idpEvent = e.JWTIDPAddedEvent
 	default:
@@ -1025,11 +994,6 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalAdded(event even
 	payload, err := json.Marshal(jwt)
 	if err != nil {
 		return nil, err
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewMultiStatement(
@@ -1055,19 +1019,19 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalAdded(event even
 }
 
 func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idp.JWTIDPChangedEvent
 	switch e := event.(type) {
 	case *org.JWTIDPChangedEvent:
 		idpEvent = e.JWTIDPChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.JWTIDPChangedEvent:
 		idpEvent = e.JWTIDPChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	jwt, err := p.idpRepo.GetJWT(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -1095,17 +1059,19 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event ev
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
 	var idpEvent idp.AzureADIDPAddedEvent
 	switch e := event.(type) {
 	case *org.AzureADIDPAddedEvent:
 		idpEvent = e.AzureADIDPAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	case *instance.AzureADIDPAddedEvent:
 		idpEvent = e.AzureADIDPAddedEvent
 	default:
@@ -1128,11 +1094,6 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event 
 	payload, err := json.Marshal(azure)
 	if err != nil {
 		return nil, err
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewMultiStatement(
@@ -1158,19 +1119,19 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event 
 }
 
 func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idp.AzureADIDPChangedEvent
 	switch e := event.(type) {
 	case *org.AzureADIDPChangedEvent:
 		idpEvent = e.AzureADIDPChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.AzureADIDPChangedEvent:
 		idpEvent = e.AzureADIDPChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	oauth, err := p.idpRepo.GetOAzureAD(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -1202,17 +1163,19 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(even
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
 	var idpEvent idp.GitHubIDPAddedEvent
 	switch e := event.(type) {
 	case *org.GitHubIDPAddedEvent:
 		idpEvent = e.GitHubIDPAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	case *instance.GitHubIDPAddedEvent:
 		idpEvent = e.GitHubIDPAddedEvent
 	default:
@@ -1228,11 +1191,6 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 	payload, err := json.Marshal(github)
 	if err != nil {
 		return nil, err
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewMultiStatement(
@@ -1258,19 +1216,19 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idp.GitHubIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GitHubIDPChangedEvent:
 		idpEvent = e.GitHubIDPChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.GitHubIDPChangedEvent:
 		idpEvent = e.GitHubIDPChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPChangedEventType, instance.GitHubIDPChangedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	github, err := p.idpRepo.GetGithub(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -1298,17 +1256,19 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
 	var idpEvent idp.GitHubEnterpriseIDPAddedEvent
 	switch e := event.(type) {
 	case *org.GitHubEnterpriseIDPAddedEvent:
 		idpEvent = e.GitHubEnterpriseIDPAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	case *instance.GitHubEnterpriseIDPAddedEvent:
 		idpEvent = e.GitHubEnterpriseIDPAddedEvent
 	default:
@@ -1327,11 +1287,6 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdd
 	payload, err := json.Marshal(githubEnterprise)
 	if err != nil {
 		return nil, err
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewMultiStatement(
@@ -1357,19 +1312,19 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdd
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idp.GitHubEnterpriseIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GitHubEnterpriseIDPChangedEvent:
 		idpEvent = e.GitHubEnterpriseIDPChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.GitHubEnterpriseIDPChangedEvent:
 		idpEvent = e.GitHubEnterpriseIDPChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	githubEnterprise, err := p.idpRepo.GetGithubEnterprise(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -1397,17 +1352,19 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalCha
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
 	var idpEvent idp.GitLabIDPAddedEvent
 	switch e := event.(type) {
 	case *org.GitLabIDPAddedEvent:
 		idpEvent = e.GitLabIDPAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	case *instance.GitLabIDPAddedEvent:
 		idpEvent = e.GitLabIDPAddedEvent
 	default:
@@ -1423,11 +1380,6 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event e
 	payload, err := json.Marshal(gitlab)
 	if err != nil {
 		return nil, err
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewMultiStatement(
@@ -1453,19 +1405,19 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event e
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idp.GitLabIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GitLabIDPChangedEvent:
 		idpEvent = e.GitLabIDPChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.GitLabIDPChangedEvent:
 		idpEvent = e.GitLabIDPChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	oauth, err := p.idpRepo.GetGitlab(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -1493,17 +1445,19 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
 	var idpEvent idp.GitLabSelfHostedIDPAddedEvent
 	switch e := event.(type) {
 	case *org.GitLabSelfHostedIDPAddedEvent:
 		idpEvent = e.GitLabSelfHostedIDPAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	case *instance.GitLabSelfHostedIDPAddedEvent:
 		idpEvent = e.GitLabSelfHostedIDPAddedEvent
 	default:
@@ -1520,11 +1474,6 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdd
 	payload, err := json.Marshal(gitlabSelfHosting)
 	if err != nil {
 		return nil, err
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewMultiStatement(
@@ -1550,19 +1499,19 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdd
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idp.GitLabSelfHostedIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GitLabSelfHostedIDPChangedEvent:
 		idpEvent = e.GitLabSelfHostedIDPChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.GitLabSelfHostedIDPChangedEvent:
 		idpEvent = e.GitLabSelfHostedIDPChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YAf3g2", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPChangedEventType, instance.GitLabSelfHostedIDPChangedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	gitlabSelfHosted, err := p.idpRepo.GetGitlabSelfHosting(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -1590,17 +1539,19 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalCha
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
 	var idpEvent idp.GoogleIDPAddedEvent
 	switch e := event.(type) {
 	case *org.GoogleIDPAddedEvent:
 		idpEvent = e.GoogleIDPAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	case *instance.GoogleIDPAddedEvent:
 		idpEvent = e.GoogleIDPAddedEvent
 	default:
@@ -1618,10 +1569,6 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event e
 		return nil, err
 	}
 
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
-	}
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddCreateStatement(
@@ -1645,19 +1592,19 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event e
 }
 
 func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idp.GoogleIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GoogleIDPChangedEvent:
 		idpEvent = e.GoogleIDPChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.GoogleIDPChangedEvent:
 		idpEvent = e.GoogleIDPChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	oauth, err := p.idpRepo.GetGoogle(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -1685,17 +1632,19 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
 	var idpEvent idp.LDAPIDPAddedEvent
 	switch e := event.(type) {
 	case *org.LDAPIDPAddedEvent:
 		idpEvent = e.LDAPIDPAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	case *instance.LDAPIDPAddedEvent:
 		idpEvent = e.LDAPIDPAddedEvent
 	default:
@@ -1734,11 +1683,6 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Ev
 		return nil, err
 	}
 
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
-	}
-
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddCreateStatement(
@@ -1762,19 +1706,19 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Ev
 }
 
 func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idp.LDAPIDPChangedEvent
 	switch e := event.(type) {
 	case *org.LDAPIDPChangedEvent:
 		idpEvent = e.LDAPIDPChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.LDAPIDPChangedEvent:
 		idpEvent = e.LDAPIDPChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPChangedEventType, instance.LDAPIDPChangedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	oauth, err := p.idpRepo.GetLDAP(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -1802,17 +1746,19 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
 	var idpEvent idp.AppleIDPAddedEvent
 	switch e := event.(type) {
 	case *org.AppleIDPAddedEvent:
 		idpEvent = e.AppleIDPAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	case *instance.AppleIDPAddedEvent:
 		idpEvent = e.AppleIDPAddedEvent
 	default:
@@ -1830,11 +1776,6 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.E
 	payload, err := json.Marshal(apple)
 	if err != nil {
 		return nil, err
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewMultiStatement(
@@ -1860,19 +1801,19 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.E
 }
 
 func (p *idpTemplateRelationalProjection) reduceAppleIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idp.AppleIDPChangedEvent
 	switch e := event.(type) {
 	case *org.AppleIDPChangedEvent:
 		idpEvent = e.AppleIDPChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.AppleIDPChangedEvent:
 		idpEvent = e.AppleIDPChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YBez3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPChangedEventType /*, instance.AppleIDPChangedEventType*/})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	apple, err := p.idpRepo.GetApple(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -1900,17 +1841,19 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPChanged(event eventstore
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
 	var idpEvent idp.SAMLIDPAddedEvent
 	switch e := event.(type) {
 	case *org.SAMLIDPAddedEvent:
 		idpEvent = e.SAMLIDPAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	case *instance.SAMLIDPAddedEvent:
 		idpEvent = e.SAMLIDPAddedEvent
 	default:
@@ -1931,11 +1874,6 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Ev
 	payload, err := json.Marshal(saml)
 	if err != nil {
 		return nil, err
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewMultiStatement(
@@ -1961,19 +1899,19 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Ev
 }
 
 func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
+	var orgId *string
 	var idpEvent idp.SAMLIDPChangedEvent
 	switch e := event.(type) {
 	case *org.SAMLIDPChangedEvent:
 		idpEvent = e.SAMLIDPChangedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
+		orgCond = handler.NewCond(IDPRelationalOrgId, orgId)
 	case *instance.SAMLIDPChangedEvent:
 		idpEvent = e.SAMLIDPChangedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y7c0fii4ad", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPChangedEventType, instance.SAMLIDPChangedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	saml, err := p.idpRepo.GetSAML(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -2001,26 +1939,24 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCond(IDPRelationalOrgId, orgId),
+				orgCond,
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var orgCond handler.Condition
 	var idpEvent idp.RemovedEvent
 	switch e := event.(type) {
 	case *org.IDPRemovedEvent:
 		idpEvent = e.RemovedEvent
+		orgCond = handler.NewCond(IDPRelationalOrgId, idpEvent.Aggregate().ResourceOwner)
 	case *instance.IDPRemovedEvent:
 		idpEvent = e.RemovedEvent
+		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ybcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewDeleteStatement(
@@ -2028,7 +1964,7 @@ func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Even
 		[]handler.Condition{
 			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-			handler.NewCond(IDPRelationalOrgId, orgId),
+			orgCond,
 		},
 	), nil
 }
