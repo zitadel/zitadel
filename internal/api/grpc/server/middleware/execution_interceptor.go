@@ -3,17 +3,30 @@ package middleware
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+	"slices"
+	"strings"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/execution"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
+
+var headersToForward = []string{
+	http_utils.ContentType,
+	http_utils.ForwardedFor,
+	http_utils.ForwardedHost,
+	http_utils.Host,
+	http_utils.Origin,
+}
 
 func ExecutionHandler(alg crypto.EncryptionAlgorithm) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -43,6 +56,7 @@ func executeTargetsForRequest(ctx context.Context, targets []target_domain.Targe
 		return req, nil
 	}
 
+	md, _ := metadata.FromIncomingContext(ctx)
 	ctxData := authz.GetCtxData(ctx)
 	info := &ContextInfoRequest{
 		FullMethod: fullMethod,
@@ -51,6 +65,7 @@ func executeTargetsForRequest(ctx context.Context, targets []target_domain.Targe
 		OrgID:      ctxData.OrgID,
 		UserID:     ctxData.UserID,
 		Request:    Message{req.(proto.Message)},
+		Headers:    setRequestHeaders(md),
 	}
 
 	return execution.CallTargets(ctx, targets, info, alg)
@@ -65,6 +80,7 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 		return resp, nil
 	}
 
+	md, _ := metadata.FromIncomingContext(ctx)
 	ctxData := authz.GetCtxData(ctx)
 	info := &ContextInfoResponse{
 		FullMethod: fullMethod,
@@ -74,6 +90,7 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 		UserID:     ctxData.UserID,
 		Request:    Message{req.(proto.Message)},
 		Response:   Message{resp.(proto.Message)},
+		Headers:    setRequestHeaders(md),
 	}
 
 	return execution.CallTargets(ctx, targets, info, alg)
@@ -82,12 +99,13 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 var _ execution.ContextInfo = &ContextInfoRequest{}
 
 type ContextInfoRequest struct {
-	FullMethod string  `json:"fullMethod,omitempty"`
-	InstanceID string  `json:"instanceID,omitempty"`
-	OrgID      string  `json:"orgID,omitempty"`
-	ProjectID  string  `json:"projectID,omitempty"`
-	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
+	FullMethod string      `json:"fullMethod,omitempty"`
+	InstanceID string      `json:"instanceID,omitempty"`
+	OrgID      string      `json:"orgID,omitempty"`
+	ProjectID  string      `json:"projectID,omitempty"`
+	UserID     string      `json:"userID,omitempty"`
+	Request    Message     `json:"request,omitempty"`
+	Headers    http.Header `json:"headers,omitempty"`
 }
 
 type Message struct {
@@ -125,13 +143,14 @@ func (c *ContextInfoRequest) GetContent() interface{} {
 var _ execution.ContextInfo = &ContextInfoResponse{}
 
 type ContextInfoResponse struct {
-	FullMethod string  `json:"fullMethod,omitempty"`
-	InstanceID string  `json:"instanceID,omitempty"`
-	OrgID      string  `json:"orgID,omitempty"`
-	ProjectID  string  `json:"projectID,omitempty"`
-	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
-	Response   Message `json:"response,omitempty"`
+	FullMethod string      `json:"fullMethod,omitempty"`
+	InstanceID string      `json:"instanceID,omitempty"`
+	OrgID      string      `json:"orgID,omitempty"`
+	ProjectID  string      `json:"projectID,omitempty"`
+	UserID     string      `json:"userID,omitempty"`
+	Request    Message     `json:"request,omitempty"`
+	Response   Message     `json:"response,omitempty"`
+	Headers    http.Header `json:"headers,omitempty"`
 }
 
 func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
@@ -148,4 +167,14 @@ func (c *ContextInfoResponse) SetHTTPResponseBody(resp []byte) error {
 
 func (c *ContextInfoResponse) GetContent() interface{} {
 	return c.Response.Message
+}
+
+func setRequestHeaders(reqHeaders map[string][]string) map[string][]string {
+	headers := make(map[string][]string)
+	for k, v := range reqHeaders {
+		if slices.Contains(headersToForward, strings.ToLower(k)) {
+			headers[k] = v
+		}
+	}
+	return headers
 }

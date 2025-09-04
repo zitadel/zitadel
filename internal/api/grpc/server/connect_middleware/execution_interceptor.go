@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"slices"
 	"strings"
 
 	"connectrpc.com/connect"
@@ -11,11 +12,20 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/execution"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
+
+var headersToForward = []string{
+	http_utils.ContentType,
+	http_utils.ForwardedFor,
+	http_utils.ForwardedHost,
+	http_utils.Host,
+	http_utils.Origin,
+}
 
 func ExecutionHandler(alg crypto.EncryptionAlgorithm) connect.UnaryInterceptorFunc {
 	return func(handler connect.UnaryFunc) connect.UnaryFunc {
@@ -166,13 +176,12 @@ func (c *ContextInfoResponse) GetContent() interface{} {
 	return c.Response.Message
 }
 
-func setRequestHeaders(reqHeaders http.Header) http.Header {
+func setRequestHeaders(reqHeaders map[string][]string) map[string][]string {
 	headers := make(map[string][]string)
 	for k, v := range reqHeaders {
-		if strings.ToLower(k) == "authorization" || strings.ToLower(k) == "grpcgateway-authorization" {
-			continue
+		if slices.Contains(headersToForward, strings.ToLower(k)) {
+			headers[k] = v
 		}
-		headers[k] = v
 	}
 	return headers
 }

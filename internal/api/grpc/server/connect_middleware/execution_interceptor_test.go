@@ -738,3 +738,28 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 		})
 	}
 }
+
+func Test_setRequestHeaders(t *testing.T) {
+	tests := []struct {
+		name       string
+		reqHeaders map[string][]string
+		want       map[string][]string
+	}{
+		{
+			name:       "no headers",
+			reqHeaders: nil,
+			want:       map[string][]string{},
+		},
+		{
+			name:       "with headers",
+			reqHeaders: map[string][]string{"Authorization": {"Bearer XXX"}, "X-Random-Header": {"Random-Value"}, "X-Forwarded-For": {"1.2.3.4"}, "Host": {"localhost:8080"}},
+			want:       map[string][]string{"X-Forwarded-For": {"1.2.3.4"}, "Host": {"localhost:8080"}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := setRequestHeaders(tt.reqHeaders)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
