@@ -1,3 +1,2 @@
 *
-!dist
-dist/apps/login/.env.*local
+!.next/standalone
