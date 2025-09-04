@@ -40,7 +40,7 @@ Generated files:
 To generate proto files:
 
 ```bash
-nx run console:generate
+nx run @zitadel/console:generate
 ```
 
 This automatically runs both generations in the correct order via Nx build orchestration.
@@ -50,7 +50,7 @@ This automatically runs both generations in the correct order via Nx build orche
 To start the development server:
 
 ```bash
-nx run console:start
+nx run @zitadel/console:start
 ```
 
 This will:
@@ -63,7 +63,7 @@ This will:
 To build for production:
 
 ```bash
-nx build console
+nx run @zitadel/console:build
 ```
 
 This will:
@@ -76,13 +76,13 @@ This will:
 To run linting and formatting checks:
 
 ```bash
-nx lint console
+nx @zitadel/console:lint
 ```
 
 To auto-fix formatting issues:
 
 ```bash
-nx lint:fix console
+nx @zitadel/console:lint-fix
 ```
 
 ## Project Structure
@@ -102,8 +102,8 @@ The Console app has the following build dependencies managed by Nx:
 
 1. `@zitadel/proto:generate` - Generates modern protobuf files
 2. `@zitadel/client:build` - Builds the TypeScript gRPC client library
-3. `console:generate` - Generates Console-specific protobuf files
-4. `console:build` - Builds the Angular application
+3. `@zitadel/console:generate` - Generates Console-specific protobuf files
+4. `@zitadel/console:build` - Builds the Angular application
 
 This ensures that the Console always has access to the latest client library and protobuf definitions.
 
