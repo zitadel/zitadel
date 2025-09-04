@@ -49,7 +49,7 @@ func (s *Server) listUserMetadataRequestToModel(req *user.ListUserMetadataReques
 }
 
 func (s *Server) SetUserMetadata(ctx context.Context, req *connect.Request[user.SetUserMetadataRequest]) (*connect.Response[user.SetUserMetadataResponse], error) {
-	result, err := s.command.BulkSetUserMetadata(ctx, req.Msg.UserId, "", setUserMetadataToDomain(req.Msg)...)
+	result, err := s.command.BulkSetUserMetadata(ctx, req.Msg.UserId, "", s.command.NewPermissionCheckUserWrite(ctx), setUserMetadataToDomain(req.Msg)...)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func setUserMetadataToDomain(req *user.SetUserMetadataRequest) []*domain.Metadat
 }
 
 func (s *Server) DeleteUserMetadata(ctx context.Context, req *connect.Request[user.DeleteUserMetadataRequest]) (*connect.Response[user.DeleteUserMetadataResponse], error) {
-	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Msg.UserId, "", req.Msg.Keys...)
+	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Msg.UserId, "", nil, req.Msg.Keys...)
 	if err != nil {
 		return nil, err
 	}
