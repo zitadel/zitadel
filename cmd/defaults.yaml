@@ -387,6 +387,12 @@ Projections:
   # Maximum amount of instances cached as active
   # If set to 0, every instance is always considered active
   MaxActiveInstances: 0 # ZITADEL_PROJECTIONS_MAXACTIVEINSTANCES
+  # Limits the amount of concurrently running projection triggers
+  # If set to 0, 1/3 of database.MaxOpenConns is used
+  # The number must be lower than the Database.MaxOpenConns
+  # A good starting point is to set this to Database.MaxOpenConns / 3
+  # so that there are enough connections free for other operations (e.g. writing events, reading projections, notifications, ...)
+  MaxParallelTriggers: 0 # ZITADEL_PROJECTIONS_MAXPARALLELTRIGGERS
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     custom_texts:
