@@ -366,12 +366,21 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
     return NextResponse.json({ error: "No samlRequest found" }, { status: 400 });
   }
 
+  // Early return: No sessions available - redirect to login
+  if (sessions.length === 0) {
+    const loginNameUrl = constructUrl(request, "/loginname");
+    loginNameUrl.searchParams.set("requestId", requestId);
+    return NextResponse.redirect(loginNameUrl);
+  }
+
+  // Try to find a valid session
   let selectedSession = await findValidSession({
     serviceUrl,
     sessions,
     samlRequest,
   });
 
+  // Early return: No valid session found - show account selection
   if (!selectedSession || !selectedSession.id) {
     return gotoAccounts({
       request,
@@ -381,6 +390,8 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
 
   const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession.id);
 
+  // Early return: No valid cookie/token found - show account selection
+  // Note: We need the session token from the cookie to authenticate API calls
   if (!cookie || !cookie.id || !cookie.token) {
     return gotoAccounts({
       request,
@@ -388,6 +399,7 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
     });
   }
 
+  // Valid session and cookie found - attempt to complete SAML flow
   const session = {
     sessionId: cookie.id,
     sessionToken: cookie.token,
@@ -425,18 +437,14 @@ export async function handleSAMLFlowInitiation(params: FlowInitiationParams): Pr
       return new NextResponse(html, {
         headers: { "Content-Type": "text/html" },
       });
-    } else {
-      console.log("could not create response, redirect user to choose other account");
-      return gotoAccounts({
-        request,
-        requestId,
-      });
     }
   } catch (error) {
-    console.error(error);
-    return gotoAccounts({
-      request,
-      requestId,
-    });
+    console.error("SAML createResponse failed:", error);
   }
+
+  // Final fallback: SAML response creation failed - show account selection
+  return gotoAccounts({
+    request,
+    requestId,
+  });
 }
