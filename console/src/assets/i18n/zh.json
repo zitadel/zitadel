@@ -1965,6 +1965,7 @@
       "CREATE_DESC": "插入您的项目名称。",
       "ROLE": "角色",
       "NOITEMS": "没有项目",
+      "USERSELFACCOUNT": "使用您的个人账户作为项目所有者",
       "ZITADELPROJECT": "这属于 ZITADEL 项目。注意：如果您修改了设置，ZITADEL 可能无法正常运行。",
       "TYPE": {
         "OWNED": "拥有的项目",

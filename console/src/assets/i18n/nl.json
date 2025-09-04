@@ -1962,6 +1962,7 @@
       "CREATE_DESC": "Voer de naam van uw project in.",
       "ROLE": "Rol",
       "NOITEMS": "Geen projecten",
+      "USERSELFACCOUNT": "Gebruik uw persoonlijke account als projecteigenaar.",
       "ZITADELPROJECT": "Dit behoort tot het ZITADEL-project. Pas op: Als u wijzigingen aanbrengt, werkt ZITADEL mogelijk niet zoals bedoeld.",
       "TYPE": {
         "OWNED": "Eigen Projecten",
