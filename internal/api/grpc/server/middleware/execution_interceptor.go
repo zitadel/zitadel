@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"slices"
-	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -13,20 +11,12 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/grpc/server/connect_middleware"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/execution"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
-
-var headersToForward = []string{
-	http_utils.ContentType,
-	http_utils.ForwardedFor,
-	http_utils.ForwardedHost,
-	http_utils.Host,
-	http_utils.Origin,
-}
 
 func ExecutionHandler(alg crypto.EncryptionAlgorithm) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -65,7 +55,7 @@ func executeTargetsForRequest(ctx context.Context, targets []target_domain.Targe
 		OrgID:      ctxData.OrgID,
 		UserID:     ctxData.UserID,
 		Request:    Message{req.(proto.Message)},
-		Headers:    setRequestHeaders(md),
+		Headers:    connect_middleware.SetRequestHeaders(md),
 	}
 
 	return execution.CallTargets(ctx, targets, info, alg)
@@ -90,7 +80,7 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 		UserID:     ctxData.UserID,
 		Request:    Message{req.(proto.Message)},
 		Response:   Message{resp.(proto.Message)},
-		Headers:    setRequestHeaders(md),
+		Headers:    connect_middleware.SetRequestHeaders(md),
 	}
 
 	return execution.CallTargets(ctx, targets, info, alg)
@@ -167,14 +157,4 @@ func (c *ContextInfoResponse) SetHTTPResponseBody(resp []byte) error {
 
 func (c *ContextInfoResponse) GetContent() interface{} {
 	return c.Response.Message
-}
-
-func setRequestHeaders(reqHeaders map[string][]string) map[string][]string {
-	headers := make(map[string][]string)
-	for k, v := range reqHeaders {
-		if slices.Contains(headersToForward, strings.ToLower(k)) {
-			headers[k] = v
-		}
-	}
-	return headers
 }

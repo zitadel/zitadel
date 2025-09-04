@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"slices"
 	"strings"
 
 	"connectrpc.com/connect"
@@ -19,12 +18,12 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-var headersToForward = []string{
-	http_utils.ContentType,
-	http_utils.ForwardedFor,
-	http_utils.ForwardedHost,
-	http_utils.Host,
-	http_utils.Origin,
+var headersToForward = map[string]bool{
+	http_utils.ContentType:   true,
+	http_utils.ForwardedFor:  true,
+	http_utils.ForwardedHost: true,
+	http_utils.Host:          true,
+	http_utils.Origin:        true,
 }
 
 func ExecutionHandler(alg crypto.EncryptionAlgorithm) connect.UnaryInterceptorFunc {
@@ -65,7 +64,7 @@ func executeTargetsForRequest(ctx context.Context, targets []target_domain.Targe
 		OrgID:      ctxData.OrgID,
 		UserID:     ctxData.UserID,
 		Request:    Message{req.Any().(proto.Message)},
-		Headers:    setRequestHeaders(req.Header()),
+		Headers:    SetRequestHeaders(req.Header()),
 	}
 
 	_, err = execution.CallTargets(ctx, targets, info, alg)
@@ -93,7 +92,7 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 		UserID:     ctxData.UserID,
 		Request:    Message{req.Any().(proto.Message)},
 		Response:   Message{resp.Any().(proto.Message)},
-		Headers:    setRequestHeaders(req.Header()),
+		Headers:    SetRequestHeaders(req.Header()),
 	}
 
 	_, err = execution.CallTargets(ctx, targets, info, alg)
@@ -176,10 +175,13 @@ func (c *ContextInfoResponse) GetContent() interface{} {
 	return c.Response.Message
 }
 
-func setRequestHeaders(reqHeaders map[string][]string) map[string][]string {
+func SetRequestHeaders(reqHeaders map[string][]string) map[string][]string {
+	if len(reqHeaders) == 0 {
+		return nil
+	}
 	headers := make(map[string][]string)
 	for k, v := range reqHeaders {
-		if slices.Contains(headersToForward, strings.ToLower(k)) {
+		if headersToForward[strings.ToLower(k)] {
 			headers[k] = v
 		}
 	}

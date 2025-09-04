@@ -77,7 +77,15 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, target_domain.TargetTypeCall, false)
 
 				// request received by target
-				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: middleware.Message{Message: request}, Headers: map[string][]string{"Content-Type": {"application/grpc"}, "Host": {instance.Host()}}}
+				wantRequest := &middleware.ContextInfoRequest{
+					FullMethod: fullMethod,
+					InstanceID: instance.ID(),
+					OrgID:      orgID,
+					ProjectID:  projectID,
+					UserID:     userID,
+					Request:    middleware.Message{Message: request},
+					Headers:    map[string][]string{"Content-Type": {"application/grpc"}, "Host": {instance.Host()}},
+				}
 				changedRequest := &action.GetTargetRequest{Id: targetCreated.GetId()}
 				// replace original request with different targetID
 				urlRequest, closeRequest, calledRequest, _ := integration.TestServerCallProto(wantRequest, 0, http.StatusOK, changedRequest)

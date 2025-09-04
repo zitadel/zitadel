@@ -740,6 +740,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 }
 
 func Test_setRequestHeaders(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		reqHeaders map[string][]string
@@ -748,7 +749,7 @@ func Test_setRequestHeaders(t *testing.T) {
 		{
 			name:       "no headers",
 			reqHeaders: nil,
-			want:       map[string][]string{},
+			want:       nil,
 		},
 		{
 			name:       "with headers",
@@ -758,7 +759,8 @@ func Test_setRequestHeaders(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := setRequestHeaders(tt.reqHeaders)
+			t.Parallel()
+			got := SetRequestHeaders(tt.reqHeaders)
 			assert.Equal(t, tt.want, got)
 		})
 	}
