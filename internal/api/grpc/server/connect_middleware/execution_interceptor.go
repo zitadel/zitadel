@@ -166,9 +166,9 @@ func (c *ContextInfoResponse) GetContent() interface{} {
 	return c.Response.Message
 }
 
-func setRequestHeaders(inHeaders http.Header) http.Header {
+func setRequestHeaders(reqHeaders http.Header) http.Header {
 	headers := make(map[string][]string)
-	for k, v := range inHeaders {
+	for k, v := range reqHeaders {
 		if strings.ToLower(k) == "authorization" || strings.ToLower(k) == "grpcgateway-authorization" {
 			continue
 		}
