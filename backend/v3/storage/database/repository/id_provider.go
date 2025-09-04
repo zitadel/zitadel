@@ -123,7 +123,7 @@ func (i *idProvider) GetOIDC(ctx context.Context, id domain.IDPIdentifierConditi
 		return nil, err
 	}
 
-	if idpOIDC.Type != domain.IDPTypeOIDC {
+	if *idpOIDC.Type != domain.IDPTypeOIDC {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeOIDC, idpOIDC.Type)
 	}
 
@@ -144,7 +144,7 @@ func (i *idProvider) GetJWT(ctx context.Context, id domain.IDPIdentifierConditio
 		return nil, err
 	}
 
-	if idpJWT.Type != domain.IDPTypeJWT {
+	if *idpJWT.Type != domain.IDPTypeJWT {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeJWT, idpJWT.Type)
 	}
 
@@ -165,7 +165,7 @@ func (i *idProvider) GetOAuth(ctx context.Context, id domain.IDPIdentifierCondit
 		return nil, err
 	}
 
-	if idpOAuth.Type != domain.IDPTypeOAuth {
+	if *idpOAuth.Type != domain.IDPTypeOAuth {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeOAuth, idpOAuth.Type)
 	}
 
@@ -186,7 +186,7 @@ func (i *idProvider) GetOAzureAD(ctx context.Context, id domain.IDPIdentifierCon
 		return nil, err
 	}
 
-	if idpAzure.Type != domain.IDPTypeAzure {
+	if *idpAzure.Type != domain.IDPTypeAzure {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeAzure, idpAzure.Type)
 	}
 
@@ -207,7 +207,7 @@ func (i *idProvider) GetGoogle(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	if idpGoogle.Type != domain.IDPTypeGoogle {
+	if *idpGoogle.Type != domain.IDPTypeGoogle {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeGoogle, idpGoogle.Type)
 	}
 
@@ -228,7 +228,7 @@ func (i *idProvider) GetGithub(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	if idpGithub.Type != domain.IDPTypeGitHub {
+	if *idpGithub.Type != domain.IDPTypeGitHub {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeGitHub, idpGithub.Type)
 	}
 
@@ -249,7 +249,7 @@ func (i *idProvider) GetGithubEnterprise(ctx context.Context, id domain.IDPIdent
 		return nil, err
 	}
 
-	if idpGithubEnterprise.Type != domain.IDPTypeGitHubEnterprise {
+	if *idpGithubEnterprise.Type != domain.IDPTypeGitHubEnterprise {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeGitHubEnterprise, idpGithubEnterprise.Type)
 	}
 
@@ -270,7 +270,7 @@ func (i *idProvider) GetGitlab(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	if idpGitlab.Type != domain.IDPTypeGitLab {
+	if *idpGitlab.Type != domain.IDPTypeGitLab {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeGitLab, idpGitlab.Type)
 	}
 
@@ -291,7 +291,7 @@ func (i *idProvider) GetGitlabSelfHosting(ctx context.Context, id domain.IDPIden
 		return nil, err
 	}
 
-	if idpGitlabSelfHosting.Type != domain.IDPTypeGitLabSelfHosted {
+	if *idpGitlabSelfHosting.Type != domain.IDPTypeGitLabSelfHosted {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeGitLabSelfHosted, idpGitlabSelfHosting.Type)
 	}
 
@@ -312,7 +312,7 @@ func (i *idProvider) GetLDAP(ctx context.Context, id domain.IDPIdentifierConditi
 		return nil, err
 	}
 
-	if ldap.Type != domain.IDPTypeLDAP {
+	if *ldap.Type != domain.IDPTypeLDAP {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeLDAP, ldap.Type)
 	}
 
@@ -333,7 +333,7 @@ func (i *idProvider) GetApple(ctx context.Context, id domain.IDPIdentifierCondit
 		return nil, err
 	}
 
-	if apple.Type != domain.IDPTypeApple {
+	if *apple.Type != domain.IDPTypeApple {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeApple, apple.Type)
 	}
 
@@ -354,7 +354,7 @@ func (i *idProvider) GetSAML(ctx context.Context, id domain.IDPIdentifierConditi
 		return nil, err
 	}
 
-	if saml.Type != domain.IDPTypeSAML {
+	if *saml.Type != domain.IDPTypeSAML {
 		return nil, domain.NewWrongTypeError(domain.IDPTypeSAML, saml.Type)
 	}
 
@@ -462,7 +462,7 @@ func (i idProvider) NameCondition(name string) domain.IDPIdentifierCondition {
 }
 
 func (i idProvider) TypeCondition(typ domain.IDPType) database.Condition {
-	return database.NewTextCondition(i.TypeColumn(), database.TextOperationEqual, typ.String())
+	return database.NewNumberCondition(i.TypeColumn(), database.NumberOperationEqual, typ)
 }
 
 func (i idProvider) AutoRegisterCondition(allow bool) database.Condition {

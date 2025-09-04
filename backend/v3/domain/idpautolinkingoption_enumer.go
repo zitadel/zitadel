@@ -8,15 +8,16 @@ import (
 	"strings"
 )
 
-const _IDPAutoLinkingOptionName = "unspecifiedusernameemail"
+const _IDPAutoLinkingOptionName = "usernameemail"
 
-var _IDPAutoLinkingOptionIndex = [...]uint8{0, 11, 19, 24}
+var _IDPAutoLinkingOptionIndex = [...]uint8{0, 8, 13}
 
-const _IDPAutoLinkingOptionLowerName = "unspecifiedusernameemail"
+const _IDPAutoLinkingOptionLowerName = "usernameemail"
 
 func (i IDPAutoLinkingOption) String() string {
+	i -= 1
 	if i >= IDPAutoLinkingOption(len(_IDPAutoLinkingOptionIndex)-1) {
-		return fmt.Sprintf("IDPAutoLinkingOption(%d)", i)
+		return fmt.Sprintf("IDPAutoLinkingOption(%d)", i+1)
 	}
 	return _IDPAutoLinkingOptionName[_IDPAutoLinkingOptionIndex[i]:_IDPAutoLinkingOptionIndex[i+1]]
 }
@@ -25,26 +26,22 @@ func (i IDPAutoLinkingOption) String() string {
 // Re-run the stringer command to generate them again.
 func _IDPAutoLinkingOptionNoOp() {
 	var x [1]struct{}
-	_ = x[IDPAutoLinkingOptionUnspecified-(0)]
 	_ = x[IDPAutoLinkingOptionUserName-(1)]
 	_ = x[IDPAutoLinkingOptionEmail-(2)]
 }
 
-var _IDPAutoLinkingOptionValues = []IDPAutoLinkingOption{IDPAutoLinkingOptionUnspecified, IDPAutoLinkingOptionUserName, IDPAutoLinkingOptionEmail}
+var _IDPAutoLinkingOptionValues = []IDPAutoLinkingOption{IDPAutoLinkingOptionUserName, IDPAutoLinkingOptionEmail}
 
 var _IDPAutoLinkingOptionNameToValueMap = map[string]IDPAutoLinkingOption{
-	_IDPAutoLinkingOptionName[0:11]:       IDPAutoLinkingOptionUnspecified,
-	_IDPAutoLinkingOptionLowerName[0:11]:  IDPAutoLinkingOptionUnspecified,
-	_IDPAutoLinkingOptionName[11:19]:      IDPAutoLinkingOptionUserName,
-	_IDPAutoLinkingOptionLowerName[11:19]: IDPAutoLinkingOptionUserName,
-	_IDPAutoLinkingOptionName[19:24]:      IDPAutoLinkingOptionEmail,
-	_IDPAutoLinkingOptionLowerName[19:24]: IDPAutoLinkingOptionEmail,
+	_IDPAutoLinkingOptionName[0:8]:       IDPAutoLinkingOptionUserName,
+	_IDPAutoLinkingOptionLowerName[0:8]:  IDPAutoLinkingOptionUserName,
+	_IDPAutoLinkingOptionName[8:13]:      IDPAutoLinkingOptionEmail,
+	_IDPAutoLinkingOptionLowerName[8:13]: IDPAutoLinkingOptionEmail,
 }
 
 var _IDPAutoLinkingOptionNames = []string{
-	_IDPAutoLinkingOptionName[0:11],
-	_IDPAutoLinkingOptionName[11:19],
-	_IDPAutoLinkingOptionName[19:24],
+	_IDPAutoLinkingOptionName[0:8],
+	_IDPAutoLinkingOptionName[8:13],
 }
 
 // IDPAutoLinkingOptionString retrieves an enum value from the enum constants string name.

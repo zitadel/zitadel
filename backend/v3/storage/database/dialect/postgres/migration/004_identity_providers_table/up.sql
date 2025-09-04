@@ -3,24 +3,26 @@ CREATE TYPE zitadel.idp_state AS ENUM (
     'inactive'
 );
 
-CREATE TYPE zitadel.idp_type AS ENUM (
-    'unspecified',
-    'oidc',
-    'jwt',
-    'oauth',
-    'saml',
-    'ldap',
-    'github',
-    'githubenterprise',
-    'gitlab',
-    'gitlabselfhosted',
-    'azure',
-    'google',
-    'apple'
+CREATE TABLE zitadel.idp_type (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL CHECK (name <> '')
 );
 
+INSERT INTO zitadel.idp_type(name) VALUES
+  ('oidc'),
+  ('jwt'),
+  ('oauth'),
+  ('saml'),
+  ('ldap'),
+  ('github'),
+  ('github_enterprise'),
+  ('gitlab'),
+  ('gitlab_selfhosted'),
+  ('azure'),
+  ('google'),
+  ('apple');
+
 CREATE TYPE zitadel.idp_auto_linking_option AS ENUM (
-    'unspecified',
     'username',
     'email'
 );
@@ -31,13 +33,13 @@ CREATE TABLE zitadel.identity_providers (
     , id TEXT NOT NULL CHECK (id <> '')
     , state zitadel.idp_state NOT NULL DEFAULT 'active'
     , name TEXT NOT NULL CHECK (name <> '')
-    , type zitadel.idp_type -- NOT NULL
+    , type INTEGER REFERENCES zitadel.idp_type(id)
     , auto_register BOOLEAN NOT NULL DEFAULT TRUE
     , allow_creation BOOLEAN NOT NULL DEFAULT TRUE
     , allow_auto_creation BOOLEAN NOT NULL DEFAULT TRUE
     , allow_auto_update BOOLEAN NOT NULL DEFAULT TRUE
     , allow_linking BOOLEAN NOT NULL DEFAULT TRUE
-    , allow_auto_linking zitadel.idp_auto_linking_option NOT NULL DEFAULT 'unspecified'
+    , allow_auto_linking zitadel.idp_auto_linking_option DEFAULT NULL
     , styling_type SMALLINT
     , payload JSONB
     
