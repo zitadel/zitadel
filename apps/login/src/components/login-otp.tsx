@@ -1,7 +1,6 @@
 "use client";
 
 import { completeFlowOrGetUrl } from "@/lib/client";
-import { completeAuthFlowAction } from "@/lib/server/auth-flow";
 import { updateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
@@ -191,30 +190,30 @@ export function LoginOTP({
         // Wait for 2 seconds to avoid eventual consistency issues with an OTP code being verified in the /login endpoint
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
-        // If we have both sessionId and requestId, use the new server action for direct completion
-        if (requestId && response.sessionId) {
-          await completeAuthFlowAction({
-            sessionId: response.sessionId,
-            requestId: requestId,
-          });
-        } else {
-          // Fallback to the unified navigation approach
-          if (response.factors?.user) {
-            const url = await completeFlowOrGetUrl(
-              {
-                loginName: response.factors.user.loginName,
-                organization: response.factors?.user?.organizationId,
-              },
-              loginSettings?.defaultRedirectUri,
-            );
+        // Use unified approach that handles both OIDC/SAML and regular flows
+        if (response.factors?.user) {
+          const url = await completeFlowOrGetUrl(
+            requestId && response.sessionId
+              ? {
+                  sessionId: response.sessionId,
+                  requestId: requestId,
+                  organization: response.factors?.user?.organizationId,
+                }
+              : {
+                  loginName: response.factors.user.loginName,
+                  organization: response.factors?.user?.organizationId,
+                },
+            loginSettings?.defaultRedirectUri,
+          );
 
-            setLoading(false);
-            if (url) {
-              router.push(url);
-            }
-          } else {
-            setLoading(false);
+          setLoading(false);
+          // If url is returned, navigate client-side
+          // If no url (void), the server action handled the redirect
+          if (url) {
+            router.push(url);
           }
+        } else {
+          setLoading(false);
         }
       }
     });
