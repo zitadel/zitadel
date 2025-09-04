@@ -11,7 +11,10 @@
 		4200,
 		8080
 	],
-	"updateContentCommand": "pnpm install && pnpm add -g nx && go mod download",
+	"updateContentCommand": {
+		"goModules": "go mod download",
+		"nodeModules": "pnpm install && pnpm add -g nx"
+	},
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {
 			"version": "1.24"
