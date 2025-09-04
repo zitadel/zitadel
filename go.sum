@@ -833,6 +833,16 @@ github.com/zitadel/passwap v0.9.0 h1:QvDK8OHKdb73C0m+mwXvu87UJSBqix3oFwTVENHdv80
 github.com/zitadel/passwap v0.9.0/go.mod h1:6QzwFjDkIr3FfudzSogTOx5Ydhq4046dRJtDM/kX+G8=
 github.com/zitadel/saml v0.3.5 h1:L1RKWS5y66cGepVxUGjx/WSBOtrtSpRA/J3nn5BJLOY=
 github.com/zitadel/saml v0.3.5/go.mod h1:ybs3e4tIWdYgSYBpuCsvf3T4FNDfbXYM+GPv5vIpHYk=
+github.com/zitadel/saml v0.3.6-0.20250903141027-846d7c39179d h1:mLO1HANojQMilkwVsC0zb5mnLo1gkVCIwnrHZyztuvs=
+github.com/zitadel/saml v0.3.6-0.20250903141027-846d7c39179d/go.mod h1:ybs3e4tIWdYgSYBpuCsvf3T4FNDfbXYM+GPv5vIpHYk=
+github.com/zitadel/saml v0.3.6-0.20250903141606-fdcc5c62b03f h1:YmLveq5MtqTG4SmYU9xmad05LVOCsJS8ui+c30WL3kE=
+github.com/zitadel/saml v0.3.6-0.20250903141606-fdcc5c62b03f/go.mod h1:ybs3e4tIWdYgSYBpuCsvf3T4FNDfbXYM+GPv5vIpHYk=
+github.com/zitadel/saml v0.3.6-0.20250903150413-391435851c27 h1:T3ol98VimqyMXKZH8tv1z9vg0WJ/BIg+WqOWc0RHkQc=
+github.com/zitadel/saml v0.3.6-0.20250903150413-391435851c27/go.mod h1:ybs3e4tIWdYgSYBpuCsvf3T4FNDfbXYM+GPv5vIpHYk=
+github.com/zitadel/saml v0.3.6-0.20250903152127-12896ef44bd4 h1:x43u3rDE6OQTXn3WwD3cVs1fItCVZ2JY3xjSYXs1q/M=
+github.com/zitadel/saml v0.3.6-0.20250903152127-12896ef44bd4/go.mod h1:ybs3e4tIWdYgSYBpuCsvf3T4FNDfbXYM+GPv5vIpHYk=
+github.com/zitadel/saml v0.3.6 h1:wH82hHe7PW/43+kMFS2wYKdUXCiJovO8Rfx1MbD6MdE=
+github.com/zitadel/saml v0.3.6/go.mod h1:ybs3e4tIWdYgSYBpuCsvf3T4FNDfbXYM+GPv5vIpHYk=
 github.com/zitadel/schema v1.3.1 h1:QT3kwiRIRXXLVAs6gCK/u044WmUVh6IlbLXUsn6yRQU=
 github.com/zitadel/schema v1.3.1/go.mod h1:071u7D2LQacy1HAN+YnMd/mx1qVE2isb0Mjeqg46xnU=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
