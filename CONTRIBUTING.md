@@ -1,6 +1,6 @@
 # Contributing to Zitadel
 
-Zitadel is an open-source identity and access management platform built with a modern tech stack including Go (backend), Next.js/React (login), Angular (console), and Docusaurus (docs) - all orchestrated through an Nx monorepo with pnpm for efficient development workflows.
+Zitadel is an open-source identity and access management platform built with a modern tech stack including Go (backend), Next.js/React (login), Angular (Console), and Docusaurus (docs) - all orchestrated through an Nx monorepo with pnpm for efficient development workflows.
 
 ## Quick Start
 
@@ -74,7 +74,7 @@ The code consists of the following parts:
 | --------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
 | backend         | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to Backend](#backend)                   |
 | API definitions | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to Backend](#backend)                   |
-| console         | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#frontend) |
+| Console         | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#frontend) |
 | login           | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#frontend) |
 | docs            | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#frontend) |
 | translations    | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#translations) |
@@ -272,7 +272,7 @@ The test binary has the race detector enabled. `core_core_integration_server_sto
 
 ### Run Local End-to-End Tests
 
-To test the whole system, including the console UI and the login UI, run the E2E tests.
+To test the whole system, including the Console UI and the login UI, run the E2E tests.
 
 ```bash
 # Build the production docker image
@@ -295,7 +295,7 @@ docker compose --file ./e2e/docker-compose.yaml down
 
 ### Run Local End-to-End Tests Against Your Dev Server Console
 
-If you also make [changes to the console](#console), you can run the test suite against your locally built backend code and frontend server.
+If you also make [changes to the Console](#console), you can run the test suite against your locally built backend code and frontend server.
 
 ```bash
 # Install dependencies (from repository root)
@@ -409,18 +409,19 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 
 ### <a name="console"></a>Contribute to Console
 
-To start developing the console, make sure your system has the [required system dependencies](#dev-requirements) installed.
+To start developing the Console, make sure your system has the [required system dependencies](#dev-requirements) installed.
+To learn more about the Console, go to the Consoles [README.md](./console).
 
 #### Quick Start
 
-Run the local console development server.
+Run the local Console development server.
 
 ```bash
 # Start development server
 nx run @zitadel/console:dev
 ```
 
-To allow console access via http://localhost:4200, you have to configure the Zitadel backend.
+To allow Console access via http://localhost:4200, you have to configure the Zitadel backend.
 
 1. Navigate to /ui/console/projects in your target Zitadel instance.
 3. Select the _ZITADEL_ project.
@@ -546,7 +547,7 @@ nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui
 
 **Recommended VS Code extensions:**
 - [Go](https://marketplace.visualstudio.com/items?itemName=golang.Go) - For core development. Use golangci-lint v2 as linter.
-- [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For console development
+- [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For Console development
 - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Code linting
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
 - [Nx Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) - Nx task runner UI
@@ -639,7 +640,7 @@ The category shows which part of Zitadel is affected.
 - **category: ci**: ci is all about continues integration and pipelines.
 - **category: design**: All about the ux/ui of Zitadel
 - **category: docs**: Adjustments or new documentations, this can be found in the docs folder.
-- **category: frontend**: The frontend concerns on the one hand the Zitadel management console (Angular) and on the other hand the login (gohtml)
+- **category: frontend**: The frontend concerns on the one hand the Zitadel management Console (Angular) and on the other hand the login (gohtml)
 - **category: infra**: Infrastructure does include many different parts. E.g Terraform-provider, docker, metrics, etc.
 - **category: translation**: Everything concerning translations or new languages
 

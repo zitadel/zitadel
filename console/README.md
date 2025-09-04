@@ -1,6 +1,6 @@
 # Console Angular App
 
-This is the ZITADEL Console Angular application.
+This is the Zitadel Console Angular application.
 
 ## Development
 
@@ -16,47 +16,32 @@ pnpm install
 pnpm add -g nx
 ```
 
-### Proto Generation
-
-The Console app uses **dual proto generation** with Nx build orchestration:
-
-1. **`@zitadel/proto` generation**: Modern ES modules with `@bufbuild/protobuf` for v2 APIs
-2. **Local `buf.gen.yaml` generation**: Traditional protobuf JavaScript classes for v1 APIs
-
-The Console app's `project.json` ensures that `@zitadel/proto:generate` runs before the Console's own generation, providing both:
-
-- Modern schemas from `@zitadel/proto` (e.g., `UserSchema`, `DetailsSchema`)
-- Legacy classes from `src/app/proto/generated` (e.g., `User`, `Project`)
-
-Generated files:
-
-- **`@zitadel/proto`**: Modern ES modules in `login/packages/zitadel-proto/`
-- **Local generation**: Traditional protobuf files in `src/app/proto/generated/`
-  - TypeScript definition files (`.d.ts`)
-  - JavaScript files (`.js`)
-  - gRPC client files (`*ServiceClientPb.ts`)
-  - OpenAPI/Swagger JSON files (`.swagger.json`)
-
-To generate proto files:
-
-```bash
-nx run @zitadel/console:generate
-```
-
-This automatically runs both generations in the correct order via Nx build orchestration.
-
 ### Development Server
 
 To start the development server:
 
 ```bash
-nx run @zitadel/console:start
+nx run @zitadel/console:dev
 ```
 
 This will:
 
 1. Fetch the environment configuration from the server
 2. Serve the app on the default port
+
+To allow Console access via http://localhost:4200, you have to configure the Zitadel backend.
+
+1. Navigate to /ui/console/projects in your target Zitadel instance.
+3. Select the _ZITADEL_ project.
+4. Select the _Console_ application.
+5. Select _Redirect Settings_
+6. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
+7. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
+8. Select the _Save_ button
+
+Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+
+Make some changes to the source code and see how the browser is automatically updated.
 
 ### Building
 
@@ -92,10 +77,6 @@ nx @zitadel/console:lint-fix
 - `project.json` - Nx build orchestration configuration for proto generation
 - `prebuild.development.js` - Development environment configuration script
 
-## Proto Generation Details
-
-The Console app uses **dual proto generation** managed by Nx build orchestration:
-
 ### Dependency Chain
 
 The Console app has the following build dependencies managed by Nx:
@@ -107,7 +88,18 @@ The Console app has the following build dependencies managed by Nx:
 
 This ensures that the Console always has access to the latest client library and protobuf definitions.
 
-### Legacy v1 API (Traditional Protobuf)
+
+### Proto Generation Details
+
+1. **`@zitadel/proto` generation**: Modern ES modules with `@bufbuild/protobuf` for v2 APIs
+2. **Local `buf.gen.yaml` generation**: Traditional protobuf JavaScript classes for v1 APIs
+
+The Console app calls Zitadel v1 and v2 APIs.
+As long as the Console still calls v1 APIs, it needs to import client stubs from separate sources:
+- [Source outputs from direct buf generation for v1 APIs](#v1-stubs)
+- [@zitadel/client for v2 APIs](#v2-stubs)
+
+### <a name="v1-stubs"></a>Legacy v1 API (Traditional Protobuf)
 
 - Uses local `buf.gen.yaml` configuration
 - Generates traditional Google protobuf JavaScript classes extending `jspb.Message`
@@ -115,7 +107,7 @@ This ensures that the Console always has access to the latest client library and
 - Output: `src/app/proto/generated/`
 - Used for: Most existing Console functionality
 
-### Modern v2 API (ES Modules)
+### <a name="v2-stubs"></a>Modern v2 API (ES Modules)
 
 - Uses `@zitadel/proto` package generation
 - Generates modern ES modules with `@bufbuild/protobuf`
