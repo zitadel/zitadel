@@ -119,8 +119,15 @@
       "continuous": true,
       "cache": false,
       "dependsOn": [
-        "build"
-      ]
+        "start"
+      ],
+      "defaultConfiguration": "local",
+      "configurations": {
+        "local": {},
+        "devcontainer": {
+          
+        }
+      }
     },
     "start-login-only": {
       "description": "Start the standalone production build without starting the core service",

@@ -1,0 +1,44 @@
+services:
+
+  devcontainer:
+    container_name: devcontainer
+    build:
+      context: .
+    volumes:
+      - ../../:/workspaces:cached
+    command: sleep infinity
+    working_dir: /workspaces/zitadel
+    environment:
+      ZITADEL_DATABASE_POSTGRES_HOST: db
+
+  db:
+    container_name: zitadel-db
+    image: postgres:17.0-alpine3.19
+    restart: unless-stopped
+    env_file:
+      - ./postgres.env
+    volumes:
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf
+      - db-data:/var/lib/postgresql/data
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-U", "postgres" ]
+      interval: "10s"
+      timeout: "30s"
+      retries: 5
+      start_period: "20s"
+    ports:
+      - "5432:5432"
+
+  login-mock-zitadel:
+    container_name: login-mock-zitadel
+    build:
+      context: ../apps/login/integration/core-mock
+      additional_contexts:
+        - zitadel-protos=../proto
+    ports:
+      - 22220:22220
+      - 22222:22222
+
+volumes:
+  db-data:

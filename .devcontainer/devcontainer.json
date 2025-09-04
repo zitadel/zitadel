@@ -1,9 +1,12 @@
 {
 	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
 	"name": "Zitadel Devcontainer",
-	"build": {
-		"dockerfile": "Dockerfile"
-	},
+	"dockerComposeFile": "docker-compose.yaml",
+	"service": "devcontainer",
+	"runServices": [
+		"devcontainer"
+	],
+	"shutdownAction": "none",
 	"workspaceFolder": "/workspaces/zitadel",
 	"forwardPorts": [
 		5432,
