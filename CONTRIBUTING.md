@@ -1,5 +1,25 @@
 # Contributing to Zitadel
 
+Zitadel is an open-source identity and access management platform built with a modern tech stack including Go (backend), Next.js/React (login UI), Angular (console), and Docusaurus (docs) - all orchestrated through an Nx monorepo with pnpm for efficient development workflows.
+
+## Quick Start
+
+This workspace contains multiple interconnected projects. Use these commands to get started with any project.
+
+| Task | Command | Notes |
+|------|---------|--------|
+| **Run** | `nx run PROJECT:start` | Production server |
+| **Develop** | `nx run PROJECT:dev` | Hot reload development server |
+| **Test** | `nx run PROJECT:test` | Run tests |
+| **Lint** | `nx run PROJECT:lint` | Check code style |
+| **Lint Fix** | `nx run PROJECT:lint-fix` | Auto-fix style issues |
+
+Replace `PROJECT` with: `@zitadel/zitadel`, `@zitadel/core`, `@zitadel/login`, `@zitadel/console`, `@zitadel/docs`, `@zitadel/client` or `@zitadel/proto`
+Instead of the project names, you can also use their directory names for `PROJECT`, like `nx run login:start`.
+Alternatively, you can use the infix-notation, like `nx start @zitadel/login` or `nx start login`.
+s
+For more details about their meaning and usage, read on.
+
 ## Introduction
 
 Thank you for your interest about how to contribute! As you might know there is more than code to contribute. You can find all information needed to start contributing here.
@@ -299,7 +319,7 @@ docker compose --file ./e2e/docker-compose.yaml down
 
 This repository uses **pnpm** as package manager and **Nx** for build orchestration.
 
-### Quick Start (Recommended)
+### Quick Start
 
 **Use Dev Container** (everything pre-configured):
 
@@ -325,20 +345,6 @@ Choose your contribution area:
 - **[Console](#console)** (Angular) - Admin dashboard and user management  
 - **[Docs](#docs)** (Docusaurus) - Project documentation
 - **[Client Packages](#client-packages)** - Shared libraries for API communication
-
-### Essential Nx Commands
-
-| Task | Command | Notes |
-|------|---------|--------|
-| **Run** | `nx run PROJECT:start` | Production server |
-| **Develop** | `nx run PROJECT:dev` | Hot reload development server |
-| **Test** | `nx run PROJECT:test` | Run all tests |
-| **Lint** | `nx run PROJECT:lint` | Check code style |
-| **Lint Fix** | `nx run PROJECT:lint-fix` | Auto-fix style issues |
-
-Replace `PROJECT` with: `@zitadel/zitadel`, `@zitadel/core`, `@zitadel/login`, `@zitadel/console`, `@zitadel/docs`, `@zitadel/client` or `@zitadel/proto`
-Instead of the project names, you can also use their directory names for `PROJECT`, like `nx run login:start`.
-Alternatively, you can use the infix-notation, like `nx start @zitadel/login` or `nx start login`.
 
 ### Project Dependencies
 
