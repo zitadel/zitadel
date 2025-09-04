@@ -1,6 +1,6 @@
 "use client";
 
-import { getNextUrl } from "@/lib/client";
+import { completeFlowOrGetUrl } from "@/lib/client";
 import { verifyTOTP } from "@/lib/server/verify";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import Link from "next/link";
@@ -72,28 +72,29 @@ export function TotpRegister({
 
           return router.push(`/otp/time-based?` + params);
         } else {
-          const url =
-            requestId && sessionId
-              ? await getNextUrl(
-                  {
-                    sessionId: sessionId,
-                    requestId: requestId,
-                    organization: organization,
-                  },
-                  loginSettings?.defaultRedirectUri,
-                )
-              : loginName
-                ? await getNextUrl(
-                    {
-                      loginName: loginName,
-                      organization: organization,
-                    },
-                    loginSettings?.defaultRedirectUri,
-                  )
-                : null;
-
-          if (url) {
-            return router.push(url);
+          if (requestId && sessionId) {
+            const url = await completeFlowOrGetUrl(
+              {
+                sessionId: sessionId,
+                requestId: requestId,
+                organization: organization,
+              },
+              loginSettings?.defaultRedirectUri,
+            );
+            if (url) {
+              return router.push(url);
+            }
+          } else if (loginName) {
+            const url = await completeFlowOrGetUrl(
+              {
+                loginName: loginName,
+                organization: organization,
+              },
+              loginSettings?.defaultRedirectUri,
+            );
+            if (url) {
+              return router.push(url);
+            }
           }
         }
       })

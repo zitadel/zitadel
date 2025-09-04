@@ -29,7 +29,7 @@ import {
   SetPasswordRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
-import { getNextUrl } from "../client";
+import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
 import {
@@ -292,7 +292,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
   }
 
   if (command.requestId && session.id) {
-    const nextUrl = await getNextUrl(
+    const nextUrl = await completeFlowOrGetUrl(
       {
         sessionId: session.id,
         requestId: command.requestId,
@@ -302,18 +302,21 @@ export async function sendPassword(command: UpdateSessionCommand) {
       loginSettings?.defaultRedirectUri,
     );
 
-    return { redirect: nextUrl };
+    // If completeFlowOrGetUrl returns void, it means flow was completed via server action
+    if (nextUrl) {
+      return { redirect: nextUrl };
+    } else {
+      return { redirect: "/" }; // Fallback, though this shouldn't be reached
+    }
   }
 
-  const url = await getNextUrl(
+  await completeFlowOrGetUrl(
     {
       loginName: session.factors.user.loginName,
       organization: session.factors?.user?.organizationId,
     },
     loginSettings?.defaultRedirectUri,
   );
-
-  return { redirect: url };
 }
 
 // this function lets users with code set a password or users with valid User Verification Check

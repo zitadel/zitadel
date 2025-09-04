@@ -8,7 +8,7 @@ import {
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getNextUrl } from "../client";
+import { completeFlowOrGetUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
@@ -166,7 +166,7 @@ export async function createNewSessionFromIdpIntent(
   //   return mfaFactorCheck;
   // }
 
-  const url = await getNextUrl(
+  await completeFlowOrGetUrl(
     command.requestId && session.id
       ? {
           sessionId: session.id,
@@ -179,10 +179,6 @@ export async function createNewSessionFromIdpIntent(
         },
     loginSettings?.defaultRedirectUri,
   );
-
-  if (url) {
-    return { redirect: url };
-  }
 }
 
 type createNewSessionForLDAPCommand = {

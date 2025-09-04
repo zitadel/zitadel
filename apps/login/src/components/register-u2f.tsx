@@ -1,7 +1,7 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
-import { getNextUrl } from "@/lib/client";
+import { completeFlowOrGetUrl } from "@/lib/client";
 import { addU2F, verifyU2F } from "@/lib/server/u2f";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -170,27 +170,29 @@ export function RegisterU2f({
 
         return router.push(`/u2f?` + paramsToContinue);
       } else {
-        const url =
-          requestId && sessionId
-            ? await getNextUrl(
-                {
-                  sessionId: sessionId,
-                  requestId: requestId,
-                  organization: organization,
-                },
-                loginSettings?.defaultRedirectUri,
-              )
-            : loginName
-              ? await getNextUrl(
-                  {
-                    loginName: loginName,
-                    organization: organization,
-                  },
-                  loginSettings?.defaultRedirectUri,
-                )
-              : null;
-        if (url) {
-          return router.push(url);
+        if (requestId && sessionId) {
+          const url = await completeFlowOrGetUrl(
+            {
+              sessionId: sessionId,
+              requestId: requestId,
+              organization: organization,
+            },
+            loginSettings?.defaultRedirectUri,
+          );
+          if (url) {
+            return router.push(url);
+          }
+        } else if (loginName) {
+          const url = await completeFlowOrGetUrl(
+            {
+              loginName: loginName,
+              organization: organization,
+            },
+            loginSettings?.defaultRedirectUri,
+          );
+          if (url) {
+            return router.push(url);
+          }
         }
       }
     }

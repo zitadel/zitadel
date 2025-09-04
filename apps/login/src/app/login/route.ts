@@ -3,7 +3,7 @@ import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { 
   validateAuthRequest, 
   isRSCRequest
-} from "@/lib/server/auth-flow";
+} from "@/lib/auth-utils";
 import { 
   handleOIDCFlowInitiation, 
   handleSAMLFlowInitiation,

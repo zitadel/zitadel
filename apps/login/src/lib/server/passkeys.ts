@@ -18,7 +18,7 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
-import { getNextUrl } from "../client";
+import { completeFlowOrGetUrl } from "../client";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
@@ -262,25 +262,22 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     return emailVerificationCheck;
   }
 
-  const url =
-    requestId && session.id
-      ? await getNextUrl(
-          {
-            sessionId: session.id,
-            requestId: requestId,
-            organization: organization,
-          },
-          loginSettings?.defaultRedirectUri,
-        )
-      : session?.factors?.user?.loginName
-        ? await getNextUrl(
-            {
-              loginName: session.factors.user.loginName,
-              organization: organization,
-            },
-            loginSettings?.defaultRedirectUri,
-          )
-        : null;
-
-  return { redirect: url };
+  if (requestId && session.id) {
+    await completeFlowOrGetUrl(
+      {
+        sessionId: session.id,
+        requestId: requestId,
+        organization: organization,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
+  } else if (session?.factors?.user?.loginName) {
+    await completeFlowOrGetUrl(
+      {
+        loginName: session.factors.user.loginName,
+        organization: organization,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
+  }
 }

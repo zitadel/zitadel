@@ -88,11 +88,7 @@ export function RegisterFormIDPIncomplete({
       return;
     }
 
-    if (response && "redirect" in response && response.redirect) {
-      return router.push(response.redirect);
-    }
-
-    return response;
+    // If no error, the function has already handled the redirect
   }
 
   const { errors } = formState;

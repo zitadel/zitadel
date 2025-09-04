@@ -9,6 +9,7 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 import { redirect } from 'next/navigation';
+import { validateAuthRequest, isRSCRequest } from '../auth-utils';
 
 export interface AuthFlowParams {
   sessionId: string;
@@ -87,24 +88,4 @@ export async function completeAuthFlowAction(params: AuthFlowParams) {
   }
   
   throw new Error('Authentication flow completion failed');
-}
-
-/**
- * Validate authentication request parameters
- */
-export function validateAuthRequest(searchParams: URLSearchParams): string | null {
-  const oidcRequestId = searchParams.get("authRequest");
-  const samlRequestId = searchParams.get("samlRequest");
-  
-  const requestId = searchParams.get("requestId") ??
-    (oidcRequestId ? `oidc_${oidcRequestId}` : samlRequestId ? `saml_${samlRequestId}` : undefined);
-
-  return requestId || null;
-}
-
-/**
- * Check if request is an RSC request
- */
-export function isRSCRequest(searchParams: URLSearchParams): boolean {
-  return searchParams.has("_rsc");
 }
