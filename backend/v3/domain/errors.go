@@ -27,4 +27,3 @@ func (e *wrongIDPTypeError) Is(target error) bool {
 	_, ok := target.(*wrongIDPTypeError)
 	return ok
 }
-
