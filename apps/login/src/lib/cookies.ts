@@ -1,7 +1,7 @@
 "use server";
 
 import { timestampDate, timestampFromMs } from "@zitadel/client";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { LANGUAGE_COOKIE_NAME } from "./i18n";
 
 // TODO: improve this to handle overflow
