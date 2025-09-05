@@ -8,7 +8,7 @@
  * - MFA validation with configured authentication methods (TOTP, OTP Email/SMS, U2F)
  * - MFA validation with login settings (forceMfa, forceMfaLocalOnly)
  * - Email verification when EMAIL_VERIFICATION environment variable is enabled
- * - Edge cases like sessions without expiration dates and non-human users
+ * - Edge cases like sessions without expiration date
  */
 
 import { timestampDate } from "@zitadel/client";
@@ -33,7 +33,7 @@ vi.mock("./zitadel", () => ({
 const originalEnv = process.env;
 
 describe("isSessionValid", () => {
-  const mockServiceUrl = "https://api.zitadel.dev";
+  const mockServiceUrl = "https://zitadel-abc123.zitadel.cloud";
   const mockUserId = "test-user-id";
   const mockOrganizationId = "test-org-id";
 
