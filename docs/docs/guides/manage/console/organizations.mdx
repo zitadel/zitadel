@@ -58,7 +58,7 @@ Once you have successfully registered your organization, ZITADEL will automatica
 Users that you create within your organization will be suffixed with this domain name.
 
 You can improve the user experience, by suffixing users with a domain name that is in your control.
-If the "validate org domains" settings in the [Domain Settings](./default-settings#domain-settings) is set to true, you have to prove the ownership of your domain, by DNS or HTTP challenge.
+If the "validate organization domains" settings in the [Domain Settings](./default-settings#domain-settings) is set to true, you have to prove the ownership of your domain, by DNS or HTTP challenge.
 If the setting is set to false, the created domain will automatically be set to verifed.
 
 An organization can have multiple domain names, but only one domain can be primary.
@@ -75,7 +75,7 @@ You can also disable domain verification with DNS challenge in the [default sett
 :::
 
 1. Browse to your organization settings
-2. Select the menu entry **Verified domains**
+2. Select the menu entry **Organization domains**
 3. To start the domain verification click the domain name and a dialog will appear, where you can choose between DNS or HTTP challenge methods.
 
 <img
@@ -109,7 +109,7 @@ Those settings are the same as your default settings.
 - [**Identity Providers**](./default-settings#identity-providers): Define IDPs which are available for all organizations
 - [**Password Complexity**](./default-settings#password-complexity): Requirements for Passwords ex. Symbols, Numbers, min length and more.
 - [**Lockout**](./default-settings#lockout): Set the maximum attempts a user can try to enter the password or any (T)OTP method. When the number is exceeded, the user gets locked out and has to be unlocked.
-- [**Verified domains**](/docs/guides/manage/console/organizations#verify-your-domain-name): This is where you manage your organization specific domains which can be used to build usernames
+- [**Organization domains**](/docs/guides/manage/console/organizations#verify-your-domain-name): This is where you manage your organization specific domains which can be used to build usernames
 - [**Domain settings**](./default-settings#domain-settings): Whether users use their email or the generated username to login. Other Validation, SMTP settings
 - [**Branding**](./default-settings#branding): Appearance of the login interface.
 - [**Message Texts**](./default-settings#message-texts): Text and internationalization for emails
