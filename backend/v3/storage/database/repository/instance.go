@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"time"
 
@@ -238,7 +237,7 @@ func (instance) UpdatedAtColumn() database.Column {
 
 type rawInstance struct {
 	*domain.Instance
-	RawDomains *sql.RawBytes `json:"domains,omitzero" db:"domains"`
+	RawDomains *json.RawMessage `json:"domains,omitzero" db:"domains"`
 }
 
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
