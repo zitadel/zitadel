@@ -74,6 +74,8 @@ func TwilioConfigToPb(twilio *query.Twilio) *settings_pb.SMSProvider_Twilio {
 
 func smsStateToPb(state domain.SMSConfigState) settings_pb.SMSProviderConfigState {
 	switch state {
+	case domain.SMSConfigStateUnspecified, domain.SMSConfigStateRemoved:
+		return settings_pb.SMSProviderConfigState_SMS_PROVIDER_CONFIG_INACTIVE
 	case domain.SMSConfigStateInactive:
 		return settings_pb.SMSProviderConfigState_SMS_PROVIDER_CONFIG_INACTIVE
 	case domain.SMSConfigStateActive:
