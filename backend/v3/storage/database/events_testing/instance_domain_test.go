@@ -37,7 +37,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 		_, err := instanceRepo.Get(CTX,
-			database.WithCondition(instanceRepo.IDCondition(instance.Instance.Id)),
+			database.WithCondition(instanceRepo.IDCondition(instance.ID())),
 		)
 		assert.NoError(ttt, err)
 	}, retryDuration, tick)
