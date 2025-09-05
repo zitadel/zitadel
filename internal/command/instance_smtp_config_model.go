@@ -201,7 +201,12 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregat
 	return changeEvent, true, nil
 }
 
-func (wm *IAMSMTPConfigWriteModel) NewHTTPChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, description, endpoint string) (*instance.SMTPConfigHTTPChangedEvent, bool, error) {
+func (wm *IAMSMTPConfigWriteModel) NewHTTPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id, description, endpoint string,
+	signingKey *crypto.CryptoValue,
+) (*instance.SMTPConfigHTTPChangedEvent, bool, error) {
 	changes := make([]instance.SMTPConfigHTTPChanges, 0)
 	var err error
 	if wm.HTTPConfig == nil {
@@ -216,6 +221,10 @@ func (wm *IAMSMTPConfigWriteModel) NewHTTPChangedEvent(ctx context.Context, aggr
 	}
 	if wm.HTTPConfig.Endpoint != endpoint {
 		changes = append(changes, instance.ChangeSMTPConfigHTTPEndpoint(endpoint))
+	}
+	// if signingkey is set, update it as it is encrypted
+	if signingKey != nil {
+		changes = append(changes, instance.ChangeSMTPConfigHTTPSigningKey(signingKey))
 	}
 	if len(changes) == 0 {
 		return nil, false, nil
@@ -251,7 +260,8 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigAddedEvent(e *instance.SMTPCo
 func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigHTTPAddedEvent(e *instance.SMTPConfigHTTPAddedEvent) {
 	wm.Description = e.Description
 	wm.HTTPConfig = &HTTPConfig{
-		Endpoint: e.Endpoint,
+		Endpoint:   e.Endpoint,
+		SigningKey: e.SigningKey,
 	}
 	wm.State = domain.SMTPConfigStateInactive
 	// If ID has empty value we're dealing with the old and unique smtp settings
@@ -312,6 +322,9 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigHTTPChangedEvent(e *instance.
 	}
 	if e.Endpoint != nil {
 		wm.HTTPConfig.Endpoint = *e.Endpoint
+	}
+	if e.SigningKey != nil {
+		wm.HTTPConfig.SigningKey = e.SigningKey
 	}
 
 	// If ID has empty value we're dealing with the old and unique smtp settings

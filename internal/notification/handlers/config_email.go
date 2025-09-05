@@ -49,9 +49,10 @@ func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context) (*email.
 		return &email.Config{
 			ProviderConfig: provider,
 			WebhookConfig: &webhook.Config{
-				CallURL: config.HTTPConfig.Endpoint,
-				Method:  http.MethodPost,
-				Headers: nil,
+				CallURL:    config.HTTPConfig.Endpoint,
+				Method:     http.MethodPost,
+				Headers:    nil,
+				SigningKey: config.HTTPConfig.SigningKey,
 			},
 		}, nil
 	}

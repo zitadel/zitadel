@@ -225,7 +225,8 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"aggregate_id": "agg-id",
 						"id": "config-id",		
 						"description": "test",
-						"endpoint": "endpoint"
+						"endpoint": "endpoint",
+						"signingKey": { "cryptoType": 0, "algorithm": "RSA-265", "keyId": "key-id" }
 					}`,
 						),
 					), eventstore.GenericEventMapper[instance.SMTPConfigHTTPChangedEvent]),
@@ -247,9 +248,10 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.smtp_configs5_http SET endpoint = $1 WHERE (id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.smtp_configs5_http SET (endpoint, signing_key) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"endpoint",
+								anyArg{},
 								"config-id",
 								"instance-id",
 							},
@@ -331,6 +333,49 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 							expectedStmt: "UPDATE projections.smtp_configs5_http SET endpoint = $1 WHERE (id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"endpoint",
+								"config-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		}, {
+			name: "reduceSMTPConfigHTTPChanged, signing key",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.SMTPConfigHTTPChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+						"instance_id": "instance-id",	
+						"resource_owner": "ro-id",	
+						"aggregate_id": "agg-id",
+						"id": "config-id",	
+						"signingKey": { "cryptoType": 0, "algorithm": "RSA-265", "keyId": "key-id" }
+					}`,
+						),
+					), eventstore.GenericEventMapper[instance.SMTPConfigHTTPChangedEvent]),
+			},
+			reduce: (&smtpConfigProjection{}).reduceSMTPConfigHTTPChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.smtp_configs5 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"config-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.smtp_configs5_http SET signing_key = $1 WHERE (id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								anyArg{},
 								"config-id",
 								"instance-id",
 							},
@@ -481,7 +526,8 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"id": "config-id",		
 						"description": "test",
 						"senderAddress": "sender",
-						"endpoint": "endpoint"
+						"endpoint": "endpoint",
+						"signingKey": { "cryptoType": 0, "algorithm": "RSA-265", "keyId": "key-id" }
 					}`),
 					), eventstore.GenericEventMapper[instance.SMTPConfigHTTPAddedEvent]),
 			},
@@ -506,11 +552,12 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.smtp_configs5_http (instance_id, id, endpoint) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.smtp_configs5_http (instance_id, id, endpoint, signing_key) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"config-id",
 								"endpoint",
+								anyArg{},
 							},
 						},
 					},

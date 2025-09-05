@@ -158,6 +158,7 @@ type Steps struct {
 	s59SetupWebkeys                         *SetupWebkeys
 	s60GenerateSystemID                     *GenerateSystemID
 	s61IDPTemplate6SAMLSignatureAlgorithm   *IDPTemplate6SAMLSignatureAlgorithm
+	s62HTTPProviderAddSigningKey            *HTTPProviderAddSigningKey
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

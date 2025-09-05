@@ -230,6 +230,7 @@ type AddSMTPConfigHTTP struct {
 
 	Description string
 	Endpoint    string
+	SigningKey  string
 }
 
 func (c *Commands) AddSMTPConfigHTTP(ctx context.Context, config *AddSMTPConfigHTTP) (err error) {
@@ -248,12 +249,19 @@ func (c *Commands) AddSMTPConfigHTTP(ctx context.Context, config *AddSMTPConfigH
 		return err
 	}
 
+	code, err := c.newSigningKey(ctx, c.eventstore.Filter, c.smtpEncryption) //nolint
+	if err != nil {
+		return err
+	}
+	config.SigningKey = code.PlainCode()
+
 	err = c.pushAppendAndReduce(ctx, smtpConfigWriteModel, instance.NewSMTPConfigHTTPAddedEvent(
 		ctx,
 		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
 		config.ID,
 		config.Description,
 		config.Endpoint,
+		code.Crypted,
 	))
 	if err != nil {
 		return err
@@ -267,8 +275,10 @@ type ChangeSMTPConfigHTTP struct {
 	ResourceOwner string
 	ID            string
 
-	Description string
-	Endpoint    string
+	Description          string
+	Endpoint             string
+	ExpirationSigningKey bool
+	SigningKey           *string
 }
 
 func (c *Commands) ChangeSMTPConfigHTTP(ctx context.Context, config *ChangeSMTPConfigHTTP) (err error) {
@@ -288,12 +298,23 @@ func (c *Commands) ChangeSMTPConfigHTTP(ctx context.Context, config *ChangeSMTPC
 		return zerrors.ThrowNotFound(nil, "COMMAND-xIrdledqv4", "Errors.SMTPConfig.NotFound")
 	}
 
+	var changedSigningKey *crypto.CryptoValue
+	if config.ExpirationSigningKey {
+		code, err := c.newSigningKey(ctx, c.eventstore.Filter, c.smtpEncryption) //nolint
+		if err != nil {
+			return err
+		}
+		changedSigningKey = code.Crypted
+		config.SigningKey = &code.Plain
+	}
+
 	changedEvent, hasChanged, err := smtpConfigWriteModel.NewHTTPChangedEvent(
 		ctx,
 		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
 		config.ID,
 		config.Description,
 		config.Endpoint,
+		changedSigningKey,
 	)
 	if err != nil {
 		return err

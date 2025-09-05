@@ -12,6 +12,11 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/pkg/actions"
+)
+
+const (
+	SigningHeader = "ZITADEL-Signature"
 )
 
 func InitChannel(ctx context.Context, cfg Config) (channels.NotificationChannel, error) {
@@ -39,6 +44,10 @@ func InitChannel(ctx context.Context, cfg Config) (channels.NotificationChannel,
 			req.Header = cfg.Headers
 		}
 		req.Header.Set("Content-Type", "application/json")
+		if cfg.SigningKey != "" {
+			req.Header.Set(SigningHeader, actions.ComputeSignatureHeader(time.Now(), []byte(payload), cfg.SigningKey))
+		}
+
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return err

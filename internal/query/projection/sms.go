@@ -37,6 +37,7 @@ const (
 	SMSHTTPColumnSMSID      = "sms_id"
 	SMSHTTPColumnInstanceID = "instance_id"
 	SMSHTTPColumnEndpoint   = "endpoint"
+	SMSHTTPColumnSigningKey = "signing_key"
 )
 
 type smsConfigProjection struct{}
@@ -80,6 +81,7 @@ func (*smsConfigProjection) Init() *old_handler.Check {
 			handler.NewColumn(SMSHTTPColumnSMSID, handler.ColumnTypeText),
 			handler.NewColumn(SMSHTTPColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(SMSHTTPColumnEndpoint, handler.ColumnTypeText),
+			handler.NewColumn(SMSHTTPColumnSigningKey, handler.ColumnTypeJSONB, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(SMSHTTPColumnInstanceID, SMSHTTPColumnSMSID),
 			smsHTTPTableSuffix,
@@ -286,6 +288,7 @@ func (p *smsConfigProjection) reduceSMSConfigHTTPAdded(event eventstore.Event) (
 				handler.NewCol(SMSHTTPColumnSMSID, e.ID),
 				handler.NewCol(SMSHTTPColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(SMSHTTPColumnEndpoint, e.Endpoint),
+				handler.NewCol(SMSHTTPColumnSigningKey, e.SigningKey),
 			},
 			handler.WithTableSuffix(smsHTTPTableSuffix),
 		),
@@ -306,21 +309,24 @@ func (p *smsConfigProjection) reduceSMSConfigHTTPChanged(event eventstore.Event)
 	if e.Description != nil {
 		columns = append(columns, handler.NewCol(SMSColumnDescription, *e.Description))
 	}
-	if len(columns) > 0 {
-		stmts = append(stmts, handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(SMSColumnID, e.ID),
-				handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
-			},
-		))
-	}
+	stmts = append(stmts, handler.AddUpdateStatement(
+		columns,
+		[]handler.Condition{
+			handler.NewCond(SMSColumnID, e.ID),
+			handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	))
 
+	httpColumns := make([]handler.Column, 0)
+	if e.SigningKey != nil {
+		httpColumns = append(httpColumns, handler.NewCol(SMSHTTPColumnSigningKey, e.SigningKey))
+	}
 	if e.Endpoint != nil {
+		httpColumns = append(httpColumns, handler.NewCol(SMSHTTPColumnEndpoint, *e.Endpoint))
+	}
+	if len(httpColumns) > 0 {
 		stmts = append(stmts, handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(SMSHTTPColumnEndpoint, *e.Endpoint),
-			},
+			httpColumns,
 			[]handler.Condition{
 				handler.NewCond(SMSHTTPColumnSMSID, e.ID),
 				handler.NewCond(SMSHTTPColumnInstanceID, e.Aggregate().InstanceID),

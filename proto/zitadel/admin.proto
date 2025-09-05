@@ -5069,6 +5069,12 @@ message AddEmailProviderHTTPRequest {
 message AddEmailProviderHTTPResponse {
     zitadel.v1.ObjectDetails details = 1;
     string id = 2;
+    // Key used to sign and check payload sent to the HTTP provider.
+    string signing_key = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"98KmsU67\""
+        }
+    ];
 }
 
 message UpdateEmailProviderHTTPRequest {
@@ -5090,10 +5096,31 @@ message UpdateEmailProviderHTTPRequest {
             max_length: 200;
         }
     ];
+    // Regenerate the key used for signing and checking the payload sent to the HTTP provider.
+    // Set the graceful period for the existing key. During that time, the previous
+    // signing key and the new one will be used to sign the request to allow you a smooth
+    // transition onf your API.
+    //
+    // Note that we currently only allow an immediate rotation ("0s") and will support
+    // longer expirations in the future.
+    optional google.protobuf.Duration expiration_signing_key = 4 [
+        (validate.rules).duration = {const: {seconds: 0, nanos: 0}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"0s\""
+            minimum: 0
+            maximum: 0
+        }
+    ];
 }
 
 message UpdateEmailProviderHTTPResponse {
     zitadel.v1.ObjectDetails details = 1;
+    // Key used to sign and check payload sent to the HTTP provider.
+    optional string signing_key = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"98KmsU67\""
+        }
+    ];
 }
 
 message ActivateEmailProviderRequest {
@@ -5336,6 +5363,12 @@ message AddSMSProviderHTTPRequest {
 message AddSMSProviderHTTPResponse {
     zitadel.v1.ObjectDetails details = 1;
     string id = 2;
+    // Key used to sign and check payload sent to the HTTP provider.
+    string signing_key = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"98KmsU67\""
+        }
+    ];
 }
 
 message UpdateSMSProviderHTTPRequest {
@@ -5357,10 +5390,30 @@ message UpdateSMSProviderHTTPRequest {
             max_length: 200;
         }
     ];
+    // Regenerate the key used for signing and checking the payload sent to the HTTP provider.
+    // Set the graceful period for the existing key. During that time, the previous
+    // signing key and the new one will be used to sign the request to allow you a smooth
+    // transition onf your API.
+    //
+    // Note that we currently only allow an immediate rotation ("0s") and will support
+    // longer expirations in the future.
+    optional google.protobuf.Duration expiration_signing_key = 4 [
+        (validate.rules).duration = {const: {seconds: 0, nanos: 0}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"0s\""
+            minimum: 0
+            maximum: 0
+        }
+    ];
 }
 
 message UpdateSMSProviderHTTPResponse {
-    zitadel.v1.ObjectDetails details = 1;
+    zitadel.v1.ObjectDetails details = 1;// Key used to sign and check payload sent to the HTTP provider.
+    optional string signing_key = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"98KmsU67\""
+        }
+    ];
 }
 
 message ActivateSMSProviderRequest {

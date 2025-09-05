@@ -35,6 +35,13 @@ type SMSConfig struct {
 	HTTPConfig   *HTTP
 }
 
+func (h *SMSConfig) decryptSigningKey(alg crypto.EncryptionAlgorithm) error {
+	if h.HTTPConfig == nil {
+		return nil
+	}
+	return h.HTTPConfig.decryptSigningKey(alg)
+}
+
 type Twilio struct {
 	SID              string
 	Token            *crypto.CryptoValue
@@ -43,7 +50,21 @@ type Twilio struct {
 }
 
 type HTTP struct {
-	Endpoint string
+	Endpoint   string
+	signingKey *crypto.CryptoValue
+	SigningKey string
+}
+
+func (h *HTTP) decryptSigningKey(alg crypto.EncryptionAlgorithm) error {
+	if h.signingKey == nil {
+		return nil
+	}
+	keyValue, err := crypto.DecryptString(h.signingKey, alg)
+	if err != nil {
+		return zerrors.ThrowInternal(err, "QUERY-bxovy3YXwy", "Errors.Internal")
+	}
+	h.SigningKey = keyValue
+	return nil
 }
 
 type SMSConfigsSearchQueries struct {
@@ -142,6 +163,10 @@ var (
 		name:  projection.SMSHTTPColumnEndpoint,
 		table: smsHTTPTable,
 	}
+	SMSHTTPColumnSigningKey = Column{
+		name:  projection.SMSHTTPColumnSigningKey,
+		table: smsHTTPTable,
+	}
 )
 
 func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (config *SMSConfig, err error) {
@@ -163,7 +188,13 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (config 
 		config, err = scan(row)
 		return err
 	}, stmt, args...)
-	return config, err
+	if err != nil {
+		return nil, err
+	}
+	if err := config.decryptSigningKey(q.smsEncryptionAlgorithm); err != nil {
+		return nil, err
+	}
+	return config, nil
 }
 
 func (q *Queries) SMSProviderConfigActive(ctx context.Context, instanceID string) (config *SMSConfig, err error) {
@@ -185,7 +216,13 @@ func (q *Queries) SMSProviderConfigActive(ctx context.Context, instanceID string
 		config, err = scan(row)
 		return err
 	}, stmt, args...)
-	return config, err
+	if err != nil {
+		return nil, err
+	}
+	if err := config.decryptSigningKey(q.smsEncryptionAlgorithm); err != nil {
+		return nil, err
+	}
+	return config, nil
 }
 
 func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearchQueries) (configs *SMSConfigs, err error) {
@@ -208,8 +245,13 @@ func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearc
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-l4bxm", "Errors.Internal")
 	}
+	for i := range configs.Configs {
+		if err := configs.Configs[i].decryptSigningKey(q.smsEncryptionAlgorithm); err != nil {
+			return nil, err
+		}
+	}
 	configs.State, err = q.latestState(ctx, smsConfigsTable)
-	return configs, err
+	return configs, nil
 }
 
 func NewSMSProviderStateQuery(state domain.SMSConfigState) (SearchQuery, error) {
@@ -235,6 +277,7 @@ func prepareSMSConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, erro
 
 			SMSHTTPColumnSMSID.identifier(),
 			SMSHTTPColumnEndpoint.identifier(),
+			SMSHTTPColumnSigningKey.identifier(),
 		).From(smsConfigsTable.identifier()).
 			LeftJoin(join(SMSTwilioColumnSMSID, SMSColumnID)).
 			LeftJoin(join(SMSHTTPColumnSMSID, SMSColumnID)).
@@ -264,6 +307,7 @@ func prepareSMSConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, erro
 
 				&httpConfig.id,
 				&httpConfig.endpoint,
+				&httpConfig.signingKey,
 			)
 
 			if err != nil {
@@ -299,6 +343,7 @@ func prepareSMSConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, e
 
 			SMSHTTPColumnSMSID.identifier(),
 			SMSHTTPColumnEndpoint.identifier(),
+			SMSHTTPColumnSigningKey.identifier(),
 
 			countColumn.identifier(),
 		).From(smsConfigsTable.identifier()).
@@ -332,6 +377,7 @@ func prepareSMSConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, e
 
 					&httpConfig.id,
 					&httpConfig.endpoint,
+					&httpConfig.signingKey,
 
 					&configs.Count,
 				)
@@ -371,8 +417,9 @@ func (c sqlTwilioConfig) set(smsConfig *SMSConfig) {
 }
 
 type sqlHTTPConfig struct {
-	id       sql.NullString
-	endpoint sql.NullString
+	id         sql.NullString
+	endpoint   sql.NullString
+	signingKey *crypto.CryptoValue
 }
 
 func (c sqlHTTPConfig) setSMS(smsConfig *SMSConfig) {
@@ -380,6 +427,7 @@ func (c sqlHTTPConfig) setSMS(smsConfig *SMSConfig) {
 		return
 	}
 	smsConfig.HTTPConfig = &HTTP{
-		Endpoint: c.endpoint.String,
+		Endpoint:   c.endpoint.String,
+		signingKey: c.signingKey,
 	}
 }
