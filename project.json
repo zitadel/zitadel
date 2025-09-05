@@ -3,11 +3,17 @@
   "projectType": "application",
   "targets": {
     "build-and-start": {
+      "continous": true,
       "description": "Start the the Zitadel platform (core, login and console)",
       "dependsOn": [
-        "build",
-        "start"
-      ]
+        "build"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "nx run start"
+        ]
+      }      
     },
     "build": {
       "description": "Build the Zitadel platform (core, login and console)",
