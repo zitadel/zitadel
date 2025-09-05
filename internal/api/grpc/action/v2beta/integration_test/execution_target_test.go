@@ -1317,7 +1317,7 @@ func getSAMLResponseAttributes(t *testing.T, samlResponse string, sp *samlsp.Mid
 	data, err := base64.StdEncoding.DecodeString(samlResponse)
 	require.NoError(t, err)
 	sp.ServiceProvider.AllowIDPInitiated = true
-	assertion, err := sp.ServiceProvider.ParseXMLResponse(data, []string{})
+	assertion, err := sp.ServiceProvider.ParseXMLResponse(data, []string{}, sp.ServiceProvider.AcsURL)
 	require.NoError(t, err)
 	return assertion.AttributeStatements[0].Attributes
 }
