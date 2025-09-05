@@ -1819,6 +1819,7 @@
       "CREATE_DESC": "Masukkan nama proyek Anda.",
       "ROLE": "Peran",
       "NOITEMS": "Tidak ada proyek",
+      "USERSELFACCOUNT": "Gunakan akun pribadi Anda sebagai pemilik proyek.",
       "ZITADELPROJECT": "Ini milik proyek ZITADEL. Hati-hati: Jika Anda membuat perubahan, ZITADEL mungkin tidak berfungsi sebagaimana mestinya.",
       "TYPE": {
         "OWNED": "Proyek Milik",

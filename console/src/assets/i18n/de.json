@@ -1960,6 +1960,7 @@
       "CREATE_DESC": "Gebe den Namen ein.",
       "ROLE": "Rolle",
       "NOITEMS": "Keine Projekte",
+      "USERSELFACCOUNT": "Verwenden Sie Ihr persönliches Konto als Projektinhaber.",
       "ZITADELPROJECT": "Diese Einstellungen gehören zum ZITADEL-Projekt. Wenn Du diese änderst, verhält sich ZITADEL möglicherweise nicht wie beabsichtigt.",
       "TYPE": {
         "OWNED": "Eigene Projekte",
