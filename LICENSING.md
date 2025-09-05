@@ -22,8 +22,9 @@ proto/
 The following files and directories, including their subdirectories, are licensed under the [MIT License](https://opensource.org/license/mit/):
 
 ```
-login/
-clients/
+apps/login/
+packages/zitadel-client/
+packages/zitadel-proto/
 ```
 
 ## Community Contributions

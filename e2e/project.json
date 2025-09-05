@@ -1,7 +1,7 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "extends": ["//"],
-  "tasks": {
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "check": {},
     "e2e": {
       "cache": false,
       "persistent": false
@@ -17,9 +17,6 @@
     "e2e:angular": {
       "cache": false,
       "persistent": false
-    },
-    "lint": {
-      "outputs": []
     }
   }
 }

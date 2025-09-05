@@ -1,5 +1,11 @@
 import createNextIntlPlugin from "next-intl/plugin";
 import { DEFAULT_CSP } from "./constants/csp.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Fix for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const withNextIntl = createNextIntlPlugin();
 
@@ -34,8 +40,9 @@ const secureHeaders = [
 ];
 
 const nextConfig = {
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH,
-  output: process.env.NEXT_OUTPUT_MODE || undefined,
+  basePath: "/ui/v2/login",
+  output: "standalone",
+  outputFileTracingRoot: path.join(__dirname, "../../"),
   reactStrictMode: true,
   experimental: {
     dynamicIO: true,

@@ -1,0 +1,31 @@
+{
+	"$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
+	"name": "Zitadel Devcontainer",
+	"dockerComposeFile": "docker-compose.yaml",
+	"service": "devcontainer",
+	"shutdownAction": "none",
+	"workspaceFolder": "/workspaces/zitadel",
+	"forwardPorts": [
+		"db:5432",
+		"login-core-mock:22220",
+		"login-core-mock:22222",
+		3000,
+		4200,
+		8080
+	],
+	"updateContentCommand": {
+		"goModules": "go mod download || true",
+		"nodeModules": "pnpm install || true; pnpm add -g nx || true; pnpm cypress install || true"
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/go:1": {
+			"version": "1.24"
+		},
+		"ghcr.io/guiyomh/features/golangci-lint:0": {},
+		"ghcr.io/jungaretti/features/make:1": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker": {},
+		"ghcr.io/devcontainers-extra/features/pnpm:2": {
+			"version": "10.13.1"
+		}
+	}
+}

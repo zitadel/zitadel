@@ -2,43 +2,25 @@
 
 This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.
 
-The documentation is part of the ZITADEL monorepo and uses **pnpm** and **Turbo** for development and build processes.
+The documentation is part of the ZITADEL monorepo and uses **pnpm** and **Nx** for development and build processes.
 
 ## Quick Start
 
 ```bash
 # From the repository root
 pnpm install
+pnpm add -g nx
 
-# Start development server (with Turbo)
-pnpm turbo dev --filter=zitadel-docs
+# Start development server (with Nx)
+nx run @zitadel/docs:dev
 
-# Or start directly from docs directory
-cd docs && pnpm start
+# Or serve a production build
+nx run @zitadel/docs:start
 ```
 
 The site will be available at http://localhost:3000
 
-## Available Scripts
-
-All scripts can be run from the repository root using Turbo:
-
-```bash
-# Development server with live reload
-pnpm turbo dev --filter=zitadel-docs
-
-# Build for production
-pnpm turbo build --filter=zitadel-docs
-
-# Generate API documentation and configuration docs
-pnpm turbo generate --filter=zitadel-docs
-
-# Lint and fix code
-pnpm turbo lint --filter=zitadel-docs
-
-# Serve production build locally
-cd docs && pnpm serve
-```
+To regenerate and rebuild the docs, rerun the `nx run` command.
 
 ## Add new Sites to existing Topics
 
@@ -55,26 +37,6 @@ The documentation build process automatically:
 3. **Generates API documentation** - Creates OpenAPI specification docs
 4. **Copies configuration files** - Includes configuration examples
 5. **Builds the Docusaurus site** - Generates the final static site
-
-## Local Development
-
-### Standard Development
-
-```bash
-# Install dependencies
-pnpm install
-
-# Start development server
-pnpm start
-```
-
-### API Documentation Development
-
-When working on the API docs, run a local development server with:
-
-```bash
-pnpm start:api
-```
 
 ## Container Image
 

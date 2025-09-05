@@ -4,7 +4,10 @@ ENV SHELL=/bin/bash \
     DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
-    CI=1 \
+    GOCACHE=/workspaces/zitadel/.cache/go-build \
+    GOMODCACHE=/workspaces/zitadel/.cache/go-mod \
+    GOTMPDIR=/workspaces/zitadel/.cache/go-tmp \
+    PNPM_STORE_PATH=/workspaces/zitadel/.pnpm-store \
     PNPM_HOME=/home/node/.local/share/pnpm \
     PATH=/home/node/.local/share/pnpm:$PATH
 
@@ -12,9 +15,6 @@ RUN apt-get update && \
     apt-get --no-install-recommends install -y \
     # Cypress dependencies
     libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libasound2 libxtst6 xauth xvfb && \
-    apt-get clean && \
-    corepack enable && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack prepare pnpm@10.13.1 --activate
-
-COPY --chown=node:node commands /commands
+    apt-get clean
 
 USER node

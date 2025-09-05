@@ -1,0 +1,16 @@
+{
+    "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+    "name": "@zitadel/login-core-mock",
+    "targets": {
+        "build-docker": {
+            "cache": true,
+            "inputs": [
+                "default",
+                "{workspaceRoot}/proto/**/*"
+            ],
+            "options": {
+                "build-context": "zitadel-protos=../../../../proto"
+            }
+        }
+    }
+}

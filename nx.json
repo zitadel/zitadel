@@ -1,0 +1,92 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*"
+    ],
+    "docker": [
+      "{projectRoot}/Dockerfile",
+      "{projectRoot}/.dockerignore"
+    ],
+    "prettier": [
+      "{projectRoot}/.prettierignore",
+      "{projectRoot}/.prettierrc",
+      "{projectRoot}/prettier.config.mjs"
+    ],
+    "compose": [
+      "docker",
+      {"env": "COMPOSE_FILE"},
+      "{workspaceRoot}/.devcontainer/postgres.env",
+      "{workspaceRoot}/.devcontainer/postgresql.conf"
+    ]
+  },
+  "targetDefaults": {
+    "generate": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "build": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ],
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
+    },
+    "start": {
+      "cache": false,
+      "continuous": true
+    },
+    "dev": {
+      "cache": false,
+      "continuous": true,
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
+    },
+    "lint": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test-unit": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test-integration": {
+      "inputs": [
+        "default"
+      ]
+    },
+    "check": {
+      "dependsOn": [
+        "build",
+        "lint",
+        "test-unit",
+        "test-integration"
+      ]
+    },
+    "build-docker": {
+      "inputs": [
+        "default"
+      ]
+    }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/docker",
+      "options": {
+        "buildTarget": "build-docker",
+        "runTarget": "start-docker"
+      }
+    }
+  ]
+}

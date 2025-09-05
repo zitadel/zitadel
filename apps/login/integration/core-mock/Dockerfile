@@ -3,9 +3,7 @@ RUN buf export https://github.com/envoyproxy/protoc-gen-validate.git --path vali
     buf export https://github.com/grpc-ecosystem/grpc-gateway.git --path protoc-gen-openapiv2 --output /proto && \
     buf export https://github.com/googleapis/googleapis.git --path google/api/annotations.proto --path google/api/http.proto --path google/api/field_behavior.proto --output /proto
 
-FROM bufbuild/buf:1.54.0 AS zitadel-protos
-RUN buf export https://github.com/zitadel/zitadel.git --path ./proto/zitadel --output /zitadel
-
+    
 FROM golang:1.20.5-alpine3.18 AS mock-zitadel
 
 RUN go install github.com/eliobischof/grpc-mock/cmd/grpc-mock@01b09f60db1b501178af59bed03b2c22661df48c
