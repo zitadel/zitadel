@@ -4,12 +4,15 @@
   [currentCreateStep]="1"
   (closed)="close()"
 >
-  <h1>{{ 'PROJECT.PAGES.CREATE_DESC' | translate }}</h1>
-  <form cdkFocusRegionStart (ngSubmit)="saveProject()">
+  <form cdkFocusRegionStart [formGroup]="form" (ngSubmit)="saveProject()">
+    <mat-slide-toggle class="example-margin" color="primary" [formControl]="form.controls.selfAccount">
+      {{ 'PROJECT.PAGES.USERSELFACCOUNT' | translate }}
+    </mat-slide-toggle>
+    <h1>{{ 'PROJECT.PAGES.CREATE_DESC' | translate }}</h1>
     <div class="column">
       <cnsl-form-field class="formfield" hintLabel="The name is required!">
         <cnsl-label>{{ 'PROJECT.NAME' | translate }}</cnsl-label>
-        <input cnslInput cdkFocusInitial autofocus [(ngModel)]="project.name" [ngModelOptions]="{ standalone: true }" />
+        <input cnslInput cdkFocusInitial autofocus [formControl]="form.controls.name" />
       </cnsl-form-field>
     </div>
 
@@ -17,12 +20,12 @@
       color="primary"
       mat-raised-button
       class="continue-button"
-      [disabled]="!project.name"
+      [disabled]="!form.valid"
       cdkFocusInitial
       type="submit"
       data-e2e="continue-button"
     >
       {{ 'ACTIONS.CONTINUE' | translate }}
     </button>
-  </form></cnsl-create-layout
->
+  </form>
+</cnsl-create-layout>
