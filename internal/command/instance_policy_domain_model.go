@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -96,17 +97,11 @@ func (wm *DomainPolicyOrgsWriteModel) AppendEvents(events ...eventstore.Event) {
 func (wm *DomainPolicyOrgsWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *org.OrgAddedEvent:
-			wm.OrgIDs = append(wm.OrgIDs, e.Aggregate().ID)
-		case *org.DomainPolicyAddedEvent:
-			for i, orgID := range wm.OrgIDs {
-				if orgID == e.Aggregate().ID {
-					wm.OrgIDs[i] = wm.OrgIDs[len(wm.OrgIDs)-1]
-					wm.OrgIDs = wm.OrgIDs[:len(wm.OrgIDs)-1]
-					break
-				}
-			}
-		case *org.DomainPolicyRemovedEvent:
+		// organization irrelevant if removed or with custom policy
+		case *org.OrgRemovedEvent, *org.DomainPolicyAddedEvent:
+			wm.OrgIDs = slices.DeleteFunc(wm.OrgIDs, func(orgID string) bool { return orgID == e.Aggregate().ID })
+		// organization relevant if added without custom policy or custom policy is removed
+		case *org.OrgAddedEvent, *org.DomainPolicyRemovedEvent:
 			wm.OrgIDs = append(wm.OrgIDs, e.Aggregate().ID)
 		}
 	}
@@ -119,6 +114,7 @@ func (wm *DomainPolicyOrgsWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(org.AggregateType).
 		EventTypes(
 			org.OrgAddedEventType,
+			org.OrgRemovedEventType,
 			org.DomainPolicyAddedEventType,
 			org.DomainPolicyRemovedEventType).
 		Builder()

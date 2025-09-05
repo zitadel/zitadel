@@ -326,6 +326,117 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 			},
 		},
 		{
+			name: "change, ok, org removed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					// domainPolicyOrgs
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org1",
+							),
+						),
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org2").Aggregate,
+								"org2",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org2").Aggregate,
+								false,
+								false,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+								"org3",
+							),
+						),
+						eventFromEventPusher(
+							org.NewOrgRemovedEvent(context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+								"org",
+								[]string{},
+								false,
+								[]string{},
+								[]*domain.UserIDPLink{},
+								[]string{},
+							),
+						),
+					),
+					// domainPolicyUsernames for each org
+					// org1
+					expectFilterOrganizationSettings("org1", false, false),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org1.com",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org1.com",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"user1",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.English,
+								domain.GenderUnspecified,
+								"user1@org1.com",
+								false,
+							),
+						),
+					),
+					expectPush(
+						newDefaultDomainPolicyChangedEvent(context.Background(), false, false, false),
+						user.NewUsernameChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"user1",
+							"user1@org1.com",
+							false,
+							false,
+							user.UsernameChangedEventWithPolicyChange(true),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:                                    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				userLoginMustBeDomain:                  false,
+				validateOrgDomains:                     false,
+				smtpSenderAddressMatchesInstanceDomain: false,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
 			name: "change, organization scoped usernames, ok",
 			fields: fields{
 				eventstore: expectEventstore(
