@@ -1,6 +1,6 @@
 "use client";
 
-import { getNextUrl } from "@/lib/client";
+import { completeFlowOrGetUrl } from "@/lib/client";
 import { updateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
@@ -190,29 +190,30 @@ export function LoginOTP({
         // Wait for 2 seconds to avoid eventual consistency issues with an OTP code being verified in the /login endpoint
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
-        const url =
-          requestId && response.sessionId
-            ? await getNextUrl(
-                {
+        // Use unified approach that handles both OIDC/SAML and regular flows
+        if (response.factors?.user) {
+          const url = await completeFlowOrGetUrl(
+            requestId && response.sessionId
+              ? {
                   sessionId: response.sessionId,
                   requestId: requestId,
                   organization: response.factors?.user?.organizationId,
+                }
+              : {
+                  loginName: response.factors.user.loginName,
+                  organization: response.factors?.user?.organizationId,
                 },
-                loginSettings?.defaultRedirectUri,
-              )
-            : response.factors?.user
-              ? await getNextUrl(
-                  {
-                    loginName: response.factors.user.loginName,
-                    organization: response.factors?.user?.organizationId,
-                  },
-                  loginSettings?.defaultRedirectUri,
-                )
-              : null;
+            loginSettings?.defaultRedirectUri,
+          );
 
-        setLoading(false);
-        if (url) {
-          router.push(url);
+          setLoading(false);
+          // If url is returned, navigate client-side
+          // If no url (void), the server action handled the redirect
+          if (url) {
+            router.push(url);
+          }
+        } else {
+          setLoading(false);
         }
       }
     });

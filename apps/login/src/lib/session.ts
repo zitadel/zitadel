@@ -154,7 +154,8 @@ export async function findValidSession({
       return s.factors?.user?.loginName === authRequest.loginHint;
     }
     if (samlRequest) {
-      // TODO: do whatever
+      // SAML requests don't contain user hints like OIDC (hintUserId/loginHint)
+      // so we return all sessions for further processing
       return true;
     }
     return true;
