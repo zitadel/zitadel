@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -67,6 +68,18 @@ func (wm *ProjectWriteModel) Reduce() error {
 			wm.State = domain.ProjectStateActive
 		case *project.ProjectRemovedEvent:
 			wm.State = domain.ProjectStateRemoved
+		case *org.OrgRemovedEvent:
+			if event.Aggregate().ID != wm.ResourceOwner {
+				continue
+			}
+			*wm = ProjectWriteModel{
+				WriteModel: eventstore.WriteModel{
+					AggregateID:       wm.AggregateID,
+					ProcessedSequence: wm.ProcessedSequence,
+					Events:            wm.Events,
+					InstanceID:        wm.InstanceID,
+				},
+			}
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -76,13 +89,15 @@ func (wm *ProjectWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateTypes(project.AggregateType).
-		AggregateIDs(wm.AggregateID).
+		AggregateTypes(project.AggregateType, org.AggregateType).
+		AggregateIDs(wm.AggregateID, wm.ResourceOwner).
 		EventTypes(project.ProjectAddedType,
 			project.ProjectChangedType,
 			project.ProjectDeactivatedType,
 			project.ProjectReactivatedType,
-			project.ProjectRemovedType).
+			project.ProjectRemovedType,
+			org.OrgRemovedEventType,
+		).
 		Builder()
 }
 
