@@ -23,27 +23,8 @@
                 "@zitadel/console:build"
             ]
         },
-        "start-db": {
-            "description": "Run the PostgreSQL database container",
-            "command": "docker compose --file ./.devcontainer/docker-compose.yaml up db",
-            "options": {
-                "cwd": "{projectRoot}"
-            },
-            "continuous": true
-        },
-        "wait-for-db": {
-            "description": "Wait until the PostgreSQL database is ready to accept connections",
-            "dependsOn": [
-                "start-db"
-            ],
-            "command": "until docker exec zitadel-postgres pg_isready -U postgres; do echo 'Waiting for PostgreSQL...'; sleep 2; done"
-        },
         "start-init": {
             "description": "Initialize the Zitadel core application",
-            "dependsOn": [
-                "build",
-                "wait-for-db"
-            ],
             "options": {
                 "env": {
                     "CONFIG_FILE": "{projectRoot}/zitadel.yaml"
@@ -53,9 +34,6 @@
         },
         "start-setup": {
             "description": "Setup the Zitadel core application. This also writes the login-client.pat if run against a database from scratch",
-            "dependsOn": [
-                "start-init"
-            ],
             "options": {
                 "env": {
                     "CONFIG_FILE": "{projectRoot}/zitadel.yaml"
@@ -68,9 +46,6 @@
         },
         "start": {
             "description": "Start the Zitadel core application",
-            "dependsOn": [
-                "start-setup"
-            ],
             "options": {
                 "env": {
                     "CONFIG_FILE": "{projectRoot}/zitadel.yaml"
@@ -82,7 +57,13 @@
         "dev": {
             "description": "Develop the Zitadel core application. Like the `start` target, but can start the application yourself in debug mode using your IDE. Run `nx show project core --json | jq '.targets.start.options'` to see how to configure your IDE",
             "dependsOn": [
-                "@zitadel/login:start-login-only"
+                "build",
+                "start-db",
+                "start-init",
+                "start-setup",
+                "local-sa-token",
+                "@zitadel/login:build",
+                "@zitadel/login:start"
             ]
         }
     }

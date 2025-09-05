@@ -4,17 +4,33 @@ Zitadel is an open-source identity and access management platform built with a m
 
 ## Quick Start
 
-This workspace contains multiple interconnected projects. Use these commands to get started with any project.
+This repository contains multiple interconnected projects. However, you can build and start the whole platform with a single command:
+
+```bash
+# build and start the API, the login and the Console
+nx run build-and-start
+```
+
+Use these commands to get started with any project.
 
 | Task | Command | Notes |
 |------|---------|--------|
-| **Run** | `nx run PROJECT:start` | Production server |
+| **Start** | `nx run PROJECT:start` | Production server |
 | **Develop** | `nx run PROJECT:dev` | Hot reload development server |
 | **Test** | `nx run PROJECT:test` | Run tests |
 | **Lint** | `nx run PROJECT:lint` | Check code style |
 | **Lint Fix** | `nx run PROJECT:lint-fix` | Auto-fix style issues |
 
-Replace `PROJECT` with: `@zitadel/zitadel`, `@zitadel/core`, `@zitadel/login`, `@zitadel/console`, `@zitadel/docs`, `@zitadel/client` or `@zitadel/proto`
+Replace `PROJECT` with one of the following:
+
+- `@zitadel/zitadel` (you can omit this root level project, like in `nx run build-and-start`)
+- `@zitadel/core`
+- `@zitadel/login`
+- `@zitadel/console`
+- `@zitadel/docs`
+- `@zitadel/client`
+- `@zitadel/proto`
+
 Instead of the project names, you can also use their directory names for `PROJECT`, like `nx run login:start`.
 Alternatively, you can use the infix-notation, like `nx start @zitadel/login` or `nx start login`.
 s

@@ -2,10 +2,67 @@
   "$schema": "./node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
-    "start": {
-      "description": "Build and start the Zitadel platform (core, login and console) in production mode",
+    "build-and-start": {
+      "description": "Start the the Zitadel platform (core, login and console)",
       "dependsOn": [
-        "@zitadel/login:start"
+        "build",
+        "start"
+      ]
+    },
+    "build": {
+      "description": "Build the Zitadel platform (core, login and console)",
+      "dependsOn": [
+        "@zitadel/core:build",
+        "@zitadel/login:build",
+        "@zitadel/console:build"
+      ]
+    },
+    "start-setup": {
+      "description": "Start the the Zitadel platform (core, login and console)",
+      "dependsOn": [
+        "@zitadel/devcontainer:start-db"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "nx run @zitadel/core:start-init",
+          "nx run @zitadel/core:start-setup",
+          "nx run @zitadel/login:local-sa-token"
+        ]
+      }
+    },
+    "start": {
+      "continous": true,
+      "dependsOn": [
+        "@zitadel/devcontainer:start-db",
+        "start-setup",
+        "@zitadel/core:start",
+        "@zitadel/login:start",
+        "@zitadel/console:start"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "nx run @zitadel/core:start",
+          "nx run @zitadel/login:start",
+          "nx run @zitadel/console:start"
+        ]
+      }
+    },
+    "generate": {
+      "description": "Generate everything needed to build the Zitadel platform (core, login and console)",
+      "dependsOn": [
+        "@zitadel/core:generate",
+        "@zitadel/login:generate",
+        "@zitadel/console:generate"
+      ]
+    },
+    "clean": {
+      "description": "Clean all local-only files relating to the Zitadel platform (core, login and console)",
+      "dependsOn": [
+        "@zitadel/core:clean",
+        "@zitadel/login:clean",
+        "@zitadel/console:clean"
       ]
     }
   }

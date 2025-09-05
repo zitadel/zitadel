@@ -3,9 +3,7 @@
   "private": true,
   "name": "@zitadel/zitadel",
   "scripts": {
-    "generate": "nx run-many -t generate",
     "changeset": "changeset",
-    "clean": "nx run-many -t clean",
     "clean:all": "pnpm run clean && rm -rf .nx node_modules"
   },
   "devDependencies": {
