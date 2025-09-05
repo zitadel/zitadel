@@ -37,15 +37,19 @@ The following resources are counted:
 - Organizations
 - Projects per organization
 - Users per organization
+- Users of type machine per organization
+- SCIM provisioned users per organization
 - Instance Administrators
 - Identity Providers
 - LDAP Identity Providers
 - Actions (V1)
 - Targets and set up executions
 - Login Policies
+- MFA enforcement (if either MFA is required for local or all users through the login policy)
 - Password Complexity Policies
 - Password Expiry Policies
 - Lockout Policies
+- Notification Policies with option "Password change" enabled
 
 The list might be extended in the future to include more resources.
 
