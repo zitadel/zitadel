@@ -90,4 +90,3 @@ func (h *Handler) setState(tx *sql.Tx, updatedState *state) error {
 	}
 	return nil
 }
-
