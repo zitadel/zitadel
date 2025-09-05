@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { GrpcService } from './grpc.service';
 import {
+  AddProjectRequestSchema,
+  AddProjectResponse,
   GenerateMachineSecretRequestSchema,
   GenerateMachineSecretResponse,
   GetDefaultPasswordComplexityPolicyResponse,
@@ -19,7 +21,6 @@ import {
   ResendHumanInitializationResponse,
   ResendHumanPhoneVerificationRequestSchema,
   ResendHumanPhoneVerificationResponse,
-  SendHumanResetPasswordNotificationRequest_Type,
   SendHumanResetPasswordNotificationRequestSchema,
   SendHumanResetPasswordNotificationResponse,
   SetUserMetadataRequestSchema,
@@ -97,5 +98,9 @@ export class NewMgmtService {
 
   public getDefaultPasswordComplexityPolicy(): Promise<GetDefaultPasswordComplexityPolicyResponse> {
     return this.grpcService.mgmtNew.getDefaultPasswordComplexityPolicy({});
+  }
+
+  public addProject(req: MessageInitShape<typeof AddProjectRequestSchema>): Promise<AddProjectResponse> {
+    return this.grpcService.mgmtNew.addProject(req);
   }
 }
