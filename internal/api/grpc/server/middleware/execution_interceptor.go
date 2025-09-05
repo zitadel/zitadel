@@ -3,12 +3,15 @@ package middleware
 import (
 	"context"
 	"encoding/json"
+	"net/http"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/server/connect_middleware"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/execution"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
@@ -43,6 +46,7 @@ func executeTargetsForRequest(ctx context.Context, targets []target_domain.Targe
 		return req, nil
 	}
 
+	md, _ := metadata.FromIncomingContext(ctx)
 	ctxData := authz.GetCtxData(ctx)
 	info := &ContextInfoRequest{
 		FullMethod: fullMethod,
@@ -51,6 +55,7 @@ func executeTargetsForRequest(ctx context.Context, targets []target_domain.Targe
 		OrgID:      ctxData.OrgID,
 		UserID:     ctxData.UserID,
 		Request:    Message{req.(proto.Message)},
+		Headers:    connect_middleware.SetRequestHeaders(md),
 	}
 
 	return execution.CallTargets(ctx, targets, info, alg)
@@ -65,6 +70,7 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 		return resp, nil
 	}
 
+	md, _ := metadata.FromIncomingContext(ctx)
 	ctxData := authz.GetCtxData(ctx)
 	info := &ContextInfoResponse{
 		FullMethod: fullMethod,
@@ -74,6 +80,7 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 		UserID:     ctxData.UserID,
 		Request:    Message{req.(proto.Message)},
 		Response:   Message{resp.(proto.Message)},
+		Headers:    connect_middleware.SetRequestHeaders(md),
 	}
 
 	return execution.CallTargets(ctx, targets, info, alg)
@@ -82,12 +89,13 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 var _ execution.ContextInfo = &ContextInfoRequest{}
 
 type ContextInfoRequest struct {
-	FullMethod string  `json:"fullMethod,omitempty"`
-	InstanceID string  `json:"instanceID,omitempty"`
-	OrgID      string  `json:"orgID,omitempty"`
-	ProjectID  string  `json:"projectID,omitempty"`
-	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
+	FullMethod string      `json:"fullMethod,omitempty"`
+	InstanceID string      `json:"instanceID,omitempty"`
+	OrgID      string      `json:"orgID,omitempty"`
+	ProjectID  string      `json:"projectID,omitempty"`
+	UserID     string      `json:"userID,omitempty"`
+	Request    Message     `json:"request,omitempty"`
+	Headers    http.Header `json:"headers,omitempty"`
 }
 
 type Message struct {
@@ -125,13 +133,14 @@ func (c *ContextInfoRequest) GetContent() interface{} {
 var _ execution.ContextInfo = &ContextInfoResponse{}
 
 type ContextInfoResponse struct {
-	FullMethod string  `json:"fullMethod,omitempty"`
-	InstanceID string  `json:"instanceID,omitempty"`
-	OrgID      string  `json:"orgID,omitempty"`
-	ProjectID  string  `json:"projectID,omitempty"`
-	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
-	Response   Message `json:"response,omitempty"`
+	FullMethod string      `json:"fullMethod,omitempty"`
+	InstanceID string      `json:"instanceID,omitempty"`
+	OrgID      string      `json:"orgID,omitempty"`
+	ProjectID  string      `json:"projectID,omitempty"`
+	UserID     string      `json:"userID,omitempty"`
+	Request    Message     `json:"request,omitempty"`
+	Response   Message     `json:"response,omitempty"`
+	Headers    http.Header `json:"headers,omitempty"`
 }
 
 func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
