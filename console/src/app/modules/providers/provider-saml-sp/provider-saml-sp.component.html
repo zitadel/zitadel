@@ -18,7 +18,7 @@
     </div>
 
     <cnsl-provider-next
-      [configureProvider]="exists$ | async"
+      [configureProvider]="(exists$ | async) === true"
       [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.SAML.TITLE' | translate"
       [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.SAML.DESCRIPTION' | translate"
       configureLink="https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml"

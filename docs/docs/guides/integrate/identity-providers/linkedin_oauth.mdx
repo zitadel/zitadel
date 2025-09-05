@@ -23,8 +23,10 @@ import TestSetup from './_test_setup.mdx';
 2. Add your App Name, your Company Page and a Logo
 3. Add "Sign In with LinkedIn using OpenID Connect" by clicking "Request access"
 4. Go to the Auth Settings of the App and add the following URL to the "Authorized redirect URLs"
- - `${CUSTOM_DOMAIN}/ui/login/login/externalidp/callback`
+ - Login V1: `${CUSTOM_DOMAIN}/ui/login/login/externalidp/callback`
  - Example redirect url for the domain `https://acme.zitadel.cloud` would look like this:  `https://acme.zitadel.cloud/ui/login/login/externalidp/callback`
+ - Login V2: `{LOGINGV2_DOMAIN}/idps/callback`
+ - In this case the url would look like this:  `https://acme.zitadel.cloud/idps/callback`
 5. Verify the app as your company
 6. In the Auth - OAuth 2.0 scopes section you should see `openid`, `profile` and `email` listed
 7. Save Client ID and Primary Client Secret from the Application credentials

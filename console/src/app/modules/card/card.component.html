@@ -1,4 +1,4 @@
-<div class="card" [ngClass]="{ nomargin: nomargin, stretch: stretch, warn: warn }" data-e2e="app-card">
+<div class="card" [ngClass]="{ nomargin: nomargin, warn: warn }" data-e2e="app-card">
   <div *ngIf="title || description" class="header" [ngClass]="{ 'bottom-margin': expanded }">
     <div *ngIf="title" class="row">
       <h2 class="title" data-e2e="app-card-title">{{ title }}</h2>
@@ -13,7 +13,7 @@
       {{ description }}
     </p>
   </div>
-  <div class="card-content" *ngIf="expanded" [@openClose]="animate">
+  <div class="card-content" *ngIf="expanded">
     <ng-content></ng-content>
   </div>
 </div>
