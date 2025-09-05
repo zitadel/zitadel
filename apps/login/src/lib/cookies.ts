@@ -23,7 +23,7 @@ type SessionCookie<T> = Cookie & T;
 async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[], iFrameEnabled: boolean = false) {
   const cookiesList = await cookies();
 
-  // Use "none" for iframe compatibility, otherwise "strict" as default 
+  // Use "none" for iframe compatibility, otherwise "strict" as default
   let resolvedSameSite: "lax" | "strict" | "none";
 
   if (iFrameEnabled) {
