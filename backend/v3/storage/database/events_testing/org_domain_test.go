@@ -97,16 +97,6 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		t.Cleanup(func() {
-			_, err := OrgClient.DeleteOrganizationDomain(CTX, &v2beta.DeleteOrganizationDomainRequest{
-				OrganizationId: org.GetId(),
-				Domain:         domainName,
-			})
-			if err != nil {
-				t.Logf("Failed to delete domain on cleanup: %v", err)
-			}
-		})
-
 		// Remove the domain
 		_, err = OrgClient.DeleteOrganizationDomain(CTX, &v2beta.DeleteOrganizationDomainRequest{
 			OrganizationId: org.GetId(),
