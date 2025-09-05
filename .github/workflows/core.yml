@@ -17,7 +17,7 @@ on:
 
 env:
   cache_path: |
-    backend/**
+    backend
     internal/statik/statik.go
     internal/notification/statik/statik.go
     internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*
