@@ -238,7 +238,7 @@ func (instance) UpdatedAtColumn() database.Column {
 
 type rawInstance struct {
 	*domain.Instance
-	RawDomains sql.Null[sql.RawBytes] `json:"domains,omitzero" db:"domains"`
+	RawDomains *sql.Null[sql.RawBytes] `json:"domains,omitzero" db:"domains"`
 }
 
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
@@ -252,7 +252,7 @@ func scanInstance(ctx context.Context, querier database.Querier, builder *databa
 		return nil, err
 	}
 
-	if instance.RawDomains.Valid {
+	if instance.RawDomains != nil && instance.RawDomains.Valid {
 		if err := json.Unmarshal(instance.RawDomains.V, &instance.Domains); err != nil {
 			return nil, err
 		}

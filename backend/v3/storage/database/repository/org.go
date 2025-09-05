@@ -215,7 +215,7 @@ func (org) UpdatedAtColumn() database.Column {
 
 type rawOrganization struct {
 	*domain.Organization
-	RawDomains sql.Null[sql.RawBytes] `json:"domains,omitempty" db:"domains"`
+	RawDomains *sql.Null[sql.RawBytes] `json:"domains,omitzero" db:"domains"`
 }
 
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
@@ -228,7 +228,7 @@ func scanOrganization(ctx context.Context, querier database.Querier, builder *da
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&org); err != nil {
 		return nil, err
 	}
-	if org.RawDomains.Valid {
+	if org.RawDomains != nil && org.RawDomains.Valid {
 		if err := json.Unmarshal(org.RawDomains.V, &org.Domains); err != nil {
 			return nil, err
 		}
