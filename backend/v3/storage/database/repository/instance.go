@@ -2,7 +2,11 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
+	"time"
+
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -88,16 +92,22 @@ func (i *instance) joinDomains() database.QueryOption {
 	)
 }
 
-const createInstanceStmt = `INSERT INTO zitadel.instances (id, name, default_org_id, iam_project_id, console_client_id, console_app_id, default_language)` +
-	` VALUES ($1, $2, $3, $4, $5, $6, $7)` +
-	` RETURNING created_at, updated_at`
-
 // Create implements [domain.InstanceRepository].
 func (i *instance) Create(ctx context.Context, instance *domain.Instance) error {
-	var builder database.StatementBuilder
+	var (
+		builder              database.StatementBuilder
+		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
+	)
+	if !instance.CreatedAt.IsZero() {
+		createdAt = instance.CreatedAt
+	}
+	if !instance.UpdatedAt.IsZero() {
+		updatedAt = instance.UpdatedAt
+	}
 
-	builder.AppendArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleAppID, instance.DefaultLanguage)
-	builder.WriteString(createInstanceStmt)
+	builder.WriteString(`INSERT INTO zitadel.instances (id, name, default_org_id, iam_project_id, console_client_id, console_app_id, default_language, created_at, updated_at) VALUES (`)
+	builder.WriteArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleAppID, instance.DefaultLanguage, createdAt, updatedAt)
+	builder.WriteString(`) RETURNING created_at, updated_at`)
 
 	return i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&instance.CreatedAt, &instance.UpdatedAt)
 }
@@ -140,6 +150,27 @@ func (i instance) Delete(ctx context.Context, id string) (int64, error) {
 // SetName implements [domain.instanceChanges].
 func (i instance) SetName(name string) database.Change {
 	return database.NewChange(i.NameColumn(), name)
+}
+
+// SetUpdatedAt implements [domain.instanceChanges].
+func (i instance) SetUpdatedAt(time time.Time) database.Change {
+	return database.NewChange(i.UpdatedAtColumn(), time)
+}
+
+func (i instance) SetIAMProject(id string) database.Change {
+	return database.NewChange(i.IAMProjectIDColumn(), id)
+}
+func (i instance) SetDefaultOrg(id string) database.Change {
+	return database.NewChange(i.DefaultOrgIDColumn(), id)
+}
+func (i instance) SetDefaultLanguage(lang language.Tag) database.Change {
+	return database.NewChange(i.DefaultLanguageColumn(), lang.String())
+}
+func (i instance) SetConsoleClientID(id string) database.Change {
+	return database.NewChange(i.ConsoleClientIDColumn(), id)
+}
+func (i instance) SetConsoleAppID(id string) database.Change {
+	return database.NewChange(i.ConsoleAppIDColumn(), id)
 }
 
 // -------------------------------------------------------------
@@ -207,7 +238,7 @@ func (instance) UpdatedAtColumn() database.Column {
 
 type rawInstance struct {
 	*domain.Instance
-	RawDomains json.RawMessage `json:"domains,omitempty" db:"domains"`
+	RawDomains sql.Null[json.RawMessage] `json:"domains,omitzero" db:"domains"`
 }
 
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
@@ -221,8 +252,8 @@ func scanInstance(ctx context.Context, querier database.Querier, builder *databa
 		return nil, err
 	}
 
-	if len(instance.RawDomains) > 0 {
-		if err := json.Unmarshal(instance.RawDomains, &instance.Domains); err != nil {
+	if instance.RawDomains.Valid {
+		if err := json.Unmarshal(instance.RawDomains.V, &instance.Domains); err != nil {
 			return nil, err
 		}
 	}
@@ -243,8 +274,8 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 
 	instances := make([]*domain.Instance, len(rawInstances))
 	for i, instance := range rawInstances {
-		if len(instance.RawDomains) > 0 {
-			if err := json.Unmarshal(instance.RawDomains, &instance.Domains); err != nil {
+		if instance.RawDomains.Valid {
+			if err := json.Unmarshal(instance.RawDomains.V, &instance.Domains); err != nil {
 				return nil, err
 			}
 		}

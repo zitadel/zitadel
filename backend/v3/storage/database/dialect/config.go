@@ -42,7 +42,7 @@ type Config struct {
 
 func (c Config) Connect(ctx context.Context) (database.Pool, error) {
 	if len(c.Dialects) != 1 {
-		return nil, errors.New("Exactly one dialect must be configured")
+		return nil, errors.New("exactly one dialect must be configured")
 	}
 
 	return c.connector.Connect(ctx)

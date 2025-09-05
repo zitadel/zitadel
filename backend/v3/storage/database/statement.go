@@ -64,3 +64,4 @@ func (b *StatementBuilder) AppendArgs(args ...any) {
 func (b *StatementBuilder) Args() []any {
 	return b.args
 }
+

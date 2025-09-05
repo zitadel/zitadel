@@ -134,4 +134,3 @@ func writeBooleanOperation[T Boolean](builder *StatementBuilder, col Column, val
 	builder.WriteString(" = ")
 	builder.WriteArg(value)
 }
-

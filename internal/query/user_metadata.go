@@ -233,6 +233,10 @@ func NewUserMetadataKeySearchQuery(value string, comparison TextComparison) (Sea
 	return NewTextQuery(UserMetadataKeyCol, value, comparison)
 }
 
+func NewUserMetadataValueSearchQuery(value []byte, comparison BytesComparison) (SearchQuery, error) {
+	return NewBytesQuery(UserMetadataValueCol, value, comparison)
+}
+
 func NewUserMetadataExistsQuery(key string, value []byte, keyComparison TextComparison, valueComparison BytesComparison) (SearchQuery, error) {
 	// linking queries for the subselect
 	instanceQuery, err := NewColumnComparisonQuery(UserMetadataInstanceIDCol, UserInstanceIDCol, ColumnEquals)

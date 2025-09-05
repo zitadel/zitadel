@@ -280,4 +280,3 @@ func (o *org) Domains(shouldLoad bool) domain.OrganizationDomainRepository {
 
 	return o.domainRepo
 }
-

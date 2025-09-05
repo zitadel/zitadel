@@ -127,6 +127,14 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 		ActiveInstancer:     config.ActiveInstancer,
 	}
 
+	if config.MaxParallelTriggers == 0 {
+		config.MaxParallelTriggers = uint16(sqlClient.Pool.Config().MaxConns / 3)
+	}
+	if sqlClient.Pool.Config().MaxConns <= int32(config.MaxParallelTriggers) {
+		logging.WithFields("database.MaxOpenConnections", sqlClient.Pool.Config().MaxConns, "projections.MaxParallelTriggers", config.MaxParallelTriggers).Fatal("Number of max parallel triggers must be lower than max open connections")
+	}
+	handler.StartWorkerPool(config.MaxParallelTriggers)
+
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	OrgMetadataProjection = newOrgMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_metadata"]))
 	ActionProjection = newActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
@@ -221,10 +229,18 @@ func Init(ctx context.Context) error {
 	return nil
 }
 
-func Start(ctx context.Context) {
+func Start(ctx context.Context) error {
+	projectionTableMap := make(map[string]bool, len(projections))
 	for _, projection := range projections {
+		table := projection.String()
+		if projectionTableMap[table] {
+			return fmt.Errorf("projection for %s already added", table)
+		}
+		projectionTableMap[table] = true
+
 		projection.Start(ctx)
 	}
+	return nil
 }
 
 func ProjectInstance(ctx context.Context) error {
@@ -287,6 +303,7 @@ func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler
 	if customConfig.TransactionDuration != nil {
 		config.TransactionDuration = *customConfig.TransactionDuration
 	}
+	config.SkipInstanceIDs = append(config.SkipInstanceIDs, customConfig.SkipInstanceIDs...)
 
 	return config
 }

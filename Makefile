@@ -48,10 +48,10 @@ core_static:
 
 .PHONY: core_generate_all
 core_generate_all:
-	go install github.com/dmarkham/enumer@v1.5.10 		# https://pkg.go.dev/github.com/dmarkham/enumer?tab=versions
+	go install github.com/dmarkham/enumer@v1.5.11 		# https://pkg.go.dev/github.com/dmarkham/enumer?tab=versions
 	go install github.com/rakyll/statik@v0.1.7			# https://pkg.go.dev/github.com/rakyll/statik?tab=versions
 	go install go.uber.org/mock/mockgen@v0.4.0			# https://pkg.go.dev/go.uber.org/mock/mockgen?tab=versions
-	go install golang.org/x/tools/cmd/stringer@v0.22.0	# https://pkg.go.dev/golang.org/x/tools/cmd/stringer?tab=versions
+	go install golang.org/x/tools/cmd/stringer@v0.36.0	# https://pkg.go.dev/golang.org/x/tools/cmd/stringer?tab=versions
 	go generate ./...
 
 .PHONY: core_assets
@@ -97,7 +97,7 @@ console_move:
 
 .PHONY: console_dependencies
 console_dependencies:
-	npx pnpm install --frozen-lockfile --filter=./console
+	npx pnpm install --frozen-lockfile --filter=console...
 
 .PHONY: console_build
 console_build: console_dependencies
@@ -120,7 +120,7 @@ core_integration_db_up:
 
 .PHONY: core_integration_db_down
 core_integration_db_down:
-	docker compose -f internal/integration/config/docker-compose.yaml down
+	docker compose -f internal/integration/config/docker-compose.yaml down -v
 
 .PHONY: core_integration_setup
 core_integration_setup:
@@ -138,7 +138,7 @@ core_integration_server_start: core_integration_setup
 
 .PHONY: core_integration_test_packages
 core_integration_test_packages:
-	go test -race -count 1 -tags integration -timeout 30m $$(go list -tags integration ./... | grep -e "integration_test" -e "events_testing")
+	go test -race -count 1 -tags integration -timeout 60m -parallel 1 $$(go list -tags integration ./... | grep -e "integration_test" -e "events_testing")
 
 .PHONY: core_integration_server_stop
 core_integration_server_stop:
@@ -194,3 +194,4 @@ login_ensure_remote:
 	else \
 		echo "Remote $(LOGIN_REMOTE_NAME) already exists."; \
 	fi
+

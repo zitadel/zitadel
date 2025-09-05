@@ -17,6 +17,7 @@ type Config struct {
 	ActiveInstancer       interface {
 		ActiveInstances() []string
 	}
+	MaxParallelTriggers uint16
 }
 
 type CustomConfig struct {
@@ -26,4 +27,5 @@ type CustomConfig struct {
 	ConcurrentInstances *uint
 	BulkLimit           *uint16
 	TransactionDuration *time.Duration
+	SkipInstanceIDs     []string
 }

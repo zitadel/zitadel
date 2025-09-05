@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/migration"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type EventStore interface {
@@ -45,6 +46,7 @@ type Config struct {
 	ActiveInstancer interface {
 		ActiveInstances() []string
 	}
+	SkipInstanceIDs []string
 }
 
 type Handler struct {
@@ -70,6 +72,8 @@ type Handler struct {
 	queryInstances func() ([]string, error)
 
 	metrics *ProjectionMetrics
+
+	skipInstanceIDs []string
 }
 
 var _ migration.Migration = (*Handler)(nil)
@@ -188,7 +192,8 @@ func NewHandler(
 			}
 			return nil, nil
 		},
-		metrics: metrics,
+		metrics:         metrics,
+		skipInstanceIDs: config.SkipInstanceIDs,
 	}
 
 	if _, ok := projection.(GlobalProjection); ok {
@@ -401,6 +406,9 @@ type triggerConfig struct {
 
 type TriggerOpt func(conf *triggerConfig)
 
+// WithAwaitRunning instructs the projection to wait until previous triggers within the same container are finished
+// If multiple containers are involved, we do not await them to finish. If another container is currently projecting the trigger is skipped.
+// The reason is that we do not want to cause potential database connection exhaustion.
 func WithAwaitRunning() TriggerOpt {
 	return func(conf *triggerConfig) {
 		conf.awaitRunning = true
@@ -419,7 +427,35 @@ func WithMinPosition(position decimal.Decimal) TriggerOpt {
 	}
 }
 
+var (
+	queue      chan func()
+	queueStart sync.Once
+)
+
+func StartWorkerPool(count uint16) {
+	queueStart.Do(func() {
+		queue = make(chan func())
+
+		for range count {
+			go worker()
+		}
+	})
+}
+
+func worker() {
+	for {
+		processEvents, ok := <-queue
+		if !ok {
+			return
+		}
+		processEvents()
+	}
+}
+
 func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Context, err error) {
+	if slices.Contains(h.skipInstanceIDs, authz.GetInstance(ctx).InstanceID()) {
+		return call.ResetTimestamp(ctx), nil
+	}
 	config := new(triggerConfig)
 	for _, opt := range opts {
 		opt(config)
@@ -432,7 +468,16 @@ func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Co
 	defer cancel()
 
 	for i := 0; ; i++ {
-		additionalIteration, err := h.processEvents(ctx, config)
+		var (
+			additionalIteration bool
+			wg                  sync.WaitGroup
+		)
+		wg.Add(1)
+		queue <- func() {
+			additionalIteration, err = h.processEvents(ctx, config)
+			wg.Done()
+		}
+		wg.Wait()
 		h.log().OnError(err).Info("process events failed")
 		h.log().WithField("iteration", i).Debug("trigger iteration")
 		if !additionalIteration || err != nil {
@@ -519,11 +564,17 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 	}()
 
-	currentState, err := h.currentState(ctx, tx, config)
+	var hasLocked bool
+	err = tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock(hashtext($1), hashtext($2))", h.ProjectionName(), authz.GetInstance(ctx).InstanceID()).Scan(&hasLocked)
 	if err != nil {
-		if errors.Is(err, errJustUpdated) {
-			return false, nil
-		}
+		return false, err
+	}
+	if !hasLocked {
+		return false, zerrors.ThrowInternal(nil, "V2-lpiK0", "projection already locked")
+	}
+
+	currentState, err := h.currentState(ctx, tx)
+	if err != nil {
 		return additionalIteration, err
 	}
 	// stop execution if currentState.position >= config.maxPosition

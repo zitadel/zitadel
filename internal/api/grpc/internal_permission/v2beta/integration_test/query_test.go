@@ -21,7 +21,7 @@ func TestServer_ListAdministrators(t *testing.T) {
 
 	projectName := gofakeit.AppName()
 	projectResp := instance.CreateProject(iamOwnerCtx, t, instance.DefaultOrg.GetId(), projectName, false, false)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 	instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 	userProjectResp := instance.CreateMachineUser(iamOwnerCtx)
@@ -648,9 +648,9 @@ func TestServer_ListAdministrators_PermissionV2(t *testing.T) {
 	// ensureFeaturePermissionV2Enabled(t, instancePermissionV2)
 	iamOwnerCtx := instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
-	projectName := gofakeit.AppName()
+	projectName := integration.ProjectName()
 	projectResp := instancePermissionV2.CreateProject(iamOwnerCtx, t, instancePermissionV2.DefaultOrg.GetId(), projectName, false, false)
-	orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, gofakeit.Company(), gofakeit.Email())
+	orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 	instancePermissionV2.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgResp.GetOrganizationId())
 
 	userProjectResp := instancePermissionV2.CreateMachineUser(iamOwnerCtx)

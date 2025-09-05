@@ -267,4 +267,3 @@ func TestServer_TestOrganizationReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 }
-
