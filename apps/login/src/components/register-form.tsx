@@ -2,20 +2,13 @@
 
 import { registerUser } from "@/lib/server/register";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
-import {
-  LoginSettings,
-  PasskeysType,
-} from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { LoginSettings, PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
-import {
-  AuthenticationMethod,
-  AuthenticationMethodRadio,
-  methods,
-} from "./authentication-method-radio";
+import { AuthenticationMethod, AuthenticationMethodRadio, methods } from "./authentication-method-radio";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -98,10 +91,7 @@ export function RegisterForm({
     return response;
   }
 
-  async function submitAndContinue(
-    value: Inputs,
-    withPassword: boolean = false,
-  ) {
+  async function submitAndContinue(value: Inputs, withPassword: boolean = false) {
     const registerParams: any = value;
 
     if (organization) {
@@ -114,9 +104,7 @@ export function RegisterForm({
 
     // redirect user to /register/password if password is chosen
     if (withPassword) {
-      return router.push(
-        `/register/password?` + new URLSearchParams(registerParams),
-      );
+      return router.push(`/register/password?` + new URLSearchParams(registerParams));
     } else {
       return submitAndRegister(value);
     }
@@ -125,6 +113,11 @@ export function RegisterForm({
   const { errors } = formState;
 
   const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
+
+  // Check if legal acceptance is required
+  const isLegalAcceptanceRequired = !!(legal?.tosLink || legal?.privacyPolicyLink);
+  const canSubmit = formState.isValid && (!isLegalAcceptanceRequired || tosAndPolicyAccepted);
+
   return (
     <form className="w-full">
       <div className="mb-4 grid grid-cols-2 gap-4">
@@ -162,38 +155,27 @@ export function RegisterForm({
           />
         </div>
       </div>
-      {legal && (
-        <PrivacyPolicyCheckboxes
-          legal={legal}
-          onChange={setTosAndPolicyAccepted}
-        />
+      {(legal?.tosLink || legal?.privacyPolicyLink) && (
+        <PrivacyPolicyCheckboxes legal={legal} onChange={setTosAndPolicyAccepted} />
       )}
       {/* show chooser if both methods are allowed */}
-      {loginSettings &&
-        loginSettings.allowUsernamePassword &&
-        loginSettings.passkeysType == PasskeysType.ALLOWED && (
-          <>
-            <p className="ztdl-p mb-6 mt-4 block text-left">
-              <Translated i18nKey="selectMethod" namespace="register" />
-            </p>
+      {loginSettings && loginSettings.allowUsernamePassword && loginSettings.passkeysType == PasskeysType.ALLOWED && (
+        <>
+          <p className="ztdl-p mb-6 mt-4 block text-left">
+            <Translated i18nKey="selectMethod" namespace="register" />
+          </p>
 
-            <div className="pb-4">
-              <AuthenticationMethodRadio
-                selected={selected}
-                selectionChanged={setSelected}
-              />
-            </div>
-          </>
-        )}
+          <div className="pb-4">
+            <AuthenticationMethodRadio selected={selected} selectionChanged={setSelected} />
+          </div>
+        </>
+      )}
       {!loginSettings?.allowUsernamePassword &&
         loginSettings?.passkeysType !== PasskeysType.ALLOWED &&
         (!loginSettings?.allowExternalIdp || !idpCount) && (
           <div className="py-4">
             <Alert type={AlertType.INFO}>
-              <Translated
-                i18nKey="noMethodAvailableWarning"
-                namespace="register"
-              />
+              <Translated i18nKey="noMethodAvailableWarning" namespace="register" />
             </Alert>
           </div>
         )}
@@ -209,11 +191,10 @@ export function RegisterForm({
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
-          disabled={loading || !formState.isValid || !tosAndPolicyAccepted}
+          disabled={loading || !canSubmit}
           onClick={handleSubmit((values) => {
             const usePasswordToContinue: boolean =
-              loginSettings?.allowUsernamePassword &&
-              loginSettings?.passkeysType == PasskeysType.ALLOWED
+              loginSettings?.allowUsernamePassword && loginSettings?.passkeysType == PasskeysType.ALLOWED
                 ? !(selected === methods[0]) // choose selection if both available
                 : !!loginSettings?.allowUsernamePassword; // if password is chosen
             // set password as default if only password is allowed
