@@ -144,7 +144,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 	t.Run("test iam idp add reduces", func(t *testing.T) {
 		name := gofakeit.Name()
 
-		beforeCreate := time.Now()
+		before := time.Now()
 		addOIDC, err := AdminClient.AddOIDCIDP(IAMCTX, &admin.AddOIDCIDPRequest{
 			Name:               name,
 			StylingType:        idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE,
@@ -156,7 +156,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL,
 			AutoRegister:       true,
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -182,8 +182,8 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, idp.AllowLinking)
 			assert.Nil(t, idp.AllowAutoLinking)
 			assert.Equal(t, int16(idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE), *idp.StylingType)
-			assert.WithinRange(t, idp.UpdatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, idp.CreatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, idp.UpdatedAt, before, after)
+			assert.WithinRange(t, idp.CreatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -205,14 +205,14 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateIDP(IAMCTX, &admin.UpdateIDPRequest{
 			IdpId:        addOIDC.IdpId,
 			Name:         name,
 			StylingType:  idp_grpc.IDPStylingType_STYLING_TYPE_UNSPECIFIED,
 			AutoRegister: false,
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -231,7 +231,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, name, idp.Name)
 			assert.Equal(t, false, idp.AutoRegister)
 			assert.Equal(t, int16(idp_grpc.IDPStylingType_STYLING_TYPE_UNSPECIFIED), *idp.StylingType)
-			assert.WithinRange(t, idp.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, idp.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -252,11 +252,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// deactivate idp
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.DeactivateIDP(IAMCTX, &admin.DeactivateIDPRequest{
 			IdpId: addOIDC.IdpId,
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -273,7 +273,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			// event iam.idp.config.deactivated
 			assert.Equal(t, addOIDC.IdpId, idp.ID)
 			assert.Equal(t, domain.IDPStateInactive, idp.State)
-			assert.WithinRange(t, idp.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, idp.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -315,11 +315,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		// reactivate idp
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.ReactivateIDP(IAMCTX, &admin.ReactivateIDPRequest{
 			IdpId: addOIDC.IdpId,
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -334,7 +334,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			// event iam.idp.config.reactivated
 			assert.Equal(t, addOIDC.IdpId, idp.ID)
 			assert.Equal(t, domain.IDPStateActive, idp.State)
-			assert.WithinRange(t, idp.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, idp.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
 
@@ -451,7 +451,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, addOIDC.IdpId, oidc.ID)
 		}, retryDuration, tick)
 
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateIDPOIDCConfig(IAMCTX, &admin.UpdateIDPOIDCConfigRequest{
 			IdpId:              addOIDC.IdpId,
 			ClientId:           "new_clientID",
@@ -461,7 +461,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			DisplayNameMapping: idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
 			UsernameMapping:    idp.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME,
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -480,7 +480,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, name, oidc.Name)
 			assert.Equal(t, addOIDC.IdpId, updateOIDC.ID)
 			assert.Equal(t, domain.IDPTypeOIDC, *updateOIDC.Type)
-			assert.WithinRange(t, updateOIDC.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, updateOIDC.UpdatedAt, before, after)
 
 			// oidc
 			assert.Equal(t, instanceID, oidc.InstanceID)
@@ -555,7 +555,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository(pool)
 
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateIDPJWTConfig(IAMCTX, &admin.UpdateIDPJWTConfigRequest{
 			IdpId:        addJWT.IdpId,
 			JwtEndpoint:  "new_jwtEndpoint",
@@ -563,7 +563,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			KeysEndpoint: "new_keyEndpoint",
 			HeaderName:   "new_headerName",
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -579,7 +579,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			// idp
 			assert.Equal(t, addJWT.IdpId, updateJWT.ID)
 			assert.Equal(t, domain.IDPTypeJWT, *updateJWT.Type)
-			assert.WithinRange(t, updateJWT.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, updateJWT.UpdatedAt, before, after)
 
 			// jwt
 			assert.Equal(t, "new_jwtEndpoint", updateJWT.JWTEndpoint)
@@ -593,7 +593,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oauth
-		beforeCreate := time.Now()
+		before := time.Now()
 		addOAuth, err := AdminClient.AddGenericOAuthProvider(IAMCTX, &admin.AddGenericOAuthProviderRequest{
 			Name:                  name,
 			ClientId:              "clientId",
@@ -612,7 +612,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			},
 			UsePkce: false,
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -635,8 +635,8 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, false, oauth.AllowCreation)
 			assert.Equal(t, false, oauth.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *oauth.AllowAutoLinking)
-			assert.WithinRange(t, oauth.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, oauth.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, oauth.CreatedAt, before, after)
+			assert.WithinRange(t, oauth.UpdatedAt, before, after)
 
 			// oauth
 			assert.Equal(t, "clientId", oauth.ClientID)
@@ -686,7 +686,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		name = "new_" + name
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateGenericOAuthProvider(IAMCTX, &admin.UpdateGenericOAuthProviderRequest{
 			Id:                    addOAuth.Id,
 			Name:                  name,
@@ -706,7 +706,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			},
 			UsePkce: true,
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -730,7 +730,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateOauth.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateOauth.AllowAutoLinking)
 			assert.Equal(t, true, updateOauth.UsePKCE)
-			assert.WithinRange(t, updateOauth.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, updateOauth.UpdatedAt, before, after)
 
 			// oauth
 			assert.Equal(t, "new_clientId", updateOauth.ClientID)
@@ -746,7 +746,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add oidc
-		beforeCreate := time.Now()
+		before := time.Now()
 		addOIDC, err := AdminClient.AddGenericOIDCProvider(IAMCTX, &admin.AddGenericOIDCProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -763,7 +763,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			IsIdTokenMapping: false,
 			UsePkce:          false,
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -785,8 +785,8 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, false, oidc.AllowCreation)
 			assert.Equal(t, false, oidc.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *oidc.AllowAutoLinking)
-			assert.WithinRange(t, oidc.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, oidc.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, oidc.CreatedAt, before, after)
+			assert.WithinRange(t, oidc.UpdatedAt, before, after)
 
 			// oidc
 			assert.Equal(t, addOIDC.Id, oidc.ID)
@@ -831,7 +831,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 
 		name = "new_" + name
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateGenericOIDCProvider(IAMCTX, &admin.UpdateGenericOIDCProviderRequest{
 			Id:           addOIDC.Id,
 			Name:         name,
@@ -849,7 +849,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			IsIdTokenMapping: true,
 			UsePkce:          true,
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -872,7 +872,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateOIDC.AllowCreation)
 			assert.Equal(t, true, updateOIDC.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateOIDC.AllowAutoLinking)
-			assert.WithinRange(t, updateOIDC.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, updateOIDC.UpdatedAt, before, after)
 
 			// oidc
 			assert.Equal(t, addOIDC.Id, updateOIDC.ID)
@@ -916,7 +916,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, domain.IDPTypeOIDC, *oidc.Type)
 		}, retryDuration, tick)
 
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.MigrateGenericOIDCProvider(IAMCTX, &admin.MigrateGenericOIDCProviderRequest{
 			Id: addOIDC.Id,
 			Template: &admin.MigrateGenericOIDCProviderRequest_Azure{
@@ -941,7 +941,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				},
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -961,7 +961,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, azure.AllowCreation)
 			assert.Equal(t, true, azure.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *azure.AllowAutoLinking)
-			assert.WithinRange(t, azure.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, azure.UpdatedAt, before, after)
 
 			// oidc
 			assert.Equal(t, "new_clientId", azure.ClientID)
@@ -1004,7 +1004,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, domain.IDPTypeOIDC, *oidc.Type)
 		}, retryDuration, tick)
 
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.MigrateGenericOIDCProvider(IAMCTX, &admin.MigrateGenericOIDCProviderRequest{
 			Id: addOIDC.Id,
 			Template: &admin.MigrateGenericOIDCProviderRequest_Google{
@@ -1023,7 +1023,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				},
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
@@ -1043,7 +1043,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, google.AllowCreation)
 			assert.Equal(t, true, google.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *google.AllowAutoLinking)
-			assert.WithinRange(t, google.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, google.UpdatedAt, before, after)
 
 			// oidc
 			assert.Equal(t, "new_clientId", google.ClientID)
@@ -1056,7 +1056,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add jwt
-		beforeCreate := time.Now()
+		before := time.Now()
 		addJWT, err := AdminClient.AddJWTProvider(IAMCTX, &admin.AddJWTProviderRequest{
 			Name:         name,
 			Issuer:       "issuer",
@@ -1071,7 +1071,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1093,8 +1093,8 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, false, jwt.AllowCreation)
 			assert.Equal(t, false, jwt.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *jwt.AllowAutoLinking)
-			assert.WithinRange(t, jwt.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, jwt.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, jwt.CreatedAt, before, after)
+			assert.WithinRange(t, jwt.UpdatedAt, before, after)
 
 			// jwt
 			assert.Equal(t, "jwtEndpoint", jwt.JWTEndpoint)
@@ -1126,7 +1126,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change jwt
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateJWTProvider(IAMCTX, &admin.UpdateJWTProviderRequest{
 			Id:           addJWT.Id,
 			Name:         name,
@@ -1142,7 +1142,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1164,7 +1164,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, jwt.AllowCreation)
 			assert.Equal(t, true, jwt.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *jwt.AllowAutoLinking)
-			assert.WithinRange(t, jwt.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, jwt.UpdatedAt, before, after)
 
 			// jwt
 			assert.Equal(t, "new_jwtEndpoint", jwt.JWTEndpoint)
@@ -1178,7 +1178,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add azure
-		beforeCreate := time.Now()
+		before := time.Now()
 		addAzure, err := AdminClient.AddAzureADProvider(IAMCTX, &admin.AddAzureADProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1198,7 +1198,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1220,7 +1220,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, azure.AllowCreation)
 			assert.Equal(t, true, azure.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *azure.AllowAutoLinking)
-			assert.WithinRange(t, azure.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, azure.UpdatedAt, before, after)
 
 			// azure
 			assert.Equal(t, "clientId", azure.ClientID)
@@ -1268,7 +1268,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change azure
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateAzureADProvider(IAMCTX, &admin.UpdateAzureADProviderRequest{
 			Id:           addAzure.Id,
 			Name:         name,
@@ -1289,7 +1289,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		// check values for azure
@@ -1309,7 +1309,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateAzure.AllowCreation)
 			assert.Equal(t, true, updateAzure.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *updateAzure.AllowAutoLinking)
-			assert.WithinRange(t, updateAzure.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, updateAzure.UpdatedAt, before, after)
 
 			// azure
 			assert.Equal(t, "new_clientId", updateAzure.ClientID)
@@ -1324,7 +1324,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add github
-		beforeCreate := time.Now()
+		before := time.Now()
 		addGithub, err := AdminClient.AddGitHubProvider(IAMCTX, &admin.AddGitHubProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1338,7 +1338,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1360,7 +1360,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, false, github.AllowCreation)
 			assert.Equal(t, false, github.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *github.AllowAutoLinking)
-			assert.WithinRange(t, github.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, github.UpdatedAt, before, after)
 
 			assert.Equal(t, "clientId", github.ClientID)
 			assert.NotNil(t, github.ClientSecret)
@@ -1399,7 +1399,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change github
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateGitHubProvider(IAMCTX, &admin.UpdateGitHubProviderRequest{
 			Id:           addGithub.Id,
 			Name:         name,
@@ -1414,7 +1414,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		// check values for azure
@@ -1434,7 +1434,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateGithub.AllowCreation)
 			assert.Equal(t, true, updateGithub.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateGithub.AllowAutoLinking)
-			assert.WithinRange(t, updateGithub.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, updateGithub.UpdatedAt, before, after)
 
 			// github
 			assert.Equal(t, "new_clientId", updateGithub.ClientID)
@@ -1447,7 +1447,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add github enterprise
-		beforeCreate := time.Now()
+		before := time.Now()
 		addGithubEnterprise, err := AdminClient.AddGitHubEnterpriseServerProvider(IAMCTX, &admin.AddGitHubEnterpriseServerProviderRequest{
 			Name:                  name,
 			ClientId:              "clientId",
@@ -1464,7 +1464,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1486,8 +1486,8 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, false, githubEnterprise.AllowCreation)
 			assert.Equal(t, false, githubEnterprise.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *githubEnterprise.AllowAutoLinking)
-			assert.WithinRange(t, githubEnterprise.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, githubEnterprise.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, githubEnterprise.CreatedAt, before, after)
+			assert.WithinRange(t, githubEnterprise.UpdatedAt, before, after)
 
 			// github enterprise
 			assert.Equal(t, "clientId", githubEnterprise.ClientID)
@@ -1533,7 +1533,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change github enterprise
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateGitHubEnterpriseServerProvider(IAMCTX, &admin.UpdateGitHubEnterpriseServerProviderRequest{
 			Id:                    addGithubEnterprise.Id,
 			Name:                  name,
@@ -1551,7 +1551,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		// check values for azure
@@ -1571,7 +1571,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, false, updateGithubEnterprise.AllowCreation)
 			assert.Equal(t, false, updateGithubEnterprise.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *updateGithubEnterprise.AllowAutoLinking)
-			assert.WithinRange(t, updateGithubEnterprise.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, updateGithubEnterprise.UpdatedAt, before, after)
 
 			// github enterprise
 			assert.Equal(t, "new_clientId", updateGithubEnterprise.ClientID)
@@ -1587,7 +1587,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add gitlab
-		beforeCreate := time.Now()
+		before := time.Now()
 		addGithub, err := AdminClient.AddGitLabProvider(IAMCTX, &admin.AddGitLabProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1601,7 +1601,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1623,8 +1623,8 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, false, gitlab.AllowCreation)
 			assert.Equal(t, false, gitlab.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *gitlab.AllowAutoLinking)
-			assert.WithinRange(t, gitlab.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, gitlab.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, gitlab.CreatedAt, before, after)
+			assert.WithinRange(t, gitlab.UpdatedAt, before, after)
 
 			// gitlab
 			assert.Equal(t, "clientId", gitlab.ClientID)
@@ -1664,7 +1664,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change gitlab
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateGitLabProvider(IAMCTX, &admin.UpdateGitLabProviderRequest{
 			Id:           addGitlab.Id,
 			Name:         name,
@@ -1679,7 +1679,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		// check values for gitlab
@@ -1698,7 +1698,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateGitlab.AllowCreation)
 			assert.Equal(t, true, updateGitlab.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateGitlab.AllowAutoLinking)
-			assert.WithinRange(t, updateGitlab.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, updateGitlab.UpdatedAt, before, after)
 
 			// gitlab
 			assert.Equal(t, "new_clientId", updateGitlab.ClientID)
@@ -1712,7 +1712,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add gitlab self hosted
-		beforeCreate := time.Now()
+		before := time.Now()
 		addGitlabSelfHosted, err := AdminClient.AddGitLabSelfHostedProvider(IAMCTX, &admin.AddGitLabSelfHostedProviderRequest{
 			Name:         name,
 			Issuer:       "issuer",
@@ -1727,7 +1727,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1749,8 +1749,8 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, false, gitlabSelfHosted.AllowCreation)
 			assert.Equal(t, false, gitlabSelfHosted.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *gitlabSelfHosted.AllowAutoLinking)
-			assert.WithinRange(t, gitlabSelfHosted.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, gitlabSelfHosted.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, gitlabSelfHosted.CreatedAt, before, after)
+			assert.WithinRange(t, gitlabSelfHosted.UpdatedAt, before, after)
 
 			// gitlab self hosted
 			assert.Equal(t, "clientId", gitlabSelfHosted.ClientID)
@@ -1792,7 +1792,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change gitlab self hosted
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateGitLabSelfHostedProvider(IAMCTX, &admin.UpdateGitLabSelfHostedProviderRequest{
 			Id:           addGitlabSelfHosted.Id,
 			Name:         name,
@@ -1808,7 +1808,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		// check values for gitlab self hosted
@@ -1828,7 +1828,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateGitlabSelfHosted.AllowCreation)
 			assert.Equal(t, true, updateGitlabSelfHosted.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateGitlabSelfHosted.AllowAutoLinking)
-			assert.WithinRange(t, updateGitlabSelfHosted.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, updateGitlabSelfHosted.UpdatedAt, before, after)
 
 			// gitlab self hosted
 			assert.Equal(t, "new_clientId", updateGitlabSelfHosted.ClientID)
@@ -1842,7 +1842,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add google
-		beforeCreate := time.Now()
+		before := time.Now()
 		addGoogle, err := AdminClient.AddGoogleProvider(IAMCTX, &admin.AddGoogleProviderRequest{
 			Name:         name,
 			ClientId:     "clientId",
@@ -1856,7 +1856,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -1878,8 +1878,8 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, false, google.AllowCreation)
 			assert.Equal(t, false, google.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *google.AllowAutoLinking)
-			assert.WithinRange(t, google.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, google.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, google.CreatedAt, before, after)
+			assert.WithinRange(t, google.UpdatedAt, before, after)
 
 			// google
 			assert.Equal(t, "clientId", google.ClientID)
@@ -1919,7 +1919,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change google
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateGoogleProvider(IAMCTX, &admin.UpdateGoogleProviderRequest{
 			Id:           addGoogle.Id,
 			Name:         name,
@@ -1934,7 +1934,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		// check values for google
@@ -1954,7 +1954,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateGoogle.AllowCreation)
 			assert.Equal(t, true, updateGoogle.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateGoogle.AllowAutoLinking)
-			assert.WithinRange(t, updateGoogle.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, updateGoogle.UpdatedAt, before, after)
 
 			// google
 			assert.Equal(t, "new_clientId", updateGoogle.ClientID)
@@ -1967,7 +1967,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add ldap
-		beforeCreate := time.Now()
+		before := time.Now()
 		addLdap, err := AdminClient.AddLDAPProvider(IAMCTX, &admin.AddLDAPProviderRequest{
 			Name:              name,
 			Servers:           []string{"servers"},
@@ -2002,7 +2002,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -2023,8 +2023,8 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, false, ldap.AllowCreation)
 			assert.Equal(t, false, ldap.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *ldap.AllowAutoLinking)
-			assert.WithinRange(t, ldap.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, ldap.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, ldap.CreatedAt, before, after)
+			assert.WithinRange(t, ldap.UpdatedAt, before, after)
 
 			// ldap
 			assert.Equal(t, []string{"servers"}, ldap.Servers)
@@ -2104,7 +2104,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change ldap
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateLDAPProvider(IAMCTX, &admin.UpdateLDAPProviderRequest{
 			Id:                addLdap.Id,
 			Name:              name,
@@ -2140,7 +2140,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		// check values for ldap
@@ -2160,7 +2160,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateLdap.AllowCreation)
 			assert.Equal(t, true, updateLdap.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateLdap.AllowAutoLinking)
-			assert.WithinRange(t, updateLdap.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, updateLdap.UpdatedAt, before, after)
 
 			// ldap
 			assert.Equal(t, []string{"new_servers"}, updateLdap.Servers)
@@ -2192,7 +2192,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name := gofakeit.Name()
 
 		// add apple
-		beforeCreate := time.Now()
+		before := time.Now()
 		addApple, err := AdminClient.AddAppleProvider(IAMCTX, &admin.AddAppleProviderRequest{
 			Name:       name,
 			ClientId:   "clientID",
@@ -2208,7 +2208,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -2229,8 +2229,8 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, false, apple.AllowCreation)
 			assert.Equal(t, false, apple.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *apple.AllowAutoLinking)
-			assert.WithinRange(t, apple.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, apple.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, apple.CreatedAt, before, after)
+			assert.WithinRange(t, apple.UpdatedAt, before, after)
 
 			// apple
 			assert.Equal(t, "clientID", apple.ClientID)
@@ -2274,7 +2274,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		name = "new_" + name
 		// change apple
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateAppleProvider(IAMCTX, &admin.UpdateAppleProviderRequest{
 			Id:         addApple.Id,
 			Name:       name,
@@ -2291,7 +2291,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		// check values for apple
@@ -2311,7 +2311,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateApple.AllowCreation)
 			assert.Equal(t, true, updateApple.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateApple.AllowAutoLinking)
-			assert.WithinRange(t, updateApple.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, updateApple.UpdatedAt, before, after)
 
 			// apple
 			assert.Equal(t, "new_clientID", updateApple.ClientID)
@@ -2327,7 +2327,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		federatedLogoutEnabled := false
 
 		// add saml
-		beforeCreate := time.Now()
+		before := time.Now()
 		addSAML, err := AdminClient.AddSAMLProvider(IAMCTX, &admin.AddSAMLProviderRequest{
 			Name: name,
 			Metadata: &admin.AddSAMLProviderRequest_MetadataXml{
@@ -2346,7 +2346,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		idpRepo := repository.IDProviderRepository(pool)
@@ -2367,8 +2367,8 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, false, saml.AllowCreation)
 			assert.Equal(t, false, saml.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *saml.AllowAutoLinking)
-			assert.WithinRange(t, saml.CreatedAt, beforeCreate, afterCreate)
-			assert.WithinRange(t, saml.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, saml.CreatedAt, before, after)
+			assert.WithinRange(t, saml.UpdatedAt, before, after)
 
 			// saml
 			assert.Equal(t, validSAMLMetadata1, saml.Metadata)
@@ -2420,7 +2420,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		name = "new_" + name
 		federatedLogoutEnabled = true
 		// change saml
-		beforeCreate := time.Now()
+		before := time.Now()
 		_, err = AdminClient.UpdateSAMLProvider(IAMCTX, &admin.UpdateSAMLProviderRequest{
 			Id:   addSAML.Id,
 			Name: name,
@@ -2440,7 +2440,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
 		})
-		afterCreate := time.Now()
+		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
 
 		// check values for apple
@@ -2460,7 +2460,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateSAML.AllowCreation)
 			assert.Equal(t, true, updateSAML.AllowAutoUpdate)
 			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateSAML.AllowAutoLinking)
-			assert.WithinRange(t, updateSAML.UpdatedAt, beforeCreate, afterCreate)
+			assert.WithinRange(t, updateSAML.UpdatedAt, before, after)
 
 			// saml
 			assert.Equal(t, validSAMLMetadata2, updateSAML.Metadata)
