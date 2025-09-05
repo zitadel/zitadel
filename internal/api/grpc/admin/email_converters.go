@@ -77,11 +77,12 @@ func httpToPb(http *query.HTTP) *settings_pb.EmailProvider_Http {
 func smtpToPb(config *query.SMTP) *settings_pb.EmailProvider_Smtp {
 	return &settings_pb.EmailProvider_Smtp{
 		Smtp: &settings_pb.EmailProviderSMTP{
-			Tls:           config.TLS,
-			Host:          config.Host,
-			User:          config.User,
-			SenderAddress: config.SenderAddress,
-			SenderName:    config.SenderName,
+			Tls:            config.TLS,
+			Host:           config.Host,
+			User:           config.User,
+			SenderAddress:  config.SenderAddress,
+			SenderName:     config.SenderName,
+			ReplyToAddress: config.ReplyToAddress,
 		},
 	}
 }
