@@ -194,4 +194,3 @@ login_ensure_remote:
 	else \
 		echo "Remote $(LOGIN_REMOTE_NAME) already exists."; \
 	fi
-

@@ -198,4 +198,3 @@ func (p *instanceRelationalProjection) updateInstance(ctx context.Context, event
 	)
 	return err
 }
-

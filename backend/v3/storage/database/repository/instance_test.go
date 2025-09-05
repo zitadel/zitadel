@@ -721,4 +721,3 @@ func TestDeleteInstance(t *testing.T) {
 		})
 	}
 }
-

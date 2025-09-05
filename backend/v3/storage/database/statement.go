@@ -41,7 +41,9 @@ func (b *StatementBuilder) AppendArg(arg any) (placeholder string) {
 	if b.existingArgs == nil {
 		b.existingArgs = make(map[any]string)
 	}
-
+	if placeholder, ok := b.existingArgs[arg]; ok {
+		return placeholder
+	}
 	if instruction, ok := arg.(Instruction); ok {
 		return string(instruction)
 	}
@@ -64,4 +66,3 @@ func (b *StatementBuilder) AppendArgs(args ...any) {
 func (b *StatementBuilder) Args() []any {
 	return b.args
 }
-

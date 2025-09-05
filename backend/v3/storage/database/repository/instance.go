@@ -304,4 +304,3 @@ func (i *instance) Domains(shouldLoad bool) domain.InstanceDomainRepository {
 	}
 	return i.domainRepo
 }
-

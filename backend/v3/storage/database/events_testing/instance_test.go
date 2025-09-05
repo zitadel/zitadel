@@ -89,6 +89,16 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 			}
 		})
 
+		// check instance exists
+		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			instance, err := instanceRepo.Get(CTX,
+				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
+			)
+			require.NoError(t, err)
+			assert.Equal(t, instanceName, instance.Name)
+		}, retryDuration, tick)
+
 		instanceName += "new"
 		beforeUpdate := time.Now()
 		_, err = SystemClient.UpdateInstance(CTX, &system.UpdateInstanceRequest{
@@ -98,14 +108,14 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		afterUpdate := time.Now()
 		require.NoError(t, err)
 
-		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
 				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
-			require.NoError(ttt, err)
+			require.NoError(t, err)
 			// event instance.changed
-			assert.Equal(ttt, instanceName, instance.Name)
+			assert.Equal(t, instanceName, instance.Name)
 			assert.WithinRange(t, instance.UpdatedAt, beforeUpdate, afterUpdate)
 		}, retryDuration, tick)
 	})
@@ -126,12 +136,12 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 
 		// check instance exists
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
 				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
-			require.NoError(ttt, err)
-			assert.Equal(ttt, instanceName, instance.Name)
+			require.NoError(t, err)
+			assert.Equal(t, instanceName, instance.Name)
 		}, retryDuration, tick)
 
 		_, err = SystemClient.RemoveInstance(CTX, &system.RemoveInstanceRequest{
@@ -140,7 +150,7 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
 				database.WithCondition(instanceRepo.IDCondition(res.GetInstanceId())),
 			)
@@ -150,5 +160,3 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 }
-
-

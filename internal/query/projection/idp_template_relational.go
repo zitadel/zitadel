@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
+	internal_domain "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/idp"
@@ -728,7 +729,12 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event ev
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			},
@@ -815,7 +821,12 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eve
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			},
@@ -912,7 +923,12 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
 			[]handler.Condition{
@@ -959,7 +975,12 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
 			[]handler.Condition{
@@ -1010,7 +1031,12 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalAdded(event even
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			},
@@ -1110,7 +1136,12 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event 
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1207,7 +1238,12 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1303,7 +1339,12 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdd
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			},
@@ -1396,7 +1437,12 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event e
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1490,7 +1536,12 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdd
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1583,7 +1634,12 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event e
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1697,7 +1753,12 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Ev
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1792,7 +1853,12 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.E
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1890,7 +1956,12 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Ev
 				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()),
+				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+						return nil
+					}
+					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 				handler.NewCol(IDPRelationalPayloadCol, payload),
 			},
@@ -1985,7 +2056,7 @@ func reduceIDPRelationalChangedTemplateColumns(name *string, optionChanges idp.O
 	if optionChanges.IsAutoUpdate != nil {
 		*cols = append(*cols, handler.NewCol(IDPRelationalAllowAutoUpdateCol, *optionChanges.IsAutoUpdate))
 	}
-	if optionChanges.AutoLinkingOption != nil {
+	if optionChanges.AutoLinkingOption != nil && *optionChanges.AutoLinkingOption != internal_domain.AutoLinkingOptionUnspecified {
 		*cols = append(*cols, handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(*optionChanges.AutoLinkingOption).String()))
 	}
 }
