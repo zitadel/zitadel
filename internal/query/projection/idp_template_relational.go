@@ -749,7 +749,7 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalChanged(event 
 		idpEvent = e.OAuthIDPChangedEvent
 		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-K1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
 	}
 
 	oauth, err := p.idpRepo.GetOAuth(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -836,7 +836,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event e
 		idpEvent = e.OIDCIDPChangedEvent
 		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1K82ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
 	}
 
 	oidc, err := p.idpRepo.GetOIDC(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -881,7 +881,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 		idpEvent = e.OIDCIDPMigratedAzureADEvent
 		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Yb582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
 	}
 
 	azureTenant, err := domain.AzureTenantTypeString(idpEvent.Tenant)
@@ -935,7 +935,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 		idpEvent = e.OIDCIDPMigratedGoogleEvent
 		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1502hk", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
 	}
 
 	google := domain.Google{
@@ -1031,7 +1031,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event ev
 		idpEvent = e.JWTIDPChangedEvent
 		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-H15j2il", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
 	}
 
 	jwt, err := p.idpRepo.GetJWT(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -1131,7 +1131,7 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(even
 		idpEvent = e.AzureADIDPChangedEvent
 		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YZ5x25s", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
 	}
 
 	oauth, err := p.idpRepo.GetOAzureAD(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -1228,7 +1228,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event
 		idpEvent = e.GitHubIDPChangedEvent
 		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPChangedEventType, instance.GitHubIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-L1U89ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPChangedEventType, instance.GitHubIDPChangedEventType})
 	}
 
 	github, err := p.idpRepo.GetGithub(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -1417,7 +1417,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event
 		idpEvent = e.GitLabIDPChangedEvent
 		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-mT5827b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
 	}
 
 	oauth, err := p.idpRepo.GetGitlab(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
@@ -1604,7 +1604,7 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 		idpEvent = e.GoogleIDPChangedEvent
 		orgCond = handler.NewIsNullCond((IDPRelationalOrgId))
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YN58hml", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
 	}
 
 	oauth, err := p.idpRepo.GetGoogle(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
