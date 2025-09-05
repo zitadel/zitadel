@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -21,17 +20,11 @@ func TranslationHandler() connect.UnaryInterceptorFunc {
 			defer func() { span.EndWithError(err) }()
 
 			if err != nil {
-				translator, translatorError := getTranslator(ctx)
-				if translatorError != nil {
-					return resp, err
-				}
+				translator := getTranslator(ctx)
 				return resp, translateError(ctx, err, translator)
 			}
 			if loc, ok := resp.Any().(localizers); ok {
-				translator, translatorError := getTranslator(ctx)
-				if translatorError != nil {
-					return resp, err
-				}
+				translator := getTranslator(ctx)
 				translateFields(ctx, loc, translator)
 			}
 			return resp, nil
@@ -39,10 +32,6 @@ func TranslationHandler() connect.UnaryInterceptorFunc {
 	}
 }
 
-func getTranslator(ctx context.Context) (*i18n.Translator, error) {
-	translator, err := i18n.NewZitadelTranslator(authz.GetInstance(ctx).DefaultLanguage())
-	if err != nil {
-		logging.New().WithError(err).Error("could not load translator")
-	}
-	return translator, err
+func getTranslator(ctx context.Context) *i18n.Translator {
+	return i18n.NewZitadelTranslator(authz.GetInstance(ctx).DefaultLanguage())
 }

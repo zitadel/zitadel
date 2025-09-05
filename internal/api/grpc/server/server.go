@@ -15,6 +15,7 @@ import (
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/query"
@@ -62,6 +63,7 @@ func CreateServer(
 	tlsConfig *tls.Config,
 	accessSvc *logstore.Service[*record.AccessLog],
 	targetEncAlg crypto.EncryptionAlgorithm,
+	translator *i18n.Translator,
 ) *grpc.Server {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	serverOptions := []grpc.ServerOption{
@@ -70,7 +72,7 @@ func CreateServer(
 				middleware.CallDurationHandler(),
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),
-				middleware.InstanceInterceptor(queries, externalDomain, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
+				middleware.InstanceInterceptor(queries, externalDomain, translator, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
 				middleware.AccessStorageInterceptor(accessSvc),
 				middleware.ErrorHandler(),
 				middleware.LimitsInterceptor(system_pb.SystemService_ServiceDesc.ServiceName),

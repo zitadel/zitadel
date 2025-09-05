@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/zitadel/logging"
-	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -24,9 +23,7 @@ const (
 	HTTP1Host = "x-zitadel-http1-host"
 )
 
-func InstanceInterceptor(verifier authz.InstanceVerifier, externalDomain string, explicitInstanceIdServices ...string) grpc.UnaryServerInterceptor {
-	translator, err := i18n.NewZitadelTranslator(language.English)
-	logging.OnError(err).Panic("unable to get translator")
+func InstanceInterceptor(verifier authz.InstanceVerifier, externalDomain string, translator *i18n.Translator, explicitInstanceIdServices ...string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		return setInstance(ctx, req, info, handler, verifier, externalDomain, translator, explicitInstanceIdServices...)
 	}

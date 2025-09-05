@@ -8,7 +8,6 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/zitadel/logging"
-	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
@@ -18,9 +17,7 @@ import (
 	object_v3 "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 )
 
-func InstanceInterceptor(verifier authz.InstanceVerifier, externalDomain string, explicitInstanceIdServices ...string) connect.UnaryInterceptorFunc {
-	translator, err := i18n.NewZitadelTranslator(language.English)
-	logging.OnError(err).Panic("unable to get translator")
+func InstanceInterceptor(verifier authz.InstanceVerifier, externalDomain string, translator *i18n.Translator, explicitInstanceIdServices ...string) connect.UnaryInterceptorFunc {
 	return func(handler connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
 			return setInstance(ctx, req, handler, verifier, externalDomain, translator, explicitInstanceIdServices...)

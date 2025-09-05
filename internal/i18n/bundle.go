@@ -31,7 +31,7 @@ func init() {
 	}
 }
 
-func newBundle(ns Namespace, defaultLanguage language.Tag, allowedLanguages []language.Tag) (*i18n.Bundle, error) {
+func newBundle(ns Namespace, defaultLanguage language.Tag, allowedLanguages []language.Tag) *i18n.Bundle {
 	bundle := i18n.NewBundle(defaultLanguage)
 
 	for lang, file := range translationMessages[ns] {
@@ -41,7 +41,7 @@ func newBundle(ns Namespace, defaultLanguage language.Tag, allowedLanguages []la
 		bundle.MustAddMessages(lang, file.Messages...)
 	}
 
-	return bundle, nil
+	return bundle
 }
 
 func loadTranslationsFromNamespace(ns Namespace) {
