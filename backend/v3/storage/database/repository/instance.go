@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"time"
 
@@ -34,7 +33,11 @@ func InstanceRepository(client database.QueryExecutor) domain.InstanceRepository
 
 const (
 	queryInstanceStmt = `SELECT instances.id, instances.name, instances.default_org_id, instances.iam_project_id, instances.console_client_id, instances.console_app_id, instances.default_language, instances.created_at, instances.updated_at` +
-		` , CASE WHEN count(instance_domains.domain) > 0 THEN jsonb_agg(json_build_object('domain', instance_domains.domain, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at)) ELSE NULL::JSONB END domains` +
+		` , CASE 
+				WHEN COUNT(instance_domains.domain) > 0 THEN 
+					JSONB_AGG(JSON_BUILD_OBJECT('domain', instance_domains.domain, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at))
+				ELSE NULL
+			END AS domains` +
 		` FROM zitadel.instances`
 )
 
@@ -160,15 +163,19 @@ func (i instance) SetUpdatedAt(time time.Time) database.Change {
 func (i instance) SetIAMProject(id string) database.Change {
 	return database.NewChange(i.IAMProjectIDColumn(), id)
 }
+
 func (i instance) SetDefaultOrg(id string) database.Change {
 	return database.NewChange(i.DefaultOrgIDColumn(), id)
 }
+
 func (i instance) SetDefaultLanguage(lang language.Tag) database.Change {
 	return database.NewChange(i.DefaultLanguageColumn(), lang.String())
 }
+
 func (i instance) SetConsoleClientID(id string) database.Change {
 	return database.NewChange(i.ConsoleClientIDColumn(), id)
 }
+
 func (i instance) SetConsoleAppID(id string) database.Change {
 	return database.NewChange(i.ConsoleAppIDColumn(), id)
 }
@@ -238,7 +245,7 @@ func (instance) UpdatedAtColumn() database.Column {
 
 type rawInstance struct {
 	*domain.Instance
-	RawDomains sql.Null[json.RawMessage] `json:"domains,omitzero" db:"domains"`
+	RawDomains *json.RawMessage `json:"domains,omitzero" db:"domains"`
 }
 
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
@@ -252,8 +259,8 @@ func scanInstance(ctx context.Context, querier database.Querier, builder *databa
 		return nil, err
 	}
 
-	if instance.RawDomains.Valid {
-		if err := json.Unmarshal(instance.RawDomains.V, &instance.Domains); err != nil {
+	if instance.RawDomains != nil {
+		if err := json.Unmarshal(*instance.RawDomains, &instance.Domains); err != nil {
 			return nil, err
 		}
 	}
@@ -274,8 +281,8 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 
 	instances := make([]*domain.Instance, len(rawInstances))
 	for i, instance := range rawInstances {
-		if instance.RawDomains.Valid {
-			if err := json.Unmarshal(instance.RawDomains.V, &instance.Domains); err != nil {
+		if instance.RawDomains != nil {
+			if err := json.Unmarshal(*instance.RawDomains, &instance.Domains); err != nil {
 				return nil, err
 			}
 		}
