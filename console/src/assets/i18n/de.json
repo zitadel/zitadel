@@ -1654,7 +1654,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wenn diese Option aktiviert ist, verwendet die Konsole die V2 User API, um neue Benutzer zu erstellen. Mit der V2 API starten neu erstellte Benutzer nicht im Initial Zustand.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Durch das Aktivieren wird das neue TypeScript-basierte Login-UI mit verbesserter Sicherheit, Leistung und Anpassbarkeit aktiviert.",
-      "LOGINV2_BASEURI": "Basis-URI"
+      "LOGINV2_BASEURI": "Basis-URI",
+      "ENABLERELATIONALTABLES": "Relationale Tabellen",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktivieren Sie diese Option, um relationale Tabellen anstelle von Projektionen zur Datenspeicherung zu verwenden. Diese Option hat derzeit keine Auswirkung."
     },
     "DIALOG": {
       "RESET": {

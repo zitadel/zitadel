@@ -122,7 +122,7 @@ https://github.com/zitadel/zitadel-go/blob/next/example/app/templates/profile.ht
 ### Start your application
 
 You will need to provide some values for the program to run:
-- `domain`: Your ZITADEL instance domain, e.g. my-domain.zitadel.cloud
+- `domain`: Your ZITADEL custom domain, e.g. my-domain.zitadel.cloud
 - `key`: Random secret string. Used for symmetric encryption of state parameters, cookies and PCKE.
 - `clientID`: The clientID provided by ZITADEL
 - `redirectURI`: The redirectURI registered at ZITADEL
