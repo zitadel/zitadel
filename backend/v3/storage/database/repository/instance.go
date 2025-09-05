@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"time"
 
@@ -237,7 +238,7 @@ func (instance) UpdatedAtColumn() database.Column {
 
 type rawInstance struct {
 	*domain.Instance
-	RawDomains *json.RawMessage `json:"domains,omitzero" db:"domains"`
+	RawDomains sql.Null[sql.RawBytes] `json:"domains,omitzero" db:"domains"`
 }
 
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
@@ -251,8 +252,8 @@ func scanInstance(ctx context.Context, querier database.Querier, builder *databa
 		return nil, err
 	}
 
-	if instance.RawDomains != nil && len(*instance.RawDomains) > 0 {
-		if err := json.Unmarshal(*instance.RawDomains, &instance.Domains); err != nil {
+	if instance.RawDomains.Valid {
+		if err := json.Unmarshal(instance.RawDomains.V, &instance.Domains); err != nil {
 			return nil, err
 		}
 	}
@@ -273,8 +274,8 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 
 	instances := make([]*domain.Instance, len(rawInstances))
 	for i, instance := range rawInstances {
-		if instance.RawDomains != nil && len(*instance.RawDomains) > 0 {
-			if err := json.Unmarshal(*instance.RawDomains, &instance.Domains); err != nil {
+		if instance.RawDomains.Valid {
+			if err := json.Unmarshal(instance.RawDomains.V, &instance.Domains); err != nil {
 				return nil, err
 			}
 		}
