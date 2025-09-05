@@ -19,11 +19,11 @@ import (
 )
 
 var headersToForward = map[string]bool{
-	http_utils.ContentType:   true,
-	http_utils.ForwardedFor:  true,
-	http_utils.ForwardedHost: true,
-	http_utils.Host:          true,
-	http_utils.Origin:        true,
+	strings.ToLower(http_utils.ContentType):   true,
+	strings.ToLower(http_utils.ForwardedFor):  true,
+	strings.ToLower(http_utils.ForwardedHost): true,
+	strings.ToLower(http_utils.Host):          true,
+	strings.ToLower(http_utils.Origin):        true,
 }
 
 func ExecutionHandler(alg crypto.EncryptionAlgorithm) connect.UnaryInterceptorFunc {
