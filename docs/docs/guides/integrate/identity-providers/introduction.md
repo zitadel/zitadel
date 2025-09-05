@@ -85,8 +85,8 @@ In ZITADEL, you have the flexibility to link an external Identity Provider (IdP)
 The login policy can be set as a default at the instance level and can be customized for each organization. The configuration process varies slightly depending on your focus:
 
 
-- **For default settings**, navigate to: `$YOUR-DOMAIN/ui/console/instance?id=general`
-- **For specific organization settings**, select the organization from the menu and visit: `$YOUR-DOMAIN/ui/console/org-settings?id=login`
+- **For default settings**, navigate to: `${CUSTOM_DOMAIN}/ui/console/instance?id=general`
+- **For specific organization settings**, select the organization from the menu and visit: `${CUSTOM_DOMAIN}/ui/console/org-settings?id=login`
 
 
 Once in the settings:
