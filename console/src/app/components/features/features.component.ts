@@ -36,6 +36,7 @@ const FEATURE_KEYS = [
   'oidcTokenExchange',
   'permissionCheckV2',
   'userSchema',
+  'enableRelationalTables',
 ] as const;
 
 export type ToggleState = { source: Source; enabled: boolean };

@@ -1652,7 +1652,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ha ez a jelző engedélyezve van, a konzol a V2 User API-t használja új felhasználók létrehozásához. A V2 API-val az újonnan létrehozott felhasználók kezdeti állapot nélkül indulnak.",
       "LOGINV2": "Bejelentkezés V2",
       "LOGINV2_DESCRIPTION": "Ennek engedélyezésével aktiválódik az új, TypeScript-alapú bejelentkezési felület, amely jobb biztonságot, teljesítményt és testreszabhatóságot nyújt.",
-      "LOGINV2_BASEURI": "Alap URI"
+      "LOGINV2_BASEURI": "Alap URI",
+      "ENABLERELATIONALTABLES": "Kapcsolati táblák",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Engedélyez ezt a relációs táblák használatához a projekciók helyett az adatok tárolásához. Jelenleg ez a kapcsoló semmit sem csinál."
     },
     "DIALOG": {
       "RESET": {
