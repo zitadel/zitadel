@@ -2,14 +2,7 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
     "default": [
-      "{workspaceRoot}/pnpm-lock.yaml",
-      "{projectRoot}/**/*",
-      "!{projectRoot}/Dockerfile",
-      "!{projectRoot}/.dockerignore",
-      "!{projectRoot}/.prettierignore",
-      "!{projectRoot}/.prettierrc",
-      "!{projectRoot}/prettier.config.mjs"
-
+      "{projectRoot}/**/*"
     ],
     "docker": [
       "{projectRoot}/Dockerfile",
@@ -19,6 +12,12 @@
       "{projectRoot}/.prettierignore",
       "{projectRoot}/.prettierrc",
       "{projectRoot}/prettier.config.mjs"
+    ],
+    "compose": [
+      "docker",
+      {"env": "COMPOSE_FILE"},
+      "{workspaceRoot}/.devcontainer/postgres.env",
+      "{workspaceRoot}/.devcontainer/postgresql.conf"
     ]
   },
   "targetDefaults": {
@@ -40,10 +39,7 @@
     },
     "start": {
       "cache": false,
-      "continuous": true,
-      "dependsOn": [
-        "build"
-      ]
+      "continuous": true
     },
     "dev": {
       "cache": false,
@@ -68,8 +64,7 @@
     "test-integration": {
       "inputs": [
         "default"
-      ],
-      "cache": true
+      ]
     },
     "check": {
       "dependsOn": [
@@ -81,8 +76,7 @@
     },
     "build-docker": {
       "inputs": [
-        "default",
-        "docker"
+        "default"
       ]
     }
   },

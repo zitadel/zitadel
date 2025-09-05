@@ -3,20 +3,19 @@
 	"name": "Zitadel Devcontainer",
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "devcontainer",
-	"runServices": [
-		"devcontainer"
-	],
 	"shutdownAction": "none",
 	"workspaceFolder": "/workspaces/zitadel",
 	"forwardPorts": [
-		5432,
+		"db:5432",
+		"login-core-mock:22220",
+		"login-core-mock:22222",
 		3000,
 		4200,
 		8080
 	],
 	"updateContentCommand": {
-		"goModules": "go mod download",
-		"nodeModules": "pnpm install && pnpm add -g nx"
+		"goModules": "go mod download || true",
+		"nodeModules": "pnpm install || true; pnpm add -g nx || true; pnpm cypress install || true"
 	},
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {

@@ -13,7 +13,7 @@
     "test-unit": "vitest --run",
     "lint-staged": "lint-staged",
     "clean": "rm -rf node_modules .next cypress",
-    "test-integration": "wait-on --simultaneous 1 http://localhost:3001/ui/v2/login/verify?userId=221394658884845598&code=abc && cypress run"
+    "test-integration": "echo \"CORE_MOCK_STUBS_URL=${CORE_MOCK_STUBS_URL} DEVCONTAINER_LOGIN_CORE_MOCK_HOST=${DEVCONTAINER_LOGIN_CORE_MOCK_HOST}\" && wait-on --simultaneous 1 ${CORE_MOCK_STUBS_URL} http://localhost:3000/ui/v2/login/verify?userId=221394658884845598&code=abc && DISPLAY='' cypress run --headless"
   },
   "pnpm": {
     "overrides": {

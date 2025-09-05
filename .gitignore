@@ -95,6 +95,9 @@ load-test/output/*
 # PNPM
 .pnpm-store
 
+# Cache directories
+.cache
+
 # Nx
 .nx/cache
 .nx/workspace-data

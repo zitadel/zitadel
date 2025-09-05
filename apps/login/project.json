@@ -1,57 +1,25 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
-    "env-local": {
-      "description": "Create environment files with ZITADEL service user token",
-      "cache": true,
-      "outputs": [
-        "{projectRoot}/.env.local"
-      ],
-      "dependsOn": [
-        "@zitadel/core:start-setup"
-      ],
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{projectRoot}",
-        "commands": [
-          "TOKEN=$(cat ../../login-client.pat) && echo \"ZITADEL_SERVICE_USER_TOKEN=$TOKEN\" > .env.local"
-        ],
-        "parallel": false
-      }
-    },
     "build": {
       "description": "Build the Next.js application in standalone mode for production. (Cache is disabled because it doesn't work https://github.com/nrwl/nx/issues/27724)",
       "cache": true,
       "dependsOn": [
-        "env-local",
         "^build"
       ],
       "inputs": [
         "default",
-        "!{projectRoot}/integration/integration/**",
-        "!{projectRoot}/integration/support/**",
-        "!{projectRoot}/cypress.config.ts",
-        "!{projectRoot}/package.json"
-
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/cypress.config.ts"
       ],
       "outputs": [
         "{projectRoot}/.next/standalone"
       ]
     },
-    "dev": {
-      "description": "Start the Next.js development server with Zitadel core backend",
-      "dependsOn": [
-        "env-local",
-        "@zitadel/core:start"
-      ]
-    },
     "start": {
-      "description": "Start the standalone production build",
-      "dependsOn": [
-        "env-local",
-        "@zitadel/core:start",
-        "build"
-      ]
+      "description": "Start the standalone production build"
     },
     "build-docker": {
       "description": "Build Docker image for the login application",
@@ -70,6 +38,37 @@
           "--publish",
           "3000:3000"
         ]
+      }
+    },
+    "dev": {
+      "description": "Start the Next.js development server with Zitadel core backend",
+      "configurations": {
+        "local": {
+          "dependsOn": [
+            "@zitadel/core:build",
+            "@zitadel/core:start-setup",
+            "local-sa-token",
+            "@zitadel/core:start",
+            "@zitadel/console:build",
+            "@zitadel/console:start"
+          ]
+        },
+        "custom": {}
+      }
+    },
+    "local-sa-token": {
+      "description": "Create environment file with ZITADEL service user token against the local API",
+      "cache": true,
+      "outputs": [
+        "{projectRoot}/.env.local"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "TOKEN=$(cat ../../login-client.pat) && echo \"ZITADEL_SERVICE_USER_TOKEN=$TOKEN\" > .env.local"
+        ],
+        "parallel": false
       }
     },
     "check": {
@@ -96,51 +95,31 @@
         "^build"
       ]
     },
-    "test-integration": {
-      "description": "Run integration tests with Cypress",
+    "test-integration-env": {
+      "description": "Start the login and the core mock server to run the integration tests",
+      "continuous": true,
       "dependsOn": [
-        "@zitadel/login-core-mock:start-docker",
-        "start-integration",
-        "build"
+        "@zitadel/login-core-mock:build-docker"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": true,
+        "commands": [
+          "nx run @zitadel/devcontainer:start-login-core-mock",
+          "HOSTNAME=localhost nx run @zitadel/login:start"
+        ]
+      }
+    },
+    "test-integration": {
+      "dependsOn": [
+        "test-integration-env"
       ],
       "inputs": [
         "{projectRoot}/integration/integration/**",
         "{projectRoot}/integration/support/**",
         "{projectRoot}/cypress.config.ts",
-        "{workspaceRoot}/pnpm-lock.yaml",
-        "{projectRoot}/package.json"
-      ],
-      "outputs": [
-        "{projectRoot}/cypress"
+        "{workspaceRoot}/pnpm-lock.yaml"
       ]
-    },
-    "start-integration": {
-      "description": "Start the application for integration testing",
-      "continuous": true,
-      "cache": false,
-      "dependsOn": [
-        "start"
-      ],
-      "defaultConfiguration": "local",
-      "configurations": {
-        "local": {},
-        "devcontainer": {
-          
-        }
-      }
-    },
-    "start-login-only": {
-      "description": "Start the standalone production build without starting the core service",
-      "continuous": true,
-      "cache": false,
-      "dependsOn": [
-        "env-local",
-        "build"
-      ],
-      "executor": "nx:run-script",
-      "options": {
-        "script": "start"
-      }
     }
   }
 }

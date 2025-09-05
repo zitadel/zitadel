@@ -3,19 +3,13 @@
     "name": "@zitadel/login-core-mock",
     "targets": {
         "build-docker": {
+            "cache": true,
+            "inputs": [
+                "default",
+                "{workspaceRoot}/proto/**/*"
+            ],
             "options": {
                 "build-context": "zitadel-protos=../../../../proto"
-            }
-        },
-        "start-docker": {
-            "continuous": true,
-            "options": {
-                "args": [
-                    "--publish",
-                    "22222:22222",
-                    "--publish",
-                    "22220:22220"
-                ]
             }
         }
     }

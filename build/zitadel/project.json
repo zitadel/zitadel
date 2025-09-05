@@ -25,7 +25,7 @@
         },
         "start-db": {
             "description": "Run the PostgreSQL database container",
-            "command": "docker compose --file ./.devcontainer/docker-compose.yaml up start-db postgres:latest postgres -c config_file=/etc/postgresql/postgresql.conf",
+            "command": "docker compose --file ./.devcontainer/docker-compose.yaml up db",
             "options": {
                 "cwd": "{projectRoot}"
             },
