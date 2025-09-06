@@ -44,7 +44,7 @@
     "deepmerge": "^4.3.1",
     "lucide-react": "0.469.0",
     "moment": "^2.29.4",
-    "next": "15.4.0-canary.86",
+    "next": "15.4.7",
     "next-intl": "^3.25.1",
     "next-themes": "^0.2.1",
     "nice-grpc": "2.0.1",
