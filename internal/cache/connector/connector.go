@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/cache/connector/gomap"
 	"github.com/zitadel/zitadel/internal/cache/connector/noop"
@@ -55,7 +56,7 @@ func StartCache[I ~int, K ~string, V cache.Entry[I, K]](background context.Conte
 		return c, nil
 	}
 	if conf.Connector == cache.ConnectorPostgres && connectors.Postgres != nil {
-		c, err := pg.NewCache[I, K, V](background, purpose, *conf, indices, connectors.Postgres)
+		c, err := pg.NewCache[I, K, V](background, purpose, build.Version(), *conf, indices, connectors.Postgres)
 		if err != nil {
 			return nil, fmt.Errorf("start cache: %w", err)
 		}
@@ -64,7 +65,7 @@ func StartCache[I ~int, K ~string, V cache.Entry[I, K]](background context.Conte
 	}
 	if conf.Connector == cache.ConnectorRedis && connectors.Redis != nil {
 		db := connectors.Redis.Config.DBOffset + int(purpose)
-		c := redis.NewCache[I, K, V](*conf, connectors.Redis, db, indices)
+		c := redis.NewCache[I, K, V](*conf, build.Version(), connectors.Redis, db, indices)
 		return c, nil
 	}
 
