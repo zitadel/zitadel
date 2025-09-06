@@ -77,7 +77,7 @@ export function SetPasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not reset password");
+        setError(t("set.errors.couldNotResetPassword"));
         return;
       })
       .finally(() => {
@@ -104,7 +104,7 @@ export function SetPasswordForm({
 
     const changeResponse = await changePassword(payload)
       .catch(() => {
-        setError("Could not set password");
+        setError(t("set.errors.couldNotSetPassword"));
         return;
       })
       .finally(() => {
@@ -117,7 +117,7 @@ export function SetPasswordForm({
     }
 
     if (!changeResponse) {
-      setError("Could not set password");
+      setError(t("set.errors.couldNotSetPassword"));
       return;
     }
 
@@ -141,7 +141,7 @@ export function SetPasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not verify password");
+        setError(t("set.errors.couldNotVerifyPassword"));
         return;
       })
       .finally(() => {

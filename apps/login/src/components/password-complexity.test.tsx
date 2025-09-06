@@ -7,6 +7,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { PasswordComplexity } from "./password-complexity";
+import { NextIntlClientProvider } from "next-intl";
 
 const matchesTitle = `Matches`;
 const doesntMatchTitle = `Doesn't match`;
@@ -23,19 +24,36 @@ describe("<PasswordComplexity/>", () => {
     ({ settingsMinLength, password, expectSVGTitle }) => {
       const feedbackElementLabel = /password length/i;
       beforeEach(() => {
+        const messages = {
+          password: {
+            complexity: {
+              "length": "Must be at least {minLength} characters long.",
+              "hasSymbol": "Must include a symbol.",
+              "hasNumber": "Must include a number.",
+              "hasUppercase": "Must include an uppercase letter.",
+              "hasLowercase": "Must include a lowercase letter.",
+              "equals": "Password confirmation matched.",
+              "matches": "Matches",
+              "doesNotMatch": "Doesn't match",
+            },
+          },
+        };
+
         render(
-          <PasswordComplexity
-            password={password}
-            equals
-            passwordComplexitySettings={{
-              minLength: settingsMinLength,
-              requiresLowercase: false,
-              requiresUppercase: false,
-              requiresNumber: false,
-              requiresSymbol: false,
-              resourceOwnerType: 0, // ResourceOwnerType.RESOURCE_OWNER_TYPE_UNSPECIFIED,
-            }}
-          />,
+          <NextIntlClientProvider locale="en" messages={messages}>
+            <PasswordComplexity
+              password={password}
+              equals
+              passwordComplexitySettings={{
+                minLength: settingsMinLength,
+                requiresLowercase: false,
+                requiresUppercase: false,
+                requiresNumber: false,
+                requiresSymbol: false,
+                resourceOwnerType: 0, // ResourceOwnerType.RESOURCE_OWNER_TYPE_UNSPECIFIED,
+              }}
+            />
+          </NextIntlClientProvider>,
         );
       });
       afterEach(cleanup);
