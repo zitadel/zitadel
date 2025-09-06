@@ -5,11 +5,7 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import {
-  getBrandingSettings,
-  getDefaultOrg,
-  getLoginSettings,
-} from "@/lib/zitadel";
+import { getBrandingSettings, getDefaultOrg, getLoginSettings } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -17,12 +13,10 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("password");
-  return { title: t('verify.title')};
+  return { title: t("verify.title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
   let { loginName, organization, requestId } = searchParams;
 
@@ -66,25 +60,11 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
-        <h1>
-          {sessionFactors?.factors?.user?.displayName ?? (
-            <Translated i18nKey="verify.title" namespace="password" />
-          )}
-        </h1>
-        <p className="ztdl-p mb-6 block">
+      <div className="flex flex-col space-y-4">
+        <h1>{sessionFactors?.factors?.user?.displayName ?? <Translated i18nKey="verify.title" namespace="password" />}</h1>
+        <p className="ztdl-p">
           <Translated i18nKey="verify.description" namespace="password" />
         </p>
-
-        {/* show error only if usernames should be shown to be unknown */}
-        {(!sessionFactors || !loginName) &&
-          !loginSettings?.ignoreUnknownUsernames && (
-            <div className="py-4">
-              <Alert>
-                <Translated i18nKey="unknownContext" namespace="error" />
-              </Alert>
-            </div>
-          )}
 
         {sessionFactors && (
           <UserAvatar
@@ -93,6 +73,17 @@ export default async function Page(props: {
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
+        )}
+      </div>
+
+      <div className="w-full">
+        {/* show error only if usernames should be shown to be unknown */}
+        {(!sessionFactors || !loginName) && !loginSettings?.ignoreUnknownUsernames && (
+          <div className="py-4">
+            <Alert>
+              <Translated i18nKey="unknownContext" namespace="error" />
+            </Alert>
+          </div>
         )}
 
         {loginName && (

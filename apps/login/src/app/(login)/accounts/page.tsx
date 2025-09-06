@@ -3,11 +3,7 @@ import { SessionsList } from "@/components/sessions-list";
 import { Translated } from "@/components/translated";
 import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
-import {
-  getBrandingSettings,
-  getDefaultOrg,
-  listSessions,
-} from "@/lib/zitadel";
+import { getBrandingSettings, getDefaultOrg, listSessions } from "@/lib/zitadel";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
@@ -18,7 +14,7 @@ import Link from "next/link";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("accounts");
-  return { title: t('title')};
+  return { title: t("title") };
 }
 
 async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
@@ -36,9 +32,7 @@ async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
   }
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   const requestId = searchParams?.requestId;
@@ -76,14 +70,16 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="title" namespace="accounts" />
         </h1>
-        <p className="ztdl-p mb-6 block">
+        <p className="ztdl-p">
           <Translated i18nKey="description" namespace="accounts" />
         </p>
+      </div>
 
+      <div className="w-full">
         <div className="flex w-full flex-col space-y-2">
           <SessionsList sessions={sessions} requestId={requestId} />
           <Link href={`/loginname?` + params}>
