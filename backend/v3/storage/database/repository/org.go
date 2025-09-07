@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -214,7 +215,7 @@ func (org) UpdatedAtColumn() database.Column {
 
 type rawOrganization struct {
 	*domain.Organization
-	RawDomains *json.RawMessage `json:",omitempty" db:"domains"`
+	RawDomains *sql.RawBytes `json:",omitempty" db:"domains"`
 }
 
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
