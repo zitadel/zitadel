@@ -211,31 +211,44 @@ func (org) UpdatedAtColumn() database.Column {
 // scanners
 // -------------------------------------------------------------
 
+type rawOrg struct {
+	*domain.Organization
+	Domains JSONArray[domain.OrganizationDomain] `json:"domains,omitempty" db:"domains"`
+}
+
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
-	var org domain.Organization
+	var org rawOrg
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&org); err != nil {
 		return nil, err
 	}
+	org.Organization.Domains = org.Domains
 
-	return &org, nil
+	return org.Organization, nil
 }
 
-func scanOrganizations(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (orgs []*domain.Organization, err error) {
+func scanOrganizations(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Organization, error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
+	var orgs []*rawOrg
 	if err := rows.(database.CollectableRows).Collect(&orgs); err != nil {
 		return nil, err
 	}
 
-	return orgs, nil
+	result := make([]*domain.Organization, len(orgs))
+	for i, org := range orgs {
+		result[i] = org.Organization
+		result[i].Domains = org.Domains
+	}
+
+	return result, nil
 }
 
 // -------------------------------------------------------------
