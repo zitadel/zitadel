@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -214,7 +213,7 @@ func (org) UpdatedAtColumn() database.Column {
 
 type rawOrganization struct {
 	*domain.Organization
-	RawDomains []byte `json:",omitempty" db:"domains"`
+	// RawDomains []byte `json:",omitempty" db:"domains"`
 }
 
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
@@ -227,11 +226,11 @@ func scanOrganization(ctx context.Context, querier database.Querier, builder *da
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&org); err != nil {
 		return nil, err
 	}
-	if len(org.RawDomains) > 0 {
-		if err := json.Unmarshal(org.RawDomains, &org.Domains); err != nil {
-			return nil, err
-		}
-	}
+	// if len(org.RawDomains) > 0 {
+	// 	if err := json.Unmarshal(org.RawDomains, &org.Domains); err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
 	return org.Organization, nil
 }
@@ -248,14 +247,14 @@ func scanOrganizations(ctx context.Context, querier database.Querier, builder *d
 	}
 
 	organizations := make([]*domain.Organization, len(rawOrgs))
-	for i, org := range rawOrgs {
-		if len(org.RawDomains) > 0 {
-			if err := json.Unmarshal(org.RawDomains, &org.Domains); err != nil {
-				return nil, err
-			}
-		}
-		organizations[i] = org.Organization
-	}
+	// for i, org := range rawOrgs {
+	// 	if len(org.RawDomains) > 0 {
+	// 		if err := json.Unmarshal(org.RawDomains, &org.Domains); err != nil {
+	// 			return nil, err
+	// 		}
+	// 	}
+	// 	organizations[i] = org.Organization
+	// }
 	return organizations, nil
 }
 

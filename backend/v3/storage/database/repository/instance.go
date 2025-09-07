@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"golang.org/x/text/language"
@@ -237,7 +236,7 @@ func (instance) UpdatedAtColumn() database.Column {
 
 type rawInstance struct {
 	*domain.Instance
-	RawDomains []byte `json:",omitempty" db:"domains"`
+	// RawDomains []byte `json:",omitempty" db:"domains"`
 }
 
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
@@ -251,11 +250,11 @@ func scanInstance(ctx context.Context, querier database.Querier, builder *databa
 		return nil, err
 	}
 
-	if len(instance.RawDomains) > 0 {
-		if err := json.Unmarshal(instance.RawDomains, &instance.Domains); err != nil {
-			return nil, err
-		}
-	}
+	// if len(instance.RawDomains) > 0 {
+	// 	if err := json.Unmarshal(instance.RawDomains, &instance.Domains); err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
 	return instance.Instance, nil
 }
@@ -272,14 +271,14 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 	}
 
 	instances := make([]*domain.Instance, len(rawInstances))
-	for i, instance := range rawInstances {
-		if len(instance.RawDomains) > 0 {
-			if err := json.Unmarshal(instance.RawDomains, &instance.Domains); err != nil {
-				return nil, err
-			}
-		}
-		instances[i] = instance.Instance
-	}
+	// for i, instance := range rawInstances {
+	// 	if len(instance.RawDomains) > 0 {
+	// 		if err := json.Unmarshal(instance.RawDomains, &instance.Domains); err != nil {
+	// 			return nil, err
+	// 		}
+	// 	}
+	// 	instances[i] = instance.Instance
+	// }
 	return instances, nil
 }
 
