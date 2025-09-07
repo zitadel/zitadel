@@ -14,6 +14,16 @@ import (
 
 type InstanceDomains []*InstanceDomain
 
+// UnmarshalJSON implements json.Unmarshaler.
+func (i *InstanceDomains) UnmarshalJSON(data []byte) error {
+	var domains []*InstanceDomain
+	if err := json.Unmarshal(data, &domains); err != nil {
+		return err
+	}
+	*i = domains
+	return nil
+}
+
 // Scan implements sql.Scanner.
 func (i *InstanceDomains) Scan(src any) error {
 	switch s := src.(type) {
@@ -29,7 +39,10 @@ func (i *InstanceDomains) Scan(src any) error {
 	}
 }
 
-var _ sql.Scanner = (*InstanceDomains)(nil)
+var (
+	_ sql.Scanner      = (*InstanceDomains)(nil)
+	_ json.Unmarshaler = (*InstanceDomains)(nil)
+)
 
 type InstanceDomain struct {
 	InstanceID string `json:"instanceId,omitempty" db:"instance_id"`
