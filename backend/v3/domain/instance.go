@@ -21,7 +21,7 @@ type Instance struct {
 	CreatedAt       time.Time `json:"createdAt" db:"created_at"`
 	UpdatedAt       time.Time `json:"updatedAt" db:"updated_at"`
 
-	Domains []*InstanceDomain `json:"domains,omitempty" db:"-"`
+	Domains []*InstanceDomain `json:"domains,omitempty" db:"domains"`
 }
 
 type instanceCacheIndex uint8

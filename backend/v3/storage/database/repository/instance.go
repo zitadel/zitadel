@@ -238,24 +238,19 @@ func (instance) UpdatedAtColumn() database.Column {
 // scanners
 // -------------------------------------------------------------
 
-type rawInstance struct {
-	*domain.Instance
-	Domains JSONArray[domain.InstanceDomain] `json:"domains,omitempty" db:"domains"`
-}
-
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
-	var instance rawInstance
+	var instance domain.Instance
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&instance); err != nil {
 		return nil, err
 	}
-	instance.Instance.Domains = instance.Domains
+	// instance.Domains = instance.Domains
 
-	return instance.Instance, nil
+	return &instance, nil
 }
 
 func scanInstances(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Instance, error) {
@@ -264,18 +259,12 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 		return nil, err
 	}
 
-	var instances []*rawInstance
+	var instances []*domain.Instance
 	if err := rows.(database.CollectableRows).Collect(&instances); err != nil {
 		return nil, err
 	}
 
-	result := make([]*domain.Instance, len(instances))
-	for i, instance := range instances {
-		result[i] = instance.Instance
-		result[i].Domains = instance.Domains
-	}
-
-	return result, nil
+	return instances, nil
 }
 
 // -------------------------------------------------------------
