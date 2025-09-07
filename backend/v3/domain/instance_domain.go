@@ -2,6 +2,9 @@ package domain
 
 import (
 	"context"
+	"database/sql"
+	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -9,24 +12,24 @@ import (
 
 // type Array[T any] []*T
 
-// type InstanceDomains []*InstanceDomain
+type InstanceDomains []*InstanceDomain
 
-// // Scan implements sql.Scanner.
-// func (i *InstanceDomains) Scan(src any) error {
-// 	switch s := src.(type) {
-// 	case string:
-// 		return json.Unmarshal([]byte(s), i)
-// 	case []byte:
-// 		return json.Unmarshal(s, i)
-// 	case nil:
-// 		*i = nil
-// 		return nil
-// 	default:
-// 		return errors.New("unsupported scan source")
-// 	}
-// }
+// Scan implements sql.Scanner.
+func (i *InstanceDomains) Scan(src any) error {
+	switch s := src.(type) {
+	case string:
+		return json.Unmarshal([]byte(s), i)
+	case []byte:
+		return json.Unmarshal(s, i)
+	case nil:
+		*i = nil
+		return nil
+	default:
+		return errors.New("unsupported scan source")
+	}
+}
 
-// var _ sql.Scanner = (*InstanceDomains)(nil)
+var _ sql.Scanner = (*InstanceDomains)(nil)
 
 type InstanceDomain struct {
 	InstanceID string `json:"instanceId,omitempty" db:"instance_id"`
