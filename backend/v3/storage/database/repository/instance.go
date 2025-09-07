@@ -32,7 +32,7 @@ func InstanceRepository(client database.QueryExecutor) domain.InstanceRepository
 
 const (
 	queryInstanceStmt = `SELECT instances.id, instances.name, instances.default_org_id, instances.iam_project_id, instances.console_client_id, instances.console_app_id, instances.default_language, instances.created_at, instances.updated_at` +
-		` , CASE WHEN count(instance_domains.domain) > 0 THEN jsonb_agg(json_build_object('domain', instance_domains.domain, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at)) ELSE NULL::JSONB END domains` +
+		` , jsonb_agg(json_build_object('domain', instance_domains.domain, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at)) FILTER (WHERE zitadel.instance_domains.instance_id IS NOT NULL) AS domains` +
 		` FROM zitadel.instances`
 )
 
@@ -238,19 +238,24 @@ func (instance) UpdatedAtColumn() database.Column {
 // scanners
 // -------------------------------------------------------------
 
+type rawInstance struct {
+	*domain.Instance
+	Domains JSONArray[domain.InstanceDomain] `json:"domains,omitempty" db:"domains"`
+}
+
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
-	var instance domain.Instance
+	var instance rawInstance
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&instance); err != nil {
 		return nil, err
 	}
-	// instance.Domains = instance.Domains
+	instance.Instance.Domains = instance.Domains
 
-	return &instance, nil
+	return instance.Instance, nil
 }
 
 func scanInstances(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Instance, error) {
@@ -259,12 +264,18 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 		return nil, err
 	}
 
-	var instances []*domain.Instance
+	var instances []*rawInstance
 	if err := rows.(database.CollectableRows).Collect(&instances); err != nil {
 		return nil, err
 	}
 
-	return instances, nil
+	result := make([]*domain.Instance, len(instances))
+	for i, inst := range instances {
+		result[i] = inst.Instance
+		result[i].Domains = inst.Domains
+	}
+
+	return result, nil
 }
 
 // -------------------------------------------------------------
