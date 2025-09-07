@@ -303,6 +303,8 @@ The code needed to run this project can be found [here](https://github.com/zitad
   const config: ZitadelConfig = {
     authority: "[YOUR-INSTANCE-URL]",
     client_id: "[YOUR-CLIENT-ID]",
+    redirect_uri: "[YOUR-REDIRECT-URI]",
+    post_logout_redirect_uri: "[YOUR-POST-LOGOUT-REDIRECT-URI]",
   };
 
   const zitadel = createZitadelAuth(config);
