@@ -234,51 +234,31 @@ func (instance) UpdatedAtColumn() database.Column {
 	return database.NewColumn("instances", "updated_at")
 }
 
-type rawInstance struct {
-	*domain.Instance
-	// RawDomains []byte `json:",omitempty" db:"domains"`
-}
-
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
-	var instance rawInstance
+	var instance domain.Instance
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&instance); err != nil {
 		return nil, err
 	}
 
-	// if len(instance.RawDomains) > 0 {
-	// 	if err := json.Unmarshal(instance.RawDomains, &instance.Domains); err != nil {
-	// 		return nil, err
-	// 	}
-	// }
-
-	return instance.Instance, nil
+	return &instance, nil
 }
 
-func scanInstances(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Instance, error) {
+func scanInstances(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (instances []*domain.Instance, err error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
-	var rawInstances []*rawInstance
-	if err := rows.(database.CollectableRows).Collect(&rawInstances); err != nil {
+	// var rawInstances []*rawInstance
+	if err := rows.(database.CollectableRows).Collect(&instances); err != nil {
 		return nil, err
 	}
 
-	instances := make([]*domain.Instance, len(rawInstances))
-	// for i, instance := range rawInstances {
-	// 	if len(instance.RawDomains) > 0 {
-	// 		if err := json.Unmarshal(instance.RawDomains, &instance.Domains); err != nil {
-	// 			return nil, err
-	// 		}
-	// 	}
-	// 	instances[i] = instance.Instance
-	// }
 	return instances, nil
 }
 

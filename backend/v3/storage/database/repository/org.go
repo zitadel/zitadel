@@ -211,51 +211,31 @@ func (org) UpdatedAtColumn() database.Column {
 // scanners
 // -------------------------------------------------------------
 
-type rawOrganization struct {
-	*domain.Organization
-	// RawDomains []byte `json:",omitempty" db:"domains"`
-}
-
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
-	var org rawOrganization
+	var org domain.Organization
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&org); err != nil {
 		return nil, err
 	}
-	// if len(org.RawDomains) > 0 {
-	// 	if err := json.Unmarshal(org.RawDomains, &org.Domains); err != nil {
-	// 		return nil, err
-	// 	}
-	// }
 
-	return org.Organization, nil
+	return &org, nil
 }
 
-func scanOrganizations(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) ([]*domain.Organization, error) {
+func scanOrganizations(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (orgs []*domain.Organization, err error) {
 	rows, err := querier.Query(ctx, builder.String(), builder.Args()...)
 	if err != nil {
 		return nil, err
 	}
 
-	var rawOrgs []*rawOrganization
-	if err := rows.(database.CollectableRows).Collect(&rawOrgs); err != nil {
+	if err := rows.(database.CollectableRows).Collect(&orgs); err != nil {
 		return nil, err
 	}
 
-	organizations := make([]*domain.Organization, len(rawOrgs))
-	// for i, org := range rawOrgs {
-	// 	if len(org.RawDomains) > 0 {
-	// 		if err := json.Unmarshal(org.RawDomains, &org.Domains); err != nil {
-	// 			return nil, err
-	// 		}
-	// 	}
-	// 	organizations[i] = org.Organization
-	// }
-	return organizations, nil
+	return orgs, nil
 }
 
 // -------------------------------------------------------------
