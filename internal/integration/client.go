@@ -961,6 +961,7 @@ func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, proje
 }
 
 func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, orgID, projectID, userID string) *mgmt.AddUserGrantResponse {
+	//nolint:staticcheck
 	resp, err := i.Client.Mgmt.AddUserGrant(SetOrgID(ctx, orgID), &mgmt.AddUserGrantRequest{
 		UserId:    userID,
 		ProjectId: projectID,
@@ -970,6 +971,7 @@ func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, org
 }
 
 func (i *Instance) CreateProjectGrantUserGrant(ctx context.Context, orgID, projectID, projectGrantID, userID string) *mgmt.AddUserGrantResponse {
+	//nolint:staticcheck
 	resp, err := i.Client.Mgmt.AddUserGrant(SetOrgID(ctx, orgID), &mgmt.AddUserGrantRequest{
 		UserId:         userID,
 		ProjectId:      projectID,
