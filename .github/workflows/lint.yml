@@ -9,10 +9,10 @@ on:
       go_lint_version:
         required: true
         type: string
-      core_cache_key:
+      api_cache_key:
         required: true
         type: string
-      core_cache_path:
+      api_cache_path:
         required: true
         type: string
 
@@ -43,8 +43,8 @@ jobs:
         with:
           against: "https://github.com/${{ github.repository }}.git#branch=${{ github.base_ref }}"
 
-  core:
-    name: core
+  api:
+    name: api
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
     steps:
@@ -55,10 +55,10 @@ jobs:
           go-version-file: "go.mod"
       - uses: actions/cache/restore@v4
         timeout-minutes: 1
-        name: restore core
+        name: restore api
         with:
-          path: ${{ inputs.core_cache_path }}
-          key: ${{ inputs.core_cache_key }}
+          path: ${{ inputs.api_cache_path }}
+          key: ${{ inputs.api_cache_key }}
           fail-on-cache-miss: true
       - uses: golangci/golangci-lint-action@v8
         with:

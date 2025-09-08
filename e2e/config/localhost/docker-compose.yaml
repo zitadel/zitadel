@@ -5,7 +5,7 @@ services:
     image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
     build:
       context: ../../..
-      dockerfile: ./build/zitadel/Dockerfile
+      dockerfile: ./apps/api/Dockerfile
       target: artifact
       cache_from:
         - type=gha

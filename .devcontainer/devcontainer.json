@@ -9,11 +9,11 @@
 	"workspaceFolder": "/workspaces/zitadel",
 	"forwardPorts": [
 		"db:5432",
-		"login-core-mock:22220",
-		"login-core-mock:22222",
+		"login-api-mock:22220",
+		"login-api-mock:22222",
 		"login:3000",
 		"console:4200",
-		"core:8080"
+		"api:8080"
 	],
 	"updateContentCommand": {
 		"goModules": "go mod download || true",

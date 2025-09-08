@@ -38,14 +38,14 @@
       }
     },
     "dev": {
-      "description": "Start the Next.js development server with Zitadel core backend",
+      "description": "Start the Next.js development server against the Zitadel API backend",
       "configurations": {
         "local": {
           "dependsOn": [
-            "@zitadel/core:build",
-            "@zitadel/core:start-setup",
+            "@zitadel/api:build",
+            "@zitadel/api:start-setup",
             "local-sa-token",
-            "@zitadel/core:start",
+            "@zitadel/api:start",
             "@zitadel/console:build",
             "@zitadel/console:start"
           ]
@@ -83,16 +83,16 @@
       "command": "nx run @zitadel/devcontainer:compose up --no-deps --watch login"
     },
     "test-integration-env-build": {
-      "description": "Build the login and the core mock server to run the integration tests",
-      "command": "nx run @zitadel/devcontainer:compose build login-core-mock login",
+      "description": "Build the login and the API mock server to run the integration tests",
+      "command": "nx run @zitadel/devcontainer:compose build login-api-mock login",
       "dependsOn": [
         "build"
       ]
     },
     "test-integration-env-start": {
-      "description": "Start the login and the core mock server to run the integration tests",
+      "description": "Start the login and the API mock server to run the integration tests",
       "continuous": true,
-      "command": "nx run @zitadel/devcontainer:compose up --no-deps --build --watch login-core-mock login",
+      "command": "nx run @zitadel/devcontainer:compose up --no-deps --build --watch login-api-mock login",
       "dependsOn": [
         "test-integration-env-build"
       ],

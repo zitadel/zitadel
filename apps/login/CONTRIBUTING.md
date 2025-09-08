@@ -12,8 +12,8 @@ You don't have to be perfectly sure about the nature of the vulnerability.
 We will give them a high priority and figure them out.
 
 We also appreciate all your other ideas, thoughts and feedback and will take care of them as soon as possible.
-We love to discuss in an open space using [GitHub issues](https://github.com/zitadel/typescript/issues),
-[GitHub discussions in the core repo](https://github.com/zitadel/zitadel/discussions)
+We love to discuss in an open space using [GitHub issues](https://github.com/zitadel/zitadel/issues),
+[GitHub discussions](https://github.com/zitadel/zitadel/discussions)
 or in our [chat on Discord](https://zitadel.com/chat).
 For private discussions,
 you have [more contact options on our Website](https://zitadel.com/contact).
@@ -36,7 +36,7 @@ Please consider the following guidelines when creating a pull request.
 
 - The latest changes are always in `main`, so please make your pull request against that branch.
 - pull requests should be raised for any change
-- Pull requests need approval of a Zitadel core engineer @zitadel/engineers before merging
+- Pull requests need approval of a Zitadel engineer @zitadel/engineers before merging
 - We use ESLint/Prettier for linting/formatting, so please run `pnpm lint:fix` before committing to make resolving conflicts easier (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
 - If you add new functionality, please provide the corresponding documentation as well and make it part of the pull request
 

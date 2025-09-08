@@ -39,7 +39,7 @@
             ]
         },
         "start": {
-            "description": "Start the Zitadel platform (core, login and console) in production mode.",
+            "description": "Start the Zitadel platform (api, login and console) in production mode.",
             "dependsOn": [
                 "@zitadel/login:start"
             ]

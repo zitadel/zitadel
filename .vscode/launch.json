@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Zitadel",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "main.go",
+            "args": [
+                 "start-from-init",
+                 "--config", "${workspaceFolder}/.devcontainer/zitadel.yaml",
+                 "--masterkey", "MasterkeyNeedsToHave32Characters"
+            ],
+            "preLaunchTask": "API dev"
+        }
+    ]
+}

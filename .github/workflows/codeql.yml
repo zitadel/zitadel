@@ -39,7 +39,7 @@ jobs:
     - if: matrix.language == 'go'
       run: |
         npm install -g sass
-        make core_build
+        make api_build
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3

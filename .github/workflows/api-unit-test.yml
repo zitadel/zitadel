@@ -1,12 +1,12 @@
-name: Unit test core
+name: Unit test API
 
 on: 
   workflow_call:
     inputs:
-      core_cache_key:
+      api_cache_key:
         required: true
         type: string
-      core_cache_path:
+      api_cache_path:
         required: true
         type: string
       crdb_version:
@@ -29,11 +29,11 @@ jobs:
       - 
         uses: actions/cache/restore@v4
         timeout-minutes: 1
-        name: restore core
-        id: restore-core
+        name: restore api
+        id: restore-api
         with:
-          path: ${{ inputs.core_cache_path }}
-          key: ${{ inputs.core_cache_key }}
+          path: ${{ inputs.api_cache_path }}
+          key: ${{ inputs.api_cache_key }}
           fail-on-cache-miss: true
       -
         id: go-cache-path
@@ -46,27 +46,27 @@ jobs:
         continue-on-error: true
         name: restore previous results
         with:
-          key: unit-test-${{ inputs.core_cache_key }}
+          key: unit-test-${{ inputs.api_cache_key }}
           restore-keys: |
-            unit-test-core-
+            unit-test-api-
           path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
       - 
         name: test
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        run: make core_unit_test
+        run: make api_unit_test
       - 
         name: publish coverage
         uses: codecov/codecov-action@v4.3.0
         with:
           file: profile.cov
-          name: core-unit-tests
-          flags: core-unit-tests
+          name: api-unit-tests
+          flags: api-unit-tests
           token: ${{ secrets.CODECOV_TOKEN }}
       - 
         uses: actions/cache/save@v4
         name: cache results
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         with:
-          key: unit-test-${{ inputs.core_cache_key }}
+          key: unit-test-${{ inputs.api_cache_key }}
           path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
         

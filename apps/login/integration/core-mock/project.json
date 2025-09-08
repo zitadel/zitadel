@@ -1,6 +1,6 @@
 {
     "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
-    "name": "@zitadel/login-core-mock",
+    "name": "@zitadel/login-api-mock",
     "targets": {
         "build-docker": {
             "cache": true,

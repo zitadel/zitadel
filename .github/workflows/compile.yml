@@ -3,10 +3,10 @@ name: Compile
 on:
   workflow_call:
     inputs:
-      core_cache_key:
+      api_cache_key:
         required: true
         type: string
-      core_cache_path:
+      api_cache_path:
         required: true
         type: string
       console_cache_key:
@@ -42,10 +42,10 @@ jobs:
           fail-on-cache-miss: true
       - uses: actions/cache/restore@v4
         timeout-minutes: 1
-        name: restore core
+        name: restore api
         with:
-          path: ${{ inputs.core_cache_path }}
-          key: ${{ inputs.core_cache_key }}
+          path: ${{ inputs.api_cache_path }}
+          key: ${{ inputs.api_cache_key }}
           fail-on-cache-miss: true
       - uses: actions/setup-go@v5
         with:

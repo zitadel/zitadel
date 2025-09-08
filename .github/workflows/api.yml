@@ -1,4 +1,4 @@
-name: Build core
+name: Build API
 
 on: 
   workflow_call:
@@ -42,9 +42,9 @@ jobs:
           continue-on-error: true
           id: cache
           with:
-            key: core-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'proto', 'internal') }}
+            key: api-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'proto', 'internal') }}
             restore-keys: |
-              core-
+              api-
             path: ${{ env.cache_path }}
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
@@ -70,7 +70,7 @@ jobs:
             go-version-file: 'go.mod'
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-          run: make core_build
+          run: make api_build
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           uses: actions/cache/save@v4

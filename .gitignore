@@ -24,7 +24,6 @@ sandbox.go
 
 # IDE
 .idea
-.vscode
 .DS_STORE
 .run
 

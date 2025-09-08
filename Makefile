@@ -17,7 +17,7 @@ LOGIN_REMOTE_URL ?= https://github.com/zitadel/typescript.git
 LOGIN_REMOTE_BRANCH ?= main
 
 .PHONY: compile
-compile: core_build console_build compile_pipeline
+compile: api_build console_build compile_pipeline
 
 .PHONY: docker_image
 docker_image:
@@ -27,40 +27,40 @@ docker_image:
 	else \
 		echo "Reusing precompiled zitadel binary"; \
 	fi
-	DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile -t $(ZITADEL_IMAGE) .
+	DOCKER_BUILDKIT=1 docker build -f apps/api/Dockerfile -t $(ZITADEL_IMAGE) .
 
 .PHONY: compile_pipeline
 compile_pipeline: console_move
 	CGO_ENABLED=0 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=$(COMMIT_SHA)' -X 'github.com/zitadel/zitadel/cmd/build.date=$(now)' -X 'github.com/zitadel/zitadel/cmd/build.version=$(VERSION)' "
 	chmod +x zitadel
 
-.PHONY: core_dependencies
-core_dependencies:
+.PHONY: api_dependencies
+api_dependencies:
 	go mod download
 
-.PHONY: core_static
-core_static:
+.PHONY: api_static
+api_static:
 	go install github.com/rakyll/statik@v0.1.7
 	go generate internal/api/ui/login/static/resources/generate.go
 	go generate internal/api/ui/login/statik/generate.go
 	go generate internal/notification/statik/generate.go
 	go generate internal/statik/generate.go
 
-.PHONY: core_generate_all
-core_generate_all:
+.PHONY: api_generate_all
+api_generate_all:
 	go install github.com/dmarkham/enumer@v1.5.11 		# https://pkg.go.dev/github.com/dmarkham/enumer?tab=versions
 	go install github.com/rakyll/statik@v0.1.7			# https://pkg.go.dev/github.com/rakyll/statik?tab=versions
 	go install go.uber.org/mock/mockgen@v0.4.0			# https://pkg.go.dev/go.uber.org/mock/mockgen?tab=versions
 	go install golang.org/x/tools/cmd/stringer@v0.36.0	# https://pkg.go.dev/golang.org/x/tools/cmd/stringer?tab=versions
 	go generate ./...
 
-.PHONY: core_assets
-core_assets:
+.PHONY: api_assets
+api_assets:
 	mkdir -p docs/apis/assets
 	go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md
 
-.PHONY: core_api_generator
-core_api_generator:
+.PHONY: api_stubs_generator
+api_stubs_generator:
 ifeq (,$(wildcard $(gen_authopt_path)))
 	go install internal/protoc/protoc-gen-authoption/main.go \
     && mv $$(go env GOPATH)/bin/main $(gen_authopt_path)
@@ -70,8 +70,8 @@ ifeq (,$(wildcard $(gen_zitadel_path)))
     && mv $$(go env GOPATH)/bin/main $(gen_zitadel_path)
 endif
 
-.PHONY: core_grpc_dependencies
-core_grpc_dependencies:
+.PHONY: api_grpc_dependencies
+api_grpc_dependencies:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1 						# https://pkg.go.dev/google.golang.org/protobuf/cmd/protoc-gen-go?tab=versions
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1 						# https://pkg.go.dev/google.golang.org/grpc/cmd/protoc-gen-go-grpc?tab=versions
 	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.22.0	# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway?tab=versions
@@ -80,16 +80,16 @@ core_grpc_dependencies:
 	go install github.com/bufbuild/buf/cmd/buf@v1.45.0										# https://pkg.go.dev/github.com/bufbuild/buf/cmd/buf?tab=versions
 	go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1						# https://pkg.go.dev/connectrpc.com/connect/cmd/protoc-gen-connect-go?tab=versions
 
-.PHONY: core_api
-core_api: core_api_generator core_grpc_dependencies
+.PHONY: api_stubs
+api_stubs: api_stubs_generator api_grpc_dependencies
 	buf generate
 	mkdir -p pkg/grpc
 	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/
 	mkdir -p openapi/v2/zitadel
 	cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel
 
-.PHONY: core_build
-core_build: core_dependencies core_api core_static core_assets
+.PHONY: api_build
+api_build: api_dependencies api_stubs api_static api_assets
 
 .PHONY: console_move
 console_move:
@@ -110,38 +110,38 @@ clean:
 	$(RM) $(gen_zitadel_path)
 	$(RM) -r tmp/
 
-.PHONY: core_unit_test
-core_unit_test:
+.PHONY: api_unit_test
+api_unit_test:
 	go test -race -coverprofile=profile.cov -coverpkg=./internal/...  ./...
 
-.PHONY: core_integration_db_up
-core_integration_db_up:
+.PHONY: api_integration_db_up
+api_integration_db_up:
 	docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait cache postgres
 
-.PHONY: core_integration_db_down
-core_integration_db_down:
+.PHONY: api_integration_db_down
+api_integration_db_down:
 	docker compose -f internal/integration/config/docker-compose.yaml down -v
 
-.PHONY: core_integration_setup
-core_integration_setup:
+.PHONY: api_integration_setup
+api_integration_setup:
 	go build -cover -race -tags integration -o zitadel.test main.go
 	mkdir -p $${GOCOVERDIR}
 	GORACE="halt_on_error=1" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml
 	GORACE="halt_on_error=1" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml --steps internal/integration/config/steps.yaml
 
-.PHONY: core_integration_server_start
-core_integration_server_start: core_integration_setup
+.PHONY: api_integration_server_start
+api_integration_server_start: api_integration_setup
 	GORACE="log_path=tmp/race.log" \
 	./zitadel.test start --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/postgres.yaml \
 	  > tmp/zitadel.log 2>&1 \
 	  & printf $$! > tmp/zitadel.pid
 
-.PHONY: core_integration_test_packages
-core_integration_test_packages:
+.PHONY: api_integration_test_packages
+api_integration_test_packages:
 	go test -race -count 1 -tags integration -timeout 30m $$(go list -tags integration ./... | grep "integration_test")
 
-.PHONY: core_integration_server_stop
-core_integration_server_stop:
+.PHONY: api_integration_server_stop
+api_integration_server_stop:
 	pid=$$(cat tmp/zitadel.pid); \
 	$(RM) tmp/zitadel.pid; \
 	kill $$pid; \
@@ -150,19 +150,19 @@ core_integration_server_stop:
 		exit 66; \
 	fi
 
-.PHONY: core_integration_reports
-core_integration_reports:
+.PHONY: api_integration_reports
+api_integration_reports:
 	go tool covdata textfmt -i=tmp/coverage -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/... -o profile.cov
 
-.PHONY: core_integration_test
-core_integration_test: core_integration_server_start core_integration_test_packages core_integration_server_stop core_integration_reports
+.PHONY: api_integration_test
+api_integration_test: api_integration_server_start api_integration_test_packages api_integration_server_stop api_integration_reports
 
 .PHONY: console_lint
 console_lint:
 	nx run @zitadel/console:lint
 
-.PHONY: core_lint
-core_lint:
+.PHONY: api_lint
+api_lint:
 	golangci-lint run \
 		--timeout 10m \
 		--config ./.golangci.yaml \

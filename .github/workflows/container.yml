@@ -3,7 +3,7 @@ name: Container
 on:
   workflow_call:
     inputs:
-      build_image_name_core:
+      build_image_name_api:
         required: true
         type: string
       build_image_name_login:
@@ -13,8 +13,8 @@ on:
         required: true
         type: string        
     outputs:
-      build_image_core:
-        value: '${{ inputs.build_image_name_core }}:${{ github.sha }}'
+      build_image_api:
+        value: '${{ inputs.build_image_name_api }}:${{ github.sha }}'
       build_image_login:
         value: '${{ inputs.build_image_name_login }}:${{ github.sha }}'
 
@@ -42,7 +42,7 @@ jobs:
         id: scratch-meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ inputs.build_image_name_core }}
+          images: ${{ inputs.build_image_name_api }}
           labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=,format=long
@@ -51,7 +51,7 @@ jobs:
         id: debug-meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ inputs.build_image_name_core }}
+          images: ${{ inputs.build_image_name_api }}
           labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=-debug,format=long
@@ -115,12 +115,12 @@ jobs:
           context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          file: build/zitadel/Dockerfile
+          file: apps/api/Dockerfile
           target: artifact
           platforms: linux/${{ matrix.arch }}
           push: true
           labels: ${{ steps.debug-meta.outputs.labels }}
-          outputs: type=image,name=${{ inputs.build_image_name_core }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ inputs.build_image_name_api }},push-by-digest=true,name-canonical=true,push=true
       - 
         name: Scratch
         id: build-scratch
@@ -130,12 +130,12 @@ jobs:
           context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          file: build/zitadel/Dockerfile
+          file: apps/api/Dockerfile
           target: final
           platforms: linux/${{ matrix.arch }}
           push: true
           labels: ${{ steps.scratch-meta.outputs.labels }}
-          outputs: type=image,name=${{ inputs.build_image_name_core }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ inputs.build_image_name_api }},push-by-digest=true,name-canonical=true,push=true
       - 
         name: Login
         id: build-login
@@ -187,10 +187,10 @@ jobs:
         include:
           - image: scratch
             suffix: ''
-            build_image_name: ${{ inputs.build_image_name_core }}
+            build_image_name: ${{ inputs.build_image_name_api }}
           - image: debug
             suffix: '-debug'
-            build_image_name: ${{ inputs.build_image_name_core }}
+            build_image_name: ${{ inputs.build_image_name_api }}
           - image: login
             suffix: ''
             build_image_name: ${{ inputs.build_image_name_login }}

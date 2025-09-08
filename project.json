@@ -3,23 +3,23 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "description": "Build the Zitadel platform (core, login and console)",
+      "description": "Build the Zitadel platform (api, login and console)",
       "dependsOn": [
-        "@zitadel/core:build",
+        "@zitadel/api:build",
         "@zitadel/login:build"
       ]
     },
     "start": {
       "continuous": true,
-      "description": "Start the the Zitadel platform (core, login and console)",
+      "description": "Start the the Zitadel platform (api, login and console)",
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run @zitadel/devcontainer:compose up --watch db core login"
+        "command": "nx run @zitadel/devcontainer:compose up --watch db api login"
       }
     },
     "build-and-start": {
       "continuous": true,
-      "description": "Build and start the the Zitadel platform (core, login and console)",
+      "description": "Build and start the the Zitadel platform (api, login and console)",
       "dependsOn": [
         "build"
       ],
@@ -34,21 +34,21 @@
       "description": "Stop all services",
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run @zitadel/devcontainer:compose stop db core login"
+        "command": "nx run @zitadel/devcontainer:compose stop db api login"
       }
     },
     "generate": {
-      "description": "Generate everything needed to build the Zitadel platform (core, login and console)",
+      "description": "Generate everything needed to build the Zitadel platform (api, login and console)",
       "dependsOn": [
-        "@zitadel/core:generate",
+        "@zitadel/api:generate",
         "@zitadel/login:generate",
         "@zitadel/console:generate"
       ]
     },
     "clean": {
-      "description": "Clean all local-only files relating to the Zitadel platform (core, login and console)",
+      "description": "Clean all local-only files relating to the Zitadel platform (api, login and console)",
       "dependsOn": [
-        "@zitadel/core:clean",
+        "@zitadel/api:clean",
         "@zitadel/login:clean",
         "@zitadel/console:clean"
       ]

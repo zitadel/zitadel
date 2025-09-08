@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "nx",
+			"project": "",
+			"command": "run",
+			"positional": "@zitadel/api:dev",
+			"flags": [],
+			"problemMatcher": [],
+			"label": "API dev"
+		}
+	]
+}

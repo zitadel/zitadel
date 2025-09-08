@@ -27,8 +27,8 @@ jobs:
     with:
       node_version: "22"
 
-  core:
-    uses: ./.github/workflows/core.yml
+  api:
+    uses: ./.github/workflows/api.yml
     with:
       node_version: "20"
       buf_version: "latest"
@@ -45,42 +45,42 @@ jobs:
       dry_run: true
 
   compile:
-    needs: [core, console, version]
+    needs: [api, console, version]
     uses: ./.github/workflows/compile.yml
     with:
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      api_cache_key: ${{ needs.api.outputs.cache_key }}
       console_cache_key: ${{ needs.console.outputs.cache_key }}
-      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      api_cache_path: ${{ needs.api.outputs.cache_path }}
       console_cache_path: ${{ needs.console.outputs.cache_path }}
       version: ${{ needs.version.outputs.version }}
       node_version: "20"
 
-  core-unit-test:
-    needs: core
-    uses: ./.github/workflows/core-unit-test.yml
+  api-unit-test:
+    needs: api
+    uses: ./.github/workflows/api-unit-test.yml
     with:
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
-      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      api_cache_key: ${{ needs.api.outputs.cache_key }}
+      api_cache_path: ${{ needs.api.outputs.cache_path }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  core-integration-test:
-    needs: core
-    uses: ./.github/workflows/core-integration-test.yml
+  api-integration-test:
+    needs: api
+    uses: ./.github/workflows/api-integration-test.yml
     with:
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
-      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      api_cache_key: ${{ needs.api.outputs.cache_key }}
+      api_cache_path: ${{ needs.api.outputs.cache_path }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   lint:
-    needs: [core]
+    needs: [api]
     uses: ./.github/workflows/lint.yml
     with:
       buf_version: "latest"
       go_lint_version: "latest"
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
-      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      api_cache_key: ${{ needs.api.outputs.cache_key }}
+      api_cache_path: ${{ needs.api.outputs.cache_path }}
 
   container:
     needs: [compile]
@@ -91,7 +91,7 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
       node_version: "22"
-      build_image_name_core: "ghcr.io/zitadel/zitadel-build"
+      build_image_name_api: "ghcr.io/zitadel/zitadel-build"
       build_image_name_login: "ghcr.io/zitadel/zitadel-login-build"
 
   e2e:
@@ -108,8 +108,8 @@ jobs:
     needs:
       [
         version,
-        core-unit-test,
-        core-integration-test,
+        api-unit-test,
+        api-integration-test,
         lint,
         check,
         container,
@@ -121,7 +121,7 @@ jobs:
       APP_ID: ${{ secrets.APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
     with:
-      build_image_name: ${{ needs.container.outputs.build_image_core }}
+      build_image_name: ${{ needs.container.outputs.build_image_api }}
       semantic_version: "23.0.7"
       image_name: "ghcr.io/zitadel/zitadel"
       google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"

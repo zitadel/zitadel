@@ -9,11 +9,11 @@ services:
     command: sleep infinity
     working_dir: /workspaces/zitadel
     env_file:
-      - .env.core
+      - .env.api
       - .env.login
     environment:
       DEVCONTAINER_DB_HOST: db
-      DEVCONTAINER_LOGIN_CORE_MOCK_HOST: login-core-mock
+      DEVCONTAINER_LOGIN_CORE_MOCK_HOST: login-api-mock
 
   db:
     container_name: db
@@ -34,8 +34,8 @@ services:
     ports:
       - 5432:5432
 
-  core-init:
-    container_name: core-init
+  api-init:
+    container_name: api-init
     depends_on:
       db:
         condition: service_healthy
@@ -43,13 +43,13 @@ services:
       - ../:/workspaces/zitadel:cached
     command: init --config /workspaces/zitadel/.devcontainer/zitadel.yaml
     env_file:
-      - path: .env.core
+      - path: .env.api
         required: true
       - path: ../${CORE_ENV_FILE:-none}
         required: false
     build:
       context: ../
-      dockerfile: build/zitadel/Dockerfile
+      dockerfile: apps/api/Dockerfile
     ports:
       - "8080:8080"
     healthcheck:
@@ -64,22 +64,22 @@ services:
       retries: 5
       start_period: 10s
 
-  core-setup:
-    container_name: core-setup
+  api-setup:
+    container_name: api-setup
     depends_on:
-      core-init:
+      api-init:
         condition: service_completed_successfully
     volumes:
       - ../:/workspaces/zitadel:cached
     command: setup --config /workspaces/zitadel/.devcontainer/zitadel.yaml --steps /workspaces/zitadel/.devcontainer/zitadel.yaml --masterkey MasterkeyNeedsToHave32Characters
     env_file:
-      - path: .env.core
+      - path: .env.api
         required: true
       - path: ../${CORE_ENV_FILE:-none}
         required: false
     build:
       context: ../
-      dockerfile: build/zitadel/Dockerfile
+      dockerfile: apps/api/Dockerfile
     ports:
       - "8080:8080"
     healthcheck:
@@ -94,22 +94,22 @@ services:
       retries: 5
       start_period: 10s
 
-  core:
-    container_name: core
+  api:
+    container_name: api
     depends_on:
-      core-setup:
+      api-setup:
         condition: service_completed_successfully
     volumes:
       - ../:/workspaces/zitadel:cached
     command: start --config /workspaces/zitadel/.devcontainer/zitadel.yaml --masterkey MasterkeyNeedsToHave32Characters
     env_file:
-      - path: .env.core
+      - path: .env.api
         required: true
       - path: ../${CORE_ENV_FILE:-none}
         required: false
     build:
       context: ../
-      dockerfile: build/zitadel/Dockerfile
+      dockerfile: apps/api/Dockerfile
     develop:
       watch:
         - path: ../zitadel
@@ -146,18 +146,18 @@ services:
       - path: ../${LOGIN_ENV_FILE:-none}
         required: false
     depends_on:
-      core-setup:
+      api-setup:
         condition: service_completed_successfully
 
-  login-core-mock:
-    container_name: login-core-mock
+  login-api-mock:
+    container_name: login-api-mock
     build:
-      context: ../apps/login/integration/core-mock
+      context: ../apps/login/integration/api-mock
       additional_contexts:
         zitadel-protos: ../proto
     develop:
       watch:
-        - path: ../apps/login/integration/core-mock
+        - path: ../apps/login/integration/api-mock
           action: "rebuild"
         - path: ../protos
           action: "rebuild"

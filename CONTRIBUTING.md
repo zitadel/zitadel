@@ -24,7 +24,7 @@ Use these commands to get started with any project.
 Replace `PROJECT` with one of the following:
 
 - `@zitadel/zitadel` (you can omit this root level project, like in `nx run build-and-start`)
-- `@zitadel/core`
+- `@zitadel/api`
 - `@zitadel/login`
 - `@zitadel/console`
 - `@zitadel/docs`
@@ -188,7 +188,7 @@ Please check out the dedicated [API guidelines](./API_DESIGN.md) page when contr
 
 ## <a name="backend"></a>Contribute Backend Code
 
-To start developing the Zitadel core Go application, make sure your system has the [required system dependencies](#dev-requirements) installed.
+To start developing the Zitadel API Go application, make sure your system has the [required system dependencies](#dev-requirements) installed.
 
 ### Quick Start
 
@@ -203,15 +203,11 @@ nx run @zitadel/zitadel:start
 Set up zitadel without starting it
 
 ```bash
-nx run @zitadel/core:dev
+nx run @zitadel/api:dev
 ```
 
-Then open your IDE and and start the application. Make sure you pass the same arguments like the `@zitadel/core:start` target:
-```bash
-nx show project core --json | jq '.targets.start.options'
-```
-
-For example, In VSCode, use a `launch.json` config like this:
+Then open your IDE and and start the application.
+In VSCode, use a `launch.json` config like this:
 
 ```json
 {
@@ -224,8 +220,8 @@ For example, In VSCode, use a `launch.json` config like this:
             "mode": "debug",
             "program": "main.go",
             "args": [
-                 "start",
-                 "--config", "build/zitadel/zitadel.yaml",
+                 "start-from-init",
+                 "--config", ".devcontainer/zitadel.yaml",
                  "--masterkey", "MasterkeyNeedsToHave32Characters"
             ]
         }
@@ -242,7 +238,7 @@ To connect to the database and explore Zitadel data, run `psql "host=localhost d
 To test the code without dependencies, run the unit tests:
 
 ```bash
-make core_unit_test
+make api_unit_test
 ```
 
 ### Run Local Integration Tests
@@ -254,7 +250,7 @@ It is also possible to run a Zitadel sever in a debugger and run the integration
 In order to prepare the local system, the following will bring up the database, builds a coverage binary, initializes the database and starts the sever.
 
 ```bash
-make core_integration_db_up core_integration_server_start
+make api_integration_db_up api_integration_server_start
 ```
 
 When this job is finished, you can run individual package integration test through your IDE or command-line. The actual integration test clients reside in the `integration_test` subdirectory of the package they aim to test. Integration test files use the `integration` build tag, in order to be excluded from regular unit tests.
@@ -269,22 +265,22 @@ go test -count 1 -tags integration ./internal/api/grpc/management/integration_te
 To run all available integration tests:
 
 ```bash
-make core_integration_test_packages
+make api_integration_test_packages
 ```
 
 When you change any Zitadel server code, be sure to rebuild and restart the server before the next test run.
 
 ```bash
-make core_integration_server_stop core_integration_server_start
+make api_integration_server_stop api_integration_server_start
 ```
 
 To cleanup after testing (deletes the database!):
 
 ```bash
-make core_integration_server_stop core_integration_db_down
+make api_integration_server_stop api_integration_db_down
 ```
 
-The test binary has the race detector enabled. `core_core_integration_server_stop` checks for any race logs reported by Go and will print them along a `66` exit code when found. Note that the actual race condition may have happened anywhere during the server lifetime, including start, stop or serving gRPC requests during tests.
+The test binary has the race detector enabled. `api_api_integration_server_stop` checks for any race logs reported by Go and will print them along a `66` exit code when found. Note that the actual race condition may have happened anywhere during the server lifetime, including start, stop or serving gRPC requests during tests.
 
 ### Run Local End-to-End Tests
 
@@ -532,7 +528,7 @@ All dependencies and tools are already installed
 - **[pnpm 10.x](https://pnpm.io/installation)** - Package manager
 - **[Docker](https://docs.docker.com/engine/install/)** - For supporting services
 
-**For developing the core backend, additionally install:**
+**For developing the API backend, additionally install:**
 
 - **[Go 1.24.x](https://go.dev/doc/install)**
 - **[golangci-lint v2](https://golangci-lint.run)** - Please use [this configuration](.golangci.yaml) when running `golangci-lint`
@@ -562,7 +558,7 @@ nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui
 </details>
 
 **Recommended VS Code extensions:**
-- [Go](https://marketplace.visualstudio.com/items?itemName=golang.Go) - For core development. Use golangci-lint v2 as linter.
+- [Go](https://marketplace.visualstudio.com/items?itemName=golang.Go) - For API development. Use golangci-lint v2 as linter.
 - [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) - For Console development
 - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) - Code linting
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - Code formatting
