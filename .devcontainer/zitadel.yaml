@@ -1,12 +1,19 @@
 ExternalSecure: false
 TLS.Enabled: false
 FirstInstance:
-  LoginClientPatPath: login-client.pat
+  LoginClientPatPath: /workspaces/zitadel/login-client.pat
+  PatPath: /workspaces/zitadel/admin.pat
   Org:
     LoginClient:
       Machine:
         Username: login-client
         Name: Automatically Initialized IAM Login Client
+      Pat:
+        ExpirationDate: '2029-01-01T00:00:00Z'
+    Machine:
+      Machine:
+        Username: admin
+        Name: Automatically Initialized IAM admin Client
       Pat:
         ExpirationDate: '2029-01-01T00:00:00Z'
 Database.Postgres.User.Password: zitadel

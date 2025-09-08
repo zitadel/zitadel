@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build && cp -r public scripts/* .next/standalone/apps/login/ && cp -r .next/static .next/standalone/apps/login/.next/",
+    "build": "next build && cp -r public scripts/* .next/standalone/ && cp -r .next/static .next/standalone/apps/login/.next/",
     "start": "node .next/standalone/apps/login/server.js",
     "lint-check-next": "next lint",
     "lint-check-prettier": "prettier --check .",

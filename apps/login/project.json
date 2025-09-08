@@ -18,9 +18,6 @@
         "{projectRoot}/.next/standalone"
       ]
     },
-    "start": {
-      "description": "Start the standalone production build"
-    },
     "build-docker": {
       "description": "Build Docker image for the login application",
       "inputs": [
@@ -56,21 +53,6 @@
         "custom": {}
       }
     },
-    "local-sa-token": {
-      "description": "Create environment file with ZITADEL service user token against the local API",
-      "cache": true,
-      "outputs": [
-        "{projectRoot}/.env.local"
-      ],
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{projectRoot}",
-        "commands": [
-          "TOKEN=$(cat ../../login-client.pat) && echo \"ZITADEL_SERVICE_USER_TOKEN=$TOKEN\" > .env.local"
-        ],
-        "parallel": false
-      }
-    },
     "check": {
       "description": "Run code quality checks (linting, formatting, testing and building)"
     },
@@ -95,30 +77,38 @@
         "^build"
       ]
     },
+    "start": {
+      "description": "Start the login service via Docker Compose with environment passthrough",
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "cwd": "{workspaceRoot}/.devcontainer",
+        "command": "docker compose up login --no-deps --force-recreate --watch"
+      }
+    },
     "test-integration-env": {
       "description": "Start the login and the core mock server to run the integration tests",
       "continuous": true,
       "dependsOn": [
-        "@zitadel/login-core-mock:build-docker"
+        "build"
       ],
       "executor": "nx:run-commands",
       "options": {
         "parallel": true,
         "commands": [
-          "nx run @zitadel/devcontainer:start-login-core-mock",
-          "HOSTNAME=localhost nx run @zitadel/login:start"
+          "nx run @zitadel/devcontainer:compose up --watch login start-login-core-mock"
         ]
       }
     },
     "test-integration": {
       "dependsOn": [
+        "build",
         "test-integration-env"
       ],
       "inputs": [
         "{projectRoot}/integration/integration/**",
         "{projectRoot}/integration/support/**",
-        "{projectRoot}/cypress.config.ts",
-        "{workspaceRoot}/pnpm-lock.yaml"
+        "{projectRoot}/cypress.config.ts"
       ]
     }
   }

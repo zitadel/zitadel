@@ -3,15 +3,17 @@
 	"name": "Zitadel Devcontainer",
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "devcontainer",
-	"shutdownAction": "none",
+	"runServices": [
+		"devcontainer"
+	],
 	"workspaceFolder": "/workspaces/zitadel",
 	"forwardPorts": [
 		"db:5432",
 		"login-core-mock:22220",
 		"login-core-mock:22222",
-		3000,
-		4200,
-		8080
+		"login:3000",
+		"console:4200",
+		"core:8080"
 	],
 	"updateContentCommand": {
 		"goModules": "go mod download || true",

@@ -8,12 +8,15 @@ services:
       - ../:/workspaces/zitadel:cached
     command: sleep infinity
     working_dir: /workspaces/zitadel
+    env_file:
+      - .env.core
+      - .env.login
     environment:
       DEVCONTAINER_DB_HOST: db
       DEVCONTAINER_LOGIN_CORE_MOCK_HOST: login-core-mock
 
   db:
-    container_name: zitadel-db
+    container_name: db
     image: postgres:17.0-alpine3.19
     restart: unless-stopped
     env_file:
@@ -31,13 +34,141 @@ services:
     ports:
       - 5432:5432
 
+  core-init:
+    container_name: core-init
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ../:/workspaces/zitadel:cached
+    command: init --config /workspaces/zitadel/.devcontainer/zitadel.yaml
+    env_file:
+      - path: ../build/zitadel/.env.start.local
+        required: false
+      - path: ../build/zitadel/.env.start
+        required: false
+      - path: ../build/zitadel/.env.local
+        required: false
+      - path: ../build/zitadel/.env
+        required: false
+      - path: .env.core
+        required: true
+    build:
+      context: ../
+      dockerfile: build/zitadel/Dockerfile
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test:
+        - CMD
+        - /app/zitadel
+        - ready
+        - --config
+        - /workspaces/zitadel/.devcontainer/zitadel.yaml
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
+  core-setup:
+    container_name: core-setup
+    depends_on:
+      core-init:
+        condition: service_completed_successfully
+    volumes:
+      - ../:/workspaces/zitadel:cached
+    command: setup --config /workspaces/zitadel/.devcontainer/zitadel.yaml --steps /workspaces/zitadel/.devcontainer/zitadel.yaml --masterkey MasterkeyNeedsToHave32Characters
+    env_file:
+      - path: ../build/zitadel/.env.start.local
+        required: false
+      - path: ../build/zitadel/.env.start
+        required: false
+      - path: ../build/zitadel/.env.local
+        required: false
+      - path: ../build/zitadel/.env
+        required: false
+      - path: .env.core
+        required: true
+    build:
+      context: ../
+      dockerfile: build/zitadel/Dockerfile
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test:
+        - CMD
+        - /app/zitadel
+        - ready
+        - --config
+        - /workspaces/zitadel/.devcontainer/zitadel.yaml
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
+  core:
+    container_name: core
+    depends_on:
+      core-setup:
+        condition: service_completed_successfully
+    volumes:
+      - ../:/workspaces/zitadel:cached
+    command: start --config /workspaces/zitadel/.devcontainer/zitadel.yaml --masterkey MasterkeyNeedsToHave32Characters
+    env_file:
+      - path: .env.core
+        required: true
+    build:
+      context: ../
+      dockerfile: build/zitadel/Dockerfile
+    develop:
+      watch:
+        - path: ../zitadel
+          action: rebuild
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test:
+        - CMD
+        - /app/zitadel
+        - ready
+        - --config
+        - /workspaces/zitadel/.devcontainer/zitadel.yaml
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
+  login:
+    container_name: login
+    build:
+      context: ../apps/login
+    develop:
+      watch:
+        - path: ../apps/login/.next/standalone
+          action: "rebuild"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../:/workspaces/zitadel:cached
+    env_file:
+      - path: .env.login
+        required: true
+    depends_on:
+      core-setup:
+        condition: service_completed_successfully
+
   login-core-mock:
     container_name: login-core-mock
-    image: "apps-login-integration-core-mock"
     build:
       context: ../apps/login/integration/core-mock
       additional_contexts:
-        - zitadel-protos=../proto
+        zitadel-protos: ../protos
+    develop:
+      watch:
+        - path: ../apps/login/integration/core-mock
+          action: "rebuild"
+        - path: ../protos
+          action: "rebuild"
     ports:
       - 22220:22220
       - 22222:22222

@@ -2,21 +2,11 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "name": "@zitadel/devcontainer",
   "targets": {
-    "start-login-db": {
-      "description": "Start the PostgreSQL database container",
-      "executor": "nx:run-commands",
+    "compose": {
+      "description": "Run docker compose command",
       "continuous": true,
+      "command": "docker compose -f docker-compose.yaml -p zitadel_devcontainer",
       "options": {
-        "command": "docker compose -f docker-compose.yaml -p zitadel_devcontainer up db",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "start-login-core-mock": {
-      "description": "Start the login core mock server",
-      "executor": "nx:run-commands",
-      "continuous": true,
-      "options": {
-        "command": "docker compose -f docker-compose.yaml -p zitadel_devcontainer up login-core-mock",
         "cwd": "{projectRoot}"
       }
     }

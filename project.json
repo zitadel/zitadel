@@ -2,9 +2,24 @@
   "$schema": "./node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
-    "build-and-start": {
-      "continous": true,
+    "build": {
+      "description": "Build the Zitadel platform (core, login and console)",
+      "dependsOn": [
+        "@zitadel/core:build",
+        "@zitadel/login:build"
+      ]
+    },
+    "start": {
+      "continuous": true,
       "description": "Start the the Zitadel platform (core, login and console)",
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run @zitadel/devcontainer:compose up --watch db core login"
+      }
+    },
+    "build-and-start": {
+      "continuous": true,
+      "description": "Build and start the the Zitadel platform (core, login and console)",
       "dependsOn": [
         "build"
       ],
@@ -15,44 +30,11 @@
         ]
       }      
     },
-    "build": {
-      "description": "Build the Zitadel platform (core, login and console)",
-      "dependsOn": [
-        "@zitadel/core:build",
-        "@zitadel/login:build",
-        "@zitadel/console:build"
-      ]
-    },
-    "start-setup": {
-      "description": "Start the the Zitadel platform (core, login and console)",
-      "dependsOn": [
-        "@zitadel/devcontainer:start-db"
-      ],
+    "stop": {
+      "description": "Stop all services",
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "nx run @zitadel/core:start-init",
-          "nx run @zitadel/core:start-setup",
-          "nx run @zitadel/login:local-sa-token"
-        ]
-      }
-    },
-    "start": {
-      "continous": true,
-      "dependsOn": [
-        "@zitadel/devcontainer:start-db",
-        "start-setup",
-        "@zitadel/core:start",
-        "@zitadel/login:start",
-        "@zitadel/console:start"
-      ],
-      "executor": "nx:run-commands",
-      "options": {
-        "commands": [
-          "nx run @zitadel/core:start",
-          "nx run @zitadel/login:start",
-          "nx run @zitadel/console:start"
-        ]
+        "command": "nx run @zitadel/devcontainer:compose stop db core login"
       }
     },
     "generate": {

@@ -80,6 +80,7 @@ build/local/*.env
 node_modules/
 .kreya
 login-client.pat
+admin.pat
 .env.*local
 
 go.work
@@ -94,9 +95,6 @@ load-test/output/*
 
 # PNPM
 .pnpm-store
-
-# Cache directories
-.cache
 
 # Nx
 .nx/cache
