@@ -18,8 +18,20 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+type Rows interface {
+	Close() error
+	Err() error
+	Next() bool
+	Scan(dest ...any) error
+}
+
+type Row interface {
+	Err() error
+	Scan(dest ...any) error
+}
+
 type ContextQuerier interface {
-	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+	QueryContext(ctx context.Context, query string, args ...any) (Rows, error)
 }
 
 type ContextExecuter interface {
@@ -83,11 +95,11 @@ type DB struct {
 	Pool *pgxpool.Pool
 }
 
-func (db *DB) Query(scan func(*sql.Rows) error, query string, args ...any) error {
+func (db *DB) Query(scan func(Rows) error, query string, args ...any) error {
 	return db.QueryContext(context.Background(), scan, query, args...)
 }
 
-func (db *DB) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) (err error) {
+func (db *DB) QueryContext(ctx context.Context, scan func(rows Rows) error, query string, args ...any) (err error) {
 	rows, err := db.DB.QueryContext(ctx, query, args...)
 	if err != nil {
 		return err
@@ -103,11 +115,11 @@ func (db *DB) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error,
 	return rows.Err()
 }
 
-func (db *DB) QueryRow(scan func(*sql.Row) error, query string, args ...any) (err error) {
+func (db *DB) QueryRow(scan func(Row) error, query string, args ...any) (err error) {
 	return db.QueryRowContext(context.Background(), scan, query, args...)
 }
 
-func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error, query string, args ...any) (err error) {
+func (db *DB) QueryRowContext(ctx context.Context, scan func(row Row) error, query string, args ...any) (err error) {
 	row := db.DB.QueryRowContext(ctx, query, args...)
 	logging.OnError(row.Err()).Error("unexpected query error")
 
@@ -120,7 +132,7 @@ func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error
 
 func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...any) (*T, error) {
 	var data []byte
-	err := db.QueryRowContext(ctx, func(row *sql.Row) error {
+	err := db.QueryRowContext(ctx, func(row Row) error {
 		return row.Scan(&data)
 	}, query, args...)
 	if errors.Is(err, sql.ErrNoRows) {

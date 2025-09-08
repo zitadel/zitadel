@@ -40,7 +40,7 @@ func (l LegacyContextQueryExecutorAdapter) ExecContext(ctx context.Context, quer
 }
 
 // QueryContext implements database.ContextQueryExecuter.
-func (l LegacyContextQueryExecutorAdapter) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
+func (l LegacyContextQueryExecutorAdapter) QueryContext(ctx context.Context, query string, args ...any) (legacy_db.Rows, error) {
 	rows, err := l.QueryExecutor.Query(ctx, query, args...)
 	return rows, err
 }
