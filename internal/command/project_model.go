@@ -78,6 +78,7 @@ func (wm *ProjectWriteModel) Reduce() error {
 					ProcessedSequence: wm.ProcessedSequence,
 					Events:            wm.Events,
 					InstanceID:        wm.InstanceID,
+					ResourceOwner:     wm.ResourceOwner,
 				},
 			}
 		}
@@ -86,18 +87,24 @@ func (wm *ProjectWriteModel) Reduce() error {
 }
 
 func (wm *ProjectWriteModel) Query() *eventstore.SearchQueryBuilder {
+	eventTypes := []eventstore.EventType{
+		project.ProjectAddedType,
+		project.ProjectChangedType,
+		project.ProjectDeactivatedType,
+		project.ProjectReactivatedType,
+		project.ProjectRemovedType,
+	}
+	aggregateIDs := []string{wm.AggregateID}
+	if wm.ResourceOwner != "" {
+		eventTypes = append(eventTypes, org.OrgRemovedEventType)
+		aggregateIDs = append(aggregateIDs, wm.ResourceOwner)
+	}
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(project.AggregateType, org.AggregateType).
-		AggregateIDs(wm.AggregateID, wm.ResourceOwner).
-		EventTypes(project.ProjectAddedType,
-			project.ProjectChangedType,
-			project.ProjectDeactivatedType,
-			project.ProjectReactivatedType,
-			project.ProjectRemovedType,
-			org.OrgRemovedEventType,
-		).
+		AggregateIDs(aggregateIDs...).
+		EventTypes(eventTypes...).
 		Builder()
 }
 
