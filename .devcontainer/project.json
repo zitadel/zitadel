@@ -4,7 +4,7 @@
   "targets": {
     "compose": {
       "description": "Run Docker Compose command",
-      "command": "docker compose -p zitadel_devcontainer",
+      "command": "docker compose -f docker-compose.yaml -p zitadel_devcontainer",
       "options": {
         "cwd": "{projectRoot}"
       }

@@ -12,7 +12,7 @@ services:
       - .env.api
       - .env.login
     environment:
-      DEVCONTAINER_DB_HOST: db
+      ZITADEL_DATABASE_POSTGRES_HOST: db
       DEVCONTAINER_LOGIN_CORE_MOCK_HOST: login-api-mock
 
   db:
@@ -20,11 +20,9 @@ services:
     image: postgres:17.0-alpine3.19
     restart: unless-stopped
     env_file:
-      - ./postgres.env
+      - ./.env.db
     volumes:
-      - ./postgresql.conf:/etc/postgresql/postgresql.conf
       - db-data:/var/lib/postgresql/data
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready", "-U", "postgres" ]
       interval: "10s"
@@ -50,8 +48,6 @@ services:
     build:
       context: ../
       dockerfile: apps/api/Dockerfile
-    ports:
-      - "8080:8080"
     healthcheck:
       test:
         - CMD
@@ -80,8 +76,6 @@ services:
     build:
       context: ../
       dockerfile: apps/api/Dockerfile
-    ports:
-      - "8080:8080"
     healthcheck:
       test:
         - CMD
