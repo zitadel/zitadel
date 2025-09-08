@@ -32,6 +32,8 @@ type Queries struct {
 	keyEncryptionAlgorithm    crypto.EncryptionAlgorithm
 	idpConfigEncryption       crypto.EncryptionAlgorithm
 	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
+	smtpEncryptionAlgorithm   crypto.EncryptionAlgorithm
+	smsEncryptionAlgorithm    crypto.EncryptionAlgorithm
 	sessionTokenVerifier      func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
 	checkPermission           domain.PermissionCheck
 
@@ -53,7 +55,7 @@ func StartQueries(
 	cacheConnectors connector.Connectors,
 	projections projection.Config,
 	defaults sd.SystemDefaults,
-	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm, targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
+	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm, targetEncryptionAlgorithm, smsEncryptionAlgorithm, smtpEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	zitadelRoles []authz.RoleMapping,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
 	permissionCheck func(q *Queries) domain.PermissionCheck,
@@ -72,6 +74,8 @@ func StartQueries(
 		keyEncryptionAlgorithm:              keyEncryptionAlgorithm,
 		idpConfigEncryption:                 idpConfigEncryption,
 		targetEncryptionAlgorithm:           targetEncryptionAlgorithm,
+		smsEncryptionAlgorithm:              smsEncryptionAlgorithm,
+		smtpEncryptionAlgorithm:             smtpEncryptionAlgorithm,
 		sessionTokenVerifier:                sessionTokenVerifier,
 		multifactors: domain.MultifactorConfigs{
 			OTP: domain.OTPConfig{
