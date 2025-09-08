@@ -1718,7 +1718,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 						}
 					}
 				}
-				require.Len(ttt, tt.keyValuPars, foundMetadataCount)
+				require.Len(ttt, tt.keyValuePairs, foundMetadataCount)
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 		})
 	}
