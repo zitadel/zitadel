@@ -56,7 +56,7 @@ func TestStart(t *testing.T) {
 
 				return projections
 			},
-			err: fmt.Errorf("projeciton for %s already added", duplicateName),
+			err: fmt.Errorf("projection for %s already added", duplicateName),
 		},
 	}
 	for _, tt := range tests {

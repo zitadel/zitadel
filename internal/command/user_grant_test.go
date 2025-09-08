@@ -1072,9 +1072,10 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 					},
 					UserID: "user1",
 				},
+				permissionCheck: failingUserGrantPermissionCheck,
 			},
 			res: res{
-				err: zerrors.IsPermissionDenied,
+				err: isMockedPermissionCheckErr,
 			},
 		},
 		{
