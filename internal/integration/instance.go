@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
@@ -263,7 +262,7 @@ func (i *Instance) setOrganization(ctx context.Context) {
 
 func (i *Instance) createMachineUser(ctx context.Context, userType UserType) (userID string) {
 	mustAwait(func() error {
-		username := gofakeit.Username()
+		username := Username()
 		userResp, err := i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 			UserName:        username,
 			Name:            username,
