@@ -36,11 +36,11 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 
 	// Wait for org to be created
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+	assert.EventuallyWithT(t, func(t *assert.CollectT) {
 		_, err := orgRepo.Get(CTX,
 			database.WithCondition(orgRepo.IDCondition(org.GetId())),
 		)
-		assert.NoError(ttt, err)
+		assert.NoError(t, err)
 	}, retryDuration, tick)
 
 	// The API call also sets the domain as primary, so we don't do a separate test for that.
@@ -67,7 +67,7 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 
 		// Test that domain add reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			gottenDomain, err := orgDomainRepo.Get(CTX,
 				database.WithCondition(
 					database.And(
@@ -77,7 +77,7 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 					),
 				),
 			)
-			require.NoError(ttt, err)
+			require.NoError(t, err)
 			// event org.domain.added
 			assert.Equal(t, domainName, gottenDomain.Domain)
 			assert.Equal(t, Instance.Instance.Id, gottenDomain.InstanceID)
@@ -97,16 +97,6 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		t.Cleanup(func() {
-			_, err := OrgClient.DeleteOrganizationDomain(CTX, &v2beta.DeleteOrganizationDomainRequest{
-				OrganizationId: org.GetId(),
-				Domain:         domainName,
-			})
-			if err != nil {
-				t.Logf("Failed to delete domain on cleanup: %v", err)
-			}
-		})
-
 		// Remove the domain
 		_, err = OrgClient.DeleteOrganizationDomain(CTX, &v2beta.DeleteOrganizationDomainRequest{
 			OrganizationId: org.GetId(),
@@ -116,7 +106,7 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 
 		// Test that domain remove reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			domain, err := orgDomainRepo.Get(CTX,
 				database.WithCondition(
 					database.And(
@@ -126,8 +116,8 @@ func TestServer_TestOrgDomainReduces(t *testing.T) {
 				),
 			)
 			// event instance.domain.removed
-			assert.Nil(ttt, domain)
-			require.ErrorIs(ttt, err, new(database.NoRowFoundError))
+			assert.Nil(t, domain)
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
 		}, retryDuration, tick)
 	})
 }

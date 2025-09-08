@@ -45,13 +45,13 @@ func TestServer_TestInstanceReduces(t *testing.T) {
 		})
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			instance, err := instanceRepo.Get(CTX,
 				database.WithCondition(instanceRepo.IDCondition(instance.GetInstanceId())),
 			)
-			require.NoError(ttt, err)
+			require.NoError(t, err)
 			// event instance.added
-			assert.Equal(ttt, instanceName, instance.Name)
+			assert.Equal(t, instanceName, instance.Name)
 			// event instance.default.org.set
 			assert.NotNil(t, instance.DefaultOrgID)
 			// event instance.iam.project.set
