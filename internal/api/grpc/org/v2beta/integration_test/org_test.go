@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -1187,11 +1188,7 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 					})
 					require.NoError(ttt, err)
 					found := false
-					for _, res := range queryRes.Domains {
-						if res.DomainName == domain {
-							found = true
-						}
-					}
+					slices.ContainsFunc(queryRes.Domains, func(d *v2beta_org.Domain) bool { return d.GetDomainName() == domain })
 					require.True(ttt, found, "unable to find added domain")
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
@@ -1285,7 +1282,6 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				// 1. create organization
 				orgs, _, _ := createOrgs(CTX, t, Client, 1)
 				orgId := orgs[0].Id
-				// ctx := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
 				domain := gofakeit.URL()
 				// 2. add domain
@@ -1720,7 +1716,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 						}
 					}
 				}
-				require.Equal(ttt, len(tt.keyValuPars), foundMetadataCount)
+				require.Len(ttt, tt.keyValuPars, foundMetadataCount)
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 		})
 	}
@@ -1998,10 +1994,10 @@ func createOrgs(ctx context.Context, t *testing.T, client v2beta_org.Organizatio
 					},
 				},
 			})
-			assert.NoError(collect, err)
-			if len(listOrgRes.Organizations) == 1 {
-				orgDomains[i] = listOrgRes.Organizations[0].PrimaryDomain
-			}
+			require.NoError(collect, err)
+			require.Len(collect, listOrgRes.Organizations, 1)
+
+			orgDomains[i] = listOrgRes.Organizations[0].PrimaryDomain
 		}, retryDuration, tick, "timeout waiting for org creation")
 	}
 
