@@ -95,14 +95,17 @@ func (wm *ProjectWriteModel) Query() *eventstore.SearchQueryBuilder {
 		project.ProjectRemovedType,
 	}
 	aggregateIDs := []string{wm.AggregateID}
+	aggregateTypes := []eventstore.AggregateType{project.AggregateType}
+
 	if wm.ResourceOwner != "" {
 		eventTypes = append(eventTypes, org.OrgRemovedEventType)
 		aggregateIDs = append(aggregateIDs, wm.ResourceOwner)
+		aggregateTypes = append(aggregateTypes, org.AggregateType)
 	}
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateTypes(project.AggregateType, org.AggregateType).
+		AggregateTypes(aggregateTypes...).
 		AggregateIDs(aggregateIDs...).
 		EventTypes(eventTypes...).
 		Builder()
