@@ -147,6 +147,7 @@ func TestCommands_CheckPermissionUserWrite(t *testing.T) {
 	type args struct {
 		ctx                        context.Context
 		resourceOwner, aggregateID string
+		allowSelfManagement        bool
 	}
 	type want struct {
 		err func(error) bool
@@ -163,8 +164,29 @@ func TestCommands_CheckPermissionUserWrite(t *testing.T) {
 				ctx: authz.SetCtxData(context.Background(), authz.CtxData{
 					UserID: "aggregateID",
 				}),
-				resourceOwner: "resourceOwner",
-				aggregateID:   "aggregateID",
+				resourceOwner:       "resourceOwner",
+				aggregateID:         "aggregateID",
+				allowSelfManagement: true,
+			},
+		},
+		{
+			name: "self, no selfManagementAllowed, permission check",
+			fields: fields{
+				domainPermissionCheck: mockDomainPermissionCheck(
+					authz.SetCtxData(context.Background(), authz.CtxData{
+						UserID: "aggregateID",
+					}),
+					"user.write",
+					"resourceOwner",
+					"aggregateID"),
+			},
+			args: args{
+				ctx: authz.SetCtxData(context.Background(), authz.CtxData{
+					UserID: "aggregateID",
+				}),
+				resourceOwner:       "resourceOwner",
+				aggregateID:         "aggregateID",
+				allowSelfManagement: false,
 			},
 		},
 		{
@@ -194,7 +216,7 @@ func TestCommands_CheckPermissionUserWrite(t *testing.T) {
 			if tt.fields.domainPermissionCheck != nil {
 				c.checkPermission = tt.fields.domainPermissionCheck(t)
 			}
-			err := c.NewPermissionCheckUserWrite(tt.args.ctx)(tt.args.resourceOwner, tt.args.aggregateID)
+			err := c.NewPermissionCheckUserWrite(tt.args.ctx, tt.args.allowSelfManagement)(tt.args.resourceOwner, tt.args.aggregateID)
 			if tt.want.err != nil {
 				assert.True(t, tt.want.err(err))
 			}
@@ -223,7 +245,47 @@ func TestCommands_CheckPermissionUserDelete(t *testing.T) {
 		want   want
 	}{
 		{
-			name: "self, no permission check",
+			name: "self permission allowed, permission check",
+			fields: fields{
+				domainPermissionCheck: mockDomainPermissionCheck(
+					userCtx,
+					"user.delete",
+					"resourceOwner",
+					"aggregateID"),
+			},
+			args: args{
+				ctx:           userCtx,
+				resourceOwner: "resourceOwner",
+				aggregateID:   "aggregateID",
+			},
+		},
+		{
+			name: "self user.delete not allowed, user.self.delete permission check",
+			fields: fields{
+				domainPermissionCheck: mockDomainPermissionChecks(
+					expectedCheck{
+						userCtx,
+						"user.delete",
+						"resourceOwner",
+						"aggregateID",
+						zerrors.ThrowPermissionDenied(nil, "id", "permission denied"),
+					},
+					expectedCheck{
+						userCtx,
+						"user.self.delete",
+						"resourceOwner",
+						"aggregateID",
+						nil,
+					},
+					expectedCheck{
+						userCtx,
+						"user.self.delete",
+						"resourceOwner",
+						"aggregateID",
+						nil,
+					},
+				),
+			},
 			args: args{
 				ctx:           userCtx,
 				resourceOwner: "resourceOwner",
@@ -273,6 +335,44 @@ func mockDomainPermissionCheck(expectCtx context.Context, expectPermission, expe
 			assert.Equal(t, expectResourceOwner, orgID)
 			assert.Equal(t, expectResourceID, resourceID)
 			return nil
+		}
+	}
+}
+
+type expectedCheck struct {
+	ctx           context.Context
+	permission    string
+	resourceOwner string
+	resourceID    string
+	err           error
+}
+
+func mockDomainPermissionChecks(checks ...expectedCheck) func(t *testing.T) domain.PermissionCheck {
+	var i int
+	return func(t *testing.T) domain.PermissionCheck {
+		t.Cleanup(func() {
+			t.Helper()
+			if i != len(checks) {
+				t.Logf("not all expected checks were called, expected: %d, got: %d", len(checks), i)
+				for ; i < len(checks); i++ {
+					t.Logf("missing call: %+v", checks[i])
+				}
+				t.Fail()
+			}
+		})
+
+		return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+			if i >= len(checks) {
+				assert.Fail(t, "no more checks expected")
+				return nil
+			}
+			expect := checks[i]
+			assert.Equal(t, expect.ctx, ctx)
+			assert.Equal(t, expect.permission, permission)
+			assert.Equal(t, expect.resourceOwner, orgID)
+			assert.Equal(t, expect.resourceID, resourceID)
+			i++
+			return expect.err
 		}
 	}
 }

@@ -1346,6 +1346,17 @@ func TestServer_LockUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.LockUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
+				},
+				func(request *user.LockUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
 			name: "lock, ok",
 			args: args{
 				CTX,
@@ -1448,6 +1459,17 @@ func TestServer_UnLockUser(t *testing.T) {
 				CTX,
 				&user.UnlockUserRequest{
 					UserId: "notexisting",
+				},
+				func(request *user.UnlockUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.UnlockUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
 				},
 				func(request *user.UnlockUserRequest) error { return nil },
 			},
@@ -1562,6 +1584,17 @@ func TestServer_DeactivateUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.DeactivateUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
+				},
+				func(request *user.DeactivateUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
 			name: "deactivate, ok",
 			args: args{
 				CTX,
@@ -1665,6 +1698,17 @@ func TestServer_ReactivateUser(t *testing.T) {
 				CTX,
 				&user.ReactivateUserRequest{
 					UserId: "notexisting",
+				},
+				func(request *user.ReactivateUserRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission, error",
+			args: args{
+				UserCTX,
+				&user.ReactivateUserRequest{
+					UserId: Instance.Users.Get(integration.UserTypeNoPermission).ID,
 				},
 				func(request *user.ReactivateUserRequest) error { return nil },
 			},
@@ -1853,6 +1897,10 @@ func TestServer_DeleteUser(t *testing.T) {
 						},
 					})
 					require.NoError(t, err)
+
+					// allow self management incl. deletion
+					Instance.CreateOrgMembership(t, CTX, Instance.DefaultOrg.Id, removeUser.Id, "ORG_USER_SELF_MANAGER")
+
 					request.UserId = removeUser.Id
 					Instance.RegisterUserPasskey(CTX, removeUser.Id)
 					_, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, removeUser.Id)
