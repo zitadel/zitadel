@@ -960,8 +960,8 @@ func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, proje
 	return resp
 }
 
-func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, projectID, userID string) *mgmt.AddUserGrantResponse {
-	resp, err := i.Client.Mgmt.AddUserGrant(ctx, &mgmt.AddUserGrantRequest{
+func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, orgID, projectID, userID string) *mgmt.AddUserGrantResponse {
+	resp, err := i.Client.Mgmt.AddUserGrant(SetOrgID(ctx, orgID), &mgmt.AddUserGrantRequest{
 		UserId:    userID,
 		ProjectId: projectID,
 	})

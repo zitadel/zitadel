@@ -77,9 +77,9 @@ func TestDeleteUser_errors(t *testing.T) {
 func TestDeleteUser_ensureReallyDeleted(t *testing.T) {
 	// create user and dependencies
 	createUserResp := Instance.CreateHumanUser(CTX)
-	proj := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
+	proj := Instance.CreateProject(CTX, t, Instance.DefaultOrg.GetId(), gofakeit.AppName(), false, false)
 
-	Instance.CreateProjectUserGrant(t, CTX, proj.Id, createUserResp.UserId)
+	Instance.CreateProjectUserGrant(t, CTX, Instance.DefaultOrg.GetId(), proj.Id, createUserResp.UserId)
 
 	// delete user via scim
 	err := Instance.Client.SCIM.Users.Delete(CTX, Instance.DefaultOrg.Id, createUserResp.UserId)
