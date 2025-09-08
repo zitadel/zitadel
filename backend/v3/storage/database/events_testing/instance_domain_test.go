@@ -35,11 +35,11 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 
 	// Wait for instance to be created
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+	assert.EventuallyWithT(t, func(t *assert.CollectT) {
 		_, err := instanceRepo.Get(CTX,
-			database.WithCondition(instanceRepo.IDCondition(instance.Instance.Id)),
+			database.WithCondition(instanceRepo.IDCondition(instance.ID())),
 		)
-		assert.NoError(ttt, err)
+		assert.NoError(t, err)
 	}, retryDuration, tick)
 
 	t.Run("test instance custom domain add reduces", func(t *testing.T) {
@@ -65,7 +65,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 
 		// Test that domain add reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			domain, err := instanceDomainRepo.Get(CTX,
 				database.WithCondition(
 					database.And(
@@ -75,13 +75,13 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 					),
 				),
 			)
-			require.NoError(ttt, err)
+			require.NoError(t, err)
 			// event instance.domain.added
-			assert.Equal(ttt, domainName, domain.Domain)
-			assert.Equal(ttt, instance.Instance.Id, domain.InstanceID)
-			assert.False(ttt, *domain.IsPrimary)
-			assert.WithinRange(ttt, domain.CreatedAt, beforeAdd, afterAdd)
-			assert.WithinRange(ttt, domain.UpdatedAt, beforeAdd, afterAdd)
+			assert.Equal(t, domainName, domain.Domain)
+			assert.Equal(t, instance.Instance.Id, domain.InstanceID)
+			assert.False(t, *domain.IsPrimary)
+			assert.WithinRange(t, domain.CreatedAt, beforeAdd, afterAdd)
+			assert.WithinRange(t, domain.UpdatedAt, beforeAdd, afterAdd)
 		}, retryDuration, tick)
 	})
 
@@ -124,7 +124,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 
 		// Wait for domain to be created
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			domain, err := instanceDomainRepo.Get(CTX,
 				database.WithCondition(
 					database.And(
@@ -134,9 +134,9 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 					),
 				),
 			)
-			require.NoError(ttt, err)
-			require.False(ttt, *domain.IsPrimary)
-			assert.Equal(ttt, domainName, domain.Domain)
+			require.NoError(t, err)
+			require.False(t, *domain.IsPrimary)
+			assert.Equal(t, domainName, domain.Domain)
 		}, retryDuration, tick)
 
 		// Set domain as primary
@@ -150,7 +150,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 
 		// Test that set primary reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			domain, err := instanceDomainRepo.Get(CTX,
 				database.WithCondition(
 					database.And(
@@ -160,11 +160,11 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 					),
 				),
 			)
-			require.NoError(ttt, err)
+			require.NoError(t, err)
 			// event instance.domain.primary.set
-			assert.Equal(ttt, domainName, domain.Domain)
-			assert.True(ttt, *domain.IsPrimary)
-			assert.WithinRange(ttt, domain.UpdatedAt, beforeSetPrimary, afterSetPrimary)
+			assert.Equal(t, domainName, domain.Domain)
+			assert.True(t, *domain.IsPrimary)
+			assert.WithinRange(t, domain.UpdatedAt, beforeSetPrimary, afterSetPrimary)
 		}, retryDuration, tick)
 	})
 
@@ -179,7 +179,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 
 		// Wait for domain to be created and verify it exists
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := instanceDomainRepo.Get(CTX,
 				database.WithCondition(
 					database.And(
@@ -189,7 +189,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 					),
 				),
 			)
-			require.NoError(ttt, err)
+			require.NoError(t, err)
 		}, retryDuration, tick)
 
 		// Remove the domain
@@ -201,7 +201,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 
 		// Test that domain remove reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			domain, err := instanceDomainRepo.Get(CTX,
 				database.WithCondition(
 					database.And(
@@ -212,8 +212,8 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 				),
 			)
 			// event instance.domain.removed
-			assert.Nil(ttt, domain)
-			require.ErrorIs(ttt, err, new(database.NoRowFoundError))
+			assert.Nil(t, domain)
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
 		}, retryDuration, tick)
 	})
 
@@ -240,7 +240,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 
 		// Test that domain add reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			domain, err := instanceDomainRepo.Get(CTX,
 				database.WithCondition(
 					database.And(
@@ -250,12 +250,12 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 					),
 				),
 			)
-			require.NoError(ttt, err)
+			require.NoError(t, err)
 			// event instance.domain.added
-			assert.Equal(ttt, domainName, domain.Domain)
-			assert.Equal(ttt, instance.Instance.Id, domain.InstanceID)
-			assert.WithinRange(ttt, domain.CreatedAt, beforeAdd, afterAdd)
-			assert.WithinRange(ttt, domain.UpdatedAt, beforeAdd, afterAdd)
+			assert.Equal(t, domainName, domain.Domain)
+			assert.Equal(t, instance.Instance.Id, domain.InstanceID)
+			assert.WithinRange(t, domain.CreatedAt, beforeAdd, afterAdd)
+			assert.WithinRange(t, domain.UpdatedAt, beforeAdd, afterAdd)
 		}, retryDuration, tick)
 	})
 
@@ -270,7 +270,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 
 		// Wait for domain to be created and verify it exists
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			_, err := instanceDomainRepo.Get(CTX,
 				database.WithCondition(
 					database.And(
@@ -280,7 +280,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 					),
 				),
 			)
-			require.NoError(ttt, err)
+			require.NoError(t, err)
 		}, retryDuration, tick)
 
 		// Remove the domain
@@ -292,7 +292,7 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 
 		// Test that domain remove reduces
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-		assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			domain, err := instanceDomainRepo.Get(CTX,
 				database.WithCondition(
 					database.And(
@@ -303,8 +303,8 @@ func TestServer_TestInstanceDomainReduces(t *testing.T) {
 				),
 			)
 			// event instance.domain.removed
-			assert.Nil(ttt, domain)
-			require.ErrorIs(ttt, err, new(database.NoRowFoundError))
+			assert.Nil(t, domain)
+			require.ErrorIs(t, err, new(database.NoRowFoundError))
 		}, retryDuration, tick)
 	})
 }
