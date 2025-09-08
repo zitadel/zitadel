@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -29,7 +28,7 @@ func OrganizationRepository(client database.QueryExecutor) domain.OrganizationRe
 }
 
 const queryOrganizationStmt = `SELECT organizations.id, organizations.name, organizations.instance_id, organizations.state, organizations.created_at, organizations.updated_at` +
-	` , CASE WHEN count(org_domains.domain) > 0 THEN jsonb_agg(json_build_object('domain', org_domains.domain, 'isVerified', org_domains.is_verified, 'isPrimary', org_domains.is_primary, 'validationType', org_domains.validation_type, 'createdAt', org_domains.created_at, 'updatedAt', org_domains.updated_at)) ELSE NULL::JSONB END domains` +
+	` , jsonb_agg(json_build_object('domain', org_domains.domain, 'isVerified', org_domains.is_verified, 'isPrimary', org_domains.is_primary, 'validationType', org_domains.validation_type, 'createdAt', org_domains.created_at, 'updatedAt', org_domains.updated_at)) FILTER (WHERE org_domains.org_id IS NOT NULL) AS domains` +
 	` FROM zitadel.organizations`
 
 // Get implements [domain.OrganizationRepository].
@@ -212,9 +211,9 @@ func (org) UpdatedAtColumn() database.Column {
 // scanners
 // -------------------------------------------------------------
 
-type rawOrganization struct {
+type rawOrg struct {
 	*domain.Organization
-	RawDomains json.RawMessage `json:"domains,omitempty" db:"domains"`
+	Domains JSONArray[domain.OrganizationDomain] `json:"domains,omitempty" db:"domains"`
 }
 
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
@@ -223,15 +222,11 @@ func scanOrganization(ctx context.Context, querier database.Querier, builder *da
 		return nil, err
 	}
 
-	var org rawOrganization
+	var org rawOrg
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&org); err != nil {
 		return nil, err
 	}
-	if len(org.RawDomains) > 0 {
-		if err := json.Unmarshal(org.RawDomains, &org.Domains); err != nil {
-			return nil, err
-		}
-	}
+	org.Organization.Domains = org.Domains
 
 	return org.Organization, nil
 }
@@ -242,21 +237,18 @@ func scanOrganizations(ctx context.Context, querier database.Querier, builder *d
 		return nil, err
 	}
 
-	var rawOrgs []*rawOrganization
-	if err := rows.(database.CollectableRows).Collect(&rawOrgs); err != nil {
+	var orgs []*rawOrg
+	if err := rows.(database.CollectableRows).Collect(&orgs); err != nil {
 		return nil, err
 	}
 
-	organizations := make([]*domain.Organization, len(rawOrgs))
-	for i, org := range rawOrgs {
-		if len(org.RawDomains) > 0 {
-			if err := json.Unmarshal(org.RawDomains, &org.Domains); err != nil {
-				return nil, err
-			}
-		}
-		organizations[i] = org.Organization
+	result := make([]*domain.Organization, len(orgs))
+	for i, org := range orgs {
+		result[i] = org.Organization
+		result[i].Domains = org.Domains
 	}
-	return organizations, nil
+
+	return result, nil
 }
 
 // -------------------------------------------------------------
