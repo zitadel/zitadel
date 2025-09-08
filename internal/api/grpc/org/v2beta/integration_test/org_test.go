@@ -646,7 +646,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 					Filter: tt.query,
 				})
 				if tt.err != nil {
-					require.ErrorContains(t, err, tt.err.Error())
+					require.ErrorContains(ttt, err, tt.err.Error())
 					return
 				}
 				require.NoError(ttt, err)
@@ -828,7 +828,9 @@ func TestServer_ActivateOrganization(t *testing.T) {
 						},
 					})
 					require.NoError(ttt, err)
-					require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+					if assert.GreaterOrEqual(ttt, len(listOrgRes.Organizations), 1) {
+						require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+					}
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				return orgId
@@ -1048,14 +1050,14 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
 						OrganizationId: orgId,
 					})
-					require.NoError(t, err)
+					require.NoError(ttt, err)
 					found := false
 					for _, res := range queryRes.Domains {
 						if res.DomainName == domain {
 							found = true
 						}
 					}
-					require.True(t, found, "unable to find added domain")
+					require.True(ttt, found, "unable to find added domain")
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				return orgId
@@ -1209,20 +1211,20 @@ func TestServer_ListOrganizationDomains(t *testing.T) {
 			queryRes, err = Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
 				OrganizationId: orgId,
 			})
-			require.NoError(t, err)
+			require.NoError(ttt, err)
 			found := false
 			for _, res := range queryRes.Domains {
 				if res.DomainName == tt.domain {
 					found = true
 				}
 			}
-			require.True(t, found, "unable to find added domain")
+			require.True(ttt, found, "unable to find added domain")
 		}, retryDuration, tick, "timeout waiting for adding domain")
 
 	}
 }
 
-func TestServer_DeleteOerganizationDomain(t *testing.T) {
+func TestServer_DeleteOrganizationDomain(t *testing.T) {
 	domain := gofakeit.URL()
 	tests := []struct {
 		name     string
@@ -1260,14 +1262,14 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
 						OrganizationId: orgId,
 					})
-					require.NoError(t, err)
+					require.NoError(ttt, err)
 					found := false
 					for _, res := range queryRes.Domains {
 						if res.DomainName == domain {
 							found = true
 						}
 					}
-					require.True(t, found, "unable to find added domain")
+					require.True(ttt, found, "unable to find added domain")
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				return orgId
@@ -1303,14 +1305,14 @@ func TestServer_DeleteOerganizationDomain(t *testing.T) {
 					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
 						OrganizationId: orgId,
 					})
-					require.NoError(t, err)
+					require.NoError(ttt, err)
 					found := false
 					for _, res := range queryRes.Domains {
 						if res.DomainName == domain {
 							found = true
 						}
 					}
-					require.True(t, found, "unable to find added domain")
+					require.True(ttt, found, "unable to find added domain")
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				_, err = Client.DeleteOrganizationDomain(CTX, &v2beta_org.DeleteOrganizationDomainRequest{
@@ -1691,7 +1693,7 @@ func TestServer_SetOrganizationMetadata(t *testing.T) {
 				listMetadataRes, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
 					OrganizationId: orgId,
 				})
-				require.NoError(t, err)
+				require.NoError(ttt, err)
 				foundMetadata := false
 				foundMetadataKeyCount := 0
 				for _, res := range listMetadataRes.Metadata {
@@ -1719,11 +1721,11 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 	orgId := orgs[0].Id
 
 	tests := []struct {
-		name        string
-		ctx         context.Context
-		setupFunc   func()
-		orgId       string
-		keyValuPars []struct {
+		name          string
+		ctx           context.Context
+		setupFunc     func()
+		orgId         string
+		keyValuePairs []struct {
 			key   string
 			value string
 		}
@@ -1744,7 +1746,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 				require.NoError(t, err)
 			},
 			orgId: orgId,
-			keyValuPars: []struct{ key, value string }{
+			keyValuePairs: []struct{ key, value string }{
 				{
 					key:   "key1",
 					value: "value1",
@@ -1775,7 +1777,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 				require.NoError(t, err)
 			},
 			orgId: orgId,
-			keyValuPars: []struct{ key, value string }{
+			keyValuePairs: []struct{ key, value string }{
 				{
 					key:   "key2",
 					value: "value2",
@@ -1791,10 +1793,10 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 			},
 		},
 		{
-			name:        "list org metadata for non existent org",
-			ctx:         Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner),
-			orgId:       "non existent orgid",
-			keyValuPars: []struct{ key, value string }{},
+			name:          "list org metadata for non existent org",
+			ctx:           Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner),
+			orgId:         "non existent orgid",
+			keyValuePairs: []struct{ key, value string }{},
 		},
 	}
 	for _, tt := range tests {
@@ -1808,10 +1810,10 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 				got, err := Client.ListOrganizationMetadata(tt.ctx, &v2beta_org.ListOrganizationMetadataRequest{
 					OrganizationId: tt.orgId,
 				})
-				require.NoError(t, err)
+				require.NoError(ttt, err)
 
 				foundMetadataCount := 0
-				for _, kv := range tt.keyValuPars {
+				for _, kv := range tt.keyValuePairs {
 					for _, res := range got.Metadata {
 						if res.Key == kv.key &&
 							string(res.Value) == kv.value {
@@ -1819,7 +1821,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 						}
 					}
 				}
-				require.Equal(t, len(tt.keyValuPars), foundMetadataCount)
+				require.Equal(ttt, len(tt.keyValuePairs), foundMetadataCount)
 			}, retryDuration, tick, "timeout waiting for expected organizations being created")
 		})
 	}
