@@ -70,7 +70,7 @@ type settingsConditions interface {
 	InstanceIDCondition(id string) database.Condition
 	OrgIDCondition(id *string) database.Condition
 	IDCondition(id string) database.Condition
-	TypeCondition(typee SettingType) database.Condition
+	TypeCondition(typ SettingType) database.Condition
 }
 
 type settingsChanges interface {
