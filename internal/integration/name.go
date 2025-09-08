@@ -87,3 +87,7 @@ func ID() string {
 func Slogan() string {
 	return gofakeit.Slogan()
 }
+
+func Number() int {
+	return gofakeit.Number(0, 1_000_000)
+}
