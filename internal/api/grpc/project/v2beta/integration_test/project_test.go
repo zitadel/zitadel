@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -22,7 +21,7 @@ func TestServer_CreateProject(t *testing.T) {
 	t.Parallel()
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 	alreadyExistingProjectName := integration.ProjectName()
 	instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), alreadyExistingProjectName, false, false)
 
@@ -95,7 +94,7 @@ func TestServer_CreateProject(t *testing.T) {
 func TestServer_CreateProject_Permission(t *testing.T) {
 	t.Parallel()
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type want struct {
 		id           bool
@@ -238,7 +237,7 @@ func assertCreateProjectResponse(t *testing.T, creationDate, changeDate time.Tim
 func TestServer_UpdateProject(t *testing.T) {
 	t.Parallel()
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type args struct {
 		ctx context.Context
@@ -348,7 +347,7 @@ func TestServer_UpdateProject(t *testing.T) {
 func TestServer_UpdateProject_Permission(t *testing.T) {
 	t.Parallel()
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	userResp := instance.CreateMachineUser(iamOwnerCtx)
 	patResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userResp.GetUserId())
@@ -514,7 +513,7 @@ func assertUpdateProjectResponse(t *testing.T, creationDate, changeDate time.Tim
 func TestServer_DeleteProject(t *testing.T) {
 	t.Parallel()
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	tests := []struct {
 		name             string
@@ -587,7 +586,7 @@ func TestServer_DeleteProject(t *testing.T) {
 func TestServer_DeleteProject_Permission(t *testing.T) {
 	t.Parallel()
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	userResp := instance.CreateMachineUser(iamOwnerCtx)
 	patResp := instance.CreatePersonalAccessToken(iamOwnerCtx, userResp.GetUserId())
@@ -720,7 +719,7 @@ func assertDeleteProjectResponse(t *testing.T, creationDate, deletionDate time.T
 func TestServer_DeactivateProject(t *testing.T) {
 	t.Parallel()
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type args struct {
 		ctx context.Context
@@ -751,8 +750,7 @@ func TestServer_DeactivateProject(t *testing.T) {
 		{
 			name: "no change, ok",
 			prepare: func(request *project.DeactivateProjectRequest) {
-				name := gofakeit.AppName()
-				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name, false, false).GetId()
+				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false).GetId()
 				request.Id = projectID
 				instance.DeactivateProject(iamOwnerCtx, t, projectID)
 			},
@@ -802,7 +800,7 @@ func TestServer_DeactivateProject(t *testing.T) {
 func TestServer_DeactivateProject_Permission(t *testing.T) {
 	t.Parallel()
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type args struct {
 		ctx context.Context
@@ -922,7 +920,7 @@ func assertDeactivateProjectResponse(t *testing.T, creationDate, changeDate time
 func TestServer_ActivateProject(t *testing.T) {
 	t.Parallel()
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type args struct {
 		ctx context.Context
@@ -966,8 +964,7 @@ func TestServer_ActivateProject(t *testing.T) {
 		{
 			name: "no change, ok",
 			prepare: func(request *project.ActivateProjectRequest) {
-				name := gofakeit.AppName()
-				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name, false, false).GetId()
+				projectID := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false).GetId()
 				request.Id = projectID
 			},
 			args: args{
@@ -1017,7 +1014,7 @@ func TestServer_ActivateProject(t *testing.T) {
 func TestServer_ActivateProject_Permission(t *testing.T) {
 	t.Parallel()
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
-	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
 	type args struct {
 		ctx context.Context

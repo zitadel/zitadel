@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -20,7 +19,7 @@ import (
 
 func TestServer_ListAppKeys(t *testing.T) {
 	// create project
-	prjName := gofakeit.Name()
+	prjName := integration.ProjectName()
 	createPrjRes, err := Instance.Client.Projectv2Beta.CreateProject(IAMOwnerCTX, &project.CreateProjectRequest{
 		Name:           prjName,
 		OrganizationId: Instance.DefaultOrg.Id,
@@ -31,7 +30,7 @@ func TestServer_ListAppKeys(t *testing.T) {
 	// add app to project
 	createAppjRes, err := Instance.Client.AppV2Beta.CreateApplication(IAMOwnerCTX, &app.CreateApplicationRequest{
 		ProjectId: prjId,
-		Name:      gofakeit.Name(),
+		Name:      integration.ApplicationName(),
 		CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
 			ApiRequest: &app.CreateAPIApplicationRequest{
 				AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
@@ -53,7 +52,7 @@ func TestServer_ListAppKeys(t *testing.T) {
 				// add other app to project
 				createOtherAppjRes, err := Instance.Client.AppV2Beta.CreateApplication(IAMOwnerCTX, &app.CreateApplicationRequest{
 					ProjectId: prjId,
-					Name:      gofakeit.Name(),
+					Name:      integration.ApplicationName(),
 					CreationRequestType: &app.CreateApplicationRequest_ApiRequest{
 						ApiRequest: &app.CreateAPIApplicationRequest{
 							AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
@@ -89,19 +88,19 @@ func TestServer_ListAppKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
-			assert.EventuallyWithT(t, func(ct *assert.CollectT) {
-				expectedKeyIds := tt.expectedKeyIdsFunc()
+			expectedKeyIds := tt.expectedKeyIdsFunc()
 
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			require.EventuallyWithT(t, func(ct *assert.CollectT) {
 				res, err := Client.ListAppKeys(IAMOwnerCTX, &management.ListAppKeysRequest{
 					AppId:     appId,
 					ProjectId: prjId,
 				})
-				require.NoError(t, err)
-				assert.Equal(t, len(expectedKeyIds), len(res.GetResult()))
+				require.NoError(ct, err)
+				assert.Equal(ct, len(expectedKeyIds), len(res.GetResult()))
 
 				for _, key := range res.GetResult() {
-					assert.True(t, slices.Contains(expectedKeyIds, key.Id))
+					assert.True(ct, slices.Contains(expectedKeyIds, key.Id))
 				}
 			}, retryDuration, tick)
 		})

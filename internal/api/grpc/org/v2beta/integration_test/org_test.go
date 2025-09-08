@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -78,7 +77,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 			wantErr: true,
 		},
 		func() test {
-			orgName := gofakeit.Name()
+			orgName := integration.OrganizationName()
 			return test{
 				name: "adding org with same name twice",
 				ctx:  CTX,
@@ -144,7 +143,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 									FamilyName: "lastname",
 								},
 								Email: &user_v2beta.SetHumanEmail{
-									Email: gofakeit.Email(),
+									Email: integration.Email(),
 									Verification: &user_v2beta.SetHumanEmail_ReturnCode{
 										ReturnCode: &user_v2beta.ReturnEmailVerificationCode{},
 									},
@@ -186,7 +185,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 									FamilyName: "lastname",
 								},
 								Email: &user_v2beta.SetHumanEmail{
-									Email: gofakeit.Email(),
+									Email: integration.Email(),
 									Verification: &user_v2beta.SetHumanEmail_IsVerified{
 										IsVerified: true,
 									},
@@ -236,20 +235,20 @@ func TestServer_CreateOrganization(t *testing.T) {
 			},
 		},
 		func() test {
-			orgID := gofakeit.Name()
+			orgID := integration.OrganizationName()
 			return test{
 				name: "adding org with same ID twice",
 				ctx:  CTX,
 				req: &v2beta_org.CreateOrganizationRequest{
 					Id:     &orgID,
-					Name:   gofakeit.Name(),
+					Name:   integration.OrganizationName(),
 					Admins: nil,
 				},
 				testFunc: func(ctx context.Context, t *testing.T) {
 					// create org initially
 					_, err := Client.CreateOrganization(ctx, &v2beta_org.CreateOrganizationRequest{
 						Id:   &orgID,
-						Name: gofakeit.Name(),
+						Name: integration.OrganizationName(),
 					})
 					require.NoError(t, err)
 				},
@@ -951,7 +950,7 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 	}{
 		{
 			name:   "add org domain, happy path",
-			domain: gofakeit.URL(),
+			domain: integration.DomainName(),
 			testFunc: func() string {
 				orgs, _, _ := createOrgs(CTX, t, Client, 1)
 				orgId := orgs[0].Id
@@ -960,13 +959,13 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "add org domain, twice",
-			domain: gofakeit.URL(),
+			domain: integration.URL(),
 			testFunc: func() string {
 				// 1. create organization
 				orgs, _, _ := createOrgs(CTX, t, Client, 1)
 				orgId := orgs[0].Id
 
-				domain := gofakeit.URL()
+				domain := integration.URL()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -999,7 +998,7 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "add org domain to non existent org",
-			domain: gofakeit.URL(),
+			domain: integration.URL(),
 			testFunc: func() string {
 				return "non-existing-org-id"
 			},
@@ -1030,7 +1029,7 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 }
 
 func TestServer_AddOrganizationDomain_ClaimDomain(t *testing.T) {
-	domain := gofakeit.DomainName()
+	domain := integration.DomainName()
 
 	// create an organization, ensure it has globally unique usernames
 	// and create a user with a loginname that matches the domain later on
@@ -1043,7 +1042,7 @@ func TestServer_AddOrganizationDomain_ClaimDomain(t *testing.T) {
 		UserLoginMustBeDomain: false,
 	})
 	require.NoError(t, err)
-	username := gofakeit.Username() + "@" + domain
+	username := integration.Username() + "@" + domain
 	ownUser := Instance.CreateHumanUserVerified(CTX, organization.GetId(), username, "")
 
 	// create another organization, ensure it has globally unique usernames
@@ -1058,7 +1057,7 @@ func TestServer_AddOrganizationDomain_ClaimDomain(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	otherUsername := gofakeit.Username() + "@" + domain
+	otherUsername := integration.Username() + "@" + domain
 	otherUser := Instance.CreateHumanUserVerified(CTX, otherOrg.GetId(), otherUsername, "")
 
 	// if we add the domain now to the first organization, it should be claimed on the second organization, resp. its user(s)
@@ -1096,7 +1095,7 @@ func TestServer_AddOrganizationDomain_ClaimDomain(t *testing.T) {
 }
 
 func TestServer_ListOrganizationDomains(t *testing.T) {
-	domain := gofakeit.URL()
+	domain := integration.URL()
 	tests := []struct {
 		name     string
 		ctx      context.Context
@@ -1155,7 +1154,7 @@ func TestServer_ListOrganizationDomains(t *testing.T) {
 }
 
 func TestServer_DeleteOrganizationDomain(t *testing.T) {
-	domain := gofakeit.URL()
+	domain := integration.URL()
 	tests := []struct {
 		name     string
 		ctx      context.Context
@@ -1199,13 +1198,13 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "delete org domain, twice",
-			domain: gofakeit.URL(),
+			domain: integration.URL(),
 			testFunc: func() string {
 				// 1. create organization
 				orgs, _, _ := createOrgs(CTX, t, Client, 1)
 				orgId := orgs[0].Id
 
-				domain := gofakeit.URL()
+				domain := integration.URL()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -1245,7 +1244,7 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "delete org domain to non existent org",
-			domain: gofakeit.URL(),
+			domain: integration.URL(),
 			testFunc: func() string {
 				return "non-existing-org-id"
 			},
@@ -1285,7 +1284,7 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				orgs, _, _ := createOrgs(CTX, t, Client, 1)
 				orgId := orgs[0].Id
 
-				domain := gofakeit.URL()
+				domain := integration.URL()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -1311,17 +1310,20 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				// assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 				// 4. check domain is added
-				queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
-					OrganizationId: orgId,
-				})
-				require.NoError(t, err)
-				found := false
-				for _, res := range queryRes.Domains {
-					if res.DomainName == domain {
-						found = true
+				retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+				require.EventuallyWithT(t, func(collect *assert.CollectT) {
+					queryRes, err := Client.ListOrganizationDomains(CTX, &v2beta_org.ListOrganizationDomainsRequest{
+						OrganizationId: orgId,
+					})
+					require.NoError(collect, err)
+					found := false
+					for _, res := range queryRes.Domains {
+						if res.DomainName == domain {
+							found = true
+						}
 					}
-				}
-				require.True(t, found, "unable to find added domain")
+					require.True(collect, found, "unable to find added domain")
+				}, retryDuration, tick)
 			},
 		},
 		{
@@ -1331,7 +1333,7 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				orgs, _, _ := createOrgs(CTX, t, Client, 1)
 				orgId := orgs[0].Id
 
-				domain := gofakeit.URL()
+				domain := integration.URL()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -1417,7 +1419,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	domain := gofakeit.URL()
+	domain := integration.URL()
 	_, err = Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 		OrganizationId: orgId,
 		Domain:         domain,
