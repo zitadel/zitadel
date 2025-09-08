@@ -79,31 +79,34 @@
     },
     "start": {
       "description": "Start the login service via Docker Compose with environment passthrough",
-      "executor": "nx:run-commands",
       "continuous": true,
-      "options": {
-        "cwd": "{workspaceRoot}/.devcontainer",
-        "command": "docker compose up login --no-deps --force-recreate --watch"
-      }
+      "command": "nx run @zitadel/devcontainer:compose up --no-deps --watch login"
     },
-    "test-integration-env": {
-      "description": "Start the login and the core mock server to run the integration tests",
-      "continuous": true,
+    "test-integration-env-build": {
+      "description": "Build the login and the core mock server to run the integration tests",
+      "command": "nx run @zitadel/devcontainer:compose build login-core-mock login",
       "dependsOn": [
         "build"
+      ]
+    },
+    "test-integration-env-start": {
+      "description": "Start the login and the core mock server to run the integration tests",
+      "continuous": true,
+      "command": "nx run @zitadel/devcontainer:compose up --no-deps --build --watch login-core-mock login",
+      "dependsOn": [
+        "test-integration-env-build"
       ],
-      "executor": "nx:run-commands",
       "options": {
-        "parallel": true,
-        "commands": [
-          "nx run @zitadel/devcontainer:compose up --watch login start-login-core-mock"
-        ]
+        "env": {
+          "LOGIN_ENV_FILE": "{projectRoot}/.env.test-integration-env"
+        }
       }
     },
     "test-integration": {
+      "cache": true,
       "dependsOn": [
         "build",
-        "test-integration-env"
+        "test-integration-env-start"
       ],
       "inputs": [
         "{projectRoot}/integration/integration/**",

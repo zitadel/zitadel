@@ -43,16 +43,10 @@ services:
       - ../:/workspaces/zitadel:cached
     command: init --config /workspaces/zitadel/.devcontainer/zitadel.yaml
     env_file:
-      - path: ../build/zitadel/.env.start.local
-        required: false
-      - path: ../build/zitadel/.env.start
-        required: false
-      - path: ../build/zitadel/.env.local
-        required: false
-      - path: ../build/zitadel/.env
-        required: false
       - path: .env.core
         required: true
+      - path: ../${CORE_ENV_FILE:-none}
+        required: false
     build:
       context: ../
       dockerfile: build/zitadel/Dockerfile
@@ -79,16 +73,10 @@ services:
       - ../:/workspaces/zitadel:cached
     command: setup --config /workspaces/zitadel/.devcontainer/zitadel.yaml --steps /workspaces/zitadel/.devcontainer/zitadel.yaml --masterkey MasterkeyNeedsToHave32Characters
     env_file:
-      - path: ../build/zitadel/.env.start.local
-        required: false
-      - path: ../build/zitadel/.env.start
-        required: false
-      - path: ../build/zitadel/.env.local
-        required: false
-      - path: ../build/zitadel/.env
-        required: false
       - path: .env.core
         required: true
+      - path: ../${CORE_ENV_FILE:-none}
+        required: false
     build:
       context: ../
       dockerfile: build/zitadel/Dockerfile
@@ -117,6 +105,8 @@ services:
     env_file:
       - path: .env.core
         required: true
+      - path: ../${CORE_ENV_FILE:-none}
+        required: false
     build:
       context: ../
       dockerfile: build/zitadel/Dockerfile
@@ -153,6 +143,8 @@ services:
     env_file:
       - path: .env.login
         required: true
+      - path: ../${LOGIN_ENV_FILE:-none}
+        required: false
     depends_on:
       core-setup:
         condition: service_completed_successfully
@@ -162,7 +154,7 @@ services:
     build:
       context: ../apps/login/integration/core-mock
       additional_contexts:
-        zitadel-protos: ../protos
+        zitadel-protos: ../proto
     develop:
       watch:
         - path: ../apps/login/integration/core-mock
