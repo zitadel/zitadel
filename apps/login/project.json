@@ -86,7 +86,6 @@
       "description": "Build the login and the API mock server to run the integration tests",
       "command": "nx run @zitadel/devcontainer:compose build login-api-mock login",
       "dependsOn": [
-        "build"
       ]
     },
     "test-integration-env-start": {
@@ -105,7 +104,6 @@
     "test-integration": {
       "cache": true,
       "dependsOn": [
-        "build",
         "test-integration-env-start"
       ],
       "inputs": [
