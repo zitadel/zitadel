@@ -7,12 +7,14 @@
             "request": "launch",
             "mode": "debug",
             "program": "main.go",
+            "env": {
+                "ZITADEL_DATABASE_POSTGRES_HOST": "${env:DEVCONTAINER_DB_HOST:-localhost}",
+            },
             "args": [
                  "start-from-init",
                  "--config", "${workspaceFolder}/.devcontainer/zitadel.yaml",
                  "--masterkey", "MasterkeyNeedsToHave32Characters"
-            ],
-            "preLaunchTask": "API dev"
+            ]
         }
     ]
 }
