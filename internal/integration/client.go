@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
@@ -1069,7 +1068,7 @@ func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Contex
 
 func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty target_domain.TargetType, interrupt bool) *action.CreateTargetResponse {
 	if name == "" {
-		name = gofakeit.Name()
+		name = TargetName()
 	}
 	req := &action.CreateTargetRequest{
 		Name:     name,
