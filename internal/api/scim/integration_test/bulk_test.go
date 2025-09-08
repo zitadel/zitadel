@@ -50,7 +50,7 @@ func init() {
 
 func TestBulk(t *testing.T) {
 	iamOwnerCtx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	secondaryOrg := Instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
+	secondaryOrg := Instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
 
 	createdSecondaryOrgUser := createHumanUser(t, iamOwnerCtx, secondaryOrg.OrganizationId, 0)
 	bulkMinimalUpdateSecondaryOrgJson := test.Must(json.Marshal(buildMinimalUpdateRequest(createdSecondaryOrgUser.UserId)))

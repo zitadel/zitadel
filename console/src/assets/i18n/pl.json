@@ -1634,8 +1634,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Jeśli flaga jest włączona, będziesz mógł zakończyć pojedynczą sesję z interfejsu użytkownika logowania, podając id_token z roszczeniem `sid` jako id_token_hint w punkcie końcowym end_session. Należy pamiętać, że obecnie wszystkie sesje z tego samego agenta użytkownika (przeglądarki) są kończone w interfejsie użytkownika logowania. Sesje zarządzane za pomocą interfejsu API sesji już pozwalają na zakończenie pojedynczych sesji.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Błąd nadrzędny",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Jeśli flaga jest włączona, błąd nadrzędny OIDC zostanie zarejestrowany w konsoli.",
-      "DISABLEUSERTOKENEVENT": "Wyłącz zdarzenie tokena użytkownika",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Włącz Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout implementuje OpenID Connect Back-Channel Logout 1.0 i może być używany do powiadamiania klientów o zakończeniu sesji u dostawcy OpenID.",
       "PERMISSIONCHECKV2": "Sprawdzanie uprawnień V2",
@@ -1655,7 +1653,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Gdy ta flaga jest włączona, konsola używa API V2 User do tworzenia nowych użytkowników. W przypadku API V2 nowo utworzeni użytkownicy rozpoczynają bez stanu początkowego.",
       "LOGINV2": "Logowanie V2",
       "LOGINV2_DESCRIPTION": "Włączenie tej opcji aktywuje nowy interfejs logowania oparty na TypeScript z ulepszonym bezpieczeństwem, wydajnością i możliwością dostosowania.",
-      "LOGINV2_BASEURI": "Podstawowy URI"
+      "LOGINV2_BASEURI": "Podstawowy URI",
+      "ENABLERELATIONALTABLES": "Tabele relacyjne",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Włącz to, aby używać tabel relacyjnych zamiast projekcji do przechowywania danych. Obecnie ten przełącznik nic nie robi."
     },
     "DIALOG": {
       "RESET": {

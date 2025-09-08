@@ -106,7 +106,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					count := 3
 					orgs := make([]orgAttr, count)
-					prefix := fmt.Sprintf("ListOrgs-%s", gofakeit.AppName())
+					prefix := integration.OrganizationName()
 					for i := 0; i < count; i++ {
 						name := prefix + strconv.Itoa(i)
 						orgs[i] = createOrganization(ctx, name)
@@ -275,8 +275,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 				&org.ListOrganizationsRequest{},
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					orgs := make([]orgAttr, 1)
-					name := fmt.Sprintf("ListOrgs-%s", gofakeit.AppName())
-					orgs[0] = createOrganization(ctx, name)
+					orgs[0] = createOrganization(ctx, integration.OrganizationName())
 					domain := gofakeit.DomainName()
 					_, err := Instance.Client.Mgmt.AddOrgDomain(integration.SetOrgID(ctx, orgs[0].ID), &management.AddOrgDomainRequest{
 						Domain: domain,
@@ -311,7 +310,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 					Queries: []*org.SearchQuery{},
 				},
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
-					name := gofakeit.Name()
+					name := integration.OrganizationName()
 					orgResp := createOrganization(ctx, name)
 					deactivateOrgResp := Instance.DeactivateOrganization(ctx, orgResp.ID)
 					request.Queries = []*org.SearchQuery{

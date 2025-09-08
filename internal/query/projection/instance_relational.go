@@ -2,7 +2,12 @@ package projection
 
 import (
 	"context"
+	"database/sql"
 
+	"github.com/zitadel/zitadel/backend/v3/domain"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -64,15 +69,18 @@ func (p *instanceRelationalProjection) reduceInstanceAdded(event eventstore.Even
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-29nRr", "reduce.wrong.event.type %s", instance.InstanceAddedEventType)
 	}
-	return handler.NewCreateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
-			handler.NewCol(InstanceColumnName, e.Name),
-			handler.NewCol(CreatedAt, e.CreationDate()),
-			handler.NewCol(UpdatedAt, e.CreationDate()),
-		},
-	), nil
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
+		}
+		return repository.InstanceRepository(v3_sql.SQLTx(tx)).Create(ctx, &domain.Instance{
+			ID:        e.Aggregate().ID,
+			Name:      e.Name,
+			CreatedAt: e.CreationDate(),
+			UpdatedAt: e.CreationDate(),
+		})
+	}), nil
 }
 
 func (p *instanceRelationalProjection) reduceInstanceChanged(event eventstore.Event) (*handler.Statement, error) {
@@ -80,16 +88,14 @@ func (p *instanceRelationalProjection) reduceInstanceChanged(event eventstore.Ev
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-so2am1", "reduce.wrong.event.type %s", instance.InstanceChangedEventType)
 	}
-	return handler.NewUpdateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(InstanceColumnName, e.Name),
-			handler.NewCol(UpdatedAt, e.CreationDate()),
-		},
-		[]handler.Condition{
-			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
-		},
-	), nil
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.InstanceRepository(v3_sql.SQLTx(tx))
+		return p.updateInstance(ctx, event, repo, repo.SetName(e.Name))
+	}), nil
 }
 
 func (p *instanceRelationalProjection) reduceInstanceDelete(event eventstore.Event) (*handler.Statement, error) {
@@ -97,12 +103,14 @@ func (p *instanceRelationalProjection) reduceInstanceDelete(event eventstore.Eve
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-so2am1", "reduce.wrong.event.type %s", instance.InstanceChangedEventType)
 	}
-	return handler.NewDeleteStatement(
-		e,
-		[]handler.Condition{
-			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
-		},
-	), nil
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
+		}
+		_, err := repository.InstanceRepository(v3_sql.SQLTx(tx)).Delete(ctx, e.Aggregate().ID)
+		return err
+	}), nil
 }
 
 func (p *instanceRelationalProjection) reduceDefaultOrgSet(event eventstore.Event) (*handler.Statement, error) {
@@ -110,16 +118,15 @@ func (p *instanceRelationalProjection) reduceDefaultOrgSet(event eventstore.Even
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", instance.DefaultOrgSetEventType)
 	}
-	return handler.NewUpdateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(UpdatedAt, e.CreationDate()),
-			handler.NewCol(InstanceColumnDefaultOrgID, e.OrgID),
-		},
-		[]handler.Condition{
-			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
-		},
-	), nil
+
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.InstanceRepository(v3_sql.SQLTx(tx))
+		return p.updateInstance(ctx, event, repo, repo.SetDefaultOrg(e.OrgID))
+	}), nil
 }
 
 func (p *instanceRelationalProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
@@ -127,16 +134,15 @@ func (p *instanceRelationalProjection) reduceIAMProjectSet(event eventstore.Even
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.ProjectSetEventType)
 	}
-	return handler.NewUpdateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(UpdatedAt, e.CreationDate()),
-			handler.NewCol(InstanceColumnProjectID, e.ProjectID),
-		},
-		[]handler.Condition{
-			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
-		},
-	), nil
+
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.InstanceRepository(v3_sql.SQLTx(tx))
+		return p.updateInstance(ctx, event, repo, repo.SetIAMProject(e.ProjectID))
+	}), nil
 }
 
 func (p *instanceRelationalProjection) reduceConsoleSet(event eventstore.Event) (*handler.Statement, error) {
@@ -144,17 +150,15 @@ func (p *instanceRelationalProjection) reduceConsoleSet(event eventstore.Event) 
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ConsoleSetEventType)
 	}
-	return handler.NewUpdateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(UpdatedAt, e.CreationDate()),
-			handler.NewCol(InstanceColumnConsoleID, e.ClientID),
-			handler.NewCol(InstanceColumnConsoleAppID, e.AppID),
-		},
-		[]handler.Condition{
-			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
-		},
-	), nil
+
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.InstanceRepository(v3_sql.SQLTx(tx))
+		return p.updateInstance(ctx, event, repo, repo.SetConsoleClientID(e.ClientID), repo.SetConsoleAppID(e.AppID))
+	}), nil
 }
 
 func (p *instanceRelationalProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handler.Statement, error) {
@@ -162,14 +166,35 @@ func (p *instanceRelationalProjection) reduceDefaultLanguageSet(event eventstore
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.DefaultLanguageSetEventType)
 	}
-	return handler.NewUpdateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(UpdatedAt, e.CreationDate()),
-			handler.NewCol(InstanceColumnDefaultLanguage, e.Language.String()),
-		},
-		[]handler.Condition{
-			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
-		},
-	), nil
+
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rVUyy", "reduce.wrong.db.pool %T", ex)
+		}
+		repo := repository.InstanceRepository(v3_sql.SQLTx(tx))
+		return p.updateInstance(ctx, event, repo, repo.SetDefaultLanguage(e.Language))
+	}), nil
+}
+
+func (p *instanceRelationalProjection) updateInstance(ctx context.Context, event eventstore.Event, repo domain.InstanceRepository, changes ...database.Change) error {
+	_, err := repo.Update(ctx, event.Aggregate().ID, changes...)
+	if err != nil {
+		return err
+	}
+
+	instance, err := repo.Get(ctx, database.WithCondition(repo.IDCondition(event.Aggregate().ID)))
+	if err != nil {
+		return err
+	}
+	if instance.UpdatedAt.Equal(event.CreatedAt()) {
+		return nil
+	}
+	// we need to split the update into two statements because multiple events can have the same creation date
+	// therefore we first do not set the updated_at timestamp
+	_, err = repo.Update(ctx,
+		event.Aggregate().ID,
+		repo.SetUpdatedAt(event.CreatedAt()),
+	)
+	return err
 }

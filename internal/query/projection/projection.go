@@ -93,7 +93,6 @@ var (
 	OrganizationRelationalProjection       *handler.Handler
 	InstanceDomainRelationalProjection     *handler.Handler
 	OrganizationDomainRelationalProjection *handler.Handler
-	SettingsRelationalProjection           *handler.Handler
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
@@ -126,6 +125,14 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 		TransactionDuration: config.TransactionDuration,
 		ActiveInstancer:     config.ActiveInstancer,
 	}
+
+	if config.MaxParallelTriggers == 0 {
+		config.MaxParallelTriggers = uint16(sqlClient.Pool.Config().MaxConns / 3)
+	}
+	if sqlClient.Pool.Config().MaxConns <= int32(config.MaxParallelTriggers) {
+		logging.WithFields("database.MaxOpenConnections", sqlClient.Pool.Config().MaxConns, "projections.MaxParallelTriggers", config.MaxParallelTriggers).Fatal("Number of max parallel triggers must be lower than max open connections")
+	}
+	handler.StartWorkerPool(config.MaxParallelTriggers)
 
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	OrgMetadataProjection = newOrgMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_metadata"]))
@@ -201,7 +208,6 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	OrganizationRelationalProjection = newOrgRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organizations_relational"]))
 	InstanceDomainRelationalProjection = newInstanceDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_domains_relational"]))
 	OrganizationDomainRelationalProjection = newOrgDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_domains_relational"]))
-	SettingsRelationalProjection = newSettingsRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["settings_relational"]))
 
 	newProjectionsList()
 	newFieldsList()
@@ -221,10 +227,18 @@ func Init(ctx context.Context) error {
 	return nil
 }
 
-func Start(ctx context.Context) {
+func Start(ctx context.Context) error {
+	projectionTableMap := make(map[string]bool, len(projections))
 	for _, projection := range projections {
+		table := projection.String()
+		if projectionTableMap[table] {
+			return fmt.Errorf("projection for %s already added", table)
+		}
+		projectionTableMap[table] = true
+
 		projection.Start(ctx)
 	}
+	return nil
 }
 
 func ProjectInstance(ctx context.Context) error {
@@ -287,6 +301,7 @@ func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler
 	if customConfig.TransactionDuration != nil {
 		config.TransactionDuration = *customConfig.TransactionDuration
 	}
+	config.SkipInstanceIDs = append(config.SkipInstanceIDs, customConfig.SkipInstanceIDs...)
 
 	return config
 }
@@ -380,6 +395,5 @@ func newProjectionsList() {
 		OrganizationRelationalProjection,
 		InstanceDomainRelationalProjection,
 		OrganizationDomainRelationalProjection,
-		SettingsRelationalProjection,
 	}
 }

@@ -11,7 +11,7 @@ deprovisioning.
 ## Supported endpoints
 
 The Zitadel SCIM v2.0 service provider implementation supports the following endpoints.
-The base URL for the SCIM endpoint in Zitadel is: `https://${ZITADEL_DOMAIN}/scim/v2/{orgId}`.
+The base URL for the SCIM endpoint in Zitadel is: `https://${CUSTOM_DOMAIN}/scim/v2/{orgId}`.
 
 | Endpoint                                                                | Remarks                                                    |
 |-------------------------------------------------------------------------|------------------------------------------------------------|

@@ -2,7 +2,9 @@ package repository
 
 import (
 	"context"
-	"encoding/json"
+	"time"
+
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -30,7 +32,7 @@ func InstanceRepository(client database.QueryExecutor) domain.InstanceRepository
 
 const (
 	queryInstanceStmt = `SELECT instances.id, instances.name, instances.default_org_id, instances.iam_project_id, instances.console_client_id, instances.console_app_id, instances.default_language, instances.created_at, instances.updated_at` +
-		` , CASE WHEN count(instance_domains.domain) > 0 THEN jsonb_agg(json_build_object('domain', instance_domains.domain, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at)) ELSE NULL::JSONB END domains` +
+		` , jsonb_agg(json_build_object('domain', instance_domains.domain, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at)) FILTER (WHERE instance_domains.instance_id IS NOT NULL) AS domains` +
 		` FROM zitadel.instances`
 )
 
@@ -88,16 +90,22 @@ func (i *instance) joinDomains() database.QueryOption {
 	)
 }
 
-const createInstanceStmt = `INSERT INTO zitadel.instances (id, name, default_org_id, iam_project_id, console_client_id, console_app_id, default_language)` +
-	` VALUES ($1, $2, $3, $4, $5, $6, $7)` +
-	` RETURNING created_at, updated_at`
-
 // Create implements [domain.InstanceRepository].
 func (i *instance) Create(ctx context.Context, instance *domain.Instance) error {
-	var builder database.StatementBuilder
+	var (
+		builder              database.StatementBuilder
+		createdAt, updatedAt any = database.DefaultInstruction, database.DefaultInstruction
+	)
+	if !instance.CreatedAt.IsZero() {
+		createdAt = instance.CreatedAt
+	}
+	if !instance.UpdatedAt.IsZero() {
+		updatedAt = instance.UpdatedAt
+	}
 
-	builder.AppendArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleAppID, instance.DefaultLanguage)
-	builder.WriteString(createInstanceStmt)
+	builder.WriteString(`INSERT INTO zitadel.instances (id, name, default_org_id, iam_project_id, console_client_id, console_app_id, default_language, created_at, updated_at) VALUES (`)
+	builder.WriteArgs(instance.ID, instance.Name, instance.DefaultOrgID, instance.IAMProjectID, instance.ConsoleClientID, instance.ConsoleAppID, instance.DefaultLanguage, createdAt, updatedAt)
+	builder.WriteString(`) RETURNING created_at, updated_at`)
 
 	return i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&instance.CreatedAt, &instance.UpdatedAt)
 }
@@ -140,6 +148,27 @@ func (i instance) Delete(ctx context.Context, id string) (int64, error) {
 // SetName implements [domain.instanceChanges].
 func (i instance) SetName(name string) database.Change {
 	return database.NewChange(i.NameColumn(), name)
+}
+
+// SetUpdatedAt implements [domain.instanceChanges].
+func (i instance) SetUpdatedAt(time time.Time) database.Change {
+	return database.NewChange(i.UpdatedAtColumn(), time)
+}
+
+func (i instance) SetIAMProject(id string) database.Change {
+	return database.NewChange(i.IAMProjectIDColumn(), id)
+}
+func (i instance) SetDefaultOrg(id string) database.Change {
+	return database.NewChange(i.DefaultOrgIDColumn(), id)
+}
+func (i instance) SetDefaultLanguage(lang language.Tag) database.Change {
+	return database.NewChange(i.DefaultLanguageColumn(), lang.String())
+}
+func (i instance) SetConsoleClientID(id string) database.Change {
+	return database.NewChange(i.ConsoleClientIDColumn(), id)
+}
+func (i instance) SetConsoleAppID(id string) database.Change {
+	return database.NewChange(i.ConsoleAppIDColumn(), id)
 }
 
 // -------------------------------------------------------------
@@ -205,9 +234,13 @@ func (instance) UpdatedAtColumn() database.Column {
 	return database.NewColumn("instances", "updated_at")
 }
 
+// -------------------------------------------------------------
+// scanners
+// -------------------------------------------------------------
+
 type rawInstance struct {
 	*domain.Instance
-	RawDomains json.RawMessage `json:"domains,omitempty" db:"domains"`
+	Domains JSONArray[domain.InstanceDomain] `json:"domains,omitempty" db:"domains"`
 }
 
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
@@ -220,12 +253,7 @@ func scanInstance(ctx context.Context, querier database.Querier, builder *databa
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&instance); err != nil {
 		return nil, err
 	}
-
-	if len(instance.RawDomains) > 0 {
-		if err := json.Unmarshal(instance.RawDomains, &instance.Domains); err != nil {
-			return nil, err
-		}
-	}
+	instance.Instance.Domains = instance.Domains
 
 	return instance.Instance, nil
 }
@@ -236,21 +264,18 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 		return nil, err
 	}
 
-	var rawInstances []*rawInstance
-	if err := rows.(database.CollectableRows).Collect(&rawInstances); err != nil {
+	var instances []*rawInstance
+	if err := rows.(database.CollectableRows).Collect(&instances); err != nil {
 		return nil, err
 	}
 
-	instances := make([]*domain.Instance, len(rawInstances))
-	for i, instance := range rawInstances {
-		if len(instance.RawDomains) > 0 {
-			if err := json.Unmarshal(instance.RawDomains, &instance.Domains); err != nil {
-				return nil, err
-			}
-		}
-		instances[i] = instance.Instance
+	result := make([]*domain.Instance, len(instances))
+	for i, inst := range instances {
+		result[i] = inst.Instance
+		result[i].Domains = inst.Domains
 	}
-	return instances, nil
+
+	return result, nil
 }
 
 // -------------------------------------------------------------
@@ -273,4 +298,3 @@ func (i *instance) Domains(shouldLoad bool) domain.InstanceDomainRepository {
 	}
 	return i.domainRepo
 }
-
