@@ -340,7 +340,7 @@ func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *do
 	if check != nil {
 		return check(usergrant.ProjectID, usergrant.ProjectGrantID)(usergrant.ResourceOwner, "")
 	}
-	return checkExplicitProjectPermission(ctx, usergrant.ProjectGrantID, usergrant.ProjectID)
+	return nil
 }
 
 // this code needs to be rewritten anyways as soon as we improved the fields handling
@@ -488,7 +488,7 @@ func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant 
 	if check != nil {
 		return check(usergrant.ProjectID, usergrant.ProjectGrantID)(usergrant.ResourceOwner, "")
 	}
-	return checkExplicitProjectPermission(ctx, usergrant.ProjectGrantID, usergrant.ProjectID)
+	return nil
 }
 
 func (c *Commands) searchProjectOwnerAndGrantID(ctx context.Context, projectID string, grantedOrgID string) (projectOwner string, grantID string, err error) {
