@@ -8,8 +8,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 )
 
@@ -65,18 +65,18 @@ func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetReque
 
 func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {
 	var (
-		targetType       domain.TargetType
+		targetType       target_domain.TargetType
 		interruptOnError bool
 	)
 	switch t := req.GetTargetType().(type) {
 	case *action.CreateTargetRequest_RestWebhook:
-		targetType = domain.TargetTypeWebhook
+		targetType = target_domain.TargetTypeWebhook
 		interruptOnError = t.RestWebhook.InterruptOnError
 	case *action.CreateTargetRequest_RestCall:
-		targetType = domain.TargetTypeCall
+		targetType = target_domain.TargetTypeCall
 		interruptOnError = t.RestCall.InterruptOnError
 	case *action.CreateTargetRequest_RestAsync:
-		targetType = domain.TargetTypeAsync
+		targetType = target_domain.TargetTypeAsync
 	}
 	return &command.AddTarget{
 		Name:             req.GetName(),
@@ -108,13 +108,13 @@ func updateTargetToCommand(req *action.UpdateTargetRequest) *command.ChangeTarge
 	if req.TargetType != nil {
 		switch t := req.GetTargetType().(type) {
 		case *action.UpdateTargetRequest_RestWebhook:
-			target.TargetType = gu.Ptr(domain.TargetTypeWebhook)
+			target.TargetType = gu.Ptr(target_domain.TargetTypeWebhook)
 			target.InterruptOnError = gu.Ptr(t.RestWebhook.InterruptOnError)
 		case *action.UpdateTargetRequest_RestCall:
-			target.TargetType = gu.Ptr(domain.TargetTypeCall)
+			target.TargetType = gu.Ptr(target_domain.TargetTypeCall)
 			target.InterruptOnError = gu.Ptr(t.RestCall.InterruptOnError)
 		case *action.UpdateTargetRequest_RestAsync:
-			target.TargetType = gu.Ptr(domain.TargetTypeAsync)
+			target.TargetType = gu.Ptr(target_domain.TargetTypeAsync)
 			target.InterruptOnError = gu.Ptr(false)
 		}
 	}

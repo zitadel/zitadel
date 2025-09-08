@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/integration"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
 )
@@ -18,7 +18,7 @@ import (
 func TestServer_SetExecution_Request(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", target_domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name        string
@@ -175,7 +175,7 @@ func assertSetExecutionResponse(t *testing.T, creationDate, setDate time.Time, e
 func TestServer_SetExecution_Response(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", target_domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name        string
@@ -319,7 +319,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 func TestServer_SetExecution_Event(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", target_domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name        string
@@ -482,7 +482,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 func TestServer_SetExecution_Function(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://notexisting", target_domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name        string

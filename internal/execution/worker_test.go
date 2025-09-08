@@ -15,35 +15,21 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/execution/mock"
-	"github.com/zitadel/zitadel/internal/query"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type fields struct {
-	queries *mock.MockQueries
-	queue   *mock.MockQueue
-}
 type fieldsWorker struct {
 	now nowFunc
-}
-type args struct {
-	event  eventstore.Event
-	mapper func(event eventstore.Event) (eventstore.Event, error)
 }
 type argsWorker struct {
 	job *river.Job[*exec_repo.Request]
 }
-type want struct {
-	noOperation bool
-	err         assert.ErrorAssertionFunc
-	stmtErr     assert.ErrorAssertionFunc
-}
 type wantWorker struct {
-	targets        []*query.ExecutionTarget
+	targets        []target_domain.Target
 	sendStatusCode int
 	err            assert.ErrorAssertionFunc
 }
@@ -285,4 +271,26 @@ func Test_handleEventExecution(t *testing.T) {
 			}
 		})
 	}
+}
+
+func mockTarget() target_domain.Target {
+	return target_domain.Target{
+		ExecutionID:      "executionID",
+		TargetID:         "targetID",
+		TargetType:       target_domain.TargetTypeWebhook,
+		Endpoint:         "endpoint",
+		Timeout:          time.Minute,
+		InterruptOnError: true,
+	}
+}
+
+func mockTargets(count int) []target_domain.Target {
+	var targets []target_domain.Target
+	if count > 0 {
+		targets = make([]target_domain.Target, count)
+		for i := range targets {
+			targets[i] = mockTarget()
+		}
+	}
+	return targets
 }

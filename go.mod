@@ -61,9 +61,12 @@ require (
 	github.com/pquerna/otp v1.5.0
 	github.com/rakyll/statik v0.1.7
 	github.com/redis/go-redis/v9 v9.8.0
-	github.com/riverqueue/river v0.22.0
-	github.com/riverqueue/river/riverdriver v0.22.0
-	github.com/riverqueue/river/rivertype v0.22.0
+	github.com/riverqueue/river v0.24.0
+	github.com/riverqueue/river/riverdriver v0.24.0
+	github.com/riverqueue/river/riverdriver/riverdatabasesql v0.24.0
+	github.com/riverqueue/river/rivertype v0.24.0
+	github.com/riverqueue/rivercontrib/otelriver v0.5.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/cors v1.11.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/shopspring/decimal v1.3.1
@@ -71,7 +74,7 @@ require (
 	github.com/sony/sonyflake v1.2.1
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/twilio/twilio-go v1.26.1
 	github.com/zitadel/exifremove v0.1.0
@@ -91,12 +94,12 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.35.0
 	go.opentelemetry.io/otel/trace v1.35.0
 	go.uber.org/mock v0.5.2
-	golang.org/x/crypto v0.38.0
+	golang.org/x/crypto v0.41.0
 	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6
-	golang.org/x/net v0.40.0
+	golang.org/x/net v0.42.0
 	golang.org/x/oauth2 v0.30.0
-	golang.org/x/sync v0.15.0
-	golang.org/x/text v0.26.0
+	golang.org/x/sync v0.16.0
+	golang.org/x/text v0.28.0
 	google.golang.org/api v0.233.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250512202823-5a2f75b736a9
 	google.golang.org/grpc v1.72.1
@@ -144,8 +147,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
-	github.com/riverqueue/river/rivershared v0.22.0 // indirect
-	github.com/riverqueue/rivercontrib/otelriver v0.5.0 // indirect
+	github.com/riverqueue/river/rivershared v0.24.0 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.5.0 // indirect
@@ -220,7 +222,6 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/riverqueue/river/riverdriver/riverpgxv5 v0.22.0
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/russellhaering/goxmldsig v1.4.0 // indirect
 	github.com/sirupsen/logrus v1.9.3
@@ -233,7 +234,7 @@ require (
 	github.com/xrash/smetrics v0.0.0-20240312152122-5f08fbb34913 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.35.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.5.0 // indirect
-	golang.org/x/sys v0.33.0
+	golang.org/x/sys v0.35.0
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	nhooyr.io/websocket v1.8.11 // indirect

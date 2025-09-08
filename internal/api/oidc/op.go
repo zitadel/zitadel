@@ -111,6 +111,7 @@ func NewServer(
 	query *query.Queries,
 	repo repository.Repository,
 	encryptionAlg crypto.EncryptionAlgorithm,
+	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	cryptoKey []byte,
 	es *eventstore.Eventstore,
 	projections *database.DB,
@@ -166,6 +167,7 @@ func NewServer(
 		fallbackLogger:             fallbackLogger,
 		hasher:                     hasher,
 		encAlg:                     encryptionAlg,
+		targetEncryptionAlgorithm:  targetEncryptionAlgorithm,
 		opCrypto:                   op.NewAESCrypto(opConfig.CryptoKey),
 		assetAPIPrefix:             assets.AssetAPI(),
 	}

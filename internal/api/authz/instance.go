@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 )
 
@@ -23,6 +24,7 @@ type Instance interface {
 	Block() *bool
 	AuditLogRetention() *time.Duration
 	Features() feature.Features
+	ExecutionRouter() target.Router
 }
 
 type InstanceVerifier interface {
@@ -31,13 +33,14 @@ type InstanceVerifier interface {
 }
 
 type instance struct {
-	id              string
-	projectID       string
-	appID           string
-	clientID        string
-	orgID           string
-	defaultLanguage language.Tag
-	features        feature.Features
+	id               string
+	projectID        string
+	appID            string
+	clientID         string
+	orgID            string
+	defaultLanguage  language.Tag
+	features         feature.Features
+	executionTargets target.Router
 }
 
 func (i *instance) Block() *bool {
@@ -82,6 +85,10 @@ func (i *instance) EnableImpersonation() bool {
 
 func (i *instance) Features() feature.Features {
 	return i.features
+}
+
+func (i *instance) ExecutionRouter() target.Router {
+	return i.executionTargets
 }
 
 func GetInstance(ctx context.Context) Instance {
@@ -140,5 +147,14 @@ func WithFeatures(ctx context.Context, f feature.Features) context.Context {
 		i = new(instance)
 	}
 	i.features = f
+	return context.WithValue(ctx, instanceKey, i)
+}
+
+func WithExecutionRouter(ctx context.Context, router target.Router) context.Context {
+	i, ok := ctx.Value(instanceKey).(*instance)
+	if !ok {
+		i = new(instance)
+	}
+	i.executionTargets = router
 	return context.WithValue(ctx, instanceKey, i)
 }

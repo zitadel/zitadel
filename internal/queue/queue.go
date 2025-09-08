@@ -2,11 +2,11 @@ package queue
 
 import (
 	"context"
+	"database/sql"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/riverqueue/river"
 	"github.com/riverqueue/river/riverdriver"
-	"github.com/riverqueue/river/riverdriver/riverpgxv5"
+	"github.com/riverqueue/river/riverdriver/riverdatabasesql"
 	"github.com/riverqueue/river/rivertype"
 	"github.com/riverqueue/rivercontrib/otelriver"
 	"github.com/zitadel/logging"
@@ -18,8 +18,8 @@ import (
 // Queue abstracts the underlying queuing library
 // For more information see github.com/riverqueue/river
 type Queue struct {
-	driver riverdriver.Driver[pgx.Tx]
-	client *river.Client[pgx.Tx]
+	driver riverdriver.Driver[*sql.Tx]
+	client *river.Client[*sql.Tx]
 
 	config      *river.Config
 	shouldStart bool
@@ -34,7 +34,7 @@ func NewQueue(config *Config) (_ *Queue, err error) {
 		MeterProvider: metrics.GetMetricsProvider(),
 	})}
 	return &Queue{
-		driver: riverpgxv5.New(config.Client.Pool),
+		driver: riverdatabasesql.New(config.Client.DB),
 		config: &river.Config{
 			Workers:    river.NewWorkers(),
 			Queues:     make(map[string]river.QueueConfig),
@@ -90,12 +90,33 @@ func WithQueueName(name string) InsertOpt {
 }
 
 func (q *Queue) Insert(ctx context.Context, args river.JobArgs, opts ...InsertOpt) error {
+	_, err := q.client.Insert(ctx, args, applyInsertOpts(opts))
+	return err
+}
+
+// InsertManyFastTx wraps [river.Client.InsertManyFastTx] to insert all jobs in
+// a single `COPY FROM` execution, within the existing transaction.
+//
+// Opts are applied to each job before sending them to river.
+func (q *Queue) InsertManyFastTx(ctx context.Context, tx *sql.Tx, args []river.JobArgs, opts ...InsertOpt) error {
+	params := make([]river.InsertManyParams, len(args))
+	for i, arg := range args {
+		params[i] = river.InsertManyParams{
+			Args:       arg,
+			InsertOpts: applyInsertOpts(opts),
+		}
+	}
+
+	_, err := q.client.InsertManyFastTx(ctx, tx, params)
+	return err
+}
+
+func applyInsertOpts(opts []InsertOpt) *river.InsertOpts {
 	options := new(river.InsertOpts)
 	for _, opt := range opts {
 		opt(options)
 	}
-	_, err := q.client.Insert(ctx, args, options)
-	return err
+	return options
 }
 
 type Worker interface {

@@ -20,6 +20,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -37,6 +38,8 @@ type API struct {
 	healthServer      *health.Server
 	accessInterceptor *http_mw.AccessInterceptor
 	queries           *query.Queries
+
+	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
 }
 
 func (a *API) ListGrpcServices() []string {
@@ -79,6 +82,7 @@ func New(
 	externalDomain string,
 	hostHeaders []string,
 	accessInterceptor *http_mw.AccessInterceptor,
+	targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 ) (_ *API, err error) {
 	api := &API{
 		port:              port,
@@ -88,9 +92,10 @@ func New(
 		queries:           queries,
 		accessInterceptor: accessInterceptor,
 		hostHeaders:       hostHeaders,
+		targetEncryptionAlgorithm: targetEncryptionAlgorithm,
 	}
 
-	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService())
+	api.grpcServer = server.CreateServer(api.verifier, systemAuthz, authZ, queries, externalDomain, tlsConfig, accessInterceptor.AccessService(), targetEncryptionAlgorithm)
 	api.grpcGateway, err = server.CreateGateway(ctx, port, hostHeaders, accessInterceptor, tlsConfig)
 	if err != nil {
 		return nil, err

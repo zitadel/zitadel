@@ -15,10 +15,12 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -216,7 +218,7 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 	publicDomain := strings.Split(publicHost, ":")[0]     // remove possible port
 
 	instance, ok := q.caches.instance.Get(ctx, instanceIndexByHost, instanceDomain)
-	if ok {
+	if ok && instance.ZitadelVersion == build.Version() {
 		return instance, instance.checkDomain(instanceDomain, publicDomain)
 	}
 	instance, scan := scanAuthzInstance()
@@ -239,14 +241,16 @@ func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance
 	}()
 
 	instance, ok := q.caches.instance.Get(ctx, instanceIndexByID, id)
-	if ok {
+	if ok && instance.ZitadelVersion == build.Version() {
 		return instance, nil
 	}
 
 	instance, scan := scanAuthzInstance()
 	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, id)
 	logging.OnError(err).WithField("instance_id", id).Warn("instance by ID")
+
 	if err == nil {
+		instance.ZitadelVersion = build.Version()
 		q.caches.instance.Set(ctx, instance)
 	}
 	return instance, err
@@ -447,19 +451,21 @@ func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance,
 }
 
 type authzInstance struct {
-	ID              string                     `json:"id,omitempty"`
-	IAMProjectID    string                     `json:"iam_project_id,omitempty"`
-	ConsoleID       string                     `json:"console_id,omitempty"`
-	ConsoleAppID    string                     `json:"console_app_id,omitempty"`
-	DefaultLang     language.Tag               `json:"default_lang,omitempty"`
-	DefaultOrgID    string                     `json:"default_org_id,omitempty"`
-	CSP             csp                        `json:"csp,omitempty"`
-	Impersonation   bool                       `json:"impersonation,omitempty"`
-	IsBlocked       *bool                      `json:"is_blocked,omitempty"`
-	LogRetention    *time.Duration             `json:"log_retention,omitempty"`
-	Feature         feature.Features           `json:"feature,omitempty"`
-	ExternalDomains database.TextArray[string] `json:"external_domains,omitempty"`
-	TrustedDomains  database.TextArray[string] `json:"trusted_domains,omitempty"`
+	ID               string                     `json:"id,omitempty"`
+	IAMProjectID     string                     `json:"iam_project_id,omitempty"`
+	ConsoleID        string                     `json:"console_id,omitempty"`
+	ConsoleAppID     string                     `json:"console_app_id,omitempty"`
+	DefaultLang      language.Tag               `json:"default_lang,omitempty"`
+	DefaultOrgID     string                     `json:"default_org_id,omitempty"`
+	CSP              csp                        `json:"csp,omitempty"`
+	Impersonation    bool                       `json:"impersonation,omitempty"`
+	IsBlocked        *bool                      `json:"is_blocked,omitempty"`
+	LogRetention     *time.Duration             `json:"log_retention,omitempty"`
+	Feature          feature.Features           `json:"feature,omitempty"`
+	ExternalDomains  database.TextArray[string] `json:"external_domains,omitempty"`
+	TrustedDomains   database.TextArray[string] `json:"trusted_domains,omitempty"`
+	ExecutionTargets target_domain.Router       `json:"execution_targets,omitzero"`
+	ZitadelVersion   string                     `json:"zitadel_version,omitempty"`
 }
 
 type csp struct {
@@ -514,6 +520,10 @@ func (i *authzInstance) Features() feature.Features {
 	return i.Feature
 }
 
+func (i *authzInstance) ExecutionRouter() target_domain.Router {
+	return i.ExecutionTargets
+}
+
 var errPublicDomain = "public domain %q not trusted"
 
 func (i *authzInstance) checkDomain(instanceDomain, publicDomain string) error {
@@ -549,6 +559,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			auditLogRetention     database.NullDuration
 			block                 sql.NullBool
 			features              []byte
+			executionTargetsBytes []byte
 		)
 		err := row.Scan(
 			&instance.ID,
@@ -565,6 +576,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			&features,
 			&instance.ExternalDomains,
 			&instance.TrustedDomains,
+			&executionTargetsBytes,
 		)
 		if errors.Is(err, sql.ErrNoRows) {
 			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
@@ -587,6 +599,13 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 		if err = json.Unmarshal(features, &instance.Feature); err != nil {
 			return zerrors.ThrowInternal(err, "QUERY-Po8ki", "Errors.Internal")
 		}
+		if len(executionTargetsBytes) > 0 {
+			var targets []target_domain.Target
+			if err := json.Unmarshal(executionTargetsBytes, &targets); err != nil {
+				return zerrors.ThrowInternal(err, "QUERY-aeKa2", "Errors.Internal")
+			}
+			instance.ExecutionTargets = target_domain.NewRouter(targets)
+		}
 		return nil
 	}
 }
@@ -603,6 +622,8 @@ func (c *Caches) registerInstanceInvalidation() {
 	invalidate = cacheInvalidationFunc(c.instance, instanceIndexByID, getResourceOwner)
 	projection.LimitsProjection.RegisterCacheInvalidation(invalidate)
 	projection.RestrictionsProjection.RegisterCacheInvalidation(invalidate)
+	projection.ExecutionProjection.RegisterCacheInvalidation(invalidate)
+	projection.TargetProjection.RegisterCacheInvalidation(invalidate)
 
 	// System feature update should invalidate all instances, so Truncate the cache.
 	projection.SystemFeatureProjection.RegisterCacheInvalidation(func(ctx context.Context, _ []*eventstore.Aggregate) {
