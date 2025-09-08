@@ -2,8 +2,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
-	"encoding/json"
 	"time"
 
 	"golang.org/x/text/language"
@@ -34,7 +32,7 @@ func InstanceRepository(client database.QueryExecutor) domain.InstanceRepository
 
 const (
 	queryInstanceStmt = `SELECT instances.id, instances.name, instances.default_org_id, instances.iam_project_id, instances.console_client_id, instances.console_app_id, instances.default_language, instances.created_at, instances.updated_at` +
-		` , CASE WHEN count(instance_domains.domain) > 0 THEN jsonb_agg(json_build_object('domain', instance_domains.domain, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at)) ELSE NULL::JSONB END domains` +
+		` , jsonb_agg(json_build_object('domain', instance_domains.domain, 'isPrimary', instance_domains.is_primary, 'isGenerated', instance_domains.is_generated, 'createdAt', instance_domains.created_at, 'updatedAt', instance_domains.updated_at)) FILTER (WHERE instance_domains.instance_id IS NOT NULL) AS domains` +
 		` FROM zitadel.instances`
 )
 
@@ -236,9 +234,13 @@ func (instance) UpdatedAtColumn() database.Column {
 	return database.NewColumn("instances", "updated_at")
 }
 
+// -------------------------------------------------------------
+// scanners
+// -------------------------------------------------------------
+
 type rawInstance struct {
 	*domain.Instance
-	RawDomains sql.Null[json.RawMessage] `json:"domains,omitzero" db:"domains"`
+	Domains JSONArray[domain.InstanceDomain] `json:"domains,omitempty" db:"domains"`
 }
 
 func scanInstance(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Instance, error) {
@@ -251,12 +253,7 @@ func scanInstance(ctx context.Context, querier database.Querier, builder *databa
 	if err := rows.(database.CollectableRows).CollectExactlyOneRow(&instance); err != nil {
 		return nil, err
 	}
-
-	if instance.RawDomains.Valid {
-		if err := json.Unmarshal(instance.RawDomains.V, &instance.Domains); err != nil {
-			return nil, err
-		}
-	}
+	instance.Instance.Domains = instance.Domains
 
 	return instance.Instance, nil
 }
@@ -267,21 +264,18 @@ func scanInstances(ctx context.Context, querier database.Querier, builder *datab
 		return nil, err
 	}
 
-	var rawInstances []*rawInstance
-	if err := rows.(database.CollectableRows).Collect(&rawInstances); err != nil {
+	var instances []*rawInstance
+	if err := rows.(database.CollectableRows).Collect(&instances); err != nil {
 		return nil, err
 	}
 
-	instances := make([]*domain.Instance, len(rawInstances))
-	for i, instance := range rawInstances {
-		if instance.RawDomains.Valid {
-			if err := json.Unmarshal(instance.RawDomains.V, &instance.Domains); err != nil {
-				return nil, err
-			}
-		}
-		instances[i] = instance.Instance
+	result := make([]*domain.Instance, len(instances))
+	for i, inst := range instances {
+		result[i] = inst.Instance
+		result[i].Domains = inst.Domains
 	}
-	return instances, nil
+
+	return result, nil
 }
 
 // -------------------------------------------------------------

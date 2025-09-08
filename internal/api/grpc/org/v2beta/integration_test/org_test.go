@@ -624,7 +624,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 					Filter: tt.query,
 				})
 				if tt.err != nil {
-					require.ErrorContains(t, err, tt.err.Error())
+					require.ErrorContains(ttt, err, tt.err.Error())
 					return
 				}
 				require.NoError(ttt, err)
@@ -790,7 +790,9 @@ func TestServer_ActivateOrganization(t *testing.T) {
 						},
 					})
 					require.NoError(ttt, err)
-					require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+					if assert.GreaterOrEqual(ttt, len(listOrgRes.Organizations), 1) {
+						require.Equal(ttt, v2beta_org.OrgState_ORG_STATE_INACTIVE, listOrgRes.Organizations[0].State)
+					}
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
 				return orgId
@@ -1616,11 +1618,11 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 	orgId := orgs[0].Id
 
 	tests := []struct {
-		name        string
-		ctx         context.Context
-		setupFunc   func()
-		orgId       string
-		keyValuPars []struct {
+		name          string
+		ctx           context.Context
+		setupFunc     func()
+		orgId         string
+		keyValuePairs []struct {
 			key   string
 			value string
 		}
@@ -1641,7 +1643,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 				require.NoError(t, err)
 			},
 			orgId: orgId,
-			keyValuPars: []struct{ key, value string }{
+			keyValuePairs: []struct{ key, value string }{
 				{
 					key:   "key1",
 					value: "value1",
@@ -1672,7 +1674,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 				require.NoError(t, err)
 			},
 			orgId: orgId,
-			keyValuPars: []struct{ key, value string }{
+			keyValuePairs: []struct{ key, value string }{
 				{
 					key:   "key2",
 					value: "value2",
@@ -1688,10 +1690,10 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 			},
 		},
 		{
-			name:        "list org metadata for non existent org",
-			ctx:         Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
-			orgId:       "non existent orgid",
-			keyValuPars: []struct{ key, value string }{},
+			name:          "list org metadata for non existent org",
+			ctx:           Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+			orgId:         "non existent orgid",
+			keyValuePairs: []struct{ key, value string }{},
 		},
 	}
 	for _, tt := range tests {
@@ -1708,7 +1710,7 @@ func TestServer_ListOrganizationMetadata(t *testing.T) {
 				require.NoError(ttt, err)
 
 				foundMetadataCount := 0
-				for _, kv := range tt.keyValuPars {
+				for _, kv := range tt.keyValuePairs {
 					for _, res := range got.Metadata {
 						if res.Key == kv.key &&
 							string(res.Value) == kv.value {
