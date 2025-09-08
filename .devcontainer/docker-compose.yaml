@@ -8,12 +8,11 @@ services:
       - ../:/workspaces/zitadel:cached
     command: sleep infinity
     working_dir: /workspaces/zitadel
-    env_file:
-      - .env.api
-      - .env.login
     environment:
-      ZITADEL_DATABASE_POSTGRES_HOST: db
-      DEVCONTAINER_LOGIN_CORE_MOCK_HOST: login-api-mock
+      DEVCONTAINER_DB_HOST: db
+      DEVCONTAINER_API_HOST: api
+      DEVCONTAINER_LOGIN_HOST: login
+      DEVCONTAINER_LOGIN_API_MOCK_HOST: login-api-mock
 
   db:
     container_name: db
@@ -43,7 +42,7 @@ services:
     env_file:
       - path: .env.api
         required: true
-      - path: ../${CORE_ENV_FILE:-none}
+      - path: ../${API_ENV_FILE:-none}
         required: false
     build:
       context: ../
@@ -71,7 +70,7 @@ services:
     env_file:
       - path: .env.api
         required: true
-      - path: ../${CORE_ENV_FILE:-none}
+      - path: ../${API_ENV_FILE:-none}
         required: false
     build:
       context: ../
@@ -99,7 +98,7 @@ services:
     env_file:
       - path: .env.api
         required: true
-      - path: ../${CORE_ENV_FILE:-none}
+      - path: ../${API_ENV_FILE:-none}
         required: false
     build:
       context: ../

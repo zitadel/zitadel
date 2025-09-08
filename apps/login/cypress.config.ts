@@ -11,7 +11,7 @@ export default defineConfig({
     specPattern: "integration/integration/**/*.cy.{js,jsx,ts,tsx}",
     supportFile: "integration/support/e2e.{js,jsx,ts,tsx}",
     env: {
-      CORE_MOCK_STUBS_URL: process.env.CORE_MOCK_STUBS_URL || "http://localhost:22220/v1/stubs"
+      API_MOCK_STUBS_URL: process.env.API_MOCK_STUBS_URL || "http://localhost:22220/v1/stubs"
     },    
     setupNodeEvents(on, config) {
       // implement node event listeners here
