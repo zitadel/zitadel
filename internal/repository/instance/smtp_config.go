@@ -217,9 +217,10 @@ func (e *SMTPConfigPasswordChangedEvent) UniqueConstraints() []*eventstore.Uniqu
 type SMTPConfigHTTPAddedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	ID          string `json:"id,omitempty"`
-	Description string `json:"description,omitempty"`
-	Endpoint    string `json:"endpoint,omitempty"`
+	ID          string              `json:"id,omitempty"`
+	Description string              `json:"description,omitempty"`
+	Endpoint    string              `json:"endpoint,omitempty"`
+	SigningKey  *crypto.CryptoValue `json:"signingKey"`
 }
 
 func NewSMTPConfigHTTPAddedEvent(
@@ -227,6 +228,7 @@ func NewSMTPConfigHTTPAddedEvent(
 	aggregate *eventstore.Aggregate,
 	id, description string,
 	endpoint string,
+	signingKey *crypto.CryptoValue,
 ) *SMTPConfigHTTPAddedEvent {
 	return &SMTPConfigHTTPAddedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -237,6 +239,7 @@ func NewSMTPConfigHTTPAddedEvent(
 		ID:          id,
 		Description: description,
 		Endpoint:    endpoint,
+		SigningKey:  signingKey,
 	}
 }
 
@@ -254,9 +257,10 @@ func (e *SMTPConfigHTTPAddedEvent) UniqueConstraints() []*eventstore.UniqueConst
 
 type SMTPConfigHTTPChangedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
-	ID                    string  `json:"id,omitempty"`
-	Description           *string `json:"description,omitempty"`
-	Endpoint              *string `json:"endpoint,omitempty"`
+	ID                    string              `json:"id,omitempty"`
+	Description           *string             `json:"description,omitempty"`
+	Endpoint              *string             `json:"endpoint,omitempty"`
+	SigningKey            *crypto.CryptoValue `json:"signingKey,omitempty"`
 }
 
 func (e *SMTPConfigHTTPChangedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
@@ -311,6 +315,12 @@ func ChangeSMTPConfigHTTPDescription(description string) func(event *SMTPConfigH
 func ChangeSMTPConfigHTTPEndpoint(endpoint string) func(event *SMTPConfigHTTPChangedEvent) {
 	return func(e *SMTPConfigHTTPChangedEvent) {
 		e.Endpoint = &endpoint
+	}
+}
+
+func ChangeSMTPConfigHTTPSigningKey(signingKey *crypto.CryptoValue) func(event *SMTPConfigHTTPChangedEvent) {
+	return func(e *SMTPConfigHTTPChangedEvent) {
+		e.SigningKey = signingKey
 	}
 }
 
