@@ -1189,8 +1189,8 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 						OrganizationId: orgId,
 					})
 					require.NoError(ttt, err)
-					found := false
-					slices.ContainsFunc(queryRes.Domains, func(d *v2beta_org.Domain) bool { return d.GetDomainName() == domain })
+
+					found := slices.ContainsFunc(queryRes.Domains, func(d *v2beta_org.Domain) bool { return d.GetDomainName() == domain })
 					require.True(ttt, found, "unable to find added domain")
 				}, retryDuration, tick, "timeout waiting for expected organizations being created")
 
