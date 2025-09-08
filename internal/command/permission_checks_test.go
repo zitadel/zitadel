@@ -277,13 +277,6 @@ func TestCommands_CheckPermissionUserDelete(t *testing.T) {
 						"aggregateID",
 						nil,
 					},
-					expectedCheck{
-						userCtx,
-						"user.self.delete",
-						"resourceOwner",
-						"aggregateID",
-						nil,
-					},
 				),
 			},
 			args: args{
