@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	//go:embed 62.sql
+	//go:embed 63.sql
 	alterResourceCounts string
 )
 
@@ -23,5 +23,5 @@ func (mig *AlterResourceCounts) Execute(ctx context.Context, _ eventstore.Event)
 }
 
 func (mig *AlterResourceCounts) String() string {
-	return "62_alter_resource_counts"
+	return "63_alter_resource_counts"
 }
