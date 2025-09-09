@@ -1,16 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  EventEmitter,
-  Input,
-  Output,
-  Pipe,
-  PipeTransform,
-  Signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, EventEmitter, Input, Output, Signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,18 +7,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {
-  Observable,
-  map,
-  of,
-  shareReplay,
-  ReplaySubject,
-  ObservedValueOf,
-  switchMap,
-  fromEvent,
-  mergeWith,
-  Subject,
-} from 'rxjs';
+import { Observable, of, shareReplay, ReplaySubject, ObservedValueOf, switchMap, Subject } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -40,22 +18,7 @@ import { Condition } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
 import { distinctUntilChanged, startWith, takeUntil } from 'rxjs/operators';
 import { CreateQueryResult } from '@tanstack/angular-query-experimental';
 import { toSignal } from '@angular/core/rxjs-interop';
-
-@Pipe({ standalone: true, name: 'filter' })
-export class Filter implements PipeTransform {
-  transform(values: string[] | undefined = [], input: HTMLInputElement): Observable<string[]> {
-    const focus$ = fromEvent(input, 'focus').pipe(map(() => ''));
-
-    return fromEvent(input, 'input').pipe(
-      startWith(undefined),
-      map(() => input.value.toLowerCase()),
-      mergeWith(focus$),
-      map((input) => {
-        return values.filter((v) => v.toLowerCase().includes(input));
-      }),
-    );
-  }
-}
+import { ActionsTwoAddActionAutocompleteInputComponent } from '../actions-two-add-action-autocomplete-input/actions-two-add-action-autocomplete-input.component';
 
 export type ConditionType = NonNullable<Condition['conditionType']['case']>;
 export type ConditionTypeValue<T extends ConditionType> = Omit<
@@ -82,7 +45,7 @@ export type ConditionTypeValue<T extends ConditionType> = Omit<
     CommonModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    Filter,
+    ActionsTwoAddActionAutocompleteInputComponent,
   ],
 })
 export class ActionsTwoAddActionConditionComponent<T extends ConditionType = ConditionType> {
