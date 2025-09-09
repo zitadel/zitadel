@@ -16,6 +16,7 @@ import (
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/feature"
+	"github.com/zitadel/zitadel/internal/i18n"
 )
 
 func Test_instanceInterceptor_Handler(t *testing.T) {
@@ -70,7 +71,7 @@ func Test_instanceInterceptor_Handler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			a := &instanceInterceptor{
 				verifier:   tt.fields.verifier,
-				translator: newZitadelTranslator(),
+				translator: i18n.NewZitadelTranslator(language.English),
 			}
 			next := &testHandler{}
 			got := a.HandlerFunc(next)
@@ -134,7 +135,7 @@ func Test_instanceInterceptor_HandlerFunc(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			a := &instanceInterceptor{
 				verifier:   tt.fields.verifier,
-				translator: newZitadelTranslator(),
+				translator: i18n.NewZitadelTranslator(language.English),
 			}
 			next := &testHandler{}
 			got := a.HandlerFunc(next)
@@ -197,7 +198,7 @@ func Test_instanceInterceptor_HandlerFuncWithError(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			a := &instanceInterceptor{
 				verifier:   tt.fields.verifier,
-				translator: newZitadelTranslator(),
+				translator: i18n.NewZitadelTranslator(language.English),
 			}
 			var ctx context.Context
 			got := a.HandlerFuncWithError(func(w http.ResponseWriter, r *http.Request) error {
