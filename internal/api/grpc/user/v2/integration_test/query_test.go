@@ -421,7 +421,7 @@ func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) 
 
 func createUserWithUserName(ctx context.Context, username string, orgID string, passwordChangeRequired bool) userAttr {
 	// used as default country prefix
-	phone := "+41" + integration.Phone()
+	phone := integration.Phone()
 	resp := Instance.CreateHumanUserVerified(ctx, orgID, username, phone)
 	info := userAttr{resp.GetUserId(), username, phone, nil, resp.GetDetails()}
 	// as the change date of the creation is the creation date
