@@ -222,7 +222,6 @@
     "termsOfService": "Términos de Servicio",
     "privacyPolicy": "Política de Privacidad",
     "submit": "Continuar",
-    "orUseIDP": "o usa un Proveedor de Identidad",
     "password": {
       "title": "Establecer Contraseña",
       "description": "Establece la contraseña para tu cuenta",
