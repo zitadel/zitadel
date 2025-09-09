@@ -116,7 +116,7 @@ func StartQueries(
 }
 
 func (q *Queries) Health(ctx context.Context) error {
-	return q.client.Ping()
+	return q.client.DB.Ping(ctx)
 }
 
 // cleanStaticQueries removes whitespaces,

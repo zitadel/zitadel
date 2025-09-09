@@ -2,7 +2,6 @@ package sql
 
 import (
 	"context"
-	"database/sql"
 	"os"
 	"testing"
 	"time"
@@ -10,9 +9,10 @@ import (
 	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
+	new_pg "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
@@ -21,7 +21,7 @@ import (
 )
 
 var (
-	testClient *sql.DB
+	testClient new_db.Pool
 )
 
 func TestMain(m *testing.M) {
@@ -40,13 +40,13 @@ func TestMain(m *testing.M) {
 		pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
 		logging.OnError(err).Fatal("unable to create db pool")
 
-		testClient = stdlib.OpenDBFromPool(pool)
+		testClient = new_pg.PGxPool(pool)
 
-		err = testClient.Ping()
+		err = testClient.Ping(context.Background())
 		logging.OnError(err).Fatal("unable to ping db")
 
 		defer func() {
-			logging.OnError(testClient.Close()).Error("unable to close db")
+			logging.OnError(testClient.Close(context.Background())).Error("unable to close db")
 		}()
 
 		err = initDB(context.Background(), &database.DB{DB: testClient, Database: &postgres.Config{Database: "zitadel"}})
@@ -91,6 +91,8 @@ func (*testDB) DatabaseName() string { return "db" }
 func (*testDB) Username() string { return "user" }
 
 func (*testDB) Type() dialect.DatabaseType { return dialect.DatabaseTypePostgres }
+
+func (*testDB) MaxOpenConnections() uint32 { return 10 }
 
 const oldEventsTable = `CREATE TABLE IF NOT EXISTS eventstore.events (
 	id UUID DEFAULT gen_random_uuid()

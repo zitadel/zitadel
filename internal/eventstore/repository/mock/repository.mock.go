@@ -14,7 +14,8 @@ import (
 	reflect "reflect"
 
 	decimal "github.com/shopspring/decimal"
-	database "github.com/zitadel/zitadel/internal/database"
+	database "github.com/zitadel/zitadel/backend/v3/storage/database"
+	database0 "github.com/zitadel/zitadel/internal/database"
 	eventstore "github.com/zitadel/zitadel/internal/eventstore"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -43,10 +44,10 @@ func (m *MockQuerier) EXPECT() *MockQuerierMockRecorder {
 }
 
 // Client mocks base method.
-func (m *MockQuerier) Client() *database.DB {
+func (m *MockQuerier) Client() *database0.DB {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Client")
-	ret0, _ := ret[0].(*database.DB)
+	ret0, _ := ret[0].(*database0.DB)
 	return ret0
 }
 
@@ -138,10 +139,10 @@ func (m *MockPusher) EXPECT() *MockPusherMockRecorder {
 }
 
 // Client mocks base method.
-func (m *MockPusher) Client() *database.DB {
+func (m *MockPusher) Client() *database0.DB {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Client")
-	ret0, _ := ret[0].(*database.DB)
+	ret0, _ := ret[0].(*database0.DB)
 	return ret0
 }
 
@@ -166,7 +167,7 @@ func (mr *MockPusherMockRecorder) Health(arg0 any) *gomock.Call {
 }
 
 // Push mocks base method.
-func (m *MockPusher) Push(arg0 context.Context, arg1 database.ContextQueryExecuter, arg2 ...eventstore.Command) ([]eventstore.Event, error) {
+func (m *MockPusher) Push(arg0 context.Context, arg1 database.QueryExecutor, arg2 ...eventstore.Command) ([]eventstore.Event, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {

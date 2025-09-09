@@ -2,11 +2,11 @@ package query
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -86,7 +86,7 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage cry
 		return nil, zerrors.ThrowInternal(err, "QUERY-SDfkg", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		certs, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -101,7 +101,7 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage cry
 	return certs, nil
 }
 
-func prepareCertificateQuery() (sq.SelectBuilder, func(*sql.Rows) (*Certificates, error)) {
+func prepareCertificateQuery() (sq.SelectBuilder, func(database.Rows) (*Certificates, error)) {
 	return sq.Select(
 			KeyColID.identifier(),
 			KeyColCreationDate.identifier(),
@@ -118,7 +118,7 @@ func prepareCertificateQuery() (sq.SelectBuilder, func(*sql.Rows) (*Certificates
 			LeftJoin(join(CertificateColID, KeyColID)).
 			LeftJoin(join(KeyPrivateColID, KeyColID)).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Certificates, error) {
+		func(rows database.Rows) (*Certificates, error) {
 			certificates := make([]Certificate, 0)
 			var count uint64
 			for rows.Next() {

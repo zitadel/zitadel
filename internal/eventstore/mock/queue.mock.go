@@ -11,10 +11,10 @@ package mock
 
 import (
 	context "context"
-	sql "database/sql"
 	reflect "reflect"
 
 	river "github.com/riverqueue/river"
+	database "github.com/zitadel/zitadel/backend/v3/storage/database"
 	queue "github.com/zitadel/zitadel/internal/queue"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -43,7 +43,7 @@ func (m *MockExecutionQueue) EXPECT() *MockExecutionQueueMockRecorder {
 }
 
 // InsertManyFastTx mocks base method.
-func (m *MockExecutionQueue) InsertManyFastTx(arg0 context.Context, arg1 *sql.Tx, arg2 []river.JobArgs, arg3 ...queue.InsertOpt) error {
+func (m *MockExecutionQueue) InsertManyFastTx(arg0 context.Context, arg1 database.Transaction, arg2 []river.JobArgs, arg3 ...queue.InsertOpt) error {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1, arg2}
 	for _, a := range arg3 {

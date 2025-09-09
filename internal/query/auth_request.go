@@ -9,6 +9,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -62,7 +63,7 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	dst := new(AuthRequest)
 	err = q.client.QueryRowContext(
 		ctx,
-		func(row *sql.Row) error {
+		func(row new_db.Row) error {
 			return row.Scan(
 				&dst.ID, &dst.CreationDate, &dst.LoginClient, &dst.ClientID, &scope, &dst.RedirectURI,
 				&prompt, &locales, &dst.LoginHint, &dst.MaxAge, &dst.HintUserID,

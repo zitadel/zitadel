@@ -2,11 +2,11 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/shopspring/decimal"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -24,7 +24,7 @@ type SearchQueryBuilder struct {
 	editorUser            string
 	queries               []*SearchQuery
 	excludeAggregateIDs   *ExclusionQuery
-	tx                    *sql.Tx
+	tx                    database.Transaction
 	positionAtLeast       decimal.Decimal
 	awaitOpenTransactions bool
 	creationDateAfter     time.Time
@@ -72,7 +72,7 @@ func (b *SearchQueryBuilder) GetExcludeAggregateIDs() *ExclusionQuery {
 	return b.excludeAggregateIDs
 }
 
-func (b *SearchQueryBuilder) GetTx() *sql.Tx {
+func (b *SearchQueryBuilder) GetTx() database.Transaction {
 	return b.tx
 }
 
@@ -270,7 +270,7 @@ func (builder *SearchQueryBuilder) OrderAsc() *SearchQueryBuilder {
 }
 
 // SetTx ensures that the eventstore library uses the existing transaction
-func (builder *SearchQueryBuilder) SetTx(tx *sql.Tx) *SearchQueryBuilder {
+func (builder *SearchQueryBuilder) SetTx(tx database.Transaction) *SearchQueryBuilder {
 	builder.tx = tx
 	return builder
 }

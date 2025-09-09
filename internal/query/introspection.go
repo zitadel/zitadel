@@ -2,10 +2,10 @@ package query
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"sync"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -55,7 +55,7 @@ func (q *Queries) ActiveIntrospectionClientByID(ctx context.Context, clientID st
 		client     = new(IntrospectionClient)
 	)
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		return row.Scan(
 			&client.AppID,
 			&client.ClientID,

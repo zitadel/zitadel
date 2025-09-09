@@ -2,13 +2,13 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"slices"
 	"time"
 
 	"github.com/shopspring/decimal"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/v2/database"
 )
 
@@ -20,7 +20,7 @@ type Querier interface {
 type Query struct {
 	instances  *filter[[]string]
 	filters    []*Filter
-	tx         *sql.Tx
+	tx         new_db.Transaction
 	pagination *Pagination
 	reducer    Reducer
 	// TODO: await push
@@ -34,7 +34,7 @@ func (q *Query) Filters() []*Filter {
 	return q.filters
 }
 
-func (q *Query) Tx() *sql.Tx {
+func (q *Query) Tx() new_db.Transaction {
 	return q.tx
 }
 
@@ -120,7 +120,7 @@ func InstancesNotContains(instances ...string) QueryOpt {
 	}
 }
 
-func SetQueryTx(tx *sql.Tx) QueryOpt {
+func SetQueryTx(tx new_db.Transaction) QueryOpt {
 	return func(query *Query) {
 		query.tx = tx
 	}

@@ -36,7 +36,7 @@ func NewPostgres(client *database.DB) *Postgres {
 	return &Postgres{client}
 }
 
-func (db *Postgres) Health(ctx context.Context) error { return db.Ping() }
+func (db *Postgres) Health(ctx context.Context) error { return db.DB.DB.Ping(ctx) }
 
 // FilterToReducer finds all events matching the given search query and passes them to the reduce function.
 func (psql *Postgres) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) (err error) {

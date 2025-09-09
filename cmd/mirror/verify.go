@@ -2,7 +2,6 @@ package mirror
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"fmt"
 	"slices"
@@ -11,6 +10,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	cryptoDatabase "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -38,11 +38,11 @@ var schemas = []string{
 func verifyMigration(ctx context.Context, config *Migration) {
 	sourceClient, err := database.Connect(config.Source, false)
 	logging.OnError(err).Fatal("unable to connect to source database")
-	defer sourceClient.Close()
+	defer sourceClient.DB.Close(ctx)
 
 	destClient, err := database.Connect(config.Destination, false)
 	logging.OnError(err).Fatal("unable to connect to destination database")
-	defer destClient.Close()
+	defer destClient.DB.Close(ctx)
 
 	for _, schema := range schemas {
 		for _, table := range append(getTables(ctx, destClient, schema), getViews(ctx, destClient, schema)...) {
@@ -62,7 +62,7 @@ func verifyMigration(ctx context.Context, config *Migration) {
 func getTables(ctx context.Context, dest *database.DB, schema string) (tables []string) {
 	err := dest.QueryContext(
 		ctx,
-		func(r *sql.Rows) error {
+		func(r new_db.Rows) error {
 			for r.Next() {
 				var table string
 				if err := r.Scan(&table); err != nil {
@@ -82,7 +82,7 @@ func getTables(ctx context.Context, dest *database.DB, schema string) (tables []
 func getViews(ctx context.Context, dest *database.DB, schema string) (tables []string) {
 	err := dest.QueryContext(
 		ctx,
-		func(r *sql.Rows) error {
+		func(r new_db.Rows) error {
 			for r.Next() {
 				var table string
 				if err := r.Scan(&table); err != nil {
@@ -112,7 +112,7 @@ func countEntries(ctx context.Context, client *database.DB, table string) (count
 
 	err := client.QueryRowContext(
 		ctx,
-		func(r *sql.Row) error {
+		func(r new_db.Row) error {
 			return r.Scan(&count)
 		},
 		fmt.Sprintf("SELECT COUNT(*) FROM %s %s", table, instanceClause),

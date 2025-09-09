@@ -10,6 +10,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -106,7 +107,7 @@ func TestStatementHandler_handleLock(t *testing.T) {
 			}
 			h := &locker{
 				projectionName: projectionName,
-				client:         client,
+				client:         new_sql.SQLPool(client),
 				workerName:     workerName,
 				lockStmt: func(values string, instances int) string {
 					return fmt.Sprintf(lockStmtFormat, lockTable, values, instances)
@@ -216,7 +217,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 			}
 			h := &locker{
 				projectionName: projectionName,
-				client:         client,
+				client:         new_sql.SQLPool(client),
 				workerName:     workerName,
 				lockStmt: func(values string, instances int) string {
 					return fmt.Sprintf(lockStmtFormat, lockTable, values, instances)
@@ -228,80 +229,6 @@ func TestStatementHandler_renewLock(t *testing.T) {
 			}
 
 			err = h.renewLock(context.Background(), tt.args.lockDuration, tt.args.instanceIDs...)
-			if !tt.want.isErr(err) {
-				t.Errorf("unexpected error = %v", err)
-			}
-
-			mock.MatchExpectationsInOrder(true)
-			if err := mock.ExpectationsWereMet(); err != nil {
-				t.Errorf("expectations not met: %v", err)
-			}
-		})
-	}
-}
-
-func TestStatementHandler_Unlock(t *testing.T) {
-	type want struct {
-		expectations []mockExpectation
-		isErr        func(err error) bool
-	}
-	type args struct {
-		instanceID string
-	}
-	tests := []struct {
-		name string
-		args args
-		want want
-	}{
-		{
-			name: "unlock fails",
-			args: args{
-				instanceID: "instanceID",
-			},
-			want: want{
-				expectations: []mockExpectation{
-					expectLockErr(lockTable, workerName, 0, "instanceID", sql.ErrTxDone),
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, sql.ErrTxDone)
-				},
-			},
-		},
-		{
-			name: "success",
-			args: args{
-				instanceID: "instanceID",
-			},
-			want: want{
-				expectations: []mockExpectation{
-					expectLock(lockTable, workerName, 0, "instanceID"),
-				},
-				isErr: func(err error) bool {
-					return errors.Is(err, nil)
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
-			if err != nil {
-				t.Fatal(err)
-			}
-			h := &locker{
-				projectionName: projectionName,
-				client:         client,
-				workerName:     workerName,
-				lockStmt: func(values string, instances int) string {
-					return fmt.Sprintf(lockStmtFormat, lockTable, values, instances)
-				},
-			}
-
-			for _, expectation := range tt.want.expectations {
-				expectation(mock)
-			}
-
-			err = h.Unlock(tt.args.instanceID)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error = %v", err)
 			}

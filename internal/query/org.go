@@ -9,6 +9,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	es "github.com/zitadel/zitadel/internal/eventstore"
@@ -180,7 +181,7 @@ func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (org *O
 		return nil, zerrors.ThrowInternal(err, "QUERY-TYUCE", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		org, err = scan(row)
 		return err
 	}, query, args...)
@@ -204,7 +205,7 @@ func (q *Queries) OrgByVerifiedDomain(ctx context.Context, domain string) (org *
 		return nil, zerrors.ThrowInternal(err, "QUERY-TYUCE", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		org, err = scan(row)
 		return err
 	}, query, args...)
@@ -241,7 +242,7 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 		return false, zerrors.ThrowInternal(err, "QUERY-Dgbe2", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		isUnique, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -292,7 +293,7 @@ func (q *Queries) searchOrgs(ctx context.Context, queries *OrgSearchQueries, per
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		orgs, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -344,7 +345,7 @@ func NewOrgIDsSearchQuery(ids ...string) (SearchQuery, error) {
 	return NewListQuery(OrgColumnID, list, ListIn)
 }
 
-func prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
+func prepareOrgsQuery() (sq.SelectBuilder, func(database.Rows) (*Orgs, error)) {
 	return sq.Select(
 			OrgColumnID.identifier(),
 			OrgColumnCreationDate.identifier(),
@@ -357,7 +358,7 @@ func prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 			countColumn.identifier()).
 			From(orgsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Orgs, error) {
+		func(rows database.Rows) (*Orgs, error) {
 			orgs := make([]*Org, 0)
 			var count uint64
 			for rows.Next() {
@@ -392,7 +393,7 @@ func prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 		}
 }
 
-func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
+func prepareOrgQuery() (sq.SelectBuilder, func(database.Row) (*Org, error)) {
 	return sq.Select(
 			OrgColumnID.identifier(),
 			OrgColumnCreationDate.identifier(),
@@ -406,7 +407,7 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 		).
 			From(orgsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Org, error) {
+		func(row database.Row) (*Org, error) {
 			o := new(Org)
 			err := row.Scan(
 				&o.ID,
@@ -429,7 +430,7 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 		}
 }
 
-func prepareOrgWithDomainsQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
+func prepareOrgWithDomainsQuery() (sq.SelectBuilder, func(database.Row) (*Org, error)) {
 	return sq.Select(
 			OrgColumnID.identifier(),
 			OrgColumnCreationDate.identifier(),
@@ -443,7 +444,7 @@ func prepareOrgWithDomainsQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error
 			From(orgsTable.identifier()).
 			LeftJoin(join(OrgDomainOrgIDCol, OrgColumnID)).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Org, error) {
+		func(row database.Row) (*Org, error) {
 			o := new(Org)
 			err := row.Scan(
 				&o.ID,
@@ -465,12 +466,12 @@ func prepareOrgWithDomainsQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error
 		}
 }
 
-func prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
+func prepareOrgUniqueQuery() (sq.SelectBuilder, func(database.Row) (bool, error)) {
 	return sq.Select(uniqueColumn.identifier()).
 			From(orgsTable.identifier()).
 			LeftJoin(join(OrgDomainOrgIDCol, OrgColumnID)).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (isUnique bool, err error) {
+		func(row database.Row) (isUnique bool, err error) {
 			err = row.Scan(&isUnique)
 			if err != nil {
 				return false, zerrors.ThrowInternal(err, "QUERY-e6EiG", "Errors.Internal")

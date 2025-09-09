@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -173,7 +174,7 @@ func (q *Queries) SMTPConfigActive(ctx context.Context, resourceOwner string) (c
 		return nil, zerrors.ThrowInternal(err, "QUERY-3m9sl", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		config, err = scan(row)
 		return err
 	}, query, args...)
@@ -199,7 +200,7 @@ func (q *Queries) SMTPConfigByID(ctx context.Context, instanceID, id string) (co
 		return nil, zerrors.ThrowInternal(err, "QUERY-8f8gw", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		config, err = scan(row)
 		return err
 	}, query, args...)
@@ -212,7 +213,7 @@ func (q *Queries) SMTPConfigByID(ctx context.Context, instanceID, id string) (co
 	return config, err
 }
 
-func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, error)) {
+func prepareSMTPConfigQuery() (sq.SelectBuilder, func(database.Row) (*SMTPConfig, error)) {
 	return sq.Select(
 			SMTPConfigColumnCreationDate.identifier(),
 			SMTPConfigColumnChangeDate.identifier(),
@@ -239,7 +240,7 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 			LeftJoin(join(SMTPConfigSMTPColumnID, SMTPConfigColumnID)).
 			LeftJoin(join(SMTPConfigHTTPColumnID, SMTPConfigColumnID)).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*SMTPConfig, error) {
+		func(row database.Row) (*SMTPConfig, error) {
 			config := new(SMTPConfig)
 			var (
 				smtpConfig = sqlSmtpConfig{}
@@ -279,7 +280,7 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 		}
 }
 
-func prepareSMTPConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs, error)) {
+func prepareSMTPConfigsQuery() (sq.SelectBuilder, func(database.Rows) (*SMTPConfigs, error)) {
 	return sq.Select(
 			SMTPConfigColumnCreationDate.identifier(),
 			SMTPConfigColumnChangeDate.identifier(),
@@ -307,7 +308,7 @@ func prepareSMTPConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs,
 			LeftJoin(join(SMTPConfigSMTPColumnID, SMTPConfigColumnID)).
 			LeftJoin(join(SMTPConfigHTTPColumnID, SMTPConfigColumnID)).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*SMTPConfigs, error) {
+		func(rows database.Rows) (*SMTPConfigs, error) {
 			configs := &SMTPConfigs{Configs: []*SMTPConfig{}}
 			for rows.Next() {
 				config := new(SMTPConfig)
@@ -362,7 +363,7 @@ func (q *Queries) SearchSMTPConfigs(ctx context.Context, queries *SMTPConfigsSea
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-sZ7Cx", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		configs, err = scan(rows)
 		return err
 	}, stmt, args...)

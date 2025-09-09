@@ -46,6 +46,7 @@ type Database interface {
 	DatabaseName() string
 	Username() string
 	Type() DatabaseType
+	MaxOpenConnections() uint32
 }
 
 func Register(matcher Matcher, config Connector, isDefault bool) {

@@ -167,9 +167,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.FirstInstance.externalSecure = config.ExternalSecure
 	steps.FirstInstance.externalPort = config.ExternalPort
 
-	steps.s5LastFailed = &LastFailed{dbClient: dbClient.DB}
-	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient.DB}
-	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username()}
+	steps.s5LastFailed = &LastFailed{dbClient: dbClient}
+	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient}
+	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient, username: config.Database.Username()}
 	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient}
 	steps.CorrectCreationDate.dbClient = dbClient
 	steps.s12AddOTPColumns = &AddOTPColumns{dbClient: dbClient}

@@ -2,10 +2,10 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/riverqueue/river"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/queue"
 )
 
@@ -16,5 +16,5 @@ type ExecutionQueue interface {
 	// a single `COPY FROM` execution, within an existing transaction.
 	//
 	// Opts are applied to each job before sending them to river.
-	InsertManyFastTx(ctx context.Context, tx *sql.Tx, args []river.JobArgs, opts ...queue.InsertOpt) error
+	InsertManyFastTx(ctx context.Context, tx database.Transaction, args []river.JobArgs, opts ...queue.InsertOpt) error
 }

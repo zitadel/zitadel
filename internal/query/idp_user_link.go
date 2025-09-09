@@ -7,6 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -154,7 +155,7 @@ func (q *Queries) idpUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-4zzFK", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		idps, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -181,7 +182,7 @@ func NewIDPUserLinksExternalIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(IDPUserLinkExternalUserIDCol, value, TextEqualsIgnoreCase)
 }
 
-func prepareIDPUserLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLinks, error)) {
+func prepareIDPUserLinksQuery() (sq.SelectBuilder, func(database.Rows) (*IDPUserLinks, error)) {
 	return sq.Select(
 			IDPUserLinkIDPIDCol.identifier(),
 			IDPUserLinkUserIDCol.identifier(),
@@ -194,7 +195,7 @@ func prepareIDPUserLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLink
 			From(idpUserLinkTable.identifier()).
 			LeftJoin(join(IDPTemplateIDCol, IDPUserLinkIDPIDCol)).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*IDPUserLinks, error) {
+		func(rows database.Rows) (*IDPUserLinks, error) {
 			idps := make([]*IDPUserLink, 0)
 			var count uint64
 			for rows.Next() {

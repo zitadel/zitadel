@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -195,7 +196,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 		return nil, zerrors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		policy, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -227,7 +228,7 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (policy *LoginPolicy, 
 		return nil, zerrors.ThrowInternal(err, "QUERY-t4TBK", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		policy, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -262,7 +263,7 @@ func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (factors
 		return nil, zerrors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		factors, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -286,7 +287,7 @@ func (q *Queries) DefaultSecondFactors(ctx context.Context) (factors *SecondFact
 		return nil, zerrors.ThrowInternal(err, "QUERY-CZ2Nv", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		factors, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -322,7 +323,7 @@ func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (factors 
 		return nil, zerrors.ThrowInternal(err, "QUERY-B4o7h", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		factors, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -346,7 +347,7 @@ func (q *Queries) DefaultMultiFactors(ctx context.Context) (factors *MultiFactor
 		return nil, zerrors.ThrowInternal(err, "QUERY-WxYjr", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		factors, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -357,7 +358,7 @@ func (q *Queries) DefaultMultiFactors(ctx context.Context) (factors *MultiFactor
 	return factors, err
 }
 
-func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy, error)) {
+func prepareLoginPolicyQuery() (sq.SelectBuilder, func(new_db.Rows) (*LoginPolicy, error)) {
 	return sq.Select(
 			LoginPolicyColumnOrgID.identifier(),
 			LoginPolicyColumnCreationDate.identifier(),
@@ -385,7 +386,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 			LoginPolicyColumnMultiFactorCheckLifetime.identifier(),
 		).From(loginPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*LoginPolicy, error) {
+		func(rows new_db.Rows) (*LoginPolicy, error) {
 			p := new(LoginPolicy)
 			defaultRedirectURI := sql.NullString{}
 			for rows.Next() {
@@ -427,12 +428,12 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 		}
 }
 
-func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFactors, error)) {
+func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(new_db.Row) (*SecondFactors, error)) {
 	return sq.Select(
 			LoginPolicyColumnSecondFactors.identifier(),
 		).From(loginPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*SecondFactors, error) {
+		func(row new_db.Row) (*SecondFactors, error) {
 			p := new(SecondFactors)
 			err := row.Scan(
 				&p.Factors,
@@ -449,12 +450,12 @@ func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFac
 		}
 }
 
-func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFactors, error)) {
+func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(new_db.Row) (*MultiFactors, error)) {
 	return sq.Select(
 			LoginPolicyColumnMultiFactors.identifier(),
 		).From(loginPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*MultiFactors, error) {
+		func(row new_db.Row) (*MultiFactors, error) {
 			p := new(MultiFactors)
 			err := row.Scan(
 				&p.Factors,

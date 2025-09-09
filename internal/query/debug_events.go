@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"errors"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -36,7 +37,7 @@ func (q *Queries) GetDebugEventsStateByID(ctx context.Context, id string, trigge
 
 	dst := new(DebugEventState)
 	err = q.client.QueryRowContext(ctx,
-		func(row *sql.Row) error {
+		func(row database.Row) error {
 			return row.Scan(
 				&dst.ID,
 				&dst.CreationDate,
@@ -68,7 +69,7 @@ func (q *Queries) ListDebugEventsStates(ctx context.Context, triggerBulk bool) (
 	}
 
 	err = q.client.QueryContext(ctx,
-		func(rows *sql.Rows) error {
+		func(rows database.Rows) error {
 			for rows.Next() {
 				var dst DebugEventState
 				err := rows.Scan(

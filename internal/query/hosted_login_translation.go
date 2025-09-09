@@ -3,7 +3,6 @@ package query
 import (
 	"context"
 	"crypto/md5"
-	"database/sql"
 	_ "embed"
 	"encoding/hex"
 	"encoding/json"
@@ -16,6 +15,7 @@ import (
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -141,7 +141,7 @@ func (q *Queries) GetHostedLoginTranslation(ctx context.Context, req *settings.G
 	}
 
 	var trs []*HostedLoginTranslation
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		trs, err = scan(rows)
 		return err
 	}, query, args...)
@@ -206,7 +206,7 @@ func getSystemTranslation(lang, instanceDefaultLang language.Tag) (map[string]an
 	return translation, hex.EncodeToString(hash[:]), nil
 }
 
-func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*HostedLoginTranslation, error)) {
+func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(database.Rows) ([]*HostedLoginTranslation, error)) {
 	return sq.Select(
 			hostedLoginTranslationColFile.identifier(),
 			hostedLoginTranslationColResourceOwnerType.identifier(),
@@ -214,7 +214,7 @@ func prepareHostedLoginTranslationQuery() (sq.SelectBuilder, func(*sql.Rows) ([]
 		).From(hostedLoginTranslationTable.identifier()).
 			Limit(2).
 			PlaceholderFormat(sq.Dollar),
-		func(r *sql.Rows) ([]*HostedLoginTranslation, error) {
+		func(r database.Rows) ([]*HostedLoginTranslation, error) {
 			translations := make([]*HostedLoginTranslation, 0, 2)
 			for r.Next() {
 				var rawTranslation json.RawMessage

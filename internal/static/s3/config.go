@@ -1,12 +1,12 @@
 package s3
 
 import (
-	"database/sql"
 	"encoding/json"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -38,7 +38,7 @@ func (c *Config) NewStorage() (static.Storage, error) {
 	}, nil
 }
 
-func NewStorage(_ *sql.DB, rawConfig map[string]interface{}) (static.Storage, error) {
+func NewStorage(_ database.Pool, rawConfig map[string]interface{}) (static.Storage, error) {
 	configData, err := json.Marshal(rawConfig)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "MINIO-Ef2f2", "could not map config")

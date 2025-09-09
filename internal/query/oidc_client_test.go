@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -265,7 +266,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			execMock(t, tt.mock, func(db *sql.DB) {
+			execMock(t, tt.mock, func(db new_db.Pool) {
 				q := &Queries{
 					client: &database.DB{
 						DB: db,

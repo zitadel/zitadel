@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"sync"
 	"time"
@@ -10,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/shopspring/decimal"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -110,17 +110,17 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		defer cancel()
 	}
 
-	tx, err := h.client.BeginTx(txCtx, nil)
+	tx, err := h.client.DB.Begin(txCtx, nil)
 	if err != nil {
 		return false, err
 	}
 	defer func() {
 		if err != nil && !errors.Is(err, &executionError{}) {
-			rollbackErr := tx.Rollback()
+			rollbackErr := tx.Rollback(ctx)
 			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
 			return
 		}
-		commitErr := tx.Commit()
+		commitErr := tx.Commit(ctx)
 		if err == nil {
 			err = commitErr
 		}
@@ -156,7 +156,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		return additionalIteration, err
 	}
 	if len(events) == 0 {
-		err = h.setState(tx, currentState)
+		err = h.setState(ctx, tx, currentState)
 		return additionalIteration, err
 	}
 
@@ -165,12 +165,12 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		return false, err
 	}
 
-	err = h.setState(tx, currentState)
+	err = h.setState(ctx, tx, currentState)
 
 	return additionalIteration, err
 }
 
-func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState *state) (_ []eventstore.FillFieldsEvent, additionalIteration bool, err error) {
+func (h *FieldHandler) fetchEvents(ctx context.Context, tx database.Transaction, currentState *state) (_ []eventstore.FillFieldsEvent, additionalIteration bool, err error) {
 	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
 	if err != nil || len(events) == 0 {
 		h.log().OnError(err).Debug("filter eventstore failed")

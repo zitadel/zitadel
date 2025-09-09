@@ -1,7 +1,7 @@
 package projection
 
 import (
-	"database/sql"
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,18 +24,18 @@ type execution struct {
 
 type anyArg struct{}
 
-func (e *testExecuter) Exec(stmt string, args ...interface{}) (sql.Result, error) {
+func (e *testExecuter) Exec(_ context.Context, stmt string, args ...interface{}) (int64, error) {
 	if stmt == "SAVEPOINT exec_stmt" {
-		return nil, nil
+		return 0, nil
 	}
 
 	if e.execIdx >= len(e.executions) {
-		return nil, zerrors.ThrowInternal(nil, "PROJE-8TNoE", "too many executions")
+		return 0, zerrors.ThrowInternal(nil, "PROJE-8TNoE", "too many executions")
 	}
 	e.executions[e.execIdx].gottenArgs = args
 	e.executions[e.execIdx].gottenStmt = stmt
 	e.execIdx++
-	return nil, nil
+	return 0, nil
 }
 
 func (e *testExecuter) Validate(t *testing.T) {

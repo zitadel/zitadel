@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -154,7 +155,7 @@ func NewTargetInIDsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(TargetColumnID, values)
 }
 
-func prepareTargetsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
+func prepareTargetsQuery() (sq.SelectBuilder, func(rows database.Rows) (*Targets, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
 			TargetColumnCreationDate.identifier(),
@@ -169,7 +170,7 @@ func prepareTargetsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, er
 			countColumn.identifier(),
 		).From(targetTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Targets, error) {
+		func(rows database.Rows) (*Targets, error) {
 			targets := make([]*Target, 0)
 			var count uint64
 			for rows.Next() {
@@ -206,7 +207,7 @@ func prepareTargetsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, er
 		}
 }
 
-func prepareTargetQuery() (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
+func prepareTargetQuery() (sq.SelectBuilder, func(row database.Row) (*Target, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
 			TargetColumnCreationDate.identifier(),
@@ -220,7 +221,7 @@ func prepareTargetQuery() (sq.SelectBuilder, func(row *sql.Row) (*Target, error)
 			TargetColumnSigningKey.identifier(),
 		).From(targetTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Target, error) {
+		func(row database.Row) (*Target, error) {
 			target := new(Target)
 			err := row.Scan(
 				&target.ID,

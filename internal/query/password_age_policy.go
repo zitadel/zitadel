@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -111,7 +112,7 @@ func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, shouldTriggerBulk 
 		return nil, zerrors.ThrowInternal(err, "QUERY-SKR6X", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
@@ -139,14 +140,14 @@ func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context, shouldTriggerBul
 		return nil, zerrors.ThrowInternal(err, "QUERY-mN0Ci", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
 	return policy, err
 }
 
-func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PasswordAgePolicy, error)) {
+func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(database.Row) (*PasswordAgePolicy, error)) {
 	return sq.Select(
 			PasswordAgeColID.identifier(),
 			PasswordAgeColSequence.identifier(),
@@ -160,7 +161,7 @@ func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*Passwor
 		).
 			From(passwordAgeTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*PasswordAgePolicy, error) {
+		func(row database.Row) (*PasswordAgePolicy, error) {
 			policy := new(PasswordAgePolicy)
 			err := row.Scan(
 				&policy.ID,

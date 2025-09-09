@@ -15,6 +15,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -580,10 +581,10 @@ func Test_SessionPrepare(t *testing.T) {
 	}
 }
 
-func prepareSessionQueryTesting(t *testing.T, token string) func() (sq.SelectBuilder, func(*sql.Row) (*Session, error)) {
-	return func() (sq.SelectBuilder, func(*sql.Row) (*Session, error)) {
+func prepareSessionQueryTesting(t *testing.T, token string) func() (sq.SelectBuilder, func(database.Row) (*Session, error)) {
+	return func() (sq.SelectBuilder, func(database.Row) (*Session, error)) {
 		builder, scan := prepareSessionQuery()
-		return builder, func(row *sql.Row) (*Session, error) {
+		return builder, func(row database.Row) (*Session, error) {
 			session, tokenID, err := scan(row)
 			require.Equal(t, tokenID, token)
 			return session, err

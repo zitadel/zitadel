@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -295,7 +296,7 @@ func Test_triggerMigration_Execute(t *testing.T) {
 
 			m := &triggerMigration{
 				db: &database.DB{
-					DB: db,
+					DB: sql.SQLPool(db),
 				},
 				triggerConfig: tt.fields.triggerConfig,
 				templateName:  tt.fields.templateName,

@@ -7,6 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
@@ -80,7 +81,7 @@ func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, qu
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-A9i5k", "Errors.Query.SQLStatement")
 	}
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		milestones, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -92,7 +93,7 @@ func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, qu
 	return milestones, err
 }
 
-func prepareMilestonesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Milestones, error)) {
+func prepareMilestonesQuery() (sq.SelectBuilder, func(database.Rows) (*Milestones, error)) {
 	return sq.Select(
 			MilestoneInstanceIDColID.identifier(),
 			InstanceDomainDomainCol.identifier(),
@@ -104,7 +105,7 @@ func prepareMilestonesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Milestones, e
 			From(milestonesTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, MilestoneInstanceIDColID)).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Milestones, error) {
+		func(rows database.Rows) (*Milestones, error) {
 			milestones := make([]*Milestone, 0)
 			var count uint64
 			for rows.Next() {

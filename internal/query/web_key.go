@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-jose/go-jose/v4"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -48,7 +49,7 @@ func (q *Queries) GetActiveSigningWebKey(ctx context.Context) (webKey *jose.JSON
 	defer func() { span.EndWithError(err) }()
 
 	var keyValue *crypto.CryptoValue
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		return row.Scan(&keyValue)
 	},
 		webKeyByStateQuery,
@@ -86,7 +87,7 @@ func (q *Queries) ListWebKeys(ctx context.Context) (list []WebKeyDetails, err er
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		for rows.Next() {
 			var (
 				configData []byte
@@ -130,7 +131,7 @@ func (q *Queries) GetWebKeySet(ctx context.Context) (_ *jose.JSONWebKeySet, err 
 
 	var keys []jose.JSONWebKey
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		for rows.Next() {
 			var webKeyData []byte
 			if err = rows.Scan(&webKeyData); err != nil {

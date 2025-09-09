@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -89,14 +90,14 @@ func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID str
 		return nil, zerrors.ThrowInternal(err, "QUERY-f9jSf", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		provider, err = scan(row)
 		return err
 	}, stmt, args...)
 	return provider, err
 }
 
-func prepareDebugNotificationProviderQuery() (sq.SelectBuilder, func(*sql.Row) (*DebugNotificationProvider, error)) {
+func prepareDebugNotificationProviderQuery() (sq.SelectBuilder, func(database.Row) (*DebugNotificationProvider, error)) {
 	return sq.Select(
 			NotificationProviderColumnAggID.identifier(),
 			NotificationProviderColumnCreationDate.identifier(),
@@ -108,7 +109,7 @@ func prepareDebugNotificationProviderQuery() (sq.SelectBuilder, func(*sql.Row) (
 			NotificationProviderColumnCompact.identifier(),
 		).From(notificationProviderTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*DebugNotificationProvider, error) {
+		func(row database.Row) (*DebugNotificationProvider, error) {
 			p := new(DebugNotificationProvider)
 			err := row.Scan(
 				&p.AggregateID,

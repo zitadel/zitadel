@@ -1,13 +1,13 @@
 package eventstore
 
 import (
-	"database/sql"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/shopspring/decimal"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/v2/database"
 )
 
@@ -807,7 +807,7 @@ func TestQueryOpt(t *testing.T) {
 	type args struct {
 		opts []QueryOpt
 	}
-	var tx sql.Tx
+	var tx new_db.Transaction
 	tests := []struct {
 		name string
 		args args
@@ -837,7 +837,7 @@ func TestQueryOpt(t *testing.T) {
 			name: "with tx",
 			args: args{
 				opts: []QueryOpt{
-					SetQueryTx(&tx),
+					SetQueryTx(tx),
 				},
 			},
 			want: &Query{
@@ -845,7 +845,7 @@ func TestQueryOpt(t *testing.T) {
 					condition: database.NewTextEqual("instance"),
 					value:     toPtr([]string{"instance"}),
 				},
-				tx: &tx,
+				tx: tx,
 			},
 		},
 		{

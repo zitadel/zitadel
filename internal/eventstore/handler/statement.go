@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"database/sql"
+	"context"
 )
 
 type Executer interface {
-	Exec(string, ...interface{}) (sql.Result, error)
+	Exec(context.Context, string, ...interface{}) (int64, error)
 }

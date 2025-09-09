@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -80,7 +81,7 @@ func (q *Queries) GetInstanceRestrictions(ctx context.Context) (restrictions Res
 	if err != nil {
 		return restrictions, zitade_errors.ThrowInternal(err, "QUERY-XnLMQ", "Errors.Query.SQLStatement")
 	}
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		restrictions, err = scan(row)
 		return err
 	}, query, args...)
@@ -91,7 +92,7 @@ func (q *Queries) GetInstanceRestrictions(ctx context.Context) (restrictions Res
 	return restrictions, err
 }
 
-func prepareRestrictionsQuery() (sq.SelectBuilder, func(*sql.Row) (Restrictions, error)) {
+func prepareRestrictionsQuery() (sq.SelectBuilder, func(new_db.Row) (Restrictions, error)) {
 	return sq.Select(
 			RestrictionsColumnAggregateID.identifier(),
 			RestrictionsColumnCreationDate.identifier(),
@@ -103,7 +104,7 @@ func prepareRestrictionsQuery() (sq.SelectBuilder, func(*sql.Row) (Restrictions,
 		).
 			From(restrictionsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (restrictions Restrictions, err error) {
+		func(row new_db.Row) (restrictions Restrictions, err error) {
 			allowedLanguages := database.TextArray[string](make([]string, 0))
 			disallowPublicOrgRegistration := sql.NullBool{}
 			err = row.Scan(

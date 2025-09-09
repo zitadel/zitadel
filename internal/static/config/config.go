@@ -1,8 +1,7 @@
 package config
 
 import (
-	"database/sql"
-
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/static/database"
@@ -16,7 +15,7 @@ type AssetStorageConfig struct {
 	Config map[string]interface{} `mapstructure:",remain"`
 }
 
-func (a *AssetStorageConfig) NewStorage(client *sql.DB) (static.Storage, error) {
+func (a *AssetStorageConfig) NewStorage(client new_db.Pool) (static.Storage, error) {
 	t, ok := storage[a.Type]
 	if !ok {
 		return nil, zerrors.ThrowInternalf(nil, "STATIC-dsbjh", "config type %s not supported", a.Type)

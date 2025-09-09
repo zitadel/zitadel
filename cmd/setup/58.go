@@ -2,12 +2,12 @@ package setup
 
 import (
 	"context"
-	"database/sql"
 	"embed"
 	"fmt"
 
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -23,7 +23,7 @@ type ReplaceLoginNames3View struct {
 
 func (mig *ReplaceLoginNames3View) Execute(ctx context.Context, _ eventstore.Event) error {
 	var exists bool
-	err := mig.dbClient.QueryRowContext(ctx, func(r *sql.Row) error {
+	err := mig.dbClient.QueryRowContext(ctx, func(r new_db.Row) error {
 		return r.Scan(&exists)
 	}, "SELECT exists(SELECT 1 from information_schema.views WHERE table_schema = 'projections' AND table_name = 'login_names3')")
 

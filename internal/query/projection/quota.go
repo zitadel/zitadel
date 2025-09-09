@@ -294,7 +294,7 @@ func (q *quotaProjection) IncrementUsage(ctx context.Context, unit quota.Unit, i
 		return 0, nil
 	}
 
-	err = q.client.DB.QueryRowContext(
+	err = q.client.DB.QueryRow(
 		ctx,
 		incrementQuotaStatement,
 		instanceID, unit, periodStart, count,

@@ -2,13 +2,11 @@ package projection
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
-	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -62,11 +60,11 @@ func (p *instanceDomainRelationalProjection) reduceCustomDomainAdded(event event
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-DU0xF", "reduce.wrong.event.type %s", instance.InstanceDomainAddedEventType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
+		tx, ok := ex.(database.Transaction)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-bXCa6", "reduce.wrong.db.pool %T", ex)
 		}
-		return repository.InstanceRepository(v3_sql.SQLTx(tx)).Domains(false).Add(ctx, &domain.AddInstanceDomain{
+		return repository.InstanceRepository(tx).Domains(false).Add(ctx, &domain.AddInstanceDomain{
 			InstanceID:  e.Aggregate().InstanceID,
 			Domain:      e.Domain,
 			IsPrimary:   gu.Ptr(false),
@@ -84,11 +82,11 @@ func (p *instanceDomainRelationalProjection) reduceDomainPrimarySet(event events
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-TdEWA", "reduce.wrong.event.type %s", instance.InstanceDomainPrimarySetEventType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
+		tx, ok := ex.(database.Transaction)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-QnjHo", "reduce.wrong.db.pool %T", ex)
 		}
-		domainRepo := repository.InstanceRepository(v3_sql.SQLTx(tx)).Domains(false)
+		domainRepo := repository.InstanceRepository(tx).Domains(false)
 
 		condition := database.And(
 			domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
@@ -119,11 +117,11 @@ func (p *instanceDomainRelationalProjection) reduceCustomDomainRemoved(event eve
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Hhcdl", "reduce.wrong.event.type %s", instance.InstanceDomainRemovedEventType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
+		tx, ok := ex.(database.Transaction)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-58ghE", "reduce.wrong.db.pool %T", ex)
 		}
-		domainRepo := repository.InstanceRepository(v3_sql.SQLTx(tx)).Domains(false)
+		domainRepo := repository.InstanceRepository(tx).Domains(false)
 		_, err := domainRepo.Remove(ctx,
 			database.And(
 				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),
@@ -141,11 +139,11 @@ func (p *instanceDomainRelationalProjection) reduceTrustedDomainAdded(event even
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-svHDh", "reduce.wrong.event.type %s", instance.TrustedDomainAddedEventType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
+		tx, ok := ex.(database.Transaction)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-gx7tQ", "reduce.wrong.db.pool %T", ex)
 		}
-		return repository.InstanceRepository(v3_sql.SQLTx(tx)).Domains(false).Add(ctx, &domain.AddInstanceDomain{
+		return repository.InstanceRepository(tx).Domains(false).Add(ctx, &domain.AddInstanceDomain{
 			InstanceID: e.Aggregate().InstanceID,
 			Domain:     e.Domain,
 			Type:       domain.DomainTypeTrusted,
@@ -161,11 +159,11 @@ func (p *instanceDomainRelationalProjection) reduceTrustedDomainRemoved(event ev
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-4K74E", "reduce.wrong.event.type %s", instance.TrustedDomainRemovedEventType)
 	}
 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
+		tx, ok := ex.(database.Transaction)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-D68ap", "reduce.wrong.db.pool %T", ex)
 		}
-		domainRepo := repository.InstanceRepository(v3_sql.SQLTx(tx)).Domains(false)
+		domainRepo := repository.InstanceRepository(tx).Domains(false)
 		_, err := domainRepo.Remove(ctx,
 			database.And(
 				domainRepo.InstanceIDCondition(e.Aggregate().InstanceID),

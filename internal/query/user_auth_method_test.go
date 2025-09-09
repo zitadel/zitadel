@@ -12,6 +12,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 )
@@ -412,9 +413,9 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareUserAuthMethodTypesQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*AuthMethodTypes, error)) {
 				builder, scan := prepareUserAuthMethodTypesQuery(true, true, "")
-				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+				return builder, func(rows database.Rows) (*AuthMethodTypes, error) {
 					return scan(rows)
 				}
 			},
@@ -429,9 +430,9 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareUserAuthMethodTypesQuery one second factor",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*AuthMethodTypes, error)) {
 				builder, scan := prepareUserAuthMethodTypesQuery(true, true, "")
-				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+				return builder, func(rows database.Rows) (*AuthMethodTypes, error) {
 					return scan(rows)
 				}
 			},
@@ -461,9 +462,9 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareUserAuthMethodTypesQuery one second factor with domain",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*AuthMethodTypes, error)) {
 				builder, scan := prepareUserAuthMethodTypesQuery(true, true, "example.com")
-				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+				return builder, func(rows database.Rows) (*AuthMethodTypes, error) {
 					return scan(rows)
 				}
 			},
@@ -493,9 +494,9 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareUserAuthMethodTypesQuery one second factor with domain external",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*AuthMethodTypes, error)) {
 				builder, scan := prepareUserAuthMethodTypesQuery(true, false, "example.com")
-				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+				return builder, func(rows database.Rows) (*AuthMethodTypes, error) {
 					return scan(rows)
 				}
 			},
@@ -525,9 +526,9 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareUserAuthMethodTypesQuery multiple second factors",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*AuthMethodTypes, error)) {
 				builder, scan := prepareUserAuthMethodTypesQuery(true, true, "")
-				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+				return builder, func(rows database.Rows) (*AuthMethodTypes, error) {
 					return scan(rows)
 				}
 			},
@@ -563,9 +564,9 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareUserAuthMethodTypesQuery multiple second factors domain",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*AuthMethodTypes, error)) {
 				builder, scan := prepareUserAuthMethodTypesQuery(true, true, "example.com")
-				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+				return builder, func(rows database.Rows) (*AuthMethodTypes, error) {
 					return scan(rows)
 				}
 			},
@@ -601,9 +602,9 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareUserAuthMethodTypesQuery multiple second factors domain external",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*AuthMethodTypes, error)) {
 				builder, scan := prepareUserAuthMethodTypesQuery(true, false, "example.com")
-				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+				return builder, func(rows database.Rows) (*AuthMethodTypes, error) {
 					return scan(rows)
 				}
 			},
@@ -639,9 +640,9 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareUserAuthMethodTypesQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*AuthMethodTypes, error)) {
 				builder, scan := prepareUserAuthMethodTypesQuery(true, true, "")
-				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+				return builder, func(rows database.Rows) (*AuthMethodTypes, error) {
 					return scan(rows)
 				}
 			},

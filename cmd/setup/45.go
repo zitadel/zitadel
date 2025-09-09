@@ -59,16 +59,16 @@ func (mig *CorrectProjectOwners) Execute(ctx context.Context, _ eventstore.Event
 func (mig *CorrectProjectOwners) correctInstanceProjects(ctx context.Context, instance string) (didCorrect bool, err error) {
 	var correctedOwners []eventstore.Command
 
-	tx, err := mig.eventstore.Client().BeginTx(ctx, nil)
+	tx, err := mig.eventstore.Client().DB.Begin(ctx, nil)
 	if err != nil {
 		return false, err
 	}
 	defer func() {
 		if err != nil {
-			_ = tx.Rollback()
+			_ = tx.Rollback(ctx)
 			return
 		}
-		err = tx.Commit()
+		err = tx.Commit(ctx)
 	}()
 
 	rows, err := tx.QueryContext(ctx, correctProjectOwnerEvents, instance)

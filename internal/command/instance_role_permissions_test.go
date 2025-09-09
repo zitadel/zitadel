@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/mock"
@@ -129,7 +130,7 @@ func Test_synchronizeRolePermissionCommands(t *testing.T) {
 			mock := tt.mock(t)
 			defer mock.Assert(t)
 			db := &database.DB{
-				DB: mock.DB,
+				DB: new_sql.SQLPool(mock.DB),
 			}
 			gotCmds, err := synchronizeRolePermissionCommands(context.Background(), db, aggregateID, target)
 			require.ErrorIs(t, err, tt.wantErr)

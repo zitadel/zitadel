@@ -2,7 +2,6 @@ package mirror
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"net/http"
 	"sync"
@@ -12,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/tls"
@@ -336,7 +336,7 @@ func queryInstanceIDs(ctx context.Context, source *database.DB) []string {
 	instances := []string{}
 	err := source.QueryContext(
 		ctx,
-		func(r *sql.Rows) error {
+		func(r new_db.Rows) error {
 			for r.Next() {
 				var instance string
 

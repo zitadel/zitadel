@@ -2,7 +2,6 @@ package query
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -12,6 +11,7 @@ import (
 	"golang.org/x/text/language"
 	"sigs.k8s.io/yaml"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -104,7 +104,7 @@ func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, lan
 		return nil, zerrors.ThrowInternal(err, "QUERY-M9gse", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		texts, err = scan(rows)
 		return err
 	}, query, args...)
@@ -134,7 +134,7 @@ func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, tem
 		return nil, zerrors.ThrowInternal(err, "QUERY-M49fs", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		texts, err = scan(rows)
 		return err
 	}, query, args...)
@@ -229,7 +229,7 @@ func (q *Queries) readLoginTranslationFile(ctx context.Context, lang string) ([]
 	return contents, nil
 }
 
-func prepareCustomTextsQuery() (sq.SelectBuilder, func(*sql.Rows) (*CustomTexts, error)) {
+func prepareCustomTextsQuery() (sq.SelectBuilder, func(database.Rows) (*CustomTexts, error)) {
 	return sq.Select(
 			CustomTextColAggregateID.identifier(),
 			CustomTextColSequence.identifier(),
@@ -242,7 +242,7 @@ func prepareCustomTextsQuery() (sq.SelectBuilder, func(*sql.Rows) (*CustomTexts,
 			countColumn.identifier()).
 			From(customTextTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*CustomTexts, error) {
+		func(rows database.Rows) (*CustomTexts, error) {
 			customTexts := make([]*CustomText, 0)
 			var count uint64
 			for rows.Next() {

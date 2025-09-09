@@ -9,6 +9,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -51,7 +52,7 @@ func (q *Queries) SamlRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	dst := new(SamlRequest)
 	err = q.client.QueryRowContext(
 		ctx,
-		func(row *sql.Row) error {
+		func(row database.Row) error {
 			return row.Scan(
 				&dst.ID, &dst.CreationDate, &dst.LoginClient, &dst.Issuer, &dst.ACS, &dst.RelayState, &dst.Binding,
 			)

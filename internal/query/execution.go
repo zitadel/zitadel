@@ -11,6 +11,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -148,7 +149,7 @@ func targetItemJSONB(t domain.ExecutionTargetType, targetItem string) ([]byte, e
 	return json.Marshal([]*executionTarget{target})
 }
 
-func prepareExecutionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Execution, error)) {
+func prepareExecutionQuery() (sq.SelectBuilder, func(row database.Row) (*Execution, error)) {
 	return sq.Select(
 			ExecutionColumnInstanceID.identifier(),
 			ExecutionColumnID.identifier(),
@@ -164,7 +165,7 @@ func prepareExecutionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Execution, 
 		scanExecution
 }
 
-func prepareExecutionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Executions, error)) {
+func prepareExecutionsQuery() (sq.SelectBuilder, func(rows database.Rows) (*Executions, error)) {
 	return sq.Select(
 			ExecutionColumnInstanceID.identifier(),
 			ExecutionColumnID.identifier(),
@@ -187,7 +188,7 @@ type executionTarget struct {
 	Target   string `json:"target,omitempty"`
 }
 
-func scanExecution(row *sql.Row) (*Execution, error) {
+func scanExecution(row database.Row) (*Execution, error) {
 	execution := new(Execution)
 	targets := make([]byte, 0)
 
@@ -244,7 +245,7 @@ func executionTargetsUnmarshal(data []byte) ([]*exec.Target, error) {
 	return targets, nil
 }
 
-func scanExecutions(rows *sql.Rows) (*Executions, error) {
+func scanExecutions(rows database.Rows) (*Executions, error) {
 	executions := make([]*Execution, 0)
 	var count uint64
 

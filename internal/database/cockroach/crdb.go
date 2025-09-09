@@ -147,6 +147,10 @@ func (c *Config) Type() dialect.DatabaseType {
 	return dialect.DatabaseTypeCockroach
 }
 
+func (c *Config) MaxOpenConnections() uint32 {
+	return c.MaxOpenConns
+}
+
 type User struct {
 	Username string
 	Password string

@@ -20,12 +20,11 @@ type UniqueConstraintToLower struct {
 }
 
 func (mig *UniqueConstraintToLower) Execute(ctx context.Context, _ eventstore.Event) error {
-	res, err := mig.dbClient.ExecContext(ctx, uniqueConstraintLower)
+	affected, err := mig.dbClient.ExecContext(ctx, uniqueConstraintLower)
 	if err != nil {
 		return err
 	}
-	count, err := res.RowsAffected()
-	logging.WithFields("count", count).Info("unique constraints updated")
+	logging.WithFields("count", affected).Info("unique constraints updated")
 	return err
 }
 

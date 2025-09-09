@@ -30,5 +30,5 @@ func New(client *database.DB, config *Config) *Storage {
 
 // Health implements eventstore.Pusher.
 func (s *Storage) Health(ctx context.Context) error {
-	return s.client.PingContext(ctx)
+	return s.client.DB.Ping(ctx)
 }

@@ -14,6 +14,7 @@ import (
 	"golang.org/x/text/language"
 	"sigs.k8s.io/yaml"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -140,7 +141,7 @@ func (q *Queries) DefaultMessageText(ctx context.Context) (text *MessageText, er
 		return nil, zerrors.ThrowInternal(err, "QUERY-1b9mf", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		text, err = scan(row)
 		return err
 	}, query, args...)
@@ -182,7 +183,7 @@ func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggreg
 		return nil, zerrors.ThrowInternal(err, "QUERY-1b9mf", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		msg, err = scan(row)
 		return err
 	}, query, args...)
@@ -248,7 +249,7 @@ func (q *Queries) readNotificationTextMessages(ctx context.Context, language str
 	return contents, nil
 }
 
-func prepareMessageTextQuery() (sq.SelectBuilder, func(*sql.Row) (*MessageText, error)) {
+func prepareMessageTextQuery() (sq.SelectBuilder, func(database.Row) (*MessageText, error)) {
 	return sq.Select(
 			MessageTextColAggregateID.identifier(),
 			MessageTextColSequence.identifier(),
@@ -267,7 +268,7 @@ func prepareMessageTextQuery() (sq.SelectBuilder, func(*sql.Row) (*MessageText, 
 		).
 			From(messageTextTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*MessageText, error) {
+		func(row database.Row) (*MessageText, error) {
 			msg := new(MessageText)
 			lang := ""
 			title := sql.NullString{}

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"reflect"
 	"strings"
@@ -64,15 +63,15 @@ func (ex *wantExecuter) check(t *testing.T) {
 	}
 }
 
-func (ex *wantExecuter) Exec(query string, args ...interface{}) (sql.Result, error) {
+func (ex *wantExecuter) Exec(_ context.Context, query string, args ...interface{}) (int64, error) {
 	ex.t.Helper()
 	if strings.Contains(query, "SAVEPOINT") {
-		return nil, nil
+		return 0, nil
 	}
 	ex.wasExecuted = true
 	if ex.i >= len(ex.params) {
 		ex.t.Errorf("did not expect more exec, but got:\n    %q with %q", query, args)
-		return nil, nil
+		return 0, nil
 	}
 	p := ex.params[ex.i]
 	if query != p.query {
@@ -82,7 +81,7 @@ func (ex *wantExecuter) Exec(query string, args ...interface{}) (sql.Result, err
 		ex.t.Errorf("wrong args:\n  expected:\n    %v\n  got:\n    %v", p.args, args)
 	}
 	ex.i++
-	return nil, nil
+	return 0, nil
 }
 
 func TestNewCreateStatement(t *testing.T) {

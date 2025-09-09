@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"golang.org/x/text/language"
 )
 
@@ -69,7 +70,7 @@ func Test_InstancePrepares(t *testing.T) {
 	}{
 		{
 			name: "prepareInstancesQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*Instances, error)) {
 				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
@@ -84,7 +85,7 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery one result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*Instances, error)) {
 				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
@@ -148,7 +149,7 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery multiple results",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*Instances, error)) {
 				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},
@@ -282,7 +283,7 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*Instances, error)) {
 				filter, query, scan := prepareInstancesQuery(Column{}, true)
 				return query(filter), scan
 			},

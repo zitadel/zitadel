@@ -11,6 +11,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -179,7 +180,7 @@ func (q *Queries) searchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		userAuthMethods, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -210,7 +211,7 @@ func (q *Queries) ListUserAuthMethodTypes(ctx context.Context, userID string, ac
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-Sfdrg", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		userAuthMethodTypes, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -241,7 +242,7 @@ func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID st
 	defer func() { span.EndWithError(err) }()
 
 	err = q.client.QueryRowContext(ctx,
-		func(row *sql.Row) error {
+		func(row database.Row) error {
 			var userType sql.NullInt32
 			var forceMFA sql.NullBool
 			var forceMFALocalOnly sql.NullBool
@@ -380,7 +381,7 @@ func (q *UserAuthMethodSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectB
 	return query
 }
 
-func prepareUserAuthMethodsQuery() (sq.SelectBuilder, func(*sql.Rows) (*AuthMethods, error)) {
+func prepareUserAuthMethodsQuery() (sq.SelectBuilder, func(database.Rows) (*AuthMethods, error)) {
 	return sq.Select(
 			UserAuthMethodColumnTokenID.identifier(),
 			UserAuthMethodColumnCreationDate.identifier(),
@@ -394,7 +395,7 @@ func prepareUserAuthMethodsQuery() (sq.SelectBuilder, func(*sql.Rows) (*AuthMeth
 			countColumn.identifier()).
 			From(userAuthMethodTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*AuthMethods, error) {
+		func(rows database.Rows) (*AuthMethods, error) {
 			userAuthMethods := make([]*AuthMethod, 0)
 			var count uint64
 			for rows.Next() {
@@ -430,7 +431,7 @@ func prepareUserAuthMethodsQuery() (sq.SelectBuilder, func(*sql.Rows) (*AuthMeth
 		}
 }
 
-func prepareUserAuthMethodTypesQuery(activeOnly bool, includeWithoutDomain bool, queryDomain string) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+func prepareUserAuthMethodTypesQuery(activeOnly bool, includeWithoutDomain bool, queryDomain string) (sq.SelectBuilder, func(database.Rows) (*AuthMethodTypes, error)) {
 	authMethodsQuery, authMethodsArgs, err := prepareAuthMethodQuery(activeOnly, includeWithoutDomain, queryDomain)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
@@ -453,7 +454,7 @@ func prepareUserAuthMethodTypesQuery(activeOnly bool, includeWithoutDomain bool,
 				userIDPsCountUserID.identifier() + " = " + UserIDCol.identifier() + " AND " +
 				userIDPsCountInstanceID.identifier() + " = " + UserInstanceIDCol.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*AuthMethodTypes, error) {
+		func(rows database.Rows) (*AuthMethodTypes, error) {
 			userAuthMethodTypes := make([]domain.UserAuthMethodType, 0)
 			var passwordSet sql.NullBool
 			var idp sql.NullInt64

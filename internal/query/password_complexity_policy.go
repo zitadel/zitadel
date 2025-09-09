@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -63,7 +64,7 @@ func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, shouldTrigg
 		return nil, zerrors.ThrowInternal(err, "QUERY-lDnrk", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
@@ -92,7 +93,7 @@ func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context, shouldTri
 		return nil, zerrors.ThrowInternal(err, "QUERY-h4Uyr", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
@@ -162,7 +163,7 @@ var (
 	}
 )
 
-func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PasswordComplexityPolicy, error)) {
+func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(database.Row) (*PasswordComplexityPolicy, error)) {
 	return sq.Select(
 			PasswordComplexityColID.identifier(),
 			PasswordComplexityColSequence.identifier(),
@@ -179,7 +180,7 @@ func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*
 		).
 			From(passwordComplexityTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*PasswordComplexityPolicy, error) {
+		func(row database.Row) (*PasswordComplexityPolicy, error) {
 			policy := new(PasswordComplexityPolicy)
 			err := row.Scan(
 				&policy.ID,

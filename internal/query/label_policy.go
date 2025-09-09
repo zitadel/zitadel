@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -68,7 +69,7 @@ func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string, with
 		return nil, zerrors.ThrowInternal(err, "QUERY-V22un", "unable to create sql stmt")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
@@ -101,7 +102,7 @@ func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (po
 		return nil, zerrors.ThrowInternal(err, "QUERY-AG5eq", "unable to create sql stmt")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
@@ -124,7 +125,7 @@ func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (policy *LabelPo
 		return nil, zerrors.ThrowInternal(err, "QUERY-mN0Ci", "unable to create sql stmt")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
@@ -147,7 +148,7 @@ func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (policy *LabelP
 		return nil, zerrors.ThrowInternal(err, "QUERY-B3JQR", "unable to create sql stmt")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
@@ -239,7 +240,7 @@ var (
 	}
 )
 
-func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, error)) {
+func prepareLabelPolicyQuery() (sq.SelectBuilder, func(database.Row) (*LabelPolicy, error)) {
 	return sq.Select(
 			LabelPolicyColCreationDate.identifier(),
 			LabelPolicyColChangeDate.identifier(),
@@ -271,7 +272,7 @@ func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, 
 		).
 			From(labelPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*LabelPolicy, error) {
+		func(row database.Row) (*LabelPolicy, error) {
 			policy := new(LabelPolicy)
 
 			var (

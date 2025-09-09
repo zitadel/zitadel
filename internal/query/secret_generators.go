@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -135,7 +136,7 @@ func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domai
 		return nil, zerrors.ThrowInternal(err, "QUERY-3k99f", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		generator, err = scan(row)
 		return err
 	}, query, args...)
@@ -156,7 +157,7 @@ func (q *Queries) SearchSecretGenerators(ctx context.Context, queries *SecretGen
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-sn9lw", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		secretGenerators, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -179,7 +180,7 @@ func NewSecretGeneratorTypeSearchQuery(value int32) (SearchQuery, error) {
 	return NewNumberQuery(SecretGeneratorColumnGeneratorType, value, NumberEquals)
 }
 
-func prepareSecretGeneratorQuery() (sq.SelectBuilder, func(*sql.Row) (*SecretGenerator, error)) {
+func prepareSecretGeneratorQuery() (sq.SelectBuilder, func(database.Row) (*SecretGenerator, error)) {
 	return sq.Select(
 			SecretGeneratorColumnAggregateID.identifier(),
 			SecretGeneratorColumnGeneratorType.identifier(),
@@ -195,7 +196,7 @@ func prepareSecretGeneratorQuery() (sq.SelectBuilder, func(*sql.Row) (*SecretGen
 			SecretGeneratorColumnIncludeSymbols.identifier()).
 			From(secretGeneratorsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*SecretGenerator, error) {
+		func(row database.Row) (*SecretGenerator, error) {
 			secretGenerator := new(SecretGenerator)
 			err := row.Scan(
 				&secretGenerator.AggregateID,
@@ -221,7 +222,7 @@ func prepareSecretGeneratorQuery() (sq.SelectBuilder, func(*sql.Row) (*SecretGen
 		}
 }
 
-func prepareSecretGeneratorsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SecretGenerators, error)) {
+func prepareSecretGeneratorsQuery() (sq.SelectBuilder, func(database.Rows) (*SecretGenerators, error)) {
 	return sq.Select(
 			SecretGeneratorColumnAggregateID.identifier(),
 			SecretGeneratorColumnGeneratorType.identifier(),
@@ -238,7 +239,7 @@ func prepareSecretGeneratorsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SecretG
 			countColumn.identifier()).
 			From(secretGeneratorsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*SecretGenerators, error) {
+		func(rows database.Rows) (*SecretGenerators, error) {
 			secretGenerators := make([]*SecretGenerator, 0)
 			var count uint64
 			for rows.Next() {

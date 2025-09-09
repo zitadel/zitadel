@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -785,7 +786,7 @@ func (q *Queries) idpTemplateByID(ctx context.Context, shouldTriggerBulk bool, i
 		return nil, zerrors.ThrowInternal(err, "QUERY-SFefg", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		template, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -809,7 +810,7 @@ func (q *Queries) IDPTemplates(ctx context.Context, queries *IDPTemplateSearchQu
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-SAF34", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		idps, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -873,7 +874,7 @@ func (q *IDPTemplateSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 	return query
 }
 
-func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTemplate, error)) {
+func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(new_db.Row) (*IDPTemplate, error)) {
 	return sq.Select(
 			IDPTemplateIDCol.identifier(),
 			IDPTemplateResourceOwnerCol.identifier(),
@@ -1006,7 +1007,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(AppleIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*IDPTemplate, error) {
+		func(row new_db.Row) (*IDPTemplate, error) {
 			idpTemplate := new(IDPTemplate)
 
 			name := sql.NullString{}
@@ -1389,7 +1390,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 }
 
 //nolint:gocognit
-func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplates, error)) {
+func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(new_db.Rows) (*IDPTemplates, error)) {
 	return sq.Select(
 			IDPTemplateIDCol.identifier(),
 			IDPTemplateResourceOwnerCol.identifier(),
@@ -1524,7 +1525,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(AppleIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*IDPTemplates, error) {
+		func(rows new_db.Rows) (*IDPTemplates, error) {
 			templates := make([]*IDPTemplate, 0)
 			var count uint64
 			for rows.Next() {

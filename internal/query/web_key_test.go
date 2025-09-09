@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -205,7 +206,7 @@ func TestQueries_GetActiveSigningWebKey(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			execMock(t, tt.mock, func(db *sql.DB) {
+			execMock(t, tt.mock, func(db new_db.Pool) {
 				q := &Queries{
 					client: &database.DB{
 						DB: db,
@@ -303,7 +304,7 @@ func TestQueries_ListWebKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			execMock(t, tt.mock, func(db *sql.DB) {
+			execMock(t, tt.mock, func(db new_db.Pool) {
 				q := &Queries{
 					client: &database.DB{
 						DB: db,
@@ -364,7 +365,7 @@ func TestQueries_GetWebKeySet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			execMock(t, tt.mock, func(db *sql.DB) {
+			execMock(t, tt.mock, func(db new_db.Pool) {
 				q := &Queries{
 					client: &database.DB{
 						DB: db,

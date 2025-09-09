@@ -10,6 +10,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/v2/database/mock"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -464,7 +465,7 @@ func Test_uniqueConstraints(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dbMock := mock.NewSQLMock(t, append([]mock.Expectation{mock.ExpectBegin(nil)}, tt.args.expectations...)...)
-			tx, err := dbMock.DB.Begin()
+			tx, err := sql.SQLPool(dbMock.DB).Begin(t.Context(), nil)
 			if err != nil {
 				t.Errorf("unexpected error in begin: %v", err)
 				t.FailNow()
@@ -715,7 +716,7 @@ func Test_lockAggregates(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dbMock := mock.NewSQLMock(t, append([]mock.Expectation{mock.ExpectBegin(nil)}, tt.args.expectations...)...)
-			tx, err := dbMock.DB.Begin()
+			tx, err := sql.SQLPool(dbMock.DB).Begin(t.Context(), nil)
 			if err != nil {
 				t.Errorf("unexpected error in begin: %v", err)
 				t.FailNow()
@@ -1293,7 +1294,7 @@ func Test_push(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dbMock := mock.NewSQLMock(t, append([]mock.Expectation{mock.ExpectBegin(nil)}, tt.args.expectations...)...)
-			tx, err := dbMock.DB.Begin()
+			tx, err := sql.SQLPool(dbMock.DB).Begin(t.Context(), nil)
 			if err != nil {
 				t.Errorf("unexpected error in begin: %v", err)
 				t.FailNow()

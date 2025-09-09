@@ -12,6 +12,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/crypto"
 	z_db "github.com/zitadel/zitadel/internal/database"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
@@ -462,7 +463,7 @@ func dbMock(t *testing.T, expectations ...func(m sqlmock.Sqlmock)) db {
 	}
 	return db{
 		mock: mock,
-		db:   &z_db.DB{DB: client},
+		db:   &z_db.DB{DB: new_sql.SQLPool(client)},
 	}
 }
 

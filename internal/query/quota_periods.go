@@ -7,6 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -55,7 +56,7 @@ func (q *Queries) GetRemainingQuotaUsage(ctx context.Context, instanceID string,
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-FSA3g", "Errors.Query.SQLStatement")
 	}
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		remaining, err = scan(row)
 		return err
 	}, query, args...)
@@ -65,14 +66,14 @@ func (q *Queries) GetRemainingQuotaUsage(ctx context.Context, instanceID string,
 	return remaining, err
 }
 
-func prepareRemainingQuotaUsageQuery() (sq.SelectBuilder, func(*sql.Row) (*uint64, error)) {
+func prepareRemainingQuotaUsageQuery() (sq.SelectBuilder, func(database.Row) (*uint64, error)) {
 	return sq.
 			Select(
 				"greatest(0, " + QuotaColumnAmount.identifier() + "-" + QuotaPeriodColumnUsage.identifier() + ")",
 			).
 			From(quotaPeriodsTable.identifier()).
 			Join(join(QuotaColumnUnit, QuotaPeriodColumnUnit)).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*uint64, error) {
+			PlaceholderFormat(sq.Dollar), func(row database.Row) (*uint64, error) {
 			remaining := new(uint64)
 			err := row.Scan(remaining)
 			if err != nil {

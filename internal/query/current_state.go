@@ -13,6 +13,7 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -74,7 +75,7 @@ func (q *Queries) SearchCurrentStates(ctx context.Context, queries *CurrentState
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-MmFef", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		currentStates, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -90,22 +91,22 @@ func (q *Queries) latestState(ctx context.Context, projections ...table) (state 
 }
 
 func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName string) (err error) {
-	tx, err := q.client.BeginTx(ctx, nil)
+	tx, err := q.client.DB.Begin(ctx, nil)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "QUERY-9iOpr", "Errors.RemoveFailed")
 	}
 	defer func() {
 		if err != nil {
-			rollbackErr := tx.Rollback()
+			rollbackErr := tx.Rollback(ctx)
 			logging.OnError(rollbackErr).Debug("rollback failed")
 			return
 		}
-		if commitErr := tx.Commit(); commitErr != nil {
+		if commitErr := tx.Commit(ctx); commitErr != nil {
 			err = zerrors.ThrowInternal(commitErr, "QUERY-JGD0l", "Errors.Internal")
 		}
 	}()
 
-	name, err := q.checkAndLock(tx, projectionName)
+	name, err := q.checkAndLock(ctx, tx, projectionName)
 	if err != nil {
 		return err
 	}
@@ -118,14 +119,14 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 	if err != nil {
 		return err
 	}
-	err = tx.Commit()
+	err = tx.Commit(ctx)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "QUERY-Sfvsc", "Errors.Internal")
 	}
 	return nil
 }
 
-func (q *Queries) checkAndLock(tx *sql.Tx, projectionName string) (name string, err error) {
+func (q *Queries) checkAndLock(ctx context.Context, tx database.Transaction, projectionName string) (name string, err error) {
 	stmt, args, err := sq.Select(CurrentStateColProjectionName.identifier()).
 		From(currentStateTable.identifier()).
 		Where(sq.Eq{
@@ -136,14 +137,14 @@ func (q *Queries) checkAndLock(tx *sql.Tx, projectionName string) (name string, 
 	if err != nil {
 		return "", zerrors.ThrowInternal(err, "QUERY-UJTUy", "Errors.Internal")
 	}
-	row := tx.QueryRow(stmt, args...)
+	row := tx.QueryRow(ctx, stmt, args...)
 	if err := row.Scan(&name); err != nil || name == "" {
 		return "", zerrors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
 	}
 	return name, nil
 }
 
-func tablesForReset(ctx context.Context, tx *sql.Tx, projectionName string) (tables []string, err error) {
+func tablesForReset(ctx context.Context, tx database.Transaction, projectionName string) (tables []string, err error) {
 	names := strings.Split(projectionName, ".")
 	if len(names) != 2 {
 		return nil, zerrors.ThrowInvalidArgument(nil, "QUERY-wk1jr", "Errors.InvalidArgument")
@@ -186,9 +187,9 @@ func tablesForReset(ctx context.Context, tx *sql.Tx, projectionName string) (tab
 	return tables, nil
 }
 
-func reset(ctx context.Context, tx *sql.Tx, tables []string, projectionName string) error {
+func reset(ctx context.Context, tx database.Transaction, tables []string, projectionName string) error {
 	for _, tableName := range tables {
-		_, err := tx.Exec(fmt.Sprintf("TRUNCATE %s cascade", tableName))
+		_, err := tx.Exec(ctx, fmt.Sprintf("TRUNCATE %s cascade", tableName))
 		if err != nil {
 			return zerrors.ThrowInternal(err, "QUERY-3n92f", "Errors.RemoveFailed")
 		}
@@ -210,14 +211,14 @@ func reset(ctx context.Context, tx *sql.Tx, tables []string, projectionName stri
 	return nil
 }
 
-func prepareLatestState() (sq.SelectBuilder, func(*sql.Row) (*State, error)) {
+func prepareLatestState() (sq.SelectBuilder, func(database.Row) (*State, error)) {
 	return sq.Select(
 			CurrentStateColEventDate.identifier(),
 			CurrentStateColPosition.identifier(),
 			CurrentStateColLastUpdated.identifier()).
 			From(currentStateTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*State, error) {
+		func(row database.Row) (*State, error) {
 			var (
 				creationDate sql.NullTime
 				lastUpdated  sql.NullTime
@@ -239,7 +240,7 @@ func prepareLatestState() (sq.SelectBuilder, func(*sql.Row) (*State, error)) {
 		}
 }
 
-func prepareCurrentStateQuery() (sq.SelectBuilder, func(*sql.Rows) (*CurrentStates, error)) {
+func prepareCurrentStateQuery() (sq.SelectBuilder, func(database.Rows) (*CurrentStates, error)) {
 	return sq.Select(
 			CurrentStateColLastUpdated.identifier(),
 			CurrentStateColEventDate.identifier(),
@@ -251,7 +252,7 @@ func prepareCurrentStateQuery() (sq.SelectBuilder, func(*sql.Rows) (*CurrentStat
 			countColumn.identifier()).
 			From(currentStateTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*CurrentStates, error) {
+		func(rows database.Rows) (*CurrentStates, error) {
 			states := make([]*CurrentState, 0)
 			var count uint64
 			for rows.Next() {

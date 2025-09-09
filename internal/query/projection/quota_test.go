@@ -9,6 +9,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -395,7 +396,7 @@ func Test_quotaProjection_IncrementUsage(t *testing.T) {
 						).
 						WillReturnRows(mock.NewRows([]string{"key"}).
 							AddRow(3))
-					return &database.DB{DB: db}
+					return &database.DB{DB: sql.SQLPool(db)}
 				}(),
 			},
 			args: args{

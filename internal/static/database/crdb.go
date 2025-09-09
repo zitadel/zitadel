@@ -10,6 +10,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -30,10 +31,10 @@ const (
 )
 
 type storage struct {
-	client *sql.DB
+	client database.Pool
 }
 
-func NewStorage(client *sql.DB, _ map[string]interface{}) (static.Storage, error) {
+func NewStorage(client database.Pool, _ map[string]interface{}) (static.Storage, error) {
 	return &storage{client: client}, nil
 }
 

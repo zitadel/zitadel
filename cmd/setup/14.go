@@ -2,7 +2,6 @@ package setup
 
 import (
 	"context"
-	"database/sql"
 	"embed"
 	"errors"
 	"strings"
@@ -10,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -27,7 +27,7 @@ func (mig *NewEventsTable) Execute(ctx context.Context, _ eventstore.Event) erro
 	// if events already exists events2 is created during a setup job
 	var count int
 	err := mig.dbClient.QueryRowContext(ctx,
-		func(row *sql.Row) error {
+		func(row new_db.Row) error {
 			if err := row.Scan(&count); err != nil {
 				return err
 			}

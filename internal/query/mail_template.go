@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -92,7 +93,7 @@ func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwner
 		return nil, zerrors.ThrowInternal(err, "QUERY-m0sJg", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		template, err = scan(row)
 		return err
 	}, query, args...)
@@ -114,14 +115,14 @@ func (q *Queries) DefaultMailTemplate(ctx context.Context) (template *MailTempla
 		return nil, zerrors.ThrowInternal(err, "QUERY-2m0fH", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		template, err = scan(row)
 		return err
 	}, query, args...)
 	return template, err
 }
 
-func prepareMailTemplateQuery() (sq.SelectBuilder, func(*sql.Row) (*MailTemplate, error)) {
+func prepareMailTemplateQuery() (sq.SelectBuilder, func(database.Row) (*MailTemplate, error)) {
 	return sq.Select(
 			MailTemplateColAggregateID.identifier(),
 			MailTemplateColSequence.identifier(),
@@ -133,7 +134,7 @@ func prepareMailTemplateQuery() (sq.SelectBuilder, func(*sql.Row) (*MailTemplate
 		).
 			From(mailTemplateTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*MailTemplate, error) {
+		func(row database.Row) (*MailTemplate, error) {
 			policy := new(MailTemplate)
 			err := row.Scan(
 				&policy.AggregateID,

@@ -9,6 +9,7 @@ import (
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/zitadel/logging"
 
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -38,7 +39,7 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context, _ eventstore.Event)
 	for i := 0; ; i++ {
 		logging.WithFields("mig", mig.String(), "iteration", i).Debug("start iteration")
 		var affected int64
-		err = crdb.ExecuteTx(ctx, mig.dbClient.DB, nil, func(tx *sql.Tx) error {
+		err = crdb.ExecuteTx(ctx, mig.dbClient.DB.(*new_sql.Pool).DB, nil, func(tx *sql.Tx) error {
 			_, err := tx.ExecContext(ctx, correctCreationDate10CreateTable)
 			if err != nil {
 				return err

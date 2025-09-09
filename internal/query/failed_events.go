@@ -7,6 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -88,7 +89,7 @@ func (q *Queries) SearchFailedEvents(ctx context.Context, queries *FailedEventSe
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-n8rjJ", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		failedEvents, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -138,7 +139,7 @@ func (q *FailedEventSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 	return query
 }
 
-func prepareFailedEventsQuery() (sq.SelectBuilder, func(*sql.Rows) (*FailedEvents, error)) {
+func prepareFailedEventsQuery() (sq.SelectBuilder, func(database.Rows) (*FailedEvents, error)) {
 	return sq.Select(
 			FailedEventsColumnProjectionName.identifier(),
 			FailedEventsColumnFailedSequence.identifier(),
@@ -150,7 +151,7 @@ func prepareFailedEventsQuery() (sq.SelectBuilder, func(*sql.Rows) (*FailedEvent
 			countColumn.identifier()).
 			From(failedEventsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*FailedEvents, error) {
+		func(rows database.Rows) (*FailedEvents, error) {
 			failedEvents := make([]*FailedEvent, 0)
 			var count uint64
 			for rows.Next() {

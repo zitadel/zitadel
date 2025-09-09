@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -25,7 +25,7 @@ var (
 	addConstraintStmt string
 )
 
-func handleUniqueConstraints(ctx context.Context, tx database.Tx, commands []eventstore.Command) (err error) {
+func handleUniqueConstraints(ctx context.Context, tx database.Transaction, commands []eventstore.Command) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

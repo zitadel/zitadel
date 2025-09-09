@@ -2,8 +2,8 @@ package setup
 
 import (
 	"context"
-	"database/sql"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -25,7 +25,7 @@ CREATE TABLE system.assets (
 )
 
 type AssetTable struct {
-	dbClient *sql.DB
+	dbClient database.Pool
 }
 
 func (mig *AssetTable) Execute(ctx context.Context, _ eventstore.Event) error {

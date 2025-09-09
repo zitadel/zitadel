@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -70,14 +71,14 @@ func (q *Queries) SecurityPolicy(ctx context.Context) (policy *SecurityPolicy, e
 		return nil, zerrors.ThrowInternal(err, "QUERY-Sf6d1", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
 	return policy, err
 }
 
-func prepareSecurityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*SecurityPolicy, error)) {
+func prepareSecurityPolicyQuery() (sq.SelectBuilder, func(new_db.Row) (*SecurityPolicy, error)) {
 	return sq.Select(
 			SecurityPolicyColumnInstanceID.identifier(),
 			SecurityPolicyColumnCreationDate.identifier(),
@@ -89,7 +90,7 @@ func prepareSecurityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*SecurityPo
 			SecurityPolicyColumnEnableImpersonation.identifier()).
 			From(securityPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*SecurityPolicy, error) {
+		func(row new_db.Row) (*SecurityPolicy, error) {
 			securityPolicy := new(SecurityPolicy)
 			err := row.Scan(
 				&securityPolicy.AggregateID,

@@ -2,12 +2,12 @@ package query
 
 import (
 	"context"
-	"database/sql"
 	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -127,7 +127,7 @@ func (q *Queries) searchOrganizationSettings(ctx context.Context, queries *Organ
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-qNPeOXlMwj", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		settingsList, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -149,7 +149,7 @@ func NewOrganizationSettingsOrganizationScopedUsernamesSearchQuery(organizationS
 	return NewBoolQuery(OrganizationSettingsColumnOrganizationScopedUsernames, organizationScopedUsernames)
 }
 
-func prepareOrganizationSettingsListQuery() (sq.SelectBuilder, func(*sql.Rows) (*OrganizationSettingsList, error)) {
+func prepareOrganizationSettingsListQuery() (sq.SelectBuilder, func(database.Rows) (*OrganizationSettingsList, error)) {
 	return sq.Select(
 			OrganizationSettingsColumnID.identifier(),
 			OrganizationSettingsColumnCreationDate.identifier(),
@@ -160,7 +160,7 @@ func prepareOrganizationSettingsListQuery() (sq.SelectBuilder, func(*sql.Rows) (
 			countColumn.identifier(),
 		).From(organizationSettingsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*OrganizationSettingsList, error) {
+		func(rows database.Rows) (*OrganizationSettingsList, error) {
 			settingsList := make([]*OrganizationSettings, 0)
 			var (
 				count uint64

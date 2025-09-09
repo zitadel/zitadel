@@ -2,11 +2,11 @@ package query
 
 import (
 	"context"
-	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -17,7 +17,7 @@ func genericRowsQuery[R any](
 	ctx context.Context,
 	client *database.DB,
 	query sq.SelectBuilder,
-	scan func(rows *sql.Rows) (R, error),
+	scan func(rows new_db.Rows) (R, error),
 ) (resp R, err error) {
 	var rnil R
 	ctx, span := tracing.NewSpan(ctx)
@@ -28,7 +28,7 @@ func genericRowsQuery[R any](
 		logging.OnError(err).Warn("query: invalid request")
 		return rnil, zerrors.ThrowInvalidArgument(err, "QUERY-05wf2q36ji", "Errors.Query.InvalidRequest")
 	}
-	err = client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = client.QueryContext(ctx, func(rows new_db.Rows) error {
 		resp, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -44,7 +44,7 @@ func genericRowsQueryWithState[R Stateful](
 	client *database.DB,
 	projection table,
 	query sq.SelectBuilder,
-	scan func(rows *sql.Rows) (R, error),
+	scan func(rows new_db.Rows) (R, error),
 ) (resp R, err error) {
 	var rnil R
 	resp, err = genericRowsQuery(ctx, client, query, scan)
@@ -78,7 +78,7 @@ func latestState(ctx context.Context, client *database.DB, projections ...table)
 		return nil, zerrors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
 	}
 
-	err = client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = client.QueryRowContext(ctx, func(row new_db.Row) error {
 		state, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -90,7 +90,7 @@ func genericRowQuery[R any](
 	ctx context.Context,
 	client *database.DB,
 	query sq.SelectBuilder,
-	scan func(row *sql.Row) (R, error),
+	scan func(row new_db.Row) (R, error),
 ) (resp R, err error) {
 	var rnil R
 	ctx, span := tracing.NewSpan(ctx)
@@ -101,7 +101,7 @@ func genericRowQuery[R any](
 		return rnil, zerrors.ThrowInternal(err, "QUERY-s969t763z4", "Errors.Query.SQLStatement")
 	}
 
-	err = client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = client.QueryRowContext(ctx, func(row new_db.Row) error {
 		resp, err = scan(row)
 		return err
 	}, stmt, args...)

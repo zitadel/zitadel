@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -112,7 +113,7 @@ func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool
 		return nil, zerrors.ThrowInternal(err, "QUERY-SKR6X", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
@@ -134,14 +135,14 @@ func (q *Queries) DefaultLockoutPolicy(ctx context.Context) (policy *LockoutPoli
 		return nil, zerrors.ThrowInternal(err, "QUERY-mN0Ci", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
 	return policy, err
 }
 
-func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPolicy, error)) {
+func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(database.Row) (*LockoutPolicy, error)) {
 	return sq.Select(
 			LockoutColID.identifier(),
 			LockoutColSequence.identifier(),
@@ -156,7 +157,7 @@ func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPoli
 		).
 			From(lockoutTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*LockoutPolicy, error) {
+		func(row database.Row) (*LockoutPolicy, error) {
 			policy := new(LockoutPolicy)
 			err := row.Scan(
 				&policy.ID,

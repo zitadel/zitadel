@@ -10,6 +10,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -170,7 +171,7 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 		return nil, zerrors.ThrowInternal(err, "QUERY-Nf93d", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		grant, err = scan(row)
 		return err
 	}, query, args...)
@@ -192,7 +193,7 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 		return nil, zerrors.ThrowInternal(err, "QUERY-MO9fs", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		grant, err = scan(row)
 		return err
 	}, query, args...)
@@ -226,7 +227,7 @@ func (q *Queries) searchProjectGrants(ctx context.Context, queries *ProjectGrant
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-N9fsg", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		grants, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -331,7 +332,7 @@ func (q *ProjectGrantSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBui
 	return query
 }
 
-func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant, error)) {
+func prepareProjectGrantQuery() (sq.SelectBuilder, func(new_db.Row) (*ProjectGrant, error)) {
 	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
 	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
 	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
@@ -354,7 +355,7 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
 			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
 			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
-		func(row *sql.Row) (*ProjectGrant, error) {
+		func(row new_db.Row) (*ProjectGrant, error) {
 			grant := new(ProjectGrant)
 			var (
 				projectName       sql.NullString
@@ -390,7 +391,7 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 		}
 }
 
-func prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGrants, error)) {
+func prepareProjectGrantsQuery() (sq.SelectBuilder, func(new_db.Rows) (*ProjectGrants, error)) {
 	resourceOwnerOrgTable := orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias)
 	resourceOwnerIDColumn := OrgColumnID.setTable(resourceOwnerOrgTable)
 	grantedOrgTable := orgsTable.setAlias(ProjectGrantGrantedOrgTableAlias)
@@ -414,7 +415,7 @@ func prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGra
 			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
 			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
 			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
-		func(rows *sql.Rows) (*ProjectGrants, error) {
+		func(rows new_db.Rows) (*ProjectGrants, error) {
 			projects := make([]*ProjectGrant, 0)
 			var (
 				count             uint64

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"net/url"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -33,7 +34,7 @@ func (q *Queries) ActiveSAMLServiceProviderByID(ctx context.Context, entityID st
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		sp, err = scanSAMLServiceProviderByID(row)
 		return err
 	}, samlSPQuery,
@@ -55,7 +56,7 @@ func (q *Queries) ActiveSAMLServiceProviderByID(ctx context.Context, entityID st
 	return sp, err
 }
 
-func scanSAMLServiceProviderByID(row *sql.Row) (*SAMLServiceProvider, error) {
+func scanSAMLServiceProviderByID(row database.Row) (*SAMLServiceProvider, error) {
 	var instanceID, appID, entityID, metadataURL, projectID sql.NullString
 	var projectRoleAssertion sql.NullBool
 	var metadata []byte

@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -87,14 +88,14 @@ func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (
 		return nil, zerrors.ThrowInternal(err, "QUERY-s9nle", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		settings, err = scan(row)
 		return err
 	}, query, args...)
 	return settings, err
 }
 
-func prepareOIDCSettingsQuery() (sq.SelectBuilder, func(*sql.Row) (*OIDCSettings, error)) {
+func prepareOIDCSettingsQuery() (sq.SelectBuilder, func(database.Row) (*OIDCSettings, error)) {
 	return sq.Select(
 			OIDCSettingsColumnAggregateID.identifier(),
 			OIDCSettingsColumnCreationDate.identifier(),
@@ -107,7 +108,7 @@ func prepareOIDCSettingsQuery() (sq.SelectBuilder, func(*sql.Row) (*OIDCSettings
 			OIDCSettingsColumnRefreshTokenExpiration.identifier()).
 			From(oidcSettingsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*OIDCSettings, error) {
+		func(row database.Row) (*OIDCSettings, error) {
 			oidcSettings := new(OIDCSettings)
 			err := row.Scan(
 				&oidcSettings.AggregateID,

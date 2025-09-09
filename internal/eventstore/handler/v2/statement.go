@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,6 +13,7 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/exp/constraints"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -39,7 +39,7 @@ func (s *executionError) Unwrap() error {
 	return s.parent
 }
 
-func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, currentState *state) (statements []*Statement, err error) {
+func (h *Handler) eventsToStatements(ctx context.Context, tx new_db.Transaction, events []eventstore.Event, currentState *state) (statements []*Statement, err error) {
 	statements = make([]*Statement, 0, len(events))
 
 	previousPosition := currentState.position
@@ -48,7 +48,7 @@ func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, curr
 		statement, err := h.reduce(event)
 		if err != nil {
 			h.logEvent(event).WithError(err).Error("reduce failed")
-			if shouldContinue := h.handleFailedStmt(tx, failureFromEvent(event, err)); shouldContinue {
+			if shouldContinue := h.handleFailedStmt(ctx, tx, failureFromEvent(event, err)); shouldContinue {
 				continue
 			}
 			return statements, err
@@ -657,7 +657,7 @@ func NewOneOfTextCond(column string, values []string) Condition {
 }
 
 type Executer interface {
-	Exec(string, ...interface{}) (sql.Result, error)
+	Exec(context.Context, string, ...interface{}) (int64, error)
 }
 
 type execOption func(*execConfig)
@@ -685,7 +685,7 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 			opt(&config)
 		}
 
-		_, err = ex.Exec(q(config), config.args...)
+		_, err = ex.Exec(ctx, q(config), config.args...)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
 		}

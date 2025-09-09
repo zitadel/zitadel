@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -106,7 +107,7 @@ func (q *Queries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk
 		return nil, zerrors.ThrowInternal(err, "QUERY-Xuoapqm", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
@@ -137,14 +138,14 @@ func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBu
 		return nil, zerrors.ThrowInternal(err, "QUERY-xlqp209", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
 	return policy, err
 }
 
-func prepareNotificationPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*NotificationPolicy, error)) {
+func prepareNotificationPolicyQuery() (sq.SelectBuilder, func(database.Row) (*NotificationPolicy, error)) {
 	return sq.Select(
 			NotificationPolicyColID.identifier(),
 			NotificationPolicyColSequence.identifier(),
@@ -157,7 +158,7 @@ func prepareNotificationPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*Notifi
 		).
 			From(notificationPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*NotificationPolicy, error) {
+		func(row database.Row) (*NotificationPolicy, error) {
 			policy := new(NotificationPolicy)
 			err := row.Scan(
 				&policy.ID,

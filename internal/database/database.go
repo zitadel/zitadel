@@ -12,26 +12,16 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	_ "github.com/zitadel/zitadel/internal/database/postgres"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type Rows interface {
-	Close() error
-	Err() error
-	Next() bool
-	Scan(dest ...any) error
-}
-
-type Row interface {
-	Err() error
-	Scan(dest ...any) error
-}
-
 type ContextQuerier interface {
-	QueryContext(ctx context.Context, query string, args ...any) (Rows, error)
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
 }
 
 type ContextExecuter interface {
@@ -59,10 +49,10 @@ type Tx interface {
 	Rollback() error
 }
 
-// var (
-// 	_ Client = (*sql.DB)(nil)
-// 	_ Tx     = (*sql.Tx)(nil)
-// )
+var (
+	_ Client = (*sql.DB)(nil)
+	_ Tx     = (*sql.Tx)(nil)
+)
 
 func CloseTransaction(tx Tx, err error) error {
 	if err != nil {
@@ -90,17 +80,17 @@ func (c *Config) SetConnector(connector dialect.Connector) {
 }
 
 type DB struct {
-	DB Client
+	DB database.Pool
 	dialect.Database
 	Pool *pgxpool.Pool
 }
 
-func (db *DB) Query(scan func(Rows) error, query string, args ...any) error {
+func (db *DB) Query(scan func(database.Rows) error, query string, args ...any) error {
 	return db.QueryContext(context.Background(), scan, query, args...)
 }
 
-func (db *DB) QueryContext(ctx context.Context, scan func(rows Rows) error, query string, args ...any) (err error) {
-	rows, err := db.DB.QueryContext(ctx, query, args...)
+func (db *DB) QueryContext(ctx context.Context, scan func(rows database.Rows) error, query string, args ...any) (err error) {
+	rows, err := db.DB.Query(ctx, query, args...)
 	if err != nil {
 		return err
 	}
@@ -115,12 +105,12 @@ func (db *DB) QueryContext(ctx context.Context, scan func(rows Rows) error, quer
 	return rows.Err()
 }
 
-func (db *DB) QueryRow(scan func(Row) error, query string, args ...any) (err error) {
+func (db *DB) QueryRow(scan func(database.Row) error, query string, args ...any) (err error) {
 	return db.QueryRowContext(context.Background(), scan, query, args...)
 }
 
-func (db *DB) QueryRowContext(ctx context.Context, scan func(row Row) error, query string, args ...any) (err error) {
-	row := db.DB.QueryRowContext(ctx, query, args...)
+func (db *DB) QueryRowContext(ctx context.Context, scan func(row database.Row) error, query string, args ...any) (err error) {
+	row := db.DB.QueryRow(ctx, query, args...)
 	logging.OnError(row.Err()).Error("unexpected query error")
 
 	err = scan(row)
@@ -130,9 +120,17 @@ func (db *DB) QueryRowContext(ctx context.Context, scan func(row Row) error, que
 	return row.Err()
 }
 
+func (db *DB) Exec(query string, args ...any) (int64, error) {
+	return db.ExecContext(context.Background(), query, args...)
+}
+
+func (db *DB) ExecContext(ctx context.Context, query string, args ...any) (int64, error) {
+	return db.DB.Exec(ctx, query, args...)
+}
+
 func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...any) (*T, error) {
 	var data []byte
-	err := db.QueryRowContext(ctx, func(row Row) error {
+	err := db.QueryRowContext(ctx, func(row database.Row) error {
 		return row.Scan(&data)
 	}, query, args...)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -148,41 +146,6 @@ func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...a
 	return obj, nil
 }
 
-type wrappedClient struct {
-	*sql.DB
-}
-
-// QueryContext implements Client.
-// Subtle: this method shadows the method (*DB).QueryContext of wrappedClient.DB.
-func (w *wrappedClient) QueryContext(ctx context.Context, query string, args ...any) (Rows, error) {
-	//nolint:rowserrcheck //will be checked by the caller
-	return w.DB.QueryContext(ctx, query, args...)
-}
-
-func (w *wrappedClient) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
-	return w.DB.BeginTx(ctx, opts)
-}
-
-func (w *wrappedClient) Begin() (*sql.Tx, error) {
-	return w.DB.Begin()
-}
-
-type wrappedTx struct {
-	*sql.Tx
-}
-
-// QueryContext implements Tx.
-// Subtle: this method shadows the method (*Tx).QueryContext of wrappedTx.Tx.
-func (w *wrappedTx) QueryContext(ctx context.Context, query string, args ...any) (Rows, error) {
-	//nolint:rowserrcheck //will be checked by the caller
-	return w.Tx.QueryContext(ctx, query, args...)
-}
-
-var (
-	_ Client = (*wrappedClient)(nil)
-	_ Tx     = (*wrappedTx)(nil)
-)
-
 func Connect(config Config, useAdmin bool) (*DB, error) {
 	client, pool, err := config.connector.Connect(useAdmin)
 	if err != nil {
@@ -192,10 +155,9 @@ func Connect(config Config, useAdmin bool) (*DB, error) {
 	if err := client.Ping(); err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "DATAB-0pIWD", "Errors.Database.Connection.Failed")
 	}
-	var db *DB
 
 	return &DB{
-		DB:       &wrappedClient{DB: client},
+		DB:       new_sql.SQLPool(client),
 		Database: config.connector,
 		Pool:     pool,
 	}, nil

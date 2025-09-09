@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -140,7 +141,7 @@ func TestQueries_SamlRequestByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			execMock(t, tt.expect, func(db *sql.DB) {
+			execMock(t, tt.expect, func(db new_db.Pool) {
 				q := &Queries{
 					checkPermission: tt.permissionCheck,
 					client: &database.DB{

@@ -15,6 +15,8 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/database/postgres"
@@ -491,7 +493,7 @@ func Test_query_events_with_postgres(t *testing.T) {
 	}
 	type fields struct {
 		existingEvents []eventstore.Command
-		client         *sql.DB
+		client         new_db.Pool
 	}
 	type res struct {
 		eventCount int
@@ -945,7 +947,7 @@ func Test_query_events_mocked(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.fields.mock != nil {
-				client.DB.DB = tt.fields.mock.client
+				client.DB.DB = new_sql.SQLPool(tt.fields.mock.client)
 			}
 
 			if strings.HasPrefix(tt.name, "aggregate / event type, position and exclusion") {

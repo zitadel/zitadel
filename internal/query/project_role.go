@@ -2,13 +2,13 @@ package query
 
 import (
 	"context"
-	"database/sql"
 	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -140,7 +140,7 @@ func (q *Queries) searchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		roles, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -172,7 +172,7 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		roles, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -247,7 +247,7 @@ func (q *ProjectRoleSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 	return query
 }
 
-func prepareProjectRolesQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectRoles, error)) {
+func prepareProjectRolesQuery() (sq.SelectBuilder, func(database.Rows) (*ProjectRoles, error)) {
 	return sq.Select(
 			ProjectRoleColumnProjectID.identifier(),
 			ProjectRoleColumnCreationDate.identifier(),
@@ -260,7 +260,7 @@ func prepareProjectRolesQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectRole
 			countColumn.identifier()).
 			From(projectRolesTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*ProjectRoles, error) {
+		func(rows database.Rows) (*ProjectRoles, error) {
 			projects := make([]*ProjectRole, 0)
 			var count uint64
 			for rows.Next() {

@@ -216,7 +216,7 @@ func (m *triggerMigration) Execute(ctx context.Context, _ eventstore.Event) erro
 	if err != nil {
 		return fmt.Errorf("%s: execute trigger template: %w", m, err)
 	}
-	_, err = m.db.ExecContext(ctx, query.String())
+	_, err = m.db.DB.ExecContext(ctx, query.String())
 	if err != nil {
 		return fmt.Errorf("%s: exec trigger query: %w", m, err)
 	}

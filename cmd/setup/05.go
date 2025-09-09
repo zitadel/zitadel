@@ -2,9 +2,9 @@ package setup
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -14,7 +14,7 @@ var (
 )
 
 type LastFailed struct {
-	dbClient *sql.DB
+	dbClient *database.DB
 }
 
 func (mig *LastFailed) Execute(ctx context.Context, _ eventstore.Event) error {

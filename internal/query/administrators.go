@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -193,7 +194,7 @@ func (q *Queries) searchAdministrators(ctx context.Context, queries *MembershipS
 	}
 	queryArgs = append(queryArgs, args...)
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		administrators, err = scan(rows)
 		return err
 	}, stmt, queryArgs...)
@@ -204,7 +205,7 @@ func (q *Queries) searchAdministrators(ctx context.Context, queries *MembershipS
 	return administrators, nil
 }
 
-func prepareAdministratorsQuery(ctx context.Context, queries *MembershipSearchQuery, permissionV2 bool) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*Administrators, error)) {
+func prepareAdministratorsQuery(ctx context.Context, queries *MembershipSearchQuery, permissionV2 bool) (sq.SelectBuilder, []interface{}, func(new_db.Rows) (*Administrators, error)) {
 	query, args := getMembershipFromQuery(ctx, queries, permissionV2)
 	return sq.Select(
 			MembershipUserID.identifier(),
@@ -241,7 +242,7 @@ func prepareAdministratorsQuery(ctx context.Context, queries *MembershipSearchQu
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),
 		args,
-		func(rows *sql.Rows) (*Administrators, error) {
+		func(rows new_db.Rows) (*Administrators, error) {
 			administrators := make([]*Administrator, 0)
 			var count uint64
 			for rows.Next() {

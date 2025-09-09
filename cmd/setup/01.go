@@ -2,9 +2,9 @@ package setup
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -18,7 +18,7 @@ var (
 )
 
 type ProjectionTable struct {
-	dbClient *sql.DB
+	dbClient database.Pool
 }
 
 func (mig *ProjectionTable) Execute(ctx context.Context, _ eventstore.Event) error {

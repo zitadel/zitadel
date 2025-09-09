@@ -7,6 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -77,7 +78,7 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-HBRh3", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		flow, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -101,7 +102,7 @@ func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flow
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		actions, err = scan(rows)
 		return err
 	}, query, args...)
@@ -122,20 +123,20 @@ func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string) (
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-Dh311", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		types, err = scan(rows)
 		return err
 	}, query, args...)
 	return types, err
 }
 
-func prepareFlowTypesQuery() (sq.SelectBuilder, func(*sql.Rows) ([]domain.FlowType, error)) {
+func prepareFlowTypesQuery() (sq.SelectBuilder, func(new_db.Rows) ([]domain.FlowType, error)) {
 	return sq.Select(
 			FlowsTriggersColumnFlowType.identifier(),
 		).
 			From(flowsTriggersTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) ([]domain.FlowType, error) {
+		func(rows new_db.Rows) ([]domain.FlowType, error) {
 			types := []domain.FlowType{}
 			for rows.Next() {
 				var flowType domain.FlowType
@@ -152,7 +153,7 @@ func prepareFlowTypesQuery() (sq.SelectBuilder, func(*sql.Rows) ([]domain.FlowTy
 
 }
 
-func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action, error)) {
+func prepareTriggerActionsQuery() (sq.SelectBuilder, func(new_db.Rows) ([]*Action, error)) {
 	return sq.Select(
 			ActionColumnID.identifier(),
 			ActionColumnCreationDate.identifier(),
@@ -169,7 +170,7 @@ func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action,
 			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID)).
 			OrderBy(FlowsTriggersColumnTriggerSequence.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) ([]*Action, error) {
+		func(rows new_db.Rows) ([]*Action, error) {
 			actions := make([]*Action, 0)
 			for rows.Next() {
 				action := new(Action)
@@ -199,7 +200,7 @@ func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action,
 		}
 }
 
-func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(new_db.Rows) (*Flow, error)) {
 	return sq.Select(
 			ActionColumnID.identifier(),
 			ActionColumnCreationDate.identifier(),
@@ -222,7 +223,7 @@ func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Row
 			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID)).
 			OrderBy(FlowsTriggersColumnTriggerSequence.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Flow, error) {
+		func(rows new_db.Rows) (*Flow, error) {
 			flow := &Flow{
 				TriggerActions: make(map[domain.TriggerType][]*Action),
 				Type:           flowType,

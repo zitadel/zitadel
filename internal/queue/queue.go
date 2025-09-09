@@ -4,24 +4,51 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/riverqueue/river"
-	"github.com/riverqueue/river/riverdriver"
 	"github.com/riverqueue/river/riverdriver/riverdatabasesql"
+	"github.com/riverqueue/river/riverdriver/riverpgxv5"
 	"github.com/riverqueue/river/rivertype"
 	"github.com/riverqueue/rivercontrib/otelriver"
 	"github.com/robfig/cron/v3"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
+type Client interface {
+	Start(ctx context.Context) error
+	Insert(ctx context.Context, args river.JobArgs, opts *river.InsertOpts) (*rivertype.JobInsertResult, error)
+	InsertManyFastTx(ctx context.Context, tx new_db.Transaction, params []river.InsertManyParams) (int, error)
+	PeriodicJobs() *river.PeriodicJobBundle
+}
+
+type pgxClient struct {
+	*river.Client[pgx.Tx]
+}
+
+func (c *pgxClient) InsertManyFastTx(ctx context.Context, tx new_db.Transaction, params []river.InsertManyParams) (int, error) {
+	return c.Client.InsertManyFastTx(ctx, tx.(*postgres.Tx).Tx, params)
+}
+
+type sqlClient struct {
+	*river.Client[*sql.Tx]
+}
+
+func (c *sqlClient) InsertManyFastTx(ctx context.Context, tx new_db.Transaction, params []river.InsertManyParams) (int, error) {
+	return c.Client.InsertManyFastTx(ctx, tx.(*new_sql.Tx).Tx, params)
+}
+
 // Queue abstracts the underlying queuing library
 // For more information see github.com/riverqueue/river
 type Queue struct {
-	driver riverdriver.Driver[*sql.Tx]
-	client *river.Client[*sql.Tx]
+	db *database.DB
 
+	client      Client
 	config      *river.Config
 	shouldStart bool
 }
@@ -36,7 +63,8 @@ func NewQueue(config *Config) (_ *Queue, err error) {
 		DurationUnit:  "ms",
 	})}
 	return &Queue{
-		driver: riverdatabasesql.New(config.Client.DB),
+		// driver: driver,
+		db: config.Client,
 		config: &river.Config{
 			Workers:    river.NewWorkers(),
 			Queues:     make(map[string]river.QueueConfig),
@@ -59,9 +87,19 @@ func (q *Queue) Start(ctx context.Context) (err error) {
 		return nil
 	}
 
-	q.client, err = river.NewClient(q.driver, q.config)
-	if err != nil {
-		return err
+	switch pool := q.db.DB.(type) {
+	case *new_sql.Pool:
+		client, err := river.NewClient(riverdatabasesql.New(pool.DB), q.config)
+		q.client = &sqlClient{client}
+		if err != nil {
+			return err
+		}
+	case *postgres.Pool:
+		client, err := river.NewClient(riverpgxv5.New(pool.Pool), q.config)
+		q.client = &pgxClient{client}
+		if err != nil {
+			return err
+		}
 	}
 
 	return q.client.Start(ctx)
@@ -120,7 +158,7 @@ func (q *Queue) Insert(ctx context.Context, args river.JobArgs, opts ...InsertOp
 // a single `COPY FROM` execution, within the existing transaction.
 //
 // Opts are applied to each job before sending them to river.
-func (q *Queue) InsertManyFastTx(ctx context.Context, tx *sql.Tx, args []river.JobArgs, opts ...InsertOpt) error {
+func (q *Queue) InsertManyFastTx(ctx context.Context, tx new_db.Transaction, args []river.JobArgs, opts ...InsertOpt) error {
 	params := make([]river.InsertManyParams, len(args))
 	for i, arg := range args {
 		params[i] = river.InsertManyParams{

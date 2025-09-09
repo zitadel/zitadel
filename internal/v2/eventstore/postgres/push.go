@@ -8,6 +8,7 @@ import (
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -21,12 +22,12 @@ func (s *Storage) Push(ctx context.Context, intent *eventstore.PushIntent) (err 
 
 	tx := intent.Tx()
 	if tx == nil {
-		tx, err = s.client.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable, ReadOnly: false})
+		tx, err = s.client.DB.Begin(ctx, &new_db.TransactionOptions{IsolationLevel: new_db.IsolationLevelSerializable, AccessMode: new_db.AccessModeReadWrite})
 		if err != nil {
 			return err
 		}
 		defer func() {
-			err = database.CloseTx(tx, err)
+			err = tx.End(ctx, err)
 		}()
 	}
 
@@ -76,7 +77,7 @@ func (s *Storage) Push(ctx context.Context, intent *eventstore.PushIntent) (err 
 }
 
 // setAppName for the the current transaction
-func setAppName(ctx context.Context, tx *sql.Tx, name string) error {
+func setAppName(ctx context.Context, tx new_db.Transaction, name string) error {
 	_, err := tx.ExecContext(ctx, fmt.Sprintf("SET LOCAL application_name TO '%s'", name))
 	if err != nil {
 		logging.WithFields("name", name).WithError(err).Debug("setting app name failed")
@@ -86,7 +87,7 @@ func setAppName(ctx context.Context, tx *sql.Tx, name string) error {
 	return nil
 }
 
-func lockAggregates(ctx context.Context, tx *sql.Tx, intent *eventstore.PushIntent) (_ []*intent, err error) {
+func lockAggregates(ctx context.Context, tx new_db.Transaction, intent *eventstore.PushIntent) (_ []*intent, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -144,7 +145,7 @@ func lockAggregates(ctx context.Context, tx *sql.Tx, intent *eventstore.PushInte
 	return res, nil
 }
 
-func (s *Storage) push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reducer, commands []*command) (err error) {
+func (s *Storage) push(ctx context.Context, tx new_db.Transaction, reducer eventstore.Reducer, commands []*command) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -197,7 +198,7 @@ func (s *Storage) push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reduc
 	})
 }
 
-func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) (err error) {
+func uniqueConstraints(ctx context.Context, tx new_db.Transaction, commands []*command) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

@@ -10,9 +10,9 @@ import (
 	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
 
+	new_pg "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/postgres"
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
@@ -48,8 +48,8 @@ func TestMain(m *testing.M) {
 		pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
 		logging.OnError(err).Fatal("unable to create db pool")
 
-		testClient.DB = stdlib.OpenDBFromPool(pool)
-		err = testClient.Ping()
+		testClient.DB = new_pg.PGxPool(pool)
+		err = testClient.DB.Ping(context.Background())
 		logging.OnError(err).Fatal("unable to ping db")
 
 		v2 := &es_sql.Postgres{DB: testClient}
@@ -68,7 +68,7 @@ func TestMain(m *testing.M) {
 		}
 
 		defer func() {
-			logging.OnError(testClient.Close()).Error("unable to close db")
+			logging.OnError(testClient.DB.Close(context.Background())).Error("unable to close db")
 		}()
 
 		err = initDB(context.Background(), &database.DB{DB: testClient.DB, Database: &postgres.Config{Database: "zitadel"}})
@@ -117,8 +117,8 @@ func connectLocalhost() (*database.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	client := stdlib.OpenDBFromPool(pool)
-	if err = client.Ping(); err != nil {
+	client := new_pg.PGxPool(pool)
+	if err = client.Ping(context.Background()); err != nil {
 		return nil, err
 	}
 
@@ -137,6 +137,8 @@ func (*testDB) DatabaseName() string { return "db" }
 func (*testDB) Username() string { return "user" }
 
 func (*testDB) Type() dialect.DatabaseType { return dialect.DatabaseTypePostgres }
+
+func (*testDB) MaxOpenConnections() uint32 { return 10 }
 
 func generateCommand(aggregateType eventstore.AggregateType, aggregateID string, opts ...func(*testEvent)) eventstore.Command {
 	e := &testEvent{

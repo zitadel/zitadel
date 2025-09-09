@@ -1,10 +1,9 @@
 package repository
 
 import (
-	"database/sql"
-
 	"github.com/shopspring/decimal"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -15,7 +14,7 @@ type SearchQuery struct {
 	Columns eventstore.Columns
 
 	SubQueries            [][]*Filter
-	Tx                    *sql.Tx
+	Tx                    new_db.Transaction
 	AwaitOpenTransactions bool
 	Limit                 uint64
 	Offset                uint32

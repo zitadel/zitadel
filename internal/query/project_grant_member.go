@@ -6,6 +6,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -93,7 +94,7 @@ func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrant
 		return nil, err
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		members, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -105,7 +106,7 @@ func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrant
 	return members, err
 }
 
-func prepareProjectGrantMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
+func prepareProjectGrantMembersQuery() (sq.SelectBuilder, func(database.Rows) (*Members, error)) {
 	return sq.Select(
 			ProjectGrantMemberCreationDate.identifier(),
 			ProjectGrantMemberChangeDate.identifier(),
@@ -132,7 +133,7 @@ func prepareProjectGrantMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memb
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Members, error) {
+		func(rows database.Rows) (*Members, error) {
 			members := make([]*Member, 0)
 			var count uint64
 

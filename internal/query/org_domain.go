@@ -2,11 +2,11 @@ package query
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -69,7 +69,7 @@ func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearch
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-ZRfj1", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		domains, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -81,7 +81,7 @@ func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearch
 	return domains, err
 }
 
-func prepareDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Domains, error)) {
+func prepareDomainsQuery() (sq.SelectBuilder, func(database.Rows) (*Domains, error)) {
 	return sq.Select(
 			OrgDomainCreationDateCol.identifier(),
 			OrgDomainChangeDateCol.identifier(),
@@ -94,7 +94,7 @@ func prepareDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Domains, error))
 			countColumn.identifier(),
 		).From(orgDomainsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Domains, error) {
+		func(rows database.Rows) (*Domains, error) {
 			domains := make([]*Domain, 0)
 			var count uint64
 			for rows.Next() {

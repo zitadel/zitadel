@@ -78,7 +78,7 @@ func initialise(ctx context.Context, config database.Config, steps ...func(conte
 	if err != nil {
 		return err
 	}
-	defer db.Close()
+	defer db.DB.Close(ctx)
 
 	return Init(ctx, db, steps...)
 }

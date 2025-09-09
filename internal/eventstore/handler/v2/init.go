@@ -194,7 +194,7 @@ func (h *Handler) Init(ctx context.Context) error {
 	if !ok || check.Init().IsNoop() {
 		return nil
 	}
-	tx, err := h.client.BeginTx(ctx, nil)
+	tx, err := h.client.DB.Begin(ctx, nil)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "CRDB-SAdf2", "begin failed")
 	}
@@ -202,7 +202,7 @@ func (h *Handler) Init(ctx context.Context) error {
 		logging.WithFields("projection", h.projection.Name(), "execute", i).Debug("executing check")
 		next, err := execute(ctx, tx, h.projection.Name())
 		if err != nil {
-			logging.OnError(tx.Rollback()).Debug("unable to rollback")
+			logging.OnError(tx.Rollback(ctx)).Debug("unable to rollback")
 			return err
 		}
 		if !next {
@@ -210,7 +210,7 @@ func (h *Handler) Init(ctx context.Context) error {
 			break
 		}
 	}
-	return tx.Commit()
+	return tx.Commit(ctx)
 }
 
 func NewTableCheck(table *Table, opts ...execOption) *handler.Check {
@@ -265,7 +265,7 @@ func NewViewCheck(selectStmt string, secondaryTables ...*SuffixedTable) *handler
 
 func execNextIfExists(config execConfig, q query, opts []execOption, executeNext bool) func(ctx context.Context, handler handler.Executer, name string) (bool, error) {
 	return func(ctx context.Context, handler handler.Executer, name string) (shouldExecuteNext bool, err error) {
-		_, err = handler.Exec("SAVEPOINT exec_stmt")
+		_, err = handler.Exec(ctx, "SAVEPOINT exec_stmt")
 		if err != nil {
 			return false, zerrors.ThrowInternal(err, "V2-U1wlz", "create savepoint failed")
 		}
@@ -275,7 +275,7 @@ func execNextIfExists(config execConfig, q query, opts []execOption, executeNext
 			}
 
 			if isErrAlreadyExists(err) {
-				_, err = handler.Exec("ROLLBACK TO SAVEPOINT exec_stmt")
+				_, err = handler.Exec(ctx, "ROLLBACK TO SAVEPOINT exec_stmt")
 				shouldExecuteNext = executeNext
 				return
 			}

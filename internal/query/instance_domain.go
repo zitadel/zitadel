@@ -2,11 +2,11 @@ package query
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -86,8 +86,8 @@ func (q *Queries) SearchInstanceDomainsGlobal(ctx context.Context, queries *Inst
 	return q.queryInstanceDomains(ctx, stmt, scan, args...)
 }
 
-func (q *Queries) queryInstanceDomains(ctx context.Context, stmt string, scan func(*sql.Rows) (*InstanceDomains, error), args ...interface{}) (domains *InstanceDomains, err error) {
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+func (q *Queries) queryInstanceDomains(ctx context.Context, stmt string, scan func(database.Rows) (*InstanceDomains, error), args ...interface{}) (domains *InstanceDomains, err error) {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		domains, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -98,7 +98,7 @@ func (q *Queries) queryInstanceDomains(ctx context.Context, stmt string, scan fu
 	return domains, err
 }
 
-func prepareInstanceDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*InstanceDomains, error)) {
+func prepareInstanceDomainsQuery() (sq.SelectBuilder, func(database.Rows) (*InstanceDomains, error)) {
 	return sq.Select(
 			InstanceDomainCreationDateCol.identifier(),
 			InstanceDomainChangeDateCol.identifier(),
@@ -110,7 +110,7 @@ func prepareInstanceDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance
 			countColumn.identifier(),
 		).From(instanceDomainsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*InstanceDomains, error) {
+		func(rows database.Rows) (*InstanceDomains, error) {
 			domains := make([]*InstanceDomain, 0)
 			var count uint64
 			for rows.Next() {

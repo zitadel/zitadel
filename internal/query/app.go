@@ -12,6 +12,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -302,7 +303,7 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 		return nil, zerrors.ThrowInternal(err, "QUERY-AFDgg", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		app, err = scan(row)
 		return err
 	}, query, args...)
@@ -341,7 +342,7 @@ func (q *Queries) AppByID(ctx context.Context, appID string, activeOnly bool) (a
 		return nil, zerrors.ThrowInternal(err, "QUERY-immt9", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		app, err = scan(row)
 		return err
 	}, query, args...)
@@ -366,7 +367,7 @@ func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (project 
 		return nil, zerrors.ThrowInternal(err, "QUERY-XhJi3", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		project, err = scan(row)
 		return err
 	}, query, args...)
@@ -381,7 +382,7 @@ func (q *Queries) CheckProjectPermissionByClientID(ctx context.Context, clientID
 	defer func() { span.EndWithError(err) }()
 
 	var p *projectPermission
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		p, err = scanProjectPermissionByClientID(row)
 		return err
 	}, appOIDCProjectPermissionQuery,
@@ -405,7 +406,7 @@ func (q *Queries) CheckProjectPermissionByEntityID(ctx context.Context, entityID
 	defer func() { span.EndWithError(err) }()
 
 	var p *projectPermission
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		p, err = scanProjectPermissionByClientID(row)
 		return err
 	}, appSAMLProjectPermissionQuery,
@@ -426,7 +427,7 @@ type projectPermission struct {
 	ProjectRoleChecked bool
 }
 
-func scanProjectPermissionByClientID(row *sql.Row) (*projectPermission, error) {
+func scanProjectPermissionByClientID(row new_db.Row) (*projectPermission, error) {
 	var hasProjectChecked, projectRoleChecked sql.NullBool
 	err := row.Scan(
 		&hasProjectChecked,
@@ -463,7 +464,7 @@ func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (id s
 		return "", zerrors.ThrowInternal(err, "QUERY-SDfg3", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		id, err = scan(row)
 		return err
 	}, query, args...)
@@ -484,7 +485,7 @@ func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (app *
 		return nil, zerrors.ThrowInternal(err, "QUERY-JgVop", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		app, err = scan(row)
 		return err
 	}, query, args...)
@@ -513,7 +514,7 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string) (app *App,
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dfge2", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		app, err = scan(row)
 		return err
 	}, query, args...)
@@ -545,7 +546,7 @@ func (q *Queries) searchApps(ctx context.Context, queries *AppSearchQueries, isP
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		apps, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -589,7 +590,7 @@ func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		ids, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -613,7 +614,7 @@ func (q *Queries) OIDCClientLoginVersion(ctx context.Context, clientID string) (
 		return domain.LoginVersionUnspecified, zerrors.ThrowInvalidArgument(err, "QUERY-WEh31", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		loginVersion, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -637,7 +638,7 @@ func (q *Queries) SAMLAppLoginVersion(ctx context.Context, appID string) (loginV
 		return domain.LoginVersionUnspecified, zerrors.ThrowInvalidArgument(err, "QUERY-TnaciwZfp3", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		loginVersion, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -670,7 +671,7 @@ func NewAppProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AppColumnProjectID, id, TextEquals)
 }
 
-func prepareAppQuery(activeOnly bool) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+func prepareAppQuery(activeOnly bool) (sq.SelectBuilder, func(new_db.Row) (*App, error)) {
 	query := sq.Select(
 		AppColumnID.identifier(),
 		AppColumnName.identifier(),
@@ -731,7 +732,7 @@ func prepareAppQuery(activeOnly bool) (sq.SelectBuilder, func(*sql.Row) (*App, e
 		scanApp
 }
 
-func scanApp(row *sql.Row) (*App, error) {
+func scanApp(row new_db.Row) (*App, error) {
 	app := new(App)
 
 	var (
@@ -797,7 +798,7 @@ func scanApp(row *sql.Row) (*App, error) {
 	return app, nil
 }
 
-func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+func prepareOIDCAppQuery() (sq.SelectBuilder, func(new_db.Row) (*App, error)) {
 	return sq.Select(
 			AppColumnID.identifier(),
 			AppColumnName.identifier(),
@@ -830,7 +831,7 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			AppOIDCConfigColumnLoginBaseURI.identifier(),
 		).From(appsTable.identifier()).
 			Join(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
+			PlaceholderFormat(sq.Dollar), func(row new_db.Row) (*App, error) {
 			app := new(App)
 
 			var (
@@ -882,14 +883,14 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 		}
 }
 
-func prepareProjectIDByAppQuery() (sq.SelectBuilder, func(*sql.Row) (projectID string, err error)) {
+func prepareProjectIDByAppQuery() (sq.SelectBuilder, func(new_db.Row) (projectID string, err error)) {
 	return sq.Select(
 			AppColumnProjectID.identifier(),
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (projectID string, err error) {
+			PlaceholderFormat(sq.Dollar), func(row new_db.Row) (projectID string, err error) {
 			err = row.Scan(
 				&projectID,
 			)
@@ -905,7 +906,7 @@ func prepareProjectIDByAppQuery() (sq.SelectBuilder, func(*sql.Row) (projectID s
 		}
 }
 
-func prepareProjectByAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
+func prepareProjectByAppQuery() (sq.SelectBuilder, func(new_db.Row) (*Project, error)) {
 	return sq.Select(
 			ProjectColumnID.identifier(),
 			ProjectColumnCreationDate.identifier(),
@@ -924,7 +925,7 @@ func prepareProjectByAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, err
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Project, error) {
+		func(row new_db.Row) (*Project, error) {
 			p := new(Project)
 			err := row.Scan(
 				&p.ID,
@@ -949,7 +950,7 @@ func prepareProjectByAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, err
 		}
 }
 
-func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
+func prepareAppsQuery() (sq.SelectBuilder, func(new_db.Rows) (*Apps, error)) {
 	return sq.Select(
 			AppColumnID.identifier(),
 			AppColumnName.identifier(),
@@ -996,7 +997,7 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*Apps, error) {
+			PlaceholderFormat(sq.Dollar), func(row new_db.Rows) (*Apps, error) {
 			apps := &Apps{Apps: []*App{}}
 
 			for row.Next() {
@@ -1067,14 +1068,14 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 		}
 }
 
-func prepareClientIDsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]string, error)) {
+func prepareClientIDsQuery() (sq.SelectBuilder, func(new_db.Rows) ([]string, error)) {
 	return sq.Select(
 			AppAPIConfigColumnClientID.identifier(),
 			AppOIDCConfigColumnClientID.identifier(),
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) ([]string, error) {
+			PlaceholderFormat(sq.Dollar), func(rows new_db.Rows) ([]string, error) {
 			ids := database.TextArray[string]{}
 
 			for rows.Next() {
@@ -1097,11 +1098,11 @@ func prepareClientIDsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]string, error
 		}
 }
 
-func prepareLoginVersionByOIDCClientID() (sq.SelectBuilder, func(*sql.Row) (domain.LoginVersion, error)) {
+func prepareLoginVersionByOIDCClientID() (sq.SelectBuilder, func(new_db.Row) (domain.LoginVersion, error)) {
 	return sq.Select(
 			AppOIDCConfigColumnLoginVersion.identifier(),
 		).From(appOIDCConfigsTable.identifier()).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (domain.LoginVersion, error) {
+			PlaceholderFormat(sq.Dollar), func(row new_db.Row) (domain.LoginVersion, error) {
 			var loginVersion sql.NullInt16
 			if err := row.Scan(
 				&loginVersion,
@@ -1112,11 +1113,11 @@ func prepareLoginVersionByOIDCClientID() (sq.SelectBuilder, func(*sql.Row) (doma
 		}
 }
 
-func prepareLoginVersionBySAMLAppID() (sq.SelectBuilder, func(*sql.Row) (domain.LoginVersion, error)) {
+func prepareLoginVersionBySAMLAppID() (sq.SelectBuilder, func(new_db.Row) (domain.LoginVersion, error)) {
 	return sq.Select(
 			AppSAMLConfigColumnLoginVersion.identifier(),
 		).From(appSAMLConfigsTable.identifier()).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (domain.LoginVersion, error) {
+			PlaceholderFormat(sq.Dollar), func(row new_db.Row) (domain.LoginVersion, error) {
 			var loginVersion sql.NullInt16
 			if err := row.Scan(
 				&loginVersion,

@@ -2,7 +2,6 @@ package crdb
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -25,17 +25,16 @@ const (
 
 type Locker interface {
 	Lock(ctx context.Context, lockDuration time.Duration, instanceIDs ...string) <-chan error
-	Unlock(instanceIDs ...string) error
 }
 
 type locker struct {
-	client         *sql.DB
+	client         new_db.Pool
 	lockStmt       func(values string, instances int) string
 	workerName     string
 	projectionName string
 }
 
-func NewLocker(client *sql.DB, lockTable, projectionName string) Locker {
+func NewLocker(client new_db.Pool, lockTable, projectionName string) Locker {
 	workerName, err := id.SonyFlakeGenerator().Next()
 	logging.OnError(err).Panic("unable to generate lockID")
 	return &locker{
@@ -72,21 +71,12 @@ func (h *locker) handleLock(ctx context.Context, errs chan error, lockDuration t
 
 func (h *locker) renewLock(ctx context.Context, lockDuration time.Duration, instanceIDs ...string) error {
 	lockStmt, values := h.lockStatement(lockDuration, instanceIDs)
-	res, err := h.client.ExecContext(ctx, lockStmt, values...)
+	rowsAffected, err := h.client.ExecContext(ctx, lockStmt, values...)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "CRDB-uaDoR", "unable to execute lock")
 	}
-	if rows, _ := res.RowsAffected(); rows == 0 {
+	if rowsAffected == 0 {
 		return zerrors.ThrowAlreadyExists(nil, "CRDB-mmi4J", "projection already locked")
-	}
-	return nil
-}
-
-func (h *locker) Unlock(instanceIDs ...string) error {
-	lockStmt, values := h.lockStatement(0, instanceIDs)
-	_, err := h.client.Exec(lockStmt, values...)
-	if err != nil {
-		return zerrors.ThrowUnknown(err, "CRDB-JjfwO", "unlock failed")
 	}
 	return nil
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -35,7 +35,7 @@ var (
 
 // pushWithoutFunc implements pushing events before setup step 39 was introduced.
 // TODO: remove with v3
-func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.ContextQueryExecuter, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.QueryExecutor, commands ...eventstore.Command) (events []eventstore.Event, err error) {
 	tx, closeTx, err := es.pushTx(ctx, client)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.Conte
 	return events, nil
 }
 
-func (es *Eventstore) writeEventsOld(ctx context.Context, tx database.Tx, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
+func (es *Eventstore) writeEventsOld(ctx context.Context, tx database.Transaction, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
 	events, placeholders, args, err := mapCommands(commands, sequences)
 	if err != nil {
 		return nil, err

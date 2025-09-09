@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -184,7 +185,7 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (config 
 		return nil, zerrors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		config, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -212,7 +213,7 @@ func (q *Queries) SMSProviderConfigActive(ctx context.Context, instanceID string
 		return nil, zerrors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		config, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -238,7 +239,7 @@ func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearc
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		configs, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -258,7 +259,7 @@ func NewSMSProviderStateQuery(state domain.SMSConfigState) (SearchQuery, error) 
 	return NewNumberQuery(SMSColumnState, state, NumberEquals)
 }
 
-func prepareSMSConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, error)) {
+func prepareSMSConfigQuery() (sq.SelectBuilder, func(database.Row) (*SMSConfig, error)) {
 	return sq.Select(
 			SMSColumnID.identifier(),
 			SMSColumnAggregateID.identifier(),
@@ -281,7 +282,7 @@ func prepareSMSConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, erro
 		).From(smsConfigsTable.identifier()).
 			LeftJoin(join(SMSTwilioColumnSMSID, SMSColumnID)).
 			LeftJoin(join(SMSHTTPColumnSMSID, SMSColumnID)).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*SMSConfig, error) {
+			PlaceholderFormat(sq.Dollar), func(row database.Row) (*SMSConfig, error) {
 			config := new(SMSConfig)
 
 			var (
@@ -324,7 +325,7 @@ func prepareSMSConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, erro
 		}
 }
 
-func prepareSMSConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, error)) {
+func prepareSMSConfigsQuery() (sq.SelectBuilder, func(database.Rows) (*SMSConfigs, error)) {
 	return sq.Select(
 			SMSColumnID.identifier(),
 			SMSColumnAggregateID.identifier(),
@@ -349,7 +350,7 @@ func prepareSMSConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, e
 		).From(smsConfigsTable.identifier()).
 			LeftJoin(join(SMSTwilioColumnSMSID, SMSColumnID)).
 			LeftJoin(join(SMSHTTPColumnSMSID, SMSColumnID)).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*SMSConfigs, error) {
+			PlaceholderFormat(sq.Dollar), func(row database.Rows) (*SMSConfigs, error) {
 			configs := &SMSConfigs{Configs: []*SMSConfig{}}
 
 			for row.Next() {

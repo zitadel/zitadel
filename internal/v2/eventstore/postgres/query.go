@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -27,7 +28,7 @@ func (s *Storage) Query(ctx context.Context, query *eventstore.Query) (eventCoun
 	return executeQuery(ctx, s.client.DB, &stmt, query)
 }
 
-func executeQuery(ctx context.Context, tx database.Querier, stmt *database.Statement, reducer eventstore.Reducer) (eventCount int, err error) {
+func executeQuery(ctx context.Context, tx new_db.Querier, stmt *database.Statement, reducer eventstore.Reducer) (eventCount int, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

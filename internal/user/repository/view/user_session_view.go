@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"errors"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -29,7 +30,7 @@ var activeUserSessionsBySessionIDQuery string
 func UserSessionByIDs(ctx context.Context, db *database.DB, agentID, userID, instanceID string) (userSession *model.UserSessionView, err error) {
 	err = db.QueryRowContext(
 		ctx,
-		func(row *sql.Row) error {
+		func(row new_db.Row) error {
 			userSession, err = scanUserSession(row)
 			return err
 		},
@@ -44,7 +45,7 @@ func UserSessionByIDs(ctx context.Context, db *database.DB, agentID, userID, ins
 func UserSessionByID(ctx context.Context, db *database.DB, userSessionID, instanceID string) (userSession *model.UserSessionView, err error) {
 	err = db.QueryRowContext(
 		ctx,
-		func(row *sql.Row) error {
+		func(row new_db.Row) error {
 			userSession, err = scanUserSession(row)
 			return err
 		},
@@ -58,7 +59,7 @@ func UserSessionByID(ctx context.Context, db *database.DB, userSessionID, instan
 func UserSessionsByAgentID(ctx context.Context, db *database.DB, agentID, instanceID string) (userSessions []*model.UserSessionView, err error) {
 	err = db.QueryContext(
 		ctx,
-		func(rows *sql.Rows) error {
+		func(rows new_db.Rows) error {
 			userSessions, err = scanUserSessions(rows)
 			return err
 		},
@@ -72,7 +73,7 @@ func UserSessionsByAgentID(ctx context.Context, db *database.DB, agentID, instan
 func UserAgentIDBySessionID(ctx context.Context, db *database.DB, sessionID, instanceID string) (userAgentID string, err error) {
 	err = db.QueryRowContext(
 		ctx,
-		func(row *sql.Row) error {
+		func(row new_db.Row) error {
 			return row.Scan(&userAgentID)
 		},
 		userAgentByUserSessionIDQuery,
@@ -86,7 +87,7 @@ func UserAgentIDBySessionID(ctx context.Context, db *database.DB, sessionID, ins
 func ActiveUserSessionsBySessionID(ctx context.Context, db *database.DB, sessionID, instanceID string) (userAgentID string, sessions map[string]string, err error) {
 	err = db.QueryContext(
 		ctx,
-		func(rows *sql.Rows) error {
+		func(rows new_db.Rows) error {
 			userAgentID, sessions, err = scanActiveUserAgentUserIDs(rows)
 			return err
 		},
@@ -97,7 +98,7 @@ func ActiveUserSessionsBySessionID(ctx context.Context, db *database.DB, session
 	return userAgentID, sessions, err
 }
 
-func scanActiveUserAgentUserIDs(rows *sql.Rows) (userAgentID string, sessions map[string]string, err error) {
+func scanActiveUserAgentUserIDs(rows new_db.Rows) (userAgentID string, sessions map[string]string, err error) {
 	sessions = make(map[string]string)
 	for rows.Next() {
 		var userID, sessionID string
@@ -117,7 +118,7 @@ func scanActiveUserAgentUserIDs(rows *sql.Rows) (userAgentID string, sessions ma
 	return userAgentID, sessions, nil
 }
 
-func scanUserSession(row *sql.Row) (*model.UserSessionView, error) {
+func scanUserSession(row new_db.Row) (*model.UserSessionView, error) {
 	session := new(model.UserSessionView)
 	err := row.Scan(
 		&session.CreationDate,
@@ -148,7 +149,7 @@ func scanUserSession(row *sql.Row) (*model.UserSessionView, error) {
 	return session, err
 }
 
-func scanUserSessions(rows *sql.Rows) ([]*model.UserSessionView, error) {
+func scanUserSessions(rows new_db.Rows) ([]*model.UserSessionView, error) {
 	sessions := make([]*model.UserSessionView, 0)
 	for rows.Next() {
 		session := new(model.UserSessionView)

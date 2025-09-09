@@ -2,12 +2,12 @@ package command
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"strings"
 
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -70,8 +70,8 @@ func synchronizeRolePermissionCommands(ctx context.Context, db *database.DB, agg
 	return cmds, nil
 }
 
-func rolePermissionScanner(ctx context.Context, aggregate *eventstore.Aggregate, cmds *[]eventstore.Command) func(rows *sql.Rows) error {
-	return func(rows *sql.Rows) error {
+func rolePermissionScanner(ctx context.Context, aggregate *eventstore.Aggregate, cmds *[]eventstore.Command) func(rows new_db.Rows) error {
+	return func(rows new_db.Rows) error {
 		for rows.Next() {
 			var operation, role, perm string
 			if err := rows.Scan(&operation, &role, &perm); err != nil {

@@ -70,6 +70,7 @@ require (
 	github.com/riverqueue/river v0.24.0
 	github.com/riverqueue/river/riverdriver v0.24.0
 	github.com/riverqueue/river/riverdriver/riverdatabasesql v0.24.0
+	github.com/riverqueue/river/riverdriver/riverpgxv5 v0.24.0
 	github.com/riverqueue/river/rivertype v0.24.0
 	github.com/riverqueue/rivercontrib/otelriver v0.5.0
 	github.com/robfig/cron/v3 v3.0.1

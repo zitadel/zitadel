@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -36,11 +37,11 @@ Only auth requests are mirrored`,
 func copyAuth(ctx context.Context, config *Migration) {
 	sourceClient, err := database.Connect(config.Source, false)
 	logging.OnError(err).Fatal("unable to connect to source database")
-	defer sourceClient.Close()
+	defer sourceClient.DB.Close(ctx)
 
 	destClient, err := database.Connect(config.Destination, false)
 	logging.OnError(err).Fatal("unable to connect to destination database")
-	defer destClient.Close()
+	defer destClient.DB.Close(ctx)
 
 	copyAuthRequests(ctx, sourceClient, destClient, config.MaxAuthRequestAge)
 }
@@ -52,15 +53,15 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB, maxAuthReq
 	_, err := source.ExecContext(ctx, "CREATE INDEX CONCURRENTLY IF NOT EXISTS auth_requests_change_date ON auth.auth_requests (change_date)")
 	logging.OnError(err).Fatal("unable to create index on auth.auth_requests.change_date")
 
-	sourceConn, err := source.Conn(ctx)
+	sourceConn, err := source.DB.Acquire(ctx)
 	logging.OnError(err).Fatal("unable to acquire connection")
-	defer sourceConn.Close()
+	defer sourceConn.Release(ctx)
 
 	r, w := io.Pipe()
 	errs := make(chan error, 1)
 
 	go func() {
-		err = sourceConn.Raw(func(driverConn any) error {
+		err = sourceConn.(*sql.Conn).Raw(func(driverConn any) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT id, regexp_replace(request::TEXT, '\\\\u0000', '', 'g')::JSON request, code, request_type, creation_date, change_date, instance_id FROM auth.auth_requests "+instanceClause()+" AND change_date > NOW() - INTERVAL '"+strconv.FormatFloat(maxAuthRequestAge.Seconds(), 'f', -1, 64)+" seconds') TO STDOUT")
 			w.Close()
@@ -69,12 +70,12 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB, maxAuthReq
 		errs <- err
 	}()
 
-	destConn, err := dest.Conn(ctx)
+	destConn, err := dest.DB.Acquire(ctx)
 	logging.OnError(err).Fatal("unable to acquire connection")
-	defer destConn.Close()
+	defer destConn.Release(ctx)
 
 	var affected int64
-	err = destConn.Raw(func(driverConn any) error {
+	err = destConn.(*sql.Conn).Raw(func(driverConn any) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
 		if shouldReplace {

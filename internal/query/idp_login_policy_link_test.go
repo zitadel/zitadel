@@ -12,6 +12,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
@@ -58,7 +59,7 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 	}{
 		{
 			name: "prepareIDPsQuery found",
-			prepare: func(ctx context.Context) (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
+			prepare: func(ctx context.Context) (sq.SelectBuilder, func(database.Rows) (*IDPLoginPolicyLinks, error)) {
 				return prepareIDPLoginPolicyLinksQuery(ctx, "resourceOwner")
 			},
 			want: want{
@@ -101,7 +102,7 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareIDPsQuery no idp",
-			prepare: func(ctx context.Context) (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
+			prepare: func(ctx context.Context) (sq.SelectBuilder, func(database.Rows) (*IDPLoginPolicyLinks, error)) {
 				return prepareIDPLoginPolicyLinksQuery(ctx, "resourceOwner")
 			},
 			want: want{
@@ -143,7 +144,7 @@ func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareIDPsQuery sql err",
-			prepare: func(ctx context.Context) (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
+			prepare: func(ctx context.Context) (sq.SelectBuilder, func(database.Rows) (*IDPLoginPolicyLinks, error)) {
 				return prepareIDPLoginPolicyLinksQuery(ctx, "resourceOwner")
 			},
 			want: want{

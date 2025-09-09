@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 )
@@ -93,7 +94,7 @@ func TestQueries_ListResourceCounts(t *testing.T) {
 			mock.ExpectClose()
 			q := &Queries{
 				client: &database.DB{
-					DB: db,
+					DB: new_sql.SQLPool(db),
 				},
 			}
 

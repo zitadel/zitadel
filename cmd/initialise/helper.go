@@ -6,10 +6,10 @@ import (
 
 	"github.com/jackc/pgx/v5/pgconn"
 
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-func exec(ctx context.Context, db database.ContextExecuter, stmt string, possibleErrCodes []string, args ...interface{}) error {
+func exec(ctx context.Context, db database.Executor, stmt string, possibleErrCodes []string, args ...interface{}) error {
 	_, err := db.ExecContext(ctx, stmt, args...)
 	pgErr := new(pgconn.PgError)
 	if errors.As(err, &pgErr) {

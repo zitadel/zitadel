@@ -12,6 +12,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -391,7 +392,7 @@ func (q *Queries) GetUserByIDWithResourceOwner(ctx context.Context, shouldTrigge
 	}
 
 	err = q.client.QueryRowContext(ctx,
-		func(row *sql.Row) error {
+		func(row new_db.Row) error {
 			user, err = scanUser(row)
 			return err
 		},
@@ -426,7 +427,7 @@ func (q *Queries) GetUserByLoginName(ctx context.Context, shouldTriggered bool, 
 	}
 
 	err = q.client.QueryRowContext(ctx,
-		func(row *sql.Row) error {
+		func(row new_db.Row) error {
 			user, err = scanUser(row)
 			return err
 		},
@@ -456,7 +457,7 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ..
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		profile, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -480,7 +481,7 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, queries ...S
 		return nil, zerrors.ThrowInternal(err, "QUERY-BHhj3", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		email, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -504,7 +505,7 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...S
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		phone, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -523,7 +524,7 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	}
 
 	err = q.client.QueryRowContext(ctx,
-		func(row *sql.Row) error {
+		func(row new_db.Row) error {
 			user, err = scanNotifyUser(row)
 			return err
 		},
@@ -557,7 +558,7 @@ func (q *Queries) GetNotifyUserByLoginName(ctx context.Context, shouldTriggered 
 	}
 
 	err = q.client.QueryRowContext(ctx,
-		func(row *sql.Row) error {
+		func(row new_db.Row) error {
 			user, err = scanNotifyUser(row)
 			return err
 		},
@@ -590,7 +591,7 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queri
 		return nil, zerrors.ThrowInternal(err, "QUERY-Err3g", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		user, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -608,7 +609,7 @@ func (q *Queries) CountUsers(ctx context.Context, queries *UserSearchQueries) (c
 		return 0, zerrors.ThrowInternal(err, "QUERY-w3Dx", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		count, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -643,7 +644,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		users, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -690,7 +691,7 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 		return false, zerrors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		isUnique, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -705,7 +706,7 @@ func (q *Queries) SearchClaimedUserIDsOfOrgDomain(ctx context.Context, domain, o
 	defer func() { span.EndWithError(err) }()
 
 	err = q.client.QueryContext(ctx,
-		func(rows *sql.Rows) error {
+		func(rows new_db.Rows) error {
 			userIDs = make([]string, 0)
 			for rows.Next() {
 				var userID string
@@ -858,7 +859,7 @@ var joinLoginNames = `LEFT JOIN LATERAL (` +
 	` AND ln.instance_id = ` + UserInstanceIDCol.identifier() +
 	`) AS login_names ON TRUE`
 
-func scanUser(row *sql.Row) (*User, error) {
+func scanUser(row new_db.Row) (*User, error) {
 	u := new(User)
 	var count int
 	preferredLoginName := sql.NullString{}
@@ -936,7 +937,7 @@ func scanUser(row *sql.Row) (*User, error) {
 	return u, nil
 }
 
-func prepareProfileQuery() (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) {
+func prepareProfileQuery() (sq.SelectBuilder, func(new_db.Row) (*Profile, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -954,7 +955,7 @@ func prepareProfileQuery() (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) 
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Profile, error) {
+		func(row new_db.Row) (*Profile, error) {
 			p := new(Profile)
 
 			humanID := sql.NullString{}
@@ -1002,7 +1003,7 @@ func prepareProfileQuery() (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) 
 		}
 }
 
-func prepareEmailQuery() (sq.SelectBuilder, func(*sql.Row) (*Email, error)) {
+func prepareEmailQuery() (sq.SelectBuilder, func(new_db.Row) (*Email, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -1015,7 +1016,7 @@ func prepareEmailQuery() (sq.SelectBuilder, func(*sql.Row) (*Email, error)) {
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Email, error) {
+		func(row new_db.Row) (*Email, error) {
 			e := new(Email)
 
 			humanID := sql.NullString{}
@@ -1049,7 +1050,7 @@ func prepareEmailQuery() (sq.SelectBuilder, func(*sql.Row) (*Email, error)) {
 		}
 }
 
-func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
+func preparePhoneQuery() (sq.SelectBuilder, func(new_db.Row) (*Phone, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -1062,7 +1063,7 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Phone, error) {
+		func(row new_db.Row) (*Phone, error) {
 			e := new(Phone)
 
 			humanID := sql.NullString{}
@@ -1096,7 +1097,7 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 		}
 }
 
-func prepareNotifyUserQuery() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
+func prepareNotifyUserQuery() (sq.SelectBuilder, func(new_db.Row) (*NotifyUser, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -1132,7 +1133,7 @@ func prepareNotifyUserQuery() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, er
 		scanNotifyUser
 }
 
-func scanNotifyUser(row *sql.Row) (*NotifyUser, error) {
+func scanNotifyUser(row new_db.Row) (*NotifyUser, error) {
 	u := new(NotifyUser)
 	var count int
 	loginNames := database.TextArray[string]{}
@@ -1215,13 +1216,13 @@ func scanNotifyUser(row *sql.Row) (*NotifyUser, error) {
 	return u, nil
 }
 
-func prepareCountUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
+func prepareCountUsersQuery() (sq.SelectBuilder, func(new_db.Rows) (uint64, error)) {
 	return sq.Select(countColumn.identifier()).
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (count uint64, err error) {
+		func(rows new_db.Rows) (count uint64, err error) {
 			// the count is implemented as a windowing function,
 			// if it is zero, no row is returned at all.
 			if !rows.Next() {
@@ -1233,7 +1234,7 @@ func prepareCountUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (uint64, error)
 		}
 }
 
-func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
+func prepareUserUniqueQuery() (sq.SelectBuilder, func(new_db.Row) (bool, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserStateCol.identifier(),
@@ -1244,7 +1245,7 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (bool, error) {
+		func(row new_db.Row) (bool, error) {
 			userID := sql.NullString{}
 			state := sql.NullInt32{}
 			username := sql.NullString{}
@@ -1270,7 +1271,7 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 		}
 }
 
-func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+func prepareUsersQuery() (sq.SelectBuilder, func(new_db.Rows) (*Users, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -1310,7 +1311,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			LeftJoin(join(UserMetadataUserIDCol, UserIDCol)).
 			JoinClause(joinLoginNames).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Users, error) {
+		func(rows new_db.Rows) (*Users, error) {
 			users := make([]*User, 0)
 			var count uint64
 			for rows.Next() {

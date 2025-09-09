@@ -13,6 +13,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/shopspring/decimal"
 
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -41,7 +42,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 				},
 				mock: mock.NewSQLMock(t,
 					mock.ExpectBegin(nil),
-					mock.ExcpectExec(updateStateStmt,
+					mock.ExpectExec(updateStateStmt,
 						mock.WithExecErr(sql.ErrTxDone),
 					),
 				),
@@ -67,7 +68,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 				},
 				mock: mock.NewSQLMock(t,
 					mock.ExpectBegin(nil),
-					mock.ExcpectExec(updateStateStmt,
+					mock.ExpectExec(updateStateStmt,
 						mock.WithExecNoRowsAffected(),
 					),
 				),
@@ -93,7 +94,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 				},
 				mock: mock.NewSQLMock(t,
 					mock.ExpectBegin(nil),
-					mock.ExcpectExec(updateStateStmt,
+					mock.ExpectExec(updateStateStmt,
 						mock.WithExecArgs(
 							"projection",
 							"instance",
@@ -129,7 +130,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 			}
 		}
 		t.Run(tt.name, func(t *testing.T) {
-			tx, err := tt.fields.mock.DB.BeginTx(context.Background(), nil)
+			tx, err := new_sql.SQLPool(tt.fields.mock.DB).Begin(context.Background(), nil)
 			if err != nil {
 				t.Fatalf("unable to begin transaction: %v", err)
 			}
@@ -137,7 +138,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 			h := &Handler{
 				projection: tt.fields.projection,
 			}
-			err = h.setState(tx, tt.args.updatedState)
+			err = h.setState(t.Context(), tx, tt.args.updatedState)
 
 			tt.isErr(t, err)
 			tt.fields.mock.Assert(t)
@@ -283,7 +284,7 @@ func TestHandler_currentState(t *testing.T) {
 				projection: tt.fields.projection,
 			}
 
-			tx, err := tt.fields.mock.DB.BeginTx(context.Background(), nil)
+			tx, err := new_sql.SQLPool(tt.fields.mock.DB).Begin(context.Background(), nil)
 			if err != nil {
 				t.Fatalf("unable to begin transaction: %v", err)
 			}

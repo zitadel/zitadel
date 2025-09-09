@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -135,7 +136,7 @@ func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, shouldTriggerBulk bool
 		return nil, zerrors.ThrowInternal(err, "QUERY-UXuPI", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
@@ -164,14 +165,14 @@ func (q *Queries) DefaultPrivacyPolicy(ctx context.Context, shouldTriggerBulk bo
 		return nil, zerrors.ThrowInternal(err, "QUERY-LkFZ7", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
 	return policy, err
 }
 
-func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPolicy, error)) {
+func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(database.Row) (*PrivacyPolicy, error)) {
 	return sq.Select(
 			PrivacyColID.identifier(),
 			PrivacyColSequence.identifier(),
@@ -190,7 +191,7 @@ func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPoli
 		).
 			From(privacyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*PrivacyPolicy, error) {
+		func(row database.Row) (*PrivacyPolicy, error) {
 			policy := new(PrivacyPolicy)
 			err := row.Scan(
 				&policy.ID,

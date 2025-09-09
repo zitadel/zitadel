@@ -9,6 +9,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -31,7 +32,7 @@ var (
 	updateStateStmt string
 )
 
-func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *state, err error) {
+func (h *Handler) currentState(ctx context.Context, tx database.Transaction) (currentState *state, err error) {
 	currentState = &state{
 		instanceID: authz.GetInstance(ctx).InstanceID(),
 	}
@@ -45,7 +46,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 		offset        = new(sql.NullInt64)
 	)
 
-	row := tx.QueryRow(currentStateStmt, currentState.instanceID, h.projection.Name())
+	row := tx.QueryRow(ctx, currentStateStmt, currentState.instanceID, h.projection.Name())
 	err = row.Scan(
 		aggregateID,
 		aggregateType,
@@ -69,8 +70,8 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx) (currentState *s
 	return currentState, nil
 }
 
-func (h *Handler) setState(tx *sql.Tx, updatedState *state) error {
-	res, err := tx.Exec(updateStateStmt,
+func (h *Handler) setState(ctx context.Context, tx database.Transaction, updatedState *state) error {
+	affected, err := tx.Exec(ctx, updateStateStmt,
 		h.projection.Name(),
 		updatedState.instanceID,
 		updatedState.aggregateID,
@@ -84,7 +85,7 @@ func (h *Handler) setState(tx *sql.Tx, updatedState *state) error {
 		h.log().WithError(err).Warn("unable to update state")
 		return zerrors.ThrowInternal(err, "V2-WF23g2", "unable to update state")
 	}
-	if affected, err := res.RowsAffected(); affected == 0 {
+	if affected == 0 {
 		h.log().OnError(err).Error("unable to check if states are updated")
 		return zerrors.ThrowInternal(err, "V2-FGEKi", "unable to update state")
 	}

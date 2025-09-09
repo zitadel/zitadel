@@ -2,7 +2,6 @@ package initialise
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"fmt"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/database"
 	es_v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
 )
@@ -37,11 +37,11 @@ func VerifyZitadel(ctx context.Context, db *database.DB, config database.Config)
 		return err
 	}
 
-	conn, err := db.Conn(ctx)
+	conn, err := db.DB.Acquire(ctx)
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
+	defer conn.Release(ctx)
 
 	logging.WithFields().Info("verify system")
 	if err := exec(ctx, conn, fmt.Sprintf(createSystemStmt, config.Username()), nil); err != nil {
@@ -88,47 +88,47 @@ func verifyZitadel(ctx context.Context, config database.Config) error {
 		return err
 	}
 
-	return db.Close()
+	return db.DB.Close(ctx)
 }
 
-func createEncryptionKeys(ctx context.Context, db database.Beginner) error {
-	tx, err := db.BeginTx(ctx, nil)
+func createEncryptionKeys(ctx context.Context, db new_db.Beginner) error {
+	tx, err := db.Begin(ctx, nil)
 	if err != nil {
 		return err
 	}
-	if _, err = tx.Exec(createEncryptionKeysStmt); err != nil {
-		rollbackErr := tx.Rollback()
+	if _, err = tx.Exec(ctx, createEncryptionKeysStmt); err != nil {
+		rollbackErr := tx.Rollback(ctx)
 		logging.OnError(rollbackErr).Error("rollback failed")
 		return err
 	}
 
-	return tx.Commit()
+	return tx.Commit(ctx)
 }
 
-func createEvents(ctx context.Context, conn *sql.Conn) (err error) {
-	tx, err := conn.BeginTx(ctx, nil)
+func createEvents(ctx context.Context, conn new_db.Client) (err error) {
+	tx, err := conn.Begin(ctx, nil)
 	if err != nil {
 		return err
 	}
 	defer func() {
 		if err != nil {
-			rollbackErr := tx.Rollback()
+			rollbackErr := tx.Rollback(ctx)
 			logging.OnError(rollbackErr).Error("rollback failed")
 			return
 		}
-		err = tx.Commit()
+		err = tx.Commit(ctx)
 	}()
 
 	// if events already exists events2 is created during a setup job
 	var count int
-	row := tx.QueryRow("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'eventstore' AND table_name like 'events%'")
+	row := tx.QueryRow(ctx, "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'eventstore' AND table_name like 'events%'")
 	if err = row.Scan(&count); err != nil {
 		return err
 	}
 	if row.Err() != nil || count >= 1 {
 		return row.Err()
 	}
-	_, err = tx.Exec(createEventsStmt)
+	_, err = tx.Exec(ctx, createEventsStmt)
 	if err != nil {
 		return err
 	}

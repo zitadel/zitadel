@@ -2,7 +2,6 @@ package setup
 
 import (
 	"context"
-	"database/sql"
 	"embed"
 	"fmt"
 	"io/fs"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -33,12 +33,12 @@ type InitPushFunc struct {
 }
 
 func (mig *InitPushFunc) Execute(ctx context.Context, _ eventstore.Event) (err error) {
-	conn, err := mig.dbClient.Conn(ctx)
+	conn, err := mig.dbClient.DB.Acquire(ctx)
 	if err != nil {
 		return err
 	}
 	defer func() {
-		closeErr := conn.Close()
+		closeErr := conn.Release(ctx)
 		logging.OnError(closeErr).Debug("failed to release connection")
 		// Force the pool to reopen connections to apply the new types
 		mig.dbClient.Pool.Reset()
@@ -101,7 +101,7 @@ func (mig *InitPushFunc) inTxOrderType(ctx context.Context) (typeName string, er
 		return "", fmt.Errorf("get in_tx_order_type: %w", err)
 	}
 
-	err = mig.dbClient.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = mig.dbClient.QueryRowContext(ctx, func(row new_db.Row) error {
 		return row.Scan(&typeName)
 	}, string(query))
 	if err != nil {

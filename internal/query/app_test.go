@@ -12,6 +12,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/muhlemmer/gu"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -1241,7 +1242,7 @@ func Test_AppPrepare(t *testing.T) {
 	}{
 		{
 			name: "prepareAppQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+			prepare: func() (sq.SelectBuilder, func(new_db.Row) (*App, error)) {
 				return prepareAppQuery(false)
 			},
 			want: want{
@@ -1261,7 +1262,7 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery found",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+			prepare: func() (sq.SelectBuilder, func(new_db.Row) (*App, error)) {
 				return prepareAppQuery(false)
 			},
 			want: want{
@@ -1325,7 +1326,7 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery api app",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+			prepare: func() (sq.SelectBuilder, func(new_db.Row) (*App, error)) {
 				return prepareAppQuery(false)
 			},
 			want: want{
@@ -1395,7 +1396,7 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+			prepare: func() (sq.SelectBuilder, func(new_db.Row) (*App, error)) {
 				return prepareAppQuery(false)
 			},
 			want: want{
@@ -1484,7 +1485,7 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app active only",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+			prepare: func() (sq.SelectBuilder, func(new_db.Row) (*App, error)) {
 				return prepareAppQuery(true)
 			},
 			want: want{
@@ -1573,7 +1574,7 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery saml app",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+			prepare: func() (sq.SelectBuilder, func(new_db.Row) (*App, error)) {
 				return prepareAppQuery(false)
 			},
 			want: want{
@@ -1646,7 +1647,7 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app IsDevMode inactive",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+			prepare: func() (sq.SelectBuilder, func(new_db.Row) (*App, error)) {
 				return prepareAppQuery(false)
 			},
 			want: want{
@@ -1735,7 +1736,7 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app AssertAccessTokenRole inactive",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+			prepare: func() (sq.SelectBuilder, func(new_db.Row) (*App, error)) {
 				return prepareAppQuery(false)
 			},
 			want: want{
@@ -1824,7 +1825,7 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app AssertIDTokenRole inactive",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+			prepare: func() (sq.SelectBuilder, func(new_db.Row) (*App, error)) {
 				return prepareAppQuery(false)
 			},
 			want: want{
@@ -1913,7 +1914,7 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery oidc app AssertIDTokenUserinfo inactive",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+			prepare: func() (sq.SelectBuilder, func(new_db.Row) (*App, error)) {
 				return prepareAppQuery(false)
 			},
 			want: want{
@@ -2002,7 +2003,7 @@ func Test_AppPrepare(t *testing.T) {
 		},
 		{
 			name: "prepareAppQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+			prepare: func() (sq.SelectBuilder, func(new_db.Row) (*App, error)) {
 				return prepareAppQuery(false)
 			},
 			want: want{

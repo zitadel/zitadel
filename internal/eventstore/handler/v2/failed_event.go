@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"database/sql"
+	"context"
 	_ "embed"
 	"time"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -47,21 +48,21 @@ func failureFromStatement(statement *Statement, err error) *failure {
 	}
 }
 
-func (h *Handler) handleFailedStmt(tx *sql.Tx, f *failure) (shouldContinue bool) {
-	failureCount, err := h.failureCount(tx, f)
+func (h *Handler) handleFailedStmt(ctx context.Context, tx database.Transaction, f *failure) (shouldContinue bool) {
+	failureCount, err := h.failureCount(ctx, tx, f)
 	if err != nil {
 		h.logFailure(f).WithError(err).Warn("unable to get failure count")
 		return false
 	}
 	failureCount += 1
-	err = h.setFailureCount(tx, failureCount, f)
+	err = h.setFailureCount(ctx, tx, failureCount, f)
 	h.logFailure(f).OnError(err).Warn("unable to update failure count")
 
 	return failureCount >= h.maxFailureCount
 }
 
-func (h *Handler) failureCount(tx *sql.Tx, f *failure) (count uint8, err error) {
-	row := tx.QueryRow(failureCountStmt,
+func (h *Handler) failureCount(ctx context.Context, tx database.Transaction, f *failure) (count uint8, err error) {
+	row := tx.QueryRow(ctx, failureCountStmt,
 		h.projection.Name(),
 		f.instance,
 		f.aggregateType,
@@ -77,8 +78,8 @@ func (h *Handler) failureCount(tx *sql.Tx, f *failure) (count uint8, err error) 
 	return count, nil
 }
 
-func (h *Handler) setFailureCount(tx *sql.Tx, count uint8, f *failure) error {
-	_, err := tx.Exec(setFailedEventStmt,
+func (h *Handler) setFailureCount(ctx context.Context, tx database.Transaction, count uint8, f *failure) error {
+	_, err := tx.Exec(ctx, setFailedEventStmt,
 		h.projection.Name(),
 		f.instance,
 		f.aggregateType,

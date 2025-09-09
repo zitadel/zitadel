@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -131,7 +132,7 @@ func NewUserSchemaStateSearchQuery(value domain.UserSchemaState) (SearchQuery, e
 	return NewNumberQuery(UserSchemaStateCol, value, NumberEquals)
 }
 
-func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, error)) {
+func prepareUserSchemaQuery() (sq.SelectBuilder, func(new_db.Row) (*UserSchema, error)) {
 	return sq.Select(
 			UserSchemaIDCol.identifier(),
 			UserSchemaCreationDateCol.identifier(),
@@ -146,7 +147,7 @@ func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, er
 		).
 			From(userSchemaTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*UserSchema, error) {
+		func(row new_db.Row) (*UserSchema, error) {
 			u := new(UserSchema)
 			var schema database.ByteArray[byte]
 			err := row.Scan(
@@ -175,7 +176,7 @@ func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, er
 		}
 }
 
-func prepareUserSchemasQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchemas, error)) {
+func prepareUserSchemasQuery() (sq.SelectBuilder, func(new_db.Rows) (*UserSchemas, error)) {
 	return sq.Select(
 			UserSchemaIDCol.identifier(),
 			UserSchemaCreationDateCol.identifier(),
@@ -190,7 +191,7 @@ func prepareUserSchemasQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchemas,
 			countColumn.identifier()).
 			From(userSchemaTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*UserSchemas, error) {
+		func(rows new_db.Rows) (*UserSchemas, error) {
 			schemas := make([]*UserSchema, 0)
 			var (
 				schema database.ByteArray[byte]

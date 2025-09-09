@@ -8,9 +8,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/golang-lru/v2"
+	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -44,7 +45,7 @@ func Start(dbClient *database.DB, amountOfCachedAuthRequests uint16) *AuthReques
 }
 
 func (c *AuthRequestCache) Health(ctx context.Context) error {
-	return c.client.PingContext(ctx)
+	return c.client.DB.Ping(ctx)
 }
 
 func (c *AuthRequestCache) GetAuthRequestByID(ctx context.Context, id string) (*domain.AuthRequest, error) {
@@ -83,7 +84,7 @@ func (c *AuthRequestCache) UpdateAuthRequest(ctx context.Context, request *domai
 }
 
 func (c *AuthRequestCache) DeleteAuthRequest(ctx context.Context, id string) error {
-	_, err := c.client.Exec("DELETE FROM auth.auth_requests WHERE instance_id = $1 and id = $2", authz.GetInstance(ctx).InstanceID(), id)
+	_, err := c.client.ExecContext(ctx, "DELETE FROM auth.auth_requests WHERE instance_id = $1 and id = $2", authz.GetInstance(ctx).InstanceID(), id)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "CACHE-dsHw3", "unable to delete auth request")
 	}
@@ -97,7 +98,7 @@ func (c *AuthRequestCache) getAuthRequest(ctx context.Context, key, value, insta
 	query := fmt.Sprintf("SELECT request, request_type FROM auth.auth_requests WHERE instance_id = $1 and %s = $2", key)
 	err := c.client.QueryRowContext(
 		ctx,
-		func(row *sql.Row) error {
+		func(row new_db.Row) error {
 			return row.Scan(&b, &requestType)
 		},
 		query, instanceID, value)
@@ -123,7 +124,7 @@ func (c *AuthRequestCache) saveAuthRequest(ctx context.Context, request *domain.
 	if err != nil {
 		return zerrors.ThrowInternal(err, "CACHE-os0GH", "Errors.Internal")
 	}
-	_, err = c.client.Exec(query, request.ID, b, request.InstanceID, date, param)
+	_, err = c.client.ExecContext(ctx, query, request.ID, b, request.InstanceID, date, param)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "CACHE-su3GK", "Errors.Internal")
 	}

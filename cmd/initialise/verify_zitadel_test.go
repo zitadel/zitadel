@@ -108,7 +108,7 @@ func Test_verifyEvents(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			conn, err := tt.args.db.db.Conn(context.Background())
+			conn, err := tt.args.db.db.DB.Acquire(t.Context())
 			if err != nil {
 				t.Error(err)
 				return
@@ -166,7 +166,7 @@ func Test_verifyEncryptionKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := createEncryptionKeys(context.Background(), tt.args.db.db); !errors.Is(err, tt.targetErr) {
+			if err := createEncryptionKeys(context.Background(), tt.args.db.db.DB); !errors.Is(err, tt.targetErr) {
 				t.Errorf("createEvents() error = %v, want: %v", err, tt.targetErr)
 			}
 			if err := tt.args.db.mock.ExpectationsWereMet(); err != nil {

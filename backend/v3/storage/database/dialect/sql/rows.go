@@ -4,7 +4,6 @@ import (
 	"database/sql"
 
 	"github.com/georgysavva/scany/v2/sqlscan"
-	"github.com/jackc/pgx/v5"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
@@ -15,7 +14,12 @@ var (
 	_ database.Row             = (*Row)(nil)
 )
 
-type Row struct{ pgx.Row }
+type Row struct{ *sql.Row }
+
+// Err implements [database.Row].
+func (r *Row) Err() error {
+	return r.Row.Err()
+}
 
 // Scan implements [database.Row].
 // Subtle: this method shadows the method ([pgx.Row]).Scan of Row.Row.

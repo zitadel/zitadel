@@ -11,6 +11,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -460,8 +461,8 @@ func Test_MembershipPrepares(t *testing.T) {
 	}
 }
 
-func prepareMembershipWrapper() func() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
-	return func() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+func prepareMembershipWrapper() func() (sq.SelectBuilder, func(new_db.Rows) (*Memberships, error)) {
+	return func() (sq.SelectBuilder, func(new_db.Rows) (*Memberships, error)) {
 		builder, _, fun := prepareMembershipsQuery(context.Background(), &MembershipSearchQuery{}, false)
 		return builder, fun
 	}

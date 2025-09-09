@@ -2,11 +2,11 @@ package eventstore_test
 
 import (
 	"context"
-	"database/sql"
 	"sync"
 	"testing"
 	"time"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -642,7 +642,7 @@ func assertResourceOwners(t *testing.T, db *database.DB, resourceOwners, aggrega
 	t.Helper()
 
 	eventCount := 0
-	err := db.Query(func(rows *sql.Rows) error {
+	err := db.Query(func(rows new_db.Rows) error {
 		for i := 0; rows.Next(); i++ {
 			var resourceOwner string
 			err := rows.Scan(&resourceOwner)
@@ -670,7 +670,7 @@ func assertEventCount(t *testing.T, db *database.DB, aggTypes database.TextArray
 	t.Helper()
 
 	var count int
-	err := db.QueryRow(func(row *sql.Row) error {
+	err := db.QueryRow(func(row new_db.Row) error {
 		return row.Scan(&count)
 	}, "SELECT count(*) FROM eventstore.events2 where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", aggTypes, aggIDs)
 
@@ -699,7 +699,7 @@ func assertUniqueConstraint(t *testing.T, db *database.DB, commands []eventstore
 	}
 
 	var uniqueCount int
-	err := db.QueryRow(func(row *sql.Row) error {
+	err := db.QueryRow(func(row new_db.Row) error {
 		return row.Scan(&uniqueCount)
 	}, "SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2", uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
 	if err != nil {

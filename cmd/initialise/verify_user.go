@@ -43,6 +43,6 @@ func VerifyUser(username, password string) func(context.Context, *database.DB) e
 			createUserStmt += " WITH PASSWORD '" + password + "'"
 		}
 
-		return exec(ctx, db, fmt.Sprintf(createUserStmt, username), []string{roleAlreadyExistsCode})
+		return exec(ctx, db.DB, fmt.Sprintf(createUserStmt, username), []string{roleAlreadyExistsCode})
 	}
 }

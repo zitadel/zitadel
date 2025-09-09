@@ -2,10 +2,10 @@ package query
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"time"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -35,7 +35,7 @@ func (q *Queries) ListResourceCounts(ctx context.Context, lastID, limit int) (re
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		for rows.Next() {
 			var count ResourceCount
 			err := rows.Scan(

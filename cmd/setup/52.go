@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"errors"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -24,7 +25,7 @@ type IDPTemplate6LDAP2 struct {
 func (mig *IDPTemplate6LDAP2) Execute(ctx context.Context, _ eventstore.Event) error {
 	var count int
 	err := mig.dbClient.QueryRowContext(ctx,
-		func(row *sql.Row) error {
+		func(row new_db.Row) error {
 			if err := row.Scan(&count); err != nil {
 				return err
 			}

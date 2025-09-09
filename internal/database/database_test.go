@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -77,7 +78,7 @@ func TestQueryJSONObject(t *testing.T) {
 			mock := tt.mock(t)
 			defer mock.Assert(t)
 			db := &DB{
-				DB: mock.DB,
+				DB: new_sql.SQLPool(mock.DB),
 			}
 			got, err := QueryJSONObject[dst](context.Background(), db, query, arg)
 			require.ErrorIs(t, err, tt.wantErr)

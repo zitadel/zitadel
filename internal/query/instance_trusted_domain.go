@@ -2,11 +2,11 @@ package query
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -59,8 +59,8 @@ func (q *Queries) SearchInstanceTrustedDomains(ctx context.Context, queries *Ins
 	return q.queryInstanceTrustedDomains(ctx, stmt, scan, args...)
 }
 
-func (q *Queries) queryInstanceTrustedDomains(ctx context.Context, stmt string, scan func(*sql.Rows) (*InstanceTrustedDomains, error), args ...interface{}) (domains *InstanceTrustedDomains, err error) {
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+func (q *Queries) queryInstanceTrustedDomains(ctx context.Context, stmt string, scan func(database.Rows) (*InstanceTrustedDomains, error), args ...interface{}) (domains *InstanceTrustedDomains, err error) {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		domains, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -71,7 +71,7 @@ func (q *Queries) queryInstanceTrustedDomains(ctx context.Context, stmt string, 
 	return domains, err
 }
 
-func prepareInstanceTrustedDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*InstanceTrustedDomains, error)) {
+func prepareInstanceTrustedDomainsQuery() (sq.SelectBuilder, func(database.Rows) (*InstanceTrustedDomains, error)) {
 	return sq.Select(
 			InstanceTrustedDomainCreationDateCol.identifier(),
 			InstanceTrustedDomainChangeDateCol.identifier(),
@@ -81,7 +81,7 @@ func prepareInstanceTrustedDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*I
 			countColumn.identifier(),
 		).From(instanceTrustedDomainsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*InstanceTrustedDomains, error) {
+		func(rows database.Rows) (*InstanceTrustedDomains, error) {
 			domains := make([]*InstanceTrustedDomain, 0)
 			var count uint64
 			for rows.Next() {

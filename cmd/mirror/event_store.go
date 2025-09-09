@@ -2,7 +2,6 @@ package mirror
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"errors"
 	"io"
@@ -15,6 +14,8 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	db "github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/id"
@@ -48,11 +49,11 @@ Migrate only copies events2 and unique constraints`,
 func copyEventstore(ctx context.Context, config *Migration) {
 	sourceClient, err := db.Connect(config.Source, false)
 	logging.OnError(err).Fatal("unable to connect to source database")
-	defer sourceClient.Close()
+	defer sourceClient.DB.Close(ctx)
 
 	destClient, err := db.Connect(config.Destination, false)
 	logging.OnError(err).Fatal("unable to connect to destination database")
-	defer destClient.Close()
+	defer destClient.DB.Close(ctx)
 
 	copyEvents(ctx, sourceClient, destClient, config.EventBulkSize)
 	copyUniqueConstraints(ctx, sourceClient, destClient)
@@ -78,10 +79,10 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	migrationID, err := id.SonyFlakeGenerator().Next()
 	logging.OnError(err).Fatal("unable to generate migration id")
 
-	sourceConn, err := source.Conn(ctx)
+	sourceConn, err := source.DB.Acquire(ctx)
 	logging.OnError(err).Fatal("unable to acquire source connection")
 
-	destConn, err := dest.Conn(ctx)
+	destConn, err := dest.DB.Acquire(ctx)
 	logging.OnError(err).Fatal("unable to acquire dest connection")
 
 	destinationES := eventstore.NewEventstoreFromOne(postgres.New(dest, &postgres.Config{
@@ -93,7 +94,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 
 	var maxPosition decimal.Decimal
 	err = source.QueryRowContext(ctx,
-		func(row *sql.Row) error {
+		func(row new_db.Row) error {
 			return row.Scan(&maxPosition)
 		},
 		"SELECT MAX(position) FROM eventstore.events2 "+instanceClause(),
@@ -107,7 +108,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	errs := make(chan error, 3)
 
 	go func() {
-		err := sourceConn.Raw(func(driverConn interface{}) error {
+		err := sourceConn.(*sql.Conn).Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 			nextPos <- true
 			var i uint32
@@ -157,7 +158,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 			var position decimal.Decimal
 			err := dest.QueryRowContext(
 				ctx,
-				func(row *sql.Row) error {
+				func(row new_db.Row) error {
 					return row.Scan(&position)
 				},
 				positionQuery(dest),
@@ -171,7 +172,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	}()
 
 	var eventCount int64
-	errs <- destConn.Raw(func(driverConn interface{}) error {
+	errs <- destConn.(*sql.Conn).Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
 		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.events2 FROM STDIN")
@@ -217,11 +218,11 @@ func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 	reader, writer := io.Pipe()
 	errs := make(chan error, 1)
 
-	sourceConn, err := source.Conn(ctx)
+	sourceConn, err := source.DB.Acquire(ctx)
 	logging.OnError(err).Fatal("unable to acquire source connection")
 
 	go func() {
-		err := sourceConn.Raw(func(driverConn interface{}) error {
+		err := sourceConn.(*sql.Conn).Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 			var stmt database.Statement
 			stmt.WriteString("COPY (SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints ")
@@ -235,11 +236,11 @@ func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 		errs <- err
 	}()
 
-	destConn, err := dest.Conn(ctx)
+	destConn, err := dest.DB.Acquire(ctx)
 	logging.OnError(err).Fatal("unable to acquire dest connection")
 
 	var eventCount int64
-	err = destConn.Raw(func(driverConn interface{}) error {
+	err = destConn.(*sql.Conn).Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
 		if shouldReplace {

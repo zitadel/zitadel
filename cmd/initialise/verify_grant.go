@@ -34,6 +34,6 @@ func VerifyGrant(databaseName, username string) func(context.Context, *database.
 	return func(ctx context.Context, db *database.DB) error {
 		logging.WithFields("user", username, "database", databaseName).Info("verify grant")
 
-		return exec(ctx, db, fmt.Sprintf(grantStmt, databaseName, username), nil)
+		return exec(ctx, db.DB, fmt.Sprintf(grantStmt, databaseName, username), nil)
 	}
 }

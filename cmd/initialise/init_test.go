@@ -7,6 +7,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 )
@@ -27,7 +28,7 @@ func prepareDB(t *testing.T, expectations ...expectation) db {
 	}
 	return db{
 		mock: mock,
-		db:   &database.DB{DB: client},
+		db:   &database.DB{DB: sql.SQLPool(client)},
 	}
 }
 

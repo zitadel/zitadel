@@ -11,6 +11,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
@@ -102,7 +103,7 @@ func Test_FlowPrepares(t *testing.T) {
 	}{
 		{
 			name: "prepareFlowQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*Flow, error)) {
 				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
@@ -119,7 +120,7 @@ func Test_FlowPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareFlowQuery one action",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*Flow, error)) {
 				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
@@ -173,7 +174,7 @@ func Test_FlowPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareFlowQuery multiple actions",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*Flow, error)) {
 				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
@@ -259,7 +260,7 @@ func Test_FlowPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareFlowQuery no action",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*Flow, error)) {
 				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
@@ -298,7 +299,7 @@ func Test_FlowPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareFlowQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+			prepare: func() (sq.SelectBuilder, func(database.Rows) (*Flow, error)) {
 				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
 			},
 			want: want{

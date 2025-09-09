@@ -11,6 +11,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -184,7 +185,7 @@ func (q *Queries) searchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-SAf3f", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		authNKeys, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -211,7 +212,7 @@ func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySear
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-SAg3f", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		authNKeys, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -260,7 +261,7 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, i
 		return nil, zerrors.ThrowInternal(err, "QUERY-AGhg4", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		key, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -311,7 +312,7 @@ func (q *Queries) GetAuthNKeyUser(ctx context.Context, keyID, userID string) (_ 
 	defer func() { span.EndWithError(err) }()
 
 	dst := new(AuthNKeyUser)
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		return row.Scan(
 			&dst.UserID,
 			&dst.ResourceOwner,
@@ -333,7 +334,7 @@ func (q *Queries) GetAuthNKeyUser(ctx context.Context, keyID, userID string) (_ 
 	return dst, nil
 }
 
-func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys, error)) {
+func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows database.Rows) (*AuthNKeys, error)) {
 	query := sq.Select(
 		AuthNKeyColumnID.identifier(),
 		AuthNKeyColumnAggregateID.identifier(),
@@ -348,7 +349,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 	).From(authNKeyTable.identifier()).
 		PlaceholderFormat(sq.Dollar)
 
-	return query, func(rows *sql.Rows) (*AuthNKeys, error) {
+	return query, func(rows database.Rows) (*AuthNKeys, error) {
 		authNKeys := make([]*AuthNKey, 0)
 		var count uint64
 		for rows.Next() {
@@ -384,7 +385,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 	}
 }
 
-func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, error)) {
+func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row database.Row) (*AuthNKey, error)) {
 	return sq.Select(
 			AuthNKeyColumnID.identifier(),
 			AuthNKeyColumnCreationDate.identifier(),
@@ -395,7 +396,7 @@ func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, er
 			AuthNKeyColumnType.identifier(),
 		).From(authNKeyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*AuthNKey, error) {
+		func(row database.Row) (*AuthNKey, error) {
 			authNKey := new(AuthNKey)
 			err := row.Scan(
 				&authNKey.ID,
@@ -416,7 +417,7 @@ func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, er
 		}
 }
 
-func prepareAuthNKeysDataQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeysData, error)) {
+func prepareAuthNKeysDataQuery() (sq.SelectBuilder, func(rows database.Rows) (*AuthNKeysData, error)) {
 	return sq.Select(
 			AuthNKeyColumnID.identifier(),
 			AuthNKeyColumnCreationDate.identifier(),
@@ -430,7 +431,7 @@ func prepareAuthNKeysDataQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthN
 			countColumn.identifier(),
 		).From(authNKeyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*AuthNKeysData, error) {
+		func(rows database.Rows) (*AuthNKeysData, error) {
 			authNKeys := make([]*AuthNKeyData, 0)
 			var count uint64
 			for rows.Next() {

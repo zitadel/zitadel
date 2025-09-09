@@ -12,6 +12,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -289,7 +290,7 @@ func (q *Queries) sessionByID(ctx context.Context, shouldTriggerBulk bool, id st
 		return nil, "", zerrors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		session, tokenID, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -326,7 +327,7 @@ func (q *Queries) searchSessions(ctx context.Context, queries *SessionsSearchQue
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		sessions, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -366,7 +367,7 @@ func NewExpirationDateQuery(datetime time.Time, compare TimestampComparison) (Se
 	return NewTimestampQuery(SessionColumnExpiration, datetime, compare)
 }
 
-func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, error)) {
+func prepareSessionQuery() (sq.SelectBuilder, func(new_db.Row) (*Session, string, error)) {
 	return sq.Select(
 			SessionColumnID.identifier(),
 			SessionColumnCreationDate.identifier(),
@@ -398,7 +399,7 @@ func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, 
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(UserIDCol, SessionColumnUserID)).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*Session, string, error) {
+			PlaceholderFormat(sq.Dollar), func(row new_db.Row) (*Session, string, error) {
 			session := new(Session)
 
 			var (
@@ -479,7 +480,7 @@ func prepareSessionQuery() (sq.SelectBuilder, func(*sql.Row) (*Session, string, 
 		}
 }
 
-func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error)) {
+func prepareSessionsQuery() (sq.SelectBuilder, func(new_db.Rows) (*Sessions, error)) {
 	return sq.Select(
 			SessionColumnID.identifier(),
 			SessionColumnCreationDate.identifier(),
@@ -511,7 +512,7 @@ func prepareSessionsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Sessions, error
 			LeftJoin(join(LoginNameUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(HumanUserIDCol, SessionColumnUserID)).
 			LeftJoin(join(UserIDCol, SessionColumnUserID)).
-			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) (*Sessions, error) {
+			PlaceholderFormat(sq.Dollar), func(rows new_db.Rows) (*Sessions, error) {
 			sessions := &Sessions{Sessions: []*Session{}}
 
 			for rows.Next() {

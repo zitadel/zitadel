@@ -39,6 +39,6 @@ func VerifyDatabase(databaseName string) func(context.Context, *database.DB) err
 	return func(ctx context.Context, db *database.DB) error {
 		logging.WithFields("database", databaseName).Info("verify database")
 
-		return exec(ctx, db, fmt.Sprintf(databaseStmt, databaseName), []string{dbAlreadyExistsCode})
+		return exec(ctx, db.DB, fmt.Sprintf(databaseStmt, databaseName), []string{dbAlreadyExistsCode})
 	}
 }

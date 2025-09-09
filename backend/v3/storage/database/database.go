@@ -12,6 +12,8 @@ type Pool interface {
 
 	Acquire(ctx context.Context) (Client, error)
 	Close(ctx context.Context) error
+
+	Ping(ctx context.Context) error
 }
 
 type PoolTest interface {
@@ -33,12 +35,18 @@ type Client interface {
 type Querier interface {
 	Query(ctx context.Context, stmt string, args ...any) (Rows, error)
 	QueryRow(ctx context.Context, stmt string, args ...any) Row
+	// QueryContext provides backward compatibility, use Query instead.
+	QueryContext(ctx context.Context, stmt string, args ...any) (Rows, error)
+	// QueryContext provides backward compatibility, use Query instead.
+	QueryRowContext(ctx context.Context, stmt string, args ...any) Row
 }
 
 // Executor is a database client that can execute statements.
 // It returns the number of rows affected or an error
 type Executor interface {
 	Exec(ctx context.Context, stmt string, args ...any) (int64, error)
+	// ExecContext provides backward compatibility, use Exec instead.
+	ExecContext(ctx context.Context, stmt string, args ...any) (int64, error)
 }
 
 // QueryExecutor is a database client that can execute queries and statements.
@@ -55,6 +63,7 @@ type Scanner interface {
 // Row is an abstraction of sql.Row.
 type Row interface {
 	Scanner
+	Err() error
 }
 
 // Rows is an abstraction of sql.Rows.

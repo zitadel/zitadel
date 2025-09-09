@@ -50,16 +50,35 @@ func (s *sqlSavepoint) Query(ctx context.Context, sql string, args ...any) (data
 	return s.parent.Query(ctx, sql, args...)
 }
 
+// QueryContext implements [database.Transaction].
+// QueryContext is for backwards compatibility, it calls Query.
+func (s *sqlSavepoint) QueryContext(ctx context.Context, stmt string, args ...any) (database.Rows, error) {
+	return s.parent.QueryContext(ctx, stmt, args...)
+}
+
 // QueryRow implements [database.Transaction].
 // Subtle: this method shadows the method (Tx).QueryRow of pgxTx.Tx.
 func (s *sqlSavepoint) QueryRow(ctx context.Context, sql string, args ...any) database.Row {
 	return s.parent.QueryRow(ctx, sql, args...)
 }
 
+// QueryContext implements [database.Transaction].
+// Subtle: this method shadows the method (*Conn).QueryContext of sqlConn.Conn.
+// QueryContext is for backwards compatibility, it calls Query.
+func (c *sqlSavepoint) QueryRowContext(ctx context.Context, stmt string, args ...any) database.Row {
+	return c.QueryRow(ctx, stmt, args...)
+}
+
 // Exec implements [database.Transaction].
 // Subtle: this method shadows the method (Pool).Exec of pgxPool.Pool.
 func (s *sqlSavepoint) Exec(ctx context.Context, sql string, args ...any) (int64, error) {
 	return s.parent.Exec(ctx, sql, args...)
+}
+
+// ExecContext implements [database.Transaction].
+// ExecContext is for backwards compatibility, it calls Exec.
+func (s *sqlSavepoint) ExecContext(ctx context.Context, stmt string, args ...any) (int64, error) {
+	return s.parent.ExecContext(ctx, stmt, args...)
 }
 
 // Begin implements [database.Transaction].

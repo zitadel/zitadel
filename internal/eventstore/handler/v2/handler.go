@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"math/rand"
 	"slices"
@@ -13,6 +12,7 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
@@ -94,11 +94,10 @@ func (h *Handler) Execute(ctx context.Context, startedEvent eventstore.Event) er
 		return err
 	}
 
-	// default amount of workers is 10
-	workerCount := 10
+	var workerCount int
 
-	if h.client.DB.Stats().MaxOpenConnections > 0 {
-		workerCount = h.client.DB.Stats().MaxOpenConnections / 4
+	if h.client.MaxOpenConnections() > 0 {
+		workerCount = int(h.client.MaxOpenConnections()) / 4
 	}
 	// ensure that at least one worker is active
 	if workerCount == 0 {
@@ -552,13 +551,13 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 
 	start := time.Now()
 
-	tx, err := h.client.BeginTx(txCtx, nil)
+	tx, err := h.client.DB.Begin(txCtx, nil)
 	if err != nil {
 		return false, err
 	}
 	defer func() {
 		if err != nil && !errors.Is(err, &executionError{}) {
-			rollbackErr := tx.Rollback()
+			rollbackErr := tx.Rollback(ctx)
 			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
 			return
 		}
@@ -594,7 +593,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	}
 
 	defer func() {
-		commitErr := tx.Commit()
+		commitErr := tx.Commit(ctx)
 		if err == nil {
 			err = commitErr
 		}
@@ -611,7 +610,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	}()
 
 	if len(statements) == 0 {
-		err = h.setState(tx, currentState)
+		err = h.setState(ctx, tx, currentState)
 		return additionalIteration, err
 	}
 
@@ -628,7 +627,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	currentState.sequence = statements[lastProcessedIndex].Sequence
 	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
 
-	setStateErr := h.setState(tx, currentState)
+	setStateErr := h.setState(ctx, tx, currentState)
 	if setStateErr != nil {
 		err = setStateErr
 	}
@@ -636,7 +635,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	return additionalIteration, err
 }
 
-func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentState *state) (_ []*Statement, additionalIteration bool, err error) {
+func (h *Handler) generateStatements(ctx context.Context, tx new_db.Transaction, currentState *state) (_ []*Statement, additionalIteration bool, err error) {
 	if h.triggerWithoutEvents != nil {
 		stmt, err := h.triggerWithoutEvents(pseudo.NewScheduledEvent(ctx, time.Now(), currentState.instanceID))
 		if err != nil {
@@ -652,7 +651,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 	eventAmount := len(events)
 
-	statements, err := h.eventsToStatements(tx, events, currentState)
+	statements, err := h.eventsToStatements(ctx, tx, events, currentState)
 	if err != nil || len(statements) == 0 {
 		return nil, false, err
 	}
@@ -691,7 +690,7 @@ func skipPreviouslyReducedStatements(statements []*Statement, currentState *stat
 	return -1
 }
 
-func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, statements []*Statement) (lastProcessedIndex int, err error) {
+func (h *Handler) executeStatements(ctx context.Context, tx new_db.Transaction, statements []*Statement) (lastProcessedIndex int, err error) {
 	lastProcessedIndex = -1
 
 	for i, statement := range statements {
@@ -709,7 +708,7 @@ func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, statements 
 	return lastProcessedIndex, nil
 }
 
-func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *Statement) (err error) {
+func (h *Handler) executeStatement(ctx context.Context, tx new_db.Transaction, statement *Statement) (err error) {
 	if statement.Execute == nil {
 		return nil
 	}
@@ -726,7 +725,7 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 		_, rollbackErr := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT exec_stmt")
 		h.log().OnError(rollbackErr).Error("rollback to savepoint failed")
 
-		shouldContinue := h.handleFailedStmt(tx, failureFromStatement(statement, err))
+		shouldContinue := h.handleFailedStmt(ctx, tx, failureFromStatement(statement, err))
 		if shouldContinue {
 			return nil
 		}

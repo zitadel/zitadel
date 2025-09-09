@@ -10,6 +10,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/database/mock"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -1372,7 +1373,7 @@ func Test_executeQuery(t *testing.T) {
 					),
 				),
 			)
-			gotEventCount, err := executeQuery(context.Background(), mockDB.DB, &database.Statement{}, tt.args.reducer)
+			gotEventCount, err := executeQuery(context.Background(), sql.SQLPool(mockDB.DB), &database.Statement{}, tt.args.reducer)
 			tt.want.assertErr(t, err)
 			if gotEventCount != tt.want.eventCount {
 				t.Errorf("executeQuery() = %v, want %v", gotEventCount, tt.want.eventCount)

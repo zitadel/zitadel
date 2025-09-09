@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"testing"
 
@@ -11,6 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/postgres"
@@ -268,7 +269,7 @@ func TestEventstore_queueExecutions(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		tx     database.Tx
+		tx     new_db.Transaction
 		events []eventstore.Event
 	}
 	tests := []struct {

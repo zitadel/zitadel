@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -124,7 +125,7 @@ func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool,
 		return nil, zerrors.ThrowInternal(err, "QUERY-D3CqT", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
@@ -146,14 +147,14 @@ func (q *Queries) DefaultDomainPolicy(ctx context.Context) (policy *DomainPolicy
 		return nil, zerrors.ThrowInternal(err, "QUERY-pM7lP", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		policy, err = scan(row)
 		return err
 	}, query, args...)
 	return policy, err
 }
 
-func prepareDomainPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy, error)) {
+func prepareDomainPolicyQuery() (sq.SelectBuilder, func(database.Row) (*DomainPolicy, error)) {
 	return sq.Select(
 			DomainPolicyColID.identifier(),
 			DomainPolicyColSequence.identifier(),
@@ -168,7 +169,7 @@ func prepareDomainPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy
 		).
 			From(domainPolicyTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*DomainPolicy, error) {
+		func(row database.Row) (*DomainPolicy, error) {
 			policy := new(DomainPolicy)
 			err := row.Scan(
 				&policy.ID,

@@ -12,6 +12,7 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
@@ -36,11 +37,11 @@ type querier interface {
 type scan func(dest ...interface{}) error
 
 type tx struct {
-	*sql.Tx
+	new_db.Transaction
 }
 
-func (t *tx) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) error {
-	rows, err := t.Tx.QueryContext(ctx, query, args...)
+func (t *tx) QueryContext(ctx context.Context, scan func(rows new_db.Rows) error, query string, args ...any) error {
+	rows, err := t.Transaction.QueryContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}
@@ -68,12 +69,12 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	}
 
 	var contextQuerier interface {
-		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
-		ExecContext(context.Context, string, ...any) (sql.Result, error)
+		QueryContext(context.Context, func(rows new_db.Rows) error, string, ...interface{}) error
+		ExecContext(context.Context, string, ...any) (int64, error)
 	}
 	contextQuerier = criteria.Client()
 	if q.Tx != nil {
-		contextQuerier = &tx{Tx: q.Tx}
+		contextQuerier = &tx{Transaction: q.Tx}
 	}
 
 	if q.AwaitOpenTransactions && q.Columns == eventstore.ColumnsEvent {
@@ -130,7 +131,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	query = criteria.placeholder(query)
 
 	err = contextQuerier.QueryContext(ctx,
-		func(rows *sql.Rows) error {
+		func(rows new_db.Rows) error {
 			for rows.Next() {
 				err := rowScanner(rows.Scan, dest)
 				if err != nil {

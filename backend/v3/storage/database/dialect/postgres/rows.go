@@ -15,6 +15,12 @@ var (
 
 type Row struct{ pgx.Row }
 
+// Err implements [database.Row].
+// [pgx.Row] does not provide an error so we always return nil.
+func (r *Row) Err() error {
+	return nil
+}
+
 // Scan implements [database.Row].
 // Subtle: this method shadows the method ([pgx.Row]).Scan of Row.Row.
 func (r *Row) Scan(dest ...any) error {

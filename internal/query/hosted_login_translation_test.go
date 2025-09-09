@@ -16,6 +16,7 @@ import (
 	"google.golang.org/protobuf/runtime/protoimpl"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/mock"
@@ -317,7 +318,7 @@ func TestGetHostedLoginTranslation(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			// Given
-			db := &database.DB{DB: mock.NewSQLMock(t, tc.sqlExpectations...).DB}
+			db := &database.DB{DB: new_sql.SQLPool(mock.NewSQLMock(t, tc.sqlExpectations...).DB)}
 			querier := Queries{client: db}
 
 			ctx := authz.NewMockContext("instance-id", "org-id", "user-id", authz.WithMockDefaultLanguage(tc.defaultInstanceLanguage))

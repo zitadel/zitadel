@@ -89,7 +89,7 @@ func WithExecRowsAffected(affected driver.RowsAffected) ExecOpt {
 	}
 }
 
-func ExcpectExec(stmt string, opts ...ExecOpt) Expectation {
+func ExpectExec(stmt string, opts ...ExecOpt) Expectation {
 	return func(m sqlmock.Sqlmock) {
 		e := m.ExpectExec(stmt)
 		for _, opt := range opts {

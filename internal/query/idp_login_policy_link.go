@@ -6,6 +6,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -110,7 +111,7 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-FDbKW", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		idps, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -122,7 +123,7 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 }
 
 //nolint:gocognit
-func prepareIDPLoginPolicyLinksQuery(ctx context.Context, resourceOwner string) (sq.SelectBuilder, func(*sql.Rows) (*IDPLoginPolicyLinks, error)) {
+func prepareIDPLoginPolicyLinksQuery(ctx context.Context, resourceOwner string) (sq.SelectBuilder, func(database.Rows) (*IDPLoginPolicyLinks, error)) {
 	resourceOwnerQuery, resourceOwnerArgs, err := prepareIDPLoginPolicyLinksResourceOwnerQuery(ctx, resourceOwner)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
@@ -145,7 +146,7 @@ func prepareIDPLoginPolicyLinksQuery(ctx context.Context, resourceOwner string) 
 				idpLoginPolicyOwnerInstanceIDCol.identifier()+" = "+IDPLoginPolicyLinkInstanceIDCol.identifier(),
 				resourceOwnerArgs...).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*IDPLoginPolicyLinks, error) {
+		func(rows database.Rows) (*IDPLoginPolicyLinks, error) {
 			links := make([]*IDPLoginPolicyLink, 0)
 			var count uint64
 			for rows.Next() {

@@ -2,10 +2,10 @@ package database
 
 import (
 	"context"
-	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/crypto"
 	z_db "github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -44,7 +44,7 @@ func (d *Database) ReadKeys() (crypto.Keys, error) {
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "", "unable to read keys")
 	}
-	err = d.client.Query(func(rows *sql.Rows) error {
+	err = d.client.Query(func(rows database.Rows) error {
 		for rows.Next() {
 			var id, encryptionKey string
 			err = rows.Scan(&id, &encryptionKey)
@@ -77,7 +77,7 @@ func (d *Database) ReadKey(id string) (_ *crypto.Key, err error) {
 		return nil, zerrors.ThrowInternal(err, "", "unable to read key")
 	}
 	var key string
-	err = d.client.QueryRow(func(row *sql.Row) error {
+	err = d.client.QueryRow(func(row database.Row) error {
 		var encryptionKey string
 		err = row.Scan(&encryptionKey)
 		if err != nil {
@@ -113,16 +113,16 @@ func (d *Database) CreateKeys(ctx context.Context, keys ...*crypto.Key) error {
 	if err != nil {
 		return zerrors.ThrowInternal(err, "", "unable to insert new keys")
 	}
-	tx, err := d.client.BeginTx(ctx, nil)
+	tx, err := d.client.DB.Begin(ctx, nil)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "", "unable to insert new keys")
 	}
-	_, err = tx.Exec(stmt, args...)
+	_, err = tx.Exec(ctx, stmt, args...)
 	if err != nil {
-		tx.Rollback()
+		tx.Rollback(ctx)
 		return zerrors.ThrowInternal(err, "", "unable to insert new keys")
 	}
-	err = tx.Commit()
+	err = tx.Commit(ctx)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "", "unable to insert new keys")
 	}

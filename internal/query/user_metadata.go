@@ -10,6 +10,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -124,7 +125,7 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 		return nil, zerrors.ThrowInternal(err, "QUERY-aDGG2", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		metadata, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -152,7 +153,7 @@ func (q *Queries) SearchUserMetadataForUsers(ctx context.Context, shouldTriggerB
 		return nil, zerrors.ThrowInternal(err, "QUERY-Egbgd", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		metadata, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -197,7 +198,7 @@ func (q *Queries) searchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 		return nil, zerrors.ThrowInternal(err, "QUERY-Egbgd", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		metadata, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -275,7 +276,7 @@ func NewUserMetadataExistsQuery(key string, value []byte, keyComparison TextComp
 	)
 }
 
-func prepareUserMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*UserMetadata, error)) {
+func prepareUserMetadataQuery() (sq.SelectBuilder, func(database.Row) (*UserMetadata, error)) {
 	return sq.Select(
 			UserMetadataCreationDateCol.identifier(),
 			UserMetadataChangeDateCol.identifier(),
@@ -286,7 +287,7 @@ func prepareUserMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*UserMetadata
 		).
 			From(userMetadataTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*UserMetadata, error) {
+		func(row database.Row) (*UserMetadata, error) {
 			m := new(UserMetadata)
 			err := row.Scan(
 				&m.CreationDate,
@@ -307,7 +308,7 @@ func prepareUserMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*UserMetadata
 		}
 }
 
-func prepareUserMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserMetadataList, error)) {
+func prepareUserMetadataListQuery() (sq.SelectBuilder, func(database.Rows) (*UserMetadataList, error)) {
 	return sq.Select(
 			UserMetadataCreationDateCol.identifier(),
 			UserMetadataChangeDateCol.identifier(),
@@ -319,7 +320,7 @@ func prepareUserMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserMet
 			countColumn.identifier()).
 			From(userMetadataTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*UserMetadataList, error) {
+		func(rows database.Rows) (*UserMetadataList, error) {
 			metadata := make([]*UserMetadata, 0)
 			var count uint64
 			for rows.Next() {

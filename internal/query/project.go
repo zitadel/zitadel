@@ -10,6 +10,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -214,7 +215,7 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 		return nil, zerrors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row database.Row) error {
 		project, err = scan(row)
 		return err
 	}, query, args...)
@@ -243,7 +244,7 @@ func (q *Queries) searchProjects(ctx context.Context, queries *ProjectSearchQuer
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-fn9ew", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		projects, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -306,7 +307,7 @@ func (q *Queries) searchGrantedProjects(ctx context.Context, queries *ProjectAnd
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-T84X9", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows database.Rows) error {
 		grantedProjects, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -397,7 +398,7 @@ func (q *ProjectSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder 
 	return query
 }
 
-func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
+func prepareProjectQuery() (sq.SelectBuilder, func(database.Row) (*Project, error)) {
 	return sq.Select(
 			ProjectColumnID.identifier(),
 			ProjectColumnCreationDate.identifier(),
@@ -412,7 +413,7 @@ func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) 
 			ProjectColumnPrivateLabelingSetting.identifier()).
 			From(projectsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Project, error) {
+		func(row database.Row) (*Project, error) {
 			p := new(Project)
 			err := row.Scan(
 				&p.ID,
@@ -437,7 +438,7 @@ func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) 
 		}
 }
 
-func prepareProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Projects, error)) {
+func prepareProjectsQuery() (sq.SelectBuilder, func(database.Rows) (*Projects, error)) {
 	return sq.Select(
 			ProjectColumnID.identifier(),
 			ProjectColumnCreationDate.identifier(),
@@ -453,7 +454,7 @@ func prepareProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Projects, error
 			countColumn.identifier()).
 			From(projectsTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Projects, error) {
+		func(rows database.Rows) (*Projects, error) {
 			projects := make([]*Project, 0)
 			var count uint64
 			for rows.Next() {
@@ -527,7 +528,7 @@ type GrantedProject struct {
 	ProjectGrantState domain.ProjectGrantState
 }
 
-func prepareGrantedProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*GrantedProjects, error)) {
+func prepareGrantedProjectsQuery() (sq.SelectBuilder, func(database.Rows) (*GrantedProjects, error)) {
 	return sq.Select(
 			GrantedProjectColumnID.identifier(),
 			GrantedProjectColumnCreationDate.identifier(),
@@ -547,7 +548,7 @@ func prepareGrantedProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*GrantedP
 			countColumn.identifier(),
 		).From(getProjectsAndGrantedProjectsFromQuery()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*GrantedProjects, error) {
+		func(rows database.Rows) (*GrantedProjects, error) {
 			projects := make([]*GrantedProject, 0)
 			var (
 				count             uint64

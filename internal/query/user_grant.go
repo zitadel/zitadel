@@ -10,6 +10,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -297,7 +298,7 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, queries
 		return nil, zerrors.ThrowInternal(err, "QUERY-Fa1KW", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		grant, err = scan(row)
 		return err
 	}, stmt, args...)
@@ -341,7 +342,7 @@ func (q *Queries) userGrants(ctx context.Context, queries *UserGrantsQueries, sh
 		return nil, err
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		grants, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -353,7 +354,7 @@ func (q *Queries) userGrants(ctx context.Context, queries *UserGrantsQueries, sh
 	return grants, nil
 }
 
-func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, error)) {
+func prepareUserGrantQuery() (sq.SelectBuilder, func(new_db.Row) (*UserGrant, error)) {
 	return sq.Select(
 			UserGrantID.identifier(),
 			UserGrantCreationDate.identifier(),
@@ -397,7 +398,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*UserGrant, error) {
+		func(row new_db.Row) (*UserGrant, error) {
 			g := new(UserGrant)
 
 			var (
@@ -481,7 +482,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 		}
 }
 
-func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, error)) {
+func prepareUserGrantsQuery() (sq.SelectBuilder, func(new_db.Rows) (*UserGrants, error)) {
 	return sq.Select(
 			UserGrantID.identifier(),
 			UserGrantCreationDate.identifier(),
@@ -527,7 +528,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*UserGrants, error) {
+		func(rows new_db.Rows) (*UserGrants, error) {
 			userGrants := make([]*UserGrant, 0)
 			var count uint64
 			for rows.Next() {

@@ -3,7 +3,6 @@ package database
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"database/sql/driver"
 	"io"
 	"reflect"
@@ -13,6 +12,8 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/static"
 )
@@ -274,7 +275,7 @@ func Test_dbStorage_RemoveInstanceObjects(t *testing.T) {
 
 type db struct {
 	mock sqlmock.Sqlmock
-	db   *sql.DB
+	db   database.Pool
 }
 
 func prepareDB(t *testing.T, expectations ...expectation) db {
@@ -288,7 +289,7 @@ func prepareDB(t *testing.T, expectations ...expectation) db {
 	}
 	return db{
 		mock: mock,
-		db:   client,
+		db:   new_sql.SQLPool(client),
 	}
 }
 

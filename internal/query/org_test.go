@@ -12,6 +12,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -422,7 +423,7 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			q := &Queries{
 				client: &database.DB{
-					DB: client,
+					DB: new_sql.SQLPool(client),
 				},
 			}
 

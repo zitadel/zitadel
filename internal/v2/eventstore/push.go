@@ -2,7 +2,8 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
 type Pusher interface {
@@ -28,7 +29,7 @@ func NewPushIntent(instance string, opts ...PushOpt) *PushIntent {
 type PushIntent struct {
 	instance   string
 	reducer    Reducer
-	tx         *sql.Tx
+	tx         database.Transaction
 	aggregates []*PushAggregate
 }
 
@@ -43,7 +44,7 @@ func (pi *PushIntent) Reduce(events ...*StorageEvent) error {
 	return pi.reducer.Reduce(events...)
 }
 
-func (pi *PushIntent) Tx() *sql.Tx {
+func (pi *PushIntent) Tx() database.Transaction {
 	return pi.tx
 }
 
@@ -59,7 +60,7 @@ func PushReducer(reducer Reducer) PushOpt {
 	}
 }
 
-func PushTx(tx *sql.Tx) PushOpt {
+func PushTx(tx database.Transaction) PushOpt {
 	return func(pi *PushIntent) {
 		pi.tx = tx
 	}

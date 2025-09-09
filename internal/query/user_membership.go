@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -157,7 +158,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	}
 	queryArgs = append(queryArgs, args...)
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		memberships, err = scan(rows)
 		return err
 	}, stmt, queryArgs...)
@@ -244,7 +245,7 @@ func getMembershipFromQuery(ctx context.Context, queries *MembershipSearchQuery,
 		args
 }
 
-func prepareMembershipsQuery(ctx context.Context, queries *MembershipSearchQuery, permissionV2 bool) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*Memberships, error)) {
+func prepareMembershipsQuery(ctx context.Context, queries *MembershipSearchQuery, permissionV2 bool) (sq.SelectBuilder, []interface{}, func(new_db.Rows) (*Memberships, error)) {
 	query, args := getMembershipFromQuery(ctx, queries, permissionV2)
 	return sq.Select(
 			MembershipUserID.identifier(),
@@ -269,7 +270,7 @@ func prepareMembershipsQuery(ctx context.Context, queries *MembershipSearchQuery
 			LeftJoin(join(InstanceColumnID, membershipInstanceID)).
 			PlaceholderFormat(sq.Dollar),
 		args,
-		func(rows *sql.Rows) (*Memberships, error) {
+		func(rows new_db.Rows) (*Memberships, error) {
 			memberships := make([]*Membership, 0)
 			var count uint64
 			for rows.Next() {

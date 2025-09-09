@@ -9,6 +9,7 @@ import (
 	"sync"
 	"text/template"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -101,7 +102,7 @@ func (q *Queries) GetOIDCUserinfoClientByID(ctx context.Context, clientID string
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	scan := func(row *sql.Row) error {
+	scan := func(row new_db.Row) error {
 		err := row.Scan(&projectID, &projectRoleAssertion)
 		return err
 	}

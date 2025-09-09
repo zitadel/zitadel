@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
@@ -158,7 +159,7 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-M9fow", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		instances, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -187,7 +188,7 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (instanc
 		return nil, zerrors.ThrowInternal(err, "QUERY-d9ngs", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		instance, err = scan(rows)
 		return err
 	}, query, args...)
@@ -264,7 +265,7 @@ func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
 	return instance.DefaultLang
 }
 
-func prepareInstancesQuery(sortBy Column, isAscedingSort bool) (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+func prepareInstancesQuery(sortBy Column, isAscedingSort bool) (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(new_db.Rows) (*Instances, error)) {
 	instanceFilterTable := instanceTable.setAlias(InstancesFilterTableAlias)
 	instanceFilterIDColumn := InstanceColumnID.setTable(instanceFilterTable)
 	instanceFilterCountColumn := InstancesFilterTableAlias + ".count"
@@ -310,7 +311,7 @@ func prepareInstancesQuery(sortBy Column, isAscedingSort bool) (sq.SelectBuilder
 
 			return outerQuery
 		},
-		func(rows *sql.Rows) (*Instances, error) {
+		func(rows new_db.Rows) (*Instances, error) {
 			instances := make([]*Instance, 0)
 			var lastInstance *Instance
 			var count uint64
@@ -382,7 +383,7 @@ func prepareInstancesQuery(sortBy Column, isAscedingSort bool) (sq.SelectBuilder
 		}
 }
 
-func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
+func prepareInstanceDomainQuery() (sq.SelectBuilder, func(new_db.Rows) (*Instance, error)) {
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			InstanceColumnCreationDate.identifier(),
@@ -404,7 +405,7 @@ func prepareInstanceDomainQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance,
 			From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Instance, error) {
+		func(rows new_db.Rows) (*Instance, error) {
 			instance := &Instance{
 				Domains: make([]*InstanceDomain, 0),
 			}
@@ -562,9 +563,9 @@ func (i *authzInstance) Keys(index instanceIndex) []string {
 	return nil
 }
 
-func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
+func scanAuthzInstance() (*authzInstance, func(row new_db.Row) error) {
 	instance := &authzInstance{}
-	return instance, func(row *sql.Row) error {
+	return instance, func(row new_db.Row) error {
 		var (
 			lang                  string
 			enableIframeEmbedding sql.NullBool

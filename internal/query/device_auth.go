@@ -7,6 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -73,7 +74,7 @@ func (q *Queries) DeviceAuthRequestByUserCode(ctx context.Context, userCode stri
 		return nil, zerrors.ThrowInternal(err, "QUERY-Axu7l", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		authReq, err = scan(row)
 		return err
 	}, query, args...)
@@ -90,14 +91,14 @@ var deviceAuthSelectColumns = []string{
 	ProjectColumnName.identifier(),
 }
 
-func prepareDeviceAuthQuery() (sq.SelectBuilder, func(*sql.Row) (*domain.AuthRequestDevice, error)) {
+func prepareDeviceAuthQuery() (sq.SelectBuilder, func(new_db.Row) (*domain.AuthRequestDevice, error)) {
 	return sq.Select(deviceAuthSelectColumns...).
 			From(deviceAuthRequestTable.identifier()).
 			LeftJoin(join(AppOIDCConfigColumnClientID, DeviceAuthRequestColumnClientID)).
 			LeftJoin(join(AppColumnID, AppOIDCConfigColumnAppID)).
 			LeftJoin(join(ProjectColumnID, AppColumnProjectID)).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*domain.AuthRequestDevice, error) {
+		func(row new_db.Row) (*domain.AuthRequestDevice, error) {
 			dst := new(domain.AuthRequestDevice)
 			var (
 				scopes      database.TextArray[string]

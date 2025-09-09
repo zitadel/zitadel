@@ -2,10 +2,10 @@ package setup
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"strings"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -19,7 +19,7 @@ var (
 )
 
 type LogstoreTables struct {
-	dbClient *sql.DB
+	dbClient *database.DB
 	username string
 }
 

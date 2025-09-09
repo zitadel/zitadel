@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -426,7 +427,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			execMock(t, tt.mock, func(db *sql.DB) {
+			execMock(t, tt.mock, func(db new_db.Pool) {
 				q := &Queries{
 					client: &database.DB{
 						DB: db,
@@ -472,7 +473,7 @@ func TestQueries_GetOIDCUserinfoClientByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			execMock(t, tt.mock, func(db *sql.DB) {
+			execMock(t, tt.mock, func(db new_db.Pool) {
 				q := &Queries{
 					client: &database.DB{
 						DB: db,

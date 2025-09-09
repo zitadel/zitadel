@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -72,14 +73,14 @@ func (q *Queries) GetQuota(ctx context.Context, instanceID string, unit quota.Un
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-XmYn9", "Errors.Query.SQLStatement")
 	}
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		qu, err = scan(row)
 		return err
 	}, stmt, args...)
 	return qu, err
 }
 
-func prepareQuotaQuery() (sq.SelectBuilder, func(*sql.Row) (*Quota, error)) {
+func prepareQuotaQuery() (sq.SelectBuilder, func(new_db.Row) (*Quota, error)) {
 	return sq.
 			Select(
 				QuotaColumnID.identifier(),
@@ -90,7 +91,7 @@ func prepareQuotaQuery() (sq.SelectBuilder, func(*sql.Row) (*Quota, error)) {
 				"now()",
 			).
 			From(quotasTable.identifier()).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*Quota, error) {
+			PlaceholderFormat(sq.Dollar), func(row new_db.Row) (*Quota, error) {
 			q := new(Quota)
 			var interval database.NullDuration
 			var now time.Time

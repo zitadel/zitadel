@@ -15,6 +15,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 )
@@ -26,9 +28,9 @@ var (
 
 // assertPrepare checks if the prepare func executes the correct sql query and returns the correct object
 // prepareFunc must be of type
-// func() (sq.SelectBuilder, func(*sql.Rows) (*struct, error))
+// func() (sq.SelectBuilder, func(new_db.Rows) (*struct, error))
 // or
-// func() (sq.SelectBuilder, func(*sql.Row) (*struct, error))
+// func() (sq.SelectBuilder, func(new_db.Row) (*struct, error))
 // expectedObject represents the return value of scan
 // sqlExpectation represents the query executed on the database
 func assertPrepare(t *testing.T, prepareFunc, expectedObject any, sqlExpectation sqlExpectation, isErr checkErr, prepareArgs ...reflect.Value) bool {
@@ -56,7 +58,7 @@ func assertPrepare(t *testing.T, prepareFunc, expectedObject any, sqlExpectation
 		}
 		return isErr(err)
 	}
-	object, ok, didScan := execScan(t, &database.DB{DB: client}, builder, scan, errCheck)
+	object, ok, didScan := execScan(t, &database.DB{DB: new_sql.SQLPool(client)}, builder, scan, errCheck)
 	if !ok {
 		t.Error(object)
 		return false
@@ -145,12 +147,12 @@ func mockQueryErr(stmt string, err error, args ...driver.Value) func(m sqlmock.S
 	}
 }
 
-func execMock(t testing.TB, exp sqlExpectation, run func(db *sql.DB)) {
+func execMock(t testing.TB, exp sqlExpectation, run func(pool new_db.Pool)) {
 	db, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 	require.NoError(t, err)
 	defer db.Close()
 	mock = exp(mock)
-	run(db)
+	run(new_sql.SQLPool(db))
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -174,14 +176,14 @@ func execScan(t testing.TB, client *database.DB, builder sq.SelectBuilder, scan 
 		return fmt.Errorf("unexpected error from sql builder: %w", err), false, false
 	}
 
-	//resultSet represents *sql.Row or *sql.Rows,
+	//resultSet represents new_db.Row or new_db.Rows,
 	// depending on whats assignable to the scan function
 	var res []reflect.Value
 
 	//execute sql stmt
-	// if scan(*sql.Rows)...
+	// if scan(new_db.Rows)...
 	if scanType.In(0).AssignableTo(rowsType) {
-		err = client.Query(func(rows *sql.Rows) error {
+		err = client.Query(func(rows new_db.Rows) error {
 			didScan = true
 			res = reflect.ValueOf(scan).Call([]reflect.Value{reflect.ValueOf(rows)})
 			if err, ok := res[1].Interface().(error); ok {
@@ -190,9 +192,9 @@ func execScan(t testing.TB, client *database.DB, builder sq.SelectBuilder, scan 
 			return nil
 		}, stmt, args...)
 
-		// if scan(*sql.Row)...
+		// if scan(new_db.Row)...
 	} else if scanType.In(0).AssignableTo(rowType) {
-		err = client.QueryRow(func(r *sql.Row) error {
+		err = client.QueryRow(func(r new_db.Row) error {
 			if r.Err() != nil {
 				return r.Err()
 			}
@@ -205,7 +207,7 @@ func execScan(t testing.TB, client *database.DB, builder sq.SelectBuilder, scan 
 		}, stmt, args...)
 
 	} else {
-		return errors.New("scan: parameter must be *sql.Row or *sql.Rows"), false, false
+		return errors.New("scan: parameter must be new_db.Row or new_db.Rows"), false, false
 	}
 
 	if err != nil {
@@ -330,7 +332,7 @@ func TestValidatePrepare(t *testing.T) {
 		},
 		{
 			name: "wong input count",
-			t: reflect.TypeOf(func(int) (sq.SelectBuilder, func(*sql.Rows) (interface{}, error)) {
+			t: reflect.TypeOf(func(int) (sq.SelectBuilder, func(new_db.Rows) (interface{}, error)) {
 				log.Fatal("should not be executed")
 				return sq.SelectBuilder{}, nil
 			}),
@@ -346,7 +348,7 @@ func TestValidatePrepare(t *testing.T) {
 		},
 		{
 			name: "first output type wrong",
-			t: reflect.TypeOf(func() (*struct{}, func(*sql.Rows) (interface{}, error)) {
+			t: reflect.TypeOf(func() (*struct{}, func(new_db.Rows) (interface{}, error)) {
 				log.Fatal("should not be executed")
 				return nil, nil
 			}),
@@ -362,7 +364,7 @@ func TestValidatePrepare(t *testing.T) {
 		},
 		{
 			name: "correct",
-			t: reflect.TypeOf(func() (sq.SelectBuilder, func(*sql.Rows) (interface{}, error)) {
+			t: reflect.TypeOf(func() (sq.SelectBuilder, func(new_db.Rows) (interface{}, error)) {
 				log.Fatal("should not be executed")
 				return sq.SelectBuilder{}, nil
 			}),

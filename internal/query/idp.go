@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	new_db "github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -220,7 +221,7 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 		return nil, zerrors.ThrowInternal(err, "QUERY-0gocI", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = q.client.QueryRowContext(ctx, func(row new_db.Row) error {
 		idp, err = scan(row)
 		return err
 	}, query, args...)
@@ -244,7 +245,7 @@ func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries, withOwner
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-X6X7y", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+	err = q.client.QueryContext(ctx, func(rows new_db.Rows) error {
 		idps, err = scan(rows)
 		return err
 	}, stmt, args...)
@@ -292,7 +293,7 @@ func (q *IDPSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
+func prepareIDPByIDQuery() (sq.SelectBuilder, func(new_db.Row) (*IDP, error)) {
 	return sq.Select(
 			IDPIDCol.identifier(),
 			IDPResourceOwnerCol.identifier(),
@@ -322,7 +323,7 @@ func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 			LeftJoin(join(OIDCIDPColIDPID, IDPIDCol)).
 			LeftJoin(join(JWTIDPColIDPID, IDPIDCol)).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*IDP, error) {
+		func(row new_db.Row) (*IDP, error) {
 			idp := new(IDP)
 
 			oidcIDPID := sql.NullString{}
@@ -400,7 +401,7 @@ func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 		}
 }
 
-func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
+func prepareIDPsQuery() (sq.SelectBuilder, func(new_db.Rows) (*IDPs, error)) {
 	return sq.Select(
 			IDPIDCol.identifier(),
 			IDPResourceOwnerCol.identifier(),
@@ -431,7 +432,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 			LeftJoin(join(OIDCIDPColIDPID, IDPIDCol)).
 			LeftJoin(join(JWTIDPColIDPID, IDPIDCol)).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*IDPs, error) {
+		func(rows new_db.Rows) (*IDPs, error) {
 			idps := make([]*IDP, 0)
 			var count uint64
 			for rows.Next() {

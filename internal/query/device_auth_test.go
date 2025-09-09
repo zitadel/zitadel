@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	new_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/internal/database"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -74,7 +75,7 @@ func TestQueries_DeviceAuthRequestByUserCode(t *testing.T) {
 		mock.NewRows(deviceAuthSelectColumns).AddRow(expectedDeviceAuthValues...),
 	)
 	q := Queries{
-		client: &database.DB{DB: client},
+		client: &database.DB{DB: new_sql.SQLPool(client)},
 	}
 	got, err := q.DeviceAuthRequestByUserCode(context.TODO(), "789")
 	require.NoError(t, err)
