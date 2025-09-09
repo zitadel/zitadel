@@ -17,6 +17,7 @@ import (
 
 func TestAddInstanceDomain(t *testing.T) {
 	// create instance
+	//something
 	instanceID := gofakeit.UUID()
 	instance := domain.Instance{
 		ID:              instanceID,
