@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/brianvoe/gofakeit/v7"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

@@ -1,6 +1,6 @@
 package integration
 
-import "github.com/brianvoe/gofakeit/v7"
+import "github.com/brianvoe/gofakeit/v6"
 
 // company private function to add a random string to the gofakeit.Company function
 func company() string {

@@ -38,7 +38,6 @@ const (
 
 // Get implements [domain.InstanceRepository].
 func (i *instance) Get(ctx context.Context, opts ...database.QueryOption) (*domain.Instance, error) {
-	// something
 	opts = append(opts,
 		i.joinDomains(),
 		database.WithGroupBy(i.IDColumn()),
