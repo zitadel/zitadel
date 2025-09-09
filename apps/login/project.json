@@ -54,28 +54,19 @@
         "^build"
       ]
     },
-    "test-integration-env-build": {
-      "description": "Build the login and the API mock server to run the integration tests",
-      "command": "nx run @zitadel/devcontainer:compose build login-api-mock login",
-      "dependsOn": []
-    },
-    "test-integration-env-start": {
-      "description": "Start the login and the API mock server to run the integration tests",
+    "test-integration-env": {
+      "description": "Starts the login-api-mock and the api for integration tests",
       "continuous": true,
-      "command": "nx run @zitadel/devcontainer:compose up --no-deps --build --watch login-api-mock login",
       "dependsOn": [
-        "test-integration-env-build"
+        "@zitadel/login-api-mock:serve",
+        "build"
       ],
-      "options": {
-        "env": {
-          "LOGIN_ENV_FILE": "{projectRoot}/.env.test-integration-env"
-        }
-      }
+      "command": "nx run @zitadel/login:production"
     },
     "test-integration": {
       "cache": true,
       "dependsOn": [
-        "test-integration-env-start"
+        "test-integration-env"
       ],
       "inputs": [
         "{projectRoot}/integration/integration/**",
