@@ -19,7 +19,7 @@ require (
 	github.com/alicebob/miniredis/v2 v2.34.0
 	github.com/benbjohnson/clock v1.3.5
 	github.com/boombuler/barcode v1.0.2
-	github.com/brianvoe/gofakeit/v6 v6.28.0
+	github.com/brianvoe/gofakeit/v7 v7.5.1
 	github.com/cockroachdb/cockroach-go/v2 v2.4.0
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/crewjam/saml v0.4.14
