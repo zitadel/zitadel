@@ -17,6 +17,7 @@ on:
 
 env:
   cache_path: |
+    backend
     internal/statik/statik.go
     internal/notification/statik/statik.go
     internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*
@@ -43,7 +44,7 @@ jobs:
           continue-on-error: true
           id: cache
           with:
-            key: core-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'proto', 'internal') }}
+            key: core-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'proto', 'internal', 'backend/**') }}
             restore-keys: |
               core-
             path: ${{ env.cache_path }}
