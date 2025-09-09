@@ -12,7 +12,7 @@ import { fromEvent, map, mergeWith, Observable } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 
 @Pipe({ standalone: true, name: 'filter' })
-export class Filter implements PipeTransform {
+class Filter implements PipeTransform {
   transform(items: string[] | undefined = [], input: HTMLInputElement): Observable<string[]> {
     const focus$ = fromEvent(input, 'focus').pipe(map(() => ''));
 
