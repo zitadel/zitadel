@@ -959,13 +959,13 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "add org domain, twice",
-			domain: integration.URL(),
+			domain: integration.DomainName(),
 			testFunc: func() string {
 				// 1. create organization
 				orgs, _, _ := createOrgs(CTX, t, Client, 1)
 				orgId := orgs[0].Id
 
-				domain := integration.URL()
+				domain := integration.DomainName()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -998,7 +998,7 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "add org domain to non existent org",
-			domain: integration.URL(),
+			domain: integration.DomainName(),
 			testFunc: func() string {
 				return "non-existing-org-id"
 			},
@@ -1095,7 +1095,7 @@ func TestServer_AddOrganizationDomain_ClaimDomain(t *testing.T) {
 }
 
 func TestServer_ListOrganizationDomains(t *testing.T) {
-	domain := integration.URL()
+	domain := integration.DomainName()
 	tests := []struct {
 		name     string
 		ctx      context.Context
@@ -1154,7 +1154,7 @@ func TestServer_ListOrganizationDomains(t *testing.T) {
 }
 
 func TestServer_DeleteOrganizationDomain(t *testing.T) {
-	domain := integration.URL()
+	domain := integration.DomainName()
 	tests := []struct {
 		name     string
 		ctx      context.Context
@@ -1198,13 +1198,13 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "delete org domain, twice",
-			domain: integration.URL(),
+			domain: integration.DomainName(),
 			testFunc: func() string {
 				// 1. create organization
 				orgs, _, _ := createOrgs(CTX, t, Client, 1)
 				orgId := orgs[0].Id
 
-				domain := integration.URL()
+				domain := integration.DomainName()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -1244,7 +1244,7 @@ func TestServer_DeleteOrganizationDomain(t *testing.T) {
 		},
 		{
 			name:   "delete org domain to non existent org",
-			domain: integration.URL(),
+			domain: integration.DomainName(),
 			testFunc: func() string {
 				return "non-existing-org-id"
 			},
@@ -1284,7 +1284,7 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				orgs, _, _ := createOrgs(CTX, t, Client, 1)
 				orgId := orgs[0].Id
 
-				domain := integration.URL()
+				domain := integration.DomainName()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -1333,7 +1333,7 @@ func TestServer_AddListDeleteOrganizationDomain(t *testing.T) {
 				orgs, _, _ := createOrgs(CTX, t, Client, 1)
 				orgId := orgs[0].Id
 
-				domain := integration.URL()
+				domain := integration.DomainName()
 				// 2. add domain
 				addOrgDomainRes, err := Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 					OrganizationId: orgId,
@@ -1419,7 +1419,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	domain := integration.URL()
+	domain := integration.DomainName()
 	_, err = Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
 		OrganizationId: orgId,
 		Domain:         domain,

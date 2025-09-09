@@ -179,7 +179,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					orgs := make([]orgAttr, 1)
 					name := integration.OrganizationName()
-					orgID := integration.OrganizationName()
+					orgID := integration.ID()
 					orgs[0] = createOrganizationWithCustomOrgID(ctx, name, orgID)
 					request.Queries = []*org.SearchQuery{
 						OrganizationIdQuery(orgID),
@@ -274,7 +274,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					orgs := make([]orgAttr, 1)
 					orgs[0] = createOrganization(ctx, integration.OrganizationName())
-					domain := integration.Username()
+					domain := integration.DomainName()
 					_, err := Instance.Client.Mgmt.AddOrgDomain(integration.SetOrgID(ctx, orgs[0].ID), &management.AddOrgDomainRequest{
 						Domain: domain,
 					})

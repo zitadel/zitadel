@@ -813,7 +813,7 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 
 func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *integration.Instance, clientID string, req *oidc_pb.CreateCallbackRequest, response *oidc_api.ContextInfoResponse) (string, func()) {
 	userEmail := integration.Email()
-	userPhone := "+41" + integration.Phone()
+	userPhone := integration.Phone()
 	userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
 
 	sessionResp := createSession(ctx, t, instance, userResp.GetUserId())
@@ -1121,7 +1121,7 @@ func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
 
 func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *integration.Instance, clientID string, req *oidc_pb.CreateCallbackRequest, response *oidc_api.ContextInfoResponse) (string, func()) {
 	userEmail := integration.Email()
-	userPhone := "+41" + integration.Phone()
+	userPhone := integration.Phone()
 	userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
 
 	sessionResp := createSession(ctx, t, instance, userResp.GetUserId())
@@ -1286,7 +1286,7 @@ func TestServer_ExecutionTargetPreSAMLResponse(t *testing.T) {
 
 func expectPreSAMLResponseExecution(ctx context.Context, t *testing.T, instance *integration.Instance, req *saml_pb.CreateResponseRequest, response *saml_api.ContextInfoResponse) (string, func()) {
 	userEmail := integration.Email()
-	userPhone := "+41" + integration.Phone()
+	userPhone := integration.Phone()
 	userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
 
 	sessionResp := createSession(ctx, t, instance, userResp.GetUserId())

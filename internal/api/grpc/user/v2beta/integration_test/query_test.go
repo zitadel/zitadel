@@ -420,7 +420,7 @@ func createUsers(ctx context.Context, orgID string, count int, passwordChangeReq
 func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) userAttr {
 	username := integration.Email()
 	// used as default country prefix
-	phone := "+41" + integration.Phone()
+	phone := integration.Phone()
 	resp := Instance.CreateHumanUserVerified(ctx, orgID, username, phone)
 	info := userAttr{resp.GetUserId(), username, phone, nil, resp.GetDetails()}
 	if passwordChangeRequired {
