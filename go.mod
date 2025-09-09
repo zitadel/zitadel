@@ -19,7 +19,7 @@ require (
 	github.com/alicebob/miniredis/v2 v2.34.0
 	github.com/benbjohnson/clock v1.3.5
 	github.com/boombuler/barcode v1.0.2
-	github.com/brianvoe/gofakeit/v6 v6.28.0
+	github.com/brianvoe/gofakeit/v7 v7.5.1
 	github.com/cockroachdb/cockroach-go/v2 v2.4.0
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/crewjam/saml v0.4.14
@@ -126,7 +126,6 @@ require (
 	github.com/Masterminds/sprig/v3 v3.3.0 // indirect
 	github.com/alicebob/gopher-json v0.0.0-20230218143504-906a9b012302 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.9.0 // indirect
-	github.com/brianvoe/gofakeit/v7 v7.5.1 // indirect
 	github.com/cncf/xds/go v0.0.0-20250121191232-2f005788dc42 // indirect
 	github.com/crewjam/httperr v0.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
