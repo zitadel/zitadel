@@ -29,6 +29,7 @@ var (
 )
 
 func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server) *cobra.Command {
+	// something
 	cmd := &cobra.Command{
 		Use:   "zitadel",
 		Short: "The ZITADEL CLI lets you interact with ZITADEL",
