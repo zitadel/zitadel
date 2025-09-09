@@ -222,7 +222,6 @@
     "termsOfService": "Nutzungsbedingungen",
     "privacyPolicy": "Datenschutzrichtlinie",
     "submit": "Weiter",
-    "orUseIDP": "oder verwenden Sie einen Identitätsanbieter",
     "password": {
       "title": "Passwort festlegen",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
