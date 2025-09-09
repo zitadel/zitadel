@@ -61,6 +61,7 @@ func (i *instanceDomain) Add(ctx context.Context, domain *domain.AddInstanceDoma
 	if !domain.CreatedAt.IsZero() {
 		createdAt = domain.CreatedAt
 	}
+
 	if !domain.UpdatedAt.IsZero() {
 		updatedAt = domain.UpdatedAt
 	}
