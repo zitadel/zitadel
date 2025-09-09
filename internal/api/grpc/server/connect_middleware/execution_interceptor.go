@@ -3,17 +3,28 @@ package connect_middleware
 import (
 	"context"
 	"encoding/json"
+	"net/http"
+	"strings"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/execution"
 	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
+
+var headersToForward = map[string]bool{
+	strings.ToLower(http_utils.ContentType):   true,
+	strings.ToLower(http_utils.ForwardedFor):  true,
+	strings.ToLower(http_utils.ForwardedHost): true,
+	strings.ToLower(http_utils.Host):          true,
+	strings.ToLower(http_utils.Origin):        true,
+}
 
 func ExecutionHandler(alg crypto.EncryptionAlgorithm) connect.UnaryInterceptorFunc {
 	return func(handler connect.UnaryFunc) connect.UnaryFunc {
@@ -53,6 +64,7 @@ func executeTargetsForRequest(ctx context.Context, targets []target_domain.Targe
 		OrgID:      ctxData.OrgID,
 		UserID:     ctxData.UserID,
 		Request:    Message{req.Any().(proto.Message)},
+		Headers:    SetRequestHeaders(req.Header()),
 	}
 
 	_, err = execution.CallTargets(ctx, targets, info, alg)
@@ -80,6 +92,7 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 		UserID:     ctxData.UserID,
 		Request:    Message{req.Any().(proto.Message)},
 		Response:   Message{resp.Any().(proto.Message)},
+		Headers:    SetRequestHeaders(req.Header()),
 	}
 
 	_, err = execution.CallTargets(ctx, targets, info, alg)
@@ -92,12 +105,13 @@ func executeTargetsForResponse(ctx context.Context, targets []target_domain.Targ
 var _ execution.ContextInfo = &ContextInfoRequest{}
 
 type ContextInfoRequest struct {
-	FullMethod string  `json:"fullMethod,omitempty"`
-	InstanceID string  `json:"instanceID,omitempty"`
-	OrgID      string  `json:"orgID,omitempty"`
-	ProjectID  string  `json:"projectID,omitempty"`
-	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
+	FullMethod string      `json:"fullMethod,omitempty"`
+	InstanceID string      `json:"instanceID,omitempty"`
+	OrgID      string      `json:"orgID,omitempty"`
+	ProjectID  string      `json:"projectID,omitempty"`
+	UserID     string      `json:"userID,omitempty"`
+	Request    Message     `json:"request,omitempty"`
+	Headers    http.Header `json:"headers,omitempty"`
 }
 
 type Message struct {
@@ -135,13 +149,14 @@ func (c *ContextInfoRequest) GetContent() interface{} {
 var _ execution.ContextInfo = &ContextInfoResponse{}
 
 type ContextInfoResponse struct {
-	FullMethod string  `json:"fullMethod,omitempty"`
-	InstanceID string  `json:"instanceID,omitempty"`
-	OrgID      string  `json:"orgID,omitempty"`
-	ProjectID  string  `json:"projectID,omitempty"`
-	UserID     string  `json:"userID,omitempty"`
-	Request    Message `json:"request,omitempty"`
-	Response   Message `json:"response,omitempty"`
+	FullMethod string      `json:"fullMethod,omitempty"`
+	InstanceID string      `json:"instanceID,omitempty"`
+	OrgID      string      `json:"orgID,omitempty"`
+	ProjectID  string      `json:"projectID,omitempty"`
+	UserID     string      `json:"userID,omitempty"`
+	Request    Message     `json:"request,omitempty"`
+	Response   Message     `json:"response,omitempty"`
+	Headers    http.Header `json:"headers,omitempty"`
 }
 
 func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
@@ -158,4 +173,17 @@ func (c *ContextInfoResponse) SetHTTPResponseBody(resp []byte) error {
 
 func (c *ContextInfoResponse) GetContent() interface{} {
 	return c.Response.Message
+}
+
+func SetRequestHeaders(reqHeaders map[string][]string) map[string][]string {
+	if len(reqHeaders) == 0 {
+		return nil
+	}
+	headers := make(map[string][]string)
+	for k, v := range reqHeaders {
+		if headersToForward[strings.ToLower(k)] {
+			headers[k] = v
+		}
+	}
+	return headers
 }
