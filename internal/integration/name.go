@@ -1,6 +1,6 @@
 package integration
 
-import "github.com/brianvoe/gofakeit/v6"
+import "github.com/brianvoe/gofakeit/v7"
 
 // company private function to add a random string to the gofakeit.Company function
 func company() string {
@@ -16,7 +16,7 @@ func Email() string {
 }
 
 func Phone() string {
-	return gofakeit.Phone()
+	return "+41" + gofakeit.Phone()
 }
 
 func FirstName() string {
@@ -35,7 +35,7 @@ func Language() string {
 	return gofakeit.LanguageBCP()
 }
 
-func UserschemaName() string {
+func UserSchemaName() string {
 	return gofakeit.Name() + RandString(5)
 }
 
@@ -73,7 +73,7 @@ func DomainName() string {
 }
 
 func URL() string {
-	return RandString(5) + gofakeit.URL()
+	return gofakeit.URL()
 }
 
 func RelayState() string {

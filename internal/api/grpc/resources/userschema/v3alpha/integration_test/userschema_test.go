@@ -54,7 +54,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: integration.UserschemaName(),
+					Type: integration.UserSchemaName(),
 				},
 			},
 			wantErr: true,
@@ -64,7 +64,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: integration.UserschemaName(),
+					Type: integration.UserSchemaName(),
 					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
@@ -95,7 +95,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: integration.UserschemaName(),
+					Type: integration.UserSchemaName(),
 					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
@@ -134,7 +134,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: integration.UserschemaName(),
+					Type: integration.UserSchemaName(),
 					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
@@ -168,7 +168,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: integration.UserschemaName(),
+					Type: integration.UserSchemaName(),
 					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
@@ -210,7 +210,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: integration.UserschemaName(),
+					Type: integration.UserSchemaName(),
 					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
@@ -245,7 +245,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.UserSchema{
-					Type: integration.UserschemaName(),
+					Type: integration.UserSchemaName(),
 					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
@@ -328,7 +328,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &schema.PatchUserSchemaRequest{
 					UserSchema: &schema.PatchUserSchema{
-						Type: gu.Ptr(integration.UserschemaName()),
+						Type: gu.Ptr(integration.UserSchemaName()),
 					},
 				},
 			},
@@ -385,7 +385,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
 					UserSchema: &schema.PatchUserSchema{
-						Type: gu.Ptr(integration.UserschemaName()),
+						Type: gu.Ptr(integration.UserSchemaName()),
 					},
 				},
 			},
@@ -569,7 +569,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
 					UserSchema: &schema.PatchUserSchema{
-						Type: gu.Ptr(integration.UserschemaName()),
+						Type: gu.Ptr(integration.UserSchemaName()),
 					},
 				},
 			},
