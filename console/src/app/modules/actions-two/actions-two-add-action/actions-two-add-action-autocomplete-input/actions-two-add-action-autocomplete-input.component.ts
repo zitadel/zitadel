@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, Optional, Pipe, PipeTransform, Self } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, Pipe, PipeTransform } from '@angular/core';
 import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
 import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -13,16 +13,14 @@ import { startWith } from 'rxjs/operators';
 
 @Pipe({ standalone: true, name: 'filter' })
 export class Filter implements PipeTransform {
-  transform(values: string[] | undefined = [], input: HTMLInputElement): Observable<string[]> {
+  transform(items: string[] | undefined = [], input: HTMLInputElement): Observable<string[]> {
     const focus$ = fromEvent(input, 'focus').pipe(map(() => ''));
 
     return fromEvent(input, 'input').pipe(
       startWith(undefined),
       map(() => input.value.toLowerCase()),
       mergeWith(focus$),
-      map((input) => {
-        return values.filter((v) => v.toLowerCase().includes(input));
-      }),
+      map((input) => items.filter((item) => item.toLowerCase().includes(input))),
     );
   }
 }
