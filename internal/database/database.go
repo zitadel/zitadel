@@ -59,10 +59,10 @@ type Tx interface {
 	Rollback() error
 }
 
-var (
-	_ Client = (*sql.DB)(nil)
-	_ Tx     = (*sql.Tx)(nil)
-)
+// var (
+// 	_ Client = (*sql.DB)(nil)
+// 	_ Tx     = (*sql.Tx)(nil)
+// )
 
 func CloseTransaction(tx Tx, err error) error {
 	if err != nil {
@@ -90,7 +90,7 @@ func (c *Config) SetConnector(connector dialect.Connector) {
 }
 
 type DB struct {
-	*sql.DB
+	DB Client
 	dialect.Database
 	Pool *pgxpool.Pool
 }
@@ -148,6 +148,41 @@ func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...a
 	return obj, nil
 }
 
+type wrappedClient struct {
+	*sql.DB
+}
+
+// QueryContext implements Client.
+// Subtle: this method shadows the method (*DB).QueryContext of wrappedClient.DB.
+func (w *wrappedClient) QueryContext(ctx context.Context, query string, args ...any) (Rows, error) {
+	//nolint:rowserrcheck //will be checked by the caller
+	return w.DB.QueryContext(ctx, query, args...)
+}
+
+func (w *wrappedClient) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
+	return w.DB.BeginTx(ctx, opts)
+}
+
+func (w *wrappedClient) Begin() (*sql.Tx, error) {
+	return w.DB.Begin()
+}
+
+type wrappedTx struct {
+	*sql.Tx
+}
+
+// QueryContext implements Tx.
+// Subtle: this method shadows the method (*Tx).QueryContext of wrappedTx.Tx.
+func (w *wrappedTx) QueryContext(ctx context.Context, query string, args ...any) (Rows, error) {
+	//nolint:rowserrcheck //will be checked by the caller
+	return w.Tx.QueryContext(ctx, query, args...)
+}
+
+var (
+	_ Client = (*wrappedClient)(nil)
+	_ Tx     = (*wrappedTx)(nil)
+)
+
 func Connect(config Config, useAdmin bool) (*DB, error) {
 	client, pool, err := config.connector.Connect(useAdmin)
 	if err != nil {
@@ -157,9 +192,10 @@ func Connect(config Config, useAdmin bool) (*DB, error) {
 	if err := client.Ping(); err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "DATAB-0pIWD", "Errors.Database.Connection.Failed")
 	}
+	var db *DB
 
 	return &DB{
-		DB:       client,
+		DB:       &wrappedClient{DB: client},
 		Database: config.connector,
 		Pool:     pool,
 	}, nil
