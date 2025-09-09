@@ -1,8 +1,8 @@
 ExternalSecure: false
 TLS.Enabled: false
 FirstInstance:
-  LoginClientPatPath: /workspaces/zitadel/login-client.pat
-  PatPath: /workspaces/zitadel/admin.pat
+  LoginClientPatPath: login-client.pat
+  PatPath: admin.pat
   Org:
     LoginClient:
       Machine:

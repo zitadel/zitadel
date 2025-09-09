@@ -15,4 +15,4 @@ ENV NODE_ENV=production
 # TODO: Check healthy, not ready
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD ["/bin/sh", "-c", "node /runtime/healthcheck.js http://localhost:${PORT}/ui/v2/login/healthy"]
-ENTRYPOINT ["/runtime/entrypoint.sh"]
+ENTRYPOINT ["/runtime/entrypoint.sh", "node", "apps/login/server.js" ]

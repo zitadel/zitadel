@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
     "build": "next build && cp -r public scripts/* .next/standalone/ && cp -r .next/static .next/standalone/apps/login/.next/",
-    "start": "node .next/standalone/apps/login/server.js",
+    "development": "./scripts/entrypoint.sh next dev",
+    "production": "cd ./.next/standalone && ./entrypoint.sh node apps/login/server.js",
     "lint-check-next": "next lint",
     "lint-check-prettier": "prettier --check .",
     "lint-fix": "prettier --write .",
@@ -94,7 +94,7 @@
     "ts-proto": "^2.7.0",
     "typescript": "^5.8.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^2.0.0",
-    "wait-on": "^7.2.0"
+    "wait-on": "^7.2.0",
+    "vitest": "^2.0.0"
   }
 }

@@ -23,33 +23,17 @@
                 "@zitadel/console:build"
             ]
         },
-        "init-and-setup": {
-            "description": "Setup the Zitadel API application. This writes the login-client.pat if run against a database from scratch",
-            "command": "nx run @zitadel/devcontainer:compose run --build --no-deps api-init api-setup",
-            "outputs": [
-                "{workspaceRoot}/login-client.pat"
-            ]
-        },
-        "start": {
-            "description": "Start the Zitadel API application",
+        "production": {
             "continuous": true,
-            "command": "nx run @zitadel/devcontainer:compose up --build --watch --no-deps api"
-        },
-        "dev": {
-            "description": "Develop the Zitadel API application. Like the `start` target, but lets you start the API application yourself in debug mode using your IDE. Check the .vscode directory for how to configure your IDE",
             "dependsOn": [
-                "@zitadel/api:build",
-                "@zitadel/login:build"
+                "build"
             ],
-            "continuous": true,
-            "executor": "nx:run-commands",
             "options": {
-                "parallel": false,
-                "commands": [
-                    "nx run @zitadel/devcontainer:compose stop api",
-                    "nx run @zitadel/devcontainer:compose up --build --watch db api-setup login"
-                ]
-            }
+                "env": {
+                    "DEFAULT_CONFIG_FILE": "{projectRoot}/api.yaml"
+                }
+            },
+            "command": "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\"; ./zitadel start-from-init --config ${DEFAULT_CONFIG_FILE} --steps ${DEFAULT_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'"
         }
     }
 }

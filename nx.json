@@ -41,14 +41,6 @@
       "cache": false,
       "continuous": true
     },
-    "dev": {
-      "cache": false,
-      "continuous": true,
-      "dependsOn": [
-        "^build",
-        "generate"
-      ]
-    },
     "lint": {
       "inputs": [
         "default"

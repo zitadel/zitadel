@@ -38,16 +38,11 @@
                 "{projectRoot}/dist"
             ]
         },
-        "start": {
-            "description": "Start the Zitadel platform (api, login and console) in production mode.",
+        "development": {
+            "continuous": true,
             "dependsOn": [
-                "@zitadel/login:start"
-            ]
-        },
-        "dev": {
-            "description": "Like `start`, but with a console running in dev mode on port 4200.",
-            "dependsOn": [
-                "@zitadel/login:start"
+                "generate",
+                "^build"
             ]
         }
     }
