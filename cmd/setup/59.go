@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -45,10 +46,16 @@ func (mig *SetupWebkeys) Execute(ctx context.Context, _ eventstore.Event) error 
 		if err := mig.commands.GenerateInitialWebKeys(ctx, conf); err != nil {
 			return fmt.Errorf("%s generate initial webkeys: %w", mig, err)
 		}
+		_, err = mig.commands.SetInstanceFeatures(ctx, &command.InstanceFeatures{
+			WebKey: gu.Ptr(true),
+		})
+		if err != nil {
+			return fmt.Errorf("%s set webkey instance feature: %w", mig, err)
+		}
 	}
 	return nil
 }
 
 func (mig *SetupWebkeys) String() string {
-	return "59_setup_webkeys"
+	return "59_setup_webkeys_2"
 }
