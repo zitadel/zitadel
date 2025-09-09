@@ -206,6 +206,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.OIDC,
 		keys.SAML,
 		keys.Target,
+		keys.SMS,
+		keys.SMTP,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
