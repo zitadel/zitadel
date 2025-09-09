@@ -26,8 +26,8 @@ jobs:
         run: |
           echo "Linting outside of pull requests is skipped"
 
-  api:
-    name: api
+  protos:
+    name: protos
     runs-on: ubuntu-latest
     continue-on-error: true
     if: ${{ github.event_name == 'pull_request' }}
