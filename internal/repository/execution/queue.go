@@ -27,10 +27,13 @@ func NewRequest(e eventstore.Event, targets []target.Target) (*Request, error) {
 	if err != nil {
 		return nil, err
 	}
-	eventData, err := json.Marshal(e)
+	// The underlying BaseEvent omits the data when using json.Marshal so we have to unmarshal it manually.
+	var eventData json.RawMessage
+	err = e.Unmarshal(&eventData)
 	if err != nil {
 		return nil, err
 	}
+
 	return &Request{
 		Aggregate:   e.Aggregate(),
 		Sequence:    e.Sequence(),
