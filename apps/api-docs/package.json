@@ -1,0 +1,33 @@
+{
+  "name": "zitadel-api-docs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "pnpm run ensure-plugins && pnpm run generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "ensure-plugins": "if [ ! -f \"protoc-gen-connect-openapi/protoc-gen-connect-openapi\" ]; then sh ./plugin-download.sh; fi",
+    "generate": "pnpm run generate:openapi",
+    "generate:openapi": "pnpm run ensure-plugins && buf generate ../../proto",
+    "postinstall": "sh ./plugin-download.sh",
+    "clean": "rm -rf .next node_modules .turbo protoc-gen-connect-openapi .artifacts"
+  },
+  "dependencies": {
+    "@scalar/api-reference": "^1.25.62",
+    "@types/js-yaml": "^4.0.9",
+    "js-yaml": "^4.1.0",
+    "next": "15.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.14.0",
+    "@types/node": "^20.16.10",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "15.0.3",
+    "typescript": "^5.6.3"
+  }
+}

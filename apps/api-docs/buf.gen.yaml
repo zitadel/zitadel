@@ -1,0 +1,12 @@
+# buf.gen.yaml
+version: v2
+managed:
+  enabled: true
+plugins:
+  - local: ./protoc-gen-connect-openapi/protoc-gen-connect-openapi
+    out: .artifacts/openapi3
+    strategy: all
+    opt:
+      - short-service-tags
+      - ignore-googleapi-http
+      - base=base.yaml
