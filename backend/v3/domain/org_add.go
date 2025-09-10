@@ -4,7 +4,7 @@ import (
 	"context"
 
 	legacy_es "github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/v2/org"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 // AddOrgCommand adds a new organization.
@@ -66,11 +66,9 @@ type AddOrgCommand struct {
 
 // Events implements [eventer].
 func (cmd *AddOrgCommand) Events(ctx context.Context) []legacy_es.Command {
-	command, err := org.NewAddedCommand(ctx, cmd.Name)
-	if err != nil {
-		return nil
+	return []legacy_es.Command{
+		org.NewOrgAddedEvent(ctx, &org.NewAggregate(cmd.ID).Aggregate, cmd.Name),
 	}
-	return []legacy_es.Command{command}
 }
 
 // var (

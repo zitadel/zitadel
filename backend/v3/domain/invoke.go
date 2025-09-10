@@ -46,30 +46,30 @@ func (i *eventStoreInvoker) Invoke(ctx context.Context, command Commander, opts 
 }
 
 // eventCollector collects events from all commands. The [eventStoreInvoker] pushes the collected events after all commands are executed.
+// The events are collected after the command got executed, the collector ensures that the command is executed in the same transaction as writing the events.
 type eventCollector struct {
 	next   Invoker
 	events []legacy_es.Command
 }
 
-type eventer interface {
-	Events() []legacy_es.Command
-}
-
 func (i *eventCollector) Invoke(ctx context.Context, command Commander, opts *CommandOpts) (err error) {
-	if e, ok := command.(eventer); ok && len(e.Events()) > 0 {
-		// we need to ensure all commands are executed in the same transaction
-		close, err := opts.EnsureTx(ctx)
-		if err != nil {
-			return err
-		}
-		defer func() { err = close(ctx, err) }()
+	close, err := opts.EnsureTx(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() { err = close(ctx, err) }()
 
-		i.events = append(i.events, e.Events()...)
-	}
 	if i.next != nil {
-		return i.next.Invoke(ctx, command, opts)
+		err = i.next.Invoke(ctx, command, opts)
+	} else {
+		err = command.Execute(ctx, opts)
 	}
-	return command.Execute(ctx, opts)
+	if err != nil {
+		return err
+	}
+	i.events = append(command.Events(ctx), i.events...)
+
+	return
 }
 
 // traceInvoker decorates each command with tracing.
@@ -138,22 +138,22 @@ func (i *noopInvoker) Invoke(ctx context.Context, command Commander, opts *Comma
 // My goal would be to have two interfaces:
 // - cacheSetter: which caches an object
 // - cacheGetter: which gets an object from the cache, this should also skip the command execution
-type cacheInvoker struct {
-	next Invoker
-}
+// type cacheInvoker struct {
+// 	next Invoker
+// }
 
-type cacher interface {
-	Cache(opts *CommandOpts)
-}
+// type cacher interface {
+// 	Cache(opts *CommandOpts)
+// }
 
-func (i *cacheInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) (err error) {
-	if c, ok := command.(cacher); ok {
-		c.Cache(opts)
-	}
-	if i.next != nil {
-		err = i.next.Invoke(ctx, command, opts)
-	} else {
-		err = command.Execute(ctx, opts)
-	}
-	return err
-}
+// func (i *cacheInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) (err error) {
+// 	if c, ok := command.(cacher); ok {
+// 		c.Cache(opts)
+// 	}
+// 	if i.next != nil {
+// 		err = i.next.Invoke(ctx, command, opts)
+// 	} else {
+// 		err = command.Execute(ctx, opts)
+// 	}
+// 	return err
+// }
