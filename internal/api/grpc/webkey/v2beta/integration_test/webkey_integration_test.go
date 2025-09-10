@@ -34,7 +34,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_Feature_Disabled(t *testing.T) {
-	instance, iamCtx, _ := createInstance(t, false)
+	instance, iamCtx, _ := createInstance(t, true)
 	client := instance.Client.WebKeyV2Beta
 
 	t.Run("CreateWebKey", func(t *testing.T) {
@@ -213,10 +213,10 @@ func createInstance(t *testing.T, disableFeature bool) (*integration.Instance, c
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		resp, err := instance.Client.WebKeyV2Beta.ListWebKeys(iamCTX, &webkey.ListWebKeysRequest{})
 		if disableFeature {
+			assert.Error(collect, err)
+		} else {
 			assert.NoError(collect, err)
 			assert.Len(collect, resp.GetWebKeys(), 2)
-		} else {
-			assert.Error(collect, err)
 		}
 	}, retryDuration, tick)
 
@@ -244,8 +244,8 @@ func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integrati
 		now := time.Now()
 		var gotActiveKeyID string
 		for _, key := range list {
-			assert.WithinRange(collect, key.GetCreationDate().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
-			assert.WithinRange(collect, key.GetChangeDate().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
+			assert.WithinRange(collect, key.GetCreationDate().AsTime(), creationDate.AsTime(), now.Add(time.Minute))
+			assert.WithinRange(collect, key.GetChangeDate().AsTime(), creationDate.AsTime(), now.Add(time.Minute))
 			assert.NotEqual(collect, webkey.State_STATE_UNSPECIFIED, key.GetState())
 			assert.NotEqual(collect, webkey.State_STATE_REMOVED, key.GetState())
 			assert.Equal(collect, config, key.GetKey())

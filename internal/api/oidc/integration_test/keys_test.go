@@ -25,6 +25,10 @@ import (
 
 func TestServer_Keys(t *testing.T) {
 	instance := integration.NewInstance(CTX)
+	// As we want to test the legacy keys as well, we need to ensure the webkey feature is off
+	// at the beginning since the instance creation enables it by default.
+	ensureWebKeyFeature(t, instance, false)
+
 	ctxLogin := instance.WithAuthorization(CTX, integration.UserTypeLogin)
 
 	clientID, _ := createClient(t, instance)
