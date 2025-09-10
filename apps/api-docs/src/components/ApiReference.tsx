@@ -29,14 +29,25 @@ export function ApiReferenceComponent() {
           throw new Error("Failed to load API specifications");
         }
         const data: ApiResponse = await response.json();
-        setSpecs(data.specs);
 
-        if (data.specs.length > 0) {
+        // Filter out specs with no endpoints (only schema definitions)
+        const specsWithEndpoints = data.specs.filter((spec) => {
+          try {
+            const parsed = yaml.load(spec.content) as any;
+            return parsed.paths && Object.keys(parsed.paths).length > 0;
+          } catch {
+            return false;
+          }
+        });
+
+        setSpecs(specsWithEndpoints);
+
+        if (specsWithEndpoints.length > 0) {
           // Default to a v2 user service if available, otherwise management service
-          const userV2Service = data.specs.find((spec) =>
+          const userV2Service = specsWithEndpoints.find((spec) =>
             spec.name.includes("user/v2/user_service")
           );
-          const managementService = data.specs.find(
+          const managementService = specsWithEndpoints.find(
             (spec) => spec.name === "management"
           );
 
@@ -45,7 +56,7 @@ export function ApiReferenceComponent() {
           } else if (managementService) {
             setSelectedSpec("management");
           } else {
-            setSelectedSpec(data.specs[0].name);
+            setSelectedSpec(specsWithEndpoints[0].name);
           }
         }
       } catch (err) {
