@@ -229,12 +229,14 @@ plugins:
 ### 3. Output Structure
 
 **REST APIs (swagger.json files)**:
+
 - Located in `.artifacts/openapi/zitadel/`
 - Single merged file: `{service_name}.swagger.json`
 - Contains proper HTTP methods (GET, POST, PUT, DELETE)
 - Used by the api-docs Next.js application
 
 **gRPC-Web APIs (openapi.yaml files)**:
+
 - Located in `.artifacts/openapi3/zitadel/`
 - Multiple files: `{service_name}.openapi.yaml`
 - Contains gRPC-Web POST endpoints only

@@ -179,16 +179,112 @@ export function ApiReferenceComponent() {
     setShowSearchResults(false);
     setSearchQuery("");
 
-    // Wait for the spec to load, then try to scroll to the endpoint
+    // Wait for the spec to load, then navigate using Scalar's navigation patterns
     setTimeout(() => {
-      // This is a basic attempt - Scalar might need specific methods to navigate to endpoints
-      const element =
-        document.querySelector(`[data-path="${result.path}"]`) ||
-        document.querySelector(`[id*="${result.operationId}"]`);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+      if (result.operationId || result.path) {
+        const method = result.method.toLowerCase();
+        const operationId = result.operationId;
+        const tag = result.tags && result.tags.length > 0 ? result.tags[0] : "";
+
+        // Based on Scalar's code, they use patterns like:
+        // - tag/{tag}/{method}{path} for operations under tags
+        // - operation/{operationId} for direct operation access
+        let targetHash = "";
+
+        if (tag && result.path) {
+          // This is the most common pattern in Scalar: tag/TagName/method/path
+          targetHash = `tag/${tag}/${method}${result.path}`;
+        } else if (operationId) {
+          // Fallback to operation ID
+          targetHash = `operation/${operationId}`;
+        } else {
+          // Last resort: method + path
+          targetHash = `${method}${result.path}`;
+        }
+
+        console.log("Navigation attempt:", {
+          result,
+          targetHash,
+          currentLocation: window.location.href,
+        });
+
+        // Set the hash and let Scalar handle it
+        window.location.hash = targetHash;
+
+        // Fallback: try to find and scroll to elements after Scalar processes the hash
+        setTimeout(() => {
+          // Try to find any element with the operation ID or path
+          const possibleSelectors = [
+            `[id="${targetHash}"]`,
+            `[id="${operationId}"]`,
+            `[data-operation-id="${operationId}"]`,
+            `[id*="${operationId}"]`,
+            // Look for the operation in the content area
+            `.scalar-api-reference [id*="${method}"][id*="${result.path.replace(
+              /\//g,
+              ""
+            )}"]`,
+            // Try to find by text content (operation summary)
+            ...Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
+              .filter(
+                (el) =>
+                  el.textContent?.includes(result.summary || "") &&
+                  result.summary
+              )
+              .map((el) => `#${el.id}`)
+              .filter((id) => id !== "#"),
+            // Look for method badges
+            `[data-method="${method}"]`,
+          ];
+
+          console.log(
+            "Searching for elements with selectors:",
+            possibleSelectors.slice(0, 5)
+          );
+
+          for (const selector of possibleSelectors) {
+            if (!selector || selector === "#") continue;
+
+            try {
+              const element = document.querySelector(selector);
+              if (element && (element as HTMLElement).offsetParent !== null) {
+                // Check if element is visible
+                console.log(
+                  "Found and scrolling to element:",
+                  selector,
+                  element
+                );
+                element.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+
+                // Highlight the element briefly to confirm navigation
+                const htmlElement = element as HTMLElement;
+                const originalStyle = htmlElement.style.border;
+                htmlElement.style.border = "2px solid #007bff";
+                setTimeout(() => {
+                  htmlElement.style.border = originalStyle;
+                }, 2000);
+
+                return; // Exit once we find and scroll to an element
+              }
+            } catch (e) {
+              console.warn("Selector failed:", selector, e);
+            }
+          }
+
+          // If nothing worked, log what's available for debugging
+          console.log(
+            "No elements found. Available IDs in document:",
+            Array.from(document.querySelectorAll("[id]"))
+              .map((el) => el.id)
+              .filter((id) => id)
+              .slice(0, 20)
+          );
+        }, 1000);
       }
-    }, 1000);
+    }, 1500);
   };
 
   useEffect(() => {
