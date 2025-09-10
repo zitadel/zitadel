@@ -1065,6 +1065,7 @@ service UserService {
       };
     };
   }
+
 }
 
 message AddHumanUserRequest{

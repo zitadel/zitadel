@@ -70,6 +70,14 @@ message SetSystemFeaturesRequest{
       description: "Enable a newer, more performant, permission check used for v2 and v3 resource based APIs.";
     }
   ];
+
+  optional bool enable_relational_tables = 13 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled Zitadel will use the relational tables instead of the projections as the main source to store the data. Regardless of the flag state, both the relational table and the projections are kept up to date. Currently the flag has no effect.";
+    }
+  ];
+
 }
 
 message SetSystemFeaturesResponse {
@@ -141,6 +149,13 @@ message GetSystemFeaturesResponse {
   FeatureFlag permission_check_v2 = 13 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Enable a newer, more performant, permission check used for v2 and v3 resource based APIs.";
+    }
+  ];
+
+  FeatureFlag enable_relational_tables = 14 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled Zitadel will use the relational tables instead of the projections as the main source to store the data. Regardless of the flag state, both the relational table and the projections are kept up to date. Currently the flag has no effect.";
     }
   ];
 }
