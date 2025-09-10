@@ -93,7 +93,7 @@ func TestServer_CreateWebKey(t *testing.T) {
 }
 
 func TestServer_ActivateWebKey(t *testing.T) {
-	instance, iamCtx, creationDate := createInstance(t, true)
+	instance, iamCtx, creationDate := createInstance(t, false)
 	client := instance.Client.WebKeyV2Beta
 
 	resp, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{
@@ -199,7 +199,7 @@ func TestServer_DeleteWebKey(t *testing.T) {
 
 func createInstance(t *testing.T, disableFeature bool) (*integration.Instance, context.Context, *timestamppb.Timestamp) {
 	instance := integration.NewInstance(CTX)
-	creationDate := timestamppb.Now()
+	creationDate := instance.Instance.GetDetails().GetCreationDate()
 	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	if disableFeature {
