@@ -6,7 +6,6 @@ import { ToastService } from 'src/app/services/toast.service';
 import { NewMgmtService } from 'src/app/services/new-mgmt.service';
 import { UserService } from 'src/app/services/user.service';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
-import { User } from '@zitadel/proto/zitadel/user/v2/user_pb';
 
 @Component({
   selector: 'cnsl-project-create',
@@ -41,13 +40,13 @@ export class ProjectCreateComponent {
     });
   }
 
-  protected saveProject(user: User): void {
+  protected saveProject(): void {
     const { name, selfAccount } = this.form.getRawValue();
 
     this.newMgmtService
       .addProject({
         name,
-        admins: selfAccount ? [{ userId: user.userId }] : undefined,
+        admins: selfAccount ? [{ userId: this.userService.userId() }] : undefined,
       })
       .then((resp) => {
         this.toast.showInfo('PROJECT.TOAST.CREATED', true);

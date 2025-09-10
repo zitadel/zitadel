@@ -4,7 +4,7 @@
   [currentCreateStep]="1"
   (closed)="location.back()"
 >
-  <form *ngIf="userService.user$ | async as user" cdkFocusRegionStart [formGroup]="form" (ngSubmit)="saveProject(user)">
+  <form cdkFocusRegionStart [formGroup]="form" (ngSubmit)="saveProject()">
     <mat-slide-toggle class="example-margin" color="primary" [formControl]="form.controls.selfAccount">
       {{ 'PROJECT.PAGES.USERSELFACCOUNT' | translate }}
     </mat-slide-toggle>
