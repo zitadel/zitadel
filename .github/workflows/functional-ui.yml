@@ -1,4 +1,4 @@
-name: "ZITADEL e2e Tests"
+name: "ZITADEL Functional UI Tests"
 
 on:
   workflow_call:
@@ -36,10 +36,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Install Cypress binary
-        run: cd ./e2e && pnpm exec cypress install
+        run: cd ./tests/functional-ui && pnpm exec cypress install
       - name: Start DB and ZITADEL
         run: |
-          cd ./e2e
+          cd ./tests/functional-ui
           ZITADEL_IMAGE=zitadel:local docker compose up --detach --wait
       - name: Cypress run
         uses: cypress-io/github-action@v6
@@ -49,7 +49,7 @@ jobs:
           CYPRESS_DATABASE_CONNECTION_URL: "postgresql://root@localhost:26257/zitadel"
           CYPRESS_BACKEND_URL: http://localhost:8080
         with:
-          working-directory: e2e
+          working-directory: tests/functional-ui
           browser: ${{ matrix.browser }}
           config-file: cypress.config.ts
           install: false
@@ -58,7 +58,7 @@ jobs:
         with:
           name: production-tests-${{ matrix.browser }}
           path: |
-            e2e/cypress/screenshots
-            e2e/cypress/videos
-            e2e/cypress/results
+            functional-ui/cypress/screenshots
+            functional-ui/cypress/videos
+            functional-ui/cypress/results
           retention-days: 30

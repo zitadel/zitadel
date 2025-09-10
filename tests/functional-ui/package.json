@@ -1,17 +1,17 @@
 {
-  "name": "@zitadel/e2e",
+  "name": "@zitadel/functional-ui",
   "version": "0.0.0",
   "scripts": {
     "open": "pnpm exec cypress open",
-    "test:e2e": "pnpm exec cypress run",
+    "test:functional-ui": "pnpm exec cypress run",
     "test:open:golang": "pnpm run open --",
-    "test:e2e:golang": "pnpm run test:e2e --",
+    "test:functional-ui:golang": "pnpm run test:functional-ui --",
     "test:open:golangangular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 pnpm run open --",
-    "test:e2e:golangangular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 pnpm run test:e2e --",
+    "test:functional-ui:golangangular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 pnpm run test:functional-ui --",
     "test:open:angulargolang": "pnpm run test:open:golangangular --",
-    "test:e2e:angulargolang": "pnpm run test:e2e:golangangular --",
+    "test:functional-ui:angulargolang": "pnpm run test:functional-ui:golangangular --",
     "test:open:angular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 CYPRESS_WEBHOOK_HANDLER_HOST=host.docker.internal pnpm run open --",
-    "test:e2e:angular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 CYPRESS_WEBHOOK_HANDLER_HOST=host.docker.internal pnpm run test:e2e --",
+    "test:functional-ui:angular": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 CYPRESS_WEBHOOK_HANDLER_HOST=host.docker.internal pnpm run test:functional-ui --",
     "lint": "prettier --check cypress",
     "lint-fix": "prettier --write cypress",
     "clean": "rm -rf node_modules"

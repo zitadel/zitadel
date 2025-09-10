@@ -1,21 +1,21 @@
 {
-  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "lint": {},
     "check": {},
-    "e2e": {
+    "functional-ui": {
       "cache": false,
       "persistent": false
     },
-    "e2e:golang": {
+    "functional-ui:golang": {
       "cache": false,
       "persistent": false
     },
-    "e2e:golangangular": {
+    "functional-ui:golangangular": {
       "cache": false,
       "persistent": false
     },
-    "e2e:angular": {
+    "functional-ui:angular": {
       "cache": false,
       "persistent": false
     }

@@ -5,7 +5,7 @@ ADMIN_LOGIN_NAME ?=
 ADMIN_PASSWORD ?=
 DATE := $(shell date '+%d-%H:%M:%S')
 
-K6 := ./../../xk6-modules/k6
+K6 := ./../../../xk6-modules/k6
 
 .PHONY: human_password_login
 human_password_login: bundle
@@ -30,7 +30,7 @@ manipulate_user: bundle
 .PHONY: introspect
 introspect: ensure_modules bundle
 	go install go.k6.io/xk6/cmd/xk6@latest
-	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
+	cd ../../../xk6-modules && xk6 build --with xk6-zitadel=.
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/introspection.js --vus ${VUS} --duration ${DURATION} --out csv=output/introspect_${DATE}.csv
 
 .PHONY: oidc_session
@@ -52,13 +52,13 @@ add_session: ensure_modules bundle
 .PHONY: machine_jwt_profile_grant
 machine_jwt_profile_grant: ensure_modules ensure_key_pair bundle
 	go install go.k6.io/xk6/cmd/xk6@latest
-	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
+	cd ../../../xk6-modules && xk6 build --with xk6-zitadel=.
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/machine_jwt_profile_grant.js --vus ${VUS} --duration ${DURATION} --out csv=output/machine_jwt_profile_grant_${DATE}.csv
 
 .PHONY: machine_jwt_profile_grant_single_user
 machine_jwt_profile_grant_single_user: ensure_modules ensure_key_pair bundle
 	go install go.k6.io/xk6/cmd/xk6@latest
-	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
+	cd ../../../xk6-modules && xk6 build --with xk6-zitadel=.
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/machine_jwt_profile_grant_single_user.js --vus ${VUS} --duration ${DURATION} --out csv=output/machine_jwt_profile_grant_single_user_${DATE}.csv
 
 .PHONY: verify_all_user_grants_exist
@@ -81,11 +81,11 @@ lint:
 
 .PHONY: ensure_modules
 ensure_modules:
-ifeq (,$(wildcard $(PWD)/../../xk6-modules))
+ifeq (,$(wildcard $(PWD)/../../../xk6-modules))
 	@echo "cloning xk6-modules"
 	cd ../.. && git clone https://github.com/zitadel/xk6-modules.git
 endif
-	cd ../../xk6-modules && git pull
+	cd ../../../xk6-modules && git pull
 
 .PHONY: bundle
 bundle:
@@ -93,7 +93,7 @@ bundle:
 	npm i
 	npm run bundle
 	go install go.k6.io/xk6/cmd/xk6@latest
-	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
+	cd ../../../xk6-modules && xk6 build --with xk6-zitadel=.
 
 .PHONY: ensure_key_pair
 ensure_key_pair:
