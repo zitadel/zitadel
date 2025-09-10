@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -108,7 +107,7 @@ func TestServer_AddOrganization(t *testing.T) {
 									FamilyName: "lastname",
 								},
 								Email: &user.SetHumanEmail{
-									Email: gofakeit.Email(),
+									Email: integration.Email(),
 									Verification: &user.SetHumanEmail_ReturnCode{
 										ReturnCode: &user.ReturnEmailVerificationCode{},
 									},
@@ -146,7 +145,7 @@ func TestServer_AddOrganization(t *testing.T) {
 									FamilyName: "lastname",
 								},
 								Email: &user.SetHumanEmail{
-									Email: gofakeit.Email(),
+									Email: integration.Email(),
 									Verification: &user.SetHumanEmail_IsVerified{
 										IsVerified: true,
 									},
