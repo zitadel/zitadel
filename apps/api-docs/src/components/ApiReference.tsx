@@ -98,7 +98,8 @@ export function ApiReferenceComponent() {
             spec: {
               content: parsedSpec,
             },
-            theme: "default",
+            theme: "github",
+            layout: "modern",
           } as any);
         } catch (err) {
           console.error("Error parsing YAML or creating API reference:", err);
@@ -223,64 +224,47 @@ export function ApiReferenceComponent() {
   });
 
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
-      {/* Sidebar for service selection */}
+    <div style={{ height: "100vh", position: "relative" }}>
+      {/* Service selector dropdown */}
       <div
         style={{
-          width: "250px",
-          borderRight: "1px solid #e1e4e8",
-          padding: "20px",
-          overflowY: "auto",
-          backgroundColor: "#f6f8fa",
+          position: "fixed",
+          top: "20px",
+          right: "20px",
+          zIndex: 1000,
+          backgroundColor: "var(--scalar-background-1, #ffffff)",
+          border: "1px solid var(--scalar-border-color, #e1e4e8)",
+          borderRadius: "6px",
+          padding: "8px 12px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+          backdropFilter: "blur(8px)",
         }}
       >
-        <h2
-          style={{ marginBottom: "20px", fontSize: "18px", fontWeight: "bold" }}
+        <select
+          value={selectedSpec}
+          onChange={(e) => setSelectedSpec(e.target.value)}
+          style={{
+            backgroundColor: "transparent",
+            border: "none",
+            color: "var(--scalar-color-1, #24292f)",
+            fontSize: "14px",
+            fontWeight: "500",
+            cursor: "pointer",
+            outline: "none",
+            minWidth: "180px",
+            padding: "4px 8px",
+          }}
         >
-          ZITADEL API Services
-        </h2>
-        <nav>
           {sortedSpecs.map((spec) => (
-            <button
-              key={spec.name}
-              onClick={() => setSelectedSpec(spec.name)}
-              style={{
-                display: "block",
-                width: "100%",
-                padding: "10px",
-                marginBottom: "8px",
-                border: "none",
-                borderRadius: "6px",
-                backgroundColor:
-                  selectedSpec === spec.name ? "#0969da" : "transparent",
-                color: selectedSpec === spec.name ? "white" : "#24292f",
-                textAlign: "left",
-                cursor: "pointer",
-                fontSize: "14px",
-                transition: "background-color 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                if (selectedSpec !== spec.name) {
-                  e.currentTarget.style.backgroundColor = "#f3f4f6";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedSpec !== spec.name) {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                }
-              }}
-            >
+            <option key={spec.name} value={spec.name}>
               {getServiceDisplayName(spec.name)}
-            </button>
+            </option>
           ))}
-        </nav>
+        </select>
       </div>
 
-      {/* Main content area */}
-      <div
-        ref={containerRef}
-        style={{ flex: 1, height: "100vh", overflow: "auto" }}
-      />
+      {/* Main content area - full width for Scalar */}
+      <div ref={containerRef} style={{ height: "100vh", overflow: "auto" }} />
     </div>
   );
 }
