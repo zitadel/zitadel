@@ -4,6 +4,62 @@ import { useEffect, useState, useRef } from "react";
 import { createApiReference } from "@scalar/api-reference";
 import yaml from "js-yaml";
 
+// Add CSS to handle scroll offset for fixed header
+if (typeof document !== "undefined") {
+  const style = document.createElement("style");
+  style.textContent = `
+    /* Fix scroll anchorin  return (
+    <div style={{ 
+      height: "100vh", 
+      width: "100vw",
+      display: "flex", 
+      flexDirection: "column",
+      overflow: "hidden"
+    }}>
+      {/* Navigation bar - fixed height */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "8px 24px",
+          backgroundColor: "var(--scalar-background-1, #ffffff)",
+          borderBottom: "1px solid var(--scalar-border-color, #e1e4e8)",
+          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+          zIndex: 1000,
+          minHeight: "70px",
+          flexShrink: 0, // Prevent shrinking
+        }}
+      > fixed header */
+    html {
+      scroll-padding-top: 80px;
+    }
+    
+    /* Target Scalar's specific elements that might be used as scroll targets */
+    [id]:target,
+    .scalar-api-reference [id]:target,
+    .scalar-api-reference h1[id],
+    .scalar-api-reference h2[id],
+    .scalar-api-reference h3[id],
+    .scalar-api-reference h4[id],
+    .scalar-api-reference h5[id],
+    .scalar-api-reference h6[id] {
+      scroll-margin-top: 80px;
+    }
+    
+    /* Also fix any operation/endpoint scrolling */
+    .scalar-api-reference [data-operation-id],
+    .scalar-api-reference [data-section-id] {
+      scroll-margin-top: 80px;
+    }
+  `;
+
+  if (!document.head.querySelector("#scroll-offset-fix")) {
+    style.id = "scroll-offset-fix";
+    document.head.appendChild(style);
+  }
+}
+
 interface OpenApiSpec {
   name: string;
   fileName: string;
@@ -166,6 +222,33 @@ export function ApiReferenceComponent() {
             },
             theme: "github",
             layout: "modern",
+            customCss: `
+              /* Fix Scalar's sidebar height to work with our navigation bar */
+              .scalar-api-reference {
+                height: 100% !important;
+              }
+              
+              /* Adjust sidebar wrapper to account for our navigation */
+              .scalar-api-reference .sidebar,
+              .scalar-api-reference .scalar-api-reference__sidebar,
+              .scalar-api-reference [data-sidebar] {
+                max-height: calc(100vh - 70px) !important;
+                top: 0 !important;
+              }
+              
+              /* Ensure sidebar content scrolls properly */
+              .scalar-api-reference .sidebar-content,
+              .scalar-api-reference .scalar-api-reference__sidebar-content,
+              .scalar-api-reference .sidebar .scalar-api-reference__navigation {
+                max-height: calc(100vh - 70px) !important;
+                overflow-y: auto !important;
+              }
+              
+              /* Let Scalar handle its own positioning but fix the viewport calculation */
+              .scalar-api-reference .scalar-api-reference__container {
+                height: 100% !important;
+              }
+            `,
           } as any);
         } catch (err) {
           console.error("Error parsing YAML or creating API reference:", err);
@@ -540,12 +623,13 @@ export function ApiReferenceComponent() {
         </div>
       </div>
 
-      {/* Main content area - takes remaining height */}
+      {/* API Documentation content - fills remaining space */}
       <div
         ref={containerRef}
         style={{
           flex: 1,
-          overflow: "auto",
+          overflow: "auto", // Allow scrolling in the content area
+          minHeight: 0, // Important: allows flex item to shrink below content size
         }}
         onClick={() => setShowSearchResults(false)}
       />
