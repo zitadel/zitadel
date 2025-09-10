@@ -1,4 +1,3 @@
-import { animate, style, transition, trigger } from '@angular/animations';
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
@@ -21,15 +20,6 @@ import { SetUpOrgRequestSchema } from '@zitadel/proto/zitadel/admin_pb';
   selector: 'cnsl-org-create',
   templateUrl: './org-create.component.html',
   styleUrls: ['./org-create.component.scss'],
-  animations: [
-    trigger('openClose', [
-      transition(':enter', [
-        style({ height: '0', opacity: 0 }),
-        animate('150ms ease-in-out', style({ height: '*', opacity: 1 })),
-      ]),
-      transition(':leave', [animate('150ms ease-in-out', style({ height: '0', opacity: 0 }))]),
-    ]),
-  ],
 })
 export class OrgCreateComponent {
   protected orgForm = this.fb.group({
