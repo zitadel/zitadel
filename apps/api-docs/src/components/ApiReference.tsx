@@ -290,235 +290,251 @@ export function ApiReferenceComponent() {
   });
 
   return (
-    <div style={{ height: "100vh", position: "relative" }}>
-      {/* Service selector dropdown - moved to left */}
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+      {/* Top navigation bar */}
       <div
         style={{
-          position: "fixed",
-          top: "20px",
-          left: "20px",
-          zIndex: 1000,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "8px 24px",
           backgroundColor: "var(--scalar-background-1, #ffffff)",
-          border: "1px solid var(--scalar-border-color, #e1e4e8)",
-          borderRadius: "6px",
-          padding: "8px 12px",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-          backdropFilter: "blur(8px)",
+          borderBottom: "1px solid var(--scalar-border-color, #e1e4e8)",
+          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+          zIndex: 1000,
+          minHeight: "70px",
         }}
       >
-        <select
-          value={selectedSpec}
-          onChange={(e) => setSelectedSpec(e.target.value)}
-          style={{
-            backgroundColor: "transparent",
-            border: "none",
-            color: "var(--scalar-color-1, #24292f)",
-            fontSize: "14px",
-            fontWeight: "500",
-            cursor: "pointer",
-            outline: "none",
-            minWidth: "180px",
-            padding: "4px 8px",
-          }}
-        >
-          {sortedSpecs.map((spec) => (
-            <option key={spec.name} value={spec.name}>
-              {getServiceDisplayName(spec.name)}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Global search interface - moved to right */}
-      <div
-        style={{
-          position: "fixed",
-          top: "20px",
-          right: "20px",
-          zIndex: 1000,
-          backgroundColor: "var(--scalar-background-1, #ffffff)",
-          border: "1px solid var(--scalar-border-color, #e1e4e8)",
-          borderRadius: "6px",
-          padding: "8px 12px",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-          backdropFilter: "blur(8px)",
-          minWidth: "300px",
-        }}
-      >
-        <div style={{ position: "relative" }}>
-          <input
-            type="text"
-            placeholder="Search across all APIs..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+        {/* Left side: Title and Service selector */}
+        <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
+          <h1
             style={{
-              width: "100%",
-              padding: "8px 12px",
-              border: "1px solid var(--scalar-border-color, #e1e4e8)",
-              borderRadius: "4px",
-              fontSize: "14px",
-              backgroundColor: "var(--scalar-background-1, #ffffff)",
+              margin: 0,
+              fontSize: "24px",
+              fontWeight: "bold",
               color: "var(--scalar-color-1, #24292f)",
-              outline: "none",
-            }}
-          />
-          {isSearching && (
-            <div
-              style={{
-                position: "absolute",
-                right: "8px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                fontSize: "12px",
-                color: "var(--scalar-color-2, #666)",
-              }}
-            >
-              Searching...
-            </div>
-          )}
-        </div>
-
-        {/* Search results dropdown */}
-        {showSearchResults && searchResults.length > 0 && (
-          <div
-            style={{
-              position: "absolute",
-              top: "100%",
-              left: "0",
-              right: "0",
-              backgroundColor: "var(--scalar-background-1, #ffffff)",
-              border: "1px solid var(--scalar-border-color, #e1e4e8)",
-              borderRadius: "6px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-              maxHeight: "400px",
-              overflowY: "auto",
-              marginTop: "4px",
-              zIndex: 1001,
+              whiteSpace: "nowrap",
             }}
           >
-            {searchResults.map((result, index) => (
-              <div
-                key={`${result.serviceName}-${result.path}-${result.method}-${index}`}
-                onClick={() => handleSearchResultClick(result)}
-                style={{
-                  padding: "12px",
-                  borderBottom:
-                    index < searchResults.length - 1
-                      ? "1px solid var(--scalar-border-color, #e1e4e8)"
-                      : "none",
-                  cursor: "pointer",
-                  transition: "background-color 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    "var(--scalar-background-2, #f6f8fa)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    marginBottom: "4px",
-                  }}
-                >
-                  <span
-                    style={{
-                      backgroundColor:
-                        result.method === "GET"
-                          ? "#28a745"
-                          : result.method === "POST"
-                          ? "#007bff"
-                          : result.method === "PUT"
-                          ? "#ffc107"
-                          : result.method === "DELETE"
-                          ? "#dc3545"
-                          : "#6c757d",
-                      color: "white",
-                      fontSize: "10px",
-                      fontWeight: "bold",
-                      padding: "2px 6px",
-                      borderRadius: "3px",
-                      minWidth: "45px",
-                      textAlign: "center",
-                    }}
-                  >
-                    {result.method}
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "monospace",
-                      fontSize: "13px",
-                      color: "var(--scalar-color-1, #24292f)",
-                      fontWeight: "500",
-                    }}
-                  >
-                    {result.path}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "var(--scalar-color-2, #666)",
-                    marginBottom: "2px",
-                  }}
-                >
-                  {result.serviceDisplayName}
-                </div>
-                {result.summary && (
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "var(--scalar-color-2, #666)",
-                      fontStyle: "italic",
-                    }}
-                  >
-                    {result.summary}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+            ZITADEL APIs
+          </h1>
 
-        {showSearchResults &&
-          searchResults.length === 0 &&
-          searchQuery.trim().length >= 2 &&
-          !isSearching && (
-            <div
+          <div
+            style={{
+              backgroundColor: "var(--scalar-background-2, #f6f8fa)",
+              border: "1px solid var(--scalar-border-color, #e1e4e8)",
+              borderRadius: "6px",
+              padding: "8px 12px",
+            }}
+          >
+            <select
+              value={selectedSpec}
+              onChange={(e) => setSelectedSpec(e.target.value)}
               style={{
-                position: "absolute",
-                top: "100%",
-                left: "0",
-                right: "0",
-                backgroundColor: "var(--scalar-background-1, #ffffff)",
-                border: "1px solid var(--scalar-border-color, #e1e4e8)",
-                borderRadius: "6px",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-                padding: "12px",
-                marginTop: "4px",
-                fontSize: "12px",
-                color: "var(--scalar-color-2, #666)",
-                textAlign: "center",
+                backgroundColor: "transparent",
+                border: "none",
+                color: "var(--scalar-color-1, #24292f)",
+                fontSize: "14px",
+                fontWeight: "500",
+                cursor: "pointer",
+                outline: "none",
+                minWidth: "200px",
+                padding: "4px 8px",
               }}
             >
-              No results found for "{searchQuery}"
+              {sortedSpecs.map((spec) => (
+                <option key={spec.name} value={spec.name}>
+                  {getServiceDisplayName(spec.name)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Right side: Global search */}
+        <div style={{ position: "relative" }}>
+          <div
+            style={{
+              backgroundColor: "var(--scalar-background-2, #f6f8fa)",
+              border: "1px solid var(--scalar-border-color, #e1e4e8)",
+              borderRadius: "6px",
+              padding: "8px 12px",
+              minWidth: "300px",
+            }}
+          >
+            <div style={{ position: "relative" }}>
+              <input
+                type="text"
+                placeholder="Search across all APIs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "8px 12px",
+                  border: "1px solid var(--scalar-border-color, #e1e4e8)",
+                  borderRadius: "4px",
+                  fontSize: "14px",
+                  backgroundColor: "var(--scalar-background-1, #ffffff)",
+                  color: "var(--scalar-color-1, #24292f)",
+                  outline: "none",
+                }}
+              />
+              {isSearching && (
+                <div
+                  style={{
+                    position: "absolute",
+                    right: "8px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    fontSize: "12px",
+                    color: "var(--scalar-color-2, #666)",
+                  }}
+                >
+                  Searching...
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Search results dropdown */}
+            {showSearchResults && searchResults.length > 0 && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "100%",
+                  left: "0",
+                  right: "0",
+                  backgroundColor: "var(--scalar-background-1, #ffffff)",
+                  border: "1px solid var(--scalar-border-color, #e1e4e8)",
+                  borderRadius: "6px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                  maxHeight: "400px",
+                  overflowY: "auto",
+                  marginTop: "4px",
+                  zIndex: 1001,
+                }}
+              >
+                {searchResults.map((result, index) => (
+                  <div
+                    key={`${result.serviceName}-${result.path}-${result.method}-${index}`}
+                    onClick={() => handleSearchResultClick(result)}
+                    style={{
+                      padding: "12px",
+                      borderBottom:
+                        index < searchResults.length - 1
+                          ? "1px solid var(--scalar-border-color, #e1e4e8)"
+                          : "none",
+                      cursor: "pointer",
+                      transition: "background-color 0.2s",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        "var(--scalar-background-2, #f6f8fa)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          backgroundColor:
+                            result.method === "GET"
+                              ? "#28a745"
+                              : result.method === "POST"
+                              ? "#007bff"
+                              : result.method === "PUT"
+                              ? "#ffc107"
+                              : result.method === "DELETE"
+                              ? "#dc3545"
+                              : "#6c757d",
+                          color: "white",
+                          fontSize: "10px",
+                          fontWeight: "bold",
+                          padding: "2px 6px",
+                          borderRadius: "3px",
+                          minWidth: "45px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {result.method}
+                      </span>
+                      <span
+                        style={{
+                          fontFamily: "monospace",
+                          fontSize: "13px",
+                          color: "var(--scalar-color-1, #24292f)",
+                          fontWeight: "500",
+                        }}
+                      >
+                        {result.path}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        color: "var(--scalar-color-2, #666)",
+                        marginBottom: "2px",
+                      }}
+                    >
+                      {result.serviceDisplayName}
+                    </div>
+                    {result.summary && (
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "var(--scalar-color-2, #666)",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        {result.summary}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {showSearchResults &&
+              searchResults.length === 0 &&
+              searchQuery.trim().length >= 2 &&
+              !isSearching && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: "0",
+                    right: "0",
+                    backgroundColor: "var(--scalar-background-1, #ffffff)",
+                    border: "1px solid var(--scalar-border-color, #e1e4e8)",
+                    borderRadius: "6px",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                    padding: "12px",
+                    marginTop: "4px",
+                    fontSize: "12px",
+                    color: "var(--scalar-color-2, #666)",
+                    textAlign: "center",
+                  }}
+                >
+                  No results found for "{searchQuery}"
+                </div>
+              )}
+          </div>
+        </div>
       </div>
 
-      {/* Main content area with padding to avoid overlap */}
+      {/* Main content area - takes remaining height */}
       <div
         ref={containerRef}
-        style={{ 
-          height: "100vh", 
+        style={{
+          flex: 1,
           overflow: "auto",
-          paddingTop: "80px", // Add padding to avoid overlap with fixed elements
-          paddingLeft: "20px",
-          paddingRight: "20px",
         }}
         onClick={() => setShowSearchResults(false)}
       />
