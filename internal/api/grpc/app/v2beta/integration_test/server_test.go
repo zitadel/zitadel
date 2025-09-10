@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -82,7 +81,7 @@ func samlMetadataGen(entityID string) []byte {
 }
 
 func createSAMLAppWithName(t *testing.T, baseURI, projectID string) ([]byte, *app.CreateApplicationResponse, string) {
-	samlMetas := samlMetadataGen(gofakeit.URL())
+	samlMetas := samlMetadataGen(integration.URL())
 	appName := integration.ApplicationName()
 
 	appForSAMLConfigChange, appSAMLConfigChangeErr := instance.Client.AppV2Beta.CreateApplication(IAMOwnerCtx, &app.CreateApplicationRequest{

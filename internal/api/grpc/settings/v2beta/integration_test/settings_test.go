@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -236,7 +235,7 @@ func TestServer_SetOrganizationSettings(t *testing.T) {
 		{
 			name: "success no changes",
 			prepare: func(req *settings.SetOrganizationSettingsRequest) {
-				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), integration.Email())
 				req.OrganizationId = orgResp.GetOrganizationId()
 			},
 			args: args{
@@ -251,7 +250,7 @@ func TestServer_SetOrganizationSettings(t *testing.T) {
 		{
 			name: "success user uniqueness",
 			prepare: func(req *settings.SetOrganizationSettingsRequest) {
-				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), integration.Email())
 				req.OrganizationId = orgResp.GetOrganizationId()
 			},
 			args: args{
@@ -268,7 +267,7 @@ func TestServer_SetOrganizationSettings(t *testing.T) {
 		{
 			name: "success no change",
 			prepare: func(req *settings.SetOrganizationSettingsRequest) {
-				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), integration.Email())
 				req.OrganizationId = orgResp.GetOrganizationId()
 			},
 			args: args{
@@ -339,7 +338,7 @@ func TestServer_DeleteOrganizationSettings(t *testing.T) {
 		{
 			name: "permission error",
 			prepare: func(t *testing.T, req *settings.DeleteOrganizationSettingsRequest) {
-				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), integration.Email())
 				req.OrganizationId = orgResp.GetOrganizationId()
 				instance.SetOrganizationSettings(iamOwnerCTX, t, orgResp.GetOrganizationId(), true)
 			},
@@ -377,7 +376,7 @@ func TestServer_DeleteOrganizationSettings(t *testing.T) {
 		{
 			name: "success user uniqueness",
 			prepare: func(t *testing.T, req *settings.DeleteOrganizationSettingsRequest) {
-				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), integration.Email())
 				req.OrganizationId = orgResp.GetOrganizationId()
 				instance.SetOrganizationSettings(iamOwnerCTX, t, orgResp.GetOrganizationId(), true)
 			},
@@ -393,7 +392,7 @@ func TestServer_DeleteOrganizationSettings(t *testing.T) {
 		{
 			name: "success no existing",
 			prepare: func(t *testing.T, req *settings.DeleteOrganizationSettingsRequest) {
-				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), integration.Email())
 				req.OrganizationId = orgResp.GetOrganizationId()
 			},
 			args: args{
@@ -408,7 +407,7 @@ func TestServer_DeleteOrganizationSettings(t *testing.T) {
 		{
 			name: "success already deleted",
 			prepare: func(t *testing.T, req *settings.DeleteOrganizationSettingsRequest) {
-				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), gofakeit.Email())
+				orgResp := instance.CreateOrganization(iamOwnerCTX, integration.OrganizationName(), integration.Email())
 				req.OrganizationId = orgResp.GetOrganizationId()
 				instance.SetOrganizationSettings(iamOwnerCTX, t, orgResp.GetOrganizationId(), true)
 				instance.DeleteOrganizationSettings(iamOwnerCTX, t, orgResp.GetOrganizationId())
