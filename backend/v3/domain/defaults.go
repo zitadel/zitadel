@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/telemetry/logging"
 	"github.com/zitadel/zitadel/backend/v3/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 // The variables could also be moved to a struct.
@@ -19,6 +20,7 @@ var (
 	userCodeAlgorithm crypto.EncryptionAlgorithm
 	tracer            tracing.Tracer
 	logger            logging.Logger = *logging.NewLogger(slog.Default())
+	legacyEventstore  *eventstore.Eventstore
 
 	// userRepo func(database.QueryExecutor) UserRepository
 	// instanceRepo func(database.QueryExecutor) InstanceRepository
@@ -47,6 +49,10 @@ func SetTracer(t tracing.Tracer) {
 
 func SetLogger(l logging.Logger) {
 	logger = l
+}
+
+func SetLegacyEventstore(es *eventstore.Eventstore) {
+	legacyEventstore = es
 }
 
 // func SetUserRepository(repo func(database.QueryExecutor) UserRepository) {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
+	legacy_es "github.com/zitadel/zitadel/internal/eventstore"
 )
 
 // Invoke provides a way to execute commands within the domain package.
@@ -36,7 +37,7 @@ func (i *eventStoreInvoker) Invoke(ctx context.Context, command Commander, opts 
 		return err
 	}
 	if len(i.collector.events) > 0 {
-		err = eventstore.Publish(ctx, i.collector.events, opts.DB)
+		err = eventstore.Publish(ctx, legacyEventstore, opts.DB, i.collector.events...)
 		if err != nil {
 			return err
 		}
@@ -47,11 +48,11 @@ func (i *eventStoreInvoker) Invoke(ctx context.Context, command Commander, opts 
 // eventCollector collects events from all commands. The [eventStoreInvoker] pushes the collected events after all commands are executed.
 type eventCollector struct {
 	next   Invoker
-	events []*eventstore.Event
+	events []legacy_es.Command
 }
 
 type eventer interface {
-	Events() []*eventstore.Event
+	Events() []legacy_es.Command
 }
 
 func (i *eventCollector) Invoke(ctx context.Context, command Commander, opts *CommandOpts) (err error) {

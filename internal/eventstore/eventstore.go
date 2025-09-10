@@ -124,7 +124,7 @@ retry:
 	for i := 0; i <= es.maxRetries; i++ {
 		events, err = es.pusher.Push(ctx, client, cmds...)
 		// if there is a transaction passed the calling function needs to retry
-		if _, ok := client.(database.Tx); ok {
+		if _, ok := client.(new_db.Transaction); ok {
 			break retry
 		}
 		var pgErr *pgconn.PgError

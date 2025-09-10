@@ -1,6 +1,11 @@
 package domain
 
-import "github.com/zitadel/zitadel/backend/v3/storage/eventstore"
+import (
+	"context"
+
+	legacy_es "github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/v2/org"
+)
 
 // AddOrgCommand adds a new organization.
 // I'm unsure if we should add the Admins here or if this should be a separate command.
@@ -60,15 +65,12 @@ type AddOrgCommand struct {
 // }
 
 // Events implements [eventer].
-func (cmd *AddOrgCommand) Events() []*eventstore.Event {
-	return []*eventstore.Event{
-		{
-			AggregateType: "org",
-			AggregateID:   cmd.ID,
-			Type:          "org.added",
-			Payload:       cmd,
-		},
+func (cmd *AddOrgCommand) Events(ctx context.Context) []legacy_es.Command {
+	command, err := org.NewAddedCommand(ctx, cmd.Name)
+	if err != nil {
+		return nil
 	}
+	return []legacy_es.Command{command}
 }
 
 // var (

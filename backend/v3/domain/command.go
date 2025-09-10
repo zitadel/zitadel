@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	legacy_es "github.com/zitadel/zitadel/internal/eventstore"
 )
 
 // Commander is the all it needs to implement the command pattern.
@@ -12,6 +13,9 @@ import (
 // If possible it should also be used for queries. We will find out if this is possible in the future.
 type Commander interface {
 	Execute(ctx context.Context, opts *CommandOpts) (err error)
+	// Events returns the events that should be pushed to the event store after the command is executed.
+	// If the command does not produce events, it should return nil or an empty slice.
+	Events() []legacy_es.Command
 	fmt.Stringer
 }
 
@@ -106,6 +110,17 @@ func DefaultOpts(invoker Invoker) *CommandOpts {
 // It uses the [Invoker] provided by the opts to execute each command.
 type commandBatch struct {
 	Commands []Commander
+}
+
+// Events implements Commander.
+func (cmd *commandBatch) Events() []legacy_es.Command {
+	commands := make([]legacy_es.Command, 0, len(cmd.Commands))
+	for _, c := range cmd.Commands {
+		if e := c.Events(); len(e) > 0 {
+			commands = append(commands, e...)
+		}
+	}
+	return commands
 }
 
 func BatchCommands(cmds ...Commander) *commandBatch {
