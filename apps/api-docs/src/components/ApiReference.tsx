@@ -31,7 +31,9 @@ export function ApiReferenceComponent() {
         const data: ApiResponse = await response.json();
         setSpecs(data.specs);
         if (data.specs.length > 0) {
-          setSelectedSpec(data.specs[0].name);
+          // Default to management service if available, otherwise first service
+          const managementSpec = data.specs.find(spec => spec.name === 'management');
+          setSelectedSpec(managementSpec ? 'management' : data.specs[0].name);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
@@ -48,21 +50,34 @@ export function ApiReferenceComponent() {
       const selectedSpecData = specs.find(spec => spec.name === selectedSpec);
       if (selectedSpecData) {
         try {
-          const parsedSpec = yaml.load(selectedSpecData.content);
+          const parsedSpec = yaml.load(selectedSpecData.content) as any;
+          
+          // Debug: Log the parsed spec
+          console.log('Selected spec:', selectedSpec);
+          console.log('Parsed spec:', parsedSpec);
+          console.log('Parsed spec paths:', parsedSpec.paths);
+          console.log('Number of paths:', Object.keys(parsedSpec.paths || {}).length);
           
           // Clear the container
           containerRef.current.innerHTML = '';
           
-          // Create the API reference
-          createApiReference(containerRef.current, {
+          // Create a div for Scalar
+          const scalarDiv = document.createElement('div');
+          scalarDiv.id = `api-reference-${selectedSpec}`;
+          containerRef.current.appendChild(scalarDiv);
+          
+          // Create the API reference with correct configuration
+          createApiReference(scalarDiv, {
             spec: {
               content: parsedSpec
             },
             theme: 'default',
-            layout: 'modern',
-          });
+          } as any);
         } catch (err) {
           console.error('Error parsing YAML or creating API reference:', err);
+          if (containerRef.current) {
+            containerRef.current.innerHTML = `<div style="padding: 20px; color: red;">Error loading API documentation: ${err}</div>`;
+          }
         }
       }
     }
