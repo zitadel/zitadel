@@ -22,10 +22,11 @@ async function getAllOpenApiFiles(
         // Recursively search subdirectories
         const subFiles = await getAllOpenApiFiles(fullPath, entryRelativePath);
         files.push(...subFiles);
-      } else if (
-        entry.endsWith(".openapi.yaml") ||
-        entry.endsWith("_service.openapi.yaml")
-      ) {
+      } else if (entry.endsWith("_service.openapi.yaml")) {
+        // Only include service files that contain actual API endpoints
+        files.push({ path: fullPath, relativePath: entryRelativePath });
+      } else if (entry.endsWith(".openapi.yaml") && relativePath === "") {
+        // Include top-level v1 API files (management, admin, auth, system)
         files.push({ path: fullPath, relativePath: entryRelativePath });
       }
     }
