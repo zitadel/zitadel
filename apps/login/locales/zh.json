@@ -35,6 +35,29 @@
     },
     "required": {
       "loginName": "此字段为必填项"
+    },
+    "errors": {
+      "internalError": "发生内部错误",
+      "couldNotGetLoginSettings": "无法获取登录设置",
+      "couldNotSearchUsers": "无法搜索用户",
+      "couldNotGetDomain": "无法获取域名",
+      "couldNotGetHost": "无法获取主机",
+      "couldNotStartIDPFlow": "无法启动身份提供者流程",
+      "moreThanOneUserFound": "找到多个用户。请提供唯一标识符。",
+      "userNotFound": "系统中未找到用户",
+      "couldNotCreateSession": "无法为用户创建会话",
+      "initialUserNotSupported": "不支持初始用户",
+      "usernamePasswordNotAllowed": "不允许使用用户名和密码！请联系管理员了解更多信息。",
+      "passkeysNotAllowed": "不允许使用 Passkey！请联系管理员了解更多信息。",
+      "couldNotFindIdentityProvider": "找不到身份提供者。",
+      "userNotActive": "用户未激活。请联系管理员了解更多信息。"
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "发生错误",
+      "multipleUsersFound": "找到多个用户",
+      "userNotFound": "系统中未找到用户"
     }
   },
   "password": {
@@ -48,6 +71,13 @@
       },
       "required": {
         "password": "此字段为必填项"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "无法验证密码",
+        "couldNotResetPassword": "无法重置密码"
+      },
+      "info": {
+        "passwordResetSent": "密码已重置。请检查您的电子邮件"
       }
     },
     "set": {
@@ -66,6 +96,11 @@
         "code": "此字段为必填项",
         "newPassword": "必须提供密码！",
         "confirmPassword": "此字段为必填项"
+      },
+      "errors": {
+        "couldNotSetPassword": "无法设置密码",
+        "couldNotResetPassword": "无法重置密码",
+        "couldNotVerifyPassword": "无法验证密码"
       }
     },
     "change": {
@@ -79,7 +114,40 @@
       "required": {
         "newPassword": "必须提供新密码！",
         "confirmPassword": "此字段为必填项"
+      },
+      "errors": {
+        "couldNotChangePassword": "无法更改密码",
+        "couldNotVerifyPassword": "无法验证密码",
+        "unknownError": "未知错误"
       }
+    },
+    "complexity": {
+      "length": "必须至少有 {minLength} 个字符。",
+      "hasSymbol": "必须包含一个符号。",
+      "hasNumber": "必须包含一个数字。",
+      "hasUppercase": "必须包含一个大写字母。",
+      "hasLowercase": "必须包含一个小写字母。",
+      "equals": "密码确认匹配。",
+      "matches": "匹配",
+      "doesNotMatch": "不匹配"
+    },
+    "errors": {
+      "noHostFound": "未找到主机",
+      "couldNotSendResetLink": "无法发送密码重置链接",
+      "couldNotCreateSessionForUser": "无法为用户创建会话",
+      "couldNotVerifyPassword": "无法验证密码",
+      "failedToAuthenticate": "身份验证失败。您已尝试输入密码 {failedAttempts} 次，共允许 {maxPasswordAttempts} 次。{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "身份验证失败。",
+      "accountLockedContactAdmin": " 请联系管理员以解锁您的账户",
+      "userNotFound": "系统中未找到用户",
+      "initialUserNotSupported": "不支持初始用户",
+      "userInitialStateNotSupported": "不支持用户初始状态",
+      "codeOrVerificationRequired": "您必须提供验证码或通过有效的用户验证",
+      "verificationRequired": "必须完成用户验证",
+      "couldNotLoadSession": "无法加载会话",
+      "couldNotLoadAuthMethods": "无法加载验证方法",
+      "failedPrecondition": "前置条件失败",
+      "sessionNotValid": "会话无效"
     }
   },
   "idp": {
@@ -244,6 +312,13 @@
       "firstname": "此字段为必填项",
       "lastname": "此字段为必填项",
       "email": "此字段为必填项"
+    },
+    "errors": {
+      "couldNotCreateUser": "无法创建用户",
+      "couldNotCreateSession": "无法创建会话",
+      "userNotFound": "系统中未找到用户",
+      "couldNotLinkIDP": "无法将 IDP 关联到用户",
+      "couldNotRegisterUser": "无法注册用户"
     }
   },
   "invite": {
@@ -287,6 +362,19 @@
       "required": {
         "code": "此字段为必填项"
       }
+    },
+    "errors": {
+      "couldNotResendEmail": "无法重新发送邮件",
+      "couldNotVerifyUser": "无法验证用户",
+      "couldNotVerifyInvite": "无法验证邀请",
+      "couldNotVerifyEmail": "无法验证邮箱",
+      "couldNotVerify": "无法验证",
+      "couldNotLoadUser": "无法加载用户",
+      "couldNotLoadAuthenticators": "无法加载可用的身份验证器",
+      "couldNotCreateSession": "无法创建会话",
+      "noHostFound": "未找到主机",
+      "userAlreadyVerified": "用户已验证！",
+      "couldNotResendInvite": "无法重新发送邀请"
     }
   },
   "authenticator": {

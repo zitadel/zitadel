@@ -35,6 +35,29 @@
     },
     "required": {
       "loginName": "Questo campo è obbligatorio"
+    },
+    "errors": {
+      "internalError": "Si è verificato un errore interno",
+      "couldNotGetLoginSettings": "Impossibile ottenere le impostazioni di accesso",
+      "couldNotSearchUsers": "Impossibile cercare gli utenti",
+      "couldNotGetDomain": "Impossibile ottenere il dominio",
+      "couldNotGetHost": "Impossibile ottenere l'host",
+      "couldNotStartIDPFlow": "Impossibile avviare il flusso IDP",
+      "moreThanOneUserFound": "È stato trovato più di un utente. Fornisci un identificatore univoco.",
+      "userNotFound": "Utente non trovato nel sistema",
+      "couldNotCreateSession": "Impossibile creare la sessione per l'utente",
+      "initialUserNotSupported": "Utente iniziale non supportato",
+      "usernamePasswordNotAllowed": "Nome utente e password non consentiti! Contatta l'amministratore per maggiori informazioni.",
+      "passkeysNotAllowed": "Passkey non consentite! Contatta l'amministratore per maggiori informazioni.",
+      "couldNotFindIdentityProvider": "Impossibile trovare il provider di identità.",
+      "userNotActive": "L'utente non è attivo. Contatta l'amministratore per maggiori informazioni."
+    }
+  },
+  "zitadel": {
+    "errors": {
+      "errorOccured": "Si è verificato un errore",
+      "multipleUsersFound": "Trovati più utenti",
+      "userNotFound": "Utente non trovato nel sistema"
     }
   },
   "password": {
@@ -48,6 +71,13 @@
       },
       "required": {
         "password": "Questo campo è obbligatorio"
+      },
+      "errors": {
+        "couldNotVerifyPassword": "Impossibile verificare la password",
+        "couldNotResetPassword": "Impossibile reimpostare la password"
+      },
+      "info": {
+        "passwordResetSent": "La password è stata reimpostata. Controlla la tua e-mail"
       }
     },
     "set": {
@@ -66,6 +96,11 @@
         "code": "Questo campo è obbligatorio",
         "newPassword": "Devi fornire una password!",
         "confirmPassword": "Questo campo è obbligatorio"
+      },
+      "errors": {
+        "couldNotSetPassword": "Impossibile impostare la password",
+        "couldNotResetPassword": "Impossibile reimpostare la password",
+        "couldNotVerifyPassword": "Impossibile verificare la password"
       }
     },
     "change": {
@@ -79,7 +114,40 @@
       "required": {
         "newPassword": "Devi fornire una nuova password!",
         "confirmPassword": "Questo campo è obbligatorio"
+      },
+      "errors": {
+        "couldNotChangePassword": "Impossibile modificare la password",
+        "couldNotVerifyPassword": "Impossibile verificare la password",
+        "unknownError": "Errore sconosciuto"
       }
+    },
+    "complexity": {
+      "length": "Deve contenere almeno {minLength} caratteri.",
+      "hasSymbol": "Deve includere un simbolo.",
+      "hasNumber": "Deve includere un numero.",
+      "hasUppercase": "Deve includere una lettera maiuscola.",
+      "hasLowercase": "Deve includere una lettera minuscola.",
+      "equals": "La conferma della password corrisponde.",
+      "matches": "Corrisponde",
+      "doesNotMatch": "Non corrisponde"
+    },
+    "errors": {
+      "noHostFound": "Nessun host trovato",
+      "couldNotSendResetLink": "Impossibile inviare il link per il ripristino della password",
+      "couldNotCreateSessionForUser": "Impossibile creare una sessione per l'utente",
+      "couldNotVerifyPassword": "Impossibile verificare la password",
+      "failedToAuthenticate": "Autenticazione non riuscita. Hai effettuato {failedAttempts} di {maxPasswordAttempts} tentativi di password.{lockoutMessage}",
+      "failedToAuthenticateNoLimit": "Autenticazione non riuscita.",
+      "accountLockedContactAdmin": " Contatta l'amministratore per sbloccare il tuo account",
+      "userNotFound": "Utente non trovato nel sistema",
+      "initialUserNotSupported": "Utente iniziale non supportato",
+      "userInitialStateNotSupported": "Lo stato iniziale dell'utente non è supportato",
+      "codeOrVerificationRequired": "Devi fornire un codice o avere una verifica utente valida",
+      "verificationRequired": "È necessario effettuare la verifica utente",
+      "couldNotLoadSession": "Impossibile caricare la sessione",
+      "couldNotLoadAuthMethods": "Impossibile caricare i metodi di autenticazione",
+      "failedPrecondition": "Precondizione non soddisfatta",
+      "sessionNotValid": "La sessione non è valida"
     }
   },
   "idp": {
@@ -244,6 +312,13 @@
       "firstname": "Questo campo è obbligatorio",
       "lastname": "Questo campo è obbligatorio",
       "email": "Questo campo è obbligatorio"
+    },
+    "errors": {
+      "couldNotCreateUser": "Impossibile creare l'utente",
+      "couldNotCreateSession": "Impossibile creare la sessione",
+      "userNotFound": "Utente non trovato nel sistema",
+      "couldNotLinkIDP": "Impossibile collegare l'IDP all'utente",
+      "couldNotRegisterUser": "Impossibile registrare l'utente"
     }
   },
   "invite": {
@@ -287,6 +362,19 @@
       "required": {
         "code": "Questo campo è obbligatorio"
       }
+    },
+    "errors": {
+      "couldNotResendEmail": "Impossibile reinviare l'email",
+      "couldNotVerifyUser": "Impossibile verificare l'utente",
+      "couldNotVerifyInvite": "Impossibile verificare l'invito",
+      "couldNotVerifyEmail": "Impossibile verificare l'email",
+      "couldNotVerify": "Impossibile verificare",
+      "couldNotLoadUser": "Impossibile caricare l'utente",
+      "couldNotLoadAuthenticators": "Impossibile caricare gli autenticatori possibili",
+      "couldNotCreateSession": "Impossibile creare la sessione",
+      "noHostFound": "Nessun host trovato",
+      "userAlreadyVerified": "L'utente è già verificato!",
+      "couldNotResendInvite": "Impossibile reinviare l'invito"
     }
   },
   "authenticator": {

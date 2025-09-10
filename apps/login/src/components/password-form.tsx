@@ -38,6 +38,7 @@ export function PasswordForm({
   
   const t = useTranslations("password");
 
+
   const [info, setInfo] = useState<string>("");
   const [error, setError] = useState<string>("");
 
@@ -58,7 +59,7 @@ export function PasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not verify password");
+        setError(t("verify.errors.couldNotVerifyPassword"));
         return;
       })
       .finally(() => {
@@ -86,7 +87,7 @@ export function PasswordForm({
       requestId,
     })
       .catch(() => {
-        setError("Could not reset password");
+        setError(t("verify.errors.couldNotResetPassword"));
         return;
       })
       .finally(() => {
@@ -98,7 +99,7 @@ export function PasswordForm({
       return;
     }
 
-    setInfo("Password was reset. Please check your email.");
+    setInfo(t("verify.info.passwordResetSent"));
 
     const params = new URLSearchParams({
       loginName: loginName,
