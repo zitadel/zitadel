@@ -60,7 +60,7 @@ func TestServer_Feature_Disabled(t *testing.T) {
 }
 
 func TestServer_ListWebKeys(t *testing.T) {
-	instance, iamCtx, creationDate := createInstance(t, true)
+	instance, iamCtx, creationDate := createInstance(t, false)
 	// After the feature is first enabled, we can expect 2 generated keys with the default config.
 	checkWebKeyListState(iamCtx, t, instance, 2, "", &webkey.WebKey_Rsa{
 		Rsa: &webkey.RSA{
@@ -71,7 +71,7 @@ func TestServer_ListWebKeys(t *testing.T) {
 }
 
 func TestServer_CreateWebKey(t *testing.T) {
-	instance, iamCtx, creationDate := createInstance(t, true)
+	instance, iamCtx, creationDate := createInstance(t, false)
 	client := instance.Client.WebKeyV2Beta
 
 	_, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{
@@ -120,7 +120,7 @@ func TestServer_ActivateWebKey(t *testing.T) {
 }
 
 func TestServer_DeleteWebKey(t *testing.T) {
-	instance, iamCtx, creationDate := createInstance(t, true)
+	instance, iamCtx, creationDate := createInstance(t, false)
 	client := instance.Client.WebKeyV2Beta
 
 	keyIDs := make([]string, 2)
@@ -197,14 +197,14 @@ func TestServer_DeleteWebKey(t *testing.T) {
 	}, creationDate)
 }
 
-func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, context.Context, *timestamppb.Timestamp) {
+func createInstance(t *testing.T, disableFeature bool) (*integration.Instance, context.Context, *timestamppb.Timestamp) {
 	instance := integration.NewInstance(CTX)
 	creationDate := timestamppb.Now()
 	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
-	if enableFeature {
+	if disableFeature {
 		_, err := instance.Client.FeatureV2.SetInstanceFeatures(iamCTX, &feature.SetInstanceFeaturesRequest{
-			WebKey: proto.Bool(true),
+			WebKey: proto.Bool(false),
 		})
 		require.NoError(t, err)
 	}
@@ -212,7 +212,7 @@ func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, co
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamCTX, time.Minute)
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		resp, err := instance.Client.WebKeyV2Beta.ListWebKeys(iamCTX, &webkey.ListWebKeysRequest{})
-		if enableFeature {
+		if disableFeature {
 			assert.NoError(collect, err)
 			assert.Len(collect, resp.GetWebKeys(), 2)
 		} else {
