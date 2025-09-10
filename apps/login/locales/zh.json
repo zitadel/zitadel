@@ -222,7 +222,6 @@
     "termsOfService": "服务条款",
     "privacyPolicy": "隐私政策",
     "submit": "继续",
-    "orUseIDP": "或使用身份提供者",
     "password": {
       "title": "设置密码",
       "description": "为您的账户设置密码",
