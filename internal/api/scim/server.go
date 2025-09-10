@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/scim/serrors"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
@@ -27,10 +28,11 @@ func NewServer(
 	verifier *authz.ApiTokenVerifier,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	config *sconfig.Config,
+	translator *i18n.Translator,
 	middlewares ...zhttp_middlware.MiddlewareWithErrorFunc,
 ) http.Handler {
 	verifier.RegisterServer("SCIM-V2", schemas.HandlerPrefix, AuthMapping)
-	return buildHandler(command, query, userCodeAlg, config, middlewares...)
+	return buildHandler(command, query, userCodeAlg, config, translator, middlewares...)
 }
 
 func buildHandler(
@@ -38,16 +40,17 @@ func buildHandler(
 	query *query.Queries,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	cfg *sconfig.Config,
+	translator *i18n.Translator,
 	middlewares ...zhttp_middlware.MiddlewareWithErrorFunc,
 ) http.Handler {
 
 	router := mux.NewRouter()
-	middleware := buildMiddleware(cfg, query, middlewares)
+	middleware := buildMiddleware(cfg, query, translator, middlewares)
 
 	usersHandler := sresources.NewResourceHandlerAdapter(sresources.NewUsersHandler(command, query, userCodeAlg, cfg))
 	mapResource(router, middleware, usersHandler)
 
-	bulkHandler := sresources.NewBulkHandler(cfg.Bulk, usersHandler)
+	bulkHandler := sresources.NewBulkHandler(cfg.Bulk, translator, usersHandler)
 	router.Handle("/"+zhttp.OrgIdInPathVariable+"/Bulk", middleware(handleJsonResponse(bulkHandler.BulkFromHttp))).Methods(http.MethodPost)
 
 	serviceProviderHandler := newServiceProviderHandler(cfg, usersHandler)
@@ -60,11 +63,16 @@ func buildHandler(
 	return router
 }
 
-func buildMiddleware(cfg *sconfig.Config, query *query.Queries, middlewares []zhttp_middlware.MiddlewareWithErrorFunc) zhttp_middlware.ErrorHandlerFunc {
+func buildMiddleware(
+	cfg *sconfig.Config,
+	query *query.Queries,
+	translator *i18n.Translator,
+	middlewares []zhttp_middlware.MiddlewareWithErrorFunc,
+) zhttp_middlware.ErrorHandlerFunc {
 	// content type middleware needs to run at the very beginning to correctly set content types of errors
 	middlewares = append([]zhttp_middlware.MiddlewareWithErrorFunc{smiddleware.ContentTypeMiddleware}, middlewares...)
 	middlewares = append(middlewares, smiddleware.ScimContextMiddleware(query))
-	scimMiddleware := zhttp_middlware.ChainedWithErrorHandler(serrors.ErrorHandler, middlewares...)
+	scimMiddleware := zhttp_middlware.ChainedWithErrorHandler(serrors.ErrorHandler(translator), middlewares...)
 	return func(handler zhttp_middlware.HandlerFuncWithError) http.Handler {
 		return http.MaxBytesHandler(scimMiddleware(handler), cfg.MaxRequestBodySize)
 	}
