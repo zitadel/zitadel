@@ -1,34 +1,79 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { readdir, readFile } from 'fs/promises';
-import { join } from 'path';
+import { NextRequest, NextResponse } from "next/server";
+import { readdir, readFile, stat } from "fs/promises";
+import { join } from "path";
+
+async function getAllOpenApiFiles(
+  dir: string,
+  relativePath = ""
+): Promise<Array<{ path: string; relativePath: string }>> {
+  const files: Array<{ path: string; relativePath: string }> = [];
+
+  try {
+    const entries = await readdir(dir);
+
+    for (const entry of entries) {
+      const fullPath = join(dir, entry);
+      const entryRelativePath = relativePath
+        ? join(relativePath, entry)
+        : entry;
+      const stats = await stat(fullPath);
+
+      if (stats.isDirectory()) {
+        // Recursively search subdirectories
+        const subFiles = await getAllOpenApiFiles(fullPath, entryRelativePath);
+        files.push(...subFiles);
+      } else if (
+        entry.endsWith(".openapi.yaml") ||
+        entry.endsWith("_service.openapi.yaml")
+      ) {
+        files.push({ path: fullPath, relativePath: entryRelativePath });
+      }
+    }
+  } catch (error) {
+    console.error(`Error reading directory ${dir}:`, error);
+  }
+
+  return files;
+}
 
 export async function GET(request: NextRequest) {
   try {
-    const artifactsPath = join(process.cwd(), '.artifacts', 'openapi3', 'zitadel');
-    
-    // Get all OpenAPI spec files
-    const files = await readdir(artifactsPath);
-    const openApiFiles = files.filter((file: string) => file.endsWith('.openapi.yaml'));
-    
+    const artifactsPath = join(
+      process.cwd(),
+      ".artifacts",
+      "openapi3",
+      "zitadel"
+    );
+
+    // Get all OpenAPI spec files recursively
+    const allFiles = await getAllOpenApiFiles(artifactsPath);
+
     const specs = await Promise.all(
-      openApiFiles.map(async (file: string) => {
-        const filePath = join(artifactsPath, file);
-        const content = await readFile(filePath, 'utf-8');
-        const serviceName = file.replace('.openapi.yaml', '');
-        
-        return {
-          name: serviceName,
-          fileName: file,
-          content: content,
-        };
+      allFiles.map(async (file: { path: string; relativePath: string }) => {
+        try {
+          const content = await readFile(file.path, "utf-8");
+          const serviceName = file.relativePath.replace(/\.openapi\.yaml$/, "");
+
+          return {
+            name: serviceName,
+            fileName: file.relativePath,
+            content: content,
+          };
+        } catch (error) {
+          console.error(`Error reading file ${file.path}:`, error);
+          return null;
+        }
       })
     );
 
-    return NextResponse.json({ specs });
+    // Filter out null entries and return valid specs
+    const validSpecs = specs.filter((spec) => spec !== null);
+
+    return NextResponse.json({ specs: validSpecs });
   } catch (error) {
-    console.error('Error reading OpenAPI specs:', error);
+    console.error("Error reading OpenAPI specs:", error);
     return NextResponse.json(
-      { error: 'Failed to load OpenAPI specifications' },
+      { error: "Failed to load OpenAPI specifications" },
       { status: 500 }
     );
   }

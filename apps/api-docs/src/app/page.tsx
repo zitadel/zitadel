@@ -1,4 +1,4 @@
-import { ApiReferenceComponent } from '@/components/ApiReference';
+import { ApiReferenceComponent } from "@/components/ApiReference";
 
 export default function HomePage() {
   return (

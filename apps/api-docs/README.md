@@ -19,16 +19,19 @@ A Next.js application that provides interactive API documentation for ZITADEL se
 ### Installation
 
 1. Install dependencies:
+
 ```bash
 pnpm install
 ```
 
 2. Generate OpenAPI specifications from proto files:
+
 ```bash
 pnpm run generate
 ```
 
 3. Start the development server:
+
 ```bash
 pnpm run dev
 ```
@@ -74,6 +77,7 @@ src/
 The app can be deployed to any platform that supports Next.js applications. Make sure to run the build script which includes generating the OpenAPI specifications.
 
 For Vercel deployment:
+
 ```bash
 pnpm run build
 ```
