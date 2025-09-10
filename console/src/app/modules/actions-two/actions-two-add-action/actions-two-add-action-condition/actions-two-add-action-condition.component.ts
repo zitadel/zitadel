@@ -1,43 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, EventEmitter, Input, Output, Signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InputModule } from 'src/app/modules/input/input.module';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
-} from '@angular/forms';
-import {
-  Observable,
-  catchError,
-  defer,
-  map,
-  of,
-  shareReplay,
-  ReplaySubject,
-  ObservedValueOf,
-  switchMap,
-  combineLatestWith,
-  OperatorFunction,
-} from 'rxjs';
+import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Observable, of, shareReplay, ReplaySubject, ObservedValueOf, switchMap, Subject } from 'rxjs';
 import { MatRadioModule } from '@angular/material/radio';
 import { ActionService } from 'src/app/services/action.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { atLeastOneFieldValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { Message } from '@bufbuild/protobuf';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Condition } from '@zitadel/proto/zitadel/action/v2beta/execution_pb';
-import { startWith } from 'rxjs/operators';
+import { distinctUntilChanged, startWith, takeUntil } from 'rxjs/operators';
+import { CreateQueryResult } from '@tanstack/angular-query-experimental';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActionsTwoAddActionAutocompleteInputComponent } from '../actions-two-add-action-autocomplete-input/actions-two-add-action-autocomplete-input.component';
 
 export type ConditionType = NonNullable<Condition['conditionType']['case']>;
 export type ConditionTypeValue<T extends ConditionType> = Omit<
@@ -64,32 +45,73 @@ export type ConditionTypeValue<T extends ConditionType> = Omit<
     CommonModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    ActionsTwoAddActionAutocompleteInputComponent,
   ],
 })
 export class ActionsTwoAddActionConditionComponent<T extends ConditionType = ConditionType> {
   @Input({ required: true }) public set conditionType(conditionType: T) {
     this.conditionType$.next(conditionType);
   }
+
   @Output() public readonly back = new EventEmitter<void>();
   @Output() public readonly continue = new EventEmitter<ConditionTypeValue<T>>();
 
   private readonly conditionType$ = new ReplaySubject<T>(1);
   protected readonly form$: ReturnType<typeof this.buildForm>;
 
-  protected readonly executionServices$: Observable<string[]>;
-  protected readonly executionMethods$: Observable<string[]>;
-  protected readonly executionFunctions$: Observable<string[]>;
+  protected readonly listExecutionServicesQuery = this.actionService.listExecutionServicesQuery();
+  private readonly listExecutionMethodsQuery = this.actionService.listExecutionMethodsQuery();
+  protected readonly listExecutionFunctionsQuery = this.actionService.listExecutionFunctionsQuery();
+  protected readonly filteredExecutionMethods: Signal<string[] | undefined>;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly actionService: ActionService,
     private readonly toast: ToastService,
-    private readonly destroyRef: DestroyRef,
   ) {
     this.form$ = this.buildForm().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.executionServices$ = this.listExecutionServices(this.form$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.executionMethods$ = this.listExecutionMethods(this.form$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.executionFunctions$ = this.listExecutionFunctions(this.form$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+
+    this.handleError(this.listExecutionServicesQuery);
+    this.handleError(this.listExecutionMethodsQuery);
+    this.handleError(this.listExecutionFunctionsQuery);
+
+    this.filteredExecutionMethods = this.filterExecutionMethods(this.form$);
+  }
+
+  public handleError(query: CreateQueryResult<any>) {
+    return effect(() => {
+      const error = query.error();
+      if (error) {
+        this.toast.showError(error);
+      }
+    });
+  }
+
+  private filterExecutionMethods(form$: typeof this.form$) {
+    const service$ = form$.pipe(
+      switchMap((form) => {
+        if (!('service' in form.form.controls)) {
+          return of<string>('');
+        }
+        const { service } = form.form.controls;
+        return service.valueChanges.pipe(startWith(service.value));
+      }),
+    );
+
+    const serviceSignal = toSignal(service$, { initialValue: '' });
+
+    const query = this.actionService.listExecutionMethodsQuery();
+
+    return computed(() => {
+      const methods = query.data();
+      const service = serviceSignal();
+
+      if (!methods) {
+        return undefined;
+      }
+
+      return methods.filter((method) => method.includes(service)).map((method) => method.replace(`/${service}/`, ''));
+    });
   }
 
   public buildForm() {
@@ -126,15 +148,20 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
       obs.next(form);
 
       const { all, service, method } = form.form.controls;
-      return all.valueChanges
-        .pipe(
-          map(() => all.value),
-          takeUntilDestroyed(this.destroyRef),
-        )
-        .subscribe((all) => {
-          this.toggleFormControl(service, !all);
-          this.toggleFormControl(method, !all);
+
+      const destroy$ = new Subject<void>();
+      form.form.valueChanges
+        .pipe(distinctUntilChanged(undefined!, JSON.stringify), startWith(undefined), takeUntil(destroy$))
+        .subscribe(() => {
+          this.toggleFormControl(service, !all.value);
+          this.toggleFormControl(method, !!service.value && !all.value);
         });
+
+      service.valueChanges.pipe(distinctUntilChanged(), takeUntil(destroy$)).subscribe(() => {
+        method.setValue('');
+      });
+
+      return () => destroy$.next();
     });
   }
 
@@ -162,15 +189,10 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
       obs.next(form);
 
       const { all, group, event } = form.form.controls;
-      return all.valueChanges
-        .pipe(
-          map(() => all.value),
-          takeUntilDestroyed(this.destroyRef),
-        )
-        .subscribe((all) => {
-          this.toggleFormControl(group, !all);
-          this.toggleFormControl(event, !all);
-        });
+      return all.valueChanges.subscribe(() => {
+        this.toggleFormControl(group, !all.value);
+        this.toggleFormControl(event, !all.value);
+      });
     });
   }
 
@@ -180,86 +202,6 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
     } else {
       control.disable();
     }
-  }
-
-  private listExecutionServices(form$: typeof this.form$) {
-    return defer(() => this.actionService.listExecutionServices({})).pipe(
-      map(({ services }) => services),
-      this.formFilter(form$, (form) => {
-        if ('service' in form.form.controls) {
-          return form.form.controls.service;
-        }
-        return undefined;
-      }),
-      catchError((error) => {
-        this.toast.showError(error);
-        return of([]);
-      }),
-    );
-  }
-
-  private listExecutionFunctions(form$: typeof this.form$) {
-    return defer(() => this.actionService.listExecutionFunctions({})).pipe(
-      map(({ functions }) => functions),
-      this.formFilter(form$, (form) => {
-        if (form.case !== 'function') {
-          return undefined;
-        }
-        return form.form.controls.name;
-      }),
-      catchError((error) => {
-        this.toast.showError(error);
-        return of([]);
-      }),
-    );
-  }
-
-  private listExecutionMethods(form$: typeof this.form$) {
-    return defer(() => this.actionService.listExecutionMethods({})).pipe(
-      map(({ methods }) => methods),
-      this.formFilter(form$, (form) => {
-        if ('method' in form.form.controls) {
-          return form.form.controls.method;
-        }
-        return undefined;
-      }),
-      // we also filter by service name
-      this.formFilter(form$, (form) => {
-        if ('service' in form.form.controls) {
-          return form.form.controls.service;
-        }
-        return undefined;
-      }),
-      catchError((error) => {
-        this.toast.showError(error);
-        return of([]);
-      }),
-    );
-  }
-
-  private formFilter(
-    form$: typeof this.form$,
-    getter: (form: ObservedValueOf<typeof this.form$>) => FormControl<string> | undefined,
-  ): OperatorFunction<string[], string[]> {
-    const filterValue$ = form$.pipe(
-      map(getter),
-      switchMap((control) => {
-        if (!control) {
-          return of('');
-        }
-
-        return control.valueChanges.pipe(
-          startWith(control.value),
-          map((value) => value.toLowerCase()),
-        );
-      }),
-    );
-
-    return (obs) =>
-      obs.pipe(
-        combineLatestWith(filterValue$),
-        map(([values, filterValue]) => values.filter((v) => v.toLowerCase().includes(filterValue))),
-      );
   }
 
   protected submit(form: ObservedValueOf<typeof this.form$>) {
@@ -289,7 +231,7 @@ export class ActionsTwoAddActionConditionComponent<T extends ConditionType = Con
       this.continue.emit({
         condition: {
           case: 'method',
-          value: method,
+          value: `/${service}/${method}`,
         },
       });
     } else if (service) {
