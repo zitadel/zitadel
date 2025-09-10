@@ -140,9 +140,19 @@ func (s *Server) VerifyAuthRequest(ctx context.Context, r *op.Request[oidc.AuthR
 
 func (s *Server) Authorize(ctx context.Context, r *op.ClientRequest[oidc.AuthRequest]) (_ *op.Redirect, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer span.End()
 
-	return s.LegacyServer.Authorize(ctx, r)
+	// Use an own method to validate the id_token_hint, because in case of an error, we don't want to fail the request.
+	// We just want to ignore the hint.
+	userID, err := op.ValidateAuthReqIDTokenHint(ctx, r.Data.IDTokenHint, s.Provider().IDTokenHintVerifier(ctx))
+	logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID()).
+		OnError(err).Error("invalid id_token_hint")
+
+	req, err := s.Provider().Storage().CreateAuthRequest(ctx, r.Data, userID)
+	if err != nil {
+		return op.TryErrorRedirect(ctx, r.Data, oidc.DefaultToServerError(err, "unable to save auth request"), s.Provider().Encoder(), s.Provider().Logger())
+	}
+	return op.NewRedirect(r.Client.LoginURL(req.GetID())), nil
 }
 
 func (s *Server) DeviceAuthorization(ctx context.Context, r *op.ClientRequest[oidc.DeviceAuthorizationRequest]) (_ *op.Response, err error) {
