@@ -7,16 +7,29 @@ Zitadel is an open-source identity and access management platform built with a m
 This repository contains multiple interconnected projects. However, you can build and start the whole platform with a single command:
 
 ```bash
-# build and start the API, the login and the Console
-nx run build-and-start
+# Develop the API
+nx run-many -t db generate -p @zitadel/devcontainer @zitadel/api
+
+# Develop the API and connect a local login production build
+nx run @zitadel/api:generate
+nx run-many -t db production -p @zitadel/devcontainer @zitadel/login
+
+# Develop the login and connect a local API with a local DB
+nx run-many -t db production -p @zitadel/devcontainer @zitadel/api
+nx run @zitadel/login:development
+
+# Develop the Console and connect a local API with a local DB
+nx run-many -t db production -p @zitadel/devcontainer @zitadel/api
+nx run @zitadel/console:development
 ```
 
 Use these commands to get started with any project.
 
 | Task | Command | Notes |
 |------|---------|--------|
-| **Start** | `nx run PROJECT:start` | Production server |
-| **Develop** | `nx run PROJECT:dev` | Hot reload development server |
+| **Production** | `nx run PROJECT:production` | Production server |
+| **Develop** | `nx run PROJECT:development` | Hot reload development server |
+| **Generate** | `nx run PROJECT:generate` | Generate files |
 | **Test** | `nx run PROJECT:test` | Run tests |
 | **Lint** | `nx run PROJECT:lint` | Check code style |
 | **Lint Fix** | `nx run PROJECT:lint-fix` | Auto-fix style issues |
@@ -24,6 +37,7 @@ Use these commands to get started with any project.
 Replace `PROJECT` with one of the following:
 
 - `@zitadel/zitadel` (you can omit this root level project, like in `nx run build-and-start`)
+- `@zitadel/devcontainer`
 - `@zitadel/api`
 - `@zitadel/login`
 - `@zitadel/console`

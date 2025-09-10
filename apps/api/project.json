@@ -23,6 +23,10 @@
                 "@zitadel/console:build"
             ]
         },
+        "generate": {
+            "description": "Generate the code needed to start the API",
+            "command": "make api_build"
+        },
         "production": {
             "continuous": true,
             "dependsOn": [
