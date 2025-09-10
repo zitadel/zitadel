@@ -59,13 +59,13 @@ LogStore:
 
 Projections:
   HandleActiveInstances: 30m
-  RequeueEvery: 5s
+  RequeueEvery: 20s
   Customizations:
     NotificationsQuotas:
-      RequeueEvery: 1s
+      RequeueEvery: 5s
     telemetry:
       HandleActiveInstances: 60s
-      RequeueEvery: 1s
+      RequeueEvery: 5s
 
 DefaultInstance:
   LoginPolicy:

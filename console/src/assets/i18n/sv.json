@@ -1658,7 +1658,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "När denna flagga är aktiverad använder konsolen V2 User API för att skapa nya användare. Med V2 API startar nyligen skapade användare utan ett initialt tillstånd.",
       "LOGINV2": "Inloggning V2",
       "LOGINV2_DESCRIPTION": "Att aktivera detta startar det nya inloggningsgränssnittet baserat på TypeScript med förbättrad säkerhet, prestanda och anpassning.",
-      "LOGINV2_BASEURI": "Bas-URI"
+      "LOGINV2_BASEURI": "Bas-URI",
+      "ENABLERELATIONALTABLES": "Relationella tabeller",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktivera detta för att använda relationella tabeller istället för projektioner för att lagra data. För närvarande gör denna växel ingenting."
     },
     "DIALOG": {
       "RESET": {

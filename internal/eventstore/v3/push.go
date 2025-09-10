@@ -17,11 +17,6 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-var pushTxOpts = &sql.TxOptions{
-	Isolation: sql.LevelReadCommitted,
-	ReadOnly:  false,
-}
-
 func (es *Eventstore) Push(ctx context.Context, client database.ContextQueryExecuter, commands ...eventstore.Command) (events []eventstore.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -60,7 +55,8 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 		}()
 	}
 
-	_, err = tx.ExecContext(ctx, fmt.Sprintf("SET LOCAL application_name = '%s'", fmt.Sprintf("zitadel_es_pusher_%s", authz.GetInstance(ctx).InstanceID())))
+	// lock the instance for reading events if await events is set for the duration of the transaction.
+	_, err = tx.ExecContext(ctx, "SELECT pg_advisory_xact_lock_shared('eventstore.events2'::REGCLASS::OID::INTEGER, hashtext($1))", authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +65,6 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 	if err != nil {
 		return nil, err
 	}
-
 	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
 		return nil, err
 	}
