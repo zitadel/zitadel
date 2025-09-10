@@ -109,7 +109,7 @@ export function ApiReferenceComponent() {
         // Filter out specs with no endpoints (only schema definitions)
         const specsWithEndpoints = data.specs.filter((spec) => {
           try {
-            const parsed = yaml.load(spec.content) as any;
+            const parsed = JSON.parse(spec.content);
             return parsed.paths && Object.keys(parsed.paths).length > 0;
           } catch {
             return false;
@@ -196,7 +196,7 @@ export function ApiReferenceComponent() {
       const selectedSpecData = specs.find((spec) => spec.name === selectedSpec);
       if (selectedSpecData) {
         try {
-          const parsedSpec = yaml.load(selectedSpecData.content) as any;
+          const parsedSpec = JSON.parse(selectedSpecData.content);
 
           // Debug: Log the parsed spec
           console.log("Selected spec:", selectedSpec);

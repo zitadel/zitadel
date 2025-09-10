@@ -22,10 +22,10 @@ async function getAllOpenApiFiles(
         // Recursively search subdirectories
         const subFiles = await getAllOpenApiFiles(fullPath, entryRelativePath);
         files.push(...subFiles);
-      } else if (entry.endsWith("_service.openapi.yaml")) {
-        // Only include service files that contain actual API endpoints
+      } else if (entry.endsWith("_service.swagger.json")) {
+        // Include v2+ service files that contain actual API endpoints
         files.push({ path: fullPath, relativePath: entryRelativePath });
-      } else if (entry.endsWith(".openapi.yaml") && relativePath === "") {
+      } else if (entry.endsWith(".swagger.json") && relativePath === "") {
         // Include top-level v1 API files (management, admin, auth, system)
         files.push({ path: fullPath, relativePath: entryRelativePath });
       }
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     const artifactsPath = join(
       process.cwd(),
       ".artifacts",
-      "openapi3",
+      "openapi",
       "zitadel"
     );
 
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
       allFiles.map(async (file: { path: string; relativePath: string }) => {
         try {
           const content = await readFile(file.path, "utf-8");
-          const serviceName = file.relativePath.replace(/\.openapi\.yaml$/, "");
+          const serviceName = file.relativePath.replace(/\.swagger\.json$/, "");
 
           return {
             name: serviceName,

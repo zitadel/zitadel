@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readdir, readFile, stat } from "fs/promises";
 import { join } from "path";
-import yaml from "js-yaml";
 
 interface SearchResult {
   serviceName: string;
@@ -33,9 +32,9 @@ async function getAllOpenApiFiles(
       if (stats.isDirectory()) {
         const subFiles = await getAllOpenApiFiles(fullPath, entryRelativePath);
         files.push(...subFiles);
-      } else if (entry.endsWith("_service.openapi.yaml")) {
+      } else if (entry.endsWith("_service.swagger.json")) {
         files.push({ path: fullPath, relativePath: entryRelativePath });
-      } else if (entry.endsWith(".openapi.yaml") && relativePath === "") {
+      } else if (entry.endsWith(".swagger.json") && relativePath === "") {
         files.push({ path: fullPath, relativePath: entryRelativePath });
       }
     }
@@ -90,7 +89,7 @@ export async function GET(request: NextRequest) {
     const artifactsPath = join(
       process.cwd(),
       ".artifacts",
-      "openapi3",
+      "openapi",
       "zitadel"
     );
     const allFiles = await getAllOpenApiFiles(artifactsPath);
@@ -100,10 +99,10 @@ export async function GET(request: NextRequest) {
     for (const file of allFiles) {
       try {
         const content = await readFile(file.path, "utf-8");
-        const serviceName = file.relativePath.replace(/\.openapi\.yaml$/, "");
+        const serviceName = file.relativePath.replace(/\.swagger\.json$/, "");
         const serviceDisplayName = getServiceDisplayName(serviceName);
 
-        const parsed = yaml.load(content) as any;
+        const parsed = JSON.parse(content) as any;
 
         if (!parsed.paths || Object.keys(parsed.paths).length === 0) {
           continue;
