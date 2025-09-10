@@ -4,14 +4,12 @@ package org_test
 
 import (
 	"context"
-	"fmt"
 	"slices"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -29,7 +27,7 @@ type orgAttr struct {
 }
 
 func createOrganization(ctx context.Context, name string) orgAttr {
-	orgResp := Instance.CreateOrganization(ctx, name, gofakeit.Email())
+	orgResp := Instance.CreateOrganization(ctx, name, integration.Email())
 	orgResp.Details.CreationDate = orgResp.Details.ChangeDate
 	return orgAttr{
 		ID:      orgResp.GetOrganizationId(),
@@ -180,8 +178,8 @@ func TestServer_ListOrganizations(t *testing.T) {
 				&org.ListOrganizationsRequest{},
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					orgs := make([]orgAttr, 1)
-					name := fmt.Sprintf("ListOrgs-%s", gofakeit.AppName())
-					orgID := gofakeit.Company()
+					name := integration.OrganizationName()
+					orgID := integration.ID()
 					orgs[0] = createOrganizationWithCustomOrgID(ctx, name, orgID)
 					request.Queries = []*org.SearchQuery{
 						OrganizationIdQuery(orgID),
@@ -276,7 +274,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					orgs := make([]orgAttr, 1)
 					orgs[0] = createOrganization(ctx, integration.OrganizationName())
-					domain := gofakeit.DomainName()
+					domain := integration.DomainName()
 					_, err := Instance.Client.Mgmt.AddOrgDomain(integration.SetOrgID(ctx, orgs[0].ID), &management.AddOrgDomainRequest{
 						Domain: domain,
 					})
