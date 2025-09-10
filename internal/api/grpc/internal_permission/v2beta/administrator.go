@@ -35,7 +35,7 @@ func (s *Server) CreateAdministrator(ctx context.Context, req *connect.Request[i
 			creationDate = timestamppb.New(member.EventDate)
 		}
 	case *internal_permission.ResourceType_ProjectId:
-		member, err := s.command.AddProjectMember(ctx, createAdministratorProjectToCommand(resource, req.Msg.UserId, req.Msg.Roles))
+		member, err := s.command.AddProjectMember(ctx, createAdministratorProjectToCommand(ctx, resource, req.Msg.UserId, req.Msg.Roles))
 		if err != nil {
 			return nil, err
 		}
@@ -43,7 +43,7 @@ func (s *Server) CreateAdministrator(ctx context.Context, req *connect.Request[i
 			creationDate = timestamppb.New(member.EventDate)
 		}
 	case *internal_permission.ResourceType_ProjectGrant_:
-		member, err := s.command.AddProjectGrantMember(ctx, createAdministratorProjectGrantToCommand(resource, req.Msg.UserId, req.Msg.Roles))
+		member, err := s.command.AddProjectGrantMember(ctx, createAdministratorProjectGrantToCommand(ctx, resource, req.Msg.UserId, req.Msg.Roles))
 		if err != nil {
 			return nil, err
 		}
@@ -75,20 +75,22 @@ func createAdministratorOrganizationToCommand(req *internal_permission.ResourceT
 	}
 }
 
-func createAdministratorProjectToCommand(req *internal_permission.ResourceType_ProjectId, userID string, roles []string) *command.AddProjectMember {
+func createAdministratorProjectToCommand(ctx context.Context, req *internal_permission.ResourceType_ProjectId, userID string, roles []string) *command.AddProjectMember {
 	return &command.AddProjectMember{
-		ProjectID: req.ProjectId,
-		UserID:    userID,
-		Roles:     roles,
+		ProjectID:     req.ProjectId,
+		UserID:        userID,
+		Roles:         roles,
+		ResourceOwner: authz.GetCtxData(ctx).OrgID,
 	}
 }
 
-func createAdministratorProjectGrantToCommand(req *internal_permission.ResourceType_ProjectGrant_, userID string, roles []string) *command.AddProjectGrantMember {
+func createAdministratorProjectGrantToCommand(ctx context.Context, req *internal_permission.ResourceType_ProjectGrant_, userID string, roles []string) *command.AddProjectGrantMember {
 	return &command.AddProjectGrantMember{
-		GrantID:   req.ProjectGrant.ProjectGrantId,
-		ProjectID: req.ProjectGrant.ProjectId,
-		UserID:    userID,
-		Roles:     roles,
+		GrantID:       req.ProjectGrant.ProjectGrantId,
+		ProjectID:     req.ProjectGrant.ProjectId,
+		UserID:        userID,
+		Roles:         roles,
+		ResourceOwner: authz.GetCtxData(ctx).OrgID,
 	}
 }
 

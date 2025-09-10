@@ -8,6 +8,7 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/app/v2beta/convert"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -17,7 +18,7 @@ import (
 func (s *Server) CreateApplication(ctx context.Context, req *connect.Request[app.CreateApplicationRequest]) (*connect.Response[app.CreateApplicationResponse], error) {
 	switch t := req.Msg.GetCreationRequestType().(type) {
 	case *app.CreateApplicationRequest_ApiRequest:
-		apiApp, err := s.command.AddAPIApplication(ctx, convert.CreateAPIApplicationRequestToDomain(req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetId(), t.ApiRequest), "")
+		apiApp, err := s.command.AddAPIApplication(ctx, convert.CreateAPIApplicationRequestToDomain(ctx, req.Msg.GetName(), req.Msg.GetProjectId(), req.Msg.GetId(), t.ApiRequest), authz.GetCtxData(ctx).OrgID)
 		if err != nil {
 			return nil, err
 		}

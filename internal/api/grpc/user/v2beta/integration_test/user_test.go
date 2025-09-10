@@ -1711,7 +1711,7 @@ func TestServer_DeleteUser(t *testing.T) {
 	type args struct {
 		ctx     context.Context
 		req     *user.DeleteUserRequest
-		prepare func(request *user.DeleteUserRequest)
+		prepare func(t *testing.T, request *user.DeleteUserRequest)
 	}
 	tests := []struct {
 		name    string
@@ -1735,7 +1735,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) {
+				prepare: func(t *testing.T, request *user.DeleteUserRequest) {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 				},
@@ -1752,7 +1752,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) {
+				prepare: func(t *testing.T, request *user.DeleteUserRequest) {
 					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
 				},
@@ -1769,7 +1769,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				req: &user.DeleteUserRequest{},
-				prepare: func(request *user.DeleteUserRequest) {
+				prepare: func(t *testing.T, request *user.DeleteUserRequest) {
 					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					Instance.CreateProjectUserGrant(t, CTX, Instance.DefaultOrg.GetId(), projectResp.GetId(), request.UserId)
@@ -1788,7 +1788,7 @@ func TestServer_DeleteUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.args.prepare != nil {
-				tt.args.prepare(tt.args.req)
+				tt.args.prepare(t, tt.args.req)
 			}
 
 			got, err := Client.DeleteUser(tt.args.ctx, tt.args.req)

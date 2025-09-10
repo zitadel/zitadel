@@ -1,18 +1,21 @@
 package convert
 
 import (
+	"context"
 	"strings"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
 
-func CreateAPIApplicationRequestToDomain(name, projectID, appID string, app *app.CreateAPIApplicationRequest) *domain.APIApp {
+func CreateAPIApplicationRequestToDomain(ctx context.Context, name, projectID, appID string, app *app.CreateAPIApplicationRequest) *domain.APIApp {
 	return &domain.APIApp{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: projectID,
+			AggregateID:   projectID,
+			ResourceOwner: authz.GetCtxData(ctx).OrgID,
 		},
 		AppName:        name,
 		AppID:          appID,
