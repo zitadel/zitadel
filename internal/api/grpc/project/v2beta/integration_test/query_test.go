@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -50,9 +49,8 @@ func TestServer_GetProject(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *project.GetProjectRequest, response *project.GetProjectResponse) {
-					name := gofakeit.AppName()
-					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
-					resp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name, false, false)
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					resp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 
 					request.Id = resp.GetId()
 				},
@@ -172,9 +170,8 @@ func TestServer_ListProjects(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
-					name := gofakeit.AppName()
 					orgID := instance.DefaultOrg.GetId()
-					resp := instance.CreateProject(iamOwnerCtx, t, orgID, name, false, false)
+					resp := instance.CreateProject(iamOwnerCtx, t, orgID, integration.ProjectName(), false, false)
 					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
 						InProjectIdsFilter: &filter.InIDsFilter{
 							Ids: []string{resp.GetId()},
@@ -192,9 +189,8 @@ func TestServer_ListProjects(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeNoPermission),
 				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
-					name := gofakeit.AppName()
 					orgID := instance.DefaultOrg.GetId()
-					resp := instance.CreateProject(iamOwnerCtx, t, orgID, name, false, false)
+					resp := instance.CreateProject(iamOwnerCtx, t, orgID, integration.ProjectName(), false, false)
 					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
 						InProjectIdsFilter: &filter.InIDsFilter{
 							Ids: []string{resp.GetId()},
@@ -212,9 +208,8 @@ func TestServer_ListProjects(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
-					name := gofakeit.AppName()
-					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
-					resp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name, false, false)
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
+					resp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
 						InProjectIdsFilter: &filter.InIDsFilter{
 							Ids: []string{resp.GetId()},
@@ -352,7 +347,7 @@ func TestServer_ListProjects(t *testing.T) {
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
 					orgID := instance.DefaultOrg.GetId()
-					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					resp1 := createProject(iamOwnerCtx, instance, t, orgResp.GetOrganizationId(), false, false)
 					resp2 := createProject(iamOwnerCtx, instance, t, orgID, true, false)
 					resp3 := createProject(iamOwnerCtx, instance, t, orgResp.GetOrganizationId(), false, true)
@@ -384,7 +379,7 @@ func TestServer_ListProjects(t *testing.T) {
 				ctx: projectOwnerCtx,
 				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
 					orgID := instance.DefaultOrg.GetId()
-					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					resp1 := createProject(iamOwnerCtx, instance, t, orgResp.GetOrganizationId(), false, false)
 					resp2 := createProject(iamOwnerCtx, instance, t, orgID, true, false)
 					resp3 := createProject(iamOwnerCtx, instance, t, orgResp.GetOrganizationId(), false, true)
@@ -511,7 +506,7 @@ func TestServer_ListProjects(t *testing.T) {
 
 					orgName := integration.OrganizationName()
 					projectName := integration.ProjectName()
-					orgResp := instance.CreateOrganization(iamOwnerCtx, orgName, gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, orgName, integration.Email())
 					projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), projectName, true, true)
 					projectGrantResp := instance.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgID)
 					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
@@ -633,7 +628,7 @@ func TestServer_ListProjects_PermissionV2(t *testing.T) {
 			args: args{
 				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
-					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					resp := createProject(iamOwnerCtx, instancePermissionV2, t, orgResp.GetOrganizationId(), false, false)
 					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
 						InProjectIdsFilter: &filter.InIDsFilter{
@@ -851,7 +846,7 @@ func TestServer_ListProjects_PermissionV2(t *testing.T) {
 			args: args{
 				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *project.ListProjectsRequest, response *project.ListProjectsResponse) {
-					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					resp1 := createProject(iamOwnerCtx, instancePermissionV2, t, orgResp.GetOrganizationId(), false, false)
 					resp2 := createProject(iamOwnerCtx, instancePermissionV2, t, orgID, true, false)
 					resp3 := createProject(iamOwnerCtx, instancePermissionV2, t, orgResp.GetOrganizationId(), false, true)
@@ -886,7 +881,7 @@ func TestServer_ListProjects_PermissionV2(t *testing.T) {
 
 					orgName := integration.OrganizationName()
 					projectName := integration.ProjectName()
-					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, orgName, gofakeit.Email())
+					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, orgName, integration.Email())
 					projectResp := instancePermissionV2.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), projectName, true, true)
 					projectGrantResp := instancePermissionV2.CreateProjectGrant(iamOwnerCtx, t, projectResp.GetId(), orgID)
 					request.Filters[0].Filter = &project.ProjectSearchFilter_InProjectIdsFilter{
@@ -968,7 +963,7 @@ func createProject(ctx context.Context, instance *integration.Instance, t *testi
 
 func createGrantedProject(ctx context.Context, instance *integration.Instance, t *testing.T, projectToGrant *project.Project) *project.Project {
 	grantedOrgName := integration.OrganizationName()
-	grantedOrg := instance.CreateOrganization(ctx, grantedOrgName, gofakeit.Email())
+	grantedOrg := instance.CreateOrganization(ctx, grantedOrgName, integration.Email())
 	projectGrantResp := instance.CreateProjectGrant(ctx, t, projectToGrant.GetId(), grantedOrg.GetOrganizationId())
 
 	return &project.Project{
@@ -1024,7 +1019,7 @@ func TestServer_ListProjectGrants(t *testing.T) {
 						Ids: []string{projectResp.GetId()},
 					},
 				}
-				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+				grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 				request.Filters[1].Filter = &project.ProjectGrantSearchFilter_ProjectGrantResourceOwnerFilter{
 					ProjectGrantResourceOwnerFilter: &filter.IDFilter{Id: grantedOrg.GetOrganizationId()},
 				}
@@ -1048,7 +1043,7 @@ func TestServer_ListProjectGrants(t *testing.T) {
 							Ids: []string{projectResp.GetId()},
 						},
 					}
-					grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					grantedOrg := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					request.Filters[1].Filter = &project.ProjectGrantSearchFilter_ProjectGrantResourceOwnerFilter{
 						ProjectGrantResourceOwnerFilter: &filter.IDFilter{Id: grantedOrg.GetOrganizationId()},
 					}
@@ -1088,7 +1083,7 @@ func TestServer_ListProjectGrants(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *project.ListProjectGrantsRequest, response *project.ListProjectGrantsResponse) {
-					name := gofakeit.AppName()
+					name := integration.ProjectName()
 					orgID := instance.DefaultOrg.GetId()
 					projectResp := instance.CreateProject(iamOwnerCtx, t, orgID, name, false, false)
 					request.Filters[0].Filter = &project.ProjectGrantSearchFilter_InProjectIdsFilter{
@@ -1118,8 +1113,8 @@ func TestServer_ListProjectGrants(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *project.ListProjectGrantsRequest, response *project.ListProjectGrantsResponse) {
-					name := gofakeit.AppName()
-					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					name := integration.ProjectName()
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name, false, false)
 					request.Filters[0].Filter = &project.ProjectGrantSearchFilter_InProjectIdsFilter{
 						InProjectIdsFilter: &filter.InIDsFilter{
@@ -1146,7 +1141,7 @@ func TestServer_ListProjectGrants(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *project.ListProjectGrantsRequest, response *project.ListProjectGrantsResponse) {
-					name := gofakeit.AppName()
+					name := integration.ProjectName()
 					orgID := instance.DefaultOrg.GetId()
 					projectResp := instance.CreateProject(iamOwnerCtx, t, orgID, name, false, false)
 					request.Filters[0].Filter = &project.ProjectGrantSearchFilter_InProjectIdsFilter{
@@ -1178,11 +1173,11 @@ func TestServer_ListProjectGrants(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *project.ListProjectGrantsRequest, response *project.ListProjectGrantsResponse) {
-					name1 := gofakeit.AppName()
-					name2 := gofakeit.AppName()
-					name3 := gofakeit.AppName()
+					name1 := integration.ProjectName()
+					name2 := integration.ProjectName()
+					name3 := integration.ProjectName()
 					orgID := instance.DefaultOrg.GetId()
-					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					project1Resp := instance.CreateProject(iamOwnerCtx, t, orgID, name1, false, false)
 					project2Resp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name2, false, false)
 					project3Resp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name3, false, false)
@@ -1215,11 +1210,11 @@ func TestServer_ListProjectGrants(t *testing.T) {
 			args: args{
 				ctx: projectGrantOwnerCtx,
 				dep: func(request *project.ListProjectGrantsRequest, response *project.ListProjectGrantsResponse) {
-					name1 := gofakeit.AppName()
-					name2 := gofakeit.AppName()
-					name3 := gofakeit.AppName()
+					name1 := integration.ProjectName()
+					name2 := integration.ProjectName()
+					name3 := integration.ProjectName()
 					orgID := instance.DefaultOrg.GetId()
-					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					project1Resp := instance.CreateProject(iamOwnerCtx, t, orgID, name1, false, false)
 					project2Resp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name2, false, false)
 					project3Resp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name3, false, false)
@@ -1252,7 +1247,7 @@ func TestServer_ListProjectGrants(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *project.ListProjectGrantsRequest, response *project.ListProjectGrantsResponse) {
-					name := gofakeit.AppName()
+					name := integration.ProjectName()
 					orgID := instance.DefaultOrg.GetId()
 					projectResp := instance.CreateProject(iamOwnerCtx, t, orgID, name, false, false)
 					request.Filters[0].Filter = &project.ProjectGrantSearchFilter_InProjectIdsFilter{
@@ -1282,7 +1277,7 @@ func TestServer_ListProjectGrants(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *project.ListProjectGrantsRequest, response *project.ListProjectGrantsResponse) {
-					name := gofakeit.AppName()
+					name := integration.ProjectName()
 					orgID := instance.DefaultOrg.GetId()
 					projectResp := instance.CreateProject(iamOwnerCtx, t, orgID, name, false, false)
 					request.Filters[0].Filter = &project.ProjectGrantSearchFilter_InProjectIdsFilter{
@@ -1366,7 +1361,7 @@ func TestServer_ListProjectGrants_PermissionV2(t *testing.T) {
 							Ids: []string{projectResp.GetId()},
 						},
 					}
-					grantedOrg := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					grantedOrg := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					request.Filters[1].Filter = &project.ProjectGrantSearchFilter_ProjectGrantResourceOwnerFilter{
 						ProjectGrantResourceOwnerFilter: &filter.IDFilter{Id: grantedOrg.GetOrganizationId()},
 					}
@@ -1390,7 +1385,7 @@ func TestServer_ListProjectGrants_PermissionV2(t *testing.T) {
 							Ids: []string{projectResp.GetId()},
 						},
 					}
-					grantedOrg := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					grantedOrg := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					request.Filters[1].Filter = &project.ProjectGrantSearchFilter_ProjectGrantResourceOwnerFilter{
 						ProjectGrantResourceOwnerFilter: &filter.IDFilter{Id: grantedOrg.GetOrganizationId()},
 					}
@@ -1408,7 +1403,7 @@ func TestServer_ListProjectGrants_PermissionV2(t *testing.T) {
 			args: args{
 				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *project.ListProjectGrantsRequest, response *project.ListProjectGrantsResponse) {
-					name := gofakeit.AppName()
+					name := integration.ProjectName()
 					orgID := instancePermissionV2.DefaultOrg.GetId()
 					projectResp := instancePermissionV2.CreateProject(iamOwnerCtx, t, orgID, name, false, false)
 					request.Filters[0].Filter = &project.ProjectGrantSearchFilter_InProjectIdsFilter{
@@ -1438,8 +1433,8 @@ func TestServer_ListProjectGrants_PermissionV2(t *testing.T) {
 			args: args{
 				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *project.ListProjectGrantsRequest, response *project.ListProjectGrantsResponse) {
-					name := gofakeit.AppName()
-					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					name := integration.ProjectName()
+					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					projectResp := instancePermissionV2.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name, false, false)
 					request.Filters[0].Filter = &project.ProjectGrantSearchFilter_InProjectIdsFilter{
 						InProjectIdsFilter: &filter.InIDsFilter{
@@ -1466,7 +1461,7 @@ func TestServer_ListProjectGrants_PermissionV2(t *testing.T) {
 			args: args{
 				ctx: iamOwnerCtx,
 				dep: func(request *project.ListProjectGrantsRequest, response *project.ListProjectGrantsResponse) {
-					name := gofakeit.AppName()
+					name := integration.ProjectName()
 					orgID := instancePermissionV2.DefaultOrg.GetId()
 					projectResp := instancePermissionV2.CreateProject(iamOwnerCtx, t, orgID, name, false, false)
 					request.Filters[0].Filter = &project.ProjectGrantSearchFilter_InProjectIdsFilter{
@@ -1498,11 +1493,11 @@ func TestServer_ListProjectGrants_PermissionV2(t *testing.T) {
 			args: args{
 				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *project.ListProjectGrantsRequest, response *project.ListProjectGrantsResponse) {
-					name1 := gofakeit.AppName()
-					name2 := gofakeit.AppName()
-					name3 := gofakeit.AppName()
+					name1 := integration.ProjectName()
+					name2 := integration.ProjectName()
+					name3 := integration.ProjectName()
 					orgID := instancePermissionV2.DefaultOrg.GetId()
-					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					project1Resp := instancePermissionV2.CreateProject(iamOwnerCtx, t, orgID, name1, false, false)
 					project2Resp := instancePermissionV2.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name2, false, false)
 					project3Resp := instancePermissionV2.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), name3, false, false)
@@ -1559,9 +1554,26 @@ func TestServer_ListProjectGrants_PermissionV2(t *testing.T) {
 }
 
 func createProjectGrant(ctx context.Context, instance *integration.Instance, t *testing.T, orgID, projectID, projectName string, roles ...string) *project.ProjectGrant {
-	grantedOrgName := gofakeit.AppName()
-	grantedOrg := instance.CreateOrganization(ctx, grantedOrgName, gofakeit.Email())
+	grantedOrgName := integration.ProjectName()
+	grantedOrg := instance.CreateOrganization(ctx, grantedOrgName, integration.Email())
 	projectGrantResp := instance.CreateProjectGrant(ctx, t, projectID, grantedOrg.GetOrganizationId(), roles...)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		projects, err := instance.Client.Projectv2Beta.ListProjects(ctx, &project.ListProjectsRequest{
+			Filters: []*project.ProjectSearchFilter{{
+				Filter: &project.ProjectSearchFilter_InProjectIdsFilter{
+					InProjectIdsFilter: &filter.InIDsFilter{Ids: []string{projectID}},
+				},
+			}, {
+				Filter: &project.ProjectSearchFilter_ProjectOrganizationIdFilter{
+					ProjectOrganizationIdFilter: &filter.IDFilter{Id: grantedOrg.GetOrganizationId()},
+				},
+			}},
+		})
+		require.NoError(collect, err)
+		require.Len(collect, projects.Projects, 1)
+	}, retryDuration, tick)
 
 	return &project.ProjectGrant{
 		OrganizationId:          orgID,
@@ -1641,7 +1653,7 @@ func TestServer_ListProjectRoles(t *testing.T) {
 			args: args{
 				ctx: instance.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *project.ListProjectRolesRequest, response *project.ListProjectRolesResponse) {
-					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					projectResp := instance.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 
 					request.ProjectId = projectResp.GetId()
@@ -1800,7 +1812,7 @@ func TestServer_ListProjectRoles_PermissionV2(t *testing.T) {
 			args: args{
 				ctx: instancePermissionV2.WithAuthorizationToken(CTX, integration.UserTypeOrgOwner),
 				dep: func(request *project.ListProjectRolesRequest, response *project.ListProjectRolesResponse) {
-					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), gofakeit.Email())
+					orgResp := instancePermissionV2.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					projectResp := instancePermissionV2.CreateProject(iamOwnerCtx, t, orgResp.GetOrganizationId(), integration.ProjectName(), false, false)
 
 					request.ProjectId = projectResp.GetId()
