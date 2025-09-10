@@ -297,7 +297,7 @@ export function ApiReferenceComponent() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "8px 24px",
+          padding: "6px 24px",
           backgroundColor: "var(--scalar-background-1, #ffffff)",
           borderBottom: "1px solid var(--scalar-border-color, #e1e4e8)",
           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
@@ -305,19 +305,30 @@ export function ApiReferenceComponent() {
           minHeight: "70px",
         }}
       >
-        {/* Left side: Title and Service selector */}
-        <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-          <h1
+        {/* Left side: Logo, Title and Service selector */}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {/* ZITADEL Logo */}
+          <a
+            href="/"
             style={{
-              margin: 0,
-              fontSize: "24px",
-              fontWeight: "bold",
-              color: "var(--scalar-color-1, #24292f)",
-              whiteSpace: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+              cursor: "pointer",
             }}
+            title="Go to homepage"
           >
-            ZITADEL APIs
-          </h1>
+            <img
+              src="/zitadel-logo-light@2x.png"
+              alt="ZITADEL"
+              width="160"
+              height="48"
+              style={{
+                marginRight: "8px",
+                objectFit: "contain",
+              }}
+            />
+          </a>
 
           <div
             style={{
@@ -358,7 +369,7 @@ export function ApiReferenceComponent() {
               backgroundColor: "var(--scalar-background-2, #f6f8fa)",
               border: "1px solid var(--scalar-border-color, #e1e4e8)",
               borderRadius: "6px",
-              padding: "8px 12px",
+              padding: "6px 12px",
               minWidth: "300px",
             }}
           >
