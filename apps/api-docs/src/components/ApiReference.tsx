@@ -14,11 +14,31 @@ interface ApiResponse {
   specs: OpenApiSpec[];
 }
 
+interface SearchResult {
+  serviceName: string;
+  serviceDisplayName: string;
+  path: string;
+  method: string;
+  operationId?: string;
+  summary?: string;
+  description?: string;
+  tags?: string[];
+}
+
+interface SearchResponse {
+  results: SearchResult[];
+  total: number;
+}
+
 export function ApiReferenceComponent() {
   const [specs, setSpecs] = useState<OpenApiSpec[]>([]);
   const [selectedSpec, setSelectedSpec] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -68,6 +88,52 @@ export function ApiReferenceComponent() {
 
     loadSpecs();
   }, []);
+
+  // Search function with debouncing
+  useEffect(() => {
+    const timeoutId = setTimeout(async () => {
+      if (searchQuery.trim().length >= 2) {
+        setIsSearching(true);
+        try {
+          const response = await fetch(
+            `/api/search?q=${encodeURIComponent(searchQuery)}`
+          );
+          if (response.ok) {
+            const data: SearchResponse = await response.json();
+            setSearchResults(data.results);
+            setShowSearchResults(true);
+          }
+        } catch (error) {
+          console.error("Search error:", error);
+          setSearchResults([]);
+        } finally {
+          setIsSearching(false);
+        }
+      } else {
+        setSearchResults([]);
+        setShowSearchResults(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  const handleSearchResultClick = (result: SearchResult) => {
+    setSelectedSpec(result.serviceName);
+    setShowSearchResults(false);
+    setSearchQuery("");
+
+    // Wait for the spec to load, then try to scroll to the endpoint
+    setTimeout(() => {
+      // This is a basic attempt - Scalar might need specific methods to navigate to endpoints
+      const element =
+        document.querySelector(`[data-path="${result.path}"]`) ||
+        document.querySelector(`[id*="${result.operationId}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 1000);
+  };
 
   useEffect(() => {
     if (selectedSpec && containerRef.current) {
@@ -225,12 +291,12 @@ export function ApiReferenceComponent() {
 
   return (
     <div style={{ height: "100vh", position: "relative" }}>
-      {/* Service selector dropdown */}
+      {/* Service selector dropdown - moved to left */}
       <div
         style={{
           position: "fixed",
           top: "20px",
-          right: "20px",
+          left: "20px",
           zIndex: 1000,
           backgroundColor: "var(--scalar-background-1, #ffffff)",
           border: "1px solid var(--scalar-border-color, #e1e4e8)",
@@ -263,8 +329,199 @@ export function ApiReferenceComponent() {
         </select>
       </div>
 
-      {/* Main content area - full width for Scalar */}
-      <div ref={containerRef} style={{ height: "100vh", overflow: "auto" }} />
+      {/* Global search interface - moved to right */}
+      <div
+        style={{
+          position: "fixed",
+          top: "20px",
+          right: "20px",
+          zIndex: 1000,
+          backgroundColor: "var(--scalar-background-1, #ffffff)",
+          border: "1px solid var(--scalar-border-color, #e1e4e8)",
+          borderRadius: "6px",
+          padding: "8px 12px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+          backdropFilter: "blur(8px)",
+          minWidth: "300px",
+        }}
+      >
+        <div style={{ position: "relative" }}>
+          <input
+            type="text"
+            placeholder="Search across all APIs..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "8px 12px",
+              border: "1px solid var(--scalar-border-color, #e1e4e8)",
+              borderRadius: "4px",
+              fontSize: "14px",
+              backgroundColor: "var(--scalar-background-1, #ffffff)",
+              color: "var(--scalar-color-1, #24292f)",
+              outline: "none",
+            }}
+          />
+          {isSearching && (
+            <div
+              style={{
+                position: "absolute",
+                right: "8px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                fontSize: "12px",
+                color: "var(--scalar-color-2, #666)",
+              }}
+            >
+              Searching...
+            </div>
+          )}
+        </div>
+
+        {/* Search results dropdown */}
+        {showSearchResults && searchResults.length > 0 && (
+          <div
+            style={{
+              position: "absolute",
+              top: "100%",
+              left: "0",
+              right: "0",
+              backgroundColor: "var(--scalar-background-1, #ffffff)",
+              border: "1px solid var(--scalar-border-color, #e1e4e8)",
+              borderRadius: "6px",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+              maxHeight: "400px",
+              overflowY: "auto",
+              marginTop: "4px",
+              zIndex: 1001,
+            }}
+          >
+            {searchResults.map((result, index) => (
+              <div
+                key={`${result.serviceName}-${result.path}-${result.method}-${index}`}
+                onClick={() => handleSearchResultClick(result)}
+                style={{
+                  padding: "12px",
+                  borderBottom:
+                    index < searchResults.length - 1
+                      ? "1px solid var(--scalar-border-color, #e1e4e8)"
+                      : "none",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "var(--scalar-background-2, #f6f8fa)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    marginBottom: "4px",
+                  }}
+                >
+                  <span
+                    style={{
+                      backgroundColor:
+                        result.method === "GET"
+                          ? "#28a745"
+                          : result.method === "POST"
+                          ? "#007bff"
+                          : result.method === "PUT"
+                          ? "#ffc107"
+                          : result.method === "DELETE"
+                          ? "#dc3545"
+                          : "#6c757d",
+                      color: "white",
+                      fontSize: "10px",
+                      fontWeight: "bold",
+                      padding: "2px 6px",
+                      borderRadius: "3px",
+                      minWidth: "45px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {result.method}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "monospace",
+                      fontSize: "13px",
+                      color: "var(--scalar-color-1, #24292f)",
+                      fontWeight: "500",
+                    }}
+                  >
+                    {result.path}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    fontSize: "12px",
+                    color: "var(--scalar-color-2, #666)",
+                    marginBottom: "2px",
+                  }}
+                >
+                  {result.serviceDisplayName}
+                </div>
+                {result.summary && (
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "var(--scalar-color-2, #666)",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {result.summary}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {showSearchResults &&
+          searchResults.length === 0 &&
+          searchQuery.trim().length >= 2 &&
+          !isSearching && (
+            <div
+              style={{
+                position: "absolute",
+                top: "100%",
+                left: "0",
+                right: "0",
+                backgroundColor: "var(--scalar-background-1, #ffffff)",
+                border: "1px solid var(--scalar-border-color, #e1e4e8)",
+                borderRadius: "6px",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                padding: "12px",
+                marginTop: "4px",
+                fontSize: "12px",
+                color: "var(--scalar-color-2, #666)",
+                textAlign: "center",
+              }}
+            >
+              No results found for "{searchQuery}"
+            </div>
+          )}
+      </div>
+
+      {/* Main content area with padding to avoid overlap */}
+      <div
+        ref={containerRef}
+        style={{ 
+          height: "100vh", 
+          overflow: "auto",
+          paddingTop: "80px", // Add padding to avoid overlap with fixed elements
+          paddingLeft: "20px",
+          paddingRight: "20px",
+        }}
+        onClick={() => setShowSearchResults(false)}
+      />
     </div>
   );
 }
