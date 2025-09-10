@@ -5,12 +5,10 @@ package user_test
 import (
 	"context"
 	"errors"
-	"fmt"
 	"slices"
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -82,7 +80,7 @@ func setPermissionCheckV2Flag(t *testing.T, setFlag bool) {
 }
 
 func TestServer_GetUserByID(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	type args struct {
 		ctx context.Context
 		req *user_v2beta.GetUserByIDRequest
@@ -245,7 +243,7 @@ func TestServer_GetUserByID(t *testing.T) {
 
 func TestServer_GetUserByID_Permission(t *testing.T) {
 	timeNow := time.Now().UTC()
-	newOrgOwnerEmail := gofakeit.Email()
+	newOrgOwnerEmail := integration.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
@@ -422,7 +420,7 @@ func createUsers(ctx context.Context, orgID string, count int, passwordChangeReq
 func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) userAttr {
 	username := integration.Email()
 	// used as default country prefix
-	phone := "+41" + gofakeit.Phone()
+	phone := integration.Phone()
 	resp := Instance.CreateHumanUserVerified(ctx, orgID, username, phone)
 	info := userAttr{resp.GetUserId(), username, phone, nil, resp.GetDetails()}
 	if passwordChangeRequired {
@@ -438,7 +436,7 @@ func TestServer_ListUsers(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	type args struct {
 		ctx context.Context
 		req *user_v2beta.ListUsersRequest
@@ -979,7 +977,7 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				&user_v2beta.ListUsersRequest{},
 				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
-					orgResp := Instance.CreateOrganization(ctx, fmt.Sprintf("ListUsersResourceowner-%s", gofakeit.AppName()), gofakeit.Email())
+					orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 
 					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
 					request.Queries = []*user_v2beta.SearchQuery{}
@@ -1065,7 +1063,7 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				&user_v2beta.ListUsersRequest{},
 				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
-					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
+					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 					info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					request.Queries = []*user_v2beta.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests.OrganizationId))
@@ -1111,8 +1109,8 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				&user_v2beta.ListUsersRequest{},
 				func(ctx context.Context, request *user_v2beta.ListUsersRequest) userAttrs {
-					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
-					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
+					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
+					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 					// info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					request.Queries = []*user_v2beta.SearchQuery{}

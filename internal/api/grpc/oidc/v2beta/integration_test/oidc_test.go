@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,13 +16,14 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
+	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 )
 
 func TestServer_GetAuthRequest(t *testing.T) {
-	project := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
+	project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
 	client, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
 	require.NoError(t, err)
 
@@ -96,7 +96,7 @@ func TestServer_GetAuthRequest(t *testing.T) {
 }
 
 func TestServer_CreateCallback(t *testing.T) {
-	project := Instance.CreateProject(CTX, t, "", gofakeit.AppName(), false, false)
+	project := Instance.CreateProject(CTX, t, "", integration.ProjectName(), false, false)
 	client, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
 	require.NoError(t, err)
 	clientV2, err := Instance.CreateOIDCClientLoginVersion(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, loginV2)
@@ -388,10 +388,10 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				projectID, clientID := createOIDCApplication(ctx, t, true, true)
 				projectID2, _ := createOIDCApplication(ctx, t, true, true)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 				Instance.CreateProjectGrant(ctx, t, projectID2, orgResp.GetOrganizationId())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
@@ -403,10 +403,10 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, true)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
@@ -424,10 +424,10 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, true)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+				createProjectGrantUserGrant(ctx, t, orgResp.GetOrganizationId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
@@ -445,8 +445,8 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				_, clientID := createOIDCApplication(ctx, t, true, true)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
@@ -469,9 +469,9 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, true)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
@@ -483,7 +483,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, true)
 				user := Instance.CreateHumanUser(ctx)
-				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
@@ -501,7 +501,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, false)
 				user := Instance.CreateHumanUser(ctx)
-				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
@@ -529,9 +529,9 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, false)
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+				createProjectUserGrant(ctx, t, Instance.DefaultOrg.GetId(), projectID, user.GetUserId())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
@@ -548,8 +548,8 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				_, clientID := createOIDCApplication(ctx, t, true, false)
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
@@ -561,10 +561,10 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, false)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
+				createProjectGrantUserGrant(ctx, t, orgResp.GetOrganizationId(), projectID, orgResp.GetOrganizationId(), user.GetUserId())
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
@@ -581,9 +581,9 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, false)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
 			wantErr: true,
@@ -610,8 +610,8 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			ctx:  CTXLoginClient,
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				_, clientID := createOIDCApplication(ctx, t, false, true)
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
@@ -623,9 +623,9 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, false, true)
 
-				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 				Instance.CreateProjectGrant(ctx, t, projectID, orgResp.GetOrganizationId())
-				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
+				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), integration.Email(), integration.Phone())
 
 				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, user.GetUserId())
 			},
@@ -686,8 +686,34 @@ func createSessionAndAuthRequestForCallback(ctx context.Context, t *testing.T, c
 }
 
 func createOIDCApplication(ctx context.Context, t *testing.T, projectRoleCheck, hasProjectCheck bool) (string, string) {
-	project := Instance.CreateProject(ctx, t, "", gofakeit.AppName(), projectRoleCheck, hasProjectCheck)
+	project := Instance.CreateProject(ctx, t, "", integration.ProjectName(), projectRoleCheck, hasProjectCheck)
 	clientV2, err := Instance.CreateOIDCClientLoginVersion(ctx, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, loginV2)
 	require.NoError(t, err)
 	return project.GetId(), clientV2.GetClientId()
+}
+
+func createProjectUserGrant(ctx context.Context, t *testing.T, orgID, projectID, userID string) {
+	resp := Instance.CreateProjectUserGrant(t, ctx, orgID, projectID, userID)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		_, err := Instance.Client.Mgmt.GetUserGrantByID(integration.SetOrgID(ctx, orgID), &mgmt.GetUserGrantByIDRequest{
+			UserId:  userID,
+			GrantId: resp.GetUserGrantId(),
+		})
+		assert.NoError(collect, err)
+	}, retryDuration, tick)
+}
+
+func createProjectGrantUserGrant(ctx context.Context, t *testing.T, orgID, projectID, projectGrantID, userID string) {
+	resp := Instance.CreateProjectGrantUserGrant(ctx, orgID, projectID, projectGrantID, userID)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		_, err := Instance.Client.Mgmt.GetUserGrantByID(integration.SetOrgID(ctx, orgID), &mgmt.GetUserGrantByIDRequest{
+			UserId:  userID,
+			GrantId: resp.GetUserGrantId(),
+		})
+		assert.NoError(collect, err)
+	}, retryDuration, tick)
 }
