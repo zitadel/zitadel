@@ -155,6 +155,7 @@ type Steps struct {
 	s56IDPTemplate6SAMLFederatedLogout      *IDPTemplate6SAMLFederatedLogout
 	s58ReplaceLoginNames3View               *ReplaceLoginNames3View
 	s59SetupWebkeys                         *SetupWebkeys
+	s64ChangePushPosition                   *ChangePushPosition
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
