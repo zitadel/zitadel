@@ -4,65 +4,64 @@ This document explains how the ZITADEL API documentation app maps and displays t
 
 ## Overview
 
-The ZITADEL API documentation app uses Scalar to render interactive API documentation from OpenAPI specifications generated from Protocol Buffer definitions. The app supports both v1 and v2 API architectures with intelligent filtering and organization.
+The ZITADEL API documentation app uses Scalar to render interactive API documentation from OpenAPI specifications generated from Protocol Buffer definitions. The app uses **OpenAPI v2 (Swagger)** specifications that provide proper REST endpoints with GET, POST, PUT, DELETE methods, ensuring accurate representation of ZITADEL's REST APIs.
 
 ## Directory Structure
 
 ### Source Files
 
 ```
-.artifacts/openapi3/zitadel/
-├── management.openapi.yaml           # v1 Management API
-├── admin.openapi.yaml               # v1 Admin API
-├── auth.openapi.yaml                # v1 Authentication API
-├── system.openapi.yaml              # v1 System API
+.artifacts/openapi/zitadel/
+├── management.swagger.json          # v1 Management API (REST endpoints)
+├── admin.swagger.json               # v1 Admin API (REST endpoints)
+├── auth.swagger.json                # v1 Authentication API (REST endpoints)
+├── system.swagger.json              # v1 System API (REST endpoints)
 ├── action/
 │   └── v1/
-│       └── action_service.openapi.yaml
+│       └── action_service.swagger.json
 ├── user/
 │   ├── v1/
-│   │   └── user_service.openapi.yaml
+│   │   └── user_service.swagger.json
 │   └── v2/
-│       ├── user_service.openapi.yaml      # v2 User API (contains endpoints)
-│       ├── user.openapi.yaml              # Schema only (filtered out)
-│       └── auth.openapi.yaml              # Schema only (filtered out)
+│       ├── user_service.swagger.json      # v2 User API (REST endpoints)
+│       └── user.swagger.json              # Schema only (filtered out)
 ├── org/
 │   └── v2/
-│       ├── org_service.openapi.yaml       # v2 Organization API
-│       └── org.openapi.yaml               # Schema only (filtered out)
+│       ├── org_service.swagger.json       # v2 Organization API (REST endpoints)
+│       └── org.swagger.json               # Schema definitions
 └── [other services]/
     └── v[version]/
-        ├── [service]_service.openapi.yaml  # Service endpoints
-        └── [resource].openapi.yaml         # Schema definitions
+        ├── [service]_service.swagger.json  # Service REST endpoints
+        └── [resource].swagger.json         # Schema definitions
 ```
 
 ## File Filtering Logic
 
 ### Server-Side Filtering (`/api/openapi/route.ts`)
 
-The API route recursively scans the `.artifacts/openapi3/zitadel/` directory and applies the following filters:
+The API route recursively scans the `.artifacts/openapi/zitadel/` directory and applies the following filters:
 
-1. **Service Files**: Include files ending with `_service.openapi.yaml`
+1. **Service Files**: Include files ending with `_service.swagger.json`
 
-   - These contain actual API endpoints and operations
-   - Found in nested directories like `user/v2/user_service.openapi.yaml`
+   - These contain actual REST API endpoints with proper HTTP methods (GET, POST, PUT, DELETE)
+   - Found in nested directories like `user/v2/user_service.swagger.json`
 
-2. **Top-Level v1 APIs**: Include root-level `.openapi.yaml` files
+2. **Top-Level v1 APIs**: Include root-level `.swagger.json` files
 
-   - Legacy v1 APIs: `management.openapi.yaml`, `admin.openapi.yaml`, etc.
-   - These are complete API specifications with endpoints
+   - Legacy v1 APIs: `management.swagger.json`, `admin.swagger.json`, etc.
+   - These are complete REST API specifications with proper HTTP methods
 
 3. **Excluded Files**: Skip schema-only files
-   - Files like `user.openapi.yaml`, `org.openapi.yaml`
-   - Contain only data type definitions without endpoints
+   - Files like `user.swagger.json`, `org.swagger.json`
+   - Contain only data type definitions without REST endpoints
 
 ```typescript
 // Server-side filtering logic
-if (entry.endsWith("_service.openapi.yaml")) {
-  // Include service files with endpoints
+if (entry.endsWith("_service.swagger.json")) {
+  // Include service files with REST endpoints
   files.push({ path: fullPath, relativePath: entryRelativePath });
-} else if (entry.endsWith(".openapi.yaml") && relativePath === "") {
-  // Include top-level v1 API files
+} else if (entry.endsWith(".swagger.json") && relativePath === "") {
+  // Include top-level v1 REST API files
   files.push({ path: fullPath, relativePath: entryRelativePath });
 }
 ```
@@ -75,7 +74,7 @@ Additional filtering on the client ensures only services with actual endpoints a
 // Filter out specs with no endpoints (only schema definitions)
 const specsWithEndpoints = data.specs.filter((spec) => {
   try {
-    const parsed = yaml.load(spec.content) as any;
+    const parsed = JSON.parse(spec.content);
     return parsed.paths && Object.keys(parsed.paths).length > 0;
   } catch {
     return false;
@@ -199,21 +198,47 @@ pnpm run generate
 ```yaml
 version: v1
 plugins:
+  # For REST endpoints with proper HTTP methods (used by api-docs app)
   - plugin: buf.build/grpc-ecosystem/openapiv2
-    out: .artifacts/openapi3
+    out: .artifacts/openapi
     opt:
       - openapi_naming_strategy=fqn
       - generate_unbound_methods=false
       - use_go_templates=true
+      - allow_merge=true
+      - merge_file_name=zitadel
+  # For gRPC-Web endpoints (used by docs website)
+  - plugin: buf.build/protocolbuffers/go
+    out: internal
+    opt:
+      - paths=source_relative
+  - plugin: buf.build/grpc-ecosystem/grpc-gateway
+    out: internal
+    opt:
+      - paths=source_relative
+  - plugin: buf.build/connectrpc/go
+    out: pkg
+    opt:
+      - paths=source_relative
+  - plugin: protoc-gen-connect-openapi
+    out: .artifacts/openapi3
+    opt:
+      - base-url=https://api.zitadel.dev
 ```
 
 ### 3. Output Structure
 
-Generated files follow the pattern:
+**REST APIs (swagger.json files)**:
+- Located in `.artifacts/openapi/zitadel/`
+- Single merged file: `{service_name}.swagger.json`
+- Contains proper HTTP methods (GET, POST, PUT, DELETE)
+- Used by the api-docs Next.js application
 
-- `{service_name}.openapi.yaml` for v1 APIs
-- `{domain}/{version}/{service}_service.openapi.yaml` for v2+ APIs
-- `{domain}/{version}/{resource}.openapi.yaml` for schema definitions
+**gRPC-Web APIs (openapi.yaml files)**:
+- Located in `.artifacts/openapi3/zitadel/`
+- Multiple files: `{service_name}.openapi.yaml`
+- Contains gRPC-Web POST endpoints only
+- Used by the docs website
 
 ## Debugging and Development
 
