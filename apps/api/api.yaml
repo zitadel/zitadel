@@ -1,20 +1,4 @@
-ExternalSecure: false
-TLS.Enabled: false
-FirstInstance:
-  LoginClientPatPath: login-client.pat
-  PatPath: admin.pat
-  Org:
-    LoginClient:
-      Machine:
-        Username: login-client
-        Name: Automatically Initialized IAM Login Client
-      Pat:
-        ExpirationDate: '2029-01-01T00:00:00Z'
-    Machine:
-      Machine:
-        Username: admin
-        Name: Automatically Initialized IAM admin Client
-      Pat:
-        ExpirationDate: '2029-01-01T00:00:00Z'
-Database.Postgres.User.Password: zitadel
+# We need this file because of a bug in the API.
+# The start-from-setup command does not read the following property from the env variables.
+# As soon as this is fixed, this file can be removed.
 DefaultInstance.Features.LoginV2.BaseURI: http://localhost:3000/ui/v2/login

@@ -1,29 +1,11 @@
 # Contributing to Zitadel
 
-Zitadel is an open-source identity and access management platform built with a modern tech stack including Go (backend), Next.js/React (login), Angular (Console), and Docusaurus (docs) - all orchestrated through an Nx monorepo with pnpm for efficient development workflows.
+Zitadel is an open-source identity and access management platform built with a modern tech stack including Go (API), Next.js/React (login), Angular (Console), and Docusaurus (docs) - all orchestrated through an Nx monorepo with pnpm for efficient development workflows.
 
 ## Quick Start
 
-This repository contains multiple interconnected projects. However, you can build and start the whole platform with a single command:
-
-```bash
-# Develop the API
-nx run-many -t db generate -p @zitadel/devcontainer @zitadel/api
-
-# Develop the API and connect a local login production build
-nx run @zitadel/api:generate
-nx run-many -t db production -p @zitadel/devcontainer @zitadel/login
-
-# Develop the login and connect a local API with a local DB
-nx run-many -t db production -p @zitadel/devcontainer @zitadel/api
-nx run @zitadel/login:development
-
-# Develop the Console and connect a local API with a local DB
-nx run-many -t db production -p @zitadel/devcontainer @zitadel/api
-nx run @zitadel/console:development
-```
-
-Use these commands to get started with any project.
+This repository contains multiple interconnected projects.
+You can build and start any project with Nx commands:
 
 | Task | Command | Notes |
 |------|---------|--------|
@@ -48,7 +30,82 @@ Replace `PROJECT` with one of the following:
 Instead of the project names, you can also use their directory names for `PROJECT`, like `nx run login:start`.
 Alternatively, you can use the infix-notation, like `nx start @zitadel/login` or `nx start login`.
 s
-For more details about their meaning and usage, read on.
+
+### <a name="api-quick-start"></a>API
+
+Prepare the API development and run a local login production build.
+
+```bash
+nx run @zitadel/api:generate
+nx run-many -t db production -p @zitadel/devcontainer @zitadel/login
+```
+
+If you don't need a login, you can omit it and use the generated ./admin.pat to call the API.
+
+```bash
+nx run @zitadel/api:generate
+nx run @zitadel/devcontainer:db
+```
+
+Start a debug session in your IDE.
+In VSCode, you can use the preconfigured [launch config](./.vscode/launch.json).
+In other IDEs, adjust accordingly.
+
+If you have a login deployed, visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+
+To connect to the database and explore Zitadel data, run `psql "host=localhost dbname=zitadel sslmode=disable"`.
+
+For more options, go to the [API section](#api) 
+
+### <a name="login-quick-start"></a>Login
+
+Develop the login and connect a local API with a local DB
+
+```bash
+nx run-many -t db production -p @zitadel/devcontainer @zitadel/api
+```
+
+In another terminal, start the login development server
+
+```bash
+nx run @zitadel/login:development
+```
+
+Visit http://localhost:8080/ui/v2/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+
+Make some changes to the source code and see how the browser is automatically updated.
+
+For more options, go to the [Login section](#login) 
+
+### <a name="console-quick-start"></a>Console
+
+Develop the Console and connect a local API with a local DB:
+
+```bash
+nx run-many -t db production -p @zitadel/devcontainer @zitadel/api
+```
+
+In another terminal, start the console development server
+
+```bash
+nx run @zitadel/console:development
+```
+
+To allow Console access via http://localhost:4200, you have to configure the Zitadel API.
+
+1. Navigate to http://localhost:8080/ui/console/projects.
+3. Select the _ZITADEL_ project.
+4. Select the _Console_ application.
+5. Select _Redirect Settings_
+6. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
+7. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
+8. Select the _Save_ button
+
+Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+
+Make some changes to the source code and see how the browser is automatically updated.
+
+For more options, go to the [Console section](#console) 
 
 ## Introduction
 
@@ -81,7 +138,7 @@ Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
 [Contribute](#how-to-contribute)
 
-- [Contribute backend code](#backend)
+- [Contribute API code](#api)
 - [Contribute frontend code](#frontend)
 - If you found a mistake on our [docs page](https://zitadel.com/docs) or something is missing please read [the docs section](#docs)
 - [Translate](#translations) and improve texts
@@ -100,14 +157,14 @@ Go through the following checklist before you submit the final pull request:
 
 The code consists of the following parts:
 
-| name            | description                                        | language                                                                                                  | where to find                                       | Development Guide                                   |
-| --------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
-| backend         | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to Backend](#backend)                   |
-| API definitions | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to Backend](#backend)                   |
-| Console         | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#frontend) |
-| login           | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#frontend) |
-| docs            | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#frontend) |
-| translations    | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#translations) |
+| name                | description                                        | language                                                                                                  | where to find                                       | Development Guide                                   |
+| ------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
+| API implementation  | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to API](#api)                   |
+| API definitions     | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#api)                   |
+| Console             | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#frontend) |
+| login               | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#frontend) |
+| docs                | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#frontend) |
+| translations        | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#translations) |
 
 Please follow the guides to validate and test the code before you contribute.
 
@@ -200,52 +257,10 @@ The API is designed to be used by different clients, such as web applications, m
 Therefore, the API is designed to be easy to use, consistent, and reliable.
 Please check out the dedicated [API guidelines](./API_DESIGN.md) page when contributing to the API.
 
-## <a name="backend"></a>Contribute Backend Code
+## <a name="api"></a>Contribute API Code
 
 To start developing the Zitadel API Go application, make sure your system has the [required system dependencies](#dev-requirements) installed.
-
-### Quick Start
-
-**Run Zitadel:**
-
-```bash
-nx run @zitadel/zitadel:start
-```
-
-**Develop the Zitadel Core Application:**
-
-Set up zitadel without starting it
-
-```bash
-nx run @zitadel/api:dev
-```
-
-Then open your IDE and and start the application.
-In VSCode, use a `launch.json` config like this:
-
-```json
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Debug Zitadel",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "program": "main.go",
-            "args": [
-                 "start-from-init",
-                 "--config", ".devcontainer/zitadel.yaml",
-                 "--masterkey", "MasterkeyNeedsToHave32Characters"
-            ]
-        }
-    ]
-}
-```
-
-Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
-
-To connect to the database and explore Zitadel data, run `psql "host=localhost dbname=zitadel sslmode=disable"`.
+Get familiar with the [API quick start](#api-quick-start).
 
 ### Run Local Unit Tests
 
@@ -321,7 +336,7 @@ docker compose --file ./e2e/docker-compose.yaml down
 
 ### Run Local End-to-End Tests Against Your Dev Server Console
 
-If you also make [changes to the Console](#console), you can run the test suite against your locally built backend code and frontend server.
+If you also make [changes to the Console](#console), you can run the test suite against your locally built API and Console server.
 
 ```bash
 # Install dependencies (from repository root)
@@ -398,17 +413,25 @@ nx run @zitadel/client:build  # Build after changes
 
 The Login UI is a Next.js application that provides the user interface for authentication flows.
 It's located in the `apps/login` directory and uses pnpm and Nx for development.
-
 To start developing the login, make sure your system has the [required system dependencies](#dev-requirements) installed.
+Get familiar with the [login quick start](#login-quick-start).
 
-#### Quick Start
+#### Develop against a Cloud instance
+
+If you don't want to build and run a local API, you can just run the login development server and point it to a cloud instance.
+
+1. Create a personal access token and point your instance to your local login, [as described in the docs](https://zitadel.com/docs/self-hosting/manage/login-client).
+2. Save the following file to `apps/login/.env.development.local`
+
+```env
+ZITADEL_API_URL=https://[your-cloud-instance-domain]
+ZITADEL_SERVICE_USER_TOKEN=[personal access token for an IAM Login Client]
+```
+
+3. Start the hot-reloading development server.
 
 ```bash
-# Start development server (recommended)
-nx run @zitadel/login:dev
-
-# Or start standalone production server
-nx run @zitadel/login:start
+nx run @zitadel/login:development
 ```
 
 Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
@@ -437,29 +460,27 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 
 To start developing the Console, make sure your system has the [required system dependencies](#dev-requirements) installed.
 To learn more about the Console, go to the Consoles [README.md](./console).
+Get familiar with the [Console quick start](#console-quick-start).
 
-#### Quick Start
+#### Develop against a Cloud instance
 
-Run the local Console development server.
+If you don't want to build and run a local API, you can just run the console development server and point it to a cloud instance.
 
-```bash
-# Start development server
-nx run @zitadel/console:dev
+1. Save the following file to console/.env.local
+
+```env
+ENVIRONMENT_JSON_URL=https://[your-cloud-instance-domain]/ui/console/assets/environment.json
 ```
 
-To allow Console access via http://localhost:4200, you have to configure the Zitadel backend.
+2. Start the hot-reloading development server.
 
-1. Navigate to /ui/console/projects in your target Zitadel instance.
-3. Select the _ZITADEL_ project.
-4. Select the _Console_ application.
-5. Select _Redirect Settings_
-6. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
-7. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
-8. Select the _Save_ button
+```bash
+nx run @zitadel/console:development
+```
+
+3. Allow your cloud instance to redirect to your local console, as described in the [Console quick start](#console-quick-start)
 
 Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
-
-Make some changes to the source code and see how the browser is automatically updated.
 
 #### Pass Quality Checks
 

@@ -9,11 +9,14 @@ services:
     command: sleep infinity
     working_dir: /workspaces/zitadel
     environment:
-      HOSTNAME: localhost
       DEVCONTAINER_DB_HOST: db
       DEVCONTAINER_API_HOST: api
       DEVCONTAINER_LOGIN_HOST: login
       DEVCONTAINER_LOGIN_API_MOCK_HOST: login-api-mock
+    ports:
+      - "8080:8080"
+      - "3000:3000"
+      - "4200:4200"
 
   db:
     container_name: db

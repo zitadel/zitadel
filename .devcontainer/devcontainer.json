@@ -11,7 +11,7 @@
 	],
 	"updateContentCommand": {
 		"goModules": "go mod download || true",
-		"nodeModules": "pnpm install || true; pnpm add -g nx || true; cd apps/login && pnpm cypress install || true"
+		"nodeModules": "pnpm install || true && pnpm add -g nx || true && cd apps/login && pnpm cypress install || true"
 	},
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {

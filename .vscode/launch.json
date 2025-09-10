@@ -8,10 +8,9 @@
             "mode": "debug",
             "program": "main.go",
             "args": [
-                 "start-from-init",
-                 "--config", "${workspaceFolder}/apps/login/api.yaml",
-                 "--masterkey", "MasterkeyNeedsToHave32Characters"
-            ]
+                 "start-from-init", "--config", "${workspaceFolder}/apps/api/api.yaml", "--steps", "${workspaceFolder}/apps/api/api.yaml", "--masterkey", "MasterkeyNeedsToHave32Characters"
+            ],
+            "envFile": "${workspaceFolder}/apps/api/.env",
         }
     ]
 }

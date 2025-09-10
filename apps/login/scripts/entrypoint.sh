@@ -1,4 +1,7 @@
 #!/bin/sh
+
+export HOSTNAME="0.0.0.0"
+
 if [ -f /.env-file/.env ]; then
     set -o allexport
     . /.env-file/.env
