@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type Event struct {
@@ -21,4 +22,9 @@ func Publish(ctx context.Context, events []*Event, db database.Executor) error {
 		}
 	}
 	return nil
+}
+
+func WriteLegacyEvents(ctx context.Context, es eventstore.Pusher, client database.QueryExecutor, commands ...eventstore.Command) error {
+	_, err := es.Push(ctx, client, commands...)
+	return err
 }
