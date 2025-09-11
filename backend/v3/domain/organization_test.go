@@ -12,7 +12,7 @@ func TestOrganization_Keys(t *testing.T) {
 	tt := []struct {
 		name     string
 		org      *Organization
-		index    orgCacheIndex
+		index    OrgCacheIndex
 		wantKeys []string
 	}{
 		{

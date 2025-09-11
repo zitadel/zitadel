@@ -27,22 +27,22 @@ type Organization struct {
 	Domains []*OrganizationDomain `json:"domains,omitempty" db:"-"` // domains need to be handled separately
 }
 
-type orgCacheIndex uint8
+type OrgCacheIndex uint8
 
 const (
-	orgCacheIndexUndefined orgCacheIndex = iota
+	orgCacheIndexUndefined OrgCacheIndex = iota
 	orgCacheIndexID
 )
 
 // Keys implements the [cache.Entry].
-func (o *Organization) Keys(index orgCacheIndex) (key []string) {
+func (o *Organization) Keys(index OrgCacheIndex) (key []string) {
 	if index == orgCacheIndexID {
 		return []string{o.ID}
 	}
 	return nil
 }
 
-var _ cache.Entry[orgCacheIndex, string] = (*Organization)(nil)
+var _ cache.Entry[OrgCacheIndex, string] = (*Organization)(nil)
 
 // OrgIdentifierCondition is used to help specify a single Organization,
 // it will either be used as the organization ID or organization name,
