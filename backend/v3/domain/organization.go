@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/backend/v3/storage/cache"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
@@ -25,6 +26,23 @@ type Organization struct {
 
 	Domains []*OrganizationDomain `json:"domains,omitempty" db:"-"` // domains need to be handled separately
 }
+
+type orgCacheIndex uint8
+
+const (
+	orgCacheIndexUndefined orgCacheIndex = iota
+	orgCacheIndexID
+)
+
+// Keys implements the [cache.Entry].
+func (o *Organization) Keys(index orgCacheIndex) (key []string) {
+	if index == orgCacheIndexID {
+		return []string{o.ID}
+	}
+	return nil
+}
+
+var _ cache.Entry[orgCacheIndex, string] = (*Organization)(nil)
 
 // OrgIdentifierCondition is used to help specify a single Organization,
 // it will either be used as the organization ID or organization name,
@@ -52,7 +70,7 @@ type organizationColumns interface {
 // organizationConditions define all the conditions for the instance table.
 type organizationConditions interface {
 	// IDCondition returns an equal filter on the id field.
-	IDCondition(instanceID string) OrgIdentifierCondition
+	IDCondition(organizationID string) OrgIdentifierCondition
 	// NameCondition returns a filter on the name field.
 	NameCondition(name string) OrgIdentifierCondition
 	// InstanceIDCondition returns a filter on the instance id field.
@@ -78,7 +96,7 @@ type OrganizationRepository interface {
 	Get(ctx context.Context, opts ...database.QueryOption) (*Organization, error)
 	List(ctx context.Context, opts ...database.QueryOption) ([]*Organization, error)
 
-	Create(ctx context.Context, instance *Organization) error
+	Create(ctx context.Context, organization *Organization) error
 	Update(ctx context.Context, id OrgIdentifierCondition, instance_id string, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, id OrgIdentifierCondition, instance_id string) (int64, error)
 
