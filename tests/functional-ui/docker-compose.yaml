@@ -2,7 +2,7 @@ services:
   api:
     extends:
       file: './config/localhost/docker-compose.yaml'
-      service: 'zitadel'
+      service: 'api'
 
   db:
     extends:

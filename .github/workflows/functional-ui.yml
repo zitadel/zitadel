@@ -37,7 +37,7 @@ jobs:
       - name: Install Cypress binary
         working-directory: ./tests/functional-ui
         run: pnpm exec cypress install
-      - name: Start DB and ZITADEL
+      - name: Start DB, API and Console
         working-directory: ./tests/functional-ui
         run: docker compose up --build --detach --wait
       - name: Cypress run
