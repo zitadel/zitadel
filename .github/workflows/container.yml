@@ -105,7 +105,7 @@ jobs:
         run: pnpm install --frozen-lockfile
       - 
         name: Build Login
-        run: pnpm nx build login
+        run: pnpm nx run login:build
       - 
         name: Debug
         id: build-debug
