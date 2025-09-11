@@ -1,0 +1,18 @@
+# buf.gen.yaml
+version: v2
+managed:
+  enabled: true
+plugins:
+  - remote: buf.build/grpc-ecosystem/openapiv2
+    out: .artifacts/openapi
+    opt:
+      - allow_delete_body
+      - remove_internal_comments=true
+      - preserve_rpc_order=true
+  - local: ./protoc-gen-connect-openapi/protoc-gen-connect-openapi
+    out: .artifacts/openapi3
+    strategy: all
+    opt:
+      - short-service-tags
+      - ignore-googleapi-http
+      - base=base.yaml

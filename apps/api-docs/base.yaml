@@ -1,0 +1,8 @@
+openapi: 3.1.0
+info:
+  title: ZITADEL API
+  description: ZITADEL API documentation
+  version: v2
+servers:
+  - url: https://$CUSTOM-DOMAIN
+    description: Your ZITADEL instance
