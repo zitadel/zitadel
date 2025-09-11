@@ -3,8 +3,6 @@ import { DEFAULT_CSP } from "./constants/csp.js";
 
 const withNextIntl = createNextIntlPlugin();
 
-/** @type {import('next').NextConfig} */
-
 const secureHeaders = [
   {
     key: "Strict-Transport-Security",
@@ -33,9 +31,10 @@ const secureHeaders = [
   { key: "X-Frame-Options", value: "deny" },
 ];
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   basePath: "/ui/v2/login",
-  output: "standalone",
+  output: process.env.NEXT_OUTPUT_MODE || undefined,
   reactStrictMode: true,
   experimental: {
     dynamicIO: true,

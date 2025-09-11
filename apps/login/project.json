@@ -18,6 +18,25 @@
         "{projectRoot}/.next/standalone"
       ]
     },
+    "build-vercel": {
+      "description": "Build for Vercel deployment",
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/cypress.config.ts"
+      ],
+      "outputs": [
+        "{projectRoot}/.next",
+        "!{projectRoot}/.next/cache",
+        "!{projectRoot}/.next/standalone"
+      ]
+    },
     "check": {
       "description": "Run code quality checks (linting, formatting, testing and building)"
     },

@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build && cp -r public scripts/* .next/standalone/ && cp -r .next/static .next/standalone/apps/login/.next/",
+    "build": "NEXT_OUTPUT_MODE=standalone next build && cp -r public scripts/* .next/standalone/ && cp -r .next/static .next/standalone/apps/login/.next/",
+    "build-vercel": "next build",
     "development": "./scripts/entrypoint.sh next dev",
     "production": "cd ./.next/standalone && ./entrypoint.sh node apps/login/server.js",
     "lint-check-next": "next lint",

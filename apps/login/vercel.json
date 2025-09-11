@@ -1,4 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm next build"
+  "buildCommand": "nx run @zitadel/login:build-vercel"
 }
