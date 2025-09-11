@@ -4,6 +4,7 @@ import { LoginPasskey } from "@/components/login-passkey";
 import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
+import { getOriginalHost } from "@/lib/server/host";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getSession } from "@/lib/zitadel";
@@ -13,23 +14,16 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("u2f");
-  return { title: t('verify.title')};
+  return { title: t("verify.title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   const { loginName, requestId, sessionId, organization } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
 
   const branding = await getBrandingSettings({
     serviceUrl,
@@ -37,17 +31,13 @@ export default async function Page(props: {
   });
 
   const sessionFactors = sessionId
-    ? await loadSessionById(serviceUrl, sessionId, organization)
+    ? await loadSessionById(sessionId, organization)
     : await loadMostRecentSession({
         serviceUrl,
         sessionParams: { loginName, organization },
       });
 
-  async function loadSessionById(
-    host: string,
-    sessionId: string,
-    organization?: string,
-  ) {
+  async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,

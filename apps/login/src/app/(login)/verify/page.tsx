@@ -4,6 +4,7 @@ import { Translated } from "@/components/translated";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { sendEmailCode, sendInviteEmailCode } from "@/lib/server/verify";
+import { getOriginalHostWithProtocol } from "@/lib/server/host";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
@@ -14,14 +15,13 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("verify");
-  return { title: t('verify.title')};
+  return { title: t("verify.title") };
 }
 
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
 
-  const { userId, loginName, code, organization, requestId, invite, send } =
-    searchParams;
+  const { userId, loginName, code, organization, requestId, invite, send } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -41,17 +41,13 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   async function sendEmail(userId: string) {
-    const host = _headers.get("host");
-
-    if (!host || typeof host !== "string") {
-      throw new Error("No host found");
-    }
+    const hostWithProtocol = await getOriginalHostWithProtocol();
 
     if (invite === "true") {
       await sendInviteEmailCode({
         userId,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((error) => {
         console.error("Could not send invitation email", error);
@@ -61,7 +57,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       await sendEmailCode({
         userId,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+          `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((error) => {
         console.error("Could not send verification email", error);
@@ -157,11 +153,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           ></UserAvatar>
         ) : (
           user && (
-            <UserAvatar
-              loginName={user.preferredLoginName}
-              displayName={human?.profile?.displayName}
-              showDropdown={false}
-            />
+            <UserAvatar loginName={user.preferredLoginName} displayName={human?.profile?.displayName} showDropdown={false} />
           )
         )}
 
