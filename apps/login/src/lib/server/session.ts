@@ -69,10 +69,7 @@ export async function skipMFAAndContinueWithNextUrl({
   }
 }
 
-export async function continueWithSession({
-  requestId,
-  ...session
-}: Session & { requestId?: string }) {
+export async function continueWithSession({ requestId, ...session }: Session & { requestId?: string }) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -116,8 +113,7 @@ export type UpdateSessionCommand = {
 };
 
 export async function updateSession(options: UpdateSessionCommand) {
-  let { loginName, sessionId, organization, checks, requestId, challenges } =
-    options;
+  let { loginName, sessionId, organization, checks, requestId, challenges } = options;
   const recentSession = sessionId
     ? await getSessionCookieById({ sessionId })
     : loginName
@@ -138,12 +134,7 @@ export async function updateSession(options: UpdateSessionCommand) {
     return { error: "Could not get host" };
   }
 
-  if (
-    host &&
-    challenges &&
-    challenges.webAuthN &&
-    !challenges.webAuthN.domain
-  ) {
+  if (host && challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
     const [hostname] = host.split(":");
 
     challenges.webAuthN.domain = hostname;
@@ -219,11 +210,11 @@ export async function clearSession(options: ClearSessionOptions) {
   });
 
   const securitySettings = await getSecuritySettings({ serviceUrl });
-  const sameSite = securitySettings?.embeddedIframe?.enabled ? "none" : true;
+  const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
 
   if (!deleteResponse) {
     throw new Error("Could not delete session");
   }
 
-  return removeSessionFromCookie({ session: sessionCookie, sameSite });
+  return removeSessionFromCookie({ session: sessionCookie, iFrameEnabled });
 }
