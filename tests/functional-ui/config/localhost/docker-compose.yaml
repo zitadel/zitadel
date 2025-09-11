@@ -4,7 +4,7 @@ services:
     restart: 'always'
     image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
     build:
-      context: ../../..
+      context: ../../../..
       dockerfile: ./apps/api/Dockerfile
       target: artifact
       cache_from:
