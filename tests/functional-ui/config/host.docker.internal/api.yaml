@@ -6,7 +6,7 @@ ExternalSecure: false
 
 Database:
   postgres:
-    # This makes the e2e config reusable with an out-of-docker zitadel process and an /etc/hosts entry
+    # This makes the test config reusable with an out-of-docker zitadel process and an /etc/hosts entry
     Host: host.docker.internal
     Port: 5432
     MaxOpenConns: 15

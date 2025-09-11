@@ -7,8 +7,27 @@
 	"forwardPorts": [
 		3000,
 		4200,
-		8080
+		8080,
+		3100
 	],
+	"portsAttributes": {
+		"3000": {
+			"label": "Login",
+			"onAutoForward": "notify"
+		},
+		"4200": {
+			"label": "Console",
+			"onAutoForward": "notify"
+		},
+		"8080": {
+			"label": "API",
+			"onAutoForward": "notify"
+		},
+		"3100": {
+			"label": "Docs",
+			"onAutoForward": "notify"
+		}
+	},
 	"updateContentCommand": {
 		"goModules": "go mod download || true",
 		"nodeModules": "pnpm install || true && pnpm add -g nx || true && cd apps/login && pnpm cypress install || true"

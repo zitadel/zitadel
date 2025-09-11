@@ -1,5 +1,8 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "workspaceLayout": {
+    "libsDir": "packages"
+  },
   "namedInputs": {
     "default": [
       "{projectRoot}/**/*"
@@ -30,10 +33,6 @@
         "^build",
         "generate"
       ]
-    },
-    "start": {
-      "cache": false,
-      "continuous": true
     },
     "lint": {
       "inputs": [

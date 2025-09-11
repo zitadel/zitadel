@@ -1,6 +1,6 @@
-# Load Tests
+# Benchmarks
 
-This package contains code for load testing specific endpoints of ZITADEL using [k6](https://k6.io).
+This project contains code for benchmarking specific endpoints of ZITADEL using [k6](https://k6.io).
 
 ## Prerequisite
 

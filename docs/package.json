@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "docusaurus start",
-    "start": "docusaurus serve",
+    "dev": "docusaurus start --port 3100",
+    "prod": "docusaurus serve --port 3100",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",

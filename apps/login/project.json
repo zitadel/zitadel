@@ -61,13 +61,13 @@
         "^build"
       ]
     },
-    "production": {
+    "prod": {
       "continuous": true,
       "dependsOn": [
         "build"
       ]
     },
-    "development": {
+    "dev": {
       "continuous": true,
       "dependsOn": [
         "^build"

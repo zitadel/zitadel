@@ -5,26 +5,27 @@ services:
       file: '../localhost/docker-compose.yaml'
       service: 'db'
 
-  zitadel:
+  api:
     depends_on:
       db:
         condition: 'service_healthy'
     extends:
       file: '../localhost/docker-compose.yaml'
-      service: 'zitadel'
+      service: 'api'
     volumes:
-      - ./zitadel.yaml:/zitadel.yaml
-  e2e:
+      - ./api.yaml:/api.yaml
+
+  cypress:
     image: cypress/included:12.2.0
     depends_on:
-      zitadel:
+      api:
         condition: 'service_healthy'
       db:
         condition: 'service_healthy'
-    working_dir: /e2e
+    working_dir: /workspaces/zitadel/functional-ui
     user: '$UID'
     volumes:
-      - ../../:/e2e
+      - ../../:/workspaces/zitadel/functional-ui
     environment:
       CYPRESS_BASE_URL: http://host.docker.internal:8080/ui/console
       CYPRESS_WEBHOOK_HANDLER_HOST: host.docker.internal

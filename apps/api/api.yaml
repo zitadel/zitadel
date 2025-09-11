@@ -1,4 +1,4 @@
 # We need this file because of a bug in the API.
 # The start-from-setup command does not read the following property from the env variables.
-# As soon as this is fixed, this file can be removed.
+# As soon as this is fixed, the following variable can be moved to the .env file and this file can be removed.
 DefaultInstance.Features.LoginV2.BaseURI: http://localhost:3000/ui/v2/login

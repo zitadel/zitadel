@@ -5,12 +5,8 @@ packages:
   - packages/*
   - apps/*
 
-inject-workspace-packages: true
-
-onlyBuiltDependencies:
-  - cypress
+exclude:
+  - tests/benchmark # because of the node 18 or 20 dependency
 
 overrides:
   '@typescript-eslint/parser': '^8.35.1'
-
-sideEffectsCache: false

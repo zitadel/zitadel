@@ -11,16 +11,14 @@ The documentation is part of the ZITADEL monorepo and uses **pnpm** and **Nx** f
 pnpm install
 pnpm add -g nx
 
-# Start development server (with Nx)
+# Start development server with live-reloading
 nx run @zitadel/docs:dev
 
 # Or serve a production build
 nx run @zitadel/docs:start
 ```
 
-The site will be available at http://localhost:3000
-
-To regenerate and rebuild the docs, rerun the `nx run` command.
+The site will be available at http://localhost:3100
 
 ## Add new Sites to existing Topics
 
@@ -37,16 +35,3 @@ The documentation build process automatically:
 3. **Generates API documentation** - Creates OpenAPI specification docs
 4. **Copies configuration files** - Includes configuration examples
 5. **Builds the Docusaurus site** - Generates the final static site
-
-## Container Image
-
-If you just want to start docusaurus locally without installing node you can fallback to our container image.
-Execute the following commands from the repository root to build and start a local version of ZITADEL
-
-```shell
-docker build -f docs/Dockerfile . -t zitadel-docs
-```
-
-```shell
-docker run -p 8080:8080 zitadel-docs
-```

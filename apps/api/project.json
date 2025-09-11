@@ -27,7 +27,7 @@
             "description": "Generate the code needed to start the API",
             "command": "make api_build"
         },
-        "production": {
+        "prod": {
             "continuous": true,
             "dependsOn": [
                 "build"

@@ -83,7 +83,7 @@ lint:
 ensure_modules:
 ifeq (,$(wildcard $(PWD)/../../../xk6-modules))
 	@echo "cloning xk6-modules"
-	cd ../.. && git clone https://github.com/zitadel/xk6-modules.git
+	cd ../../.. && git clone https://github.com/zitadel/xk6-modules.git
 endif
 	cd ../../../xk6-modules && git pull
 

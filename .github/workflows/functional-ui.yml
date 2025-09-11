@@ -23,8 +23,6 @@ jobs:
         run: |
           tar -xvf .artifacts/zitadel-linux-amd64.tar.gz
           mv zitadel-linux-amd64/zitadel ./zitadel
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - uses: pnpm/action-setup@v4
@@ -34,13 +32,14 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
+        working-directory: ./tests/functional-ui
         run: pnpm install
       - name: Install Cypress binary
-        run: cd ./tests/functional-ui && pnpm exec cypress install
+        working-directory: ./tests/functional-ui
+        run: pnpm exec cypress install
       - name: Start DB and ZITADEL
-        run: |
-          cd ./tests/functional-ui
-          ZITADEL_IMAGE=zitadel:local docker compose up --detach --wait
+        working-directory: ./tests/functional-ui
+        run: docker compose up --build --detach --wait
       - name: Cypress run
         uses: cypress-io/github-action@v6
         env:
@@ -58,7 +57,7 @@ jobs:
         with:
           name: production-tests-${{ matrix.browser }}
           path: |
-            functional-ui/cypress/screenshots
-            functional-ui/cypress/videos
-            functional-ui/cypress/results
+            tests/functional-ui/cypress/screenshots
+            tests/functional-ui/cypress/videos
+            tests/functional-ui/cypress/results
           retention-days: 30

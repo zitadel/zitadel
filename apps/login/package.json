@@ -6,8 +6,8 @@
   "scripts": {
     "build": "NEXT_OUTPUT_MODE=standalone next build && cp -r public scripts/* .next/standalone/ && cp -r .next/static .next/standalone/apps/login/.next/",
     "build-vercel": "next build",
-    "development": "./scripts/entrypoint.sh next dev",
-    "production": "cd ./.next/standalone && ./entrypoint.sh node apps/login/server.js",
+    "dev": "./scripts/entrypoint.sh next dev",
+    "prod": "cd ./.next/standalone && ./entrypoint.sh node apps/login/server.js",
     "lint-check-next": "next lint",
     "lint-check-prettier": "prettier --check .",
     "lint-fix": "prettier --write .",

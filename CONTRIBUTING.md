@@ -9,8 +9,8 @@ You can build and start any project with Nx commands:
 
 | Task | Command | Notes |
 |------|---------|--------|
-| **Production** | `nx run PROJECT:production` | Production server |
-| **Develop** | `nx run PROJECT:development` | Hot reload development server |
+| **Production** | `nx run PROJECT:prod` | Production server |
+| **Develop** | `nx run PROJECT:dev` | Hot reload development server |
 | **Generate** | `nx run PROJECT:generate` | Generate files |
 | **Test** | `nx run PROJECT:test` | Run tests |
 | **Lint** | `nx run PROJECT:lint` | Check code style |
@@ -26,9 +26,8 @@ Replace `PROJECT` with one of the following:
 - `@zitadel/client`
 - `@zitadel/proto`
 
-Instead of the project names, you can also use their directory names for `PROJECT`, like `nx run login:start`.
-Alternatively, you can use the infix-notation, like `nx start @zitadel/login` or `nx start login`.
-s
+Instead of the project names, you can also use their directory names for `PROJECT`, like `nx run login:dev`.
+Alternatively, you can use the infix-notation, like `nx dev @zitadel/login` or `nx dev login`.
 
 ### <a name="api-quick-start"></a>API
 
@@ -36,13 +35,13 @@ Prepare the API development and run a local login production build.
 
 ```bash
 nx run @zitadel/api:generate
-nx run-many -t db production -p . @zitadel/login
+nx run-many -p . @zitadel/login -t db prod
 ```
 
 If you don't need a login, you can omit it and use the generated ./admin.pat to call the API.
 
 ```bash
-nx run-many -t db generate -p . @zitadel/api
+nx run-many -p . @zitadel/api -t db generate
 ```
 
 Start a debug session in your IDE.
@@ -60,13 +59,13 @@ For more options, go to the [API section](#api)
 Develop the login and connect a local API with a local DB
 
 ```bash
-nx run-many -t db production -p . @zitadel/api
+nx run-many -p . @zitadel/api -t db prod
 ```
 
 In another terminal, start the login development server
 
 ```bash
-nx run @zitadel/login:development
+nx run @zitadel/login:dev
 ```
 
 Visit http://localhost:8080/ui/v2/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
@@ -80,13 +79,13 @@ For more options, go to the [Login section](#login)
 Develop the Console and connect a local API with a local DB:
 
 ```bash
-nx run-many -t db production -p . @zitadel/api
+nx run-many -p . @zitadel/api -t db prod
 ```
 
 In another terminal, start the console development server
 
 ```bash
-nx run @zitadel/console:development
+nx run @zitadel/console:dev
 ```
 
 To allow Console access via http://localhost:4200, you have to configure the Zitadel API.
@@ -268,9 +267,9 @@ To test the code without dependencies, run the unit tests:
 make api_unit_test
 ```
 
-### Run Local Integration Tests
+### Run Local Functional API Tests (Formerly Called Integration Tests)
 
-Integration tests are run as gRPC clients against a running Zitadel server binary.
+Functional API tests are run as gRPC clients against a running Zitadel server binary.
 The server binary is typically [build with coverage enabled](https://go.dev/doc/build-cover).
 It is also possible to run a Zitadel sever in a debugger and run the integrations tests like that. In order to run the server, a database is required.
 
@@ -307,32 +306,31 @@ To cleanup after testing (deletes the database!):
 make api_integration_server_stop api_integration_db_down
 ```
 
-The test binary has the race detector enabled. `api_api_integration_server_stop` checks for any race logs reported by Go and will print them along a `66` exit code when found. Note that the actual race condition may have happened anywhere during the server lifetime, including start, stop or serving gRPC requests during tests.
+The test binary has the race detector enabled. `api_integration_server_stop` checks for any race logs reported by Go and will print them along a `66` exit code when found. Note that the actual race condition may have happened anywhere during the server lifetime, including start, stop or serving gRPC requests during tests.
 
-### Run Local End-to-End Tests
+### Run Local Functional UI Tests
 
-To test the whole system, including the Console UI and the login UI, run the E2E tests.
+To test the whole system, including the Console UI and the login UI, run the Functional UI tests.
 
 ```bash
-# Build the production docker image
-export Zitadel_IMAGE=zitadel:local GOOS=linux
-make docker_image
+# Build the zitadel binary
+nx run @zitadel/api:build
 
-# If you made changes in the e2e directory, make sure you reformat the files
-nx run @zitadel/e2e:lint-fix
+# If you made changes in the tests/functional-ui directory, make sure you reformat the files
+nx run @zitadel/functional-ui:lint-fix
 
 # Run the tests
-docker compose --file ./e2e/docker-compose.yaml run --service-ports e2e
+docker compose --file ./tests/functional-ui/docker-compose.yaml run --service-ports cypress
 ```
 
 When you are happy with your changes, you can cleanup your environment.
 
 ```bash
 # Stop and remove the docker containers for zitadel and the database
-docker compose --file ./e2e/docker-compose.yaml down
+docker compose --file ./tests/functional-ui/docker-compose.yaml down
 ```
 
-### Run Local End-to-End Tests Against Your Dev Server Console
+### Run Local Functional UI Tests Against Your Dev Server Console
 
 If you also make [changes to the Console](#console), you can run the test suite against your locally built API and Console server.
 
@@ -341,17 +339,17 @@ If you also make [changes to the Console](#console), you can run the test suite 
 pnpm install
 
 # Run the tests interactively
-pnpm run open:golangangular
+pnpm run test:open:golangangular --filter @zitadel/functional-ui
 
 # Run the tests non-interactively
-pnpm run e2e:golangangular
+pnpm run test:run:golangangular  --filter @zitadel/functional-ui
 ```
 
 When you are happy with your changes, you can cleanup your environment.
 
 ```bash
 # Stop and remove the docker containers for zitadel and the database
-docker compose --file ./e2e/docker-compose.yaml down
+docker compose --file ./tests/functional-ui/docker-compose.yaml down
 ```
 
 ## <a name="frontend"></a>Contribute Frontend Code
@@ -410,16 +408,17 @@ nx run @zitadel/client:build  # Build after changes
 ### <a name="login"></a>Contribute to Login
 
 The Login UI is a Next.js application that provides the user interface for authentication flows.
+It is MIT-licensed, so you are free to change and deploy it as you like.
 It's located in the `apps/login` directory and uses pnpm and Nx for development.
 To start developing the login, make sure your system has the [required system dependencies](#dev-requirements) installed.
-Get familiar with the [login quick start](#login-quick-start).
+Get familiar with the [login quick start](#login-quick-start) and the [login ui docs](https://zitadel.com/docs/guides/integrate/login-ui).
 
 #### Develop against a Cloud instance
 
 If you don't want to build and run a local API, you can just run the login development server and point it to a cloud instance.
 
 1. Create a personal access token and point your instance to your local login, [as described in the docs](https://zitadel.com/docs/self-hosting/manage/login-client).
-2. Save the following file to `apps/login/.env.development.local`
+2. Save the following file to `apps/login/.env.dev.local`
 
 ```env
 ZITADEL_API_URL=https://[your-cloud-instance-domain]
@@ -429,7 +428,7 @@ ZITADEL_SERVICE_USER_TOKEN=[personal access token for an IAM Login Client]
 3. Start the hot-reloading development server.
 
 ```bash
-nx run @zitadel/login:development
+nx run @zitadel/login:dev
 ```
 
 Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
@@ -454,6 +453,12 @@ nx affected --target check
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
 
+#### <a name="login-deploy"></a>Deploy
+
+- [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Fzitadel&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_ID,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_LOGIN_CLIENT%20membership%20on%20your%20instance%20and%20provide%20its%20id%20and%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)
+- Build and deploy with Docker: `nx run @zitadel/login:build && docker build -t my-zitadel-login apps/login`
+- Build and deploy with NodeJS: `nx run @zitadel/login:prod`
+
 ### <a name="console"></a>Contribute to Console
 
 To start developing the Console, make sure your system has the [required system dependencies](#dev-requirements) installed.
@@ -473,7 +478,7 @@ ENVIRONMENT_JSON_URL=https://[your-cloud-instance-domain]/ui/console/assets/envi
 2. Start the hot-reloading development server.
 
 ```bash
-nx run @zitadel/console:development
+nx run @zitadel/console:dev
 ```
 
 3. Allow your cloud instance to redirect to your local console, as described in the [Console quick start](#console-quick-start)
@@ -503,7 +508,7 @@ To start developing the docs, make sure your system has the [required system dep
 nx run @zitadel/docs:dev
 
 # Or start production server
-nx run @zitadel/docs:start
+nx run @zitadel/docs:prod
 ```
 
 The docs build process automatically:
@@ -577,7 +582,7 @@ nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui
 ```
 
 **Additional requirements for testing:**
-- **[Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)** - For integration tests
+- **[Cypress runtime dependencies](https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies)** - For UI tests
 
 <details>
   <summary>WSL2 on Windows 10 users (click to expand)</summary>
@@ -682,7 +687,7 @@ There are a few general labels that don't belong to a specific category.
 The category shows which part of Zitadel is affected.
 
 - **category: backend**: The backend includes the APIs, event store, command and query side. This is developed in golang.
-- **category: ci**: ci is all about continues integration and pipelines.
+- **category: ci**: ci is all about continuous integration and pipelines.
 - **category: design**: All about the ux/ui of Zitadel
 - **category: docs**: Adjustments or new documentations, this can be found in the docs folder.
 - **category: frontend**: The frontend concerns on the one hand the Zitadel management Console (Angular) and on the other hand the login (gohtml)

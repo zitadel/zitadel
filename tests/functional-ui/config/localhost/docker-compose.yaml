@@ -1,8 +1,7 @@
 services:
-  zitadel:
+  api:
     user: '$UID'
     restart: 'always'
-    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
     build:
       context: ../../../..
       dockerfile: ./apps/api/Dockerfile
@@ -11,16 +10,16 @@ services:
         - type=gha
       cache_to:
         - type=gha,mode=max
-    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /api.yaml --steps /api.yaml'
     depends_on:
       db:
         condition: 'service_healthy'
     volumes:
-      - ./zitadel.yaml:/zitadel.yaml
+      - ./api.yaml:/api.yaml
     ports:
       - "8080:8080"
     healthcheck:
-      test: [ "CMD", "/app/zitadel", "ready", "--config", "/zitadel.yaml" ]
+      test: [ "CMD", "/app/zitadel", "ready", "--config", "/api.yaml" ]
       interval: '10s'
       timeout: '5s'
       retries: 5

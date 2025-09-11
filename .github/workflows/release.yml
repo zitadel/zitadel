@@ -194,26 +194,3 @@ jobs:
           version: ${{ needs.version.outputs.version }}
           cwd: packages
           createGithubReleases: false
-
-  login-repo:
-    runs-on: ubuntu-latest
-    needs: version
-    if: ${{ github.ref_name == 'next' }}
-    continue-on-error: true
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Push Subtree
-        run: make login_push LOGIN_REMOTE_BRANCH=mirror-zitadel-repo
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: 'chore: mirror zitadel repo'
-          branch: mirror-zitadel-repo
-          title: 'chore: mirror zitadel repo'
-          body: 'This PR updates the login repository with the latest changes from the zitadel repository.'
-          base: main
-          reviewers: |
-            @peintnermax
-            @eliobischof

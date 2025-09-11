@@ -51,6 +51,18 @@
       "outputs": [
         "{projectRoot}/build"
       ]
+    },
+    "prod": {
+      "continuous": true,
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "dev": {
+      "continuous": true,
+      "dependsOn": [
+        "generate"
+      ]
     }
   }
 }
