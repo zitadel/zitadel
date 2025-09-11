@@ -20,7 +20,6 @@ import (
 	"github.com/zitadel/zitadel/internal/migration"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type EventStore interface {
@@ -316,7 +315,7 @@ func (h *Handler) subscribe(ctx context.Context) {
 			solvedInstances := make([]string, 0, len(events))
 			queueCtx := call.WithTimestamp(ctx)
 			for _, e := range events {
-				if instanceSolved(solvedInstances, e.Aggregate().InstanceID) {
+				if slices.Contains(solvedInstances, e.Aggregate().InstanceID) {
 					continue
 				}
 				queueCtx = authz.WithInstanceID(queueCtx, e.Aggregate().InstanceID)
@@ -570,7 +569,8 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return false, err
 	}
 	if !hasLocked {
-		return false, zerrors.ThrowInternal(nil, "V2-lpiK0", "projection already locked")
+		h.log().Debug("skip execution, projection already locked")
+		return false, nil
 	}
 
 	currentState, err := h.currentState(ctx, tx)
@@ -578,7 +578,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return additionalIteration, err
 	}
 	// stop execution if currentState.position >= config.maxPosition
-	if !config.maxPosition.Equal(decimal.Decimal{}) && currentState.position.GreaterThanOrEqual(config.maxPosition) {
+	if !config.maxPosition.IsZero() && currentState.position.GreaterThanOrEqual(config.maxPosition) {
 		return false, nil
 	}
 
