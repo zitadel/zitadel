@@ -158,10 +158,10 @@ The code consists of the following parts:
 | ------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
 | API implementation  | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to API](#api)                   |
 | API definitions     | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#api)                   |
-| Console             | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#frontend) |
+| Console             | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./apps/console](./apps/console)                              | [Contribute to Frontend](#frontend) |
 | login               | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#frontend) |
 | docs                | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#frontend) |
-| translations        | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#translations) |
+| translations        | Internationalization files for default languages   | YAML                                                                                                      | [./apps/console](./apps/console) and [./internal](./internal) | [Contribute Translations](#translations) |
 
 Please follow the guides to validate and test the code before you contribute.
 
@@ -462,7 +462,7 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 ### <a name="console"></a>Contribute to Console
 
 To start developing the Console, make sure your system has the [required system dependencies](#dev-requirements) installed.
-To learn more about the Console, go to the Consoles [README.md](./console).
+To learn more about the Console, go to the Consoles [README.md](./apps/console).
 Get familiar with the [Console quick start](#console-quick-start).
 
 #### Develop against a Cloud instance
