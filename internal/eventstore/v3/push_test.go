@@ -262,8 +262,8 @@ func Test_mapCommands(t *testing.T) {
 
 func TestEventstore_queueExecutions(t *testing.T) {
 	events := []eventstore.Event{
-		mockEventType(mockAggregate("TEST"), 1, nil, "ex.foo.bar"),
-		mockEventType(mockAggregate("TEST"), 2, nil, "ex.bar.foo"),
+		mockEventType(mockAggregate("TEST"), 1, []byte(`{"test":"test"}`), "ex.foo.bar"),
+		mockEventType(mockAggregate("TEST"), 2, []byte("{}"), "ex.bar.foo"),
 		mockEventType(mockAggregate("TEST"), 3, nil, "ex.removed"),
 	}
 	type args struct {

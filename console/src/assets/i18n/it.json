@@ -1654,7 +1654,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando questa opzione è abilitata, la console utilizza l'API V2 User per creare nuovi utenti. Con l'API V2, i nuovi utenti creati iniziano senza uno stato iniziale.",
       "LOGINV2": "Accesso V2",
       "LOGINV2_DESCRIPTION": "Abilitando questa opzione si attiva la nuova interfaccia di login basata su TypeScript con sicurezza, prestazioni e personalizzazione migliorate.",
-      "LOGINV2_BASEURI": "URI di base"
+      "LOGINV2_BASEURI": "URI di base",
+      "ENABLERELATIONALTABLES": "Tabelle relazionali",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Abilita questo toggle per utilizzare le tabelle relazionali invece di proiezioni per memorizzare i dati. Attualmente questo toggle non fa nulla."
     },
     "DIALOG": {
       "RESET": {

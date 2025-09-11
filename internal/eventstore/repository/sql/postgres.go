@@ -17,8 +17,8 @@ import (
 
 // awaitOpenTransactions ensures event ordering, so we don't events younger that open transactions
 var (
-	awaitOpenTransactionsV1 = ` AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')`
-	awaitOpenTransactionsV2 = ` AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = ANY(?) AND state <> 'idle')`
+	awaitOpenTransactionsV1 = ` AND created_at <= now()`
+	awaitOpenTransactionsV2 = ` AND "position" <= EXTRACT(EPOCH FROM now())`
 )
 
 func awaitOpenTransactions(useV1 bool) string {
