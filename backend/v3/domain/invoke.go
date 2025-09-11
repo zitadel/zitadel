@@ -1,5 +1,7 @@
 package domain
 
+import "context"
+
 // import (
 // 	"context"
 // 	"fmt"
@@ -122,16 +124,16 @@ package domain
 // 	return nil
 // }
 
-// type noopInvoker struct {
-// 	next Invoker
-// }
+type noopInvoker struct {
+	next Invoker
+}
 
-// func (i *noopInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) error {
-// 	if i.next != nil {
-// 		return i.next.Invoke(ctx, command, opts)
-// 	}
-// 	return command.Execute(ctx, opts)
-// }
+func (i *noopInvoker) Invoke(ctx context.Context, command Commander, opts *CommandOpts) error {
+	if i.next != nil {
+		return i.next.Invoke(ctx, command, opts)
+	}
+	return command.Execute(ctx, opts)
+}
 
 // // cacheInvoker could be used in the future to do the caching.
 // // My goal would be to have two interfaces:
