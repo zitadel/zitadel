@@ -12,12 +12,6 @@
       "{projectRoot}/.prettierignore",
       "{projectRoot}/.prettierrc",
       "{projectRoot}/prettier.config.mjs"
-    ],
-    "compose": [
-      "docker",
-      {"env": "COMPOSE_FILE"},
-      "{workspaceRoot}/.devcontainer/postgres.env",
-      "{workspaceRoot}/.devcontainer/postgresql.conf"
     ]
   },
   "targetDefaults": {
@@ -65,20 +59,6 @@
         "test-unit",
         "test-integration"
       ]
-    },
-    "build-docker": {
-      "inputs": [
-        "default"
-      ]
     }
-  },
-  "plugins": [
-    {
-      "plugin": "@nx/docker",
-      "options": {
-        "buildTarget": "build-docker",
-        "runTarget": "start-docker"
-      }
-    }
-  ]
+  }
 }

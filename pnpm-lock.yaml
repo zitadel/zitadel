@@ -14,9 +14,6 @@ importers:
       '@changesets/cli':
         specifier: ^2.29.5
         version: 2.29.7(@types/node@24.3.1)
-      '@nx/docker':
-        specifier: 21.4.1
-        version: 21.4.1(nx@21.4.1(@swc/core@1.13.5(@swc/helpers@0.5.17)))
       nx:
         specifier: 21.4.1
         version: 21.4.1(@swc/core@1.13.5(@swc/helpers@0.5.17))
@@ -3610,14 +3607,6 @@ packages:
     resolution: {integrity: sha512-T1acZrVVmJw/sJ4PIGidCBYBiBqlg/jT9e8nIGXLSDS20xcLvfo4zBQf8UZLrmHglnwwpDpOWuVJCp2rYA5aDg==}
     peerDependencies:
       nx: '>= 15 <= 17'
-
-  '@nx/devkit@21.4.1':
-    resolution: {integrity: sha512-rWgMNG2e0tSG5L3vffuMH/aRkn+i9vYHelWkgVAslGBOaqriEg1dCSL/W9I3Fd5lnucHy3DrG1f19uDjv7Dm0A==}
-    peerDependencies:
-      nx: '>= 20 <= 22'
-
-  '@nx/docker@21.4.1':
-    resolution: {integrity: sha512-1wPjsxadE1Wy5QaXRX8rSWrp9fbm8STV2MYzLSkXbwlrusvYQETP/MKGsqT5fZZTrN9NrQ+HTLa/7vW5vU8fkA==}
 
   '@nx/nx-darwin-arm64@16.5.1':
     resolution: {integrity: sha512-q98TFI4B/9N9PmKUr1jcbtD4yAFs1HfYd9jUXXTQOlfO9SbDjnrYJgZ4Fp9rMNfrBhgIQ4x1qx0AukZccKmH9Q==}
@@ -20317,26 +20306,6 @@ snapshots:
       tmp: 0.2.1
       tslib: 2.8.1
 
-  '@nx/devkit@21.4.1(nx@21.4.1(@swc/core@1.13.5(@swc/helpers@0.5.17)))':
-    dependencies:
-      ejs: 3.1.10
-      enquirer: 2.3.6
-      ignore: 5.3.2
-      minimatch: 9.0.3
-      nx: 21.4.1(@swc/core@1.13.5(@swc/helpers@0.5.17))
-      semver: 7.7.2
-      tmp: 0.2.5
-      tslib: 2.8.1
-      yargs-parser: 21.1.1
-
-  '@nx/docker@21.4.1(nx@21.4.1(@swc/core@1.13.5(@swc/helpers@0.5.17)))':
-    dependencies:
-      '@nx/devkit': 21.4.1(nx@21.4.1(@swc/core@1.13.5(@swc/helpers@0.5.17)))
-      enquirer: 2.3.6
-      tslib: 2.8.1
-    transitivePeerDependencies:
-      - nx
-
   '@nx/nx-darwin-arm64@16.5.1':
     optional: true
 
@@ -23330,6 +23299,14 @@ snapshots:
 
   axe-core@4.10.3: {}
 
+  axios@1.11.0:
+    dependencies:
+      follow-redirects: 1.15.11
+      form-data: 4.0.4
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
   axios@1.11.0(debug@4.4.1):
     dependencies:
       follow-redirects: 1.15.11(debug@4.4.1)
@@ -25978,6 +25955,8 @@ snapshots:
   flat@5.0.2: {}
 
   flatted@3.3.3: {}
+
+  follow-redirects@1.15.11: {}
 
   follow-redirects@1.15.11(debug@4.4.1):
     optionalDependencies:
@@ -29580,7 +29559,7 @@ snapshots:
       '@yarnpkg/lockfile': 1.1.0
       '@yarnpkg/parsers': 3.0.2
       '@zkochan/js-yaml': 0.0.7
-      axios: 1.11.0(debug@4.4.1)
+      axios: 1.11.0
       chalk: 4.1.2
       cli-cursor: 3.1.0
       cli-spinners: 2.6.1
