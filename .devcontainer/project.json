@@ -2,14 +2,6 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "name": "@zitadel/devcontainer",
   "targets": {
-    "db": {
-      "continuous": true,
-      "description": "Run a local Postgres database for development",
-      "command": "docker compose -f docker-compose.yaml -p zitadel_devcontainer up db",
-      "options": {
-        "cwd": "{projectRoot}"
-      }
-    },
     "compose": {
       "description": "Run docker compose commands",
       "command": "docker compose -f docker-compose.yaml -p zitadel_devcontainer",

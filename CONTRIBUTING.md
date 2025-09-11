@@ -18,8 +18,7 @@ You can build and start any project with Nx commands:
 
 Replace `PROJECT` with one of the following:
 
-- `@zitadel/zitadel` (you can omit this root level project, like in `nx run build-and-start`)
-- `@zitadel/devcontainer`
+- `@zitadel/zitadel` (you can omit this root level project when using `nx run`, like `nx run db`)
 - `@zitadel/api`
 - `@zitadel/login`
 - `@zitadel/console`
@@ -37,14 +36,13 @@ Prepare the API development and run a local login production build.
 
 ```bash
 nx run @zitadel/api:generate
-nx run-many -t db production -p @zitadel/devcontainer @zitadel/login
+nx run-many -t db production -p . @zitadel/login
 ```
 
 If you don't need a login, you can omit it and use the generated ./admin.pat to call the API.
 
 ```bash
-nx run @zitadel/api:generate
-nx run @zitadel/devcontainer:db
+nx run-many -t db generate -p . @zitadel/api
 ```
 
 Start a debug session in your IDE.
@@ -62,7 +60,7 @@ For more options, go to the [API section](#api)
 Develop the login and connect a local API with a local DB
 
 ```bash
-nx run-many -t db production -p @zitadel/devcontainer @zitadel/api
+nx run-many -t db production -p . @zitadel/api
 ```
 
 In another terminal, start the login development server
@@ -82,7 +80,7 @@ For more options, go to the [Login section](#login)
 Develop the Console and connect a local API with a local DB:
 
 ```bash
-nx run-many -t db production -p @zitadel/devcontainer @zitadel/api
+nx run-many -t db production -p . @zitadel/api
 ```
 
 In another terminal, start the console development server

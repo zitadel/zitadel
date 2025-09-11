@@ -2,39 +2,12 @@
   "$schema": "./node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
-    "build": {
-      "description": "Build the Zitadel platform (api, login and console)",
-      "dependsOn": [
-        "@zitadel/api:build",
-        "@zitadel/login:build"
-      ]
-    },
-    "start": {
+    "db": {
       "continuous": true,
-      "description": "Start the the Zitadel platform (api, login and console)",
-      "executor": "nx:run-commands",
+      "description": "Run a local Postgres database for development",
+      "command": "nx run @zitadel/devcontainer:compose up db",
       "options": {
-        "command": "nx run @zitadel/devcontainer:compose up --watch db api login"
-      }
-    },
-    "build-and-start": {
-      "continuous": true,
-      "description": "Build and start the the Zitadel platform (api, login and console)",
-      "dependsOn": [
-        "build"
-      ],
-      "executor": "nx:run-commands",
-      "options": {
-        "commands": [
-          "nx run start"
-        ]
-      }      
-    },
-    "stop": {
-      "description": "Stop all services",
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "nx run @zitadel/devcontainer:compose stop db api login"
+        "cwd": "{workspaceRoot}/.devcontainer"
       }
     },
     "generate": {
