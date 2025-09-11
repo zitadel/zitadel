@@ -93,7 +93,7 @@ api_build: api_dependencies api_stubs api_static api_assets
 
 .PHONY: console_move
 console_move:
-	cp -r console/dist/console/* internal/api/ui/console/static
+	cp -r apps/console/dist/console/* internal/api/ui/console/static
 
 .PHONY: console_dependencies
 console_dependencies:

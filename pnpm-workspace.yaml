@@ -1,5 +1,4 @@
 packages:
-  - console
   - docs
   - tests/*
   - packages/*

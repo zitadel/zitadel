@@ -8,9 +8,9 @@
 **/.pnpm-store
 **/.nx
 **/.next
-/console/src/app/proto/generated/
-/console/.angular
-/console/tmp/
+apps/console/src/app/proto/generated/
+apps/console/.angular
+apps/console/tmp/
 .releaserc.js
 changelog.config.js
 CONTRIBUTING.md
@@ -22,9 +22,5 @@ SECURITY.md
 pkg/grpc/*/*.pb.*
 pkg/grpc/*/*.swagger.json
 **/.artifacts
-console/.angular
-console/node_modules
-console/src/app/proto/generated/
-console/tmp/
 build/*.Dockerfile
 

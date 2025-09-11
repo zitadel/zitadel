@@ -469,7 +469,7 @@ Get familiar with the [Console quick start](#console-quick-start).
 
 If you don't want to build and run a local API, you can just run the console development server and point it to a cloud instance.
 
-1. Save the following file to console/.env.local
+1. Save the following file to apps/console/.env.local
 
 ```env
 ENVIRONMENT_JSON_URL=https://[your-cloud-instance-domain]/ui/console/assets/environment.json
@@ -606,7 +606,7 @@ nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui
 
 Zitadel loads translations from four files:
 
-- [Console texts](./console/src/assets/i18n)
+- [Console texts](./apps/console/src/assets/i18n)
 - [Login interface](./internal/api/ui/login/static/i18n)
 - [Email notification](./internal/notification/static/i18n)
 - [Common texts](./internal/static/i18n) for success or error toasts
@@ -617,8 +617,8 @@ If you have added support for a new language, please also ensure that it is adde
 
 You also have to add some changes to the following files:
 
-- [Register Local File](./console/src/app/app.module.ts)
-- [Add Supported Language](./console/src/app/utils/language.ts)
+- [Register Local File](./apps/console/src/app/app.module.ts)
+- [Add Supported Language](./apps/console/src/app/utils/language.ts)
 - [Customized Text Docs](./docs/docs/guides/manage/customize/texts.md)
 - [Add language option](./internal/api/ui/login/static/templates/external_not_found_option.html)
 
