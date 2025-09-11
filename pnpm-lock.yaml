@@ -14,9 +14,6 @@ importers:
       '@changesets/cli':
         specifier: ^2.29.5
         version: 2.29.7(@types/node@24.3.1)
-      '@devcontainers/cli':
-        specifier: ^0.80.0
-        version: 0.80.1
       '@nx/docker':
         specifier: 21.4.1
         version: 21.4.1(nx@21.4.1(@swc/core@1.13.5(@swc/helpers@0.5.17)))
@@ -2259,11 +2256,6 @@ packages:
 
   '@cypress/xvfb@1.2.4':
     resolution: {integrity: sha512-skbBzPggOVYCbnGgV+0dmBdW/s77ZkAOXIC1knS8NagwDjBrNC1LuXtQJeiN6l+m7lzmHtaoUw/ctJKdqkG57Q==}
-
-  '@devcontainers/cli@0.80.1':
-    resolution: {integrity: sha512-FD6wq8ka2fVqybWooW++0UVTqo46TzxHblwTi9y58TqP3Qdx6iwMt/hzgjfcs865BtR36+wEg+qRPcKwxjzjBA==}
-    engines: {node: ^16.13.0 || >=18.0.0}
-    hasBin: true
 
   '@discoveryjs/json-ext@0.5.7':
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
@@ -17995,8 +17987,6 @@ snapshots:
       lodash.once: 4.1.1
     transitivePeerDependencies:
       - supports-color
-
-  '@devcontainers/cli@0.80.1': {}
 
   '@discoveryjs/json-ext@0.5.7': {}
 
