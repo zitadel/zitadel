@@ -1,25 +1,15 @@
 "use server";
 
-import {
-  createSessionAndUpdateCookie,
-  createSessionForIdpAndUpdateCookie,
-} from "@/lib/server/cookie";
-import {
-  addHumanUser,
-  addIDPLink,
-  getLoginSettings,
-  getUserByID,
-} from "@/lib/zitadel";
+import { createSessionAndUpdateCookie, createSessionForIdpAndUpdateCookie } from "@/lib/server/cookie";
+import { addHumanUser, addIDPLink, getLoginSettings, getUserByID } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import {
-  ChecksJson,
-  ChecksSchema,
-} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { ChecksJson, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification } from "../verify-helper";
+import { getOriginalHost } from "./host";
 
 type RegisterUserCommand = {
   email: string;
@@ -38,11 +28,6 @@ export type RegisterUserResponse = {
 export async function registerUser(command: RegisterUserCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
 
   const addResponse = await addHumanUser({
     serviceUrl,
@@ -78,9 +63,7 @@ export async function registerUser(command: RegisterUserCommand) {
   const session = await createSessionAndUpdateCookie({
     checks,
     requestId: command.requestId,
-    lifetime: command.password
-      ? loginSettings?.passwordCheckLifetime
-      : undefined,
+    lifetime: command.password ? loginSettings?.passwordCheckLifetime : undefined,
   });
 
   if (!session || !session.factors?.user) {
@@ -108,10 +91,7 @@ export async function registerUser(command: RegisterUserCommand) {
       return { error: "User not found in the system" };
     }
 
-    const humanUser =
-      userResponse.user.type.case === "human"
-        ? userResponse.user.type.value
-        : undefined;
+    const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
     const emailVerificationCheck = checkEmailVerification(
       session,
@@ -162,16 +142,9 @@ export type registerUserAndLinkToIDPResponse = {
   sessionId: string;
   factors: Factors | undefined;
 };
-export async function registerUserAndLinkToIDP(
-  command: RegisterUserAndLinkToIDPommand,
-) {
+export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDPommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
 
   const addResponse = await addHumanUser({
     serviceUrl,

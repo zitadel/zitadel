@@ -21,6 +21,7 @@ import {
   removeSessionFromCookie,
 } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
+import { getOriginalHost } from "./host";
 
 export async function skipMFAAndContinueWithNextUrl({
   userId,
@@ -69,10 +70,7 @@ export async function skipMFAAndContinueWithNextUrl({
   }
 }
 
-export async function continueWithSession({
-  requestId,
-  ...session
-}: Session & { requestId?: string }) {
+export async function continueWithSession({ requestId, ...session }: Session & { requestId?: string }) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -116,8 +114,7 @@ export type UpdateSessionCommand = {
 };
 
 export async function updateSession(options: UpdateSessionCommand) {
-  let { loginName, sessionId, organization, checks, requestId, challenges } =
-    options;
+  let { loginName, sessionId, organization, checks, requestId, challenges } = options;
   const recentSession = sessionId
     ? await getSessionCookieById({ sessionId })
     : loginName
@@ -132,18 +129,9 @@ export async function updateSession(options: UpdateSessionCommand) {
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-  const host = _headers.get("host");
+  const host = await getOriginalHost();
 
-  if (!host) {
-    return { error: "Could not get host" };
-  }
-
-  if (
-    host &&
-    challenges &&
-    challenges.webAuthN &&
-    !challenges.webAuthN.domain
-  ) {
+  if (host && challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
     const [hostname] = host.split(":");
 
     challenges.webAuthN.domain = hostname;
