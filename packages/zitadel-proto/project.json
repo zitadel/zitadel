@@ -4,6 +4,7 @@
     "generate": {
       "inputs": [
         "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
         "{workspaceRoot}/proto/**/*"
       ],
       "outputs": [

@@ -47,6 +47,7 @@
       ]
     },
     "lint-check-prettier": {
+      "cache": true,
       "inputs": [
         "prettier",
         "{projectRoot}/constants/**/*",
