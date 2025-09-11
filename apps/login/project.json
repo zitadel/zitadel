@@ -80,7 +80,7 @@
         "@zitadel/login-api-mock:serve",
         "build"
       ],
-      "command": "nx run @zitadel/login:production"
+      "command": "nx run @zitadel/login:prod"
     },
     "test-integration": {
       "cache": true,
