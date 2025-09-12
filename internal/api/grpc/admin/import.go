@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -28,6 +29,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	management_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/policy"
@@ -309,7 +311,7 @@ func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 	setOrgInactive := org_converter.OrgStateToDomain(org.OrgState) == domain.OrgStateInactive
 	_, err = s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), setOrgInactive, []string{})
 	if err != nil {
-		*errors = append(*errors, &admin_pb.ImportDataError{Type: "org", Id: org.GetOrgId(), Message: err.Error()})
+		*errors = append(*errors, &admin_pb.ImportDataError{Type: "org", Id: org.GetOrgId(), Message: errorToImportError(err)})
 		if _, err := s.query.OrgByID(ctx, org.OrgId); err != nil {
 			// TODO: Only nil if err != not found
 			return nil
@@ -336,7 +338,7 @@ func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 	if org.DomainPolicy != nil {
 		_, err := s.command.AddOrgDomainPolicy(ctx, org.GetOrgId(), domainPolicy.UserLoginMustBeDomain, domainPolicy.ValidateOrgDomains, domainPolicy.SmtpSenderAddressMatchesInstanceDomain)
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain_policy", Id: org.GetOrgId(), Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain_policy", Id: org.GetOrgId(), Message: errorToImportError(err)})
 		}
 	}
 	return importResources(ctx, s, errors, successOrg, org, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
@@ -351,14 +353,14 @@ func importLabelPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.Impor
 	}
 	_, err = s.command.AddLabelPolicy(ctx, org.GetOrgId(), management.AddLabelPolicyToDomain(org.GetLabelPolicy()))
 	if err != nil {
-		*errors = append(*errors, &admin_pb.ImportDataError{Type: "label_policy", Id: org.GetOrgId(), Message: err.Error()})
+		*errors = append(*errors, &admin_pb.ImportDataError{Type: "label_policy", Id: org.GetOrgId(), Message: errorToImportError(err)})
 		if isCtxTimeout(ctx) {
 			return err
 		}
 	} else {
 		_, err = s.command.ActivateLabelPolicy(ctx, org.GetOrgId())
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "label_policy", Id: org.GetOrgId(), Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "label_policy", Id: org.GetOrgId(), Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -376,7 +378,7 @@ func importLockoutPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.Imp
 	}
 	_, err := s.command.AddLockoutPolicy(ctx, org.GetOrgId(), management.AddLockoutPolicyToDomain(org.GetLockoutPolicy()))
 	if err != nil {
-		*errors = append(*errors, &admin_pb.ImportDataError{Type: "lockout_policy", Id: org.GetOrgId(), Message: err.Error()})
+		*errors = append(*errors, &admin_pb.ImportDataError{Type: "lockout_policy", Id: org.GetOrgId(), Message: errorToImportError(err)})
 	}
 }
 
@@ -391,7 +393,7 @@ func importOidcIdps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 		logging.Debugf("import oidcidp: %s", idp.IdpId)
 		_, err := s.command.ImportIDPConfig(ctx, management.AddOIDCIDPRequestToDomain(idp.Idp), idp.IdpId, org.GetOrgId())
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "oidc_idp", Id: idp.IdpId, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "oidc_idp", Id: idp.IdpId, Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -414,8 +416,8 @@ func importJwtIdps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDat
 		logging.Debugf("import jwtidp: %s", idp.IdpId)
 		_, err := s.command.ImportIDPConfig(ctx, management.AddJWTIDPRequestToDomain(idp.Idp), idp.IdpId, org.GetOrgId())
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "jwt_idp", Id: idp.IdpId, Message: err.Error()})
 			if isCtxTimeout(ctx) {
+				*errors = append(*errors, &admin_pb.ImportDataError{Type: "jwt_idp", Id: idp.IdpId, Message: errorToImportError(err)})
 				return err
 			}
 			continue
@@ -435,7 +437,7 @@ func importLoginPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.Impor
 	}
 	_, err := s.command.AddLoginPolicy(ctx, org.GetOrgId(), management.AddLoginPolicyToCommand(org.GetLoginPolicy()))
 	if err != nil {
-		*errors = append(*errors, &admin_pb.ImportDataError{Type: "login_policy", Id: org.GetOrgId(), Message: err.Error()})
+		*errors = append(*errors, &admin_pb.ImportDataError{Type: "login_policy", Id: org.GetOrgId(), Message: errorToImportError(err)})
 	}
 }
 
@@ -448,7 +450,7 @@ func importPwComlexityPolicy(ctx context.Context, s *Server, errors *[]*admin_pb
 	}
 	_, err := s.command.AddPasswordComplexityPolicy(ctx, org.GetOrgId(), management.AddPasswordComplexityPolicyToDomain(org.GetPasswordComplexityPolicy()))
 	if err != nil {
-		*errors = append(*errors, &admin_pb.ImportDataError{Type: "password_complexity_policy", Id: org.GetOrgId(), Message: err.Error()})
+		*errors = append(*errors, &admin_pb.ImportDataError{Type: "password_complexity_policy", Id: org.GetOrgId(), Message: errorToImportError(err)})
 	}
 }
 
@@ -461,7 +463,7 @@ func importPrivacyPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.Imp
 	}
 	_, err := s.command.AddPrivacyPolicy(ctx, org.GetOrgId(), management.AddPrivacyPolicyToDomain(org.GetPrivacyPolicy()))
 	if err != nil {
-		*errors = append(*errors, &admin_pb.ImportDataError{Type: "privacy_policy", Id: org.GetOrgId(), Message: err.Error()})
+		*errors = append(*errors, &admin_pb.ImportDataError{Type: "privacy_policy", Id: org.GetOrgId(), Message: errorToImportError(err)})
 	}
 }
 
@@ -481,7 +483,7 @@ func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 		//nolint:staticcheck
 		_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, &userState, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "human_user", Id: user.GetUserId(), Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "human_user", Id: user.GetUserId(), Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -494,7 +496,7 @@ func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 		if user.User.OtpCode != "" {
 			logging.Debugf("import user otp: %s", user.GetUserId())
 			if err := s.command.ImportHumanTOTP(ctx, user.UserId, "", org.GetOrgId(), user.User.OtpCode); err != nil {
-				*errors = append(*errors, &admin_pb.ImportDataError{Type: "human_user_otp", Id: user.GetUserId(), Message: err.Error()})
+				*errors = append(*errors, &admin_pb.ImportDataError{Type: "human_user_otp", Id: user.GetUserId(), Message: errorToImportError(err)})
 				if isCtxTimeout(ctx) {
 					return err
 				}
@@ -518,7 +520,7 @@ func importMachineUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 		userState := user.State.ToDomain()
 		_, err := s.command.AddMachine(ctx, management.AddMachineUserRequestToCommand(user.GetUser(), org.GetOrgId()), &userState, nil)
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "machine_user", Id: user.GetUserId(), Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "machine_user", Id: user.GetUserId(), Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -542,7 +544,7 @@ func importUserMetadata(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 		logging.Debugf("import usermetadata: %s", userMetadata.GetId()+"_"+userMetadata.GetKey())
 		_, err := s.command.SetUserMetadata(ctx, &domain.Metadata{Key: userMetadata.GetKey(), Value: userMetadata.GetValue()}, userMetadata.GetId(), org.GetOrgId())
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "user_metadata", Id: userMetadata.GetId() + "_" + userMetadata.GetKey(), Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "user_metadata", Id: userMetadata.GetId() + "_" + userMetadata.GetKey(), Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -575,7 +577,7 @@ func importMachineKeys(ctx context.Context, s *Server, errors *[]*admin_pb.Impor
 			PublicKey:      key.PublicKey,
 		})
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "machine_user_key", Id: key.KeyId, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "machine_user_key", Id: key.KeyId, Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -604,7 +606,7 @@ func importUserLinks(ctx context.Context, s *Server, errors *[]*admin_pb.ImportD
 		}
 		// TBD: why not command.BulkAddedUserIDPLinks?
 		if _, err := s.command.AddUserIDPLink(ctx, userLinks.UserId, org.GetOrgId(), externalIDP); err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "user_link", Id: userLinks.UserId + "_" + userLinks.IdpId, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "user_link", Id: userLinks.UserId + "_" + userLinks.IdpId, Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -628,7 +630,7 @@ func importProjects(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 		logging.Debugf("import project: %s", project.GetProjectId())
 		_, err := s.command.AddProject(ctx, management.ProjectCreateToCommand(project.GetProject(), project.GetProjectId(), org.GetOrgId()))
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project", Id: project.GetProjectId(), Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project", Id: project.GetProjectId(), Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -652,7 +654,7 @@ func importOIDCApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 		logging.Debugf("import oidcapplication: %s", app.GetAppId())
 		oidcApp, err := management.AddOIDCAppRequestToDomain(app.App)
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "oidc_app", Id: app.GetAppId(), Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "oidc_app", Id: app.GetAppId(), Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -660,7 +662,7 @@ func importOIDCApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 		}
 		_, err = s.command.AddOIDCApplicationWithID(ctx, oidcApp, org.GetOrgId(), app.GetAppId())
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "oidc_app", Id: app.GetAppId(), Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "oidc_app", Id: app.GetAppId(), Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -684,7 +686,7 @@ func importAPIApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDat
 		logging.Debugf("import apiapplication: %s", app.GetAppId())
 		_, err := s.command.AddAPIApplicationWithID(ctx, management.AddAPIAppRequestToDomain(app.GetApp()), org.GetOrgId(), app.GetAppId())
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "api_app", Id: app.GetAppId(), Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "api_app", Id: app.GetAppId(), Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -719,7 +721,7 @@ func importAppKeys(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDat
 			PublicKey:      key.PublicKey,
 		}, org.GetOrgId())
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "app_key", Id: key.Id, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "app_key", Id: key.Id, Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -743,7 +745,7 @@ func importActions(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDat
 		logging.Debugf("import action: %s", action.GetActionId())
 		_, _, err := s.command.AddActionWithID(ctx, management.CreateActionRequestToDomain(action.GetAction()), org.GetOrgId(), action.GetActionId())
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "action", Id: action.GetActionId(), Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "action", Id: action.GetActionId(), Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -769,7 +771,7 @@ func importProjectRoles(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 		// TBD: why not command.BulkAddProjectRole?
 		_, err := s.command.AddProjectRole(ctx, management.AddProjectRoleRequestToCommand(role, org.GetOrgId()))
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_role", Id: role.ProjectId + "_" + role.RoleKey, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_role", Id: role.ProjectId + "_" + role.RoleKey, Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -866,7 +868,7 @@ func importOrgDomains(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 		}
 		_, err := s.command.AddOrgDomain(ctx, org.GetOrgId(), domainR.DomainName, []string{})
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -877,12 +879,12 @@ func importOrgDomains(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 
 		if domainR.IsVerified {
 			if _, err := s.command.VerifyOrgDomain(ctx, org.GetOrgId(), domainR.DomainName); err != nil {
-				*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain_isverified", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: err.Error()})
+				*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain_isverified", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: errorToImportError(err)})
 			}
 		}
 		if domainR.IsPrimary {
 			if _, err := s.command.SetPrimaryOrgDomain(ctx, orgDomain); err != nil {
-				*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain_isprimary", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: err.Error()})
+				*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain_isprimary", Id: org.GetOrgId() + "_" + domainR.DomainName, Message: errorToImportError(err)})
 			}
 		}
 	}
@@ -899,7 +901,7 @@ func importLoginTexts(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 	for _, text := range org.GetLoginTexts() {
 		_, err := s.command.SetOrgLoginText(ctx, org.GetOrgId(), management.SetLoginCustomTextToDomain(text))
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "login_texts", Id: org.GetOrgId() + "_" + text.Language, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "login_texts", Id: org.GetOrgId() + "_" + text.Language, Message: errorToImportError(err)})
 		}
 	}
 }
@@ -914,7 +916,7 @@ func importInitMessageTexts(ctx context.Context, s *Server, errors *[]*admin_pb.
 	for _, message := range org.GetInitMessages() {
 		_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetInitCustomTextToDomain(message))
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "init_message", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "init_message", Id: org.GetOrgId() + "_" + message.Language, Message: errorToImportError(err)})
 		}
 	}
 }
@@ -929,7 +931,7 @@ func importPWResetMessageTexts(ctx context.Context, s *Server, errors *[]*admin_
 	for _, message := range org.GetPasswordResetMessages() {
 		_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetPasswordResetCustomTextToDomain(message))
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "password_reset_message", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "password_reset_message", Id: org.GetOrgId() + "_" + message.Language, Message: errorToImportError(err)})
 		}
 	}
 }
@@ -944,7 +946,7 @@ func importVerifyEmailMessageTexts(ctx context.Context, s *Server, errors *[]*ad
 	for _, message := range org.GetVerifyEmailMessages() {
 		_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetVerifyEmailCustomTextToDomain(message))
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "verify_email_message", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "verify_email_message", Id: org.GetOrgId() + "_" + message.Language, Message: errorToImportError(err)})
 		}
 	}
 }
@@ -959,7 +961,7 @@ func importVerifyPhoneMessageTexts(ctx context.Context, s *Server, errors *[]*ad
 	for _, message := range org.GetVerifyPhoneMessages() {
 		_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetVerifyPhoneCustomTextToDomain(message))
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "verify_phone_message", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "verify_phone_message", Id: org.GetOrgId() + "_" + message.Language, Message: errorToImportError(err)})
 		}
 	}
 }
@@ -974,7 +976,7 @@ func importDomainClaimedMessageTexts(ctx context.Context, s *Server, errors *[]*
 	for _, message := range org.GetDomainClaimedMessages() {
 		_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetDomainClaimedCustomTextToDomain(message))
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain_claimed_message", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain_claimed_message", Id: org.GetOrgId() + "_" + message.Language, Message: errorToImportError(err)})
 		}
 	}
 }
@@ -989,7 +991,7 @@ func importPasswordlessRegistrationMessageTexts(ctx context.Context, s *Server, 
 	for _, message := range org.GetPasswordlessRegistrationMessages() {
 		_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetPasswordlessRegistrationCustomTextToDomain(message))
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "passwordless_registration_message", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "passwordless_registration_message", Id: org.GetOrgId() + "_" + message.Language, Message: errorToImportError(err)})
 		}
 	}
 }
@@ -1004,7 +1006,7 @@ func importInviteUserMessageTexts(ctx context.Context, s *Server, errors *[]*adm
 	for _, message := range org.GetInviteUserMessages() {
 		_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetInviteUserCustomTextToDomain(message))
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "invite_user_messages", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "invite_user_messages", Id: org.GetOrgId() + "_" + message.Language, Message: errorToImportError(err)})
 		}
 	}
 }
@@ -1021,7 +1023,7 @@ func importOrg2(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 		for _, triggerAction := range org.GetTriggerActions() {
 			_, err := s.command.SetTriggerActions(ctx, action_grpc.FlowTypeToDomain(triggerAction.FlowType), action_grpc.TriggerTypeToDomain(triggerAction.TriggerType), triggerAction.ActionIds, org.GetOrgId())
 			if err != nil {
-				*errors = append(*errors, &admin_pb.ImportDataError{Type: "trigger_action", Id: triggerAction.FlowType + "_" + triggerAction.TriggerType, Message: err.Error()})
+				*errors = append(*errors, &admin_pb.ImportDataError{Type: "trigger_action", Id: triggerAction.FlowType + "_" + triggerAction.TriggerType, Message: errorToImportError(err)})
 				continue
 			}
 			successOrg.TriggerActions = append(successOrg.TriggerActions, &management_pb.SetTriggerActionsRequest{FlowType: triggerAction.FlowType, TriggerType: triggerAction.TriggerType, ActionIds: triggerAction.GetActionIds()})
@@ -1032,7 +1034,7 @@ func importOrg2(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 			logging.Debugf("import projectgrant: %s", grant.GetGrantId()+"_"+grant.GetProjectGrant().GetProjectId()+"_"+grant.GetProjectGrant().GetGrantedOrgId())
 			_, err := s.command.AddProjectGrant(ctx, management.AddProjectGrantRequestToCommand(grant.GetProjectGrant(), grant.GetGrantId(), org.GetOrgId()))
 			if err != nil {
-				*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_grant", Id: org.GetOrgId() + "_" + grant.GetProjectGrant().GetProjectId() + "_" + grant.GetProjectGrant().GetGrantedOrgId(), Message: err.Error()})
+				*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_grant", Id: org.GetOrgId() + "_" + grant.GetProjectGrant().GetProjectId() + "_" + grant.GetProjectGrant().GetGrantedOrgId(), Message: errorToImportError(err)})
 				if isCtxTimeout(ctx) {
 					return err
 				}
@@ -1048,7 +1050,7 @@ func importOrg2(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 			logging.Debugf("import usergrant: %s", grant.GetProjectId()+"_"+grant.GetUserId())
 			_, err := s.command.AddUserGrant(ctx, management.AddUserGrantRequestToDomain(grant, org.GetOrgId()), nil)
 			if err != nil {
-				*errors = append(*errors, &admin_pb.ImportDataError{Type: "user_grant", Id: org.GetOrgId() + "_" + grant.GetProjectId() + "_" + grant.GetUserId(), Message: err.Error()})
+				*errors = append(*errors, &admin_pb.ImportDataError{Type: "user_grant", Id: org.GetOrgId() + "_" + grant.GetProjectId() + "_" + grant.GetUserId(), Message: errorToImportError(err)})
 				if isCtxTimeout(ctx) {
 					return err
 				}
@@ -1090,7 +1092,7 @@ func importOrgMembers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 		logging.Debugf("import orgmember: %s", member.GetUserId())
 		_, err := s.command.AddOrgMember(ctx, management.AddOrgMemberRequestToCommand(member, org.GetOrgId()))
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "org_member", Id: org.GetOrgId() + "_" + member.GetUserId(), Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "org_member", Id: org.GetOrgId() + "_" + member.GetUserId(), Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -1114,7 +1116,7 @@ func importProjectGrantMembers(ctx context.Context, s *Server, errors *[]*admin_
 		logging.Debugf("import projectgrantmember: %s", member.GetProjectId()+"_"+member.GetGrantId()+"_"+member.GetUserId())
 		_, err := s.command.AddProjectGrantMember(ctx, management.AddProjectGrantMemberRequestToCommand(member, org.GetOrgId()))
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_grant_member", Id: org.GetOrgId() + "_" + member.GetProjectId() + "_" + member.GetGrantId() + "_" + member.GetUserId(), Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_grant_member", Id: org.GetOrgId() + "_" + member.GetProjectId() + "_" + member.GetGrantId() + "_" + member.GetUserId(), Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -1138,7 +1140,7 @@ func importProjectMembers(ctx context.Context, s *Server, errors *[]*admin_pb.Im
 		logging.Debugf("import orgmember: %s", member.GetProjectId()+"_"+member.GetUserId())
 		_, err := s.command.AddProjectMember(ctx, management.AddProjectMemberRequestToCommand(member, org.GetOrgId()))
 		if err != nil {
-			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_member", Id: org.GetOrgId() + "_" + member.GetProjectId() + "_" + member.GetUserId(), Message: err.Error()})
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_member", Id: org.GetOrgId() + "_" + member.GetProjectId() + "_" + member.GetUserId(), Message: errorToImportError(err)})
 			if isCtxTimeout(ctx) {
 				return err
 			}
@@ -1338,4 +1340,15 @@ func isCtxTimeout(ctx context.Context) bool {
 	default:
 		return false
 	}
+}
+
+func errorToImportError(err error) string {
+	if err == nil {
+		return ""
+	}
+	zErr := new(zerrors.ZitadelError)
+	if errors.As(err, &zErr) {
+		zErr.Parent = nil // prevent leaking unnecessary details
+	}
+	return err.Error()
 }
