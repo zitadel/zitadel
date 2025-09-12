@@ -21,15 +21,16 @@ import (
 
 func TestSession_FetchUser(t *testing.T) {
 	type fields struct {
-		clientID     string
-		clientSecret string
-		redirectURI  string
-		httpMock     func()
-		authURL      string
-		code         string
-		tokens       *oidc.Tokens[*oidc.IDTokenClaims]
-		scopes       []string
-		options      []oauth.ProviderOpts
+		clientID      string
+		clientSecret  string
+		redirectURI   string
+		httpMock      func()
+		httpEmailMock func()
+		authURL       string
+		code          string
+		tokens        *oidc.Tokens[*oidc.IDTokenClaims]
+		scopes        []string
+		options       []oauth.ProviderOpts
 	}
 	type args struct {
 		session idp.Session
@@ -73,7 +74,7 @@ func TestSession_FetchUser(t *testing.T) {
 				tokens:  nil,
 			},
 			args: args{
-				&oauth.Session{},
+				&Session{},
 			},
 			want: want{
 				err: func(err error) bool {
@@ -101,7 +102,7 @@ func TestSession_FetchUser(t *testing.T) {
 				},
 			},
 			args: args{
-				&oauth.Session{},
+				&Session{},
 			},
 			want: want{
 				err: func(err error) bool {
@@ -130,7 +131,7 @@ func TestSession_FetchUser(t *testing.T) {
 				},
 			},
 			args: args{
-				&oauth.Session{},
+				&Session{},
 			},
 			want: want{
 				user: &User{
@@ -159,21 +160,253 @@ func TestSession_FetchUser(t *testing.T) {
 				profile:           "htmlURL",
 			},
 		},
+		{
+			name: "successful fetch, no verified email",
+			fields: fields{
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				httpMock: func() {
+					gock.New("https://api.github.com").
+						Get("/user").
+						Reply(200).
+						JSON(userinfoWithoutEmail())
+				},
+				httpEmailMock: func() {
+					gock.New("https://api.github.com").
+						Get("/user/emails").
+						Reply(200).
+						JSON(emailList())
+				},
+				authURL: "https://github.com/login/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&state=testState",
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token: &oauth2.Token{
+						AccessToken: "accessToken",
+						TokenType:   oidc.BearerToken,
+					},
+				},
+			},
+			args: args{
+				&Session{},
+			},
+			want: want{
+				user: &User{
+					Login:      "login",
+					ID:         1,
+					AvatarUrl:  "avatarURL",
+					GravatarId: "gravatarID",
+					Name:       "name",
+					Email:      "",
+					HtmlUrl:    "htmlURL",
+					CreatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
+					UpdatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
+				},
+				id:                "1",
+				firstName:         "",
+				lastName:          "",
+				displayName:       "name",
+				nickName:          "login",
+				preferredUsername: "login",
+				email:             "",
+				isEmailVerified:   true,
+				phone:             "",
+				isPhoneVerified:   false,
+				preferredLanguage: language.Und,
+				avatarURL:         "avatarURL",
+				profile:           "htmlURL",
+			},
+		},
+		{
+			name: "successful fetch, no user scope provided",
+			fields: fields{
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				httpMock: func() {
+					gock.New("https://api.github.com").
+						Get("/user").
+						Reply(200).
+						JSON(userinfoWithoutEmail())
+				},
+				httpEmailMock: func() {
+					gock.New("https://api.github.com").
+						Get("/user/email").
+						Reply(200).
+						JSON(emailListVerified())
+				},
+				authURL: "https://github.com/login/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&state=testState",
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token: &oauth2.Token{
+						AccessToken: "accessToken",
+						TokenType:   oidc.BearerToken,
+					},
+				},
+			},
+			args: args{
+				&Session{},
+			},
+			want: want{
+				user: &User{
+					Login:      "login",
+					ID:         1,
+					AvatarUrl:  "avatarURL",
+					GravatarId: "gravatarID",
+					Name:       "name",
+					Email:      "",
+					HtmlUrl:    "htmlURL",
+					CreatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
+					UpdatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
+				},
+				id:                "1",
+				firstName:         "",
+				lastName:          "",
+				displayName:       "name",
+				nickName:          "login",
+				preferredUsername: "login",
+				email:             "",
+				isEmailVerified:   true,
+				phone:             "",
+				isPhoneVerified:   false,
+				preferredLanguage: language.Und,
+				avatarURL:         "avatarURL",
+				profile:           "htmlURL",
+			},
+		},
+		{
+			name: "successful fetch, private email",
+			fields: fields{
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				httpMock: func() {
+					gock.New("https://api.github.com").
+						Get("/user").
+						Reply(200).
+						JSON(userinfoWithoutEmail())
+				},
+				httpEmailMock: func() {
+					gock.New("https://api.github.com").
+						Get("/user/email").
+						Reply(200).
+						JSON(emailListVerified())
+				},
+				authURL: "https://github.com/login/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&state=testState",
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token: &oauth2.Token{
+						AccessToken: "accessToken",
+						TokenType:   oidc.BearerToken,
+					},
+				},
+				scopes: []string{"user:email"},
+			},
+			args: args{
+				&Session{},
+			},
+			want: want{
+				user: &User{
+					Login:      "login",
+					ID:         1,
+					AvatarUrl:  "avatarURL",
+					GravatarId: "gravatarID",
+					Name:       "name",
+					Email:      "primaryandverfied@example.com",
+					HtmlUrl:    "htmlURL",
+					CreatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
+					UpdatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
+				},
+				id:                "1",
+				firstName:         "",
+				lastName:          "",
+				displayName:       "name",
+				nickName:          "login",
+				preferredUsername: "login",
+				email:             "primaryandverfied@example.com",
+				isEmailVerified:   true,
+				phone:             "",
+				isPhoneVerified:   false,
+				preferredLanguage: language.Und,
+				avatarURL:         "avatarURL",
+				profile:           "htmlURL",
+			},
+		},
+		{
+			name: "successful fetch, unsuccessful email",
+			fields: fields{
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				httpMock: func() {
+					gock.New("https://api.github.com").
+						Get("/user").
+						Reply(200).
+						JSON(userinfoWithoutEmail())
+				},
+				httpEmailMock: func() {
+					gock.New("https://api.github.com").
+						Get("/user/email").
+						Reply(400)
+				},
+				authURL: "https://github.com/login/oauth/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&state=testState",
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token: &oauth2.Token{
+						AccessToken: "accessToken",
+						TokenType:   oidc.BearerToken,
+					},
+				},
+				scopes: []string{"user"},
+			},
+			args: args{
+				&Session{},
+			},
+			want: want{
+				user: &User{
+					Login:      "login",
+					ID:         1,
+					AvatarUrl:  "avatarURL",
+					GravatarId: "gravatarID",
+					Name:       "name",
+					Email:      "",
+					HtmlUrl:    "htmlURL",
+					CreatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
+					UpdatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
+				},
+				id:                "1",
+				firstName:         "",
+				lastName:          "",
+				displayName:       "name",
+				nickName:          "login",
+				preferredUsername: "login",
+				email:             "",
+				isEmailVerified:   true,
+				phone:             "",
+				isPhoneVerified:   false,
+				preferredLanguage: language.Und,
+				avatarURL:         "avatarURL",
+				profile:           "htmlURL",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer gock.Off()
 			tt.fields.httpMock()
+			if tt.fields.httpEmailMock != nil {
+				tt.fields.httpEmailMock()
+			}
 			a := assert.New(t)
 
 			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.options...)
 			require.NoError(t, err)
 
-			session := &oauth.Session{
-				AuthURL:  tt.fields.authURL,
+			session := &Session{
+				OAuthSession: &oauth.Session{
+					AuthURL:  tt.fields.authURL,
+					Tokens:   tt.fields.tokens,
+					Provider: provider.Provider,
+					Code:     tt.fields.code,
+				},
 				Code:     tt.fields.code,
-				Tokens:   tt.fields.tokens,
-				Provider: provider.Provider,
+				Provider: provider,
 			}
 
 			user, err := session.FetchUser(context.Background())
@@ -212,5 +445,40 @@ func userinfo() *User {
 		HtmlUrl:    "htmlURL",
 		CreatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
 		UpdatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
+	}
+}
+
+func userinfoWithoutEmail() *User {
+	userinfo := userinfo()
+	userinfo.Email = ""
+	return userinfo
+}
+
+func emailListVerified() []Email {
+	return append(emailList(),
+		Email{
+			Email:    "primaryandverfied@example.com",
+			Primary:  true,
+			Verified: true,
+		})
+}
+
+func emailList() []Email {
+	return []Email{
+		{
+			Email:    "notverified@example.com",
+			Primary:  false,
+			Verified: false,
+		},
+		{
+			Email:    "verfied@example.com",
+			Primary:  false,
+			Verified: true,
+		},
+		{
+			Email:    "primary@example.com",
+			Primary:  true,
+			Verified: false,
+		},
 	}
 }
