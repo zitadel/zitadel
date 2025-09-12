@@ -1,6 +1,6 @@
 package repository
 
-//Asset represents all information about a asset (img)
+// Asset represents all information about a asset (img)
 type Asset struct {
 	// ID is to refer to the asset
 	ID string
