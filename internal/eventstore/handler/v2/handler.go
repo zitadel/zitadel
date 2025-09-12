@@ -561,7 +561,10 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
 			return
 		}
-		err = tx.Commit()
+		commitErr := tx.Commit()
+		if !errors.Is(commitErr, sql.ErrTxDone) {
+			err = commitErr
+		}
 	}()
 
 	var hasLocked bool
