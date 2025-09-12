@@ -2,7 +2,6 @@
 
 import { ColorShade, getColorHash } from "@/helpers/colors";
 import { useTheme } from "next-themes";
-import Image from "next/image";
 
 interface AvatarProps {
   name: string | null | undefined;
@@ -17,8 +16,7 @@ export function getInitials(name: string, loginName: string) {
   if (name) {
     const split = name.split(" ");
     if (split) {
-      const initials =
-        split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
+      const initials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
       credentials = initials;
     } else {
       credentials = name.charAt(0);
@@ -40,13 +38,7 @@ export function getInitials(name: string, loginName: string) {
   return credentials;
 }
 
-export function Avatar({
-  size = "base",
-  name,
-  loginName,
-  imageUrl,
-  shadow,
-}: AvatarProps) {
+export function Avatar({ size = "base", name, loginName, imageUrl, shadow }: AvatarProps) {
   const { resolvedTheme } = useTheme();
   const credentials = getInitials(name ?? loginName, loginName);
 
@@ -78,7 +70,7 @@ export function Avatar({
       style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
     >
       {imageUrl ? (
-        <Image
+        <img
           height={48}
           width={48}
           alt="avatar"
@@ -86,11 +78,7 @@ export function Avatar({
           src={imageUrl}
         />
       ) : (
-        <span
-          className={`uppercase ${size === "large" ? "text-xl" : "text-13px"}`}
-        >
-          {credentials}
-        </span>
+        <span className={`uppercase ${size === "large" ? "text-xl" : "text-13px"}`}>{credentials}</span>
       )}
     </div>
   );
