@@ -12,8 +12,8 @@ ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
 export GOCOVERDIR ZITADEL_MASTERKEY
 
-GOOS?=$(go env GOOS)
-GOARCH?=$(go env GOARCH)
+GOOS?=$(shell go env GOOS)
+GOARCH?=$(shell go env GOARCH)
 
 export GOOS GOARCH
 
