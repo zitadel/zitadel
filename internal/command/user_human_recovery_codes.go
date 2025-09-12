@@ -16,7 +16,7 @@ func (c *Commands) ImportHumanRecoveryCodes(ctx context.Context, userID, resourc
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if err = c.checkUserExists(ctx, userID, resourceOwner); err != nil {
+	if _, err = c.checkUserExists(ctx, userID, resourceOwner); err != nil {
 		return err
 	}
 
@@ -34,7 +34,7 @@ func (c *Commands) ImportHumanRecoveryCodes(ctx context.Context, userID, resourc
 		return err
 	}
 
-	userAgg := UserAggregateFromWriteModel(&recoveryCodeWriteModel.WriteModel)
+	userAgg := UserAggregateFromWriteModelCtx(ctx, &recoveryCodeWriteModel.WriteModel)
 
 	_, err = c.eventstore.Push(ctx,
 		user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, nil),
@@ -56,6 +56,10 @@ func (c *Commands) GenerateRecoveryCodes(ctx context.Context, userID string, cou
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-7c0nx", "Errors.User.RecoveryCodes.CountInvalid")
 	}
 
+	if !c.multifactors.RecoveryCodes.Format.Valid() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-7c0nx", "Errors.User.RecoveryCodes.FormatInvalid")
+	}
+
 	recoveryCodeWriteModel := NewHumanRecoveryCodeWriteModel(userID, resourceOwner)
 	if err := c.eventstore.FilterToQueryReducer(ctx, recoveryCodeWriteModel); err != nil {
 		return nil, err
@@ -65,12 +69,12 @@ func (c *Commands) GenerateRecoveryCodes(ctx context.Context, userID string, cou
 		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-8f2k9", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded")
 	}
 
-	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(count, c.secretHasher)
+	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(count, c.multifactors.RecoveryCodes.Format, c.secretHasher)
 	if err != nil {
 		return nil, err
 	}
 
-	userAgg := UserAggregateFromWriteModel(&recoveryCodeWriteModel.WriteModel)
+	userAgg := UserAggregateFromWriteModelCtx(ctx, &recoveryCodeWriteModel.WriteModel)
 
 	_, err = c.eventstore.Push(ctx,
 		user.NewHumanRecoveryCodesAddedEvent(ctx, userAgg, hashedCodes, authRequestDomainToAuthRequestInfo(authRequest)),
@@ -105,7 +109,7 @@ func (c *Commands) RemoveRecoveryCodes(ctx context.Context, userID, resourceOwne
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-84rgg", "Errors.User.RecoveryCodes.NotAdded")
 	}
 
-	userAgg := UserAggregateFromWriteModel(&writeModel.WriteModel)
+	userAgg := UserAggregateFromWriteModelCtx(ctx, &writeModel.WriteModel)
 
 	_, err := c.eventstore.Push(ctx, user.NewHumanRecoveryCodeRemovedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 	if err != nil {
@@ -156,15 +160,13 @@ func checkRecoveryCode(
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-84rgg", "Errors.User.RecoveryCodes.NotReady")
 	}
 
-	index, err := domain.ValidateRecoveryCode(code, toHumanRecoveryCode(ctx, recoveryCodeWm), secretHasher)
+	hashedCode, err := domain.ValidateRecoveryCode(code, toHumanRecoveryCode(ctx, recoveryCodeWm), secretHasher)
 
-	// TODO: is recheck of new events needed here like in CheckHumanOTP?
-
-	userAgg := UserAggregateFromWriteModel(&recoveryCodeWm.WriteModel)
+	userAgg := UserAggregateFromWriteModelCtx(ctx, &recoveryCodeWm.WriteModel)
 	commands := make([]eventstore.Command, 0, 2)
 
 	if err == nil {
-		commands = append(commands, user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, index, nil))
+		commands = append(commands, user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, hashedCode, nil))
 	} else {
 		commands = append(commands, user.NewHumanRecoveryCodeCheckFailedEvent(ctx, userAgg, nil))
 

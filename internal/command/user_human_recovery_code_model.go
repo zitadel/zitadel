@@ -1,6 +1,8 @@
 package command
 
 import (
+	"slices"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -43,7 +45,13 @@ func (wm *HumanRecoveryCodeWriteModel) Reduce() error {
 			wm.State = domain.MFAStateReady
 		case *user.HumanRecoveryCodeCheckSucceededEvent:
 			wm.FailedAttempts = 0
-			wm.codes = append(wm.codes[:e.CodeIndex], wm.codes[e.CodeIndex+1:]...)
+			codeCheckedIndex := slices.Index(wm.codes, e.CodeChecked)
+			if codeCheckedIndex == -1 {
+				// NB: this should typically never happen, but a race-condition could
+				// possibly lead to inconsistent state and duplicate code checks
+				continue
+			}
+			wm.codes = slices.Delete(wm.codes, codeCheckedIndex, codeCheckedIndex+1)
 		case *user.HumanRecoveryCodeCheckFailedEvent:
 			wm.FailedAttempts += 1
 		case *user.HumanRecoveryCodesRemovedEvent:

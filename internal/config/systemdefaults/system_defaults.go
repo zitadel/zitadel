@@ -25,11 +25,17 @@ type SecretGenerators struct {
 }
 
 type MultifactorConfig struct {
-	OTP OTPConfig
+	OTP           OTPConfig
+	RecoveryCodes RecoveryCodesConfig
 }
 
 type OTPConfig struct {
 	Issuer string
+}
+
+type RecoveryCodesConfig struct {
+	MaxCount int
+	Format   string
 }
 
 type DomainVerification struct {

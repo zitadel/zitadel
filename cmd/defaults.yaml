@@ -736,6 +736,8 @@ SystemDefaults:
     RecoveryCodes:
       # The maximum number of recovery codes that a user can hold at any given time
       MaxCount: 5 # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_MAXCOUNT
+      # The format of the recovery codes, supported: uuid, sonyflake
+      Format: sonyflake # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_FORMAT
   DomainVerification:
     VerificationGenerator:
       Length: 32 # ZITADEL_SYSTEMDEFAULTS_DOMAINVERIFICATION_VERIFICATIONGENERATOR_LENGTH

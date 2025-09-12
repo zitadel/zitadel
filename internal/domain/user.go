@@ -42,10 +42,10 @@ const (
 	UserAuthMethodTypeIDP
 	UserAuthMethodTypeOTPSMS
 	UserAuthMethodTypeOTPEmail
-	UserAuthMethodTypeRecoveryCode
 	UserAuthMethodTypeOTP // generic OTP when parsing AMR from OIDC
 	UserAuthMethodTypePrivateKey
 	userAuthMethodTypeCount
+	UserAuthMethodTypeRecoveryCode
 )
 
 // HasMFA checks whether the user authenticated with multiple auth factors.

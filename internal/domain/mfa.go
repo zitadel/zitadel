@@ -25,6 +25,18 @@ type OTPConfig struct {
 	CryptoMFA crypto.EncryptionAlgorithm
 }
 
+type RecoveryCodeFormat string
+
+const (
+	RecoveryCodeFormatUUID      RecoveryCodeFormat = "uuid"
+	RecoveryCodeFormatSonyFlake RecoveryCodeFormat = "sonyflake"
+)
+
 type RecoveryCodesConfig struct {
 	MaxCount int
+	Format   RecoveryCodeFormat
+}
+
+func (f RecoveryCodeFormat) Valid() bool {
+	return f == RecoveryCodeFormatUUID || f == RecoveryCodeFormatSonyFlake
 }

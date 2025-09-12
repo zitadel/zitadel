@@ -858,7 +858,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
 			SessionId: createResp.GetSessionId(),
 			Checks: &session.Checks{
-				RecoveryCode: &session.CheckOTP{
+				RecoveryCode: &session.CheckRecoveryCode{
 					Code: recoveryCode,
 				},
 			},

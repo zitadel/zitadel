@@ -203,6 +203,10 @@ func StartCommands(
 				CryptoMFA: otpEncryption,
 				Issuer:    defaults.Multifactors.OTP.Issuer,
 			},
+			RecoveryCodes: domain.RecoveryCodesConfig{
+				MaxCount: defaults.Multifactors.RecoveryCodes.MaxCount,
+				Format:   domain.RecoveryCodeFormat(defaults.Multifactors.RecoveryCodes.Format),
+			},
 		},
 		GenerateDomain:                domain.NewGeneratedInstanceDomain,
 		caches:                        caches,

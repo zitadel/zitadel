@@ -84,7 +84,7 @@ func NewHumanRecoveryCodeRemovedEvent(
 type HumanRecoveryCodeCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	*AuthRequestInfo
-	CodeIndex int `json:"codeIndex,omitempty"`
+	CodeChecked string `json:"codeChecked,omitempty"`
 }
 
 func (e *HumanRecoveryCodeCheckSucceededEvent) Payload() interface{} {
@@ -102,7 +102,7 @@ func (e *HumanRecoveryCodeCheckSucceededEvent) SetBaseEvent(event *eventstore.Ba
 func NewHumanRecoveryCodeCheckSucceededEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	codeIndex int,
+	codeChecked string,
 	info *AuthRequestInfo,
 ) *HumanRecoveryCodeCheckSucceededEvent {
 	return &HumanRecoveryCodeCheckSucceededEvent{
@@ -112,7 +112,7 @@ func NewHumanRecoveryCodeCheckSucceededEvent(
 			HumanRecoveryCodeCheckSucceededType,
 		),
 		AuthRequestInfo: info,
-		CodeIndex:       codeIndex,
+		CodeChecked:     codeChecked,
 	}
 }
 
