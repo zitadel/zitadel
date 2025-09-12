@@ -1,3 +1,5 @@
+import { completeAuthFlowAction } from "./server/auth-flow";
+
 type FinishFlowCommand =
   | {
       sessionId: string;
@@ -33,7 +35,37 @@ function goToSignedInPage(
 }
 
 /**
- * for client: redirects user back to an OIDC or SAML application or to a success page when using requestId, check if a default redirect and redirect to it, or just redirect to a success page with the loginName
+ * Complete authentication flow or get next URL for navigation
+ * - For OIDC/SAML flows with sessionId+requestId: completes flow directly via server action
+ * - For device flows: returns URL to signed-in page
+ * - For other cases: returns default redirect or fallback URL
+ */
+export async function completeFlowOrGetUrl(
+  command: FinishFlowCommand & { organization?: string },
+  defaultRedirectUri?: string,
+): Promise<string | void> {
+  // Complete OIDC/SAML flows directly with server action
+  if (
+    "sessionId" in command &&
+    "requestId" in command &&
+    (command.requestId.startsWith("saml_") ||
+      command.requestId.startsWith("oidc_"))
+  ) {
+    // This completes the flow and redirects, so no URL is returned
+    await completeAuthFlowAction({
+      sessionId: command.sessionId,
+      requestId: command.requestId,
+    });
+    return; // No URL needed - server action handles redirect
+  }
+
+  // For all other cases, return URL for navigation
+  return getNextUrl(command, defaultRedirectUri);
+}
+
+/**
+ * for client: redirects user back to device flow completion, default redirect, or success page
+ * Note: OIDC/SAML flows now use completeAuthFlowAction() instead of URL navigation
  * @param command
  * @returns
  */
@@ -53,24 +85,8 @@ export async function getNextUrl(
     });
   }
 
-  // finish SAML or OIDC flow
-  if (
-    "sessionId" in command &&
-    "requestId" in command &&
-    (command.requestId.startsWith("saml_") ||
-      command.requestId.startsWith("oidc_"))
-  ) {
-    const params = new URLSearchParams({
-      sessionId: command.sessionId,
-      requestId: command.requestId,
-    });
-
-    if (command.organization) {
-      params.append("organization", command.organization);
-    }
-
-    return `/login?` + params;
-  }
+  // OIDC/SAML flows are now handled by completeAuthFlowAction() server action
+  // This function only handles device flows and fallback navigation
 
   if (defaultRedirectUri) {
     return defaultRedirectUri;
