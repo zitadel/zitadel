@@ -317,6 +317,10 @@ describe("isSessionValid", () => {
         forceMfaLocalOnly: false,
       } as any);
 
+      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.TOTP, AuthenticationMethodType.OTP_EMAIL],
+      } as any);
+
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(true);
@@ -412,10 +416,24 @@ describe("isSessionValid", () => {
         forceMfaLocalOnly: false,
       } as any);
 
+      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.TOTP],
+      } as any);
+
       const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
 
       expect(result).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith("Session has no valid multifactor", expect.any(Object));
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Session has no valid MFA factor. Configured methods:",
+        [AuthenticationMethodType.TOTP],
+        "Session factors:",
+        expect.objectContaining({
+          totp: undefined,
+          otpEmail: undefined,
+          otpSms: undefined,
+          webAuthN: undefined,
+        }),
+      );
       consoleSpy.mockRestore();
     });
 
