@@ -2,6 +2,7 @@ package initialise
 
 import (
 	"context"
+	"database/sql"
 	_ "embed"
 	"fmt"
 
@@ -39,10 +40,40 @@ func VerifyUser(username, password string) func(context.Context, *database.DB) e
 	return func(ctx context.Context, db *database.DB) error {
 		logging.WithFields("username", username).Info("verify user")
 
-		if password != "" {
-			createUserStmt += " WITH PASSWORD '" + password + "'"
+		// Check if user already exists first
+		exists, err := userExists(ctx, db, username)
+		if err != nil {
+			return fmt.Errorf("failed to check if user exists: %w", err)
 		}
 
-		return exec(ctx, db, fmt.Sprintf(createUserStmt, username), []string{roleAlreadyExistsCode})
+		if exists {
+			logging.WithFields("username", username).Info("user already exists, skipping creation")
+			return nil
+		}
+
+		// Proceed with user creation
+		stmt := createUserStmt
+		if password != "" {
+			stmt += " WITH PASSWORD '" + password + "'"
+		}
+
+		return exec(ctx, db, fmt.Sprintf(stmt, username), []string{roleAlreadyExistsCode})
 	}
+}
+
+func userExists(ctx context.Context, db *database.DB, username string) (bool, error) {
+	query := `SELECT 1 FROM pg_user WHERE usename = $1`
+	
+	var exists int
+	err := db.QueryRowContext(ctx, func(row *sql.Row) error {
+		return row.Scan(&exists)
+	}, query, username)
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	
+	return true, nil
 }
