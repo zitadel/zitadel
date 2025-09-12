@@ -255,7 +255,7 @@ var (
 		` auth_methods_force_mfa.force_mfa,` +
 		` auth_methods_force_mfa.force_mfa_local_only` +
 		` FROM projections.users14` +
-		` LEFT JOIN (SELECT auth_methods_force_mfa.force_mfa, auth_methods_force_mfa.force_mfa_local_only, auth_methods_force_mfa.instance_id, auth_methods_force_mfa.aggregate_id, auth_methods_force_mfa.is_default FROM projections.login_policies5 AS auth_methods_force_mfa) AS auth_methods_force_mfa` +
+		` LEFT JOIN (SELECT auth_methods_force_mfa.force_mfa, auth_methods_force_mfa.force_mfa_local_only, auth_methods_force_mfa.instance_id, auth_methods_force_mfa.aggregate_id, auth_methods_force_mfa.is_default FROM projections.login_policies6 AS auth_methods_force_mfa) AS auth_methods_force_mfa` +
 		` ON (auth_methods_force_mfa.aggregate_id = projections.users14.instance_id OR auth_methods_force_mfa.aggregate_id = projections.users14.resource_owner) AND auth_methods_force_mfa.instance_id = projections.users14.instance_id` +
 		` ORDER BY auth_methods_force_mfa.is_default LIMIT 1
 `
