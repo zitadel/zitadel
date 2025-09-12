@@ -75,11 +75,11 @@ jobs:
       -
         name: Unpack executables
         run: |
-          mkdir -p ./artifacts/linux/amd64 ./artifacts/linux/arm64
-          tar -xzf .artifacts/zitadel-linux-amd64.tar.gz -C ./artifacts/
-          mv ./artifacts/zitadel-linux-amd64/zitadel ./artifacts/linux/amd64/zitadel
-          tar -xzf .artifacts/zitadel-linux-arm64.tar.gz -C ./artifacts/
-          mv ./artifacts/zitadel-linux-arm64/zitadel ./artifacts/linux/arm64/zitadel
+          mkdir -p ./.artifacts/linux/amd64 ./.artifacts/linux/arm64
+          tar -xzf .artifacts/zitadel-linux-amd64.tar.gz -C .artifacts/
+          mv .artifacts/zitadel-linux-amd64/zitadel ./.artifacts/linux/amd64/zitadel
+          tar -xzf .artifacts/zitadel-linux-arm64.tar.gz -C .artifacts/
+          mv .artifacts/zitadel-linux-arm64/zitadel ./.artifacts/linux/arm64/zitadel
       -
         name: Debug
         id: build-debug
