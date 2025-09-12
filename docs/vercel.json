@@ -220,6 +220,11 @@
       "source": "/docs/guides/integrate/login/login-users#password-reset",
       "destination": "/docs/guides/integrate/login/hosted-login#password-reset",
       "permanent": true
+    },
+    {
+      "source": "/docs/guides/integrate/login-ui/typescript-repo",
+      "destination": "/docs/guides/integrate/login-ui/typescript-login-ui",
+      "permanent": true
     }
   ]
 }
