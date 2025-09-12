@@ -285,8 +285,6 @@ func setUserinfo(user *query.User, userinfo models.AttributeSetter, attributes [
 }
 
 func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, userGrants *query.UserGrants) (map[string]*customAttribute, error) {
-	userCtx := authz.SetCtxData(ctx, authz.CtxData{UserID: user.ID, ResourceOwner: user.ResourceOwner})
-
 	customAttributes := make(map[string]*customAttribute, 0)
 	queriedActions, err := p.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomizeSAMLResponse, domain.TriggerTypePreSAMLResponseCreation, user.ResourceOwner)
 	if err != nil {
@@ -366,7 +364,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 							Key:   key,
 							Value: value,
 						}
-						if _, err = p.command.SetUserMetadata(userCtx, metadata, user.ID, user.ResourceOwner); err != nil {
+						if _, err = p.command.SetUserMetadata(ctx, metadata, user.ID, user.ResourceOwner, nil); err != nil {
 							logging.WithError(err).Info("unable to set md in action")
 							panic(err)
 						}
@@ -413,7 +411,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 	}
 	attributeLogs := make([]string, 0)
 	for _, metadata := range contextInfoResponse.SetUserMetadata {
-		if _, err = p.command.SetUserMetadata(userCtx, metadata, user.ID, user.ResourceOwner); err != nil {
+		if _, err = p.command.SetUserMetadata(ctx, metadata, user.ID, user.ResourceOwner, nil); err != nil {
 			attributeLogs = append(attributeLogs, fmt.Sprintf("failed to set user metadata key %q", metadata.Key))
 		}
 	}

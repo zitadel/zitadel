@@ -204,7 +204,12 @@ func MetadataListToDomain(metadataList *MetadataList) []*domain.Metadata {
 	for i, metadata := range metadataList.metadata {
 		value := metadata.value
 		if len(value) == 0 {
-			value = mapBytesToByteArray(metadata.Value.Export())
+			var err error
+			value, err = json.Marshal(metadata.Value.Export())
+			if err != nil {
+				logging.WithError(err).Debug("unable to marshal")
+				panic(err)
+			}
 		}
 		list[i] = &domain.Metadata{
 			Key:   metadata.Key,
@@ -213,22 +218,4 @@ func MetadataListToDomain(metadataList *MetadataList) []*domain.Metadata {
 	}
 
 	return list
-}
-
-// mapBytesToByteArray is used for backwards compatibility of old metadata.push method
-// converts the Javascript uint8 array which is exported as []interface{} to a []byte
-func mapBytesToByteArray(i interface{}) []byte {
-	bytes, ok := i.([]interface{})
-	if !ok {
-		return nil
-	}
-	value := make([]byte, len(bytes))
-	for i, val := range bytes {
-		b, ok := val.(int64)
-		if !ok {
-			return nil
-		}
-		value[i] = byte(b)
-	}
-	return value
 }

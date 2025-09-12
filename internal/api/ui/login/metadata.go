@@ -10,6 +10,6 @@ import (
 func (l *Login) bulkSetUserMetadata(ctx context.Context, userID, orgID string, metadata []*domain.Metadata) error {
 	// user context necessary due to permission check in command
 	userCtx := authz.SetCtxData(ctx, authz.CtxData{UserID: userID, OrgID: orgID})
-	_, err := l.command.BulkSetUserMetadata(userCtx, userID, orgID, metadata...)
+	_, err := l.command.BulkSetUserMetadata(userCtx, userID, orgID, nil, metadata...)
 	return err
 }

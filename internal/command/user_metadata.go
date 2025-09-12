@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) SetUserMetadata(ctx context.Context, metadata *domain.Metadata, userID, resourceOwner string) (_ *domain.Metadata, err error) {
+func (c *Commands) SetUserMetadata(ctx context.Context, metadata *domain.Metadata, userID, resourceOwner string, check PermissionCheck) (_ *domain.Metadata, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -20,8 +20,10 @@ func (c *Commands) SetUserMetadata(ctx context.Context, metadata *domain.Metadat
 		return nil, err
 	}
 
-	if err := c.checkPermissionUpdateUser(ctx, userResourceOwner, userID); err != nil {
-		return nil, err
+	if check != nil {
+		if err := check(userResourceOwner, userID); err != nil {
+			return nil, err
+		}
 	}
 
 	setMetadata, err := c.getUserMetadataModelByID(ctx, userID, userResourceOwner, metadata.Key)
@@ -30,7 +32,7 @@ func (c *Commands) SetUserMetadata(ctx context.Context, metadata *domain.Metadat
 	}
 	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
 	// return if no change in the metadata
-	if bytes.Equal(setMetadata.Value, metadata.Value) {
+	if setMetadata.State == domain.MetadataStateActive && bytes.Equal(setMetadata.Value, metadata.Value) {
 		return writeModelToUserMetadata(setMetadata), nil
 	}
 
@@ -50,7 +52,7 @@ func (c *Commands) SetUserMetadata(ctx context.Context, metadata *domain.Metadat
 	return writeModelToUserMetadata(setMetadata), nil
 }
 
-func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwner string, metadatas ...*domain.Metadata) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwner string, check PermissionCheck, metadatas ...*domain.Metadata) (_ *domain.ObjectDetails, err error) {
 	if len(metadatas) == 0 {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "META-9mm2d", "Errors.Metadata.NoData")
 	}
@@ -59,8 +61,10 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 		return nil, err
 	}
 
-	if err := c.checkPermissionUpdateUser(ctx, userResourceOwner, userID); err != nil {
-		return nil, err
+	if check != nil {
+		if err := check(userResourceOwner, userID); err != nil {
+			return nil, err
+		}
 	}
 
 	events := make([]eventstore.Command, 0)
@@ -109,7 +113,7 @@ func (c *Commands) setUserMetadata(ctx context.Context, userAgg *eventstore.Aggr
 	), nil
 }
 
-func (c *Commands) RemoveUserMetadata(ctx context.Context, metadataKey, userID, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) RemoveUserMetadata(ctx context.Context, metadataKey, userID, resourceOwner string, check PermissionCheck) (_ *domain.ObjectDetails, err error) {
 	if metadataKey == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "META-2n0fs", "Errors.Metadata.Invalid")
 	}
@@ -117,9 +121,10 @@ func (c *Commands) RemoveUserMetadata(ctx context.Context, metadataKey, userID, 
 	if err != nil {
 		return nil, err
 	}
-
-	if err := c.checkPermissionUpdateUser(ctx, userResourceOwner, userID); err != nil {
-		return nil, err
+	if check != nil {
+		if err := check(userResourceOwner, userID); err != nil {
+			return nil, err
+		}
 	}
 
 	removeMetadata, err := c.getUserMetadataModelByID(ctx, userID, userResourceOwner, metadataKey)
@@ -146,7 +151,7 @@ func (c *Commands) RemoveUserMetadata(ctx context.Context, metadataKey, userID, 
 	return writeModelToObjectDetails(&removeMetadata.WriteModel), nil
 }
 
-func (c *Commands) BulkRemoveUserMetadata(ctx context.Context, userID, resourceOwner string, metadataKeys ...string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) BulkRemoveUserMetadata(ctx context.Context, userID, resourceOwner string, check PermissionCheck, metadataKeys ...string) (_ *domain.ObjectDetails, err error) {
 	if len(metadataKeys) == 0 {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "META-9mm2d", "Errors.Metadata.NoData")
 	}
@@ -154,9 +159,10 @@ func (c *Commands) BulkRemoveUserMetadata(ctx context.Context, userID, resourceO
 	if err != nil {
 		return nil, err
 	}
-
-	if err := c.checkPermissionUpdateUser(ctx, userResourceOwner, userID); err != nil {
-		return nil, err
+	if check != nil {
+		if err := check(userResourceOwner, userID); err != nil {
+			return nil, err
+		}
 	}
 
 	events := make([]eventstore.Command, len(metadataKeys))
