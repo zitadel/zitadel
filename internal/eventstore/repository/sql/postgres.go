@@ -91,9 +91,9 @@ func (db *Postgres) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool
 	}
 
 	if desc {
-		return ` ORDER BY "position" DESC, in_tx_order DESC`
+		return ` ORDER BY "position" DESC, in_tx_order DESC, instance_id, aggregate_type, aggregate_id`
 	}
-	return ` ORDER BY "position", in_tx_order`
+	return ` ORDER BY "position", in_tx_order, instance_id, aggregate_type, aggregate_id`
 }
 
 func (db *Postgres) eventQuery(useV1 bool) string {
