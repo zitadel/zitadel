@@ -37,7 +37,7 @@
                     "API_CONFIG_FILE": "{projectRoot}/api.yaml"
                 }
             },
-            "command": "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\"; ./zitadel start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'"
+            "command": "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\"; ./.artifacts/$(go env GOOS)/$(go env GOARCH)/zitadel start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'"
         }
     }
 }

@@ -22,7 +22,7 @@ jobs:
       - name: Unpack executable
         run: |
           tar -xvf .artifacts/zitadel-linux-amd64.tar.gz
-          mv zitadel-linux-amd64/zitadel ./zitadel
+          mv zitadel-linux-amd64/zitadel ./artifacts/linux/amd64/zitadel
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - uses: pnpm/action-setup@v4
