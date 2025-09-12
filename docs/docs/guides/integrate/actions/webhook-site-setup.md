@@ -8,7 +8,6 @@ sidebar_label: Testing Actions V2 with Webhook.site
 This guide explains how to test **ZITADEL Actions V2** locally using [Webhook.site](https://webhook.site).  
 We will use Webhook.site’s **XHR Redirect** feature to forward requests from ZITADEL to your local machine.
 
-
 **What you will learn in this guide:**
 
 - How to add the required CORS headers to your local listener
@@ -22,11 +21,9 @@ We will use Webhook.site’s **XHR Redirect** feature to forward requests from Z
 
 ### 2.1. Local Listener
 
-
 You should already have a local HTTP server (for example, the Go example listener from [Testing a Request](./testing-request)) running at `http://localhost:8090/webhook`.
 
 ### 2.2. CORS Headers
-
 
 Because Webhook.site’s XHR redirect runs in your browser, your listener must allow CORS.
 Add the following headers in your handler:
@@ -55,11 +52,10 @@ if req.Method == http.MethodOptions {
    http://localhost:8090/webhook
    ```
 
-
 5. Leave other fields empty unless you need custom headers.
 6. Keep the Webhook.site browser tab open while testing.
 
-![Screenshot: Webhook.site XHR Redirect configuration interface](image-5.png)
+![Screenshot: Webhook.site XHR Redirect configuration interface](/docs/static/img/actions-v2/webhook-xhr.png)
 
 ---
 
@@ -73,15 +69,13 @@ go run actionsRequest.go
 
 You should see output in your console whenever the listener is called.
 
-![Screenshot: Console output showing listener receiving webhook requests](image-9.png)
+![Screenshot: Console output showing listener receiving webhook requests](/docs/static/img/actions-v2/console.png)
 
 ---
 
 ## 5. Create Target in ZITADEL
 
-
 As shown in the example above, the target is created with HTTP and port '8090'. If you want to use it as a webhook, the target can be created as follows:
-
 
 See [Create a target](/apis/resources/action_service_v2/action-service-create-target) for more detailed information. Notice that the `endpoint` is your Webhook.site URL.
 
@@ -100,10 +94,9 @@ curl -L -X POST 'https://$CUSTOM-DOMAIN/v2beta/actions/targets' \
 }'
 ```
 
-![Screenshot: Webhook.site target creation interface](image-7.png)
+![Screenshot: Webhook.site target creation interface](/docs/static/img/actions-v2/webhook-url.png)
 
 ---
-
 
 Save the returned ID to use in the execution step. A sample response looks like this:
 
@@ -117,11 +110,9 @@ Save the returned ID to use in the execution step. A sample response looks like 
 
 ## 6. Set execution
 
-
 To configure ZITADEL to call the target when an API endpoint is called, set an execution and define the request condition.
 
 See [Set an execution](/apis/resources/action_service_v2/action-service-set-execution) for more detailed information.
-
 
 Here, `<TargetID returned>` is the `id` from the previous step.
 
@@ -146,7 +137,6 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 
 ## 7. Example Call
 
-
 Now that you have set up the target and execution, you can test it by creating a user through the Console UI or by calling the ZITADEL API to create a human user.
 
 Here, we are creating a user via the API:
@@ -167,18 +157,16 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 }'
 ```
 
-
 Both your Webhook.site and your local listener should now print out something like the following. See the [Sent information Request](./usage#sent-information-request) payload description for details.
 
 Your local listener should look like this:
-![Screenshot: Local listener output](image-10.png)
+![Screenshot: Local listener output](/docs/static/img/actions-v2/local-listener.png)
 
 Your Webhook.site should look like this:
-![Screenshot: Webhook.site request log](image-11.png)
+![Screenshot: Webhook.site request log](/docs/static/img/actions-v2/webhook-listener.png)
 
 ---
 
 ## 8. Done
-
 
 You now have a fully working setup for testing ZITADEL Actions V2 with Webhook.site. This allows you to forward requests securely from ZITADEL to your local environment without needing a public IP address or domain.
