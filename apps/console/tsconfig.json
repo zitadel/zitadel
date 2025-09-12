@@ -26,7 +26,8 @@
     "paths": {
       "@ng-icons/core": ["./node_modules/@ng-icons/core"],
       "@ng-icons/heroicons/outline": ["./node_modules/@ng-icons/heroicons/outline"],
-      "@ng-icons/heroicons/solid": ["./node_modules/@ng-icons/heroicons/solid"]
+      "@ng-icons/heroicons/solid": ["./node_modules/@ng-icons/heroicons/solid"],
+      "@zitadel/docs/frameworks.json": ["../../docs/frameworks.json"],
     }
   },
   "angularCompilerOptions": {

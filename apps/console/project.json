@@ -32,7 +32,8 @@
             "description": "Generate code from protobuf definitions",
             "inputs": [
                 "default",
-                "{workspaceRoot}/pnpm-lock.yaml"
+                "{workspaceRoot}/pnpm-lock.yaml",
+                "{workspaceRoot}/docs/frameworks.json"
             ],
             "outputs": [
                 "{projectRoot}/dist"
