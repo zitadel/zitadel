@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -75,7 +74,7 @@ func setPermissionCheckV2Flag(t *testing.T, setFlag bool) {
 }
 
 func TestServer_GetUserByID(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	type args struct {
 		ctx context.Context
 		req *user.GetUserByIDRequest
@@ -239,7 +238,7 @@ func TestServer_GetUserByID(t *testing.T) {
 }
 
 func TestServer_GetUserByID_Permission(t *testing.T) {
-	newOrgOwnerEmail := gofakeit.Email()
+	newOrgOwnerEmail := integration.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
@@ -422,7 +421,7 @@ func createUser(ctx context.Context, orgID string, passwordChangeRequired bool) 
 
 func createUserWithUserName(ctx context.Context, username string, orgID string, passwordChangeRequired bool) userAttr {
 	// used as default country prefix
-	phone := "+41" + gofakeit.Phone()
+	phone := integration.Phone()
 	resp := Instance.CreateHumanUserVerified(ctx, orgID, username, phone)
 	info := userAttr{resp.GetUserId(), username, phone, nil, resp.GetDetails()}
 	// as the change date of the creation is the creation date
@@ -440,7 +439,7 @@ func TestServer_ListUsers(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	orgResp := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	type args struct {
 		ctx context.Context
 		req *user.ListUsersRequest
@@ -997,7 +996,7 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), gofakeit.Email())
+					orgResp := Instance.CreateOrganization(ctx, integration.OrganizationName(), integration.Email())
 
 					infos := createUsers(ctx, orgResp.OrganizationId, 3, false)
 					request.Queries = []*user.SearchQuery{}
@@ -1084,7 +1083,7 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 					info := createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests.OrganizationId))
@@ -1131,8 +1130,8 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				&user.ListUsersRequest{},
 				func(ctx context.Context, request *user.ListUsersRequest) userAttrs {
-					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
-					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+					orgRespForOrgTests := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
+					orgRespForOrgTests2 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 					createUser(ctx, orgRespForOrgTests.OrganizationId, false)
 					request.Queries = []*user.SearchQuery{}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgRespForOrgTests2.OrganizationId))
@@ -1234,9 +1233,9 @@ func TestServer_SystemUsers_ListUsers(t *testing.T) {
 		require.NoError(t, err)
 	}()
 
-	org1 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	org1 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	org2 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), "org2@zitadel.com")
-	org3 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), gofakeit.Email())
+	org3 := Instance.CreateOrganization(IamCTX, integration.OrganizationName(), integration.Email())
 	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser1@zitadel.com", org1.OrganizationId, false)
 	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser2@zitadel.com", org2.OrganizationId, false)
 	_ = createUserWithUserName(IamCTX, "Test_SystemUsers_ListUser3@zitadel.com", org3.OrganizationId, false)

@@ -120,17 +120,27 @@ Now that you have set up the target and execution, you can test it by creating a
 by calling the ZITADEL API to create a human user.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/users/new' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "userId": {
-        "givenName": "Test",
-        "familyName": "User"
-    },
-    "email": {
-        "email": "example@test.com"
+    "organizationId": "336392597046099971",
+    "human":
+    {
+        "profile":
+        {
+            "givenName": "Minnie",
+            "familyName": "Mouse",
+            "nickName": "Mini",
+            "displayName": "Minnie Mouse",
+            "preferredLanguage": "en",
+            "gender": "GENDER_FEMALE"
+        },
+        "email":
+        {
+            "email": "mini@mouse.com"
+        }
     }
 }'
 ```
@@ -140,22 +150,25 @@ the [Sent information Event](./usage#sent-information-event) payload description
 
 ```json
 {
-  "aggregateID": "313014806065971608",
+  "aggregateID": "336494809936035843",
   "aggregateType": "user",
-  "resourceOwner": "312909075211944344",
-  "instanceID": "312909075211878808",
+  "resourceOwner": "336392597046099971",
+  "instanceID": "336392597046034435",
   "version": "v2",
   "sequence": 1,
   "event_type": "user.human.added",
-  "created_at": "2025-03-27T10:22:43.262665+01:00",
-  "userID": "312909075212468632",
-  "event_payload": {
-    "userName":"example@test.com",
-    "firstName":"Test",
-    "lastName":"User",
-    "displayName":"Test User",
-    "preferredLanguage":"und",
-    "email":"example@test.com"
+  "created_at": "2025-09-05T08:55:36.156333Z",
+  "userID": "336392597046755331",
+  "event_payload":
+  {
+    "email": "mini@mouse.com",
+    "gender": 1,
+    "lastName": "Mouse",
+    "nickName": "Mini",
+    "userName": "mini@mouse.com",
+    "firstName": "Minnie",
+    "displayName": "Minnie Mouse",
+    "preferredLanguage": "en"
   }
 }
 ```
@@ -164,12 +177,14 @@ The event_payload is base64 encoded and has the following content:
 
 ```json
 {
-  "userName": "example@test.com",
-  "firstName": "Test",
-  "lastName": "User",
-  "displayName": "Test User",
-  "preferredLanguage": "und",
-  "email": "example@test.com"
+  "email": "mini@mouse.com",
+  "gender": 1,
+  "lastName": "Mouse",
+  "nickName": "Mini",
+  "userName": "mini@mouse.com",
+  "firstName": "Minnie",
+  "displayName": "Minnie Mouse",
+  "preferredLanguage": "en"
 }
 ```
 

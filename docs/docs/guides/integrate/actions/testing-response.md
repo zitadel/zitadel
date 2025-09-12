@@ -109,7 +109,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 --data-raw '{
     "condition": {
         "response": {
-            "method": "/zitadel.user.v2.UserService/AddHumanUser"
+            "method": "/zitadel.user.v2.UserService/CreateUser"
         }
     },
     "targets": [
@@ -124,47 +124,81 @@ Now that you have set up the target and execution, you can test it by creating a
 by calling the ZITADEL API to create a human user.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/users/new' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "userId": {
-        "givenName": "Example_given",
-        "familyName": "Example_family"
-    },
-    "email": {
-        "email": "example@example.com"
+    "organizationId": "336392597046099971",
+    "human":
+    {
+        "profile":
+        {
+            "givenName": "Minnie",
+            "familyName": "Mouse",
+            "nickName": "Mini",
+            "displayName": "Minnie Mouse",
+            "preferredLanguage": "en",
+            "gender": "GENDER_FEMALE"
+        },
+        "email":
+        {
+            "email": "mini@mouse.com"
+        }
     }
 }'
 ```
 
 Your server should now print out something like the following. Check out
 the [Sent information Response](./usage#sent-information-response) payload description.
+The incoming request headers to the Execution are propagated via the request payload to the target.
 
 ```json
 {
-  "fullMethod": "/zitadel.user.v2.UserService/AddHumanUser",
-  "instanceID": "262851882718855632",
-  "orgID": "262851882718921168",
-  "projectID": "262851882719052240",
-  "userID": "262851882718986704",
-  "request": {
-    "profile": {
-      "given_name": "Example_given",
-      "family_name": "Example_family"
-    },
-    "email": {
-      "email": "example@example.com"
+  "fullMethod": "/zitadel.user.v2.UserService/CreateUser",
+  "instanceID": "336392597046034435",
+  "orgID": "336392597046099971",
+  "projectID": "336392597046165507",
+  "userID": "336392597046755331",
+  "request":
+  {
+    "organizationId": "336392597046099971",
+    "human":
+    {
+      "profile":
+      {
+        "givenName": "Minnie",
+        "familyName": "Mouse",
+        "nickName": "Mini",
+        "displayName": "Minnie Mouse",
+        "preferredLanguage": "en",
+        "gender": "GENDER_FEMALE"
+      },
+      "email":
+      {
+        "email": "mini@mouse.com"
+      }
     }
   },
-  "response": {
-    "user_id": "312918757460672920",
-    "details": {
-        "sequence": "2",
-        "change_date": "2025-03-26T17:28:33.856436Z",
-        "resource_owner": "312909075211944344",
-    }
+  "response":
+  {
+    "id": "336494809936035843",
+    "creationDate": "2025-09-05T08:55:36.156333Z"
+  },
+  "headers":
+  {
+    "Content-Type":
+    [
+      "application/grpc"
+    ],
+    "Host":
+    [
+      "localhost:8080"
+    ],
+    "X-Forwarded-Host":
+    [
+      "localhost:8080"
+    ]
   }
 }
 ```
