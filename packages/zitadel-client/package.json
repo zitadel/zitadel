@@ -67,11 +67,10 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
-    "lint": "pnpm run '/^lint:check:.*$/'",
-    "lint:check:eslint": "eslint 'src/**/*.ts*'",
-    "lint:check:knip": "knip",
-    "test:unit": "vitest --run",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "lint-check-eslint": "eslint 'src/**/*.ts*'",
+    "lint-check-knip": "knip",
+    "test-unit": "vitest --run",
+    "clean": "rm -rf node_modules dist"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.2",

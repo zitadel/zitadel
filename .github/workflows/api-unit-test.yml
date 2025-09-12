@@ -1,0 +1,73 @@
+name: Unit test API
+
+on: 
+  workflow_call:
+    inputs:
+      api_cache_key:
+        required: true
+        type: string
+      api_cache_path:
+        required: true
+        type: string
+      crdb_version:
+        required: false
+        type: string
+    secrets:
+      CODECOV_TOKEN:
+        required: true
+
+jobs:
+  test:
+    runs-on: 
+      group: zitadel-public
+    steps:
+      - 
+        uses: actions/checkout@v3
+      -
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+      - 
+        uses: actions/cache/restore@v4
+        timeout-minutes: 1
+        name: restore api
+        id: restore-api
+        with:
+          path: ${{ inputs.api_cache_path }}
+          key: ${{ inputs.api_cache_key }}
+          fail-on-cache-miss: true
+      -
+        id: go-cache-path
+        name: set cache path
+        run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+      - 
+        uses: actions/cache/restore@v4
+        id: cache
+        timeout-minutes: 1
+        continue-on-error: true
+        name: restore previous results
+        with:
+          key: unit-test-${{ inputs.api_cache_key }}
+          restore-keys: |
+            unit-test-api-
+          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
+      - 
+        name: test
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        run: make api_unit_test
+      - 
+        name: publish coverage
+        uses: codecov/codecov-action@v4.3.0
+        with:
+          file: profile.cov
+          name: api-unit-tests
+          flags: api-unit-tests
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - 
+        uses: actions/cache/save@v4
+        name: cache results
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        with:
+          key: unit-test-${{ inputs.api_cache_key }}
+          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
+        

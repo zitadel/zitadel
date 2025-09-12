@@ -1,0 +1,23 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "lint": {},
+    "check": {},
+    "functional-ui": {
+      "cache": false,
+      "persistent": false
+    },
+    "functional-ui:golang": {
+      "cache": false,
+      "persistent": false
+    },
+    "functional-ui:golangangular": {
+      "cache": false,
+      "persistent": false
+    },
+    "functional-ui:angular": {
+      "cache": false,
+      "persistent": false
+    }
+  }
+}

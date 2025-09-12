@@ -1,0 +1,28 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "namedInputs": {
+    "sources": ["{projectRoot}/src/**/*"]
+  },
+  "targets": {
+    "check": {},
+    "lint": {
+      "dependsOn": [
+        "sources"
+      ]
+    },
+    "lint-check-eslint": {
+      "inputs": [
+        "sources"
+      ],
+      "cache": true
+    }, 
+    "build": {
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml"
+      ],
+      "outputs": ["{projectRoot}/dist"],
+      "dependsOn": ["^generate"]
+    }
+  }
+}

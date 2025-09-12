@@ -1,0 +1,63 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "workspaceLayout": {
+    "libsDir": "packages"
+  },
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*"
+    ],
+    "docker": [
+      "{projectRoot}/Dockerfile",
+      "{projectRoot}/.dockerignore"
+    ],
+    "prettier": [
+      "{projectRoot}/.prettierignore",
+      "{projectRoot}/.prettierrc",
+      "{projectRoot}/prettier.config.mjs"
+    ]
+  },
+  "targetDefaults": {
+    "generate": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "build": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ],
+      "dependsOn": [
+        "^build",
+        "generate"
+      ]
+    },
+    "lint": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test-unit": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test-integration": {
+      "inputs": [
+        "default"
+      ]
+    },
+    "check": {
+      "dependsOn": [
+        "build",
+        "lint",
+        "test-unit",
+        "test-integration"
+      ]
+    }
+  }
+}

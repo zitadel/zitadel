@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Zitadel",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "main.go",
+            "args": [
+                 "start-from-init", "--config", "${workspaceFolder}/apps/api/api.yaml", "--steps", "${workspaceFolder}/apps/api/api.yaml", "--masterkey", "MasterkeyNeedsToHave32Characters"
+            ],
+            "envFile": "${workspaceFolder}/apps/api/.env",
+        }
+    ]
+}

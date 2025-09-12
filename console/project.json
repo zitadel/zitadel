@@ -1,0 +1,50 @@
+{
+    "$schema": "../node_modules/nx/schemas/project-schema.json",
+    "targets": {
+        "check": {
+            "description": "Check linting and formatting"
+        },
+        "lint": {
+            "description": "Run all lint checks",
+            "dependsOn": [
+                "lint-check-*"
+            ]
+        },
+        "lint-check-prettier": {
+            "inputs": [
+                "default",
+                "prettier"
+            ]
+        },
+        "generate": {
+            "description": "Generate code from protobuf definitions",
+            "inputs": [
+                "{workspaceRoot}/proto/**/*",
+                "{projectRoot}/buf.gen.yaml",
+                "{projectRoot}/package.json",
+                "{workspaceRoot}/pnpm-lock.yaml"
+            ],
+            "outputs": [
+                "{projectRoot}/src/app/proto/generated"
+            ]
+        },
+        "build": {
+            "description": "Generate code from protobuf definitions",
+            "inputs": [
+                "default",
+                "{workspaceRoot}/pnpm-lock.yaml",
+                "{workspaceRoot}/docs/frameworks.json"
+            ],
+            "outputs": [
+                "{projectRoot}/dist"
+            ]
+        },
+        "development": {
+            "continuous": true,
+            "dependsOn": [
+                "generate",
+                "^build"
+            ]
+        }
+    }
+}

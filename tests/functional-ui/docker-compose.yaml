@@ -1,0 +1,10 @@
+services:
+  api:
+    extends:
+      file: './config/localhost/docker-compose.yaml'
+      service: 'api'
+
+  db:
+    extends:
+      file: './config/localhost/docker-compose.yaml'
+      service: 'db'

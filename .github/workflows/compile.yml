@@ -3,10 +3,10 @@ name: Compile
 on:
   workflow_call:
     inputs:
-      core_cache_key:
+      api_cache_key:
         required: true
         type: string
-      core_cache_path:
+      api_cache_path:
         required: true
         type: string
       console_cache_key:
@@ -42,10 +42,10 @@ jobs:
           fail-on-cache-miss: true
       - uses: actions/cache/restore@v4
         timeout-minutes: 1
-        name: restore core
+        name: restore api
         with:
-          path: ${{ inputs.core_cache_path }}
-          key: ${{ inputs.core_cache_key }}
+          path: ${{ inputs.api_cache_path }}
+          key: ${{ inputs.api_cache_key }}
           fail-on-cache-miss: true
       - uses: actions/setup-go@v5
         with:
@@ -61,7 +61,7 @@ jobs:
       - name: create folder
         run: |
           mkdir zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
-          mv zitadel zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+          mv .artifacts/${{ matrix.goos }}/${{ matrix.goarch }}/zitadel zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
           cp LICENSE zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
           cp README.md zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
           tar -czvf zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz zitadel-${{ matrix.goos }}-${{ matrix.goarch }}

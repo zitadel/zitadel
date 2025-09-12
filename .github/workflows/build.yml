@@ -21,8 +21,14 @@ permissions:
   actions: write
 
 jobs:
-  core:
-    uses: ./.github/workflows/core.yml
+
+  check:
+    uses: ./.github/workflows/check.yml
+    with:
+      node_version: "22"
+
+  api:
+    uses: ./.github/workflows/api.yml
     with:
       node_version: "20"
       buf_version: "latest"
@@ -32,12 +38,6 @@ jobs:
     with:
       node_version: "20"
 
-  docs:
-    uses: ./.github/workflows/docs.yml
-    with:
-      node_version: "20"
-      buf_version: "latest"
-
   version:
     uses: ./.github/workflows/version.yml
     with:
@@ -45,43 +45,42 @@ jobs:
       dry_run: true
 
   compile:
-    needs: [core, console, version]
+    needs: [api, console, version]
     uses: ./.github/workflows/compile.yml
     with:
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
+      api_cache_key: ${{ needs.api.outputs.cache_key }}
       console_cache_key: ${{ needs.console.outputs.cache_key }}
-      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      api_cache_path: ${{ needs.api.outputs.cache_path }}
       console_cache_path: ${{ needs.console.outputs.cache_path }}
       version: ${{ needs.version.outputs.version }}
       node_version: "20"
 
-  core-unit-test:
-    needs: core
-    uses: ./.github/workflows/core-unit-test.yml
+  api-unit-test:
+    needs: api
+    uses: ./.github/workflows/api-unit-test.yml
     with:
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
-      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      api_cache_key: ${{ needs.api.outputs.cache_key }}
+      api_cache_path: ${{ needs.api.outputs.cache_path }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  core-integration-test:
-    needs: core
-    uses: ./.github/workflows/core-integration-test.yml
+  api-integration-test:
+    needs: api
+    uses: ./.github/workflows/api-integration-test.yml
     with:
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
-      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      api_cache_key: ${{ needs.api.outputs.cache_key }}
+      api_cache_path: ${{ needs.api.outputs.cache_path }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   lint:
-    needs: [core, console]
+    needs: [api]
     uses: ./.github/workflows/lint.yml
     with:
-      node_version: "18"
       buf_version: "latest"
       go_lint_version: "latest"
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
-      core_cache_path: ${{ needs.core.outputs.cache_path }}
+      api_cache_key: ${{ needs.api.outputs.cache_key }}
+      api_cache_path: ${{ needs.api.outputs.cache_path }}
 
   container:
     needs: [compile]
@@ -91,25 +90,12 @@ jobs:
       packages: write
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
-      build_image_name: "ghcr.io/zitadel/zitadel-build"
+      node_version: "22"
+      build_image_name_api: "ghcr.io/zitadel/zitadel-build"
+      build_image_name_login: "ghcr.io/zitadel/zitadel-login-build"
 
-  login-container:
-    uses: ./.github/workflows/login-container.yml
-    permissions:
-      packages: write
-      id-token: write
-    with:
-      login_build_image_name: "ghcr.io/zitadel/zitadel-login-build"
-      node_version: "20"
-
-  login-integration-test:
-    uses: ./.github/workflows/login-integration-test.yml
-    needs: [login-container]
-    with:
-      login_build_image: ${{ needs.login-container.outputs.login_build_image }}
-
-  e2e:
-    uses: ./.github/workflows/e2e.yml
+  functional-ui:
+    uses: ./.github/workflows/functional-ui.yml
     needs: [compile]
 
   release:
@@ -122,13 +108,12 @@ jobs:
     needs:
       [
         version,
-        core-unit-test,
-        core-integration-test,
+        api-unit-test,
+        api-integration-test,
         lint,
+        check,
         container,
-        login-container,
-        login-integration-test,
-        e2e,
+        functional-ui,
       ]
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
@@ -136,10 +121,10 @@ jobs:
       APP_ID: ${{ secrets.APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
     with:
-      build_image_name: ${{ needs.container.outputs.build_image }}
+      build_image_name: ${{ needs.container.outputs.build_image_api }}
       semantic_version: "23.0.7"
       image_name: "ghcr.io/zitadel/zitadel"
       google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      build_image_name_login: ${{ needs.login-container.outputs.login_build_image }}
+      build_image_name_login: ${{ needs.container.outputs.build_image_login }}
       image_name_login: "ghcr.io/zitadel/zitadel-login"
       google_image_name_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"

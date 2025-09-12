@@ -1,0 +1,68 @@
+{
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "check": {},
+    "ensure-plugins": {
+      "inputs": [
+        "{projectRoot}/plugin-download.sh"
+      ],
+      "outputs": [
+        "{projectRoot}/protoc-gen-connect-openapi/protoc-gen-connect-openapi"
+      ],
+      "cache": true
+    },
+    "generate-grpc": {
+      "dependsOn": [
+        "ensure-plugins"
+      ],
+      "outputs": [
+        "{projectRoot}/.artifacts/openapi",
+        "{projectRoot}/.artifacts/openapi3"
+      ],
+      "cache": true
+    },
+    "generate-apidocs": {
+      "dependsOn": [
+        "generate-grpc"
+      ],
+      "outputs": [
+        "{projectRoot}/docs/api"
+      ],
+      "cache": true
+    },
+    "generate-configdocs": {
+      "inputs": [
+        "{workspaceRoot}/cmd/defaults.yaml",
+        "{workspaceRoot}/cmd/setup/steps.yaml"
+      ],
+      "outputs": [
+        "{projectRoot}/docs/self-hosting/manage/configure/defaults.yaml",
+        "{projectRoot}/docs/self-hosting/manage/configure/steps.yaml"
+      ],
+      "cache": true
+    },
+    "generate": {
+      "dependsOn": [
+        "generate-apidocs",
+        "generate-configdocs"
+      ]
+    },
+    "build": {
+      "outputs": [
+        "{projectRoot}/build"
+      ]
+    },
+    "prod": {
+      "continuous": true,
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "dev": {
+      "continuous": true,
+      "dependsOn": [
+        "generate"
+      ]
+    }
+  }
+}

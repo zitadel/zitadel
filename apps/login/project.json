@@ -1,0 +1,102 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "build": {
+      "description": "Build the Next.js application in standalone mode for production. (Cache is disabled because it doesn't work https://github.com/nrwl/nx/issues/27724)",
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/.env.*",
+        "!{projectRoot}/.local.env",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/cypress.config.ts"
+      ],
+      "outputs": [
+        "{projectRoot}/.next/standalone"
+      ]
+    },
+    "build-vercel": {
+      "description": "Build for Vercel deployment",
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/.env.*",
+        "!{projectRoot}/.local.env",
+        "!{projectRoot}/integration/**/*",
+        "!{projectRoot}/acceptance/**/*",
+        "!{projectRoot}/cypress.config.ts"
+      ],
+      "outputs": [
+        "{projectRoot}/.next",
+        "!{projectRoot}/.next/cache",
+        "!{projectRoot}/.next/standalone"
+      ]
+    },
+    "check": {
+      "description": "Run code quality checks (linting, formatting, testing and building)"
+    },
+    "lint": {
+      "description": "Run all linters",
+      "dependsOn": [
+        "lint-check-*"
+      ]
+    },
+    "lint-check-prettier": {
+      "cache": true,
+      "inputs": [
+        "prettier",
+        "{projectRoot}/constants/**/*",
+        "{projectRoot}/src/**/*",
+        "{projectRoot}/locales/**/*",
+        "{projectRoot}/scripts/healthcheck.js"
+      ]
+    },
+    "test-unit": {
+      "description": "Run unit tests",
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "prod": {
+      "continuous": true,
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "dev": {
+      "continuous": true,
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "test-integration-env": {
+      "description": "Starts the login-api-mock and the api for integration tests",
+      "continuous": true,
+      "dependsOn": [
+        "@zitadel/login-api-mock:serve",
+        "build"
+      ],
+      "command": "nx run @zitadel/login:prod"
+    },
+    "test-integration": {
+      "cache": true,
+      "dependsOn": [
+        "test-integration-env"
+      ],
+      "inputs": [
+        "{projectRoot}/integration/integration/**",
+        "{projectRoot}/integration/support/**",
+        "{projectRoot}/cypress.config.ts"
+      ]
+    }
+  }
+}

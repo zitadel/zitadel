@@ -1,0 +1,43 @@
+{
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "name": "@zitadel/api",
+    "projectType": "application",
+    "targets": {
+        "build": {
+            "description": "Build the Zitadel API application",
+            "command": "make api_build compile_pipeline",
+            "inputs": [
+                "{workspaceRoot}/cmd/**/*",
+                "{workspaceRoot}/internal/**/*",
+                "{workspaceRoot}/proto/**/*",
+                "{workspaceRoot}/pkg/**/*",
+                "{workspaceRoot}/Makefile",
+                "{workspaceRoot}/go.mod",
+                "{workspaceRoot}/go.sum",
+                "{workspaceRoot}/main.go"
+            ],
+            "outputs": [
+                "{workspaceRoot}/zitadel"
+            ],
+            "dependsOn": [
+                "@zitadel/console:build"
+            ]
+        },
+        "generate": {
+            "description": "Generate the code needed to start the API",
+            "command": "make api_build"
+        },
+        "prod": {
+            "continuous": true,
+            "dependsOn": [
+                "build"
+            ],
+            "options": {
+                "env": {
+                    "API_CONFIG_FILE": "{projectRoot}/api.yaml"
+                }
+            },
+            "command": "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\"; ./.artifacts/$(go env GOOS)/$(go env GOARCH)/zitadel start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'"
+        }
+    }
+}
