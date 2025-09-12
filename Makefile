@@ -12,16 +12,17 @@ ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
 export GOCOVERDIR ZITADEL_MASTERKEY
 
-LOGIN_REMOTE_NAME := login
-LOGIN_REMOTE_URL ?= https://github.com/zitadel/typescript.git
-LOGIN_REMOTE_BRANCH ?= main
+GOOS?=$(go env GOOS)
+GOARCH?=$(go env GOARCH)
+
+export GOOS GOARCH
 
 .PHONY: compile
 compile: api_build console_build compile_pipeline
 
 .PHONY: docker_image
 docker_image:
-	@if [ ! -f ./zitadel ]; then \
+	@if [ ! -f .artifacts/${GOOS}/${GOARCH}/zitadel ]; then \
 		echo "Compiling zitadel binary"; \
 		$(MAKE) compile; \
 	else \
@@ -31,8 +32,8 @@ docker_image:
 
 .PHONY: compile_pipeline
 compile_pipeline: console_move
-	CGO_ENABLED=0 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=$(COMMIT_SHA)' -X 'github.com/zitadel/zitadel/cmd/build.date=$(now)' -X 'github.com/zitadel/zitadel/cmd/build.version=$(VERSION)' "
-	chmod +x zitadel
+	CGO_ENABLED=0 go build -o .artifacts/${GOOS}/${GOARCH}/zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=$(COMMIT_SHA)' -X 'github.com/zitadel/zitadel/cmd/build.date=$(now)' -X 'github.com/zitadel/zitadel/cmd/build.version=$(VERSION)' "
+	chmod +x .artifacts/${GOOS}/${GOARCH}/zitadel
 
 .PHONY: api_dependencies
 api_dependencies:

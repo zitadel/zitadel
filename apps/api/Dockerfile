@@ -1,11 +1,12 @@
-FROM --platform=$TARGETPLATFORM debian:latest as artifact
-ENV ZITADEL_ARGS=
+FROM debian:latest AS artifact
 ARG TARGETPLATFORM
+
+ENV ZITADEL_ARGS=
 
 RUN apt-get update && apt-get install ca-certificates -y
 
 COPY apps/api/entrypoint.sh /app/entrypoint.sh
-COPY zitadel /app/zitadel
+COPY ${TARGETPLATFORM}/zitadel /app/zitadel
 
 RUN useradd -s "" --home / zitadel && \
     chown zitadel /app/zitadel && \
@@ -19,8 +20,7 @@ ENV PATH="/app:${PATH}"
 USER zitadel
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-FROM --platform=$TARGETPLATFORM scratch as final
-ARG TARGETPLATFORM
+FROM scratch AS final
 
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
