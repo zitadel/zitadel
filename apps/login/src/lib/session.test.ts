@@ -855,6 +855,44 @@ describe("isSessionValid", () => {
 
       expect(result).toBe(true);
     });
+
+    test("should return true when authenticated with IDP intent even with forced MFA", async () => {
+      const verifiedTimestamp = createMockTimestamp();
+      const session = createMockSession({
+        factors: {
+          user: {
+            id: mockUserId,
+            organizationId: mockOrganizationId,
+            loginName: "test@example.com",
+            displayName: "Test User",
+            verifiedAt: verifiedTimestamp,
+          },
+          intent: {
+            verifiedAt: verifiedTimestamp,
+          },
+          // No password factor, no MFA factors
+        },
+      });
+
+      // Organization enforces MFA
+      vi.mocked(zitadelModule.getLoginSettings).mockResolvedValue({
+        forceMfa: true,
+        forceMfaLocalOnly: false,
+      } as any);
+
+      // User has MFA methods configured but none verified
+      vi.mocked(zitadelModule.listAuthenticationMethodTypes).mockResolvedValue({
+        authMethodTypes: [AuthenticationMethodType.TOTP, AuthenticationMethodType.OTP_EMAIL],
+      } as any);
+
+      // Should still return true because IDP bypasses MFA requirements
+      const result = await isSessionValid({ serviceUrl: mockServiceUrl, session });
+
+      expect(result).toBe(true);
+      // Verify that getLoginSettings was not called since IDP should bypass MFA check entirely
+      expect(zitadelModule.getLoginSettings).not.toHaveBeenCalled();
+      expect(zitadelModule.listAuthenticationMethodTypes).not.toHaveBeenCalled();
+    });
   });
 
   describe("edge cases", () => {
