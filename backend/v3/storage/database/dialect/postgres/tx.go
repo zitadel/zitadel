@@ -9,24 +9,30 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 )
 
-type pgxTx struct{ pgx.Tx }
+type Transaction struct{ pgx.Tx }
 
-var _ database.Transaction = (*pgxTx)(nil)
+func PGxTx(tx pgx.Tx) *Transaction {
+	return &Transaction{
+		Tx: tx,
+	}
+}
+
+var _ database.Transaction = (*Transaction)(nil)
 
 // Commit implements [database.Transaction].
-func (tx *pgxTx) Commit(ctx context.Context) error {
+func (tx *Transaction) Commit(ctx context.Context) error {
 	err := tx.Tx.Commit(ctx)
 	return wrapError(err)
 }
 
 // Rollback implements [database.Transaction].
-func (tx *pgxTx) Rollback(ctx context.Context) error {
+func (tx *Transaction) Rollback(ctx context.Context) error {
 	err := tx.Tx.Rollback(ctx)
 	return wrapError(err)
 }
 
 // End implements [database.Transaction].
-func (tx *pgxTx) End(ctx context.Context, err error) error {
+func (tx *Transaction) End(ctx context.Context, err error) error {
 	if err != nil {
 		rollbackErr := tx.Rollback(ctx)
 		if rollbackErr != nil {
@@ -39,7 +45,7 @@ func (tx *pgxTx) End(ctx context.Context, err error) error {
 
 // Query implements [database.Transaction].
 // Subtle: this method shadows the method (Tx).Query of pgxTx.Tx.
-func (tx *pgxTx) Query(ctx context.Context, sql string, args ...any) (database.Rows, error) {
+func (tx *Transaction) Query(ctx context.Context, sql string, args ...any) (database.Rows, error) {
 	rows, err := tx.Tx.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, wrapError(err)
@@ -49,13 +55,13 @@ func (tx *pgxTx) Query(ctx context.Context, sql string, args ...any) (database.R
 
 // QueryRow implements [database.Transaction].
 // Subtle: this method shadows the method (Tx).QueryRow of pgxTx.Tx.
-func (tx *pgxTx) QueryRow(ctx context.Context, sql string, args ...any) database.Row {
+func (tx *Transaction) QueryRow(ctx context.Context, sql string, args ...any) database.Row {
 	return &Row{tx.Tx.QueryRow(ctx, sql, args...)}
 }
 
 // Exec implements [database.Transaction].
 // Subtle: this method shadows the method (Pool).Exec of pgxPool.Pool.
-func (tx *pgxTx) Exec(ctx context.Context, sql string, args ...any) (int64, error) {
+func (tx *Transaction) Exec(ctx context.Context, sql string, args ...any) (int64, error) {
 	res, err := tx.Tx.Exec(ctx, sql, args...)
 	if err != nil {
 		return 0, wrapError(err)
@@ -65,12 +71,12 @@ func (tx *pgxTx) Exec(ctx context.Context, sql string, args ...any) (int64, erro
 
 // Begin implements [database.Transaction].
 // As postgres does not support nested transactions we use savepoints to emulate them.
-func (tx *pgxTx) Begin(ctx context.Context) (database.Transaction, error) {
+func (tx *Transaction) Begin(ctx context.Context) (database.Transaction, error) {
 	savepoint, err := tx.Tx.Begin(ctx)
 	if err != nil {
 		return nil, wrapError(err)
 	}
-	return &pgxTx{savepoint}, nil
+	return &Transaction{savepoint}, nil
 }
 
 func transactionOptionsToPgx(opts *database.TransactionOptions) pgx.TxOptions {

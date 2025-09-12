@@ -27,7 +27,7 @@ func (c *pgxConn) Begin(ctx context.Context, opts *database.TransactionOptions) 
 	if err != nil {
 		return nil, wrapError(err)
 	}
-	return &pgxTx{tx}, nil
+	return &Transaction{tx}, nil
 }
 
 // Query implements sql.Client.
@@ -54,6 +54,11 @@ func (c *pgxConn) Exec(ctx context.Context, sql string, args ...any) (int64, err
 		return 0, wrapError(err)
 	}
 	return res.RowsAffected(), nil
+}
+
+// Ping implements [database.Pool].
+func (c *pgxConn) Ping(ctx context.Context) error {
+	return wrapError(c.Conn.Ping(ctx))
 }
 
 // Migrate implements [database.Migrator].

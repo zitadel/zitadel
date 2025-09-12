@@ -61,7 +61,12 @@ func (c *sqlPool) Begin(ctx context.Context, opts *database.TransactionOptions) 
 	if err != nil {
 		return nil, wrapError(err)
 	}
-	return &sqlTx{tx}, nil
+	return &Transaction{tx}, nil
+}
+
+// Ping implements [database.Pool].
+func (c *sqlPool) Ping(ctx context.Context) error {
+	return wrapError(c.PingContext(ctx))
 }
 
 // Close implements [database.Pool].

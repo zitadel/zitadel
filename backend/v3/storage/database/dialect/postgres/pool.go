@@ -62,13 +62,18 @@ func (c *pgxPool) Begin(ctx context.Context, opts *database.TransactionOptions) 
 	if err != nil {
 		return nil, wrapError(err)
 	}
-	return &pgxTx{tx}, nil
+	return &Transaction{tx}, nil
 }
 
 // Close implements [database.Pool].
 func (c *pgxPool) Close(_ context.Context) error {
 	c.Pool.Close()
 	return nil
+}
+
+// Ping implements [database.Pool].
+func (c *pgxPool) Ping(ctx context.Context) error {
+	return wrapError(c.Pool.Ping(ctx))
 }
 
 // Migrate implements [database.Migrator].

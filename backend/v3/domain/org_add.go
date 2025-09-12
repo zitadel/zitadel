@@ -1,18 +1,19 @@
 package domain
 
-// import (
-// 	"context"
+import (
+	"context"
 
-// 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
-// )
+	legacy_es "github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/org"
+)
 
-// // AddOrgCommand adds a new organization.
-// // I'm unsure if we should add the Admins here or if this should be a separate command.
-// type AddOrgCommand struct {
-// 	ID     string              `json:"id"`
-// 	Name   string              `json:"name"`
-// 	Admins []*AddMemberCommand `json:"admins"`
-// }
+// AddOrgCommand adds a new organization.
+// I'm unsure if we should add the Admins here or if this should be a separate command.
+type AddOrgCommand struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	// Admins []*AddMemberCommand `json:"admins"`
+}
 
 // func NewAddOrgCommand(name string, admins ...*AddMemberCommand) *AddOrgCommand {
 // 	return &AddOrgCommand{
@@ -63,17 +64,12 @@ package domain
 // 	return nil
 // }
 
-// // Events implements [eventer].
-// func (cmd *AddOrgCommand) Events() []*eventstore.Event {
-// 	return []*eventstore.Event{
-// 		{
-// 			AggregateType: "org",
-// 			AggregateID:   cmd.ID,
-// 			Type:          "org.added",
-// 			Payload:       cmd,
-// 		},
-// 	}
-// }
+// Events implements [eventer].
+func (cmd *AddOrgCommand) Events(ctx context.Context) []legacy_es.Command {
+	return []legacy_es.Command{
+		org.NewOrgAddedEvent(ctx, &org.NewAggregate(cmd.ID).Aggregate, cmd.Name),
+	}
+}
 
 // var (
 // 	_ Commander = (*AddOrgCommand)(nil)

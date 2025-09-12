@@ -14,7 +14,8 @@ import (
 	reflect "reflect"
 
 	decimal "github.com/shopspring/decimal"
-	database "github.com/zitadel/zitadel/internal/database"
+	database "github.com/zitadel/zitadel/backend/v3/storage/database"
+	database0 "github.com/zitadel/zitadel/internal/database"
 	eventstore "github.com/zitadel/zitadel/internal/eventstore"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -43,10 +44,10 @@ func (m *MockQuerier) EXPECT() *MockQuerierMockRecorder {
 }
 
 // Client mocks base method.
-func (m *MockQuerier) Client() *database.DB {
+func (m *MockQuerier) Client() *database0.DB {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Client")
-	ret0, _ := ret[0].(*database.DB)
+	ret0, _ := ret[0].(*database0.DB)
 	return ret0
 }
 
@@ -137,20 +138,6 @@ func (m *MockPusher) EXPECT() *MockPusherMockRecorder {
 	return m.recorder
 }
 
-// Client mocks base method.
-func (m *MockPusher) Client() *database.DB {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Client")
-	ret0, _ := ret[0].(*database.DB)
-	return ret0
-}
-
-// Client indicates an expected call of Client.
-func (mr *MockPusherMockRecorder) Client() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockPusher)(nil).Client))
-}
-
 // Health mocks base method.
 func (m *MockPusher) Health(arg0 context.Context) error {
 	m.ctrl.T.Helper()
@@ -166,7 +153,7 @@ func (mr *MockPusherMockRecorder) Health(arg0 any) *gomock.Call {
 }
 
 // Push mocks base method.
-func (m *MockPusher) Push(arg0 context.Context, arg1 database.ContextQueryExecuter, arg2 ...eventstore.Command) ([]eventstore.Event, error) {
+func (m *MockPusher) Push(arg0 context.Context, arg1 database.QueryExecutor, arg2 ...eventstore.Command) ([]eventstore.Event, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {

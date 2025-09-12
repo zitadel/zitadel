@@ -95,6 +95,10 @@ func (e *IntegrityViolationError) Is(target error) bool {
 	return ok
 }
 
+func (e *IntegrityViolationError) Unwrap() error {
+	return e.original
+}
+
 // CheckError is returned when a check constraint fails.
 // It wraps the [IntegrityViolationError] to provide more context.
 // It is used to indicate that a check constraint was violated during an insert or update operation.
