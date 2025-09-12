@@ -37,7 +37,7 @@ jobs:
       cache_path: ${{ env.cache_path }}
     steps:
         - 
-          uses: actions/checkout@v4
+          uses: actions/checkout@v5
         - 
           uses: actions/cache/restore@v4
           timeout-minutes: 1
@@ -58,7 +58,7 @@ jobs:
         - 
           # node to install sass
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-          uses: actions/setup-node@v4
+          uses: actions/setup-node@v5
           with:
             node-version: ${{ inputs.node_version }}
         - 
@@ -67,7 +67,7 @@ jobs:
         
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-          uses: actions/setup-go@v5
+          uses: actions/setup-go@v6
           with:
             go-version-file: 'go.mod'
         - 
