@@ -10,6 +10,8 @@
       "inputs": [
         "default",
         "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/.env.*",
+        "!{projectRoot}/.local.env",
         "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",
         "!{projectRoot}/cypress.config.ts"
@@ -27,6 +29,8 @@
       "inputs": [
         "default",
         "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/.env.*",
+        "!{projectRoot}/.local.env",
         "!{projectRoot}/integration/**/*",
         "!{projectRoot}/acceptance/**/*",
         "!{projectRoot}/cypress.config.ts"
