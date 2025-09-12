@@ -60,9 +60,11 @@ jobs:
           make compile_pipeline
       - name: create folder
         run: |
-          cp LICENSE .artifacts/${{ matrix.goos }}/${{ matrix.goarch }}/
-          cp README.md .artifacts/${{ matrix.goos }}/${{ matrix.goarch }}/
-          tar -czvf zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz .artifacts/${{ matrix.goos }}/${{ matrix.goarch }}/
+          mkdir zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+          mv .artifacts/${{ matrix.goos }}/${{ matrix.goarch }}/zitadel zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+          cp LICENSE zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+          cp README.md zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+          tar -czvf zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
       - uses: actions/upload-artifact@v4
         with:
           name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
