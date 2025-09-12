@@ -12,8 +12,8 @@ ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
 export GOCOVERDIR ZITADEL_MASTERKEY
 
-GOOS?=$(shell go env GOOS)
-GOARCH?=$(shell go env GOARCH)
+GOOS?=$(go env GOOS)
+GOARCH?=$(go env GOARCH)
 
 export GOOS GOARCH
 
@@ -94,7 +94,7 @@ api_build: api_dependencies api_stubs api_static api_assets
 
 .PHONY: console_move
 console_move:
-	cp -r apps/console/dist/console/* internal/api/ui/console/static
+	cp -r console/dist/console/* internal/api/ui/console/static
 
 .PHONY: console_dependencies
 console_dependencies:

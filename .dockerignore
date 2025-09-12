@@ -8,9 +8,9 @@
 **/.pnpm-store
 **/.nx
 **/.next
-apps/console/src/app/proto/generated/
-apps/console/.angular
-apps/console/tmp/
+console/src/app/proto/generated/
+console/.angular
+console/tmp/
 .releaserc.js
 changelog.config.js
 CONTRIBUTING.md

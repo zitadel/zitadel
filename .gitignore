@@ -47,7 +47,7 @@ cmd/zitadel/zitadel
 
 # buildfolders and generated files
 tmp/
-apps/console/src/app/proto/generated/
+console/src/app/proto/generated/
 **.pb.go
 !pkg/grpc/protoc/v2/options.pb.go
 **.proto.mock.go

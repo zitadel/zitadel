@@ -1,5 +1,6 @@
 packages:
   - docs
+  - console
   - tests/*
   - packages/*
   - apps/*

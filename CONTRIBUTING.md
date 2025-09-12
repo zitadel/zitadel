@@ -158,10 +158,10 @@ The code consists of the following parts:
 | ------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
 | API implementation  | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to API](#api)                   |
 | API definitions     | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#api)                   |
-| Console             | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./apps/console](./apps/console)                              | [Contribute to Frontend](#frontend) |
+| Console             | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#frontend) |
 | login               | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#frontend) |
 | docs                | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#frontend) |
-| translations        | Internationalization files for default languages   | YAML                                                                                                      | [./apps/console](./apps/console) and [./internal](./internal) | [Contribute Translations](#translations) |
+| translations        | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#translations) |
 
 Please follow the guides to validate and test the code before you contribute.
 
@@ -462,14 +462,14 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 ### <a name="console"></a>Contribute to Console
 
 To start developing the Console, make sure your system has the [required system dependencies](#dev-requirements) installed.
-To learn more about the Console, go to the Consoles [README.md](./apps/console).
+To learn more about the Console, go to the Consoles [README.md](./console).
 Get familiar with the [Console quick start](#console-quick-start).
 
 #### Develop against a Cloud instance
 
 If you don't want to build and run a local API, you can just run the console development server and point it to a cloud instance.
 
-1. Save the following file to apps/console/.env.local
+1. Save the following file to console/.env.local
 
 ```env
 ENVIRONMENT_JSON_URL=https://[your-cloud-instance-domain]/ui/console/assets/environment.json
@@ -606,7 +606,7 @@ nx run @zitadel/login:dev  # Should start dev server at http://localhost:3000/ui
 
 Zitadel loads translations from four files:
 
-- [Console texts](./apps/console/src/assets/i18n)
+- [Console texts](./console/src/assets/i18n)
 - [Login interface](./internal/api/ui/login/static/i18n)
 - [Email notification](./internal/notification/static/i18n)
 - [Common texts](./internal/static/i18n) for success or error toasts
@@ -617,8 +617,8 @@ If you have added support for a new language, please also ensure that it is adde
 
 You also have to add some changes to the following files:
 
-- [Register Local File](./apps/console/src/app/app.module.ts)
-- [Add Supported Language](./apps/console/src/app/utils/language.ts)
+- [Register Local File](./console/src/app/app.module.ts)
+- [Add Supported Language](./console/src/app/utils/language.ts)
 - [Customized Text Docs](./docs/docs/guides/manage/customize/texts.md)
 - [Add language option](./internal/api/ui/login/static/templates/external_not_found_option.html)
 

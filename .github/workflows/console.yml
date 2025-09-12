@@ -13,7 +13,7 @@ on:
         value: ${{ jobs.build.outputs.cache_path }}
 
 env:
-  cache_path: apps/console/dist/console
+  cache_path: console/dist/console
 
 jobs:
   build:
@@ -29,7 +29,7 @@ jobs:
         continue-on-error: true
         id: cache
         with:
-          key: console-${{ hashFiles('apps/console', 'proto', '!apps/console/dist') }}
+          key: console-${{ hashFiles('console', 'proto', '!console/dist') }}
           restore-keys: |
             console-
           path: ${{ env.cache_path }}
