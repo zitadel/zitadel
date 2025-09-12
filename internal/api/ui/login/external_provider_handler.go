@@ -321,14 +321,22 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
+		// Use the GitHub-specific session that handles email fetching
+		session = &github.Session{
+			Session: oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs),
+			Provider: provider,
+		}
 	case domain.IDPTypeGitHubEnterprise:
 		provider, err := l.githubEnterpriseProvider(r.Context(), identityProvider)
 		if err != nil {
 			l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs)
+		// Use the GitHub-specific session for GitHub Enterprise too
+		session = &github.Session{
+			Session: oauth.NewSession(provider.Provider, data.Code, authReq.SelectedIDPConfigArgs),
+			Provider: provider,
+		}
 	case domain.IDPTypeGitLab:
 		provider, err := l.gitlabProvider(r.Context(), identityProvider)
 		if err != nil {
