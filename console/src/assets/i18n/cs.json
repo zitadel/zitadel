@@ -1961,6 +1961,7 @@
       "CREATE_DESC": "Vložte název vašeho projektu.",
       "ROLE": "Role",
       "NOITEMS": "Žádné projekty",
+      "USERSELFACCOUNT": "Použijte svůj osobní účet jako vlastník projektu.",
       "ZITADELPROJECT": "Tato nastavení jsou základní nastavení instance projektu ZITADEL. Pozor: Pokud provedete změny, ZITADEL se nemusí chovat podle očekávání.",
       "TYPE": {
         "OWNED": "Vlastní projekty",
