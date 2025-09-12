@@ -1545,7 +1545,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1624,12 +1625,8 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Standardorganisation für die Anmeldung",
       "LOGINDEFAULTORG_DESCRIPTION": "Die Anmelde-Benutzeroberfläche verwendet die Einstellungen der Standardorganisation (und nicht von der Instanz), wenn kein Organisationskontext festgelegt ist.",
-      "OIDCLEGACYINTROSPECTION": "OIDC Legacy-Introspektion",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Wir haben kürzlich den Introspektionsendpunkt aus Leistungsgründen neu strukturiert. Mit diesem Feature können Sie zur alten Implementierung zurückkehren, falls unerwartete Fehler auftreten.",
       "OIDCTOKENEXCHANGE": "OIDC Token-Austausch",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktivieren Sie den experimentellen urn:ietf:params:oauth:grant-type:token-exchange-Grant-Typ für den OIDC-Token-Endpunkt. Der Token-Austausch kann verwendet werden, um Token mit einem geringeren Umfang anzufordern oder andere Benutzer zu impersonieren. Siehe die Sicherheitsrichtlinie, um die Impersonation auf einer Instanz zu erlauben.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Trigger-Introspektionsprojektionen",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Aktivieren Sie Projektionstrigger während einer Introspektionsanfrage. Dies kann als Workaround fungieren, wenn bemerkbare Konsistenzprobleme in der Introspektionsantwort auftreten, kann sich jedoch auf die Leistung auswirken. Wir planen, Trigger für Introspektionsanfragen in Zukunft zu entfernen.",
       "USERSCHEMA": "Benutzerschema",
       "USERSCHEMA_DESCRIPTION": "Benutzerschemata ermöglichen das Verwalten von Datenschemata von Benutzern. Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "ACTIONS": "Aktionen",
@@ -1638,14 +1635,10 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Wenn das Flag aktiviert ist, können Sie eine einzelne Sitzung über die Login-Benutzeroberfläche beenden, indem Sie einen id_token mit einem `sid` Claim als id_token_hint am Endpunkt end_session übergeben. Beachten Sie, dass derzeit alle Sitzungen desselben Benutzeragenten (Browser) in der Login-Benutzeroberfläche beendet werden. Sitzungen, die über die Session API verwaltet werden, ermöglichen bereits die Beendigung einzelner Sitzungen.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Wenn die Flagge aktiviert ist, wird der OIDC-Elternfehler in der Konsole protokolliert.",
-      "DISABLEUSERTOKENEVENT": "Benutzer-Token-Ereignis deaktivieren",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Backchannel-Logout aktivieren",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Der Back-Channel-Logout implementiert OpenID Connect Back-Channel Logout 1.0 und kann verwendet werden, um Clients über die Beendigung der Sitzung beim OpenID-Provider zu benachrichtigen.",
       "PERMISSIONCHECKV2": "Berechtigungsprüfung V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
-      "WEBKEY": "Web-Schlüssel",
-      "WEBKEY_DESCRIPTION": "Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "STATES": {
         "INHERITED": "Erben",
         "ENABLED": "Aktiviert",
@@ -1661,7 +1654,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wenn diese Option aktiviert ist, verwendet die Konsole die V2 User API, um neue Benutzer zu erstellen. Mit der V2 API starten neu erstellte Benutzer nicht im Initial Zustand.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Durch das Aktivieren wird das neue TypeScript-basierte Login-UI mit verbesserter Sicherheit, Leistung und Anpassbarkeit aktiviert.",
-      "LOGINV2_BASEURI": "Basis-URI"
+      "LOGINV2_BASEURI": "Basis-URI",
+      "ENABLERELATIONALTABLES": "Relationale Tabellen",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktivieren Sie diese Option, um relationale Tabellen anstelle von Projektionen zur Datenspeicherung zu verwenden. Diese Option hat derzeit keine Auswirkung."
     },
     "DIALOG": {
       "RESET": {
@@ -1800,7 +1795,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -2754,7 +2750,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

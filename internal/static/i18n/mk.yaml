@@ -115,6 +115,7 @@ Errors:
       AlreadyVerified: Телефонскиот број веќе е верифициран
       Empty: Телефонскиот број е празен
       NotChanged: Телефонскиот број не е променет
+      VerifyingRemovalIsNotSupported: Отстранувањето на верификацијата не е поддржано
     Address:
       NotFound: Адресата не е пронајдена
       NotChanged: Адресата не е променета
@@ -192,7 +193,7 @@ Errors:
     AlreadyExists: Инстанцата веќе постои
     NotChanged: Инстанцата не е променета
   Org:
-    AlreadyExists: Името на организацијата е веќе зафатено
+    AlreadyExists: Името или ID-то на организацијата е веќе зафатено
     Invalid: Организацијата е невалидна
     AlreadyDeactivated: Организацијата е веќе деактивирана
     AlreadyActive: Организацијата е веќе активна
@@ -434,8 +435,6 @@ Errors:
     Invalid: Овластувањето на корисникот е невалидно
     NotChanged: Овластувањето на корисникот не е променето
     IDMissing: ID недостасува
-    NotActive: Овластувањето на корисникот не е активно
-    NotInactive: Овластувањето на корисникот не е неактивно
     NoPermissionForProject: Корисникот нема овластувања за овој проект
     RoleKeyNotFound: Улогата не е пронајдена
   Member:

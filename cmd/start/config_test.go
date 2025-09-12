@@ -73,9 +73,10 @@ Log:
 DefaultInstance:
   Features:
     LoginDefaultOrg: true
-    LegacyIntrospection: true
-    TriggerIntrospectionProjections: true
     UserSchema: true
+    LoginV2:
+      Required: true
+      BaseURI: 'http://zitadel:8080'
 Log:
   Level: info
 Actions:
@@ -83,11 +84,13 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceFeatures{
-				LoginDefaultOrg:                 gu.Ptr(true),
-				LegacyIntrospection:             gu.Ptr(true),
-				TriggerIntrospectionProjections: gu.Ptr(true),
-				UserSchema:                      gu.Ptr(true),
+			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceSetupFeatures{
+				LoginDefaultOrg: gu.Ptr(true),
+				UserSchema:      gu.Ptr(true),
+				LoginV2: &command.InstanceSetupFeatureLoginV2{
+					Required: true,
+					BaseURI:  gu.Ptr("http://zitadel:8080"),
+				},
 			})
 		},
 	}, {

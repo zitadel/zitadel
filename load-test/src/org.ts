@@ -13,7 +13,7 @@ export function createOrg(accessToken: string): Promise<Org> {
   return new Promise((resolve, reject) => {
     let response = http.asyncRequest(
       'POST',
-      url('/v2beta/organizations'),
+      url('/v2/organizations'),
       JSON.stringify({
         name: `load-test-${new Date(Date.now()).toISOString()}`,
       }),
@@ -29,7 +29,7 @@ export function createOrg(accessToken: string): Promise<Org> {
     response.then((res) => {
       check(res, {
         'org created': (r) => {
-          return r !== undefined && r.status === 201;
+          return r !== undefined && r.status >= 200 && r.status < 300;
         },
       }) || reject(`unable to create org status: ${res.status} || body: ${res.body}`);
 
@@ -49,7 +49,7 @@ export function removeOrg(org: Org, accessToken: string) {
   });
 
   check(response, {
-    'org removed': (r) => r.status === 200,
+    'org removed': (r) => r.status >= 200 && r.status < 300,
   }) || console.log(`status: ${response.status} || body: ${response.body}|| org: ${JSON.stringify(org)}`);
 
   return response.json();

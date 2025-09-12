@@ -1,0 +1,15 @@
+<!-- the cdk overlay doesn't like it's properties being changed that's why we used the ng if to rerender it -->
+<ng-template
+  *ngIf="isOpen$ | async as isOpen"
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOpen"
+  [cdkConnectedOverlayPositionStrategy]="positionStrategy()"
+  [cdkConnectedOverlayScrollStrategy]="scrollStrategy"
+  [cdkConnectedOverlayHasBackdrop]="isHandset()"
+  (overlayOutsideClick)="closed.emit()"
+>
+  <div class="dropdown-content">
+    <ng-content></ng-content>
+  </div>
+</ng-template>

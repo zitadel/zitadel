@@ -127,7 +127,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 						return func(goja.FunctionCall) goja.Value {
 							metadata, err := l.query.SearchOrgMetadata(
 								ctx,
-								true,
+								false,
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
 								false,
@@ -322,7 +322,7 @@ func (l *Login) runPreCreationActions(
 						return func(goja.FunctionCall) goja.Value {
 							metadata, err := l.query.SearchOrgMetadata(
 								ctx,
-								true,
+								false,
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
 								false,
@@ -398,7 +398,7 @@ func (l *Login) runPostCreationActions(
 						return func(goja.FunctionCall) goja.Value {
 							metadata, err := l.query.SearchOrgMetadata(
 								ctx,
-								true,
+								false,
 								resourceOwner,
 								&query.OrgMetadataSearchQueries{},
 								false,

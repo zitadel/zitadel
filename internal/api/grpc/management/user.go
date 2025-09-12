@@ -142,7 +142,7 @@ func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMeta
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUserMetadata(ctx, true, req.Id, metadataQueries, false)
+	res, err := s.query.SearchUserMetadata(ctx, true, req.Id, metadataQueries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -273,7 +273,8 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	if err != nil {
 		return nil, err
 	}
-	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, links, initCodeGenerator, phoneCodeGenerator, emailCodeGenerator, passwordlessInitCode)
+	//nolint:staticcheck
+	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, nil, links, initCodeGenerator, phoneCodeGenerator, emailCodeGenerator, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}
@@ -297,7 +298,7 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 
 func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUserRequest) (*mgmt_pb.AddMachineUserResponse, error) {
 	machine := AddMachineUserRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
-	objectDetails, err := s.command.AddMachine(ctx, machine)
+	objectDetails, err := s.command.AddMachine(ctx, machine, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -368,7 +369,7 @@ func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*
 	}
 	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{userGrantUserQuery},
-	}, true)
+	}, true, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -752,11 +753,11 @@ func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachine
 }
 
 func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*mgmt_pb.ListMachineKeysResponse, error) {
-	query, err := ListMachineKeysRequestToQuery(ctx, req)
+	q, err := ListMachineKeysRequestToQuery(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchAuthNKeys(ctx, query, false)
+	result, err := s.query.SearchAuthNKeys(ctx, q, query.JoinFilterUserMachine, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -774,7 +775,6 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 	if err != nil {
 		return nil, err
 	}
-
 	// Return key details only if the pubkey wasn't supplied, otherwise the user already has
 	// private key locally
 	var keyDetails []byte
@@ -821,7 +821,7 @@ func (s *Server) GenerateMachineSecret(ctx context.Context, req *mgmt_pb.Generat
 }
 
 func (s *Server) RemoveMachineSecret(ctx context.Context, req *mgmt_pb.RemoveMachineSecretRequest) (*mgmt_pb.RemoveMachineSecretResponse, error) {
-	objectDetails, err := s.command.RemoveMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.RemoveMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -839,7 +839,7 @@ func (s *Server) GetPersonalAccessTokenByIDs(ctx context.Context, req *mgmt_pb.G
 	if err != nil {
 		return nil, err
 	}
-	token, err := s.query.PersonalAccessTokenByID(ctx, true, req.TokenId, false, resourceOwner, aggregateID)
+	token, err := s.query.PersonalAccessTokenByID(ctx, true, req.TokenId, resourceOwner, aggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -853,7 +853,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.List
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchPersonalAccessTokens(ctx, queries, false)
+	result, err := s.query.SearchPersonalAccessTokens(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}

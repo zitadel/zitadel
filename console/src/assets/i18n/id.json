@@ -1423,7 +1423,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       }
     },
     "SMTP": {
@@ -1498,25 +1499,17 @@
     "FEATURES": {
       "LOGINDEFAULTORG": "Masuk Organisasi Default",
       "LOGINDEFAULTORG_DESCRIPTION": "UI login akan menggunakan pengaturan organisasi default (dan bukan dari instance) jika tidak ada konteks organisasi yang ditetapkan",
-      "OIDCLEGACYINTROSPECTION": "Introspeksi Warisan OIDC",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Kami baru-baru ini memfaktorkan ulang titik akhir introspeksi untuk alasan kinerja. Fitur ini dapat digunakan untuk melakukan rollback ke implementasi lama jika muncul bug yang tidak terduga.",
       "OIDCTOKENEXCHANGE": "Pertukaran Token OIDC",
       "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktifkan jenis pemberian urn:ietf:params:oauth:grant-type:token-exchange eksperimental untuk titik akhir token OIDC. Pertukaran token dapat digunakan untuk meminta token dengan cakupan yang lebih kecil atau menyamar sebagai pengguna lain. Lihat kebijakan keamanan untuk mengizinkan peniruan identitas pada sebuah instans.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Memicu Proyeksi Introspeksi",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Aktifkan pemicu proyeksi selama permintaan introspeksi. Hal ini dapat menjadi solusi jika terdapat masalah konsistensi yang nyata dalam respons introspeksi namun dapat berdampak pada kinerja. Kami berencana untuk menghilangkan pemicu permintaan introspeksi di masa depan.",
       "USERSCHEMA": "Skema Pengguna",
       "USERSCHEMA_DESCRIPTION": "Skema Pengguna memungkinkan untuk mengelola skema data pengguna. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
       "ACTIONS": "Tindakan",
       "ACTIONS_DESCRIPTION": "Tindakan v2 memungkinkan untuk mengelola eksekusi dan target data. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "If the flag is enabled, the OIDC parent error will be logged in the console.",
-      "DISABLEUSERTOKENEVENT": "Disable User Token Event",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Enable Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "The Back-Channel Logout implements OpenID Connect Back-Channel Logout 1.0 and can be used to notify clients about session termination at the OpenID Provider.",
       "PERMISSIONCHECKV2": "Permission Check V2",
       "PERMISSIONCHECKV2_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
-      "WEBKEY": "Web Key",
-      "WEBKEY_DESCRIPTION": "If the flag is enabled, you'll be able to use the new API and its features.",
       "STATES": { "INHERITED": "Mewarisi", "ENABLED": "Diaktifkan", "DISABLED": "Dengan disabilitas" },
       "INHERITED_DESCRIPTION": "Ini menetapkan nilai ke nilai default sistem.",
       "INHERITEDINDICATOR_DESCRIPTION": {
@@ -1528,7 +1521,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ketika flag ini diaktifkan, konsol menggunakan API Pengguna V2 untuk membuat pengguna baru. Dengan API V2, pengguna yang baru dibuat dimulai tanpa keadaan awal.",
       "LOGINV2": "Login V2",
       "LOGINV2_DESCRIPTION": "Mengaktifkan ini akan mengaktifkan antarmuka login baru berbasis TypeScript dengan keamanan, performa, dan kustomisasi yang lebih baik.",
-      "LOGINV2_BASEURI": "URI dasar"
+      "LOGINV2_BASEURI": "URI dasar",
+      "ENABLERELATIONALTABLES": "Tabel Relasional",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Aktifkan ini untuk menggunakan tabel relasional alih-alih proyeksi untuk menyimpan data. Saat ini, toggle ini tidak berfungsi."
     },
     "DIALOG": {
       "RESET": {
@@ -1664,7 +1659,8 @@
         "id": "Bahasa Indonesia",
         "hu": "Magyar",
         "ko": "한국어",
-        "ro": "Română"
+        "ro": "Română",
+        "tr": "Türkçe"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifikasi email selesai",
@@ -2156,6 +2152,7 @@
       "METADATAURL": "URL metadata",
       "BINDING": "Mengikat",
       "SIGNEDREQUEST": "Permintaan yang Ditandatangani",
+      "SIGNATUREALGORITHM": "Algoritma tanda tangan",
       "NAMEIDFORMAT": "Format ID Nama",
       "TRANSIENTMAPPINGATTRIBUTENAME": "Nama Atribut Pemetaan Khusus",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Nama atribut alternatif untuk memetakan pengguna jika `format nameid` yang dikembalikan adalah `sementara`, mis. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
@@ -2462,7 +2459,8 @@
     "id": "Bahasa Indonesia",
     "hu": "Magyar",
     "ko": "한국어",
-    "ro": "Română"
+    "ro": "Română",
+    "tr": "Türkçe"
   },
   "MEMBER": {
     "ADD": "Tambahkan Manajer",

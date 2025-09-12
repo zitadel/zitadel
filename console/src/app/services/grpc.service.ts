@@ -16,12 +16,14 @@ import { ExhaustedGrpcInterceptor } from './interceptors/exhausted.grpc.intercep
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
 import { NewConnectWebOrgInterceptor, OrgInterceptor, OrgInterceptorProvider } from './interceptors/org.interceptor';
 import { UserServiceClient } from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
-//@ts-ignore
-import { createFeatureServiceClient, createUserServiceClient, createSessionServiceClient } from '@zitadel/client/v2';
-//@ts-ignore
-import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
+import {
+  createFeatureServiceClient,
+  createUserServiceClient,
+  createSessionServiceClient,
+  createOrganizationServiceClient,
+} from '@zitadel/client/v2';
+import { createAdminServiceClient, createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
-// @ts-ignore
 import { createClientFor } from '@zitadel/client';
 
 import { WebKeyService } from '@zitadel/proto/zitadel/webkey/v2beta/webkey_service_pb';
@@ -45,6 +47,10 @@ export class GrpcService {
   public featureNew!: ReturnType<typeof createFeatureServiceClient>;
   public actionNew!: ReturnType<typeof createActionServiceClient>;
   public webKey!: ReturnType<typeof createWebKeyServiceClient>;
+  public organizationNew!: ReturnType<typeof createOrganizationServiceClient>;
+  public adminNew!: ReturnType<typeof createAdminServiceClient>;
+
+  public assets!: void;
 
   constructor(
     private readonly envService: EnvironmentService,
@@ -77,30 +83,10 @@ export class GrpcService {
           ],
         };
 
-        this.auth = new AuthServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
-        this.mgmt = new ManagementServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
-        this.admin = new AdminServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
-        this.user = new UserServiceClient(
-          env.api,
-          null,
-          // @ts-ignore
-          interceptors,
-        );
+        this.auth = new AuthServiceClient(env.api, null, interceptors);
+        this.mgmt = new ManagementServiceClient(env.api, null, interceptors);
+        this.admin = new AdminServiceClient(env.api, null, interceptors);
+        this.user = new UserServiceClient(env.api, null, interceptors);
 
         const transport = createGrpcWebTransport({
           baseUrl: env.api,
@@ -116,10 +102,12 @@ export class GrpcService {
         this.userNew = createUserServiceClient(transport);
         this.session = createSessionServiceClient(transport);
         this.mgmtNew = createManagementServiceClient(transportOldAPIs);
-        this.authNew = createAuthServiceClient(transport);
+        this.authNew = createAuthServiceClient(transportOldAPIs);
         this.featureNew = createFeatureServiceClient(transport);
         this.actionNew = createActionServiceClient(transport);
         this.webKey = createWebKeyServiceClient(transport);
+        this.organizationNew = createOrganizationServiceClient(transport);
+        this.adminNew = createAdminServiceClient(transportOldAPIs);
 
         const authConfig: AuthConfig = {
           scope: 'openid profile email',

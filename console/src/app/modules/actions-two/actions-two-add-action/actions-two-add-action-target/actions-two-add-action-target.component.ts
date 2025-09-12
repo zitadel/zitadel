@@ -21,7 +21,6 @@ import { ToastService } from 'src/app/services/toast.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MessageInitShape } from '@bufbuild/protobuf';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
 import { MatSelectModule } from '@angular/material/select';
 import { ActionConditionPipeModule } from 'src/app/pipes/action-condition-pipe/action-condition-pipe.module';
@@ -115,13 +114,13 @@ export class ActionsTwoAddActionTargetComponent {
 
     this.actionService
       .listTargets({})
-      .then(({ result }) => {
-        const targets = result.reduce((acc, target) => {
+      .then(({ targets }) => {
+        const result = targets.reduce((acc, target) => {
           acc.set(target.id, target);
           return acc;
         }, new Map<string, Target>());
 
-        targetsSignal.set({ state: 'loaded', targets });
+        targetsSignal.set({ state: 'loaded', targets: result });
       })
       .catch((error) => {
         this.toast.showError(error);

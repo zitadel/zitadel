@@ -147,6 +147,7 @@ message SearchQuery {
     CreationDateQuery creation_date_query = 3;
     CreatorQuery creator_query = 4;
     UserAgentQuery user_agent_query = 5;
+    ExpirationDateQuery expiration_date_query = 6;
   }
 }
 
@@ -188,6 +189,16 @@ message UserAgentQuery {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       max_length: 200;
       example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+message ExpirationDateQuery {
+  google.protobuf.Timestamp expiration_date = 1;
+  zitadel.v1.TimestampQueryMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which timestamp comparison method is used";
     }
   ];
 }

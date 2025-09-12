@@ -18,7 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	v2beta_object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	v2beta_org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
@@ -48,14 +47,17 @@ func TestMain(m *testing.M) {
 func TestServer_CreateOrganization(t *testing.T) {
 	idpResp := Instance.AddGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 
-	tests := []struct {
-		name    string
-		ctx     context.Context
-		req     *v2beta_org.CreateOrganizationRequest
-		id      string
-		want    *v2beta_org.CreateOrganizationResponse
-		wantErr bool
-	}{
+	type test struct {
+		name     string
+		ctx      context.Context
+		req      *v2beta_org.CreateOrganizationRequest
+		id       string
+		testFunc func(ctx context.Context, t *testing.T)
+		want     *v2beta_org.CreateOrganizationResponse
+		wantErr  bool
+	}
+
+	tests := []test{
 		{
 			name: "missing permission",
 			ctx:  Instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
@@ -74,11 +76,30 @@ func TestServer_CreateOrganization(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		func() test {
+			orgName := gofakeit.Name()
+			return test{
+				name: "adding org with same name twice",
+				ctx:  CTX,
+				req: &v2beta_org.CreateOrganizationRequest{
+					Name:   orgName,
+					Admins: nil,
+				},
+				testFunc: func(ctx context.Context, t *testing.T) {
+					// create org initially
+					_, err := Client.CreateOrganization(ctx, &v2beta_org.CreateOrganizationRequest{
+						Name: orgName,
+					})
+					require.NoError(t, err)
+				},
+				wantErr: true,
+			}
+		}(),
 		{
 			name: "invalid admin type",
 			ctx:  CTX,
 			req: &v2beta_org.CreateOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
 					{},
 				},
@@ -86,10 +107,33 @@ func TestServer_CreateOrganization(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "existing user as admin",
+			ctx:  CTX,
+			req: &v2beta_org.CreateOrganizationRequest{
+				Name: integration.OrganizationName(),
+				Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
+					{
+						UserType: &v2beta_org.CreateOrganizationRequest_Admin_UserId{UserId: User.GetUserId()},
+					},
+				},
+			},
+			want: &v2beta_org.CreateOrganizationResponse{
+				OrganizationAdmins: []*v2beta_org.OrganizationAdmin{
+					{
+						OrganizationAdmin: &v2beta_org.OrganizationAdmin_AssignedAdmin{
+							AssignedAdmin: &v2beta_org.AssignedAdmin{
+								UserId: User.GetUserId(),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "admin with init",
 			ctx:  CTX,
 			req: &v2beta_org.CreateOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
 					{
 						UserType: &v2beta_org.CreateOrganizationRequest_Admin_Human{
@@ -111,11 +155,15 @@ func TestServer_CreateOrganization(t *testing.T) {
 			},
 			want: &v2beta_org.CreateOrganizationResponse{
 				Id: integration.NotEmpty,
-				CreatedAdmins: []*v2beta_org.CreatedAdmin{
+				OrganizationAdmins: []*v2beta_org.OrganizationAdmin{
 					{
-						UserId:    integration.NotEmpty,
-						EmailCode: gu.Ptr(integration.NotEmpty),
-						PhoneCode: nil,
+						OrganizationAdmin: &v2beta_org.OrganizationAdmin_CreatedAdmin{
+							CreatedAdmin: &v2beta_org.CreatedAdmin{
+								UserId:    integration.NotEmpty,
+								EmailCode: gu.Ptr(integration.NotEmpty),
+								PhoneCode: nil,
+							},
+						},
 					},
 				},
 			},
@@ -124,7 +172,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 			name: "existing user and new human with idp",
 			ctx:  CTX,
 			req: &v2beta_org.CreateOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Admins: []*v2beta_org.CreateOrganizationRequest_Admin{
 					{
 						UserType: &v2beta_org.CreateOrganizationRequest_Admin_UserId{UserId: User.GetUserId()},
@@ -155,10 +203,21 @@ func TestServer_CreateOrganization(t *testing.T) {
 				},
 			},
 			want: &v2beta_org.CreateOrganizationResponse{
-				CreatedAdmins: []*v2beta_org.CreatedAdmin{
-					// a single admin is expected, because the first provided already exists
+				// OrganizationId: integration.NotEmpty,
+				OrganizationAdmins: []*v2beta_org.OrganizationAdmin{
 					{
-						UserId: integration.NotEmpty,
+						OrganizationAdmin: &v2beta_org.OrganizationAdmin_AssignedAdmin{
+							AssignedAdmin: &v2beta_org.AssignedAdmin{
+								UserId: User.GetUserId(),
+							},
+						},
+					},
+					{
+						OrganizationAdmin: &v2beta_org.OrganizationAdmin_CreatedAdmin{
+							CreatedAdmin: &v2beta_org.CreatedAdmin{
+								UserId: integration.NotEmpty,
+							},
+						},
 					},
 				},
 			},
@@ -168,14 +227,41 @@ func TestServer_CreateOrganization(t *testing.T) {
 			ctx:  CTX,
 			id:   "custom_id",
 			req: &v2beta_org.CreateOrganizationRequest{
-				Name: gofakeit.AppName(),
+				Name: integration.OrganizationName(),
 				Id:   gu.Ptr("custom_id"),
 			},
-			want: &v2beta_org.CreateOrganizationResponse{},
+			want: &v2beta_org.CreateOrganizationResponse{
+				Id: "custom_id",
+			},
 		},
+		func() test {
+			orgID := gofakeit.Name()
+			return test{
+				name: "adding org with same ID twice",
+				ctx:  CTX,
+				req: &v2beta_org.CreateOrganizationRequest{
+					Id:     &orgID,
+					Name:   gofakeit.Name(),
+					Admins: nil,
+				},
+				testFunc: func(ctx context.Context, t *testing.T) {
+					// create org initially
+					_, err := Client.CreateOrganization(ctx, &v2beta_org.CreateOrganizationRequest{
+						Id:   &orgID,
+						Name: gofakeit.Name(),
+					})
+					require.NoError(t, err)
+				},
+				wantErr: true,
+			}
+		}(),
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.testFunc != nil {
+				tt.testFunc(tt.ctx, t)
+			}
+
 			got, err := Client.CreateOrganization(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
@@ -192,13 +278,16 @@ func TestServer_CreateOrganization(t *testing.T) {
 			now := time.Now()
 			assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
-			// organization id must be the same as the resourceOwner
-
 			// check the admins
-			require.Len(t, got.GetCreatedAdmins(), len(tt.want.GetCreatedAdmins()))
-			for i, admin := range tt.want.GetCreatedAdmins() {
-				gotAdmin := got.GetCreatedAdmins()[i]
-				assertCreatedAdmin(t, admin, gotAdmin)
+			require.Equal(t, len(tt.want.GetOrganizationAdmins()), len(got.GetOrganizationAdmins()))
+			for i, admin := range tt.want.GetOrganizationAdmins() {
+				gotAdmin := got.GetOrganizationAdmins()[i].OrganizationAdmin
+				switch admin := admin.OrganizationAdmin.(type) {
+				case *v2beta_org.OrganizationAdmin_CreatedAdmin:
+					assertCreatedAdmin(t, admin.CreatedAdmin, gotAdmin.(*v2beta_org.OrganizationAdmin_CreatedAdmin).CreatedAdmin)
+				case *v2beta_org.OrganizationAdmin_AssignedAdmin:
+					assert.Equal(t, admin.AssignedAdmin.GetUserId(), gotAdmin.(*v2beta_org.OrganizationAdmin_AssignedAdmin).AssignedAdmin.GetUserId())
+				}
 			}
 		})
 	}
@@ -472,8 +561,8 @@ func TestServer_ListOrganizations(t *testing.T) {
 			ctx:  listOrgIAmOwnerCtx,
 			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Filter: &org.OrganizationSearchFilter_DomainFilter{
-						DomainFilter: &org.OrgDomainFilter{
+					Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
+						DomainFilter: &v2beta_org.OrgDomainFilter{
 							Domain: func() string {
 								listOrgRes, err := listOrgClient.ListOrganizations(listOrgIAmOwnerCtx, &v2beta_org.ListOrganizationsRequest{
 									Filter: []*v2beta_org.OrganizationSearchFilter{
@@ -507,8 +596,8 @@ func TestServer_ListOrganizations(t *testing.T) {
 			ctx:  listOrgIAmOwnerCtx,
 			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Filter: &org.OrganizationSearchFilter_DomainFilter{
-						DomainFilter: &org.OrgDomainFilter{
+					Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
+						DomainFilter: &v2beta_org.OrgDomainFilter{
 							Domain: func() string {
 								domain := strings.ToLower(strings.ReplaceAll(orgsName[1][1:len(orgsName[1])-2], " ", "-"))
 								return domain
@@ -530,8 +619,8 @@ func TestServer_ListOrganizations(t *testing.T) {
 			ctx:  listOrgIAmOwnerCtx,
 			query: []*v2beta_org.OrganizationSearchFilter{
 				{
-					Filter: &org.OrganizationSearchFilter_DomainFilter{
-						DomainFilter: &org.OrgDomainFilter{
+					Filter: &v2beta_org.OrganizationSearchFilter_DomainFilter{
+						DomainFilter: &v2beta_org.OrgDomainFilter{
 							Domain: func() string {
 								domain := strings.ToUpper(strings.ReplaceAll(orgsName[1][1:len(orgsName[1])-2], " ", "-"))
 								return domain
@@ -1004,6 +1093,72 @@ func TestServer_AddOrganizationDomain(t *testing.T) {
 	}
 }
 
+func TestServer_AddOrganizationDomain_ClaimDomain(t *testing.T) {
+	domain := gofakeit.DomainName()
+
+	// create an organization, ensure it has globally unique usernames
+	// and create a user with a loginname that matches the domain later on
+	organization, err := Client.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
+		Name: integration.OrganizationName(),
+	})
+	require.NoError(t, err)
+	_, err = Instance.Client.Admin.AddCustomDomainPolicy(CTX, &admin.AddCustomDomainPolicyRequest{
+		OrgId:                 organization.GetId(),
+		UserLoginMustBeDomain: false,
+	})
+	require.NoError(t, err)
+	username := gofakeit.Username() + "@" + domain
+	ownUser := Instance.CreateHumanUserVerified(CTX, organization.GetId(), username, "")
+
+	// create another organization, ensure it has globally unique usernames
+	// and create a user with a loginname that matches the domain later on
+	otherOrg, err := Client.CreateOrganization(CTX, &v2beta_org.CreateOrganizationRequest{
+		Name: integration.OrganizationName(),
+	})
+	require.NoError(t, err)
+	_, err = Instance.Client.Admin.AddCustomDomainPolicy(CTX, &admin.AddCustomDomainPolicyRequest{
+		OrgId:                 otherOrg.GetId(),
+		UserLoginMustBeDomain: false,
+	})
+	require.NoError(t, err)
+
+	otherUsername := gofakeit.Username() + "@" + domain
+	otherUser := Instance.CreateHumanUserVerified(CTX, otherOrg.GetId(), otherUsername, "")
+
+	// if we add the domain now to the first organization, it should be claimed on the second organization, resp. its user(s)
+	_, err = Client.AddOrganizationDomain(CTX, &v2beta_org.AddOrganizationDomainRequest{
+		OrganizationId: organization.GetId(),
+		Domain:         domain,
+	})
+	require.NoError(t, err)
+
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		// check both users: the first one must be untouched, the second one must be updated
+		users, err := Instance.Client.UserV2.ListUsers(CTX, &user.ListUsersRequest{
+			Queries: []*user.SearchQuery{
+				{
+					Query: &user.SearchQuery_InUserIdsQuery{
+						InUserIdsQuery: &user.InUserIDQuery{UserIds: []string{ownUser.GetUserId(), otherUser.GetUserId()}},
+					},
+				},
+			},
+		})
+		require.NoError(t, err)
+		require.Len(t, users.GetResult(), 2)
+
+		for _, u := range users.GetResult() {
+			if u.GetUserId() == ownUser.GetUserId() {
+				assert.Equal(collect, username, u.GetPreferredLoginName())
+				continue
+			}
+			if u.GetUserId() == otherUser.GetUserId() {
+				assert.NotEqual(collect, otherUsername, u.GetPreferredLoginName())
+				assert.Contains(collect, u.GetPreferredLoginName(), "@temporary.")
+			}
+		}
+	}, 5*time.Second, time.Second, "user not updated in time")
+}
+
 func TestServer_ListOrganizationDomains(t *testing.T) {
 	domain := gofakeit.URL()
 	tests := []struct {
@@ -1374,7 +1529,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
 				OrganizationId: orgId,
 				Domain:         domain,
-				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+				Type:           v2beta_org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
 			},
 		},
 		{
@@ -1383,7 +1538,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
 				OrganizationId: "non existent org id",
 				Domain:         domain,
-				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+				Type:           v2beta_org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
 			},
 			// BUG: this should be 'organization does not exist'
 			err: errors.New("Domain doesn't exist on organization"),
@@ -1394,7 +1549,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
 				OrganizationId: orgId,
 				Domain:         domain,
-				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
+				Type:           v2beta_org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
 			},
 		},
 		{
@@ -1403,7 +1558,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
 				OrganizationId: "non existent org id",
 				Domain:         domain,
-				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
+				Type:           v2beta_org.DomainValidationType_DOMAIN_VALIDATION_TYPE_DNS,
 			},
 			// BUG: this should be 'organization does not exist'
 			err: errors.New("Domain doesn't exist on organization"),
@@ -1414,7 +1569,7 @@ func TestServer_ValidateOrganizationDomain(t *testing.T) {
 			req: &v2beta_org.GenerateOrganizationDomainValidationRequest{
 				OrganizationId: orgId,
 				Domain:         "non existent domain",
-				Type:           org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
+				Type:           v2beta_org.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP,
 			},
 			err: errors.New("Domain doesn't exist on organization"),
 		},

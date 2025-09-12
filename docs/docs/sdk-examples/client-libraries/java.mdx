@@ -1,0 +1,194 @@
+---
+title: Java Client
+sidebar_label: 'Java Client'
+---
+
+<table>
+	<tr>
+		<td width="100px">
+			<img width="100px" src="/docs/img/tech/java.svg" alt="java logo"/>
+		</td>
+		<td>
+			This guide covers the official Zitadel Management API Client for the JVM (Java 11+), which allows you to programmatically manage resources in your Zitadel instance.
+		</td>
+	</tr>
+</table>
+
+:::info
+**This is a Management API Client, not an Authentication SDK.**
+
+This library is designed for server-to-server communication to manage your Zitadel instance (e.g., creating users, managing projects, and updating settings). It is **not** intended for handling end-user login flows in your web application. For user authentication, you should use a standard OIDC library like Spring Security.
+:::
+
+The Zitadel Java Client provides an idiomatic way to access the full gamut of Zitadel's v2 Management APIs from your JVM-based backend applications.
+
+> Please be aware that this client library is currently in an **incubating stage**.
+While it is available for use, the API and its functionality may evolve, potentially introducing
+breaking changes in future updates. We advise caution when considering it for production environments.
+
+### Installation
+
+You can add the client library to your project using Maven by adding the following dependency to your `pom.xml` :
+
+```xml
+<dependency>
+    <groupId>io.github.zitadel</groupId>
+    <artifactId>client</artifactId>
+    <version>4.0.0-beta-1</version>
+</dependency>
+```
+
+### Using the SDK
+
+Your SDK offers three ways to authenticate with Zitadel. Each method has its
+own benefits—choose the one that fits your situation best.
+
+#### 1. Private Key JWT Authentication
+
+**What is it?**
+You use a JSON Web Token (JWT) that you sign with a private key stored in a
+JSON file. This process creates a secure token.
+
+**When should you use it?**
+
+- **Best for production:** It offers strong security.
+- **Advanced control:** You can adjust token settings like expiration.
+
+**How do you use it?**
+
+1. Save your private key in a JSON file.
+2. Build the authenticator using the helper method.
+
+**Example:**
+
+```java
+import com.zitadel.ApiException;
+import com.zitadel.Zitadel;
+import com.zitadel.model.UserServiceAddHumanUserRequest;
+import com.zitadel.model.UserServiceAddHumanUserResponse;
+import com.zitadel.model.UserServiceSetHumanEmail;
+import com.zitadel.model.UserServiceSetHumanProfile;
+
+class Demo {
+    public static void main(String[] args) throws ApiException {
+        Zitadel zitadel = Zitadel.withPrivateKey("https://example.us1.zitadel.cloud", "path/to/jwt-key.json");
+
+        UserServiceAddHumanUserResponse response = zitadel.users.userServiceAddHumanUser(
+                new UserServiceAddHumanUserRequest()
+                        .username("john.doe")
+                        .profile(new UserServiceSetHumanProfile()
+                                .givenName("John")
+                                .familyName("Doe"))
+                        .email(new UserServiceSetHumanEmail()
+                                .email("john@doe.com"))
+        );
+        System.out.println("User created: " + response);
+    }
+}
+```
+
+#### 2. Client Credentials Grant
+
+**What is it?**
+This method uses a client ID and client secret to get a secure access token,
+which is then used to authenticate.
+
+**When should you use it?**
+
+- **Simple and straightforward:** Good for server-to-server communication.
+- **Trusted environments:** Use it when both servers are owned or trusted.
+
+**How do you use it?**
+
+1. Provide your client ID and client secret.
+2. Build the authenticator using the helper method.
+
+**Example:**
+
+```java
+import com.zitadel.ApiException;
+import com.zitadel.Zitadel;
+import com.zitadel.model.UserServiceAddHumanUserRequest;
+import com.zitadel.model.UserServiceAddHumanUserResponse;
+import com.zitadel.model.UserServiceSetHumanEmail;
+import com.zitadel.model.UserServiceSetHumanProfile;
+
+class Demo {
+    public static void main(String[] args) throws ApiException {
+        Zitadel zitadel = Zitadel.withClientCredentials("https://example.us1.zitadel.cloud", "id", "secret");
+
+        UserServiceAddHumanUserResponse response = zitadel.users.addHumanUser(
+                new UserServiceAddHumanUserRequest()
+                        .username("john.doe")
+                        .profile(new UserServiceSetHumanProfile()
+                                .givenName("John")
+                                .familyName("Doe"))
+                        .email(new UserServiceSetHumanEmail()
+                                .email("john@doe.com"))
+        );
+        System.out.println("User created: " + response);
+    }
+}
+```
+
+#### 3. Personal Access Tokens (PATs)
+
+**What is it?**
+A Personal Access Token (PAT) is a pre-generated token that you can use to
+authenticate without exchanging credentials every time.
+
+**When should you use it?**
+
+- **Easy to use:** Great for development or testing scenarios.
+- **Quick setup:** No need for dynamic token generation.
+
+**How do you use it?**
+
+1. Obtain a valid personal access token from your account.
+2. Build the authenticator using the helper method.
+
+**Example:**
+
+```java
+import com.zitadel.ApiException;
+import com.zitadel.Zitadel;
+import com.zitadel.model.UserServiceAddHumanUserRequest;
+import com.zitadel.model.UserServiceAddHumanUserResponse;
+import com.zitadel.model.UserServiceSetHumanEmail;
+import com.zitadel.model.UserServiceSetHumanProfile;
+
+class Demo {
+
+    public static void main(String[] args) throws ApiException {
+        Zitadel zitadel = Zitadel.withAccessToken("https://example.us1.zitadel.cloud", "token");
+
+        UserServiceAddHumanUserResponse response = zitadel.users.addHumanUser(
+                new UserServiceAddHumanUserRequest()
+                        .username("john.doe")
+                        .profile(new UserServiceSetHumanProfile()
+                                .givenName("John")
+                                .familyName("Doe"))
+                        .email(new UserServiceSetHumanEmail()
+                                .email("john@doe.com"))
+        );
+        System.out.println("User created: " + response);
+    }
+}
+```
+
+---
+
+Choose the authentication method that best suits your needs based on your
+environment and security requirements. For more details, please refer to the
+[Zitadel documentation on authenticating service users](https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users).
+
+### Versioning
+
+The client library's versioning is aligned with the Zitadel core project. The major version of the
+client corresponds to the major version of Zitadel it is designed to work with. For example,
+v2.x.x of the client is built for and tested against Zitadel v2, ensuring a predictable and stable integration.
+
+### Resources
+
+- [GitHub Repository](https://github.com/zitadel/client-java): For source code, examples, and to report issues.
+- [Maven Package](https://central.sonatype.com/artifact/io.github.zitadel/client): The official package artifact for Maven.

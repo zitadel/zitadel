@@ -115,6 +115,8 @@ service OrganizationService {
   //
   // Required permission:
   //  - `org.create`
+  //
+  // Deprecated: Use [AddOrganization](/apis/resources/org_service_v2/organization-service-add-organization.api.mdx) instead to create an organization.
   rpc CreateOrganization(CreateOrganizationRequest) returns (CreateOrganizationResponse) {
     option (google.api.http) = {
       post: "/v2beta/organizations"
@@ -127,7 +129,7 @@ service OrganizationService {
       }
     };
 
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
         key: "200";
         value: {
@@ -140,6 +142,7 @@ service OrganizationService {
           description: "The organization to create already exists.";
         }
       };
+      deprecated: true;
     };
   }
 
@@ -190,6 +193,8 @@ service OrganizationService {
   //
   // Required permission:
   //  - `iam.read`
+  //
+  // Deprecated: Use [ListOrganizations](/apis/resources/org_service_v2/organization-service-list-organizations.api.mdx) instead to list organizations.
   rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
     option (google.api.http) = {
         post: "/v2beta/organizations/search";
@@ -206,6 +211,7 @@ service OrganizationService {
       responses: {
         key: "200";
       };
+      deprecated: true;
     };
   }
 
@@ -558,6 +564,18 @@ message CreatedAdmin {
   optional string phone_code = 3;
 }
 
+message AssignedAdmin {
+  string user_id = 1;
+}
+
+message OrganizationAdmin {
+  // The admins created/assigned for the Organization.
+  oneof OrganizationAdmin {
+    CreatedAdmin created_admin = 1;
+    AssignedAdmin assigned_admin = 2;
+  }
+}
+
 message CreateOrganizationResponse{
   // The timestamp of the organization was created.
   google.protobuf.Timestamp creation_date = 1 [
@@ -577,8 +595,8 @@ message CreateOrganizationResponse{
     }
   ];
 
-  // The admins created for the Organization
-  repeated CreatedAdmin created_admins = 3;
+  // The admins created/assigned for the Organization
+  repeated OrganizationAdmin organization_admins = 3;
 }
 
 message UpdateOrganizationRequest {
@@ -939,3 +957,5 @@ message DeleteOrganizationMetadataResponse{
     }
   ];
 }
+
+

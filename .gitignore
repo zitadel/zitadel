@@ -7,6 +7,7 @@
 
 # Test binary, build with `go test -c`
 *.test
+!/**/.env.test
 
 # Coverage
 coverage.txt
@@ -52,7 +53,8 @@ console/src/app/proto/generated/
 !pkg/grpc/protoc/v2/options.pb.go
 **.proto.mock.go
 **.pb.*.go
-**.gen.go 
+pkg/**/**.connect.go
+**.gen.go
 openapi/**/*.json
 /internal/api/assets/authz.go
 /internal/api/assets/router.go
@@ -67,6 +69,7 @@ docs/docs/apis/proto
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css.map
 zitadel-*-*
+!apps/**/zitadel-*-*
 
 # local
 build/local/*.env
@@ -83,7 +86,14 @@ go.work.sum
 .netlify
 
 load-test/node_modules
-load-test/yarn-error.log
+load-test/pnpm-debug.log
 load-test/dist
 load-test/output/*
 .vercel
+
+# Turbo
+.turbo/
+**/.turbo/
+
+# PNPM
+.pnpm-store

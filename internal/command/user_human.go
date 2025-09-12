@@ -199,6 +199,11 @@ func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto
 				return nil, err
 			}
 
+			organizationScopedUsername, err := checkOrganizationScopedUsernames(ctx, filter, a.ResourceOwner, nil)
+			if err != nil {
+				return nil, err
+			}
+
 			var createCmd humanCreationCommand
 			if human.Register {
 				createCmd = user.NewHumanRegisteredEvent(
@@ -212,7 +217,7 @@ func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto
 					human.PreferredLanguage,
 					human.Gender,
 					human.Email.Address,
-					domainPolicy.UserLoginMustBeDomain,
+					domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
 					"", // no user agent id available
 				)
 			} else {
@@ -227,7 +232,7 @@ func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto
 					human.PreferredLanguage,
 					human.Gender,
 					human.Email.Address,
-					domainPolicy.UserLoginMustBeDomain,
+					domainPolicy.UserLoginMustBeDomain || organizationScopedUsername,
 				)
 			}
 
@@ -299,6 +304,11 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 		if human.Email.ReturnCode {
 			human.EmailCode = &emailCode.Plain
 		}
+
+		if human.Email.URLTemplate == "" {
+			human.Email.URLTemplate = c.defaultEmailCodeURLTemplate(ctx)
+		}
+
 		return append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &a.Aggregate, emailCode.Crypted, emailCode.Expiry, human.Email.URLTemplate, human.Email.ReturnCode, human.AuthRequestID)), nil
 	}
 	return cmds, nil
@@ -428,7 +438,7 @@ func (h *AddHuman) shouldAddInitCode() bool {
 }
 
 // Deprecated: use commands.AddUserHuman
-func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, links []*domain.UserIDPLink, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
+func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, state *domain.UserState, links []*domain.UserIDPLink, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -439,6 +449,12 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	if err != nil {
 		return nil, nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-2N9fs", "Errors.Org.DomainPolicy.NotFound")
 	}
+
+	organizationScopedUsername, err := c.checkOrganizationScopedUsernames(ctx, orgID)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
 		return nil, nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-4N8gs", "Errors.Org.PasswordComplexityPolicy.NotFound")
@@ -455,9 +471,31 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 		}
 	}
 
-	events, addedHuman, addedCode, code, err := c.importHuman(ctx, orgID, human, passwordless, links, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator)
+	events, userAgg, addedHuman, addedCode, code, err := c.importHuman(ctx, orgID, human, passwordless, links, domainPolicy, organizationScopedUsername, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator)
 	if err != nil {
 		return nil, nil, err
+	}
+	if state != nil {
+		var event eventstore.Command
+		switch *state {
+		case domain.UserStateInactive:
+			event = user.NewUserDeactivatedEvent(ctx, userAgg)
+		case domain.UserStateLocked:
+			event = user.NewUserLockedEvent(ctx, userAgg)
+		case domain.UserStateDeleted:
+		// users are never imported if deleted
+		case domain.UserStateActive:
+		// added because of the linter
+		case domain.UserStateSuspend:
+		// added because of the linter
+		case domain.UserStateInitial:
+		// added because of the linter
+		case domain.UserStateUnspecified:
+			// added because of the linter
+		}
+		if event != nil {
+			events = append(events, event)
+		}
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
@@ -479,48 +517,48 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	return writeModelToHuman(addedHuman), passwordlessCode, nil
 }
 
-func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, links []*domain.UserIDPLink, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (events []eventstore.Command, humanWriteModel *HumanWriteModel, passwordlessCodeWriteModel *HumanPasswordlessInitCodeWriteModel, code string, err error) {
+func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, links []*domain.UserIDPLink, domainPolicy *domain.DomainPolicy, orgScopedUsername bool, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (events []eventstore.Command, userAgg *eventstore.Aggregate, humanWriteModel *HumanWriteModel, passwordlessCodeWriteModel *HumanPasswordlessInitCodeWriteModel, code string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if orgID == "" {
-		return nil, nil, nil, "", zerrors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.Org.Empty")
+		return nil, nil, nil, nil, "", zerrors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.Org.Empty")
 	}
 	if err = human.Normalize(); err != nil {
-		return nil, nil, nil, "", err
+		return nil, nil, nil, nil, "", err
 	}
-	events, humanWriteModel, err = c.createHuman(ctx, orgID, human, links, passwordless, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
+	events, userAgg, humanWriteModel, err = c.createHuman(ctx, orgID, human, links, passwordless, domainPolicy, orgScopedUsername, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
 	if err != nil {
-		return nil, nil, nil, "", err
+		return nil, nil, nil, nil, "", err
 	}
 	if passwordless {
 		var codeEvent eventstore.Command
 		codeEvent, passwordlessCodeWriteModel, code, err = c.humanAddPasswordlessInitCode(ctx, human.AggregateID, orgID, true, passwordlessCodeGenerator)
 		if err != nil {
-			return nil, nil, nil, "", err
+			return nil, nil, nil, nil, "", err
 		}
 		events = append(events, codeEvent)
 	}
-	return events, humanWriteModel, passwordlessCodeWriteModel, code, nil
+	return events, userAgg, humanWriteModel, passwordlessCodeWriteModel, code, nil
 }
 
-func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, links []*domain.UserIDPLink, passwordless bool, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator crypto.Generator) (events []eventstore.Command, addedHuman *HumanWriteModel, err error) {
+func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, links []*domain.UserIDPLink, passwordless bool, domainPolicy *domain.DomainPolicy, orgScopedUsername bool, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator crypto.Generator) (events []eventstore.Command, userAgg *eventstore.Aggregate, addedHuman *HumanWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if err = human.CheckDomainPolicy(domainPolicy); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	human.Username = strings.TrimSpace(human.Username)
 	human.EmailAddress = human.EmailAddress.Normalize()
 	if err = c.userValidateDomain(ctx, orgID, human.Username, domainPolicy.UserLoginMustBeDomain); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	if human.AggregateID == "" {
 		userID, err := c.idGenerator.Next()
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 		human.AggregateID = userID
 	}
@@ -528,20 +566,21 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	human.EnsureDisplayName()
 	if human.Password != nil {
 		if err := human.HashPasswordIfExisting(ctx, pwPolicy, c.userPasswordHasher, human.Password.ChangeRequired); err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 	}
 
 	addedHuman = NewHumanWriteModel(human.AggregateID, orgID)
-	//TODO: adlerhurst maybe we could simplify the code below
-	userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)
 
-	events = append(events, createAddHumanEvent(ctx, userAgg, human, domainPolicy.UserLoginMustBeDomain))
+	// TODO: adlerhurst maybe we could simplify the code below
+	userAgg = UserAggregateFromWriteModelCtx(ctx, &addedHuman.WriteModel)
+
+	events = append(events, createAddHumanEvent(ctx, userAgg, human, domainPolicy.UserLoginMustBeDomain, orgScopedUsername))
 
 	for _, link := range links {
 		event, err := c.addUserIDPLink(ctx, userAgg, link, false)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 		events = append(events, event)
 	}
@@ -549,7 +588,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	if human.IsInitialState(passwordless, len(links) > 0) {
 		initCode, err := domain.NewInitUserCode(initCodeGenerator)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 		events = append(events, user.NewHumanInitialCodeAddedEvent(ctx, userAgg, initCode.Code, initCode.Expiry, ""))
 	} else {
@@ -558,7 +597,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 		} else {
 			emailCode, _, err := domain.NewEmailCode(emailCodeGenerator)
 			if err != nil {
-				return nil, nil, err
+				return nil, nil, nil, err
 			}
 			events = append(events, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry, ""))
 		}
@@ -567,14 +606,14 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	if human.Phone != nil && human.PhoneNumber != "" && !human.IsPhoneVerified {
 		phoneCode, generatorID, err := c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, c.userEncryption, c.defaultSecretGenerators.PhoneVerificationCode) //nolint:staticcheck
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 		events = append(events, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.CryptedCode(), phoneCode.CodeExpiry(), generatorID))
 	} else if human.Phone != nil && human.PhoneNumber != "" && human.IsPhoneVerified {
 		events = append(events, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
 	}
 
-	return events, addedHuman, nil
+	return events, userAgg, addedHuman, nil
 }
 
 func (c *Commands) HumanSkipMFAInit(ctx context.Context, userID, resourceowner string) (err error) {
@@ -596,7 +635,7 @@ func (c *Commands) HumanSkipMFAInit(ctx context.Context, userID, resourceowner s
 }
 
 // TODO: adlerhurst maybe we can simplify createAddHumanEvent and createRegisterHumanEvent
-func createAddHumanEvent(ctx context.Context, aggregate *eventstore.Aggregate, human *domain.Human, userLoginMustBeDomain bool) *user.HumanAddedEvent {
+func createAddHumanEvent(ctx context.Context, aggregate *eventstore.Aggregate, human *domain.Human, userLoginMustBeDomain, orgScopedUsername bool) *user.HumanAddedEvent {
 	addEvent := user.NewHumanAddedEvent(
 		ctx,
 		aggregate,
@@ -608,7 +647,7 @@ func createAddHumanEvent(ctx context.Context, aggregate *eventstore.Aggregate, h
 		human.PreferredLanguage,
 		human.Gender,
 		human.EmailAddress,
-		userLoginMustBeDomain,
+		userLoginMustBeDomain || orgScopedUsername,
 	)
 	if human.Phone != nil {
 		addEvent.AddPhoneData(human.PhoneNumber)

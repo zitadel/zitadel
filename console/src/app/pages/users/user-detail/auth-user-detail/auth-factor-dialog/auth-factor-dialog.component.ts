@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -15,6 +16,17 @@ export enum AuthFactorType {
   OTPSMS,
   OTPEMAIL,
 }
+
+export type AddAuthFactorDialogData = {
+  otp$: Observable<boolean>;
+  u2f$: Observable<boolean>;
+  otpSms$: Observable<boolean>;
+  otpEmail$: Observable<boolean>;
+  otpDisabled$: Observable<boolean>;
+  otpSmsDisabled$: Observable<boolean>;
+  otpEmailDisabled$: Observable<boolean>;
+  phoneVerified: boolean;
+};
 
 @Component({
   selector: 'cnsl-auth-factor-dialog',
@@ -44,7 +56,7 @@ export class AuthFactorDialogComponent {
     private toast: ToastService,
     private translate: TranslateService,
     public dialogRef: MatDialogRef<AuthFactorDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
+    @Inject(MAT_DIALOG_DATA) public data: AddAuthFactorDialogData,
   ) {}
 
   closeDialog(code: string = ''): void {

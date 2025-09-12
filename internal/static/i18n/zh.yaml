@@ -53,6 +53,7 @@ Errors:
     NotFound: 未找到 SMS 配置
     AlreadyActive: SMS 配置已启用
     AlreadyDeactivated: SMS 配置已停用
+    NotExternalVerification: SMS 配置不支持验证码
   SMTP:
     NotEmailMessage: 消息不是电子邮件消息
     RequiredAttributes: 必须设置主题、收件人和内容，但部分或全部为空
@@ -115,6 +116,7 @@ Errors:
       AlreadyVerified: 手机号码已经验证
       Empty: 电话号码是空的
       NotChanged: 电话号码没有改变
+      VerifyingRemovalIsNotSupported: 验证手机号码删除不受支持
     Address:
       NotFound: 找不到地址
       NotChanged: 地址没有改变
@@ -193,7 +195,7 @@ Errors:
     AlreadyExists: 实例已经存在
     NotChanged: 实例没有改变
   Org:
-    AlreadyExists: 组织名称已被占用
+    AlreadyExists: 该组织名称或 ID 已被占用
     Invalid: 组织无效
     AlreadyDeactivated: 组织已停用
     AlreadyActive: 组织已处于启用状态
@@ -435,8 +437,6 @@ Errors:
     Invalid: 用户授权无效
     NotChanged: 用户授权未更改
     IDMissing: 没有 ID
-    NotActive: 用户授权不是启用状态
-    NotInactive: 用户授权不是停用状态
     NoPermissionForProject: 用户对此项目没有权限
     RoleKeyNotFound: 角色不存在
   Member:
@@ -659,6 +659,7 @@ EventTypes:
     token:
       added: 已创建访问令牌
       v2.added: 已创建访问令牌
+      removed: 已删除访问令牌
     impersonated: 用户冒充
     username:
       reserved: 保留用户名
@@ -1136,7 +1137,7 @@ EventTypes:
       jwt:
         config:
           added: 添加了身份提供者的 JWT 配置
-          changed: 身份提供商的 JWT 配置已删除
+          changed: 身份提供者的 JWT 配置已删除
     customtext:
       set: 设置文本
       removed: 删除文本
@@ -1291,10 +1292,10 @@ EventTypes:
         added: 添加了登录策略
         changed: 登录政策已更改
         idpprovider:
-          added: 身份提供商已添加到登录策略中
+          added: 身份提供者已添加到登录策略中
           cascade:
             removed: 身份提供者级联从登录策略中删除
-          removed: 身份提供商已从登录策略中删除
+          removed: 身份提供者已从登录策略中删除
         multifactor:
           added: 登录策略中添加了多因素
           removed: 从登录策略中删除了多因素

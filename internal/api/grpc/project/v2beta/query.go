@@ -3,27 +3,29 @@ package project
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	filter "github.com/zitadel/zitadel/internal/api/grpc/filter/v2beta"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	filter_pb "github.com/zitadel/zitadel/pkg/grpc/filter/v2beta"
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 )
 
-func (s *Server) GetProject(ctx context.Context, req *project_pb.GetProjectRequest) (*project_pb.GetProjectResponse, error) {
-	project, err := s.query.GetProjectByIDWithPermission(ctx, true, req.Id, s.checkPermission)
+func (s *Server) GetProject(ctx context.Context, req *connect.Request[project_pb.GetProjectRequest]) (*connect.Response[project_pb.GetProjectResponse], error) {
+	project, err := s.query.GetProjectByIDWithPermission(ctx, true, req.Msg.GetId(), s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	return &project_pb.GetProjectResponse{
+	return connect.NewResponse(&project_pb.GetProjectResponse{
 		Project: projectToPb(project),
-	}, nil
+	}), nil
 }
 
-func (s *Server) ListProjects(ctx context.Context, req *project_pb.ListProjectsRequest) (*project_pb.ListProjectsResponse, error) {
-	queries, err := s.listProjectRequestToModel(req)
+func (s *Server) ListProjects(ctx context.Context, req *connect.Request[project_pb.ListProjectsRequest]) (*connect.Response[project_pb.ListProjectsResponse], error) {
+	queries, err := s.listProjectRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -31,10 +33,10 @@ func (s *Server) ListProjects(ctx context.Context, req *project_pb.ListProjectsR
 	if err != nil {
 		return nil, err
 	}
-	return &project_pb.ListProjectsResponse{
+	return connect.NewResponse(&project_pb.ListProjectsResponse{
 		Projects:   grantedProjectsToPb(resp.GrantedProjects),
 		Pagination: filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
-	}, nil
+	}), nil
 }
 
 func (s *Server) listProjectRequestToModel(req *project_pb.ListProjectsRequest) (*query.ProjectAndGrantedProjectSearchQueries, error) {
@@ -109,20 +111,20 @@ func projectNameFilterToQuery(q *project_pb.ProjectNameFilter) (query.SearchQuer
 	return query.NewGrantedProjectNameSearchQuery(filter.TextMethodPbToQuery(q.Method), q.GetProjectName())
 }
 
-func projectInIDsFilterToQuery(q *project_pb.InProjectIDsFilter) (query.SearchQuery, error) {
-	return query.NewGrantedProjectIDSearchQuery(q.ProjectIds)
+func projectInIDsFilterToQuery(q *filter_pb.InIDsFilter) (query.SearchQuery, error) {
+	return query.NewGrantedProjectIDSearchQuery(q.Ids)
 }
 
-func projectResourceOwnerFilterToQuery(q *project_pb.ProjectResourceOwnerFilter) (query.SearchQuery, error) {
-	return query.NewGrantedProjectResourceOwnerSearchQuery(q.ProjectResourceOwner)
+func projectResourceOwnerFilterToQuery(q *filter_pb.IDFilter) (query.SearchQuery, error) {
+	return query.NewGrantedProjectResourceOwnerSearchQuery(q.Id)
 }
 
-func projectOrganizationIDFilterToQuery(q *project_pb.ProjectOrganizationIDFilter) (query.SearchQuery, error) {
-	return query.NewGrantedProjectOrganizationIDSearchQuery(q.ProjectOrganizationId)
+func projectOrganizationIDFilterToQuery(q *filter_pb.IDFilter) (query.SearchQuery, error) {
+	return query.NewGrantedProjectOrganizationIDSearchQuery(q.Id)
 }
 
-func projectGrantResourceOwnerFilterToQuery(q *project_pb.ProjectGrantResourceOwnerFilter) (query.SearchQuery, error) {
-	return query.NewGrantedProjectGrantResourceOwnerSearchQuery(q.ProjectGrantResourceOwner)
+func projectGrantResourceOwnerFilterToQuery(q *filter_pb.IDFilter) (query.SearchQuery, error) {
+	return query.NewGrantedProjectGrantResourceOwnerSearchQuery(q.Id)
 }
 
 func grantedProjectsToPb(projects []*query.GrantedProject) []*project_pb.Project {
@@ -212,8 +214,8 @@ func privateLabelingSettingToPb(setting domain.PrivateLabelingSetting) project_p
 	}
 }
 
-func (s *Server) ListProjectGrants(ctx context.Context, req *project_pb.ListProjectGrantsRequest) (*project_pb.ListProjectGrantsResponse, error) {
-	queries, err := s.listProjectGrantsRequestToModel(req)
+func (s *Server) ListProjectGrants(ctx context.Context, req *connect.Request[project_pb.ListProjectGrantsRequest]) (*connect.Response[project_pb.ListProjectGrantsResponse], error) {
+	queries, err := s.listProjectGrantsRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -221,10 +223,10 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *project_pb.ListProj
 	if err != nil {
 		return nil, err
 	}
-	return &project_pb.ListProjectGrantsResponse{
+	return connect.NewResponse(&project_pb.ListProjectGrantsResponse{
 		ProjectGrants: projectGrantsToPb(resp.ProjectGrants),
 		Pagination:    filter.QueryToPaginationPb(queries.SearchRequest, resp.SearchResponse),
-	}, nil
+	}), nil
 }
 
 func (s *Server) listProjectGrantsRequestToModel(req *project_pb.ListProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
@@ -283,11 +285,11 @@ func projectGrantFilterToModel(filter *project_pb.ProjectGrantSearchFilter) (que
 	case *project_pb.ProjectGrantSearchFilter_RoleKeyFilter:
 		return query.NewProjectGrantRoleKeySearchQuery(q.RoleKeyFilter.Key)
 	case *project_pb.ProjectGrantSearchFilter_InProjectIdsFilter:
-		return query.NewProjectGrantProjectIDsSearchQuery(q.InProjectIdsFilter.ProjectIds)
+		return query.NewProjectGrantProjectIDsSearchQuery(q.InProjectIdsFilter.Ids)
 	case *project_pb.ProjectGrantSearchFilter_ProjectResourceOwnerFilter:
-		return query.NewProjectGrantResourceOwnerSearchQuery(q.ProjectResourceOwnerFilter.ProjectResourceOwner)
+		return query.NewProjectGrantResourceOwnerSearchQuery(q.ProjectResourceOwnerFilter.Id)
 	case *project_pb.ProjectGrantSearchFilter_ProjectGrantResourceOwnerFilter:
-		return query.NewProjectGrantGrantedOrgIDSearchQuery(q.ProjectGrantResourceOwnerFilter.ProjectGrantResourceOwner)
+		return query.NewProjectGrantGrantedOrgIDSearchQuery(q.ProjectGrantResourceOwnerFilter.Id)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
 	}
@@ -328,12 +330,12 @@ func projectGrantStateToPb(state domain.ProjectGrantState) project_pb.ProjectGra
 	}
 }
 
-func (s *Server) ListProjectRoles(ctx context.Context, req *project_pb.ListProjectRolesRequest) (*project_pb.ListProjectRolesResponse, error) {
-	queries, err := s.listProjectRolesRequestToModel(req)
+func (s *Server) ListProjectRoles(ctx context.Context, req *connect.Request[project_pb.ListProjectRolesRequest]) (*connect.Response[project_pb.ListProjectRolesResponse], error) {
+	queries, err := s.listProjectRolesRequestToModel(req.Msg)
 	if err != nil {
 		return nil, err
 	}
-	err = queries.AppendProjectIDQuery(req.ProjectId)
+	err = queries.AppendProjectIDQuery(req.Msg.GetProjectId())
 	if err != nil {
 		return nil, err
 	}
@@ -341,10 +343,10 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *project_pb.ListProje
 	if err != nil {
 		return nil, err
 	}
-	return &project_pb.ListProjectRolesResponse{
+	return connect.NewResponse(&project_pb.ListProjectRolesResponse{
 		ProjectRoles: roleViewsToPb(roles.ProjectRoles),
 		Pagination:   filter.QueryToPaginationPb(queries.SearchRequest, roles.SearchResponse),
-	}, nil
+	}), nil
 }
 
 func (s *Server) listProjectRolesRequestToModel(req *project_pb.ListProjectRolesRequest) (*query.ProjectRoleSearchQueries, error) {

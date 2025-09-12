@@ -1,5 +1,16 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, DestroyRef, EventEmitter, Input, OnInit, Output, signal, Signal, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  effect,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  signal,
+  Signal,
+  ViewChild,
+} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -11,13 +22,11 @@ import {
   delay,
   distinctUntilChanged,
   EMPTY,
-  from,
   Observable,
   of,
   ReplaySubject,
   shareReplay,
   switchMap,
-  toArray,
 } from 'rxjs';
 import { catchError, filter, finalize, map, startWith, take } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
@@ -26,20 +35,19 @@ import { PaginatorComponent } from 'src/app/modules/paginator/paginator.componen
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { ToastService } from 'src/app/services/toast.service';
 import { UserService } from 'src/app/services/user.service';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { SearchQuery as UserSearchQuery } from 'src/app/proto/generated/zitadel/user_pb';
 import { Type, UserFieldName } from '@zitadel/proto/zitadel/user/v2/query_pb';
 import { UserState, User } from '@zitadel/proto/zitadel/user/v2/user_pb';
 import { MessageInitShape } from '@bufbuild/protobuf';
 import { ListUsersRequestSchema, ListUsersResponse } from '@zitadel/proto/zitadel/user/v2/user_service_pb';
-import { AuthenticationService } from 'src/app/services/authentication.service';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { UserState as UserStateV1 } from 'src/app/proto/generated/zitadel/user_pb';
+import { NewOrganizationService } from 'src/app/services/new-organization.service';
 
-type Query = Exclude<
-  Exclude<MessageInitShape<typeof ListUsersRequestSchema>['queries'], undefined>[number]['query'],
-  undefined
->;
+type ListUsersRequest = MessageInitShape<typeof ListUsersRequestSchema>;
+type QueriesArray = NonNullable<ListUsersRequest['queries']>;
+type QueryWrapper = QueriesArray extends readonly (infer T)[] ? T : never;
+type Query = NonNullable<QueryWrapper extends { query?: infer Q } ? Q : never>;
 
 @Component({
   selector: 'cnsl-user-table',
@@ -50,20 +58,25 @@ type Query = Exclude<
 export class UserTableComponent implements OnInit {
   protected readonly Type = Type;
   protected readonly refresh$ = new ReplaySubject<true>(1);
+  protected readonly userQuery = this.userService.userQuery();
 
   @Input() public canWrite$: Observable<boolean> = of(false);
   @Input() public canDelete$: Observable<boolean> = of(false);
 
   protected readonly dataSize: Signal<number>;
-  protected readonly loading = signal(false);
+  protected readonly loading = signal(true);
 
   private readonly paginator$ = new ReplaySubject<PaginatorComponent>(1);
-  @ViewChild(PaginatorComponent) public set paginator(paginator: PaginatorComponent) {
-    this.paginator$.next(paginator);
+  @ViewChild(PaginatorComponent) public set paginator(paginator: PaginatorComponent | null) {
+    if (paginator) {
+      this.paginator$.next(paginator);
+    }
   }
   private readonly sort$ = new ReplaySubject<MatSort>(1);
-  @ViewChild(MatSort) public set sort(sort: MatSort) {
-    this.sort$.next(sort);
+  @ViewChild(MatSort) public set sort(sort: MatSort | null) {
+    if (sort) {
+      this.sort$.next(sort);
+    }
   }
 
   protected readonly INITIAL_PAGE_SIZE = 20;
@@ -73,7 +86,6 @@ export class UserTableComponent implements OnInit {
   protected readonly users$: Observable<ListUsersResponse>;
   protected readonly type$: Observable<Type>;
   protected readonly searchQueries$ = new ReplaySubject<UserSearchQuery[]>(1);
-  protected readonly myUser: Signal<User | undefined>;
 
   @Input() public displayedColumnsHuman: string[] = [
     'select',
@@ -110,12 +122,10 @@ export class UserTableComponent implements OnInit {
     private readonly dialog: MatDialog,
     private readonly route: ActivatedRoute,
     private readonly destroyRef: DestroyRef,
-    private readonly authenticationService: AuthenticationService,
-    private readonly authService: GrpcAuthService,
+    private readonly newOrganizationService: NewOrganizationService,
   ) {
     this.type$ = this.getType$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.users$ = this.getUsers(this.type$).pipe(shareReplay({ refCount: true, bufferSize: 1 }));
-    this.myUser = toSignal(this.getMyUser());
 
     this.dataSize = toSignal(
       this.users$.pipe(
@@ -124,6 +134,12 @@ export class UserTableComponent implements OnInit {
       ),
       { initialValue: 0 },
     );
+
+    effect(() => {
+      if (this.userQuery.isError()) {
+        this.toast.showError(this.userQuery.error());
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -156,15 +172,6 @@ export class UserTableComponent implements OnInit {
         skipLocationChange: false,
       })
       .then();
-  }
-
-  private getMyUser() {
-    return this.userService.user$.pipe(
-      catchError((error) => {
-        this.toast.showError(error);
-        return EMPTY;
-      }),
-    );
   }
 
   private getType$(): Observable<Type> {
@@ -221,20 +228,19 @@ export class UserTableComponent implements OnInit {
   }
 
   private getQueries(type$: Observable<Type>): Observable<Query[]> {
-    const activeOrgId$ = this.getActiveOrgId();
-
+    const orgId$ = toObservable(this.newOrganizationService.orgId).pipe(filter(Boolean));
     return this.searchQueries$.pipe(
       startWith([]),
-      combineLatestWith(type$, activeOrgId$),
-      switchMap(([queries, type, organizationId]) =>
-        from(queries).pipe(
-          map((query) => this.searchQueryToV2(query.toObject())),
-          startWith({ case: 'typeQuery' as const, value: { type } }),
-          startWith(organizationId ? { case: 'organizationIdQuery' as const, value: { organizationId } } : undefined),
-          filter(Boolean),
-          toArray(),
-        ),
-      ),
+      combineLatestWith(type$, orgId$),
+      map(([queries, type, organizationId]) => {
+        const mappedQueries = queries.map((q) => this.searchQueryToV2(q.toObject()));
+
+        return [
+          { case: 'typeQuery' as const, value: { type } },
+          organizationId ? { case: 'organizationIdQuery' as const, value: { organizationId } } : undefined,
+          ...mappedQueries,
+        ].filter((q): q is NonNullable<typeof q> => !!q);
+      }),
     );
   }
 
@@ -399,7 +405,7 @@ export class UserTableComponent implements OnInit {
     }, 1000);
   }
 
-  public deleteUser(user: User): void {
+  public deleteUser(user: User, authUser: User): void {
     const authUserData = {
       confirmKey: 'ACTIONS.DELETE',
       cancelKey: 'ACTIONS.CANCEL',
@@ -423,9 +429,7 @@ export class UserTableComponent implements OnInit {
     };
 
     if (user?.userId) {
-      const authUser = this.myUser();
-      console.log('my user', authUser);
-      const isMe = authUser?.userId === user.userId;
+      const isMe = authUser.userId === user.userId;
 
       let dialogRef;
 
@@ -468,21 +472,5 @@ export class UserTableComponent implements OnInit {
   public get multipleDeactivatePossible(): boolean {
     const selected = this.selection.selected;
     return selected ? selected.findIndex((user) => user.state !== UserState.INACTIVE) > -1 : false;
-  }
-
-  private getActiveOrgId() {
-    return this.authenticationService.authenticationChanged.pipe(
-      startWith(true),
-      filter(Boolean),
-      switchMap(() =>
-        from(this.authService.getActiveOrg()).pipe(
-          catchError((err) => {
-            this.toast.showError(err);
-            return of(undefined);
-          }),
-        ),
-      ),
-      map((org) => org?.id),
-    );
   }
 }

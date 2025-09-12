@@ -10,18 +10,18 @@ import (
 
 var (
 	//go:embed 57.sql
-	addSessionRecoveryCodeCheckedAt string
+	createResourceCounts string
 )
 
-type SessionRecoveryCodeCheckedAt struct {
+type CreateResourceCounts struct {
 	dbClient *database.DB
 }
 
-func (mig *SessionRecoveryCodeCheckedAt) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, addSessionRecoveryCodeCheckedAt)
+func (mig *CreateResourceCounts) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, createResourceCounts)
 	return err
 }
 
-func (mig *SessionRecoveryCodeCheckedAt) String() string {
-	return "57_session_recovery_code_checked_at"
+func (mig *CreateResourceCounts) String() string {
+	return "57_create_resource_counts"
 }

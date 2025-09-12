@@ -35,8 +35,17 @@ func NewMemberLastNameSearchQuery(method TextComparison, value string) (SearchQu
 }
 
 func NewMemberUserIDSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(membershipUserID, value, TextEquals)
+	return NewTextQuery(MembershipUserID, value, TextEquals)
 }
+
+func NewMemberInUserIDsSearchQuery(ids []string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(MembershipUserID, list, ListIn)
+}
+
 func NewMemberResourceOwnerSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(membershipResourceOwner, value, TextEquals)
 }

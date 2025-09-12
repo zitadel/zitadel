@@ -32,6 +32,8 @@ import { withLatestFromSynchronousFix } from 'src/app/utils/withLatestFromSynchr
 import { PasswordComplexityValidatorFactoryService } from 'src/app/services/password-complexity-validator-factory.service';
 import { NewFeatureService } from 'src/app/services/new-feature.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { NewOrganizationService } from '../../../../services/new-organization.service';
 
 type PwdForm = ReturnType<UserCreateV2Component['buildPwdForm']>;
 type AuthenticationFactor =
@@ -53,6 +55,7 @@ export class UserCreateV2Component implements OnInit {
   private readonly passwordComplexityPolicy$: Observable<PasswordComplexityPolicy>;
   protected readonly authenticationFactor$: Observable<AuthenticationFactor>;
   private readonly useLoginV2$: Observable<LoginV2FeatureFlag | undefined>;
+  private orgId = this.organizationService.getOrgId();
 
   constructor(
     private readonly router: Router,
@@ -65,6 +68,8 @@ export class UserCreateV2Component implements OnInit {
     private readonly destroyRef: DestroyRef,
     private readonly route: ActivatedRoute,
     protected readonly location: Location,
+    private readonly authService: GrpcAuthService,
+    private readonly organizationService: NewOrganizationService,
   ) {
     this.userForm = this.buildUserForm();
 
@@ -180,9 +185,11 @@ export class UserCreateV2Component implements OnInit {
   private async createUserV2Try(authenticationFactor: AuthenticationFactor) {
     this.loading.set(true);
 
+    this.organizationService.getOrgId();
     const userValues = this.userForm.getRawValue();
 
     const humanReq: MessageInitShape<typeof AddHumanUserRequestSchema> = {
+      organization: { org: { case: 'orgId', value: this.orgId() } },
       username: userValues.username,
       profile: {
         givenName: userValues.givenName,
@@ -199,7 +206,7 @@ export class UserCreateV2Component implements OnInit {
 
     if (authenticationFactor.factor === 'initialPassword') {
       const { password } = authenticationFactor.form.getRawValue();
-      humanReq.passwordType = {
+      humanReq['passwordType'] = {
         case: 'password',
         value: {
           password,

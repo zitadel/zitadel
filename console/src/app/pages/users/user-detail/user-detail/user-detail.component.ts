@@ -4,7 +4,6 @@ import { Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Buffer } from 'buffer';
 import { catchError, filter, map, startWith, take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
@@ -38,7 +37,6 @@ import {
   combineLatestWith,
   defer,
   EMPTY,
-  identity,
   mergeWith,
   Observable,
   ObservedValueOf,
@@ -413,7 +411,10 @@ export class UserDetailComponent implements OnInit {
 
   public sendSetPasswordNotification(user: UserV2): void {
     this.newMgmtService
-      .sendHumanResetPasswordNotification(user.userId, SendHumanResetPasswordNotificationRequest_Type.EMAIL)
+      .sendHumanResetPasswordNotification({
+        userId: user.userId,
+        type: SendHumanResetPasswordNotificationRequest_Type.EMAIL,
+      })
       .then(() => {
         this.toast.showInfo('USER.TOAST.PASSWORDNOTIFICATIONSENT', true);
         this.refreshChanges$.emit();
@@ -582,7 +583,7 @@ export class UserDetailComponent implements OnInit {
     const setFcn = (key: string, value: string) =>
       this.newMgmtService.setUserMetadata({
         key,
-        value: Buffer.from(value),
+        value: new TextEncoder().encode(value),
         id: user.userId,
       });
     const removeFcn = (key: string): Promise<any> => this.newMgmtService.removeUserMetadata({ key, id: user.userId });

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -287,9 +288,7 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*textQuery,
 	}
 	// handle the comparisons which use (i)like and therefore need to escape potential wildcards in the value
 	switch compare {
-	case TextEqualsIgnoreCase,
-		TextNotEqualsIgnoreCase,
-		TextStartsWith,
+	case TextStartsWith,
 		TextStartsWithIgnoreCase,
 		TextEndsWith,
 		TextEndsWithIgnoreCase,
@@ -299,6 +298,8 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*textQuery,
 	case TextEquals,
 		TextListContains,
 		TextNotEquals,
+		TextEqualsIgnoreCase,
+		TextNotEqualsIgnoreCase,
 		textCompareMax:
 		// do nothing
 	}
@@ -334,23 +335,23 @@ func (q *textQuery) comp() sq.Sqlizer {
 	case TextNotEquals:
 		return sq.NotEq{q.Column.identifier(): q.Text}
 	case TextEqualsIgnoreCase:
-		return sq.ILike{q.Column.identifier(): q.Text}
+		return sq.Eq{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text)}
 	case TextNotEqualsIgnoreCase:
-		return sq.NotILike{q.Column.identifier(): q.Text}
+		return sq.NotEq{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text)}
 	case TextStartsWith:
 		return sq.Like{q.Column.identifier(): q.Text + "%"}
 	case TextStartsWithIgnoreCase:
-		return sq.ILike{q.Column.identifier(): q.Text + "%"}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": strings.ToLower(q.Text) + "%"}
 	case TextEndsWith:
 		return sq.Like{q.Column.identifier(): "%" + q.Text}
 	case TextEndsWithIgnoreCase:
-		return sq.ILike{q.Column.identifier(): "%" + q.Text}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text)}
 	case TextContains:
 		return sq.Like{q.Column.identifier(): "%" + q.Text + "%"}
 	case TextContainsIgnoreCase:
-		return sq.ILike{q.Column.identifier(): "%" + q.Text + "%"}
+		return sq.Like{"LOWER(" + q.Column.identifier() + ")": "%" + strings.ToLower(q.Text) + "%"}
 	case TextListContains:
-		return &listContains{col: q.Column, args: []interface{}{q.Text}}
+		return &listContains{col: q.Column, args: []any{q.Text}}
 	case textCompareMax:
 		return nil
 	}
@@ -674,6 +675,9 @@ type TimestampQuery struct {
 }
 
 func NewTimestampQuery(c Column, value time.Time, compare TimestampComparison) (*TimestampQuery, error) {
+	if c.isZero() {
+		return nil, ErrMissingColumn
+	}
 	return &TimestampQuery{
 		Column:  c,
 		Compare: compare,

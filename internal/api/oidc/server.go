@@ -36,11 +36,12 @@ type Server struct {
 	defaultIdTokenLifetime     time.Duration
 	jwksCacheControlMaxAge     time.Duration
 
-	fallbackLogger      *slog.Logger
-	hasher              *crypto.Hasher
-	signingKeyAlgorithm string
-	encAlg              crypto.EncryptionAlgorithm
-	opCrypto            op.Crypto
+	fallbackLogger            *slog.Logger
+	hasher                    *crypto.Hasher
+	signingKeyAlgorithm       string
+	encAlg                    crypto.EncryptionAlgorithm
+	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
+	opCrypto                  op.Crypto
 
 	assetAPIPrefix func(ctx context.Context) string
 }
@@ -188,7 +189,7 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 		},
 		GrantTypesSupported:                                op.GrantTypes(s.Provider()),
 		SubjectTypesSupported:                              op.SubjectTypes(s.Provider()),
-		IDTokenSigningAlgValuesSupported:                   supportedSigningAlgs(ctx),
+		IDTokenSigningAlgValuesSupported:                   supportedSigningAlgs(),
 		RequestObjectSigningAlgValuesSupported:             op.RequestObjectSigAlgorithms(s.Provider()),
 		TokenEndpointAuthMethodsSupported:                  op.AuthMethodsTokenEndpoint(s.Provider()),
 		TokenEndpointAuthSigningAlgValuesSupported:         op.TokenSigAlgorithms(s.Provider()),

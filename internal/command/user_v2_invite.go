@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -50,8 +51,10 @@ func (c *Commands) sendInviteCode(ctx context.Context, invite *CreateUserInvite,
 	if err != nil {
 		return nil, nil, err
 	}
-	if err := c.checkPermission(ctx, domain.PermissionUserWrite, wm.ResourceOwner, wm.AggregateID); err != nil {
-		return nil, nil, err
+	if wm.AggregateID != authz.GetCtxData(ctx).UserID {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, wm.ResourceOwner, wm.AggregateID); err != nil {
+			return nil, nil, err
+		}
 	}
 	if !wm.UserState.Exists() {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Wgvn4", "Errors.User.NotFound")

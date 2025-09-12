@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"slices"
 	"strings"
 	"time"
 
@@ -332,38 +331,14 @@ type openIDKeySet struct {
 // VerifySignature implements the oidc.KeySet interface
 // providing an implementation for the keys retrieved directly from Queries
 func (o *openIDKeySet) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) (payload []byte, err error) {
-	keySet := new(jose.JSONWebKeySet)
-	if authz.GetFeatures(ctx).WebKey {
-		keySet, err = o.Queries.GetWebKeySet(ctx)
-		if err != nil {
-			return nil, err
-		}
-	}
-	legacyKeySet, err := o.Queries.ActivePublicKeys(ctx, time.Now())
+	keySet, err := o.Queries.GetWebKeySet(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error fetching keys: %w", err)
+		return nil, err
 	}
-	appendPublicKeysToWebKeySet(keySet, legacyKeySet)
 	keyID, alg := oidc.GetKeyIDAndAlg(jws)
 	key, err := oidc.FindMatchingKey(keyID, oidc.KeyUseSignature, alg, keySet.Keys...)
 	if err != nil {
 		return nil, fmt.Errorf("invalid signature: %w", err)
 	}
 	return jws.Verify(&key)
-}
-
-func appendPublicKeysToWebKeySet(keyset *jose.JSONWebKeySet, pubkeys *query.PublicKeys) {
-	if pubkeys == nil || len(pubkeys.Keys) == 0 {
-		return
-	}
-	keyset.Keys = slices.Grow(keyset.Keys, len(pubkeys.Keys))
-
-	for _, key := range pubkeys.Keys {
-		keyset.Keys = append(keyset.Keys, jose.JSONWebKey{
-			Key:       key.Key(),
-			KeyID:     key.ID(),
-			Algorithm: key.Algorithm(),
-			Use:       key.Use().String(),
-		})
-	}
 }
