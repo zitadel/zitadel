@@ -147,6 +147,30 @@ service OIDCService {
       };
     };
   }
+
+  rpc DeleteSession (DeleteSessionRequest) returns (DeleteSessionResponse) {
+    option (google.api.http) = {
+      delete: "/v2beta/oidc/sessions/{session_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Terminate an existing OIDC session";
+      description: "Terminate your own OIDC session or if granted any other OIDC session."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
 }
 
 message GetAuthRequestRequest {
@@ -217,3 +241,18 @@ message CreateCallbackResponse {
   ];
 }
 
+message DeleteSessionRequest {
+  string session_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "\"id of the session to terminate\"";
+      example: "\"V2_332345671627571204\"";
+    }
+  ];
+}
+
+message DeleteSessionResponse {
+  zitadel.object.v2beta.Details details = 1;
+}
