@@ -329,15 +329,6 @@ func (h *Handler) subscribe(ctx context.Context) {
 	}
 }
 
-func instanceSolved(solvedInstances []string, instanceID string) bool {
-	for _, solvedInstance := range solvedInstances {
-		if solvedInstance == instanceID {
-			return true
-		}
-	}
-	return false
-}
-
 func checkAdditionalEvents(eventQueue chan eventstore.Event, event eventstore.Event) []eventstore.Event {
 	events := make([]eventstore.Event, 1)
 	events[0] = event
