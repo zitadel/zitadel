@@ -70,23 +70,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: .artifacts
-          name: zitadel-linux-amd64
+          pattern: zitadel-linux-*
+          merge-multiple: true
       -
-        name: Unpack executable
+        name: Unpack executables
         run: |
-          tar -xvf .artifacts/zitadel-linux-amd64.tar.gz
-          mv zitadel-linux-amd64/zitadel ./artifacts/linux/amd64/zitadel
-      - 
-        uses: actions/download-artifact@v4
-        with:
-          path: .artifacts
-          name: zitadel-linux-arm64
-      -
-        name: Unpack executable
-        run: |
-          tar -xvf .artifacts/zitadel-linux-arm64.tar.gz
-          mv zitadel-linux-arm64/zitadel ./artifacts/linux/arm64/zitadel
-
+          mkdir -p ./artifacts/linux/amd64 ./artifacts/linux/arm64
+          tar -xzf .artifacts/zitadel-linux-amd64.tar.gz --strip-components=1 -C ./artifacts/linux/amd64/ zitadel-linux-amd64/zitadel
+          tar -xzf .artifacts/zitadel-linux-arm64.tar.gz --strip-components=1 -C ./artifacts/linux/arm64/ zitadel-linux-arm64/zitadel
       - 
         name: Debug
         id: build-debug
@@ -167,7 +158,6 @@ jobs:
       - 
         name: Build Login
         run: pnpm nx run @zitadel/login:build
-
       - 
         name: Login
         id: build-login
