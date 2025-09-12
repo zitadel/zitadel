@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 	"github.com/stretchr/testify/assert"
@@ -71,7 +70,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				userID := instance.Users.Get(integration.UserTypeIAMOwner).ID
 
 				// create target for target changes
-				targetCreatedName := gofakeit.Name()
+				targetCreatedName := integration.TargetName()
 				targetCreatedURL := "https://nonexistent"
 
 				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, target_domain.TargetTypeCall, false)
@@ -212,7 +211,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				userID := instance.Users.Get(integration.UserTypeIAMOwner).ID
 
 				// create target for target changes
-				targetCreatedName := gofakeit.Name()
+				targetCreatedName := integration.TargetName()
 				targetCreatedURL := "https://nonexistent"
 
 				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, target_domain.TargetTypeCall, false)
@@ -756,8 +755,8 @@ func TestServer_ExecutionTargetPreUserinfo(t *testing.T) {
 }
 
 func expectPreUserinfoExecution(ctx context.Context, t *testing.T, instance *integration.Instance, clientID string, req *oidc_pb.CreateCallbackRequest, response *oidc_api.ContextInfoResponse) (string, func()) {
-	userEmail := gofakeit.Email()
-	userPhone := "+41" + gofakeit.Phone()
+	userEmail := integration.Email()
+	userPhone := integration.Phone()
 	userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
 
 	sessionResp := createSession(ctx, t, instance, userResp.GetUserId())
@@ -1064,8 +1063,8 @@ func TestServer_ExecutionTargetPreAccessToken(t *testing.T) {
 }
 
 func expectPreAccessTokenExecution(ctx context.Context, t *testing.T, instance *integration.Instance, clientID string, req *oidc_pb.CreateCallbackRequest, response *oidc_api.ContextInfoResponse) (string, func()) {
-	userEmail := gofakeit.Email()
-	userPhone := "+41" + gofakeit.Phone()
+	userEmail := integration.Email()
+	userPhone := integration.Phone()
 	userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
 
 	sessionResp := createSession(ctx, t, instance, userResp.GetUserId())
@@ -1120,7 +1119,7 @@ func TestServer_ExecutionTargetPreSAMLResponse(t *testing.T) {
 			},
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, samlRequestID, err := instance.CreateSAMLAuthRequest(spMiddlewarePost, instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, samlRequestID, err := instance.CreateSAMLAuthRequest(spMiddlewarePost, instance.Users[integration.UserTypeOrgOwner].ID, acsPost, integration.RelayState(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return samlRequestID
 				}(),
@@ -1145,7 +1144,7 @@ func TestServer_ExecutionTargetPreSAMLResponse(t *testing.T) {
 			},
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, samlRequestID, err := instance.CreateSAMLAuthRequest(spMiddlewarePost, instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, samlRequestID, err := instance.CreateSAMLAuthRequest(spMiddlewarePost, instance.Users[integration.UserTypeOrgOwner].ID, acsPost, integration.RelayState(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return samlRequestID
 				}(),
@@ -1177,7 +1176,7 @@ func TestServer_ExecutionTargetPreSAMLResponse(t *testing.T) {
 			},
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
-					_, samlRequestID, err := instance.CreateSAMLAuthRequest(spMiddlewarePost, instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					_, samlRequestID, err := instance.CreateSAMLAuthRequest(spMiddlewarePost, instance.Users[integration.UserTypeOrgOwner].ID, acsPost, integration.RelayState(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return samlRequestID
 				}(),
@@ -1229,8 +1228,8 @@ func TestServer_ExecutionTargetPreSAMLResponse(t *testing.T) {
 }
 
 func expectPreSAMLResponseExecution(ctx context.Context, t *testing.T, instance *integration.Instance, req *saml_pb.CreateResponseRequest, response *saml_api.ContextInfoResponse) (string, func()) {
-	userEmail := gofakeit.Email()
-	userPhone := "+41" + gofakeit.Phone()
+	userEmail := integration.Email()
+	userPhone := integration.Phone()
 	userResp := instance.CreateHumanUserVerified(ctx, instance.DefaultOrg.Id, userEmail, userPhone)
 
 	sessionResp := createSession(ctx, t, instance, userResp.GetUserId())
@@ -1251,7 +1250,7 @@ func expectPreSAMLResponseExecution(ctx context.Context, t *testing.T, instance 
 }
 
 func createSAMLSP(t *testing.T, idpMetadata *saml.EntityDescriptor, binding string) (string, *samlsp.Middleware) {
-	rootURL := "example." + gofakeit.DomainName()
+	rootURL := "example." + integration.DomainName()
 	spMiddleware, err := integration.CreateSAMLSP("https://"+rootURL, idpMetadata, binding)
 	require.NoError(t, err)
 	return rootURL, spMiddleware

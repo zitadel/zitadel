@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -80,7 +79,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				req: &schema.SearchUserSchemasRequest{},
 				prepare: func(request *schema.SearchUserSchemasRequest, resp *schema.SearchUserSchemasResponse) error {
-					schemaType := gofakeit.Name()
+					schemaType := integration.UserSchemaName()
 					createResp := instance.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType)
 					request.Filters = []*schema.SearchFilter{
 						{
@@ -126,7 +125,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				req: &schema.SearchUserSchemasRequest{},
 				prepare: func(request *schema.SearchUserSchemasRequest, resp *schema.SearchUserSchemasResponse) error {
-					schemaType := gofakeit.Name()
+					schemaType := integration.UserSchemaName()
 					schemaType1 := schemaType + "_1"
 					schemaType2 := schemaType + "_2"
 					createResp := instance.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType1)
@@ -241,7 +240,7 @@ func TestServer_GetUserSchema(t *testing.T) {
 				ctx: instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &schema.GetUserSchemaRequest{},
 				prepare: func(request *schema.GetUserSchemaRequest, resp *schema.GetUserSchemaResponse) error {
-					schemaType := gofakeit.Name()
+					schemaType := integration.UserSchemaName()
 					createResp := instance.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType)
 					request.Id = createResp.GetDetails().GetId()
 					return nil
@@ -265,7 +264,7 @@ func TestServer_GetUserSchema(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				req: &schema.GetUserSchemaRequest{},
 				prepare: func(request *schema.GetUserSchemaRequest, resp *schema.GetUserSchemaResponse) error {
-					schemaType := gofakeit.Name()
+					schemaType := integration.UserSchemaName()
 					createResp := instance.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType)
 					request.Id = createResp.GetDetails().GetId()
 
