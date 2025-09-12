@@ -3,6 +3,8 @@ import { GrpcService } from './grpc.service';
 import {
   AddOrgResponse,
   DeactivateOrgResponse,
+  AddProjectRequestSchema,
+  AddProjectResponse,
   GenerateMachineSecretRequestSchema,
   GenerateMachineSecretResponse,
   GetDefaultPasswordComplexityPolicyResponse,
@@ -23,7 +25,6 @@ import {
   ResendHumanInitializationResponse,
   ResendHumanPhoneVerificationRequestSchema,
   ResendHumanPhoneVerificationResponse,
-  SendHumanResetPasswordNotificationRequest_Type,
   SendHumanResetPasswordNotificationRequestSchema,
   SendHumanResetPasswordNotificationResponse,
   SetUserMetadataRequestSchema,
@@ -123,5 +124,9 @@ export class NewMgmtService {
 
   public addOrg(name: string): Promise<AddOrgResponse> {
     return this.grpcService.mgmtNew.addOrg({ name });
+  }
+
+  public addProject(req: MessageInitShape<typeof AddProjectRequestSchema>): Promise<AddProjectResponse> {
+    return this.grpcService.mgmtNew.addProject(req);
   }
 }

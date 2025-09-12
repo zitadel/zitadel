@@ -1,8 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { Request, RpcError, StatusCode, UnaryInterceptor, UnaryResponse } from 'grpc-web';
-
-import { StorageKey, StorageLocation, StorageService } from '../storage.service';
 import { ConnectError, Interceptor } from '@connectrpc/connect';
+import { NewOrganizationService } from '../new-organization.service';
 
 const ORG_HEADER_KEY = 'x-zitadel-orgid';
 @Injectable({ providedIn: 'root' })
@@ -36,10 +35,16 @@ export function NewConnectWebOrgInterceptor(orgInterceptorProvider: OrgIntercept
 
 @Injectable({ providedIn: 'root' })
 export class OrgInterceptorProvider {
-  constructor(private storageService: StorageService) {}
+  constructor(private readonly injector: Injector) {}
+
+  private organizationService?: NewOrganizationService;
+
+  private getOrganizationService() {
+    return (this.organizationService ??= this.injector.get(NewOrganizationService));
+  }
 
   getOrgId() {
-    return this.storageService.getItem(StorageKey.organizationId, StorageLocation.session);
+    return this.getOrganizationService().orgId();
   }
 
   handleError = (error: any): never => {
@@ -52,7 +57,7 @@ export class OrgInterceptorProvider {
       error.code === StatusCode.PERMISSION_DENIED &&
       error.message.startsWith("Organisation doesn't exist")
     ) {
-      this.storageService.removeItem(StorageKey.organizationId, StorageLocation.session);
+      this.organizationService?.setOrgId()?.catch();
     }
 
     throw error;

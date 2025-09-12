@@ -1965,6 +1965,7 @@
       "CREATE_DESC": "Projenizin adını girin.",
       "ROLE": "Rol",
       "NOITEMS": "Proje yok",
+      "USERSELFACCOUNT": "Proje sahibi olarak kişisel hesabınızı kullanın.",
       "ZITADELPROJECT": "Bu ZITADEL projesine aittir. Dikkat: Değişiklik yaparsanız ZITADEL amaçlandığı gibi davranmayabilir.",
       "TYPE": {
         "OWNED": "Sahip Olunan Projeler",

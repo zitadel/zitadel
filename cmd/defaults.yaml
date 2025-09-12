@@ -1690,6 +1690,7 @@ InternalAuthZ:
         - "project.grant.member.read"
     - Role: "ORG_PROJECT_CREATOR"
       Permissions:
+        - "org.read"
         - "user.global.read"
         - "policy.read"
         - "project.read:self"
