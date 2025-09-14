@@ -2,6 +2,7 @@ package projection
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -433,6 +434,8 @@ func (p *labelPolicyProjection) reduceLogoAdded(event eventstore.Event) (*handle
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-4wbOI", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoAddedEventType, instance.LabelPolicyLogoAddedEventType, org.LabelPolicyLogoDarkAddedEventType, instance.LabelPolicyLogoDarkAddedEventType})
 	}
 
+	fmt.Println("[DEBUGPRINT] [settings_relational.go:1] <>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LOGO POLICY")
+
 	return handler.NewUpdateStatement(
 		event,
 		[]handler.Column{
@@ -587,7 +590,7 @@ func (p *labelPolicyProjection) reduceFontRemoved(event eventstore.Event) (*hand
 func (p *labelPolicyProjection) reduceAssetsRemoved(event eventstore.Event) (*handler.Statement, error) {
 	switch event.(type) {
 	case *org.LabelPolicyAssetsRemovedEvent, *instance.LabelPolicyAssetsRemovedEvent:
-		//ok
+		// ok
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-qi39A", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyAssetsRemovedEventType, instance.LabelPolicyAssetsRemovedEventType})
 	}

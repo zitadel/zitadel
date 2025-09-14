@@ -1,13 +1,15 @@
 CREATE TYPE zitadel.settings_type AS ENUM (
     'login',
-    'password_complexity',
-    'password_expiry',
+    'label',
+    'password_complexity', --4
+    'password_expiry', --4
     'branding',
-    'domain',
+    'domain', -- 3
     'legal_and_support',
-    'lockout',
+    'lockout', -- 3
     'general',
-    'security'
+    'security', -- 2
+    'organization' -- 4
 );
 
 CREATE TABLE zitadel.settings (
