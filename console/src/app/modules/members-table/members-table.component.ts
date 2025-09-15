@@ -2,8 +2,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTable } from '@angular/material/table';
-import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { combineLatestWith, firstValueFrom, Observable, ReplaySubject, Subject } from 'rxjs';
+import { map, startWith, takeUntil } from 'rxjs/operators';
 import { InstanceMembersDataSource } from 'src/app/pages/instance/instance-members/instance-members-datasource';
 import { OrgMembersDataSource } from 'src/app/pages/orgs/org-members/org-members-datasource';
 import { ProjectGrantMembersDataSource } from 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-members-datasource';
@@ -29,8 +29,16 @@ type MemberDatasource =
 })
 export class MembersTableComponent implements OnInit, OnDestroy {
   public INITIALPAGESIZE: number = 25;
-  @Input() public canDelete: boolean | null = false;
-  @Input() public canWrite: boolean | null = false;
+  @Input()
+  public set canWrite(value: boolean | null) {
+    this.canWrite$.next(!!value);
+  }
+
+  @Input()
+  public set canDelete(value: boolean | null) {
+    this.canDelete$.next(!!value);
+  }
+
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatTable) public table!: MatTable<Member.AsObject>;
   @Input() public dataSource?: MemberDatasource;
@@ -42,24 +50,38 @@ export class MembersTableComponent implements OnInit, OnDestroy {
   @Output() public changedSelection: EventEmitter<any[]> = new EventEmitter();
   @Output() public deleteMember: EventEmitter<Member.AsObject> = new EventEmitter();
 
+  protected readonly displayedColumns$: Observable<string[]>;
+  protected readonly canWrite$ = new ReplaySubject<boolean>(1);
+  protected readonly canDelete$ = new ReplaySubject<boolean>(1);
   private destroyed: Subject<void> = new Subject();
-  public displayedColumns: string[] = ['select', 'userId', 'displayName', 'loginname', 'email', 'roles'];
   public UserType: any = Type;
 
   constructor(private dialog: MatDialog) {
     this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe((_) => {
       this.changedSelection.emit(this.selection.selected);
     });
+
+    this.displayedColumns$ = this.getDisplayedColumns();
   }
 
   public ngOnInit(): void {
     this.refreshTrigger.pipe(takeUntil(this.destroyed)).subscribe(() => {
       this.changePage(this.paginator);
     });
+  }
 
-    if (this.canDelete || this.canWrite) {
-      this.displayedColumns.push('actions');
-    }
+  private getDisplayedColumns() {
+    const defaultColumns = ['select', 'userId', 'displayName', 'loginname', 'email', 'roles'];
+    return this.canWrite$.pipe(
+      combineLatestWith(this.canDelete$),
+      map(([canWrite, canDelete]) => {
+        if (canWrite || canDelete) {
+          return [...defaultColumns, 'actions'];
+        }
+        return defaultColumns;
+      }),
+      startWith(defaultColumns),
+    );
   }
 
   public ngOnDestroy(): void {
@@ -99,7 +121,11 @@ export class MembersTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  public addRole(member: Member.AsObject) {
+  public async addRole(member: Member.AsObject) {
+    if (!(await firstValueFrom(this.canWrite$))) {
+      return;
+    }
+
     const dialogRef = this.dialog.open(AddMemberRolesDialogComponent, {
       data: {
         user: member.displayName,

@@ -130,6 +130,12 @@ func main() {
 }
 ```
 
+:::info  
+The example above runs only on your local machine (`localhost`).  
+To test it with Zitadel, you must make your listener reachable from the internet.  
+You can do this by using **Webhook.site** (see [Creating a Listener with Webhook.site](./webhook-site-setup)).  
+:::
+
 ## Create target
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as call, the

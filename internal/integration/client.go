@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
@@ -20,6 +19,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	target_domain "github.com/zitadel/zitadel/internal/execution/target"
 	"github.com/zitadel/zitadel/internal/integration/scim"
 	"github.com/zitadel/zitadel/pkg/grpc/action/v2"
 	action_v2beta "github.com/zitadel/zitadel/pkg/grpc/action/v2beta"
@@ -295,8 +295,11 @@ func (i *Instance) CreateUserTypeHuman(ctx context.Context, email string) *user_
 }
 
 func (i *Instance) CreateUserTypeMachine(ctx context.Context, orgId string) *user_v2.CreateUserResponse {
+	if orgId == "" {
+		orgId = i.DefaultOrg.GetId()
+	}
 	resp, err := i.Client.UserV2.CreateUser(ctx, &user_v2.CreateUserRequest{
-		OrganizationId: i.DefaultOrg.GetId(),
+		OrganizationId: orgId,
 		UserType: &user_v2.CreateUserRequest_Machine_{
 			Machine: &user_v2.CreateUserRequest_Machine{
 				Name: "machine",
@@ -629,6 +632,34 @@ func (i *Instance) AddProviderToDefaultLoginPolicy(ctx context.Context, id strin
 	logging.OnError(err).Panic("add provider to default login policy")
 }
 
+func (i *Instance) AddAzureADProvider(ctx context.Context, name string) *admin.AddAzureADProviderResponse {
+	resp, err := i.Client.Admin.AddAzureADProvider(ctx, &admin.AddAzureADProviderRequest{
+		Name:          name,
+		ClientId:      "clientID",
+		ClientSecret:  "clientSecret",
+		Tenant:        nil,
+		EmailVerified: false,
+		Scopes:        []string{"openid", "profile", "email"},
+		ProviderOptions: &idp.Options{
+			IsLinkingAllowed:  true,
+			IsCreationAllowed: true,
+			IsAutoCreation:    true,
+			IsAutoUpdate:      true,
+			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+		},
+	})
+	logging.OnError(err).Panic("create Azure AD idp")
+
+	mustAwait(func() error {
+		_, err := i.Client.Admin.GetProviderByID(ctx, &admin.GetProviderByIDRequest{
+			Id: resp.GetId(),
+		})
+		return err
+	})
+
+	return resp
+}
+
 func (i *Instance) AddGenericOAuthProvider(ctx context.Context, name string) *admin.AddGenericOAuthProviderResponse {
 	return i.AddGenericOAuthProviderWithOptions(ctx, name, true, true, true, idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME)
 }
@@ -928,8 +959,9 @@ func (i *Instance) ActivateProjectGrant(ctx context.Context, t *testing.T, proje
 	return resp
 }
 
-func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, projectID, userID string) *mgmt.AddUserGrantResponse {
-	resp, err := i.Client.Mgmt.AddUserGrant(ctx, &mgmt.AddUserGrantRequest{
+func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, orgID, projectID, userID string) *mgmt.AddUserGrantResponse {
+	//nolint:staticcheck
+	resp, err := i.Client.Mgmt.AddUserGrant(SetOrgID(ctx, orgID), &mgmt.AddUserGrantRequest{
 		UserId:    userID,
 		ProjectId: projectID,
 	})
@@ -938,6 +970,7 @@ func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, pro
 }
 
 func (i *Instance) CreateProjectGrantUserGrant(ctx context.Context, orgID, projectID, projectGrantID, userID string) *mgmt.AddUserGrantResponse {
+	//nolint:staticcheck
 	resp, err := i.Client.Mgmt.AddUserGrant(SetOrgID(ctx, orgID), &mgmt.AddUserGrantRequest{
 		UserId:         userID,
 		ProjectId:      projectID,
@@ -1033,9 +1066,9 @@ func (i *Instance) DeleteProjectGrantMembership(t *testing.T, ctx context.Contex
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
+func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty target_domain.TargetType, interrupt bool) *action.CreateTargetResponse {
 	if name == "" {
-		name = gofakeit.Name()
+		name = TargetName()
 	}
 	req := &action.CreateTargetRequest{
 		Name:     name,
@@ -1043,19 +1076,19 @@ func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoin
 		Timeout:  durationpb.New(5 * time.Second),
 	}
 	switch ty {
-	case domain.TargetTypeWebhook:
+	case target_domain.TargetTypeWebhook:
 		req.TargetType = &action.CreateTargetRequest_RestWebhook{
 			RestWebhook: &action.RESTWebhook{
 				InterruptOnError: interrupt,
 			},
 		}
-	case domain.TargetTypeCall:
+	case target_domain.TargetTypeCall:
 		req.TargetType = &action.CreateTargetRequest_RestCall{
 			RestCall: &action.RESTCall{
 				InterruptOnError: interrupt,
 			},
 		}
-	case domain.TargetTypeAsync:
+	case target_domain.TargetTypeAsync:
 		req.TargetType = &action.CreateTargetRequest_RestAsync{
 			RestAsync: &action.RESTAsync{},
 		}

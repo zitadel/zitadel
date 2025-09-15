@@ -11,8 +11,9 @@ import "zitadel/feature/v2/feature.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2;feature";
 
 message SetInstanceFeaturesRequest{
-  reserved 2, 3, 6, 8;
-  reserved "oidc_trigger_introspection_projections", "oidc_legacy_introspection", "actions", "web_key";
+  reserved 2, 3, 6, 8, 11;
+  reserved "oidc_trigger_introspection_projections", "oidc_legacy_introspection", "actions", "web_key", "disable_user_token_event";
+
   optional bool login_default_org = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
@@ -57,13 +58,6 @@ message SetInstanceFeaturesRequest{
     }
   ];
 
-  optional bool disable_user_token_event = 11 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
-    }
-  ];
-
   optional bool enable_back_channel_logout = 12 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
@@ -90,6 +84,13 @@ message SetInstanceFeaturesRequest{
       description: "If this is enabled the console web client will use the new User v2 API for certain calls";
     }
   ];
+
+  optional bool enable_relational_tables = 16 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled Zitadel will use the relational tables instead of the projections as the main source to store the data. Regardless of the flag state, both the relational table and the projections are kept up to date. Currently the flag has no effect.";
+    }
+  ];
 }
 
 message SetInstanceFeaturesResponse {
@@ -112,8 +113,9 @@ message GetInstanceFeaturesRequest {
 }
 
 message GetInstanceFeaturesResponse {
-  reserved 3, 4, 7, 9;
-  reserved "oidc_trigger_introspection_projections", "oidc_legacy_introspection", "actions", "web_key";
+  reserved 3, 4, 7, 9, 12;
+  reserved "oidc_trigger_introspection_projections", "oidc_legacy_introspection", "actions", "web_key", "disable_user_token_event";
+
   zitadel.object.v2.Details details = 1;
   FeatureFlag login_default_org = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -157,13 +159,6 @@ message GetInstanceFeaturesResponse {
     }
   ];
 
-  FeatureFlag disable_user_token_event = 12 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
-    }
-  ];
-
   FeatureFlag enable_back_channel_logout = 13 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
@@ -188,6 +183,13 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "If this is enabled the console web client will use the new User v2 API for certain calls";
+    }
+  ];
+
+  FeatureFlag enable_relational_tables = 17 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled Zitadel will use the relational tables instead of the projections as the main source to store the data. Regardless of the flag state, both the relational table and the projections are kept up to date. Currently the flag has no effect.";
     }
   ];
 }

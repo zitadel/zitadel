@@ -1636,8 +1636,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si la bandera está habilitada, podrá terminar una sesión única desde la interfaz de usuario de inicio de sesión proporcionando un id_token con una reclamación `sid` como id_token_hint en el punto final de end_session. Tenga en cuenta que actualmente se terminan todas las sesiones del mismo agente de usuario (navegador) en la interfaz de usuario de inicio de sesión. Las sesiones administradas a través de la API de sesión ya permiten la terminación de sesiones individuales.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Parent Error",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Si la bandera está habilitada, el error del padre OIDC se registrará en la consola.",
-      "DISABLEUSERTOKENEVENT": "Desactivar evento de token de usuario",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Habilitar Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "El Back-Channel Logout implementa OpenID Connect Back-Channel Logout 1.0 y se puede usar para notificar a los clientes sobre la terminación de la sesión en el proveedor de OpenID.",
       "PERMISSIONCHECKV2": "Verificación de permisos V2",
@@ -1657,7 +1655,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Cuando esta opción está habilitada, la consola utiliza la API V2 de usuario para crear nuevos usuarios. Con la API V2, los usuarios recién creados comienzan sin un estado inicial.",
       "LOGINV2": "Inicio de sesión V2",
       "LOGINV2_DESCRIPTION": "Al habilitar esto, se activa la nueva interfaz de inicio de sesión basada en TypeScript con mejoras en seguridad, rendimiento y personalización.",
-      "LOGINV2_BASEURI": "URI base"
+      "LOGINV2_BASEURI": "URI base",
+      "ENABLERELATIONALTABLES": "Tablas relacionales",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Habilitar esto para usar tablas relacionales en lugar de proyecciones para almacenar datos. Actualmente este interruptor no hace nada."
     },
     "DIALOG": {
       "RESET": {

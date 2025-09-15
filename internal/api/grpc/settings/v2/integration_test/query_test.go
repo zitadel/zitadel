@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -359,7 +358,7 @@ func TestServer_GetActiveIdentityProviders(t *testing.T) {
 
 func TestServer_GetHostedLoginTranslation(t *testing.T) {
 	// Given
-	translations := map[string]any{"loginTitle": gofakeit.Slogan()}
+	translations := map[string]any{"loginTitle": integration.Slogan()}
 
 	protoTranslations, err := structpb.NewStruct(translations)
 	require.NoError(t, err)
@@ -369,7 +368,7 @@ func TestServer_GetHostedLoginTranslation(t *testing.T) {
 			OrganizationId: Instance.DefaultOrg.GetId(),
 		},
 		Translations: protoTranslations,
-		Locale:       gofakeit.LanguageBCP(),
+		Locale:       integration.Language(),
 	}
 	savedTranslation, err := Client.SetHostedLoginTranslation(AdminCTX, setupRequest)
 	require.NoError(t, err)

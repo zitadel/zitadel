@@ -21,7 +21,6 @@ import { ToastService } from 'src/app/services/toast.service';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MessageInitShape } from '@bufbuild/protobuf';
 import { Target } from '@zitadel/proto/zitadel/action/v2beta/target_pb';
 import { MatSelectModule } from '@angular/material/select';
 import { ActionConditionPipeModule } from 'src/app/pipes/action-condition-pipe/action-condition-pipe.module';
@@ -30,10 +29,10 @@ import { map, startWith } from 'rxjs/operators';
 import { TypeSafeCellDefModule } from 'src/app/directives/type-safe-cell-def/type-safe-cell-def.module';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { minArrayLengthValidator } from '../../../form-field/validators/validators';
-import { ProjectRoleChipModule } from '../../../project-role-chip/project-role-chip.module';
+import { minArrayLengthValidator } from 'src/app/modules/form-field/validators/validators';
+import { ProjectRoleChipModule } from 'src/app/modules/project-role-chip/project-role-chip.module';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TableActionsModule } from '../../../table-actions/table-actions.module';
+import { TableActionsModule } from 'src/app/modules/table-actions/table-actions.module';
 
 @Component({
   standalone: true,

@@ -113,6 +113,12 @@ func main() {
 
 ```
 
+:::info  
+The example above runs only on your local machine (`localhost`).  
+To test it with Zitadel, you must make your listener reachable from the internet.  
+You can do this by using **Webhook.site** (see [Creating a Listener with Webhook.site](./webhook-site-setup)).  
+:::
+
 ## Create target
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as call, the target can be created as follows:
@@ -150,7 +156,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/actions/executions' \
 --data-raw '{
     "condition": {
         "request": {
-            "method": "/zitadel.user.v2.UserService/AddHumanUser"
+            "method": "/zitadel.user.v2.UserService/CreateUser"
         }
     },
     "targets": [
@@ -165,17 +171,27 @@ Now that you have set up the target and execution, you can test it by creating a
 by calling the ZITADEL API to create a human user.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
+curl -L -X POST 'https://$CUSTOM-DOMAIN/v2/users/new' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "profile": {
-        "givenName": "Example_given",
-        "familyName": "Example_family"
-    },
-    "email": {
-        "email": "example@example.com"
+    "organizationId": "336392597046099971",
+    "human":
+    {
+        "profile":
+        {
+            "givenName": "Minnie",
+            "familyName": "Mouse",
+            "nickName": "Mini",
+            "displayName": "Minnie Mouse",
+            "preferredLanguage": "en",
+            "gender": "GENDER_FEMALE"
+        },
+        "email":
+        {
+            "email": "mini@mouse.com"
+        }
     }
 }'
 ```
@@ -184,17 +200,27 @@ Your server should now manipulate the request to something like the following. C
 the [Sent information Request](./usage#sent-information-request) payload description.
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/new' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
 --data-raw '{
-    "profile": {
-        "givenName": "Example_given",
-        "familyName": "Example_family"
-    },
-    "email": {
-        "email": "example@example.com"
+    "organizationId": "336392597046099971",
+    "human":
+    {
+        "profile":
+        {
+            "givenName": "Minnie",
+            "familyName": "Mouse",
+            "nickName": "Mini",
+            "displayName": "Minnie Mouse",
+            "preferredLanguage": "en",
+            "gender": "GENDER_FEMALE"
+        },
+        "email":
+        {
+            "email": "mini@mouse.com"
+        }
     }
     "metadata": [
         {"key": "organization", "value": "Y29tcGFueQ=="}
