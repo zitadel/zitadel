@@ -11,7 +11,7 @@ import {
 } from "@/lib/zitadel";
 import { create, Duration, Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks, GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import {
   RegisterPasskeyResponse,
   VerifyPasskeyRegistrationRequestSchema,
@@ -28,11 +28,13 @@ type VerifyPasskeyCommand = {
   passkeyId: string;
   passkeyName?: string;
   publicKeyCredential: any;
-  sessionId: string;
+  sessionId?: string;
+  userId?: string;
 };
 
 type RegisterPasskeyCommand = {
-  sessionId: string;
+  sessionId?: string;
+  userId?: string;
   code?: string;
 };
 
@@ -53,7 +55,11 @@ function isSessionValid(session: Partial<Session>): {
 export async function registerPasskeyLink(
   command: RegisterPasskeyCommand,
 ): Promise<RegisterPasskeyResponse | { error: string }> {
-  const { sessionId } = command;
+  const { sessionId, userId: commandUserId } = command;
+
+  if (!sessionId && !commandUserId) {
+    return { error: "Either sessionId or userId must be provided" };
+  }
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -63,34 +69,62 @@ export async function registerPasskeyLink(
     throw new Error("Could not get domain");
   }
 
-  const sessionCookie = await getSessionCookieById({ sessionId });
-  const session = await getSession({
-    serviceUrl,
-    sessionId: sessionCookie.id,
-    sessionToken: sessionCookie.token,
-  });
+  let session: GetSessionResponse | undefined;
+  let currentUserId: string;
 
-  if (!session?.session?.factors?.user?.id) {
-    return { error: "Could not determine user from session" };
-  }
-
-  const sessionValid = isSessionValid(session.session);
-
-  if (!sessionValid) {
-    const authmethods = await listAuthenticationMethodTypes({
+  if (sessionId) {
+    // Session-based flow (existing logic)
+    const sessionCookie = await getSessionCookieById({ sessionId });
+    session = await getSession({
       serviceUrl,
-      userId: session.session.factors.user.id,
+      sessionId: sessionCookie.id,
+      sessionToken: sessionCookie.token,
     });
 
-    // if the user has no authmethods set, we need to check if the user was verified
-    if (authmethods.authMethodTypes.length !== 0) {
-      return {
-        error: "You have to authenticate or have a valid User Verification Check",
-      };
+    if (!session?.session?.factors?.user?.id) {
+      return { error: "Could not determine user from session" };
     }
 
-    // check if a verification was done earlier
-    const hasValidUserVerificationCheck = await checkUserVerification(session.session.factors.user.id);
+    currentUserId = session.session.factors.user.id;
+
+    const sessionValid = isSessionValid(session.session);
+
+    if (!sessionValid) {
+      const authmethods = await listAuthenticationMethodTypes({
+        serviceUrl,
+        userId: currentUserId,
+      });
+
+      // if the user has no authmethods set, we need to check if the user was verified
+      if (authmethods.authMethodTypes.length !== 0) {
+        return {
+          error: "You have to authenticate or have a valid User Verification Check",
+        };
+      }
+
+      // check if a verification was done earlier
+      const hasValidUserVerificationCheck = await checkUserVerification(currentUserId);
+
+      if (!hasValidUserVerificationCheck) {
+        return { error: "User Verification Check has to be done" };
+      }
+    }
+  } else {
+    // UserId-based flow (similar to verify.ts pattern)
+    currentUserId = commandUserId!;
+
+    // Check if user exists
+    const userResponse = await getUserByID({
+      serviceUrl,
+      userId: currentUserId,
+    });
+
+    if (!userResponse || !userResponse.user) {
+      return { error: "User not found" };
+    }
+
+    // For userId-based flow, we assume verification was done via email/invite code
+    const hasValidUserVerificationCheck = await checkUserVerification(currentUserId);
 
     if (!hasValidUserVerificationCheck) {
       return { error: "User Verification Check has to be done" };
@@ -103,19 +137,13 @@ export async function registerPasskeyLink(
     throw new Error("Could not get hostname");
   }
 
-  const userId = session?.session?.factors?.user?.id;
-
-  if (!userId) {
-    throw new Error("Could not get session");
-  }
-
   let registerCode;
 
   if (!command.code) {
     // request a new code if no code is provided
     const { code } = await createPasskeyRegistrationLink({
       serviceUrl,
-      userId,
+      userId: currentUserId,
     });
     registerCode = code;
   }
@@ -126,7 +154,7 @@ export async function registerPasskeyLink(
 
   return registerPasskey({
     serviceUrl,
-    userId,
+    userId: currentUserId,
     code: registerCode,
     domain: hostname,
   });
@@ -135,6 +163,10 @@ export async function registerPasskeyLink(
 export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  if (!command.sessionId && !command.userId) {
+    throw new Error("Either sessionId or userId must be provided");
+  }
 
   // if no name is provided, try to generate one from the user agent
   let passkeyName = command.passkeyName;
@@ -148,18 +180,38 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     }${os.name}${os.name ? ", " : ""}${browser.name}`;
   }
 
-  const sessionCookie = await getSessionCookieById({
-    sessionId: command.sessionId,
-  });
-  const session = await getSession({
-    serviceUrl,
-    sessionId: sessionCookie.id,
-    sessionToken: sessionCookie.token,
-  });
-  const userId = session?.session?.factors?.user?.id;
+  let currentUserId: string;
 
-  if (!userId) {
-    throw new Error("Could not get session");
+  if (command.sessionId) {
+    // Session-based flow
+    const sessionCookie = await getSessionCookieById({
+      sessionId: command.sessionId,
+    });
+    const session = await getSession({
+      serviceUrl,
+      sessionId: sessionCookie.id,
+      sessionToken: sessionCookie.token,
+    });
+    const userId = session?.session?.factors?.user?.id;
+
+    if (!userId) {
+      throw new Error("Could not get session");
+    }
+
+    currentUserId = userId;
+  } else {
+    // UserId-based flow
+    currentUserId = command.userId!;
+
+    // Verify user exists
+    const userResponse = await getUserByID({
+      serviceUrl,
+      userId: currentUserId,
+    });
+
+    if (!userResponse || !userResponse.user) {
+      throw new Error("User not found");
+    }
   }
 
   return zitadelVerifyPasskeyRegistration({
@@ -168,7 +220,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
       passkeyId: command.passkeyId,
       publicKeyCredential: command.publicKeyCredential,
       passkeyName,
-      userId,
+      userId: currentUserId,
     }),
   });
 }

@@ -14,14 +14,15 @@ import { Translated } from "./translated";
 type Inputs = {};
 
 type Props = {
-  sessionId: string;
+  sessionId?: string;
+  userId?: string;
   isPrompt: boolean;
   requestId?: string;
   organization?: string;
   code?: string;
 };
 
-export function RegisterPasskey({ sessionId, isPrompt, organization, requestId, code }: Props) {
+export function RegisterPasskey({ sessionId, userId, isPrompt, organization, requestId, code }: Props) {
   const { handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -32,13 +33,20 @@ export function RegisterPasskey({ sessionId, isPrompt, organization, requestId, 
 
   const router = useRouter();
 
-  async function submitVerify(passkeyId: string, passkeyName: string, publicKeyCredential: any, sessionId: string) {
+  async function submitVerify(
+    passkeyId: string,
+    passkeyName: string,
+    publicKeyCredential: any,
+    currentSessionId?: string,
+    currentUserId?: string,
+  ) {
     setLoading(true);
     const response = await verifyPasskeyRegistration({
       passkeyId,
       passkeyName,
       publicKeyCredential,
-      sessionId,
+      sessionId: currentSessionId,
+      userId: currentUserId,
     })
       .catch(() => {
         setError("Could not verify Passkey");
@@ -52,9 +60,16 @@ export function RegisterPasskey({ sessionId, isPrompt, organization, requestId, 
   }
 
   const submitRegisterAndContinue = useCallback(async (): Promise<boolean | void> => {
+    // Require either sessionId or userId
+    if (!sessionId && !userId) {
+      setError("Missing session or user information");
+      return;
+    }
+
     setLoading(true);
     const resp = await registerPasskeyLink({
       sessionId,
+      userId,
       code,
     })
       .catch(() => {
@@ -123,7 +138,7 @@ export function RegisterPasskey({ sessionId, isPrompt, organization, requestId, 
       },
     };
 
-    const verificationResponse = await submitVerify(passkeyId, "", data, sessionId);
+    const verificationResponse = await submitVerify(passkeyId, "", data, sessionId, userId);
 
     if (!verificationResponse) {
       setError("Could not verify Passkey!");
@@ -131,7 +146,7 @@ export function RegisterPasskey({ sessionId, isPrompt, organization, requestId, 
     }
 
     continueAndLogin();
-  }, [sessionId, code]);
+  }, [sessionId, userId, code]);
 
   // Auto-submit when code is provided (similar to VerifyForm)
   useEffect(() => {
@@ -151,7 +166,13 @@ export function RegisterPasskey({ sessionId, isPrompt, organization, requestId, 
       params.set("requestId", requestId);
     }
 
-    params.set("sessionId", sessionId);
+    if (sessionId) {
+      params.set("sessionId", sessionId);
+    }
+
+    if (userId) {
+      params.set("userId", userId);
+    }
 
     router.push("/passkey?" + params);
   }
