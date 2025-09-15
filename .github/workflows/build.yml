@@ -62,9 +62,9 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  lint:
+  api-lint:
     needs: [check]
-    uses: ./.github/workflows/lint.yml
+    uses: ./.github/workflows/api-lint.yml
     with:
       buf_version: "latest"
       go_lint_version: "latest"
