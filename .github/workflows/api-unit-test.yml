@@ -21,53 +21,37 @@ jobs:
     runs-on: 
       group: zitadel-public
     steps:
-      - 
-        uses: actions/checkout@v3
-      -
-        uses: actions/setup-go@v5
+      - uses: actions/checkout@v4
+        with:
+          filter: tree:0
+          fetch-depth: 0      
+      - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-      - 
-        uses: actions/cache/restore@v4
-        timeout-minutes: 1
-        name: restore api
-        id: restore-api
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
         with:
-          path: ${{ inputs.api_cache_path }}
-          key: ${{ inputs.api_cache_key }}
+          run_install: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: "pnpm"
+      - name: Restore Nx cache
+        uses: actions/cache/restore@v4
+        id: nx_cache
+        with:
+          path: ${{ inputs.nx_cache_path }}
+          key: ${{ inputs.nx_cache_key }}
           fail-on-cache-miss: true
-      -
-        id: go-cache-path
-        name: set cache path
-        run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
-      - 
-        uses: actions/cache/restore@v4
-        id: cache
-        timeout-minutes: 1
-        continue-on-error: true
-        name: restore previous results
-        with:
-          key: unit-test-${{ inputs.api_cache_key }}
-          restore-keys: |
-            unit-test-api-
-          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
-      - 
-        name: test
-        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+      - name: Restore generated API files from Nx cache
+        run: pnpm nx run @zitadel/api:generate
+      - name: test
         run: make api_unit_test
-      - 
-        name: publish coverage
+      - name: publish coverage
         uses: codecov/codecov-action@v4.3.0
         with:
           file: profile.cov
           name: api-unit-tests
           flags: api-unit-tests
           token: ${{ secrets.CODECOV_TOKEN }}
-      - 
-        uses: actions/cache/save@v4
-        name: cache results
-        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        with:
-          key: unit-test-${{ inputs.api_cache_key }}
-          path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
-        
