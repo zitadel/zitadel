@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/zitadel/zitadel/backend/v3/storage/cache"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/telemetry/logging"
 	"github.com/zitadel/zitadel/backend/v3/telemetry/tracing"
@@ -80,7 +79,6 @@ var (
 	orgRepo func(database.QueryExecutor) OrganizationRepository
 
 	// instanceCache cache.Cache[instanceCacheIndex, string, *Instance]
-	orgCache cache.Cache[OrgCacheIndex, string, *Organization]
 
 	generateID func() (string, error) = func() (string, error) {
 		return strconv.FormatUint(rand.Uint64(), 10), nil
@@ -89,10 +87,6 @@ var (
 
 func SetPool(p database.Pool) {
 	pool = p
-}
-
-func SetCache(c cache.Cache[OrgCacheIndex, string, *Organization]) {
-	orgCache = c
 }
 
 // func SetUserCodeAlgorithm(algorithm crypto.EncryptionAlgorithm) {
