@@ -11,7 +11,7 @@ import {
 } from "@/lib/zitadel";
 import { create, Duration, Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { Checks, GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks, ChecksSchema, GetSessionResponse } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import {
   RegisterPasskeyResponse,
   VerifyPasskeyRegistrationRequestSchema,
@@ -22,7 +22,7 @@ import { getNextUrl } from "../client";
 import { getMostRecentSessionCookie, getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification, checkUserVerification } from "../verify-helper";
-import { setSessionAndUpdateCookie } from "./cookie";
+import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "./cookie";
 
 type VerifyPasskeyCommand = {
   passkeyId: string;
@@ -55,9 +55,9 @@ function isSessionValid(session: Partial<Session>): {
 export async function registerPasskeyLink(
   command: RegisterPasskeyCommand,
 ): Promise<RegisterPasskeyResponse | { error: string }> {
-  const { sessionId, userId: commandUserId } = command;
+  const { sessionId, userId } = command;
 
-  if (!sessionId && !commandUserId) {
+  if (!sessionId && !userId) {
     return { error: "Either sessionId or userId must be provided" };
   }
 
@@ -70,7 +70,8 @@ export async function registerPasskeyLink(
   }
 
   let session: GetSessionResponse | undefined;
-  let currentUserId: string;
+  let createdSession: Session | undefined;
+  let currentUserId: string | undefined = undefined;
 
   if (sessionId) {
     // Session-based flow (existing logic)
@@ -89,7 +90,7 @@ export async function registerPasskeyLink(
 
     const sessionValid = isSessionValid(session.session);
 
-    if (!sessionValid) {
+    if (!sessionValid.valid) {
       const authmethods = await listAuthenticationMethodTypes({
         serviceUrl,
         userId: currentUserId,
@@ -109,9 +110,8 @@ export async function registerPasskeyLink(
         return { error: "User Verification Check has to be done" };
       }
     }
-  } else {
-    // UserId-based flow (similar to verify.ts pattern)
-    currentUserId = commandUserId!;
+  } else if (userId) {
+    currentUserId = userId;
 
     // Check if user exists
     const userResponse = await getUserByID({
@@ -129,12 +129,35 @@ export async function registerPasskeyLink(
     if (!hasValidUserVerificationCheck) {
       return { error: "User Verification Check has to be done" };
     }
+
+    // Create a session for the user to continue the flow after passkey registration
+    const checks = create(ChecksSchema, {
+      user: {
+        search: {
+          case: "loginName",
+          value: userResponse.user.preferredLoginName,
+        },
+      },
+    });
+
+    createdSession = await createSessionAndUpdateCookie({
+      checks,
+      requestId: undefined, // No requestId in passkey registration context, TODO: consider if needed
+    });
+
+    if (!createdSession) {
+      return { error: "Could not create session" };
+    }
   }
 
   const [hostname] = host.split(":");
 
   if (!hostname) {
     throw new Error("Could not get hostname");
+  }
+
+  if (!currentUserId) {
+    throw new Error("Could not determine user");
   }
 
   let registerCode;
