@@ -41,9 +41,6 @@
         "!{projectRoot}/.next/standalone"
       ]
     },
-    "check": {
-      "description": "Run code quality checks (linting, formatting, testing and building)"
-    },
     "lint": {
       "description": "Run all linters",
       "dependsOn": [
@@ -78,24 +75,14 @@
         "^build"
       ]
     },
-    "test-integration-env": {
-      "description": "Starts the login-api-mock and the api for integration tests",
-      "continuous": true,
-      "dependsOn": [
-        "@zitadel/login-api-mock:serve",
-        "build"
-      ],
-      "command": "nx run @zitadel/login:prod"
-    },
-    "test-integration": {
+    "test-integration-run": {
       "cache": true,
-      "dependsOn": [
-        "test-integration-env"
-      ],
       "inputs": [
-        "{projectRoot}/integration/integration/**",
-        "{projectRoot}/integration/support/**",
-        "{projectRoot}/cypress.config.ts"
+        "default",
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "!{projectRoot}/acceptance/**/*",
+        { "env": "API_MOCK_STUBS_URL" },
+        { "env": "LOGIN_BASE_URL" }
       ]
     }
   }

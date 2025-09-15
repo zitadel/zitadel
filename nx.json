@@ -10,11 +10,6 @@
     "docker": [
       "{projectRoot}/Dockerfile",
       "{projectRoot}/.dockerignore"
-    ],
-    "prettier": [
-      "{projectRoot}/.prettierignore",
-      "{projectRoot}/.prettierrc",
-      "{projectRoot}/prettier.config.mjs"
     ]
   },
   "targetDefaults": {
@@ -49,14 +44,6 @@
     "test-integration": {
       "inputs": [
         "default"
-      ]
-    },
-    "check": {
-      "dependsOn": [
-        "build",
-        "lint",
-        "test-unit",
-        "test-integration"
       ]
     }
   }

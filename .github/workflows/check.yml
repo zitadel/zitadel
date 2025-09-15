@@ -34,5 +34,7 @@ jobs:
         run: pnpm cypress install
         working-directory: apps/login
       - uses: nrwl/nx-set-shas@v4
-      - name: Run all TypeScript related checks
-        run: "pnpm nx affected --target check --nxBail --exclude @zitadel/docs,@zitadel/console"
+      - name: Lint, Build, Unit Tests
+        run: pnpm nx affected --target lint build test-unit --exclude @zitadel/docs,@zitadel/console
+      - name: Login Integration Tests
+        run: pnpm --filter @zitadel/login test-integration

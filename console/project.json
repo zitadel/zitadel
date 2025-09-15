@@ -11,9 +11,15 @@
             ]
         },
         "lint-check-prettier": {
+            "cache": true,
             "inputs": [
-                "default",
-                "prettier"
+                "default"
+            ]
+        },
+        "lint-check-ng": {
+            "cache": true,
+            "inputs": [
+                "default"
             ]
         },
         "generate": {

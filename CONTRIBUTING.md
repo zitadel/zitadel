@@ -448,7 +448,10 @@ The build process uses Nx and PNPM to orchestrate dependencies:
 Reproduce the pipeline quality checks for the code you changed.
 
 ```bash
-nx affected --target check
+# Run login-related linting builds and unit tests
+nx run-many --projects @zitadel/login @zitadel/client @zitadel/proto --targets lint build test-unit
+# Run login integration tests
+pnpm --filter @zitadel/login test-integration
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.
@@ -490,7 +493,14 @@ Visit http://localhost:4200/?login_hint=zitadel-admin@zitadel.localhost and ente
 Reproduce the pipeline quality checks for the code you changed.
 
 ```bash
-nx affected --target check
+# Run console-related linting builds and unit tests
+nx run-many --projects @zitadel/console @zitadel/client @zitadel/proto @zitadel/functional-ui --targets lint build test-unit
+
+# Build the zitadel binary
+nx run @zitadel/api:build
+
+# Run the tests
+docker compose --file ./tests/functional-ui/docker-compose.yaml run --service-ports cypress
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.

@@ -4,15 +4,20 @@
     "sources": ["{projectRoot}/src/**/*"]
   },
   "targets": {
-    "check": {},
     "lint": {
       "dependsOn": [
-        "sources"
+        "lint-*"
       ]
     },
     "lint-check-eslint": {
       "inputs": [
-        "sources"
+        "default"
+      ],
+      "cache": true
+    }, 
+    "lint-check-knip": {
+      "inputs": [
+        "default"
       ],
       "cache": true
     }, 

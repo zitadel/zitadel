@@ -14,7 +14,8 @@
     "test-unit": "vitest --run",
     "lint-staged": "lint-staged",
     "clean": "rm -rf node_modules .next cypress",
-    "test-integration": "wait-on --simultaneous 1 ${API_MOCK_STUBS_URL} ${LOGIN_BASE_URL}/verify?userId=221394658884845598&code=abc && DISPLAY='' cypress run --headless"
+    "test-integration": "concurrently --success first --kill-others --names env,test --prefix '{name}-{pid}' \"ZITADEL_API_URL=http://${DEVCONTAINER_LOGIN_API_MOCK_HOST:-localhost}:22222 ZITADEL_SERVICE_USER_TOKEN=none ZITADEL_SERVICE_USER_TOKEN_FILE=\"\" nx run-many -p @zitadel/login-api-mock @zitadel/login -t prod serve\" \"nx run @zitadel/login:test-integration-run\"",
+    "test-integration-run": "wait-on --verbose --interval 2000 --simultaneous 1 \"tcp:${DEVCONTAINER_LOGIN_API_MOCK_HOST:-localhost}:22220\" \"http-get://localhost:3000/ui/v2/login/verify?userId=221394658884845598&code=abc\" && DISPLAY='' cypress run --headless"
   },
   "pnpm": {
     "overrides": {
