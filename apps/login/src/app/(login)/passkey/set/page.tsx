@@ -12,15 +12,13 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("passkey");
-  return { title: t('set.title')};
+  return { title: t("set.title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
-  const { loginName, prompt, organization, requestId } = searchParams;
+  const { loginName, prompt, organization, requestId, code } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -84,6 +82,7 @@ export default async function Page(props: {
             isPrompt={!!prompt}
             organization={organization}
             requestId={requestId}
+            code={code}
           />
         )}
       </div>

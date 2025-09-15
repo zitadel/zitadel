@@ -19,16 +19,9 @@ import {
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 import { getNextUrl } from "../client";
-import {
-  getMostRecentSessionCookie,
-  getSessionCookieById,
-  getSessionCookieByLoginName,
-} from "../cookies";
+import { getMostRecentSessionCookie, getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
-import {
-  checkEmailVerification,
-  checkUserVerification,
-} from "../verify-helper";
+import { checkEmailVerification, checkUserVerification } from "../verify-helper";
 import { setSessionAndUpdateCookie } from "./cookie";
 
 type VerifyPasskeyCommand = {
@@ -40,6 +33,7 @@ type VerifyPasskeyCommand = {
 
 type RegisterPasskeyCommand = {
   sessionId: string;
+  code?: string;
 };
 
 function isSessionValid(session: Partial<Session>): {
@@ -48,9 +42,7 @@ function isSessionValid(session: Partial<Session>): {
 } {
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
-  const stillValid = session.expirationDate
-    ? timestampDate(session.expirationDate) > new Date()
-    : true;
+  const stillValid = session.expirationDate ? timestampDate(session.expirationDate) > new Date() : true;
 
   const verifiedAt = validPassword || validPasskey;
   const valid = !!((validPassword || validPasskey) && stillValid);
@@ -93,15 +85,12 @@ export async function registerPasskeyLink(
     // if the user has no authmethods set, we need to check if the user was verified
     if (authmethods.authMethodTypes.length !== 0) {
       return {
-        error:
-          "You have to authenticate or have a valid User Verification Check",
+        error: "You have to authenticate or have a valid User Verification Check",
       };
     }
 
     // check if a verification was done earlier
-    const hasValidUserVerificationCheck = await checkUserVerification(
-      session.session.factors.user.id,
-    );
+    const hasValidUserVerificationCheck = await checkUserVerification(session.session.factors.user.id);
 
     if (!hasValidUserVerificationCheck) {
       return { error: "User Verification Check has to be done" };
@@ -119,22 +108,26 @@ export async function registerPasskeyLink(
   if (!userId) {
     throw new Error("Could not get session");
   }
-  // TODO: add org context
 
-  // use session token to add the passkey
-  const registerLink = await createPasskeyRegistrationLink({
-    serviceUrl,
-    userId,
-  });
+  let registerCode;
 
-  if (!registerLink.code) {
+  if (!command.code) {
+    // request a new code if no code is provided
+    const { code } = await createPasskeyRegistrationLink({
+      serviceUrl,
+      userId,
+    });
+    registerCode = code;
+  }
+
+  if (!registerCode) {
     throw new Error("Missing code in response");
   }
 
   return registerPasskey({
     serviceUrl,
     userId,
-    code: registerLink.code,
+    code: registerCode,
     domain: hostname,
   });
 }
@@ -246,17 +239,9 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     return { error: "User not found in the system" };
   }
 
-  const humanUser =
-    userResponse.user.type.case === "human"
-      ? userResponse.user.type.value
-      : undefined;
+  const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
 
-  const emailVerificationCheck = checkEmailVerification(
-    session,
-    humanUser,
-    organization,
-    requestId,
-  );
+  const emailVerificationCheck = checkEmailVerification(session, humanUser, organization, requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;

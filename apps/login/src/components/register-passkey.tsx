@@ -1,10 +1,7 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
-import {
-  registerPasskeyLink,
-  verifyPasskeyRegistration,
-} from "@/lib/server/passkeys";
+import { registerPasskeyLink, verifyPasskeyRegistration } from "@/lib/server/passkeys";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -21,14 +18,10 @@ type Props = {
   isPrompt: boolean;
   requestId?: string;
   organization?: string;
+  code?: string;
 };
 
-export function RegisterPasskey({
-  sessionId,
-  isPrompt,
-  organization,
-  requestId,
-}: Props) {
+export function RegisterPasskey({ sessionId, isPrompt, organization, requestId, code }: Props) {
   const { handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -39,12 +32,7 @@ export function RegisterPasskey({
 
   const router = useRouter();
 
-  async function submitVerify(
-    passkeyId: string,
-    passkeyName: string,
-    publicKeyCredential: any,
-    sessionId: string,
-  ) {
+  async function submitVerify(passkeyId: string, passkeyName: string, publicKeyCredential: any, sessionId: string) {
     setLoading(true);
     const response = await verifyPasskeyRegistration({
       passkeyId,
@@ -67,6 +55,7 @@ export function RegisterPasskey({
     setLoading(true);
     const resp = await registerPasskeyLink({
       sessionId,
+      code,
     })
       .catch(() => {
         setError("Could not register passkey");
@@ -92,29 +81,18 @@ export function RegisterPasskey({
     }
 
     const passkeyId = resp.passkeyId;
-    const options: CredentialCreationOptions =
-      (resp.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
-      {};
+    const options: CredentialCreationOptions = (resp.publicKeyCredentialCreationOptions as CredentialCreationOptions) ?? {};
 
     if (!options.publicKey) {
       setError("An error on registering passkey");
       return;
     }
 
-    options.publicKey.challenge = coerceToArrayBuffer(
-      options.publicKey.challenge,
-      "challenge",
-    );
-    options.publicKey.user.id = coerceToArrayBuffer(
-      options.publicKey.user.id,
-      "userid",
-    );
+    options.publicKey.challenge = coerceToArrayBuffer(options.publicKey.challenge, "challenge");
+    options.publicKey.user.id = coerceToArrayBuffer(options.publicKey.user.id, "userid");
     if (options.publicKey.excludeCredentials) {
       options.publicKey.excludeCredentials.map((cred: any) => {
-        cred.id = coerceToArrayBuffer(
-          cred.id as string,
-          "excludeCredentials.id",
-        );
+        cred.id = coerceToArrayBuffer(cred.id as string, "excludeCredentials.id");
         return cred;
       });
     }
@@ -140,20 +118,12 @@ export function RegisterPasskey({
       rawId: coerceToBase64Url(rawId, "rawId"),
       type: credentials.type,
       response: {
-        attestationObject: coerceToBase64Url(
-          attestationObject,
-          "attestationObject",
-        ),
+        attestationObject: coerceToBase64Url(attestationObject, "attestationObject"),
         clientDataJSON: coerceToBase64Url(clientDataJSON, "clientDataJSON"),
       },
     };
 
-    const verificationResponse = await submitVerify(
-      passkeyId,
-      "",
-      data,
-      sessionId,
-    );
+    const verificationResponse = await submitVerify(passkeyId, "", data, sessionId);
 
     if (!verificationResponse) {
       setError("Could not verify Passkey!");
@@ -211,8 +181,7 @@ export function RegisterPasskey({
           onClick={handleSubmit(submitRegisterAndContinue)}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="set.submit" namespace="passkey" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="set.submit" namespace="passkey" />
         </Button>
       </div>
     </form>
