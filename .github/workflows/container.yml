@@ -117,8 +117,26 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-      - 
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          filter: tree:0
+          fetch-depth: 0      
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: "pnpm"
+      - name: Restore Nx cache
+        uses: actions/cache/restore@v4
+        id: nx_cache
+        with:
+          path: ${{ inputs.nx_cache_path }}
+          key: ${{ inputs.nx_cache_key }}
+          fail-on-cache-miss: true
       -
         name: Login meta
         id: login-meta
@@ -144,21 +162,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - 
-        name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-      - 
-        name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ inputs.node_version }}
-          cache: "pnpm"
-      - 
-        name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - 
-        name: Build Login
+        name: Restore Login
         run: pnpm nx run @zitadel/login:build
       - 
         name: Login

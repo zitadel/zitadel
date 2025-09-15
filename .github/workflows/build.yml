@@ -70,7 +70,7 @@ jobs:
       nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
 
   container:
-    needs: [compile]
+    needs: [api-compile]
     uses: ./.github/workflows/container.yml
     secrets: inherit
     permissions:
@@ -83,7 +83,7 @@ jobs:
 
   functional-ui:
     uses: ./.github/workflows/functional-ui.yml
-    needs: [compile]
+    needs: [api-compile]
 
   release:
     uses: ./.github/workflows/release.yml
