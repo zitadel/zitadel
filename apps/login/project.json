@@ -53,6 +53,12 @@
         "default"
       ]
     },
+    "lint-check-next": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
     "test-unit": {
       "description": "Run unit tests",
       "dependsOn": [
