@@ -32,11 +32,8 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           run_install: false
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ inputs.node_version }}
-          cache: "pnpm"
+      - name: Install Nx
+        run: pnpm add -g nx
       - name: Restore Nx cache
         uses: actions/cache/restore@v4
         id: nx_cache
@@ -45,7 +42,7 @@ jobs:
           key: ${{ inputs.nx_cache_key }}
           fail-on-cache-miss: true
       - name: Restore generated API files from Nx cache
-        run: pnpm nx run @zitadel/api:generate
+        run: nx run @zitadel/api:generate
       - name: test
         run: make api_unit_test
       - name: publish coverage

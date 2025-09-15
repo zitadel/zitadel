@@ -34,14 +34,11 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           run_install: false
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ inputs.node_version }}
-          cache: "pnpm"
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
+      - name: Install Nx
+        run: pnpm add -g nx
       - name: Restore Nx cache
         uses: actions/cache/restore@v4
         id: nx_cache
@@ -56,7 +53,7 @@ jobs:
           GOARCH="${{matrix.goarch}}" \
           VERSION="${{ inputs.version }}" \
           COMMIT_SHA="${{ github.sha }}" \
-          pnpm nx run @zitadel/api:build-${{matrix.goos}}-${{matrix.goarch}}
+          nx run @zitadel/api:build-${{matrix.goos}}-${{matrix.goarch}}
       - name: create folder
         run: |
           mkdir zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
