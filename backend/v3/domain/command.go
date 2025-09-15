@@ -110,8 +110,9 @@ func DefaultOpts(invoker Invoker) *CommandOpts {
 		invoker = &noopInvoker{}
 	}
 	return &CommandOpts{
-		DB:      pool,
-		Invoker: invoker,
+		DB:       pool,
+		Invoker:  invoker,
+		_orgRepo: orgRepo,
 	}
 }
 

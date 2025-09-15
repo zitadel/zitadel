@@ -17,9 +17,9 @@ import (
 )
 
 func TestUpdateOrgCommand_Execute(t *testing.T) {
-	t.Parallel()
 	txInitErr := errors.New("tx init error")
 	updateErr := errors.New("update error")
+
 	tt := []struct {
 		testName string
 
@@ -73,7 +73,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					return repo
 				}
 			},
-			expectedError: zerrors.ThrowNotFound(nil, "DOM-7PfSUn", "organization not found"),
+			expectedError: domain.NewOrgNotFoundError("DOM-7PfSUn"),
 		},
 		{
 			testName: "when org update returns more than 1 row updated should return internal error",
@@ -89,7 +89,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
-			expectedError: zerrors.ThrowInternalf(nil, "DOM-QzITrx", "expecting 1 row updated, got %d", 2),
+			expectedError: domain.NewMultipleOrgsUpdatedError("DOM-QzITrx", 1, 2),
 		},
 		{
 			testName: "when org update returns 1 row updated should return no error and set cache",
@@ -110,6 +110,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
 			// Given
 			ctx := authz.NewMockContext("instance-1", "", "")
 			ctrl := gomock.NewController(t)
@@ -131,7 +132,39 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			err := cmd.Execute(ctx, opts)
 
 			// Verify
-			assert.ErrorIs(t, err, tc.expectedError)
+			assert.Equal(t, tc.expectedError, err)
+		})
+	}
+}
+
+func TestUpdateOrgCommand_Validate(t *testing.T) {
+	t.Parallel()
+	tt := []struct {
+		name          string
+		cmd           *domain.UpdateOrgCommand
+		expectedError error
+	}{
+		{
+			name:          "when no ID should return invalid argument error",
+			cmd:           &domain.UpdateOrgCommand{ID: "", Name: "test-name"},
+			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-lEMhVC", "invalid organization ID"),
+		},
+		{
+			name:          "when no name shuld return invalid argument error",
+			cmd:           &domain.UpdateOrgCommand{ID: "test-id", Name: ""},
+			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-wfUntW", "invalid organization name"),
+		},
+		{
+			name: "when validation succeeds should return no error",
+			cmd:  &domain.UpdateOrgCommand{ID: "test-id", Name: "test-name"},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			err := tc.cmd.Validate()
+			assert.Equal(t, tc.expectedError, err)
 		})
 	}
 }
