@@ -6,19 +6,45 @@ on:
       node_version:
         required: true
         type: string
+    outputs:
+      api_generate_cache_key:
+        value: ${{ jobs.check.outputs.api_generate_cache_key }}
+      api_generate_cache_path:
+        value: ${{ jobs.check.outputs.api_generate_cache_path }}        
+      console_cache_key:
+        value: ${{ jobs.check.outputs.console_cache_key }}
+      console_cache_path:
+        value: ${{ jobs.check.outputs.console_cache_path }}
+
+env:
+  api_generate_cache_path: |
+    backend
+    internal/statik/statik.go
+    internal/notification/statik/statik.go
+    internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*
+    internal/api/ui/login/statik/statik.go
+    internal/api/assets/authz.go 
+    internal/api/assets/router.go
+    openapi/v2
+    pkg/grpc/**/*.pb.*
+    pkg/grpc/**/*.connect.go
+  console_cache_path: console/dist/console
 
 jobs:
   check:
     name: check
     runs-on: ubuntu-latest
+    outputs:
+      api_generate_cache_key: ${{ steps.api-generated-files-cache.outputs.cache-primary-key }}
+      api_generate_cache_path: ${{ env.api_generate_cache_path }}
+      console_cache_key: ${{ steps.console-cache.outputs.cache-primary-key }}
+      console_cache_path: ${{ env.console_cache_path }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           filter: tree:0
           fetch-depth: 0
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -28,13 +54,50 @@ jobs:
         with:
           node-version: ${{ inputs.node_version }}
           cache: "pnpm"
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Install global modules
+        run: pnpm add -g nx sass
       - name: Install Cypress binary
         run: pnpm cypress install
         working-directory: apps/login
       - uses: nrwl/nx-set-shas@v4
+      - name: Cache API Generated Files
+        uses: actions/cache/restore@v4
+        timeout-minutes: 1
+        continue-on-error: true
+        id: api-generated-files-cache
+        with:
+          key: api-${{ hashFiles( 'go.*', 'openapi', 'cmd', 'pkg/grpc/**/*.go', 'proto', 'internal', 'backend/**') }}
+          restore-keys: |
+            api-
+          path: ${{ env.api_generate_cache_path }}
+          lookup-only: true
+      - uses: actions/cache/restore@v4
+        timeout-minutes: 1
+        continue-on-error: true
+        id: console-cache
+        with:
+          key: console-${{ hashFiles('console', 'proto', '!console/dist') }}
+          restore-keys: |
+            console-
+          path: console/dist/console
       - name: Lint, Build, Unit Tests
-        run: pnpm nx affected --target lint build test-unit --exclude @zitadel/docs,@zitadel/console
+        run: nx affected --targets lint test-unit generate build --exclude @zitadel/docs,@zitadel/benchmark
+      - if: ${{ steps.api-generated-files-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          key: ${{ steps.api-generated-files-cache.outputs.cache-primary-key }}
+          path: ${{ env.api_generate_cache_path }}          
+      - if: ${{ steps.console-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          key: ${{ steps.console-cache.outputs.cache-primary-key }}
+          path: ${{ env.console_cache_path }}          
       - name: Login Integration Tests
         run: pnpm --filter @zitadel/login test-integration

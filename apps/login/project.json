@@ -50,11 +50,7 @@
     "lint-check-prettier": {
       "cache": true,
       "inputs": [
-        "prettier",
-        "{projectRoot}/constants/**/*",
-        "{projectRoot}/src/**/*",
-        "{projectRoot}/locales/**/*",
-        "{projectRoot}/scripts/healthcheck.js"
+        "default"
       ]
     },
     "test-unit": {

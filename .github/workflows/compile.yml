@@ -50,6 +50,11 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: "go.mod"
+      - name: Lint, Build, Unit Tests
+        run: |
+          pnpm nx affected \
+          --target lint test-unit build \
+          --exclude @zitadel/docs,@zitadel/benchmark          
       - name: compile
         timeout-minutes: 5
         run: |

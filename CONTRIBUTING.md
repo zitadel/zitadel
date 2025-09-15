@@ -314,7 +314,7 @@ To test the whole system, including the Console UI and the login UI, run the Fun
 
 ```bash
 # Build the zitadel binary
-nx run @zitadel/api:build
+nx run @zitadel/api:build-$(go env GOOS)-$(go env GOARCH) @zitadel/api
 
 # If you made changes in the tests/functional-ui directory, make sure you reformat the files
 nx run @zitadel/functional-ui:lint-fix
@@ -556,10 +556,10 @@ Scope can be left empty (omit the brackets) or refer to the top navigation secti
 
 #### Pass Quality Checks
 
-Reproduce the pipeline quality checks for the code you changed.
+Verify the docs build correctly.
 
 ```bash
-nx affected --target check
+nx run @zitadel/docs:build
 ```
 
 Fix the quality checks, add new checks that cover your changes and mark your pull request as ready for review when the pipeline checks pass.

@@ -27,17 +27,6 @@ jobs:
     with:
       node_version: "22"
 
-  api:
-    uses: ./.github/workflows/api.yml
-    with:
-      node_version: "20"
-      buf_version: "latest"
-
-  console:
-    uses: ./.github/workflows/console.yml
-    with:
-      node_version: "20"
-
   version:
     uses: ./.github/workflows/version.yml
     with:
@@ -45,42 +34,42 @@ jobs:
       dry_run: true
 
   compile:
-    needs: [api, console, version]
+    needs: [check, version]
     uses: ./.github/workflows/compile.yml
     with:
-      api_cache_key: ${{ needs.api.outputs.cache_key }}
-      console_cache_key: ${{ needs.console.outputs.cache_key }}
-      api_cache_path: ${{ needs.api.outputs.cache_path }}
-      console_cache_path: ${{ needs.console.outputs.cache_path }}
+      api_cache_key: ${{ needs.check.outputs.api_generate_cache_key }}
+      console_cache_key: ${{ needs.check.outputs.console_cache_key }}
+      api_cache_path: ${{ needs.check.outputs.api_generate_cache_path }}
+      console_cache_path: ${{ needs.check.outputs.console_cache_path }}
       version: ${{ needs.version.outputs.version }}
       node_version: "20"
 
   api-unit-test:
-    needs: api
+    needs: check
     uses: ./.github/workflows/api-unit-test.yml
     with:
-      api_cache_key: ${{ needs.api.outputs.cache_key }}
-      api_cache_path: ${{ needs.api.outputs.cache_path }}
+      api_cache_key: ${{ needs.check.outputs.api_generate_cache_key }}
+      api_cache_path: ${{ needs.check.outputs.api_generate_cache_path }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   api-integration-test:
-    needs: api
+    needs: check
     uses: ./.github/workflows/api-integration-test.yml
     with:
-      api_cache_key: ${{ needs.api.outputs.cache_key }}
-      api_cache_path: ${{ needs.api.outputs.cache_path }}
+      api_cache_key: ${{ needs.check.outputs.api_generate_cache_key }}
+      api_cache_path: ${{ needs.check.outputs.api_generate_cache_path }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   lint:
-    needs: [api]
+    needs: [check]
     uses: ./.github/workflows/lint.yml
     with:
       buf_version: "latest"
       go_lint_version: "latest"
-      api_cache_key: ${{ needs.api.outputs.cache_key }}
-      api_cache_path: ${{ needs.api.outputs.cache_path }}
+      api_cache_key: ${{ needs.check.outputs.api_generate_cache_key }}
+      api_cache_path: ${{ needs.check.outputs.api_generate_cache_path }}
 
   container:
     needs: [compile]
@@ -110,7 +99,6 @@ jobs:
         version,
         api-unit-test,
         api-integration-test,
-        lint,
         check,
         container,
         functional-ui,

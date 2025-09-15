@@ -2,9 +2,9 @@ go_bin := "$$(go env GOPATH)/bin"
 gen_authopt_path := "$(go_bin)/protoc-gen-authoption"
 gen_zitadel_path := "$(go_bin)/protoc-gen-zitadel"
 
-now := $(shell date '+%Y-%m-%dT%T%z' | sed -E 's/.([0-9]{2})([0-9]{2})$$/-\1:\2/')
+now := $$(date '+%Y-%m-%dT%T%z' | sed -E 's/.([0-9]{2})([0-9]{2})$$/-\1:\2/')
 VERSION ?= development-$(now)
-COMMIT_SHA ?= $(shell git rev-parse HEAD)
+COMMIT_SHA ?= $$(git rev-parse HEAD)
 ZITADEL_IMAGE ?= zitadel:local
 
 GOCOVERDIR = tmp/coverage
@@ -12,8 +12,8 @@ ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
 
 export GOCOVERDIR ZITADEL_MASTERKEY
 
-GOOS?=$(go env GOOS)
-GOARCH?=$(go env GOARCH)
+GOOS ?= $(shell go env GOOS)
+GOARCH ?= $(shell go env GOARCH)
 
 export GOOS GOARCH
 
@@ -22,7 +22,7 @@ compile: api_build console_build compile_pipeline
 
 .PHONY: docker_image
 docker_image:
-	@if [ ! -f .artifacts/${GOOS}/${GOARCH}/zitadel ]; then \
+	@if [ ! -f .artifacts/$(GOOS)/$(GOARCH)/zitadel ]; then \
 		echo "Compiling zitadel binary"; \
 		$(MAKE) compile; \
 	else \
@@ -32,8 +32,8 @@ docker_image:
 
 .PHONY: compile_pipeline
 compile_pipeline: console_move
-	CGO_ENABLED=0 go build -o .artifacts/${GOOS}/${GOARCH}/zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=$(COMMIT_SHA)' -X 'github.com/zitadel/zitadel/cmd/build.date=$(now)' -X 'github.com/zitadel/zitadel/cmd/build.version=$(VERSION)' "
-	chmod +x .artifacts/${GOOS}/${GOARCH}/zitadel
+	CGO_ENABLED=0 go build -o .artifacts/$(GOOS)/$(GOARCH)/zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=$(COMMIT_SHA)' -X 'github.com/zitadel/zitadel/cmd/build.date=$(now)' -X 'github.com/zitadel/zitadel/cmd/build.version=$(VERSION)' "
+	chmod +x .artifacts/$(GOOS)/$(GOARCH)/zitadel
 
 .PHONY: api_dependencies
 api_dependencies:
