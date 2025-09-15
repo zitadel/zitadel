@@ -72,7 +72,7 @@ export class ActionsTwoActionsComponent {
       .open<ActionTwoAddActionDialogComponent, ActionTwoAddActionDialogData, ActionTwoAddActionDialogResult>(
         ActionTwoAddActionDialogComponent,
         {
-          width: '400px',
+          width: '500px',
           data: execution
             ? {
                 execution,

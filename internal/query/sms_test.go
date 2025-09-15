@@ -32,7 +32,8 @@ var (
 
 		// http config
 		` projections.sms_configs3_http.sms_id,` +
-		` projections.sms_configs3_http.endpoint` +
+		` projections.sms_configs3_http.endpoint,` +
+		` projections.sms_configs3_http.signing_key` +
 		` FROM projections.sms_configs3` +
 		` LEFT JOIN projections.sms_configs3_twilio ON projections.sms_configs3.id = projections.sms_configs3_twilio.sms_id AND projections.sms_configs3.instance_id = projections.sms_configs3_twilio.instance_id` +
 		` LEFT JOIN projections.sms_configs3_http ON projections.sms_configs3.id = projections.sms_configs3_http.sms_id AND projections.sms_configs3.instance_id = projections.sms_configs3_http.instance_id`)
@@ -55,6 +56,7 @@ var (
 		// http config
 		` projections.sms_configs3_http.sms_id,` +
 		` projections.sms_configs3_http.endpoint,` +
+		` projections.sms_configs3_http.signing_key,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.sms_configs3` +
 		` LEFT JOIN projections.sms_configs3_twilio ON projections.sms_configs3.id = projections.sms_configs3_twilio.sms_id AND projections.sms_configs3.instance_id = projections.sms_configs3_twilio.instance_id` +
@@ -78,6 +80,7 @@ var (
 		// http config
 		"sms_id",
 		"endpoint",
+		"signing_key",
 	}
 	smsConfigsCols = append(smsConfigCols, "count")
 )
@@ -129,6 +132,7 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 							"sender-number",
 							"",
 							// http config
+							nil,
 							nil,
 							nil,
 						},
@@ -185,6 +189,12 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 							// http config
 							"sms-id",
 							"endpoint",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "alg",
+								KeyID:      "encKey",
+								Crypted:    []byte("crypted"),
+							},
 						},
 					},
 				),
@@ -205,6 +215,12 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 						Description:   "description",
 						HTTPConfig: &HTTP{
 							Endpoint: "endpoint",
+							signingKey: &crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "alg",
+								KeyID:      "encKey",
+								Crypted:    []byte("crypted"),
+							},
 						},
 					},
 				},
@@ -236,6 +252,7 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 							// http config
 							nil,
 							nil,
+							nil,
 						},
 						{
 							"sms-id2",
@@ -253,6 +270,7 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 							"sender-number2",
 							"verify-service-sid2",
 							// http config
+							nil,
 							nil,
 							nil,
 						},
@@ -274,6 +292,12 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 							// http config
 							"sms-id3",
 							"endpoint3",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "alg",
+								KeyID:      "encKey",
+								Crypted:    []byte("crypted"),
+							},
 						},
 					},
 				),
@@ -326,6 +350,12 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 						Description:   "description",
 						HTTPConfig: &HTTP{
 							Endpoint: "endpoint3",
+							signingKey: &crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "alg",
+								KeyID:      "encKey",
+								Crypted:    []byte("crypted"),
+							},
 						},
 					},
 				},
@@ -410,6 +440,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 						// http config
 						nil,
 						nil,
+						nil,
 					},
 				),
 			},
@@ -455,6 +486,12 @@ func Test_SMSConfigPrepare(t *testing.T) {
 						// http config
 						"sms-id",
 						"endpoint",
+						&crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "encKey",
+							Crypted:    []byte("crypted"),
+						},
 					},
 				),
 			},
@@ -469,6 +506,12 @@ func Test_SMSConfigPrepare(t *testing.T) {
 				Description:   "description",
 				HTTPConfig: &HTTP{
 					Endpoint: "endpoint",
+					signingKey: &crypto.CryptoValue{
+						CryptoType: crypto.TypeEncryption,
+						Algorithm:  "alg",
+						KeyID:      "encKey",
+						Crypted:    []byte("crypted"),
+					},
 				},
 			},
 		},
