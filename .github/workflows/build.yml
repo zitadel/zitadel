@@ -96,14 +96,12 @@ jobs:
       issues: write
       pull-requests: write
     needs:
-      [
-        version,
-        api-unit-test,
-        api-integration-test,
-        check,
-        container,
-        functional-ui,
-      ]
+      - version
+      - api-unit-test
+      - api-integration-test
+      - check
+      - container
+      - functional-ui
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}

@@ -41,6 +41,7 @@ jobs:
           path: ${{ inputs.nx_cache_path }}
           key: ${{ inputs.nx_cache_key }}
           fail-on-cache-miss: true
+          enableCrossOsArchive: true
       - name: Restore generated API files from Nx cache
         run: nx run @zitadel/api:generate
       - name: test
