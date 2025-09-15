@@ -320,8 +320,10 @@ func TestUpdateOrganization(t *testing.T) {
 
 				// delete instance
 				_, err = organizationRepo.Delete(ctx,
-					organizationRepo.IDCondition(org.ID),
-					org.InstanceID,
+					database.And(
+						organizationRepo.InstanceIDCondition(org.InstanceID),
+						organizationRepo.IDCondition(org.ID),
+					),
 				)
 				require.NoError(t, err)
 
@@ -378,8 +380,10 @@ func TestUpdateOrganization(t *testing.T) {
 			// update org
 			beforeUpdate := time.Now()
 			rowsAffected, err := organizationRepo.Update(ctx,
-				organizationRepo.IDCondition(createdOrg.ID),
-				createdOrg.InstanceID,
+				database.And(
+					organizationRepo.InstanceIDCondition(createdOrg.InstanceID),
+					organizationRepo.IDCondition(createdOrg.ID),
+				),
 				tt.update...,
 			)
 			afterUpdate := time.Now()
@@ -443,7 +447,7 @@ func TestGetOrganization(t *testing.T) {
 	type test struct {
 		name                   string
 		testFunc               func(ctx context.Context, t *testing.T) *domain.Organization
-		orgIdentifierCondition domain.OrgIdentifierCondition
+		orgIdentifierCondition database.Condition
 		err                    error
 	}
 
@@ -537,7 +541,7 @@ func TestGetOrganization(t *testing.T) {
 
 					return &org
 				},
-				orgIdentifierCondition: orgRepo.NameCondition(organizationName),
+				orgIdentifierCondition: orgRepo.NameCondition(database.TextOperationEqual, organizationName),
 			}
 		}(),
 		{
@@ -549,7 +553,7 @@ func TestGetOrganization(t *testing.T) {
 				}
 				return &org
 			},
-			orgIdentifierCondition: orgRepo.NameCondition("non-existent-instance-name"),
+			orgIdentifierCondition: orgRepo.NameCondition(database.TextOperationEqual, "non-existent-instance-name"),
 			err:                    new(database.NoRowFoundError),
 		},
 	}
@@ -869,7 +873,7 @@ func TestDeleteOrganization(t *testing.T) {
 	type test struct {
 		name                   string
 		testFunc               func(ctx context.Context, t *testing.T)
-		orgIdentifierCondition domain.OrgIdentifierCondition
+		orgIdentifierCondition database.Condition
 		noOfDeletedRows        int64
 	}
 	tests := []test{
@@ -925,7 +929,7 @@ func TestDeleteOrganization(t *testing.T) {
 						organizations[i] = &org
 					}
 				},
-				orgIdentifierCondition: organizationRepo.NameCondition(organizationName),
+				orgIdentifierCondition: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
 				noOfDeletedRows:        noOfOrganizations,
 			}
 		}(),
@@ -934,7 +938,7 @@ func TestDeleteOrganization(t *testing.T) {
 			non_existent_organization_name := gofakeit.Name()
 			return test{
 				name:                   "delete non existent organization",
-				orgIdentifierCondition: organizationRepo.NameCondition(non_existent_organization_name),
+				orgIdentifierCondition: organizationRepo.NameCondition(database.TextOperationEqual, non_existent_organization_name),
 			}
 		}(),
 		func() test {
@@ -963,13 +967,15 @@ func TestDeleteOrganization(t *testing.T) {
 
 					// delete organization
 					affectedRows, err := organizationRepo.Delete(ctx,
-						organizationRepo.NameCondition(organizationName),
-						organizations[0].InstanceID,
+						database.And(
+							organizationRepo.InstanceIDCondition(organizations[0].InstanceID),
+							organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
+						),
 					)
 					assert.Equal(t, int64(1), affectedRows)
 					require.NoError(t, err)
 				},
-				orgIdentifierCondition: organizationRepo.NameCondition(organizationName),
+				orgIdentifierCondition: organizationRepo.NameCondition(database.TextOperationEqual, organizationName),
 				// this test should return 0 affected rows as the org was already deleted
 				noOfDeletedRows: 0,
 			}
@@ -986,8 +992,10 @@ func TestDeleteOrganization(t *testing.T) {
 
 			// delete organization
 			noOfDeletedRows, err := organizationRepo.Delete(ctx,
-				tt.orgIdentifierCondition,
-				instanceId,
+				database.And(
+					organizationRepo.InstanceIDCondition(instanceId),
+					tt.orgIdentifierCondition,
+				),
 			)
 			require.NoError(t, err)
 			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)

@@ -1,0 +1,1 @@
+DROP TABLE zitadel.org_metadata;
