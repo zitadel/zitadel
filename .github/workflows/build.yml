@@ -33,14 +33,12 @@ jobs:
       semantic_version: "23.0.7"
       dry_run: true
 
-  compile:
+  api-compile:
     needs: [check, version]
-    uses: ./.github/workflows/compile.yml
+    uses: ./.github/workflows/api-compile.yml
     with:
-      api_cache_key: ${{ needs.check.outputs.api_generate_cache_key }}
-      console_cache_key: ${{ needs.check.outputs.console_cache_key }}
-      api_cache_path: ${{ needs.check.outputs.api_generate_cache_path }}
-      console_cache_path: ${{ needs.check.outputs.console_cache_path }}
+      nx_cache_key: ${{ needs.check.outputs.nx_cache_key }}
+      nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
       version: ${{ needs.version.outputs.version }}
       node_version: "20"
 
@@ -48,8 +46,8 @@ jobs:
     needs: check
     uses: ./.github/workflows/api-unit-test.yml
     with:
-      api_cache_key: ${{ needs.check.outputs.api_generate_cache_key }}
-      api_cache_path: ${{ needs.check.outputs.api_generate_cache_path }}
+      nx_cache_key: ${{ needs.check.outputs.nx_cache_key }}
+      nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -57,8 +55,8 @@ jobs:
     needs: check
     uses: ./.github/workflows/api-integration-test.yml
     with:
-      api_cache_key: ${{ needs.check.outputs.api_generate_cache_key }}
-      api_cache_path: ${{ needs.check.outputs.api_generate_cache_path }}
+      nx_cache_key: ${{ needs.check.outputs.nx_cache_key }}
+      nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -68,8 +66,8 @@ jobs:
     with:
       buf_version: "latest"
       go_lint_version: "latest"
-      api_cache_key: ${{ needs.check.outputs.api_generate_cache_key }}
-      api_cache_path: ${{ needs.check.outputs.api_generate_cache_path }}
+      nx_cache_key: ${{ needs.check.outputs.nx_cache_key }}
+      nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
 
   container:
     needs: [compile]
