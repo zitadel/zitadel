@@ -141,3 +141,34 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		})
 	}
 }
+func TestUpdateOrgCommand_Validate(t *testing.T) {
+	t.Parallel()
+	tt := []struct {
+		name          string
+		cmd           *UpdateOrgCommand
+		expectedError error
+	}{
+		{
+			name:          "when no ID should return invalid argument error",
+			cmd:           &UpdateOrgCommand{ID: "", Name: "test-name"},
+			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-lEMhVC", "invalid organization ID"),
+		},
+		{
+			name:          "when no name shuld return invalid argument error",
+			cmd:           &UpdateOrgCommand{ID: "test-id", Name: ""},
+			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-wfUntW", "invalid organization name"),
+		},
+		{
+			name: "when validation succeeds should return no error",
+			cmd:  &UpdateOrgCommand{ID: "test-id", Name: "test-name"},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			err := tc.cmd.Validate()
+			assert.Equal(t, tc.expectedError, err)
+		})
+	}
+}
