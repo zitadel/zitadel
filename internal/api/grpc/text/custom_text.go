@@ -431,7 +431,7 @@ func ExternalUserNotFoundScreenTextToPb(text domain.ExternalUserNotFoundScreenTe
 		AutoRegisterButtonText: text.AutoRegisterButtonText,
 		TosAndPrivacyLabel:     text.TOSAndPrivacyLabel,
 		TosConfirm:             text.TOSConfirm,
-		TosLinkText:            text.TOSLinkText,
+		TosLinkText:            text.PrivacyLinkText,
 		PrivacyConfirm:         text.PrivacyConfirm,
 		PrivacyLinkText:        text.PrivacyLinkText,
 	}
@@ -915,7 +915,7 @@ func ExternalUserNotFoundScreenTextPbToDomain(text *text_pb.ExternalUserNotFound
 		AutoRegisterButtonText: text.AutoRegisterButtonText,
 		TOSAndPrivacyLabel:     text.TosAndPrivacyLabel,
 		TOSConfirm:             text.TosConfirm,
-		TOSLinkText:            text.TosLinkText,
+		TOSLinkText:            text.PrivacyLinkText,
 		PrivacyConfirm:         text.PrivacyConfirm,
 		PrivacyLinkText:        text.PrivacyLinkText,
 	}
