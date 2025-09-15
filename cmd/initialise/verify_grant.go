@@ -34,6 +34,11 @@ func VerifyGrant(databaseName, username string) func(context.Context, *database.
 	return func(ctx context.Context, db *database.DB) error {
 		logging.WithFields("user", username, "database", databaseName).Info("verify grant")
 
+		if db.Username() == username {
+			logging.WithFields("username", username).Info("already connected as the user that would be granted access - no granting will be done")
+			return nil
+		}
+
 		return exec(ctx, db, fmt.Sprintf(grantStmt, databaseName, username), nil)
 	}
 }

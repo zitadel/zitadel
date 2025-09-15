@@ -39,6 +39,11 @@ func VerifyUser(username, password string) func(context.Context, *database.DB) e
 	return func(ctx context.Context, db *database.DB) error {
 		logging.WithFields("username", username).Info("verify user")
 
+		if db.Username() == username {
+			logging.WithFields("username", username).Info("already connected as the user that would be created - will not attempt to create user")
+			return nil
+		}
+
 		if password != "" {
 			createUserStmt += " WITH PASSWORD '" + password + "'"
 		}

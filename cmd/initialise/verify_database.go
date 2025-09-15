@@ -39,6 +39,11 @@ func VerifyDatabase(databaseName string) func(context.Context, *database.DB) err
 	return func(ctx context.Context, db *database.DB) error {
 		logging.WithFields("database", databaseName).Info("verify database")
 
+		if db.DatabaseName() == databaseName {
+			logging.WithFields("database", databaseName).Info("already connected to database that would be created - will not attempt to create database")
+			return nil
+		}
+
 		return exec(ctx, db, fmt.Sprintf(databaseStmt, databaseName), []string{dbAlreadyExistsCode})
 	}
 }
