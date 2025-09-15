@@ -3,7 +3,7 @@
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { registerPasskeyLink, verifyPasskeyRegistration } from "@/lib/server/passkeys";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import { BackButton } from "./back-button";
@@ -51,7 +51,7 @@ export function RegisterPasskey({ sessionId, isPrompt, organization, requestId, 
     return response;
   }
 
-  async function submitRegisterAndContinue(): Promise<boolean | void> {
+  const submitRegisterAndContinue = useCallback(async (): Promise<boolean | void> => {
     setLoading(true);
     const resp = await registerPasskeyLink({
       sessionId,
@@ -131,7 +131,14 @@ export function RegisterPasskey({ sessionId, isPrompt, organization, requestId, 
     }
 
     continueAndLogin();
-  }
+  }, [sessionId, code]);
+
+  // Auto-submit when code is provided (similar to VerifyForm)
+  useEffect(() => {
+    if (code) {
+      submitRegisterAndContinue();
+    }
+  }, [code, submitRegisterAndContinue]);
 
   function continueAndLogin() {
     const params = new URLSearchParams();
