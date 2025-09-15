@@ -117,7 +117,7 @@
                 "{workspaceRoot}/internal/notification/statik/statik.go",
                 "{workspaceRoot}/internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*",
                 "{workspaceRoot}/internal/api/ui/login/statik/statik.go",
-                "{workspaceRoot}/internal/api/assets/authz.go ",
+                "{workspaceRoot}/internal/api/assets/authz.go",
                 "{workspaceRoot}/internal/api/assets/router.go",
                 "{workspaceRoot}/openapi/v2",
                 "{workspaceRoot}/pkg/grpc/**/*.pb.*",
