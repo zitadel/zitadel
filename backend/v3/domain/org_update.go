@@ -35,11 +35,11 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 	}
 
 	if updateCount == 0 {
-		err = zerrors.ThrowNotFound(nil, "DOM-7PfSUn", "organization not found")
+		err = NewOrgNotFoundError("DOM-7PfSUn")
 		return err
 	}
 	if updateCount > 1 {
-		err = zerrors.ThrowInternalf(nil, "DOM-QzITrx", "expecting 1 row updated, got %d", updateCount)
+		err = NewMultipleOrgsUpdatedError("DOM-QzITrx", 1, updateCount)
 		return err
 	}
 

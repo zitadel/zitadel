@@ -61,7 +61,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		{
 			testName: "when org update returns 0 rows updated should return not found error",
 			expectations: func(ctx context.Context, mockDB *dbmock.MockPool, txMock *dbmock.MockTransaction, args ...any) {
-				mockUpdateErr := zerrors.ThrowNotFound(nil, "DOM-7PfSUn", "organization not found")
+				mockUpdateErr := domain.NewOrgNotFoundError("DOM-7PfSUn")
 				mockDB.EXPECT().
 					Begin(ctx, gomock.Any()).
 					Times(1).
@@ -74,12 +74,12 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
-			expectedError: zerrors.ThrowNotFound(nil, "DOM-7PfSUn", "organization not found"),
+			expectedError: domain.NewOrgNotFoundError("DOM-7PfSUn"),
 		},
 		{
 			testName: "when org update returns more than 1 row updated should return internal error",
 			expectations: func(ctx context.Context, mockDB *dbmock.MockPool, txMock *dbmock.MockTransaction, args ...any) {
-				mockUpdateErr := zerrors.ThrowInternalf(nil, "DOM-QzITrx", "expecting 1 row updated, got %d", 2)
+				mockUpdateErr := domain.NewMultipleOrgsUpdatedError("DOM-QzITrx", 1, 2)
 				mockDB.EXPECT().
 					Begin(ctx, gomock.Any()).
 					Times(1).
@@ -92,7 +92,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
-			expectedError: zerrors.ThrowInternalf(nil, "DOM-QzITrx", "expecting 1 row updated, got %d", 2),
+			expectedError: domain.NewMultipleOrgsUpdatedError("DOM-QzITrx", 1, 2),
 		},
 		{
 			testName: "when org update returns 1 row updated should return no error and set cache",
