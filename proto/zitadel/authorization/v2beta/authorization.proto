@@ -26,7 +26,7 @@ message Authorization {
   string project_organization_id = 4;
   // ID of the granted project, only provided if it is a granted project.
   optional string project_grant_id = 5;
-  // ID of the organization the authorization is granted to, contains the organization the user belongs to.
+  // ID of the organization the project is granted to, only provided if it is a granted project.
   optional string granted_organization_id = 6;
 
   // The unique identifier of the organization the authorization belongs to.
