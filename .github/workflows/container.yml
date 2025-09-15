@@ -9,9 +9,15 @@ on:
       build_image_name_login:
         required: true
         type: string
+      nx_cache_key:
+        required: true
+        type: string
+      nx_cache_path:
+        required: true
+        type: string
       node_version:
         required: true
-        type: string        
+        type: string
     outputs:
       build_image_api:
         value: '${{ inputs.build_image_name_api }}:${{ github.sha }}'

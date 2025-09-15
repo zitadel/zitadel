@@ -34,7 +34,9 @@ jobs:
       dry_run: true
 
   api-compile:
-    needs: [check, version]
+    needs: 
+      - check
+      - version
     uses: ./.github/workflows/api-compile.yml
     with:
       node_version: "22"
@@ -63,7 +65,7 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   api-lint:
-    needs: [check]
+    needs: check
     uses: ./.github/workflows/api-lint.yml
     with:
       node_version: "22"
@@ -73,7 +75,9 @@ jobs:
       nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
 
   container:
-    needs: [api-compile]
+    needs: 
+    - api-compile
+    - check
     uses: ./.github/workflows/container.yml
     secrets: inherit
     permissions:
@@ -83,10 +87,12 @@ jobs:
       node_version: "22"
       build_image_name_api: "ghcr.io/zitadel/zitadel-build"
       build_image_name_login: "ghcr.io/zitadel/zitadel-login-build"
+      nx_cache_key: ${{ needs.check.outputs.nx_cache_key }}
+      nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
 
   functional-ui:
     uses: ./.github/workflows/functional-ui.yml
-    needs: [api-compile]
+    needs: api-compile
 
   release:
     uses: ./.github/workflows/release.yml
