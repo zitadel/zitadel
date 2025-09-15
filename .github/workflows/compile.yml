@@ -3,16 +3,10 @@ name: Compile
 on:
   workflow_call:
     inputs:
-      api_cache_key:
+      nx_cache_key:
         required: true
         type: string
-      api_cache_path:
-        required: true
-        type: string
-      console_cache_key:
-        required: true
-        type: string
-      console_cache_path:
+      nx_cache_path:
         required: true
         type: string
       version:
@@ -33,28 +27,28 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/cache/restore@v4
-        timeout-minutes: 1
-        name: restore console
         with:
-          path: ${{ inputs.console_cache_path }}
-          key: ${{ inputs.console_cache_key }}
-          fail-on-cache-miss: true
-      - uses: actions/cache/restore@v4
-        timeout-minutes: 1
-        name: restore api
+          filter: tree:0
+          fetch-depth: 0      
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
         with:
-          path: ${{ inputs.api_cache_path }}
-          key: ${{ inputs.api_cache_key }}
-          fail-on-cache-miss: true
+          run_install: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: "pnpm"
       - uses: actions/setup-go@v5
         with:
-          go-version-file: "go.mod"
-      - name: Lint, Build, Unit Tests
-        run: |
-          pnpm nx affected \
-          --target lint test-unit build \
-          --exclude @zitadel/docs,@zitadel/benchmark          
+          go-version-file: 'go.mod'
+      - name: Restore Nx cache
+        uses: actions/cache/restore@v4
+        id: nx_cache
+        with:
+          path: ${{ inputs.nx_cache_path }}
+          key: ${{ inputs.nx_cache_key }}
+          fail-on-cache-miss: true
       - name: compile
         timeout-minutes: 5
         run: |
@@ -62,7 +56,7 @@ jobs:
           GOARCH="${{matrix.goarch}}" \
           VERSION="${{ inputs.version }}" \
           COMMIT_SHA="${{ github.sha }}" \
-          make compile_pipeline
+          pnpm nx run @zitadel/api:build-${{matrix.goos}}-${{matrix.goarch}}
       - name: create folder
         run: |
           mkdir zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
