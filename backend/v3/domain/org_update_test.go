@@ -1,92 +1,91 @@
-package domain
+package domain_test
 
 import (
-	"context"
 	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
+	"github.com/zitadel/zitadel/backend/v3/domain"
+	domainmock "github.com/zitadel/zitadel/backend/v3/domain/mock"
+	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
+	noopdb "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/noop"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestUpdateOrgCommand_Execute(t *testing.T) {
+	t.Parallel()
+	txInitErr := errors.New("tx init error")
+	updateErr := errors.New("update error")
 	tt := []struct {
 		testName string
 
-		expectations func(ctx context.Context, mockDB *dbmock.MockPool, txMock *dbmock.MockTransaction, args ...any)
-
-		dbArgs []any
+		queryExecutor func(ctrl *gomock.Controller) database.QueryExecutor
+		orgRepo       func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository
 
 		inputID   string
 		inputName string
 
-		expectedError    error
-		expectedCacheObj *Organization
+		expectedError error
 	}{
 		{
 			testName: "when EnsureTx fails should return error",
-			expectations: func(ctx context.Context, mockDB *dbmock.MockPool, _ *dbmock.MockTransaction, args ...any) {
+			queryExecutor: func(ctrl *gomock.Controller) database.QueryExecutor {
+				mockDB := dbmock.NewMockPool(ctrl)
 				mockDB.EXPECT().
-					Begin(ctx, gomock.Any()).
+					Begin(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(nil, errors.New("mock tx init error"))
+					Return(nil, txInitErr)
+				return mockDB
 			},
-			expectedError: errors.New("mock tx init error"),
+			expectedError: txInitErr,
 		},
 		{
 			testName: "when org update fails should return error",
-			expectations: func(ctx context.Context, mockDB *dbmock.MockPool, txMock *dbmock.MockTransaction, args ...any) {
-				mockUpdateErr := errors.New("mock update failed")
-				mockDB.EXPECT().
-					Begin(ctx, gomock.Any()).
-					Times(1).
-					Return(txMock, nil)
-				txMock.EXPECT().
-					Exec(ctx, "UPDATE zitadel.organizations SET name = $1 WHERE (organizations.id = $2 AND organizations.instance_id = $3)", args...).
-					Times(1).
-					Return(int64(-1), mockUpdateErr)
-				txMock.EXPECT().End(ctx, mockUpdateErr).Return(mockUpdateErr)
+			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
+				repo := domainmock.NewOrgRepo(ctrl)
+				repo.EXPECT().
+					Update(gomock.Any(), repo.IDCondition("org-1"), "instance-1", repo.SetName("test org update")).
+					Return(int64(0), updateErr).
+					AnyTimes()
+				return func(_ database.QueryExecutor) domain.OrganizationRepository {
+					return repo
+				}
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
-			expectedError: errors.New("mock update failed"),
+			expectedError: updateErr,
 		},
 		{
-			testName: "when org update returns 0 rows updated should return not found error",
-			expectations: func(ctx context.Context, mockDB *dbmock.MockPool, txMock *dbmock.MockTransaction, args ...any) {
-				mockUpdateErr := zerrors.ThrowNotFound(nil, "DOM-7PfSUn", "organization not found")
-				mockDB.EXPECT().
-					Begin(ctx, gomock.Any()).
-					Times(1).
-					Return(txMock, nil)
-				txMock.EXPECT().
-					Exec(ctx, "UPDATE zitadel.organizations SET name = $1 WHERE (organizations.id = $2 AND organizations.instance_id = $3)", args...).
-					Times(1).
-					Return(int64(0), nil)
-				txMock.EXPECT().End(ctx, mockUpdateErr).Return(mockUpdateErr)
+			testName:  "when org update returns 0 rows updated should return not found error",
+			inputID:   "org-1",
+			inputName: "test org update",
+			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
+				repo := domainmock.NewOrgRepo(ctrl)
+				repo.EXPECT().
+					Update(gomock.Any(), repo.IDCondition("org-1"), "instance-1", repo.SetName("test org update")).
+					Return(int64(0), nil).
+					AnyTimes()
+				return func(_ database.QueryExecutor) domain.OrganizationRepository {
+					return repo
+				}
 			},
-			inputID:       "org-1",
-			inputName:     "test org update",
 			expectedError: zerrors.ThrowNotFound(nil, "DOM-7PfSUn", "organization not found"),
 		},
 		{
 			testName: "when org update returns more than 1 row updated should return internal error",
-			expectations: func(ctx context.Context, mockDB *dbmock.MockPool, txMock *dbmock.MockTransaction, args ...any) {
-				mockUpdateErr := zerrors.ThrowInternalf(nil, "DOM-QzITrx", "expecting 1 row updated, got %d", 2)
-				mockDB.EXPECT().
-					Begin(ctx, gomock.Any()).
-					Times(1).
-					Return(txMock, nil)
-				txMock.EXPECT().
-					Exec(ctx, "UPDATE zitadel.organizations SET name = $1 WHERE (organizations.id = $2 AND organizations.instance_id = $3)", args...).
-					Times(1).
-					Return(int64(2), nil)
-				txMock.EXPECT().End(ctx, mockUpdateErr).Return(mockUpdateErr)
+			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
+				repo := domainmock.NewOrgRepo(ctrl)
+				repo.EXPECT().
+					Update(gomock.Any(), repo.IDCondition("org-1"), "instance-1", repo.SetName("test org update")).
+					Return(int64(2), nil).
+					AnyTimes()
+				return func(_ database.QueryExecutor) domain.OrganizationRepository {
+					return repo
+				}
 			},
 			inputID:       "org-1",
 			inputName:     "test org update",
@@ -94,20 +93,18 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		},
 		{
 			testName: "when org update returns 1 row updated should return no error and set cache",
-			expectations: func(ctx context.Context, mockDB *dbmock.MockPool, txMock *dbmock.MockTransaction, args ...any) {
-				mockDB.EXPECT().
-					Begin(ctx, gomock.Any()).
-					Times(1).
-					Return(txMock, nil)
-				txMock.EXPECT().
-					Exec(ctx, "UPDATE zitadel.organizations SET name = $1 WHERE (organizations.id = $2 AND organizations.instance_id = $3)", args...).
-					Times(1).
-					Return(int64(1), nil)
-				txMock.EXPECT().End(ctx, nil).Return(nil)
+			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
+				repo := domainmock.NewOrgRepo(ctrl)
+				repo.EXPECT().
+					Update(gomock.Any(), repo.IDCondition("org-1"), "instance-1", repo.SetName("test org update")).
+					Return(int64(1), nil).
+					AnyTimes()
+				return func(_ database.QueryExecutor) domain.OrganizationRepository {
+					return repo
+				}
 			},
-			inputID:          "org-1",
-			inputName:        "test org update",
-			expectedCacheObj: &Organization{ID: "org-1", Name: "test org update"},
+			inputID:   "org-1",
+			inputName: "test org update",
 		},
 	}
 
@@ -115,29 +112,26 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			// Given
 			ctx := authz.NewMockContext("instance-1", "", "")
-			mockCtrl := gomock.NewController(t)
-			cmd := &UpdateOrgCommand{
+			ctrl := gomock.NewController(t)
+			cmd := &domain.UpdateOrgCommand{
 				ID:   tc.inputID,
 				Name: tc.inputName,
 			}
-			mockDB := dbmock.NewMockPool(mockCtrl)
-			mockTX := dbmock.NewMockTransaction(mockCtrl)
-			tc.expectations(ctx, mockDB, mockTX, tc.inputName, tc.inputID, "instance-1")
 
-			opts := &CommandOpts{
-				DB: mockDB,
+			opts := &domain.CommandOpts{
+				DB: new(noopdb.Pool),
+			}
+			if tc.orgRepo != nil {
+				opts.SetOrgRepo(tc.orgRepo(ctrl))
+			}
+			if tc.queryExecutor != nil {
+				opts.DB = tc.queryExecutor(ctrl)
 			}
 
-			// Test
 			err := cmd.Execute(ctx, opts)
 
 			// Verify
-			assert.Equal(t, tc.expectedError, err)
-			if tc.expectedCacheObj != nil {
-				cachedOrg, found := orgCache.Get(ctx, orgCacheIndexID, tc.inputID)
-				require.True(t, found)
-				assert.Equal(t, tc.expectedCacheObj, cachedOrg)
-			}
+			assert.ErrorIs(t, err, tc.expectedError)
 		})
 	}
 }

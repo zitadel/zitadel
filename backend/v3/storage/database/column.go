@@ -1,5 +1,7 @@
 package database
 
+import "go.uber.org/mock/gomock"
+
 type Columns []Column
 
 // WriteQualified implements [Column].
@@ -24,6 +26,7 @@ func (m Columns) WriteUnqualified(builder *StatementBuilder) {
 
 // Column represents a column in a database table.
 type Column interface {
+	gomock.Matcher
 	// Write(builder *StatementBuilder)
 	WriteQualified(builder *StatementBuilder)
 	WriteUnqualified(builder *StatementBuilder)
@@ -32,6 +35,20 @@ type Column interface {
 type column struct {
 	table string
 	name  string
+}
+
+// Matches implements [Column].
+func (c column) Matches(x any) bool {
+	toMatch, ok := x.(*column)
+	if !ok {
+		return false
+	}
+	return c.table == toMatch.table && c.name == toMatch.name
+}
+
+// String implements [Column].
+func (c column) String() string {
+	return "database.Column"
 }
 
 func NewColumn(table, name string) Column {

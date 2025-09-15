@@ -267,7 +267,6 @@ func (o *org) Domains(shouldLoad bool) domain.OrganizationDomainRepository {
 
 	o.domainRepo = &orgDomain{
 		repository: o.repository,
-		org:        o,
 	}
 
 	return o.domainRepo
