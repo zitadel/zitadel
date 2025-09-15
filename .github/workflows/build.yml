@@ -85,8 +85,10 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     with:
       node_version: "22"
-      build_image_name_api: "ghcr.io/zitadel/zitadel-build"
-      build_image_name_login: "ghcr.io/zitadel/zitadel-login-build"
+      image_name_github_api: "ghcr.io/zitadel/zitadel"
+      image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
+      image_name_github_login: "ghcr.io/zitadel/zitadel-login"
+      image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
       nx_cache_key: ${{ needs.check.outputs.nx_cache_key }}
       nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
 
@@ -114,10 +116,8 @@ jobs:
       APP_ID: ${{ secrets.APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
     with:
-      build_image_name: ${{ needs.container.outputs.build_image_api }}
       semantic_version: "23.0.7"
-      image_name: "ghcr.io/zitadel/zitadel"
-      google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
-      build_image_name_login: ${{ needs.container.outputs.build_image_login }}
-      image_name_login: "ghcr.io/zitadel/zitadel-login"
-      google_image_name_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"
+      image_name_github_api: "ghcr.io/zitadel/zitadel"
+      image_name_google_api: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
+      image_name_github_login: "ghcr.io/zitadel/zitadel-login"
+      image_name_google_login: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel-login"

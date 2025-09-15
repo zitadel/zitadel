@@ -6,22 +6,16 @@ on:
       semantic_version:
         required: true
         type: string
-      build_image_name:
+      image_name_github_api:
         required: true
         type: string
-      image_name:
+      image_name_google_api:
         required: true
         type: string
-      google_image_name:
+      image_name_github_login:
         required: true
         type: string
-      build_image_name_login:
-        required: true
-        type: string
-      image_name_login:
-        required: true
-        type: string
-      google_image_name_login:
+      image_name_google_login:
         required: true
         type: string
     secrets:
@@ -48,6 +42,7 @@ jobs:
   publish:
     runs-on: ubuntu-22.04
     needs: [ version ]
+    if: needs.version.outputs.published == 'true'
     steps:
       - id: get_release
         uses: cardinalby/git-get-release-action@v1
@@ -72,6 +67,7 @@ jobs:
   docker:
     runs-on: ubuntu-22.04
     needs: [ version ]
+    if: needs.version.outputs.published == 'true'
     steps:
     -
       name: Set up QEMU
@@ -97,38 +93,38 @@ jobs:
       name: Publish ${{ needs.version.outputs.version }}
       run: |
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.build_image_name }}
+          --tag ${{ inputs.image_name_github_api }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.image_name_github_api }}:${{ github.sha }}
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:${{ needs.version.outputs.version }}-debug \
-          ${{ inputs.build_image_name }}-debug        
+          --tag ${{ inputs.image_name_github_api }}:${{ needs.version.outputs.version }}-debug \
+          ${{ inputs.image_name_github_api }}:${{ github.sha }}-debug        
         docker buildx imagetools create \
-          --tag ${{ inputs.google_image_name }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.build_image_name }}
+          --tag ${{ inputs.image_name_google_api }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.image_name_google_api }}:${{ github.sha }}
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name_login }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.build_image_name_login }}
+          --tag ${{ inputs.image_name_github_login }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.image_name_github_login }}:${{ github.sha }}
         docker buildx imagetools create \
-          --tag ${{ inputs.google_image_name_login }}:${{ needs.version.outputs.version }} \
-          ${{ inputs.build_image_name_login }}
+          --tag ${{ inputs.image_name_google_login }}:${{ needs.version.outputs.version }} \
+          ${{ inputs.image_name_google_login }}:${{ github.sha }}
     -
       name: Publish latest
       if: ${{ github.ref_name == 'next' }}
       run: |
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:latest \
-          ${{ inputs.build_image_name }}
+          --tag ${{ inputs.image_name_github_api }}:latest \
+          ${{ inputs.image_name_github_api }}:${{ github.sha }}
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name }}:latest-debug \
-          ${{ inputs.build_image_name }}-debug
+          --tag ${{ inputs.image_name_github_api }}:latest-debug \
+          ${{ inputs.image_name_github_api }}:${{ github.sha }}-debug
         docker buildx imagetools create \
-          --tag ${{ inputs.image_name_login }}:latest \
-          ${{ inputs.build_image_name_login }}
+          --tag ${{ inputs.image_name_github_login }}:latest \
+          ${{ inputs.image_name_github_login }}:${{ github.sha }}
 
   homebrew-tap:
     runs-on: ubuntu-22.04
     needs: version
-    if: ${{ github.ref_name == 'next' }}
+    if: needs.version.outputs.published == 'true' && github.ref_name == 'next'
     continue-on-error: true
     steps:
     - name: generate token
@@ -148,7 +144,7 @@ jobs:
   helm-chart:
     runs-on: ubuntu-22.04
     needs: version
-    if: ${{ github.ref_name == 'next' }}
+    if: needs.version.outputs.published == 'true' && github.ref_name == 'next'
     continue-on-error: true
     steps:
       - name: generate token
@@ -168,7 +164,7 @@ jobs:
   npm-packages:
     runs-on: ubuntu-latest
     needs: version
-    if: ${{ github.ref_name == 'next' }}
+    if: needs.version.outputs.published == 'true' && github.ref_name == 'next'
     continue-on-error: true
     steps:
       - name: Checkout code

@@ -3,10 +3,16 @@ name: Container
 on:
   workflow_call:
     inputs:
-      build_image_name_api:
+      image_name_github_api:
         required: true
         type: string
-      build_image_name_login:
+      image_name_github_login:
+        required: true
+        type: string
+      image_name_google_api:
+        required: true
+        type: string
+      image_name_google_login:
         required: true
         type: string
       nx_cache_key:
@@ -18,11 +24,6 @@ on:
       node_version:
         required: true
         type: string
-    outputs:
-      build_image_api:
-        value: '${{ inputs.build_image_name_api }}:${{ github.sha }}'
-      build_image_login:
-        value: '${{ inputs.build_image_name_login }}:${{ github.sha }}'
 
 permissions:
   packages: write
@@ -44,7 +45,9 @@ jobs:
         id: scratch-meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ inputs.build_image_name_api }}
+          images: |
+            ${{ inputs.image_name_github_api }}
+            ${{ inputs.image_name_google_api }}
           labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=,format=long
@@ -52,7 +55,9 @@ jobs:
         id: debug-meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ inputs.build_image_name_api }}
+          images: |
+            ${{ inputs.image_name_github_api }}
+            ${{ inputs.image_name_google_api }}
           labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=-debug,format=long
@@ -66,6 +71,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to Google Artifact Registry
+        uses: docker/login-action@v3
+        with:
+          registry: europe-docker.pkg.dev
+          username: _json_key_base64
+          password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
       - uses: actions/download-artifact@v4
         with:
           path: .artifacts
@@ -91,7 +102,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           labels: ${{ steps.debug-meta.outputs.labels }}
-          outputs: type=image,name=${{ inputs.build_image_name_api }},name-canonical=true
+          tags: ${{ steps.debug-meta.outputs.tags }}
+          outputs: type=image,name=${{ inputs.image_name_github_api }},name-canonical=true
       - name: Scratch
         id: build-scratch
         uses: docker/build-push-action@v6
@@ -105,7 +117,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           labels: ${{ steps.scratch-meta.outputs.labels }}
-          outputs: type=image,name=${{ inputs.build_image_name_api }},name-canonical=true
+          tags: ${{ steps.scratch-meta.outputs.tags }}
 
   build-login:
     name: login
@@ -134,7 +146,9 @@ jobs:
         id: login-meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ inputs.build_image_name_login }}
+          images: |
+            ${{ inputs.image_name_github_login }}
+            ${{ inputs.image_name_google_login }}
           labels: |
             org.opencontainers.image.licenses=MIT
             ${{ env.default_labels}}
@@ -163,4 +177,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           labels: ${{ steps.login-meta.outputs.labels }}
-          outputs: type=image,name=${{ inputs.build_image_name_login }},name-canonical=true          
+          tags: ${{ steps.login-meta.outputs.tags }}
