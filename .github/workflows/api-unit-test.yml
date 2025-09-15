@@ -3,14 +3,14 @@ name: Unit test API
 on: 
   workflow_call:
     inputs:
-      api_cache_key:
+      node_version:
         required: true
         type: string
-      api_cache_path:
+      nx_cache_key:
         required: true
         type: string
-      crdb_version:
-        required: false
+      nx_cache_path:
+        required: true
         type: string
     secrets:
       CODECOV_TOKEN:

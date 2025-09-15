@@ -3,6 +3,9 @@ name: Lint
 on:
   workflow_call:
     inputs:
+      node_version:
+        required: true
+        type: string
       buf_version:
         required: true
         type: string
