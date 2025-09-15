@@ -336,7 +336,7 @@ func TestServer_ImportData(t *testing.T) {
 					{
 						Type:    "project_grant",
 						Id:      orgIDs[3] + "_" + projectIDs[2] + "_" + orgIDs[4],
-						Message: "ID=V3-DKcYh Message=Errors.Project.Grant.AlreadyExists Parent=(ERROR: duplicate key value violates unique constraint \"unique_constraints_pkey\" (SQLSTATE 23505))",
+						Message: "ID=V3-DKcYh Message=Errors.Project.Grant.AlreadyExists",
 					},
 				},
 				Success: &admin.ImportDataSuccess{
