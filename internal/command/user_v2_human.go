@@ -415,7 +415,7 @@ func (c *Commands) changeUserEmail(ctx context.Context, cmds []eventstore.Comman
 				email.URLTemplate = c.defaultEmailCodeURLTemplate(ctx)
 			}
 
-			cmds = append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &wm.Aggregate().Aggregate, cryptoCode.Crypted, cryptoCode.Expiry, email.URLTemplate, email.ReturnCode, ""))
+			cmds = append(cmds, user.NewHumanEmailCodeAddedEvent(ctx, &wm.Aggregate().Aggregate, cryptoCode.Crypted, cryptoCode.Expiry, email.URLTemplate, email.ReturnCode, ""))
 			if email.ReturnCode {
 				code = &cryptoCode.Plain
 			}

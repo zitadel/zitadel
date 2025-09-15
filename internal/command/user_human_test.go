@@ -600,7 +600,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "", AllowedLanguage),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
@@ -674,7 +674,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "", AllowedLanguage),
-						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+						user.NewHumanEmailCodeAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,

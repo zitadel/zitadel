@@ -201,6 +201,7 @@ func projections(
 		config.DefaultInstance.SecretGenerators,
 		nil,
 		nil,
+		nil,
 	)
 	logging.OnError(err).Fatal("unable to start commands")
 
