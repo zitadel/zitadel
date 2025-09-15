@@ -1,6 +1,7 @@
 {
   "common": {
-    "back": "Indietro"
+    "back": "Indietro",
+    "title": "Accedi con Zitadel"
   },
   "accounts": {
     "title": "Account",
@@ -26,6 +27,12 @@
     "description": "Inserisci i tuoi dati di accesso.",
     "register": "Registrati come nuovo utente",
     "submit": "Continua",
+    "labels": {
+      "loginname": "Nome di accesso",
+      "username": "Nome utente",
+      "usernameOrPhoneNumber": "Nome utente o numero di telefono",
+      "usernameOrEmail": "Nome utente o e-mail"
+    },
     "required": {
       "loginName": "Questo campo è obbligatorio"
     }
@@ -36,6 +43,9 @@
       "description": "Inserisci la tua password.",
       "resetPassword": "Reimposta Password",
       "submit": "Continua",
+      "labels": {
+        "password": "Password"
+      },
       "required": {
         "password": "Questo campo è obbligatorio"
       }
@@ -47,6 +57,11 @@
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resend": "Invia di nuovo",
       "submit": "Continua",
+      "labels": {
+        "code": "Codice",
+        "newPassword": "Nuova password",
+        "confirmPassword": "Conferma password"
+      },
       "required": {
         "code": "Questo campo è obbligatorio",
         "newPassword": "Devi fornire una password!",
@@ -57,6 +72,10 @@
       "title": "Cambia Password",
       "description": "Imposta la password per il tuo account",
       "submit": "Continua",
+      "labels": {
+        "newPassword": "Nuova password",
+        "confirmPassword": "Conferma password"
+      },
       "required": {
         "newPassword": "Devi fornire una nuova password!",
         "confirmPassword": "Questo campo è obbligatorio"
@@ -100,9 +119,11 @@
   "ldap": {
     "title": "Accedi con LDAP",
     "description": "Inserisci le tue credenziali LDAP.",
-    "username": "Nome utente",
-    "password": "Password",
     "submit": "Continua",
+    "labels": {
+      "username": "Nome utente",
+      "password": "Password"
+    },
     "required": {
       "username": "Questo campo è obbligatorio",
       "password": "Questo campo è obbligatorio"
@@ -129,6 +150,9 @@
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resendCode": "Invia di nuovo il codice",
       "submit": "Continua",
+      "labels": {
+        "code": "Codice"
+      },
       "required": {
         "code": "Questo campo è obbligatorio"
       }
@@ -140,6 +164,9 @@
       "emailDescription": "Inserisci il tuo indirizzo email per ricevere un codice via email.",
       "totpRegisterDescription": "Scansiona il codice QR o naviga manualmente all'URL.",
       "submit": "Continua",
+      "labels": {
+        "code": "Codice"
+      },
       "required": {
         "code": "Questo campo è obbligatorio"
       }
@@ -195,15 +222,23 @@
     "termsOfService": "Termini di Servizio",
     "privacyPolicy": "Informativa sulla Privacy",
     "submit": "Continua",
-    "orUseIDP": "o usa un Identity Provider",
     "password": {
       "title": "Imposta Password",
       "description": "Imposta la password per il tuo account",
       "submit": "Continua",
+      "labels": {
+        "password": "Password",
+        "confirmPassword": "Conferma password"
+      },
       "required": {
         "password": "Devi fornire una password!",
         "confirmPassword": "Questo campo è obbligatorio"
       }
+    },
+    "labels": {
+      "firstname": "Nome",
+      "lastname": "Cognome",
+      "email": "E-mail"
     },
     "required": {
       "firstname": "Questo campo è obbligatorio",
@@ -246,6 +281,9 @@
       "resendCode": "Invia di nuovo il codice",
       "codeSent": "Un codice è stato appena inviato al tuo indirizzo email.",
       "submit": "Continua",
+      "labels": {
+        "code": "Codice"
+      },
       "required": {
         "code": "Questo campo è obbligatorio"
       }
@@ -263,6 +301,9 @@
       "title": "Codice dispositivo",
       "description": "Inserisci il codice.",
       "submit": "Continua",
+      "labels": {
+        "code": "Codice"
+      },
       "required": {
         "code": "Questo campo è obbligatorio"
       }

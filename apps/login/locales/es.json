@@ -1,6 +1,7 @@
 {
   "common": {
-    "back": "Atrás"
+    "back": "Atrás",
+    "title": "Iniciar sesión con Zitadel"
   },
   "accounts": {
     "title": "Cuentas",
@@ -26,6 +27,12 @@
     "description": "Introduce tus datos de acceso.",
     "register": "Registrar nuevo usuario",
     "submit": "Continuar",
+    "labels": {
+      "loginname": "Nombre de inicio de sesión",
+      "username": "Nombre de usuario",
+      "usernameOrPhoneNumber": "Nombre de usuario o número de teléfono",
+      "usernameOrEmail": "Nombre de usuario o correo electrónico"
+    },
     "required": {
       "loginName": "Este campo es obligatorio"
     }
@@ -36,6 +43,9 @@
       "description": "Introduce tu contraseña.",
       "resetPassword": "Restablecer contraseña",
       "submit": "Continuar",
+      "labels": {
+        "password": "Contraseña"
+      },
       "required": {
         "password": "Este campo es obligatorio"
       }
@@ -47,6 +57,11 @@
       "noCodeReceived": "¿No recibiste un código?",
       "resend": "Reenviar código",
       "submit": "Continuar",
+      "labels": {
+        "code": "Código",
+        "newPassword": "Nueva contraseña",
+        "confirmPassword": "Confirmar contraseña"
+      },
       "required": {
         "code": "Este campo es obligatorio",
         "newPassword": "¡Debes proporcionar una contraseña!",
@@ -57,6 +72,10 @@
       "title": "Cambiar Contraseña",
       "description": "Establece la contraseña para tu cuenta",
       "submit": "Continuar",
+      "labels": {
+        "newPassword": "Nueva contraseña",
+        "confirmPassword": "Confirmar contraseña"
+      },
       "required": {
         "newPassword": "¡Debes proporcionar una nueva contraseña!",
         "confirmPassword": "Este campo es obligatorio"
@@ -100,9 +119,11 @@
   "ldap": {
     "title": "Iniciar sesión con LDAP",
     "description": "Introduce tus credenciales LDAP.",
-    "username": "Nombre de usuario",
-    "password": "Contraseña",
     "submit": "Continuar",
+    "labels": {
+      "username": "Nombre de usuario",
+      "password": "Contraseña"
+    },
     "required": {
       "username": "Este campo es obligatorio",
       "password": "Este campo es obligatorio"
@@ -129,6 +150,9 @@
       "noCodeReceived": "¿No recibiste un código?",
       "resendCode": "Reenviar código",
       "submit": "Continuar",
+      "labels": {
+        "code": "Código"
+      },
       "required": {
         "code": "Este campo es obligatorio"
       }
@@ -140,6 +164,9 @@
       "emailDescription": "Introduce tu dirección de correo electrónico para recibir un código por correo electrónico.",
       "totpRegisterDescription": "Escanea el código QR o navega manualmente a la URL.",
       "submit": "Continuar",
+      "labels": {
+        "code": "Código"
+      },
       "required": {
         "code": "Este campo es obligatorio"
       }
@@ -195,15 +222,23 @@
     "termsOfService": "Términos de Servicio",
     "privacyPolicy": "Política de Privacidad",
     "submit": "Continuar",
-    "orUseIDP": "o usa un Proveedor de Identidad",
     "password": {
       "title": "Establecer Contraseña",
       "description": "Establece la contraseña para tu cuenta",
       "submit": "Continuar",
+      "labels": {
+        "password": "Contraseña",
+        "confirmPassword": "Confirmar contraseña"
+      },
       "required": {
         "password": "¡Debes proporcionar una contraseña!",
         "confirmPassword": "Este campo es obligatorio"
       }
+    },
+    "labels": {
+      "firstname": "Nombre",
+      "lastname": "Apellidos",
+      "email": "Correo electrónico"
     },
     "required": {
       "firstname": "Este campo es obligatorio",
@@ -246,6 +281,9 @@
       "resendCode": "Reenviar código",
       "codeSent": "Se ha enviado un código a tu dirección de correo electrónico.",
       "submit": "Continuar",
+      "labels": {
+        "code": "Código"
+      },
       "required": {
         "code": "Este campo es obligatorio"
       }
@@ -263,6 +301,9 @@
       "title": "Código del dispositivo",
       "description": "Introduce el código.",
       "submit": "Continuar",
+      "labels": {
+        "code": "Código"
+      },
       "required": {
         "code": "Este campo es obligatorio"
       }

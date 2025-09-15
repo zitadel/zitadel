@@ -442,10 +442,8 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 	if function == "" {
 		return nil
 	}
-	executionTargets, err := execution.QueryExecutionTargetsForFunction(ctx, s.query, function)
-	if err != nil {
-		return err
-	}
+
+	executionTargets := execution.QueryExecutionTargetsForFunction(ctx, function)
 	info := &ContextInfo{
 		Function:     function,
 		UserInfo:     userInfo,
@@ -456,7 +454,7 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 		UserGrants:   qu.UserGrants,
 	}
 
-	resp, err := execution.CallTargets(ctx, executionTargets, info)
+	resp, err := execution.CallTargets(ctx, executionTargets, info, s.targetEncryptionAlgorithm)
 	if err != nil {
 		return err
 	}

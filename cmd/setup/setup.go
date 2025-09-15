@@ -218,6 +218,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s57CreateResourceCounts = &CreateResourceCounts{dbClient: dbClient}
 	steps.s58ReplaceLoginNames3View = &ReplaceLoginNames3View{dbClient: dbClient}
 	steps.s60GenerateSystemID = &GenerateSystemID{eventstore: eventstoreClient}
+	steps.s61IDPTemplate6SAMLSignatureAlgorithm = &IDPTemplate6SAMLSignatureAlgorithm{dbClient: dbClient}
+	steps.s62HTTPProviderAddSigningKey = &HTTPProviderAddSigningKey{dbClient: dbClient}
+	steps.s63AlterResourceCounts = &AlterResourceCounts{dbClient: dbClient}
+	steps.s64ChangePushPosition = &ChangePushPosition{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -266,6 +270,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s57CreateResourceCounts,
 		steps.s58ReplaceLoginNames3View,
 		steps.s60GenerateSystemID,
+		steps.s61IDPTemplate6SAMLSignatureAlgorithm,
+		steps.s62HTTPProviderAddSigningKey,
+		steps.s63AlterResourceCounts,
+		steps.s64ChangePushPosition,
 	} {
 		setupErr = executeMigration(ctx, eventstoreClient, step, "migration failed")
 		if setupErr != nil {
@@ -283,6 +291,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			ExternalPort:   config.ExternalPort,
 			ExternalSecure: config.ExternalSecure,
 			defaults:       config.SystemDefaults,
+		},
+		&TransactionalTables{
+			dbClient: dbClient,
 		},
 		&projectionTables{
 			es:      eventstoreClient,
@@ -466,6 +477,8 @@ func startCommandsQueries(
 		keys.OIDC,
 		keys.SAML,
 		keys.Target,
+		keys.SMS,
+		keys.SMTP,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
@@ -527,6 +540,9 @@ func startCommandsQueries(
 		config.OIDC.DefaultRefreshTokenExpiration,
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
+
+		nil,
+		nil,
 	)
 	logging.OnError(err).Fatal("unable to start commands")
 
@@ -549,7 +565,7 @@ func startCommandsQueries(
 		commands,
 		queries,
 		eventstoreClient,
-		config.Login.DefaultOTPEmailURLV2,
+		config.Login.DefaultPaths.OTPEmailPath,
 		config.SystemDefaults.Notifications.FileSystemPath,
 		keys.User,
 		keys.SMTP,
@@ -566,8 +582,6 @@ func initProjections(
 	ctx context.Context,
 	eventstoreClient *eventstore.Eventstore,
 ) error {
-	logging.Info("init-projections is currently in beta")
-
 	for _, p := range projection.Projections() {
 		if err := migration.Migrate(ctx, eventstoreClient, p); err != nil {
 			logging.WithFields("name", p.String()).OnError(err).Error("projection migration failed")

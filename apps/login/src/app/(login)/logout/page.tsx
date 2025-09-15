@@ -5,7 +5,14 @@ import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { getBrandingSettings, getDefaultOrg, listSessions } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("logout");
+  return { title: t('title')};
+}
 
 async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
   const cookieIds = await getAllSessionCookieIds();
