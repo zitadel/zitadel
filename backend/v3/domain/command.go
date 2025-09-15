@@ -25,8 +25,9 @@ type Invoker interface {
 // CommandOpts are passed to each command
 // they provide common fields used by commands like the database client.
 type CommandOpts struct {
-	DB      database.QueryExecutor
-	Invoker Invoker
+	DB            database.QueryExecutor
+	Invoker       Invoker
+	OrgRepository OrganizationRepository
 }
 
 type ensureTxOpts struct {
@@ -98,8 +99,9 @@ func DefaultOpts(invoker Invoker) *CommandOpts {
 		invoker = &noopInvoker{}
 	}
 	return &CommandOpts{
-		DB:      pool,
-		Invoker: invoker,
+		DB:            pool,
+		Invoker:       invoker,
+		OrgRepository: orgRepo(pool),
 	}
 }
 

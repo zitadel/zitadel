@@ -1,4 +1,4 @@
-package domain
+package domain_test
 
 import (
 	"context"
@@ -6,15 +6,18 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
+	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/dbmock"
+	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestUpdateOrgCommand_Execute(t *testing.T) {
+	t.Parallel()
+
 	tt := []struct {
 		testName string
 
@@ -25,8 +28,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		inputID   string
 		inputName string
 
-		expectedError    error
-		expectedCacheObj *Organization
+		expectedError error
 	}{
 		{
 			testName: "when EnsureTx fails should return error",
@@ -105,18 +107,18 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					Return(int64(1), nil)
 				txMock.EXPECT().End(ctx, nil).Return(nil)
 			},
-			inputID:          "org-1",
-			inputName:        "test org update",
-			expectedCacheObj: &Organization{ID: "org-1", Name: "test org update"},
+			inputID:   "org-1",
+			inputName: "test org update",
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
+			t.Parallel()
 			// Given
 			ctx := authz.NewMockContext("instance-1", "", "")
 			mockCtrl := gomock.NewController(t)
-			cmd := &UpdateOrgCommand{
+			cmd := &domain.UpdateOrgCommand{
 				ID:   tc.inputID,
 				Name: tc.inputName,
 			}
@@ -124,8 +126,9 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			mockTX := dbmock.NewMockTransaction(mockCtrl)
 			tc.expectations(ctx, mockDB, mockTX, tc.inputName, tc.inputID, "instance-1")
 
-			opts := &CommandOpts{
-				DB: mockDB,
+			opts := &domain.CommandOpts{
+				DB:            mockDB,
+				OrgRepository: repository.OrganizationRepository(mockTX),
 			}
 
 			// Test
@@ -133,11 +136,6 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 
 			// Verify
 			assert.Equal(t, tc.expectedError, err)
-			if tc.expectedCacheObj != nil {
-				cachedOrg, found := orgCache.Get(ctx, orgCacheIndexID, tc.inputID)
-				require.True(t, found)
-				assert.Equal(t, tc.expectedCacheObj, cachedOrg)
-			}
 		})
 	}
 }
@@ -145,22 +143,22 @@ func TestUpdateOrgCommand_Validate(t *testing.T) {
 	t.Parallel()
 	tt := []struct {
 		name          string
-		cmd           *UpdateOrgCommand
+		cmd           *domain.UpdateOrgCommand
 		expectedError error
 	}{
 		{
 			name:          "when no ID should return invalid argument error",
-			cmd:           &UpdateOrgCommand{ID: "", Name: "test-name"},
+			cmd:           &domain.UpdateOrgCommand{ID: "", Name: "test-name"},
 			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-lEMhVC", "invalid organization ID"),
 		},
 		{
 			name:          "when no name shuld return invalid argument error",
-			cmd:           &UpdateOrgCommand{ID: "test-id", Name: ""},
+			cmd:           &domain.UpdateOrgCommand{ID: "test-id", Name: ""},
 			expectedError: zerrors.ThrowInvalidArgument(nil, "DOM-wfUntW", "invalid organization name"),
 		},
 		{
 			name: "when validation succeeds should return no error",
-			cmd:  &UpdateOrgCommand{ID: "test-id", Name: "test-name"},
+			cmd:  &domain.UpdateOrgCommand{ID: "test-id", Name: "test-name"},
 		},
 	}
 

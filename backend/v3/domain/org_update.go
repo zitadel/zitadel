@@ -22,7 +22,7 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 	}
 	defer func() { err = close(ctx, err) }()
 
-	organizationRepo := orgRepo(opts.DB)
+	organizationRepo := opts.OrgRepository
 
 	updateCount, err := organizationRepo.Update(
 		ctx,
@@ -42,11 +42,6 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 		err = zerrors.ThrowInternalf(nil, "DOM-QzITrx", "expecting 1 row updated, got %d", updateCount)
 		return err
 	}
-
-	orgCache.Set(ctx, &Organization{
-		ID:   u.ID,
-		Name: u.Name,
-	})
 
 	return err
 }
