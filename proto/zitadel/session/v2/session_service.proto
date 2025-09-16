@@ -502,11 +502,11 @@ message CheckOTP {
 
 message CheckRecoveryCode {
   string code = 1 [
-    (validate.rules).string = {min_len: 36, max_len: 36},
+    (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 36;
-      max_length: 36;
-      example: "\"fc4b8dc0-8337-40e5-a12e-f0ee9aa9be56\"";
+      min_length: 1;
+      max_length: 200;
+      example: "\"1234567890\"";
     }
   ];
 }

@@ -73,12 +73,7 @@ func ValidateRecoveryCode(code string, recoveryCodes *HumanRecoveryCodes, hasher
 		if _, verifyErr := hasher.Verify(recoveryCode, code); verifyErr != nil {
 			continue
 		}
-		// return the hashed code to store in the success event data
-		hashedCode, err := hasher.Hash(recoveryCode)
-		if err != nil {
-			return "", err
-		}
-		return hashedCode, nil
+		return recoveryCode, nil
 	}
 
 	return "", zerrors.ThrowInvalidArgument(nil, "DOMAIN-6uvh0", "Errors.User.MFA.RecoveryCodes.InvalidCode")

@@ -34,6 +34,7 @@ type SessionCommands struct {
 	eventCommands     []eventstore.Command
 
 	hasher               *crypto.Hasher
+	secretHasher         *crypto.Hasher
 	intentAlg            crypto.EncryptionAlgorithm
 	totpAlg              crypto.EncryptionAlgorithm
 	otpAlg               crypto.EncryptionAlgorithm
@@ -50,6 +51,7 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		sessionCommands:      cmds,
 		sessionWriteModel:    session,
 		eventstore:           c.eventstore,
+		secretHasher:         c.secretHasher,
 		hasher:               c.userPasswordHasher,
 		intentAlg:            c.idpConfigEncryption,
 		totpAlg:              c.multifactors.OTP.CryptoMFA,

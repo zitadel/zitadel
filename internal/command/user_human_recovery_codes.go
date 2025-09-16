@@ -146,7 +146,6 @@ func checkRecoveryCode(
 	}
 
 	recoveryCodeWm := NewHumanRecoveryCodeWriteModel(userID, resourceOwner)
-
 	err := queryReducer(ctx, recoveryCodeWm)
 	if err != nil {
 		return nil, err

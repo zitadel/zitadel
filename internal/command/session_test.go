@@ -1318,7 +1318,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 	orgAgg := &org.NewAggregate("org1").Aggregate
 
 	hasher := mockPasswordHasher("x")
-	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(1, hasher)
+	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(1, domain.RecoveryCodeFormatUUID, hasher)
 	require.NoError(t, err)
 	validCode := rawCodes[0]
 	invalidCode := "invalid-code"
@@ -1470,7 +1470,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 				hasher: hasher,
 			},
 			wantEventCommands: []eventstore.Command{
-				user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, 0, nil),
+				user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, validCode, nil),
 				session.NewRecoveryCodeCheckedEvent(ctx, sessAgg, testNow),
 			},
 		},

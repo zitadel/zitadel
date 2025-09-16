@@ -710,6 +710,10 @@ func (e *RecoveryCodeCheckedEvent) UniqueConstraints() []*eventstore.UniqueConst
 	return nil
 }
 
+func (e *RecoveryCodeCheckedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
 func NewRecoveryCodeCheckedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
