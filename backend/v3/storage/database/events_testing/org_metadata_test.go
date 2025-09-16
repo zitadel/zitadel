@@ -14,9 +14,7 @@ import (
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
-	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
 	"github.com/zitadel/zitadel/internal/integration"
-	org_repo "github.com/zitadel/zitadel/internal/repository/org"
 	v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
@@ -194,20 +192,12 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 
-	t.Run("test org metadata remove all reduces", func(t *testing.T) {
+	t.Run("test org metadata removed on org remove", func(t *testing.T) {
 		// Add a metadata to the organization
 		org, err := OrgClient.CreateOrganization(CTX, &v2beta.CreateOrganizationRequest{
 			Name: "some funny name",
 		})
 		require.NoError(t, err)
-		t.Cleanup(func() {
-			_, err := OrgClient.DeleteOrganization(CTX, &v2beta.DeleteOrganizationRequest{
-				Id: org.GetId(),
-			})
-			if err != nil {
-				t.Logf("Failed to delete organization on cleanup: %v", err)
-			}
-		})
 
 		_, err = OrgClient.SetOrganizationMetadata(CTX, &v2beta.SetOrganizationMetadataRequest{
 			OrganizationId: org.GetId(),
@@ -227,9 +217,25 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 			},
 		})
 		require.NoError(t, err)
-		// simulate org metadata remove all event
-		// as the API does not have a call for that
-		err = eventstore.Publish(CTX, []*eventstore.Event{org_repo.NewMetadataRemovedAllEvent(CTX, &org_repo.NewAggregate(org.GetId()).Aggregate)}, pool)
+
+		// await metadata creation
+		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+			metadata, err := orgMetadataRepo.List(CTX,
+				database.WithCondition(
+					database.And(
+						orgMetadataRepo.InstanceIDCondition(Instance.Instance.Id),
+						orgMetadataRepo.OrgIDCondition(org.Id),
+					),
+				),
+			)
+			require.NoError(t, err)
+			assert.Len(t, metadata, 3)
+		}, retryDuration, tick)
+
+		_, err = OrgClient.DeleteOrganization(CTX, &v2beta.DeleteOrganizationRequest{
+			Id: org.Id,
+		})
 		require.NoError(t, err)
 
 		// Test that metadata remove reduces
