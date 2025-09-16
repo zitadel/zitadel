@@ -8,7 +8,7 @@ import (
 	legacy_es "github.com/zitadel/zitadel/internal/eventstore"
 )
 
-// Commander is the all it needs to implement the command pattern.
+// Commander is all that is needed to implement the command pattern.
 // It is the interface all manipulations need to implement.
 // If possible it should also be used for queries. We will find out if this is possible in the future.
 type Commander interface {
@@ -26,7 +26,7 @@ type Invoker interface {
 }
 
 // CommandOpts are passed to each command
-// the provide common fields used by commands like the database client.
+// it provides common fields used by commands like the database client.
 type CommandOpts struct {
 	DB      database.QueryExecutor
 	Invoker Invoker
