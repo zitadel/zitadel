@@ -10,14 +10,6 @@
         "cwd": "{workspaceRoot}/.devcontainer"
       }
     },
-    "generate": {
-      "description": "Generate everything needed to build the Zitadel platform (api, login and console)",
-      "dependsOn": [
-        "@zitadel/api:generate",
-        "@zitadel/login:generate",
-        "@zitadel/console:generate"
-      ]
-    },
     "clean": {
       "description": "Clean all local-only files relating to the Zitadel platform (api, login and console)",
       "dependsOn": [
