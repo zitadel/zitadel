@@ -27,7 +27,7 @@ func (c *Commands) LockUserV2(ctx context.Context, userID string) (*domain.Objec
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-lgws8wtsqf", "Errors.User.ShouldBeActiveOrInitial")
 	}
 
-	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, false); err != nil {
 		return nil, err
 	}
 
@@ -52,7 +52,7 @@ func (c *Commands) UnlockUserV2(ctx context.Context, userID string) (*domain.Obj
 	if !hasUserState(existingHuman.UserState, domain.UserStateLocked) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-olb9vb0oca", "Errors.User.NotLocked")
 	}
-	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, false); err != nil {
 		return nil, err
 	}
 
@@ -80,7 +80,7 @@ func (c *Commands) DeactivateUserV2(ctx context.Context, userID string) (*domain
 	if isUserStateInactive(existingHuman.UserState) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5gunjw0cd7", "Errors.User.AlreadyInactive")
 	}
-	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, false); err != nil {
 		return nil, err
 	}
 
@@ -105,7 +105,7 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain
 	if !isUserStateInactive(existingHuman.UserState) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-s5qqcz97hf", "Errors.User.NotInactive")
 	}
-	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID, false); err != nil {
 		return nil, err
 	}
 
