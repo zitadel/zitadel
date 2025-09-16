@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -10,8 +9,9 @@ import (
 type Metadata struct {
 	InstanceID string `json:"instanceId,omitempty" db:"instance_id"`
 	Key        string `json:"key,omitempty" db:"key"`
-	// Value is a JSON encoded type
-	Value *json.RawMessage `json:"value,omitempty" db:"value"`
+	// Value is a byte slice that might be json encoded.
+	// the API does not require json encoding so we keep it as a byte slice here.
+	Value []byte `json:"value,omitempty" db:"value"`
 
 	CreatedAt time.Time `json:"createdAt,omitzero" db:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt,omitzero" db:"updated_at"`

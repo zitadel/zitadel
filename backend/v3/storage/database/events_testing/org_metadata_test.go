@@ -3,7 +3,6 @@
 package events_test
 
 import (
-	"encoding/json"
 	"testing"
 	"time"
 
@@ -68,6 +67,10 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 					Key:   "test-text",
 					Value: []byte(`"test-value"`),
 				},
+				{
+					Key:   "test-bytes",
+					Value: []byte(`test-value`),
+				},
 			},
 		})
 		require.NoError(t, err)
@@ -100,40 +103,43 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 				database.WithOrderByAscending(orgMetadataRepo.KeyColumn()),
 			)
 			require.NoError(t, err)
-			require.Len(t, gottenMetadata, 4)
+			require.Len(t, gottenMetadata, 5)
 		}, retryDuration, tick)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[0].InstanceID)
 		assert.Equal(t, org.Id, gottenMetadata[0].OrgID)
 		assert.Equal(t, "test-bool", gottenMetadata[0].Key)
-		require.NotNil(t, gottenMetadata[0].Value)
-		assert.Equal(t, json.RawMessage(`false`), *gottenMetadata[0].Value)
+		assert.Equal(t, []byte(`false`), gottenMetadata[0].Value)
 		assert.WithinRange(t, gottenMetadata[0].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[0].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[1].InstanceID)
 		assert.Equal(t, org.Id, gottenMetadata[1].OrgID)
 		assert.Equal(t, "test-number", gottenMetadata[1].Key)
-		require.NotNil(t, gottenMetadata[1].Value)
-		assert.Equal(t, json.RawMessage(`123`), *gottenMetadata[1].Value)
+		assert.Equal(t, []byte(`123`), gottenMetadata[1].Value)
 		assert.WithinRange(t, gottenMetadata[1].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[1].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[2].InstanceID)
 		assert.Equal(t, org.Id, gottenMetadata[2].OrgID)
 		assert.Equal(t, "test-object", gottenMetadata[2].Key)
-		require.NotNil(t, gottenMetadata[2].Value)
-		assert.JSONEq(t, `{"text":"value", "number":123, "bool": false}`, string(*gottenMetadata[2].Value))
+		assert.JSONEq(t, `{"text":"value", "number":123, "bool": false}`, string(gottenMetadata[2].Value))
 		assert.WithinRange(t, gottenMetadata[2].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[2].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[3].InstanceID)
 		assert.Equal(t, org.Id, gottenMetadata[3].OrgID)
 		assert.Equal(t, "test-text", gottenMetadata[3].Key)
-		require.NotNil(t, gottenMetadata[3].Value)
-		assert.Equal(t, json.RawMessage(`"test-value"`), *gottenMetadata[3].Value)
+		assert.Equal(t, []byte(`"test-value"`), gottenMetadata[3].Value)
 		assert.WithinRange(t, gottenMetadata[3].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[3].UpdatedAt, beforeAdd, afterAdd)
+
+		assert.Equal(t, Instance.Instance.Id, gottenMetadata[4].InstanceID)
+		assert.Equal(t, org.Id, gottenMetadata[4].OrgID)
+		assert.Equal(t, "test-text", gottenMetadata[4].Key)
+		assert.Equal(t, []byte(`test-value`), gottenMetadata[4].Value)
+		assert.WithinRange(t, gottenMetadata[4].CreatedAt, beforeAdd, afterAdd)
+		assert.WithinRange(t, gottenMetadata[4].UpdatedAt, beforeAdd, afterAdd)
 
 	})
 

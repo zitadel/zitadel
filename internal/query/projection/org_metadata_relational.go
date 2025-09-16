@@ -70,7 +70,7 @@ func (p *orgMetadataRelationalProjection) reduceSet(event eventstore.Event) (*ha
 			Metadata: domain.Metadata{
 				InstanceID: e.Aggregate().InstanceID,
 				Key:        e.Key,
-				Value:      (*json.RawMessage)(&e.Value),
+				Value:      e.Value,
 				CreatedAt:  e.CreationDate(),
 				UpdatedAt:  e.CreationDate(),
 			},
