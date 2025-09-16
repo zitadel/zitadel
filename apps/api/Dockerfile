@@ -6,7 +6,7 @@ ENV ZITADEL_ARGS=
 RUN apt-get update && apt-get install ca-certificates -y
 
 COPY apps/api/entrypoint.sh /app/entrypoint.sh
-COPY ./.artifacts/${TARGETPLATFORM}/zitadel /app/zitadel
+COPY ./.artifacts/bin/${TARGETPLATFORM}/zitadel /app/zitadel
 
 RUN useradd -s "" --home / zitadel && \
     chown zitadel /app/zitadel && \
