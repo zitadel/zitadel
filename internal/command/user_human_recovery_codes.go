@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -25,8 +26,8 @@ func (c *Commands) ImportHumanRecoveryCodes(ctx context.Context, userID, resourc
 		return err
 	}
 
-	if recoveryCodeWriteModel.State == domain.MFAStateReady {
-		return zerrors.ThrowAlreadyExists(nil, "COMMAND-x7k9p", "Errors.User.MFA.RecoveryCodes.AlreadyExists")
+	if len(recoveryCodeWriteModel.Codes())+len(codes) > c.multifactors.RecoveryCodes.MaxCount {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-53cjw", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded")
 	}
 
 	hashedCodes, err := domain.RecoveryCodesFromRaw(codes, c.secretHasher)
@@ -50,6 +51,15 @@ type RecoveryCodesDetails struct {
 func (c *Commands) GenerateRecoveryCodes(ctx context.Context, userID string, count int, resourceOwner string, authRequest *domain.AuthRequest) (*RecoveryCodesDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4kje7", "Errors.User.UserIDMissing")
+	}
+
+	resourceOwner, err := c.checkUserExists(ctx, userID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := c.checkPermissionUpdateUserCredentials(ctx, resourceOwner, userID); err != nil {
+		return nil, err
 	}
 
 	if count <= 0 || count > c.multifactors.RecoveryCodes.MaxCount {
@@ -98,6 +108,10 @@ func (c *Commands) RemoveRecoveryCodes(ctx context.Context, userID, resourceOwne
 
 	writeModel := NewHumanRecoveryCodeWriteModel(userID, resourceOwner)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+
+	if err := c.checkPermissionUpdateUserCredentials(ctx, writeModel.ResourceOwner, userID); err != nil {
 		return nil, err
 	}
 
@@ -164,10 +178,12 @@ func checkRecoveryCode(
 	userAgg := UserAggregateFromWriteModelCtx(ctx, &recoveryCodeWm.WriteModel)
 	commands := make([]eventstore.Command, 0, 2)
 
+	authRequestInfo := authRequestDomainToAuthRequestInfo(authRequest)
+
 	if err == nil {
-		commands = append(commands, user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, hashedCode, nil))
+		commands = append(commands, user.NewHumanRecoveryCodeCheckSucceededEvent(ctx, userAgg, hashedCode, authRequestInfo))
 	} else {
-		commands = append(commands, user.NewHumanRecoveryCodeCheckFailedEvent(ctx, userAgg, nil))
+		commands = append(commands, user.NewHumanRecoveryCodeCheckFailedEvent(ctx, userAgg, authRequestInfo))
 
 		lockoutPolicy, lockoutErr := getLockoutPolicy(ctx, recoveryCodeWm.ResourceOwner, queryReducer)
 		logging.OnError(lockoutErr).Error("failed to get lockout policy")

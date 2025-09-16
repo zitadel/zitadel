@@ -131,7 +131,7 @@ func (p *userAuthMethodProjection) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  user.HumanRecoveryCodesAddedType,
-					Reduce: p.reduceAddAuthMethod,
+					Reduce: p.reduceInitAuthMethod,
 				},
 				{
 					Event:  user.HumanRecoveryCodesRemovedType,
@@ -175,8 +175,10 @@ func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 		rpID = &e.RPID
 	case *user.HumanOTPAddedEvent:
 		methodType = domain.UserAuthMethodTypeTOTP
+	case *user.HumanRecoveryCodesAddedEvent:
+		methodType = domain.UserAuthMethodTypeRecoveryCode
 	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType, user.HumanMFAOTPAddedType, user.HumanRecoveryCodesAddedType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(UserAuthMethodTokenIDCol, tokenID),
@@ -250,8 +252,6 @@ func (p *userAuthMethodProjection) reduceAddAuthMethod(event eventstore.Event) (
 		methodType = domain.UserAuthMethodTypeOTPSMS
 	case *user.HumanOTPEmailAddedEvent:
 		methodType = domain.UserAuthMethodTypeOTPEmail
-	case *user.HumanRecoveryCodesAddedEvent:
-		methodType = domain.UserAuthMethodTypeRecoveryCode
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-DS4g3", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanOTPSMSAddedType, user.HumanOTPEmailAddedType})
 	}
