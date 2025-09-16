@@ -31,17 +31,17 @@ Alternatively, you can use the infix-notation, like `nx dev @zitadel/login` or `
 
 ### <a name="api-quick-start"></a>API
 
-Prepare the API development and run a local login production build.
+Prepare the API development with a Console and run a local login production build.
 
 ```bash
 nx run @zitadel/api:generate
 nx run-many -p . @zitadel/login -t db prod
 ```
 
-If you don't need a login, you can omit it and use the generated ./admin.pat to call the API.
+If you don't need a login or a Console, you can omit them and use the generated ./admin.pat to call the API.
 
 ```bash
-nx run-many -p . @zitadel/api -t db generate
+nx run-many --excludeTaskDependencies -p . @zitadel/api -t db generate
 ```
 
 Start a debug session in your IDE.

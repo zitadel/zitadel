@@ -100,8 +100,11 @@
             ]
         },
         "generate": {
+            "dependsOn": [
+                "@zitadel/console:build"
+            ],
             "description": "Generate the code needed to start the API",
-            "command": "make api_build",
+            "command": "make api_build && make console_move",
             "inputs": [
                 "{workspaceRoot}/go.*",
                 "{workspaceRoot}/openapi/**/*",
@@ -119,9 +122,11 @@
                 "{workspaceRoot}/internal/api/ui/login/statik/statik.go",
                 "{workspaceRoot}/internal/api/assets/authz.go",
                 "{workspaceRoot}/internal/api/assets/router.go",
+                "{workspaceRoot}/internal/api/ui/console/static",
                 "{workspaceRoot}/openapi/v2",
                 "{workspaceRoot}/pkg/grpc/**/*.pb.*",
                 "{workspaceRoot}/pkg/grpc/**/*.connect.go"
+
             ]
         },
         "prod": {
