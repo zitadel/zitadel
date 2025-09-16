@@ -17,7 +17,10 @@ import (
 )
 
 func TestUpdateOrgCommand_Execute(t *testing.T) {
+	t.Parallel()
+
 	txInitErr := errors.New("tx init error")
+	getErr := errors.New("get error")
 	updateErr := errors.New("update error")
 
 	tt := []struct {
@@ -44,13 +47,78 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			expectedError: txInitErr,
 		},
 		{
+			testName: "when retrieving org fails should return error",
+			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
+				repo := domainmock.NewOrgRepo(ctrl)
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(nil, getErr)
+				return func(_ database.QueryExecutor) domain.OrganizationRepository {
+					return repo
+				}
+			},
+			inputID:       "org-1",
+			inputName:     "test org update",
+			expectedError: getErr,
+		},
+		{
+			testName: "when org name is not changed should return name not changed error",
+			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
+				repo := domainmock.NewOrgRepo(ctrl)
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(&domain.Organization{
+						ID:   "org-1",
+						Name: "test org update",
+					}, nil)
+				return func(_ database.QueryExecutor) domain.OrganizationRepository {
+					return repo
+				}
+			},
+			inputID:       "org-1",
+			inputName:     "test org update",
+			expectedError: domain.NewOrgNameNotChangedError("DOM-nDzwIu"),
+		},
+		{
+			testName: "when org is inactive should return not found error",
+			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
+				repo := domainmock.NewOrgRepo(ctrl)
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(&domain.Organization{
+						ID:    "org-1",
+						Name:  "old org name",
+						State: domain.OrgStateInactive,
+					}, nil)
+				return func(_ database.QueryExecutor) domain.OrganizationRepository {
+					return repo
+				}
+			},
+			inputID:       "org-1",
+			inputName:     "test org update",
+			expectedError: domain.NewOrgNotFoundError("DOM-OcA1jq"),
+		},
+		{
 			testName: "when org update fails should return error",
 			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(&domain.Organization{
+						ID:         "org-1",
+						Name:       "old org name",
+						InstanceID: "instance-1",
+						State:      domain.OrgStateActive,
+					}, nil)
+
+				repo.EXPECT().
 					Update(gomock.Any(), repo.IDCondition("org-1"), "instance-1", repo.SetName("test org update")).
-					Return(int64(0), updateErr).
-					AnyTimes()
+					Times(1).
+					Return(int64(0), updateErr)
 				return func(_ database.QueryExecutor) domain.OrganizationRepository {
 					return repo
 				}
@@ -66,9 +134,19 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(&domain.Organization{
+						ID:         "org-1",
+						Name:       "old org name",
+						InstanceID: "instance-1",
+						State:      domain.OrgStateActive,
+					}, nil)
+
+				repo.EXPECT().
 					Update(gomock.Any(), repo.IDCondition("org-1"), "instance-1", repo.SetName("test org update")).
-					Return(int64(0), nil).
-					AnyTimes()
+					Times(1).
+					Return(int64(0), nil)
 				return func(_ database.QueryExecutor) domain.OrganizationRepository {
 					return repo
 				}
@@ -80,9 +158,19 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(&domain.Organization{
+						ID:         "org-1",
+						Name:       "old org name",
+						InstanceID: "instance-1",
+						State:      domain.OrgStateActive,
+					}, nil)
+
+				repo.EXPECT().
 					Update(gomock.Any(), repo.IDCondition("org-1"), "instance-1", repo.SetName("test org update")).
-					Return(int64(2), nil).
-					AnyTimes()
+					Times(1).
+					Return(int64(2), nil)
 				return func(_ database.QueryExecutor) domain.OrganizationRepository {
 					return repo
 				}
@@ -96,9 +184,19 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(&domain.Organization{
+						ID:         "org-1",
+						Name:       "old org name",
+						InstanceID: "instance-1",
+						State:      domain.OrgStateActive,
+					}, nil)
+
+				repo.EXPECT().
 					Update(gomock.Any(), repo.IDCondition("org-1"), "instance-1", repo.SetName("test org update")).
-					Return(int64(1), nil).
-					AnyTimes()
+					Times(1).
+					Return(int64(1), nil)
 				return func(_ database.QueryExecutor) domain.OrganizationRepository {
 					return repo
 				}
@@ -129,6 +227,7 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 				opts.DB = tc.queryExecutor(ctrl)
 			}
 
+			// Test
 			err := cmd.Execute(ctx, opts)
 
 			// Verify

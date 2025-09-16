@@ -43,3 +43,17 @@ func NewMultipleOrgsUpdatedError(id string, expected, actual int64) error {
 func (err *MultipleOrgsUpdatedError) Error() string {
 	return fmt.Sprintf("ID=%s Message=expecting %d row(s) updated, got %d", err.ID, err.Expected, err.Actual)
 }
+
+type OrgNameNotChangedError struct {
+	ID string
+}
+
+func NewOrgNameNotChangedError(errID string) error {
+	return &OrgNameNotChangedError{
+		ID: errID,
+	}
+}
+
+func (err *OrgNameNotChangedError) Error() string {
+	return fmt.Sprintf("ID=%s Message=organization name has not changed", err.ID)
+}

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -31,10 +30,25 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 
 	organizationRepo := opts.orgRepo()
 
+	org, err := organizationRepo.Get(ctx, database.WithCondition(organizationRepo.IDCondition(u.ID)))
+	if err != nil {
+		return err
+	}
+
+	if org.Name == u.Name {
+		err = NewOrgNameNotChangedError("DOM-nDzwIu")
+		return err
+	}
+
+	if org.State == OrgStateInactive {
+		err = NewOrgNotFoundError("DOM-OcA1jq")
+		return err
+	}
+
 	updateCount, err := organizationRepo.Update(
 		ctx,
-		organizationRepo.IDCondition(u.ID),
-		authz.GetInstance(ctx).InstanceID(),
+		organizationRepo.IDCondition(org.ID),
+		org.InstanceID,
 		database.NewChange(organizationRepo.NameColumn(), u.Name),
 	)
 	if err != nil {
