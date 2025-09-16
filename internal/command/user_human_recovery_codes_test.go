@@ -124,7 +124,7 @@ func TestCommands_ImportHumanRecoveryCodes(t *testing.T) {
 				resourceOwner: "org1",
 				codes:         []string{},
 			},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-vee93", "Errors.User.MFA.RecoveryCodes.InvalidCount"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-vee93", "Errors.User.MFA.RecoveryCodes.ConfigInvalid"),
 		},
 		{
 			name: "max count exceeded with existing codes, error",
@@ -716,7 +716,7 @@ func TestCommands_HumanCheckRecoveryCode(t *testing.T) {
 				code:          "validcode",
 				resourceOwner: "org1",
 			},
-			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-2w6oa", "Errors.User.MFA.RecoveryCodes.Locked"),
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-2w6oa", "Errors.User.Locked"),
 		},
 		{
 			name: "recovery codes not ready, error",

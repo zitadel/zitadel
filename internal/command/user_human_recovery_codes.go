@@ -27,7 +27,7 @@ func (c *Commands) ImportHumanRecoveryCodes(ctx context.Context, userID, resourc
 	}
 
 	if len(recoveryCodeWriteModel.Codes())+len(codes) > c.multifactors.RecoveryCodes.MaxCount {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-53cjw", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-53cjw", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded")
 	}
 
 	hashedCodes, err := domain.RecoveryCodesFromRaw(codes, c.secretHasher)
@@ -62,21 +62,13 @@ func (c *Commands) GenerateRecoveryCodes(ctx context.Context, userID string, cou
 		return nil, err
 	}
 
-	if count <= 0 || count > c.multifactors.RecoveryCodes.MaxCount {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-7c0nx", "Errors.User.RecoveryCodes.CountInvalid")
-	}
-
-	if err := c.multifactors.RecoveryCodes.Valid(); err != nil {
-		return nil, err
-	}
-
 	recoveryCodeWriteModel := NewHumanRecoveryCodeWriteModel(userID, resourceOwner)
 	if err := c.eventstore.FilterToQueryReducer(ctx, recoveryCodeWriteModel); err != nil {
 		return nil, err
 	}
 
 	if len(recoveryCodeWriteModel.Codes())+count > c.multifactors.RecoveryCodes.MaxCount {
-		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-8f2k9", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-8f2k9", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded")
 	}
 
 	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(count, c.multifactors.RecoveryCodes, c.secretHasher)
@@ -116,11 +108,11 @@ func (c *Commands) RemoveRecoveryCodes(ctx context.Context, userID, resourceOwne
 	}
 
 	if writeModel.UserLocked() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-d9u8q", "Errors.User.RecoveryCodes.Locked")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-d9u8q", "Errors.User.Locked")
 	}
 
 	if writeModel.State != domain.MFAStateReady {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-84rgg", "Errors.User.RecoveryCodes.NotAdded")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-84rgg", "Errors.User.MFA.RecoveryCodes.NotReady")
 	}
 
 	userAgg := UserAggregateFromWriteModelCtx(ctx, &writeModel.WriteModel)
@@ -166,11 +158,11 @@ func checkRecoveryCode(
 	}
 
 	if recoveryCodeWm.UserLocked() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-2w6oa", "Errors.User.MFA.RecoveryCodes.Locked")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-2w6oa", "Errors.User.Locked")
 	}
 
 	if recoveryCodeWm.State != domain.MFAStateReady {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-84rgg", "Errors.User.RecoveryCodes.NotReady")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-84rgg", "Errors.User.MFA.RecoveryCodes.NotReady")
 	}
 
 	hashedCode, err := domain.ValidateRecoveryCode(code, toHumanRecoveryCode(ctx, recoveryCodeWm), secretHasher)

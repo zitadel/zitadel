@@ -1454,7 +1454,7 @@ func TestCheckRecoveryCode(t *testing.T) {
 				),
 				hasher: hasher,
 			},
-			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-2w6oa", "Errors.User.MFA.RecoveryCodes.Locked"),
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-2w6oa", "Errors.User.Locked"),
 		},
 		{
 			name: "ok",
