@@ -41,7 +41,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel-go/v3/pkg/client/zitadel/user/v2"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
