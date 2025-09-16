@@ -87,6 +87,8 @@ type organizationChanges interface {
 	SetState(state OrgState) database.Change
 }
 
+//go:generate mockgen -typed -package domainmock -destination ./mock/org.mock.go . OrganizationRepository
+
 // OrganizationRepository is the interface for the instance repository.
 type OrganizationRepository interface {
 	organizationColumns

@@ -20,9 +20,9 @@ func Invoke(ctx context.Context, cmd Commander) error {
 		),
 	)
 	opts := &CommandOpts{
-		Invoker:       invoker.collector,
-		DB:            pool,
-		OrgRepository: nil,
+		Invoker:          invoker.collector,
+		DB:               pool,
+		organizationRepo: nil,
 	}
 	return invoker.Invoke(ctx, cmd, opts)
 }

@@ -12,7 +12,14 @@ var _ domain.OrganizationDomainRepository = (*orgDomain)(nil)
 
 type orgDomain struct {
 	repository
-	*org
+}
+
+func OrganizationDomainRepository(client database.QueryExecutor) domain.OrganizationDomainRepository {
+	return &orgDomain{
+		repository: repository{
+			client: client,
+		},
+	}
 }
 
 // -------------------------------------------------------------

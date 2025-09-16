@@ -22,7 +22,7 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 	}
 	defer func() { err = close(ctx, err) }()
 
-	organizationRepo := opts.OrgRepository
+	organizationRepo := opts.orgRepo()
 
 	updateCount, err := organizationRepo.Update(
 		ctx,
