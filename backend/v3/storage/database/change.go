@@ -29,7 +29,7 @@ func (c *change[V]) Matches(x any) bool {
 
 // String implements [gomock.Matcher].
 func (c *change[V]) String() string {
-	return "database.Change"
+	return "database.change"
 }
 
 var (
@@ -93,7 +93,7 @@ func (c Changes) Matches(x any) bool {
 
 // String implements [gomock.Matcher].
 func (c Changes) String() string {
-	return "database.Change"
+	return "database.Changes"
 }
 
 var _ Change = Changes(nil)

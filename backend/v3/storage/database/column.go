@@ -48,7 +48,7 @@ func (c column) Matches(x any) bool {
 
 // String implements [Column].
 func (c column) String() string {
-	return "database.Column"
+	return "database.column"
 }
 
 func NewColumn(table, name string) Column {
