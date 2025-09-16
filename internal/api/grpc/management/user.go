@@ -194,7 +194,7 @@ func (s *Server) BulkSetUserMetadata(ctx context.Context, req *mgmt_pb.BulkSetUs
 
 func (s *Server) RemoveUserMetadata(ctx context.Context, req *mgmt_pb.RemoveUserMetadataRequest) (*mgmt_pb.RemoveUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.RemoveUserMetadata(ctx, req.Key, req.Id, ctxData.OrgID, s.command.NewPermissionCheckUserWrite(ctx, false))
+	result, err := s.command.RemoveUserMetadata(ctx, req.Key, req.Id, ctxData.OrgID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +205,7 @@ func (s *Server) RemoveUserMetadata(ctx context.Context, req *mgmt_pb.RemoveUser
 
 func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRemoveUserMetadataRequest) (*mgmt_pb.BulkRemoveUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Id, ctxData.OrgID, s.command.NewPermissionCheckUserWrite(ctx, false), req.Keys...)
+	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Id, ctxData.OrgID, nil, req.Keys...)
 	if err != nil {
 		return nil, err
 	}

@@ -70,7 +70,7 @@ func setUserMetadataToDomain(req *user.SetUserMetadataRequest) []*domain.Metadat
 }
 
 func (s *Server) DeleteUserMetadata(ctx context.Context, req *connect.Request[user.DeleteUserMetadataRequest]) (*connect.Response[user.DeleteUserMetadataResponse], error) {
-	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Msg.UserId, "", nil, req.Msg.Keys...)
+	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Msg.UserId, "", s.command.NewPermissionCheckUserWrite(ctx, false), req.Msg.Keys...)
 	if err != nil {
 		return nil, err
 	}
