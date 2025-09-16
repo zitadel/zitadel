@@ -9,6 +9,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
+	"github.com/zitadel/zitadel/internal/database/postgres"
 )
 
 type db struct {
@@ -27,7 +28,13 @@ func prepareDB(t *testing.T, expectations ...expectation) db {
 	}
 	return db{
 		mock: mock,
-		db:   &database.DB{DB: client},
+		db: &database.DB{
+			DB: client,
+			Database: &postgres.Config{
+				User:     postgres.User{Username: "postgres"},
+				Database: "postgres",
+			},
+		},
 	}
 }
 

@@ -49,7 +49,12 @@ func TestMain(m *testing.M) {
 			logging.OnError(testClient.Close()).Error("unable to close db")
 		}()
 
-		err = initDB(context.Background(), &database.DB{DB: testClient, Database: &postgres.Config{Database: "zitadel"}})
+		err = initDB(context.Background(), &database.DB{
+			DB: testClient,
+			Database: &postgres.Config{
+				User:     postgres.User{Username: connConfig.ConnConfig.User},
+				Database: connConfig.ConnConfig.Database,
+			}})
 		logging.OnError(err).Fatal("migrations failed")
 
 		return m.Run()
