@@ -39,7 +39,6 @@ var (
 	OrgDomainProjection                 *handler.Handler
 	LoginPolicyProjection               *handler.Handler
 	IDPProjection                       *handler.Handler
-	IDPTemplateRelationalProjection     *handler.Handler
 	AppProjection                       *handler.Handler
 	IDPUserLinkProjection               *handler.Handler
 	IDPLoginPolicyLinkProjection        *handler.Handler
@@ -94,6 +93,7 @@ var (
 	OrganizationRelationalProjection       *handler.Handler
 	InstanceDomainRelationalProjection     *handler.Handler
 	OrganizationDomainRelationalProjection *handler.Handler
+	IDPTemplateRelationalProjection        *handler.Handler
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
@@ -155,7 +155,6 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	IDPUserLinkProjection = newIDPUserLinkProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_user_links"]))
 	IDPLoginPolicyLinkProjection = newIDPLoginPolicyLinkProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_login_policy_links"]))
 	IDPTemplateProjection = newIDPTemplateProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_templates"]))
-	IDPTemplateRelationalProjection = newIDPTemplateRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_templates_relational"]))
 	MailTemplateProjection = newMailTemplateProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["mail_templates"]))
 	MessageTextProjection = newMessageTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["message_texts"]))
 	CustomTextProjection = newCustomTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["custom_texts"]))
@@ -210,6 +209,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	OrganizationRelationalProjection = newOrgRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organizations_relational"]))
 	InstanceDomainRelationalProjection = newInstanceDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_domains_relational"]))
 	OrganizationDomainRelationalProjection = newOrgDomainRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["organization_domains_relational"]))
+	IDPTemplateRelationalProjection = newIDPTemplateRelationalProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_templates_relational"]))
 
 	newProjectionsList()
 	newFieldsList()
@@ -346,7 +346,6 @@ func newProjectionsList() {
 		OrgDomainProjection,
 		LoginPolicyProjection,
 		IDPProjection,
-		IDPTemplateRelationalProjection,
 		IDPTemplateProjection,
 		AppProjection,
 		IDPUserLinkProjection,
@@ -398,5 +397,6 @@ func newProjectionsList() {
 		OrganizationRelationalProjection,
 		InstanceDomainRelationalProjection,
 		OrganizationDomainRelationalProjection,
+		IDPTemplateRelationalProjection,
 	}
 }

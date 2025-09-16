@@ -350,19 +350,16 @@ func (p *idpTemplateRelationalProjection) Reducers() []handler.AggregateReducer 
 }
 
 func (p *idpTemplateRelationalProjection) reduceIDPRelationalAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
 	var idpEvent idpconfig.IDPConfigAddedEvent
 	switch e := event.(type) {
 	case *org.IDPConfigAddedEvent:
 		idpEvent = e.IDPConfigAddedEvent
+		orgId = &idpEvent.Aggregate().ResourceOwner
 	case *instance.IDPConfigAddedEvent:
 		idpEvent = e.IDPConfigAddedEvent
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YcUdQ", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigAddedEventType, instance.IDPConfigAddedEventType})
-	}
-
-	var orgId *string
-	if idpEvent.Aggregate().ResourceOwner != idpEvent.Agg.InstanceID {
-		orgId = &idpEvent.Aggregate().ResourceOwner
 	}
 
 	return handler.NewCreateStatement(
@@ -516,7 +513,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigAdded(event 
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YFuAA", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType})
 	}
 
-	payload, err := json.Marshal(idpEvent)
+	payloadJSON, err := json.Marshal(idpEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -524,7 +521,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigAdded(event 
 	return handler.NewUpdateStatement(
 		&idpEvent,
 		[]handler.Column{
-			handler.NewCol(IDPRelationalPayloadCol, payload),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			handler.NewCol(IDPTypeCol, domain.IDPTypeOIDC),
 		},
 		[]handler.Condition{
@@ -536,8 +533,8 @@ func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigAdded(event 
 }
 
 func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idpconfig.OIDCConfigChangedEvent
 	switch e := event.(type) {
 	case *org.IDPOIDCConfigChangedEvent:
@@ -581,7 +578,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigChanged(even
 		oidc.UserNameMapping = domain.OIDCMappingField(*idpEvent.UserNameMapping)
 	}
 
-	payload, err := json.Marshal(idpEvent)
+	payloadJSON, err := json.Marshal(idpEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -589,7 +586,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCRelationalConfigChanged(even
 	return handler.NewUpdateStatement(
 		&idpEvent,
 		[]handler.Column{
-			handler.NewCol(IDPRelationalPayloadCol, payload),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			handler.NewCol(IDPTypeCol, domain.IDPTypeOIDC),
 		},
 		[]handler.Condition{
@@ -614,7 +611,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigAdded(event e
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YvPdb", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType})
 	}
 
-	payload, err := json.Marshal(idpEvent)
+	payloadJSON, err := json.Marshal(idpEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -622,7 +619,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigAdded(event e
 	return handler.NewUpdateStatement(
 		&idpEvent,
 		[]handler.Column{
-			handler.NewCol(IDPRelationalPayloadCol, payload),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			handler.NewCol(IDPTypeCol, domain.IDPTypeJWT),
 		},
 		[]handler.Condition{
@@ -634,8 +631,8 @@ func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigAdded(event e
 }
 
 func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idpconfig.JWTConfigChangedEvent
 	switch e := event.(type) {
 	case *org.IDPJWTConfigChangedEvent:
@@ -667,7 +664,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigChanged(event
 		jwt.HeaderName = *idpEvent.HeaderName
 	}
 
-	payload, err := json.Marshal(idpEvent)
+	payloadJSON, err := json.Marshal(idpEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -675,7 +672,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTRelationalConfigChanged(event
 	return handler.NewUpdateStatement(
 		&idpEvent,
 		[]handler.Column{
-			handler.NewCol(IDPRelationalPayloadCol, payload),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			handler.NewCol(IDPTypeCol, domain.IDPTypeJWT),
 		},
 		[]handler.Condition{
@@ -710,7 +707,7 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event ev
 		UsePKCE:               idpEvent.UsePKCE,
 	}
 
-	payload, err := json.Marshal(oauth)
+	payloadJSON, err := json.Marshal(oauth)
 	if err != nil {
 		return nil, err
 	}
@@ -735,7 +732,7 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event ev
 					}
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			},
 		),
@@ -743,8 +740,8 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event ev
 }
 
 func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idp.OAuthIDPChangedEvent
 	switch e := event.(type) {
 	case *org.OAuthIDPChangedEvent:
@@ -763,17 +760,16 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalChanged(event 
 		return nil, err
 	}
 
-	columns := make([]handler.Column, 0, 7)
-	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
 	payload := &oauth.OAuth
 	payloadChanged := reduceOAuthIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
-		payload, err := json.Marshal(payload)
+		payloadJSON, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
 	return handler.NewMultiStatement(
@@ -802,7 +798,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eve
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ys02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPAddedEventType, instance.OIDCIDPAddedEventType})
 	}
 
-	payload, err := json.Marshal(idpEvent)
+	payloadJSON, err := json.Marshal(idpEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -827,7 +823,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eve
 					}
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			},
 		),
@@ -835,8 +831,8 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eve
 }
 
 func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idp.OIDCIDPChangedEvent
 	switch e := event.(type) {
 	case *org.OIDCIDPChangedEvent:
@@ -855,17 +851,16 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event e
 		return nil, err
 	}
 
-	columns := make([]handler.Column, 0, 7)
-	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
 	payload := &oidc.OIDC
 	payloadChanged := reduceOIDCIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
-		payload, err := json.Marshal(payload)
+		payloadJSON, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
 	return handler.NewMultiStatement(
@@ -908,7 +903,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 		IsEmailVerified: idpEvent.IsEmailVerified,
 	}
 
-	payload, err := json.Marshal(azure)
+	payloadJSON, err := json.Marshal(azure)
 	if err != nil {
 		return nil, err
 	}
@@ -929,7 +924,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 					}
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -960,7 +955,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 		Scopes:       idpEvent.Scopes,
 	}
 
-	payload, err := json.Marshal(google)
+	payloadJSON, err := json.Marshal(google)
 	if err != nil {
 		return nil, err
 	}
@@ -981,7 +976,7 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 					}
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -1012,7 +1007,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalAdded(event even
 		HeaderName:   idpEvent.HeaderName,
 	}
 
-	payload, err := json.Marshal(jwt)
+	payloadJSON, err := json.Marshal(jwt)
 	if err != nil {
 		return nil, err
 	}
@@ -1037,7 +1032,7 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalAdded(event even
 					}
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			},
 		),
@@ -1045,8 +1040,8 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalAdded(event even
 }
 
 func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idp.JWTIDPChangedEvent
 	switch e := event.(type) {
 	case *org.JWTIDPChangedEvent:
@@ -1065,17 +1060,16 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event ev
 		return nil, err
 	}
 
-	columns := make([]handler.Column, 0, 7)
-	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
 	payload := &jwt.JWT
 	payloadChanged := reduceJWTIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
-		payload, err := json.Marshal(payload)
+		payloadJSON, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
 	return handler.NewMultiStatement(
@@ -1117,7 +1111,7 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event 
 		IsEmailVerified: idpEvent.IsEmailVerified,
 	}
 
-	payload, err := json.Marshal(azure)
+	payloadJSON, err := json.Marshal(azure)
 	if err != nil {
 		return nil, err
 	}
@@ -1143,15 +1137,15 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event 
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idp.AzureADIDPChangedEvent
 	switch e := event.(type) {
 	case *org.AzureADIDPChangedEvent:
@@ -1165,13 +1159,12 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(even
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-YZ5x25s", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
 	}
 
-	oauth, err := p.idpRepo.GetOAzureAD(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
+	oauth, err := p.idpRepo.GetAzureAD(context.Background(), p.idpRepo.IDCondition(idpEvent.ID), idpEvent.Agg.InstanceID, orgId)
 	if err != nil {
 		return nil, err
 	}
 
-	columns := make([]handler.Column, 0, 7)
-	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
 	payload := &oauth.Azure
 	payloadChanged, err := reduceAzureADIDPRelationalChangedColumns(payload, &idpEvent)
@@ -1180,11 +1173,11 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(even
 	}
 
 	if payloadChanged {
-		payload, err := json.Marshal(payload)
+		payloadJSON, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
 	return handler.NewMultiStatement(
@@ -1219,7 +1212,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 		Scopes:       idpEvent.Scopes,
 	}
 
-	payload, err := json.Marshal(github)
+	payloadJSON, err := json.Marshal(github)
 	if err != nil {
 		return nil, err
 	}
@@ -1245,15 +1238,15 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idp.GitHubIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GitHubIDPChangedEvent:
@@ -1272,17 +1265,16 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event
 		return nil, err
 	}
 
-	columns := make([]handler.Column, 0, 7)
-	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
 	payload := &github.Github
 	payloadChanged := reduceGitHubIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
-		payload, err := json.Marshal(payload)
+		payloadJSON, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
 	return handler.NewMultiStatement(
@@ -1320,7 +1312,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdd
 		Scopes:                idpEvent.Scopes,
 	}
 
-	payload, err := json.Marshal(githubEnterprise)
+	payloadJSON, err := json.Marshal(githubEnterprise)
 	if err != nil {
 		return nil, err
 	}
@@ -1345,7 +1337,7 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdd
 					}
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
 			},
 		),
@@ -1353,8 +1345,8 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdd
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idp.GitHubEnterpriseIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GitHubEnterpriseIDPChangedEvent:
@@ -1373,17 +1365,16 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalCha
 		return nil, err
 	}
 
-	columns := make([]handler.Column, 0, 7)
-	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
 	payload := &githubEnterprise.GithubEnterprise
 	payloadChanged := reduceGitHubEnterpriseIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
-		payload, err := json.Marshal(payload)
+		payloadJSON, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
 	return handler.NewMultiStatement(
@@ -1418,7 +1409,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event e
 		Scopes:       idpEvent.Scopes,
 	}
 
-	payload, err := json.Marshal(gitlab)
+	payloadJSON, err := json.Marshal(gitlab)
 	if err != nil {
 		return nil, err
 	}
@@ -1444,15 +1435,15 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event e
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idp.GitLabIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GitLabIDPChangedEvent:
@@ -1471,17 +1462,16 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event
 		return nil, err
 	}
 
-	columns := make([]handler.Column, 0, 7)
-	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
 	payload := &oauth.Gitlab
 	payloadChanged := reduceGitLabIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
-		payload, err := json.Marshal(payload)
+		payloadJSON, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
 	return handler.NewMultiStatement(
@@ -1517,7 +1507,7 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdd
 		Scopes:       idpEvent.Scopes,
 	}
 
-	payload, err := json.Marshal(gitlabSelfHosting)
+	payloadJSON, err := json.Marshal(gitlabSelfHosting)
 	if err != nil {
 		return nil, err
 	}
@@ -1543,15 +1533,15 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdd
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idp.GitLabSelfHostedIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GitLabSelfHostedIDPChangedEvent:
@@ -1570,17 +1560,16 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalCha
 		return nil, err
 	}
 
-	columns := make([]handler.Column, 0, 7)
-	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
 	payload := &gitlabSelfHosted.GitlabSelfHosting
 	payloadChanged := reduceGitLabSelfHostedIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
-		payload, err := json.Marshal(payload)
+		payloadJSON, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
 	return handler.NewMultiStatement(
@@ -1615,7 +1604,7 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event e
 		Scopes:       idpEvent.Scopes,
 	}
 
-	payload, err := json.Marshal(google)
+	payloadJSON, err := json.Marshal(google)
 	if err != nil {
 		return nil, err
 	}
@@ -1641,15 +1630,15 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event e
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idp.GoogleIDPChangedEvent
 	switch e := event.(type) {
 	case *org.GoogleIDPChangedEvent:
@@ -1668,17 +1657,16 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 		return nil, err
 	}
 
-	columns := make([]handler.Column, 0, 7)
-	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
 	payload := &oauth.Google
 	payloadChanged := reduceGoogleIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
-		payload, err := json.Marshal(payload)
+		payloadJSON, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
 	return handler.NewMultiStatement(
@@ -1734,7 +1722,7 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Ev
 		},
 	}
 
-	payload, err := json.Marshal(ldap)
+	payloadJSON, err := json.Marshal(ldap)
 	if err != nil {
 		return nil, err
 	}
@@ -1760,15 +1748,15 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Ev
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idp.LDAPIDPChangedEvent
 	switch e := event.(type) {
 	case *org.LDAPIDPChangedEvent:
@@ -1787,17 +1775,16 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.
 		return nil, err
 	}
 
-	columns := make([]handler.Column, 0, 7)
-	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
 	payload := &oauth.LDAP
 	payloadChanged := reduceLDAPIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
-		payload, err := json.Marshal(payload)
+		payloadJSON, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
 	return handler.NewMultiStatement(
@@ -1834,7 +1821,7 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.E
 		Scopes:     idpEvent.Scopes,
 	}
 
-	payload, err := json.Marshal(apple)
+	payloadJSON, err := json.Marshal(apple)
 	if err != nil {
 		return nil, err
 	}
@@ -1860,15 +1847,15 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.E
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceAppleIDPChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idp.AppleIDPChangedEvent
 	switch e := event.(type) {
 	case *org.AppleIDPChangedEvent:
@@ -1887,17 +1874,16 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPChanged(event eventstore
 		return nil, err
 	}
 
-	columns := make([]handler.Column, 0, 7)
-	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
 	payload := &apple.Apple
 	payloadChanged := reduceAppleIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
-		payload, err := json.Marshal(payload)
+		payloadJSON, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
 	return handler.NewMultiStatement(
@@ -1937,7 +1923,7 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Ev
 		FederatedLogoutEnabled:        idpEvent.FederatedLogoutEnabled,
 	}
 
-	payload, err := json.Marshal(saml)
+	payloadJSON, err := json.Marshal(saml)
 	if err != nil {
 		return nil, err
 	}
@@ -1963,15 +1949,15 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Ev
 					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
 				}()),
 				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payload),
+				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
 			},
 		),
 	), nil
 }
 
 func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.Event) (*handler.Statement, error) {
-	var orgCond handler.Condition
 	var orgId *string
+	var orgCond handler.Condition
 	var idpEvent idp.SAMLIDPChangedEvent
 	switch e := event.(type) {
 	case *org.SAMLIDPChangedEvent:
@@ -1990,17 +1976,16 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.
 		return nil, err
 	}
 
-	columns := make([]handler.Column, 0, 7)
-	reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges, &columns)
+	columns := reduceIDPRelationalChangedTemplateColumns(idpEvent.Name, idpEvent.OptionChanges)
 
 	payload := &saml.SAML
 	payloadChanged := reduceSAMLIDPRelationalChangedColumns(payload, &idpEvent)
 	if payloadChanged {
-		payload, err := json.Marshal(payload)
+		payloadJSON, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payload))
+		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
 	return handler.NewMultiStatement(
@@ -2040,25 +2025,28 @@ func (p *idpTemplateRelationalProjection) reduceIDPRemoved(event eventstore.Even
 	), nil
 }
 
-func reduceIDPRelationalChangedTemplateColumns(name *string, optionChanges idp.OptionChanges, cols *[]handler.Column) {
+func reduceIDPRelationalChangedTemplateColumns(name *string, optionChanges idp.OptionChanges) []handler.Column {
+	cols := make([]handler.Column, 0, 7)
 	if name != nil {
-		*cols = append(*cols, handler.NewCol(IDPTemplateNameCol, *name))
+		cols = append(cols, handler.NewCol(IDPTemplateNameCol, *name))
 	}
 	if optionChanges.IsCreationAllowed != nil {
-		*cols = append(*cols, handler.NewCol(IDPRelationalAllowCreationCol, *optionChanges.IsCreationAllowed))
+		cols = append(cols, handler.NewCol(IDPRelationalAllowCreationCol, *optionChanges.IsCreationAllowed))
 	}
 	if optionChanges.IsLinkingAllowed != nil {
-		*cols = append(*cols, handler.NewCol(IDPRelationalAllowLinkingCol, *optionChanges.IsLinkingAllowed))
+		cols = append(cols, handler.NewCol(IDPRelationalAllowLinkingCol, *optionChanges.IsLinkingAllowed))
 	}
 	if optionChanges.IsAutoCreation != nil {
-		*cols = append(*cols, handler.NewCol(IDPRelationalAllowAutoCreationCol, *optionChanges.IsAutoCreation))
+		cols = append(cols, handler.NewCol(IDPRelationalAllowAutoCreationCol, *optionChanges.IsAutoCreation))
 	}
 	if optionChanges.IsAutoUpdate != nil {
-		*cols = append(*cols, handler.NewCol(IDPRelationalAllowAutoUpdateCol, *optionChanges.IsAutoUpdate))
+		cols = append(cols, handler.NewCol(IDPRelationalAllowAutoUpdateCol, *optionChanges.IsAutoUpdate))
 	}
 	if optionChanges.AutoLinkingOption != nil && *optionChanges.AutoLinkingOption != internal_domain.AutoLinkingOptionUnspecified {
-		*cols = append(*cols, handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(*optionChanges.AutoLinkingOption).String()))
+		cols = append(cols, handler.NewCol(IDPRelationalAllowAutoLinkingCol, domain.IDPAutoLinkingOption(*optionChanges.AutoLinkingOption).String()))
 	}
+
+	return cols
 }
 
 func reduceOAuthIDPRelationalChangedColumns(payload *domain.OAuth, idpEvent *idp.OAuthIDPChangedEvent) bool {

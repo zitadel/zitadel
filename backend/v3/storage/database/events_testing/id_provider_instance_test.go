@@ -946,7 +946,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			azure, err := idpRepo.GetOAzureAD(IAMCTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
+			azure, err := idpRepo.GetAzureAD(IAMCTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.oidc.migrated.azure
@@ -1206,7 +1206,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		// check values for azure
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			azure, err := idpRepo.GetOAzureAD(IAMCTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
+			azure, err := idpRepo.GetAzureAD(IAMCTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.azure.added
@@ -1258,10 +1258,10 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 
 		idpRepo := repository.IDProviderRepository(pool)
 
-		var azure *domain.IDPOAzureAD
+		var azure *domain.IDPAzureAD
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			azure, err = idpRepo.GetOAzureAD(IAMCTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
+			azure, err = idpRepo.GetAzureAD(IAMCTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
 			require.NoError(t, err)
 			assert.Equal(t, addAzure.Id, azure.ID)
 		}, retryDuration, tick)
@@ -1295,7 +1295,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		// check values for azure
 		retryDuration, tick = integration.WaitForAndTickWithMaxDuration(IAMCTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
-			updateAzure, err := idpRepo.GetOAzureAD(IAMCTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
+			updateAzure, err := idpRepo.GetAzureAD(IAMCTX, idpRepo.IDCondition(addAzure.Id), instanceID, nil)
 			require.NoError(t, err)
 
 			// event instance.idp.azure.changed

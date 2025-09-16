@@ -138,7 +138,7 @@ type Azure struct {
 	IsEmailVerified bool                `json:"isEmailVerified,omitempty"`
 }
 
-type IDPOAzureAD struct {
+type IDPAzureAD struct {
 	*IdentityProvider
 	Azure
 }
@@ -340,7 +340,7 @@ type IDProviderRepository interface {
 
 	GetOAuth(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOAuth, error)
 
-	GetOAzureAD(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPOAzureAD, error)
+	GetAzureAD(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPAzureAD, error)
 	GetGoogle(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGoogle, error)
 	GetGithub(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithub, error)
 	GetGithubEnterprise(ctx context.Context, id IDPIdentifierCondition, instanceID string, orgID *string) (*IDPGithubEnterprise, error)
