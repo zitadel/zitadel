@@ -40,6 +40,7 @@ func (p *orgMetadataRelationalProjection) Reducers() []handler.AggregateReducer 
 					Event:  org.MetadataRemovedType,
 					Reduce: p.reduceRemoved,
 				},
+				// This event cannot be tested because it was never used in the past
 				{
 					Event:  org.MetadataRemovedAllType,
 					Reduce: p.reduceRemovedAll,
@@ -60,6 +61,7 @@ func (p *orgMetadataRelationalProjection) reduceSet(event eventstore.Event) (*ha
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-xg4IJ", "reduce.wrong.db.pool %T", ex)
 		}
 		if !json.Valid(e.Value) {
+			// TODO(adlerhurst): how should we handle invalid data?
 			logging.Info("invalid")
 		} else {
 			logging.Info("valid")
