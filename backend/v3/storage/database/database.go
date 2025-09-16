@@ -12,6 +12,8 @@ type Pool interface {
 
 	Acquire(ctx context.Context) (Client, error)
 	Close(ctx context.Context) error
+
+	Ping(ctx context.Context) error
 }
 
 type PoolTest interface {
@@ -27,6 +29,8 @@ type Client interface {
 	Migrator
 
 	Release(ctx context.Context) error
+
+	Ping(ctx context.Context) error
 }
 
 // Querier is a database client that can execute queries and return rows.
