@@ -54,11 +54,11 @@ jobs:
           GOARCH="${{matrix.goarch}}" \
           VERSION="${{ inputs.version }}" \
           COMMIT_SHA="${{ github.sha }}" \
-          nx run @zitadel/api:build-${{matrix.goos}}-${{matrix.goarch}}
+          nx run @zitadel/api:build
       - name: create folder
         run: |
           mkdir zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
-          mv .artifacts/${{ matrix.goos }}/${{ matrix.goarch }}/zitadel zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
+          mv .artifacts/bin/${{ matrix.goos }}/${{ matrix.goarch }}/zitadel zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
           cp LICENSE zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
           cp README.md zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
           tar -czvf zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz zitadel-${{ matrix.goos }}-${{ matrix.goarch }}

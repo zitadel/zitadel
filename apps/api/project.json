@@ -2,101 +2,29 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "name": "@zitadel/api",
     "projectType": "application",
-    "namedInputs": {
-        "build": [
-            "{workspaceRoot}/cmd/**/*",
-            "{workspaceRoot}/internal/**/*",
-            "{workspaceRoot}/proto/**/*",
-            "{workspaceRoot}/pkg/**/*",
-            "{workspaceRoot}/Makefile",
-            "{workspaceRoot}/go.mod",
-            "{workspaceRoot}/go.sum",
-            "{workspaceRoot}/main.go"
-        ]
-    },
     "targets": {
-        "build-linux-amd64": {
-            "description": "Build the Zitadel API application for Linux AMD64",
-            "command": "GOOS=linux GOARCH=amd64 make compile_pipeline",
+        "build": {
+            "description": "Build the Zitadel API application",
+            "dependsOn": [
+                "generate"
+            ],
+            "command": "make compile_pipeline",
             "inputs": [
-                "build"
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },
+                "{workspaceRoot}/cmd/**/*.go",
+                "{workspaceRoot}/internal/**/*.go",
+                "{workspaceRoot}/proto/**/*.go",
+                "{workspaceRoot}/pkg/**/*.go",
+                "{workspaceRoot}/go*",
+                "{workspaceRoot}/main.go",
+                "{workspaceRoot}/Makefile",
+                "!{workspaceRoot}/internal/integration/**",
+                "!{workspaceRoot}/**/*_test.go",
+                "!{workspaceRoot}/**/integration_test/**/*"
             ],
             "outputs": [
-                "{workspaceRoot}/.artifacts/linux/amd64/zitadel"
-            ],
-            "dependsOn": [
-                "@zitadel/console:build",
-                "generate"
-            ]
-        },
-        "build-linux-arm64": {
-            "description": "Build the Zitadel API application for Linux ARM64",
-            "command": "GOOS=linux GOARCH=arm64 make compile_pipeline",
-            "inputs": [
-                "build"
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/linux/arm64/zitadel"
-            ],
-            "dependsOn": [
-                "@zitadel/console:build",
-                "generate"
-            ]
-        },
-        "build-darwin-amd64": {
-            "description": "Build the Zitadel API application for Darwin AMD64",
-            "command": "GOOS=darwin GOARCH=amd64 make compile_pipeline",
-            "inputs": [
-                "build"
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/darwin/amd64/zitadel"
-            ],
-            "dependsOn": [
-                "@zitadel/console:build",
-                "generate"
-            ]
-        },
-        "build-darwin-arm64": {
-            "description": "Build the Zitadel API application for Darwin ARM64",
-            "command": "GOOS=darwin GOARCH=arm64 make compile_pipeline",
-            "inputs": [
-                "build"
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/darwin/arm64/zitadel"
-            ],
-            "dependsOn": [
-                "@zitadel/console:build",
-                "generate"
-            ]
-        },
-        "build-windows-amd64": {
-            "description": "Build the Zitadel API application for Windows AMD64",
-            "command": "GOOS=windows GOARCH=amd64 make compile_pipeline",
-            "inputs": [
-                "build"
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/windows/amd64/zitadel"
-            ],
-            "dependsOn": [
-                "@zitadel/console:build",
-                "generate"
-            ]
-        },
-        "build-windows-arm64": {
-            "description": "Build the Zitadel API application for Windows ARM64",
-            "command": "GOOS=windows GOARCH=arm64 make compile_pipeline",
-            "inputs": [
-                "build"
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/windows/arm64/zitadel"
-            ],
-            "dependsOn": [
-                "@zitadel/console:build",
-                "generate"
+                "{workspaceRoot}/.artifacts/bin/*/*/zitadel"
             ]
         },
         "generate": {
@@ -126,20 +54,19 @@
                 "{workspaceRoot}/openapi/v2",
                 "{workspaceRoot}/pkg/grpc/**/*.pb.*",
                 "{workspaceRoot}/pkg/grpc/**/*.connect.go"
-
             ]
         },
         "prod": {
             "continuous": true,
+            "dependsOn": [
+                "build"
+            ],
             "options": {
                 "env": {
                     "API_CONFIG_FILE": "{projectRoot}/api.yaml"
                 }
             },
-            "commands": [
-                "nx run @zitadel/api:build-${GOOS:-$(go env GOOS)}-${GOARCH:-$(go env GOARCH)}",
-                "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\"; ./.artifacts/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/zitadel start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'"
-            ]
+            "command": "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\"; ./.artifacts/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/zitadel start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'"
         }
     }
 }
