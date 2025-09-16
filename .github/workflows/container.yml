@@ -24,6 +24,10 @@ on:
       node_version:
         required: true
         type: string
+    secrets:
+      GCR_JSON_KEY_BASE64:
+        description: 'base64 endcrypted key to connect to Google'
+        required: true
 
 permissions:
   packages: write

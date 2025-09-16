@@ -79,7 +79,8 @@ jobs:
     - api-compile
     - check
     uses: ./.github/workflows/container.yml
-    secrets: inherit
+    secrets:
+      GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     permissions:
       packages: write
     if: ${{ github.event_name == 'workflow_dispatch' }}
