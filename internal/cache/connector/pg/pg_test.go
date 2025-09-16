@@ -80,7 +80,7 @@ func TestNewCache(t *testing.T) {
 				PGXPool: pool,
 			}
 
-			c, err := NewCache[testIndex, string, *testObject](context.Background(), cachePurpose, conf, testIndices, connector)
+			c, err := NewCache[testIndex, string, *testObject](context.Background(), cachePurpose, "VERSION", conf, testIndices, connector)
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.wantErr == nil {
 				assert.NotNil(t, c)
@@ -115,10 +115,10 @@ func Test_pgCache_Set(t *testing.T) {
 			expect: func(ppi pgxmock.PgxCommonIface) {
 				ppi.ExpectExec(queryExpect).
 					WithArgs(cachePurpose.String(),
-						[]indexKey[testIndex, string]{
-							{IndexID: testIndexID, IndexKey: "id1"},
-							{IndexID: testIndexName, IndexKey: "foo"},
-							{IndexID: testIndexName, IndexKey: "bar"},
+						[]indexKey[testIndex]{
+							{IndexID: testIndexID, IndexKey: "VERSION:id1"},
+							{IndexID: testIndexName, IndexKey: "VERSION:foo"},
+							{IndexID: testIndexName, IndexKey: "VERSION:bar"},
 						},
 						&testObject{
 							ID:   "id1",
@@ -139,10 +139,10 @@ func Test_pgCache_Set(t *testing.T) {
 			expect: func(ppi pgxmock.PgxCommonIface) {
 				ppi.ExpectExec(queryExpect).
 					WithArgs(cachePurpose.String(),
-						[]indexKey[testIndex, string]{
-							{IndexID: testIndexID, IndexKey: "id1"},
-							{IndexID: testIndexName, IndexKey: "foo"},
-							{IndexID: testIndexName, IndexKey: "bar"},
+						[]indexKey[testIndex]{
+							{IndexID: testIndexID, IndexKey: "VERSION:id1"},
+							{IndexID: testIndexName, IndexKey: "VERSION:foo"},
+							{IndexID: testIndexName, IndexKey: "VERSION:bar"},
 						},
 						&testObject{
 							ID:   "id1",
@@ -207,7 +207,7 @@ func Test_pgCache_Get(t *testing.T) {
 			},
 			expect: func(pci pgxmock.PgxCommonIface) {
 				pci.ExpectQuery(queryExpect).
-					WithArgs(cachePurpose.String(), testIndexID, "id1", time.Duration(0), time.Duration(0)).
+					WithArgs(cachePurpose.String(), testIndexID, "VERSION:id1", time.Duration(0), time.Duration(0)).
 					WillReturnRows(pgxmock.NewRows([]string{"payload"}))
 			},
 			wantOk: false,
@@ -224,7 +224,7 @@ func Test_pgCache_Get(t *testing.T) {
 			},
 			expect: func(pci pgxmock.PgxCommonIface) {
 				pci.ExpectQuery(queryExpect).
-					WithArgs(cachePurpose.String(), testIndexID, "id1", time.Duration(0), time.Duration(0)).
+					WithArgs(cachePurpose.String(), testIndexID, "VERSION:id1", time.Duration(0), time.Duration(0)).
 					WillReturnError(pgx.ErrTxClosed)
 			},
 			wantOk: false,
@@ -241,7 +241,7 @@ func Test_pgCache_Get(t *testing.T) {
 			},
 			expect: func(pci pgxmock.PgxCommonIface) {
 				pci.ExpectQuery(queryExpect).
-					WithArgs(cachePurpose.String(), testIndexID, "id1", time.Minute, time.Second).
+					WithArgs(cachePurpose.String(), testIndexID, "VERSION:id1", time.Minute, time.Second).
 					WillReturnRows(
 						pgxmock.NewRows([]string{"payload"}).AddRow(&testObject{
 							ID:   "id1",
@@ -296,7 +296,7 @@ func Test_pgCache_Invalidate(t *testing.T) {
 			},
 			expect: func(pci pgxmock.PgxCommonIface) {
 				pci.ExpectExec(queryExpect).
-					WithArgs(cachePurpose.String(), testIndexID, []string{"id1", "id2"}).
+					WithArgs(cachePurpose.String(), testIndexID, []string{"VERSION:id1", "VERSION:id2"}).
 					WillReturnError(pgx.ErrTxClosed)
 			},
 			wantErr: pgx.ErrTxClosed,
@@ -313,7 +313,7 @@ func Test_pgCache_Invalidate(t *testing.T) {
 			},
 			expect: func(pci pgxmock.PgxCommonIface) {
 				pci.ExpectExec(queryExpect).
-					WithArgs(cachePurpose.String(), testIndexID, []string{"id1", "id2"}).
+					WithArgs(cachePurpose.String(), testIndexID, []string{"VERSION:id1", "VERSION:id2"}).
 					WillReturnResult(pgxmock.NewResult("DELETE", 1))
 			},
 		},
@@ -358,7 +358,7 @@ func Test_pgCache_Delete(t *testing.T) {
 			},
 			expect: func(pci pgxmock.PgxCommonIface) {
 				pci.ExpectExec(queryExpect).
-					WithArgs(cachePurpose.String(), testIndexID, []string{"id1", "id2"}).
+					WithArgs(cachePurpose.String(), testIndexID, []string{"VERSION:id1", "VERSION:id2"}).
 					WillReturnError(pgx.ErrTxClosed)
 			},
 			wantErr: pgx.ErrTxClosed,
@@ -375,7 +375,7 @@ func Test_pgCache_Delete(t *testing.T) {
 			},
 			expect: func(pci pgxmock.PgxCommonIface) {
 				pci.ExpectExec(queryExpect).
-					WithArgs(cachePurpose.String(), testIndexID, []string{"id1", "id2"}).
+					WithArgs(cachePurpose.String(), testIndexID, []string{"VERSION:id1", "VERSION:id2"}).
 					WillReturnResult(pgxmock.NewResult("DELETE", 1))
 			},
 		},
@@ -518,7 +518,7 @@ func prepareCache(t *testing.T, conf cache.Config) (cache.PrunerCache[testIndex,
 	connector := &Connector{
 		PGXPool: pool,
 	}
-	c, err := NewCache[testIndex, string, *testObject](context.Background(), cachePurpose, conf, testIndices, connector)
+	c, err := NewCache[testIndex, string, *testObject](context.Background(), cachePurpose, "VERSION", conf, testIndices, connector)
 	require.NoError(t, err)
 	return c, pool
 }
