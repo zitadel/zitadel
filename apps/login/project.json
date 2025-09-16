@@ -77,8 +77,26 @@
         "^build"
       ]
     },
-    "test-integration-run": {
+    "test-integration-env": {
+      "dependsOn": [
+        "build",
+        "@zitadel/login-api-mock:build"
+      ],
+      "description": "Run the integration tests with cypress",
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "commands": [
+          "ZITADEL_API_URL=http://${DEVCONTAINER_LOGIN_API_MOCK_HOST:-localhost}:22222 ZITADEL_SERVICE_USER_TOKEN=none ZITADEL_SERVICE_USER_TOKEN_FILE=\"\" nx run @zitadel/login:prod --excludeTaskDependencies",
+          "nx run @zitadel/login-api-mock:serve --excludeTaskDependencies"
+        ]
+      }
+    },
+    "test-integration": {
       "cache": true,
+      "dependsOn": [
+        "test-integration-env"
+      ],
       "inputs": [
         "default",
         "{workspaceRoot}/pnpm-lock.yaml",

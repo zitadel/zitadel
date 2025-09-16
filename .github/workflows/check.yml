@@ -69,7 +69,7 @@ jobs:
         working-directory: apps/login
       - uses: nrwl/nx-set-shas@v4
       - name: Lint, Build, Unit Tests
-        run: nx affected --targets lint build test-unit --exclude @zitadel/docs,@zitadel/benchmark
+        run: nx affected --targets lint build test-unit test-integration --exclude @zitadel/docs,@zitadel/benchmark
       - uses: actions/cache/save@v4
         if: always()
         with:
@@ -82,5 +82,3 @@ jobs:
           name: api-unit-tests
           flags: api-unit-tests
           token: ${{ secrets.CODECOV_TOKEN }}
-      - name: Login Integration Tests
-        run: pnpm --filter @zitadel/login test-integration
