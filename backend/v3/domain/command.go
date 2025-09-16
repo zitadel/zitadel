@@ -25,18 +25,18 @@ type Invoker interface {
 // CommandOpts are passed to each command
 // they provide common fields used by commands like the database client.
 type CommandOpts struct {
-	DB       database.QueryExecutor
-	Invoker  Invoker
-	_orgRepo func(db database.QueryExecutor) OrganizationRepository
+	DB               database.QueryExecutor
+	Invoker          Invoker
+	organizationRepo func(db database.QueryExecutor) OrganizationRepository
 }
 
 func (opts *CommandOpts) SetOrgRepo(repo func(db database.QueryExecutor) OrganizationRepository) {
-	opts._orgRepo = repo
+	opts.organizationRepo = repo
 }
 
 func (opts *CommandOpts) orgRepo() OrganizationRepository {
-	if opts._orgRepo != nil {
-		return opts._orgRepo(opts.DB)
+	if opts.organizationRepo != nil {
+		return opts.organizationRepo(opts.DB)
 	}
 	return orgRepo(opts.DB)
 }
@@ -110,9 +110,9 @@ func DefaultOpts(invoker Invoker) *CommandOpts {
 		invoker = &noopInvoker{}
 	}
 	return &CommandOpts{
-		DB:       pool,
-		Invoker:  invoker,
-		_orgRepo: orgRepo,
+		DB:               pool,
+		Invoker:          invoker,
+		organizationRepo: orgRepo,
 	}
 }
 
