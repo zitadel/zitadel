@@ -382,7 +382,7 @@ message UpdateGroupRequest {
   ];
 
   // Name of the group.
-  string name = 2 [
+  optional string name = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
@@ -392,7 +392,7 @@ message UpdateGroupRequest {
   ];
 
   // Description of the group.
-  string description = 3 [
+  optional string description = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;

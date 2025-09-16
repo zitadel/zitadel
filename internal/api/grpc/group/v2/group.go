@@ -37,9 +37,13 @@ func (s *Server) CreateGroup(ctx context.Context, req *connect.Request[group.Cre
 // UpdateGroup updates a user group.
 func (s *Server) UpdateGroup(ctx context.Context, req *connect.Request[group.UpdateGroupRequest]) (*connect.Response[group.UpdateGroupResponse], error) {
 	userGroup := &domain.Group{
-		Name:           req.Msg.Name,
-		Description:    req.Msg.Description,
-		OrganizationID: req.Msg.Id,
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   req.Msg.GetId(),
+			ResourceOwner: authz.GetCtxData(ctx).ResourceOwner,
+		},
+		Name:           req.Msg.GetName(),
+		Description:    req.Msg.GetDescription(),
+		OrganizationID: authz.GetCtxData(ctx).OrgID,
 	}
 
 	details, err := s.command.UpdateGroup(ctx, userGroup)
@@ -53,7 +57,7 @@ func (s *Server) UpdateGroup(ctx context.Context, req *connect.Request[group.Upd
 
 // DeleteGroup deletes a user group from an organization.
 func (s *Server) DeleteGroup(ctx context.Context, req *connect.Request[group.DeleteGroupRequest]) (*connect.Response[group.DeleteGroupResponse], error) {
-	details, err := s.command.DeleteGroup(ctx, req.Msg.Id)
+	details, err := s.command.DeleteGroup(ctx, req.Msg.GetId())
 	if err != nil {
 		return nil, err
 	}
