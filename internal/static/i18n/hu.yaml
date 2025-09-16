@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Az inicializáló kód nem található
     UsernameNotChanged: A felhasználónév nem változott
     InvalidURLTemplate: Az URL sablon érvénytelen
+    Locked: A felhasználó zárolva van
     Profile:
       NotFound: A profil nem található
       NotChanged: A profil nem változott
@@ -177,6 +178,11 @@ Errors:
         NotExisting: Az U2F nem létezik
       Passwordless:
         NotExisting: Passwordless nem létezik
+      RecoveryCodes:
+        InvalidCode: Érvénytelen visszaállítási kód lett megadva
+        MaxCountExceeded: A visszaállítási kódok maximális száma túllépve
+        NotReady: A visszaállítási kódok nem készek a használatra
+        ConfigInvalid: A visszaállítási kódok konfigurációja érvénytelen
     WebAuthN:
       NotFound: A WebAuthN token nem található
       BeginRegisterFailed: A WebAuthN regisztráció megkezdése sikertelen

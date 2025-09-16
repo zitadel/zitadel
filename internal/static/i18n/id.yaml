@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Kode Inisialisasi tidak ditemukan
     UsernameNotChanged: Nama pengguna tidak diubah
     InvalidURLTemplate: Templat URL tidak valid
+    Locked: Pengguna dikunci
     Profile:
       NotFound: Profil tidak ditemukan
       NotChanged: Profil tidak berubah
@@ -177,6 +178,11 @@ Errors:
         NotExisting: U2F tidak ada
       Passwordless:
         NotExisting: Tanpa kata sandi tidak ada
+      RecoveryCodes:
+        InvalidCode: Kode pemulihan yang tidak valid disediakan
+        MaxCountExceeded: Jumlah maksimum kode pemulihan terlampaui
+        NotReady: Kode pemulihan tidak siap untuk digunakan
+        ConfigInvalid: Konfigurasi kode pemulihan tidak valid
     WebAuthN:
       NotFound: Token WebAuthN tidak dapat ditemukan
       BeginRegisterFailed: Pendaftaran awal WebAuthN gagal
