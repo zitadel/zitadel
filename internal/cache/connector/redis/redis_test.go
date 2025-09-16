@@ -68,9 +68,9 @@ func Test_redisCache_set(t *testing.T) {
 				},
 			},
 			assertions: func(t *testing.T, s *miniredis.Miniredis, objectID string) {
-				s.CheckGet(t, "0:one", objectID)
-				s.CheckGet(t, "1:foo", objectID)
-				s.CheckGet(t, "1:bar", objectID)
+				s.CheckGet(t, "VERSION:0:one", objectID)
+				s.CheckGet(t, "VERSION:1:foo", objectID)
+				s.CheckGet(t, "VERSION:1:bar", objectID)
 				assert.Empty(t, s.HGet(objectID, "expiry"))
 				assert.JSONEq(t, `{"ID":"one","Name":["foo","bar"]}`, s.HGet(objectID, "object"))
 			},
@@ -88,9 +88,9 @@ func Test_redisCache_set(t *testing.T) {
 				},
 			},
 			assertions: func(t *testing.T, s *miniredis.Miniredis, objectID string) {
-				s.CheckGet(t, "0:one", objectID)
-				s.CheckGet(t, "1:foo", objectID)
-				s.CheckGet(t, "1:bar", objectID)
+				s.CheckGet(t, "VERSION:0:one", objectID)
+				s.CheckGet(t, "VERSION:1:foo", objectID)
+				s.CheckGet(t, "VERSION:1:bar", objectID)
 				assert.Empty(t, s.HGet(objectID, "expiry"))
 				assert.JSONEq(t, `{"ID":"one","Name":["foo","bar"]}`, s.HGet(objectID, "object"))
 				assert.Positive(t, s.TTL(objectID))
@@ -115,9 +115,9 @@ func Test_redisCache_set(t *testing.T) {
 				},
 			},
 			assertions: func(t *testing.T, s *miniredis.Miniredis, objectID string) {
-				s.CheckGet(t, "0:one", objectID)
-				s.CheckGet(t, "1:foo", objectID)
-				s.CheckGet(t, "1:bar", objectID)
+				s.CheckGet(t, "VERSION:0:one", objectID)
+				s.CheckGet(t, "VERSION:1:foo", objectID)
+				s.CheckGet(t, "VERSION:1:bar", objectID)
 				assert.NotEmpty(t, s.HGet(objectID, "expiry"))
 				assert.JSONEq(t, `{"ID":"one","Name":["foo","bar"]}`, s.HGet(objectID, "object"))
 				assert.Positive(t, s.TTL(objectID))
@@ -141,9 +141,9 @@ func Test_redisCache_set(t *testing.T) {
 				},
 			},
 			assertions: func(t *testing.T, s *miniredis.Miniredis, objectID string) {
-				s.CheckGet(t, "0:one", objectID)
-				s.CheckGet(t, "1:foo", objectID)
-				s.CheckGet(t, "1:bar", objectID)
+				s.CheckGet(t, "VERSION:0:one", objectID)
+				s.CheckGet(t, "VERSION:1:foo", objectID)
+				s.CheckGet(t, "VERSION:1:bar", objectID)
 				assert.Empty(t, s.HGet(objectID, "expiry"))
 				assert.JSONEq(t, `{"ID":"one","Name":["foo","bar"]}`, s.HGet(objectID, "object"))
 				assert.Positive(t, s.TTL(objectID))
@@ -710,7 +710,7 @@ func prepareCache(t *testing.T, conf cache.Config, options ...func(*Config)) (ca
 		connector.Close()
 		server.Close()
 	})
-	c := NewCache[testIndex, string, *testObject](conf, connector, testDB, testIndices)
+	c := NewCache[testIndex, string, *testObject](conf, "VERSION", connector, testDB, testIndices)
 	return c, server
 }
 

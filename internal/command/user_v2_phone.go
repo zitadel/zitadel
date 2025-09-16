@@ -82,7 +82,7 @@ func (c *Commands) changeUserPhoneWithGenerator(ctx context.Context, userID, pho
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID); err != nil {
+	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID, true); err != nil {
 		return nil, err
 	}
 	if err = cmd.Change(ctx, domain.PhoneNumber(phone)); err != nil {
@@ -102,7 +102,7 @@ func (c *Commands) resendUserPhoneCodeWithGenerator(ctx context.Context, userID 
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID); err != nil {
+	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID, true); err != nil {
 		return nil, err
 	}
 	if cmd.model.Code == nil && cmd.model.GeneratorID == "" {

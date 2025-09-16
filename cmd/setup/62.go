@@ -9,19 +9,19 @@ import (
 )
 
 var (
-	//go:embed 57.sql
-	addSessionRecoveryCodeCheckedAt string
+	//go:embed 62.sql
+	addHTTPProviderSigningKey string
 )
 
-type SessionRecoveryCodeCheckedAt struct {
+type HTTPProviderAddSigningKey struct {
 	dbClient *database.DB
 }
 
-func (mig *SessionRecoveryCodeCheckedAt) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, addSessionRecoveryCodeCheckedAt)
+func (mig *HTTPProviderAddSigningKey) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, addHTTPProviderSigningKey)
 	return err
 }
 
-func (mig *SessionRecoveryCodeCheckedAt) String() string {
-	return "57_session_recovery_code_checked_at"
+func (mig *HTTPProviderAddSigningKey) String() string {
+	return "62_http_provider_add_signing_key"
 }
