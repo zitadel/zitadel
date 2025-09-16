@@ -71,6 +71,7 @@ jobs:
       - name: Lint, Build, Unit Tests
         run: nx affected --targets lint build test-unit --exclude @zitadel/docs,@zitadel/benchmark
       - uses: actions/cache/save@v4
+        if: always()
         with:
           key: ${{ steps.nx_cache.outputs.cache-primary-key }}
           path: ${{ env.nx_cache_path }}
