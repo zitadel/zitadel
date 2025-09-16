@@ -5,7 +5,6 @@ package events_test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"testing"
 	"time"
 
@@ -673,7 +672,6 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 	// 	// require.NoError(t, err)
 
 	// 	// token := tkn.Token
-	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] token = %+v\n", token)
 
 	// 	client := resty.New()
 	// 	// _, err = client.R().SetAuthToken(token).
@@ -681,8 +679,6 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 	// 		SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 	// 		Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo")
 	// 	require.NoError(t, err)
-	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
-	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
 
 	// 	// before := time.Now()
 	// 	_, err = newInstance.Client.Admin.UpdateLabelPolicy(IAMCTX, &admin.UpdateLabelPolicyRequest{})
@@ -767,7 +763,6 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
 
 		// add label policy
 		label := management.AddCustomLabelPolicyRequest{
@@ -791,6 +786,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetBody(setLabelPolicyPayload).
 			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// set logo light
 		before := time.Now()
@@ -800,6 +796,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/logo")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
@@ -838,7 +835,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 
 		systemCTX = integration.SetOrgID(systemCTX, orgID)
 
@@ -864,6 +861,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetBody(setLabelPolicyPayload).
 			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// set logo dark
 		before := time.Now()
@@ -873,6 +871,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/logo/dark")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
@@ -909,7 +908,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 
 		// add label policy
 		label := management.AddCustomLabelPolicyRequest{
@@ -933,6 +932,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetBody(setLabelPolicyPayload).
 			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// set logo light
 		client = resty.New()
@@ -941,6 +941,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/logo")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// check light logo set
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -961,6 +962,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/logo")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
 		// check light logo removed
@@ -996,6 +998,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// add label policy
 		label := management.AddCustomLabelPolicyRequest{
@@ -1019,6 +1022,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetBody(setLabelPolicyPayload).
 			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// set logo dark
 		client = resty.New()
@@ -1027,6 +1031,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/logo/dark")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// check dark logo set
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -1047,7 +1052,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/logo_dark")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>> out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
 		// check dark logo removed
@@ -1077,17 +1082,13 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 		org_, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
 		orgID := org_.ID
 
-		systemCTX := integration.WithSystemAuthorization(ctx)
-
 		// delete previous label settings
 		client := resty.New()
 		out, err := client.R().SetAuthToken(token).
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
-
-		systemCTX = integration.SetOrgID(systemCTX, orgID)
+		require.Equal(t, 200, out.StatusCode())
 
 		// add label policy
 		label := management.AddCustomLabelPolicyRequest{
@@ -1111,6 +1112,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetBody(setLabelPolicyPayload).
 			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// set icon light
 		before := time.Now()
@@ -1120,6 +1122,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/icon")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
@@ -1155,7 +1158,6 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
 
 		// add label policy
 		label := management.AddCustomLabelPolicyRequest{
@@ -1179,6 +1181,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetBody(setLabelPolicyPayload).
 			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// set icon dark
 		before := time.Now()
@@ -1188,6 +1191,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/icon/dark")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
@@ -1223,7 +1227,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 
 		// add label policy
 		label := management.AddCustomLabelPolicyRequest{
@@ -1247,6 +1251,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetBody(setLabelPolicyPayload).
 			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// set icon light
 		client = resty.New()
@@ -1255,6 +1260,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/icon")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// check light icon set
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -1275,7 +1281,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/icon")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>> out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
 		// check light icon removed
@@ -1311,7 +1317,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 
 		// add label policy
 		label := management.AddCustomLabelPolicyRequest{
@@ -1335,6 +1341,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetBody(setLabelPolicyPayload).
 			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// set icon dark
 		client = resty.New()
@@ -1343,6 +1350,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/icon/dark")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// check dark icon set
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -1364,7 +1372,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/icon_dark")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>> out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
 		// check dark icon removed
@@ -1402,7 +1410,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 
 		// add label policy
 		label := management.AddCustomLabelPolicyRequest{
@@ -1426,6 +1434,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetBody(setLabelPolicyPayload).
 			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// set logo light
 		before := time.Now()
@@ -1435,7 +1444,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/font")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
@@ -1472,7 +1481,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 
 		// add label policy
 		label := management.AddCustomLabelPolicyRequest{
@@ -1496,6 +1505,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetBody(setLabelPolicyPayload).
 			Post("http://localhost:8080" + "/management/v1" + "/policies/label")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// set logo light
 		client = resty.New()
@@ -1504,7 +1514,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/font")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1524,7 +1534,7 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			SetHeader("x-zitadel-orgid", orgID).
 			Delete("http://localhost:8080" + "/management/v1" + "/policies/label/font")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>> out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
 		// check font policy removed
@@ -1705,7 +1715,6 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 	// 		SetHeader("x-zitadel-orgid", orgID).
 	// 		Delete("http://localhost:8080" + "/management/v1" + "/policies/label")
 	// 	require.NoError(t, err)
-	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
 
 	// 	// add label policy
 	// 	label := management.AddCustomLabelPolicyRequest{
@@ -1736,7 +1745,6 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 	// 		SetHeader("x-zitadel-orgid", orgID).
 	// 		Post("http://localhost:8080" + "/assets/v1" + "/org/policy/label/logo")
 	// 	require.NoError(t, err)
-	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
 
 	// 	client = resty.New()
 	// 	out, err = client.R().SetAuthToken(token).
@@ -1821,10 +1829,10 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 		before := time.Now()
 		_, err = newInstance.Client.Mgmt.AddCustomPasswordComplexityPolicy(IAMCTX, &management.AddCustomPasswordComplexityPolicyRequest{
 			MinLength:    10,
-			HasUppercase: false,
-			HasLowercase: false,
-			HasNumber:    false,
-			HasSymbol:    false,
+			HasUppercase: true,
+			HasLowercase: true,
+			HasNumber:    true,
+			HasSymbol:    true,
 		})
 		require.NoError(t, err)
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
@@ -1840,10 +1848,10 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			// event org.policy.password.complexity.added
 			assert.Equal(t, false, setting.Settings.IsDefault)
 			assert.Equal(t, uint64(10), setting.Settings.MinLength)
-			assert.Equal(t, false, setting.Settings.HasUppercase)
-			assert.Equal(t, false, setting.Settings.HasLowercase)
-			assert.Equal(t, false, setting.Settings.HasNumber)
-			assert.Equal(t, false, setting.Settings.HasSymbol)
+			assert.Equal(t, true, setting.Settings.HasUppercase)
+			assert.Equal(t, true, setting.Settings.HasLowercase)
+			assert.Equal(t, true, setting.Settings.HasNumber)
+			assert.Equal(t, true, setting.Settings.HasSymbol)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -2209,7 +2217,6 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 	// 			newInstance.ID(),
 	// 			&organization.Id)
 	// 		require.NoError(t, err)
-	// 		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] setting = %+v\n", setting)
 
 	// 		// event instance.policy.lockout.added
 	// 		assert.Equal(t, true, setting.Settings.IsDefault)
@@ -2389,7 +2396,6 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 				newInstance.ID(),
 				&organization.Id)
 			require.NoError(t, err)
-			fmt.Printf("[DEBUGPRINT] [:1] setting = %+v\n", setting)
 
 			// event instance.policy.domain.added
 			assert.Equal(t, false, setting.Settings.IsDefault)
@@ -2583,7 +2589,6 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 				newInstance.ID(),
 				&organization.Id)
 			require.NoError(t, err)
-			fmt.Printf("[DEBUGPRINT] [:1] setting = %+v\n", setting)
 
 			// event settings.organization.set
 			assert.Equal(t, organizationScopedUsernames, setting.Settings.OrganizationScopedUsernames)

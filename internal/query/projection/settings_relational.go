@@ -76,11 +76,7 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  org.LoginPolicySecondFactorRemovedEventType,
 					Reduce: s.reduceSecondFactorRemoved,
 				},
-				// {
-				// 	Event:  org.OrgRemovedEventType,
-				// 	Reduce: s.reduceOrgLoginPolicyRemoved,
-				// },
-				// label -----------------------------------------------------------
+				// label
 				{
 					Event:  org.LabelPolicyAddedEventType,
 					Reduce: s.reduceLabelAdded,
@@ -141,11 +137,7 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  org.LabelPolicyAssetsRemovedEventType,
 					Reduce: s.reduceAssetsRemoved,
 				},
-				// {
-				// 	Event:  org.OrgRemovedEventType,
-				// 	Reduce: s.reduceOwnerRemoved,
-				// },
-				// Password Complexity -------------------------------------------------------
+				// Password Complexity
 				{
 					Event:  org.PasswordComplexityPolicyAddedEventType,
 					Reduce: s.reducePassedComplexityAdded,
@@ -158,10 +150,6 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  org.PasswordComplexityPolicyRemovedEventType,
 					Reduce: s.reducePasswordComplexityRemoved,
 				},
-				// {
-				// 	Event:  org.OrgRemovedEventType,
-				// 	Reduce: s.reducePasswordComplexityOrgRemoved,
-				// },
 				// Password Policy
 				{
 					Event:  org.PasswordAgePolicyAddedEventType,
@@ -175,30 +163,20 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  org.PasswordAgePolicyRemovedEventType,
 					Reduce: s.reducePasswordPolicyRemoved,
 				},
-				// {
-				// 	Event:  org.OrgRemovedEventType,
-				// 	Reduce: s.reducePasswordPolicyOrgRemoved,
-				// },
-				// Lockout Policy -------------------------------------------------------
+				// Lockout Policy
 				{
-					Event: org.LockoutPolicyAddedEventType,
-					// Reduce: s.reduceOrgLockoutPolicyAdded,
+					Event:  org.LockoutPolicyAddedEventType,
 					Reduce: s.reduceLockoutPolicyAdded,
 				},
 				{
-					Event: org.LockoutPolicyChangedEventType,
-					// Reduce: s.reduceOrgLockoutPolciyChanged,
+					Event:  org.LockoutPolicyChangedEventType,
 					Reduce: s.reduceLockoutPolicyChanged,
 				},
 				{
 					Event:  org.LockoutPolicyRemovedEventType,
 					Reduce: s.reduceOrgLockoutPolicyRemoved,
 				},
-				// {
-				// 	Event:  org.OrgRemovedEventType,
-				// 	Reduce: s.reduceOrgLockoutPolicyOrgRemoved,
-				// },
-				// Domain Policy -------------------------------------------------------
+				// Domain Policy
 				{
 					Event:  org.DomainPolicyAddedEventType,
 					Reduce: s.reduceDomainPolicyAdded,
@@ -211,13 +189,14 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  org.DomainPolicyRemovedEventType,
 					Reduce: s.reduceOrgDomainPolicyRemoved,
 				},
-				// settings
+				// Delete org
 				{
 					Event:  org.OrgRemovedEventType,
-					Reduce: s.reduceOrgSettingsRemovedRemoved,
+					Reduce: s.reduceOrgRemoved,
 				},
 			},
 		},
+		// settings
 		{
 			Aggregate: settings.AggregateType,
 			EventReducers: []handler.EventReducer{
@@ -259,10 +238,6 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.LoginPolicySecondFactorRemovedEventType,
 					Reduce: s.reduceSecondFactorRemoved,
 				},
-				// {
-				// 	Event:  instance.InstanceRemovedEventType,
-				// 	Reduce: s.reduceInstanceRemoved,
-				// },
 				// Label
 				{
 					Event:  instance.LabelPolicyAddedEventType,
@@ -321,11 +296,7 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.LabelPolicyAssetsRemovedEventType,
 					Reduce: s.reduceAssetsRemoved,
 				},
-				// {
-				// 	Event:  instance.InstanceRemovedEventType,
-				// 	Reduce: reduceInstanceRemovedHelper(LabelPolicyInstanceIDCol),
-				// },
-				// Password Complexity -------------------------------------------------------
+				// Password Complexity
 				{
 					Event:  instance.PasswordComplexityPolicyAddedEventType,
 					Reduce: s.reducePassedComplexityAdded,
@@ -334,11 +305,7 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.PasswordComplexityPolicyChangedEventType,
 					Reduce: s.reducePasswordComplexityChanged,
 				},
-				// {
-				// 	Event:  instance.InstanceRemovedEventType,
-				// 	Reduce: s.reducePasswordComplexityInstanceRemoved,
-				// },
-				// Password Policy -------------------------------------------------------
+				// Password Policy
 				{
 					Event:  instance.PasswordAgePolicyAddedEventType,
 					Reduce: s.reducePasswordPolicyAdded,
@@ -347,11 +314,7 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.PasswordAgePolicyChangedEventType,
 					Reduce: s.reducePasswordPolicyChanged,
 				},
-				// {
-				// 	Event:  instance.InstanceRemovedEventType,
-				// 	Reduce: s.reduceInstancePasswordPoicyRemoved,
-				// },
-				// Lockout Policy -------------------------------------------------------
+				// Lockout Policy
 				{
 					Event:  instance.LockoutPolicyAddedEventType,
 					Reduce: s.reduceLockoutPolicyAdded,
@@ -360,11 +323,7 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.LockoutPolicyChangedEventType,
 					Reduce: s.reduceLockoutPolicyChanged,
 				},
-				// {
-				// 	Event:  instance.InstanceRemovedEventType,
-				// 	Reduce: s.reduceInstanceLockoutRemoved,
-				// },
-				// Domain Policy -------------------------------------------------------
+				// Domain Policy
 				{
 					Event:  instance.DomainPolicyAddedEventType,
 					Reduce: s.reduceDomainPolicyAdded,
@@ -373,23 +332,15 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.DomainPolicyChangedEventType,
 					Reduce: s.reduceDomainPolicyChanged,
 				},
-				// {
-				// 	Event:  instance.InstanceRemovedEventType,
-				// 	Reduce: s.reduceInstanceDomainPolicyRemoved,
-				// },
-				// Security Policy -------------------------------------------------------
+				// Security Policy
 				{
 					Event:  instance.SecurityPolicySetEventType,
 					Reduce: s.reduceSecurityPolicySet,
 				},
-				// {
-				// 	Event:  instance.InstanceRemovedEventType,
-				// 	Reduce: s.reduceInstanceSecurityPoicyRemoved,
-				// },
-				// settings
+				// Delete Instance
 				{
 					Event:  instance.InstanceRemovedEventType,
-					Reduce: s.reduceInstanceSettingsRemovedRemoved,
+					Reduce: s.reduceInstanceRemoved,
 				},
 			},
 		},
@@ -705,26 +656,7 @@ func (s *settingsRelationalProjection) reduceInstanceRemoved(event eventstore.Ev
 
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 
-		_, err := settingsRepo.Delete(ctx, removeInstanceEvent.Aggregate().ID, nil, domain.SettingTypeLogin)
-		return err
-	}), nil
-}
-
-func (s *settingsRelationalProjection) reduceOrgLoginPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
-	removeOrgEvent, ok := event.(*org.OrgRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-T8NZa", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
-	}
-
-	return handler.NewStatement(removeOrgEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-arg9y", "reduce.wrong.db.pool %T", ex)
-		}
-
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
-
-		_, err := settingsRepo.Delete(ctx, removeOrgEvent.Aggregate().InstanceID, &removeOrgEvent.Aggregate().ID, domain.SettingTypeLogin)
+		_, err := settingsRepo.DeleteSettingsForInstance(ctx, removeInstanceEvent.Aggregate().InstanceID)
 		return err
 	}), nil
 }
@@ -1165,40 +1097,6 @@ func (p *settingsRelationalProjection) reduceAssetsRemoved(event eventstore.Even
 	}), nil
 }
 
-// return handler.NewUpdateStatement(
-// 	event,
-// 	[]handler.Column{
-// 		handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
-// 		handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
-
-// 		handler.NewCol(LabelPolicyLightLogoURLCol, nil),
-// 		handler.NewCol(LabelPolicyLightIconURLCol, nil),
-// 		handler.NewCol(LabelPolicyDarkLogoURLCol, nil),
-// 		handler.NewCol(LabelPolicyDarkIconURLCol, nil),
-// 		handler.NewCol(LabelPolicyFontURLCol, nil),
-// 	},
-// 	[]handler.Condition{
-// 		handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
-// 		handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
-// 		handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
-// 	}), nil
-// }
-
-// func (p *settingsRelationalProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
-// 	e, ok := event.(*org.OrgRemovedEvent)
-// 	if !ok {
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Su6pX", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
-// 	}
-
-// 	return handler.NewDeleteStatement(
-// 		e,
-// 		[]handler.Condition{
-// 			handler.NewCond(LabelPolicyInstanceIDCol, e.Aggregate().InstanceID),
-// 			handler.NewCond(LabelPolicyResourceOwnerCol, e.Aggregate().ID),
-// 		},
-// 	), nil
-// }
-
 type setting struct {
 	any
 	IsDefault *bool `json:"isDefault,omitempty"`
@@ -1453,109 +1351,6 @@ func (p *settingsRelationalProjection) reducePasswordPolicyRemoved(event eventst
 	}), nil
 }
 
-func (p *settingsRelationalProjection) reducePasswordPolicyOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*org.OrgRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-edLs2", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
-	}
-
-	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UrdHy", "reduce.wrong.db.pool %T", ex)
-		}
-
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
-
-		orgID := &e.Aggregate().ID
-
-		_, err := settingsRepo.Delete(ctx, e.Aggregate().InstanceID, orgID, domain.SettingTypePasswordExpiry)
-		return err
-	}), nil
-}
-
-// func (s *settingsRelationalProjection) reduceOrgLockoutPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var orgId *string
-// 	var policyEvent policy.LockoutPolicyAddedEvent
-// 	var isDefault bool
-// 	switch e := event.(type) {
-// 	case *org.LockoutPolicyAddedEvent:
-// 		policyEvent = e.LockoutPolicyAddedEvent
-// 		isDefault = false
-// 		orgId = &policyEvent.Aggregate().ResourceOwner
-// 	case *instance.LockoutPolicyAddedEvent:
-// 		policyEvent = e.LockoutPolicyAddedEvent
-// 		isDefault = true
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-d8mZO", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyAddedEventType, instance.LockoutPolicyAddedEventType})
-// 	}
-// 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-// 		loginSettings := setting{
-// 			any:       policyEvent,
-// 			IsDefault: &isDefault,
-// 		}
-// 		settings, err := json.Marshal(loginSettings)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> policyEvent = %+v\n", policyEvent)
-
-// 		tx, ok := ex.(*sql.Tx)
-// 		if !ok {
-// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5QPNE", "reduce.wrong.db.pool %T", ex)
-// 		}
-// 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
-// 		setting := domain.Setting{
-// 			InstanceID: policyEvent.Aggregate().InstanceID,
-// 			OrgID:      orgId,
-// 			Type:       domain.SettingTypeLockout,
-// 			Settings:   settings,
-// 		}
-// 		err = settingsRepo.Create(ctx, &setting)
-// 		return err
-// 	}), nil
-// }
-
-// func (s *settingsRelationalProjection) reduceOrgLockoutPolciyChanged(event eventstore.Event) (*handler.Statement, error) {
-// 	var orgId *string
-// 	var policyEvent policy.LockoutPolicyChangedEvent
-// 	switch e := event.(type) {
-// 	case *org.LockoutPolicyChangedEvent:
-// 		policyEvent = e.LockoutPolicyChangedEvent
-// 		orgId = &policyEvent.Aggregate().ResourceOwner
-// 	case *instance.LockoutPolicyChangedEvent:
-// 		policyEvent = e.LockoutPolicyChangedEvent
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-pT3mQ", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyChangedEventType, instance.LockoutPolicyChangedEventType})
-// 	}
-// 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-// 		tx, ok := ex.(*sql.Tx)
-// 		if !ok {
-// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rLk9y", "reduce.wrong.db.pool %T", ex)
-// 		}
-
-// 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
-
-// 		setting, err := settingsRepo.GetLockout(ctx, policyEvent.Agg.InstanceID, orgId)
-// 		if err != nil {
-// 			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
-// 		}
-
-// 		if policyEvent.MaxPasswordAttempts != nil {
-// 			setting.Settings.MaxPasswordAttempts = *policyEvent.MaxPasswordAttempts
-// 		}
-// 		if policyEvent.MaxOTPAttempts != nil {
-// 			setting.Settings.MaxOTPAttempts = *policyEvent.MaxOTPAttempts
-// 		}
-// 		if policyEvent.ShowLockOutFailures != nil {
-// 			setting.Settings.ShowLockOutFailures = *policyEvent.ShowLockOutFailures
-// 		}
-
-// 		_, err = settingsRepo.UpdateLockout(ctx, setting)
-// 		return err
-// 	}), nil
-// }
-
 func (p *settingsRelationalProjection) reduceOrgLockoutPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.LockoutPolicyRemovedEvent)
 	if !ok {
@@ -1576,42 +1371,23 @@ func (p *settingsRelationalProjection) reduceOrgLockoutPolicyRemoved(event event
 	}), nil
 }
 
-// func (s *settingsRelationalProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
-// 	e, ok := event.(*org.OrgRemovedEvent)
-// 	if !ok {
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-IoW0x", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
-// 	}
-
-// 	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-// 		tx, ok := ex.(*sql.Tx)
-// 		if !ok {
-// 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UrdHy", "reduce.wrong.db.pool %T", ex)
-// 		}
-
-// 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
-
-// 		orgID := &e.Aggregate().ID
-
-// 		_, err := settingsRepo.Delete(ctx, e.Aggregate().InstanceID, orgID, domain.SettingTypeLockout)
-// 		return err
-// 	}), nil
-// }
-
-func (s *settingsRelationalProjection) reduceOrgLockoutPolicyOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
-	removeOrgEvent, ok := event.(*org.OrgRemovedEvent)
+func (s *settingsRelationalProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-28UlS", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-IoW0x", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return handler.NewStatement(removeOrgEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rV8Hy", "reduce.wrong.db.pool %T", ex)
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-UrdHy", "reduce.wrong.db.pool %T", ex)
 		}
 
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 
-		_, err := settingsRepo.Delete(ctx, removeOrgEvent.Aggregate().InstanceID, &removeOrgEvent.Aggregate().ID, domain.SettingTypeLockout)
+		orgID := &e.Aggregate().ID
+
+		_, err := settingsRepo.DeleteSettingsForOrg(ctx, orgID)
 		return err
 	}), nil
 }
@@ -1695,25 +1471,6 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyChanged(event eventsto
 		}
 
 		_, err = settingsRepo.UpdateLockout(ctx, setting)
-		return err
-	}), nil
-}
-
-func (s *settingsRelationalProjection) reduceInstanceLockoutRemoved(event eventstore.Event) (*handler.Statement, error) {
-	removeInstanceEvent, ok := event.(*instance.InstanceRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-28gl9", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
-	}
-
-	return handler.NewStatement(removeInstanceEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-ZrdHz", "reduce.wrong.db.pool %T", ex)
-		}
-
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
-
-		_, err := settingsRepo.Delete(ctx, removeInstanceEvent.Aggregate().InstanceID, nil, domain.SettingTypeLockout)
 		return err
 	}), nil
 }
@@ -1911,25 +1668,6 @@ func (s *settingsRelationalProjection) reduceSecurityPolicySet(event eventstore.
 	}), nil
 }
 
-func (s *settingsRelationalProjection) reduceInstanceSecurityPoicyRemoved(event eventstore.Event) (*handler.Statement, error) {
-	removeInstanceEvent, ok := event.(*instance.InstanceRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-b88lS", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
-	}
-
-	return handler.NewStatement(removeInstanceEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rHiHb", "reduce.wrong.db.pool %T", ex)
-		}
-
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
-
-		_, err := settingsRepo.Delete(ctx, removeInstanceEvent.Aggregate().InstanceID, nil, domain.SettingTypeSecurity)
-		return err
-	}), nil
-}
-
 func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*settings.OrganizationSettingsSetEvent](event)
 	if err != nil {
@@ -1991,45 +1729,6 @@ func (s *settingsRelationalProjection) reduceOrganizationSettingsRemoved(event e
 		orgId := &event.Aggregate().ID
 
 		_, err := settingsRepo.Delete(ctx, e.Aggregate().InstanceID, orgId, domain.SettingTypeOrganization)
-		return err
-	}), nil
-}
-
-func (s *settingsRelationalProjection) reduceOrgSettingsRemovedRemoved(event eventstore.Event) (*handler.Statement, error) {
-	removeOrgEvent, ok := event.(*org.OrgRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-T8NZa", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
-	}
-
-	return handler.NewStatement(removeOrgEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-arg9y", "reduce.wrong.db.pool %T", ex)
-		}
-
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
-
-		orgId := &event.Aggregate().ID
-		_, err := settingsRepo.Delete(ctx, removeOrgEvent.Aggregate().InstanceID, orgId, domain.SettingTypeOrganization)
-		return err
-	}), nil
-}
-
-func (s *settingsRelationalProjection) reduceInstanceSettingsRemovedRemoved(event eventstore.Event) (*handler.Statement, error) {
-	removeInstanceEvent, ok := event.(*instance.InstanceRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-28UlS", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
-	}
-
-	return handler.NewStatement(removeInstanceEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rrdHy", "reduce.wrong.db.pool %T", ex)
-		}
-
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
-
-		_, err := settingsRepo.Delete(ctx, removeInstanceEvent.Aggregate().ID, nil, domain.SettingTypeOrganization)
 		return err
 	}), nil
 }

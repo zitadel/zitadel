@@ -267,4 +267,7 @@ type SettingsRepository interface {
 	Create(ctx context.Context, setting *Setting) error
 	// Update(ctx context.Context, id string, instanceID string, orgID *string, changes ...database.Change) (int64, error)
 	Delete(ctx context.Context, instanceID string, orgID *string, typ SettingType) (int64, error)
+
+	DeleteSettingsForInstance(ctx context.Context, instanceID string) (int64, error)
+	DeleteSettingsForOrg(ctx context.Context, orgID *string) (int64, error)
 }

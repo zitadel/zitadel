@@ -5,8 +5,6 @@ package events_test
 import (
 	"bytes"
 	_ "embed"
-	"encoding/json"
-	"fmt"
 	"testing"
 	"time"
 
@@ -33,7 +31,7 @@ var picture []byte
 //go:embed font.otf
 var font []byte
 
-func TestServer_TestLoginSettingsReduces(t *testing.T) {
+func TestServer_TestInstanceLoginSettingsReduces(t *testing.T) {
 	settingsRepo := repository.SettingsRepository(pool)
 
 	t.Run("test adding login settings reduces", func(t *testing.T) {
@@ -291,7 +289,7 @@ func TestServer_TestLoginSettingsReduces(t *testing.T) {
 	})
 }
 
-func TestServer_TestLabelSettingsReduces(t *testing.T) {
+func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	settingsRepo := repository.SettingsRepository(pool)
 
 	t.Run("test adding label settings reduces", func(t *testing.T) {
@@ -423,7 +421,7 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 	// 		SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 	// 		Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo")
 	// 	require.NoError(t, err)
-	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+	// require.Equal(t, 200, out.StatusCode())
 	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
 
 	// 	// before := time.Now()
@@ -471,7 +469,7 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 	// 		SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 	// 		Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo")
 	// 	require.NoError(t, err)
-	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+	// require.Equal(t, 200, out.StatusCode())
 	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
 
 	// 	after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
@@ -500,36 +498,36 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// add label policy
-		label := management.AddCustomLabelPolicyRequest{
-			PrimaryColor:        "#055090",
-			HideLoginNameSuffix: false,
-			WarnColor:           "#055090",
-			BackgroundColor:     "#055090",
-			FontColor:           "#055090",
-			PrimaryColorDark:    "#055090",
-			BackgroundColorDark: "#055090",
-			WarnColorDark:       "#055090",
-			FontColorDark:       "#055090",
-			DisableWatermark:    false,
-			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		}
-		setLabelPolicyPayload, err := json.Marshal(&label)
-		require.NoError(t, err)
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		// // add label policy
+		// label := management.AddCustomLabelPolicyRequest{
+		// 	PrimaryColor:        "#055090",
+		// 	HideLoginNameSuffix: false,
+		// 	WarnColor:           "#055090",
+		// 	BackgroundColor:     "#055090",
+		// 	FontColor:           "#055090",
+		// 	PrimaryColorDark:    "#055090",
+		// 	BackgroundColorDark: "#055090",
+		// 	WarnColorDark:       "#055090",
+		// 	FontColorDark:       "#055090",
+		// 	DisableWatermark:    false,
+		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+		// }
+		// setLabelPolicyPayload, err := json.Marshal(&label)
+		// require.NoError(t, err)
+		// client := resty.New()
+		// out, err := client.R().SetAuthToken(token).
+		// 	SetBody(setLabelPolicyPayload).
+		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
+		// require.NoError(t, err)
 
 		// set logo light
 		before := time.Now()
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
+		client := resty.New()
+		out, err := client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
@@ -557,36 +555,38 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// add label policy
-		label := management.AddCustomLabelPolicyRequest{
-			PrimaryColor:        "#055090",
-			HideLoginNameSuffix: false,
-			WarnColor:           "#055090",
-			BackgroundColor:     "#055090",
-			FontColor:           "#055090",
-			PrimaryColorDark:    "#055090",
-			BackgroundColorDark: "#055090",
-			WarnColorDark:       "#055090",
-			FontColorDark:       "#055090",
-			DisableWatermark:    false,
-			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		}
-		setLabelPolicyPayload, err := json.Marshal(&label)
-		require.NoError(t, err)
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		// // add label policy
+		// label := management.AddCustomLabelPolicyRequest{
+		// 	PrimaryColor:        "#055090",
+		// 	HideLoginNameSuffix: false,
+		// 	WarnColor:           "#055090",
+		// 	BackgroundColor:     "#055090",
+		// 	FontColor:           "#055090",
+		// 	PrimaryColorDark:    "#055090",
+		// 	BackgroundColorDark: "#055090",
+		// 	WarnColorDark:       "#055090",
+		// 	FontColorDark:       "#055090",
+		// 	DisableWatermark:    false,
+		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+		// }
+		// setLabelPolicyPayload, err := json.Marshal(&label)
+		// require.NoError(t, err)
+		// client := resty.New()
+		// out, err := client.R().SetAuthToken(token).
+		// 	SetBody(setLabelPolicyPayload).
+		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
+		// require.NoError(t, err)
+		// require.Equal(t, 200, out.StatusCode())
+		// require.Equal(t, 200, out.StatusCode())
 
 		// set logo dark
 		before := time.Now()
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
+		client := resty.New()
+		out, err := client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo/dark")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
@@ -614,35 +614,36 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// add label policy
-		label := management.AddCustomLabelPolicyRequest{
-			PrimaryColor:        "#055090",
-			HideLoginNameSuffix: false,
-			WarnColor:           "#055090",
-			BackgroundColor:     "#055090",
-			FontColor:           "#055090",
-			PrimaryColorDark:    "#055090",
-			BackgroundColorDark: "#055090",
-			WarnColorDark:       "#055090",
-			FontColorDark:       "#055090",
-			DisableWatermark:    false,
-			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		}
-		setLabelPolicyPayload, err := json.Marshal(&label)
-		require.NoError(t, err)
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		// // add label policy
+		// label := management.AddCustomLabelPolicyRequest{
+		// 	PrimaryColor:        "#055090",
+		// 	HideLoginNameSuffix: false,
+		// 	WarnColor:           "#055090",
+		// 	BackgroundColor:     "#055090",
+		// 	FontColor:           "#055090",
+		// 	PrimaryColorDark:    "#055090",
+		// 	BackgroundColorDark: "#055090",
+		// 	WarnColorDark:       "#055090",
+		// 	FontColorDark:       "#055090",
+		// 	DisableWatermark:    false,
+		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+		// }
+		// setLabelPolicyPayload, err := json.Marshal(&label)
+		// require.NoError(t, err)
+		// client := resty.New()
+		// out, err := client.R().SetAuthToken(token).
+		// 	SetBody(setLabelPolicyPayload).
+		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
+		// require.NoError(t, err)
+		// require.Equal(t, 200, out.StatusCode())
 
 		// set logo light
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
+		client := resty.New()
+		out, err := client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// check light logo set
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -662,6 +663,7 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			Delete("http://localhost:8080" + "/admin/v1" + "/policies/label/logo")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
 		// check light logo removed
@@ -688,36 +690,35 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// add label policy
-		label := management.AddCustomLabelPolicyRequest{
-			PrimaryColor:        "#055090",
-			HideLoginNameSuffix: false,
-			WarnColor:           "#055090",
-			BackgroundColor:     "#055090",
-			FontColor:           "#055090",
-			PrimaryColorDark:    "#055090",
-			BackgroundColorDark: "#055090",
-			WarnColorDark:       "#055090",
-			FontColorDark:       "#055090",
-			DisableWatermark:    false,
-			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		}
-		setLabelPolicyPayload, err := json.Marshal(&label)
-		require.NoError(t, err)
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		// // add label policy
+		// label := management.AddCustomLabelPolicyRequest{
+		// 	PrimaryColor:        "#055090",
+		// 	HideLoginNameSuffix: false,
+		// 	WarnColor:           "#055090",
+		// 	BackgroundColor:     "#055090",
+		// 	FontColor:           "#055090",
+		// 	PrimaryColorDark:    "#055090",
+		// 	BackgroundColorDark: "#055090",
+		// 	WarnColorDark:       "#055090",
+		// 	FontColorDark:       "#055090",
+		// 	DisableWatermark:    false,
+		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+		// }
+		// setLabelPolicyPayload, err := json.Marshal(&label)
+		// require.NoError(t, err)
+		// client := resty.New()
+		// out, err := client.R().SetAuthToken(token).
+		// 	SetBody(setLabelPolicyPayload).
+		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
+		// require.NoError(t, err)
 
 		// set logo dark
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
+		client := resty.New()
+		out, err := client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo/dark")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 
 		// check dark logo set
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -737,7 +738,7 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			Delete("http://localhost:8080" + "/admin/v1" + "/policies/label/logo_dark")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>> out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
 		// check dark logo removed
@@ -764,36 +765,37 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// add label policy
-		label := management.AddCustomLabelPolicyRequest{
-			PrimaryColor:        "#055090",
-			HideLoginNameSuffix: false,
-			WarnColor:           "#055090",
-			BackgroundColor:     "#055090",
-			FontColor:           "#055090",
-			PrimaryColorDark:    "#055090",
-			BackgroundColorDark: "#055090",
-			WarnColorDark:       "#055090",
-			FontColorDark:       "#055090",
-			DisableWatermark:    false,
-			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		}
-		setLabelPolicyPayload, err := json.Marshal(&label)
-		require.NoError(t, err)
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		// // add label policy
+		// label := management.AddCustomLabelPolicyRequest{
+		// 	PrimaryColor:        "#055090",
+		// 	HideLoginNameSuffix: false,
+		// 	WarnColor:           "#055090",
+		// 	BackgroundColor:     "#055090",
+		// 	FontColor:           "#055090",
+		// 	PrimaryColorDark:    "#055090",
+		// 	BackgroundColorDark: "#055090",
+		// 	WarnColorDark:       "#055090",
+		// 	FontColorDark:       "#055090",
+		// 	DisableWatermark:    false,
+		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+		// }
+		// setLabelPolicyPayload, err := json.Marshal(&label)
+		// require.NoError(t, err)
+		// client := resty.New()
+		// out, err := client.R().SetAuthToken(token).
+		// 	SetBody(setLabelPolicyPayload).
+		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
+		// require.NoError(t, err)
+		// require.Equal(t, 200, out.StatusCode())
 
 		// set icon light
 		before := time.Now()
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
+		client := resty.New()
+		out, err := client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/icon")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
@@ -820,36 +822,37 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// add label policy
-		label := management.AddCustomLabelPolicyRequest{
-			PrimaryColor:        "#055090",
-			HideLoginNameSuffix: false,
-			WarnColor:           "#055090",
-			BackgroundColor:     "#055090",
-			FontColor:           "#055090",
-			PrimaryColorDark:    "#055090",
-			BackgroundColorDark: "#055090",
-			WarnColorDark:       "#055090",
-			FontColorDark:       "#055090",
-			DisableWatermark:    false,
-			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		}
-		setLabelPolicyPayload, err := json.Marshal(&label)
-		require.NoError(t, err)
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		// // add label policy
+		// label := management.AddCustomLabelPolicyRequest{
+		// 	PrimaryColor:        "#055090",
+		// 	HideLoginNameSuffix: false,
+		// 	WarnColor:           "#055090",
+		// 	BackgroundColor:     "#055090",
+		// 	FontColor:           "#055090",
+		// 	PrimaryColorDark:    "#055090",
+		// 	BackgroundColorDark: "#055090",
+		// 	WarnColorDark:       "#055090",
+		// 	FontColorDark:       "#055090",
+		// 	DisableWatermark:    false,
+		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+		// }
+		// setLabelPolicyPayload, err := json.Marshal(&label)
+		// require.NoError(t, err)
+		// client := resty.New()
+		// out, err := client.R().SetAuthToken(token).
+		// 	SetBody(setLabelPolicyPayload).
+		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
+		// require.NoError(t, err)
+		// require.Equal(t, 200, out.StatusCode())
 
 		// set icon dark
 		before := time.Now()
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
+		client := resty.New()
+		out, err := client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/icon/dark")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
@@ -876,34 +879,36 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// add label policy
-		label := management.AddCustomLabelPolicyRequest{
-			PrimaryColor:        "#055090",
-			HideLoginNameSuffix: false,
-			WarnColor:           "#055090",
-			BackgroundColor:     "#055090",
-			FontColor:           "#055090",
-			PrimaryColorDark:    "#055090",
-			BackgroundColorDark: "#055090",
-			WarnColorDark:       "#055090",
-			FontColorDark:       "#055090",
-			DisableWatermark:    false,
-			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		}
-		setLabelPolicyPayload, err := json.Marshal(&label)
-		require.NoError(t, err)
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		require.NoError(t, err)
+		// // add label policy
+		// label := management.AddCustomLabelPolicyRequest{
+		// 	PrimaryColor:        "#055090",
+		// 	HideLoginNameSuffix: false,
+		// 	WarnColor:           "#055090",
+		// 	BackgroundColor:     "#055090",
+		// 	FontColor:           "#055090",
+		// 	PrimaryColorDark:    "#055090",
+		// 	BackgroundColorDark: "#055090",
+		// 	WarnColorDark:       "#055090",
+		// 	FontColorDark:       "#055090",
+		// 	DisableWatermark:    false,
+		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+		// }
+		// setLabelPolicyPayload, err := json.Marshal(&label)
+		// require.NoError(t, err)
+		// client := resty.New()
+		// out, err := client.R().SetAuthToken(token).
+		// 	SetBody(setLabelPolicyPayload).
+		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
+		// require.NoError(t, err)
+		// require.Equal(t, 200, out.StatusCode())
 
 		// set icon light
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
+		client := resty.New()
+		out, err := client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/icon")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// check light icon set
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -923,7 +928,7 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			Delete("http://localhost:8080" + "/admin/v1" + "/policies/label/icon")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>> out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
 		// check light icon removed
@@ -951,33 +956,35 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		require.NoError(t, err)
 
 		// add label policy
-		label := management.AddCustomLabelPolicyRequest{
-			PrimaryColor:        "#055090",
-			HideLoginNameSuffix: false,
-			WarnColor:           "#055090",
-			BackgroundColor:     "#055090",
-			FontColor:           "#055090",
-			PrimaryColorDark:    "#055090",
-			BackgroundColorDark: "#055090",
-			WarnColorDark:       "#055090",
-			FontColorDark:       "#055090",
-			DisableWatermark:    false,
-			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		}
-		setLabelPolicyPayload, err := json.Marshal(&label)
-		require.NoError(t, err)
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		require.NoError(t, err)
+		// label := management.AddCustomLabelPolicyRequest{
+		// 	PrimaryColor:        "#055090",
+		// 	HideLoginNameSuffix: false,
+		// 	WarnColor:           "#055090",
+		// 	BackgroundColor:     "#055090",
+		// 	FontColor:           "#055090",
+		// 	PrimaryColorDark:    "#055090",
+		// 	BackgroundColorDark: "#055090",
+		// 	WarnColorDark:       "#055090",
+		// 	FontColorDark:       "#055090",
+		// 	DisableWatermark:    false,
+		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+		// }
+		// setLabelPolicyPayload, err := json.Marshal(&label)
+		// require.NoError(t, err)
+		// client := resty.New()
+		// out, err := client.R().SetAuthToken(token).
+		// 	SetBody(setLabelPolicyPayload).
+		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
+		// require.NoError(t, err)
+		// require.Equal(t, 200, out.StatusCode())
 
 		// set icon dark
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
+		client := resty.New()
+		out, err := client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/icon/dark")
 		require.NoError(t, err)
+		require.Equal(t, 200, out.StatusCode())
 
 		// check dark icon set
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
@@ -998,7 +1005,7 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			Delete("http://localhost:8080" + "/admin/v1" + "/policies/label/icon_dark")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>> out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
 		// check dark icon removed
@@ -1027,36 +1034,37 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// add label policy
-		label := management.AddCustomLabelPolicyRequest{
-			PrimaryColor:        "#055090",
-			HideLoginNameSuffix: false,
-			WarnColor:           "#055090",
-			BackgroundColor:     "#055090",
-			FontColor:           "#055090",
-			PrimaryColorDark:    "#055090",
-			BackgroundColorDark: "#055090",
-			WarnColorDark:       "#055090",
-			FontColorDark:       "#055090",
-			DisableWatermark:    false,
-			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		}
-		setLabelPolicyPayload, err := json.Marshal(&label)
-		require.NoError(t, err)
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		require.NoError(t, err)
+		// // add label policy
+		// label := management.AddCustomLabelPolicyRequest{
+		// 	PrimaryColor:        "#055090",
+		// 	HideLoginNameSuffix: false,
+		// 	WarnColor:           "#055090",
+		// 	BackgroundColor:     "#055090",
+		// 	FontColor:           "#055090",
+		// 	PrimaryColorDark:    "#055090",
+		// 	BackgroundColorDark: "#055090",
+		// 	WarnColorDark:       "#055090",
+		// 	FontColorDark:       "#055090",
+		// 	DisableWatermark:    false,
+		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+		// }
+		// setLabelPolicyPayload, err := json.Marshal(&label)
+		// require.NoError(t, err)
+		// client := resty.New()
+		// out, err := client.R().SetAuthToken(token).
+		// 	SetBody(setLabelPolicyPayload).
+		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
+		// require.NoError(t, err)
+		// require.Equal(t, 200, out.StatusCode())
 
 		// set logo light
 		before := time.Now()
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
+		client := resty.New()
+		out, err := client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(font)).
 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/font")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
@@ -1083,35 +1091,36 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// add label policy
-		label := management.AddCustomLabelPolicyRequest{
-			PrimaryColor:        "#055090",
-			HideLoginNameSuffix: false,
-			WarnColor:           "#055090",
-			BackgroundColor:     "#055090",
-			FontColor:           "#055090",
-			PrimaryColorDark:    "#055090",
-			BackgroundColorDark: "#055090",
-			WarnColorDark:       "#055090",
-			FontColorDark:       "#055090",
-			DisableWatermark:    false,
-			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		}
-		setLabelPolicyPayload, err := json.Marshal(&label)
-		require.NoError(t, err)
-		client := resty.New()
-		out, err := client.R().SetAuthToken(token).
-			SetBody(setLabelPolicyPayload).
-			Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		require.NoError(t, err)
+		// // add label policy
+		// label := management.AddCustomLabelPolicyRequest{
+		// 	PrimaryColor:        "#055090",
+		// 	HideLoginNameSuffix: false,
+		// 	WarnColor:           "#055090",
+		// 	BackgroundColor:     "#055090",
+		// 	FontColor:           "#055090",
+		// 	PrimaryColorDark:    "#055090",
+		// 	BackgroundColorDark: "#055090",
+		// 	WarnColorDark:       "#055090",
+		// 	FontColorDark:       "#055090",
+		// 	DisableWatermark:    false,
+		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+		// }
+		// setLabelPolicyPayload, err := json.Marshal(&label)
+		// require.NoError(t, err)
+		// client := resty.New()
+		// out, err := client.R().SetAuthToken(token).
+		// 	SetBody(setLabelPolicyPayload).
+		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
+		// require.NoError(t, err)
+		// require.Equal(t, 200, out.StatusCode())
 
 		// set logo light
-		client = resty.New()
-		out, err = client.R().SetAuthToken(token).
+		client := resty.New()
+		out, err := client.R().SetAuthToken(token).
 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(font)).
 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/font")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 
 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -1130,7 +1139,7 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 		out, err = client.R().SetAuthToken(token).
 			Delete("http://localhost:8080" + "/admin/v1" + "/policies/label/font")
 		require.NoError(t, err)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>> out = %+v\n", out)
+		require.Equal(t, 200, out.StatusCode())
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 
 		// check font policy removed
@@ -1332,7 +1341,7 @@ func TestServer_TestLabelSettingsReduces(t *testing.T) {
 	// 		SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
 	// 		Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo")
 	// 	require.NoError(t, err)
-	// 	fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] out = %+v\n", out)
+	// require.Equal(t, 200, out.StatusCode())
 
 	// 	client = resty.New()
 	// 	out, err = client.R().SetAuthToken(token).
@@ -1611,7 +1620,6 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 				newInstance.ID(),
 				nil)
 			require.NoError(t, err)
-			fmt.Printf("[DEBUGPRINT] [:1] setting = %+v\n", setting)
 
 			// event instance.policy.domain.added
 			assert.Equal(t, true, setting.Settings.IsDefault)
@@ -1817,7 +1825,6 @@ func TestServer_TestSecuritySettingsReduces(t *testing.T) {
 				newInstance.ID(),
 				nil)
 			require.NoError(t, err)
-			fmt.Printf("[DEBUGPRINT] [:1] setting = %+v\n", setting)
 
 			// event instance.policy.security.set
 			assert.Equal(t, true, setting.Settings.EnableIframeEmbedding)

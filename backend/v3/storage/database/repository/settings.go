@@ -430,6 +430,35 @@ func (s *settings) Delete(ctx context.Context, instanceID string, orgID *string,
 	return s.client.Exec(ctx, builder.String(), builder.Args()...)
 }
 
+func (s *settings) DeleteSettingsForInstance(ctx context.Context, instanceID string) (int64, error) {
+	builder := database.StatementBuilder{}
+
+	builder.WriteString(`DELETE FROM zitadel.settings`)
+
+	conditions := []database.Condition{
+		s.InstanceIDCondition(instanceID),
+	}
+	writeCondition(&builder, database.And(conditions...))
+
+	return s.client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
+func (s *settings) DeleteSettingsForOrg(ctx context.Context, orgID *string) (int64, error) {
+	if orgID == nil {
+		return 0, domain.ErrNoOrgIdSpecified
+	}
+	builder := database.StatementBuilder{}
+
+	builder.WriteString(`DELETE FROM zitadel.settings`)
+
+	conditions := []database.Condition{
+		s.OrgIDCondition(orgID),
+	}
+	writeCondition(&builder, database.And(conditions...))
+
+	return s.client.Exec(ctx, builder.String(), builder.Args()...)
+}
+
 func scanSetting(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Setting, error) {
 	setting := &domain.Setting{}
 
