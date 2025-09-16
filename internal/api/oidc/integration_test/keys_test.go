@@ -86,7 +86,7 @@ func TestServer_Keys(t *testing.T) {
 				err = json.NewDecoder(resp.Body).Decode(got)
 				require.NoError(ttt, err)
 
-				assert.Len(t, got.Keys, tt.wantLen)
+				assert.Len(ttt, got.Keys, tt.wantLen)
 				for _, key := range got.Keys {
 					_, ok := key.Key.(*rsa.PublicKey)
 					require.True(ttt, ok)
