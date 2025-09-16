@@ -120,7 +120,6 @@ func newProjectRoles(projectID string, grants []query.UserGrant, requestedRoles 
 				checkGrantedRoles(roles, grant, requestedRole, grant.ProjectID == projectID)
 			}
 		}
-		// return roles
 	}
 	// no specific roles were requested, so convert any grants into roles
 	for _, grant := range grants {
