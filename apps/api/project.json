@@ -2,60 +2,16 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "name": "@zitadel/api",
     "projectType": "application",
+    "namedInputs": {
+        "sources": [
+            "{workspaceRoot}/cmd/**/*.go",
+            "{workspaceRoot}/internal/**/*.go",
+            "{workspaceRoot}/proto/**/*.go",
+            "{workspaceRoot}/pkg/**/*.go",
+            "{workspaceRoot}/main.go"
+        ]
+    },
     "targets": {
-        "build": {
-            "description": "Build the Zitadel API application",
-            "dependsOn": [
-                "generate"
-            ],
-            "command": "make compile_pipeline",
-            "inputs": [
-                { "runtime": "go env GOOS" },
-                { "runtime": "go env GOARCH" },
-                "{workspaceRoot}/cmd/**/*.go",
-                "{workspaceRoot}/internal/**/*.go",
-                "{workspaceRoot}/proto/**/*.go",
-                "{workspaceRoot}/pkg/**/*.go",
-                "{workspaceRoot}/go*",
-                "{workspaceRoot}/main.go",
-                "{workspaceRoot}/Makefile",
-                "!{workspaceRoot}/internal/integration/**",
-                "!{workspaceRoot}/**/*_test.go",
-                "!{workspaceRoot}/**/integration_test/**/*"
-            ],
-            "outputs": [
-                "{workspaceRoot}/.artifacts/bin/*/*/zitadel"
-            ]
-        },
-        "generate": {
-            "dependsOn": [
-                "@zitadel/console:build"
-            ],
-            "description": "Generate the code needed to start the API",
-            "command": "make api_build && make console_move",
-            "inputs": [
-                "{workspaceRoot}/go.*",
-                "{workspaceRoot}/openapi/**/*",
-                "{workspaceRoot}/cmd/**/*", 
-                "{workspaceRoot}/pkg/grpc/**/*.go", 
-                "{workspaceRoot}/proto/**/*",
-                "{workspaceRoot}/internal/**/*",
-                "{workspaceRoot}/backend/**/*"
-            ],
-            "outputs": [
-                "{workspaceRoot}/backend",
-                "{workspaceRoot}/internal/statik/statik.go",
-                "{workspaceRoot}/internal/notification/statik/statik.go",
-                "{workspaceRoot}/internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*",
-                "{workspaceRoot}/internal/api/ui/login/statik/statik.go",
-                "{workspaceRoot}/internal/api/assets/authz.go",
-                "{workspaceRoot}/internal/api/assets/router.go",
-                "{workspaceRoot}/internal/api/ui/console/static",
-                "{workspaceRoot}/openapi/v2",
-                "{workspaceRoot}/pkg/grpc/**/*.pb.*",
-                "{workspaceRoot}/pkg/grpc/**/*.connect.go"
-            ]
-        },
         "prod": {
             "continuous": true,
             "dependsOn": [
@@ -67,6 +23,230 @@
                 }
             },
             "command": "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\"; ./.artifacts/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/zitadel start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'"
+        },        
+        "build": {
+            "description": "Build the Zitadel API application",
+            "dependsOn": [
+                "generate"
+            ],
+            "command": "bash -c 'ZITADEL_NOW=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\"); ZITADEL_VERSION=${VERSION:-development-${ZITADEL_NOW}}; COMMIT_SHA=${COMMIT_SHA:-$(git rev-parse --short HEAD)}; CGO_ENABLED=0 go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel -v -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=${COMMIT_SHA} -X github.com/zitadel/zitadel/cmd/build.date=${ZITADEL_NOW} -X github.com/zitadel/zitadel/cmd/build.version=${ZITADEL_VERSION}\"'",
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },
+                { "env": "VERSION" },
+                "sources",
+                "{workspaceRoot}/go*",
+                "!{workspaceRoot}/internal/integration/**",
+                "!{workspaceRoot}/**/*_test.go",
+                "!{workspaceRoot}/**/integration_test/**/*"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/*/*/zitadel"
+            ]
+        },
+        "generate": {
+            "description": "Generate the code needed to start the API",
+            "dependsOn": [
+                "generate-stubs",
+                "generate-statik",
+                "generate-console",
+                "generate-assets"
+            ]
+        },
+        "lint": {
+            "description": "Lint the Go code using golangci-lint",
+            "cache": true,
+            "inputs": [
+                "sources",
+                "{workspaceRoot}/.golangci.yaml"
+            ],
+            "command": "golangci-lint run --timeout 10m --config ./.golangci.yaml --out-format=github-actions"
+        },
+        "test-unit": {
+            "description": "Run the unit tests with coverage",
+            "cache": true,
+            "inputs": [
+                "sources",
+                "{workspaceRoot}/go*"
+            ],
+            "command": "go test -race -coverprofile=profile.cov -coverpkg=./internal/...  ./..."
+        },
+        "generate-console": {
+            "description": "Build the console and copy the static files to the api",
+            "cache": true,
+            "dependsOn": [
+                "@zitadel/console:build"
+            ],
+            "command": "cp -r console/dist/console/* internal/api/ui/console/static",
+            "outputs": [
+                "{workspaceRoot}/internal/api/ui/console/static/**"
+            ]
+        },
+        "generate-stubs": {
+            "description": "Generate the gRPC and OpenAPI stubs from the proto files",
+            "cache": true,
+            "dependsOn": [
+                "generate-stubs-build",
+                "generate-stubs-install"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" buf generate",
+                    "mkdir -p pkg/grpc openapi/v2/zitadel",
+                    "cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/** pkg/grpc/",
+                    "cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel"
+                ]
+            },
+            "inputs": [
+                "{workspaceRoot}/proto/**/*",
+                "{workspaceRoot}/buf.gen.yaml",
+                "{workspaceRoot}/buf.yaml"                
+            ],
+            "outputs": [
+                "{workspaceRoot}/pkg/grpc/**/*",
+                "{workspaceRoot}/openapi/v2/zitadel/**/*"
+            ]            
+        },
+        "generate-stubs-build": {
+            "description": "Install protoc stub generators",
+            "cache": true,
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "mkdir -p .artifacts/bin",
+                    "go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/protoc-gen-authoption internal/protoc/protoc-gen-authoption/main.go",
+                    "go build -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/protoc-gen-zitadel internal/protoc/protoc-gen-zitadel/main.go"
+                ]
+            },
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },                
+                "{workspaceRoot}/internal/protoc/protoc-gen-authoption/**/*",
+                "{workspaceRoot}/internal/protoc/protoc-gen-zitadel/**/*"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-authoption",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-zitadel"
+            ]
+        },
+        "generate-stubs-install": {
+            "description": "Install protoc stub generators",
+            "cache": true,
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": true,
+                "commands": [
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.1",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.22.0",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.22.0",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/envoyproxy/protoc-gen-validate@v1.1.0",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/bufbuild/buf/cmd/buf@v1.45.0",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1"
+                ]
+            },
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-go",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-go-grpc",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-grpc-gateway",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-openapiv2",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-validate",
+                "{workspaceRoot}/.artifacts/bin/*/*/buf",
+                "{workspaceRoot}/.artifacts/bin/*/*/protoc-gen-connect-go"
+            ]
+        },
+        "generate-statik": {
+            "description": "Generate statik files for embedding static resources",
+            "cache": true,
+            "dependsOn": [
+                "generate-statik-install"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/api/ui/login/static/resources/generate.go",
+                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/api/ui/login/statik/generate.go",
+                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/notification/statik/generate.go",
+                    "PATH=\"$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH):$PATH\" go generate internal/statik/generate.go"
+                ]
+            },
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },
+                "{workspaceRoot}/internal/statik/generate.go",
+                "{workspaceRoot}/internal/notification/statik/generate.go",
+                "{workspaceRoot}/internal/api/ui/login/static/resources/generate.go",
+                "{workspaceRoot}/internal/api/ui/login/statik/generate.go"
+            ],
+            "outputs": [
+                "{workspaceRoot}/internal/statik/statik.go",
+                "{workspaceRoot}/internal/notification/statik/statik.go",
+                "{workspaceRoot}/internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*",
+                "{workspaceRoot}/internal/api/ui/login/statik/statik.go"
+            ]
+        },
+        "generate-statik-install": {
+            "description": "Install statik binary for embedding static files",
+            "cache": true,
+            "command": "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/rakyll/statik@v0.1.7",
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/*/*/statik"
+            ]
+        },        
+        "generate-assets": {
+            "description": "Generate asset routes and documentation",
+            "cache": true,
+            "command": "mkdir -p docs/apis/assets && go run internal/api/assets/generator/asset_generator.go -directory=internal/api/assets/generator/ -assets=docs/apis/assets/assets.md",
+            "inputs": [
+                "{workspaceRoot}/internal/api/assets/generator/asset_generator.go"
+            ],
+            "outputs": [
+                "{workspaceRoot}/internal/api/assets/authz.go",
+                "{workspaceRoot}/internal/api/assets/router.go",
+                "{workspaceRoot}/docs/apis/assets/assets.md"
+            ]
+        },
+        "generate-go": {
+            "description": "Generate Go code",
+            "dependsOn": [
+                "generate-go-install"
+            ],
+            "command": "go generate ./..."
+        },
+        "generate-go-install": {
+            "description": "Install Go binaries needed to generate Go code",
+            "cache": true,
+            "dependsOn": [
+                "generate-statik-install"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install github.com/dmarkham/enumer@v1.5.11",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install go.uber.org/mock/mockgen@v0.4.0",
+                    "GOBIN=$(pwd)/.artifacts/bin/$(go env GOOS)/$(go env GOARCH) go install golang.org/x/tools/cmd/stringer@v0.36.0"
+                ]
+            },
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" }
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/*/*/enumer",
+                "{workspaceRoot}/.artifacts/bin/*/*/mockgen",
+                "{workspaceRoot}/.artifacts/bin/*/*/stringer"
+            ]
         }
     }
 }
