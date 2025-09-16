@@ -56,8 +56,8 @@ func (c *Commands) GenerateRecoveryCodes(ctx context.Context, userID string, cou
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-7c0nx", "Errors.User.RecoveryCodes.CountInvalid")
 	}
 
-	if !c.multifactors.RecoveryCodes.Format.Valid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-7c0nx", "Errors.User.RecoveryCodes.FormatInvalid")
+	if err := c.multifactors.RecoveryCodes.Valid(); err != nil {
+		return nil, err
 	}
 
 	recoveryCodeWriteModel := NewHumanRecoveryCodeWriteModel(userID, resourceOwner)
@@ -69,7 +69,7 @@ func (c *Commands) GenerateRecoveryCodes(ctx context.Context, userID string, cou
 		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-8f2k9", "Errors.User.MFA.RecoveryCodes.MaxCountExceeded")
 	}
 
-	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(count, c.multifactors.RecoveryCodes.Format, c.secretHasher)
+	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(count, c.multifactors.RecoveryCodes, c.secretHasher)
 	if err != nil {
 		return nil, err
 	}

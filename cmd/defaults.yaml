@@ -735,9 +735,13 @@ SystemDefaults:
       Issuer: "ZITADEL" # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_OTP_ISSUER
     RecoveryCodes:
       # The maximum number of recovery codes that a user can hold at any given time
-      MaxCount: 5 # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_MAXCOUNT
-      # The format of the recovery codes, supported: uuid, sonyflake
-      Format: sonyflake # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_FORMAT
+      MaxCount: 10 # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_MAXCOUNT
+      # The format of the recovery codes, supported: uuid, alphanumeric
+      Format: alphanumeric # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_FORMAT
+      # Length of the recovery codes (only applies to alphanumeric format)
+      Length: 10 # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_LENGTH
+      # Whether to include hyphens in the recovery codes (alphanumeric: hyphen in middle, uuid: keep/remove all hyphens)
+      WithHyphen: true # ZITADEL_SYSTEMDEFAULTS_MULTIFACTORS_RECOVERYCODES_WITHHYPHEN
   DomainVerification:
     VerificationGenerator:
       Length: 32 # ZITADEL_SYSTEMDEFAULTS_DOMAINVERIFICATION_VERIFICATIONGENERATOR_LENGTH

@@ -1,9 +1,11 @@
 package domain
 
 import (
+	"strings"
+
 	"github.com/google/uuid"
+
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -30,7 +32,7 @@ func RecoveryCodesFromRaw(codes []string, hasher *crypto.Hasher) ([]string, erro
 	return hashedCodes, nil
 }
 
-func GenerateRecoveryCodes(count int, format RecoveryCodeFormat, hasher *crypto.Hasher) ([]string, []string, error) {
+func GenerateRecoveryCodes(count int, config RecoveryCodesConfig, hasher *crypto.Hasher) ([]string, []string, error) {
 	if count <= 0 {
 		return nil, nil, zerrors.ThrowInvalidArgument(nil, "DOMAIN-7rp5j", "Errors.User.MFA.RecoveryCodes.InvalidCount")
 	}
@@ -38,7 +40,7 @@ func GenerateRecoveryCodes(count int, format RecoveryCodeFormat, hasher *crypto.
 	hashedCodes, rawCodes := make([]string, count), make([]string, count)
 
 	for i := 0; i < count; i++ {
-		rawCode, err := makeRawCode(format)
+		rawCode, err := makeRawCode(config)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -53,11 +55,41 @@ func GenerateRecoveryCodes(count int, format RecoveryCodeFormat, hasher *crypto.
 	return hashedCodes, rawCodes, nil
 }
 
-func makeRawCode(format RecoveryCodeFormat) (string, error) {
-	if format == RecoveryCodeFormatSonyFlake {
-		return id.SonyFlakeGenerator().Next()
+func makeRawCode(config RecoveryCodesConfig) (string, error) {
+	switch config.Format {
+	case RecoveryCodeFormatAlphanumeric:
+		return generateAlphanumericCode(config.Length, config.WithHyphen)
+	case RecoveryCodeFormatUUID:
+		code := uuid.New().String()
+		if !config.WithHyphen {
+			code = strings.ReplaceAll(code, "-", "")
+		}
+		return code, nil
+	default:
+		return "", zerrors.ThrowInvalidArgument(nil, "DOMAIN-g52kn", "Errors.User.MFA.RecoveryCodes.FormatInvalid")
 	}
-	return uuid.New().String(), nil
+}
+
+func generateAlphanumericCode(length int, withHyphen bool) (string, error) {
+	if length <= 0 {
+		// This should never happen
+		return "", zerrors.ThrowInvalidArgument(nil, "DOMAIN-68mvq", "Errors.User.MFA.RecoveryCodes.LengthInvalid")
+	}
+
+	// lower-cased base32 character set https://www.crockford.com/base32.html
+	chars := []rune("0123456789abcdefghjkmnpqrstvwxyz")
+
+	code, err := crypto.GenerateRandomString(uint(length), chars)
+	if err != nil {
+		return "", err
+	}
+
+	if withHyphen && length > 2 {
+		mid := length / 2
+		return code[:mid] + "-" + code[mid:], nil
+	}
+
+	return code, nil
 }
 
 func ValidateRecoveryCode(code string, recoveryCodes *HumanRecoveryCodes, hasher *crypto.Hasher) (string, error) {

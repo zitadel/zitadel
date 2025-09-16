@@ -1318,7 +1318,11 @@ func TestCheckRecoveryCode(t *testing.T) {
 	orgAgg := &org.NewAggregate("org1").Aggregate
 
 	hasher := mockPasswordHasher("x")
-	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(1, domain.RecoveryCodeFormatUUID, hasher)
+	hashedCodes, rawCodes, err := domain.GenerateRecoveryCodes(1, domain.RecoveryCodesConfig{
+		Format:   domain.RecoveryCodeFormatUUID,
+		MaxCount: 10,
+		Length:   10,
+	}, hasher)
 	require.NoError(t, err)
 	validCode := rawCodes[0]
 	invalidCode := "invalid-code"

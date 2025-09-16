@@ -34,8 +34,10 @@ type OTPConfig struct {
 }
 
 type RecoveryCodesConfig struct {
-	MaxCount int
-	Format   string
+	MaxCount   int
+	Format     string
+	Length     int
+	WithHyphen bool
 }
 
 type DomainVerification struct {
