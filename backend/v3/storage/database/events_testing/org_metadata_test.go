@@ -52,23 +52,23 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 			OrganizationId: org.GetId(),
 			Metadata: []*v2beta.Metadata{
 				{
-					Key:   "test-bool",
+					Key:   "test-1-bool",
 					Value: []byte("false"),
 				},
 				{
-					Key:   "test-number",
+					Key:   "test-2-number",
 					Value: []byte("123"),
 				},
 				{
-					Key:   "test-object",
+					Key:   "test-3-object",
 					Value: []byte(`{"text":"value", "number":123, "bool": false}`),
 				},
 				{
-					Key:   "test-text",
+					Key:   "test-4-text",
 					Value: []byte(`"test-value"`),
 				},
 				{
-					Key:   "test-bytes",
+					Key:   "test-5-bytes",
 					Value: []byte(`test-value`),
 				},
 			},
@@ -79,7 +79,7 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 		t.Cleanup(func() {
 			_, err := OrgClient.DeleteOrganizationMetadata(CTX, &v2beta.DeleteOrganizationMetadataRequest{
 				OrganizationId: org.GetId(),
-				Keys:           []string{"test-text", "test-number", "test-bool", "test-object"},
+				Keys:           []string{"test-1-bool", "test-2-number", "test-3-object", "test-4-text", "test-5-bytes"},
 			})
 			if err != nil {
 				t.Logf("Failed to delete metadata on cleanup: %v", err)
@@ -108,35 +108,35 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[0].InstanceID)
 		assert.Equal(t, org.Id, gottenMetadata[0].OrgID)
-		assert.Equal(t, "test-bool", gottenMetadata[0].Key)
+		assert.Equal(t, "test-1-bool", gottenMetadata[0].Key)
 		assert.Equal(t, []byte(`false`), gottenMetadata[0].Value)
 		assert.WithinRange(t, gottenMetadata[0].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[0].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[1].InstanceID)
 		assert.Equal(t, org.Id, gottenMetadata[1].OrgID)
-		assert.Equal(t, "test-number", gottenMetadata[1].Key)
+		assert.Equal(t, "test-2-number", gottenMetadata[1].Key)
 		assert.Equal(t, []byte(`123`), gottenMetadata[1].Value)
 		assert.WithinRange(t, gottenMetadata[1].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[1].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[2].InstanceID)
 		assert.Equal(t, org.Id, gottenMetadata[2].OrgID)
-		assert.Equal(t, "test-object", gottenMetadata[2].Key)
+		assert.Equal(t, "test-3-object", gottenMetadata[2].Key)
 		assert.JSONEq(t, `{"text":"value", "number":123, "bool": false}`, string(gottenMetadata[2].Value))
 		assert.WithinRange(t, gottenMetadata[2].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[2].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[3].InstanceID)
 		assert.Equal(t, org.Id, gottenMetadata[3].OrgID)
-		assert.Equal(t, "test-text", gottenMetadata[3].Key)
+		assert.Equal(t, "test-4-text", gottenMetadata[3].Key)
 		assert.Equal(t, []byte(`"test-value"`), gottenMetadata[3].Value)
 		assert.WithinRange(t, gottenMetadata[3].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[3].UpdatedAt, beforeAdd, afterAdd)
 
 		assert.Equal(t, Instance.Instance.Id, gottenMetadata[4].InstanceID)
 		assert.Equal(t, org.Id, gottenMetadata[4].OrgID)
-		assert.Equal(t, "test-text", gottenMetadata[4].Key)
+		assert.Equal(t, "test-5-bytes", gottenMetadata[4].Key)
 		assert.Equal(t, []byte(`test-value`), gottenMetadata[4].Value)
 		assert.WithinRange(t, gottenMetadata[4].CreatedAt, beforeAdd, afterAdd)
 		assert.WithinRange(t, gottenMetadata[4].UpdatedAt, beforeAdd, afterAdd)
@@ -204,6 +204,15 @@ func TestServer_TestOrgMetadataReduces(t *testing.T) {
 			Name: "some funny name",
 		})
 		require.NoError(t, err)
+
+		t.Cleanup(func() {
+			_, err := OrgClient.DeleteOrganization(CTX, &v2beta.DeleteOrganizationRequest{
+				Id: org.Id,
+			})
+			if err != nil {
+				t.Logf("Failed to delete organization on cleanup: %v", err)
+			}
+		})
 
 		_, err = OrgClient.SetOrganizationMetadata(CTX, &v2beta.SetOrganizationMetadataRequest{
 			OrganizationId: org.GetId(),
