@@ -17,6 +17,9 @@ type orgMetadata struct {
 	org *org
 }
 
+const queryOrganizationMetadataStmt = `SELECT instance_id, org_id, key, value, created_at, updated_at ` +
+	`FROM zitadel.org_metadata`
+
 // Get implements [domain.OrganizationMetadataRepository].
 func (o *orgMetadata) Get(ctx context.Context, opts ...database.QueryOption) (*domain.OrganizationMetadata, error) {
 	options := new(database.QueryOpts)
@@ -25,7 +28,7 @@ func (o *orgMetadata) Get(ctx context.Context, opts ...database.QueryOption) (*d
 	}
 
 	var builder database.StatementBuilder
-	builder.WriteString(queryOrganizationDomainStmt)
+	builder.WriteString(queryOrganizationMetadataStmt)
 	options.Write(&builder)
 
 	return scanOrganizationMetadata(ctx, o.client, &builder)
@@ -39,7 +42,7 @@ func (o *orgMetadata) List(ctx context.Context, opts ...database.QueryOption) ([
 	}
 
 	var builder database.StatementBuilder
-	builder.WriteString(queryOrganizationDomainStmt)
+	builder.WriteString(queryOrganizationMetadataStmt)
 	options.Write(&builder)
 
 	return scanOrganizationMetadataList(ctx, o.client, &builder)

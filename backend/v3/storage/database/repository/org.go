@@ -208,7 +208,8 @@ func (org) UpdatedAtColumn() database.Column {
 
 type rawOrg struct {
 	*domain.Organization
-	Domains JSONArray[domain.OrganizationDomain] `json:"domains,omitempty" db:"domains"`
+	Domains  JSONArray[domain.OrganizationDomain]   `json:"domains,omitempty" db:"domains"`
+	Metadata JSONArray[domain.OrganizationMetadata] `json:"metadata,omitempty" db:"metadata"`
 }
 
 func scanOrganization(ctx context.Context, querier database.Querier, builder *database.StatementBuilder) (*domain.Organization, error) {
@@ -222,6 +223,7 @@ func scanOrganization(ctx context.Context, querier database.Querier, builder *da
 		return nil, err
 	}
 	org.Organization.Domains = org.Domains
+	org.Organization.Metadata = org.Metadata
 
 	return org.Organization, nil
 }
@@ -241,6 +243,7 @@ func scanOrganizations(ctx context.Context, querier database.Querier, builder *d
 	for i, org := range orgs {
 		result[i] = org.Organization
 		result[i].Domains = org.Domains
+		result[i].Metadata = org.Metadata
 	}
 
 	return result, nil

@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"encoding/json"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
@@ -56,6 +58,11 @@ func (p *orgMetadataRelationalProjection) reduceSet(event eventstore.Event) (*ha
 		tx, ok := ex.(*sql.Tx)
 		if !ok {
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-xg4IJ", "reduce.wrong.db.pool %T", ex)
+		}
+		if !json.Valid(e.Value) {
+			logging.Info("invalid")
+		} else {
+			logging.Info("valid")
 		}
 		return repository.OrganizationRepository(v3_sql.SQLTx(tx)).Metadata(false).Set(ctx, &domain.OrganizationMetadata{
 			Metadata: domain.Metadata{
