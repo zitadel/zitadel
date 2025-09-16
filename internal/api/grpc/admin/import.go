@@ -504,6 +504,18 @@ func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 				logging.Debugf("successful user otp: %s", user.GetUserId())
 			}
 		}
+
+		if user.User.RecoveryCodes != nil && len(user.User.RecoveryCodes) > 0 {
+			logging.Debugf("import user recovery codes: %s", user.GetUserId())
+			if err := s.command.ImportHumanRecoveryCodes(ctx, user.UserId, org.GetOrgId(), user.User.RecoveryCodes); err != nil {
+				*errors = append(*errors, &admin_pb.ImportDataError{Type: "human_user_recovery_codes", Id: user.GetUserId(), Message: err.Error()})
+				if isCtxTimeout(ctx) {
+					return err
+				}
+			} else {
+				logging.Debugf("successful user recovery codes: %s", user.GetUserId())
+			}
+		}
 	}
 	return nil
 }
