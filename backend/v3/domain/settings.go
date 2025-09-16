@@ -23,6 +23,7 @@ const (
 	SettingTypeLockout
 	SettingTypeGeneral
 	SettingTypeSecurity
+	SettingTypeOrganization
 )
 
 type Setting struct {
@@ -117,8 +118,13 @@ type LabelSettings struct {
 	DisableWatermark    bool                 `json:"disableMsgPopup,omitempty"`
 	ThemeMode           LabelPolicyThemeMode `json:"themeMode,omitempty"`
 
-	LabelPolicyLightLogoURL string `json:"labelPolicyLightLogoURL,omitempty"`
-	LabelPolicyDarkLogoURL  string `json:"labelPolicyDarkLogoURL,omitempty"`
+	LabelPolicyLightLogoURL *string `json:"labelPolicyLightLogoURL,omitempty"`
+	LabelPolicyDarkLogoURL  *string `json:"labelPolicyDarkLogoURL,omitempty"`
+
+	LabelPolicyLightIconURL *string `json:"labelPolicyLightIconURL,omitempty"`
+	LabelPolicyDarkIconURL  *string `json:"labelPolicyDarkIconURL,omitempty"`
+
+	LabelPolicyFontURL *string `json:"labelPolicyLightFontURL,omitempty"`
 }
 
 type LabelSetting struct {
@@ -187,6 +193,17 @@ type SecuritySetting struct {
 	Settings SecuritySettings
 }
 
+type OrgSettings struct {
+	OrganizationScopedUsernames    bool     `json:"organizationScopedUsernames,omitempty"`
+	oldOrganizationScopedUsernames bool     `json:"oldOrganizationScopedUsernames,omitempty"`
+	usernameChanges                []string `json:"usernameChanges,omitempty"`
+}
+
+type OrgSetting struct {
+	*Setting
+	Settings OrgSettings
+}
+
 type settingsColumns interface {
 	IDColumn() database.Column
 	InstanceIDColumn() database.Column
@@ -243,6 +260,9 @@ type SettingsRepository interface {
 
 	GetDomain(ctx context.Context, instanceID string, orgID *string) (*DomainSetting, error)
 	UpdateDomain(ctx context.Context, setting *DomainSetting) (int64, error)
+
+	GetOrg(ctx context.Context, instanceID string, orgID *string) (*OrgSetting, error)
+	UpdateOrg(ctx context.Context, setting *OrgSetting) (int64, error)
 
 	Create(ctx context.Context, setting *Setting) error
 	// Update(ctx context.Context, id string, instanceID string, orgID *string, changes ...database.Change) (int64, error)

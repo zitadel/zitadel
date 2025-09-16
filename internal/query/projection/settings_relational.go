@@ -13,6 +13,7 @@ import (
 	v3_sql "github.com/zitadel/zitadel/backend/v3/storage/database/dialect/sql"
 	"github.com/zitadel/zitadel/backend/v3/storage/database/repository"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	settings "github.com/zitadel/zitadel/internal/repository/organization_settings"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 	"github.com/zitadel/zitadel/internal/zerrors"
 
@@ -92,7 +93,6 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  org.LabelPolicyRemovedEventType,
 					Reduce: s.reduceLabelPolicyRemoved,
 				},
-				// TODO
 				// {
 				// 	Event:  org.LabelPolicyActivatedEventType,
 				// 	Reduce: s.reduceLabelActivated,
@@ -101,46 +101,46 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  org.LabelPolicyLogoAddedEventType,
 					Reduce: s.reduceLabelLogoAdded,
 				},
-				// {
-				// 	Event:  org.LabelPolicyLogoRemovedEventType,
-				// 	Reduce: s.reduceLogoRemoved,
-				// },
-				// {
-				// 	Event:  org.LabelPolicyIconAddedEventType,
-				// 	Reduce: s.reduceIconAdded,
-				// },
-				// {
-				// 	Event:  org.LabelPolicyIconRemovedEventType,
-				// 	Reduce: s.reduceIconRemoved,
-				// },
-				// {
-				// 	Event:  org.LabelPolicyLogoDarkAddedEventType,
-				// 	Reduce: s.reduceLogoAdded,
-				// },
-				// {
-				// 	Event:  org.LabelPolicyLogoDarkRemovedEventType,
-				// 	Reduce: s.reduceLogoRemoved,
-				// },
-				// {
-				// 	Event:  org.LabelPolicyIconDarkAddedEventType,
-				// 	Reduce: s.reduceIconAdded,
-				// },
-				// {
-				// 	Event:  org.LabelPolicyIconDarkRemovedEventType,
-				// 	Reduce: s.reduceIconRemoved,
-				// },
-				// {
-				// 	Event:  org.LabelPolicyFontAddedEventType,
-				// 	Reduce: s.reduceFontAdded,
-				// },
-				// {
-				// 	Event:  org.LabelPolicyFontRemovedEventType,
-				// 	Reduce: s.reduceFontRemoved,
-				// },
-				// {
-				// 	Event:  org.LabelPolicyAssetsRemovedEventType,
-				// 	Reduce: s.reduceAssetsRemoved,
-				// },
+				{
+					Event:  org.LabelPolicyLogoRemovedEventType,
+					Reduce: s.reduceLogoRemoved,
+				},
+				{
+					Event:  org.LabelPolicyIconAddedEventType,
+					Reduce: s.reduceIconAdded,
+				},
+				{
+					Event:  org.LabelPolicyIconRemovedEventType,
+					Reduce: s.reduceIconRemoved,
+				},
+				{
+					Event:  org.LabelPolicyLogoDarkAddedEventType,
+					Reduce: s.reduceLabelLogoAdded,
+				},
+				{
+					Event:  org.LabelPolicyLogoDarkRemovedEventType,
+					Reduce: s.reduceLogoRemoved,
+				},
+				{
+					Event:  org.LabelPolicyIconDarkAddedEventType,
+					Reduce: s.reduceIconAdded,
+				},
+				{
+					Event:  org.LabelPolicyIconDarkRemovedEventType,
+					Reduce: s.reduceIconRemoved,
+				},
+				{
+					Event:  org.LabelPolicyFontAddedEventType,
+					Reduce: s.reduceFontAdded,
+				},
+				{
+					Event:  org.LabelPolicyFontRemovedEventType,
+					Reduce: s.reduceFontRemoved,
+				},
+				{
+					Event:  org.LabelPolicyAssetsRemovedEventType,
+					Reduce: s.reduceAssetsRemoved,
+				},
 				// {
 				// 	Event:  org.OrgRemovedEventType,
 				// 	Reduce: s.reduceOwnerRemoved,
@@ -211,10 +211,24 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  org.DomainPolicyRemovedEventType,
 					Reduce: s.reduceOrgDomainPolicyRemoved,
 				},
-				// {
-				// 	Event:  org.OrgRemovedEventType,
-				// 	Reduce: s.reduceOrgDomainPolicyOrgRemoved,
-				// },
+				// settings
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: s.reduceOrgSettingsRemovedRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: settings.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  settings.OrganizationSettingsSetEventType,
+					Reduce: s.reduceOrganizationSettingsSet,
+				},
+				{
+					Event:  settings.OrganizationSettingsRemovedEventType,
+					Reduce: s.reduceOrganizationSettingsRemoved,
+				},
 			},
 		},
 		{
@@ -267,46 +281,46 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 					Event:  instance.LabelPolicyLogoAddedEventType,
 					Reduce: s.reduceLabelLogoAdded,
 				},
-				// {
-				// 	Event:  instance.LabelPolicyLogoRemovedEventType,
-				// 	Reduce: s.reduceLogoRemoved,
-				// },
-				// {
-				// 	Event:  instance.LabelPolicyIconAddedEventType,
-				// 	Reduce: s.reduceIconAdded,
-				// },
-				// {
-				// 	Event:  instance.LabelPolicyIconRemovedEventType,
-				// 	Reduce: s.reduceIconRemoved,
-				// },
-				// {
-				// 	Event:  instance.LabelPolicyLogoDarkAddedEventType,
-				// 	Reduce: s.reduceLogoAdded,
-				// },
-				// {
-				// 	Event:  instance.LabelPolicyLogoDarkRemovedEventType,
-				// 	Reduce: s.reduceLogoRemoved,
-				// },
-				// {
-				// 	Event:  instance.LabelPolicyIconDarkAddedEventType,
-				// 	Reduce: s.reduceIconAdded,
-				// },
-				// {
-				// 	Event:  instance.LabelPolicyIconDarkRemovedEventType,
-				// 	Reduce: s.reduceIconRemoved,
-				// },
-				// {
-				// 	Event:  instance.LabelPolicyFontAddedEventType,
-				// 	Reduce: s.reduceFontAdded,
-				// },
-				// {
-				// 	Event:  instance.LabelPolicyFontRemovedEventType,
-				// 	Reduce: s.reduceFontRemoved,
-				// },
-				// {
-				// 	Event:  instance.LabelPolicyAssetsRemovedEventType,
-				// 	Reduce: s.reduceAssetsRemoved,
-				// },
+				{
+					Event:  instance.LabelPolicyLogoRemovedEventType,
+					Reduce: s.reduceLogoRemoved,
+				},
+				{
+					Event:  instance.LabelPolicyIconAddedEventType,
+					Reduce: s.reduceIconAdded,
+				},
+				{
+					Event:  instance.LabelPolicyIconRemovedEventType,
+					Reduce: s.reduceIconRemoved,
+				},
+				{
+					Event:  instance.LabelPolicyLogoDarkAddedEventType,
+					Reduce: s.reduceLabelLogoAdded,
+				},
+				{
+					Event:  instance.LabelPolicyLogoDarkRemovedEventType,
+					Reduce: s.reduceLogoRemoved,
+				},
+				{
+					Event:  instance.LabelPolicyIconDarkAddedEventType,
+					Reduce: s.reduceIconAdded,
+				},
+				{
+					Event:  instance.LabelPolicyIconDarkRemovedEventType,
+					Reduce: s.reduceIconRemoved,
+				},
+				{
+					Event:  instance.LabelPolicyFontAddedEventType,
+					Reduce: s.reduceFontAdded,
+				},
+				{
+					Event:  instance.LabelPolicyFontRemovedEventType,
+					Reduce: s.reduceFontRemoved,
+				},
+				{
+					Event:  instance.LabelPolicyAssetsRemovedEventType,
+					Reduce: s.reduceAssetsRemoved,
+				},
 				// {
 				// 	Event:  instance.InstanceRemovedEventType,
 				// 	Reduce: reduceInstanceRemovedHelper(LabelPolicyInstanceIDCol),
@@ -372,6 +386,11 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 				// 	Event:  instance.InstanceRemovedEventType,
 				// 	Reduce: s.reduceInstanceSecurityPoicyRemoved,
 				// },
+				// settings
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: s.reduceInstanceSettingsRemovedRemoved,
+				},
 			},
 		},
 	}
@@ -717,6 +736,7 @@ type labelSettings struct {
 
 // label
 func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) (*handler.Statement, error) {
+	fmt.Println("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ADDING LABEL")
 	var orgId *string
 	var policyEvent policy.LabelPolicyAddedEvent
 	var isDefault bool
@@ -725,6 +745,7 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 		policyEvent = e.LabelPolicyAddedEvent
 		isDefault = false
 		orgId = &policyEvent.Aggregate().ResourceOwner
+		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] *orgId = %+v\n", *orgId)
 	case *instance.LabelPolicyAddedEvent:
 		policyEvent = e.LabelPolicyAddedEvent
 		isDefault = true
@@ -754,6 +775,7 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 			Settings:   settings,
 		}
 		err = settingsRepo.Create(ctx, &setting)
+		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
 		return err
 	}), nil
 }
@@ -877,18 +899,61 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 	var orgId *string
 	switch e := event.(type) {
 	case *org.LabelPolicyLogoAddedEvent:
-		orgId = &e.Aggregate().ResourceOwner
+		orgId = &e.Aggregate().ID
 	case *instance.LabelPolicyLogoAddedEvent:
 	// ok
 	case *org.LabelPolicyLogoDarkAddedEvent:
-		orgId = &e.Aggregate().ResourceOwner
+		orgId = &e.Aggregate().ID
 	case *instance.LabelPolicyLogoDarkAddedEvent:
 	// ok
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-4UbiP", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoAddedEventType, instance.LabelPolicyLogoAddedEventType, org.LabelPolicyLogoDarkAddedEventType, instance.LabelPolicyLogoDarkAddedEventType})
 	}
 
-	fmt.Println("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LOGO")
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
+		}
+		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+		fmt.Println("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LOGO ADD")
+
+		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
+		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] srtting = %+v\n", setting)
+		if err != nil {
+			fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
+			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
+		}
+
+		switch e := event.(type) {
+		case *org.LabelPolicyLogoAddedEvent:
+			setting.Settings.LabelPolicyLightLogoURL = &e.StoreKey
+		case *instance.LabelPolicyLogoAddedEvent:
+			setting.Settings.LabelPolicyLightLogoURL = &e.StoreKey
+		case *org.LabelPolicyLogoDarkAddedEvent:
+			setting.Settings.LabelPolicyDarkLogoURL = &e.StoreKey
+		case *instance.LabelPolicyLogoDarkAddedEvent:
+			setting.Settings.LabelPolicyDarkLogoURL = &e.StoreKey
+		}
+
+		_, err = settingsRepo.UpdateLabel(ctx, setting)
+		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
+		return err
+	}), nil
+}
+
+func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	switch event.(type) {
+	case *org.LabelPolicyLogoRemovedEvent:
+		orgId = &event.Aggregate().ID
+	case *instance.LabelPolicyLogoRemovedEvent:
+	case *org.LabelPolicyLogoDarkRemovedEvent:
+		orgId = &event.Aggregate().ID
+	case *instance.LabelPolicyLogoDarkRemovedEvent:
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-kg8H4", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoRemovedEventType, instance.LabelPolicyLogoRemovedEventType, org.LabelPolicyLogoDarkRemovedEventType, instance.LabelPolicyLogoDarkRemovedEventType})
+	}
 
 	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
 		tx, ok := ex.(*sql.Tx)
@@ -902,16 +967,135 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
 		}
 
-		fmt.Println("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LOGO")
+		switch event.(type) {
+		case *org.LabelPolicyLogoRemovedEvent:
+			setting.Settings.LabelPolicyLightLogoURL = nil
+		case *instance.LabelPolicyLogoRemovedEvent:
+			setting.Settings.LabelPolicyLightLogoURL = nil
+		case *org.LabelPolicyLogoDarkRemovedEvent:
+			setting.Settings.LabelPolicyDarkLogoURL = nil
+		case *instance.LabelPolicyLogoDarkRemovedEvent:
+			setting.Settings.LabelPolicyDarkLogoURL = nil
+		}
+
+		_, err = settingsRepo.UpdateLabel(ctx, setting)
+		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
+		return err
+	}), nil
+}
+
+func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	switch event.(type) {
+	case *org.LabelPolicyIconAddedEvent:
+		orgId = &event.Aggregate().ID
+	case *instance.LabelPolicyIconAddedEvent:
+	case *org.LabelPolicyIconDarkAddedEvent:
+		orgId = &event.Aggregate().ID
+	case *instance.LabelPolicyIconDarkAddedEvent:
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-e2JFz", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconAddedEventType, instance.LabelPolicyIconAddedEventType, org.LabelPolicyIconDarkAddedEventType, instance.LabelPolicyIconDarkAddedEventType})
+	}
+
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
+		}
+		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+
+		fmt.Println("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DELETEEEE ICON")
+		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
+		if err != nil {
+			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
+		}
+
 		switch e := event.(type) {
-		case *org.LabelPolicyLogoAddedEvent:
-			setting.Settings.LabelPolicyLightLogoURL = e.StoreKey
-		case *instance.LabelPolicyLogoAddedEvent:
-			setting.Settings.LabelPolicyLightLogoURL = e.StoreKey
-		case *org.LabelPolicyLogoDarkAddedEvent:
-			setting.Settings.LabelPolicyDarkLogoURL = e.StoreKey
-		case *instance.LabelPolicyLogoDarkAddedEvent:
-			setting.Settings.LabelPolicyDarkLogoURL = e.StoreKey
+		case *org.LabelPolicyIconAddedEvent:
+			setting.Settings.LabelPolicyLightIconURL = &e.StoreKey
+		case *instance.LabelPolicyIconAddedEvent:
+			setting.Settings.LabelPolicyLightIconURL = &e.StoreKey
+		case *org.LabelPolicyIconDarkAddedEvent:
+			setting.Settings.LabelPolicyDarkIconURL = &e.StoreKey
+		case *instance.LabelPolicyIconDarkAddedEvent:
+			setting.Settings.LabelPolicyDarkIconURL = &e.StoreKey
+		}
+
+		_, err = settingsRepo.UpdateLabel(ctx, setting)
+		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
+		return err
+	}), nil
+}
+
+func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	switch event.(type) {
+	case *org.LabelPolicyIconRemovedEvent:
+		orgId = &event.Aggregate().ID
+	case *instance.LabelPolicyIconRemovedEvent:
+	case *org.LabelPolicyIconDarkRemovedEvent:
+		orgId = &event.Aggregate().ID
+	case *instance.LabelPolicyIconDarkRemovedEvent:
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-gfgbY", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconRemovedEventType, instance.LabelPolicyIconRemovedEventType, org.LabelPolicyIconDarkRemovedEventType, instance.LabelPolicyIconDarkRemovedEventType})
+	}
+
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
+		}
+		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+
+		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
+		if err != nil {
+			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
+		}
+
+		switch event.(type) {
+		case *org.LabelPolicyIconRemovedEvent:
+			setting.Settings.LabelPolicyLightIconURL = nil
+		case *instance.LabelPolicyIconRemovedEvent:
+			setting.Settings.LabelPolicyLightIconURL = nil
+		case *org.LabelPolicyIconDarkRemovedEvent:
+			setting.Settings.LabelPolicyDarkIconURL = nil
+		case *instance.LabelPolicyIconDarkRemovedEvent:
+			setting.Settings.LabelPolicyDarkIconURL = nil
+		}
+
+		_, err = settingsRepo.UpdateLabel(ctx, setting)
+		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
+		return err
+	}), nil
+}
+
+func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	switch event.(type) {
+	case *org.LabelPolicyFontAddedEvent:
+		orgId = &event.Aggregate().ID
+	case *instance.LabelPolicyFontAddedEvent:
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-65i9W", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyFontAddedEventType, instance.LabelPolicyFontAddedEventType})
+	}
+
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
+		}
+		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+
+		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
+		if err != nil {
+			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
+		}
+
+		switch e := event.(type) {
+		case *org.LabelPolicyFontAddedEvent:
+			setting.Settings.LabelPolicyFontURL = &e.StoreKey
+		case *instance.LabelPolicyFontAddedEvent:
+			setting.Settings.LabelPolicyFontURL = &e.StoreKey
 		}
 
 		_, err = settingsRepo.UpdateLabel(ctx, setting)
@@ -919,167 +1103,85 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 	}), nil
 }
 
-// func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event) (*handler.Statement, error) {
-// 	var col string
-// 	switch event.(type) {
-// 	case *org.LabelPolicyLogoRemovedEvent:
-// 		col = LabelPolicyLightLogoURLCol
-// 	case *instance.LabelPolicyLogoRemovedEvent:
-// 		col = LabelPolicyLightLogoURLCol
-// 	case *org.LabelPolicyLogoDarkRemovedEvent:
-// 		col = LabelPolicyDarkLogoURLCol
-// 	case *instance.LabelPolicyLogoDarkRemovedEvent:
-// 		col = LabelPolicyDarkLogoURLCol
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-kg8H4", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoRemovedEventType, instance.LabelPolicyLogoRemovedEventType, org.LabelPolicyLogoDarkRemovedEventType, instance.LabelPolicyLogoDarkRemovedEventType})
-// 	}
+func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	switch event.(type) {
+	case *org.LabelPolicyFontRemovedEvent:
+		orgId = &event.Aggregate().ID
+	case *instance.LabelPolicyFontRemovedEvent:
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-xf32J", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyFontRemovedEventType, instance.LabelPolicyFontRemovedEventType})
+	}
 
-// 	return handler.NewUpdateStatement(
-// 		event,
-// 		[]handler.Column{
-// 			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
-// 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
-// 			handler.NewCol(col, nil),
-// 		},
-// 		[]handler.Condition{
-// 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
-// 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
-// 			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
-// 		}), nil
-// }
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
+		}
+		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 
-// func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var storeKey handler.Column
-// 	switch e := event.(type) {
-// 	case *org.LabelPolicyIconAddedEvent:
-// 		storeKey = handler.NewCol(LabelPolicyLightIconURLCol, e.StoreKey)
-// 	case *instance.LabelPolicyIconAddedEvent:
-// 		storeKey = handler.NewCol(LabelPolicyLightIconURLCol, e.StoreKey)
-// 	case *org.LabelPolicyIconDarkAddedEvent:
-// 		storeKey = handler.NewCol(LabelPolicyDarkIconURLCol, e.StoreKey)
-// 	case *instance.LabelPolicyIconDarkAddedEvent:
-// 		storeKey = handler.NewCol(LabelPolicyDarkIconURLCol, e.StoreKey)
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-e2JFz", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconAddedEventType, instance.LabelPolicyIconAddedEventType, org.LabelPolicyIconDarkAddedEventType, instance.LabelPolicyIconDarkAddedEventType})
-// 	}
+		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
+		if err != nil {
+			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
+		}
 
-// 	return handler.NewUpdateStatement(
-// 		event,
-// 		[]handler.Column{
-// 			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
-// 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
-// 			storeKey,
-// 		},
-// 		[]handler.Condition{
-// 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
-// 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
-// 			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
-// 		}), nil
-// }
+		setting.Settings.LabelPolicyFontURL = nil
 
-// func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event) (*handler.Statement, error) {
-// 	var col string
-// 	switch event.(type) {
-// 	case *org.LabelPolicyIconRemovedEvent:
-// 		col = LabelPolicyLightIconURLCol
-// 	case *instance.LabelPolicyIconRemovedEvent:
-// 		col = LabelPolicyLightIconURLCol
-// 	case *org.LabelPolicyIconDarkRemovedEvent:
-// 		col = LabelPolicyDarkIconURLCol
-// 	case *instance.LabelPolicyIconDarkRemovedEvent:
-// 		col = LabelPolicyDarkIconURLCol
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-gfgbY", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconRemovedEventType, instance.LabelPolicyIconRemovedEventType, org.LabelPolicyIconDarkRemovedEventType, instance.LabelPolicyIconDarkRemovedEventType})
-// 	}
+		_, err = settingsRepo.UpdateLabel(ctx, setting)
+		return err
+	}), nil
+}
 
-// 	return handler.NewUpdateStatement(
-// 		event,
-// 		[]handler.Column{
-// 			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
-// 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
-// 			handler.NewCol(col, nil),
-// 		},
-// 		[]handler.Condition{
-// 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
-// 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
-// 			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
-// 		}), nil
-// }
+func (p *settingsRelationalProjection) reduceAssetsRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var orgId *string
+	switch event.(type) {
+	case *org.LabelPolicyAssetsRemovedEvent:
+		orgId = &event.Aggregate().ID
+	case *instance.LabelPolicyAssetsRemovedEvent:
+	// ok
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-qi39A", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyAssetsRemovedEventType, instance.LabelPolicyAssetsRemovedEventType})
+	}
+	return handler.NewStatement(event, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
+		}
+		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 
-// func (p *settingsRelationalProjection) reduceFontAdded(event eventstore.Event) (*handler.Statement, error) {
-// 	var storeKey handler.Column
-// 	switch e := event.(type) {
-// 	case *org.LabelPolicyFontAddedEvent:
-// 		storeKey = handler.NewCol(LabelPolicyFontURLCol, e.StoreKey)
-// 	case *instance.LabelPolicyFontAddedEvent:
-// 		storeKey = handler.NewCol(LabelPolicyFontURLCol, e.StoreKey)
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-65i9W", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyFontAddedEventType, instance.LabelPolicyFontAddedEventType})
-// 	}
+		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
+		if err != nil {
+			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
+		}
 
-// 	return handler.NewUpdateStatement(
-// 		event,
-// 		[]handler.Column{
-// 			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
-// 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
-// 			storeKey,
-// 		},
-// 		[]handler.Condition{
-// 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
-// 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
-// 			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
-// 		}), nil
-// }
+		setting.Settings.LabelPolicyLightLogoURL = nil
+		setting.Settings.LabelPolicyDarkLogoURL = nil
+		setting.Settings.LabelPolicyLightIconURL = nil
+		setting.Settings.LabelPolicyDarkIconURL = nil
+		setting.Settings.LabelPolicyFontURL = nil
 
-// func (p *settingsRelationalProjection) reduceFontRemoved(event eventstore.Event) (*handler.Statement, error) {
-// 	var col string
-// 	switch event.(type) {
-// 	case *org.LabelPolicyFontRemovedEvent:
-// 		col = LabelPolicyFontURLCol
-// 	case *instance.LabelPolicyFontRemovedEvent:
-// 		col = LabelPolicyFontURLCol
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-xf32J", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyFontRemovedEventType, instance.LabelPolicyFontRemovedEventType})
-// 	}
+		_, err = settingsRepo.UpdateLabel(ctx, setting)
+		return err
+	}), nil
+}
 
-// 	return handler.NewUpdateStatement(
-// 		event,
-// 		[]handler.Column{
-// 			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
-// 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
-// 			handler.NewCol(col, nil),
-// 		},
-// 		[]handler.Condition{
-// 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
-// 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
-// 			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
-// 		}), nil
-// }
+// return handler.NewUpdateStatement(
+// 	event,
+// 	[]handler.Column{
+// 		handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
+// 		handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 
-// func (p *settingsRelationalProjection) reduceAssetsRemoved(event eventstore.Event) (*handler.Statement, error) {
-// 	switch event.(type) {
-// 	case *org.LabelPolicyAssetsRemovedEvent, *instance.LabelPolicyAssetsRemovedEvent:
-// 		// ok
-// 	default:
-// 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-qi39A", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyAssetsRemovedEventType, instance.LabelPolicyAssetsRemovedEventType})
-// 	}
-
-// 	return handler.NewUpdateStatement(
-// 		event,
-// 		[]handler.Column{
-// 			handler.NewCol(LabelPolicyChangeDateCol, event.CreatedAt()),
-// 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
-// 			handler.NewCol(LabelPolicyLightLogoURLCol, nil),
-// 			handler.NewCol(LabelPolicyLightIconURLCol, nil),
-// 			handler.NewCol(LabelPolicyDarkLogoURLCol, nil),
-// 			handler.NewCol(LabelPolicyDarkIconURLCol, nil),
-// 			handler.NewCol(LabelPolicyFontURLCol, nil),
-// 		},
-// 		[]handler.Condition{
-// 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
-// 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
-// 			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
-// 		}), nil
+// 		handler.NewCol(LabelPolicyLightLogoURLCol, nil),
+// 		handler.NewCol(LabelPolicyLightIconURLCol, nil),
+// 		handler.NewCol(LabelPolicyDarkLogoURLCol, nil),
+// 		handler.NewCol(LabelPolicyDarkIconURLCol, nil),
+// 		handler.NewCol(LabelPolicyFontURLCol, nil),
+// 	},
+// 	[]handler.Condition{
+// 		handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
+// 		handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+// 		handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
+// 	}), nil
 // }
 
 // func (p *settingsRelationalProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
@@ -1824,6 +1926,110 @@ func (s *settingsRelationalProjection) reduceInstanceSecurityPoicyRemoved(event 
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 
 		_, err := settingsRepo.Delete(ctx, removeInstanceEvent.Aggregate().InstanceID, nil, domain.SettingTypeSecurity)
+		return err
+	}), nil
+}
+
+func (s *settingsRelationalProjection) reduceOrganizationSettingsSet(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*settings.OrganizationSettingsSetEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		settings, err := json.Marshal(e)
+		if err != nil {
+			return err
+		}
+
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-chluS", "reduce.wrong.db.pool %T", ex)
+		}
+		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+
+		orgID := &e.Aggregate().ID
+
+		existingSetting, err := settingsRepo.GetOrg(ctx, e.Agg.InstanceID, nil)
+		if err != nil {
+			if errors.Is(err, &database.NoRowFoundError{}) {
+				setting := domain.Setting{
+					InstanceID: e.Aggregate().InstanceID,
+					OrgID:      orgID,
+					Type:       domain.SettingTypeOrganization,
+					Settings:   settings,
+				}
+				err = settingsRepo.Create(ctx, &setting)
+				return err
+
+			} else {
+				return zerrors.ThrowInternal(err, "HANDL-rSkxt", "error accessing login policy record")
+			}
+		}
+
+		existingSetting.Settings.OrganizationScopedUsernames = e.OrganizationScopedUsernames
+
+		_, err = settingsRepo.UpdateOrg(ctx, existingSetting)
+		return err
+	}), nil
+}
+
+func (s *settingsRelationalProjection) reduceOrganizationSettingsRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*settings.OrganizationSettingsRemovedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewStatement(e, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rHiHb", "reduce.wrong.db.pool %T", ex)
+		}
+
+		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+
+		orgId := &event.Aggregate().ID
+
+		_, err := settingsRepo.Delete(ctx, e.Aggregate().InstanceID, orgId, domain.SettingTypeOrganization)
+		return err
+	}), nil
+}
+
+func (s *settingsRelationalProjection) reduceOrgSettingsRemovedRemoved(event eventstore.Event) (*handler.Statement, error) {
+	removeOrgEvent, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-T8NZa", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return handler.NewStatement(removeOrgEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-arg9y", "reduce.wrong.db.pool %T", ex)
+		}
+
+		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+
+		orgId := &event.Aggregate().ID
+		_, err := settingsRepo.Delete(ctx, removeOrgEvent.Aggregate().InstanceID, orgId, domain.SettingTypeOrganization)
+		return err
+	}), nil
+}
+
+func (s *settingsRelationalProjection) reduceInstanceSettingsRemovedRemoved(event eventstore.Event) (*handler.Statement, error) {
+	removeInstanceEvent, ok := event.(*instance.InstanceRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-28UlS", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
+	}
+
+	return handler.NewStatement(removeInstanceEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
+		tx, ok := ex.(*sql.Tx)
+		if !ok {
+			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-rrdHy", "reduce.wrong.db.pool %T", ex)
+		}
+
+		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
+
+		_, err := settingsRepo.Delete(ctx, removeInstanceEvent.Aggregate().ID, nil, domain.SettingTypeOrganization)
 		return err
 	}), nil
 }

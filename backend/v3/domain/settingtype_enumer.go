@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _SettingTypeName = "unspecifiedloginlabelpassword_complexitypassword_expirybrandingdomainlegal_and_supportlockoutgeneralsecurity"
+const _SettingTypeName = "unspecifiedloginlabelpassword_complexitypassword_expirybrandingdomainlegal_and_supportlockoutgeneralsecurityorganization"
 
-var _SettingTypeIndex = [...]uint8{0, 11, 16, 21, 40, 55, 63, 69, 86, 93, 100, 108}
+var _SettingTypeIndex = [...]uint8{0, 11, 16, 21, 40, 55, 63, 69, 86, 93, 100, 108, 120}
 
-const _SettingTypeLowerName = "unspecifiedloginlabelpassword_complexitypassword_expirybrandingdomainlegal_and_supportlockoutgeneralsecurity"
+const _SettingTypeLowerName = "unspecifiedloginlabelpassword_complexitypassword_expirybrandingdomainlegal_and_supportlockoutgeneralsecurityorganization"
 
 func (i SettingType) String() string {
 	if i >= SettingType(len(_SettingTypeIndex)-1) {
@@ -36,9 +36,10 @@ func _SettingTypeNoOp() {
 	_ = x[SettingTypeLockout-(8)]
 	_ = x[SettingTypeGeneral-(9)]
 	_ = x[SettingTypeSecurity-(10)]
+	_ = x[SettingTypeOrganization-(11)]
 }
 
-var _SettingTypeValues = []SettingType{SettingTypeUnspecified, SettingTypeLogin, SettingTypeLabel, SettingTypePasswordComplexity, SettingTypePasswordExpiry, SettingTypeBranding, SettingTypeDomain, SettingTypeLegalAndSupport, SettingTypeLockout, SettingTypeGeneral, SettingTypeSecurity}
+var _SettingTypeValues = []SettingType{SettingTypeUnspecified, SettingTypeLogin, SettingTypeLabel, SettingTypePasswordComplexity, SettingTypePasswordExpiry, SettingTypeBranding, SettingTypeDomain, SettingTypeLegalAndSupport, SettingTypeLockout, SettingTypeGeneral, SettingTypeSecurity, SettingTypeOrganization}
 
 var _SettingTypeNameToValueMap = map[string]SettingType{
 	_SettingTypeName[0:11]:         SettingTypeUnspecified,
@@ -63,6 +64,8 @@ var _SettingTypeNameToValueMap = map[string]SettingType{
 	_SettingTypeLowerName[93:100]:  SettingTypeGeneral,
 	_SettingTypeName[100:108]:      SettingTypeSecurity,
 	_SettingTypeLowerName[100:108]: SettingTypeSecurity,
+	_SettingTypeName[108:120]:      SettingTypeOrganization,
+	_SettingTypeLowerName[108:120]: SettingTypeOrganization,
 }
 
 var _SettingTypeNames = []string{
@@ -77,6 +80,7 @@ var _SettingTypeNames = []string{
 	_SettingTypeName[86:93],
 	_SettingTypeName[93:100],
 	_SettingTypeName[100:108],
+	_SettingTypeName[108:120],
 }
 
 // SettingTypeString retrieves an enum value from the enum constants string name.

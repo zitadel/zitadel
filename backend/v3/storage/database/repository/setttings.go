@@ -311,6 +311,48 @@ func (s *settings) UpdateDomain(ctx context.Context, setting *domain.DomainSetti
 	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
 }
 
+// func (s *settings) updateSetting(ctx context.Context, setting *domain.Setting, settings any) (int64, error) {
+// 	builder := database.StatementBuilder{}
+// 	builder.WriteString(`UPDATE zitadel.settings SET `)
+// 	conditions := []database.Condition{
+// 		s.IDCondition(*setting.ID),
+// 		s.InstanceIDCondition(setting.InstanceID),
+// 		s.OrgIDCondition(setting.OrgID),
+// 		s.TypeCondition(setting.Type),
+// 	}
+// 	settingJSON, err := json.Marshal(settings)
+// 	if err != nil {
+// 		return 0, err
+// 	}
+// 	s.SetSettings(string(settingJSON)).Write(&builder)
+// 	writeCondition(&builder, database.And(conditions...))
+
+// 	stmt := builder.String()
+
+// 	return s.client.Exec(ctx, stmt, builder.Args()...)
+// }
+
+func (s *settings) GetOrg(ctx context.Context, instanceID string, orgID *string) (*domain.OrgSetting, error) {
+	orgSetting := &domain.OrgSetting{}
+	var err error
+
+	orgSetting.Setting, err = s.Get(ctx, instanceID, orgID, domain.SettingTypeOrganization)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(orgSetting.Setting.Settings, &orgSetting.Settings)
+	if err != nil {
+		return nil, err
+	}
+
+	return orgSetting, nil
+}
+
+func (s *settings) UpdateOrg(ctx context.Context, setting *domain.OrgSetting) (int64, error) {
+	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
+}
+
 func (s *settings) updateSetting(ctx context.Context, setting *domain.Setting, settings any) (int64, error) {
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.settings SET `)
@@ -378,10 +420,6 @@ func (s *settings) Delete(ctx context.Context, instanceID string, orgID *string,
 
 	builder.WriteString(`DELETE FROM zitadel.settings`)
 
-	// conditions := []database.Condition{
-	// 	s.InstanceIDCondition(instanceID),
-	// 	s.OrgIDCondition(orgID),
-	// }
 	conditions := []database.Condition{
 		s.TypeCondition(typ),
 		s.InstanceIDCondition(instanceID),
