@@ -1635,8 +1635,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "フラグが有効になっている場合、id_token を `sid` クレームと共に id_token_hint として end_session エンドポイントに提供することで、ログイン UI から単一のセッションを終了できるようになります。 現在、同じユーザー エージェント (ブラウザ) からのすべてのセッションがログイン UI で終了することに注意してください。 セッション API を通じて管理されるセッションは、すでに単一のセッションの終了を許可しています。",
       "DEBUGOIDCPARENTERROR": "デバッグ OIDC 親エラー",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "フラグが有効になっている場合、OIDC 親エラーはコンソールに記録されます。",
-      "DISABLEUSERTOKENEVENT": "ユーザートークンイベントを無効にする",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "バックチャネルログアウトを有効にする",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "バックチャネルログアウトは OpenID Connect バックチャネルログアウト 1.0 を実装し、OpenID プロバイダーでのセッション終了についてクライアントに通知するために使用できます。",
       "PERMISSIONCHECKV2": "権限チェック V2",
@@ -1656,7 +1654,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "このフラグが有効化されると、コンソールはV2ユーザーAPIを使用して新しいユーザーを作成します。V2 APIでは、新しく作成されたユーザーは初期状態なしで開始します。",
       "LOGINV2": "ログイン V2",
       "LOGINV2_DESCRIPTION": "これを有効にすると、セキュリティ、パフォーマンス、およびカスタマイズ性が向上した、TypeScript ベースの新しいログイン UI が有効になります。",
-      "LOGINV2_BASEURI": "ベースURI"
+      "LOGINV2_BASEURI": "ベースURI",
+      "ENABLERELATIONALTABLES": "リレーショナルテーブル",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "データを保存するためにプロジェクションの代わりにリレーショナルテーブルを使用するには、これを有効にします。現在、このトグルは何もしません。"
     },
     "DIALOG": {
       "RESET": {
@@ -2372,6 +2372,7 @@
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
       "SIGNEDREQUEST": "署名付きリクエスト",
+      "SIGNATUREALGORITHM": "署名アルゴリズム",
       "NAMEIDFORMAT": "NameIDフォーマット",
       "TRANSIENTMAPPINGATTRIBUTENAME": "カスタム属性名",
       "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "NameIDフォーマットが`transient`の場合にユーザーをマッピングするためのカスタム属性名 (例: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`)"

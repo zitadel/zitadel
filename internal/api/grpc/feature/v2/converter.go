@@ -23,10 +23,10 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) (*command
 		TokenExchange:                  req.OidcTokenExchange,
 		ImprovedPerformance:            improvedPerformanceListToDomain(req.ImprovedPerformance),
 		OIDCSingleV1SessionTermination: req.OidcSingleV1SessionTermination,
-		DisableUserTokenEvent:          req.DisableUserTokenEvent,
 		EnableBackChannelLogout:        req.EnableBackChannelLogout,
 		LoginV2:                        loginV2,
 		PermissionCheckV2:              req.PermissionCheckV2,
+		EnableRelationalTables:         req.EnableRelationalTables,
 	}, nil
 }
 
@@ -38,10 +38,10 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		OidcTokenExchange:              featureSourceToFlagPb(&f.TokenExchange),
 		ImprovedPerformance:            featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
 		OidcSingleV1SessionTermination: featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
-		DisableUserTokenEvent:          featureSourceToFlagPb(&f.DisableUserTokenEvent),
 		EnableBackChannelLogout:        featureSourceToFlagPb(&f.EnableBackChannelLogout),
 		LoginV2:                        loginV2ToLoginV2FlagPb(f.LoginV2),
 		PermissionCheckV2:              featureSourceToFlagPb(&f.PermissionCheckV2),
+		EnableRelationalTables:         featureSourceToFlagPb(&f.EnableRelationalTables),
 	}
 }
 
@@ -57,11 +57,11 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) (*com
 		ImprovedPerformance:            improvedPerformanceListToDomain(req.ImprovedPerformance),
 		DebugOIDCParentError:           req.DebugOidcParentError,
 		OIDCSingleV1SessionTermination: req.OidcSingleV1SessionTermination,
-		DisableUserTokenEvent:          req.DisableUserTokenEvent,
 		EnableBackChannelLogout:        req.EnableBackChannelLogout,
 		LoginV2:                        loginV2,
 		PermissionCheckV2:              req.PermissionCheckV2,
 		ConsoleUseV2UserApi:            req.ConsoleUseV2UserApi,
+		EnableRelationalTables:         req.EnableRelationalTables,
 	}, nil
 }
 
@@ -74,11 +74,11 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		ImprovedPerformance:            featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
 		DebugOidcParentError:           featureSourceToFlagPb(&f.DebugOIDCParentError),
 		OidcSingleV1SessionTermination: featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
-		DisableUserTokenEvent:          featureSourceToFlagPb(&f.DisableUserTokenEvent),
 		EnableBackChannelLogout:        featureSourceToFlagPb(&f.EnableBackChannelLogout),
 		LoginV2:                        loginV2ToLoginV2FlagPb(f.LoginV2),
 		PermissionCheckV2:              featureSourceToFlagPb(&f.PermissionCheckV2),
 		ConsoleUseV2UserApi:            featureSourceToFlagPb(&f.ConsoleUseV2UserApi),
+		EnableRelationalTables:         featureSourceToFlagPb(&f.EnableRelationalTables),
 	}
 }
 

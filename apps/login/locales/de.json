@@ -1,6 +1,7 @@
 {
   "common": {
-    "back": "Zurück"
+    "back": "Zurück",
+    "title": "Anmelden mit Zitadel"
   },
   "accounts": {
     "title": "Konten",
@@ -26,6 +27,12 @@
     "description": "Geben Sie Ihre Anmeldedaten ein.",
     "register": "Neuen Benutzer registrieren",
     "submit": "Weiter",
+    "labels": {
+      "loginname": "Loginname",
+      "username": "Benutzername",
+      "usernameOrPhoneNumber": "Benutzername oder Telefonnummer",
+      "usernameOrEmail": "Benutzername oder E-Mail"
+    },
     "required": {
       "loginName": "Dieses Feld ist erforderlich"
     }
@@ -36,6 +43,9 @@
       "description": "Geben Sie Ihr Passwort ein.",
       "resetPassword": "Passwort zurücksetzen",
       "submit": "Weiter",
+      "labels": {
+        "password": "Passwort"
+      },
       "required": {
         "password": "Dieses Feld ist erforderlich"
       }
@@ -47,6 +57,11 @@
       "noCodeReceived": "Keinen Code erhalten?",
       "resend": "Erneut senden",
       "submit": "Weiter",
+      "labels": {
+        "code": "Code",
+        "newPassword": "Neues Passwort",
+        "confirmPassword": "Neues Passwort wiederholen"
+      },
       "required": {
         "code": "Dieses Feld ist erforderlich",
         "newPassword": "Bitte geben Sie ein Passwort ein!",
@@ -57,6 +72,10 @@
       "title": "Passwort ändern",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
       "submit": "Weiter",
+      "labels": {
+        "newPassword": "Neues Passwort",
+        "confirmPassword": "Neues Passwort wiederholen"
+      },
       "required": {
         "newPassword": "Bitte geben Sie ein neues Passwort ein!",
         "confirmPassword": "Dieses Feld ist erforderlich"
@@ -100,9 +119,11 @@
   "ldap": {
     "title": "LDAP Login",
     "description": "Geben Sie Ihre LDAP-Anmeldedaten ein.",
-    "username": "Benutzername",
-    "password": "Passwort",
     "submit": "Weiter",
+    "labels": {
+      "username": "Benutzername",
+      "password": "Passwort"
+    },
     "required": {
       "username": "Dieses Feld ist erforderlich",
       "password": "Dieses Feld ist erforderlich"
@@ -129,6 +150,9 @@
       "noCodeReceived": "Keinen Code erhalten?",
       "resendCode": "Code erneut senden",
       "submit": "Weiter",
+      "labels": {
+        "code": "Code"
+      },
       "required": {
         "code": "Dieses Feld ist erforderlich"
       }
@@ -140,6 +164,9 @@
       "emailDescription": "Geben Sie Ihre E-Mail-Adresse ein, um einen Code per E-Mail zu erhalten.",
       "totpRegisterDescription": "Scannen Sie den QR-Code oder navigieren Sie manuell zur URL.",
       "submit": "Weiter",
+      "labels": {
+        "code": "Code"
+      },
       "required": {
         "code": "Dieses Feld ist erforderlich"
       }
@@ -177,7 +204,7 @@
   "register": {
     "methods": {
       "passkey": "Passkey",
-      "password": "Password"
+      "password": "Passwort"
     },
     "disabled": {
       "title": "Registrierung deaktiviert",
@@ -195,15 +222,23 @@
     "termsOfService": "Nutzungsbedingungen",
     "privacyPolicy": "Datenschutzrichtlinie",
     "submit": "Weiter",
-    "orUseIDP": "oder verwenden Sie einen Identitätsanbieter",
     "password": {
       "title": "Passwort festlegen",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
       "submit": "Weiter",
+      "labels": {
+        "password": "Passwort",
+        "confirmPassword": "Neues Passwort wiederholen"
+      },
       "required": {
         "password": "Bitte geben Sie ein Passwort ein!",
         "confirmPassword": "Dieses Feld ist erforderlich"
       }
+    },
+    "labels": {
+      "firstname": "Vorname",
+      "lastname": "Nachname",
+      "email": "E-Mail"
     },
     "required": {
       "firstname": "Dieses Feld ist erforderlich",
@@ -246,6 +281,9 @@
       "resendCode": "Code erneut senden",
       "codeSent": "Ein Code wurde gerade an Ihre E-Mail-Adresse gesendet.",
       "submit": "Weiter",
+      "labels": {
+        "code": "Code"
+      },
       "required": {
         "code": "Dieses Feld ist erforderlich"
       }
@@ -263,6 +301,9 @@
       "title": "Gerätecode",
       "description": "Geben Sie den Code ein.",
       "submit": "Weiter",
+      "labels": {
+        "code": "Code"
+      },
       "required": {
         "code": "Dieses Feld ist erforderlich"
       }

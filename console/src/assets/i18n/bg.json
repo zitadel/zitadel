@@ -1634,8 +1634,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Ако флагът е активиран, ще можете да прекратите единична сесия от UI за вход, като предоставите id_token с `sid` претенция като id_token_hint на крайната точка на end_session. Имайте предвид, че в момента всички сесии от същия потребителски агент (браузър) се прекратяват в UI за вход. Сесиите, управлявани чрез API на сесията, вече позволяват прекратяването на единични сесии.",
       "DEBUGOIDCPARENTERROR": "Отстраняване на грешки на OIDC родителя",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Ако флагът е активиран, грешката на OIDC родителя ще бъде записана в конзолата.",
-      "DISABLEUSERTOKENEVENT": "Деактивиране на събитие за потребителски токен",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Активиране на Backchannel Logout",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "Back-Channel Logout имплементира OpenID Connect Back-Channel Logout 1.0 и може да се използва за уведомяване на клиентите за прекратяване на сесията при OpenID доставчика.",
       "PERMISSIONCHECKV2": "Проверка на разрешения V2",
@@ -1655,7 +1653,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Когато този флаг е активиран, конзолата използва V2 User API за създаване на нови потребители. С V2 API новосъздадените потребители започват без начален статус.",
       "LOGINV2": "Вход V2",
       "LOGINV2_DESCRIPTION": "Активирането на това включва новия потребителски интерфейс за вход, базиран на TypeScript, с подобрена сигурност, производителност и възможности за персонализиране.",
-      "LOGINV2_BASEURI": "Базов URI"
+      "LOGINV2_BASEURI": "Базов URI",
+      "ENABLERELATIONALTABLES": "Релационни таблици",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Активирайте това, за да използвате релационни таблици вместо проекции за съхранение на данни. В момента този превключвател не прави нищо."
     },
     "DIALOG": {
       "RESET": {

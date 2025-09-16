@@ -9,11 +9,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/scim/resources"
+	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
@@ -27,7 +27,7 @@ var totalCountOfHumanUsers = 13
 		// these should never be modified.
 		// This allows testing list requests without filters.
 		iamOwnerCtx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-		secondaryOrg := Instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
+		secondaryOrg := Instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 		secondaryOrgCreatedUserIDs := createUsers(t, iamOwnerCtx, secondaryOrg.OrganizationId)
 
 		testsInitializedUtc := time.Now().UTC()
@@ -292,8 +292,8 @@ var totalCountOfHumanUsers = 13
 						UserId: userID,
 
 						Profile: &user_v2.SetHumanProfile{
-							GivenName:  "scim-user-given-name-modified-0: " + gofakeit.FirstName(),
-							FamilyName: "scim-user-family-name-modified-0: " + gofakeit.LastName(),
+							GivenName:  "scim-user-given-name-modified-0: " + integration.FirstName(),
+							FamilyName: "scim-user-family-name-modified-0: " + integration.LastName(),
 						},
 					})
 					require.NoError(t, err)
@@ -348,7 +348,7 @@ var totalCountOfHumanUsers = 13
 				name: "do not count user of other org",
 				prepare: func(t require.TestingT) *scim.ListRequest {
 					iamOwnerCtx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-					org := Instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
+					org := Instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 					resp := createHumanUser(t, iamOwnerCtx, org.OrganizationId, 102)
 
 					return &scim.ListRequest{
@@ -442,7 +442,7 @@ func createUsers(t *testing.T, ctx context.Context, orgID string) []string {
 
 	// create the full scim user if on primary org
 	if orgID == Instance.DefaultOrg.Id {
-		fullUserCreatedResp, err := Instance.Client.SCIM.Users.Create(ctx, orgID, withUsername(fullUserJson, gofakeit.Username()))
+		fullUserCreatedResp, err := Instance.Client.SCIM.Users.Create(ctx, orgID, withUsername(fullUserJson, integration.Username()))
 		require.NoError(t, err)
 		createdUserIDs = append(createdUserIDs, fullUserCreatedResp.ID)
 		count--
@@ -473,15 +473,15 @@ func createHumanUser(t require.TestingT, ctx context.Context, orgID string, i in
 				OrgId: orgID,
 			},
 		},
-		Username: gu.Ptr(fmt.Sprintf("scim-username-%d: %s", i, gofakeit.Username())),
+		Username: gu.Ptr(fmt.Sprintf("scim-username-%d: %s", i, integration.Username())),
 		Profile: &user_v2.SetHumanProfile{
-			GivenName:         fmt.Sprintf("scim-givenname-%d: %s", i, gofakeit.FirstName()),
-			FamilyName:        fmt.Sprintf("scim-familyname-%d: %s", i, gofakeit.LastName()),
+			GivenName:         fmt.Sprintf("scim-givenname-%d: %s", i, integration.FirstName()),
+			FamilyName:        fmt.Sprintf("scim-familyname-%d: %s", i, integration.LastName()),
 			PreferredLanguage: gu.Ptr("en-US"),
 			Gender:            gu.Ptr(user_v2.Gender_GENDER_MALE),
 		},
 		Email: &user_v2.SetHumanEmail{
-			Email: fmt.Sprintf("scim-email-%d-%d@example.com", i, gofakeit.Number(0, 1_000_000)),
+			Email: fmt.Sprintf("scim-email-%d-%d@example.com", i, integration.Number()),
 		},
 	})
 	require.NoError(t, err)

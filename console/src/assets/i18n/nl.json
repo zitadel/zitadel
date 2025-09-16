@@ -1635,8 +1635,6 @@
       "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Als het vlagje is ingeschakeld, kunt u een enkele sessie beëindigen via de login-gebruikersinterface door een id_token met een `sid`-claim als id_token_hint op het eindpunt end_session te verstrekken. Houd er rekening mee dat momenteel alle sessies van dezelfde gebruikersagent (browser) worden beëindigd in de login-gebruikersinterface. Sessies die worden beheerd via de Session API staan al toe om individuele sessies te beëindigen.",
       "DEBUGOIDCPARENTERROR": "Debug OIDC Ouderfout",
       "DEBUGOIDCPARENTERROR_DESCRIPTION": "Als de vlag is ingeschakeld, wordt de OIDC-ouderfout in de console geregistreerd.",
-      "DISABLEUSERTOKENEVENT": "Gebruikerstokengebeurtenis uitschakelen",
-      "DISABLEUSERTOKENEVENT_DESCRIPTION": "",
       "ENABLEBACKCHANNELLOGOUT": "Backchannel Logout inschakelen",
       "ENABLEBACKCHANNELLOGOUT_DESCRIPTION": "De Back-Channel Logout implementeert OpenID Connect Back-Channel Logout 1.0 en kan worden gebruikt om clients te informeren over het beëindigen van de sessie bij de OpenID-provider.",
       "PERMISSIONCHECKV2": "Permissiecontrole V2",
@@ -1656,7 +1654,9 @@
       "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wanneer deze vlag is ingeschakeld, gebruikt de console de V2 User API om nieuwe gebruikers aan te maken. Met de V2 API beginnen nieuw aangemaakte gebruikers zonder een initiële status.",
       "LOGINV2": "Inloggen V2",
       "LOGINV2_DESCRIPTION": "Door dit in te schakelen wordt de nieuwe TypeScript-gebaseerde login-UI geactiveerd met verbeterde beveiliging, prestaties en aanpasbaarheid.",
-      "LOGINV2_BASEURI": "Basis-URI"
+      "LOGINV2_BASEURI": "Basis-URI",
+      "ENABLERELATIONALTABLES": "Relationele tabellen",
+      "ENABLERELATIONALTABLES_DESCRIPTION": "Schakel dit in om relationele tabellen te gebruiken in plaats van projecties voor het opslaan van gegevens. Momenteel doet deze schakelaar niets."
     },
     "DIALOG": {
       "RESET": {
@@ -2371,7 +2371,8 @@
       "METADATAXML": "Metadata Xml",
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
-      "SIGNEDREQUEST": "Ondertekend Verzoek"
+      "SIGNEDREQUEST": "Ondertekend Verzoek",
+      "SIGNATUREALGORITHM": "Handtekeningalgoritme"
     },
     "TOAST": {
       "SAVED": "Succesvol opgeslagen.",

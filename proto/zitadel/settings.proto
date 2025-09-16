@@ -144,6 +144,11 @@ message EmailProviderSMTP {
 
 message EmailProviderHTTP {
   string endpoint = 1;
+  string signing_key = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"98KmsU67\""
+    }
+  ];
 }
 
 message SMSProvider {
@@ -166,6 +171,11 @@ message TwilioConfig {
 
 message HTTPConfig {
   string endpoint = 1;
+  string signing_key = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"98KmsU67\""
+    }
+  ];
 }
 
 enum SMSProviderConfigState {
