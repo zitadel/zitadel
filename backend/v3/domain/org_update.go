@@ -15,6 +15,13 @@ type UpdateOrgCommand struct {
 
 var _ Commander = (*UpdateOrgCommand)(nil)
 
+func NewUpdateOrgCommand(id, name string) *UpdateOrgCommand {
+	return &UpdateOrgCommand{
+		ID:   id,
+		Name: name,
+	}
+}
+
 func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err error) {
 	close, err := opts.EnsureTx(ctx)
 	if err != nil {
