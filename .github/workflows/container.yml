@@ -168,6 +168,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to Google Artifact Registry
+        uses: docker/login-action@v3
+        with:
+          registry: europe-docker.pkg.dev
+          username: _json_key_base64
+          password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
       - name: Restore Login
         run: nx run @zitadel/login:build
       - name: Login
