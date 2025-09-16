@@ -712,30 +712,28 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalAdded(event ev
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewCreateStatement(
 		&idpEvent,
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOAuth),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCol(IDPRelationalOrgId, orgId),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOAuth),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+		},
 	), nil
 }
 
@@ -772,16 +770,14 @@ func (p *idpTemplateRelationalProjection) reduceOAuthIDPRelationalChanged(event 
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		columns,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
@@ -803,30 +799,28 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalAdded(event eve
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewCreateStatement(
 		&idpEvent,
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOIDC),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgId, orgId),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOIDC),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+		},
 	), nil
 }
 
@@ -863,16 +857,14 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalChanged(event e
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		columns,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
@@ -908,30 +900,28 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedAzureAD
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzure),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-			},
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzure),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+		},
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
@@ -960,30 +950,28 @@ func (p *idpTemplateRelationalProjection) reduceOIDCIDPRelationalMigratedGoogle(
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-			},
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+		},
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
@@ -1012,30 +1000,28 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalAdded(event even
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewCreateStatement(
 		&idpEvent,
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeJWT),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgId, orgId),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeJWT),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+		},
 	), nil
 }
 
@@ -1072,16 +1058,14 @@ func (p *idpTemplateRelationalProjection) reduceJWTIDPRelationalChanged(event ev
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		columns,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
@@ -1116,30 +1100,28 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalAdded(event 
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewCreateStatement(
 		&idpEvent,
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzure),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgId, orgId),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzure),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+		},
 	), nil
 }
 
@@ -1180,16 +1162,14 @@ func (p *idpTemplateRelationalProjection) reduceAzureADIDPRelationalChanged(even
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		columns,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
@@ -1217,30 +1197,28 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalAdded(event e
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewCreateStatement(
 		&idpEvent,
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitHub),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgId, orgId),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitHub),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+		},
 	), nil
 }
 
@@ -1277,16 +1255,14 @@ func (p *idpTemplateRelationalProjection) reduceGitHubIDPRelationalChanged(event
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		columns,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
@@ -1317,30 +1293,28 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalAdd
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewCreateStatement(
 		&idpEvent,
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitHubEnterprise),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgId, orgId),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitHubEnterprise),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+		},
 	), nil
 }
 
@@ -1377,16 +1351,14 @@ func (p *idpTemplateRelationalProjection) reduceGitHubEnterpriseIDPRelationalCha
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		columns,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
@@ -1414,30 +1386,28 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalAdded(event e
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewCreateStatement(
 		&idpEvent,
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLab),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgId, orgId),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLab),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+		},
 	), nil
 }
 
@@ -1474,16 +1444,14 @@ func (p *idpTemplateRelationalProjection) reduceGitLabIDPRelationalChanged(event
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		columns,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
@@ -1512,30 +1480,28 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalAdd
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewCreateStatement(
 		&idpEvent,
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLabSelfHosted),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgId, orgId),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLabSelfHosted),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+		},
 	), nil
 }
 
@@ -1572,16 +1538,14 @@ func (p *idpTemplateRelationalProjection) reduceGitLabSelfHostedIDPRelationalCha
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		columns,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
@@ -1609,30 +1573,28 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalAdded(event e
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewCreateStatement(
 		&idpEvent,
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgId, orgId),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+		},
 	), nil
 }
 
@@ -1669,16 +1631,14 @@ func (p *idpTemplateRelationalProjection) reduceGoogleIDPRelationalChanged(event
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		columns,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
@@ -1727,30 +1687,28 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPAdded(event eventstore.Ev
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewCreateStatement(
 		&idpEvent,
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeLDAP),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgId, orgId),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeLDAP),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+		},
 	), nil
 }
 
@@ -1787,16 +1745,14 @@ func (p *idpTemplateRelationalProjection) reduceLDAPIDPChanged(event eventstore.
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		columns,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
@@ -1826,30 +1782,28 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPAdded(event eventstore.E
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewCreateStatement(
 		&idpEvent,
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeApple),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgId, orgId),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeApple),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+		},
 	), nil
 }
 
@@ -1886,16 +1840,14 @@ func (p *idpTemplateRelationalProjection) reduceAppleIDPChanged(event eventstore
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		columns,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
@@ -1928,30 +1880,28 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Ev
 		return nil, err
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewCreateStatement(
 		&idpEvent,
-		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPRelationalOrgId, orgId),
-				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
-				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeSAML),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
-				handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
-				handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
-				handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
-				handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
-					if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
-						return nil
-					}
-					return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
-				}()),
-				handler.NewCol(CreatedAt, idpEvent.CreationDate()),
-				handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			handler.NewCol(IDPRelationalOrgId, orgId),
+			handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+			handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeSAML),
+			handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive.String()),
+			handler.NewCol(IDPRelationalAllowCreationCol, idpEvent.IsCreationAllowed),
+			handler.NewCol(IDPRelationalAllowLinkingCol, idpEvent.IsLinkingAllowed),
+			handler.NewCol(IDPRelationalAllowAutoCreationCol, idpEvent.IsAutoCreation),
+			handler.NewCol(IDPRelationalAllowAutoUpdateCol, idpEvent.IsAutoUpdate),
+			handler.NewCol(IDPRelationalAllowAutoLinkingCol, func() any {
+				if idpEvent.AutoLinkingOption == internal_domain.AutoLinkingOptionUnspecified {
+					return nil
+				}
+				return domain.IDPAutoLinkingOption(idpEvent.AutoLinkingOption).String()
+			}()),
+			handler.NewCol(CreatedAt, idpEvent.CreationDate()),
+			handler.NewCol(IDPRelationalPayloadCol, payloadJSON),
+		},
 	), nil
 }
 
@@ -1988,16 +1938,14 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPChanged(event eventstore.
 		columns = append(columns, handler.NewCol(IDPRelationalPayloadCol, payloadJSON))
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		&idpEvent,
-		handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				orgCond,
-			},
-		),
+		columns,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			orgCond,
+		},
 	), nil
 }
 
