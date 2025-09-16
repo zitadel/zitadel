@@ -27,23 +27,24 @@ type Sessions struct {
 }
 
 type Session struct {
-	ID             string
-	CreationDate   time.Time
-	ChangeDate     time.Time
-	Sequence       uint64
-	State          domain.SessionState
-	ResourceOwner  string
-	Creator        string
-	UserFactor     SessionUserFactor
-	PasswordFactor SessionPasswordFactor
-	IntentFactor   SessionIntentFactor
-	WebAuthNFactor SessionWebAuthNFactor
-	TOTPFactor     SessionTOTPFactor
-	OTPSMSFactor   SessionOTPFactor
-	OTPEmailFactor SessionOTPFactor
-	Metadata       map[string][]byte
-	UserAgent      domain.UserAgent
-	Expiration     time.Time
+	ID                 string
+	CreationDate       time.Time
+	ChangeDate         time.Time
+	Sequence           uint64
+	State              domain.SessionState
+	ResourceOwner      string
+	Creator            string
+	UserFactor         SessionUserFactor
+	PasswordFactor     SessionPasswordFactor
+	IntentFactor       SessionIntentFactor
+	WebAuthNFactor     SessionWebAuthNFactor
+	TOTPFactor         SessionTOTPFactor
+	OTPSMSFactor       SessionOTPFactor
+	OTPEmailFactor     SessionOTPFactor
+	RecoveryCodeFactor SessionRecoveryCodeFactor
+	Metadata           map[string][]byte
+	UserAgent          domain.UserAgent
+	Expiration         time.Time
 }
 
 type SessionUserFactor struct {
@@ -73,6 +74,10 @@ type SessionTOTPFactor struct {
 
 type SessionOTPFactor struct {
 	OTPCheckedAt time.Time
+}
+
+type SessionRecoveryCodeFactor struct {
+	RecoveryCodeCheckedAt time.Time
 }
 
 type SessionsSearchQueries struct {
@@ -214,6 +219,10 @@ var (
 	}
 	SessionColumnOTPEmailCheckedAt = Column{
 		name:  projection.SessionColumnOTPEmailCheckedAt,
+		table: sessionsTable,
+	}
+	SessionColumnRecoveryCodeCheckedAt = Column{
+		name:  projection.SessionColumnRecoveryCodeCheckedAt,
 		table: sessionsTable,
 	}
 	SessionColumnMetadata = Column{

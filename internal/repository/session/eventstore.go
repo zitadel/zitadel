@@ -16,6 +16,7 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, OTPEmailChallengedType, eventstore.GenericEventMapper[OTPEmailChallengedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, OTPEmailSentType, eventstore.GenericEventMapper[OTPEmailSentEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, OTPEmailCheckedType, eventstore.GenericEventMapper[OTPEmailCheckedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, RecoveryCodeCheckedType, eventstore.GenericEventMapper[RecoveryCodeCheckedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, TokenSetType, TokenSetEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, MetadataSetType, MetadataSetEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, LifetimeSetType, eventstore.GenericEventMapper[LifetimeSetEvent])

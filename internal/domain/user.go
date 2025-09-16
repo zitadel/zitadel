@@ -45,6 +45,7 @@ const (
 	UserAuthMethodTypeOTP // generic OTP when parsing AMR from OIDC
 	UserAuthMethodTypePrivateKey
 	userAuthMethodTypeCount
+	UserAuthMethodTypeRecoveryCode
 )
 
 // HasMFA checks whether the user authenticated with multiple auth factors.
@@ -63,6 +64,7 @@ func HasMFA(methods []UserAuthMethodType) bool {
 			UserAuthMethodTypeOTPEmail,
 			UserAuthMethodTypeIDP,
 			UserAuthMethodTypeOTP,
+			UserAuthMethodTypeRecoveryCode,
 			UserAuthMethodTypePrivateKey:
 			factors++
 		case UserAuthMethodTypeUnspecified,
@@ -83,6 +85,7 @@ func Has2FA(methods []UserAuthMethodType) bool {
 			UserAuthMethodTypeTOTP,
 			UserAuthMethodTypeOTPSMS,
 			UserAuthMethodTypeOTPEmail,
+			UserAuthMethodTypeRecoveryCode,
 			UserAuthMethodTypeOTP:
 			factors++
 		case UserAuthMethodTypeUnspecified,

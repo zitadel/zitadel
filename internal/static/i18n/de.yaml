@@ -95,6 +95,7 @@ Errors:
     InitCodeNotFound: Kein Initialisierungs-Code gefunden
     UsernameNotChanged: Benutzername wurde nicht verändert
     InvalidURLTemplate: URL Template ist ungültig
+    Locked: Benutzer ist gesperrt
     Profile:
       NotFound: Profil nicht gefunden
       NotChanged: Profil nicht verändert
@@ -177,6 +178,11 @@ Errors:
         NotExisting: U2F existiert nicht
       Passwordless:
         NotExisting: Passwortlos existiert nicht
+      RecoveryCodes:
+        InvalidCode: Ungültiger Wiederherstellungscode angegeben
+        MaxCountExceeded: Maximale Anzahl von Wiederherstellungscodes überschritten
+        NotReady: Wiederherstellungscodes sind nicht bereit für die Verwendung
+        ConfigInvalid: Wiederherstellungscodes-Konfiguration ist ungültig
     WebAuthN:
       NotFound: WebAuthN Token konnte nicht gefunden werden
       BeginRegisterFailed: Es ist ein Fehler bei der WebAuthN Registrierung aufgetreten

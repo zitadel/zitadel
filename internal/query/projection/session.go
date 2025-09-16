@@ -34,6 +34,7 @@ const (
 	SessionColumnTOTPCheckedAt          = "totp_checked_at"
 	SessionColumnOTPSMSCheckedAt        = "otp_sms_checked_at"
 	SessionColumnOTPEmailCheckedAt      = "otp_email_checked_at"
+	SessionColumnRecoveryCodeCheckedAt  = "mfa_recovery_code_checked_at"
 	SessionColumnMetadata               = "metadata"
 	SessionColumnTokenID                = "token_id"
 	SessionColumnUserAgentFingerprintID = "user_agent_fingerprint_id"
@@ -74,6 +75,7 @@ func (*sessionProjection) Init() *old_handler.Check {
 			handler.NewColumn(SessionColumnTOTPCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnOTPSMSCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnOTPEmailCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
+			handler.NewColumn(SessionColumnRecoveryCodeCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnMetadata, handler.ColumnTypeJSONB, handler.Nullable()),
 			handler.NewColumn(SessionColumnTokenID, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SessionColumnUserAgentFingerprintID, handler.ColumnTypeText, handler.Nullable()),
@@ -128,6 +130,10 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  session.OTPEmailCheckedType,
 					Reduce: p.reduceOTPEmailChecked,
+				},
+				{
+					Event:  session.RecoveryCodeCheckedType,
+					Reduce: p.reduceRecoveryCodeChecked,
 				},
 				{
 					Event:  session.TokenSetType,
@@ -338,6 +344,26 @@ func (p *sessionProjection) reduceOTPEmailChecked(event eventstore.Event) (*hand
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnOTPEmailCheckedAt, e.CheckedAt),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *sessionProjection) reduceRecoveryCodeChecked(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*session.RecoveryCodeCheckedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnRecoveryCodeCheckedAt, e.CheckedAt),
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnID, e.Aggregate().ID),

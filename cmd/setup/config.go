@@ -161,6 +161,7 @@ type Steps struct {
 	s62HTTPProviderAddSigningKey            *HTTPProviderAddSigningKey
 	s63AlterResourceCounts                  *AlterResourceCounts
 	s64ChangePushPosition                   *ChangePushPosition
+	s65SessionRecoveryCodeCheckedAt         *SessionRecoveryCodeCheckedAt
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

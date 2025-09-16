@@ -96,6 +96,7 @@ Errors:
     InitCodeNotFound: 初期化コードが見つかりません
     UsernameNotChanged: ユーザー名は変更されていません
     InvalidURLTemplate: URLテンプレートが無効です
+    Locked: ユーザーがロックされています
     Profile:
       NotFound: プロファイルが見つかりません
       NotChanged: プロファイルが変更されていません
@@ -178,6 +179,11 @@ Errors:
         NotExisting: U2Fは存在しません
       Passwordless:
         NotExisting: パスワードレスは存在しません
+      RecoveryCodes:
+        InvalidCode: 無効なリカバリーコードが提供されました
+        MaxCountExceeded: リカバリーコードの最大数を超過しました
+        NotReady: リカバリーコードの使用準備ができていません
+        ConfigInvalid: リカバリーコードの設定が無効です
     WebAuthN:
       NotFound: WebAuthNトークンが見つかりませんでした
       BeginRegisterFailed: WebAuthN登録の開始に失敗しました

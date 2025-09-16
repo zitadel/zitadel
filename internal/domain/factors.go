@@ -8,6 +8,7 @@ const (
 	SecondFactorTypeU2F
 	SecondFactorTypeOTPEmail
 	SecondFactorTypeOTPSMS
+	SecondFactorTypeRecoveryCodes
 
 	secondFactorCount
 )
