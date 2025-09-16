@@ -7,7 +7,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/query"
-	group "github.com/zitadel/zitadel/pkg/grpc/group/v2beta"
+	group "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
 
 // ListGroups returns a list of groups that match the search criteria

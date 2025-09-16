@@ -6,16 +6,22 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	group "github.com/zitadel/zitadel/pkg/grpc/group/v2beta"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
 
 // CreateGroup creates a new user group in the specified organization.
 func (s *Server) CreateGroup(ctx context.Context, req *connect.Request[group.CreateGroupRequest]) (*connect.Response[group.CreateGroupResponse], error) {
 	userGroup := &domain.Group{
-		Name:           req.Msg.Name,
-		Description:    req.Msg.Description,
-		OrganizationID: req.Msg.OrganizationId,
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   req.Msg.GetId(),
+			ResourceOwner: authz.GetCtxData(ctx).ResourceOwner,
+		},
+		Name:           req.Msg.GetName(),
+		Description:    req.Msg.GetDescription(),
+		OrganizationID: req.Msg.GetOrganizationId(),
 	}
 
 	groupDetails, err := s.command.CreateGroup(ctx, userGroup)

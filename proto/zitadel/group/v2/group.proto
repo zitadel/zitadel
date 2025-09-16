@@ -6,7 +6,7 @@ import "validate/validate.proto";
 
 package zitadel.group.v2beta;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/group/v2beta;group";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/group/v2;group";
 
 message Group {
   // Unique identifier of the user group.

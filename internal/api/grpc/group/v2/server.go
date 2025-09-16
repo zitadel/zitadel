@@ -12,8 +12,8 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	group "github.com/zitadel/zitadel/pkg/grpc/group/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/group/v2beta/groupconnect"
+	"github.com/zitadel/zitadel/pkg/grpc/group/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/group/v2/groupconnect"
 )
 
 var _ groupconnect.GroupServiceHandler = (*Server)(nil)
@@ -31,7 +31,7 @@ func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (str
 }
 
 func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
-	return group.File_zitadel_group_v2beta_group_service_proto
+	return group.File_zitadel_group_v2_group_service_proto
 }
 
 func (s *Server) AppName() string {
