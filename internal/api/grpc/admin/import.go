@@ -505,7 +505,7 @@ func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 			}
 		}
 
-		if user.User.RecoveryCodes != nil && len(user.User.RecoveryCodes) > 0 {
+		if len(user.User.RecoveryCodes) > 0 {
 			logging.Debugf("import user recovery codes: %s", user.GetUserId())
 			if err := s.command.ImportHumanRecoveryCodes(ctx, user.UserId, org.GetOrgId(), user.User.RecoveryCodes); err != nil {
 				*errors = append(*errors, &admin_pb.ImportDataError{Type: "human_user_recovery_codes", Id: user.GetUserId(), Message: err.Error()})
