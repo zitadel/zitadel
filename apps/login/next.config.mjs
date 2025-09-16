@@ -33,43 +33,28 @@ const secureHeaders = [
   { key: "X-Frame-Options", value: "deny" },
 ];
 
-const imageRemotePatterns = [
-  {
-    protocol: "http",
-    hostname: "localhost",
-    port: "8080",
-    pathname: "/**",
-  },
-  {
-    protocol: "https",
-    hostname: "*.zitadel.*",
-    port: "",
-    pathname: "/**",
-  },
-];
-
-if (process.env.ZITADEL_API_URL) {
-  imageRemotePatterns.push({
-    protocol: "https",
-    hostname: process.env.ZITADEL_API_URL?.replace("https://", "") || "",
-    port: "",
-    pathname: "/**",
-  });
-}
-
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   output: process.env.NEXT_OUTPUT_MODE || undefined,
-  reactStrictMode: true, // Recommended for the `pages` directory, default in `app`.
+  reactStrictMode: true,
   experimental: {
     dynamicIO: true,
+    // Add React 19 compatibility optimizations
+    optimizePackageImports: ['@radix-ui/react-tooltip', '@heroicons/react'],
   },
   images: {
-    remotePatterns: imageRemotePatterns,
+    unoptimized: true
   },
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Improve SSR stability - not actually needed for React 19 SSR issues
+  // onDemandEntries: {
+  //   maxInactiveAge: 25 * 1000,
+  //   pagesBufferLength: 2,
+  // },
+  // Better error handling for production builds
+  poweredByHeader: false,
   async headers() {
     return [
       {

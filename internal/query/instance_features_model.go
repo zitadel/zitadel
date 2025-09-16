@@ -68,16 +68,17 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceImprovedPerformanceEventType,
 			feature_v2.InstanceDebugOIDCParentErrorEventType,
 			feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
-			feature_v2.InstanceDisableUserTokenEvent,
 			feature_v2.InstanceEnableBackChannelLogout,
 			feature_v2.InstanceLoginVersion,
 			feature_v2.InstancePermissionCheckV2,
 			feature_v2.InstanceConsoleUseV2UserApi,
+			feature_v2.InstanceEnableRelationalTables,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
 
 func (m *InstanceFeaturesReadModel) reduceReset() {
+	m.instance.EnableRelationalTables = FeatureSource[bool]{}
 	if m.populateFromSystem() {
 		return
 	}
@@ -94,7 +95,6 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	m.instance.TokenExchange = m.system.TokenExchange
 	m.instance.ImprovedPerformance = m.system.ImprovedPerformance
 	m.instance.OIDCSingleV1SessionTermination = m.system.OIDCSingleV1SessionTermination
-	m.instance.DisableUserTokenEvent = m.system.DisableUserTokenEvent
 	m.instance.EnableBackChannelLogout = m.system.EnableBackChannelLogout
 	m.instance.LoginV2 = m.system.LoginV2
 	return true
@@ -120,8 +120,6 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.DebugOIDCParentError.set(level, event.Value)
 	case feature.KeyOIDCSingleV1SessionTermination:
 		features.OIDCSingleV1SessionTermination.set(level, event.Value)
-	case feature.KeyDisableUserTokenEvent:
-		features.DisableUserTokenEvent.set(level, event.Value)
 	case feature.KeyEnableBackChannelLogout:
 		features.EnableBackChannelLogout.set(level, event.Value)
 	case feature.KeyLoginV2:
@@ -130,6 +128,8 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.PermissionCheckV2.set(level, event.Value)
 	case feature.KeyConsoleUseV2UserApi:
 		features.ConsoleUseV2UserApi.set(level, event.Value)
+	case feature.KeyEnableRelationalTables:
+		features.EnableRelationalTables.set(level, event.Value)
 	}
 	return nil
 }

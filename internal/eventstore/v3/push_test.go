@@ -1,15 +1,23 @@
 package eventstore
 
 import (
+	"context"
+	"database/sql"
 	_ "embed"
 	"testing"
 
+	"github.com/riverqueue/river"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/postgres"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/mock"
+	"github.com/zitadel/zitadel/internal/execution/target"
+	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 )
 
 func Test_mapCommands(t *testing.T) {
@@ -250,4 +258,160 @@ func Test_mapCommands(t *testing.T) {
 			assert.ElementsMatch(t, tt.want.args, gotArgs)
 		})
 	}
+}
+
+func TestEventstore_queueExecutions(t *testing.T) {
+	events := []eventstore.Event{
+		mockEventType(mockAggregate("TEST"), 1, []byte(`{"test":"test"}`), "ex.foo.bar"),
+		mockEventType(mockAggregate("TEST"), 2, []byte("{}"), "ex.bar.foo"),
+		mockEventType(mockAggregate("TEST"), 3, nil, "ex.removed"),
+	}
+	type args struct {
+		ctx    context.Context
+		tx     database.Tx
+		events []eventstore.Event
+	}
+	tests := []struct {
+		name    string
+		queue   func(t *testing.T) eventstore.ExecutionQueue
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "incorrect Tx type, noop",
+			queue: func(t *testing.T) eventstore.ExecutionQueue {
+				mQueue := mock.NewMockExecutionQueue(gomock.NewController(t))
+				return mQueue
+			},
+			args: args{
+				ctx:    context.Background(),
+				tx:     nil,
+				events: events,
+			},
+			wantErr: false,
+		},
+		{
+			name: "no events",
+			queue: func(t *testing.T) eventstore.ExecutionQueue {
+				mQueue := mock.NewMockExecutionQueue(gomock.NewController(t))
+				return mQueue
+			},
+			args: args{
+				ctx:    context.Background(),
+				tx:     &sql.Tx{},
+				events: []eventstore.Event{},
+			},
+			wantErr: false,
+		},
+		{
+			name: "no router in Ctx",
+			queue: func(t *testing.T) eventstore.ExecutionQueue {
+				mQueue := mock.NewMockExecutionQueue(gomock.NewController(t))
+				return mQueue
+			},
+			args: args{
+				ctx:    context.Background(),
+				tx:     &sql.Tx{},
+				events: events,
+			},
+			wantErr: false,
+		},
+		{
+			name: "not found in router",
+			queue: func(t *testing.T) eventstore.ExecutionQueue {
+				mQueue := mock.NewMockExecutionQueue(gomock.NewController(t))
+				return mQueue
+			},
+			args: args{
+				ctx: authz.WithExecutionRouter(
+					context.Background(),
+					target.NewRouter([]target.Target{
+						{
+							ExecutionID: "function/fooBar",
+						},
+					}),
+				),
+				tx:     &sql.Tx{},
+				events: events,
+			},
+			wantErr: false,
+		},
+		{
+			name: "event prefix",
+			queue: func(t *testing.T) eventstore.ExecutionQueue {
+				mQueue := mock.NewMockExecutionQueue(gomock.NewController(t))
+				mQueue.EXPECT().InsertManyFastTx(
+					gomock.Any(),
+					gomock.Any(),
+					[]river.JobArgs{
+						mustNewRequest(t, events[0], []target.Target{{ExecutionID: "event"}}),
+						mustNewRequest(t, events[1], []target.Target{{ExecutionID: "event"}}),
+						mustNewRequest(t, events[2], []target.Target{{ExecutionID: "event"}}),
+					},
+					gomock.Any(),
+				)
+				return mQueue
+			},
+			args: args{
+				ctx: authz.WithExecutionRouter(
+					context.Background(),
+					target.NewRouter([]target.Target{
+						{ExecutionID: "function/fooBar"},
+						{ExecutionID: "event"},
+					}),
+				),
+				tx:     &sql.Tx{},
+				events: events,
+			},
+			wantErr: false,
+		},
+		{
+			name: "event wildcard and exact match",
+			queue: func(t *testing.T) eventstore.ExecutionQueue {
+				mQueue := mock.NewMockExecutionQueue(gomock.NewController(t))
+				mQueue.EXPECT().InsertManyFastTx(
+					gomock.Any(),
+					gomock.Any(),
+					[]river.JobArgs{
+						mustNewRequest(t, events[0], []target.Target{{ExecutionID: "event/ex.foo.*"}}),
+						mustNewRequest(t, events[2], []target.Target{{ExecutionID: "event/ex.removed"}}),
+					},
+					gomock.Any(),
+				)
+				return mQueue
+			},
+			args: args{
+				ctx: authz.WithExecutionRouter(
+					context.Background(),
+					target.NewRouter([]target.Target{
+						{ExecutionID: "function/fooBar"},
+						{ExecutionID: "event/ex.foo.*"},
+						{ExecutionID: "event/ex.removed"},
+					}),
+				),
+				tx:     &sql.Tx{},
+				events: events,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			es := &Eventstore{
+				queue: tt.queue(t),
+			}
+			err := es.queueExecutions(tt.args.ctx, tt.args.tx, tt.args.events)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func mustNewRequest(t *testing.T, e eventstore.Event, targets []target.Target) *exec_repo.Request {
+	req, err := exec_repo.NewRequest(e, targets)
+	require.NoError(t, err, "exec_repo.NewRequest")
+	return req
 }
