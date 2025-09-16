@@ -36,7 +36,7 @@ const (
 	IDPStateInactive
 )
 
-//go:generate enumer -type IDPAutoLinkingOption -transform lower -trimprefix IDPAutoLinkingOption -sql
+//go:generate enumer -type IDPAutoLinkingOption -transform lower -trimprefix IDPAutoLinkingOption
 type IDPAutoLinkingOption uint8
 
 const (
@@ -56,22 +56,22 @@ const (
 )
 
 type IdentityProvider struct {
-	InstanceID        string                `json:"instanceId,omitempty" db:"instance_id"`
-	OrgID             *string               `json:"orgId,omitempty" db:"org_id"`
-	ID                string                `json:"id,omitempty" db:"id"`
-	State             IDPState              `json:"state,omitempty" db:"state"`
-	Name              string                `json:"name,omitempty" db:"name"`
-	Type              *IDPType              `json:"type,omitempty" db:"type"`
-	AllowCreation     bool                  `json:"allowCreation,omitempty" db:"allow_creation"`
-	AutoRegister      bool                  `json:"autoRegister,omitempty" db:"auto_register"`
-	AllowAutoCreation bool                  `json:"allowAutoCreation,omitempty" db:"allow_auto_creation"`
-	AllowAutoUpdate   bool                  `json:"allowAutoUpdate,omitempty" db:"allow_auto_update"`
-	AllowLinking      bool                  `json:"allowLinking,omitempty" db:"allow_linking"`
-	AllowAutoLinking  *IDPAutoLinkingOption `json:"allowAutoLinking,omitempty" db:"allow_auto_linking"`
-	StylingType       *int16                `json:"stylingType,omitempty" db:"styling_type"`
-	Payload           json.RawMessage       `json:"payload,omitempty" db:"payload"`
-	CreatedAt         time.Time             `json:"createdAt,omitzero" db:"created_at"`
-	UpdatedAt         time.Time             `json:"updatedAt,omitzero" db:"updated_at"`
+	InstanceID        string          `json:"instanceId,omitempty" db:"instance_id"`
+	OrgID             *string         `json:"orgId,omitempty" db:"org_id"`
+	ID                string          `json:"id,omitempty" db:"id"`
+	State             IDPState        `json:"state,omitempty" db:"state"`
+	Name              string          `json:"name,omitempty" db:"name"`
+	Type              *int16          `json:"type,omitempty" db:"type"`
+	AllowCreation     bool            `json:"allowCreation,omitempty" db:"allow_creation"`
+	AutoRegister      bool            `json:"autoRegister,omitempty" db:"auto_register"`
+	AllowAutoCreation bool            `json:"allowAutoCreation,omitempty" db:"allow_auto_creation"`
+	AllowAutoUpdate   bool            `json:"allowAutoUpdate,omitempty" db:"allow_auto_update"`
+	AllowLinking      bool            `json:"allowLinking,omitempty" db:"allow_linking"`
+	AllowAutoLinking  *int16          `json:"allowAutoLinking,omitempty" db:"allow_auto_linking"`
+	StylingType       *int16          `json:"stylingType,omitempty" db:"styling_type"`
+	Payload           json.RawMessage `json:"payload,omitempty" db:"payload"`
+	CreatedAt         time.Time       `json:"createdAt,omitzero" db:"created_at"`
+	UpdatedAt         time.Time       `json:"updatedAt,omitzero" db:"updated_at"`
 }
 
 type OIDC struct {

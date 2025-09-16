@@ -410,7 +410,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, oidc.OrgID)
 			assert.Equal(t, name, oidc.Name)
 			assert.Equal(t, addOIDC.IdpId, oidc.ID)
-			assert.Equal(t, domain.IDPTypeOIDC, *oidc.Type)
+			assert.Equal(t, domain.IDPTypeOIDC, domain.IDPType(*oidc.Type))
 
 			// oidc
 			assert.Equal(t, "issuer", oidc.Issuer)
@@ -479,7 +479,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, oidc.OrgID)
 			assert.Equal(t, name, oidc.Name)
 			assert.Equal(t, addOIDC.IdpId, updateOIDC.ID)
-			assert.Equal(t, domain.IDPTypeOIDC, *updateOIDC.Type)
+			assert.Equal(t, domain.IDPTypeOIDC, domain.IDPType(*updateOIDC.Type))
 			assert.WithinRange(t, updateOIDC.UpdatedAt, before, after)
 
 			// oidc
@@ -527,7 +527,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, jwt.OrgID)
 			assert.Equal(t, name, jwt.Name)
 			assert.Equal(t, addJWT.IdpId, jwt.ID)
-			assert.Equal(t, domain.IDPTypeJWT, *jwt.Type)
+			assert.Equal(t, domain.IDPTypeJWT, domain.IDPType(*jwt.Type))
 			assert.Equal(t, int16(idp_grpc.IDPStylingType_STYLING_TYPE_GOOGLE), *jwt.StylingType)
 
 			// jwt
@@ -578,7 +578,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			// event iam.idp.jwt.config.changed
 			// idp
 			assert.Equal(t, addJWT.IdpId, updateJWT.ID)
-			assert.Equal(t, domain.IDPTypeJWT, *updateJWT.Type)
+			assert.Equal(t, domain.IDPTypeJWT, domain.IDPType(*updateJWT.Type))
 			assert.WithinRange(t, updateJWT.UpdatedAt, before, after)
 
 			// jwt
@@ -630,11 +630,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, oauth.OrgID)
 			assert.Equal(t, addOAuth.Id, oauth.ID)
 			assert.Equal(t, name, oauth.Name)
-			assert.Equal(t, domain.IDPTypeOAuth, *oauth.Type)
+			assert.Equal(t, domain.IDPTypeOAuth, domain.IDPType(*oauth.Type))
 			assert.Equal(t, false, oauth.AllowLinking)
 			assert.Equal(t, false, oauth.AllowCreation)
 			assert.Equal(t, false, oauth.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *oauth.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, domain.IDPAutoLinkingOption(*oauth.AllowAutoLinking))
 			assert.WithinRange(t, oauth.CreatedAt, before, after)
 			assert.WithinRange(t, oauth.UpdatedAt, before, after)
 
@@ -724,11 +724,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, oauth.OrgID)
 			assert.Equal(t, addOAuth.Id, updateOauth.ID)
 			assert.Equal(t, name, updateOauth.Name)
-			assert.Equal(t, domain.IDPTypeOAuth, *oauth.Type)
+			assert.Equal(t, domain.IDPTypeOAuth, domain.IDPType(*oauth.Type))
 			assert.Equal(t, true, updateOauth.AllowLinking)
 			assert.Equal(t, true, updateOauth.AllowCreation)
 			assert.Equal(t, true, updateOauth.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateOauth.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*updateOauth.AllowAutoLinking))
 			assert.Equal(t, true, updateOauth.UsePKCE)
 			assert.WithinRange(t, updateOauth.UpdatedAt, before, after)
 
@@ -780,11 +780,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, oidc.OrgID)
 			assert.Equal(t, addOIDC.Id, oidc.ID)
 			assert.Equal(t, name, oidc.Name)
-			assert.Equal(t, domain.IDPTypeOIDC, *oidc.Type)
+			assert.Equal(t, domain.IDPTypeOIDC, domain.IDPType(*oidc.Type))
 			assert.Equal(t, false, oidc.AllowLinking)
 			assert.Equal(t, false, oidc.AllowCreation)
 			assert.Equal(t, false, oidc.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *oidc.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, domain.IDPAutoLinkingOption(*oidc.AllowAutoLinking))
 			assert.WithinRange(t, oidc.CreatedAt, before, after)
 			assert.WithinRange(t, oidc.UpdatedAt, before, after)
 
@@ -867,11 +867,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, oidc.OrgID)
 			assert.Equal(t, addOIDC.Id, oidc.ID)
 			assert.Equal(t, name, updateOIDC.Name)
-			assert.Equal(t, domain.IDPTypeOIDC, *oidc.Type)
+			assert.Equal(t, domain.IDPTypeOIDC, domain.IDPType(*oidc.Type))
 			assert.Equal(t, true, updateOIDC.AllowLinking)
 			assert.Equal(t, true, updateOIDC.AllowCreation)
 			assert.Equal(t, true, updateOIDC.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateOIDC.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*updateOIDC.AllowAutoLinking))
 			assert.WithinRange(t, updateOIDC.UpdatedAt, before, after)
 
 			// oidc
@@ -913,7 +913,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			oidc, err = idpRepo.GetOIDC(IAMCTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
 			require.NoError(t, err)
-			assert.Equal(t, domain.IDPTypeOIDC, *oidc.Type)
+			assert.Equal(t, domain.IDPTypeOIDC, domain.IDPType(*oidc.Type))
 		}, retryDuration, tick)
 
 		before := time.Now()
@@ -956,11 +956,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, addOIDC.Id, azure.ID)
 			assert.Equal(t, name, azure.Name)
 			// type = azure
-			assert.Equal(t, domain.IDPTypeAzure, *azure.Type)
+			assert.Equal(t, domain.IDPTypeAzure, domain.IDPType(*azure.Type))
 			assert.Equal(t, true, azure.AllowLinking)
 			assert.Equal(t, true, azure.AllowCreation)
 			assert.Equal(t, true, azure.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *azure.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*azure.AllowAutoLinking))
 			assert.WithinRange(t, azure.UpdatedAt, before, after)
 
 			// oidc
@@ -1001,7 +1001,7 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
 			oidc, err = idpRepo.GetOIDC(IAMCTX, idpRepo.IDCondition(addOIDC.Id), instanceID, nil)
 			require.NoError(t, err)
-			assert.Equal(t, domain.IDPTypeOIDC, *oidc.Type)
+			assert.Equal(t, domain.IDPTypeOIDC, domain.IDPType(*oidc.Type))
 		}, retryDuration, tick)
 
 		before := time.Now()
@@ -1038,11 +1038,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, addOIDC.Id, google.ID)
 			assert.Equal(t, name, google.Name)
 			// type = google
-			assert.Equal(t, domain.IDPTypeGoogle, *google.Type)
+			assert.Equal(t, domain.IDPTypeGoogle, domain.IDPType(*google.Type))
 			assert.Equal(t, true, google.AllowLinking)
 			assert.Equal(t, true, google.AllowCreation)
 			assert.Equal(t, true, google.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *google.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*google.AllowAutoLinking))
 			assert.WithinRange(t, google.UpdatedAt, before, after)
 
 			// oidc
@@ -1088,11 +1088,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, jwt.OrgID)
 			assert.Equal(t, addJWT.Id, jwt.ID)
 			assert.Equal(t, name, jwt.Name)
-			assert.Equal(t, domain.IDPTypeJWT, *jwt.Type)
+			assert.Equal(t, domain.IDPTypeJWT, domain.IDPType(*jwt.Type))
 			assert.Equal(t, false, jwt.AllowLinking)
 			assert.Equal(t, false, jwt.AllowCreation)
 			assert.Equal(t, false, jwt.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *jwt.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, domain.IDPAutoLinkingOption(*jwt.AllowAutoLinking))
 			assert.WithinRange(t, jwt.CreatedAt, before, after)
 			assert.WithinRange(t, jwt.UpdatedAt, before, after)
 
@@ -1159,11 +1159,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, jwt.OrgID)
 			assert.Equal(t, addJWT.Id, jwt.ID)
 			assert.Equal(t, name, jwt.Name)
-			assert.Equal(t, domain.IDPTypeJWT, *jwt.Type)
+			assert.Equal(t, domain.IDPTypeJWT, domain.IDPType(*jwt.Type))
 			assert.Equal(t, true, jwt.AllowLinking)
 			assert.Equal(t, true, jwt.AllowCreation)
 			assert.Equal(t, true, jwt.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *jwt.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*jwt.AllowAutoLinking))
 			assert.WithinRange(t, jwt.UpdatedAt, before, after)
 
 			// jwt
@@ -1215,11 +1215,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, azure.OrgID)
 			assert.Equal(t, addAzure.Id, azure.ID)
 			assert.Equal(t, name, azure.Name)
-			assert.Equal(t, domain.IDPTypeAzure, *azure.Type)
+			assert.Equal(t, domain.IDPTypeAzure, domain.IDPType(*azure.Type))
 			assert.Equal(t, true, azure.AllowLinking)
 			assert.Equal(t, true, azure.AllowCreation)
 			assert.Equal(t, true, azure.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *azure.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*azure.AllowAutoLinking))
 			assert.WithinRange(t, azure.UpdatedAt, before, after)
 
 			// azure
@@ -1304,11 +1304,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, updateAzure.OrgID)
 			assert.Equal(t, addAzure.Id, updateAzure.ID)
 			assert.Equal(t, name, updateAzure.Name)
-			assert.Equal(t, domain.IDPTypeAzure, *updateAzure.Type)
+			assert.Equal(t, domain.IDPTypeAzure, domain.IDPType(*updateAzure.Type))
 			assert.Equal(t, true, updateAzure.AllowLinking)
 			assert.Equal(t, true, updateAzure.AllowCreation)
 			assert.Equal(t, true, updateAzure.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *updateAzure.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, domain.IDPAutoLinkingOption(*updateAzure.AllowAutoLinking))
 			assert.WithinRange(t, updateAzure.UpdatedAt, before, after)
 
 			// azure
@@ -1355,11 +1355,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, github.OrgID)
 			assert.Equal(t, addGithub.Id, github.ID)
 			assert.Equal(t, name, github.Name)
-			assert.Equal(t, domain.IDPTypeGitHub, *github.Type)
+			assert.Equal(t, domain.IDPTypeGitHub, domain.IDPType(*github.Type))
 			assert.Equal(t, false, github.AllowLinking)
 			assert.Equal(t, false, github.AllowCreation)
 			assert.Equal(t, false, github.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *github.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*github.AllowAutoLinking))
 			assert.WithinRange(t, github.UpdatedAt, before, after)
 
 			assert.Equal(t, "clientId", github.ClientID)
@@ -1429,11 +1429,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, updateGithub.OrgID)
 			assert.Equal(t, addGithub.Id, updateGithub.ID)
 			assert.Equal(t, name, updateGithub.Name)
-			assert.Equal(t, domain.IDPTypeGitHub, *updateGithub.Type)
+			assert.Equal(t, domain.IDPTypeGitHub, domain.IDPType(*updateGithub.Type))
 			assert.Equal(t, true, updateGithub.AllowLinking)
 			assert.Equal(t, true, updateGithub.AllowCreation)
 			assert.Equal(t, true, updateGithub.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateGithub.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*updateGithub.AllowAutoLinking))
 			assert.WithinRange(t, updateGithub.UpdatedAt, before, after)
 
 			// github
@@ -1481,11 +1481,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, githubEnterprise.OrgID)
 			assert.Equal(t, addGithubEnterprise.Id, githubEnterprise.ID)
 			assert.Equal(t, name, githubEnterprise.Name)
-			assert.Equal(t, domain.IDPTypeGitHubEnterprise, *githubEnterprise.Type)
+			assert.Equal(t, domain.IDPTypeGitHubEnterprise, domain.IDPType(*githubEnterprise.Type))
 			assert.Equal(t, false, githubEnterprise.AllowLinking)
 			assert.Equal(t, false, githubEnterprise.AllowCreation)
 			assert.Equal(t, false, githubEnterprise.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *githubEnterprise.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, domain.IDPAutoLinkingOption(*githubEnterprise.AllowAutoLinking))
 			assert.WithinRange(t, githubEnterprise.CreatedAt, before, after)
 			assert.WithinRange(t, githubEnterprise.UpdatedAt, before, after)
 
@@ -1566,11 +1566,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, githubEnterprise.OrgID)
 			assert.Equal(t, addGithubEnterprise.Id, updateGithubEnterprise.ID)
 			assert.Equal(t, name, updateGithubEnterprise.Name)
-			assert.Equal(t, domain.IDPTypeGitHubEnterprise, *updateGithubEnterprise.Type)
+			assert.Equal(t, domain.IDPTypeGitHubEnterprise, domain.IDPType(*updateGithubEnterprise.Type))
 			assert.Equal(t, false, updateGithubEnterprise.AllowLinking)
 			assert.Equal(t, false, updateGithubEnterprise.AllowCreation)
 			assert.Equal(t, false, updateGithubEnterprise.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *updateGithubEnterprise.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, domain.IDPAutoLinkingOption(*updateGithubEnterprise.AllowAutoLinking))
 			assert.WithinRange(t, updateGithubEnterprise.UpdatedAt, before, after)
 
 			// github enterprise
@@ -1618,11 +1618,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, gitlab.OrgID)
 			assert.Equal(t, addGithub.Id, gitlab.ID)
 			assert.Equal(t, name, gitlab.Name)
-			assert.Equal(t, domain.IDPTypeGitLab, *gitlab.Type)
+			assert.Equal(t, domain.IDPTypeGitLab, domain.IDPType(*gitlab.Type))
 			assert.Equal(t, false, gitlab.AllowLinking)
 			assert.Equal(t, false, gitlab.AllowCreation)
 			assert.Equal(t, false, gitlab.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *gitlab.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, domain.IDPAutoLinkingOption(*gitlab.AllowAutoLinking))
 			assert.WithinRange(t, gitlab.CreatedAt, before, after)
 			assert.WithinRange(t, gitlab.UpdatedAt, before, after)
 
@@ -1697,13 +1697,13 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Equal(t, true, updateGitlab.AllowLinking)
 			assert.Equal(t, true, updateGitlab.AllowCreation)
 			assert.Equal(t, true, updateGitlab.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateGitlab.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*updateGitlab.AllowAutoLinking))
 			assert.WithinRange(t, updateGitlab.UpdatedAt, before, after)
 
 			// gitlab
 			assert.Equal(t, "new_clientId", updateGitlab.ClientID)
 			assert.NotEqual(t, githlab.ClientSecret, updateGitlab.ClientSecret)
-			assert.Equal(t, domain.IDPTypeGitLab, *updateGitlab.Type)
+			assert.Equal(t, domain.IDPTypeGitLab, domain.IDPType(*updateGitlab.Type))
 			assert.Equal(t, []string{"new_scope"}, updateGitlab.Scopes)
 		}, retryDuration, tick)
 	})
@@ -1744,11 +1744,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, gitlabSelfHosted.OrgID)
 			assert.Equal(t, addGitlabSelfHosted.Id, gitlabSelfHosted.ID)
 			assert.Equal(t, name, gitlabSelfHosted.Name)
-			assert.Equal(t, domain.IDPTypeGitLabSelfHosted, *gitlabSelfHosted.Type)
+			assert.Equal(t, domain.IDPTypeGitLabSelfHosted, domain.IDPType(*gitlabSelfHosted.Type))
 			assert.Equal(t, false, gitlabSelfHosted.AllowLinking)
 			assert.Equal(t, false, gitlabSelfHosted.AllowCreation)
 			assert.Equal(t, false, gitlabSelfHosted.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *gitlabSelfHosted.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, domain.IDPAutoLinkingOption(*gitlabSelfHosted.AllowAutoLinking))
 			assert.WithinRange(t, gitlabSelfHosted.CreatedAt, before, after)
 			assert.WithinRange(t, gitlabSelfHosted.UpdatedAt, before, after)
 
@@ -1823,11 +1823,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, updateGitlabSelfHosted.OrgID)
 			assert.Equal(t, addGitlabSelfHosted.Id, updateGitlabSelfHosted.ID)
 			assert.Equal(t, name, updateGitlabSelfHosted.Name)
-			assert.Equal(t, domain.IDPTypeGitLabSelfHosted, *updateGitlabSelfHosted.Type)
+			assert.Equal(t, domain.IDPTypeGitLabSelfHosted, domain.IDPType(*updateGitlabSelfHosted.Type))
 			assert.Equal(t, true, updateGitlabSelfHosted.AllowLinking)
 			assert.Equal(t, true, updateGitlabSelfHosted.AllowCreation)
 			assert.Equal(t, true, updateGitlabSelfHosted.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateGitlabSelfHosted.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*updateGitlabSelfHosted.AllowAutoLinking))
 			assert.WithinRange(t, updateGitlabSelfHosted.UpdatedAt, before, after)
 
 			// gitlab self hosted
@@ -1873,11 +1873,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, google.OrgID)
 			assert.Equal(t, addGoogle.Id, google.ID)
 			assert.Equal(t, name, google.Name)
-			assert.Equal(t, domain.IDPTypeGoogle, *google.Type)
+			assert.Equal(t, domain.IDPTypeGoogle, domain.IDPType(*google.Type))
 			assert.Equal(t, false, google.AllowLinking)
 			assert.Equal(t, false, google.AllowCreation)
 			assert.Equal(t, false, google.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *google.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, domain.IDPAutoLinkingOption(*google.AllowAutoLinking))
 			assert.WithinRange(t, google.CreatedAt, before, after)
 			assert.WithinRange(t, google.UpdatedAt, before, after)
 
@@ -1949,11 +1949,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, updateGoogle.OrgID)
 			assert.Equal(t, addGoogle.Id, updateGoogle.ID)
 			assert.Equal(t, name, updateGoogle.Name)
-			assert.Equal(t, domain.IDPTypeGoogle, *updateGoogle.Type)
+			assert.Equal(t, domain.IDPTypeGoogle, domain.IDPType(*updateGoogle.Type))
 			assert.Equal(t, true, updateGoogle.AllowLinking)
 			assert.Equal(t, true, updateGoogle.AllowCreation)
 			assert.Equal(t, true, updateGoogle.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateGoogle.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*updateGoogle.AllowAutoLinking))
 			assert.WithinRange(t, updateGoogle.UpdatedAt, before, after)
 
 			// google
@@ -2018,11 +2018,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, ldap.OrgID)
 			assert.Equal(t, addLdap.Id, ldap.ID)
 			assert.Equal(t, name, ldap.Name)
-			assert.Equal(t, domain.IDPTypeLDAP, *ldap.Type)
+			assert.Equal(t, domain.IDPTypeLDAP, domain.IDPType(*ldap.Type))
 			assert.Equal(t, false, ldap.AllowLinking)
 			assert.Equal(t, false, ldap.AllowCreation)
 			assert.Equal(t, false, ldap.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *ldap.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, domain.IDPAutoLinkingOption(*ldap.AllowAutoLinking))
 			assert.WithinRange(t, ldap.CreatedAt, before, after)
 			assert.WithinRange(t, ldap.UpdatedAt, before, after)
 
@@ -2155,11 +2155,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, updateLdap.OrgID)
 			assert.Equal(t, addLdap.Id, updateLdap.ID)
 			assert.Equal(t, name, updateLdap.Name)
-			assert.Equal(t, domain.IDPTypeLDAP, *updateLdap.Type)
+			assert.Equal(t, domain.IDPTypeLDAP, domain.IDPType(*updateLdap.Type))
 			assert.Equal(t, true, updateLdap.AllowLinking)
 			assert.Equal(t, true, updateLdap.AllowCreation)
 			assert.Equal(t, true, updateLdap.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateLdap.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*updateLdap.AllowAutoLinking))
 			assert.WithinRange(t, updateLdap.UpdatedAt, before, after)
 
 			// ldap
@@ -2224,11 +2224,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, apple.OrgID)
 			assert.Equal(t, addApple.Id, apple.ID)
 			assert.Equal(t, name, apple.Name)
-			assert.Equal(t, domain.IDPTypeApple, *apple.Type)
+			assert.Equal(t, domain.IDPTypeApple, domain.IDPType(*apple.Type))
 			assert.Equal(t, false, apple.AllowLinking)
 			assert.Equal(t, false, apple.AllowCreation)
 			assert.Equal(t, false, apple.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *apple.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, domain.IDPAutoLinkingOption(*apple.AllowAutoLinking))
 			assert.WithinRange(t, apple.CreatedAt, before, after)
 			assert.WithinRange(t, apple.UpdatedAt, before, after)
 
@@ -2306,11 +2306,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, updateApple.OrgID)
 			assert.Equal(t, addApple.Id, updateApple.ID)
 			assert.Equal(t, name, updateApple.Name)
-			assert.Equal(t, domain.IDPTypeApple, *updateApple.Type)
+			assert.Equal(t, domain.IDPTypeApple, domain.IDPType(*updateApple.Type))
 			assert.Equal(t, true, updateApple.AllowLinking)
 			assert.Equal(t, true, updateApple.AllowCreation)
 			assert.Equal(t, true, updateApple.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateApple.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*updateApple.AllowAutoLinking))
 			assert.WithinRange(t, updateApple.UpdatedAt, before, after)
 
 			// apple
@@ -2362,11 +2362,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, saml.OrgID)
 			assert.Equal(t, addSAML.Id, saml.ID)
 			assert.Equal(t, name, saml.Name)
-			assert.Equal(t, domain.IDPTypeSAML, *saml.Type)
+			assert.Equal(t, domain.IDPTypeSAML, domain.IDPType(*saml.Type))
 			assert.Equal(t, false, saml.AllowLinking)
 			assert.Equal(t, false, saml.AllowCreation)
 			assert.Equal(t, false, saml.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, *saml.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionEmail, domain.IDPAutoLinkingOption(*saml.AllowAutoLinking))
 			assert.WithinRange(t, saml.CreatedAt, before, after)
 			assert.WithinRange(t, saml.UpdatedAt, before, after)
 
@@ -2455,11 +2455,11 @@ func TestServer_TestIDProviderInstanceReduces(t *testing.T) {
 			assert.Nil(t, updateSAML.OrgID)
 			assert.Equal(t, addSAML.Id, updateSAML.ID)
 			assert.Equal(t, name, updateSAML.Name)
-			assert.Equal(t, domain.IDPTypeSAML, *updateSAML.Type)
+			assert.Equal(t, domain.IDPTypeSAML, domain.IDPType(*updateSAML.Type))
 			assert.Equal(t, true, updateSAML.AllowLinking)
 			assert.Equal(t, true, updateSAML.AllowCreation)
 			assert.Equal(t, true, updateSAML.AllowAutoUpdate)
-			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, *updateSAML.AllowAutoLinking)
+			assert.Equal(t, domain.IDPAutoLinkingOptionUserName, domain.IDPAutoLinkingOption(*updateSAML.AllowAutoLinking))
 			assert.WithinRange(t, updateSAML.UpdatedAt, before, after)
 
 			// saml

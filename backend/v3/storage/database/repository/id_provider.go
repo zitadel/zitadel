@@ -123,8 +123,9 @@ func (i *idProvider) GetOIDC(ctx context.Context, id domain.IDPIdentifierConditi
 		return nil, err
 	}
 
-	if *idpOIDC.Type != domain.IDPTypeOIDC {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeOIDC, idpOIDC.Type)
+	idpType := domain.IDPType(*idpOIDC.Type)
+	if idpType != domain.IDPTypeOIDC {
+		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeOIDC, idpType)
 	}
 
 	err = json.Unmarshal(idpOIDC.Payload, idpOIDC)
@@ -144,8 +145,9 @@ func (i *idProvider) GetJWT(ctx context.Context, id domain.IDPIdentifierConditio
 		return nil, err
 	}
 
-	if *idpJWT.Type != domain.IDPTypeJWT {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeJWT, idpJWT.Type)
+	idpType := domain.IDPType(*idpJWT.Type)
+	if idpType != domain.IDPTypeJWT {
+		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeJWT, idpType)
 	}
 
 	err = json.Unmarshal(idpJWT.Payload, idpJWT)
@@ -165,8 +167,9 @@ func (i *idProvider) GetOAuth(ctx context.Context, id domain.IDPIdentifierCondit
 		return nil, err
 	}
 
-	if *idpOAuth.Type != domain.IDPTypeOAuth {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeOAuth, idpOAuth.Type)
+	idpType := domain.IDPType(*idpOAuth.Type)
+	if idpType != domain.IDPTypeOAuth {
+		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeOAuth, idpType)
 	}
 
 	err = json.Unmarshal(idpOAuth.Payload, idpOAuth)
@@ -186,8 +189,9 @@ func (i *idProvider) GetAzureAD(ctx context.Context, id domain.IDPIdentifierCond
 		return nil, err
 	}
 
-	if *idpAzure.Type != domain.IDPTypeAzure {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeAzure, idpAzure.Type)
+	idpType := domain.IDPType(*idpAzure.Type)
+	if idpType != domain.IDPTypeAzure {
+		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeAzure, idpType)
 	}
 
 	err = json.Unmarshal(idpAzure.Payload, idpAzure)
@@ -207,8 +211,9 @@ func (i *idProvider) GetGoogle(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	if *idpGoogle.Type != domain.IDPTypeGoogle {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGoogle, idpGoogle.Type)
+	idpType := domain.IDPType(*idpGoogle.Type)
+	if idpType != domain.IDPTypeGoogle {
+		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGoogle, idpType)
 	}
 
 	err = json.Unmarshal(idpGoogle.Payload, idpGoogle)
@@ -228,8 +233,9 @@ func (i *idProvider) GetGithub(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	if *idpGithub.Type != domain.IDPTypeGitHub {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitHub, idpGithub.Type)
+	idpType := domain.IDPType(*idpGithub.Type)
+	if idpType != domain.IDPTypeGitHub {
+		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitHub, idpType)
 	}
 
 	err = json.Unmarshal(idpGithub.Payload, idpGithub)
@@ -249,8 +255,9 @@ func (i *idProvider) GetGithubEnterprise(ctx context.Context, id domain.IDPIdent
 		return nil, err
 	}
 
-	if *idpGithubEnterprise.Type != domain.IDPTypeGitHubEnterprise {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitHubEnterprise, idpGithubEnterprise.Type)
+	idpType := domain.IDPType(*idpGithubEnterprise.Type)
+	if idpType != domain.IDPTypeGitHubEnterprise {
+		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitHubEnterprise, idpType)
 	}
 
 	err = json.Unmarshal(idpGithubEnterprise.Payload, idpGithubEnterprise)
@@ -270,8 +277,9 @@ func (i *idProvider) GetGitlab(ctx context.Context, id domain.IDPIdentifierCondi
 		return nil, err
 	}
 
-	if *idpGitlab.Type != domain.IDPTypeGitLab {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitLab, idpGitlab.Type)
+	idpType := domain.IDPType(*idpGitlab.Type)
+	if idpType != domain.IDPTypeGitLab {
+		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitLab, idpType)
 	}
 
 	err = json.Unmarshal(idpGitlab.Payload, idpGitlab)
@@ -291,8 +299,9 @@ func (i *idProvider) GetGitlabSelfHosting(ctx context.Context, id domain.IDPIden
 		return nil, err
 	}
 
-	if *idpGitlabSelfHosting.Type != domain.IDPTypeGitLabSelfHosted {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitLabSelfHosted, idpGitlabSelfHosting.Type)
+	idpType := domain.IDPType(*idpGitlabSelfHosting.Type)
+	if idpType != domain.IDPTypeGitLabSelfHosted {
+		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeGitLabSelfHosted, idpType)
 	}
 
 	err = json.Unmarshal(idpGitlabSelfHosting.Payload, idpGitlabSelfHosting)
@@ -312,8 +321,9 @@ func (i *idProvider) GetLDAP(ctx context.Context, id domain.IDPIdentifierConditi
 		return nil, err
 	}
 
-	if *ldap.Type != domain.IDPTypeLDAP {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeLDAP, ldap.Type)
+	idpType := domain.IDPType(*ldap.Type)
+	if idpType != domain.IDPTypeLDAP {
+		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeLDAP, idpType)
 	}
 
 	err = json.Unmarshal(ldap.Payload, ldap)
@@ -333,8 +343,9 @@ func (i *idProvider) GetApple(ctx context.Context, id domain.IDPIdentifierCondit
 		return nil, err
 	}
 
-	if *apple.Type != domain.IDPTypeApple {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeApple, apple.Type)
+	idpType := domain.IDPType(*apple.Type)
+	if idpType != domain.IDPTypeApple {
+		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeApple, idpType)
 	}
 
 	err = json.Unmarshal(apple.Payload, apple)
@@ -354,8 +365,9 @@ func (i *idProvider) GetSAML(ctx context.Context, id domain.IDPIdentifierConditi
 		return nil, err
 	}
 
-	if *saml.Type != domain.IDPTypeSAML {
-		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeSAML, saml.Type)
+	idpType := domain.IDPType(*saml.Type)
+	if idpType != domain.IDPTypeSAML {
+		return nil, domain.NewIDPWrongTypeError(domain.IDPTypeSAML, idpType)
 	}
 
 	err = json.Unmarshal(saml.Payload, saml)
