@@ -21,7 +21,7 @@ func Invoke(ctx context.Context, cmd Commander) error {
 	return invoker.Invoke(ctx, cmd, opts)
 }
 
-// eventStoreInvoker checks if the command implements the [eventer] interface.
+// eventStoreInvoker checks if the [Commander].Events function returns any events.
 // If it does, it collects the events and publishes them to the event store.
 type eventStoreInvoker struct {
 	collector *eventCollector
