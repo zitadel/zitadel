@@ -1962,6 +1962,7 @@
       "CREATE_DESC": "Insérez le nom de votre projet.",
       "ROLE": "Rôle",
       "NOITEMS": "Aucun projet",
+      "USERSELFACCOUNT": "Utilisez votre compte personnel en tant que propriétaire du projet.",
       "ZITADELPROJECT": "Ceci appartient au projet ZITADEL. Attention : si vous faites de changements, ZITADEL pourrait ne pas fonctionner correctement.",
       "TYPE": {
         "OWNED": "Projets possédés",

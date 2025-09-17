@@ -96,6 +96,12 @@ func TestServer_CreateProject_Permission(t *testing.T) {
 	iamOwnerCtx := instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
 	orgResp := instance.CreateOrganization(iamOwnerCtx, integration.OrganizationName(), integration.Email())
 
+	// user with ORG_PROJECT_CREATOR role in same org
+	user1Id, token1 := getOrgProjectCreator(t, iamOwnerCtx, orgResp.GetOrganizationId(), orgResp.GetOrganizationId())
+
+	// user with ORG_PROJECT_CREATOR role in a different org
+	_, token2 := getOrgProjectCreator(t, iamOwnerCtx, orgResp.GetOrganizationId(), instance.DefaultOrg.GetId())
+
 	type want struct {
 		id           bool
 		creationDate bool
@@ -136,7 +142,7 @@ func TestServer_CreateProject_Permission(t *testing.T) {
 		},
 		{
 			name: "with ORG_PROJECT_CREATOR permission, same organization, ok",
-			ctx:  integration.WithAuthorizationToken(CTX, getOrgProjectCreatorToken(t, iamOwnerCtx, orgResp.GetOrganizationId(), orgResp.GetOrganizationId())),
+			ctx:  integration.WithAuthorizationToken(CTX, token1),
 			req: &project.CreateProjectRequest{
 				Name:           integration.ProjectName(),
 				OrganizationId: orgResp.GetOrganizationId(),
@@ -148,7 +154,7 @@ func TestServer_CreateProject_Permission(t *testing.T) {
 		},
 		{
 			name: "with ORG_PROJECT_CREATOR permission, other organization, ok",
-			ctx:  integration.WithAuthorizationToken(CTX, getOrgProjectCreatorToken(t, iamOwnerCtx, orgResp.GetOrganizationId(), instance.DefaultOrg.GetId())),
+			ctx:  integration.WithAuthorizationToken(CTX, token2),
 			req: &project.CreateProjectRequest{
 				Name:           integration.ProjectName(),
 				OrganizationId: instance.DefaultOrg.GetId(),
@@ -157,6 +163,43 @@ func TestServer_CreateProject_Permission(t *testing.T) {
 				id:           true,
 				creationDate: true,
 			},
+		},
+		{
+			name: "with ORG_PROJECT_CREATOR permission, with admins and roles, ok",
+			ctx:  integration.WithAuthorizationToken(CTX, token1),
+			req: &project.CreateProjectRequest{
+				Name:           integration.ProjectName(),
+				OrganizationId: orgResp.GetOrganizationId(),
+				Admins: []*project.CreateProjectRequest_Admin{
+					{
+						UserId: user1Id,
+						Roles:  []string{"role1", "role2"},
+					},
+				},
+			},
+			want: want{
+				id:           true,
+				creationDate: true,
+			},
+		},
+		{
+			name: "with ORG_PROJECT_CREATOR permission, missing user from the admins list, ok",
+			ctx:  integration.WithAuthorizationToken(CTX, token1),
+			req: &project.CreateProjectRequest{
+				Name:           integration.ProjectName(),
+				OrganizationId: orgResp.GetOrganizationId(),
+				Admins: []*project.CreateProjectRequest_Admin{
+					{
+						UserId: user1Id,
+						Roles:  []string{"role1", "role2"},
+					},
+					{
+						UserId: "random_user",
+						Roles:  []string{"role1", "role2"},
+					},
+				},
+			},
+			wantErr: true,
 		},
 		{
 			name: "organization owner, ok",
@@ -199,7 +242,7 @@ func TestServer_CreateProject_Permission(t *testing.T) {
 	}
 }
 
-func getOrgProjectCreatorToken(t *testing.T, ctx context.Context, orgId1, orgId2 string) string {
+func getOrgProjectCreator(t *testing.T, ctx context.Context, orgId1, orgId2 string) (string, string) {
 	// create a machine user in Org 1
 	userResp := instance.CreateUserTypeMachine(ctx, orgId1)
 
@@ -213,7 +256,7 @@ func getOrgProjectCreatorToken(t *testing.T, ctx context.Context, orgId1, orgId2
 	})
 	require.NoError(t, err)
 
-	return instance.CreatePersonalAccessToken(ctx, userResp.GetId()).Token
+	return userResp.GetId(), instance.CreatePersonalAccessToken(ctx, userResp.GetId()).Token
 }
 
 func assertCreateProjectResponse(t *testing.T, creationDate, changeDate time.Time, expectedCreationDate, expectedID bool, actualResp *project.CreateProjectResponse) {
