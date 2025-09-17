@@ -2,7 +2,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "build": {
-      "description": "Build the Next.js application in standalone mode for production. (Cache is disabled because it doesn't work https://github.com/nrwl/nx/issues/27724)",
+      "description": "Build the Next.js application in standalone mode for production",
       "cache": true,
       "dependsOn": [
         "^build"

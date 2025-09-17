@@ -22,10 +22,10 @@ services:
         condition: 'service_healthy'
       db:
         condition: 'service_healthy'
-    working_dir: /workspaces/zitadel/functional-ui
+    working_dir: /workspaces/zitadel/tests/functional-ui
     user: '$UID'
     volumes:
-      - ../../:/workspaces/zitadel/functional-ui
+      - ../../:/workspaces/zitadel/tests/functional-ui
     environment:
       CYPRESS_BASE_URL: http://host.docker.internal:8080/ui/console
       CYPRESS_WEBHOOK_HANDLER_HOST: host.docker.internal
