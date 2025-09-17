@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/eventstore"
+	legacy_es "github.com/zitadel/zitadel/internal/eventstore"
 )
 
 // Invoke provides a way to execute commands within the domain package.
@@ -27,7 +28,7 @@ func Invoke(ctx context.Context, cmd Commander) error {
 	return invoker.Invoke(ctx, cmd, opts)
 }
 
-// eventStoreInvoker checks if the command implements the [eventer] interface.
+// eventStoreInvoker checks if the [Commander].Events function returns any events.
 // If it does, it collects the events and publishes them to the event store.
 type eventStoreInvoker struct {
 	collector *eventCollector
@@ -43,7 +44,7 @@ func (i *eventStoreInvoker) Invoke(ctx context.Context, command Commander, opts 
 		return err
 	}
 	if len(i.collector.events) > 0 {
-		err = eventstore.Publish(ctx, i.collector.events, opts.DB)
+		err = eventstore.Publish(ctx, legacyEventstore, opts.DB, i.collector.events...)
 		if err != nil {
 			return err
 		}
@@ -52,30 +53,30 @@ func (i *eventStoreInvoker) Invoke(ctx context.Context, command Commander, opts 
 }
 
 // eventCollector collects events from all commands. The [eventStoreInvoker] pushes the collected events after all commands are executed.
+// The events are collected after the command got executed, the collector ensures that the command is executed in the same transaction as writing the events.
 type eventCollector struct {
 	next   Invoker
-	events []*eventstore.Event
-}
-
-type eventer interface {
-	Events() []*eventstore.Event
+	events []legacy_es.Command
 }
 
 func (i *eventCollector) Invoke(ctx context.Context, command Commander, opts *CommandOpts) (err error) {
-	if e, ok := command.(eventer); ok && len(e.Events()) > 0 {
-		// we need to ensure all commands are executed in the same transaction
-		close, err := opts.EnsureTx(ctx)
-		if err != nil {
-			return err
-		}
-		defer func() { err = close(ctx, err) }()
+	close, err := opts.EnsureTx(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() { err = close(ctx, err) }()
 
-		i.events = append(i.events, e.Events()...)
-	}
 	if i.next != nil {
-		return i.next.Invoke(ctx, command, opts)
+		err = i.next.Invoke(ctx, command, opts)
+	} else {
+		err = command.Execute(ctx, opts)
 	}
-	return command.Execute(ctx, opts)
+	if err != nil {
+		return err
+	}
+	i.events = append(command.Events(ctx), i.events...)
+
+	return
 }
 
 // traceInvoker decorates each command with tracing.
@@ -160,10 +161,10 @@ func (i *validatorInvoker) Invoke(ctx context.Context, command Commander, opts *
 	return command.Execute(ctx, opts)
 }
 
-// // cacheInvoker could be used in the future to do the caching.
-// // My goal would be to have two interfaces:
-// // - cacheSetter: which caches an object
-// // - cacheGetter: which gets an object from the cache, this should also skip the command execution
+// cacheInvoker could be used in the future to do the caching.
+// My goal would be to have two interfaces:
+// - cacheSetter: which caches an object
+// - cacheGetter: which gets an object from the cache, this should also skip the command execution
 // type cacheInvoker struct {
 // 	next Invoker
 // }
