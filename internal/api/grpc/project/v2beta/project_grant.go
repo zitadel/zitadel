@@ -6,10 +6,11 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	project_pb "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
+
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
-	project_pb "github.com/zitadel/zitadel/pkg/grpc/project/v2beta"
 )
 
 func (s *Server) CreateProjectGrant(ctx context.Context, req *connect.Request[project_pb.CreateProjectGrantRequest]) (*connect.Response[project_pb.CreateProjectGrantResponse], error) {
@@ -32,7 +33,6 @@ func projectGrantCreateToCommand(req *project_pb.CreateProjectGrantRequest) *com
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.ProjectId,
 		},
-		GrantID:      req.GrantedOrganizationId,
 		GrantedOrgID: req.GrantedOrganizationId,
 		RoleKeys:     req.RoleKeys,
 	}
@@ -113,7 +113,7 @@ func (s *Server) userGrantsFromProjectGrant(ctx context.Context, projectID, gran
 	if err != nil {
 		return nil, err
 	}
-	grantQuery, err := query.NewUserGrantGrantIDSearchQuery(grantedOrganizationID)
+	grantQuery, err := query.NewUserGrantWithGrantedQuery(grantedOrganizationID)
 	if err != nil {
 		return nil, err
 	}
