@@ -53,15 +53,18 @@ func (i *idProvider) List(ctx context.Context, conditions ...database.Condition)
 	return scanIDProviders(ctx, i.client, &builder)
 }
 
-const createIDProviderStmt = `INSERT INTO zitadel.identity_providers` +
+const createIDProviderStmtStart = `INSERT INTO zitadel.identity_providers` +
 	` (instance_id, org_id, id, state, name, type, allow_creation, allow_auto_creation,` +
-	` allow_auto_update, allow_linking, styling_type, payload)` +
-	` VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)` +
-	` RETURNING created_at, updated_at`
+	` allow_auto_update, allow_linking, styling_type, payload) VALUES (`
+
+const createIDProviderStmtEnd = `) RETURNING created_at, updated_at`
 
 func (i *idProvider) Create(ctx context.Context, idp *domain.IdentityProvider) error {
 	builder := database.StatementBuilder{}
-	builder.AppendArgs(
+
+	builder.WriteString(createIDProviderStmtStart)
+
+	builder.WriteArgs(
 		idp.InstanceID,
 		idp.OrgID,
 		idp.ID,
@@ -74,9 +77,11 @@ func (i *idProvider) Create(ctx context.Context, idp *domain.IdentityProvider) e
 		idp.AllowLinking,
 		idp.StylingType,
 		string(idp.Payload))
-	builder.WriteString(createIDProviderStmt)
 
-	return i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&idp.CreatedAt, &idp.UpdatedAt)
+	builder.WriteString(createIDProviderStmtEnd)
+
+	err := i.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&idp.CreatedAt, &idp.UpdatedAt)
+	return err
 }
 
 func (i *idProvider) Update(ctx context.Context, id domain.IDPIdentifierCondition, instanceID string, orgID *string, changes ...database.Change) (int64, error) {
