@@ -27,7 +27,7 @@ const (
 )
 
 type Setting struct {
-	ID         *string         `json:"id,omitempty" db:"id"`
+	ID         string          `json:"id,omitempty" db:"id"`
 	InstanceID string          `json:"instanceId,omitempty" db:"instance_id"`
 	OrgID      *string         `json:"orgId,omitempty" db:"org_id"`
 	Type       SettingType     `json:"type,omitempty" db:"type"`
@@ -202,6 +202,10 @@ type OrgSettings struct {
 type OrgSetting struct {
 	*Setting
 	Settings OrgSettings
+}
+
+func (s *OrgSetting) getSettings() any {
+	return s.Settings
 }
 
 type settingsColumns interface {

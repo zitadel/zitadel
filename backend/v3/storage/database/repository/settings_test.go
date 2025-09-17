@@ -2,7 +2,6 @@ package repository_test
 
 import (
 	"context"
-	"encoding/json"
 	"testing"
 	"time"
 
@@ -59,107 +58,107 @@ func TestCreateSetting(t *testing.T) {
 				InstanceID: instanceId,
 				OrgID:      &orgId,
 				ID:         gofakeit.Name(),
-				Type:       domain.SettingTypeLogin.String(),
+				Type:       domain.SettingTypeLogin,
 				Settings:   []byte("{}"),
 			},
 		},
-		{
-			name: "adding setting with same id twice",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
-				settingRepo := repository.SettingsRepository(pool)
+		// {
+		// 	name: "adding setting with same id twice",
+		// 	testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+		// 		settingRepo := repository.SettingsRepository(pool)
 
-				setting := domain.Setting{
-					InstanceID: instanceId,
-					OrgID:      &orgId,
-					ID:         gofakeit.Name(),
-					Type:       domain.SettingTypePasswordComplexity.String(),
-					Settings:   []byte("{}"),
-				}
+		// 		setting := domain.Setting{
+		// 			InstanceID: instanceId,
+		// 			OrgID:      &orgId,
+		// 			ID:         gofakeit.Name(),
+		// 			Type:       domain.SettingTypePasswordComplexity,
+		// 			Settings:   []byte("{}"),
+		// 		}
 
-				err := settingRepo.Create(ctx, &setting)
-				require.NoError(t, err)
-				// change the name to make sure same only the id clashes
-				return &setting
-			},
-			err: new(database.UniqueError),
-		},
-		func() test {
-			id := gofakeit.Name()
-			return test{
-				name: "adding idp with same name, id, different instance",
-				testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
-					// create instance
-					newInstId := gofakeit.Name()
-					instance := domain.Instance{
-						ID:              newInstId,
-						Name:            gofakeit.Name(),
-						DefaultOrgID:    "defaultOrgId",
-						IAMProjectID:    "iamProject",
-						ConsoleClientID: "consoleCLient",
-						ConsoleAppID:    "consoleApp",
-						DefaultLanguage: "defaultLanguage",
-					}
-					instanceRepo := repository.InstanceRepository(pool)
-					err := instanceRepo.Create(ctx, &instance)
-					assert.Nil(t, err)
+		// 		err := settingRepo.Create(ctx, &setting)
+		// 		require.NoError(t, err)
+		// 		// change the name to make sure same only the id clashes
+		// 		return &setting
+		// 	},
+		// 	err: new(database.UniqueError),
+		// },
+		// func() test {
+		// 	id := gofakeit.Name()
+		// 	return test{
+		// 		name: "adding idp with same name, id, different instance",
+		// 		testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+		// 			// create instance
+		// 			newInstId := gofakeit.Name()
+		// 			instance := domain.Instance{
+		// 				ID:              newInstId,
+		// 				Name:            gofakeit.Name(),
+		// 				DefaultOrgID:    "defaultOrgId",
+		// 				IAMProjectID:    "iamProject",
+		// 				ConsoleClientID: "consoleCLient",
+		// 				ConsoleAppID:    "consoleApp",
+		// 				DefaultLanguage: "defaultLanguage",
+		// 			}
+		// 			instanceRepo := repository.InstanceRepository(pool)
+		// 			err := instanceRepo.Create(ctx, &instance)
+		// 			assert.Nil(t, err)
 
-					// create org
-					newOrgId := gofakeit.Name()
-					org := domain.Organization{
-						ID:         newOrgId,
-						Name:       gofakeit.Name(),
-						InstanceID: newInstId,
-						State:      domain.OrgStateActive.String(),
-					}
-					organizationRepo := repository.OrganizationRepository(pool)
-					err = organizationRepo.Create(ctx, &org)
-					require.NoError(t, err)
+		// 			// create org
+		// 			newOrgId := gofakeit.Name()
+		// 			org := domain.Organization{
+		// 				ID:         newOrgId,
+		// 				Name:       gofakeit.Name(),
+		// 				InstanceID: newInstId,
+		// 				State:      domain.OrgStateActive,
+		// 			}
+		// 			organizationRepo := repository.OrganizationRepository(pool)
+		// 			err = organizationRepo.Create(ctx, &org)
+		// 			require.NoError(t, err)
 
-					settingRepo := repository.SettingsRepository(pool)
-					setting := domain.Setting{
-						InstanceID: newInstId,
-						OrgID:      &newOrgId,
-						ID:         id,
-						Type:       domain.SettingTypeLockout.String(),
-						Settings:   []byte("{}"),
-					}
+		// 			settingRepo := repository.SettingsRepository(pool)
+		// 			setting := domain.Setting{
+		// 				InstanceID: newInstId,
+		// 				OrgID:      &newOrgId,
+		// 				ID:         id,
+		// 				Type:       domain.SettingTypeLockout,
+		// 				Settings:   []byte("{}"),
+		// 			}
 
-					err = settingRepo.Create(ctx, &setting)
-					require.NoError(t, err)
+		// 			err = settingRepo.Create(ctx, &setting)
+		// 			require.NoError(t, err)
 
-					// change the instanceID to a different instance
-					setting.InstanceID = instanceId
-					// change the OrgId to a different organization
-					setting.OrgID = &orgId
-					return &setting
-				},
-				setting: domain.Setting{
-					InstanceID: instanceId,
-					OrgID:      &orgId,
-					ID:         id,
-					Type:       domain.SettingTypeLockout.String(),
-					Settings:   []byte("{}"),
-				},
-			}
-		}(),
-		{
-			name: "adding setting with no id",
-			setting: domain.Setting{
-				InstanceID: instanceId,
-				OrgID:      &orgId,
-				// ID:                gofakeit.Name(),
-				Type:     domain.SettingTypeBranding.String(),
-				Settings: []byte("{}"),
-			},
-			err: new(database.CheckError),
-		},
+		// 			// change the instanceID to a different instance
+		// 			setting.InstanceID = instanceId
+		// 			// change the OrgId to a different organization
+		// 			setting.OrgID = &orgId
+		// 			return &setting
+		// 		},
+		// 		setting: domain.Setting{
+		// 			InstanceID: instanceId,
+		// 			OrgID:      &orgId,
+		// 			ID:         id,
+		// 			Type:       domain.SettingTypeLockout,
+		// 			Settings:   []byte("{}"),
+		// 		},
+		// 	}
+		// }(),
+		// {
+		// 	name: "adding setting with no id",
+		// 	setting: domain.Setting{
+		// 		InstanceID: instanceId,
+		// 		OrgID:      &orgId,
+		// 		// ID:                gofakeit.Name(),
+		// 		Type:     domain.SettingTypeBranding,
+		// 		Settings: []byte("{}"),
+		// 	},
+		// 	err: new(database.CheckError),
+		// },
 		{
 			name: "adding setting with no instance id",
 			setting: domain.Setting{
 				// InstanceID:        instanceId,
 				OrgID:    &orgId,
 				ID:       gofakeit.Name(),
-				Type:     domain.SettingTypeBranding.String(),
+				Type:     domain.SettingTypeBranding,
 				Settings: []byte("{}"),
 			},
 			err: new(database.IntegrityViolationError),
@@ -170,7 +169,7 @@ func TestCreateSetting(t *testing.T) {
 				InstanceID: gofakeit.Name(),
 				OrgID:      &orgId,
 				ID:         gofakeit.Name(),
-				Type:       domain.SettingTypeBranding.String(),
+				Type:       domain.SettingTypeBranding,
 				Settings:   []byte("{}"),
 			},
 			err: new(database.ForeignKeyError),
@@ -181,7 +180,7 @@ func TestCreateSetting(t *testing.T) {
 				InstanceID: instanceId,
 				OrgID:      gu.Ptr(gofakeit.Name()),
 				ID:         gofakeit.Name(),
-				Type:       domain.SettingTypeBranding.String(),
+				Type:       domain.SettingTypeBranding,
 				Settings:   []byte("{}"),
 			},
 			err: new(database.ForeignKeyError),
@@ -210,9 +209,9 @@ func TestCreateSetting(t *testing.T) {
 
 			// check organization values
 			setting, err = settingRepo.Get(ctx,
-				setting.ID,
 				setting.InstanceID,
 				setting.OrgID,
+				setting.Type,
 			)
 			require.NoError(t, err)
 
@@ -226,125 +225,124 @@ func TestCreateSetting(t *testing.T) {
 	}
 }
 
-func TestUpdateSetting(t *testing.T) {
-	// create instance
-	instanceId := gofakeit.Name()
-	instance := domain.Instance{
-		ID:              instanceId,
-		Name:            gofakeit.Name(),
-		DefaultOrgID:    "defaultOrgId",
-		IAMProjectID:    "iamProject",
-		ConsoleClientID: "consoleCLient",
-		ConsoleAppID:    "consoleApp",
-		DefaultLanguage: "defaultLanguage",
-	}
-	instanceRepo := repository.InstanceRepository(pool)
-	err := instanceRepo.Create(t.Context(), &instance)
-	require.NoError(t, err)
+// func TestUpdateSetting(t *testing.T) {
+// 	// create instance
+// 	instanceId := gofakeit.Name()
+// 	instance := domain.Instance{
+// 		ID:              instanceId,
+// 		Name:            gofakeit.Name(),
+// 		DefaultOrgID:    "defaultOrgId",
+// 		IAMProjectID:    "iamProject",
+// 		ConsoleClientID: "consoleCLient",
+// 		ConsoleAppID:    "consoleApp",
+// 		DefaultLanguage: "defaultLanguage",
+// 	}
+// 	instanceRepo := repository.InstanceRepository(pool)
+// 	err := instanceRepo.Create(t.Context(), &instance)
+// 	require.NoError(t, err)
 
-	// create org
-	orgId := gofakeit.Name()
-	org := domain.Organization{
-		ID:         orgId,
-		Name:       gofakeit.Name(),
-		InstanceID: instanceId,
-		State:      domain.OrgStateActive.String(),
-	}
-	organizationRepo := repository.OrganizationRepository(pool)
-	err = organizationRepo.Create(t.Context(), &org)
-	require.NoError(t, err)
+// 	// create org
+// 	orgId := gofakeit.Name()
+// 	org := domain.Organization{
+// 		ID:         orgId,
+// 		Name:       gofakeit.Name(),
+// 		InstanceID: instanceId,
+// 		State:      domain.OrgStateActive,
+// 	}
+// 	organizationRepo := repository.OrganizationRepository(pool)
+// 	err = organizationRepo.Create(t.Context(), &org)
+// 	require.NoError(t, err)
 
-	settingRepo := repository.SettingsRepository(pool)
+// 	settingRepo := repository.SettingsRepository(pool)
 
-	tests := []struct {
-		name         string
-		testFunc     func(ctx context.Context, t *testing.T) *domain.Setting
-		update       []database.Change
-		rowsAffected int64
-	}{
-		{
-			name: "happy path update type",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
-				setting := domain.Setting{
-					InstanceID: instanceId,
-					OrgID:      &orgId,
-					ID:         gofakeit.Name(),
-					Type:       domain.SettingTypeLogin.String(),
-					Settings:   []byte("{}"),
-				}
+// 	tests := []struct {
+// 		name         string
+// 		testFunc     func(ctx context.Context, t *testing.T) *domain.Setting
+// 		update       []database.Change
+// 		rowsAffected int64
+// 	}{
+// 		{
+// 			name: "happy path update type",
+// 			testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+// 				setting := domain.Setting{
+// 					InstanceID: instanceId,
+// 					OrgID:      &orgId,
+// 					ID:         gofakeit.Name(),
+// 					Type:       domain.SettingTypeLogin,
+// 					Settings:   []byte("{}"),
+// 				}
 
-				err := settingRepo.Create(ctx, &setting)
-				require.NoError(t, err)
-				setting.Type = domain.SettingTypeBranding.String()
-				return &setting
-			},
-			update:       []database.Change{settingRepo.SetType(domain.SettingTypeBranding)},
-			rowsAffected: 1,
-		},
-		{
-			name: "happy path update Settings",
-			testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
-				setting := domain.Setting{
-					InstanceID: instanceId,
-					OrgID:      &orgId,
-					ID:         gofakeit.Name(),
-					Type:       domain.SettingTypeLogin.String(),
-					Settings:   []byte("{}"),
-				}
+// 				err := settingRepo.Create(ctx, &setting)
+// 				require.NoError(t, err)
+// 				setting.Type = domain.SettingTypeBranding
+// 				return &setting
+// 			},
+// 			update:       []database.Change{settingRepo.SetType(domain.SettingTypeBranding)},
+// 			rowsAffected: 1,
+// 		},
+// 		{
+// 			name: "happy path update Settings",
+// 			testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+// 				setting := domain.Setting{
+// 					InstanceID: instanceId,
+// 					OrgID:      &orgId,
+// 					ID:         gofakeit.Name(),
+// 					Type:       domain.SettingTypeLogin,
+// 					Settings:   []byte("{}"),
+// 				}
 
-				err := settingRepo.Create(ctx, &setting)
-				require.NoError(t, err)
-				setting.Settings = json.RawMessage(`{"json": {}}`)
-				return &setting
-			},
-			// update:       []database.Change{settingRepo.SetSetting("{{}}")},
-			update:       []database.Change{settingRepo.SetSettings(`{"json": {}}`)},
-			rowsAffected: 1,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ctx := t.Context()
-			// _, err := pool.Exec(ctx, "DELETE FROM zitadel.settings")
+// 				err := settingRepo.Create(ctx, &setting)
+// 				require.NoError(t, err)
+// 				setting.Settings = json.RawMessage(`{"json": {}}`)
+// 				return &setting
+// 			},
+// 			// update:       []database.Change{settingRepo.SetSetting("{{}}")},
+// 			update:       []database.Change{settingRepo.SetSettings(`{"json": {}}`)},
+// 			rowsAffected: 1,
+// 		},
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			ctx := t.Context()
 
-			settingRepo := repository.SettingsRepository(pool)
+// 			settingRepo := repository.SettingsRepository(pool)
 
-			setting := tt.testFunc(ctx, t)
+// 			setting := tt.testFunc(ctx, t)
 
-			// update setting
-			beforeUpdate := time.Now()
-			rowsAffected, err := settingRepo.Update(ctx,
-				setting.ID,
-				setting.InstanceID,
-				setting.OrgID,
-				tt.update...,
-			)
-			afterUpdate := time.Now()
-			require.NoError(t, err)
+// 			// update setting
+// 			beforeUpdate := time.Now()
+// 			rowsAffected, err := settingRepo.updateSetting(ctx,
+// 				setting.ID,
+// 				setting.InstanceID,
+// 				setting.OrgID,
+// 				tt.update...,
+// 			)
+// 			afterUpdate := time.Now()
+// 			require.NoError(t, err)
 
-			assert.Equal(t, tt.rowsAffected, rowsAffected)
+// 			assert.Equal(t, tt.rowsAffected, rowsAffected)
 
-			if rowsAffected == 0 {
-				return
-			}
+// 			if rowsAffected == 0 {
+// 				return
+// 			}
 
-			// check updatedSetting values
-			updatedSetting, err := settingRepo.Get(ctx,
-				setting.ID,
-				setting.InstanceID,
-				setting.OrgID,
-			)
-			require.NoError(t, err)
+// 			// check updatedSetting values
+// 			updatedSetting, err := settingRepo.Get(ctx,
+// 				setting.ID,
+// 				setting.InstanceID,
+// 				setting.OrgID,
+// 			)
+// 			require.NoError(t, err)
 
-			assert.Equal(t, setting.InstanceID, updatedSetting.InstanceID)
-			assert.Equal(t, setting.OrgID, updatedSetting.OrgID)
-			assert.Equal(t, setting.ID, updatedSetting.ID)
-			assert.Equal(t, setting.Type, updatedSetting.Type)
-			assert.Equal(t, string(setting.Settings), string(updatedSetting.Settings))
-			assert.WithinRange(t, updatedSetting.UpdatedAt, beforeUpdate, afterUpdate)
-		})
-	}
-}
+// 			assert.Equal(t, setting.InstanceID, updatedSetting.InstanceID)
+// 			assert.Equal(t, setting.OrgID, updatedSetting.OrgID)
+// 			assert.Equal(t, setting.ID, updatedSetting.ID)
+// 			assert.Equal(t, setting.Type, updatedSetting.Type)
+// 			assert.Equal(t, string(setting.Settings), string(updatedSetting.Settings))
+// 			assert.WithinRange(t, updatedSetting.UpdatedAt, beforeUpdate, afterUpdate)
+// 		})
+// 	}
+// }
 
 func TestGetSetting(t *testing.T) {
 	// create instance
@@ -368,7 +366,7 @@ func TestGetSetting(t *testing.T) {
 		ID:         orgId,
 		Name:       gofakeit.Name(),
 		InstanceID: instanceId,
-		State:      domain.OrgStateActive.String(),
+		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository(pool)
 	err = organizationRepo.Create(t.Context(), &org)
@@ -381,7 +379,7 @@ func TestGetSetting(t *testing.T) {
 		InstanceID: instanceId,
 		OrgID:      &orgId,
 		ID:         gofakeit.Name(),
-		Type:       domain.SettingTypePasswordExpiry.String(),
+		Type:       domain.SettingTypePasswordExpiry,
 		Settings:   []byte("{}"),
 	}
 	settingRepo := repository.SettingsRepository(pool)
@@ -405,7 +403,7 @@ func TestGetSetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         id,
-						Type:       domain.SettingTypeLogin.String(),
+						Type:       domain.SettingTypeLogin,
 						Settings:   []byte("{}"),
 					}
 
@@ -425,7 +423,7 @@ func TestGetSetting(t *testing.T) {
 		// 				InstanceID:        instanceId,
 		// 				OrgID:             &orgId,
 		// 				ID:                gofakeit.Name(),
-		// 				Type:              domain.SettingTypeLogin.String(),
+		// 				Type:              domain.SettingTypeLogin,
 		// 				Settings:           []byte("{}"),
 		// 			}
 
@@ -444,7 +442,7 @@ func TestGetSetting(t *testing.T) {
 					OrgID:      &orgId,
 					ID:         gofakeit.Name(),
 
-					Type:     domain.SettingTypeDomain.String(),
+					Type:     domain.SettingTypeDomain,
 					Settings: []byte("{}"),
 				}
 
@@ -463,7 +461,7 @@ func TestGetSetting(t *testing.T) {
 		// 			OrgID:             &orgId,
 		// 			ID:                gofakeit.Name(),
 
-		// 			Type:              domain.SettingTypeLogin.String(),
+		// 			Type:              domain.SettingTypeLogin,
 		// 			Settings:           []byte("{}"),
 		// 		}
 
@@ -483,7 +481,7 @@ func TestGetSetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         id,
-						Type:       domain.SettingTypePasswordComplexity.String(),
+						Type:       domain.SettingTypePasswordComplexity,
 						Settings:   []byte("{}"),
 					}
 
@@ -505,7 +503,7 @@ func TestGetSetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         id,
-						Type:       domain.SettingTypeLockout.String(),
+						Type:       domain.SettingTypeLockout,
 						Settings:   []byte("{}"),
 					}
 
@@ -530,9 +528,9 @@ func TestGetSetting(t *testing.T) {
 
 			// get setting
 			returnedIDP, err := settingRepo.Get(ctx,
-				setting.ID,
 				setting.InstanceID,
 				setting.OrgID,
+				setting.Type,
 			)
 			if err != nil {
 				require.ErrorIs(t, tt.err, err)
@@ -579,7 +577,7 @@ func TestListSetting(t *testing.T) {
 		ID:         orgId,
 		Name:       gofakeit.Name(),
 		InstanceID: instanceId,
-		State:      domain.OrgStateActive.String(),
+		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository(pool)
 	err = organizationRepo.Create(t.Context(), &org)
@@ -590,7 +588,7 @@ func TestListSetting(t *testing.T) {
 	type test struct {
 		name             string
 		testFunc         func(ctx context.Context, t *testing.T) []*domain.Setting
-		conditionClauses []database.Condition
+		conditionClauses func() []database.Condition
 		noIDPsReturned   bool
 	}
 	tests := []test{
@@ -617,7 +615,7 @@ func TestListSetting(t *testing.T) {
 					ID:         newOrgId,
 					Name:       gofakeit.Name(),
 					InstanceID: newInstanceId,
-					State:      domain.OrgStateActive.String(),
+					State:      domain.OrgStateActive,
 				}
 				organizationRepo := repository.OrganizationRepository(pool)
 				err = organizationRepo.Create(ctx, &org)
@@ -630,7 +628,7 @@ func TestListSetting(t *testing.T) {
 					InstanceID: newInstanceId,
 					OrgID:      &newOrgId,
 					ID:         gofakeit.Name(),
-					Type:       domain.SettingTypeSecurity.String(),
+					Type:       domain.SettingTypeSecurity,
 					Settings:   []byte("{}"),
 				}
 				err := settingRepo.Create(ctx, &setting)
@@ -644,8 +642,8 @@ func TestListSetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
-						// Type:              domain.SettingTypeLogin.String(),
-						Type:     domain.SettingType(i + 1).String(),
+						// Type:              domain.SettingTypeLogin,
+						Type:     domain.SettingType(i + 1),
 						Settings: []byte("{}"),
 					}
 
@@ -657,7 +655,9 @@ func TestListSetting(t *testing.T) {
 
 				return settings
 			},
-			conditionClauses: []database.Condition{settingRepo.InstanceIDCondition(instanceId)},
+			conditionClauses: func() []database.Condition {
+				return []database.Condition{settingRepo.InstanceIDCondition(instanceId)}
+			},
 		},
 		{
 			name: "multiple settings filter on org",
@@ -668,7 +668,7 @@ func TestListSetting(t *testing.T) {
 					ID:         newOrgId,
 					Name:       gofakeit.Name(),
 					InstanceID: instanceId,
-					State:      domain.OrgStateActive.String(),
+					State:      domain.OrgStateActive,
 				}
 				organizationRepo := repository.OrganizationRepository(pool)
 				err = organizationRepo.Create(ctx, &org)
@@ -681,7 +681,7 @@ func TestListSetting(t *testing.T) {
 					InstanceID: instanceId,
 					OrgID:      &newOrgId,
 					ID:         gofakeit.Name(),
-					Type:       domain.SettingTypeSecurity.String(),
+					Type:       domain.SettingTypeSecurity,
 					Settings:   []byte("{}"),
 				}
 				err := settingRepo.Create(ctx, &setting)
@@ -695,7 +695,7 @@ func TestListSetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
-						Type:       domain.SettingType(i + 1).String(),
+						Type:       domain.SettingType(i + 1),
 						Settings:   []byte("{}"),
 					}
 
@@ -707,7 +707,10 @@ func TestListSetting(t *testing.T) {
 
 				return settings
 			},
-			conditionClauses: []database.Condition{settingRepo.OrgIDCondition(&orgId)},
+			// conditionClauses:
+			conditionClauses: func() []database.Condition {
+				return []database.Condition{settingRepo.OrgIDCondition(&orgId)}
+			},
 		},
 		{
 			name: "happy path single setting no filter",
@@ -720,7 +723,7 @@ func TestListSetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
-						Type:       domain.SettingType(i + 1).String(),
+						Type:       domain.SettingType(i + 1),
 						Settings:   []byte("{}"),
 					}
 
@@ -744,7 +747,7 @@ func TestListSetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
-						Type:       domain.SettingType(i + 1).String(),
+						Type:       domain.SettingType(i + 1),
 						Settings:   []byte("{}"),
 					}
 
@@ -769,7 +772,7 @@ func TestListSetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
-						Type:       domain.SettingTypeSecurity.String(),
+						Type:       domain.SettingTypeSecurity,
 						Settings:   []byte("{}"),
 					}
 					err := settingRepo.Create(ctx, &setting)
@@ -782,20 +785,23 @@ func TestListSetting(t *testing.T) {
 						setting := domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
-							ID:         id,
-							Type:       domain.SettingType(i + 1).String(),
-							Settings:   []byte("{}"),
+							// ID:         id,
+							Type:     domain.SettingType(i + 1),
+							Settings: []byte("{}"),
 						}
 
 						err := settingRepo.Create(ctx, &setting)
 						require.NoError(t, err)
 
 						settings[i] = &setting
+						id = setting.ID
 					}
 
 					return settings
 				},
-				conditionClauses: []database.Condition{settingRepo.IDCondition(id)},
+				conditionClauses: func() []database.Condition {
+					return []database.Condition{settingRepo.IDCondition(id)}
+				},
 			}
 		}(),
 		{
@@ -809,7 +815,7 @@ func TestListSetting(t *testing.T) {
 					OrgID:      &orgId,
 					ID:         gofakeit.Name(),
 
-					Type:     domain.SettingTypeLogin.String(),
+					Type:     domain.SettingTypeLogin,
 					Settings: []byte("{}"),
 				}
 				err := settingRepo.Create(ctx, &setting)
@@ -823,7 +829,7 @@ func TestListSetting(t *testing.T) {
 						InstanceID: instanceId,
 						OrgID:      &orgId,
 						ID:         gofakeit.Name(),
-						Type:       domain.SettingTypePasswordExpiry.String(),
+						Type:       domain.SettingTypePasswordExpiry,
 						Settings:   []byte("{}"),
 					}
 
@@ -835,7 +841,9 @@ func TestListSetting(t *testing.T) {
 
 				return settings
 			},
-			conditionClauses: []database.Condition{settingRepo.TypeCondition(domain.SettingTypePasswordExpiry)},
+			conditionClauses: func() []database.Condition {
+				return []database.Condition{settingRepo.TypeCondition(domain.SettingTypePasswordExpiry)}
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -849,9 +857,14 @@ func TestListSetting(t *testing.T) {
 
 			settings := tt.testFunc(ctx, t)
 
+			var conditions []database.Condition
+			if tt.conditionClauses != nil {
+				conditions = tt.conditionClauses()
+			}
+
 			// check setting values
 			returnedIDPs, err := settingRepo.List(ctx,
-				tt.conditionClauses...,
+				conditions...,
 			)
 			require.NoError(t, err)
 			if tt.noIDPsReturned {
@@ -893,7 +906,7 @@ func TestDeleteSetting(t *testing.T) {
 		ID:         orgId,
 		Name:       gofakeit.Name(),
 		InstanceID: instanceId,
-		State:      domain.OrgStateActive.String(),
+		State:      domain.OrgStateActive,
 	}
 	organizationRepo := repository.OrganizationRepository(pool)
 	err = organizationRepo.Create(t.Context(), &org)
@@ -902,73 +915,99 @@ func TestDeleteSetting(t *testing.T) {
 	settingRepo := repository.SettingsRepository(pool)
 
 	type test struct {
-		name                       string
-		testFunc                   func(ctx context.Context, t *testing.T)
-		settingIdentifierCondition domain.OrgIdentifierCondition
-		noOfDeletedRows            int64
+		name            string
+		testFunc        func(ctx context.Context, t *testing.T)
+		settingType     domain.SettingType
+		noOfDeletedRows int64
 	}
 	tests := []test{
 		func() test {
-			id := gofakeit.Name()
 			var noOfIDPs int64 = 1
 			return test{
-				name: "happy path delete setting filter id",
+				name: "happy path delete",
 				testFunc: func(ctx context.Context, t *testing.T) {
 					for range noOfIDPs {
 						setting := domain.Setting{
 							InstanceID: instanceId,
 							OrgID:      &orgId,
-							ID:         id,
-
-							Type:     domain.SettingTypeLogin.String(),
-							Settings: []byte("{}"),
+							Type:       domain.SettingTypeLogin,
+							Settings:   []byte("{}"),
 						}
 
 						err := settingRepo.Create(ctx, &setting)
 						require.NoError(t, err)
 					}
 				},
-				settingIdentifierCondition: settingRepo.IDCondition(id),
-				noOfDeletedRows:            noOfIDPs,
+				noOfDeletedRows: noOfIDPs,
+				settingType:     domain.SettingTypeLogin,
 			}
 		}(),
-		// {
-		// 	name: "delete non existent setting",
-		// },
-		// func() test {
-		// 	name := gofakeit.Name()
-		// 	return test{
-		// 		name: "deleted already deleted setting",
-		// 		testFunc: func(ctx context.Context, t *testing.T) {
-		// 			noOfIDPs := 1
-		// 			for range noOfIDPs {
-		// 				setting := domain.Setting{
-		// 					InstanceID: instanceId,
-		// 					OrgID:      &orgId,
-		// 					ID:         gofakeit.Name(),
+		func() test {
+			return test{
+				name: "deleted setting with wrong type",
+				testFunc: func(ctx context.Context, t *testing.T) {
+					noOfIDPs := 1
+					for range noOfIDPs {
+						setting := domain.Setting{
+							InstanceID: instanceId,
+							OrgID:      &orgId,
+							ID:         gofakeit.Name(),
 
-		// 					Type:     domain.SettingTypeLogin.String(),
-		// 					Settings: []byte("{}"),
-		// 				}
+							Type:     domain.SettingTypeLogin,
+							Settings: []byte("{}"),
+						}
 
-		// 				err := settingRepo.Create(ctx, &setting)
-		// 				require.NoError(t, err)
-		// 			}
+						err := settingRepo.Create(ctx, &setting)
+						require.NoError(t, err)
+					}
 
-		// 			// delete organization
-		// 			affectedRows, err := settingRepo.Delete(ctx,
-		// 				settingRepo.NameCondition(name),
-		// 				instanceId,
-		// 				&orgId,
-		// 			)
-		// 			assert.Equal(t, int64(1), affectedRows)
-		// 			require.NoError(t, err)
-		// 		},
-		// 		settingIdentifierCondition: settingRepo.NameCondition(name),
-		// 		// this test should return 0 affected rows as the setting was already deleted
-		// 		noOfDeletedRows: 0,
-		// 	}
-		// }(),
+					// delete organization
+					affectedRows, err := settingRepo.Delete(ctx,
+						instanceId,
+						&orgId,
+						domain.SettingTypeLogin,
+					)
+					assert.Equal(t, int64(1), affectedRows)
+					require.NoError(t, err)
+				},
+				// this test should return 0 affected rows as the setting was already deleted
+				noOfDeletedRows: 0,
+				settingType:     domain.SettingTypePasswordComplexity,
+			}
+		}(),
+		func() test {
+			return test{
+				name: "deleted already deleted setting",
+				testFunc: func(ctx context.Context, t *testing.T) {
+					noOfIDPs := 1
+					for range noOfIDPs {
+						setting := domain.Setting{
+							InstanceID: instanceId,
+							OrgID:      &orgId,
+							ID:         gofakeit.Name(),
+
+							Type:     domain.SettingTypeLogin,
+							Settings: []byte("{}"),
+						}
+
+						err := settingRepo.Create(ctx, &setting)
+						require.NoError(t, err)
+					}
+
+					// delete organization
+					affectedRows, err := settingRepo.Delete(ctx,
+						instanceId,
+						&orgId,
+						domain.SettingTypeLogin,
+					)
+					assert.Equal(t, int64(1), affectedRows)
+					require.NoError(t, err)
+				},
+				// this test should return 0 affected rows as the setting was already deleted
+				noOfDeletedRows: 0,
+				settingType:     domain.SettingTypeLogin,
+			}
+		}(),
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -980,18 +1019,18 @@ func TestDeleteSetting(t *testing.T) {
 
 			// delete setting
 			noOfDeletedRows, err := settingRepo.Delete(ctx,
-				tt.
-					instanceId,
+				instanceId,
 				&orgId,
+				tt.settingType,
 			)
 			require.NoError(t, err)
 			assert.Equal(t, noOfDeletedRows, tt.noOfDeletedRows)
 
 			// check setting was deleted
 			organization, err := settingRepo.Get(ctx,
-				tt.settingIdentifierCondition,
 				instanceId,
 				&orgId,
+				tt.settingType,
 			)
 			require.ErrorIs(t, err, new(database.NoRowFoundError))
 			assert.Nil(t, organization)

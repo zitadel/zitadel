@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -117,6 +118,7 @@ func (s *settings) List(ctx context.Context, conditions ...database.Condition) (
 	orderBy := database.OrderBy(s.CreatedAtColumn())
 	orderBy.Write(&builder)
 
+	fmt.Printf("[DEBUGPRINT] [:1] builder.String() = %+v\n", builder.String())
 	return scanSettings(ctx, s.client, &builder)
 }
 
@@ -142,7 +144,7 @@ func (s *settings) UpdateLogin(ctx context.Context, setting *domain.LoginSetting
 	builder.WriteString(`UPDATE zitadel.settings SET `)
 
 	conditions := []database.Condition{
-		s.IDCondition(*setting.ID),
+		// s.IDCondition(*setting.ID),
 		s.InstanceIDCondition(setting.InstanceID),
 		s.OrgIDCondition(setting.OrgID),
 		s.TypeCondition(setting.Type),
@@ -176,28 +178,6 @@ func (s *settings) GetLabel(ctx context.Context, instanceID string, orgID *strin
 	return labelSetting, nil
 }
 
-// func (s *settings) UpdateLabel(ctx context.Context, setting *domain.LabelSetting) (int64, error) {
-// 	builder := database.StatementBuilder{}
-// 	builder.WriteString(`UPDATE zitadel.settings SET `)
-// 	fmt.Printf("[DEBUGPRINT] [settings_instance_test.go:1] setting.InstanceID = %+v\n", setting.InstanceID)
-
-// 	conditions := []database.Condition{
-// 		s.IDCondition(*setting.ID),
-// 		s.InstanceIDCondition(setting.InstanceID),
-// 		s.OrgIDCondition(setting.OrgID),
-// 		s.TypeCondition(setting.Type),
-// 	}
-// 	settingJSON, err := json.Marshal(setting.Settings)
-// 	if err != nil {
-// 		return 0, err
-// 	}
-// 	s.SetSettings(string(settingJSON)).Write(&builder)
-// 	writeCondition(&builder, database.And(conditions...))
-
-// 	stmt := builder.String()
-
-//		return s.client.Exec(ctx, stmt, builder.Args()...)
-//	}
 func (s *settings) UpdateLabel(ctx context.Context, setting *domain.LabelSetting) (int64, error) {
 	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
 }
@@ -357,7 +337,7 @@ func (s *settings) updateSetting(ctx context.Context, setting *domain.Setting, s
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.settings SET `)
 	conditions := []database.Condition{
-		s.IDCondition(*setting.ID),
+		// s.IDCondition(setting.ID),
 		s.InstanceIDCondition(setting.InstanceID),
 		s.OrgIDCondition(setting.OrgID),
 		s.TypeCondition(setting.Type),
@@ -379,7 +359,7 @@ const createSettingStmt = `INSERT INTO zitadel.settings` +
 	` (instance_id, org_id, type, settings)` +
 	// ` VALUES ($1, $2, $3, $4, $5)` +
 	` VALUES ($1, $2, $3, $4)` +
-	` RETURNING created_at, updated_at`
+	` RETURNING id, created_at, updated_at`
 
 func (s *settings) Create(ctx context.Context, setting *domain.Setting) error {
 	builder := database.StatementBuilder{}
@@ -387,12 +367,11 @@ func (s *settings) Create(ctx context.Context, setting *domain.Setting) error {
 	builder.AppendArgs(
 		setting.InstanceID,
 		setting.OrgID,
-		// setting.ID,
 		setting.Type,
 		string(setting.Settings))
 	builder.WriteString(createSettingStmt)
 
-	return s.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.CreatedAt, &setting.UpdatedAt)
+	return s.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
 }
 
 // func (s *settings) Update(ctx context.Context, id string, instanceID string, orgID *string, changes ...database.Change) (int64, error) {

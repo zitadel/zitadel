@@ -1980,8 +1980,8 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 		// add add password policy
 		before := time.Now()
 		_, err = newInstance.Client.Mgmt.AddCustomPasswordAgePolicy(IAMCTX, &management.AddCustomPasswordAgePolicyRequest{
-			MaxAgeDays:     0,
-			ExpireWarnDays: 0,
+			MaxAgeDays:     10,
+			ExpireWarnDays: 10,
 		})
 		require.NoError(t, err)
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
@@ -1996,8 +1996,8 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 
 			// event instance.policy.password.age.added
 			assert.Equal(t, false, setting.Settings.IsDefault)
-			assert.Equal(t, uint64(0), setting.Settings.ExpireWarnDays)
-			assert.Equal(t, uint64(0), setting.Settings.MaxAgeDays)
+			assert.Equal(t, uint64(10), setting.Settings.ExpireWarnDays)
+			assert.Equal(t, uint64(10), setting.Settings.MaxAgeDays)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -2015,15 +2015,15 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 		IAMCTX = integration.SetOrgID(IAMCTX, organization.Id)
 
 		_, err = newInstance.Client.Mgmt.AddCustomPasswordAgePolicy(IAMCTX, &management.AddCustomPasswordAgePolicyRequest{
-			MaxAgeDays:     0,
-			ExpireWarnDays: 0,
+			MaxAgeDays:     10,
+			ExpireWarnDays: 10,
 		})
 		require.NoError(t, err)
 
 		before := time.Now()
 		_, err = newInstance.Client.Mgmt.UpdateCustomPasswordAgePolicy(IAMCTX, &management.UpdateCustomPasswordAgePolicyRequest{
-			MaxAgeDays:     30,
-			ExpireWarnDays: 30,
+			MaxAgeDays:     40,
+			ExpireWarnDays: 40,
 		})
 		require.NoError(t, err)
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
@@ -2038,8 +2038,8 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 
 			// event instance.policy.password.age.changed
 			assert.Equal(t, false, setting.Settings.IsDefault)
-			assert.Equal(t, uint64(30), setting.Settings.ExpireWarnDays)
-			assert.Equal(t, uint64(30), setting.Settings.MaxAgeDays)
+			assert.Equal(t, uint64(40), setting.Settings.ExpireWarnDays)
+			assert.Equal(t, uint64(40), setting.Settings.MaxAgeDays)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
