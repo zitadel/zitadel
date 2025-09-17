@@ -223,7 +223,7 @@
     },
     {
       "source": "/docs/guides/integrate/login-ui/typescript-repo",
-      "destination": "/docs/guides/integrate/login-ui/typescript-login-ui",
+      "destination": "/docs/guides/integrate/login-ui/login-app",
       "permanent": true
     }
   ]
