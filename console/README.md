@@ -81,7 +81,7 @@ nx @zitadel/console:lint-fix
 
 The Console app has the following build dependencies managed by Nx:
 
-1. `@zitadel/proto:generate` - Generates modern protobuf files
+1. `@zitadel/proto:generate` - Generates the protobuf stubs
 2. `@zitadel/client:build` - Builds the TypeScript gRPC client library
 3. `@zitadel/console:generate` - Generates Console-specific protobuf files
 4. `@zitadel/console:build` - Builds the Angular application
