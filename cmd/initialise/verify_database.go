@@ -2,6 +2,7 @@ package initialise
 
 import (
 	"context"
+	"database/sql"
 	_ "embed"
 	"fmt"
 
@@ -39,6 +40,33 @@ func VerifyDatabase(databaseName string) func(context.Context, *database.DB) err
 	return func(ctx context.Context, db *database.DB) error {
 		logging.WithFields("database", databaseName).Info("verify database")
 
+		// Check if database already exists first
+		exists, err := databaseExists(ctx, db, databaseName)
+		if err != nil {
+			return fmt.Errorf("failed to check if database exists: %w", err)
+		}
+
+		if exists {
+			logging.WithFields("database", databaseName).Info("database already exists, skipping creation")
+			return nil
+		}
+
+		// Proceed with database creation
 		return exec(ctx, db, fmt.Sprintf(databaseStmt, databaseName), []string{dbAlreadyExistsCode})
 	}
+}
+
+func databaseExists(ctx context.Context, db *database.DB, databaseName string) (bool, error) {
+	var exists int
+	err := db.QueryRowContext(ctx, func(row *sql.Row) error {
+		return row.Scan(&exists)
+	}, `SELECT 1 FROM pg_database WHERE datname = $1`, databaseName)
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	
+	return true, nil
 }
