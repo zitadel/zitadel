@@ -333,11 +333,16 @@ func (s *settings) UpdateOrg(ctx context.Context, setting *domain.OrgSetting) (i
 	return s.updateSetting(ctx, setting.Setting, &setting.Settings)
 }
 
+// UpdateSetting added for testing purposes
+func UpdateSetting(ctx context.Context, s *settings, setting *domain.Setting, settings any) (int64, error) {
+	return s.updateSetting(ctx, setting, settings)
+}
+
 func (s *settings) updateSetting(ctx context.Context, setting *domain.Setting, settings any) (int64, error) {
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.settings SET `)
 	conditions := []database.Condition{
-		// s.IDCondition(setting.ID),
+		s.IDCondition(setting.ID),
 		s.InstanceIDCondition(setting.InstanceID),
 		s.OrgIDCondition(setting.OrgID),
 		s.TypeCondition(setting.Type),
@@ -372,6 +377,29 @@ func (s *settings) Create(ctx context.Context, setting *domain.Setting) error {
 	builder.WriteString(createSettingStmt)
 
 	return s.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
+}
+
+func (s *settings) create(ctx context.Context, setting *domain.Setting, settings any) error {
+	builder := database.StatementBuilder{}
+
+	settingJSON, err := json.Marshal(setting.Settings)
+	if err != nil {
+		return err
+	}
+
+	builder.AppendArgs(
+		setting.InstanceID,
+		setting.OrgID,
+		setting.Type,
+		string(settingJSON))
+
+	builder.WriteString(createSettingStmt)
+
+	return s.client.QueryRow(ctx, builder.String(), builder.Args()...).Scan(&setting.ID, &setting.CreatedAt, &setting.UpdatedAt)
+}
+
+func (s *settings) CreatePasswordExpiry(ctx context.Context, setting *domain.PasswordExpirySetting) error {
+	return s.create(ctx, setting.Setting, &setting.Settings)
 }
 
 // func (s *settings) Update(ctx context.Context, id string, instanceID string, orgID *string, changes ...database.Change) (int64, error) {

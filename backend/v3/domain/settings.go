@@ -253,6 +253,7 @@ type SettingsRepository interface {
 	GetPasswordComplexity(ctx context.Context, instanceID string, orgID *string) (*PasswordComplexitySetting, error)
 	UpdatePasswordComplexity(ctx context.Context, setting *PasswordComplexitySetting) (int64, error)
 
+	CreatePasswordExpiry(ctx context.Context, setting *PasswordExpirySetting) error
 	GetPasswordExpiry(ctx context.Context, instanceID string, orgID *string) (*PasswordExpirySetting, error)
 	UpdatePasswordExpiry(ctx context.Context, setting *PasswordExpirySetting) (int64, error)
 
