@@ -3,12 +3,7 @@ import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { Translated } from "@/components/translated";
 import { UsernameForm } from "@/components/username-form";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
-import {
-  getActiveIdentityProviders,
-  getBrandingSettings,
-  getDefaultOrg,
-  getLoginSettings,
-} from "@/lib/zitadel";
+import { getActiveIdentityProviders, getBrandingSettings, getDefaultOrg, getLoginSettings } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -16,12 +11,10 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("loginname");
-  return { title: t('title')};
+  return { title: t("title") };
 }
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<Record<string | number | symbol, string | undefined>> }) {
   const searchParams = await props.searchParams;
 
   const loginName = searchParams?.loginName;
@@ -67,14 +60,16 @@ export default async function Page(props: {
 
   return (
     <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col space-y-4">
         <h1>
           <Translated i18nKey="title" namespace="loginname" />
         </h1>
         <p className="ztdl-p">
           <Translated i18nKey="description" namespace="loginname" />
         </p>
+      </div>
 
+      <div className="w-full">
         <UsernameForm
           loginName={loginName}
           requestId={requestId}
