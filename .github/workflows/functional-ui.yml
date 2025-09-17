@@ -1,4 +1,4 @@
-name: "Functional UI Tests"
+name: Functional UI Tests
 
 on:
   workflow_call:

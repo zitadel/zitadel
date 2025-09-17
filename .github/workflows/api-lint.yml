@@ -1,4 +1,4 @@
-name: Lint
+name: API Lint
 
 on:
   workflow_call:
