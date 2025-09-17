@@ -43,7 +43,6 @@
                 "{workspaceRoot}/backend/**/*"
             ],
             "outputs": [
-                "{workspaceRoot}/backend",
                 "{workspaceRoot}/internal/statik/statik.go",
                 "{workspaceRoot}/internal/notification/statik/statik.go",
                 "{workspaceRoot}/internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css*",

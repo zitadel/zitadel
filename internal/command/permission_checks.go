@@ -39,29 +39,36 @@ func (c *Commands) newPermissionCheck(ctx context.Context, permission string, ag
 	}
 }
 
-func (c *Commands) checkPermissionOnUser(ctx context.Context, permission string) PermissionCheck {
+func (c *Commands) checkPermissionOnUser(ctx context.Context, permission string, allowSelfManagement bool) PermissionCheck {
 	return func(resourceOwner, aggregateID string) error {
-		if aggregateID != "" && aggregateID == authz.GetCtxData(ctx).UserID {
+		if allowSelfManagement && aggregateID != "" && aggregateID == authz.GetCtxData(ctx).UserID {
 			return nil
 		}
 		return c.newPermissionCheck(ctx, permission, user.AggregateType)(resourceOwner, aggregateID)
 	}
 }
 
-func (c *Commands) NewPermissionCheckUserWrite(ctx context.Context) PermissionCheck {
-	return c.checkPermissionOnUser(ctx, domain.PermissionUserWrite)
+func (c *Commands) NewPermissionCheckUserWrite(ctx context.Context, allowSelfManagement bool) PermissionCheck {
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserWrite, allowSelfManagement)
 }
 
 func (c *Commands) checkPermissionDeleteUser(ctx context.Context, resourceOwner, userID string) error {
-	return c.checkPermissionOnUser(ctx, domain.PermissionUserDelete)(resourceOwner, userID)
+	err := c.checkPermissionOnUser(ctx, domain.PermissionUserDelete, false)(resourceOwner, userID)
+	if err == nil {
+		return nil
+	}
+	if userID != authz.GetCtxData(ctx).UserID {
+		return err
+	}
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserDeleteSelf, false)(resourceOwner, userID)
 }
 
-func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
-	return c.NewPermissionCheckUserWrite(ctx)(resourceOwner, userID)
+func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string, allowSelfManagement bool) error {
+	return c.NewPermissionCheckUserWrite(ctx, allowSelfManagement)(resourceOwner, userID)
 }
 
 func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, resourceOwner, userID string) error {
-	return c.checkPermissionOnUser(ctx, domain.PermissionUserCredentialWrite)(resourceOwner, userID)
+	return c.checkPermissionOnUser(ctx, domain.PermissionUserCredentialWrite, true)(resourceOwner, userID)
 }
 
 func (c *Commands) checkPermissionCreateProject(ctx context.Context, resourceOwner, projectID string) error {
