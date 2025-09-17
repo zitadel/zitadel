@@ -8,6 +8,11 @@ import (
 
 type Client struct{}
 
+// Ping implements database.Client.
+func (n *Client) Ping(ctx context.Context) error {
+	return nil
+}
+
 // Begin implements [database.Client].
 func (n *Client) Begin(ctx context.Context, opts *database.TransactionOptions) (database.Transaction, error) {
 	return new(Transaction), nil

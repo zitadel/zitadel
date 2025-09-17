@@ -8,6 +8,11 @@ import (
 
 type Pool struct{}
 
+// Ping implements database.Pool.
+func (n *Pool) Ping(ctx context.Context) error {
+	return nil
+}
+
 // Acquire implements [database.Pool].
 func (n *Pool) Acquire(ctx context.Context) (database.Client, error) {
 	return new(Client), nil
