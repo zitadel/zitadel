@@ -3,16 +3,6 @@ CREATE TYPE zitadel.idp_state AS ENUM (
     'inactive'
 );
 
-CREATE TABLE zitadel.idp_type (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL CHECK (name <> '')
-);
-
-CREATE TYPE zitadel.idp_auto_linking_option AS ENUM (
-    'username',
-    'email'
-);
-
 CREATE TABLE zitadel.identity_providers (
     instance_id TEXT NOT NULL
     , org_id TEXT

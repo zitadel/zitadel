@@ -260,6 +260,7 @@ type SAML struct {
 	NameIDFormat                  *domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"`
 	TransientMappingAttributeName string                   `json:"transientMappingAttributeName,omitempty"`
 	FederatedLogoutEnabled        bool                     `json:"federatedLogoutEnabled,omitempty"`
+	SignatureAlgorithm            string                   `json:"signatureAlgorithm,omitempty"`
 }
 
 type IDPSAML struct {

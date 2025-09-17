@@ -1872,7 +1872,7 @@ func (p *idpTemplateRelationalProjection) reduceSAMLIDPAdded(event eventstore.Ev
 		WithSignedRequest:             idpEvent.WithSignedRequest,
 		NameIDFormat:                  idpEvent.NameIDFormat,
 		TransientMappingAttributeName: idpEvent.TransientMappingAttributeName,
-		FederatedLogoutEnabled:        idpEvent.FederatedLogoutEnabled,
+		SignatureAlgorithm:            idpEvent.SignatureAlgorithm,
 	}
 
 	payloadJSON, err := json.Marshal(saml)
@@ -2371,6 +2371,10 @@ func reduceSAMLIDPRelationalChangedColumns(payload *domain.SAML, idpEvent *idp.S
 	if idpEvent.FederatedLogoutEnabled != nil {
 		payloadChange = true
 		payload.FederatedLogoutEnabled = *idpEvent.FederatedLogoutEnabled
+	}
+	if idpEvent.SignatureAlgorithm != nil {
+		payloadChange = true
+		payload.SignatureAlgorithm = *idpEvent.SignatureAlgorithm
 	}
 	return payloadChange
 }

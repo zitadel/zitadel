@@ -2230,6 +2230,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				IsAutoUpdate:      false,
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
+			SignatureAlgorithm: idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1,
 		})
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
@@ -2264,6 +2265,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			assert.Equal(t, zitadel_internal_domain.SAMLNameIDFormatTransient, *saml.NameIDFormat)
 			assert.Equal(t, name, saml.TransientMappingAttributeName)
 			assert.Equal(t, false, saml.FederatedLogoutEnabled)
+			assert.Equal(t, "http://www.w3.org/2000/09/xmldsig#rsa-sha1", saml.SignatureAlgorithm)
 		}, retryDuration, tick)
 	})
 
@@ -2289,6 +2291,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				IsAutoUpdate:      false,
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL,
 			},
+			SignatureAlgorithm: idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA1,
 		})
 		require.NoError(t, err)
 
@@ -2324,6 +2327,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 				IsAutoUpdate:      true,
 				AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 			},
+			SignatureAlgorithm: idp.SAMLSignatureAlgorithm_SAML_SIGNATURE_RSA_SHA256,
 		})
 		after := time.Now().Add(time.Second * 30) // need to allow time for the events to be processed
 		require.NoError(t, err)
@@ -2357,6 +2361,7 @@ func TestServer_TestIDProviderOrgReduces(t *testing.T) {
 			assert.Equal(t, zitadel_internal_domain.SAMLNameIDFormatEmailAddress, *updateSAML.NameIDFormat)
 			assert.Equal(t, name, updateSAML.TransientMappingAttributeName)
 			assert.Equal(t, true, updateSAML.FederatedLogoutEnabled)
+			assert.Equal(t, "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", updateSAML.SignatureAlgorithm)
 		}, retryDuration, tick)
 	})
 
