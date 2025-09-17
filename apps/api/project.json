@@ -15,15 +15,31 @@
         "prod": {
             "continuous": true,
             "dependsOn": [
-                "build"
+                "setup"
             ],
             "options": {
                 "env": {
                     "API_CONFIG_FILE": "{projectRoot}/api.yaml"
                 }
             },
-            "command": "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\"; ./.artifacts/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/zitadel start-from-init --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'"
-        },        
+            "command": "bash -c '${ZITADEL_BINARY:-./.artifacts/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/zitadel} start --config ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters'"
+        },
+        "setup": {
+            "dependsOn": [
+                "build"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "parallel": false,
+                "env": {
+                    "API_CONFIG_FILE": "{projectRoot}/api.yaml"
+                },
+                "commands": [
+                    "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\"; ${ZITADEL_BINARY:-./.artifacts/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/zitadel} init --config ${API_CONFIG_FILE} && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'",
+                    "bash -c '${ZITADEL_BINARY:-./.artifacts/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/zitadel} setup --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters'"
+                ]
+            }
+        },
         "build": {
             "description": "Build the Zitadel API application",
             "dependsOn": [
@@ -70,6 +86,52 @@
                 "{workspaceRoot}/go*"
             ],
             "command": "go test -race -coverprofile=profile.cov -coverpkg=./internal/...  ./..."
+        },
+        "test-integration-pull": {
+            "command": "nx run @zitadel/devcontainer:compose pull db-api-integration cache-api-integration"
+        },
+        "test-integration-build": {
+            "dependsOn": [
+                "generate"
+            ],            
+            "command": "go build -cover -race -tags integration -o .artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test main.go",
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },
+                "sources",
+                "{workspaceRoot}/internal/integration/**",
+                "{workspaceRoot}/go*"
+            ],
+            "outputs": [
+                "{workspaceRoot}/.artifacts/bin/*/*/zitadel.test"
+            ]
+        },
+        "test-integration-setup": {
+            "dependsOn": [
+                "test-integration-build"
+            ],
+            "command": "ZITADEL_BINARY=.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test nx run @zitadel/api:setup"
+        },
+        "test-integration-env": {
+            "continuous": true,
+            "dependsOn": [
+                "test-integration-pull",
+                "test-integration-setup"
+            ],
+            "executor": "nx:run-commands",
+            "options": {
+                "commands": [
+                    "nx run @zitadel/devcontainer:compose up db-api-integration cache-api-integration",
+                    "ZITADEL_BINARY=.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test nx run @zitadel/api:prod --excludeTaskDependencies"
+                ]
+            }                
+        },
+        "test-integration": {
+            "cache": true,
+            "dependsOn": [
+                "test-integration-env"
+            ],
+            "command": "bash -c 'go test -race -count 1 -tags integration -timeout 60m -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")'"
         },
         "generate-console": {
             "description": "Build the console and copy the static files to the api",
