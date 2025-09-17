@@ -115,6 +115,7 @@ clean:
 	$(RM) -r console/dist
 	git clean -fdx -e '.gitkeep' internal/api/ui/console/static
 	$(RM) zitadel
+	$(RM) zitadel.test
 
 .PHONY: core_unit_test
 core_unit_test:
