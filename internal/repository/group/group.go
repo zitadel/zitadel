@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -34,12 +35,28 @@ func NewGroupAddedEvent(
 	organizationID string,
 ) *GroupAddedEvent {
 	return &GroupAddedEvent{
-		BaseEvent:      *eventstore.NewBaseEventForPush(ctx, aggregate, GroupAddedEventType),
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			GroupAddedEventType),
 		ID:             aggregate.ID,
 		Name:           name,
 		Description:    description,
 		OrganizationID: organizationID,
 	}
+}
+
+func GroupAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e := &GroupAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := event.Unmarshal(e)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "GROUP-4bZsga", "unable to unmarshal group")
+	}
+
+	return e, nil
 }
 
 func (g GroupAddedEvent) Payload() any {
@@ -89,6 +106,19 @@ func NewGroupChangedEvent(
 	}
 }
 
+func GroupChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e := &GroupChangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := event.Unmarshal(e)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "GROUP-4bYsga", "unable to unmarshal group")
+	}
+
+	return e, nil
+}
+
 func (g GroupChangedEvent) Payload() any {
 	return g
 }
@@ -111,6 +141,19 @@ func NewGroupRemovedEvent(
 		BaseEvent: *eventstore.NewBaseEventForPush(ctx, aggregate, GroupRemovedEventType),
 		ID:        aggregate.ID,
 	}
+}
+
+func GroupRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e := &GroupRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := event.Unmarshal(e)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "GROUP-4bXsga", "unable to unmarshal group")
+	}
+
+	return e, nil
 }
 
 func (g GroupRemovedEvent) Payload() any {

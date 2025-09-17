@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -95,7 +96,7 @@ func (c *Commands) DeleteGroup(ctx context.Context, groupID string) (details *do
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if groupID == "" {
+	if strings.TrimSpace(groupID) == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "CMDGRP-aNg318", "Errors.Group.MissingID")
 	}
 	existingGroup, err := c.getGroupWriteModelByID(ctx, &domain.Group{ObjectRoot: models.ObjectRoot{AggregateID: groupID, ResourceOwner: authz.GetCtxData(ctx).ResourceOwner}})
