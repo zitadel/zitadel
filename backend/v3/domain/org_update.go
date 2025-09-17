@@ -4,12 +4,30 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type UpdateOrgCommand struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+
+	OldDomainName       *string `json:"old_name"`
+	IsOldDomainVerified *bool   `json:"is_old_domain_primary"`
+}
+
+// Events implements Commander.
+func (u *UpdateOrgCommand) Events(ctx context.Context) []eventstore.Command {
+	toReturn := []eventstore.Command{}
+
+	if u.OldDomainName != nil && *u.OldDomainName != u.Name {
+		toReturn = append(toReturn, org.NewOrgChangedEvent(ctx, &org.NewAggregate(u.ID).Aggregate, *u.OldDomainName, u.Name))
+	}
+
+	return toReturn
 }
 
 var _ Commander = (*UpdateOrgCommand)(nil)
@@ -29,6 +47,7 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 	defer func() { err = close(ctx, err) }()
 
 	organizationRepo := opts.orgRepo()
+	organizationRepo.Domains(true)
 
 	org, err := organizationRepo.Get(ctx, database.WithCondition(organizationRepo.IDCondition(u.ID)))
 	if err != nil {
@@ -42,6 +61,11 @@ func (u *UpdateOrgCommand) Execute(ctx context.Context, opts *CommandOpts) (err 
 
 	if org.State == OrgStateInactive {
 		err = NewOrgNotFoundError("DOM-OcA1jq")
+		return err
+	}
+
+	err = u.setDomainInfos(ctx, org)
+	if err != nil {
 		return err
 	}
 
@@ -78,5 +102,23 @@ func (u *UpdateOrgCommand) Validate() error {
 	if u.Name == "" {
 		return zerrors.ThrowInvalidArgument(nil, "DOM-wfUntW", "invalid organization name")
 	}
+	return nil
+}
+
+func (u *UpdateOrgCommand) setDomainInfos(ctx context.Context, org *Organization) error {
+	iamDomain := http_utils.DomainContext(ctx).RequestedDomain()
+	oldDomainName, err := domain.NewIAMDomainName(org.Name, iamDomain)
+	if err != nil {
+		return err
+	}
+
+	for _, d := range org.Domains {
+		if d.Domain == oldDomainName && !d.IsPrimary {
+			u.IsOldDomainVerified = &d.IsVerified
+			u.OldDomainName = &d.Domain
+			return nil
+		}
+	}
+
 	return nil
 }

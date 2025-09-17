@@ -1,9 +1,11 @@
 package domain_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
@@ -32,7 +34,9 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 		inputID   string
 		inputName string
 
-		expectedError error
+		expectedError          error
+		expectedOldDomainName  *string
+		expectedDomainVerified *bool
 	}{
 		{
 			testName: "when EnsureTx fails should return error",
@@ -102,6 +106,31 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			expectedError: domain.NewOrgNotFoundError("DOM-OcA1jq"),
 		},
 		{
+			testName: "when setting domain info fails should return error",
+			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
+				repo := domainmock.NewOrgRepo(ctrl)
+				repo.EXPECT().
+					Get(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(&domain.Organization{
+						ID:    "org-1",
+						Name:  "",
+						State: domain.OrgStateActive,
+						Domains: []*domain.OrganizationDomain{
+							{IsPrimary: true, IsVerified: true, Domain: "old org name"},
+							{IsPrimary: false, IsVerified: true, Domain: "old org name"},
+							{IsPrimary: false, IsVerified: true, Domain: "old primary org name"},
+						},
+					}, nil)
+				return func(_ database.QueryExecutor) domain.OrganizationRepository {
+					return repo
+				}
+			},
+			inputID:       "org-1",
+			inputName:     "test org update",
+			expectedError: zerrors.ThrowInvalidArgument(nil, "ORG-RrfXY", "Errors.Org.Domain.EmptyString"),
+		},
+		{
 			testName: "when org update fails should return error",
 			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
@@ -113,6 +142,10 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 						Name:       "old org name",
 						InstanceID: "instance-1",
 						State:      domain.OrgStateActive,
+						Domains: []*domain.OrganizationDomain{
+							{IsPrimary: true, IsVerified: true, Domain: "old-org-name."},
+							{IsPrimary: false, IsVerified: true, Domain: "old-org-name-2."},
+						},
 					}, nil)
 
 				repo.EXPECT().
@@ -141,6 +174,11 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 						Name:       "old org name",
 						InstanceID: "instance-1",
 						State:      domain.OrgStateActive,
+						Domains: []*domain.OrganizationDomain{
+							{IsPrimary: true, IsVerified: true, Domain: "old-org-name."},
+							{IsPrimary: false, IsVerified: true, Domain: "old-org-name."},
+							{IsPrimary: false, IsVerified: true, Domain: "old-org-name-2."},
+						},
 					}, nil)
 
 				repo.EXPECT().
@@ -151,7 +189,9 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					return repo
 				}
 			},
-			expectedError: domain.NewOrgNotFoundError("DOM-7PfSUn"),
+			expectedError:          domain.NewOrgNotFoundError("DOM-7PfSUn"),
+			expectedOldDomainName:  gu.Ptr("old-org-name."),
+			expectedDomainVerified: gu.Ptr(true),
 		},
 		{
 			testName: "when org update returns more than 1 row updated should return internal error",
@@ -165,6 +205,11 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 						Name:       "old org name",
 						InstanceID: "instance-1",
 						State:      domain.OrgStateActive,
+						Domains: []*domain.OrganizationDomain{
+							{IsPrimary: true, IsVerified: true, Domain: "old-org-name."},
+							{IsPrimary: false, IsVerified: true, Domain: "old-org-name."},
+							{IsPrimary: false, IsVerified: true, Domain: "old-org-name-2."},
+						},
 					}, nil)
 
 				repo.EXPECT().
@@ -175,12 +220,14 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 					return repo
 				}
 			},
-			inputID:       "org-1",
-			inputName:     "test org update",
-			expectedError: domain.NewMultipleOrgsUpdatedError("DOM-QzITrx", 1, 2),
+			inputID:                "org-1",
+			inputName:              "test org update",
+			expectedError:          domain.NewMultipleOrgsUpdatedError("DOM-QzITrx", 1, 2),
+			expectedOldDomainName:  gu.Ptr("old-org-name."),
+			expectedDomainVerified: gu.Ptr(true),
 		},
 		{
-			testName: "when org update returns 1 row updated should return no error and set cache",
+			testName: "when org update returns 1 row updated should return no error and set non-primary verified domain",
 			orgRepo: func(ctrl *gomock.Controller) func(database.QueryExecutor) domain.OrganizationRepository {
 				repo := domainmock.NewOrgRepo(ctrl)
 				repo.EXPECT().
@@ -191,6 +238,11 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 						Name:       "old org name",
 						InstanceID: "instance-1",
 						State:      domain.OrgStateActive,
+						Domains: []*domain.OrganizationDomain{
+							{IsPrimary: true, IsVerified: true, Domain: "old-org-name."},
+							{IsPrimary: false, IsVerified: true, Domain: "old-org-name."},
+							{IsPrimary: false, IsVerified: true, Domain: "old-org-name-2."},
+						},
 					}, nil)
 
 				repo.EXPECT().
@@ -203,6 +255,9 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 			},
 			inputID:   "org-1",
 			inputName: "test org update",
+
+			expectedOldDomainName:  gu.Ptr("old-org-name."),
+			expectedDomainVerified: gu.Ptr(true),
 		},
 	}
 
@@ -232,6 +287,8 @@ func TestUpdateOrgCommand_Execute(t *testing.T) {
 
 			// Verify
 			assert.Equal(t, tc.expectedError, err)
+			assert.Equal(t, tc.expectedOldDomainName, cmd.OldDomainName)
+			assert.Equal(t, tc.expectedDomainVerified, cmd.IsOldDomainVerified)
 		})
 	}
 }
@@ -264,6 +321,51 @@ func TestUpdateOrgCommand_Validate(t *testing.T) {
 			t.Parallel()
 			err := tc.cmd.Validate()
 			assert.Equal(t, tc.expectedError, err)
+		})
+	}
+}
+func TestUpdateOrgCommand_Events(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name          string
+		cmd           *domain.UpdateOrgCommand
+		expectedCount int
+	}{
+		{
+			name: "no old name, no events",
+			cmd: &domain.UpdateOrgCommand{
+				ID:            "org-1",
+				Name:          "new-name",
+				OldDomainName: nil,
+			},
+			expectedCount: 0,
+		},
+		{
+			name: "old name equals new name, no events",
+			cmd: &domain.UpdateOrgCommand{
+				ID:            "org-1",
+				Name:          "same-name",
+				OldDomainName: gu.Ptr("same-name"),
+			},
+			expectedCount: 0,
+		},
+		{
+			name: "old name different from new name, returns event",
+			cmd: &domain.UpdateOrgCommand{
+				ID:            "org-1",
+				Name:          "new-name",
+				OldDomainName: gu.Ptr("old-name"),
+			},
+			expectedCount: 1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			events := tt.cmd.Events(context.Background())
+			assert.Len(t, events, tt.expectedCount)
 		})
 	}
 }
