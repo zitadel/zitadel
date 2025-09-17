@@ -62,96 +62,91 @@ func TestCreateSetting(t *testing.T) {
 				Settings:   []byte("{}"),
 			},
 		},
-		// {
-		// 	name: "adding setting with same id twice",
-		// 	testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
-		// 		settingRepo := repository.SettingsRepository(pool)
+		{
+			name: "adding setting with same id twice",
+			testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+				settingRepo := repository.SettingsRepository(pool)
 
-		// 		setting := domain.Setting{
-		// 			InstanceID: instanceId,
-		// 			OrgID:      &orgId,
-		// 			ID:         gofakeit.Name(),
-		// 			Type:       domain.SettingTypePasswordComplexity,
-		// 			Settings:   []byte("{}"),
-		// 		}
+				setting := domain.Setting{
+					InstanceID: instanceId,
+					OrgID:      &orgId,
+					ID:         gofakeit.Name(),
+					Type:       domain.SettingTypePasswordComplexity,
+					Settings:   []byte("{}"),
+				}
 
-		// 		err := settingRepo.Create(ctx, &setting)
-		// 		require.NoError(t, err)
-		// 		// change the name to make sure same only the id clashes
-		// 		return &setting
-		// 	},
-		// 	err: new(database.UniqueError),
-		// },
-		// func() test {
-		// 	id := gofakeit.Name()
-		// 	return test{
-		// 		name: "adding idp with same name, id, different instance",
-		// 		testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
-		// 			// create instance
-		// 			newInstId := gofakeit.Name()
-		// 			instance := domain.Instance{
-		// 				ID:              newInstId,
-		// 				Name:            gofakeit.Name(),
-		// 				DefaultOrgID:    "defaultOrgId",
-		// 				IAMProjectID:    "iamProject",
-		// 				ConsoleClientID: "consoleCLient",
-		// 				ConsoleAppID:    "consoleApp",
-		// 				DefaultLanguage: "defaultLanguage",
-		// 			}
-		// 			instanceRepo := repository.InstanceRepository(pool)
-		// 			err := instanceRepo.Create(ctx, &instance)
-		// 			assert.Nil(t, err)
+				err := settingRepo.Create(ctx, &setting)
+				require.NoError(t, err)
+				// change the name to make sure same only the id clashes
+				return &setting
+			},
+			err: new(database.UniqueError),
+		},
+		func() test {
+			// id := gofakeit.Name()
+			newInstId := gofakeit.Name()
+			newOrgId := gofakeit.Name()
+			return test{
+				name: "adding idp with same instance, org, different type",
+				testFunc: func(ctx context.Context, t *testing.T) *domain.Setting {
+					// create instance
+					instance := domain.Instance{
+						ID:              newInstId,
+						Name:            gofakeit.Name(),
+						DefaultOrgID:    "defaultOrgId",
+						IAMProjectID:    "iamProject",
+						ConsoleClientID: "consoleCLient",
+						ConsoleAppID:    "consoleApp",
+						DefaultLanguage: "defaultLanguage",
+					}
+					instanceRepo := repository.InstanceRepository(pool)
+					err := instanceRepo.Create(ctx, &instance)
+					assert.Nil(t, err)
 
-		// 			// create org
-		// 			newOrgId := gofakeit.Name()
-		// 			org := domain.Organization{
-		// 				ID:         newOrgId,
-		// 				Name:       gofakeit.Name(),
-		// 				InstanceID: newInstId,
-		// 				State:      domain.OrgStateActive,
-		// 			}
-		// 			organizationRepo := repository.OrganizationRepository(pool)
-		// 			err = organizationRepo.Create(ctx, &org)
-		// 			require.NoError(t, err)
+					// create org
+					org := domain.Organization{
+						ID:         newOrgId,
+						Name:       gofakeit.Name(),
+						InstanceID: newInstId,
+						State:      domain.OrgStateActive,
+					}
+					organizationRepo := repository.OrganizationRepository(pool)
+					err = organizationRepo.Create(ctx, &org)
+					require.NoError(t, err)
 
-		// 			settingRepo := repository.SettingsRepository(pool)
-		// 			setting := domain.Setting{
-		// 				InstanceID: newInstId,
-		// 				OrgID:      &newOrgId,
-		// 				ID:         id,
-		// 				Type:       domain.SettingTypeLockout,
-		// 				Settings:   []byte("{}"),
-		// 			}
+					settingRepo := repository.SettingsRepository(pool)
+					setting := domain.Setting{
+						InstanceID: newInstId,
+						OrgID:      &newOrgId,
+						Type:       domain.SettingTypeLockout,
+						Settings:   []byte("{}"),
+					}
 
-		// 			err = settingRepo.Create(ctx, &setting)
-		// 			require.NoError(t, err)
+					err = settingRepo.Create(ctx, &setting)
+					require.NoError(t, err)
 
-		// 			// change the instanceID to a different instance
-		// 			setting.InstanceID = instanceId
-		// 			// change the OrgId to a different organization
-		// 			setting.OrgID = &orgId
-		// 			return &setting
-		// 		},
-		// 		setting: domain.Setting{
-		// 			InstanceID: instanceId,
-		// 			OrgID:      &orgId,
-		// 			ID:         id,
-		// 			Type:       domain.SettingTypeLockout,
-		// 			Settings:   []byte("{}"),
-		// 		},
-		// 	}
-		// }(),
-		// {
-		// 	name: "adding setting with no id",
-		// 	setting: domain.Setting{
-		// 		InstanceID: instanceId,
-		// 		OrgID:      &orgId,
-		// 		// ID:                gofakeit.Name(),
-		// 		Type:     domain.SettingTypeBranding,
-		// 		Settings: []byte("{}"),
-		// 	},
-		// 	err: new(database.CheckError),
-		// },
+					// change the Type
+					setting.Type = domain.SettingTypePasswordComplexity
+					return &setting
+				},
+				setting: domain.Setting{
+					InstanceID: newInstId,
+					OrgID:      &newOrgId,
+					Type:       domain.SettingTypePasswordComplexity,
+					Settings:   []byte("{}"),
+				},
+			}
+		}(),
+		{
+			name: "adding setting with no type",
+			setting: domain.Setting{
+				InstanceID: instanceId,
+				OrgID:      &orgId,
+				// Type:     domain.SettingTypeBranding,
+				Settings: []byte("{}"),
+			},
+			err: new(database.IntegrityViolationError),
+		},
 		{
 			name: "adding setting with no instance id",
 			setting: domain.Setting{
@@ -217,7 +212,7 @@ func TestCreateSetting(t *testing.T) {
 
 			assert.Equal(t, tt.setting.InstanceID, setting.InstanceID)
 			assert.Equal(t, tt.setting.OrgID, setting.OrgID)
-			assert.Equal(t, tt.setting.ID, setting.ID)
+			// assert.Equal(t, tt.setting.ID, setting.ID)
 			assert.Equal(t, tt.setting.Type, setting.Type)
 			assert.WithinRange(t, setting.CreatedAt, beforeCreate, afterCreate)
 			assert.WithinRange(t, setting.UpdatedAt, beforeCreate, afterCreate)

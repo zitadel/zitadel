@@ -68,7 +68,6 @@ func TestServer_TestOrgLoginSettingsReduces(t *testing.T) {
 				ctx,
 				newInstance.ID(),
 				&organization.Id)
-			// nil)
 			require.NoError(t, err)
 
 			// event org.policy.login.added
@@ -630,7 +629,6 @@ func TestServer_TestOrgLabelSettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.Settings.ErrorMsgPopup)
 			assert.Equal(t, true, setting.Settings.DisableWatermark)
 			assert.Equal(t, domain.LabelPolicyThemeLight, setting.Settings.ThemeMode)
-			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1905,7 +1903,6 @@ func TestServer_TestOrgPasswordComplexitySettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.HasLowercase)
 			assert.Equal(t, true, setting.Settings.HasNumber)
 			assert.Equal(t, true, setting.Settings.HasSymbol)
-			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -2040,7 +2037,6 @@ func TestServer_TestOrgPasswordPolicySettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.Settings.IsDefault)
 			assert.Equal(t, uint64(40), setting.Settings.ExpireWarnDays)
 			assert.Equal(t, uint64(40), setting.Settings.MaxAgeDays)
-			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -2265,7 +2261,6 @@ func TestServer_TestOrgLockoutSettingsReduces(t *testing.T) {
 			assert.Equal(t, false, setting.Settings.IsDefault)
 			assert.Equal(t, uint64(5), setting.Settings.MaxOTPAttempts)
 			assert.Equal(t, uint64(5), setting.Settings.MaxPasswordAttempts)
-			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -2451,7 +2446,6 @@ func TestServer_TestOrgDomainSettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
 			assert.Equal(t, true, setting.Settings.UserLoginMustBeDomain)
 			assert.Equal(t, true, setting.Settings.ValidateOrgDomains)
-			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})

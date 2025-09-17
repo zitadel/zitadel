@@ -33,6 +33,8 @@ func wrapError(err error) error {
 	// 23502: not_null_violation - A value violates a NOT NULL constraint.
 	case "23502":
 		return database.NewNotNullError(pgxErr.TableName, pgxErr.ConstraintName, pgxErr)
+	case "22P02":
+		return database.NewCheckError(pgxErr.ConstraintName, pgxErr.TableName, pgxErr)
 	}
 	return database.NewUnknownError(err)
 }

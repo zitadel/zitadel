@@ -347,11 +347,6 @@ func (s *settingsRelationalProjection) Reducers() []handler.AggregateReducer {
 	}
 }
 
-type loginSettings struct {
-	policy.LoginPolicyAddedEvent
-	IsDefault *bool `json:"isDefault,omitempty"`
-}
-
 func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.LoginPolicyAddedEvent
@@ -369,11 +364,16 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 	}
 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		loginSettings := loginSettings{
+		type settingStruct struct {
+			policy.LoginPolicyAddedEvent
+			IsDefault *bool `json:"isDefault,omitempty"`
+		}
+
+		loginPolicySetting := settingStruct{
 			LoginPolicyAddedEvent: policyEvent,
 			IsDefault:             &isDefault,
 		}
-		settings, err := json.Marshal(loginSettings)
+		settingJSON, err := json.Marshal(loginPolicySetting)
 		if err != nil {
 			return err
 		}
@@ -387,7 +387,7 @@ func (s *settingsRelationalProjection) reduceLoginPolicyAdded(event eventstore.E
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypeLogin,
-			Settings:   settings,
+			Settings:   settingJSON,
 		}
 		err = settingsRepo.Create(ctx, &setting)
 		return err
@@ -540,9 +540,11 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
 		}
 
+		fmt.Printf("[DEBUGPRINT] [settings_test.go:1] setting.Settings.MFAType>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BEORE = %+v\n", setting.Settings.MFAType)
 		setting.Settings.MFAType = slices.DeleteFunc(setting.Settings.MFAType, func(mfaType domain.MultiFactorType) bool {
 			return mfaType == domain.MultiFactorType(policyEvent.MFAType)
 		})
+		fmt.Printf("[DEBUGPRINT] [settings_test.go:1] setting.Settings.MFAType>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> AFTER = %+v\n", setting.Settings.MFAType)
 
 		_, err = settingsRepo.UpdateLogin(ctx, setting)
 		return err
@@ -661,11 +663,6 @@ func (s *settingsRelationalProjection) reduceInstanceRemoved(event eventstore.Ev
 	}), nil
 }
 
-type labelSettings struct {
-	policy.LabelPolicyAddedEvent
-	IsDefault *bool `json:"isDefault,omitempty"`
-}
-
 // label
 func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) (*handler.Statement, error) {
 	fmt.Println("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ADDING LABEL")
@@ -686,11 +683,16 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 	}
 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		labelSettings := labelSettings{
+		type settingStruct struct {
+			policy.LabelPolicyAddedEvent
+			IsDefault *bool `json:"isDefault,omitempty"`
+		}
+
+		labelSetting := settingStruct{
 			LabelPolicyAddedEvent: policyEvent,
 			IsDefault:             &isDefault,
 		}
-		settings, err := json.Marshal(labelSettings)
+		settings, err := json.Marshal(labelSetting)
 		if err != nil {
 			return err
 		}
@@ -1097,11 +1099,6 @@ func (p *settingsRelationalProjection) reduceAssetsRemoved(event eventstore.Even
 	}), nil
 }
 
-type setting struct {
-	any
-	IsDefault *bool `json:"isDefault,omitempty"`
-}
-
 func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventstore.Event) (*handler.Statement, error) {
 	var orgId *string
 	var policyEvent policy.PasswordComplexityPolicyAddedEvent
@@ -1119,11 +1116,16 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 	}
 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		loginSettings := setting{
-			any:       policyEvent,
-			IsDefault: &isDefault,
+		type setting struct {
+			policy.PasswordComplexityPolicyAddedEvent
+			IsDefault *bool `json:"isDefault,omitempty"`
 		}
-		settings, err := json.Marshal(loginSettings)
+
+		passwordComplexitySetting := setting{
+			PasswordComplexityPolicyAddedEvent: policyEvent,
+			IsDefault:                          &isDefault,
+		}
+		settingJSON, err := json.Marshal(passwordComplexitySetting)
 		if err != nil {
 			return err
 		}
@@ -1133,13 +1135,13 @@ func (p *settingsRelationalProjection) reducePassedComplexityAdded(event eventst
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
-		setting := domain.Setting{
+		newSetting := domain.Setting{
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypePasswordComplexity,
-			Settings:   settings,
+			Settings:   settingJSON,
 		}
-		err = settingsRepo.Create(ctx, &setting)
+		err = settingsRepo.Create(ctx, &newSetting)
 		return err
 	}), nil
 }
@@ -1269,11 +1271,17 @@ func (p *settingsRelationalProjection) reducePasswordPolicyAdded(event eventstor
 	}
 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		loginSettings := setting{
-			any:       policyEvent,
-			IsDefault: &isDefault,
+		type settingStruct struct {
+			policy.PasswordAgePolicyAddedEvent
+			IsDefault *bool `json:"isDefault,omitempty"`
 		}
-		settings, err := json.Marshal(loginSettings)
+
+		passwordAgeSetting := settingStruct{
+			PasswordAgePolicyAddedEvent: policyEvent,
+			IsDefault:                   &isDefault,
+		}
+
+		settings, err := json.Marshal(passwordAgeSetting)
 		if err != nil {
 			return err
 		}
@@ -1409,9 +1417,14 @@ func (p *settingsRelationalProjection) reduceLockoutPolicyAdded(event eventstore
 	}
 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		loginSettings := setting{
-			any:       policyEvent,
-			IsDefault: &isDefault,
+		type settingStruct struct {
+			policy.LockoutPolicyAddedEvent
+			IsDefault *bool `json:"isDefault,omitempty"`
+		}
+
+		loginSettings := settingStruct{
+			LockoutPolicyAddedEvent: policyEvent,
+			IsDefault:               &isDefault,
 		}
 		settings, err := json.Marshal(loginSettings)
 		if err != nil {
@@ -1492,11 +1505,15 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 	}
 
 	return handler.NewStatement(&policyEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		loginSettings := setting{
-			any:       policyEvent,
-			IsDefault: &isDefault,
+		type settingStruct struct {
+			policy.DomainPolicyAddedEvent
+			IsDefault *bool `json:"isDefault,omitempty"`
 		}
-		settings, err := json.Marshal(loginSettings)
+		loginSettings := settingStruct{
+			DomainPolicyAddedEvent: policyEvent,
+			IsDefault:              &isDefault,
+		}
+		settingJSON, err := json.Marshal(loginSettings)
 		if err != nil {
 			return err
 		}
@@ -1510,7 +1527,7 @@ func (p *settingsRelationalProjection) reduceDomainPolicyAdded(event eventstore.
 			InstanceID: policyEvent.Aggregate().InstanceID,
 			OrgID:      orgId,
 			Type:       domain.SettingTypeDomain,
-			Settings:   settings,
+			Settings:   settingJSON,
 		}
 		err = settingsRepo.Create(ctx, &setting)
 		return err
@@ -1595,25 +1612,6 @@ func (s *settingsRelationalProjection) reduceOrgDomainPolicyOrgRemoved(event eve
 		orgID := &removeOrgEvent.Aggregate().ID
 
 		_, err := settingsRepo.Delete(ctx, removeOrgEvent.Aggregate().InstanceID, orgID, domain.SettingTypeDomain)
-		return err
-	}), nil
-}
-
-func (s *settingsRelationalProjection) reduceInstanceDomainPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
-	removeInstanceEvent, ok := event.(*instance.InstanceRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-78jl9", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
-	}
-
-	return handler.NewStatement(removeInstanceEvent, func(ctx context.Context, ex handler.Executer, projectionName string) error {
-		tx, ok := ex.(*sql.Tx)
-		if !ok {
-			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-zrdJz", "reduce.wrong.db.pool %T", ex)
-		}
-
-		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
-
-		_, err := settingsRepo.Delete(ctx, removeInstanceEvent.Aggregate().InstanceID, nil, domain.SettingTypeDomain)
 		return err
 	}), nil
 }

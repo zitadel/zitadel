@@ -488,7 +488,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	// 	}, retryDuration, tick)
 	// })
 
-	// org
 	t.Run("test policy label logo light added", func(t *testing.T) {
 		ctx := t.Context()
 		token := integration.SystemToken
@@ -497,28 +496,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-
-		// // add label policy
-		// label := management.AddCustomLabelPolicyRequest{
-		// 	PrimaryColor:        "#055090",
-		// 	HideLoginNameSuffix: false,
-		// 	WarnColor:           "#055090",
-		// 	BackgroundColor:     "#055090",
-		// 	FontColor:           "#055090",
-		// 	PrimaryColorDark:    "#055090",
-		// 	BackgroundColorDark: "#055090",
-		// 	WarnColorDark:       "#055090",
-		// 	FontColorDark:       "#055090",
-		// 	DisableWatermark:    false,
-		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		// }
-		// setLabelPolicyPayload, err := json.Marshal(&label)
-		// require.NoError(t, err)
-		// client := resty.New()
-		// out, err := client.R().SetAuthToken(token).
-		// 	SetBody(setLabelPolicyPayload).
-		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		// require.NoError(t, err)
 
 		// set logo light
 		before := time.Now()
@@ -555,30 +532,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// // add label policy
-		// label := management.AddCustomLabelPolicyRequest{
-		// 	PrimaryColor:        "#055090",
-		// 	HideLoginNameSuffix: false,
-		// 	WarnColor:           "#055090",
-		// 	BackgroundColor:     "#055090",
-		// 	FontColor:           "#055090",
-		// 	PrimaryColorDark:    "#055090",
-		// 	BackgroundColorDark: "#055090",
-		// 	WarnColorDark:       "#055090",
-		// 	FontColorDark:       "#055090",
-		// 	DisableWatermark:    false,
-		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		// }
-		// setLabelPolicyPayload, err := json.Marshal(&label)
-		// require.NoError(t, err)
-		// client := resty.New()
-		// out, err := client.R().SetAuthToken(token).
-		// 	SetBody(setLabelPolicyPayload).
-		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		// require.NoError(t, err)
-		// require.Equal(t, 200, out.StatusCode())
-		// require.Equal(t, 200, out.StatusCode())
-
 		// set logo dark
 		before := time.Now()
 		client := resty.New()
@@ -613,29 +566,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-
-		// // add label policy
-		// label := management.AddCustomLabelPolicyRequest{
-		// 	PrimaryColor:        "#055090",
-		// 	HideLoginNameSuffix: false,
-		// 	WarnColor:           "#055090",
-		// 	BackgroundColor:     "#055090",
-		// 	FontColor:           "#055090",
-		// 	PrimaryColorDark:    "#055090",
-		// 	BackgroundColorDark: "#055090",
-		// 	WarnColorDark:       "#055090",
-		// 	FontColorDark:       "#055090",
-		// 	DisableWatermark:    false,
-		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		// }
-		// setLabelPolicyPayload, err := json.Marshal(&label)
-		// require.NoError(t, err)
-		// client := resty.New()
-		// out, err := client.R().SetAuthToken(token).
-		// 	SetBody(setLabelPolicyPayload).
-		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		// require.NoError(t, err)
-		// require.Equal(t, 200, out.StatusCode())
 
 		// set logo light
 		client := resty.New()
@@ -690,28 +620,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// // add label policy
-		// label := management.AddCustomLabelPolicyRequest{
-		// 	PrimaryColor:        "#055090",
-		// 	HideLoginNameSuffix: false,
-		// 	WarnColor:           "#055090",
-		// 	BackgroundColor:     "#055090",
-		// 	FontColor:           "#055090",
-		// 	PrimaryColorDark:    "#055090",
-		// 	BackgroundColorDark: "#055090",
-		// 	WarnColorDark:       "#055090",
-		// 	FontColorDark:       "#055090",
-		// 	DisableWatermark:    false,
-		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		// }
-		// setLabelPolicyPayload, err := json.Marshal(&label)
-		// require.NoError(t, err)
-		// client := resty.New()
-		// out, err := client.R().SetAuthToken(token).
-		// 	SetBody(setLabelPolicyPayload).
-		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		// require.NoError(t, err)
-
 		// set logo dark
 		client := resty.New()
 		out, err := client.R().SetAuthToken(token).
@@ -765,29 +673,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// // add label policy
-		// label := management.AddCustomLabelPolicyRequest{
-		// 	PrimaryColor:        "#055090",
-		// 	HideLoginNameSuffix: false,
-		// 	WarnColor:           "#055090",
-		// 	BackgroundColor:     "#055090",
-		// 	FontColor:           "#055090",
-		// 	PrimaryColorDark:    "#055090",
-		// 	BackgroundColorDark: "#055090",
-		// 	WarnColorDark:       "#055090",
-		// 	FontColorDark:       "#055090",
-		// 	DisableWatermark:    false,
-		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		// }
-		// setLabelPolicyPayload, err := json.Marshal(&label)
-		// require.NoError(t, err)
-		// client := resty.New()
-		// out, err := client.R().SetAuthToken(token).
-		// 	SetBody(setLabelPolicyPayload).
-		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		// require.NoError(t, err)
-		// require.Equal(t, 200, out.StatusCode())
-
 		// set icon light
 		before := time.Now()
 		client := resty.New()
@@ -822,29 +707,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// // add label policy
-		// label := management.AddCustomLabelPolicyRequest{
-		// 	PrimaryColor:        "#055090",
-		// 	HideLoginNameSuffix: false,
-		// 	WarnColor:           "#055090",
-		// 	BackgroundColor:     "#055090",
-		// 	FontColor:           "#055090",
-		// 	PrimaryColorDark:    "#055090",
-		// 	BackgroundColorDark: "#055090",
-		// 	WarnColorDark:       "#055090",
-		// 	FontColorDark:       "#055090",
-		// 	DisableWatermark:    false,
-		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		// }
-		// setLabelPolicyPayload, err := json.Marshal(&label)
-		// require.NoError(t, err)
-		// client := resty.New()
-		// out, err := client.R().SetAuthToken(token).
-		// 	SetBody(setLabelPolicyPayload).
-		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		// require.NoError(t, err)
-		// require.Equal(t, 200, out.StatusCode())
-
 		// set icon dark
 		before := time.Now()
 		client := resty.New()
@@ -878,29 +740,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-
-		// // add label policy
-		// label := management.AddCustomLabelPolicyRequest{
-		// 	PrimaryColor:        "#055090",
-		// 	HideLoginNameSuffix: false,
-		// 	WarnColor:           "#055090",
-		// 	BackgroundColor:     "#055090",
-		// 	FontColor:           "#055090",
-		// 	PrimaryColorDark:    "#055090",
-		// 	BackgroundColorDark: "#055090",
-		// 	WarnColorDark:       "#055090",
-		// 	FontColorDark:       "#055090",
-		// 	DisableWatermark:    false,
-		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		// }
-		// setLabelPolicyPayload, err := json.Marshal(&label)
-		// require.NoError(t, err)
-		// client := resty.New()
-		// out, err := client.R().SetAuthToken(token).
-		// 	SetBody(setLabelPolicyPayload).
-		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		// require.NoError(t, err)
-		// require.Equal(t, 200, out.StatusCode())
 
 		// set icon light
 		client := resty.New()
@@ -955,29 +794,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		instanceID := instance.ID
 		require.NoError(t, err)
 
-		// add label policy
-		// label := management.AddCustomLabelPolicyRequest{
-		// 	PrimaryColor:        "#055090",
-		// 	HideLoginNameSuffix: false,
-		// 	WarnColor:           "#055090",
-		// 	BackgroundColor:     "#055090",
-		// 	FontColor:           "#055090",
-		// 	PrimaryColorDark:    "#055090",
-		// 	BackgroundColorDark: "#055090",
-		// 	WarnColorDark:       "#055090",
-		// 	FontColorDark:       "#055090",
-		// 	DisableWatermark:    false,
-		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		// }
-		// setLabelPolicyPayload, err := json.Marshal(&label)
-		// require.NoError(t, err)
-		// client := resty.New()
-		// out, err := client.R().SetAuthToken(token).
-		// 	SetBody(setLabelPolicyPayload).
-		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		// require.NoError(t, err)
-		// require.Equal(t, 200, out.StatusCode())
-
 		// set icon dark
 		client := resty.New()
 		out, err := client.R().SetAuthToken(token).
@@ -1022,8 +838,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// FONT
 
 	t.Run("test policy font added", func(t *testing.T) {
 		ctx := t.Context()
@@ -1033,29 +847,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-
-		// // add label policy
-		// label := management.AddCustomLabelPolicyRequest{
-		// 	PrimaryColor:        "#055090",
-		// 	HideLoginNameSuffix: false,
-		// 	WarnColor:           "#055090",
-		// 	BackgroundColor:     "#055090",
-		// 	FontColor:           "#055090",
-		// 	PrimaryColorDark:    "#055090",
-		// 	BackgroundColorDark: "#055090",
-		// 	WarnColorDark:       "#055090",
-		// 	FontColorDark:       "#055090",
-		// 	DisableWatermark:    false,
-		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		// }
-		// setLabelPolicyPayload, err := json.Marshal(&label)
-		// require.NoError(t, err)
-		// client := resty.New()
-		// out, err := client.R().SetAuthToken(token).
-		// 	SetBody(setLabelPolicyPayload).
-		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		// require.NoError(t, err)
-		// require.Equal(t, 200, out.StatusCode())
 
 		// set logo light
 		before := time.Now()
@@ -1090,29 +881,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
 		instanceID := instance.ID
 		require.NoError(t, err)
-
-		// // add label policy
-		// label := management.AddCustomLabelPolicyRequest{
-		// 	PrimaryColor:        "#055090",
-		// 	HideLoginNameSuffix: false,
-		// 	WarnColor:           "#055090",
-		// 	BackgroundColor:     "#055090",
-		// 	FontColor:           "#055090",
-		// 	PrimaryColorDark:    "#055090",
-		// 	BackgroundColorDark: "#055090",
-		// 	WarnColorDark:       "#055090",
-		// 	FontColorDark:       "#055090",
-		// 	DisableWatermark:    false,
-		// 	ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-		// }
-		// setLabelPolicyPayload, err := json.Marshal(&label)
-		// require.NoError(t, err)
-		// client := resty.New()
-		// out, err := client.R().SetAuthToken(token).
-		// 	SetBody(setLabelPolicyPayload).
-		// 	Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-		// require.NoError(t, err)
-		// require.Equal(t, 200, out.StatusCode())
 
 		// set logo light
 		client := resty.New()
@@ -1301,106 +1069,6 @@ func TestServer_TestInstanceLabelSettingsReduces(t *testing.T) {
 	// 	}
 	// 	require.NoError(t, err)
 	// })
-
-	// t.Run("test label label assets remove reduces", func(t *testing.T) {
-	// 	ctx := t.Context()
-	// 	token := integration.SystemToken
-
-	// 	instanceRepo := repository.InstanceRepository(pool)
-	// 	instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
-	// 	instanceID := instance.ID
-	// 	require.NoError(t, err)
-	// 	orgRepo := repository.OrganizationRepository(pool)
-	// 	org_, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
-	// 	orgID := org_.ID
-
-	// 	// add label policy
-	// 	label := management.AddCustomLabelPolicyRequest{
-	// 		PrimaryColor:        "#055090",
-	// 		HideLoginNameSuffix: false,
-	// 		WarnColor:           "#055090",
-	// 		BackgroundColor:     "#055090",
-	// 		FontColor:           "#055090",
-	// 		PrimaryColorDark:    "#055090",
-	// 		BackgroundColorDark: "#055090",
-	// 		WarnColorDark:       "#055090",
-	// 		FontColorDark:       "#055090",
-	// 		DisableWatermark:    false,
-	// 		ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
-	// 	}
-	// 	setLabelPolicyPayload, err := json.Marshal(&label)
-	// 	require.NoError(t, err)
-	// 	client = resty.New()
-	// 	out, err = client.R().SetAuthToken(token).
-	// 		SetBody(setLabelPolicyPayload).
-	// 		Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-	// 	require.NoError(t, err)
-
-	// 	// add logo light
-	// 	out, err = client.R().SetAuthToken(token).
-	// 		SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-	// 		Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo")
-	// 	require.NoError(t, err)
-	// require.Equal(t, 200, out.StatusCode())
-
-	// 	client = resty.New()
-	// 	out, err = client.R().SetAuthToken(token).
-	// 		SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-	// 		Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo/dark")
-	// 	require.NoError(t, err)
-
-	// 	// set logo light
-	// 	client = resty.New()
-	// 	out, err = client.R().SetAuthToken(token).
-	// 		SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-	// 		Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo")
-	// 	require.NoError(t, err)
-
-	// 	// set logo dark
-	// 	client = resty.New()
-	// 	out, err = client.R().SetAuthToken(token).
-	// 		SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-	// 		Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo/dark")
-	// 	require.NoError(t, err)
-
-	// 	// set icon light
-	// 	client = resty.New()
-	// 	out, err = client.R().SetAuthToken(token).
-	// 		SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-	// 		Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/icon")
-	// 	require.NoError(t, err)
-
-	// 	// set icon dark
-	// 	client = resty.New()
-	// 	out, err = client.R().SetAuthToken(token).
-	// 		SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
-	// 		Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/icon/dark")
-	// 	require.NoError(t, err)
-
-	// 	// set font
-	// 	client = resty.New()
-	// 	out, err = client.R().SetAuthToken(token).
-	// 		SetBody(setLabelPolicyPayload).
-	// 		Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
-	// 	require.NoError(t, err)
-
-	// 	// check all assets exist
-	// 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
-	// 	assert.EventuallyWithT(t, func(t *assert.CollectT) {
-	// 		setting, err := settingsRepo.GetLabel(
-	// 			ctx,
-	// 			instanceID,
-	// 			nil)
-	// 		require.NoError(t, err)
-
-	// 		// event instance.policy.label.font.added
-	// 		assert.NotNil(t, setting.Settings.LabelPolicyLightLogoURL)
-	// 		assert.NotNil(t, setting.Settings.LabelPolicyDarkLogoURL)
-	// 		assert.NotNil(t, setting.Settings.LabelPolicyLightIconURL)
-	// 		assert.NotNil(t, setting.Settings.LabelPolicyDarkIconURL)
-	// 		assert.NotNil(t, setting.Settings.LabelPolicyFontURL)
-	// 	}, retryDuration, tick)
-	// })
 }
 
 func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
@@ -1422,12 +1090,13 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 			require.NoError(t, err)
 
 			// event instance.policy.password.complexity.added
+			// these values are found in default.yaml
 			assert.Equal(t, true, setting.Settings.IsDefault)
-			assert.Equal(t, uint64(0), setting.Settings.MinLength)
-			assert.Equal(t, false, setting.Settings.HasUppercase)
-			assert.Equal(t, false, setting.Settings.HasLowercase)
-			assert.Equal(t, false, setting.Settings.HasNumber)
-			assert.Equal(t, false, setting.Settings.HasSymbol)
+			assert.Equal(t, uint64(8), setting.Settings.MinLength)
+			assert.Equal(t, true, setting.Settings.HasUppercase)
+			assert.Equal(t, true, setting.Settings.HasLowercase)
+			assert.Equal(t, true, setting.Settings.HasNumber)
+			assert.Equal(t, true, setting.Settings.HasSymbol)
 			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
@@ -1464,7 +1133,6 @@ func TestServer_TestPasswordComplexitySettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.HasLowercase)
 			assert.Equal(t, true, setting.Settings.HasNumber)
 			assert.Equal(t, true, setting.Settings.HasSymbol)
-			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1560,7 +1228,6 @@ func TestServer_TestInstancePasswordPolicySettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.IsDefault)
 			assert.Equal(t, uint64(30), setting.Settings.ExpireWarnDays)
 			assert.Equal(t, uint64(30), setting.Settings.MaxAgeDays)
-			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1659,7 +1326,6 @@ func TestServer_TestDomainSettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.SMTPSenderAddressMatchesInstanceDomain)
 			assert.Equal(t, true, setting.Settings.UserLoginMustBeDomain)
 			assert.Equal(t, true, setting.Settings.ValidateOrgDomains)
-			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1756,7 +1422,6 @@ func TestServer_TestLockoutSettingsReduces(t *testing.T) {
 			assert.Equal(t, true, setting.Settings.IsDefault)
 			assert.Equal(t, uint64(5), setting.Settings.MaxOTPAttempts)
 			assert.Equal(t, uint64(5), setting.Settings.MaxPasswordAttempts)
-			assert.WithinRange(t, setting.CreatedAt, before, after)
 			assert.WithinRange(t, setting.UpdatedAt, before, after)
 		}, retryDuration, tick)
 	})
@@ -1963,3 +1628,105 @@ func TestServer_TestInstanceOrgSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 }
+
+// func TestServer_TestInstanceOrgSettingsReduces(t *testing.T) {
+// 	t.Run("test label label assets remove reduces", func(t *testing.T) {
+// 		ctx := t.Context()
+// 		token := integration.SystemToken
+
+// 		instanceRepo := repository.InstanceRepository(pool)
+// 		instance, err := instanceRepo.Get(ctx, database.WithCondition(instanceRepo.NameCondition(database.TextOperationEqual, "ZITADEL")))
+// 		instanceID := instance.ID
+// 		require.NoError(t, err)
+// 		orgRepo := repository.OrganizationRepository(pool)
+// 		org_, err := orgRepo.Get(ctx, database.WithCondition(orgRepo.InstanceIDCondition(instanceID)), database.WithCondition(orgRepo.NameCondition("ZITADEL")))
+// 		orgID := org_.ID
+
+// 		// add label policy
+// 		label := management.AddCustomLabelPolicyRequest{
+// 			PrimaryColor:        "#055090",
+// 			HideLoginNameSuffix: false,
+// 			WarnColor:           "#055090",
+// 			BackgroundColor:     "#055090",
+// 			FontColor:           "#055090",
+// 			PrimaryColorDark:    "#055090",
+// 			BackgroundColorDark: "#055090",
+// 			WarnColorDark:       "#055090",
+// 			FontColorDark:       "#055090",
+// 			DisableWatermark:    false,
+// 			ThemeMode:           policy.ThemeMode_THEME_MODE_DARK,
+// 		}
+// 		setLabelPolicyPayload, err := json.Marshal(&label)
+// 		require.NoError(t, err)
+// 		client = resty.New()
+// 		out, err = client.R().SetAuthToken(token).
+// 			SetBody(setLabelPolicyPayload).
+// 			Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
+// 		require.NoError(t, err)
+
+// 		// add logo light
+// 		out, err = client.R().SetAuthToken(token).
+// 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
+// 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo")
+// 		require.NoError(t, err)
+// 	require.Equal(t, 200, out.StatusCode())
+
+// 		client = resty.New()
+// 		out, err = client.R().SetAuthToken(token).
+// 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
+// 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo/dark")
+// 		require.NoError(t, err)
+
+// 		// set logo light
+// 		client = resty.New()
+// 		out, err = client.R().SetAuthToken(token).
+// 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
+// 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo")
+// 		require.NoError(t, err)
+
+// 		// set logo dark
+// 		client = resty.New()
+// 		out, err = client.R().SetAuthToken(token).
+// 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
+// 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/logo/dark")
+// 		require.NoError(t, err)
+
+// 		// set icon light
+// 		client = resty.New()
+// 		out, err = client.R().SetAuthToken(token).
+// 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
+// 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/icon")
+// 		require.NoError(t, err)
+
+// 		// set icon dark
+// 		client = resty.New()
+// 		out, err = client.R().SetAuthToken(token).
+// 			SetMultipartField("file", "filename", "image/png", bytes.NewReader(picture)).
+// 			Post("http://localhost:8080" + "/assets/v1" + "/instance/policy/label/icon/dark")
+// 		require.NoError(t, err)
+
+// 		// set font
+// 		client = resty.New()
+// 		out, err = client.R().SetAuthToken(token).
+// 			SetBody(setLabelPolicyPayload).
+// 			Post("http://localhost:8080" + "/admin/v1" + "/policies/label")
+// 		require.NoError(t, err)
+
+// 		// check all assets exist
+// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Second*5)
+// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+// 			setting, err := settingsRepo.GetLabel(
+// 				ctx,
+// 				instanceID,
+// 				nil)
+// 			require.NoError(t, err)
+
+// 			// event instance.policy.label.font.added
+// 			assert.NotNil(t, setting.Settings.LabelPolicyLightLogoURL)
+// 			assert.NotNil(t, setting.Settings.LabelPolicyDarkLogoURL)
+// 			assert.NotNil(t, setting.Settings.LabelPolicyLightIconURL)
+// 			assert.NotNil(t, setting.Settings.LabelPolicyDarkIconURL)
+// 			assert.NotNil(t, setting.Settings.LabelPolicyFontURL)
+// 		}, retryDuration, tick)
+// 	})
+// }
