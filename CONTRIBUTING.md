@@ -1,6 +1,6 @@
 # Contributing to Zitadel
 
-Zitadel is an open-source identity and access management platform built with a modern tech stack including Go (API), Next.js/React (login), Angular (Console), and Docusaurus (docs) - all orchestrated through an Nx monorepo with pnpm for efficient development workflows.
+Zitadel is an open-source identity and access management platform built with a modern tech stack including Go (API), Next.js/React (Login), Angular (Console), and Docusaurus (Docs) - all orchestrated through an Nx monorepo with pnpm for efficient development workflows.
 
 ## Quick Start
 
@@ -31,14 +31,14 @@ Alternatively, you can use the infix-notation, like `nx dev @zitadel/login` or `
 
 ### <a name="api-quick-start"></a>API
 
-Prepare the API development with a Console and run a local login production build.
+Prepare the API development with a Console and run a local Login production build.
 
 ```bash
 nx run @zitadel/api:generate
 nx run-many -p . @zitadel/login -t db prod
 ```
 
-If you don't need a login or a Console, you can omit them and use the generated ./admin.pat to call the API.
+If you don't need a Login or a Console, you can omit them and use the generated ./admin.pat to call the API.
 
 ```bash
 nx run-many --excludeTaskDependencies -p . @zitadel/api -t db generate
@@ -48,7 +48,7 @@ Start a debug session in your IDE.
 In VSCode, you can use the preconfigured [launch config](./.vscode/launch.json).
 In other IDEs, adjust accordingly.
 
-If you have a login deployed, visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
+If you have a Login deployed, visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhost and enter `Password1!` to log in.
 
 To connect to the database and explore Zitadel data, run `psql "host=localhost dbname=zitadel sslmode=disable"`.
 
@@ -56,13 +56,13 @@ For more options, go to the [API section](#api)
 
 ### <a name="login-quick-start"></a>Login
 
-Develop the login and connect a local API with a local DB
+Develop the Login and connect a local API with a local DB
 
 ```bash
 nx run-many -p . @zitadel/api -t db prod
 ```
 
-In another terminal, start the login development server
+In another terminal, start the Login development server
 
 ```bash
 nx run @zitadel/login:dev
@@ -137,7 +137,7 @@ Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
 - [Contribute API code](#api)
 - [Contribute frontend code](#frontend)
-- If you found a mistake on our [docs page](https://zitadel.com/docs) or something is missing please read [the docs section](#docs)
+- If you found a mistake on our [Docs page](https://zitadel.com/docs) or something is missing please read [the Docs section](#docs)
 - [Translate](#translations) and improve texts
 
 ## How to contribute
@@ -159,8 +159,8 @@ The code consists of the following parts:
 | API implementation  | Service that serves the grpc(-web) and RESTful API | [go](https://go.dev)                                                                                      | [API implementation](./internal/api/grpc)           | [Contribute to API](#api)                   |
 | API definitions     | Specifications of the API                          | [Protobuf](https://developers.google.com/protocol-buffers)                                                | [./proto/zitadel](./proto/zitadel)                  | [Contribute to API](#api)                   |
 | Console             | Frontend the user interacts with after log in      | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org)                               | [./console](./console)                              | [Contribute to Frontend](#frontend) |
-| login               | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#frontend) |
-| docs                | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#frontend) |
+| Login               | Modern authentication UI built with Next.js        | [Next.js](https://nextjs.org), [React](https://reactjs.org), [TypeScript](https://www.typescriptlang.org) | [./apps/login](./apps/login)                        | [Contribute to Frontend](#frontend) |
+| Docs                | Project documentation made with docusaurus         | [Docusaurus](https://docusaurus.io/)                                                                      | [./docs](./docs)                                    | [Contribute to Frontend](#frontend) |
 | translations        | Internationalization files for default languages   | YAML                                                                                                      | [./console](./console) and [./internal](./internal) | [Contribute Translations](#translations) |
 
 Please follow the guides to validate and test the code before you contribute.
@@ -310,7 +310,7 @@ The test binary has the race detector enabled. `api_integration_server_stop` che
 
 ### Run Local Functional UI Tests
 
-To test the whole system, including the Console UI and the login UI, run the Functional UI tests.
+To test the whole system, including the Console UI and the Login UI, run the Functional UI tests.
 
 ```bash
 # Build the zitadel binary
@@ -410,14 +410,14 @@ nx run @zitadel/client:build  # Build after changes
 The Login UI is a Next.js application that provides the user interface for authentication flows.
 It is MIT-licensed, so you are free to change and deploy it as you like.
 It's located in the `apps/login` directory and uses pnpm and Nx for development.
-To start developing the login, make sure your system has the [required system dependencies](#dev-requirements) installed.
-Get familiar with the [login quick start](#login-quick-start) and the [login ui docs](https://zitadel.com/docs/guides/integrate/login-ui).
+To start developing the Login, make sure your system has the [required system dependencies](#dev-requirements) installed.
+Get familiar with the [login quick start](#login-quick-start) and the [Login ui docs](https://zitadel.com/docs/guides/integrate/login-ui).
 
 #### Develop against a Cloud instance
 
-If you don't want to build and run a local API, you can just run the login development server and point it to a cloud instance.
+If you don't want to build and run a local API, you can just run the Login development server and point it to a cloud instance.
 
-1. Create a personal access token and point your instance to your local login, [as described in the docs](https://zitadel.com/docs/self-hosting/manage/login-client).
+1. Create a personal access token and point your instance to your local Login, [as described in the Docs](https://zitadel.com/docs/self-hosting/manage/login-client).
 2. Save the following file to `apps/login/.env.dev.local`
 
 ```env
@@ -435,7 +435,7 @@ Visit http://localhost:8080/ui/console?login_hint=zitadel-admin@zitadel.localhos
 
 #### Login Architecture
 
-The login application consists of multiple packages:
+The Login application consists of multiple packages:
 
 - `@zitadel/login` - Main Next.js application
 - `@zitadel/client` - TypeScript client library for Zitadel APIs
@@ -448,9 +448,9 @@ The build process uses Nx and PNPM to orchestrate dependencies:
 Reproduce the pipeline quality checks for the code you changed.
 
 ```bash
-# Run login-related linting builds and unit tests
+# Run Login-related linting builds and unit tests
 nx run-many --projects @zitadel/login @zitadel/client @zitadel/proto --targets lint build test-unit
-# Run login integration tests
+# Run Login integration tests
 pnpm --filter @zitadel/login test-integration
 ```
 
@@ -509,7 +509,7 @@ Fix the quality checks, add new checks that cover your changes and mark your pul
 
 Project documentation is made with Docusaurus and is located under [./docs](./docs). The documentation uses **pnpm** and **Nx** for development and build processes.
 
-To start developing the docs, make sure your system has the [required system dependencies](#dev-requirements) installed.
+To start developing the Docs, make sure your system has the [required system dependencies](#dev-requirements) installed.
 
 #### Local Development
 
@@ -521,7 +521,7 @@ nx run @zitadel/docs:dev
 nx run @zitadel/docs:prod
 ```
 
-The docs build process automatically:
+The Docs build process automatically:
 
 1. Downloads required protoc plugins
 2. Generates gRPC documentation from proto files
@@ -556,7 +556,7 @@ Scope can be left empty (omit the brackets) or refer to the top navigation secti
 
 #### Pass Quality Checks
 
-Verify the docs build correctly.
+Verify the Docs build correctly.
 
 ```bash
 nx run @zitadel/docs:build
@@ -700,7 +700,7 @@ The category shows which part of Zitadel is affected.
 - **category: ci**: ci is all about continuous integration and pipelines.
 - **category: design**: All about the ux/ui of Zitadel
 - **category: docs**: Adjustments or new documentations, this can be found in the docs folder.
-- **category: frontend**: The frontend concerns on the one hand the Zitadel management Console (Angular) and on the other hand the login (gohtml)
+- **category: frontend**: The frontend concerns on the one hand the Zitadel management Console (Angular) and on the other hand the Login (gohtml)
 - **category: infra**: Infrastructure does include many different parts. E.g Terraform-provider, docker, metrics, etc.
 - **category: translation**: Everything concerning translations or new languages
 

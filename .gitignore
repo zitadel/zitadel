@@ -87,9 +87,7 @@ go.work.sum
 # Local Netlify folder
 .netlify
 
-load-test/pnpm-debug.log
-load-test/dist
-load-test/output/*
+dist
 .vercel
 
 # PNPM
