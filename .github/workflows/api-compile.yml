@@ -1,4 +1,4 @@
-name: Compile
+name: API Compile
 
 on:
   workflow_call:

@@ -6,10 +6,6 @@
   "namedInputs": {
     "default": [
       "{projectRoot}/**/*"
-    ],
-    "docker": [
-      "{projectRoot}/Dockerfile",
-      "{projectRoot}/.dockerignore"
     ]
   },
   "targetDefaults": {

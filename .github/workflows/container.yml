@@ -1,4 +1,4 @@
-name: Container
+name: Build and Push SHA Docker Images
 
 on:
   workflow_call:
@@ -38,14 +38,14 @@ env:
     org.opencontainers.image.vendor=CAOS AG
 
 jobs:
-  build-api:
+  api:
     name: api
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
-      - name: Scratch meta
+      - name: API Scratch Image Meta
         id: scratch-meta
         uses: docker/metadata-action@v5
         with:
@@ -55,7 +55,7 @@ jobs:
           labels: ${{ env.default_labels}}
           tags: |
             type=sha,prefix=,suffix=,format=long
-      - name: Debug meta
+      - name: API Debug Image Meta
         id: debug-meta
         uses: docker/metadata-action@v5
         with:
@@ -93,7 +93,7 @@ jobs:
           mv .artifacts/zitadel-linux-amd64/zitadel ./.artifacts/linux/amd64/zitadel
           tar -xzf .artifacts/zitadel-linux-arm64.tar.gz -C .artifacts/
           mv .artifacts/zitadel-linux-arm64/zitadel ./.artifacts/linux/arm64/zitadel
-      - name: Debug
+      - name: API Debug Image Build and Push
         id: build-debug
         uses: docker/build-push-action@v6
         timeout-minutes: 5
@@ -108,7 +108,7 @@ jobs:
           labels: ${{ steps.debug-meta.outputs.labels }}
           tags: ${{ steps.debug-meta.outputs.tags }}
           outputs: type=image,name=${{ inputs.image_name_github_api }},name-canonical=true
-      - name: Scratch
+      - name: API Scratch Image Build and Push
         id: build-scratch
         uses: docker/build-push-action@v6
         timeout-minutes: 3
@@ -123,7 +123,7 @@ jobs:
           labels: ${{ steps.scratch-meta.outputs.labels }}
           tags: ${{ steps.scratch-meta.outputs.tags }}
 
-  build-login:
+  login:
     name: login
     runs-on: ubuntu-latest
     strategy:
@@ -146,7 +146,7 @@ jobs:
           path: ${{ inputs.nx_cache_path }}
           key: ${{ inputs.nx_cache_key }}
           fail-on-cache-miss: true
-      - name: Login meta
+      - name: Login Image Meta
         id: login-meta
         uses: docker/metadata-action@v5
         with:
@@ -174,7 +174,7 @@ jobs:
           registry: europe-docker.pkg.dev
           username: _json_key_base64
           password: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-      - name: Restore Login
+      - name: Restore Login from Nx Cache
         run: nx run @zitadel/login:build
       - name: Login
         id: build-login
