@@ -2741,3 +2741,107 @@ func TestServer_TestOrgSettingsReduces(t *testing.T) {
 		}, retryDuration, tick)
 	})
 }
+
+// func TestServer_TestOrgeRemoveReduces(t *testing.T) {
+// 	settingsRepo := repository.SettingsRepository(pool)
+
+// 	t.Run("test label label assets remove reduces", func(t *testing.T) {
+// 		ctx := t.Context()
+
+// 		newInstance := integration.NewInstance(t.Context())
+
+// 		// check login settings exist
+// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+// 			setting, err := settingsRepo.GetLogin(
+// 				ctx,
+// 				newInstance.ID(),
+// 				nil)
+// 			require.NoError(t, err)
+
+// 			assert.NotNil(t, setting)
+// 		}, retryDuration, tick)
+
+// 		// check label settings exist
+// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
+// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+// 			setting, err := settingsRepo.GetLabel(
+// 				ctx,
+// 				newInstance.ID(),
+// 				&organization.Id)
+// 			require.NoError(t, err)
+
+// 			require.NotNil(t, setting)
+// 		}, retryDuration, tick)
+
+// 		// check login settings exist
+// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
+// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+// 			setting, err := settingsRepo.GetPasswordComplexity(
+// 				ctx,
+// 				newInstance.ID(),
+// 				nil)
+// 			require.NoError(t, err)
+
+// 			require.NotNil(t, setting)
+// 		}, retryDuration, tick)
+
+// 		// check login settings exist
+// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
+// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+// 			setting, err := settingsRepo.GetPasswordExpiry(
+// 				ctx,
+// 				newInstance.ID(),
+// 				nil)
+// 			require.NoError(t, err)
+
+// 			require.NotNil(t, setting)
+// 		}, retryDuration, tick)
+
+// 		// check login settings exist
+// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
+// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+// 			setting, err := settingsRepo.GetDomain(
+// 				ctx,
+// 				newInstance.ID(),
+// 				nil)
+// 			require.NoError(t, err)
+
+// 			require.NotNil(t, setting)
+// 		}, retryDuration, tick)
+
+// 		// check login settings exist
+// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
+// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+// 			setting, err := settingsRepo.GetLockout(
+// 				ctx,
+// 				newInstance.ID(),
+// 				nil)
+// 			require.NoError(t, err)
+
+// 			require.NotNil(t, setting)
+// 		}, retryDuration, tick)
+
+// 		// check organization settings exist
+// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
+// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+// 			setting, err := settingsRepo.GetOrg(
+// 				ctx,
+// 				newInstance.ID(),
+// 				&organization.Id)
+// 			require.NoError(t, err)
+// 		}, retryDuration, tick)
+
+// 		// 2. check security instance exists
+// 		retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Second*5)
+// 		assert.EventuallyWithT(t, func(t *assert.CollectT) {
+// 			setting, err := settingsRepo.GetSecurity(
+// 				ctx,
+// 				newInstance.ID(),
+// 				nil)
+// 			require.NoError(t, err)
+
+// 			require.NotNil(t, setting)
+// 		}, retryDuration, tick)
+// 	})
+// }

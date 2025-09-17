@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"slices"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
@@ -540,11 +539,9 @@ func (s *settingsRelationalProjection) reduceMFARemoved(event eventstore.Event) 
 			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
 		}
 
-		fmt.Printf("[DEBUGPRINT] [settings_test.go:1] setting.Settings.MFAType>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BEORE = %+v\n", setting.Settings.MFAType)
 		setting.Settings.MFAType = slices.DeleteFunc(setting.Settings.MFAType, func(mfaType domain.MultiFactorType) bool {
 			return mfaType == domain.MultiFactorType(policyEvent.MFAType)
 		})
-		fmt.Printf("[DEBUGPRINT] [settings_test.go:1] setting.Settings.MFAType>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> AFTER = %+v\n", setting.Settings.MFAType)
 
 		_, err = settingsRepo.UpdateLogin(ctx, setting)
 		return err
@@ -665,7 +662,6 @@ func (s *settingsRelationalProjection) reduceInstanceRemoved(event eventstore.Ev
 
 // label
 func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) (*handler.Statement, error) {
-	fmt.Println("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ADDING LABEL")
 	var orgId *string
 	var policyEvent policy.LabelPolicyAddedEvent
 	var isDefault bool
@@ -674,7 +670,6 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 		policyEvent = e.LabelPolicyAddedEvent
 		isDefault = false
 		orgId = &policyEvent.Aggregate().ResourceOwner
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] *orgId = %+v\n", *orgId)
 	case *instance.LabelPolicyAddedEvent:
 		policyEvent = e.LabelPolicyAddedEvent
 		isDefault = true
@@ -709,7 +704,6 @@ func (s *settingsRelationalProjection) reduceLabelAdded(event eventstore.Event) 
 			Settings:   settings,
 		}
 		err = settingsRepo.Create(ctx, &setting)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
 		return err
 	}), nil
 }
@@ -850,12 +844,9 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 			return zerrors.ThrowInvalidArgumentf(nil, "HANDL-5hONE", "reduce.wrong.db.pool %T", ex)
 		}
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
-		fmt.Println("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LOGO ADD")
 
 		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] srtting = %+v\n", setting)
 		if err != nil {
-			fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
 			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
 		}
 
@@ -871,7 +862,6 @@ func (p *settingsRelationalProjection) reduceLabelLogoAdded(event eventstore.Eve
 		}
 
 		_, err = settingsRepo.UpdateLabel(ctx, setting)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
 		return err
 	}), nil
 }
@@ -913,7 +903,6 @@ func (p *settingsRelationalProjection) reduceLogoRemoved(event eventstore.Event)
 		}
 
 		_, err = settingsRepo.UpdateLabel(ctx, setting)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
 		return err
 	}), nil
 }
@@ -938,7 +927,6 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 		}
 		settingsRepo := repository.SettingsRepository(v3_sql.SQLTx(tx))
 
-		fmt.Println("[DEBUGPRINT] [settings_org_test.go:1] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DELETEEEE ICON")
 		setting, err := settingsRepo.GetLabel(ctx, event.Aggregate().InstanceID, orgId)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "HANDL-r7k9m", "error accessing login policy record")
@@ -956,7 +944,6 @@ func (p *settingsRelationalProjection) reduceIconAdded(event eventstore.Event) (
 		}
 
 		_, err = settingsRepo.UpdateLabel(ctx, setting)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
 		return err
 	}), nil
 }
@@ -998,7 +985,6 @@ func (p *settingsRelationalProjection) reduceIconRemoved(event eventstore.Event)
 		}
 
 		_, err = settingsRepo.UpdateLabel(ctx, setting)
-		fmt.Printf("[DEBUGPRINT] [settings_org_test.go:1] err = %+v\n", err)
 		return err
 	}), nil
 }
