@@ -2,7 +2,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "build": {
-      "description": "Build the Next.js application in standalone mode for production",
+      "description": "Builds the Next.js Login application in standalone mode for production",
       "cache": true,
       "dependsOn": [
         "^build"
@@ -21,7 +21,7 @@
       ]
     },
     "build-vercel": {
-      "description": "Build for Vercel deployment",
+      "description": "Builds the Next.js Login application for Vercel deployment",
       "cache": true,
       "dependsOn": [
         "^build"
@@ -42,42 +42,47 @@
       ]
     },
     "lint": {
-      "description": "Run all linters",
+      "description": "Runs all linters",
       "dependsOn": [
         "lint-check-*"
       ]
     },
     "lint-check-prettier": {
+      "description": "Checks code formatting with Prettier",
       "cache": true,
       "inputs": [
         "default"
       ]
     },
     "lint-check-next": {
+      "description": "Runs Next.js specific lint checks",
       "cache": true,
       "inputs": [
         "default"
       ]
     },
     "test-unit": {
-      "description": "Run unit tests",
+      "description": "Runs unit tests using Vitest",
       "dependsOn": [
         "^build"
       ]
     },
     "prod": {
+      "description": "Runs the Next.js Login application in production mode from the standalone build",
       "continuous": true,
       "dependsOn": [
         "build"
       ]
     },
     "dev": {
+      "description": "Runs the Next.js Login application in development mode with hot-reloading",
       "continuous": true,
       "dependsOn": [
         "^build"
       ]
     },
     "test-integration-run": {
+      "description": "Runs the integration tests using Cypress against an already running Login applications that should be connected to the Login API Mock server",
       "cache": true,
       "inputs": [
         "default",

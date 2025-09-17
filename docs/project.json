@@ -2,6 +2,7 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "ensure-plugins": {
+      "description": "Downloads the connectRPC plugin to generate OpenAPI documentation from protobuf definitions",
       "inputs": [
         "{projectRoot}/plugin-download.sh"
       ],
@@ -11,6 +12,7 @@
       "cache": true
     },
     "generate-grpc": {
+      "description": "Generates OpenAPI specifications from protobuf definitions for API endpoints",
       "dependsOn": [
         "ensure-plugins"
       ],
@@ -21,6 +23,7 @@
       "cache": true
     },
     "generate-apidocs": {
+      "description": "Generates API documentation from OpenAPI specifications for API endpoints",
       "dependsOn": [
         "generate-grpc"
       ],
@@ -30,6 +33,7 @@
       "cache": true
     },
     "generate-configdocs": {
+      "description": "Copies default configuration files and setup steps to the documentation site",
       "inputs": [
         "{workspaceRoot}/cmd/defaults.yaml",
         "{workspaceRoot}/cmd/setup/steps.yaml"
@@ -41,23 +45,27 @@
       "cache": true
     },
     "generate": {
+      "description": "Runs all documentation generation targets",
       "dependsOn": [
         "generate-apidocs",
         "generate-configdocs"
       ]
     },
     "build": {
+      "description": "Builds the documentation site using Docusaurus",
       "outputs": [
         "{projectRoot}/build"
       ]
     },
     "prod": {
+      "description": "Runs the documentation site in production mode",
       "continuous": true,
       "dependsOn": [
         "build"
       ]
     },
     "dev": {
+      "description": "Runs the documentation site in development mode with hot-reloading",
       "continuous": true,
       "dependsOn": [
         "generate"

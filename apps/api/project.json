@@ -4,7 +4,7 @@
     "projectType": "application",
     "targets": {
         "build": {
-            "description": "Build the Zitadel API application",
+            "description": "Compiles the Go-based API backend into an executable binary.",
             "dependsOn": [
                 "generate"
             ],
@@ -31,7 +31,7 @@
             "dependsOn": [
                 "@zitadel/console:build"
             ],
-            "description": "Generate the code needed to start the API",
+            "description": "Generates the code needed to build the API",
             "command": "make api_build && make console_move",
             "inputs": [
                 "{workspaceRoot}/go.*",
@@ -56,6 +56,7 @@
             ]
         },
         "prod": {
+            "description": "Runs the APIs start-form-init command. It retries up to 5 times if it fails to start, allowing for the database to become available.",
             "continuous": true,
             "dependsOn": [
                 "build"

@@ -4,14 +4,14 @@
   "targets": {
     "db": {
       "continuous": true,
-      "description": "Run a local Postgres database for development",
+      "description": "Runs a local Postgres database for development",
       "command": "nx run @zitadel/devcontainer:compose up db",
       "options": {
         "cwd": "{workspaceRoot}/.devcontainer"
       }
     },
     "clean": {
-      "description": "Clean all local-only files relating to the Zitadel platform (api, login and console)",
+      "description": "Cleans all local-only files relating to the Zitadel platform (API, Login and Console)",
       "dependsOn": [
         "@zitadel/api:clean",
         "@zitadel/login:clean",
