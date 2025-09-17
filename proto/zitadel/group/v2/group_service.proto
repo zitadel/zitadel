@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package zitadel.group.v2beta;
+package zitadel.group.v2;
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";

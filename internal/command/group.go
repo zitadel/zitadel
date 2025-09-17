@@ -45,18 +45,14 @@ func (c *Commands) CreateGroup(ctx context.Context, group *domain.Group) (detail
 		return nil, zerrors.ThrowAlreadyExists(nil, "CMDGRP-shRut3", "Errors.Group.AlreadyExists")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx,
+	err = c.pushAppendAndReduce(ctx,
+		groupWriteModel,
 		repo.NewGroupAddedEvent(ctx,
 			GroupAggregateFromWriteModel(ctx, &groupWriteModel.WriteModel),
 			group.Name,
 			group.Description,
 			group.OrganizationID,
-		),
-	)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(groupWriteModel, pushedEvents...)
+		))
 	if err != nil {
 		return nil, err
 	}
@@ -80,18 +76,14 @@ func (c *Commands) UpdateGroup(ctx context.Context, group *domain.Group) (detail
 		return nil, zerrors.ThrowNotFound(nil, "CMDGRP-b33zly", "Errors.Group.NotFound")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx,
+	err = c.pushAppendAndReduce(ctx,
+		existingGroup,
 		repo.NewGroupChangedEvent(ctx,
 			GroupAggregateFromWriteModel(ctx, &existingGroup.WriteModel),
 			group.Name,
 			group.Description,
-			group.OrganizationID,
-		),
-	)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(existingGroup, pushedEvents...)
+			existingGroup.ResourceOwner,
+		))
 	if err != nil {
 		return nil, err
 	}
@@ -114,15 +106,11 @@ func (c *Commands) DeleteGroup(ctx context.Context, groupID string) (details *do
 		return writeModelToObjectDetails(&existingGroup.WriteModel), nil
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx,
+	err = c.pushAppendAndReduce(ctx,
+		existingGroup,
 		repo.NewGroupRemovedEvent(ctx,
 			GroupAggregateFromWriteModel(ctx, &existingGroup.WriteModel),
-		),
-	)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(existingGroup, pushedEvents...)
+		))
 	if err != nil {
 		return nil, err
 	}

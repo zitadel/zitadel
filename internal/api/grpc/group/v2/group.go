@@ -41,9 +41,8 @@ func (s *Server) UpdateGroup(ctx context.Context, req *connect.Request[group.Upd
 			AggregateID:   req.Msg.GetId(),
 			ResourceOwner: authz.GetCtxData(ctx).ResourceOwner,
 		},
-		Name:           req.Msg.GetName(),
-		Description:    req.Msg.GetDescription(),
-		OrganizationID: authz.GetCtxData(ctx).OrgID,
+		Name:        req.Msg.GetName(),
+		Description: req.Msg.GetDescription(),
 	}
 
 	details, err := s.command.UpdateGroup(ctx, userGroup)
