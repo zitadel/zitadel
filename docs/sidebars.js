@@ -355,7 +355,7 @@ module.exports = {
             "guides/integrate/login-ui/oidc-standard",
             "guides/integrate/login-ui/saml-standard",
             "guides/integrate/login-ui/device-auth",
-            "guides/integrate/login-ui/typescript-login-ui",
+            "guides/integrate/login-ui/login-app",
           ],
         },
         {
