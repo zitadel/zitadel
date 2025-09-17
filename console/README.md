@@ -74,7 +74,7 @@ nx @zitadel/console:lint-fix
 
 - `src/app/proto/generated/` - Generated proto files (Angular-specific format)
 - `buf.gen.yaml` - Local proto generation configuration
-- `project.json` - Nx build orchestration configuration for proto generation
+- `project.json` - Nx orchestration and caching for builds and tests
 - `prebuild.development.js` - Development environment configuration script
 
 ### Dependency Chain
@@ -83,8 +83,8 @@ The Console app has the following build dependencies managed by Nx:
 
 1. `@zitadel/proto:generate` - Generates the protobuf stubs
 2. `@zitadel/client:build` - Builds the TypeScript gRPC client library
-3. `@zitadel/console:generate` - Generates Console-specific protobuf files
-4. `@zitadel/console:build` - Builds the Angular application
+3. `@zitadel/console:generate` - Generates Console-specific protobuf stubs
+4. `@zitadel/console:build` - Creates a production build from Console
 
 This ensures that the Console always has access to the latest client library and protobuf definitions.
 
