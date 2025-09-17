@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -15,6 +16,12 @@ func wrapError(err error) error {
 	}
 	if errors.Is(err, pgx.ErrNoRows) {
 		return database.NewNoRowFoundError(err)
+	}
+	if errors.Is(err, pgx.ErrTooManyRows) {
+		return database.NewMultipleRowsFoundError(err)
+	}
+	if strings.HasPrefix(err.Error(), "scany: expected 1 row, got: ") {
+		return database.NewMultipleRowsFoundError(err)
 	}
 	var pgxErr *pgconn.PgError
 	if !errors.As(err, &pgxErr) {

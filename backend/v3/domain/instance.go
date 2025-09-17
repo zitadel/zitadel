@@ -44,23 +44,23 @@ var _ cache.Entry[instanceCacheIndex, string] = (*Instance)(nil)
 // instanceColumns define all the columns of the instance table.
 type instanceColumns interface {
 	// IDColumn returns the column for the id field.
-	IDColumn() database.Column
+	IDColumn() *database.Column
 	// NameColumn returns the column for the name field.
-	NameColumn() database.Column
+	NameColumn() *database.Column
 	// DefaultOrgIDColumn returns the column for the default org id field
-	DefaultOrgIDColumn() database.Column
+	DefaultOrgIDColumn() *database.Column
 	// IAMProjectIDColumn returns the column for the default IAM org id field
-	IAMProjectIDColumn() database.Column
+	IAMProjectIDColumn() *database.Column
 	// ConsoleClientIDColumn returns the column for the default IAM org id field
-	ConsoleClientIDColumn() database.Column
+	ConsoleClientIDColumn() *database.Column
 	// ConsoleAppIDColumn returns the column for the console client id field
-	ConsoleAppIDColumn() database.Column
+	ConsoleAppIDColumn() *database.Column
 	// DefaultLanguageColumn returns the column for the default language field
-	DefaultLanguageColumn() database.Column
+	DefaultLanguageColumn() *database.Column
 	// CreatedAtColumn returns the column for the created at field.
-	CreatedAtColumn() database.Column
+	CreatedAtColumn() *database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
-	UpdatedAtColumn() database.Column
+	UpdatedAtColumn() *database.Column
 }
 
 // instanceConditions define all the conditions for the instance table.

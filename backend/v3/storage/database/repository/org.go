@@ -108,6 +108,9 @@ func (o *org) Update(ctx context.Context, condition database.Condition, changes 
 	if len(changes) == 0 {
 		return 0, database.ErrNoChanges
 	}
+	if !condition.ContainsColumn(o.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
+	}
 	builder := database.StatementBuilder{}
 	builder.WriteString(`UPDATE zitadel.organizations SET `)
 
@@ -122,6 +125,10 @@ func (o *org) Update(ctx context.Context, condition database.Condition, changes 
 
 // Delete implements [domain.OrganizationRepository].
 func (o *org) Delete(ctx context.Context, condition database.Condition) (int64, error) {
+	if !condition.ContainsColumn(o.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
+	}
+
 	builder := database.StatementBuilder{}
 
 	builder.WriteString(`DELETE FROM zitadel.organizations`)
@@ -173,32 +180,32 @@ func (o org) StateCondition(state domain.OrgState) database.Condition {
 // -------------------------------------------------------------
 
 // IDColumn implements [domain.organizationColumns].
-func (org) IDColumn() database.Column {
+func (org) IDColumn() *database.Column {
 	return database.NewColumn("organizations", "id")
 }
 
 // NameColumn implements [domain.organizationColumns].
-func (org) NameColumn() database.Column {
+func (org) NameColumn() *database.Column {
 	return database.NewColumn("organizations", "name")
 }
 
 // InstanceIDColumn implements [domain.organizationColumns].
-func (org) InstanceIDColumn() database.Column {
+func (org) InstanceIDColumn() *database.Column {
 	return database.NewColumn("organizations", "instance_id")
 }
 
 // StateColumn implements [domain.organizationColumns].
-func (org) StateColumn() database.Column {
+func (org) StateColumn() *database.Column {
 	return database.NewColumn("organizations", "state")
 }
 
 // CreatedAtColumn implements [domain.organizationColumns].
-func (org) CreatedAtColumn() database.Column {
+func (org) CreatedAtColumn() *database.Column {
 	return database.NewColumn("organizations", "created_at")
 }
 
 // UpdatedAtColumn implements [domain.organizationColumns].
-func (org) UpdatedAtColumn() database.Column {
+func (org) UpdatedAtColumn() *database.Column {
 	return database.NewColumn("organizations", "updated_at")
 }
 

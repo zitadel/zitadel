@@ -14,7 +14,7 @@ type OrganizationMetadata struct {
 type organizationMetadataColumns interface {
 	MetadataColumns
 	// OrgIDColumn returns the column for the org id field.
-	OrgIDColumn() database.Column
+	OrgIDColumn() *database.Column
 }
 
 type organizationMetadataConditions interface {

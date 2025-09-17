@@ -10,18 +10,18 @@ func WithCondition(condition Condition) QueryOption {
 }
 
 // WithOrderBy sets the columns to order the results by.
-func WithOrderBy(ordering OrderDirection, orderBy ...Column) QueryOption {
+func WithOrderBy(ordering OrderDirection, orderBy ...*Column) QueryOption {
 	return func(opts *QueryOpts) {
 		opts.OrderBy = orderBy
 		opts.Ordering = ordering
 	}
 }
 
-func WithOrderByAscending(columns ...Column) QueryOption {
+func WithOrderByAscending(columns ...*Column) QueryOption {
 	return WithOrderBy(OrderDirectionAsc, columns...)
 }
 
-func WithOrderByDescending(columns ...Column) QueryOption {
+func WithOrderByDescending(columns ...*Column) QueryOption {
 	return WithOrderBy(OrderDirectionDesc, columns...)
 }
 
@@ -40,7 +40,7 @@ func WithOffset(offset uint32) QueryOption {
 }
 
 // WithGroupBy sets the columns to group the results by.
-func WithGroupBy(groupBy ...Column) QueryOption {
+func WithGroupBy(groupBy ...*Column) QueryOption {
 	return func(opts *QueryOpts) {
 		opts.GroupBy = groupBy
 	}

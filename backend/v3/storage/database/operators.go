@@ -7,11 +7,11 @@ import (
 )
 
 type Value interface {
-	Boolean | Number | Text | Instruction
+	Boolean | Number | Text | Instruction | Bytes
 }
 
 type Operation interface {
-	BooleanOperation | NumberOperation | TextOperation
+	BooleanOperation | NumberOperation | TextOperation | BytesOperation
 }
 
 type Text interface {
@@ -45,7 +45,7 @@ var textOperations = map[TextOperation]string{
 	TextOperationStartsWithIgnoreCase: " LIKE ",
 }
 
-func writeTextOperation[T Text](builder *StatementBuilder, col Column, op TextOperation, value T) {
+func writeTextOperation[T Text](builder *StatementBuilder, col *Column, op TextOperation, value T) {
 	switch op {
 	case TextOperationEqual, TextOperationNotEqual:
 		col.WriteQualified(builder)
@@ -111,7 +111,7 @@ var numberOperations = map[NumberOperation]string{
 	NumberOperationAtMost:      " >= ",
 }
 
-func writeNumberOperation[T Number](builder *StatementBuilder, col Column, op NumberOperation, value T) {
+func writeNumberOperation[T Number](builder *StatementBuilder, col *Column, op NumberOperation, value T) {
 	col.WriteQualified(builder)
 	builder.WriteString(numberOperations[op])
 	builder.WriteArg(value)
@@ -129,8 +129,31 @@ const (
 	BooleanOperationIsFalse
 )
 
-func writeBooleanOperation[T Boolean](builder *StatementBuilder, col Column, value T) {
+func writeBooleanOperation[T Boolean](builder *StatementBuilder, col *Column, value T) {
 	col.WriteQualified(builder)
 	builder.WriteString(" = ")
+	builder.WriteArg(value)
+}
+
+type Bytes interface {
+	~[]byte
+}
+
+// BytesOperation are operations that can be performed on bytea values.
+type BytesOperation uint8
+
+const (
+	BytesOperationEqual BytesOperation = iota + 1
+	BytesOperationNotEqual
+)
+
+var bytesOperations = map[BytesOperation]string{
+	BytesOperationEqual:    " = ",
+	BytesOperationNotEqual: " <> ",
+}
+
+func writeBytesOperation[T Bytes](builder *StatementBuilder, col *Column, op BytesOperation, value T) {
+	col.WriteQualified(builder)
+	builder.WriteString(bytesOperations[op])
 	builder.WriteArg(value)
 }

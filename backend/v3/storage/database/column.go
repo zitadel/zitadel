@@ -1,6 +1,6 @@
 package database
 
-type Columns []Column
+type Columns []*Column
 
 // WriteQualified implements [Column].
 func (m Columns) WriteQualified(builder *StatementBuilder) {
@@ -22,24 +22,25 @@ func (m Columns) WriteUnqualified(builder *StatementBuilder) {
 	}
 }
 
-// Column represents a column in a database table.
-type Column interface {
-	// Write(builder *StatementBuilder)
-	WriteQualified(builder *StatementBuilder)
-	WriteUnqualified(builder *StatementBuilder)
-}
+// // Column represents a column in a database table.
+// type Column interface {
+// 	// Write(builder *StatementBuilder)
+// 	WriteQualified(builder *StatementBuilder)
+// 	WriteUnqualified(builder *StatementBuilder)
+// 	Equals(col Column) bool
+// }
 
-type column struct {
+type Column struct {
 	table string
 	name  string
 }
 
-func NewColumn(table, name string) Column {
-	return column{table: table, name: name}
+func NewColumn(table, name string) *Column {
+	return &Column{table: table, name: name}
 }
 
 // WriteQualified implements [Column].
-func (c column) WriteQualified(builder *StatementBuilder) {
+func (c Column) WriteQualified(builder *StatementBuilder) {
 	builder.Grow(len(c.table) + len(c.name) + 1)
 	builder.WriteString(c.table)
 	builder.WriteRune('.')
@@ -47,11 +48,19 @@ func (c column) WriteQualified(builder *StatementBuilder) {
 }
 
 // WriteUnqualified implements [Column].
-func (c column) WriteUnqualified(builder *StatementBuilder) {
+func (c Column) WriteUnqualified(builder *StatementBuilder) {
 	builder.WriteString(c.name)
 }
 
-var _ Column = (*column)(nil)
+// Equals implements [Column].
+func (c *Column) Equals(col *Column) bool {
+	if col == nil {
+		return c == nil
+	}
+	return c.table == col.table && c.name == col.name
+}
+
+// var _ Column = (*column)(nil)
 
 // // ignoreCaseColumn represents two database columns, one for the
 // // original value and one for the lower case value.

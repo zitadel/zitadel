@@ -38,11 +38,11 @@ type AddOrganizationDomain struct {
 type organizationDomainColumns interface {
 	domainColumns
 	// OrgIDColumn returns the column for the org id field.
-	OrgIDColumn() database.Column
+	OrgIDColumn() *database.Column
 	// IsVerifiedColumn returns the column for the is verified field.
-	IsVerifiedColumn() database.Column
+	IsVerifiedColumn() *database.Column
 	// ValidationTypeColumn returns the column for the verification type field.
-	ValidationTypeColumn() database.Column
+	ValidationTypeColumn() *database.Column
 }
 
 type organizationDomainConditions interface {

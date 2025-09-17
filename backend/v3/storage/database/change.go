@@ -7,20 +7,20 @@ type Change interface {
 }
 
 type change[V Value] struct {
-	column Column
+	column *Column
 	value  V
 }
 
 var _ Change = (*change[string])(nil)
 
-func NewChange[V Value](col Column, value V) Change {
+func NewChange[V Value](col *Column, value V) Change {
 	return &change[V]{
 		column: col,
 		value:  value,
 	}
 }
 
-func NewChangePtr[V Value](col Column, value *V) Change {
+func NewChangePtr[V Value](col *Column, value *V) Change {
 	if value == nil {
 		return NewChange(col, NullInstruction)
 	}

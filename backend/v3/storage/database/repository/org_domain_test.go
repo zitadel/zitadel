@@ -856,7 +856,7 @@ func TestOrganizationDomainColumns(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		column    database.Column
+		column    *database.Column
 		qualified bool
 		expected  string
 	}{

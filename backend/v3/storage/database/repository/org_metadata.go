@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/zitadel/zitadel/backend/v3/domain"
 	"github.com/zitadel/zitadel/backend/v3/storage/database"
@@ -26,6 +27,9 @@ func (o *orgMetadata) Get(ctx context.Context, opts ...database.QueryOption) (*d
 	for _, opt := range opts {
 		opt(options)
 	}
+	if !options.Condition.ContainsColumn(o.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(o.InstanceIDColumn())
+	}
 
 	var builder database.StatementBuilder
 	builder.WriteString(queryOrganizationMetadataStmt)
@@ -40,6 +44,9 @@ func (o *orgMetadata) List(ctx context.Context, opts ...database.QueryOption) ([
 	for _, opt := range opts {
 		opt(options)
 	}
+	if !options.Condition.ContainsColumn(o.InstanceIDColumn()) {
+		return nil, database.NewMissingConditionError(o.InstanceIDColumn())
+	}
 
 	var builder database.StatementBuilder
 	builder.WriteString(queryOrganizationMetadataStmt)
@@ -50,6 +57,10 @@ func (o *orgMetadata) List(ctx context.Context, opts ...database.QueryOption) ([
 
 // Set implements [domain.OrganizationMetadataRepository].
 func (o *orgMetadata) Set(ctx context.Context, metadata ...*domain.OrganizationMetadata) error {
+	if len(metadata) == 0 {
+		return database.ErrNoChanges
+	}
+
 	var builder database.StatementBuilder
 	builder.WriteString(`INSERT INTO zitadel.org_metadata (instance_id, org_id, key, value, created_at, updated_at) VALUES `)
 	for i, m := range metadata {
@@ -70,8 +81,8 @@ func (o *orgMetadata) Set(ctx context.Context, metadata ...*domain.OrganizationM
 	builder.WriteString(` ON CONFLICT (instance_id, org_id, key) DO UPDATE SET value = EXCLUDED.value, updated_at = EXCLUDED.updated_at RETURNING created_at, updated_at`)
 
 	res, err := o.client.Query(ctx, builder.String(), builder.Args()...)
-	if err != nil {
-		return err
+	if err != nil || res.Err() != nil {
+		return errors.Join(err, res.Err())
 	}
 	return res.(database.CollectableRows).Collect(&metadata)
 }
@@ -79,6 +90,12 @@ func (o *orgMetadata) Set(ctx context.Context, metadata ...*domain.OrganizationM
 // Remove implements [domain.OrganizationMetadataRepository].
 func (o *orgMetadata) Remove(ctx context.Context, condition database.Condition) (int64, error) {
 	var builder database.StatementBuilder
+	if !condition.ContainsColumn(o.InstanceIDColumn()) {
+		return 0, database.NewMissingConditionError(o.InstanceIDColumn())
+	}
+	if !condition.ContainsColumn(o.OrgIDColumn()) {
+		return 0, database.NewMissingConditionError(o.OrgIDColumn())
+	}
 
 	builder.WriteString(`DELETE FROM zitadel.org_metadata `)
 	writeCondition(&builder, condition)
@@ -106,9 +123,9 @@ func (o *orgMetadata) OrgIDCondition(orgID string) database.Condition {
 }
 
 // ValueCondition implements [domain.OrganizationMetadataRepository].
-func (o *orgMetadata) ValueCondition(value any) database.Condition {
+func (o *orgMetadata) ValueCondition(op database.BytesOperation, value []byte) database.Condition {
 	// return database.NewValueCondition(o.ValueColumn(), value)
-	panic("unimplemented")
+	return database.NewBytesCondition(o.ValueColumn(), op, value)
 }
 
 // -------------------------------------------------------------
@@ -116,32 +133,32 @@ func (o *orgMetadata) ValueCondition(value any) database.Condition {
 // -------------------------------------------------------------
 
 // CreatedAtColumn implements [domain.OrganizationMetadataRepository].
-func (o *orgMetadata) CreatedAtColumn() database.Column {
+func (o *orgMetadata) CreatedAtColumn() *database.Column {
 	return database.NewColumn("org_metadata", "created_at")
 }
 
 // InstanceIDColumn implements [domain.OrganizationMetadataRepository].
-func (o *orgMetadata) InstanceIDColumn() database.Column {
+func (o *orgMetadata) InstanceIDColumn() *database.Column {
 	return database.NewColumn("org_metadata", "instance_id")
 }
 
 // KeyColumn implements [domain.OrganizationMetadataRepository].
-func (o *orgMetadata) KeyColumn() database.Column {
+func (o *orgMetadata) KeyColumn() *database.Column {
 	return database.NewColumn("org_metadata", "key")
 }
 
 // OrgIDColumn implements [domain.OrganizationMetadataRepository].
-func (o *orgMetadata) OrgIDColumn() database.Column {
+func (o *orgMetadata) OrgIDColumn() *database.Column {
 	return database.NewColumn("org_metadata", "org_id")
 }
 
 // UpdatedAtColumn implements [domain.OrganizationMetadataRepository].
-func (o *orgMetadata) UpdatedAtColumn() database.Column {
+func (o *orgMetadata) UpdatedAtColumn() *database.Column {
 	return database.NewColumn("org_metadata", "updated_at")
 }
 
 // ValueColumn implements [domain.OrganizationMetadataRepository].
-func (o *orgMetadata) ValueColumn() database.Column {
+func (o *orgMetadata) ValueColumn() *database.Column {
 	return database.NewColumn("org_metadata", "value")
 }
 

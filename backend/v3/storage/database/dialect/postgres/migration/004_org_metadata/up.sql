@@ -1,11 +1,11 @@
 CREATE TABLE zitadel.org_metadata (
     instance_id TEXT NOT NULL
     , org_id TEXT NOT NULL
-    , key TEXT NOT NULL
+    , key TEXT NOT NULL CHECK (key <> '')
     , value BYTEA NOT NULL
 
-    , created_at TIMESTAMPTZ NOT NULL
-    , updated_at TIMESTAMPTZ NOT NULL
+    , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    , updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     
     , PRIMARY KEY (instance_id, org_id, key)
     

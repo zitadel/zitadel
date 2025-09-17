@@ -147,38 +147,38 @@ func (i instanceDomain) TypeCondition(typ domain.DomainType) database.Condition 
 
 // CreatedAtColumn implements [domain.InstanceDomainRepository].
 // Subtle: this method shadows the method ([domain.InstanceRepository]).CreatedAtColumn of instanceDomain.instance.
-func (instanceDomain) CreatedAtColumn() database.Column {
+func (instanceDomain) CreatedAtColumn() *database.Column {
 	return database.NewColumn("instance_domains", "created_at")
 }
 
 // DomainColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) DomainColumn() database.Column {
+func (instanceDomain) DomainColumn() *database.Column {
 	return database.NewColumn("instance_domains", "domain")
 }
 
 // InstanceIDColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) InstanceIDColumn() database.Column {
+func (instanceDomain) InstanceIDColumn() *database.Column {
 	return database.NewColumn("instance_domains", "instance_id")
 }
 
 // IsPrimaryColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) IsPrimaryColumn() database.Column {
+func (instanceDomain) IsPrimaryColumn() *database.Column {
 	return database.NewColumn("instance_domains", "is_primary")
 }
 
 // UpdatedAtColumn implements [domain.InstanceDomainRepository].
 // Subtle: this method shadows the method ([domain.InstanceRepository]).UpdatedAtColumn of instanceDomain.instance.
-func (instanceDomain) UpdatedAtColumn() database.Column {
+func (instanceDomain) UpdatedAtColumn() *database.Column {
 	return database.NewColumn("instance_domains", "updated_at")
 }
 
 // IsGeneratedColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) IsGeneratedColumn() database.Column {
+func (instanceDomain) IsGeneratedColumn() *database.Column {
 	return database.NewColumn("instance_domains", "is_generated")
 }
 
 // TypeColumn implements [domain.InstanceDomainRepository].
-func (instanceDomain) TypeColumn() database.Column {
+func (instanceDomain) TypeColumn() *database.Column {
 	return database.NewColumn("instance_domains", "type")
 }
 

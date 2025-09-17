@@ -10,19 +10,19 @@ import (
 // userColumns define all the columns of the user table.
 type userColumns interface {
 	// InstanceIDColumn returns the column for the instance id field.
-	InstanceIDColumn() database.Column
+	InstanceIDColumn() *database.Column
 	// OrgIDColumn returns the column for the org id field.
-	OrgIDColumn() database.Column
+	OrgIDColumn() *database.Column
 	// IDColumn returns the column for the id field.
-	IDColumn() database.Column
+	IDColumn() *database.Column
 	// UsernameColumn returns the column for the username field.
-	UsernameColumn() database.Column
+	UsernameColumn() *database.Column
 	// CreatedAtColumn returns the column for the created at field.
-	CreatedAtColumn() database.Column
+	CreatedAtColumn() *database.Column
 	// UpdatedAtColumn returns the column for the updated at field.
-	UpdatedAtColumn() database.Column
+	UpdatedAtColumn() *database.Column
 	// DeletedAtColumn returns the column for the deleted at field.
-	DeletedAtColumn() database.Column
+	DeletedAtColumn() *database.Column
 }
 
 // userConditions define all the conditions for the user table.
@@ -74,17 +74,17 @@ type UserRepository interface {
 type humanColumns interface {
 	userColumns
 	// FirstNameColumn returns the column for the first name field.
-	FirstNameColumn() database.Column
+	FirstNameColumn() *database.Column
 	// LastNameColumn returns the column for the last name field.
-	LastNameColumn() database.Column
+	LastNameColumn() *database.Column
 	// EmailAddressColumn returns the column for the email address field.
-	EmailAddressColumn() database.Column
+	EmailAddressColumn() *database.Column
 	// EmailVerifiedAtColumn returns the column for the email verified at field.
-	EmailVerifiedAtColumn() database.Column
+	EmailVerifiedAtColumn() *database.Column
 	// PhoneNumberColumn returns the column for the phone number field.
-	PhoneNumberColumn() database.Column
+	PhoneNumberColumn() *database.Column
 	// PhoneVerifiedAtColumn returns the column for the phone verified at field.
-	PhoneVerifiedAtColumn() database.Column
+	PhoneVerifiedAtColumn() *database.Column
 }
 
 // humanConditions define all the conditions for the human table which inherits the user table.
@@ -152,7 +152,7 @@ type HumanRepository interface {
 type machineColumns interface {
 	userColumns
 	// DescriptionColumn returns the column for the description field.
-	DescriptionColumn() database.Column
+	DescriptionColumn() *database.Column
 }
 
 // machineConditions define all the conditions for the machine table which inherits the user table.

@@ -190,47 +190,47 @@ func (i instance) NameCondition(op database.TextOperation, name string) database
 // -------------------------------------------------------------
 
 // IDColumn implements [domain.instanceColumns].
-func (instance) IDColumn() database.Column {
+func (instance) IDColumn() *database.Column {
 	return database.NewColumn("instances", "id")
 }
 
 // NameColumn implements [domain.instanceColumns].
-func (instance) NameColumn() database.Column {
+func (instance) NameColumn() *database.Column {
 	return database.NewColumn("instances", "name")
 }
 
 // CreatedAtColumn implements [domain.instanceColumns].
-func (instance) CreatedAtColumn() database.Column {
+func (instance) CreatedAtColumn() *database.Column {
 	return database.NewColumn("instances", "created_at")
 }
 
 // DefaultOrgIdColumn implements [domain.instanceColumns].
-func (instance) DefaultOrgIDColumn() database.Column {
+func (instance) DefaultOrgIDColumn() *database.Column {
 	return database.NewColumn("instances", "default_org_id")
 }
 
 // IAMProjectIDColumn implements [domain.instanceColumns].
-func (instance) IAMProjectIDColumn() database.Column {
+func (instance) IAMProjectIDColumn() *database.Column {
 	return database.NewColumn("instances", "iam_project_id")
 }
 
 // ConsoleClientIDColumn implements [domain.instanceColumns].
-func (instance) ConsoleClientIDColumn() database.Column {
+func (instance) ConsoleClientIDColumn() *database.Column {
 	return database.NewColumn("instances", "console_client_id")
 }
 
 // ConsoleAppIDColumn implements [domain.instanceColumns].
-func (instance) ConsoleAppIDColumn() database.Column {
+func (instance) ConsoleAppIDColumn() *database.Column {
 	return database.NewColumn("instances", "console_app_id")
 }
 
 // DefaultLanguageColumn implements [domain.instanceColumns].
-func (instance) DefaultLanguageColumn() database.Column {
+func (instance) DefaultLanguageColumn() *database.Column {
 	return database.NewColumn("instances", "default_language")
 }
 
 // UpdatedAtColumn implements [domain.instanceColumns].
-func (instance) UpdatedAtColumn() database.Column {
+func (instance) UpdatedAtColumn() *database.Column {
 	return database.NewColumn("instances", "updated_at")
 }
 

@@ -158,44 +158,44 @@ func (o orgDomain) OrgIDCondition(orgID string) database.Condition {
 
 // CreatedAtColumn implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).CreatedAtColumn of orgDomain.org.
-func (orgDomain) CreatedAtColumn() database.Column {
+func (orgDomain) CreatedAtColumn() *database.Column {
 	return database.NewColumn("org_domains", "created_at")
 }
 
 // DomainColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) DomainColumn() database.Column {
+func (orgDomain) DomainColumn() *database.Column {
 	return database.NewColumn("org_domains", "domain")
 }
 
 // InstanceIDColumn implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).InstanceIDColumn of orgDomain.org.
-func (orgDomain) InstanceIDColumn() database.Column {
+func (orgDomain) InstanceIDColumn() *database.Column {
 	return database.NewColumn("org_domains", "instance_id")
 }
 
 // IsPrimaryColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) IsPrimaryColumn() database.Column {
+func (orgDomain) IsPrimaryColumn() *database.Column {
 	return database.NewColumn("org_domains", "is_primary")
 }
 
 // IsVerifiedColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) IsVerifiedColumn() database.Column {
+func (orgDomain) IsVerifiedColumn() *database.Column {
 	return database.NewColumn("org_domains", "is_verified")
 }
 
 // OrgIDColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) OrgIDColumn() database.Column {
+func (orgDomain) OrgIDColumn() *database.Column {
 	return database.NewColumn("org_domains", "org_id")
 }
 
 // UpdatedAtColumn implements [domain.OrganizationDomainRepository].
 // Subtle: this method shadows the method ([domain.OrganizationRepository]).UpdatedAtColumn of orgDomain.org.
-func (orgDomain) UpdatedAtColumn() database.Column {
+func (orgDomain) UpdatedAtColumn() *database.Column {
 	return database.NewColumn("org_domains", "updated_at")
 }
 
 // ValidationTypeColumn implements [domain.OrganizationDomainRepository].
-func (orgDomain) ValidationTypeColumn() database.Column {
+func (orgDomain) ValidationTypeColumn() *database.Column {
 	return database.NewColumn("org_domains", "validation_type")
 }
 
