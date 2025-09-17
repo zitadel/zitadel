@@ -999,13 +999,17 @@ func (i *Instance) DeleteInstanceMembership(t *testing.T, ctx context.Context, u
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, orgID, userID string) *internal_permission_v2beta.CreateAdministratorResponse {
+// CreateOrgMembership creates an org membership with the given roles. If no roles are provided, the user will be assigned the "org.owner" role.
+func (i *Instance) CreateOrgMembership(t *testing.T, ctx context.Context, orgID, userID string, roles ...string) *internal_permission_v2beta.CreateAdministratorResponse {
+	if len(roles) == 0 {
+		roles = []string{domain.RoleOrgOwner}
+	}
 	resp, err := i.Client.InternalPermissionv2Beta.CreateAdministrator(ctx, &internal_permission_v2beta.CreateAdministratorRequest{
 		Resource: &internal_permission_v2beta.ResourceType{
 			Resource: &internal_permission_v2beta.ResourceType_OrganizationId{OrganizationId: orgID},
 		},
 		UserId: userID,
-		Roles:  []string{domain.RoleOrgOwner},
+		Roles:  roles,
 	})
 	require.NoError(t, err)
 	return resp
