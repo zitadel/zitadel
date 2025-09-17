@@ -12,19 +12,19 @@
 	],
 	"portsAttributes": {
 		"3000": {
-			"label": "Login",
+			"label": "login",
 			"onAutoForward": "notify"
 		},
 		"4200": {
-			"label": "Console",
+			"label": "console",
 			"onAutoForward": "notify"
 		},
 		"8080": {
-			"label": "API",
+			"label": "api",
 			"onAutoForward": "notify"
 		},
 		"3100": {
-			"label": "Docs",
+			"label": "docs",
 			"onAutoForward": "notify"
 		}
 	},
