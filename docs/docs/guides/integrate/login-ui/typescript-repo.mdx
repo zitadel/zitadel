@@ -1,0 +1,148 @@
+---
+title: Typescript Repository
+sidebar_label: Typescript Repository
+---
+
+To replace our current golang built login UI and showcase the use of our new resource, session and OIDC APIs, we've created the [Typescript Repository](https://github.com/zitadel/typescript).
+The typescript repository contains all TypeScript and JavaScript packages and applications you need to create your own Login UI using the ZITADEL APIs.
+
+## Included Apps And Packages
+
+- **[login](./typescript-repo#new-login-ui)**: The future login UI used by ZITADEL Cloud, powered by Next.js
+- `@zitadel/proto`: Typescript implementation of Protocol Buffers, suitable for web browsers and Node.js.
+- `@zitadel/client`: Core components for establishing a client connection
+- `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
+- `eslint-config-zitadel`: ESLint preset
+
+## Login UI
+
+The new implementation of the login is based on Next.js and implements the [OIDC standard](./oidc-standard) by proxying requests to the ZITADEL backend and using the session API.
+The UI uses the branding and behaves based on the policies and settings of your instance or organization.
+It is also allows users to authenticate directly (without an OIDC context) and self service their account.
+Its set of features will increase with time and its progress will be tracked [here](./typescript-repo#implemented-features).
+
+### Architectural Overview
+
+The new login app consists of a confidential (backend) part and a browser (client side) part.
+In addition to that, the OIDC specification builds upon a proxy which is set up in the Next.js middleware. It rewrites requests of the paths `/.well-known/:path*`, `/oauth/:path*`, `/oidc/:path*` to ZITADEL.
+
+The backend side of the application is authorized using a machine user's personal access token.
+This token is used to fetch policies and settings from your instances or organization which define how users are authenticated and how the login is displayed.
+
+The frontend side of the application communicates to the backend side by using a cookie which is set by the server.
+The cookie consists of an id and a token and is bound to a session which is updated continuously.
+
+The following illustration shows the architecture of the login and a potential authentication code flow starting from an application which implements the OIDC specification respectively.
+
+![Next.js Login Architecture](/img/typescript-login-architecture.png)
+
+_Note that the illustration is just a representation of the architecture and may not specify actual endpoints._
+
+The flow starts by the `/authorize` endpoint which is intercepted by the login and forwarded to ZITADEL.
+ZITADEL interprets the request and specifically redirects back to the login app.
+It does so by redirecting to `/login`.
+The login is then able to load an [AuthRequest](/docs/apis/resources/oidc_service_v2/oidc-service-get-auth-request#get-oidc-auth-request-details).
+
+The Auth Request defines how users proceed to authenticate. If no special prompts or scopes are set, the login brings up the `/loginname` page.
+The /loginname page allows to enter loginname or email of a user which is then used to search for a user.
+If the user is found, a session is created and set as cookie, then the user is redirected to the available authentication method page.
+While the users continues and provides more information, the cookie is hydrated with this information until a final state is reached.
+
+The communication from the browser to the server is done by [NextJS Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations).
+The OIDC Auth request is always passed in the url to have a context to the ongoing authentication flow.
+
+If enough user information is retrieved and the user is authenticated according to the policies, the flow is finalized by [requesting a the callback url](/docs/apis/resources/oidc_service_v2/oidc-service-create-callback) for the auth request and the user is redirected back to the application.
+The application can then request a token calling the /token endpoint of the login which is proxied to the ZITADEL API.
+
+### Implemented features
+
+#### OIDC Standard
+
+- [x] Authorization Code Flow with PKCE
+- [x] AuthRequest `hintUserId`
+- [x] AuthRequest `loginHint`
+- [x] AuthRequest `prompt`
+  - [x] Login
+  - [x] Select Account
+  - [x] Create
+  - [x] None
+  - [ ] Consent
+- Scopes
+  - [x] `openid email profile address``
+  - [x] `offline access`
+  - [x] `urn:zitadel:iam:org:idp:id:{idp_id}`
+  - [x] `urn:zitadel:iam:org:project:id:zitadel:aud`
+  - [x] `urn:zitadel:iam:org:id:{orgid}`
+  - [x] `urn:zitadel:iam:org:domain:primary:{domain}`
+- [ ] AuthRequest UI locales
+- Multifactor
+  - [x] Passkeys
+  - [x] TOTP
+  - [x] OTP via email
+  - [x] OTP via SMS
+- Passwordless
+  - [x] Passkeys
+- Security Prompts
+  - [x] Setup Passkey as Passwordless method
+  - [x] Setup TOTP as Multifactor
+  - [ ] Password Change
+- Login
+  - [x] Email Password
+  - [x] Passkey
+  - [x] IDPs
+    - [x] Google
+    - [x] GitHub
+    - [x] GitLab
+    - [x] Azure
+    - [ ] Apple
+- Register
+  - [x] Email Password
+  - [x] Passkey
+
+#### Self service
+
+The self service part of the application allows to load the login without an OIDC flow.
+Authenticated users are directly able to self service their account.
+
+- [ ] Change user information
+- [ ] Password Change
+- [x] Setup Passkey
+- [x] Setup Multifactor
+  - [x] Passkeys
+  - [x] TOTP
+  - [x] OTP via email
+  - [x] OTP via SMS
+- [x] Setup Multifactor Passkey (U2F)
+- [x] Validate Account (email verification)
+
+### Setup
+
+In order to run the new login app, make sure to follow the instructions in the [Readme](https://github.com/zitadel/typescript/blob/main/README.md#run-login-ui).
+
+#### How to setup domains for OIDC
+
+When setting up the new login app for OIDC, the domain must be registered on your instance and use https.
+To register your login domain on your instance, [add](/docs/apis/resources/admin/admin-service-add-instance-trusted-domain) your domain on your instances trusted domains.
+
+#### OIDC Proxy
+
+When setting up the new login app for OIDC, ensure it meets the following requirements:
+
+- The OIDC Proxy is deployed and running on HTTPS
+- The OIDC Proxy sets `x-zitadel-public-host` which is the host, your login is deployed to `ex. login.example.com`.
+- The OIDC Proxy sets `x-zitadel-instance-host` which is the host of your instance `ex. test-hdujwl.zitadel.cloud`.
+
+You can review an example implementation of a middlware [here](https://github.com/zitadel/typescript/blob/main/apps/login/src/middleware.ts).
+
+#### Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Ftypescript&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_LOGIN_CLIENT%20membership%20on%20your%20instance%20and%20provide%20its%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)
+
+To deploy your own version on Vercel, navigate to your instance and create a service user.
+Create a personal access token (PAT) for the user and copy and set it as `ZITADEL_SERVICE_USER_TOKEN`, then navigate to Default settings and make sure it gets `IAM_LOGIN_CLIENT` permissions.
+Finally set your instance url as `ZITADEL_API_URL`. Make sure to set it without trailing slash.
+Also ensure your login domain is registered on your instance by adding it as a [trusted domain](/docs/apis/resources/admin/admin-service-add-instance-trusted-domain).
+
+If you want to enforce users to have their email verified, you can set the optional `EMAIL_VERIFICATION` variable to `true` in your environment and your users will be enforced to verify their email address before they can log in.
+
+![Deploy to Vercel](/img/deploy-to-vercel.png)
