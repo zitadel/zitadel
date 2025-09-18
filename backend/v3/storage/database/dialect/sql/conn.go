@@ -11,6 +11,10 @@ type sqlConn struct {
 	*sql.Conn
 }
 
+func SQLConn(conn *sql.Conn) database.Client {
+	return &sqlConn{Conn: conn}
+}
+
 var _ database.Client = (*sqlConn)(nil)
 
 // Release implements [database.Client].
@@ -24,7 +28,7 @@ func (c *sqlConn) Begin(ctx context.Context, opts *database.TransactionOptions) 
 	if err != nil {
 		return nil, wrapError(err)
 	}
-	return &sqlTx{tx}, nil
+	return &Transaction{tx}, nil
 }
 
 // Query implements sql.Client.
@@ -52,6 +56,11 @@ func (c *sqlConn) Exec(ctx context.Context, sql string, args ...any) (int64, err
 		return 0, wrapError(err)
 	}
 	return res.RowsAffected()
+}
+
+// Ping implements [database.Pool].
+func (c *sqlConn) Ping(ctx context.Context) error {
+	return wrapError(c.PingContext(ctx))
 }
 
 // Migrate implements [database.Migrator].
