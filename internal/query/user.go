@@ -1320,7 +1320,7 @@ func prepareUsersQuery(orderBy Column) (sq.SelectBuilder, func(*sql.Rows) (*User
 				preferredLoginName := sql.NullString{}
 
 				human, machine := sqlHuman{}, sqlMachine{}
-				var oderByValue any
+				var orderByValue any
 
 				err := rows.Scan(
 					&u.ID,
@@ -1356,7 +1356,7 @@ func prepareUsersQuery(orderBy Column) (sq.SelectBuilder, func(*sql.Rows) (*User
 					&machine.encodedSecret,
 					&machine.accessTokenType,
 
-					&oderByValue,
+					&orderByValue,
 					&count,
 				)
 				if err != nil {
