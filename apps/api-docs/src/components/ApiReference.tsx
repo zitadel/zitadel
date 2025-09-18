@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { createApiReference } from "@scalar/api-reference";
 import yaml from "js-yaml";
 import Link from "next/link";
@@ -87,9 +88,27 @@ interface SearchResponse {
   total: number;
 }
 
+interface ApiVersion {
+  id: string;
+  name: string;
+  isDefault: boolean;
+  available: boolean;
+}
+
+interface VersionsResponse {
+  versions: ApiVersion[];
+  default: string;
+}
+
 export function ApiReferenceComponent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [specs, setSpecs] = useState<OpenApiSpec[]>([]);
   const [selectedSpec, setSelectedSpec] = useState<string>("");
+  const [selectedVersion, setSelectedVersion] = useState<string>("latest");
+  const [availableVersions, setAvailableVersions] = useState<ApiVersion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -97,6 +116,66 @@ export function ApiReferenceComponent() {
   const [isSearching, setIsSearching] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Update URL when version changes
+  const updateUrlParams = (version: string, service?: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (version !== "latest") {
+      params.set("version", version);
+    } else {
+      params.delete("version");
+    }
+
+    if (service) {
+      params.set("service", service);
+    }
+
+    const paramString = params.toString();
+    const newUrl = paramString ? `${pathname}?${paramString}` : pathname;
+    router.replace(newUrl);
+  };
+
+  // Read version from URL on component mount
+  useEffect(() => {
+    const versionFromUrl = searchParams.get("version");
+    const serviceFromUrl = searchParams.get("service");
+
+    if (versionFromUrl) {
+      setSelectedVersion(versionFromUrl);
+    }
+
+    if (serviceFromUrl) {
+      setSelectedSpec(serviceFromUrl);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    async function loadVersions() {
+      try {
+        const response = await fetch("/api/versions");
+        if (!response.ok) {
+          throw new Error("Failed to load versions");
+        }
+        const data: VersionsResponse = await response.json();
+        setAvailableVersions(data.versions);
+        setSelectedVersion(data.default);
+      } catch (error) {
+        console.error("Error loading versions:", error);
+        // Fallback to latest only
+        setAvailableVersions([
+          {
+            id: "latest",
+            name: "Latest",
+            isDefault: true,
+            available: true,
+          },
+        ]);
+        setSelectedVersion("latest");
+      }
+    }
+    loadVersions();
+  }, []);
 
   useEffect(() => {
     async function loadSpecs() {
@@ -289,73 +368,138 @@ export function ApiReferenceComponent() {
   };
 
   useEffect(() => {
-    if (selectedSpec && containerRef.current) {
+    // Don't try to load if specs haven't been loaded yet
+    if (
+      selectedSpec &&
+      selectedVersion &&
+      containerRef.current &&
+      specs.length > 0
+    ) {
       const selectedSpecData = specs.find((spec) => spec.name === selectedSpec);
       if (selectedSpecData) {
-        try {
-          const parsedSpec = JSON.parse(selectedSpecData.content);
+        const loadVersionedSpec = async () => {
+          try {
+            // Load the spec for the selected version
+            const specUrl =
+              selectedVersion === "latest"
+                ? `/api/openapi/${selectedSpec}`
+                : `/api/openapi/${selectedVersion}/${selectedSpec}`;
 
-          // Debug: Log the parsed spec
-          console.log("Selected spec:", selectedSpec);
-          console.log("Parsed spec:", parsedSpec);
-          console.log("Parsed spec paths:", parsedSpec.paths);
-          console.log(
-            "Number of paths:",
-            Object.keys(parsedSpec.paths || {}).length
-          );
+            console.log("Loading spec from URL:", specUrl);
+            console.log(
+              "Selected version:",
+              selectedVersion,
+              "Selected spec:",
+              selectedSpec
+            );
 
-          // Clear the container
-          containerRef.current.innerHTML = "";
+            const response = await fetch(specUrl);
+            if (!response.ok) {
+              console.error(
+                "Response not OK:",
+                response.status,
+                response.statusText
+              );
+              throw new Error(
+                `Failed to load spec: ${response.status} ${response.statusText}`
+              );
+            }
 
-          // Create a div for Scalar
-          const scalarDiv = document.createElement("div");
-          scalarDiv.id = `api-reference-${selectedSpec}`;
-          containerRef.current.appendChild(scalarDiv);
+            const specContent = await response.text();
+            console.log("Spec content length:", specContent.length);
+            let parsedSpec;
 
-          // Create the API reference with correct configuration
-          createApiReference(scalarDiv, {
-            spec: {
-              content: parsedSpec,
-            },
-            theme: "github",
-            layout: "modern",
-            customCss: `
-              /* Fix Scalar's sidebar height to work with our navigation bar */
-              .scalar-api-reference {
-                height: 100% !important;
+            // Parse YAML or JSON
+            try {
+              if (specUrl.endsWith(".yaml") || specUrl.endsWith(".yml")) {
+                parsedSpec = yaml.load(specContent);
+              } else {
+                parsedSpec = JSON.parse(specContent);
               }
-              
-              /* Adjust sidebar wrapper to account for our navigation */
-              .scalar-api-reference .sidebar,
-              .scalar-api-reference .scalar-api-reference__sidebar,
-              .scalar-api-reference [data-sidebar] {
-                max-height: calc(100vh - 70px) !important;
-                top: 0 !important;
+            } catch (parseError) {
+              // Fallback: use the original content if versioned spec fails
+              console.warn(
+                "Failed to parse versioned spec, using original:",
+                parseError
+              );
+              if (selectedSpecData) {
+                parsedSpec = JSON.parse(selectedSpecData.content);
+              } else {
+                throw new Error("No fallback spec available");
               }
-              
-              /* Ensure sidebar content scrolls properly */
-              .scalar-api-reference .sidebar-content,
-              .scalar-api-reference .scalar-api-reference__sidebar-content,
-              .scalar-api-reference .sidebar .scalar-api-reference__navigation {
-                max-height: calc(100vh - 70px) !important;
-                overflow-y: auto !important;
-              }
-              
-              /* Let Scalar handle its own positioning but fix the viewport calculation */
-              .scalar-api-reference .scalar-api-reference__container {
-                height: 100% !important;
-              }
-            `,
-          } as any);
-        } catch (err) {
-          console.error("Error parsing YAML or creating API reference:", err);
-          if (containerRef.current) {
-            containerRef.current.innerHTML = `<div style="padding: 20px; color: red;">Error loading API documentation: ${err}</div>`;
+            }
+
+            // Debug: Log the parsed spec
+            console.log(
+              "Selected spec:",
+              selectedSpec,
+              "version:",
+              selectedVersion
+            );
+            console.log("Parsed spec:", parsedSpec);
+            console.log("Parsed spec paths:", parsedSpec.paths);
+            console.log(
+              "Number of paths:",
+              Object.keys(parsedSpec.paths || {}).length
+            );
+
+            // Clear the container
+            if (containerRef.current) {
+              containerRef.current.innerHTML = "";
+
+              // Create a div for Scalar
+              const scalarDiv = document.createElement("div");
+              scalarDiv.id = `api-reference-${selectedSpec}-${selectedVersion}`;
+              containerRef.current.appendChild(scalarDiv);
+
+              // Create the API reference with correct configuration
+              createApiReference(scalarDiv, {
+                spec: {
+                  content: parsedSpec,
+                },
+                theme: "github",
+                layout: "modern",
+                customCss: `
+                  /* Fix Scalar's sidebar height to work with our navigation bar */
+                  .scalar-api-reference {
+                    height: 100% !important;
+                  }
+                  
+                  /* Adjust sidebar wrapper to account for our navigation */
+                  .scalar-api-reference .sidebar,
+                  .scalar-api-reference .scalar-api-reference__sidebar,
+                  .scalar-api-reference [data-sidebar] {
+                    max-height: calc(100vh - 70px) !important;
+                    top: 0 !important;
+                  }
+                  
+                  /* Ensure sidebar content scrolls properly */
+                  .scalar-api-reference .sidebar-content,
+                  .scalar-api-reference .scalar-api-reference__sidebar-content,
+                  .scalar-api-reference .sidebar .scalar-api-reference__navigation {
+                    max-height: calc(100vh - 70px) !important;
+                    overflow-y: auto !important;
+                  }
+                  
+                  /* Let Scalar handle its own positioning but fix the viewport calculation */
+                  .scalar-api-reference .scalar-api-reference__container {
+                    height: 100% !important;
+                  }
+                `,
+              } as any);
+            }
+          } catch (err) {
+            console.error("Error loading versioned API spec:", err);
+            if (containerRef.current) {
+              containerRef.current.innerHTML = `<div style="padding: 20px; color: red;">Error loading API documentation for version ${selectedVersion}: ${err}</div>`;
+            }
           }
-        }
+        };
+
+        loadVersionedSpec();
       }
     }
-  }, [selectedSpec, specs]);
+  }, [selectedSpec, selectedVersion, specs]);
 
   if (loading) {
     return (
@@ -485,7 +629,7 @@ export function ApiReferenceComponent() {
           minHeight: "70px",
         }}
       >
-        {/* Left side: Logo, Title and Service selector */}
+        {/* Left side: Logo, Title, Version and Service selector */}
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           {/* ZITADEL Logo */}
           <Link
@@ -510,6 +654,39 @@ export function ApiReferenceComponent() {
             />
           </Link>
 
+          {/* Version Selector */}
+          <div
+            style={{
+              backgroundColor: "var(--scalar-background-2, #f6f8fa)",
+              border: "1px solid var(--scalar-border-color, #e1e4e8)",
+              borderRadius: "6px",
+              padding: "8px 12px",
+            }}
+          >
+            <select
+              value={selectedVersion}
+              onChange={(e) => setSelectedVersion(e.target.value)}
+              style={{
+                backgroundColor: "transparent",
+                border: "none",
+                color: "var(--scalar-color-1, #24292f)",
+                fontSize: "14px",
+                fontWeight: "500",
+                cursor: "pointer",
+                outline: "none",
+                minWidth: "120px",
+                padding: "4px 8px",
+              }}
+            >
+              {availableVersions.map((version) => (
+                <option key={version.id} value={version.id}>
+                  {version.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Service Selector */}
           <div
             style={{
               backgroundColor: "var(--scalar-background-2, #f6f8fa)",
