@@ -254,7 +254,6 @@
                 "{workspaceRoot}/internal/api/ui/login/statik/statik.go"
             ]
         },
-<<<<<<< HEAD
         "generate-statik-install": {
             "description": "Install statik binary for embedding static files",
             "cache": true,
@@ -262,13 +261,6 @@
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" }
-=======
-        "prod": {
-            "description": "Runs the APIs start-form-init command. It retries up to 5 times if it fails to start, allowing for the database to become available.",
-            "continuous": true,
-            "dependsOn": [
-                "build"
->>>>>>> remove-turbo-2
             ],
             "outputs": [
                 "{workspaceRoot}/.artifacts/bin/*/*/statik"
