@@ -19,8 +19,8 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/group/v2;group";
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Group Service";
-    version: "2.0-beta";
-    description: "This API is intended to manage user groups in ZITADEL. This service is in beta state. It can AND will continue breaking until a stable version is released.";
+    version: "2.0";
+    description: "This API is intended to manage user groups in ZITADEL.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -117,7 +117,7 @@ service GroupService {
   //   - "org.member.write" for organization administrators
   rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {
     option (google.api.http) = {
-      post: "/v2beta/groups"
+      post: "/v2/groups"
       body: "*"
     };
 
@@ -171,7 +171,7 @@ service GroupService {
   //   - "org.member.read" for organization administrators
   rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse) {
     option (google.api.http) = {
-      post: "/v2beta/groups/search"
+      post: "/v2/groups/search"
       body: "*"
     };
 
@@ -211,7 +211,7 @@ service GroupService {
   //   - "org.member.write" for organization administrators
   rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse) {
     option (google.api.http) = {
-      post: "/v2beta/groups/{id}"
+      post: "/v2/groups/{id}"
       body: "*"
     };
 
@@ -255,7 +255,7 @@ service GroupService {
   //   - "org.member.delete" for organization administrators
   rpc DeleteGroup(DeleteGroupRequest) returns (DeleteGroupResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/groups/{id}"
+      delete: "/v2/groups/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
