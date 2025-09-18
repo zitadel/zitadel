@@ -1,3 +1,4 @@
+name: Auth
 services:
   zitadel:
     restart: unless-stopped
