@@ -349,17 +349,14 @@ message CreateGroupResponse {
 }
 
 message ListGroupsRequest {
-  // The ID of the organization from which the user groups should be retrieved.
-  string organization_id = 1;
-
   // Criteria to list the user groups.
-  repeated Query queries = 2;
+  repeated GroupsSearchFilter queries = 1;
 
   // Pagination and sorting.
-  zitadel.filter.v2beta.PaginationRequest pagination = 3;
+  zitadel.filter.v2beta.PaginationRequest pagination = 2;
 
   // The field the result is sorted by.
-  optional FieldName sorting_column = 4;
+  optional FieldName sorting_column = 3;
 }
 
 message ListGroupsResponse {
