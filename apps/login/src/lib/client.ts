@@ -1,4 +1,4 @@
-import { completeAuthFlowAction } from "./server/auth-flow";
+import { completeAuthFlow } from "./server/auth-flow";
 
 type FinishFlowCommand =
   | {
@@ -43,20 +43,22 @@ function goToSignedInPage(
 export async function completeFlowOrGetUrl(
   command: FinishFlowCommand & { organization?: string },
   defaultRedirectUri?: string,
-): Promise<string | void> {
+): Promise<string | { error: string }> {
   // Complete OIDC/SAML flows directly with server action
   if (
     "sessionId" in command &&
     "requestId" in command &&
-    (command.requestId.startsWith("saml_") ||
-      command.requestId.startsWith("oidc_"))
+    (command.requestId.startsWith("saml_") || command.requestId.startsWith("oidc_"))
   ) {
     // This completes the flow and redirects, so no URL is returned
-    await completeAuthFlowAction({
+    const response = await completeAuthFlow({
       sessionId: command.sessionId,
       requestId: command.requestId,
     });
-    return; // No URL needed - server action handles redirect
+
+    if (response && "error" in response && response.error) {
+      return { error: response.error };
+    }
   }
 
   // For all other cases, return URL for navigation

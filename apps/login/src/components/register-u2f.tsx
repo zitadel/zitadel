@@ -22,26 +22,14 @@ type Props = {
   loginSettings?: LoginSettings;
 };
 
-export function RegisterU2f({
-  loginName,
-  sessionId,
-  organization,
-  requestId,
-  checkAfter,
-  loginSettings,
-}: Props) {
+export function RegisterU2f({ loginName, sessionId, organization, requestId, checkAfter, loginSettings }: Props) {
   const [error, setError] = useState<string>("");
 
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
 
-  async function submitVerify(
-    u2fId: string,
-    passkeyName: string,
-    publicKeyCredential: any,
-    sessionId: string,
-  ) {
+  async function submitVerify(u2fId: string, passkeyName: string, publicKeyCredential: any, sessionId: string) {
     setError("");
     setLoading(true);
     const response = await verifyU2F({
@@ -94,24 +82,14 @@ export function RegisterU2f({
 
     const u2fId = u2fResponse.u2fId;
     const options: CredentialCreationOptions =
-      (u2fResponse?.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
-      {};
+      (u2fResponse?.publicKeyCredentialCreationOptions as CredentialCreationOptions) ?? {};
 
     if (options.publicKey) {
-      options.publicKey.challenge = coerceToArrayBuffer(
-        options.publicKey.challenge,
-        "challenge",
-      );
-      options.publicKey.user.id = coerceToArrayBuffer(
-        options.publicKey.user.id,
-        "userid",
-      );
+      options.publicKey.challenge = coerceToArrayBuffer(options.publicKey.challenge, "challenge");
+      options.publicKey.user.id = coerceToArrayBuffer(options.publicKey.user.id, "userid");
       if (options.publicKey.excludeCredentials) {
         options.publicKey.excludeCredentials.map((cred: any) => {
-          cred.id = coerceToArrayBuffer(
-            cred.id as string,
-            "excludeCredentials.id",
-          );
+          cred.id = coerceToArrayBuffer(cred.id as string, "excludeCredentials.id");
           return cred;
         });
       }
@@ -137,10 +115,7 @@ export function RegisterU2f({
         rawId: coerceToBase64Url(rawId, "rawId"),
         type: resp.type,
         response: {
-          attestationObject: coerceToBase64Url(
-            attestationObject,
-            "attestationObject",
-          ),
+          attestationObject: coerceToBase64Url(attestationObject, "attestationObject"),
           clientDataJSON: coerceToBase64Url(clientDataJSON, "clientDataJSON"),
         },
       };
@@ -171,7 +146,7 @@ export function RegisterU2f({
         return router.push(`/u2f?` + paramsToContinue);
       } else {
         if (requestId && sessionId) {
-          const url = await completeFlowOrGetUrl(
+          const response = await completeFlowOrGetUrl(
             {
               sessionId: sessionId,
               requestId: requestId,
@@ -179,19 +154,30 @@ export function RegisterU2f({
             },
             loginSettings?.defaultRedirectUri,
           );
-          if (url) {
-            return router.push(url);
+          if (response && typeof response === "object" && "error" in response && response.error) {
+            setError(response.error);
+            return;
+          }
+
+          if (response && typeof response === "string") {
+            return router.push(response);
           }
         } else if (loginName) {
-          const url = await completeFlowOrGetUrl(
+          const response = await completeFlowOrGetUrl(
             {
               loginName: loginName,
               organization: organization,
             },
             loginSettings?.defaultRedirectUri,
           );
-          if (url) {
-            return router.push(url);
+
+          if (response && typeof response === "object" && "error" in response && response.error) {
+            setError(response.error);
+            return;
+          }
+
+          if (response && typeof response === "string") {
+            return router.push(response);
           }
         }
       }
@@ -218,8 +204,7 @@ export function RegisterU2f({
           onClick={submitRegisterAndContinue}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="set.submit" namespace="u2f" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="set.submit" namespace="u2f" />
         </Button>
       </div>
     </form>

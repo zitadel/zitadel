@@ -33,16 +33,7 @@ type Inputs = {
   code: string;
 };
 
-export function LoginOTP({
-  host,
-  loginName,
-  sessionId,
-  requestId,
-  organization,
-  method,
-  code,
-  loginSettings,
-}: Props) {
+export function LoginOTP({ host, loginName, sessionId, requestId, organization, method, code, loginSettings }: Props) {
   const t = useTranslations("otp");
 
   const [error, setError] = useState<string>("");
@@ -192,7 +183,7 @@ export function LoginOTP({
 
         // Use unified approach that handles both OIDC/SAML and regular flows
         if (response.factors?.user) {
-          const url = await completeFlowOrGetUrl(
+          const callbackResponse = await completeFlowOrGetUrl(
             requestId && response.sessionId
               ? {
                   sessionId: response.sessionId,
@@ -205,12 +196,20 @@ export function LoginOTP({
                 },
             loginSettings?.defaultRedirectUri,
           );
-
           setLoading(false);
-          // If url is returned, navigate client-side
-          // If no url (void), the server action handled the redirect
-          if (url) {
-            router.push(url);
+
+          if (
+            callbackResponse &&
+            typeof callbackResponse === "object" &&
+            "error" in callbackResponse &&
+            callbackResponse.error
+          ) {
+            setError(callbackResponse.error);
+            return;
+          }
+
+          if (callbackResponse && typeof callbackResponse === "string") {
+            return router.push(callbackResponse);
           }
         } else {
           setLoading(false);
@@ -279,8 +278,7 @@ export function LoginOTP({
           })}
           data-testid="submit-button"
         >
-          {loading && <Spinner className="mr-2 h-5 w-5" />}{" "}
-          <Translated i18nKey="verify.submit" namespace="otp" />
+          {loading && <Spinner className="mr-2 h-5 w-5" />} <Translated i18nKey="verify.submit" namespace="otp" />
         </Button>
       </div>
     </form>
