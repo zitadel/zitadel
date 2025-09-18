@@ -10,6 +10,22 @@ interface VersionMetadata {
   gitBranch?: string;
 }
 
+interface VersionConfig {
+  versions: Array<{
+    id: string;
+    name: string;
+    gitRef: string;
+    enabled: boolean;
+    isStable: boolean;
+  }>;
+  settings: {
+    defaultVersion: string;
+    autoGenerate: boolean;
+    maxVersions: number;
+    includePrerelease: boolean;
+  };
+}
+
 export async function GET(request: NextRequest) {
   try {
     const versions: Array<{
@@ -20,6 +36,18 @@ export async function GET(request: NextRequest) {
       metadata?: VersionMetadata;
     }> = [];
 
+    // Load version config for fallback
+    let versionConfig: VersionConfig | null = null;
+    try {
+      const configPath = join(process.cwd(), "versions.config.json");
+      if (existsSync(configPath)) {
+        const configContent = await readFile(configPath, "utf-8");
+        versionConfig = JSON.parse(configContent);
+      }
+    } catch (error) {
+      console.warn("Failed to load versions config:", error);
+    }
+
     // Add current/latest version
     const currentArtifactsPath = join(
       process.cwd(),
@@ -27,21 +55,28 @@ export async function GET(request: NextRequest) {
       "openapi3",
       "zitadel"
     );
+
+    const isDefaultLatest =
+      !versionConfig?.settings?.defaultVersion ||
+      versionConfig.settings.defaultVersion === "latest";
+
     versions.push({
       id: "latest",
       name: "Latest (Current Branch)",
-      isDefault: true,
+      isDefault: isDefaultLatest,
       available: existsSync(currentArtifactsPath),
     });
 
     // Check for organized version folders (.artifacts/versions/)
     const versionsDir = join(process.cwd(), ".artifacts", "versions");
+    const foundVersions = new Set<string>();
 
     if (existsSync(versionsDir)) {
       try {
         const versionDirs = await readdir(versionsDir);
 
         for (const versionDir of versionDirs) {
+          foundVersions.add(versionDir);
           const versionPath = join(
             versionsDir,
             versionDir,
@@ -69,16 +104,44 @@ export async function GET(request: NextRequest) {
               ? `${versionDir} (Main Branch)`
               : versionDir;
 
+          const isConfigDefault =
+            versionConfig?.settings?.defaultVersion === versionDir;
+
           versions.push({
             id: versionDir,
             name: displayName,
-            isDefault: false,
+            isDefault: isConfigDefault,
             available: existsSync(versionPath),
             metadata,
           });
         }
       } catch (error) {
         console.error("Error reading version directories:", error);
+      }
+    }
+
+    // Add versions from config that weren't found in filesystem (fallback)
+    if (versionConfig) {
+      for (const configVersion of versionConfig.versions) {
+        if (
+          configVersion.enabled &&
+          !foundVersions.has(configVersion.id) &&
+          configVersion.id !== "latest"
+        ) {
+          const isConfigDefault =
+            versionConfig.settings.defaultVersion === configVersion.id;
+
+          versions.push({
+            id: configVersion.id,
+            name: configVersion.name,
+            isDefault: isConfigDefault,
+            available: false, // Not available since artifacts don't exist
+            metadata: {
+              version: configVersion.id,
+              gitBranch: configVersion.gitRef,
+            },
+          });
+        }
       }
     }
 

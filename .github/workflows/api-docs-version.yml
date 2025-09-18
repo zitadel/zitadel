@@ -1,0 +1,167 @@
+name: API Docs Version Management
+
+on:
+  push:
+    tags:
+      - "v*.*.*" # Triggers on version tags like v2.72.0, v2.71.9, etc.
+
+jobs:
+  create-api-docs-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history for git operations
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+          cache-dependency-path: "apps/api-docs/pnpm-lock.yaml"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Install dependencies
+        run: |
+          cd apps/api-docs
+          pnpm install
+
+      - name: Install buf CLI
+        run: |
+          # Install buf for protocol buffer generation
+          curl -sSL "https://github.com/bufbuild/buf/releases/latest/download/buf-$(uname -s)-$(uname -m)" -o "/usr/local/bin/buf"
+          chmod +x "/usr/local/bin/buf"
+
+      - name: Generate API artifacts
+        run: |
+          cd apps/api-docs
+          pnpm run generate
+
+      - name: Extract tag version
+        id: get_version
+        run: |
+          # Extract version from tag (remove 'v' prefix if present)
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Creating version: $VERSION"
+
+      - name: Create version snapshot
+        run: |
+          cd apps/api-docs
+          chmod +x scripts/manage-versions.sh
+          ./scripts/manage-versions.sh create ${{ steps.get_version.outputs.version }}
+
+      - name: Commit and push version artifacts
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # Add the new version artifacts
+          git add apps/api-docs/.artifacts/versions/${{ steps.get_version.outputs.version }}/
+
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "feat(api-docs): add version ${{ steps.get_version.outputs.version }} artifacts"
+            git push origin HEAD:main
+          fi
+
+      - name: Trigger Vercel deployment
+        if: success()
+        run: |
+          echo "🚀 Version ${{ steps.get_version.outputs.version }} created successfully!"
+          echo "Vercel will automatically deploy the updated API docs."
+          echo "The new version will be available in the dropdown shortly."
+
+      - name: Create deployment comment
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ steps.get_version.outputs.version }}';
+
+            // Find the release associated with this tag
+            try {
+              const release = await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag: version
+              });
+              
+              // Add comment to release
+              await github.rest.repos.createReleaseComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release.data.id,
+                body: `📚 **API Documentation Updated**\n\nVersion \`${version}\` has been added to the API documentation. The new version will be available in the version dropdown at [docs.zitadel.com/api](https://docs.zitadel.com/api) shortly.\n\n✅ Artifacts generated and committed\n🚀 Vercel deployment triggered`
+              });
+            } catch (error) {
+              console.log('Could not find release for tag, skipping comment');
+            }
+
+  # Optional: Cleanup old versions (keep last 10)
+  cleanup-old-versions:
+    runs-on: ubuntu-latest
+    needs: create-api-docs-version
+    if: success()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main # Work on main branch after the push
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Cleanup old versions
+        run: |
+          cd apps/api-docs
+
+          # Count versions (excluding 'latest')
+          if [ -d ".artifacts/versions" ]; then
+            VERSION_COUNT=$(find .artifacts/versions -maxdepth 1 -type d | grep -v "^\.artifacts/versions$" | wc -l)
+            echo "Found $VERSION_COUNT versions"
+            
+            # Keep only the 10 most recent versions
+            if [ $VERSION_COUNT -gt 10 ]; then
+              echo "Cleaning up old versions (keeping 10 most recent)"
+              
+              # Get sorted list of versions (oldest first)
+              OLD_VERSIONS=$(find .artifacts/versions -maxdepth 1 -type d -name "v*" -printf '%T@ %p\n' | sort -n | head -n $((VERSION_COUNT - 10)) | cut -d' ' -f2-)
+              
+              for old_version in $OLD_VERSIONS; do
+                if [ -d "$old_version" ]; then
+                  echo "Removing old version: $(basename $old_version)"
+                  rm -rf "$old_version"
+                fi
+              done
+              
+              # Commit cleanup
+              git config --local user.email "action@github.com"
+              git config --local user.name "GitHub Action"
+              git add .artifacts/versions/
+              
+              if ! git diff --staged --quiet; then
+                git commit -m "chore(api-docs): cleanup old version artifacts"
+                git push origin main
+              fi
+            else
+              echo "No cleanup needed (≤10 versions)"
+            fi
+          fi

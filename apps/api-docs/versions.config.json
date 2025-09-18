@@ -1,0 +1,31 @@
+{
+  "versions": [
+    {
+      "id": "v2.71.9",
+      "name": "v2.71.9",
+      "gitRef": "v2.71.9",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "v2.70.0",
+      "name": "v2.70.0",
+      "gitRef": "v2.70.0",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "main",
+      "name": "Latest (Main)",
+      "gitRef": "main",
+      "enabled": true,
+      "isStable": false
+    }
+  ],
+  "settings": {
+    "defaultVersion": "v2.71.9",
+    "autoGenerate": true,
+    "maxVersions": 10,
+    "includePrerelease": false
+  }
+}
