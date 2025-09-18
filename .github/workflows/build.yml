@@ -26,6 +26,8 @@ jobs:
     uses: ./.github/workflows/check.yml
     with:
       node_version: "22"
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   version:
     uses: ./.github/workflows/version.yml
@@ -44,16 +46,6 @@ jobs:
       nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
       version: ${{ needs.version.outputs.version }}
 
-  api-unit-test:
-    needs: check
-    uses: ./.github/workflows/api-unit-test.yml
-    with:
-      node_version: "22"
-      nx_cache_key: ${{ needs.check.outputs.nx_cache_key }}
-      nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
   api-integration-test:
     needs: check
     uses: ./.github/workflows/api-integration-test.yml
@@ -63,16 +55,6 @@ jobs:
       nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  api-lint:
-    needs: check
-    uses: ./.github/workflows/api-lint.yml
-    with:
-      node_version: "22"
-      buf_version: "latest"
-      go_lint_version: "latest"
-      nx_cache_key: ${{ needs.check.outputs.nx_cache_key }}
-      nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
 
   container:
     needs: 
@@ -106,7 +88,6 @@ jobs:
       pull-requests: write
     needs:
       - version
-      - api-unit-test
       - api-integration-test
       - check
       - container
