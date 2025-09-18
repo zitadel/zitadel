@@ -1,6 +1,5 @@
 {
     "name": "@zitadel/benchmark",
-    "version": "1.0.0",
     "repository": "ssh://git@github.com/zitadel/zitadel.git",
     "author": "ZITADEL Authors <hi@zitadel.com>",
     "engines": {

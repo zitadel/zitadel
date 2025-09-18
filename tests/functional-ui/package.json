@@ -1,6 +1,5 @@
 {
   "name": "@zitadel/functional-ui",
-  "version": "0.0.0",
   "scripts": {
     "open": "pnpm exec cypress open",
     "test:run": "pnpm exec cypress run",
