@@ -19,15 +19,15 @@ import (
 )
 
 func TestServer_RegisterPasskey(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	reg, err := Client.CreatePasskeyRegistrationLink(CTX, &user.CreatePasskeyRegistrationLinkRequest{
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	reg, err := Client.CreatePasskeyRegistrationLink(OrgCTX, &user.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
 		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
 	})
 	require.NoError(t, err)
 
 	// We also need a user session
-	Instance.RegisterUserPasskey(CTX, userID)
+	Instance.RegisterUserPasskey(OrgCTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
 
 	type args struct {
@@ -43,7 +43,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 		{
 			name: "missing user id",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.RegisterPasskeyRequest{},
 			},
 			wantErr: true,
@@ -51,7 +51,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 		{
 			name: "register code",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.RegisterPasskeyRequest{
 					UserId:        userID,
 					Code:          reg.GetCode(),
@@ -68,7 +68,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 		{
 			name: "reuse code (not allowed)",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.RegisterPasskeyRequest{
 					UserId:        userID,
 					Code:          reg.GetCode(),
@@ -80,7 +80,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 		{
 			name: "wrong code",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.RegisterPasskeyRequest{
 					UserId: userID,
 					Code: &user.PasskeyRegistrationCode{
@@ -120,7 +120,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 		{
 			name: "user setting its own passkey",
 			args: args{
-				ctx: integration.WithAuthorizationToken(CTX, sessionToken),
+				ctx: integration.WithAuthorizationToken(OrgCTX, sessionToken),
 				req: &user.RegisterPasskeyRequest{
 					UserId: userID,
 				},
@@ -172,7 +172,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 		{
 			name: "missing user id",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.VerifyPasskeyRegistrationRequest{
 					PasskeyId:           pkr.GetPasskeyId(),
 					PublicKeyCredential: attestationResponse,
@@ -184,7 +184,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.VerifyPasskeyRegistrationRequest{
 					UserId:              userID,
 					PasskeyId:           pkr.GetPasskeyId(),
@@ -202,7 +202,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 		{
 			name: "wrong credential",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.VerifyPasskeyRegistrationRequest{
 					UserId:    userID,
 					PasskeyId: pkr.GetPasskeyId(),
@@ -230,7 +230,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 }
 
 func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 
 	type args struct {
 		ctx context.Context
@@ -246,7 +246,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 		{
 			name: "missing user id",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.CreatePasskeyRegistrationLinkRequest{},
 			},
 			wantErr: true,
@@ -254,7 +254,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 		{
 			name: "send default mail",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.CreatePasskeyRegistrationLinkRequest{
 					UserId: userID,
 				},
@@ -269,7 +269,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 		{
 			name: "send custom url",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.CreatePasskeyRegistrationLinkRequest{
 					UserId: userID,
 					Medium: &user.CreatePasskeyRegistrationLinkRequest_SendLink{
@@ -289,7 +289,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 		{
 			name: "return code",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.CreatePasskeyRegistrationLinkRequest{
 					UserId: userID,
 					Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
@@ -323,7 +323,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 }
 
 func userWithPasskeyRegistered(t *testing.T) (string, *user.RegisterPasskeyResponse) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 	return userID, passkeyRegister(t, userID)
 }
 
@@ -333,12 +333,12 @@ func userWithPasskeyVerified(t *testing.T) (string, string) {
 }
 
 func passkeyRegister(t *testing.T, userID string) *user.RegisterPasskeyResponse {
-	reg, err := Client.CreatePasskeyRegistrationLink(CTX, &user.CreatePasskeyRegistrationLinkRequest{
+	reg, err := Client.CreatePasskeyRegistrationLink(OrgCTX, &user.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
 		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
 	})
 	require.NoError(t, err)
-	pkr, err := Client.RegisterPasskey(CTX, &user.RegisterPasskeyRequest{
+	pkr, err := Client.RegisterPasskey(OrgCTX, &user.RegisterPasskeyRequest{
 		UserId: userID,
 		Code:   reg.GetCode(),
 	})
@@ -352,7 +352,7 @@ func passkeyVerify(t *testing.T, userID string, pkr *user.RegisterPasskeyRespons
 	attestationResponse, err := Instance.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
 	require.NoError(t, err)
 
-	_, err = Client.VerifyPasskeyRegistration(CTX, &user.VerifyPasskeyRegistrationRequest{
+	_, err = Client.VerifyPasskeyRegistration(OrgCTX, &user.VerifyPasskeyRegistrationRequest{
 		UserId:              userID,
 		PasskeyId:           pkr.GetPasskeyId(),
 		PublicKeyCredential: attestationResponse,
@@ -363,7 +363,7 @@ func passkeyVerify(t *testing.T, userID string, pkr *user.RegisterPasskeyRespons
 }
 
 func TestServer_RemovePasskey(t *testing.T) {
-	userIDWithout := Instance.CreateHumanUser(CTX).GetUserId()
+	userIDWithout := Instance.CreateHumanUser(OrgCTX).GetUserId()
 	userIDRegistered, pkrRegistered := userWithPasskeyRegistered(t)
 	userIDVerified, passkeyIDVerified := userWithPasskeyVerified(t)
 	userIDVerifiedPermission, passkeyIDVerifiedPermission := userWithPasskeyVerified(t)
@@ -468,7 +468,7 @@ func TestServer_RemovePasskey(t *testing.T) {
 }
 
 func TestServer_ListPasskeys(t *testing.T) {
-	userIDWithout := Instance.CreateHumanUser(CTX).GetUserId()
+	userIDWithout := Instance.CreateHumanUser(OrgCTX).GetUserId()
 	userIDRegistered, _ := userWithPasskeyRegistered(t)
 	userIDVerified, passkeyIDVerified := userWithPasskeyVerified(t)
 

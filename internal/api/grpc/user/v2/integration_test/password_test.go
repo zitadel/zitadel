@@ -17,7 +17,7 @@ import (
 )
 
 func TestServer_RequestPasswordReset(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -89,7 +89,7 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.PasswordReset(CTX, tt.req)
+			got, err := Client.PasswordReset(OrgCTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -122,7 +122,7 @@ func TestServer_Deprecated_SetPassword(t *testing.T) {
 				return nil
 			},
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.SetPasswordRequest{},
 			},
 			wantErr: true,
@@ -130,12 +130,12 @@ func TestServer_Deprecated_SetPassword(t *testing.T) {
 		{
 			name: "set successful",
 			prepare: func(request *user.SetPasswordRequest) error {
-				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.SetPasswordRequest{
 					NewPassword: &user.Password{
 						Password: "Secr3tP4ssw0rd!",
@@ -152,9 +152,9 @@ func TestServer_Deprecated_SetPassword(t *testing.T) {
 		{
 			name: "change successful",
 			prepare: func(request *user.SetPasswordRequest) error {
-				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				request.UserId = userID
-				_, err := Client.SetPassword(CTX, &user.SetPasswordRequest{
+				_, err := Client.SetPassword(OrgCTX, &user.SetPasswordRequest{
 					UserId: userID,
 					NewPassword: &user.Password{
 						Password: "InitialPassw0rd!",
@@ -163,7 +163,7 @@ func TestServer_Deprecated_SetPassword(t *testing.T) {
 				return err
 			},
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.SetPasswordRequest{
 					NewPassword: &user.Password{
 						Password: "Secr3tP4ssw0rd!",
@@ -183,9 +183,9 @@ func TestServer_Deprecated_SetPassword(t *testing.T) {
 		{
 			name: "set with code successful",
 			prepare: func(request *user.SetPasswordRequest) error {
-				userID := Instance.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
 				request.UserId = userID
-				resp, err := Client.PasswordReset(CTX, &user.PasswordResetRequest{
+				resp, err := Client.PasswordReset(OrgCTX, &user.PasswordResetRequest{
 					UserId: userID,
 					Medium: &user.PasswordResetRequest_ReturnCode{
 						ReturnCode: &user.ReturnPasswordResetCode{},
@@ -200,7 +200,7 @@ func TestServer_Deprecated_SetPassword(t *testing.T) {
 				return nil
 			},
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.SetPasswordRequest{
 					NewPassword: &user.Password{
 						Password: "Secr3tP4ssw0rd!",

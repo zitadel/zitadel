@@ -18,7 +18,7 @@ import (
 )
 
 func TestServer_SetUserMetadata(t *testing.T) {
-	iamOwnerCTX := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCTX := Instance.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner)
 
 	tests := []struct {
 		name    string
@@ -32,7 +32,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			name: "missing permission",
 			ctx:  Instance.WithAuthorizationToken(context.Background(), integration.UserTypeNoPermission),
 			dep: func(req *user.SetUserMetadataRequest) {
-				req.UserId = Instance.CreateUserTypeHuman(CTX, integration.Email()).GetId()
+				req.UserId = Instance.CreateUserTypeHuman(OrgCTX, integration.Email()).GetId()
 			},
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))}},
@@ -43,7 +43,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			name: "set user metadata",
 			ctx:  iamOwnerCTX,
 			dep: func(req *user.SetUserMetadataRequest) {
-				req.UserId = Instance.CreateUserTypeHuman(CTX, integration.Email()).GetId()
+				req.UserId = Instance.CreateUserTypeHuman(OrgCTX, integration.Email()).GetId()
 			},
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{{Key: "key1", Value: []byte(base64.StdEncoding.EncodeToString([]byte("value1")))}},
@@ -54,7 +54,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 			name: "set user metadata, multiple",
 			ctx:  iamOwnerCTX,
 			dep: func(req *user.SetUserMetadataRequest) {
-				req.UserId = Instance.CreateUserTypeHuman(CTX, integration.Email()).GetId()
+				req.UserId = Instance.CreateUserTypeHuman(OrgCTX, integration.Email()).GetId()
 			},
 			req: &user.SetUserMetadataRequest{
 				Metadata: []*user.Metadata{
@@ -76,7 +76,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 		},
 		{
 			name: "update user metadata",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+			ctx:  Instance.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner),
 			dep: func(req *user.SetUserMetadataRequest) {
 				req.UserId = Instance.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
 				Instance.SetUserMetadata(iamOwnerCTX, req.UserId, "key1", "value1")
@@ -88,7 +88,7 @@ func TestServer_SetUserMetadata(t *testing.T) {
 		},
 		{
 			name: "update user metadata with same value",
-			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
+			ctx:  Instance.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner),
 			dep: func(req *user.SetUserMetadataRequest) {
 				req.UserId = Instance.CreateUserTypeHuman(iamOwnerCTX, integration.Email()).GetId()
 				Instance.SetUserMetadata(iamOwnerCTX, req.UserId, "key1", "value1")
@@ -131,7 +131,7 @@ func assertSetUserMetadataResponse(t *testing.T, creationDate, changeDate time.T
 }
 
 func TestServer_ListUserMetadata(t *testing.T) {
-	iamOwnerCTX := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCTX := Instance.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner)
 
 	type args struct {
 		ctx context.Context
@@ -280,7 +280,7 @@ func assertPaginationResponse(t *assert.CollectT, expected *filter.PaginationRes
 }
 
 func TestServer_DeleteUserMetadata(t *testing.T) {
-	iamOwnerCTX := Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCTX := Instance.WithAuthorizationToken(OrgCTX, integration.UserTypeIAMOwner)
 
 	tests := []struct {
 		name             string

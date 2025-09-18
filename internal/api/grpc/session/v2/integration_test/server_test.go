@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/integration"
@@ -16,15 +18,13 @@ import (
 )
 
 var (
-	CTX             context.Context
-	IAMOwnerCTX     context.Context
-	UserCTX         context.Context
-	LoginCTX        context.Context
-	Instance        *integration.Instance
-	Client          session.SessionServiceClient
-	User            *user.AddHumanUserResponse
-	DeactivatedUser *user.AddHumanUserResponse
-	LockedUser      *user.AddHumanUserResponse
+	CTX         context.Context
+	IAMOwnerCTX context.Context
+	UserCTX     context.Context
+	LoginCTX    context.Context
+	Instance    *integration.Instance
+	Client      session.SessionServiceClient
+	User        *user.AddHumanUserResponse
 )
 
 func TestMain(m *testing.M) {
@@ -40,8 +40,6 @@ func TestMain(m *testing.M) {
 		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
 		LoginCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
 		User = createFullUser(CTX)
-		DeactivatedUser = createDeactivatedUser(CTX)
-		LockedUser = createLockedUser(CTX)
 		return m.Run()
 	}())
 }
@@ -61,16 +59,36 @@ func createFullUser(ctx context.Context) *user.AddHumanUserResponse {
 	return userResp
 }
 
-func createDeactivatedUser(ctx context.Context) *user.AddHumanUserResponse {
+func createDeactivatedUser(ctx context.Context, t *testing.T) *user.AddHumanUserResponse {
 	userResp := Instance.CreateHumanUser(ctx)
 	_, err := Instance.Client.UserV2.DeactivateUser(ctx, &user.DeactivateUserRequest{UserId: userResp.GetUserId()})
 	logging.OnError(err).Fatal("deactivate human user")
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		result, err := Instance.Client.UserV2.GetUserByID(ctx, &user.GetUserByIDRequest{
+			UserId: userResp.GetUserId(),
+		})
+		assert.NoError(collect, err)
+		assert.Equal(t, user.UserState_USER_STATE_INACTIVE, result.GetUser().GetState())
+	}, retryDuration, tick, "user not locked in time")
+
 	return userResp
 }
 
-func createLockedUser(ctx context.Context) *user.AddHumanUserResponse {
+func createLockedUser(ctx context.Context, t *testing.T) *user.AddHumanUserResponse {
 	userResp := Instance.CreateHumanUser(ctx)
 	_, err := Instance.Client.UserV2.LockUser(ctx, &user.LockUserRequest{UserId: userResp.GetUserId()})
 	logging.OnError(err).Fatal("lock human user")
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		result, err := Instance.Client.UserV2.GetUserByID(ctx, &user.GetUserByIDRequest{
+			UserId: userResp.GetUserId(),
+		})
+		assert.NoError(collect, err)
+		assert.Equal(t, user.UserState_USER_STATE_LOCKED, result.GetUser().GetState())
+	}, retryDuration, tick, "user not locked in time")
+
 	return userResp
 }

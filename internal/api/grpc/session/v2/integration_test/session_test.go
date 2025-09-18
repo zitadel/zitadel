@@ -123,6 +123,9 @@ func verifyFactors(t assert.TestingT, factors *session.Factors, window time.Dura
 }
 
 func TestServer_CreateSession(t *testing.T) {
+	lockedUser := createLockedUser(CTX, t)
+	deactivatedUser := createDeactivatedUser(CTX, t)
+
 	tests := []struct {
 		name                 string
 		req                  *session.CreateSessionRequest
@@ -186,7 +189,7 @@ func TestServer_CreateSession(t *testing.T) {
 				Checks: &session.Checks{
 					User: &session.CheckUser{
 						Search: &session.CheckUser_UserId{
-							UserId: DeactivatedUser.GetUserId(),
+							UserId: deactivatedUser.GetUserId(),
 						},
 					},
 				},
@@ -199,7 +202,7 @@ func TestServer_CreateSession(t *testing.T) {
 				Checks: &session.Checks{
 					User: &session.CheckUser{
 						Search: &session.CheckUser_UserId{
-							UserId: LockedUser.GetUserId(),
+							UserId: lockedUser.GetUserId(),
 						},
 					},
 				},

@@ -17,13 +17,13 @@ import (
 )
 
 func TestServer_RegisterU2F(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	otherUser := Instance.CreateHumanUser(OrgCTX).GetUserId()
 
 	// We also need a user session
-	Instance.RegisterUserPasskey(CTX, userID)
+	Instance.RegisterUserPasskey(OrgCTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
-	Instance.RegisterUserPasskey(CTX, otherUser)
+	Instance.RegisterUserPasskey(OrgCTX, otherUser)
 	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, otherUser)
 
 	type args struct {
@@ -39,7 +39,7 @@ func TestServer_RegisterU2F(t *testing.T) {
 		{
 			name: "missing user id",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.RegisterU2FRequest{},
 			},
 			wantErr: true,
@@ -47,7 +47,7 @@ func TestServer_RegisterU2F(t *testing.T) {
 		{
 			name: "admin user",
 			args: args{
-				ctx: CTX,
+				ctx: OrgCTX,
 				req: &user.RegisterU2FRequest{
 					UserId: userID,
 				},
@@ -62,7 +62,7 @@ func TestServer_RegisterU2F(t *testing.T) {
 		{
 			name: "other user, no permission",
 			args: args{
-				ctx: integration.WithAuthorizationToken(CTX, sessionTokenOtherUser),
+				ctx: integration.WithAuthorizationToken(OrgCTX, sessionTokenOtherUser),
 				req: &user.RegisterU2FRequest{
 					UserId: userID,
 				},
@@ -72,7 +72,7 @@ func TestServer_RegisterU2F(t *testing.T) {
 		{
 			name: "user setting its own passkey",
 			args: args{
-				ctx: integration.WithAuthorizationToken(CTX, sessionToken),
+				ctx: integration.WithAuthorizationToken(OrgCTX, sessionToken),
 				req: &user.RegisterU2FRequest{
 					UserId: userID,
 				},
@@ -181,10 +181,10 @@ func TestServer_VerifyU2FRegistration(t *testing.T) {
 }
 
 func ctxFromNewUserWithRegisteredU2F(t *testing.T) (context.Context, string, *user.RegisterU2FResponse) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	Instance.RegisterUserPasskey(CTX, userID)
+	userID := Instance.CreateHumanUser(OrgCTX).GetUserId()
+	Instance.RegisterUserPasskey(OrgCTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, LoginCTX, userID)
-	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
+	ctx := integration.WithAuthorizationToken(OrgCTX, sessionToken)
 
 	pkr, err := Client.RegisterU2F(ctx, &user.RegisterU2FRequest{
 		UserId: userID,
@@ -211,7 +211,7 @@ func ctxFromNewUserWithVerifiedU2F(t *testing.T) (context.Context, string, strin
 }
 
 func TestServer_RemoveU2F(t *testing.T) {
-	userIDWithout := Instance.CreateHumanUser(CTX).GetUserId()
+	userIDWithout := Instance.CreateHumanUser(OrgCTX).GetUserId()
 	ctxRegistered, userIDRegistered, pkrRegistered := ctxFromNewUserWithRegisteredU2F(t)
 	_, userIDVerified, u2fVerified := ctxFromNewUserWithVerifiedU2F(t)
 	_, userIDVerifiedPermission, u2fVerifiedPermission := ctxFromNewUserWithVerifiedU2F(t)
