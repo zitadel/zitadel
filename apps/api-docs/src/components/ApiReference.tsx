@@ -713,7 +713,7 @@ export function ApiReferenceComponent() {
                     textAlign: "center",
                   }}
                 >
-                  No results found for "{searchQuery}"
+                  No results found for &quot;{searchQuery}&quot;
                 </div>
               )}
           </div>
