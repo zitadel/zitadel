@@ -1,11 +1,14 @@
 package github
 
 import (
+	"context"
+	"net/http"
 	"strconv"
 	"time"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
+	httphelper "github.com/zitadel/oidc/v3/pkg/http"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
@@ -13,10 +16,11 @@ import (
 )
 
 const (
-	authURL    = "https://github.com/login/oauth/authorize"
-	tokenURL   = "https://github.com/login/oauth/access_token"
-	profileURL = "https://api.github.com/user"
-	name       = "GitHub"
+	authURL     = "https://github.com/login/oauth/authorize"
+	tokenURL    = "https://github.com/login/oauth/access_token"
+	profileURL  = "https://api.github.com/user"
+	emailsURL   = "https://api.github.com/user/emails"
+	name        = "GitHub"
 )
 
 var _ idp.Provider = (*Provider)(nil)
@@ -49,6 +53,88 @@ func NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profil
 // Provider is the [idp.Provider] implementation for GitHub
 type Provider struct {
 	*oauth.Provider
+}
+
+// Session is the GitHub-specific implementation of idp.Session
+type Session struct {
+	*oauth.Session
+	Provider *Provider
+}
+
+// FetchUser extends the OAuth session's FetchUser to handle GitHub's email fetching
+func (s *Session) FetchUser(ctx context.Context) (idp.User, error) {
+	user, err := s.Session.FetchUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+	
+	githubUser, ok := user.(*User)
+	if !ok {
+		return user, nil
+	}
+	
+	// If email is empty, try to fetch it from the emails endpoint
+	if githubUser.Email == "" {
+		emails, err := s.fetchEmails(ctx)
+		if err == nil && len(emails) > 0 {
+			// Find the best email in a single pass
+			var verifiedEmail string
+			
+			for _, email := range emails {
+				// Priority 1: Primary and verified
+				if email.Primary && email.Verified {
+					githubUser.Email = domain.EmailAddress(email.Email)
+					break
+				}
+				
+				// Priority 2: First verified email
+				if email.Verified && verifiedEmail == "" {
+					verifiedEmail = email.Email
+				}
+			}
+			
+			// If no primary verified email found, use first verified or first available
+			if githubUser.Email == "" {
+				if verifiedEmail != "" {
+					githubUser.Email = domain.EmailAddress(verifiedEmail)
+				} else {
+					githubUser.Email = domain.EmailAddress(emails[0].Email)
+				}
+			}
+		}
+	}
+	
+	return githubUser, nil
+}
+
+// GitHubEmail represents an email from the GitHub API
+type GitHubEmail struct {
+	Email    string `json:"email"`
+	Primary  bool   `json:"primary"`
+	Verified bool   `json:"verified"`
+}
+
+// fetchEmails fetches the user's emails from GitHub
+func (s *Session) fetchEmails(ctx context.Context) ([]GitHubEmail, error) {
+	if s.Tokens == nil {
+		return nil, oauth.ErrCodeMissing
+	}
+	
+	req, err := http.NewRequestWithContext(ctx, "GET", emailsURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	
+	// Make sure we use the correct Authorization header format
+	req.Header.Set("Authorization", s.Tokens.TokenType+" "+s.Tokens.AccessToken)
+	req.Header.Set("Accept", "application/vnd.github.v3+json") // Use GitHub's recommended API version
+	
+	var emails []GitHubEmail
+	if err := httphelper.HttpRequest(s.Provider.RelyingParty.HttpClient(), req, &emails); err != nil {
+		return nil, err
+	}
+	
+	return emails, nil
 }
 
 func newConfig(clientID, secret, callbackURL, authURL, tokenURL string, scopes []string) *oauth2.Config {
