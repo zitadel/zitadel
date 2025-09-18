@@ -52,9 +52,7 @@ services:
       retries: 5
       start_period: '20s'
     ports:
-      - 5432:5433
-    volumes:
-      - 'db-data-api-integration:/var/lib/postgresql/data'
+      - 5433:5432
 
   cache-api-integration:
     restart: 'always'
@@ -80,5 +78,3 @@ services:
 
 volumes:
   db-data-dev:
-  db-data-api-integration:
-    driver: local

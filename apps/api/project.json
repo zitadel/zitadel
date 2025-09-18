@@ -106,25 +106,28 @@
                 "{workspaceRoot}/.artifacts/bin/*/*/zitadel.test"
             ]
         },
+        "test-integration-state": {
+            "continuous": true,
+            "command": "nx run @zitadel/devcontainer:compose up db-api-integration cache-api-integration"
+        },
         "test-integration-setup": {
             "dependsOn": [
+                "test-integration-state",
                 "test-integration-build"
             ],
-            "command": "ZITADEL_BINARY=.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test nx run @zitadel/api:setup"
+            "options": {
+                "envFile": "{projectRoot}/.env.test-integration-env"
+            },
+            "command": "ZITADEL_BINARY=.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test nx run @zitadel/api:setup --excludeTaskDependencies"
         },
         "test-integration-env": {
             "continuous": true,
             "dependsOn": [
+                "test-integration-state",
                 "test-integration-pull",
                 "test-integration-setup"
             ],
-            "executor": "nx:run-commands",
-            "options": {
-                "commands": [
-                    "nx run @zitadel/devcontainer:compose up db-api-integration cache-api-integration",
-                    "ZITADEL_BINARY=.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test nx run @zitadel/api:prod --excludeTaskDependencies"
-                ]
-            }                
+            "command": "ZITADEL_BINARY=.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test nx run @zitadel/api:prod --excludeTaskDependencies"
         },
         "test-integration": {
             "cache": true,

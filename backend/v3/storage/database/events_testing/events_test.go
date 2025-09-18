@@ -4,6 +4,7 @@ package events_test
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -20,7 +21,20 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
-const ConnString = "host=localhost port=5432 user=zitadel password=zitadel dbname=zitadel sslmode=disable"
+func getEnv(key, fallback string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return fallback
+}
+
+var ConnString = fmt.Sprintf("host=%s port=%s user=zitadel password=%s dbname=%s sslmode=%s",
+	getEnv("ZITADEL_DATABASE_POSTGRES_HOST", "localhost"),
+	getEnv("ZITADEL_DATABASE_POSTGRES_PORT", "5432"),
+	getEnv("ZITADEL_DATABASE_POSTGRES_PASSWORD", "zitadel"),
+	getEnv("ZITADEL_DATABASE_POSTGRES_DB", "zitadel"),
+	getEnv("ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE", "disable"),
+)
 
 var (
 	dbPool       *pgxpool.Pool
