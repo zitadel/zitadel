@@ -1,13 +1,13 @@
 # Benchmarks
 
-This project contains code for benchmarking specific endpoints of ZITADEL using [k6](https://k6.io).
+This package contains code for benchmarking specific endpoints of the API using [k6](https://k6.io).
 
 ## Prerequisite
 
 * [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 * [k6](https://k6.io/docs/get-started/installation/)
 * [go](https://go.dev/doc/install)
-* running ZITADEL
+* running the API
 
 ## Structure
 
