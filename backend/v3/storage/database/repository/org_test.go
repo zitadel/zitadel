@@ -1014,3 +1014,74 @@ func TestDeleteOrganization(t *testing.T) {
 		})
 	}
 }
+
+func TestGetOrganizationWithSubResources(t *testing.T) {
+	tx, err := pool.Begin(t.Context(), nil)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_ = tx.Rollback(t.Context())
+	})
+
+	// create instance
+	instanceId := gofakeit.Name()
+	instanceRepo := repository.InstanceRepository(tx)
+	err = instanceRepo.Create(t.Context(), &domain.Instance{
+		ID:              instanceId,
+		Name:            gofakeit.Name(),
+		DefaultOrgID:    "defaultOrgId",
+		IAMProjectID:    "iamProject",
+		ConsoleClientID: "consoleCLient",
+		ConsoleAppID:    "consoleApp",
+		DefaultLanguage: "defaultLanguage",
+	})
+	require.NoError(t, err)
+
+	orgRepo := repository.OrganizationRepository(tx)
+
+	// create organization
+	org := domain.Organization{
+		ID:         "1",
+		Name:       "org-name",
+		InstanceID: instanceId,
+		State:      domain.OrgStateActive,
+	}
+	err = orgRepo.Create(t.Context(), &org)
+	require.NoError(t, err)
+
+	t.Run("domains", func(t *testing.T) {
+		domainRepo := orgRepo.Domains(true)
+		domain1 := &domain.AddOrganizationDomain{
+			InstanceID: org.InstanceID,
+			OrgID:      org.ID,
+			Domain:     "domain1.com",
+			IsVerified: true,
+			IsPrimary:  true,
+		}
+		err = domainRepo.Add(t.Context(), domain1)
+		require.NoError(t, err)
+
+		domain2 := &domain.AddOrganizationDomain{
+			InstanceID: org.InstanceID,
+			OrgID:      org.ID,
+			Domain:     "domain2.com",
+			IsVerified: false,
+			IsPrimary:  false,
+		}
+		err = domainRepo.Add(t.Context(), domain2)
+		require.NoError(t, err)
+
+		t.Run("org by domain", func(t *testing.T) {
+			returnedOrg, err := orgRepo.Get(t.Context(),
+				database.WithCondition(
+					database.And(
+						orgRepo.InstanceIDCondition(instanceId),
+						domainRepo.DomainCondition(database.TextOperationEqual, domain1.Domain),
+					),
+				),
+			)
+			require.NoError(t, err)
+			assert.Equal(t, org.ID, returnedOrg.ID)
+			assert.Len(t, returnedOrg.Domains, 2)
+		})
+	})
+}

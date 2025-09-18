@@ -633,7 +633,6 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, p
 func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheckV2 bool) (users *Users, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
 	query, scan := prepareUsersQuery()
 	query = userPermissionCheckV2(ctx, query, permissionCheckV2, queries.Queries)
 	stmt, args, err := queries.toQuery(query).Where(sq.Eq{
