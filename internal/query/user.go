@@ -634,7 +634,7 @@ func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, p
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUsersQuery()
+	query, scan := prepareUsersQuery(queries.SortingColumn)
 	query = userPermissionCheckV2(ctx, query, permissionCheckV2, queries.Queries)
 	stmt, args, err := queries.toQuery(query).Where(sq.Eq{
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -1270,7 +1270,7 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 		}
 }
 
-func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+func prepareUsersQuery(orderBy Column) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -1302,6 +1302,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			MachineDescriptionCol.identifier(),
 			MachineSecretCol.identifier(),
 			MachineAccessTokenTypeCol.identifier(),
+			orderBy.orderBy(),
 			countColumn.identifier()).
 			Distinct().
 			From(userTable.identifier()).
@@ -1319,6 +1320,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 				preferredLoginName := sql.NullString{}
 
 				human, machine := sqlHuman{}, sqlMachine{}
+				var oderByValue any
 
 				err := rows.Scan(
 					&u.ID,
@@ -1354,6 +1356,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					&machine.encodedSecret,
 					&machine.accessTokenType,
 
+					&oderByValue,
 					&count,
 				)
 				if err != nil {
