@@ -527,5 +527,11 @@ Errors:
       RegistrationNotAllowed: Înregistrarea nu este permisă
   DeviceAuth:
     NotExisting: Codul de utilizator nu există
+  Captcha:
+    InitializationFailed: Eșec la inițializarea Captcha
+    InvalidCaptcha: Verificarea Captcha a eșuat. Tokenul este invalid sau expirat
+    MissingToken: Lipsește tokenul Captcha
+    UnexpectedType: Tip Captcha neașteptat în configurație
+    ValidationFailed: A apărut o eroare la validarea tokenului Captcha
 
 optional: (opțional)

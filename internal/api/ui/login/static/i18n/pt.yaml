@@ -176,7 +176,7 @@ Passwordless:
 PasswordlessPrompt:
   Title: Configuração de login sem senha
   Description: Você gostaria de configurar o login sem senha? (Métodos de autenticação do seu dispositivo, como FaceID, Windows Hello ou Impressão digital)
-  
+
 PasswordlessRegistration:
   Title: Configuração de login sem senha
   Description: Adicione sua autenticação fornecendo um nome (por exemplo, MeuCelular, MacBook, etc.) e clique no botão 'Registrar login sem senha' abaixo.
@@ -524,5 +524,11 @@ Errors:
       RegistrationNotAllowed: O registro não é permitido
   DeviceAuth:
     NotExisting: Código do usuário não existe
+  Captcha:
+    InitializationFailed: Falha ao inicializar o Captcha
+    InvalidCaptcha: Falha na verificação do Captcha. O token é inválido ou expirou
+    MissingToken: Token do Captcha ausente
+    UnexpectedType: Tipo de Captcha inesperado na configuração
+    ValidationFailed: Ocorreu um erro ao validar o token do Captcha
 
 optional: (opcional)
