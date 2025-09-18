@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { createApiReference } from "@scalar/api-reference";
 import yaml from "js-yaml";
+import Link from "next/link";
 
 // Add CSS to handle scroll offset for fixed header
 if (typeof document !== "undefined") {
@@ -487,7 +488,7 @@ export function ApiReferenceComponent() {
         {/* Left side: Logo, Title and Service selector */}
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           {/* ZITADEL Logo */}
-          <a
+          <Link
             href="/"
             style={{
               display: "flex",
@@ -507,7 +508,7 @@ export function ApiReferenceComponent() {
                 objectFit: "contain",
               }}
             />
-          </a>
+          </Link>
 
           <div
             style={{
