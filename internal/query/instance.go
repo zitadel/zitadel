@@ -224,7 +224,6 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 	if err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, instanceDomain); err != nil {
 		return nil, err
 	}
-	instance.ZitadelVersion = build.Version()
 	q.caches.instance.Set(ctx, instance)
 
 	return instance, instance.checkDomain(instanceDomain, publicDomain)
