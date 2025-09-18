@@ -7,13 +7,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/integration"
 	app "github.com/zitadel/zitadel/pkg/grpc/app/v2beta"
 )
 
@@ -35,7 +35,7 @@ func TestCreateApplicationKey(t *testing.T) {
 			inputCtx: IAMOwnerCtx,
 			creationRequest: &app.CreateApplicationKeyRequest{
 				ProjectId:      p.GetId(),
-				AppId:          gofakeit.UUID(),
+				AppId:          integration.ID(),
 				ExpirationDate: timestamppb.New(time.Now().AddDate(0, 0, 1).UTC()),
 			},
 			expectedErrorType: codes.FailedPrecondition,
@@ -118,7 +118,7 @@ func TestDeleteApplicationKey(t *testing.T) {
 			inputCtx: IAMOwnerCtx,
 			deletionRequest: func(ttt *testing.T) *app.DeleteApplicationKeyRequest {
 				return &app.DeleteApplicationKeyRequest{
-					Id:            gofakeit.UUID(),
+					Id:            integration.ID(),
 					ProjectId:     p.GetId(),
 					ApplicationId: createdApp.GetAppId(),
 				}

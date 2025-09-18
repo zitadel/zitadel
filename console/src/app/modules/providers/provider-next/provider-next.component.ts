@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 export interface CopyUrl {
   label: string;
@@ -10,17 +10,16 @@ export interface CopyUrl {
   selector: 'cnsl-provider-next',
   templateUrl: './provider-next.component.html',
   styleUrls: ['./provider-next.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProviderNextComponent {
-  @Input() copyUrls?: CopyUrl[] | null;
-  @Input() autofillLink?: string | null;
-  @Input() activateLink?: string | null;
-  @Input() configureProvider?: boolean | null;
-  @Input() configureTitle?: string;
-  @Input() configureDescription?: string;
+  @Input() copyUrls: CopyUrl[] | null = null;
+  @Input() autofillLink: string | null = null;
+  @Input({ required: true }) activateLink!: string | null;
+  @Input({ required: true }) configureProvider!: boolean;
+  @Input({ required: true }) configureTitle!: string;
+  @Input({ required: true }) configureDescription!: string;
   @Input() configureLink?: string;
-  @Input() expanded?: boolean;
+  @Input({ required: true }) expanded!: boolean;
   @Output() activate = new EventEmitter<void>();
-
-  constructor() {}
 }
