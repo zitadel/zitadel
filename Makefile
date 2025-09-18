@@ -1,10 +1,10 @@
-go_bin := "$$(go env GOPATH)/bin"
+go_bin := "$(shell go env GOPATH)/bin"
 gen_authopt_path := "$(go_bin)/protoc-gen-authoption"
 gen_zitadel_path := "$(go_bin)/protoc-gen-zitadel"
 
-now := $$(date '+%Y-%m-%dT%T%z' | sed -E 's/.([0-9]{2})([0-9]{2})$$/-\1:\2/')
+now := $(shell date '+%Y-%m-%dT%T%z' | sed -E 's/.([0-9]{2})([0-9]{2})$$/-\1:\2/')
 VERSION ?= development-$(now)
-COMMIT_SHA ?= $$(git rev-parse HEAD)
+COMMIT_SHA ?= $(shell git rev-parse HEAD)
 ZITADEL_IMAGE ?= zitadel:local
 
 GOCOVERDIR = tmp/coverage

@@ -1,14 +1,14 @@
 ---
-title: Typescript Login UI
-sidebar_label: Typescript Login UI
+title: Typescript Repository
+sidebar_label: Typescript Repository
 ---
 
-To replace our current golang built login UI and showcase the use of our new resource, session and OIDC APIs, we've created the [Typescript Login UI](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#contribute-to-login).
-The typescript login UI contains all TypeScript and JavaScript packages and applications you need to create your own Login UI using the ZITADEL APIs.
+To replace our current golang built login UI and showcase the use of our new resource, session and OIDC APIs, we've created the [Typescript Repository](https://github.com/zitadel/typescript).
+The typescript repository contains all TypeScript and JavaScript packages and applications you need to create your own Login UI using the ZITADEL APIs.
 
-## Used Apps And Packages
+## Included Apps And Packages
 
-- **[login](./typescript-login-ui#new-login-ui)**: The login UI used by ZITADEL Cloud, powered by Next.js
+- **[login](./typescript-repo#new-login-ui)**: The future login UI used by ZITADEL Cloud, powered by Next.js
 - `@zitadel/proto`: Typescript implementation of Protocol Buffers, suitable for web browsers and Node.js.
 - `@zitadel/client`: Core components for establishing a client connection
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
@@ -19,7 +19,7 @@ The typescript login UI contains all TypeScript and JavaScript packages and appl
 The new implementation of the login is based on Next.js and implements the [OIDC standard](./oidc-standard) by proxying requests to the ZITADEL backend and using the session API.
 The UI uses the branding and behaves based on the policies and settings of your instance or organization.
 It is also allows users to authenticate directly (without an OIDC context) and self service their account.
-Its set of features will increase with time and its progress will be tracked [here](./typescript-login-ui#implemented-features).
+Its set of features will increase with time and its progress will be tracked [here](./typescript-repo#implemented-features).
 
 ### Architectural Overview
 
@@ -117,7 +117,7 @@ Authenticated users are directly able to self service their account.
 
 ### Setup
 
-In order to run the new login app, make sure to follow the instructions in the [contribution guide](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#contribute-to-login).
+In order to run the new login app, make sure to follow the instructions in the [Readme](https://github.com/zitadel/typescript/blob/main/README.md#run-login-ui).
 
 #### How to setup domains for OIDC
 
@@ -132,11 +132,11 @@ When setting up the new login app for OIDC, ensure it meets the following requir
 - The OIDC Proxy sets `x-zitadel-public-host` which is the host, your login is deployed to `ex. login.example.com`.
 - The OIDC Proxy sets `x-zitadel-instance-host` which is the host of your instance `ex. test-hdujwl.zitadel.cloud`.
 
-You can review an example implementation of a middlware [here](https://github.com/zitadel/zitadel/blob/main/apps/login/src/middleware.ts).
+You can review an example implementation of a middlware [here](https://github.com/zitadel/typescript/blob/main/apps/login/src/middleware.ts).
 
 #### Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Fzitadel&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_ID,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_LOGIN_CLIENT%20membership%20on%20your%20instance%20and%20provide%20its%20id%20and%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Ftypescript&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_LOGIN_CLIENT%20membership%20on%20your%20instance%20and%20provide%20its%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)
 
 To deploy your own version on Vercel, navigate to your instance and create a service user.
 Create a personal access token (PAT) for the user and copy and set it as `ZITADEL_SERVICE_USER_TOKEN`, then navigate to Default settings and make sure it gets `IAM_LOGIN_CLIENT` permissions.

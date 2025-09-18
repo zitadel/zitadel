@@ -1,49 +1,46 @@
 ---
-title: Typescript Login UI
-sidebar_label: Typescript Login UI
+title: Login App
+sidebar_label: Login App
 ---
 
-To replace our current golang built login UI and showcase the use of our new resource, session and OIDC APIs, we've created the [Typescript Login UI](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#contribute-to-login).
-The typescript login UI contains all TypeScript and JavaScript packages and applications you need to create your own Login UI using the ZITADEL APIs.
+To replace the old embedded Login built with Golang and to showcase the use of our session and OIDC APIs, we've created the new [Login app](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#contribute-to-login).
 
 ## Used Apps And Packages
 
-- **[login](./typescript-login-ui#new-login-ui)**: The login UI used by ZITADEL Cloud, powered by Next.js
+- **[Login app](./login-app#login-app)**: The Login app used by ZITADEL Cloud, powered by Next.js
 - `@zitadel/proto`: Typescript implementation of Protocol Buffers, suitable for web browsers and Node.js.
 - `@zitadel/client`: Core components for establishing a client connection
-- `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
-- `eslint-config-zitadel`: ESLint preset
 
-## Login UI
+## Login App
 
-The new implementation of the login is based on Next.js and implements the [OIDC standard](./oidc-standard) by proxying requests to the ZITADEL backend and using the session API.
+The new implementation of the Login app is based on Next.js and implements the [OIDC standard](./oidc-standard) by proxying requests to the ZITADEL backend and using the session API.
 The UI uses the branding and behaves based on the policies and settings of your instance or organization.
 It is also allows users to authenticate directly (without an OIDC context) and self service their account.
-Its set of features will increase with time and its progress will be tracked [here](./typescript-login-ui#implemented-features).
+Its set of features will increase with time and its progress will be tracked [here](./login-app#implemented-features).
 
 ### Architectural Overview
 
-The new login app consists of a confidential (backend) part and a browser (client side) part.
+The new Login app consists of a confidential (backend) part and a browser (client side) part.
 In addition to that, the OIDC specification builds upon a proxy which is set up in the Next.js middleware. It rewrites requests of the paths `/.well-known/:path*`, `/oauth/:path*`, `/oidc/:path*` to ZITADEL.
 
 The backend side of the application is authorized using a machine user's personal access token.
-This token is used to fetch policies and settings from your instances or organization which define how users are authenticated and how the login is displayed.
+This token is used to fetch policies and settings from your instances or organization which define how users are authenticated and how the Login app is displayed.
 
 The frontend side of the application communicates to the backend side by using a cookie which is set by the server.
 The cookie consists of an id and a token and is bound to a session which is updated continuously.
 
-The following illustration shows the architecture of the login and a potential authentication code flow starting from an application which implements the OIDC specification respectively.
+The following illustration shows the architecture of the Login app and a potential authentication code flow starting from an application which implements the OIDC specification respectively.
 
 ![Next.js Login Architecture](/img/typescript-login-architecture.png)
 
 _Note that the illustration is just a representation of the architecture and may not specify actual endpoints._
 
-The flow starts by the `/authorize` endpoint which is intercepted by the login and forwarded to ZITADEL.
-ZITADEL interprets the request and specifically redirects back to the login app.
+The flow starts by the `/authorize` endpoint which is intercepted by the Login app and forwarded to ZITADEL.
+ZITADEL interprets the request and specifically redirects back to the Login app.
 It does so by redirecting to `/login`.
-The login is then able to load an [AuthRequest](/docs/apis/resources/oidc_service_v2/oidc-service-get-auth-request#get-oidc-auth-request-details).
+The Login app is then able to load an [AuthRequest](/docs/apis/resources/oidc_service_v2/oidc-service-get-auth-request#get-oidc-auth-request-details).
 
-The Auth Request defines how users proceed to authenticate. If no special prompts or scopes are set, the login brings up the `/loginname` page.
+The Auth Request defines how users proceed to authenticate. If no special prompts or scopes are set, the Login app brings up the `/loginname` page.
 The /loginname page allows to enter loginname or email of a user which is then used to search for a user.
 If the user is found, a session is created and set as cookie, then the user is redirected to the available authentication method page.
 While the users continues and provides more information, the cookie is hydrated with this information until a final state is reached.
@@ -52,7 +49,7 @@ The communication from the browser to the server is done by [NextJS Server Actio
 The OIDC Auth request is always passed in the url to have a context to the ongoing authentication flow.
 
 If enough user information is retrieved and the user is authenticated according to the policies, the flow is finalized by [requesting a the callback url](/docs/apis/resources/oidc_service_v2/oidc-service-create-callback) for the auth request and the user is redirected back to the application.
-The application can then request a token calling the /token endpoint of the login which is proxied to the ZITADEL API.
+The application can then request a token calling the /token endpoint of the Login app which is proxied to the ZITADEL API.
 
 ### Implemented features
 
@@ -101,7 +98,7 @@ The application can then request a token calling the /token endpoint of the logi
 
 #### Self service
 
-The self service part of the application allows to load the login without an OIDC flow.
+The self service part of the application allows to load the Login app without an OIDC flow.
 Authenticated users are directly able to self service their account.
 
 - [ ] Change user information
@@ -117,19 +114,19 @@ Authenticated users are directly able to self service their account.
 
 ### Setup
 
-In order to run the new login app, make sure to follow the instructions in the [contribution guide](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#contribute-to-login).
+In order to run the new Login app, make sure to follow the instructions in the [contribution guide](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#contribute-to-login).
 
 #### How to setup domains for OIDC
 
-When setting up the new login app for OIDC, the domain must be registered on your instance and use https.
+When setting up the new Login app for OIDC, the domain must be registered on your instance and use https.
 To register your login domain on your instance, [add](/docs/apis/resources/admin/admin-service-add-instance-trusted-domain) your domain on your instances trusted domains.
 
 #### OIDC Proxy
 
-When setting up the new login app for OIDC, ensure it meets the following requirements:
+When setting up the new Login app for OIDC, ensure it meets the following requirements:
 
 - The OIDC Proxy is deployed and running on HTTPS
-- The OIDC Proxy sets `x-zitadel-public-host` which is the host, your login is deployed to `ex. login.example.com`.
+- The OIDC Proxy sets `x-zitadel-public-host` which is the host, your Login app is deployed to `ex. login.example.com`.
 - The OIDC Proxy sets `x-zitadel-instance-host` which is the host of your instance `ex. test-hdujwl.zitadel.cloud`.
 
 You can review an example implementation of a middlware [here](https://github.com/zitadel/zitadel/blob/main/apps/login/src/middleware.ts).

@@ -1,5 +1,0 @@
-*
-!apps/api/entrypoint.sh
-!zitadel
-!.artifacts/linux/amd64/zitadel
-!.artifacts/linux/arm64/zitadel

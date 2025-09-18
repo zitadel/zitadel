@@ -1,29 +1,28 @@
 {
     "$schema": "../node_modules/nx/schemas/project-schema.json",
     "targets": {
-        "check": {
-            "description": "Check linting and formatting"
-        },
         "lint": {
-            "description": "Run all lint checks",
+            "description": "Runs all linters",
             "dependsOn": [
                 "lint-check-*"
             ]
         },
         "lint-check-prettier": {
+            "description": "Checks code formatting with Prettier",
             "cache": true,
             "inputs": [
                 "default"
             ]
         },
         "lint-check-ng": {
+            "description": "Runs Angular specific lint checks",
             "cache": true,
             "inputs": [
                 "default"
             ]
         },
         "generate": {
-            "description": "Generate code from protobuf definitions",
+            "description": "Generate code from protobuf definitions for API v1 endpoints",
             "inputs": [
                 "{workspaceRoot}/proto/**/*",
                 "{projectRoot}/buf.gen.yaml",
@@ -35,7 +34,7 @@
             ]
         },
         "build": {
-            "description": "Generate code from protobuf definitions",
+            "description": "Builds the Angular Console application for production",
             "inputs": [
                 "default",
                 "{workspaceRoot}/pnpm-lock.yaml",
@@ -46,6 +45,7 @@
             ]
         },
         "development": {
+            "description": "Runs the Angular Console application in development mode with hot-reloading",
             "continuous": true,
             "dependsOn": [
                 "generate",
