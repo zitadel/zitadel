@@ -84,25 +84,27 @@ func NewRemoveGroupNameUniqueConstraint(groupName string) *eventstore.UniqueCons
 type GroupChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID             string `json:"id,omitempty"`
-	Name           string `json:"name,omitempty"`
-	Description    string `json:"description,omitempty"`
-	OrganizationID string `json:"organizationId,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+
+	oldName        string
+	oldDescription string
 }
 
 func NewGroupChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	name,
-	description string,
-	organizationID string,
+	oldName,
+	updatedName,
+	oldDescription,
+	updatedDescription string,
 ) *GroupChangedEvent {
 	return &GroupChangedEvent{
 		BaseEvent:      *eventstore.NewBaseEventForPush(ctx, aggregate, GroupChangedEventType),
-		ID:             aggregate.ID,
-		Name:           name,
-		Description:    description,
-		OrganizationID: organizationID,
+		Name:           updatedName,
+		Description:    updatedDescription,
+		oldName:        oldName,
+		oldDescription: oldDescription,
 	}
 }
 
@@ -124,7 +126,9 @@ func (g GroupChangedEvent) Payload() any {
 }
 
 func (g GroupChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddGroupNameUniqueConstraint(g.Name)}
+	return []*eventstore.UniqueConstraint{
+		NewRemoveGroupNameUniqueConstraint(g.oldName),
+		NewAddGroupNameUniqueConstraint(g.Name)}
 }
 
 type GroupRemovedEvent struct {

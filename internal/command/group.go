@@ -38,6 +38,8 @@ func (c *Commands) CreateGroup(ctx context.Context, group *domain.Group) (detail
 			return nil, err
 		}
 	}
+
+	// check if a group with the same ID already exists
 	groupWriteModel, err := c.getGroupWriteModelByID(ctx, group)
 	if err != nil {
 		return nil, err
@@ -61,15 +63,12 @@ func (c *Commands) CreateGroup(ctx context.Context, group *domain.Group) (detail
 }
 
 // UpdateGroup updates a user group in an organization
-func (c *Commands) UpdateGroup(ctx context.Context, group *domain.Group) (details *domain.ObjectDetails, err error) {
+func (c *Commands) UpdateGroup(ctx context.Context, groupUpdate *domain.Group) (details *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	// todo: check permissions
-	if !group.IsValid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "CMDGRP-m177lN", "Errors.Group.InvalidName")
-	}
-	existingGroup, err := c.getGroupWriteModelByID(ctx, group)
+	existingGroup, err := c.getGroupWriteModelByID(ctx, groupUpdate)
 	if err != nil {
 		return nil, err
 	}
@@ -77,13 +76,20 @@ func (c *Commands) UpdateGroup(ctx context.Context, group *domain.Group) (detail
 		return nil, zerrors.ThrowNotFound(nil, "CMDGRP-b33zly", "Errors.Group.NotFound")
 	}
 
+	if groupUpdate.Name != "" && existingGroup.Name != groupUpdate.Name {
+		if !groupUpdate.IsValid() {
+			return nil, zerrors.ThrowInvalidArgument(nil, "CMDGRP-m177lN", "Errors.Group.InvalidName")
+		}
+	}
+
 	err = c.pushAppendAndReduce(ctx,
 		existingGroup,
 		repo.NewGroupChangedEvent(ctx,
 			GroupAggregateFromWriteModel(ctx, &existingGroup.WriteModel),
-			group.Name,
-			group.Description,
-			existingGroup.ResourceOwner,
+			existingGroup.Name,
+			groupUpdate.Name,
+			existingGroup.Description,
+			groupUpdate.Description,
 		))
 	if err != nil {
 		return nil, err

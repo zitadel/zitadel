@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/pkg/grpc/group/v2"
+	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/group/v2/groupconnect"
 )
 
@@ -45,21 +45,21 @@ func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (str
 }
 
 func (s *Server) FileDescriptor() protoreflect.FileDescriptor {
-	return group.File_zitadel_group_v2_group_service_proto
+	return group_v2.File_zitadel_group_v2_group_service_proto
 }
 
 func (s *Server) AppName() string {
-	return group.GroupService_ServiceDesc.ServiceName
+	return group_v2.GroupService_ServiceDesc.ServiceName
 }
 
 func (s *Server) MethodPrefix() string {
-	return group.GroupService_ServiceDesc.ServiceName
+	return group_v2.GroupService_ServiceDesc.ServiceName
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return group.GroupService_AuthMethods
+	return group_v2.GroupService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return group.RegisterGroupServiceHandler
+	return group_v2.RegisterGroupServiceHandler
 }

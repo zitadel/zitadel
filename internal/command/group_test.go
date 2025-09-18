@@ -373,7 +373,18 @@ func TestCommands_UpdateGroup(t *testing.T) {
 		{
 			name: "invalid group name, error",
 			fields: fields{
-				eventstore: expectEventstore(),
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							group.NewGroupAddedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+								"group1 description",
+								"org1",
+							),
+						),
+					),
+				),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -441,9 +452,10 @@ func TestCommands_UpdateGroup(t *testing.T) {
 						pushErr,
 						group.NewGroupChangedEvent(context.Background(),
 							&group.NewAggregate("1234", "org1").Aggregate,
+							"group1",
 							"updated group name",
+							"group1 description",
 							"updated group description",
-							"org1",
 						),
 					),
 				),
@@ -460,7 +472,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 			},
 		},
 		{
-			name: "update group, ok",
+			name: "no change, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -477,9 +489,134 @@ func TestCommands_UpdateGroup(t *testing.T) {
 						eventFromEventPusher(
 							group.NewGroupChangedEvent(context.Background(),
 								&group.NewAggregate("1234", "org1").Aggregate,
-								"groupXX",
-								"updated description",
+								"group1",
+								"group1",
+								"group1 description",
+								"group1 description",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				group: &domain.Group{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "1234",
+					},
+					Name:        "group1",
+					Description: "group1 description",
+				},
+			},
+			want: &domain.ObjectDetails{
+				ID:            "1234",
+				ResourceOwner: "org1",
+			},
+		},
+		{
+			name: "update group name, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							group.NewGroupAddedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+								"group1 description",
 								"org1",
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							group.NewGroupChangedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+								"groupXX",
+								"group1 description",
+								"",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				group: &domain.Group{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "1234",
+					},
+					Name: "groupXX",
+				},
+			},
+			want: &domain.ObjectDetails{
+				ID:            "1234",
+				ResourceOwner: "org1",
+			},
+		},
+		{
+			name: "update group description, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							group.NewGroupAddedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+								"group1 description",
+								"org1",
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							group.NewGroupChangedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+								"",
+								"group1 description",
+								"updated group description",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				group: &domain.Group{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "1234",
+					},
+					Description: "updated group description",
+				},
+			},
+			want: &domain.ObjectDetails{
+				ID:            "1234",
+				ResourceOwner: "org1",
+			},
+		},
+		{
+			name: "full update (group name and description), ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							group.NewGroupAddedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+								"group1 description",
+								"org1",
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							group.NewGroupChangedEvent(context.Background(),
+								&group.NewAggregate("1234", "org1").Aggregate,
+								"group1",
+								"groupXX",
+								"group1 description",
+								"updated group description",
 							),
 						),
 					),
@@ -492,7 +629,7 @@ func TestCommands_UpdateGroup(t *testing.T) {
 						AggregateID: "1234",
 					},
 					Name:        "groupXX",
-					Description: "updated description",
+					Description: "updated group description",
 				},
 			},
 			want: &domain.ObjectDetails{

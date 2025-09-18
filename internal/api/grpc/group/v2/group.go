@@ -9,11 +9,11 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/pkg/grpc/group/v2"
+	group_v2 "github.com/zitadel/zitadel/pkg/grpc/group/v2"
 )
 
 // CreateGroup creates a new user group in the specified organization.
-func (s *Server) CreateGroup(ctx context.Context, req *connect.Request[group.CreateGroupRequest]) (*connect.Response[group.CreateGroupResponse], error) {
+func (s *Server) CreateGroup(ctx context.Context, req *connect.Request[group_v2.CreateGroupRequest]) (*connect.Response[group_v2.CreateGroupResponse], error) {
 	userGroup := &domain.Group{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:   req.Msg.GetId(),
@@ -28,14 +28,14 @@ func (s *Server) CreateGroup(ctx context.Context, req *connect.Request[group.Cre
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&group.CreateGroupResponse{
+	return connect.NewResponse(&group_v2.CreateGroupResponse{
 		Id:           groupDetails.ID,
-		CreationDate: timestamppb.New(groupDetails.CreationDate),
+		CreationDate: timestamppb.New(groupDetails.EventDate),
 	}), nil
 }
 
 // UpdateGroup updates a user group.
-func (s *Server) UpdateGroup(ctx context.Context, req *connect.Request[group.UpdateGroupRequest]) (*connect.Response[group.UpdateGroupResponse], error) {
+func (s *Server) UpdateGroup(ctx context.Context, req *connect.Request[group_v2.UpdateGroupRequest]) (*connect.Response[group_v2.UpdateGroupResponse], error) {
 	userGroup := &domain.Group{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:   req.Msg.GetId(),
@@ -49,18 +49,22 @@ func (s *Server) UpdateGroup(ctx context.Context, req *connect.Request[group.Upd
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&group.UpdateGroupResponse{
+	return connect.NewResponse(&group_v2.UpdateGroupResponse{
 		ChangeDate: timestamppb.New(details.EventDate),
 	}), nil
 }
 
 // DeleteGroup deletes a user group from an organization.
-func (s *Server) DeleteGroup(ctx context.Context, req *connect.Request[group.DeleteGroupRequest]) (*connect.Response[group.DeleteGroupResponse], error) {
+func (s *Server) DeleteGroup(ctx context.Context, req *connect.Request[group_v2.DeleteGroupRequest]) (*connect.Response[group_v2.DeleteGroupResponse], error) {
 	details, err := s.command.DeleteGroup(ctx, req.Msg.GetId())
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&group.DeleteGroupResponse{
-		DeletionDate: timestamppb.New(details.EventDate),
+	var deletionDate *timestamppb.Timestamp
+	if !details.EventDate.IsZero() {
+		deletionDate = timestamppb.New(details.EventDate)
+	}
+	return connect.NewResponse(&group_v2.DeleteGroupResponse{
+		DeletionDate: deletionDate,
 	}), nil
 }
