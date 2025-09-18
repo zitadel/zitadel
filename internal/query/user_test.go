@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"testing"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -396,6 +397,7 @@ var (
 		` projections.users14_machines.description,` +
 		` projections.users14_machines.secret,` +
 		` projections.users14_machines.access_token_type,` +
+		` projections.users14.id,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.users14` +
 		` LEFT JOIN projections.users14_humans ON projections.users14.id = projections.users14_humans.user_id AND projections.users14.instance_id = projections.users14_humans.instance_id` +
@@ -435,6 +437,7 @@ var (
 		"description",
 		"secret",
 		"access_token_type",
+		"id",
 		"count",
 	}
 	countUsersQuery = "SELECT COUNT(*) OVER () FROM projections.users14"
@@ -944,8 +947,10 @@ func Test_UserPrepares(t *testing.T) {
 			object: (*NotifyUser)(nil),
 		},
 		{
-			name:    "prepareUsersQuery no result",
-			prepare: prepareUsersQuery,
+			name: "prepareUsersQuery no result",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+				return prepareUsersQuery(UserIDCol)
+			},
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(usersQuery),
@@ -962,8 +967,10 @@ func Test_UserPrepares(t *testing.T) {
 			object: &Users{Users: []*User{}},
 		},
 		{
-			name:    "prepareUsersQuery one result",
-			prepare: prepareUsersQuery,
+			name: "prepareUsersQuery one result",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+				return prepareUsersQuery(UserIDCol)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(usersQuery),
@@ -1002,6 +1009,7 @@ func Test_UserPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							"id", // orderBy col
 						},
 					},
 				),
@@ -1043,8 +1051,10 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareUsersQuery multiple results",
-			prepare: prepareUsersQuery,
+			name: "prepareUsersQuery multiple results",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+				return prepareUsersQuery(UserIDCol)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(usersQuery),
@@ -1083,6 +1093,7 @@ func Test_UserPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							"id", // orderBy col
 						},
 						{
 							"id",
@@ -1117,6 +1128,7 @@ func Test_UserPrepares(t *testing.T) {
 							"description",
 							"secret",
 							domain.OIDCTokenTypeBearer,
+							"id", // orderBy col
 						},
 					},
 				),
@@ -1176,8 +1188,10 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareUsersQuery sql err",
-			prepare: prepareUsersQuery,
+			name: "prepareUsersQuery sql err",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+				return prepareUsersQuery(UserIDCol)
+			},
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(usersQuery),
