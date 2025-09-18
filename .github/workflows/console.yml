@@ -23,7 +23,7 @@ jobs:
     runs-on: 
       group:  zitadel-public
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/cache/restore@v4
         timeout-minutes: 1
         continue-on-error: true
@@ -36,7 +36,7 @@ jobs:
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         uses: pnpm/action-setup@v4
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ inputs.node_version }}
           cache: "pnpm"

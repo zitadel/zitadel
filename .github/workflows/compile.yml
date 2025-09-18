@@ -32,7 +32,7 @@ jobs:
         goarch: [amd64, arm64]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/cache/restore@v4
         timeout-minutes: 1
         name: restore console
@@ -47,7 +47,7 @@ jobs:
           path: ${{ inputs.core_cache_path }}
           key: ${{ inputs.core_cache_key }}
           fail-on-cache-miss: true
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
       - name: compile
@@ -74,7 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [executable]
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           path: executables
           pattern: 'zitadel-*-*'
