@@ -1,0 +1,16 @@
+# Minimal init steps for ZITADEL first instance
+FirstInstance:
+  Skip: false
+  InstanceName: JOY
+  DefaultLanguage: en
+  Org:
+    Name: JOY
+    Human:
+      UserName: admin
+      FirstName: JOY
+      LastName: Admin
+      Email:
+        Address: admin@joy.box
+        Verified: true
+      Password: Password1!
+      PasswordChangeRequired: true
