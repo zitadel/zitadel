@@ -26,6 +26,20 @@ type Server struct {
 	checkPermission domain.PermissionCheck
 }
 
+func CreateServer(
+	systemDefaults systemdefaults.SystemDefaults,
+	command *command.Commands,
+	query *query.Queries,
+	checkPermission domain.PermissionCheck,
+) *Server {
+	return &Server{
+		systemDefaults:  systemDefaults,
+		command:         command,
+		query:           query,
+		checkPermission: checkPermission,
+	}
+}
+
 func (s *Server) RegisterConnectServer(interceptors ...connect.Interceptor) (string, http.Handler) {
 	return groupconnect.NewGroupServiceHandler(s, connect.WithInterceptors(interceptors...))
 }
