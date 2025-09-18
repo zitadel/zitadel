@@ -8,6 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/sdk/instrumentation"
@@ -27,15 +28,34 @@ type Metrics struct {
 	Histograms        sync.Map
 }
 
-func NewMetrics(meterName string) (metrics.Metrics, error) {
+func NewMetrics(rawConfig map[string]interface{}) (metrics.Metrics, error) {
 	resource, err := otel_resource.ResourceWithService("ZITADEL")
 	if err != nil {
 		return nil, err
 	}
-	exporter, err := prometheus.New(prometheus.WithoutScopeInfo())
-	if err != nil {
-		return &Metrics{}, err
+
+	endpoint, _ := rawConfig["endpoint"].(string)
+	meterName, _ := rawConfig["metername"].(string)
+
+	var exporter sdk_metric.Reader
+
+	if endpoint != "" {
+		otlpExporter, err := otlpmetricgrpc.New(
+			context.Background(),
+			otlpmetricgrpc.WithEndpoint(endpoint),
+			otlpmetricgrpc.WithInsecure(),
+		)
+		if err != nil {
+			return nil, err
+		}
+		exporter = sdk_metric.NewPeriodicReader(otlpExporter)
+	} else {
+		exporter, err = prometheus.New(prometheus.WithoutScopeInfo())
 	}
+	if err != nil {
+		return nil, err
+	}
+
 	// create a view to filter out unwanted attributes
 	view := sdk_metric.NewView(
 		sdk_metric.Instrument{
