@@ -1,0 +1,25 @@
+services:
+  zitadel:
+    restart: unless-stopped
+    image: ghcr.io/zitadel/zitadel:latest
+    container_name: zitadel
+    command: start-from-init --steps /zitadel-init-steps.yaml --masterkey "${ZITADEL_MASTERKEY}"
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./zitadel-init-steps.yaml:/zitadel-init-steps.yaml:ro
+    networks:
+      - Gateway
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.zitadel.rule=Host(`auth.joy.box`)"
+      - "traefik.http.routers.zitadel.entrypoints=websecure"
+      - "traefik.http.routers.zitadel.tls.certresolver=myresolver"
+      - "traefik.http.services.zitadel.loadbalancer.server.port=8080"
+      - "traefik.http.routers.zitadel.middlewares=csp@docker"
+
+networks:
+  Gateway:
+    external: true
