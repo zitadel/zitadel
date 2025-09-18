@@ -294,9 +294,7 @@ func TestServer_CreateOrganization(t *testing.T) {
 }
 
 func TestServer_UpdateOrganization(t *testing.T) {
-	orgs, orgsName, _ := createOrgs(CTX, t, Client, 1)
-	orgId := orgs[0].Id
-	orgName := orgsName[0]
+	orgs, orgsName, _ := createOrgs(CTX, t, Client, 2)
 
 	tests := []struct {
 		name    string
@@ -309,7 +307,7 @@ func TestServer_UpdateOrganization(t *testing.T) {
 			name: "update org with new name",
 			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &v2beta_org.UpdateOrganizationRequest{
-				Id:   orgId,
+				Id:   orgs[0].GetId(),
 				Name: "new org name",
 			},
 		},
@@ -317,16 +315,17 @@ func TestServer_UpdateOrganization(t *testing.T) {
 			name: "update org with same name",
 			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &v2beta_org.UpdateOrganizationRequest{
-				Id:   orgId,
-				Name: orgName,
+				Id:   orgs[1].GetId(),
+				Name: orgsName[1],
 			},
+			wantErr: true,
 		},
 		{
 			name: "update org with non existent org id",
 			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &v2beta_org.UpdateOrganizationRequest{
-				Id: "non existant org id",
-				// Name: "",
+				Id:   "non existent org id",
+				Name: "new name",
 			},
 			wantErr: true,
 		},
@@ -334,8 +333,8 @@ func TestServer_UpdateOrganization(t *testing.T) {
 			name: "update org with no id",
 			ctx:  Instance.WithAuthorizationToken(CTX, integration.UserTypeIAMOwner),
 			req: &v2beta_org.UpdateOrganizationRequest{
-				Id:   "",
-				Name: orgName,
+				Id:   " ",
+				Name: "new name",
 			},
 			wantErr: true,
 		},
