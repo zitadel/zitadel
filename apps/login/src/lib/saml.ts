@@ -5,10 +5,9 @@ import { create } from "@zitadel/client";
 import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
-import { constructUrl } from "./service-url";
 import { isSessionValid } from "./session";
+import { redirect } from "next/navigation";
 
 type LoginWithSAMLAndSession = {
   serviceUrl: string;
@@ -16,7 +15,6 @@ type LoginWithSAMLAndSession = {
   sessionId: string;
   sessions: Session[];
   sessionCookies: Cookie[];
-  request: NextRequest;
 };
 
 export async function getSAMLFormUID() {
@@ -30,15 +28,11 @@ export async function setSAMLFormCookie(value: string): Promise<string> {
   try {
     // Check cookie size limits (typical limit is 4KB)
     if (value.length > 4000) {
-      console.warn(
-        `SAML form cookie value is large (${value.length} characters), may exceed browser limits`,
-      );
+      console.warn(`SAML form cookie value is large (${value.length} characters), may exceed browser limits`);
     }
 
     // Log the attempt
-    console.log(
-      `Setting SAML form cookie with uid: ${uid}, value length: ${value.length}`,
-    );
+    console.log(`Setting SAML form cookie with uid: ${uid}, value length: ${value.length}`);
 
     await cookiesList.set({
       name: uid,
@@ -61,9 +55,7 @@ export async function setSAMLFormCookie(value: string): Promise<string> {
       valueLength: value.length,
       uid,
     });
-    throw new Error(
-      `Failed to set SAML form cookie: ${error instanceof Error ? error.message : String(error)}`,
-    );
+    throw new Error(`Failed to set SAML form cookie: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -83,9 +75,7 @@ export async function getSAMLFormCookie(uid: string): Promise<string | null> {
       return null;
     }
 
-    console.log(
-      `Successfully retrieved SAML form cookie for uid: ${uid}, value length: ${cookie.value.length}`,
-    );
+    console.log(`Successfully retrieved SAML form cookie for uid: ${uid}, value length: ${cookie.value.length}`);
     return cookie.value;
   } catch (error) {
     console.error(`Error retrieving SAML form cookie for uid: ${uid}`, error);
@@ -99,11 +89,8 @@ export async function loginWithSAMLAndSession({
   sessionId,
   sessions,
   sessionCookies,
-  request,
 }: LoginWithSAMLAndSession) {
-  console.log(
-    `Login with session: ${sessionId} and samlRequest: ${samlRequest}`,
-  );
+  console.log(`Login with session: ${sessionId} and samlRequest: ${samlRequest}`);
 
   const selectedSession = sessions.find((s) => s.id === sessionId);
 
@@ -129,14 +116,11 @@ export async function loginWithSAMLAndSession({
       const res = await sendLoginname(command);
 
       if (res && "redirect" in res && res?.redirect) {
-        const absoluteUrl = constructUrl(request, res.redirect);
-        return NextResponse.redirect(absoluteUrl.toString());
+        redirect(res.redirect);
       }
     }
 
-    const cookie = sessionCookies.find(
-      (cookie) => cookie.id === selectedSession?.id,
-    );
+    const cookie = sessionCookies.find((cookie) => cookie.id === selectedSession?.id);
 
     if (cookie && cookie.id && cookie.token) {
       const session = {
@@ -157,48 +141,36 @@ export async function loginWithSAMLAndSession({
           }),
         });
         if (url) {
-          return NextResponse.redirect(url);
+          return redirect(url);
         } else {
-          return NextResponse.json(
-            { error: "An error occurred!" },
-            { status: 500 },
-          );
+          return { error: "An error occurred!" };
         }
       } catch (error: unknown) {
         // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
         console.error(error);
-        if (
-          error &&
-          typeof error === "object" &&
-          "code" in error &&
-          error?.code === 9
-        ) {
+
+        if (error && typeof error === "object" && "code" in error && error?.code === 9) {
           const loginSettings = await getLoginSettings({
             serviceUrl,
             organization: selectedSession.factors?.user?.organizationId,
           });
 
           if (loginSettings?.defaultRedirectUri) {
-            return NextResponse.redirect(loginSettings.defaultRedirectUri);
+            redirect(loginSettings.defaultRedirectUri);
           }
 
-          const signedinUrl = constructUrl(request, "/signedin");
+          const signedinUrl = "/signedin";
 
+          const params = new URLSearchParams();
           if (selectedSession.factors?.user?.loginName) {
-            signedinUrl.searchParams.set(
-              "loginName",
-              selectedSession.factors?.user?.loginName,
-            );
+            params.append("loginName", selectedSession.factors?.user?.loginName);
           }
           if (selectedSession.factors?.user?.organizationId) {
-            signedinUrl.searchParams.set(
-              "organization",
-              selectedSession.factors?.user?.organizationId,
-            );
+            params.append("organization", selectedSession.factors?.user?.organizationId);
           }
-          return NextResponse.redirect(signedinUrl);
+          redirect(signedinUrl + "?" + params.toString());
         } else {
-          return NextResponse.json({ error }, { status: 500 });
+          return { error: "Unknown error occurred" };
         }
       }
     }

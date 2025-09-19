@@ -1,9 +1,6 @@
 "use server";
 
-import {
-  createSessionAndUpdateCookie,
-  setSessionAndUpdateCookie,
-} from "@/lib/server/cookie";
+import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
   getLockoutSettings,
   getLoginSettings,
@@ -18,18 +15,13 @@ import {
 } from "@/lib/zitadel";
 import { ConnectError, create, Duration } from "@zitadel/client";
 import { createUserServiceClient } from "@zitadel/client/v2";
-import {
-  Checks,
-  ChecksSchema,
-} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks, ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import {
-  AuthenticationMethodType,
-  SetPasswordRequestSchema,
-} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { AuthenticationMethodType, SetPasswordRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
-import { getNextUrl } from "../client";
+import { redirect } from "next/navigation";
+import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
 import {
@@ -61,11 +53,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
     organizationId: command.organization,
   });
 
-  if (
-    !users.details ||
-    users.details.totalResult !== BigInt(1) ||
-    !users.result[0].userId
-  ) {
+  if (!users.details || users.details.totalResult !== BigInt(1) || !users.result[0].userId) {
     return { error: "Could not send Password Reset Link" };
   }
   const userId = users.result[0].userId;
@@ -139,8 +127,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
           return {
             error:
               `Failed to authenticate. You had ${error.failedAttempts} of ${lockoutSettings?.maxPasswordAttempts} password attempts.` +
-              (lockoutSettings?.maxPasswordAttempts &&
-              error.failedAttempts >= lockoutSettings?.maxPasswordAttempts
+              (lockoutSettings?.maxPasswordAttempts && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts
                 ? "Contact your administrator to unlock your account"
                 : ""),
           };
@@ -188,8 +175,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
         return {
           error:
             `Failed to authenticate. You had ${error.failedAttempts} of ${lockoutSettings?.maxPasswordAttempts} password attempts.` +
-            (lockoutSettings?.maxPasswordAttempts &&
-            error.failedAttempts >= lockoutSettings?.maxPasswordAttempts
+            (lockoutSettings?.maxPasswordAttempts && error.failedAttempts >= lockoutSettings?.maxPasswordAttempts
               ? " Contact your administrator to unlock your account"
               : ""),
         };
@@ -216,8 +202,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
   if (!loginSettings) {
     loginSettings = await getLoginSettings({
       serviceUrl,
-      organization:
-        command.organization ?? session.factors?.user?.organizationId,
+      organization: command.organization ?? session.factors?.user?.organizationId,
     });
   }
 
@@ -251,12 +236,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
   }
 
   // check to see if user was verified
-  const emailVerificationCheck = checkEmailVerification(
-    session,
-    humanUser,
-    command.organization,
-    command.requestId,
-  );
+  const emailVerificationCheck = checkEmailVerification(session, humanUser, command.organization, command.requestId);
 
   if (emailVerificationCheck?.redirect) {
     return emailVerificationCheck;
@@ -292,20 +272,28 @@ export async function sendPassword(command: UpdateSessionCommand) {
   }
 
   if (command.requestId && session.id) {
-    const nextUrl = await getNextUrl(
+    // OIDC/SAML flow - use completeFlowOrGetUrl for proper handling
+    const callbackResponse = await completeFlowOrGetUrl(
       {
         sessionId: session.id,
         requestId: command.requestId,
-        organization:
-          command.organization ?? session.factors?.user?.organizationId,
+        organization: command.organization ?? session.factors?.user?.organizationId,
       },
       loginSettings?.defaultRedirectUri,
     );
 
-    return { redirect: nextUrl };
+    if (callbackResponse && typeof callbackResponse === "object" && "error" in callbackResponse && callbackResponse.error) {
+      setError(callbackResponse.error);
+      return;
+    }
+
+    if (callbackResponse && typeof callbackResponse === "string") {
+      return router.push(callbackResponse);
+    }
   }
 
-  const url = await getNextUrl(
+  // Regular flow (no requestId) - return URL for client-side navigation
+  const nextUrl = await completeFlowOrGetUrl(
     {
       loginName: session.factors.user.loginName,
       organization: session.factors?.user?.organizationId,
@@ -313,15 +301,13 @@ export async function sendPassword(command: UpdateSessionCommand) {
     loginSettings?.defaultRedirectUri,
   );
 
-  return { redirect: url };
+  if (nextUrl) {
+    return { redirect: nextUrl };
+  }
 }
 
 // this function lets users with code set a password or users with valid User Verification Check
-export async function changePassword(command: {
-  code?: string;
-  userId: string;
-  password: string;
-}) {
+export async function changePassword(command: { code?: string; userId: string; password: string }) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -350,15 +336,12 @@ export async function changePassword(command: {
     // if the user has no authmethods set, we need to check if the user was verified
     if (authmethods.authMethodTypes.length !== 0) {
       return {
-        error:
-          "You have to provide a code or have a valid User Verification Check",
+        error: "You have to provide a code or have a valid User Verification Check",
       };
     }
 
     // check if a verification was done earlier
-    const hasValidUserVerificationCheck = await checkUserVerification(
-      user.userId,
-    );
+    const hasValidUserVerificationCheck = await checkUserVerification(user.userId);
 
     if (!hasValidUserVerificationCheck) {
       return { error: "User Verification Check has to be done" };
@@ -378,10 +361,7 @@ type CheckSessionAndSetPasswordCommand = {
   password: string;
 };
 
-export async function checkSessionAndSetPassword({
-  sessionId,
-  password,
-}: CheckSessionAndSetPasswordCommand) {
+export async function checkSessionAndSetPassword({ sessionId, password }: CheckSessionAndSetPasswordCommand) {
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -421,18 +401,14 @@ export async function checkSessionAndSetPassword({
     AuthenticationMethodType.U2F,
   ];
 
-  const hasNoMFAMethods = requiredAuthMethodsForForceMFA.every(
-    (method) => !authmethods.authMethodTypes.includes(method),
-  );
+  const hasNoMFAMethods = requiredAuthMethodsForForceMFA.every((method) => !authmethods.authMethodTypes.includes(method));
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
     organization: session.factors.user.organizationId,
   });
 
-  const forceMfa = !!(
-    loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly
-  );
+  const forceMfa = !!(loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly);
 
   // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
   if (forceMfa && hasNoMFAMethods) {
@@ -454,10 +430,7 @@ export async function checkSessionAndSetPassword({
       return createUserServiceClient(transportPromise);
     };
 
-    const selfService = await myUserService(
-      serviceUrl,
-      `${sessionCookie.token}`,
-    );
+    const selfService = await myUserService(serviceUrl, `${sessionCookie.token}`);
 
     return selfService
       .setPassword(

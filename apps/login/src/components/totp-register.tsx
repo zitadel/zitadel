@@ -1,6 +1,6 @@
 "use client";
 
-import { getNextUrl } from "@/lib/client";
+import { completeFlowOrGetUrl } from "@/lib/client";
 import { verifyTOTP } from "@/lib/server/verify";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import Link from "next/link";
@@ -30,15 +30,7 @@ type Props = {
   checkAfter?: boolean;
   loginSettings?: LoginSettings;
 };
-export function TotpRegister({
-  uri,
-  loginName,
-  sessionId,
-  requestId,
-  organization,
-  checkAfter,
-  loginSettings,
-}: Props) {
+export function TotpRegister({ uri, loginName, sessionId, requestId, organization, checkAfter, loginSettings }: Props) {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -72,28 +64,49 @@ export function TotpRegister({
 
           return router.push(`/otp/time-based?` + params);
         } else {
-          const url =
-            requestId && sessionId
-              ? await getNextUrl(
-                  {
-                    sessionId: sessionId,
-                    requestId: requestId,
-                    organization: organization,
-                  },
-                  loginSettings?.defaultRedirectUri,
-                )
-              : loginName
-                ? await getNextUrl(
-                    {
-                      loginName: loginName,
-                      organization: organization,
-                    },
-                    loginSettings?.defaultRedirectUri,
-                  )
-                : null;
+          if (requestId && sessionId) {
+            const callbackResponse = await completeFlowOrGetUrl(
+              {
+                sessionId: sessionId,
+                requestId: requestId,
+                organization: organization,
+              },
+              loginSettings?.defaultRedirectUri,
+            );
+            if (
+              callbackResponse &&
+              typeof callbackResponse === "object" &&
+              "error" in callbackResponse &&
+              callbackResponse.error
+            ) {
+              setError(callbackResponse.error);
+              return;
+            }
 
-          if (url) {
-            return router.push(url);
+            if (callbackResponse && typeof callbackResponse === "string") {
+              return router.push(callbackResponse);
+            }
+          } else if (loginName) {
+            const callbackResponse = await completeFlowOrGetUrl(
+              {
+                loginName: loginName,
+                organization: organization,
+              },
+              loginSettings?.defaultRedirectUri,
+            );
+            if (
+              callbackResponse &&
+              typeof callbackResponse === "object" &&
+              "error" in callbackResponse &&
+              callbackResponse.error
+            ) {
+              setError(callbackResponse.error);
+              return;
+            }
+
+            if (callbackResponse && typeof callbackResponse === "string") {
+              return router.push(callbackResponse);
+            }
           }
         }
       })
@@ -110,10 +123,7 @@ export function TotpRegister({
     <div className="flex flex-col items-center">
       {uri && (
         <>
-          <QRCodeSVG
-            className="my-4 h-40 w-40 rounded-md bg-white p-2"
-            value={uri}
-          />
+          <QRCodeSVG className="my-4 h-40 w-40 rounded-md bg-white p-2" value={uri} />
           <div className="my-2 mb-4 flex w-96 rounded-lg border border-divider-light px-4 py-2 pr-2 text-sm dark:border-divider-dark">
             <Link href={uri} target="_blank" className="flex-1 overflow-x-auto">
               {uri}
