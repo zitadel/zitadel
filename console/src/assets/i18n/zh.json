@@ -1152,7 +1152,7 @@
       "SECRETREMOVED": "秘密被成功删除!"
     },
     "MEMBERSHIPS": {
-      "TITLE": "CITADEL 管理角色",
+      "TITLE": "ZITADEL 管理角色",
       "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或 IAM 详细信息页面上修改它们。",
       "ORGCONTEXT": "您会看到与当前所选组织相关的所有组织和项目。",
       "USERCONTEXT": "您会看到您被授权的所有组织和项目。包括其他组织。",
