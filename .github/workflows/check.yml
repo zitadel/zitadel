@@ -70,7 +70,7 @@ jobs:
         working-directory: apps/login
       - uses: nrwl/nx-set-shas@v4
       - name: Lint, Build, Tests and Pack
-        run: nx affected --targets lint build test-unit test-integration pack --exclude @zitadel/docs,@zitadel/benchmark
+        run: nx affected --targets lint build test-* pack --exclude @zitadel/docs,@zitadel/benchmark
       - uses: actions/cache/save@v4
         if: always()
         with:

@@ -374,9 +374,9 @@
             "executor": "nx:run-commands",
             "options": {
                 "commands": [
-                    "mkdir -p .artifacts/pack",
+                    "mkdir -p .artifacts/pack .artifacts/bin/$GOOS/$GOARCH",
                     "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; echo \"Building for $GOOS-$GOARCH...\"; CGO_ENABLED=0 go build -o .artifacts/bin/$GOOS/$GOARCH/zitadel$EXT -v -ldflags=\"-s -w -X github.com/zitadel/zitadel/cmd/build.commit=$(git rev-parse --short HEAD) -X github.com/zitadel/zitadel/cmd/build.date=$(date \"+%Y-%m-%dT%T%z\" | sed -E \"s/.([0-9]{2})([0-9]{2})$/-\\1:\\2/\") -X github.com/zitadel/zitadel/cmd/build.version=${VERSION}\"'",
-                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\"zitadel-$GOOS-$GOARCH\"; mkdir -p \"$FOLDER\"; cp \".artifacts/bin/$GOOS/$GOARCH/zitadel$EXT\" \"$FOLDER/\"; cp LICENSE \"$FOLDER/\"; cp README.md \"$FOLDER/\"; tar -czvf \"$FOLDER.tar.gz\" \"$FOLDER\"; rm -rf \"$FOLDER\"'"
+                    "bash -c 'EXT=\"\"; if [ \"$GOOS\" = \"windows\" ]; then EXT=\".exe\"; fi; FOLDER=\".artifacts/pack/zitadel-$GOOS-$GOARCH\"; mkdir -p \"$FOLDER\"; cp \".artifacts/bin/$GOOS/$GOARCH/zitadel$EXT\" \"$FOLDER/\"; cp LICENSE \"$FOLDER/\"; cp README.md \"$FOLDER/\"; tar -czvf \"$FOLDER.tar.gz\" \"$FOLDER\"; rm -rf \"$FOLDER\"'"
                 ]
             }
         },
