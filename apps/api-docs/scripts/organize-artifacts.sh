@@ -39,5 +39,11 @@ cat > "$VERSION_DIR/metadata.json" << EOF
 EOF
 
 echo "✓ Artifacts organized in: $VERSION_DIR"
+
+# Regenerate versions config to include the new version
+echo "🔄 Regenerating versions configuration..."
+cd "$SCRIPT_DIR/.."
+pnpm run generate:versions
+
 echo "Available versions:"
 ls -1 "$ARTIFACTS_DIR/versions/" 2>/dev/null || echo "No versions found"

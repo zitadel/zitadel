@@ -1,13 +1,6 @@
 {
   "versions": [
     {
-      "id": "v2.71.9",
-      "name": "v2.71.9",
-      "gitRef": "v2.71.9",
-      "enabled": true,
-      "isStable": true
-    },
-    {
       "id": "v2.70.0",
       "name": "v2.70.0",
       "gitRef": "v2.70.0",
@@ -15,17 +8,114 @@
       "isStable": true
     },
     {
+      "id": "v2.71.9",
+      "name": "v2.71.9",
+      "gitRef": "v2.71.9",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "v2.72.0-test",
+      "name": "v2.72.0-test",
+      "gitRef": "v2.72.0-test",
+      "enabled": true,
+      "isStable": false
+    },
+    {
+      "id": "v2.73.0-test",
+      "name": "v2.73.0-test",
+      "gitRef": "v2.73.0-test",
+      "enabled": true,
+      "isStable": false
+    },
+    {
+      "id": "v4.2.2",
+      "name": "v4.2.2",
+      "gitRef": "v4.2.2",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "v4.2.1",
+      "name": "v4.2.1",
+      "gitRef": "v4.2.1",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "v4.2.0",
+      "name": "v4.2.0",
+      "gitRef": "v4.2.0",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "v4.1.4",
+      "name": "v4.1.4",
+      "gitRef": "v4.1.4",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "v4.1.3",
+      "name": "v4.1.3",
+      "gitRef": "v4.1.3",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "v4.1.2",
+      "name": "v4.1.2",
+      "gitRef": "v4.1.2",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "v4.1.1",
+      "name": "v4.1.1",
+      "gitRef": "v4.1.1",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "v4.1.0",
+      "name": "v4.1.0",
+      "gitRef": "v4.1.0",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "v4.0.3",
+      "name": "v4.0.3",
+      "gitRef": "v4.0.3",
+      "enabled": true,
+      "isStable": true
+    },
+    {
+      "id": "v4.0.2",
+      "name": "v4.0.2",
+      "gitRef": "v4.0.2",
+      "enabled": true,
+      "isStable": true
+    },
+    {
       "id": "main",
-      "name": "Latest (Main)",
+      "name": "Latest (Main Branch)",
       "gitRef": "main",
       "enabled": true,
       "isStable": false
     }
   ],
   "settings": {
-    "defaultVersion": "v2.71.9",
+    "defaultVersion": "v2.70.0",
     "autoGenerate": true,
-    "maxVersions": 10,
+    "maxVersions": 15,
     "includePrerelease": false
+  },
+  "metadata": {
+    "generatedAt": "2025-09-19T11:36:46Z",
+    "generatedBy": "scripts/generate-versions-config.sh",
+    "availableVersionsCount": 4,
+    "totalVersionsCount": 15
   }
 }

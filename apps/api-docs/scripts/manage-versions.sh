@@ -67,6 +67,11 @@ EOF
     
     echo "✓ Version $version created successfully"
     echo "Location: $version_dir"
+    
+    # Regenerate versions config to include the new version
+    echo "🔄 Regenerating versions configuration..."
+    cd "$SCRIPT_DIR/.."
+    pnpm run generate:versions
 }
 
 list_versions() {
