@@ -85,7 +85,7 @@
     "includePrerelease": false
   },
   "metadata": {
-    "generatedAt": "2025-09-19T13:42:27Z",
+    "generatedAt": "2025-09-19T13:43:02Z",
     "generatedBy": "scripts/generate-versions-config.sh",
     "availableVersionsCount": 3,
     "totalVersionsCount": 11
