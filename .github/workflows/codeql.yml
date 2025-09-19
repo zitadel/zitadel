@@ -39,7 +39,7 @@ jobs:
     - if: matrix.language == 'go'
       run: |
         pnpm install -g sass nx
-        nx run @zitadel/api:generate
+        nx run-many --project @zitadel/api --targets generate-stubs generate-statik generate-assets
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3

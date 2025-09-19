@@ -13,6 +13,10 @@
                 "build"
             ],
             "command": "nx run @zitadel/devcontainer:compose up --watch login-api-mock"
+        },
+        "status": {
+            "description": "Check the status of the API mock server",
+            "command": "nx run @zitadel/devcontainer:compose ps --format \"{{.Service}}:{{.State}}:{{.Health}}\" login-api-mock"
         }
     }
 }

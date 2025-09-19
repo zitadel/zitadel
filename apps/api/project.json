@@ -170,6 +170,7 @@
             "inputs": [
                 { "runtime": "go env GOOS" },
                 { "runtime": "go env GOARCH" },
+                { "runtime": "nx run @zitadel/devcontainer:compose ps --format \"{{.Service}}:{{.State}}:{{.Health}}\" db-api-integration cache-api-integration" },
                 "sources",
                 "{workspaceRoot}/internal/integration/**",
                 "{workspaceRoot}/go*"
