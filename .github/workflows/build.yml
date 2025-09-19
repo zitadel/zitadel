@@ -46,16 +46,6 @@ jobs:
       nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
       version: ${{ needs.version.outputs.version }}
 
-  api-integration-test:
-    needs: check
-    uses: ./.github/workflows/api-integration-test.yml
-    with:
-      node_version: "22"
-      nx_cache_key: ${{ needs.check.outputs.nx_cache_key }}
-      nx_cache_path: ${{ needs.check.outputs.nx_cache_path }}
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
   container:
     needs: 
     - api-compile

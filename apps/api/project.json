@@ -19,10 +19,10 @@
             ],
             "options": {
                 "env": {
-                    "API_CONFIG_FILE": "{projectRoot}/api.yaml"
+                    "DEV_CONFIG_FILE": "{projectRoot}/dev.yaml"
                 }
             },
-            "command": "bash -c './.artifacts/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/zitadel start --config ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters'"
+            "command": "bash -c './.artifacts/bin/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/${ZITADEL_BINARY:-zitadel} start --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
         },
         "setup": {
             "dependsOn": [
@@ -32,11 +32,11 @@
             "options": {
                 "parallel": false,
                 "env": {
-                    "API_CONFIG_FILE": "{projectRoot}/api.yaml"
+                    "DEV_CONFIG_FILE": "{projectRoot}/dev.yaml"
                 },
                 "commands": [
-                    "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\"; zitadel init --config ${API_CONFIG_FILE} && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'",
-                    "bash -c './.artifacts/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/zitadel setup --config ${API_CONFIG_FILE} --steps ${API_CONFIG_FILE} --masterkey MasterkeyNeedsToHave32Characters'"
+                    "bash -c 'for i in {1..5}; do echo \"Attempt $i/5: Starting ZITADEL...\";./.artifacts/bin/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/${ZITADEL_BINARY:-zitadel} init --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} && break || (echo \"Failed, retrying in 2s...\" && sleep 2); done'",
+                    "bash -c './.artifacts/bin/${GOOS:-$(go env GOOS)}/${GOARCH:-$(go env GOARCH)}/${ZITADEL_BINARY:-zitadel} setup --config ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --steps ${API_CONFIG_FILE:-${DEV_CONFIG_FILE}} --masterkey MasterkeyNeedsToHave32Characters'"
                 ]
             }
         },
@@ -85,12 +85,13 @@
                 "sources",
                 "{workspaceRoot}/go*"
             ],
-            "command": "go test -race -coverprofile=profile.cov -coverpkg=./internal/...  ./..."
+            "command": "go test -race -coverprofile=profile.api.test-unit.cov -coverpkg=./internal/...  ./..."
         },
         "test-integration-pull": {
             "command": "nx run @zitadel/devcontainer:compose pull db-api-integration cache-api-integration"
         },
         "test-integration-build": {
+            "cache": true,
             "dependsOn": [
                 "generate"
             ],            
@@ -111,27 +112,20 @@
                 "test-integration-pull"
             ],
             "continuous": true,
-            "command": "nx run @zitadel/devcontainer:compose up db-api-integration cache-api-integration"
+            "command": "nx run @zitadel/devcontainer:compose up --force-recreate db-api-integration cache-api-integration"
         },
-        "test-integration-init": {
+        "test-integration-setup": {
             "dependsOn": [
                 "test-integration-state",
                 "test-integration-build"
             ],
             "options": {
-                "envFile": "{projectRoot}/.env.test-integration-env"
+                "env": {
+                    "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
+                    "ZITADEL_BINARY": "zitadel.test"
+                }
             },
-            "command": "bash -c '.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test init'"
-        },
-        "test-integration-setup": {
-            "dependsOn": [
-                "test-integration-state",
-                "test-integration-init"
-            ],
-            "options": {
-                "envFile": "{projectRoot}/.env.test-integration-env"
-            },
-            "command": ".artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test setup"
+            "command": "nx run @zitadel/api:setup --excludeTaskDependencies"
         },
         "test-integration-env": {
             "continuous": true,
@@ -139,15 +133,34 @@
                 "test-integration-state",
                 "test-integration-setup"
             ],
-            "command": "bash -c '.artifacts/bin/$(go env GOOS)/$(go env GOARCH)/zitadel.test start'"
+            "options": {
+                "env": {
+                    "API_CONFIG_FILE": "{projectRoot}/test-integration.yaml",
+                    "ZITADEL_BINARY": "zitadel.test"
+                }
+            },
+            "command": "nx run @zitadel/api:prod --excludeTaskDependencies"
         },
         "test-integration": {
             "cache": true,
+            "inputs": [
+                { "runtime": "go env GOOS" },
+                { "runtime": "go env GOARCH" },
+                "sources",
+                "{workspaceRoot}/internal/integration/**",
+                "{workspaceRoot}/go*"
+            ],
             "dependsOn": [
                 "test-integration-state",
                 "test-integration-env"
             ],
-            "command": "bash -c 'go test -race -count 1 -tags integration -timeout 60m -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")'"
+            "options": {
+                "parallel": false,
+                "commands": [
+                    "bash -c 'go test -race -count 1 -tags integration -timeout 60m -parallel 1 $(go list -tags integration ./... | grep -e \"integration_test\" -e \"events_testing\")'",
+                    "go tool covdata textfmt -i=tmp/coverage -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/...,github.com/zitadel/zitadel/backend/... -o profile.api.test-integration.cov"
+                ]
+            }
         },
         "generate-console": {
             "description": "Build the console and copy the static files to the api",

@@ -75,10 +75,25 @@ jobs:
         with:
           key: ${{ steps.nx_cache.outputs.cache-primary-key }}
           path: ${{ env.nx_cache_path }}
+      - name: upload server logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-server-logs
+          path: |
+           tmp/zitadel.log
+           tmp/race.log.*
       - name: publish coverage
         uses: codecov/codecov-action@v4.3.0
         with:
-          file: profile.cov
-          name: api-unit-tests
-          flags: api-unit-tests
+          file: profile.api.test-unit.cov
+          name: api-test-unit
+          flags: api-test-unit
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: publish coverage
+        uses: codecov/codecov-action@v4.3.0
+        with:
+          file: profile.api.test-integration.cov
+          name: api-test-integration
+          flags: api-test-integration
           token: ${{ secrets.CODECOV_TOKEN }}
