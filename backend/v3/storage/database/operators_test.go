@@ -82,6 +82,22 @@ func TestWriteTextOperation(t *testing.T) {
 			expected: "test.col ILIKE '%' || $1 || '%'",
 			args:     []any{"value"},
 		},
+		{
+			name:     "EndsWith",
+			col:      NewColumn("test", "col"),
+			op:       TextOperationEndsWith,
+			value:    "value",
+			expected: "test.col LIKE '%' || $1",
+			args:     []any{"value"},
+		},
+		{
+			name:     "EndsWithIgnoreCase",
+			col:      NewColumn("test", "col"),
+			op:       TextOperationEndsWithIgnoreCase,
+			value:    "value",
+			expected: "LOWER(test.col) LIKE '%' || LOWER($1)",
+			args:     []any{"value"},
+		},
 	}
 
 	for _, tt := range tests {
