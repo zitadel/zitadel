@@ -340,7 +340,7 @@ func (o org) joinMetadata() database.QueryOption {
 	}
 
 	return database.WithLeftJoin(
-		"zitadel.org_metadata",
+		o.metadataRepo.qualifiedTableName(),
 		database.And(columns...),
 	)
 }

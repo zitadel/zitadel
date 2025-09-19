@@ -81,6 +81,7 @@ func (c lowerColumn) WriteQualified(builder *StatementBuilder) {
 }
 
 func (c lowerColumn) WriteUnqualified(builder *StatementBuilder) {
+	builder.Grow(len("lower()"))
 	builder.WriteString("LOWER(")
 	c.col.WriteUnqualified(builder)
 	builder.WriteRune(')')
