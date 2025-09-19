@@ -87,6 +87,8 @@ const (
 // QueryOpts holds the options for a query.
 // It is used to build the SQL SELECT statement.
 type QueryOpts struct {
+	// TBD(muhlemmer): Shouldn't the struct fields be private?
+
 	// Condition is the condition to filter the results.
 	// It is used to build the WHERE clause of the SQL statement.
 	Condition Condition
